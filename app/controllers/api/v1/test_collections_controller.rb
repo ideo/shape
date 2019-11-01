@@ -12,7 +12,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   end
 
   def validate_launch
-    if @test_collection.completed_and_launchable?
+    if @test_collection.valid_and_launchable?
       render json: :ok
     else
       render_api_errors @test_collection.errors
@@ -95,7 +95,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
 
   def render_test_collection
     included = Collection.default_relationships_for_api
-    included << :test_design
+    included << :test_results_collection
     render_collection(include: included)
   end
 

@@ -87,7 +87,7 @@ InlineRow.displayName = 'StyledInlineRow'
 export const StyledHeader = styled.header`
   box-sizing: border-box;
   width: 100%;
-  padding: 0 ${v.containerPadding.horizontal}rem 1.875rem;
+  padding: 0 ${v.containerPadding.horizontal}rem 0.2rem;
   position: relative; /* necessary to get above the FixedBoundary */
   // Page headers should still show up in print styles
   @media print {

@@ -19,9 +19,11 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :activities, only: %i[create]
+      resources :question_choices, only: %i[update]
       resources :collections do
         member do
           get 'in_my_collection'
+          get 'direct_children_tag_list'
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'
@@ -43,6 +45,7 @@ Rails.application.routes.draw do
             post 'unselect'
           end
         end
+        resources :collection_filters, only: %i[create update destroy]
       end
       resources :items do
         member do
@@ -58,6 +61,7 @@ Rails.application.routes.draw do
             get 'will_become_private'
           end
         end
+        resources :question_choices, only: %i[create destroy]
       end
       resources :datasets, only: %i[index show create update destroy] do
         resources :roles, only: %i[index create destroy] do
@@ -117,6 +121,7 @@ Rails.application.routes.draw do
           get 'check_payments'
           get 'my_collection'
           get 'admin_users'
+          get 'tags'
         end
 
         get 'search', to: 'search#search'
@@ -140,6 +145,12 @@ Rails.application.routes.draw do
         member do
           get 'replies'
           patch 'resolve'
+        end
+      end
+      resources :collection_filters, only: %i[update] do
+        member do
+          post 'select'
+          post 'unselect'
         end
       end
       resources :comment_threads, only: %i[index show create subscribe unsubscribe] do

@@ -168,7 +168,7 @@ class CollectionCover extends React.Component {
       (collection.isTemplated ||
         collection.isMasterTemplate ||
         collection.isSubmissionBox ||
-        collection.isTestCollectionOrTestDesign)
+        collection.isTestCollectionOrResults)
     )
   }
 
@@ -192,7 +192,7 @@ class CollectionCover extends React.Component {
         rightIcon = <TemplateIcon circled />
       } else if (collection.isSubmissionBox) {
         rightIcon = <SubmissionBoxIconLg />
-      } else if (collection.isTestCollectionOrTestDesign) {
+      } else if (collection.isTestCollectionOrResults) {
         rightIcon = <TestCollectionIcon />
       }
       return (

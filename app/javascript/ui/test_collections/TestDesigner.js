@@ -1,10 +1,12 @@
 import _ from 'lodash'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
+import { Fragment } from 'react'
 import FlipMove from 'react-flip-move'
 import pluralize from 'pluralize'
 import googleTagManager from '~/vendor/googleTagManager'
 
+import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
 import {
@@ -20,22 +22,6 @@ import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 
-// TODO: have first and last TestQuestionFlexWrapper replace BottomBorder/TopBorder
-const TopBorder = styled.div`
-  background-color: ${props => props.theme.borderColorEditing};
-  border-radius: 7px 7px 0 0;
-  height: 16px;
-  margin-left: 314px;
-  width: 374px;
-
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    display: none;
-  }
-`
-const BottomBorder = styled(TopBorder)`
-  border-radius: 0 0 7px 7px;
-`
-
 const TestQuestionFlexWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -50,8 +36,23 @@ const TestQuestionFlexWrapper = styled.div`
   }
 `
 
+const SECTIONS = ['intro', 'ideas', 'outro']
+
+const Section = styled.div`
+  border-top: 1px solid ${v.colors.black};
+  margin: 1.25rem 0 -1.25rem 0;
+  padding-top: 0.5rem;
+`
+Section.displayName = 'StyledSection'
+
+const sectionTitle = section => {
+  if (section === 'ideas') return 'Idea(s)'
+  return section
+}
+
 const OuterContainer = styled.div`
   display: flex;
+  margin-bottom: 50px;
 
   .design-column {
     flex: 1 0 0;
@@ -76,6 +77,12 @@ const OuterContainer = styled.div`
     }
   }
 `
+
+const userEditableQuestionType = questionType => {
+  return ['media', 'question_media', 'question_description'].includes(
+    questionType
+  )
+}
 
 @observer
 class TestDesigner extends React.Component {
@@ -110,6 +117,16 @@ class TestDesigner extends React.Component {
   get numResponses() {
     const { collection } = this.props
     return collection.num_survey_responses
+  }
+
+  get cardsBySection() {
+    const { collection } = this.props
+    const sections = {}
+    SECTIONS.forEach(section => (sections[section] = []))
+    collection.sortedCards.forEach(card => {
+      if (sections[card.section_type]) sections[card.section_type].push(card)
+    })
+    return sections
   }
 
   // This shows a dialog immediately
@@ -147,6 +164,10 @@ class TestDesigner extends React.Component {
     }
   }
 
+  onAddQuestionChoice = question => {
+    question.API_createQuestionChoice({})
+  }
+
   handleSelectChange = replacingCard => ev => {
     // If test is already launched, and this isn't a blank card,
     // confirm they want to change the type
@@ -169,11 +190,11 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleNew = (card, addBefore) => () => {
+  handleNew = (card, sectionType, addBefore) => () => {
     this.confirmActionIfResponsesExist({
       action: () => {
         const order = addBefore ? card.order - 0.5 : card.order + 1
-        const createdCard = this.createNewQuestionCard({ order })
+        const createdCard = this.createNewQuestionCard({ order, sectionType })
 
         if (createdCard) this.trackQuestionCreation()
       },
@@ -188,24 +209,7 @@ class TestDesigner extends React.Component {
     })
   }
 
-  archiveMediaCardsIfDefaultState() {
-    const { sortedCards } = this.props.collection
-    const [first, second, third] = sortedCards
-    // basic check to see if we are (roughly) in the default state
-    const defaultState =
-      first &&
-      second &&
-      third &&
-      first.card_question_type === 'question_media' &&
-      second.card_question_type === 'question_description' &&
-      third.card_question_type === 'question_useful' &&
-      sortedCards.length === 4
-    if (!defaultState) return false
-    // archive the media and description card when switching to testType -> collection
-    return first.API_archiveCards(_.map([first, second], 'id'))
-  }
-
-  handleTestTypeChange = e => {
+  handleTestTypeChange = async e => {
     const { collection } = this.props
     const { collectionToTest } = this.state
     const { value } = e.target
@@ -214,12 +218,12 @@ class TestDesigner extends React.Component {
       if (value === 'media') {
         collection.collection_to_test_id = null
       } else if (collectionToTest) {
-        await this.archiveMediaCardsIfDefaultState()
         collection.collection_to_test_id = collectionToTest.id
       } else {
         return
       }
-      collection.save()
+      await collection.save()
+      collection.API_fetchCards()
     })
   }
 
@@ -263,6 +267,7 @@ class TestDesigner extends React.Component {
   createNewQuestionCard = async ({
     replacingCard,
     order,
+    sectionType,
     questionType = '',
   }) => {
     const { collection } = this.props
@@ -271,6 +276,7 @@ class TestDesigner extends React.Component {
         type: ITEM_TYPES.QUESTION,
         question_type: questionType,
       },
+      section_type: replacingCard ? replacingCard.section_type : sectionType,
       order: replacingCard ? replacingCard.order : order,
       parent_id: collection.id,
     }
@@ -284,8 +290,11 @@ class TestDesigner extends React.Component {
     return card.API_create()
   }
 
-  renderHotEdge(card, addBefore = false) {
-    return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
+  renderHotEdge(card, sectionType, addBefore = false) {
+    if (!this.canEdit) return
+    return (
+      <QuestionHotEdge onAdd={this.handleNew(card, sectionType, addBefore)} />
+    )
   }
 
   renderTestTypeForm() {
@@ -335,62 +344,84 @@ class TestDesigner extends React.Component {
     )
   }
 
+  renderCard = (card, firstCard, lastCard) => {
+    const { collection } = this.props
+    const item = card.record
+    return (
+      <Fragment>
+        <QuestionSelectHolder
+          card={card}
+          canEdit={this.canEdit}
+          handleSelectChange={this.handleSelectChange}
+          handleTrash={this.handleTrash}
+          canAddChoice={item.isCustomizableQuestionType}
+          onAddChoice={this.onAddQuestionChoice}
+        />
+        <TestQuestionHolder
+          editing
+          firstCard={firstCard}
+          lastCard={lastCard}
+          userEditable={userEditableQuestionType(item.question_type)}
+        >
+          <TestQuestion
+            editing
+            parent={collection}
+            card={card}
+            item={item}
+            order={card.order}
+            canEdit={this.canEditQuestions}
+            question_choices={item.question_choices}
+          />
+        </TestQuestionHolder>
+      </Fragment>
+    )
+  }
+
+  renderSections() {
+    return _.map(this.cardsBySection, (cards, section) => (
+      <Fragment key={`section-${section}`}>
+        <Section>
+          <LargerH3 data-cy="section-title">{sectionTitle(section)}</LargerH3>
+        </Section>
+        {cards.length === 0 && (
+          <TestQuestionFlexWrapper className="card">
+            {this.renderHotEdge({ order: 0 }, section, true)}
+          </TestQuestionFlexWrapper>
+        )}
+        {cards.map((card, i) => {
+          // blank item can occur briefly while the placeholder card/item is being replaced
+          let firstCard = false
+          let lastCard = false
+          if (!card.record) return null
+          const cardCount = cards.length
+          if (i === 0) firstCard = true
+          if (i === cardCount - 1) lastCard = true
+          return (
+            <FlipMove appearAnimation="fade" key={card.id}>
+              <TestQuestionFlexWrapper className={`card ${card.id}`}>
+                {i === 0 && this.renderHotEdge(card, section, true)}
+                {this.renderCard(card, firstCard, lastCard)}
+                {card.card_question_type !== 'question_finish' &&
+                  this.renderHotEdge(card, section)}
+              </TestQuestionFlexWrapper>
+            </FlipMove>
+          )
+        })}
+      </Fragment>
+    ))
+  }
+
   render() {
     const { collection } = this.props
-    const cardCount = collection.sortedCards.length
-    const inner = collection.sortedCards.map((card, i) => {
-      let position
-      const item = card.record
-      // blank item can occur briefly while the placeholder card/item is being replaced
-      if (!item) return null
-      if (i === 0) position = 'question_beginning'
-      if (i === cardCount - 1) position = 'question_end'
-      const userEditable = [
-        'media',
-        'question_media',
-        'question_description',
-      ].includes(item.question_type)
-      return (
-        <FlipMove appearAnimation="fade" key={card.id}>
-          <TestQuestionFlexWrapper className={`card ${card.id}`}>
-            {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
-            <QuestionSelectHolder
-              card={card}
-              canEdit={this.canEdit}
-              handleSelectChange={this.handleSelectChange}
-              handleTrash={this.handleTrash}
-            />
-            <TestQuestionHolder editing userEditable={userEditable}>
-              <TestQuestion
-                editing
-                parent={collection}
-                card={card}
-                item={item}
-                position={position}
-                order={card.order}
-                canEdit={this.canEditQuestions}
-                question_choices={item.question_choices}
-              />
-            </TestQuestionHolder>
-            {this.canEdit &&
-              card.card_question_type !== 'question_finish' &&
-              this.renderHotEdge(card)}
-          </TestQuestionFlexWrapper>
-        </FlipMove>
-      )
-    })
-
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
           <div className={'design-column'}>
-            <h3>Feedback Design</h3>
-            <TopBorder />
-            {inner}
-            <BottomBorder />
+            <LargerH3>Feedback Design</LargerH3>
+            {this.renderSections()}
           </div>
           <div className={'settings-column'}>
-            <h3>Feedback Settings</h3>
+            <LargerH3>Feedback Settings</LargerH3>
             {this.renderTestTypeForm()}
             <AudienceSettings testCollection={collection} />
           </div>

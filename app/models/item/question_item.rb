@@ -32,10 +32,12 @@
 #
 # Indexes
 #
+#  index_items_on_archive_batch                        (archive_batch)
 #  index_items_on_breadcrumb                           (breadcrumb) USING gin
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
 #  index_items_on_type                                 (type)
 #
@@ -66,10 +68,6 @@ class Item
     after_create :create_question_dataset
     after_create :add_default_question_choices,
                  if: :question_choices_customizable?
-
-    after_commit :notify_test_design_of_creation,
-                 on: :create,
-                 if: :notify_test_design_collection_of_creation?
 
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
@@ -113,6 +111,7 @@ class Item
         idea_content: %i[
           question_description
           question_media
+          question_idea
         ],
         scaled_rating: %i[
           question_context
@@ -133,7 +132,12 @@ class Item
     end
 
     def self.unanswerable_question_types
-      %i[question_media question_description question_finish]
+      %i[
+        question_media
+        question_description
+        question_finish
+        question_idea
+      ]
     end
 
     def self.question_title_and_description(question_type = nil)
@@ -222,7 +226,7 @@ class Item
       (points * 100.0 / total).round
     end
 
-    def create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
+    def find_or_create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
       return if !scale_question? || test_data_item.present?
 
       legend_item ||= parent_collection.legend_item
@@ -255,7 +259,7 @@ class Item
       builder.collection_card
     end
 
-    def create_open_response_collection(parent_collection:, initiated_by:)
+    def find_or_create_open_response_collection(parent_collection:, initiated_by:)
       return if !question_open? || test_open_responses_collection.present?
 
       builder = CollectionCardBuilder.new(

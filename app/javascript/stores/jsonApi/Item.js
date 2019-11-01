@@ -74,6 +74,13 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.report_type === 'report_type_question_item'
   }
 
+  get isCustomizableQuestionType() {
+    return (
+      this.question_type === 'question_single_choice' ||
+      this.question_type === 'question_multiple_choice'
+    )
+  }
+
   get pdfCoverUrl() {
     if (!this.filestack_file) return ''
     return FilestackUpload.pdfCoverUrl(this.filestack_file.handle)
@@ -235,6 +242,21 @@ class Item extends SharedRecordMixin(BaseRecord) {
 
   API_pingCollection() {
     return this.apiStore.request(`items/${this.id}/ping_collection`)
+  }
+
+  API_createQuestionChoice(choiceData) {
+    return this.apiStore.request(
+      `items/${this.id}/question_choices/`,
+      'POST',
+      choiceData
+    )
+  }
+
+  API_destroyQuestionChoice(choice) {
+    return this.apiStore.request(
+      `items/${this.id}/question_choices/${choice.id}`,
+      'DELETE'
+    )
   }
 
   async API_persistHighlight({ commentId, delta } = {}) {

@@ -128,7 +128,7 @@ describe Api::V1::CommentThreadsController, type: :request, json: true, auth: tr
     end
   end
 
-  describe 'GET #find_by_comment', only: true do
+  describe 'GET #find_by_comment' do
     let(:record_type) { 'Item' }
     let(:record_id) { comment_thread.record_id }
     let!(:comment_thread) { create(:item_comment_thread, num_comments: 1) }

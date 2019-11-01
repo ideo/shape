@@ -14,6 +14,7 @@ import Activity from './jsonApi/Activity'
 import Audience from './jsonApi/Audience'
 import Collection from './jsonApi/Collection'
 import CollectionCard from './jsonApi/CollectionCard'
+import CollectionFilter from './jsonApi/CollectionFilter'
 import DataItemsDataset from './jsonApi/DataItemsDataset'
 import Dataset from './jsonApi/Dataset'
 import Comment from './jsonApi/Comment'
@@ -589,9 +590,10 @@ class ApiStore extends jsonapi(datxCollection) {
       }
     )
     if (undoable) {
+      const snapshot = collection.toJsonApiWithCards()
       this.undoStore.pushUndoAction({
         message: 'Delete undone',
-        apiCall: () => this.unarchiveCards({ cardIds, collection }),
+        apiCall: () => this.unarchiveCards({ cardIds, collection, snapshot }),
         redirectPath: { type: 'collections', id: collection.id },
         redoAction: {
           message: 'Delete redone',
@@ -605,11 +607,16 @@ class ApiStore extends jsonapi(datxCollection) {
     return archiveResult
   }
 
-  async unarchiveCards({ cardIds, collection, undoable = true }) {
-    const snapshot = collection.toJsonApiWithCards()
+  async unarchiveCards({
+    cardIds,
+    collection,
+    snapshot = null,
+    undoable = true,
+  }) {
+    const collection_snapshot = snapshot || collection.toJsonApiWithCards()
     const res = await this.request('collection_cards/unarchive', 'PATCH', {
       card_ids: cardIds,
-      collection_snapshot: snapshot,
+      collection_snapshot,
     })
 
     if (undoable) {
@@ -841,6 +848,7 @@ ApiStore.types = [
   Audience,
   Collection,
   CollectionCard,
+  CollectionFilter,
   Comment,
   CommentThread,
   Dataset,

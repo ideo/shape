@@ -39,11 +39,7 @@ FactoryBot.define do
       end
     end
 
-    factory :test_design, class: Collection::TestDesign do
-      transient do
-        record_type :question
-      end
-    end
+    factory :test_results_collection, class: Collection::TestResultsCollection
     factory :test_collection, class: Collection::TestCollection do
       transient do
         record_type :question
@@ -52,7 +48,7 @@ FactoryBot.define do
 
       trait :answerable_questions do
         after(:create) do |collection|
-          collection.prelaunch_question_items.each do |item|
+          collection.question_items.each do |item|
             item.update(question_type: :question_context)
           end
         end
@@ -60,7 +56,7 @@ FactoryBot.define do
 
       trait :open_response_questions do
         after(:create) do |collection|
-          collection.prelaunch_question_items.each_with_index do |item, index|
+          collection.question_items.each_with_index do |item, index|
             item.update(question_type: :question_open, content: "Item #{index}")
           end
         end
@@ -81,16 +77,34 @@ FactoryBot.define do
         end
       end
 
+      trait :launched do
+        after(:create) do |collection|
+          collection.create_test_results_collection(
+            name: collection.name,
+            organization: collection.organization,
+            created_by: collection.created_by,
+            roles_anchor_collection: collection.roles_anchor,
+          )
+          # do this after_create so that it doesn't get confused when creating questions
+          collection.update(test_status: :live)
+        end
+      end
+
       trait :completed do
         after(:create) do |collection|
-          media_question = collection.prelaunch_question_items.detect(&:question_media?)
+          category_satisfaction_question = collection.question_items.detect(&:question_category_satisfaction?)
+          category_satisfaction_question&.update(content: 'solutions')
+          collection.question_items.select(&:question_open?).each do |open_response|
+            open_response.update(content: 'What do you think?')
+          end
+          media_question = collection.question_items.detect(&:question_media?)
           media_question&.update(
             type: 'Item::VideoItem',
             url: 'something',
             thumbnail_url: 'something',
             question_type: nil,
           )
-          description_question = collection.prelaunch_question_items.detect(&:question_description?)
+          description_question = collection.question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
         end
       end
@@ -141,11 +155,13 @@ FactoryBot.define do
         end
       end
 
-      if evaluator.parent_collection
+      parent_collection = evaluator.parent_collection
+      parent_collection ||= create(:collection) if collection.is_a?(Collection::TestCollection)
+      if parent_collection
         collection.parent_collection_card = build(
           :collection_card,
-          parent: evaluator.parent_collection,
-          order: evaluator.parent_collection.collection_cards.count,
+          parent: parent_collection,
+          order: parent_collection.collection_cards.count,
           width: 1,
           height: 1,
           pinned: evaluator.pin_cards,

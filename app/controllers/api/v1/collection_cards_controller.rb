@@ -200,6 +200,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_collection_cards
     filter_params = params[:filter].present? ? params[:filter] : params
+    filter_params.merge(q: params[:q]) if params[:q].present?
     @collection_cards = CollectionCardFilter
                         .call(
                           collection: @collection,
@@ -360,15 +361,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :filter,
       :show_replace,
       :order,
+      :section_type,
     )
   end
 
   def collection_snapshot_params
-    return {} if json_api_params[:collection_snapshot].nil?
+    attrs = json_api_params[:collection_snapshot].try(:[], :attributes)
+    return {} if attrs.nil?
 
-    json_api_params[:collection_snapshot].permit(:attributes).permit(
-      collection_cards_attributes: %i[id order width height row col],
-    )
+    attrs.permit(collection_cards_attributes: %i[id order width height row col])
   end
 
   def collection_card_nested_attributes
@@ -456,6 +457,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       hidden
       show_replace
       card_type
+      section_type
     ]
     # Allow pinning, replacing if this is an application/bot user
     attrs << :pinned if current_application.present?

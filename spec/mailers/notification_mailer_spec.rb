@@ -29,8 +29,7 @@ RSpec.describe NotificationMailer, type: :mailer do
 
       it 'renders the body' do
         expect(mail.body.encoded).to match(
-          'Your collaborators and teammates have updates for you. ' \
-          "Check out what's been going on since you've been gone!",
+          'Your collaborators and teammates have updates for you.'
         )
       end
 

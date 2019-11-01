@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-autosize-textarea'
 
+import { SmallHelperText } from '~/ui/global/styled/typography'
 import { StyledCommentTextarea } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
 
@@ -40,6 +41,7 @@ QuestionText.defaultProps = {
 }
 
 export const TextInputHolder = styled(StyledCommentTextarea)`
+  position: relative;
   color: white;
   padding: 6px;
   width: calc(100% - 12px);
@@ -59,15 +61,45 @@ export const TextResponseHolder = styled(StyledCommentTextarea)`
 `
 
 export const TextInput = styled(TextareaAutosize)`
-  color: ${props => props.theme[props.type]};
-  font-family: ${v.fonts.sans} !important;
-  width: calc(100% - 20px);
+  && {
+    border: 0;
+    color: ${props => props.theme[props.type]};
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    margin: -1px 2px -4px 5px;
+    padding: 2px 3px;
+    width: calc(100% - 20px);
 
-  ::placeholder {
-    color: ${props => props.theme[props.type]} !important;
-    opacity: 1;
+    &:focus {
+      outline: 0;
+    }
+
+    ::placeholder {
+      color: ${props => props.theme.placeholder} !important;
+    }
+
+    ${props =>
+      props.inverse &&
+      `
+      background-color: rgba(255, 255, 255, 0);
+      color: ${v.colors.white};
+
+      &::placeholder {
+        color: ${v.colors.white};
+        opacity: 0.5;
+      }
+    `}
+
+    ${props =>
+      props.inline &&
+      `
+      background: none;
+      display: inline-block;
+      resize: none;
+      vertical-align: text-bottom;
+      width: auto;
+    `}
   }
-}
 `
 TextInput.displayName = 'TextInput'
 
@@ -77,8 +109,7 @@ export const SingleLineInput = styled.input`
   width: calc(100% - 20px);
 
   ::placeholder {
-    color: ${props => props.theme[props.type]} !important;
-    opacity: 1;
+    color: ${props => props.theme.placeholder} !important;
   }
 `
 
@@ -90,13 +121,28 @@ export const TestQuestionHolder = styled.div`
   border-color: ${props =>
     props.editing ? props.theme.borderColorEditing : props.theme.borderColor};
   border-bottom-width: 0;
-  border-left-width: ${props => (props.editing ? '20px' : '0')};
-  border-right-width: ${props => (props.editing ? '20px' : '0')};
+  border-left-width: ${props => (props.editing ? '10px' : '0')};
+  border-right-width: ${props => (props.editing ? '10px' : '0')};
   border-style: solid;
   border-top-width: ${props => (props.editing ? '10px' : 0)};
   margin-bottom: ${props => (props.editing ? 0 : '10px')};
   width: ${props => (props.editing ? '334px' : '100%')};
 
+  ${props =>
+    props.editing &&
+    props.firstCard &&
+    `
+    border-top-right-radius: 7px;
+    border-top-left-radius: 7px;
+  `}
+  ${props =>
+    props.editing &&
+    props.lastCard &&
+    `
+    border-bottom-width: 10px;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+  `}
   /* this responsive resize only factors into the edit state */
   ${props =>
     props.editing &&
@@ -107,21 +153,20 @@ export const TestQuestionHolder = styled.div`
       margin-left: 22px;
       margin-right: 28px;
     }
-  `} &:last {
-    margin-bottom: 0;
-  }
+  `}
 `
 
 export const styledTestTheme = (themeName = 'primary') => {
   // primary theme used for TestType == Media (non-collection test w/ image/video)
   if (themeName === 'primary') {
     return {
-      backgroundColor: v.colors.primaryDark,
+      backgroundColor: v.colors.primaryDarkest,
       borderColor: v.colors.primaryMedium,
-      borderColorEditing: v.colors.commonMedium,
-      backgroundColorEditable: v.colors.primaryMedium,
+      borderColorEditing: v.colors.primaryMedium,
+      backgroundColorEditable: v.colors.secondaryMedium,
       responseHolder: v.colors.commonLightest,
       descriptionText: v.colors.commonLightest,
+      placeholder: v.colors.primaryMedium,
       questionText: v.colors.primaryDark,
     }
   }
@@ -134,8 +179,14 @@ export const styledTestTheme = (themeName = 'primary') => {
     responseHolder: v.colors.secondaryLight,
     questionText: v.colors.commonLightest,
     descriptionText: v.colors.commonLightest,
+    placeholder: v.colors.commonMediumTint,
   }
 }
+
+export const QuestionHelperText = styled(SmallHelperText)`
+  color: ${props => props.theme.placeholder};
+  display: ${props => (props.block ? 'block' : 'inline')};
+`
 
 export const TextEnterButton = styled.button`
   bottom: 14px;

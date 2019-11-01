@@ -2,14 +2,12 @@ require 'rails_helper'
 
 RSpec.describe NotifyFeedbackCompletedWorker, type: :worker do
   describe '#perform' do
-    let(:test_collection) { create(:test_collection) }
+    let(:test_collection) { create(:test_collection, add_editors: [editor, group]) }
     let(:editor) { create(:user) }
     let(:group_editor) { create(:user) }
     let(:group) { create(:group, add_admins: [group_editor]) }
 
     before do
-      editor.add_role(Role::EDITOR, test_collection)
-      group.add_role(Role::EDITOR, test_collection)
       allow(TestCollectionMailer).to receive(:notify_closed).and_call_original
     end
 

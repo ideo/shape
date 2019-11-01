@@ -16,4 +16,8 @@ class QuestionChoice < ApplicationRecord
   belongs_to :question,
              class_name: 'Item::QuestionItem',
              foreign_key: 'question_item_id'
+
+  delegate :can_edit?,
+           :can_view?,
+           to: :question
 end

@@ -4,13 +4,13 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 
 import ArrowIcon from '~/ui/icons/ArrowIcon'
-import DescriptionQuestion from './DescriptionQuestion'
+import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 import {
   QuestionText,
   TextResponseHolder,
   TextInput,
   TextEnterButton,
-} from './shared'
+} from '~/ui/test_collections/shared'
 
 const QuestionSpacing = css`
   border-bottom-color: ${props =>
@@ -74,11 +74,12 @@ class OpenQuestion extends React.Component {
     if (editing) {
       content = (
         <QuestionSpacingContainer editing={editing}>
-          <DescriptionQuestion
+          <QuestionContentEditor
             item={item}
             maxLength={100}
-            placeholder="this question is optional"
+            placeholder="please enter question here"
             canEdit={canEdit}
+            optional
           />
         </QuestionSpacingContainer>
       )
@@ -103,7 +104,7 @@ class OpenQuestion extends React.Component {
               onBlur={() => this.setState({ focused: false })}
               value={this.state.response}
               type="questionText"
-              placeholder="this question is optional"
+              placeholder="please enter your response"
               disabled={editing}
               data-cy="OpenQuestionTextInput"
             />

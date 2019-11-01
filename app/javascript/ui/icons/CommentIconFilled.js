@@ -32,7 +32,16 @@ const CommentIconFilled = ({ text, textColor } = {}) => (
       <g mask="url(#mask0)">
         <rect x="-8" y="-7" width="30" height="30" />
       </g>
-      <text textAnchor="middle" x="50%" y="42%" dominantBaseline="middle">
+      <text
+        textAnchor="middle"
+        x="50%"
+        y="50%"
+        dy="0.17em"
+        fontSize=".45em"
+        fill="#f2f1ee" // IE11 wants this to be specified
+        fontFamily="Gotham"
+        fontWeight="500"
+      >
         {text}
       </text>
     </svg>{' '}

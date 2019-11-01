@@ -1,15 +1,14 @@
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
-import AutosizeInput from 'react-input-autosize'
-
 import { debounce } from 'lodash'
-import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
-import v from '~/utils/variables'
-import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, runInAction } from 'mobx'
+import styled from 'styled-components'
+
 import ArrowIcon from '../icons/ArrowIcon'
-import { TextEnterButton, TextResponseHolder } from './shared'
-import { runInAction } from 'mobx'
+import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
+import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
+import { TextInput, TextEnterButton, TextResponseHolder } from './shared'
+import v from '~/utils/variables'
 
 const Question = styled.div`
   border-color: ${props =>
@@ -33,27 +32,11 @@ const Question = styled.div`
 `
 Question.displayName = 'Question'
 
-const EditableInput = styled(AutosizeInput)`
-  input {
-    background-color: rgba(255, 255, 255, 0);
-    border: 0;
-    color: white;
-    padding: 2px 3px;
-    margin: -1px 2px -1px 5px;
-    font-size: 16px;
-    font-family: ${v.fonts.sans};
-    font-size: 1rem;
-    color: ${v.colors.white};
-    &:focus {
-      outline: 0;
-    }
-    &::placeholder {
-      color: ${v.colors.white};
-      opacity: 0.5;
-    }
-  }
+const EditableInputHolder = styled(TextResponseHolder)`
+  background-color: rgba(255, 255, 255, 0);
+  padding: 0;
 `
-EditableInput.displayName = 'EditableInput'
+EditableInputHolder.displayName = 'EditableInputHolder'
 
 const ChoicesHolder = styled.div`
   background-color: ${props => props.theme.responseHolder};
@@ -171,6 +154,19 @@ class CustomizableQuestion extends React.Component {
     if (event.key === 'Enter') this.stopEditingIfContent()
   }
 
+  handleCreateChoice = () => {
+    const { question, editing } = this.props
+    if (!editing) return
+    question.API_createQuestionChoice({})
+  }
+
+  @action
+  onDeleteChoice = choice => {
+    const { question, editing } = this.props
+    if (!editing) return
+    question.API_destroyQuestionChoice(choice)
+  }
+
   startEditing = () => {
     this.setState({ editing: true })
   }
@@ -194,16 +190,20 @@ class CustomizableQuestion extends React.Component {
     return (
       <Question editing={editing}>
         <DisplayText color={v.colors.white}>
-          <EditableInput
-            type="text"
-            placeholder="write question here"
-            value={questionContent}
-            onChange={this.handleInputChange}
-            onKeyPress={this.handleKeyPress}
-            onBlur={this.stopEditingIfContent}
-          />
+          <EditableInputHolder>
+            <TextInput
+              onChange={this.handleInputChange}
+              onKeyPress={this.handleKeyPress}
+              onBlur={this.stopEditingIfContent}
+              value={questionContent}
+              type="questionText"
+              placeholder="write question here"
+              data-cy="CustomizableQuestionTextInput"
+              disabled={!editing}
+              inverse
+            />
+          </EditableInputHolder>
         </DisplayText>
-        <br />
         <SmallHelperText
           color={v.colors.white}
           style={{ marginLeft: '8px', opacity: '0.5' }}
@@ -225,25 +225,28 @@ class CustomizableQuestion extends React.Component {
       <div style={{ width: '100%' }}>
         {this.question}
         <ChoicesHolder>
-          {question_choices.map((choice, index) => (
-            <CustomizableQuestionChoice
-              disabled={editing}
-              isChecked={this.isChoiceSelected(choice)}
-              choice={choice}
-              questionType={question_type}
-              questionAnswer={questionAnswer}
-              onChange={this.handleAnswerSelection(choice)}
-              key={`question-${question.id}-choice-${index}`}
-            />
-          ))}
+          {question_choices
+            .sort((ca, cb) => ca.order - cb.order)
+            .map((choice, index) => (
+              <CustomizableQuestionChoice
+                isChecked={this.isChoiceSelected(choice)}
+                choice={choice}
+                questionType={question_type}
+                questionAnswer={questionAnswer}
+                onChange={this.handleAnswerSelection(choice)}
+                key={`question-${question.id}-choice-${index}`}
+                editing={editing}
+                onDelete={this.onDeleteChoice}
+              />
+            ))}
         </ChoicesHolder>
-        <TextResponseHolder>
-          {!this.isSingleChoiceQuestion && !this.state.hasSubmittedAnswer && (
+        {!this.isSingleChoiceQuestion && !this.state.hasSubmittedAnswer && (
+          <TextResponseHolder style={{ padding: '20px' }}>
             <TextEnterButton onClick={this.submitAnswer}>
               <ArrowIcon rotation={90} />
             </TextEnterButton>
-          )}
-        </TextResponseHolder>
+          </TextResponseHolder>
+        )}
       </div>
     )
   }

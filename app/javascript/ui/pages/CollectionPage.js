@@ -501,7 +501,7 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox, requiresTestDesigner } = collection
+    const { isSubmissionBox, isTestCollection } = collection
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
@@ -517,7 +517,7 @@ class CollectionPage extends React.Component {
           cardIdMenuOpen={cardMenuOpen.id}
         />
       )
-    } else if (requiresTestDesigner) {
+    } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {
       inner = (

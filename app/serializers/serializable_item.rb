@@ -28,10 +28,14 @@ class SerializableItem < BaseJsonSerializer
     end
   end
 
-  has_many :question_choices
+  has_many :question_choices do
+    @object.try(:question_choices)
+  end
+
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source
+  belongs_to :filestack_file
   has_many :comments
 
   attribute :tag_list do
@@ -66,8 +70,6 @@ class SerializableItem < BaseJsonSerializer
   attribute :has_replaced_media do
     @object.replaced_media?
   end
-
-  belongs_to :filestack_file
 
   attribute :breadcrumb, if: -> { @object == @current_record || @force_breadcrumbs } do
     Breadcrumb::ForUser.new(
