@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_18_203725) do
+ActiveRecord::Schema.define(version: 2019_10_30_230157) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -123,12 +123,22 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.boolean "show_replace", default: true
     t.integer "row"
     t.integer "col"
+    t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
     t.index ["templated_from_id"], name: "index_collection_cards_on_templated_from_id"
     t.index ["type"], name: "index_collection_cards_on_type"
+  end
+
+  create_table "collection_filters", force: :cascade do |t|
+    t.integer "filter_type"
+    t.string "text"
+    t.bigint "collection_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_id"], name: "index_collection_filters_on_collection_id"
   end
 
   create_table "collection_translations", force: :cascade do |t|
@@ -178,6 +188,7 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.bigint "joinable_group_id"
     t.datetime "test_closed_at"
     t.integer "default_group_id"
+    t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
@@ -392,6 +403,7 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.string "network_id"
     t.integer "created_by_id"
     t.integer "application_id"
+    t.index ["archive_batch"], name: "index_groups_on_archive_batch"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["network_id"], name: "index_groups_on_network_id"
@@ -454,6 +466,7 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.integer "legend_item_id"
     t.integer "legend_search_source"
     t.jsonb "style"
+    t.index ["archive_batch"], name: "index_items_on_archive_batch"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
@@ -589,6 +602,7 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
   create_table "tags", id: :serial, force: :cascade do |t|
     t.string "name"
     t.integer "taggings_count", default: 0
+    t.jsonb "organization_ids", default: []
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
@@ -616,6 +630,16 @@ ActiveRecord::Schema.define(version: 2019_10_18_203725) do
     t.datetime "closed_at"
     t.index ["audience_id"], name: "index_test_audiences_on_audience_id"
     t.index ["test_collection_id"], name: "index_test_audiences_on_test_collection_id"
+  end
+
+  create_table "user_collection_filters", force: :cascade do |t|
+    t.boolean "selected", default: true
+    t.bigint "collection_filter_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["collection_filter_id"], name: "index_user_collection_filters_on_collection_filter_id"
+    t.index ["user_id"], name: "index_user_collection_filters_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|

@@ -3,8 +3,7 @@ import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import CloseIcon from '~/ui/icons/CloseIcon'
-import { Pill } from '~/ui/global/styled/forms'
+import Pill from '~/ui/global/Pill'
 import Avatar from '~/ui/global/Avatar'
 
 const ChipHolder = styled.div`
@@ -14,16 +13,13 @@ const ChipHolder = styled.div`
 `
 ChipHolder.displayName = 'StyledChipHolder'
 
-// Holder needs extra specificity to not be overridden by material ui (&&)
-const IconHolder = styled.span`
+const PillIconHolder = styled.span`
   && {
-    width: 9px;
-    height: 20px;
-    margin-left: 0px;
-    margin-bottom: 2px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
   }
 `
-IconHolder.displayName = 'StyledIconHolder'
 
 @observer
 class PillList extends React.Component {
@@ -41,26 +37,27 @@ class PillList extends React.Component {
             avatar = (
               <Avatar
                 className="avatar"
-                size={38}
+                size={26}
                 title={item.name}
                 url={item.pic_url_square}
               />
             )
           }
+          if (item.icon) {
+            avatar = <PillIconHolder>{item.icon}</PillIconHolder>
+          }
 
           // This could be a user, a group or an unregistered user
           return (
             <Pill
-              className="pill"
               key={item.name || item.id || item.email}
-              avatar={avatar}
+              symbol={avatar}
               label={item.name}
+              id={item.id}
               onDelete={this.handleDelete(item)}
-              deleteIcon={
-                <IconHolder>
-                  <CloseIcon />
-                </IconHolder>
-              }
+              selectable={item.selectable}
+              selected={item.selected}
+              onSelect={item.onSelect}
             />
           )
         })}

@@ -9,9 +9,10 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
-import CardMoveService from '~/ui/grid/CardMoveService'
 import BaseRecord from './BaseRecord'
+import CardMoveService from '~/ui/grid/CardMoveService'
 import CollectionCard from './CollectionCard'
+import CollectionFilter from './CollectionFilter'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
@@ -255,6 +256,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return true
   }
 
+  get isRegularCollection() {
+    return this.type === 'Collection' && !this.isBoard
+  }
+
   get isUserCollection() {
     return this.type === 'Collection::UserCollection'
   }
@@ -476,6 +481,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  get collectionFilterQuery() {
+    const activeFilters = this.collection_filters
+      .filter(filter => filter.selected)
+      .map(filter =>
+        filter.filter_type === 'tag' ? `#${filter.text}` : filter.text
+      )
+    if (activeFilters.length === 0) return {}
+    return { q: activeFilters.join(' ') }
+  }
+
   async API_fetchCards({
     page = 1,
     per_page = null,
@@ -491,6 +506,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       page,
       per_page,
     }
+    Object.assign(params, this.collectionFilterQuery)
     if (!params.per_page) {
       // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
       params.per_page = this.recordsPerPage
@@ -662,6 +678,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       onCancel,
       onConfirm: performUpdate,
     })
+  }
+
+  API_createCollectionFilter(params) {
+    return this.apiStore.request(
+      `collections/${this.id}/collection_filters/`,
+      'POST',
+      {
+        ...params,
+      }
+    )
+  }
+
+  API_destroyCollectionFilter(filter) {
+    return this.apiStore.request(
+      `collections/${this.id}/collection_filters/${filter.id}`,
+      'DELETE'
+    )
   }
 
   API_selectDatasetsWithIdentifier({ identifier }) {
@@ -1039,6 +1072,11 @@ Collection.refDefaults = {
   },
   test_audiences: {
     model: TestAudience,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
+  collection_filters: {
+    model: CollectionFilter,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
   },

@@ -28,6 +28,7 @@
 #
 # Indexes
 #
+#  index_collection_cards_on_archive_batch          (archive_batch)
 #  index_collection_cards_on_collection_id          (collection_id)
 #  index_collection_cards_on_item_id                (item_id)
 #  index_collection_cards_on_order_and_row_and_col  (order,row,col)
@@ -332,6 +333,14 @@ class CollectionCard < ApplicationRecord
       parent.touch
     end
     record.try(:remove_comment_followers!)
+
+    if collection.present? &&
+       collection.is_a?(Collection::TestCollection) &&
+       collection.inside_a_submission_box_template? &&
+       collection.live?
+      # close the submission template test if you archive it
+      collection.close!
+    end
   end
 
   # gets called by child STI classes

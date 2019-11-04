@@ -28,6 +28,7 @@
 #
 # Indexes
 #
+#  index_collection_cards_on_archive_batch          (archive_batch)
 #  index_collection_cards_on_collection_id          (collection_id)
 #  index_collection_cards_on_item_id                (item_id)
 #  index_collection_cards_on_order_and_row_and_col  (order,row,col)

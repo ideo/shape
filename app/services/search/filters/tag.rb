@@ -1,7 +1,8 @@
 class Search
   module Filters
     class Tag < Base
-      REGEXP = /#\w+/.freeze
+      # [:word] should work for UTF-8 e.g. CJK characters
+      REGEXP = /#[[:word:]\-_]+/.freeze
 
       def options
         tags = @query.scan(REGEXP).flatten.map { |tag| tag.delete('#') }
