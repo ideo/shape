@@ -200,7 +200,7 @@ class CustomizableQuestion extends React.Component {
               placeholder="write question here"
               data-cy="CustomizableQuestionTextInput"
               disabled={!editing}
-              inverse
+              inverse="true"
             />
           </EditableInputHolder>
         </DisplayText>

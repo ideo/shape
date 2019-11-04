@@ -92,7 +92,7 @@ class CustomizableQuestionChoice extends React.Component {
               placeholder="write question here"
               data-cy="CustomizableQuestionTextInput"
               disabled={!editing}
-              inline
+              inline="true"
             />
           </DisplayText>
         </label>
