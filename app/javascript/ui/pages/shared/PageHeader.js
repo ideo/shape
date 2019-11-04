@@ -8,6 +8,7 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import HiddenIconButton from '~/ui/icons/HiddenIconButton'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
@@ -102,6 +103,11 @@ class PageHeader extends React.Component {
     ev.preventDefault()
     const { record } = this.props
     record.restore()
+  }
+
+  handleFilterClick = ev => {
+    ev.preventDefault()
+    console.log('filter click')
   }
 
   openMoveMenuForTemplate = e => {
@@ -364,10 +370,14 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     return (
-      <StyledHeader pageHeader data-empty-space-click>
+      <StyledHeader
+        pageHeader
+        data-empty-space-click
+        bottomPadding={record.isCollection ? 0.2 : 1.875}
+      >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          <div>
+          <div style={{ minHeight: '72px' }}>
             <StyledTitleAndRoles
               data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -411,12 +421,20 @@ class PageHeader extends React.Component {
 
               {record.show_language_selector && (
                 <Flex
-                  style={{ position: 'relative', top: '15px', height: '33px' }}
+                  style={{
+                    position: 'relative',
+                    top: '22px',
+                    right: '60px',
+                    height: '33px',
+                  }}
                 >
                   <LanguageSelector />
                 </Flex>
               )}
             </StyledTitleAndRoles>
+            {(record.isRegularCollection || record.isSubmissionsCollection) && (
+              <CollectionFilter collection={record} canEdit={this.canEdit} />
+            )}
           </div>
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal

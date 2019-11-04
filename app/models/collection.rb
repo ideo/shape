@@ -41,6 +41,7 @@
 #
 # Indexes
 #
+#  index_collections_on_archive_batch               (archive_batch)
 #  index_collections_on_breadcrumb                  (breadcrumb) USING gin
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
@@ -175,6 +176,7 @@ class Collection < ApplicationRecord
            source: :item,
            class_name: 'Item::DataItem',
            through: :primary_collection_cards
+  has_many :collection_filters
 
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
@@ -252,6 +254,7 @@ class Collection < ApplicationRecord
       organization_id: organization_id,
       user_ids: search_user_ids,
       group_ids: search_group_ids,
+      parent_id: parent&.id,
       parent_ids: parent_ids,
       activity_dates: activity_dates.empty? ? nil : activity_dates,
       created_at: created_at,
@@ -305,6 +308,7 @@ class Collection < ApplicationRecord
       :collection_cover_items,
       :test_audiences,
       :restorable_parent,
+      :collection_filters,
       roles: %i[pending_users users groups resource],
     ]
   end

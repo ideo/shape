@@ -140,10 +140,6 @@ module Resourceable
     roles_anchor.roles
   end
 
-  def item_or_collection?
-    is_a?(Item) || is_a?(Collection)
-  end
-
   def can_edit?(user_or_group)
     return true if user_or_group.has_cached_role?(Role::SUPER_ADMIN)
 
@@ -333,6 +329,20 @@ module Resourceable
   def common_viewable?
     # `common_viewable` comes from cached_attributes
     roles_anchor.try(:common_viewable)
+  end
+
+  # these are defined here so that all resourceable types can return true/false
+  # for being an Item or Collection
+  def item_or_collection?
+    item? || collection?
+  end
+
+  def item?
+    is_a?(Item)
+  end
+
+  def collection?
+    is_a?(Collection)
   end
 
   private

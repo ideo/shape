@@ -6,6 +6,7 @@ import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 
 const CommentIconWrapper = styled.div`
   color: ${v.colors.alert};
+  height: 18px;
   width: 18px;
   svg {
     height: ${props => (props.size === 'small' ? 100 : 120)}%;
@@ -19,7 +20,7 @@ const UnresolvedCount = ({ count, size }) => {
 
   return (
     <CommentIconWrapper size={size}>
-      <CommentIconFilled text={unreadText} textColor={v.colors.white} />
+      <CommentIconFilled text={unreadText} />
     </CommentIconWrapper>
   )
 }

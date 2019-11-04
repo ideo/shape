@@ -32,6 +32,7 @@
 #
 # Indexes
 #
+#  index_items_on_archive_batch                        (archive_batch)
 #  index_items_on_breadcrumb                           (breadcrumb) USING gin
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
@@ -167,6 +168,7 @@ class Item < ApplicationRecord
       content: search_content,
       # NOTE: could change this back to defer to parent if we ever remove item roles
       user_ids: search_user_ids,
+      parent_id: parent&.id,
       group_ids: search_group_ids,
       organization_id: organization_id,
       archived: archived,
