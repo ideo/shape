@@ -97,7 +97,7 @@ FactoryBot.define do
           collection.question_items.select(&:question_open?).each do |open_response|
             open_response.update(content: 'What do you think?')
           end
-          idea_question = collection.question_items.detect(&:question_idea?)
+          idea_question = collection.ideas_collection.items.find(&:question_idea?)
           idea_question&.update(
             type: 'Item::VideoItem',
             name: 'Video',

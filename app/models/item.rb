@@ -337,6 +337,11 @@ class Item < ApplicationRecord
 
   def quill_data; end
 
+  # So that regular items can respond when working with test collection media items
+  def scale_question?
+    false
+  end
+
   def question_item_incomplete?
     return true if (
       question_category_satisfaction? || question_description? || question_open?

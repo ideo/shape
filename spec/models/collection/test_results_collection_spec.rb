@@ -30,6 +30,7 @@ describe Collection::TestResultsCollection, type: :model do
       end
 
       it 'creates a media item link for each idea' do
+        launch
         expect(
           test_results_collection
             .items
@@ -44,7 +45,7 @@ describe Collection::TestResultsCollection, type: :model do
       end
 
       context 'with open response questions' do
-        let!(:test_collection) { create(:test_collection, :open_response_questions, parent_collection: parent_collection) }
+        let!(:test_collection) { create(:test_collection, :completed, :open_response_questions, parent_collection: parent_collection) }
 
         it 'creates a TestOpenResponse collection for each item' do
           count = test_collection.question_items.size
