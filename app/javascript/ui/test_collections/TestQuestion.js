@@ -92,6 +92,7 @@ class TestQuestion extends React.Component {
       surveyResponse,
       numberOfQuestions,
       apiStore,
+      hideMedia,
     } = this.props
     const { record } = card
 
@@ -113,7 +114,14 @@ class TestQuestion extends React.Component {
       case 'question_media':
         return <MediaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_idea':
-        return <IdeaQuestion card={card} parent={parent} canEdit={canEdit} />
+        return (
+          <IdeaQuestion
+            card={card}
+            parent={parent}
+            canEdit={canEdit}
+            hideMedia={hideMedia}
+          />
+        )
       case 'question_description':
         if (editing) {
           return (
@@ -212,6 +220,7 @@ TestQuestion.propTypes = {
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
   numberOfQuestions: PropTypes.number,
+  hideMedia: PropTypes.bool,
 }
 TestQuestion.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -224,6 +233,7 @@ TestQuestion.defaultProps = {
   afterQuestionAnswered: null,
   canEdit: false,
   numberOfQuestions: null,
+  hideMedia: false,
 }
 
 TestQuestion.displayName = 'TestQuestion'

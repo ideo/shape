@@ -29,6 +29,20 @@ describe Collection::TestResultsCollection, type: :model do
         ).to eq(count)
       end
 
+      it 'creates a media item link for each idea' do
+        expect(
+          test_results_collection
+            .items
+            .where(type: 'Item::LinkItem')
+            .size,
+        ).to equal(
+          test_collection
+            .items
+            .where(question_type: :question_media)
+            .size,
+        )
+      end
+
       context 'with open response questions' do
         let!(:test_collection) { create(:test_collection, :open_response_questions, parent_collection: parent_collection) }
 

@@ -368,7 +368,7 @@ class Item < ApplicationRecord
     elsif question_media?
       'an image or video'
     elsif question_idea?
-      'your idea content'
+      'your content'
     end
   end
 

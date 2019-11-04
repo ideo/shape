@@ -211,7 +211,6 @@ class TestDesigner extends React.Component {
   }
 
   handleSetCurrentIdeaCardIndex = index => {
-    console.log('set currentIdeaCardIndex', index)
     this.setState({
       currentIdeaCardIndex: index,
     })
@@ -407,6 +406,7 @@ class TestDesigner extends React.Component {
         >
           <TestQuestion
             editing
+            hideMedia={!collection.test_show_media}
             parent={questionParent}
             card={questionCard}
             order={questionCard.order}

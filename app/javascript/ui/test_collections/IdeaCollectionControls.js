@@ -79,6 +79,11 @@ class IdeaCollectionControls extends React.Component {
     })
   }
 
+  get canDelete() {
+    const { canEdit } = this.props
+    return canEdit && this.numIdeas > 1
+  }
+
   get ideaCards() {
     const {
       collection: { sortedCards },
@@ -98,7 +103,6 @@ class IdeaCollectionControls extends React.Component {
   render() {
     const {
       handleTrash,
-      canEdit,
       showMedia,
       handleToggleShowMedia,
       currentIdeaCardIndex,
@@ -127,7 +131,7 @@ class IdeaCollectionControls extends React.Component {
           >
             <ChevronRightIcon />
           </ChevronCircleWrapper>
-          {canEdit && (
+          {this.canDelete && (
             <TrashButton onClick={() => handleTrash(this.currentIdea)}>
               <TrashIcon />
             </TrashButton>

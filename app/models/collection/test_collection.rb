@@ -267,15 +267,10 @@ class Collection
       return true if incomplete_items.blank?
 
       incomplete_items.each do |item|
-        question_card_number = if item.question_idea?
-                                 collection_cards.ideas_collection_card.first.order
-                               else
-                                 item.parent_collection_card.order
-                               end
-        errors.add(
-          :base,
-          "Please add #{item.incomplete_description} to question #{question_card_number + 1}",
-        )
+        msg = "Please add #{item.incomplete_description} to "
+        msg += item.question_idea? ? 'idea' : 'question'
+        msg += " #{item.parent_collection_card.order + 1}"
+        errors.add(:base, msg)
       end
 
       false
@@ -445,11 +440,11 @@ class Collection
     end
 
     def incomplete_question_items
-      incomplete_items = question_items.joins(
+      incomplete_items = idea_cards.joins(
         :parent_collection_card,
       ).select(&:question_item_incomplete?)
 
-      incomplete_items += idea_cards.joins(
+      incomplete_items += question_items.joins(
         :parent_collection_card,
       ).select(&:question_item_incomplete?)
 

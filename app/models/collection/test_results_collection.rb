@@ -77,6 +77,7 @@ class Collection
              :link_sharing?,
              :test_audiences,
              :question_items,
+             :ideas_collection,
              to: :test_collection
 
     # TODO: revisit what should happen when you archive results or the test
@@ -142,7 +143,10 @@ class Collection
     end
 
     def create_media_item_link(media_question_items: nil)
-      media_question_items ||= test_collection.items.reject { |i| i.type == 'Item::QuestionItem' }
+      if media_question_items.blank?
+        items = test_collection.items + ideas_collection.items
+        media_question_items = items.reject { |item| item.type == 'Item::QuestionItem' }
+      end
       # since we're placing things at the front one by one, we reverse the order
       media_question_items.reverse.map do |media_item|
         next unless media_item.cards_linked_to_this_item.empty?
