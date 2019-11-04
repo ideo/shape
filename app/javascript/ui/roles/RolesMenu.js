@@ -39,6 +39,7 @@ class RolesMenu extends React.Component {
     page: {
       pending: 1,
       active: 1,
+      archived: 1,
     },
   }
 
@@ -132,6 +133,10 @@ class RolesMenu extends React.Component {
           status === 'active' || status === 'both'
             ? page
             : prevState.page.active,
+        archived:
+          status === 'archived' || status === 'both'
+            ? page
+            : prevState.page.archived,
       },
     }))
   }
@@ -154,8 +159,7 @@ class RolesMenu extends React.Component {
       entities: entities.filter(
         role =>
           role.entity.internalType !== 'users' ||
-          (role.entity.status !== 'pending' &&
-            role.entity.status !== 'archived')
+          role.entity.status === 'active'
       ),
     },
     {
@@ -280,7 +284,7 @@ class RolesMenu extends React.Component {
         <Panel
           key={panelTitle}
           title={`${panelTitle} (${count})`}
-          open={status !== 'pending'}
+          open={status === 'active'}
         >
           <React.Fragment>
             {entities.map(

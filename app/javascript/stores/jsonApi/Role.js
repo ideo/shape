@@ -17,6 +17,8 @@ class Role extends BaseRecord {
   @observable
   pendingCount = 0
   @observable
+  archivedCount = 0
+  @observable
   prevUsers = []
   @observable
   prevGroups = []
