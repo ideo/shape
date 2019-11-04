@@ -41,7 +41,7 @@ class TestQuestion extends React.Component {
       afterQuestionAnswered,
       apiStore,
     } = this.props
-    const { text, number, selected_choice_ids } = answer
+    const { text, number, selected_choice_ids, skipScrolling } = answer
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -77,6 +77,10 @@ class TestQuestion extends React.Component {
         answer_number: number,
         selected_choice_ids,
       })
+    }
+
+    if (skipScrolling) {
+      return
     }
     afterQuestionAnswered(card)
   }
