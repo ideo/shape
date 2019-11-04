@@ -537,11 +537,17 @@ describe Collection::TestCollection, type: :model do
       create(:test_collection, :completed, master_template: true, parent_collection: submission_template)
     end
     let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
-    let(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
+    let!(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
 
     before do
       submission_box.setup_submissions_collection!
       submission_box.update(submission_template: submission_template)
+      # copy cards into the template the way it actually would happen
+      test_collection.update_template_instances
+    end
+
+    it 'should create the templated questions in the submission_test' do
+      expect(submission_test.question_items.count).to eq test_collection.question_items.count
     end
 
     describe '#launch!' do
@@ -559,6 +565,13 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.templated_collections.count).to eq 1
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(test_collection.id)
           test_collection.launch!(initiated_by: user)
+        end
+
+        it 'should preserve all of the instance cards' do
+          test_collection.launch!(initiated_by: user)
+          test_collection.update_template_instances
+          # testing a bug case where it was accidentally deleting cards because they weren't pinned
+          expect(submission_test.question_items.count).to eq test_collection.question_items.count
         end
       end
 
