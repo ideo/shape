@@ -60,6 +60,7 @@ exports[`TestDesigner renders snapshot 1`] = `
           className="card 10"
         >
           <QuestionSelectHolder
+            canAddChoice={false}
             canEdit={false}
             card={
               Object {
@@ -201,6 +202,7 @@ exports[`TestDesigner renders snapshot 1`] = `
             }
             handleSelectChange={[Function]}
             handleTrash={[Function]}
+            onAddChoice={[Function]}
           />
           <styled.div
             editing={true}
@@ -2466,6 +2468,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 }
               }
               questionAnswer={null}
+              question_choices={Array []}
               surveyResponse={null}
             />
           </styled.div>
@@ -2491,6 +2494,7 @@ exports[`TestDesigner renders snapshot 1`] = `
           className="card 10"
         >
           <QuestionSelectHolder
+            canAddChoice={false}
             canEdit={false}
             card={
               Object {
@@ -2632,6 +2636,7 @@ exports[`TestDesigner renders snapshot 1`] = `
             }
             handleSelectChange={[Function]}
             handleTrash={[Function]}
+            onAddChoice={[Function]}
           />
           <styled.div
             editing={true}
@@ -4897,6 +4902,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 }
               }
               questionAnswer={null}
+              question_choices={Array []}
               surveyResponse={null}
             />
           </styled.div>
@@ -4922,6 +4928,7 @@ exports[`TestDesigner renders snapshot 1`] = `
           className="card 10"
         >
           <QuestionSelectHolder
+            canAddChoice={false}
             canEdit={false}
             card={
               Object {
@@ -5063,6 +5070,7 @@ exports[`TestDesigner renders snapshot 1`] = `
             }
             handleSelectChange={[Function]}
             handleTrash={[Function]}
+            onAddChoice={[Function]}
           />
           <styled.div
             editing={true}
@@ -7328,6 +7336,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                 }
               }
               questionAnswer={null}
+              question_choices={Array []}
               surveyResponse={null}
             />
           </styled.div>

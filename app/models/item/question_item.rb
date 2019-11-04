@@ -95,6 +95,7 @@ class Item
       question_context: 0,
       question_useful: 1,
       question_open: 2,
+      # Is there supposed to be no #3 for this enum?
       question_media: 4,
       question_description: 5,
       question_finish: 6,
