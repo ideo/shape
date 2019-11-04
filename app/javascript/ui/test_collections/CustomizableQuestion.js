@@ -221,11 +221,12 @@ class CustomizableQuestion extends React.Component {
                 onChange={this.handleAnswerSelection(choice)}
                 key={`question-${question.id}-choice-${index}`}
                 editing={editing}
+                onCreate={this.onNewChoice}
                 onDelete={this.onDeleteChoice}
               />
             ))}
         </ChoicesHolder>
-        {!this.isSingleChoiceQuestion && (
+        {!this.isSingleChoiceQuestion && !editing && (
           <TextResponseHolder style={{ padding: '20px' }}>
             <TextEnterButton onClick={this.submitAnswer}>
               <ArrowIcon rotation={90} />

@@ -210,7 +210,7 @@ Select.displayName = 'StyledSelect'
 export const Checkbox = styled(MuiCheckbox)`
   && {
     height: auto;
-    margin-right: 10px;
+    margin-right: 0;
     width: 28px;
   }
 
