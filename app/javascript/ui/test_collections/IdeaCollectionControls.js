@@ -76,6 +76,7 @@ class IdeaCollectionControls extends React.Component {
     createNewIdea({
       parentCollection: collection,
       questionType: 'question_idea',
+      sectionType: 'ideas',
       order: this.currentIdea.order + 0.5,
     })
   }
