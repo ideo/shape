@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import v from '~/utils/variables'
-import { DisplayText } from '~/ui/global/styled/typography'
+import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
 import ChevronLeftIcon from '~/ui/icons/ChevronLeftIcon'
 import ChevronRightIcon from '~/ui/icons/ChevronRightIcon'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import Tooltip from '~/ui/global/Tooltip'
 import styled from 'styled-components'
 
 const IdeaCollectionControlsWrapper = styled.div`
@@ -28,8 +29,9 @@ const StyledAddIdea = styled.div`
   top: 10px;
 `
 
-const StyledIdeaNavigation = styled.div`
-  margin-top: 15px;
+const StyledNavigationAndCheckboxWrapper = styled.div`
+  margin-top: 10px;
+  margin-left: 25px;
 `
 
 const TrashButton = styled.button`
@@ -71,11 +73,20 @@ class IdeaCollectionControls extends React.Component {
 
   addNewIdeaItem = () => {
     const { createNewIdea, collection } = this.props
-    const current = this.currentIdea
     createNewIdea({
       parentCollection: collection,
       questionType: 'question_idea',
-      order: current.order + 0.5,
+      order: this.currentIdea.order + 0.5,
+    })
+  }
+
+  confirmWithDialog = ({ prompt, onConfirm }) => {
+    const { collection } = this.props
+    collection.apiStore.uiStore.confirm({
+      prompt,
+      confirmText: 'Remove',
+      iconName: 'Alert',
+      onConfirm: () => onConfirm(),
     })
   }
 
@@ -104,18 +115,20 @@ class IdeaCollectionControls extends React.Component {
     const {
       handleTrash,
       showMedia,
+      cardNumber,
       handleToggleShowMedia,
       currentIdeaCardIndex,
     } = this.props
     return (
       <IdeaCollectionControlsWrapper>
+        <NumberListText>{cardNumber}.</NumberListText>
         <DisplayText>
           <IdeaLabel>Idea</IdeaLabel>
           <StyledAddIdea onClick={this.addNewIdeaItem}>
             <PlusCircleIcon />
           </StyledAddIdea>
         </DisplayText>
-        <StyledIdeaNavigation>
+        <StyledNavigationAndCheckboxWrapper>
           <ChevronCircleWrapper
             first
             onClick={() => this.showNextPrevIdea('prev')}
@@ -132,29 +145,45 @@ class IdeaCollectionControls extends React.Component {
             <ChevronRightIcon />
           </ChevronCircleWrapper>
           {this.canDelete && (
-            <TrashButton onClick={() => handleTrash(this.currentIdea)}>
-              <TrashIcon />
-            </TrashButton>
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title={'remove idea'}
+              placement="top"
+            >
+              <TrashButton
+                onClick={() =>
+                  this.confirmWithDialog({
+                    prompt:
+                      'Are you sure you want to remove this idea? This action can not be undone.',
+                    onConfirm: () => handleTrash(this.currentIdea),
+                  })
+                }
+              >
+                <TrashIcon />
+              </TrashButton>
+            </Tooltip>
           )}
-        </StyledIdeaNavigation>
-        <LabelContainer
-          classes={{ label: 'form-control' }}
-          labelPlacement={'end'}
-          control={
-            <Checkbox
-              data-cy={`test-show-media-checkbox`}
-              checked={showMedia}
-              onChange={handleToggleShowMedia}
-              value={'1'}
-              color={'default'}
+          <div style={{ marginLeft: '9px' }}>
+            <LabelContainer
+              classes={{ label: 'form-control' }}
+              labelPlacement={'end'}
+              control={
+                <Checkbox
+                  data-cy={`test-show-media-checkbox`}
+                  checked={showMedia}
+                  onChange={handleToggleShowMedia}
+                  value={'1'}
+                  color={'default'}
+                />
+              }
+              label={
+                <div style={{ paddingTop: '14px' }}>
+                  <DisplayText>include photo/video</DisplayText>
+                </div>
+              }
             />
-          }
-          label={
-            <div style={{ paddingTop: '13px' }}>
-              <DisplayText>include photo/video</DisplayText>
-            </div>
-          }
-        />
+          </div>
+        </StyledNavigationAndCheckboxWrapper>
       </IdeaCollectionControlsWrapper>
     )
   }
@@ -168,6 +197,7 @@ IdeaCollectionControls.propTypes = {
   showMedia: PropTypes.bool.isRequired,
   handleToggleShowMedia: PropTypes.func.isRequired,
   handleSetCurrentIdeaCardIndex: PropTypes.func.isRequired,
+  cardNumber: PropTypes.number.isRequired,
   currentIdeaCardIndex: PropTypes.number,
 }
 

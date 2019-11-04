@@ -46,13 +46,16 @@ const QuestionLeftSide = ({
 }) => {
   return (
     <LeftSideContainer>
-      <NumberListText>{cardNumber}.</NumberListText>
+      {!card.card_question_type === 'question_idea' && (
+        <NumberListText>{cardNumber}.</NumberListText>
+      )}
       {card.card_question_type === 'question_finish' && (
         <DisplayText>End of Survey</DisplayText>
       )}
       {card.card_question_type === 'question_idea' && (
         <IdeaCollectionControls
           collection={ideaCollection}
+          cardNumber={cardNumber}
           canEdit={canEdit}
           handleTrash={handleTrash}
           createNewIdea={createNewQuestionCard}

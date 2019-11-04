@@ -192,8 +192,15 @@ class TestDesigner extends React.Component {
   }
 
   handleTrash = card => {
+    const archiveCard = card => {
+      card.API_archiveSelf({})
+      if (card.card_question_type === 'question_idea') {
+        const { currentIdeaCardIndex } = this.state
+        this.handleSetCurrentIdeaCardIndex(currentIdeaCardIndex - 1)
+      }
+    }
     this.confirmActionIfResponsesExist({
-      action: () => card.API_archiveSelf({}),
+      action: () => archiveCard(card),
       message: 'Are you sure you want to remove this question?',
     })
   }
@@ -211,6 +218,10 @@ class TestDesigner extends React.Component {
   }
 
   handleSetCurrentIdeaCardIndex = index => {
+    const numIdeas = this.ideaCollection
+      ? this.ideaCollection.sortedCards.length
+      : 0
+    if (index < 0 || index > numIdeas - 1) return
     this.setState({
       currentIdeaCardIndex: index,
     })
