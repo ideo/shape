@@ -9,7 +9,7 @@ import ChevronRightIcon from '~/ui/icons/ChevronRightIcon'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 import styled from 'styled-components'
 
-const IdeaQuestionsControlsWrapper = styled.div`
+const IdeaCollectionControlsWrapper = styled.div`
   display: inline-block;
 `
 
@@ -53,52 +53,46 @@ const ChevronCircleWrapper = styled.div`
   color: ${v.colors.white};
 `
 
-class IdeaQuestionsControls extends React.Component {
-  showNextPrevIdea = async direction => {
-    const { ideaCards } = this.props
+class IdeaCollectionControls extends React.Component {
+  showNextPrevIdea = direction => {
+    const { handleSetCurrentIdeaCardIndex, currentIdeaCardIndex } = this.props
     let index
     if (direction === 'next') {
-      index = this.currentIdeaIndex + 1
+      index = currentIdeaCardIndex + 1
       if (index > this.numIdeas - 1) index = 0
     } else {
-      index = this.currentIdeaIndex - 1
+      index = currentIdeaCardIndex - 1
       if (index < 0) index = this.numIdeas - 1
     }
-    const showIdea = ideaCards[index]
+    const showIdea = this.ideaCards[index]
     if (!showIdea || showIdea.id === this.currentIdea.id) return
-    this.currentIdea.hidden = true
-    await this.currentIdea.save()
-    showIdea.hidden = false
-    showIdea.save()
+    handleSetCurrentIdeaCardIndex(index)
   }
 
-  addNewIdeaItem = async () => {
-    const { createNewIdea } = this.props
+  addNewIdeaItem = () => {
+    const { createNewIdea, collection } = this.props
     const current = this.currentIdea
-    const newIdea = await createNewIdea({
+    createNewIdea({
+      parentCollection: collection,
       questionType: 'question_idea',
       order: current.order + 0.5,
-      sectionType: 'ideas',
     })
-    if (newIdea.id) {
-      current.hidden = true
-      current.save()
-    }
+  }
+
+  get ideaCards() {
+    const {
+      collection: { sortedCards },
+    } = this.props
+    return sortedCards
   }
 
   get numIdeas() {
-    const { ideaCards } = this.props
-    return ideaCards.length
+    return this.ideaCards.length
   }
 
   get currentIdea() {
-    const { currentIdeaCardId, ideaCards } = this.props
-    return ideaCards.find(card => card.id === currentIdeaCardId.toString())
-  }
-
-  get currentIdeaIndex() {
-    const { ideaCards } = this.props
-    return ideaCards.indexOf(this.currentIdea)
+    const { currentIdeaCardIndex } = this.props
+    return this.ideaCards[currentIdeaCardIndex]
   }
 
   render() {
@@ -107,9 +101,10 @@ class IdeaQuestionsControls extends React.Component {
       canEdit,
       showMedia,
       handleToggleShowMedia,
+      currentIdeaCardIndex,
     } = this.props
     return (
-      <IdeaQuestionsControlsWrapper>
+      <IdeaCollectionControlsWrapper>
         <DisplayText>
           <IdeaLabel>Idea</IdeaLabel>
           <StyledAddIdea onClick={this.addNewIdeaItem}>
@@ -124,7 +119,7 @@ class IdeaQuestionsControls extends React.Component {
             <ChevronLeftIcon />
           </ChevronCircleWrapper>
           <DisplayText>
-            {this.currentIdeaIndex + 1}/{this.numIdeas}
+            {currentIdeaCardIndex + 1}/{this.numIdeas}
           </DisplayText>
           <ChevronCircleWrapper
             last
@@ -156,20 +151,24 @@ class IdeaQuestionsControls extends React.Component {
             </div>
           }
         />
-      </IdeaQuestionsControlsWrapper>
+      </IdeaCollectionControlsWrapper>
     )
   }
 }
 
-IdeaQuestionsControls.propTypes = {
-  currentIdeaCardId: PropTypes.number.isRequired,
-  ideaCards: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject)
-    .isRequired,
+IdeaCollectionControls.propTypes = {
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool.isRequired,
   handleTrash: PropTypes.func.isRequired,
   createNewIdea: PropTypes.func.isRequired,
   showMedia: PropTypes.bool.isRequired,
   handleToggleShowMedia: PropTypes.func.isRequired,
+  handleSetCurrentIdeaCardIndex: PropTypes.func.isRequired,
+  currentIdeaCardIndex: PropTypes.number,
 }
 
-export default IdeaQuestionsControls
+IdeaCollectionControls.defaultProps = {
+  currentIdeaCardIndex: 0,
+}
+
+export default IdeaCollectionControls

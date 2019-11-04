@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types'
 import v from '~/utils/variables'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
-import IdeaQuestionsControls from '~/ui/test_collections/IdeaQuestionsControls'
+import IdeaCollectionControls from '~/ui/test_collections/IdeaCollectionControls'
 import QuestionSelector from '~/ui/test_collections/QuestionSelector'
 import styled from 'styled-components'
 
@@ -33,13 +34,15 @@ const showTrash = (card, canEdit) => {
 const QuestionLeftSide = ({
   card,
   canEdit,
+  cardNumber,
   handleSelectChange,
   handleTrash,
   createNewQuestionCard,
-  ideaCards,
+  ideaCollection,
   showMedia,
   handleToggleShowMedia,
-  cardNumber,
+  handleSetCurrentIdeaCardIndex,
+  currentIdeaCardIndex,
 }) => {
   return (
     <LeftSideContainer>
@@ -48,14 +51,15 @@ const QuestionLeftSide = ({
         <DisplayText>End of Survey</DisplayText>
       )}
       {card.card_question_type === 'question_idea' && (
-        <IdeaQuestionsControls
-          currentIdeaCardId={card.id}
-          ideaCards={ideaCards}
+        <IdeaCollectionControls
+          collection={ideaCollection}
           canEdit={canEdit}
           handleTrash={handleTrash}
           createNewIdea={createNewQuestionCard}
           showMedia={showMedia}
           handleToggleShowMedia={handleToggleShowMedia}
+          handleSetCurrentIdeaCardIndex={handleSetCurrentIdeaCardIndex}
+          currentIdeaCardIndex={currentIdeaCardIndex}
         />
       )}
       {!['question_finish', 'question_idea'].includes(
@@ -89,13 +93,19 @@ QuestionLeftSide.propTypes = {
     section_type: PropTypes.string.isRequired,
   }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
+  cardNumber: PropTypes.number.isRequired,
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,
   createNewQuestionCard: PropTypes.func.isRequired,
   showMedia: PropTypes.bool.isRequired,
   handleToggleShowMedia: PropTypes.func.isRequired,
-  ideaCards: PropTypes.array.isRequired,
-  cardNumber: PropTypes.number.isRequired,
+  ideaCollection: MobxPropTypes.objectOrObservableObject.isRequired,
+  handleSetCurrentIdeaCardIndex: PropTypes.func.isRequired,
+  currentIdeaCardIndex: PropTypes.number,
+}
+
+QuestionLeftSide.defaultProps = {
+  currentIdeaCardIndex: 0,
 }
 
 export default QuestionLeftSide

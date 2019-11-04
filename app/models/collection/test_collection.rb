@@ -144,7 +144,7 @@ class Collection
           question_category_satisfaction
         ],
         ideas: %i[
-          question_idea
+          ideas_collection
           question_clarity
           question_excitement
           question_useful
@@ -266,14 +266,16 @@ class Collection
 
       return true if incomplete_items.blank?
 
-      shown_idea_error = false
-
       incomplete_items.each do |item|
-        if item.question_idea?
-          next if shown_idea_error
-          shown_idea_error = true
-        end
-        errors.add(:base, "Please add #{item.incomplete_description} to question #{item.parent_collection_card.order + 1}")
+        question_card_number = if item.question_idea?
+                                 collection_cards.ideas_collection_card.first.order
+                               else
+                                 item.parent_collection_card.order
+                               end
+        errors.add(
+          :base,
+          "Please add #{item.incomplete_description} to question #{question_card_number + 1}",
+        )
       end
 
       false
@@ -309,6 +311,12 @@ class Collection
 
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
+    end
+
+    def ideas_collection
+      collections.joins(:primary_collection_cards).merge(
+        CollectionCard.ideas_collection_card,
+      ).first
     end
 
     def create_uniq_survey_response(user_id: nil, test_audience_id: nil)
@@ -377,13 +385,21 @@ class Collection
           .default_question_types_by_section
           .each do |section_type, question_types|
         question_types.each do |question_type|
-          primary_collection_cards.build(
-            order: order += 1,
-            section_type: section_type,
-            item: Item::QuestionItem.new(
-              question_type: question_type,
-            ),
-          )
+          if question_type == :ideas_collection
+            primary_collection_cards.build(
+              order: order += 1,
+              section_type: section_type,
+              record: Collection.build_ideas_collection,
+            )
+          else
+            primary_collection_cards.build(
+              order: order += 1,
+              section_type: section_type,
+              record: Item::QuestionItem.new(
+                question_type: question_type,
+              ),
+            )
+          end
         end
       end
     end
@@ -429,9 +445,15 @@ class Collection
     end
 
     def incomplete_question_items
-      question_items.joins(
+      incomplete_items = question_items.joins(
         :parent_collection_card,
       ).select(&:question_item_incomplete?)
+
+      incomplete_items += idea_cards.joins(
+        :parent_collection_card,
+      ).select(&:question_item_incomplete?)
+
+      incomplete_items.compact
     end
 
     def remove_empty_question_items
@@ -456,9 +478,7 @@ class Collection
     end
 
     def idea_cards
-      collection_cards.includes(:item).select do |card|
-        %w[question_idea].include?(card.card_question_type)
-      end
+      ideas_collection.items
     end
 
     def cloned_from_present?
@@ -598,7 +618,8 @@ class Collection
     end
 
     def only_default_cards?
-      collection_cards.map { |card| card.record&.question_type } == self.class.default_question_types_by_section.values.flatten.map(&:to_s)
+      card_question_types = collection_cards.map(&:card_question_type)
+      card_question_types == self.class.default_question_types_by_section.values.flatten.map(&:to_s)
     end
 
     def archive_idea_questions

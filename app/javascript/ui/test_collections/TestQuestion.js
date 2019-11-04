@@ -34,12 +34,12 @@ class TestQuestion extends React.Component {
   handleQuestionAnswer = async answer => {
     const {
       card,
-      item,
       editing,
       createSurveyResponse,
       afterQuestionAnswered,
       apiStore,
     } = this.props
+    const { record } = card
     const { text, number } = answer
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
@@ -58,7 +58,7 @@ class TestQuestion extends React.Component {
       // create new answer if we didn't have one
       questionAnswer = new QuestionAnswer(
         {
-          question_id: item.id,
+          question_id: record.id,
           answer_text: text,
           answer_number: number,
         },
@@ -86,7 +86,6 @@ class TestQuestion extends React.Component {
     const {
       parent,
       card,
-      item,
       editing,
       questionAnswer,
       canEdit,
@@ -94,6 +93,7 @@ class TestQuestion extends React.Component {
       numberOfQuestions,
       apiStore,
     } = this.props
+    const { record } = card
 
     switch (card.card_question_type) {
       case 'question_useful':
@@ -104,7 +104,7 @@ class TestQuestion extends React.Component {
       case 'question_category_satisfaction':
         return (
           <ScaleQuestion
-            question={item}
+            question={record}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
@@ -119,17 +119,17 @@ class TestQuestion extends React.Component {
           return (
             <QuestionContentEditor
               placeholder="write idea description here…"
-              item={item}
+              item={record}
               canEdit={canEdit}
             />
           )
         }
-        return <QuestionText>{item.content}</QuestionText>
+        return <QuestionText>{record.content}</QuestionText>
 
       case 'question_open':
         return (
           <OpenQuestion
-            item={item}
+            item={record}
             editing={editing}
             canEdit={canEdit}
             questionAnswer={questionAnswer}
@@ -180,9 +180,10 @@ class TestQuestion extends React.Component {
   }
 
   get questionIdentifier() {
-    const { card, item } = this.props
-    if (item.question_description || item.content) {
-      return 'question-' + (item.question_description || item.content)
+    const { card } = this.props
+    const { record } = card
+    if (record.question_description || record.content) {
+      return 'question-' + (record.question_description || record.content)
     }
     return card.card_question_type
   }
@@ -204,7 +205,6 @@ TestQuestion.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  item: MobxPropTypes.objectOrObservableObject.isRequired,
   editing: PropTypes.bool.isRequired,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),

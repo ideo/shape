@@ -448,6 +448,16 @@ class Collection < ApplicationRecord
     CollectionCard.where(id: duplicates.pluck(:id))
   end
 
+  def self.build_ideas_collection
+    collection = new(name: 'Ideas')
+    collection.primary_collection_cards.build(
+      record: Item::QuestionItem.new(
+        question_type: :question_idea,
+      ),
+    )
+    collection
+  end
+
   # NOTE: this refers to the first level of children
   # i.e. things directly in this collection
   def children

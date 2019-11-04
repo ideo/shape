@@ -96,11 +96,8 @@ class CollectionPage extends React.Component {
 
   loadCollectionCards = async ({ page, per_page, rows, cols }) => {
     const { collection } = this.props
-    const { isTestCollection } = collection
-    // Ideas are on hidden cards, so we always load them for test collections
-    const hidden = isTestCollection ? true : false
     return collection
-      .API_fetchCards({ page, per_page, rows, cols, hidden })
+      .API_fetchCards({ page, per_page, rows, cols })
       .then(() => {
         runInAction(() => {
           this.cardsFetched = true

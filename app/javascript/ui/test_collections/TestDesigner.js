@@ -93,10 +93,14 @@ class TestDesigner extends React.Component {
     this.state = {
       testType: hasCollectionToTest ? 'collection' : 'media',
       collectionToTest: collection_to_test,
+      currentIdeaCardIndex: 0,
     }
   }
 
   async componentDidMount() {
+    // Load idea cards
+    if (this.ideaCollection) this.ideaCollection.API_fetchCards()
+
     if (this.state.collectionToTest) return
     // if none is set, we look up the parent to provide a default value
     const { collection } = this.props
@@ -119,31 +123,22 @@ class TestDesigner extends React.Component {
     return collection.num_survey_responses
   }
 
-  get ideaCards() {
+  get ideaCollection() {
     const { collection } = this.props
-    return collection.sortedCards.filter(
-      card => card.card_question_type === 'question_idea'
+    const card = collection.sortedCards.find(
+      card => card.card_question_type === 'ideas_collection'
     )
-  }
-
-  get visibleCardsWithSection() {
-    const { collection } = this.props
-    return collection.sortedCards.filter(
-      card => !card.hidden && card.section_type
-    )
+    if (card) return card.record
   }
 
   get cardsBySection() {
+    const { collection } = this.props
     const sections = {}
     SECTIONS.forEach(section => (sections[section] = []))
-    this.visibleCardsWithSection.forEach(card => {
+    collection.sortedCards.forEach(card => {
       if (sections[card.section_type]) sections[card.section_type].push(card)
     })
     return sections
-  }
-
-  cardNumber = card => {
-    return this.visibleCardsWithSection.indexOf(card) + 1
   }
 
   // This shows a dialog immediately
@@ -212,6 +207,13 @@ class TestDesigner extends React.Component {
         if (createdCard) this.trackQuestionCreation()
       },
       message: 'Are you sure you want to add a new question?',
+    })
+  }
+
+  handleSetCurrentIdeaCardIndex = index => {
+    console.log('set currentIdeaCardIndex', index)
+    this.setState({
+      currentIdeaCardIndex: index,
     })
   }
 
@@ -290,8 +292,10 @@ class TestDesigner extends React.Component {
     order,
     sectionType,
     questionType = '',
+    parentCollection = null,
   }) => {
     const { collection } = this.props
+    const parent = parentCollection ? parentCollection : collection
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
@@ -299,10 +303,10 @@ class TestDesigner extends React.Component {
       },
       section_type: replacingCard ? replacingCard.section_type : sectionType,
       order: replacingCard ? replacingCard.order : order,
-      parent_id: collection.id,
+      parent_id: parent.id,
     }
     const card = new CollectionCard(attrs, apiStore)
-    card.parent = collection
+    card.parent = parent
     if (replacingCard) {
       // Set new card in same place as that you are replacing
       card.order = replacingCard.order
@@ -367,32 +371,45 @@ class TestDesigner extends React.Component {
 
   renderCard = (card, firstCard, lastCard) => {
     const { collection } = this.props
-    const item = card.record
+    const { currentIdeaCardIndex } = this.state
+    let questionParent
+    let questionCard
+    if (card.card_question_type === 'ideas_collection') {
+      questionParent = card.record
+      questionCard = questionParent.sortedCards[currentIdeaCardIndex]
+    } else {
+      questionParent = collection
+      questionCard = card
+    }
+    // Return if it tries to render idea card before they have been loaded
+    if (!questionCard) return
+    const { record } = questionCard
     return (
       <Fragment>
         <QuestionLeftSide
-          card={card}
+          card={questionCard}
+          cardNumber={card.order + 1}
           canEdit={this.canEdit}
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}
           createNewQuestionCard={this.createNewQuestionCard}
-          ideaCards={this.ideaCards}
+          ideaCollection={this.ideaCollection}
           showMedia={collection.test_show_media}
           handleToggleShowMedia={this.handleToggleShowMedia}
-          cardNumber={this.cardNumber(card)}
+          handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}
+          currentIdeaCardIndex={currentIdeaCardIndex}
         />
         <TestQuestionHolder
           editing
           firstCard={firstCard}
           lastCard={lastCard}
-          userEditable={userEditableQuestionType(item.question_type)}
+          userEditable={userEditableQuestionType(record.card_question_type)}
         >
           <TestQuestion
             editing
-            parent={collection}
-            card={card}
-            item={item}
-            order={card.order}
+            parent={questionParent}
+            card={questionCard}
+            order={questionCard.order}
             canEdit={this.canEditQuestions}
           />
         </TestQuestionHolder>
