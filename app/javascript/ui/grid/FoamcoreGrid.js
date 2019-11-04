@@ -255,14 +255,19 @@ class FoamcoreGrid extends React.Component {
     if (col > this.loadedCols.max) this.loadedCols.max = col
   }
 
+  get maxCols() {
+    const { uiStore } = this.props
+    return uiStore.isTouchDevice && uiStore.isMobile
+      ? MAX_COLS_MOBILE
+      : MAX_COLS
+  }
+
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
     if (this.zoomLevel !== 3) return this.zoomLevel
-    const { uiStore } = this.props
     const { gridW, gutter } = this.gridSettings
-    const maxCols = !uiStore.isTouchDevice ? MAX_COLS : MAX_COLS_MOBILE
     const gridWidth =
-      (gridW + gutter) * maxCols + pageMargins.left * 2 * this.zoomLevel
+      (gridW + gutter) * this.maxCols + pageMargins.left * 2 * this.zoomLevel
     return gridWidth / window.innerWidth
   }
 
@@ -274,7 +279,7 @@ class FoamcoreGrid extends React.Component {
 
   get totalGridSize() {
     const { gridW, gridH, gutter } = this.gridSettings
-    const { collection, uiStore } = this.props
+    const { collection } = this.props
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
     // + 2x the visible number of rows
@@ -282,8 +287,7 @@ class FoamcoreGrid extends React.Component {
     const visRows = this.visibleRows.num || 1
     const maxRows = collection.max_row_index + 1 + visRows * 2
     const height = ((gridH + gutter) * maxRows) / this.relativeZoomLevel
-    const maxCols = !uiStore.isTouchDevice ? MAX_COLS : MAX_COLS_MOBILE
-    const width = ((gridW + gutter) * maxCols) / this.relativeZoomLevel
+    const width = ((gridW + gutter) * this.maxCols) / this.relativeZoomLevel
     return {
       width,
       height,
@@ -1068,16 +1072,15 @@ class FoamcoreGrid extends React.Component {
   }
 
   get blankCardsForEmptySpacesWithinVisibleArea() {
-    const { collection, uiStore } = this.props
+    const { collection } = this.props
     const matrix = collection.cardMatrix
     const blankCards = []
     // Add blank cards to all empty spaces,
     // and 2x screen heights at the bottom
-    const maxCols = !uiStore.isTouchDevice ? MAX_COLS : MAX_COLS_MOBILE
     _.each(
       _.range(0, collection.max_row_index + this.visibleRows.num * 2),
       row => {
-        _.each(_.range(0, maxCols), col => {
+        _.each(_.range(0, this.maxCols), col => {
           // If there's no row, or nothing in this column, add a blank card for this spot
           const blankCard = { row, col, width: 1, height: 1 }
           if (!matrix[row] || !matrix[row][col]) {
