@@ -17,7 +17,7 @@ export const ChartTooltip = props => (
     style={{
       fill: 'white',
       fontFamily: v.fonts.sans,
-      fontSize: 10,
+      fontSize: props.fontSize || 10,
       fontWeight: 'normal',
     }}
     pointerLength={0}
@@ -66,6 +66,7 @@ class ChartLabelWithTooltip extends React.Component {
           dy={15}
           text={props.text}
           active={this.state.tooltipOn}
+          fontSize={8}
         />
       </Fragment>
     )
