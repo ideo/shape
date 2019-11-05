@@ -554,9 +554,6 @@ describe Collection::TestCollection, type: :model do
 
     describe '#launch!' do
       context 'with valid draft collection (default status)' do
-        # for testing UpdateTemplateInstancesWorker below
-        let!(:test_instance) { create(:test_collection, template: test_collection) }
-
         it 'should launch without creating a TestResults collection' do
           expect(test_collection.launch!(initiated_by: user)).to be true
           expect(test_collection.test_status).to eq 'live'
