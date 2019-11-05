@@ -40,6 +40,10 @@ QuestionText.defaultProps = {
   fontSizeEm: 1,
 }
 
+export const TestQuestionBorder = styled.div`
+  border-bottom: 4px solid ${props => props.theme.borderColorEditing};
+`
+
 export const TextInputHolder = styled(StyledCommentTextarea)`
   position: relative;
   color: white;
@@ -132,11 +136,12 @@ export const styledTestTheme = (themeName = 'primary') => {
       backgroundColor: v.colors.primaryDarkest,
       borderColor: v.colors.primaryMedium,
       borderColorEditing: v.colors.primaryMedium,
-      backgroundColorEditable: v.colors.secondaryMedium,
+      backgroundColorEditable: v.colors.primaryDark,
       responseHolder: v.colors.commonLightest,
       descriptionText: v.colors.commonLightest,
       placeholder: v.colors.primaryMedium,
       questionText: v.colors.primaryDark,
+      hotEdge: v.colors.primaryLight,
     }
   }
   // secondary theme used for TestType == Collection
@@ -149,6 +154,7 @@ export const styledTestTheme = (themeName = 'primary') => {
     questionText: v.colors.commonLightest,
     descriptionText: v.colors.commonLightest,
     placeholder: v.colors.commonMediumTint,
+    hotEdge: v.colors.primaryDarkest,
   }
 }
 

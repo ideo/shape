@@ -7,9 +7,9 @@ import { uiStore } from '~/stores'
 
 const HotEdge = styled.div`
   height: 0;
-  margin-left: 320px;
+  margin-left: 300px;
   position: relative;
-  top: -20px;
+  top: ${props => (props.lastCard ? -30 : -20)}px;
   width: 100%;
   z-index: ${v.zIndex.floatOverContent};
 
@@ -28,15 +28,16 @@ const HotEdgeVisuals = styled.div`
 `
 
 const VisualBar = styled.div`
-  background-color: ${v.colors.primaryLight};
+  background-color: ${props => props.theme.hotEdge};
+  border-radius: 5px;
   height: 10px;
   left: 15px;
   position: absolute;
   top: 20px;
-  width: calc(100% - 40px);
+  width: calc(100% - 42px);
 `
 const RoundAddButton = styled.button`
-  background-color: ${v.colors.primaryLight};
+  background-color: ${props => props.theme.hotEdge};
   border-radius: 50%;
   color: white;
   height: 32px;
@@ -84,7 +85,7 @@ class QuestionHotEdge extends React.Component {
 
   render() {
     return (
-      <HotEdge>
+      <HotEdge lastCard={this.props.lastCard}>
         <HotAreaButton
           data-cy="QuestionHotEdgeButton"
           onClick={this.handleAdd}
@@ -105,6 +106,10 @@ class QuestionHotEdge extends React.Component {
 }
 QuestionHotEdge.propTypes = {
   onAdd: PropTypes.func.isRequired,
+  lastCard: PropTypes.bool,
+}
+QuestionHotEdge.defaultProps = {
+  lastCard: false,
 }
 
 export default QuestionHotEdge

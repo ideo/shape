@@ -5,10 +5,11 @@ exports[`TestDesigner renders snapshot 1`] = `
   theme={
     Object {
       "backgroundColor": "#35889e",
-      "backgroundColorEditable": "#4a5b71",
+      "backgroundColorEditable": "#5698ae",
       "borderColor": "#9ec1cc",
       "borderColorEditing": "#9ec1cc",
       "descriptionText": "#f5f4f3",
+      "hotEdge": "#c0dbde",
       "placeholder": "#9ec1cc",
       "questionText": "#5698ae",
       "responseHolder": "#f5f4f3",

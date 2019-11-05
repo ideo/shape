@@ -55,20 +55,18 @@ class CollectionFilter extends React.Component {
   }
 
   onCreateFilter = async tag => {
-    return this.onFilterChange(async () => {
-      const { collection } = this.props
-      if (!this.currentFilterLookupType) return
-      const backendFilterType = pluralize
-        .singular(this.currentFilterLookupType)
-        .toLowerCase()
-        .split(' ')[0]
-      const filter = {
-        text: tag.name,
-        filter_type: backendFilterType,
-        selected: false,
-      }
-      return collection.API_createCollectionFilter(filter)
-    })
+    const { collection } = this.props
+    if (!this.currentFilterLookupType) return
+    const backendFilterType = pluralize
+      .singular(this.currentFilterLookupType)
+      .toLowerCase()
+      .split(' ')[0]
+    const filter = {
+      text: tag.name,
+      filter_type: backendFilterType,
+      selected: false,
+    }
+    return collection.API_createCollectionFilter(filter)
   }
 
   onDeleteFilter = async tag => {

@@ -12,7 +12,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
     let!(:current_user) { @user }
     let!(:organization) { current_user.current_organization }
     # check for case-sensitivity
-    let(:tag_list) { %w[BLOCKchain prototype innovation] }
+    let(:tag_list) { %w[BLOCKchain prototype innovation-metrics] }
     let!(:collection_with_tags) do
       create(
         :collection,
@@ -92,6 +92,9 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
         get(path, params: { query: '#prototype' })
+        expect(json['data'].size).to eq(1)
+        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+        get(path, params: { query: '#Innovation-Metrics' })
         expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
       end

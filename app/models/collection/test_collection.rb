@@ -79,7 +79,7 @@ class Collection
              class_name: 'TestAudience'
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
-    before_create :setup_default_status_and_questions, unless: :cloned_from_present?
+    before_create :setup_default_status_and_questions, unless: :cloned_or_templated?
     after_create :add_test_tag
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
@@ -242,11 +242,16 @@ class Collection
       return false unless draft? || closed?
 
       # is this in a submission? If so, am I tied to a test template, and is that one launched?
-      if inside_a_submission?
-        return false unless submission_test_launchable?
+      if inside_a_submission? && !submission_test_launchable?
+        errors.add(:base, 'Submission Box admin has not launched the test.')
+        return false
       end
       if inside_a_submission_box_template?
-        return false if parent_submission_box_template.try(:submission_attrs).try(:[], 'test_status') == 'live'
+        parent_test_status = parent_submission_box_template.submission_attrs.try(:[], 'test_status')
+        if parent_test_status == 'live'
+          errors.add(:base, 'You already have a running submission box test. Please close that one before proceeding.')
+          return false
+        end
       end
       # standalone tests otherwise don't really have any restrictions
       return true unless collection_to_test_id.present?
@@ -262,9 +267,7 @@ class Collection
     end
 
     def questions_valid?
-      incomplete_items = incomplete_question_items
-
-      return true if incomplete_items.blank?
+      return true if inside_a_submission_box_template? || incomplete_items.blank?
 
       incomplete_items.each do |item|
         msg = "Please add #{item.incomplete_description} to "
@@ -380,16 +383,20 @@ class Collection
           .default_question_types_by_section
           .each do |section_type, question_types|
         question_types.each do |question_type|
+          # NOTE: this doesn't use CollectionCardBuilder because it's in before_create
+          # so just need to make sure logic like pinning cards is set up appropriately
           if question_type == :ideas_collection
             primary_collection_cards.build(
               order: order += 1,
               section_type: section_type,
+              pinned: master_template?,
               record: Collection.build_ideas_collection,
             )
           else
             primary_collection_cards.build(
               order: order += 1,
               section_type: section_type,
+              pinned: master_template?,
               record: Item::QuestionItem.new(
                 question_type: question_type,
               ),
@@ -476,8 +483,8 @@ class Collection
       ideas_collection.items
     end
 
-    def cloned_from_present?
-      cloned_from.present?
+    def cloned_or_templated?
+      cloned_from.present? || template_id.present?
     end
 
     def gives_incentive?

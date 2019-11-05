@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
+import { TestQuestionBorder } from '~/ui/test_collections/shared'
 import MediaQuestion from '~/ui/test_collections/MediaQuestion'
 import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 
@@ -17,6 +18,7 @@ class IdeaQuestion extends React.Component {
           canEdit={canEdit}
           maxLength={100}
         />
+        <TestQuestionBorder />
         <QuestionContentEditor
           placeholder="add idea description here…"
           item={card.record}

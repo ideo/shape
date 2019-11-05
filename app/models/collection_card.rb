@@ -358,6 +358,14 @@ class CollectionCard < ApplicationRecord
       parent.touch
     end
     record.try(:remove_comment_followers!)
+
+    if collection.present? &&
+       collection.is_a?(Collection::TestCollection) &&
+       collection.inside_a_submission_box_template? &&
+       collection.live?
+      # close the submission template test if you archive it
+      collection.close!
+    end
   end
 
   # gets called by child STI classes

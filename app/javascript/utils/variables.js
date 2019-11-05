@@ -48,17 +48,7 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
     ],
   },
   {
-    category: 'Idea Content',
-    values: [
-      {
-        value: 'question_description',
-        label: 'Description',
-        sections: ['ideas'],
-      },
-    ],
-  },
-  {
-    category: 'Scaled Rating',
+    category: 'Idea Ratings',
     values: [
       { value: 'question_clarity', label: 'Clear', sections: ['ideas'] },
       { value: 'question_different', label: 'Different', sections: ['ideas'] },
@@ -75,11 +65,6 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
         sections: ['intro'],
       },
       {
-        value: 'question_context',
-        label: 'Context Setting',
-        sections: ['intro'],
-      },
-      {
         value: 'question_open',
         label: 'Open Response',
         sections: ['intro', 'ideas', 'outro'],
@@ -88,6 +73,11 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
         value: 'question_media',
         label: 'Photo/Video',
         // check on final AC...
+        sections: ['intro', 'ideas', 'outro'],
+      },
+      {
+        value: 'question_description',
+        label: 'Text Block',
         sections: ['intro', 'ideas', 'outro'],
       },
     ],
