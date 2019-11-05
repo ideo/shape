@@ -32,10 +32,7 @@ class WelcomeQuestion extends React.Component {
       )
     }
     return (
-      <QuestionSpacingContainer
-        editing={false}
-        data-cy="WelcomeQuestionWrapper"
-      >
+      <QuestionSpacingContainer editing={false}>
         <QuestionText>
           Thanks for taking the time to provide your feedback here on Shape. We
           look forward to hearing your thoughts!
@@ -47,7 +44,7 @@ class WelcomeQuestion extends React.Component {
           <strong>2 minutes</strong>
           {incentiveMessage}.
         </QuestionText>
-        <EmojiHolder data-cy="WelcomeQuestionEmojiHolder">
+        <EmojiHolder>
           <EmojiButton
             data-cy="WelcomeQuestionEmojiButton"
             selected={true}
