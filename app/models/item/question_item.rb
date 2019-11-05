@@ -184,7 +184,15 @@ class Item
       end
     end
 
+    def customizable_title_and_description
+      {
+        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
+        description: content,
+      }
+    end
+
     def question_title_and_description
+      return customizable_title_and_description if question_choices_customizable?
       self.class.question_title_and_description(question_type)
     end
 
@@ -285,11 +293,15 @@ class Item
     end
 
     def org_wide_question_dataset
+      # For customizable questions the org dataset needs the reference
+      # to the actual question
+      data_source = self if question_choices_customizable?
       Dataset::Question.find_or_create_by(
         groupings: [{ type: 'Organization', id: organization.id }],
         question_type: question_type,
         identifier: Dataset::Question::DEFAULT_ORG_NAME,
         chart_type: :bar,
+        data_source: data_source,
       )
     end
 

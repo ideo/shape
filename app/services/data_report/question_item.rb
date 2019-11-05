@@ -114,7 +114,7 @@ module DataReport
 
     def org_survey_answers
       organization_id = @dataset.grouping['id']
-      QuestionAnswer
+      query = QuestionAnswer
         .joins(
           :question,
           survey_response: :test_collection,
@@ -130,6 +130,12 @@ module DataReport
             ),
           ),
         )
+      if question_item&.question_choices_customizable?
+        query = query.where(
+          Item::QuestionItem.arel_table[:id].eq(question_item.id)
+        )
+      end
+      query
     end
   end
 end
