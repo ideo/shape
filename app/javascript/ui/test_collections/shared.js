@@ -40,6 +40,10 @@ QuestionText.defaultProps = {
   fontSizeEm: 1,
 }
 
+export const TestQuestionBorder = styled.div`
+  border-bottom: 4px solid ${props => props.theme.borderColorEditing};
+`
+
 export const TextInputHolder = styled(StyledCommentTextarea)`
   position: relative;
   color: white;
