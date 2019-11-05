@@ -49,6 +49,7 @@ class SurveyResponse < ApplicationRecord
     in_progress: 0,
     completed: 1,
     completed_late: 2,
+    duplicate: 3,
   }
 
   enum incentive_status: {

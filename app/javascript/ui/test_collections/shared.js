@@ -34,10 +34,10 @@ export const QuestionText = styled.p`
 QuestionText.propTypes = {
   fontSizeEm: PropTypes.number,
 }
-
 QuestionText.defaultProps = {
   fontSizeEm: 1,
 }
+QuestionText.displayName = 'QuestionText'
 
 export const TextInputHolder = styled(StyledCommentTextarea)`
   color: white;
