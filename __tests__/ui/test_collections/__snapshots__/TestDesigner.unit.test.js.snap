@@ -377,6 +377,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
                     "collections": Array [],
+                    "createLimitedUser": [MockFunction],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
                     "currentThreads": Array [
@@ -2560,6 +2561,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
                     "collections": Array [],
+                    "createLimitedUser": [MockFunction],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
                     "currentThreads": Array [
@@ -4742,6 +4744,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
                     "collections": Array [],
+                    "createLimitedUser": [MockFunction],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
                     "currentThreads": Array [
@@ -6627,6 +6630,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "checkInMyCollection": [MockFunction],
               "collapseReplies": [MockFunction],
               "collections": Array [],
+              "createLimitedUser": [MockFunction],
               "createTemplateInstance": [MockFunction],
               "currentOrgSlug": "org-slug",
               "currentThreads": Array [
