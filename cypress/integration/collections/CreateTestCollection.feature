@@ -13,7 +13,8 @@ Feature: Creating a Test Collection
     Then I should see "outro" in a "section-title"
     # verify the existence of the default questions
     Then I should see "Category Satisfaction" in a "QuestionSelectOption-category-satisfaction"
-    Then I should see "Idea" in a ".DisplayText"
+    Then I should see "Idea" in a ".IdeaLabel"
+    Then I should see "1/1" in a "num-ideas"
     Then I should see "Clear" in a "QuestionSelectOption-clear"
     Then I should see "Exciting" in a "QuestionSelectOption-exciting"
     Then I should see "Useful" in a "QuestionSelectOption-useful"
@@ -23,9 +24,25 @@ Feature: Creating a Test Collection
 
     # Scenario: Setting up the questions and launching the test
     When I enter "solutions{enter}" as my category
-    # adding the link should automatically fill out the idea title/content
+    And I fill the 1st "QuestionContentEditorText" with "Space Elevator"
+    And I fill the 2nd "QuestionContentEditorText" with "Take this elevator to the stratosphere"
     When I add a link URL
     And I wait for "@apiUpdateItem" to finish
+
+    # Add another idea
+    When I click the "add-new-idea"
+    Then I should see "1/2" in a "num-ideas"
+    And I fill the 1st "QuestionContentEditorText" with "Space Escalator"
+    And I fill the 2nd "QuestionContentEditorText" with "Slowly ride up into the stratosphere"
+    When I add a link URL
+    And I wait for "@apiUpdateItem" to finish
+
+    # Toggling show media
+    When I click the "test-show-media-checkbox"
+    Then I should not see a ".StyledLinkCover"
+    When I click the "test-show-media-checkbox"
+    Then I should see a ".StyledLinkCover"
+
     # 3rd and 4th are after the first 2 content editors inside the Idea
     And I fill the 3rd "QuestionContentEditorText" with "What do you think?"
     And I fill the 4th "QuestionContentEditorText" with "Would you buy it?"

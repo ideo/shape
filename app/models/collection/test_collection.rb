@@ -267,7 +267,10 @@ class Collection
     end
 
     def questions_valid?
-      return true if inside_a_submission_box_template? || incomplete_items.blank?
+      return true if inside_a_submission_box_template?
+
+      incomplete_items = incomplete_question_items
+      return true if incomplete_items.blank?
 
       incomplete_items.each do |item|
         msg = "Please add #{item.incomplete_description} to "

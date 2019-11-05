@@ -125,7 +125,7 @@ class IdeaCollectionControls extends React.Component {
         <NumberListText>{cardNumber}.</NumberListText>
         <DisplayText>
           <IdeaLabel>Idea</IdeaLabel>
-          <StyledAddIdea onClick={this.addNewIdeaItem}>
+          <StyledAddIdea onClick={this.addNewIdeaItem} data-cy="add-new-idea">
             <PlusCircleIcon />
           </StyledAddIdea>
         </DisplayText>
@@ -136,7 +136,7 @@ class IdeaCollectionControls extends React.Component {
           >
             <ChevronLeftIcon />
           </ChevronCircleWrapper>
-          <DisplayText>
+          <DisplayText data-cy="num-ideas">
             {currentIdeaCardIndex + 1}/{this.numIdeas}
           </DisplayText>
           <ChevronCircleWrapper

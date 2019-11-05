@@ -402,6 +402,8 @@ class TestDesigner extends React.Component {
     // Return if it tries to render idea card before they have been loaded
     if (!questionCard) return
     const { record } = questionCard
+    // Record is not present momentarily when turning an idea into a media item
+    if (!record) return
     return (
       <Fragment>
         <QuestionLeftSide
