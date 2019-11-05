@@ -14,7 +14,6 @@ class CollectionCardBuilder
     @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
     @errors = @collection_card.errors
     @user = user
-
   end
 
   def create
