@@ -197,14 +197,27 @@ class ChartGroup extends React.Component {
     }
 
     if (this.primaryDatasetBarChart) {
+      let tickValues = 'column'
+      let tickFormat, tickLabelComponent
+      // For emoji scale charts the column is always just a number
+      if (this.primaryDataset.data[0].column === 0) {
+        tickValues = [1, 2, 3, 4]
+        tickFormat = this.emojiScale.map(e => e.symbol)
+        tickLabelComponent = <Tick emojiScale={this.emojiScale} />
+      }
       return (
         <VictoryAxis
           style={{
-            axis: { stroke: 'transparent' },
+            axis: {
+              strokeWidth: 0,
+            },
+            tickLabels: {
+              textTransform: 'none',
+            },
           }}
-          tickValues={[1, 2, 3, 4]}
-          tickFormat={this.emojiScale.map(e => e.symbol)}
-          tickLabelComponent={<Tick emojiScale={this.emojiScale} />}
+          tickValues={tickValues}
+          tickFormat={tickFormat}
+          tickLabelComponent={tickLabelComponent}
           events={[
             {
               eventHandlers: {
@@ -339,7 +352,7 @@ class ChartGroup extends React.Component {
           domainPadding={{ y: 70 }}
           padding={{ top: 0, left: 60, right: 60, bottom: 30 }}
         >
-          <VictoryGroup offset={30 / (this.totalBarsPerGroup / 3)}>
+          <VictoryGroup offset={20 / (this.totalBarsPerGroup / 3)}>
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
           {this.chartAxis}

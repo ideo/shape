@@ -63,7 +63,7 @@ class Item
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
-    has_many :question_choices
+    has_many :question_choices, -> { order(order: :desc) }
 
     after_create :create_question_dataset
     after_create :add_default_question_choices,
@@ -200,6 +200,11 @@ class Item
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
 
+    def graphable_question?
+      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym) ||
+        [:question_single_choice, :question_multiple_choice].include?(question_type&.to_sym)
+    end
+
     def requires_roles?
       # NOTE: QuestionItems defer their can_edit access to their parent collection.
       # this is defined in item.rb as to be shared by Questions / FileItems
@@ -228,7 +233,7 @@ class Item
     end
 
     def find_or_create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
-      return if !scale_question? || test_data_item.present?
+      return if test_data_item.present?
 
       legend_item ||= parent_collection.legend_item
 
@@ -302,6 +307,10 @@ class Item
       )
     end
 
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
+    end
+
     private
 
     def create_question_dataset
@@ -332,10 +341,6 @@ class Item
 
     def update_test_open_responses_collection?
       saved_change_to_content? && test_open_responses_collection.present?
-    end
-
-    def question_choices_customizable?
-      question_single_choice? || question_multiple_choice?
     end
 
     def update_test_open_responses_collection
