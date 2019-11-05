@@ -244,6 +244,7 @@ export const Radio = styled(MuiRadio)`
     color: white !important;
   }
 `
+Radio.displayName = 'StyledRadio'
 
 /** @component */
 export const SelectOption = styled(MenuItem)`

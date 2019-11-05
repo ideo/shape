@@ -154,12 +154,6 @@ class CustomizableQuestion extends React.Component {
     if (event.key === 'Enter') this.stopEditingIfContent()
   }
 
-  handleCreateChoice = () => {
-    const { question, editing } = this.props
-    if (!editing) return
-    question.API_createQuestionChoice({})
-  }
-
   @action
   onDeleteChoice = choice => {
     const { question, editing } = this.props
@@ -226,7 +220,7 @@ class CustomizableQuestion extends React.Component {
         {this.question}
         <ChoicesHolder>
           {question_choices
-            .sort((ca, cb) => ca.order - cb.order)
+            .sort((choiceA, choiceB) => choiceA.order - choiceB.order)
             .map((choice, index) => (
               <CustomizableQuestionChoice
                 isChecked={this.isChoiceSelected(choice)}
