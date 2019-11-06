@@ -131,6 +131,11 @@ class CardMover
         else
           card.assign_attributes(pinned: false)
         end
+        if @to_collection.anyone_can_view && card.primary?
+          card.record.update(anyone_can_view: true)
+          card.record.reload
+          ToggleAnyoneCanView.call(card.record)
+        end
       end
 
       if card.changed?
