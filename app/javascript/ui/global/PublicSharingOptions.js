@@ -169,7 +169,7 @@ class PublicSharingOptions extends React.Component {
       // Show dialog if they are toggling on
       uiStore.confirm({
         prompt:
-          'This content will be available to anyone with this link. Are you sure you want to share this content?',
+          'This content and any nested collections will be available to anyone with this link. Are you sure you want to share this content?',
         confirmText: 'Continue',
         iconName: 'Alert',
         onConfirm: this.toggleAnyoneCanView,

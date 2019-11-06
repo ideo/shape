@@ -45,6 +45,7 @@ class CollectionUpdater < SimpleService
     @collection.update_cached_tag_lists
     # always touch the updated timestamp even though we may just be updating the related cards
     @collection.updated_at = Time.now
+    ToggleAnyoneCanView.call(@collection) if @collection.anyone_can_view_changed?
   end
 
   def clean_collection_card_attributes
