@@ -53,7 +53,8 @@ class Api::V1::QuestionChoicesController < Api::V1::BaseController
     params.require(:question_choice).permit(
       :text,
       :order,
-      :archived
+      :archived,
+      :selected_choice_ids,
     )
   end
 

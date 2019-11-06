@@ -63,7 +63,7 @@ class Item
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
-    has_many :question_choices, -> { order(order: :desc) }
+    has_many :question_choices, -> { order(order: :asc) }
 
     after_create :create_question_dataset
     after_create :add_default_question_choices,

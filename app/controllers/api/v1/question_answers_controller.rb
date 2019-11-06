@@ -5,9 +5,6 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
 
   before_action :build_question_answer, only: %i[create]
   def create
-    p '*' * 80
-    p question_answer_params
-    p '*' * 80
     if @question_answer.save
       render jsonapi: @question_answer
     else
@@ -17,9 +14,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
 
   load_resource :question_answer, only: %i[update]
   def update
-    p '*' * 80
     p question_answer_params
-    p '*' * 80
     if @question_answer.update(question_answer_params)
       render jsonapi: @question_answer
     else
