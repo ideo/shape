@@ -259,6 +259,13 @@ class Item extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  API_archiveQuestionChoice(choice) {
+    return this.apiStore.request(
+      `items/${this.id}/question_choices/${choice.id}/archive`,
+      'POST'
+    )
+  }
+
   async API_persistHighlight({ commentId, delta } = {}) {
     // pick up "new" highlights that are currently in our quillEditor
     _.each(delta.ops, op => {

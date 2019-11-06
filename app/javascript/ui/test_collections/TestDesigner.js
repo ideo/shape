@@ -354,6 +354,7 @@ class TestDesigner extends React.Component {
 
   renderCard = (card, firstCard, lastCard) => {
     const { collection } = this.props
+    const { test_status } = collection
     const item = card.record
     return (
       <Fragment>
@@ -379,6 +380,7 @@ class TestDesigner extends React.Component {
             order={card.order}
             canEdit={this.canEditQuestions}
             question_choices={item.question_choices}
+            testStatus={test_status}
           />
         </TestQuestionHolder>
       </Fragment>

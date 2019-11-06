@@ -162,9 +162,13 @@ class CustomizableQuestion extends React.Component {
 
   @action
   onDeleteChoice = choice => {
-    const { question, editing } = this.props
+    const { question, editing, isTestDraft } = this.props
     if (!editing) return
-    question.API_destroyQuestionChoice(choice)
+    if (isTestDraft) {
+      question.API_destroyQuestionChoice(choice)
+    } else {
+      question.API_archiveQuestionChoice(choice)
+    }
   }
 
   startEditing = () => {
@@ -261,11 +265,13 @@ CustomizableQuestion.propTypes = {
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
   question_choices: MobxPropTypes.arrayOrObservableArray,
+  isTestDraft: PropTypes.bool,
 }
 CustomizableQuestion.defaultProps = {
   questionAnswer: null,
   editing: false,
   onAnswer: () => null,
   question_choices: [],
+  isTestDraft: false,
 }
 export default CustomizableQuestion

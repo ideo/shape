@@ -1,7 +1,7 @@
 class Api::V1::QuestionChoicesController < Api::V1::BaseController
   deserializable_resource :question_choice, class: DeserializableQuestionChoice, only: %i[update]
-  load_and_authorize_resource :question_choice, only: %i[update destroy]
-  before_action :load_question, only: %i[destroy create]
+  load_and_authorize_resource :question_choice, only: %i[update destroy archive]
+  before_action :load_question, only: %i[destroy create archive]
 
   def create
     next_order = @question.question_choices.count + 1
@@ -22,6 +22,16 @@ class Api::V1::QuestionChoicesController < Api::V1::BaseController
     @question_choice.attributes = question_choice_params
     if @question_choice.save
       render jsonapi: @question_choice
+    else
+      render_api_errors @question_choice.errors
+    end
+  end
+
+  def archive
+    @question_choice.archived = true
+    if @question_choice.save
+      render jsonapi: @question,
+             include: [:question_choices]
     else
       render_api_errors @question_choice.errors
     end
