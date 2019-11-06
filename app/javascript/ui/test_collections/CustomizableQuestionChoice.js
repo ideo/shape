@@ -70,6 +70,7 @@ class CustomizableQuestionChoice extends React.Component {
             onClick={onChange}
             value={choice.value}
             color="primary"
+            removePadding
           />
         ) : (
           <Checkbox
@@ -78,6 +79,7 @@ class CustomizableQuestionChoice extends React.Component {
             onClick={onChange}
             value={choice.value}
             color="primary"
+            removePadding
           />
         )}
         <label
