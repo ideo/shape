@@ -542,13 +542,18 @@ describe Collection::TestCollection, type: :model do
     before do
       submission_box.setup_submissions_collection!
       submission_box.update(submission_template: submission_template)
+      # persist this now that submissions_collection exists
+      submission_test
+      # copy cards into the template the way it actually would happen
+      test_collection.update_template_instances
+    end
+
+    it 'should create the templated questions in the submission_test' do
+      expect(submission_test.question_items.count).to eq test_collection.question_items.count
     end
 
     describe '#launch!' do
       context 'with valid draft collection (default status)' do
-        # for testing UpdateTemplateInstancesWorker below
-        let!(:test_instance) { create(:test_collection, template: test_collection) }
-
         it 'should launch without creating a TestResults collection' do
           expect(test_collection.launch!(initiated_by: user)).to be true
           expect(test_collection.test_status).to eq 'live'
@@ -559,6 +564,13 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.templated_collections.count).to eq 1
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(test_collection.id)
           test_collection.launch!(initiated_by: user)
+        end
+
+        it 'should preserve all of the instance cards' do
+          test_collection.launch!(initiated_by: user)
+          test_collection.update_template_instances
+          # testing a bug case where it was accidentally deleting cards because they weren't pinned
+          expect(submission_test.question_items.count).to eq test_collection.question_items.count
         end
       end
 
@@ -578,6 +590,7 @@ describe Collection::TestCollection, type: :model do
         # make sure this is now persisted
         submission_test.reload
         test_collection.launch!(initiated_by: user)
+        puts "submission is #{submission.id} #{submission.name}"
         test_collection.update_submissions_launch_status
         submission.reload
         submission_template.reload

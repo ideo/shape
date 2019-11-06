@@ -87,6 +87,7 @@ const pageMargins = {
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
 const MAX_COLS = 16
+const MAX_COLS_MOBILE = 8
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -254,12 +255,19 @@ class FoamcoreGrid extends React.Component {
     if (col > this.loadedCols.max) this.loadedCols.max = col
   }
 
+  get maxCols() {
+    const { uiStore } = this.props
+    return uiStore.isTouchDevice && uiStore.isMobile
+      ? MAX_COLS_MOBILE
+      : MAX_COLS
+  }
+
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
     if (this.zoomLevel !== 3) return this.zoomLevel
     const { gridW, gutter } = this.gridSettings
     const gridWidth =
-      (gridW + gutter) * MAX_COLS + pageMargins.left * 2 * this.zoomLevel
+      (gridW + gutter) * this.maxCols + pageMargins.left * 2 * this.zoomLevel
     return gridWidth / window.innerWidth
   }
 
@@ -279,7 +287,7 @@ class FoamcoreGrid extends React.Component {
     const visRows = this.visibleRows.num || 1
     const maxRows = collection.max_row_index + 1 + visRows * 2
     const height = ((gridH + gutter) * maxRows) / this.relativeZoomLevel
-    const width = ((gridW + gutter) * MAX_COLS) / this.relativeZoomLevel
+    const width = ((gridW + gutter) * this.maxCols) / this.relativeZoomLevel
     return {
       width,
       height,
@@ -1072,7 +1080,7 @@ class FoamcoreGrid extends React.Component {
     _.each(
       _.range(0, collection.max_row_index + this.visibleRows.num * 2),
       row => {
-        _.each(_.range(0, MAX_COLS), col => {
+        _.each(_.range(0, this.maxCols), col => {
           // If there's no row, or nothing in this column, add a blank card for this spot
           const blankCard = { row, col, width: 1, height: 1 }
           if (!matrix[row] || !matrix[row][col]) {

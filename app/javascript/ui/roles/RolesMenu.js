@@ -39,6 +39,7 @@ class RolesMenu extends React.Component {
     page: {
       pending: 1,
       active: 1,
+      archived: 1,
     },
   }
 
@@ -81,6 +82,13 @@ class RolesMenu extends React.Component {
           query: searchText,
         })
       }
+      if (status === 'both' || status === 'archived') {
+        await apiStore.searchRoles(record, {
+          status: 'archived',
+          page,
+          query: searchText,
+        })
+      }
       runInAction(() => {
         this.loadingMore = false
       })
@@ -91,6 +99,7 @@ class RolesMenu extends React.Component {
       // the total counts are stored on each role, just need to grab one
       pending: record.roles[0].pendingCount,
       active: record.roles[0].activeCount,
+      archived: record.roles[0].archivedCount,
     }
     const groups = []
     record.roles.forEach(role => {
@@ -124,6 +133,10 @@ class RolesMenu extends React.Component {
           status === 'active' || status === 'both'
             ? page
             : prevState.page.active,
+        archived:
+          status === 'archived' || status === 'both'
+            ? page
+            : prevState.page.archived,
       },
     }))
   }
@@ -146,7 +159,17 @@ class RolesMenu extends React.Component {
       entities: entities.filter(
         role =>
           role.entity.internalType !== 'users' ||
-          role.entity.status !== 'pending'
+          role.entity.status === 'active'
+      ),
+    },
+    {
+      panelTitle: 'Archived Users',
+      status: 'archived',
+      count: counts.archived,
+      entities: entities.filter(
+        role =>
+          role.entity.internalType === 'users' &&
+          role.entity.status === 'archived'
       ),
     },
   ]
@@ -261,7 +284,7 @@ class RolesMenu extends React.Component {
         <Panel
           key={panelTitle}
           title={`${panelTitle} (${count})`}
-          open={status !== 'pending'}
+          open={status === 'active'}
         >
           <React.Fragment>
             {entities.map(
