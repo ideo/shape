@@ -17,6 +17,7 @@ describe('CustomizableQuestion', () => {
         editing: true,
         onAnswer: jest.fn(),
         handleAnswerSelection: jest.fn(),
+        isTestDraft: true,
       }
 
       props.question.question_type = 'question_single_choice'
