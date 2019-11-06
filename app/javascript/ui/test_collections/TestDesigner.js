@@ -99,7 +99,7 @@ class TestDesigner extends React.Component {
 
   async componentDidMount() {
     // Load idea cards
-    if (this.ideaCollection) this.ideaCollection.API_fetchCards()
+    if (this.ideasCollection) this.ideasCollection.API_fetchCards()
 
     if (this.state.collectionToTest) return
     // if none is set, we look up the parent to provide a default value
@@ -123,7 +123,7 @@ class TestDesigner extends React.Component {
     return collection.num_survey_responses
   }
 
-  get ideaCollection() {
+  get ideasCollection() {
     const { collection } = this.props
     const card = collection.sortedCards.find(
       card => card.card_question_type === 'ideas_collection'
@@ -218,8 +218,8 @@ class TestDesigner extends React.Component {
   }
 
   handleSetCurrentIdeaCardIndex = index => {
-    const numIdeas = this.ideaCollection
-      ? this.ideaCollection.sortedCards.length
+    const numIdeas = this.ideasCollection
+      ? this.ideasCollection.sortedCards.length
       : 0
     if (index < 0 || index > numIdeas - 1) return
     this.setState({
@@ -413,7 +413,7 @@ class TestDesigner extends React.Component {
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}
           createNewQuestionCard={this.createNewQuestionCard}
-          ideaCollection={this.ideaCollection}
+          ideasCollection={this.ideasCollection}
           showMedia={collection.test_show_media}
           handleToggleShowMedia={this.handleToggleShowMedia}
           handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}
