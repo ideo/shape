@@ -87,7 +87,7 @@ class Collection
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
     after_commit :close_test_after_archive, if: :archived_on_previous_save?
 
-    FEEDBACK_DESIGN_SUFFIX = 'Feedback Design'.freeze
+    FEEDBACK_DESIGN_SUFFIX = ' Feedback Design'.freeze
 
     enum test_status: {
       draft: 0,
@@ -158,8 +158,13 @@ class Collection
     end
 
     # Used so that we can interchangably call this on TestCollection and TestDesign
+    # TODO: check, is this still needed with TestResults?
     def test_collection
       self
+    end
+
+    def base_name
+      name.sub(FEEDBACK_DESIGN_SUFFIX, '')
     end
 
     def test_audience_closed!
@@ -304,7 +309,7 @@ class Collection
         duplicate.collection_to_test = args[:parent]
       elsif !parent.master_template? && !args[:parent].master_template?
         # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}".gsub(" #{FEEDBACK_DESIGN_SUFFIX}", '')
+        duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
       duplicate.save
       duplicate
@@ -596,7 +601,7 @@ class Collection
         end
       end
 
-      update(name: "#{name} #{FEEDBACK_DESIGN_SUFFIX}")
+      update(name: "#{name}#{FEEDBACK_DESIGN_SUFFIX}")
       parent_collection_card.update(collection_id: test_results_collection.id)
       # pick up parent_collection_card relationship
       reload

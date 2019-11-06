@@ -244,7 +244,7 @@ describe Collection::TestCollection, type: :model do
 
       it 'renames it to Copy of {name}' do
         duplicate_name = "Copy of #{test_collection.name}"
-                         .gsub(" #{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}", '')
+                         .gsub(Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX, '')
         expect(duplicate.name).to eq(duplicate_name)
       end
 
