@@ -46,6 +46,7 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
+    has_one :test_results_collection, class_name: 'Collection::TestResultsCollection', inverse_of: :idea
     has_one :question_dataset,
             -> { without_groupings },
             as: :data_source,
@@ -238,31 +239,24 @@ class Item
       builder.collection_card
     end
 
-    def find_or_create_open_response_collection(parent_collection:, initiated_by:)
-      return if !question_open? || test_open_responses_collection.present?
-
-      builder = CollectionCardBuilder.new(
-        params: {
-          order: parent_collection_card.order,
-          collection_attributes: {
-            name: "#{content} Responses",
-            type: 'Collection::TestOpenResponses',
-            question_item_id: id,
-          },
-        },
-        parent_collection: parent_collection,
-        user: initiated_by,
-      )
-      builder.create
-      builder.collection_card
-    end
-
     def org_wide_question_dataset
-      Dataset::Question.find_or_create_by(
-        groupings: [{ type: 'Organization', id: organization.id }],
+      org_grouping = [{ type: 'Organization', id: organization.id }]
+
+      dataset = Dataset::Question.where(
         question_type: question_type,
         identifier: Dataset::Question::DEFAULT_ORG_NAME,
         chart_type: :bar,
+      ).where(
+        'groupings @> ?', org_grouping.to_json,
+      ).first
+
+      return dataset if dataset.present?
+
+      Dataset::Question.create(
+        question_type: question_type,
+        identifier: Dataset::Question::DEFAULT_ORG_NAME,
+        chart_type: :bar,
+        groupings: org_grouping,
       )
     end
 

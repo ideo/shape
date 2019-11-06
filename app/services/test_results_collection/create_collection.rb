@@ -1,0 +1,105 @@
+module TestResultsCollection
+  class CreateCollection
+    include Interactor
+    include Interactor::Schema
+    include CollectionCardBuilderHelpers
+
+    schema :test_collection,
+           :test_results_collection,
+           :created_by,
+           :message
+
+    require_in_context :test_collection,
+                       :created_by
+
+    delegate :test_results_collection, :test_collection, :idea, :created_by,
+             to: :context
+
+    delegate :idea_cards, to: :test_collection
+
+    def call
+      context.test_results_collection = find_test_results_collection
+
+      return if test_results_collection.present?
+
+      context.test_results_collection = create_collection
+
+      return unless master_results_collection?
+
+      update_test_collection_name
+      move_roles_to_results_collection if move_roles?
+      move_test_collection_inside_test_results
+    end
+
+    private
+
+    def find_test_results_collection
+      return test_collection.test_results_collection if master_results_collection?
+
+      idea.test_results_collection
+    end
+
+    def master_results_collection?
+      idea.blank?
+    end
+
+    def create_collection
+      collection = test_collection.create_test_results_collection(
+        name: test_collection.name,
+        organization: test_collection.organization,
+        created_by: created_by,
+        roles_anchor_collection: test_results_roles_anchor,
+        idea_id: idea&.id,
+      )
+
+      return collection if collection.persisted?
+
+      context.fail!(
+        message: collection.errors.full_messages.to_sentence,
+      )
+    end
+
+    def update_test_collection_name
+      test_collection.update(
+        name: "#{test_collection.name} #{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}",
+      )
+    end
+
+    def move_roles_to_results_collection
+      test_collection.roles.each do |role|
+        role.update(resource: test_results_collection)
+      end
+    end
+
+    def move_test_collection_inside_test_results
+      test_collection.parent_collection_card.update(
+        collection_id: test_results_collection.id,
+      )
+
+      # pick up parent_collection_card relationship
+      reload_collections
+
+      create_card(
+        attrs: {
+          order: 999,
+          collection_id: test_collection.id,
+        },
+        parent_collection: test_results_collection,
+        created_by: created_by,
+      )
+    end
+
+    def reload_collections
+      test_collection.reload
+      test_results_collection.reload
+    end
+
+    def test_results_roles_anchor
+      return test_collection.roles_anchor if test_collection.roles_anchor != test_collection
+    end
+
+    def move_roles?
+      test_results_roles_anchor.blank?
+    end
+  end
+end

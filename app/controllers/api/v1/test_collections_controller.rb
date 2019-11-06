@@ -85,7 +85,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   end
 
   def csv_report
-    @report = TestCollectionToCsv.call(@test_collection)
+    @report = TestCollection::ExportToCsv.call(@test_collection)
     respond_to do |format|
       format.any { send_data @report, filename: "test-#{params[:id]}-#{Date.today}.csv" }
     end

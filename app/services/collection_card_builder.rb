@@ -94,20 +94,7 @@ class CollectionCardBuilder
        @parent_collection.live_or_was_launched? &&
        record.is_a?(Item::QuestionItem)
 
-      test_collection = @parent_collection.test_collection
-
-      # If this is a new scale question, create response graphs
-      if record.scale_question?
-        record.find_or_create_response_graph(
-          parent_collection: test_collection.test_results_collection,
-          initiated_by: @user,
-        )
-      elsif record.question_open?
-        record.find_or_create_open_response_collection(
-          parent_collection: test_collection.test_results_collection,
-          initiated_by: @user,
-        )
-      end
+      TestResultsCollectionUpdateWorker.perform_async(@parent_collection.id, @user.id)
     end
 
     return unless @parent_collection.is_a? Collection::SubmissionsCollection
@@ -128,5 +115,10 @@ class CollectionCardBuilder
     @datasets_params.to_h.values.each do |dataset_params|
       @collection_card.item.create_dataset(dataset_params)
     end
+  end
+
+  def capture_error_and_rollback(error)
+    @errors << error
+    raise ActiveRecord::Rollback
   end
 end

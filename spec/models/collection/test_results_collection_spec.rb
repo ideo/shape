@@ -17,18 +17,6 @@ describe Collection::TestResultsCollection, type: :model do
 
   context 'callbacks' do
     describe '#initialize_cards!' do
-      it 'should create a chart item for each scale question' do
-        count = test_collection.question_items.select(&:scale_question?).size
-        expect {
-          launch
-        }.to change(
-          Item::DataItem, :count
-        ).by(count)
-        expect(
-          test_results_collection.items.where(type: 'Item::DataItem').size,
-        ).to eq(count)
-      end
-
       it 'creates a media item link for each idea' do
         launch
         expect(
