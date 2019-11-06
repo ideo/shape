@@ -1,6 +1,4 @@
-
 class UniqNameGenerator < SimpleService
-
   def initialize(disallowed_names:)
     @disallowed_names = disallowed_names
   end
