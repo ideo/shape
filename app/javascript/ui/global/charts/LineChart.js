@@ -12,11 +12,11 @@ import {
   lineChartDashWithForOrder,
 } from '~/ui/global/charts/ChartUtils'
 
-const formatValuesWithoutDates = (values, numValues) => {
+const formatValuesWithoutDates = (values, numDesiredValues) => {
   const formattedValues = [...values]
 
   // Add a duplicate value
-  for (let i = formattedValues.length; i < numValues; i++) {
+  for (let i = formattedValues.length; i < numDesiredValues; i++) {
     const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
     formattedValues.unshift(duplicateValue)
   }
@@ -55,11 +55,12 @@ const LineChart = ({
   numPrimaryDatasetValues,
 }) => {
   const { measure, timeframe } = dataset
+  const { data } = dataset
   let values
-  if (dataset.data[0].date) {
-    values = formatValuesWithDates(dataset.data)
+  if (data[0] && !data[0].date) {
+    values = formatValuesWithoutDates(data, numPrimaryDatasetValues)
   } else {
-    values = formatValuesWithoutDates(dataset.data, numPrimaryDatasetValues)
+    values = formatValuesWithDates(data)
   }
   const domain = chartDomainForDatasetValues({
     values,
