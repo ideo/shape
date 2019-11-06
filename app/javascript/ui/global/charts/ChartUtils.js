@@ -8,10 +8,16 @@ import objectAssignDeep from '~/vendor/object-assign-deep'
 
 import v from '~/utils/variables'
 
-export const barWidthPx = (totalColumns, totalGroupings) =>
-  totalGroupings > 2 || totalColumns > 4
-    ? 30 / (totalColumns / totalGroupings / 2)
-    : 30
+export const barWidthPx = (totalColumns, totalGroupings) => {
+  const padding = 16
+  const maxWidth = 644
+  const paddingModifier = (totalColumns - 1) * padding
+  const widthModifier = maxWidth / (totalColumns + totalGroupings)
+  const width = Math.min(widthModifier - paddingModifier, 28)
+  return width
+}
+
+// 30 / (5 / 1 / 2)
 
 export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
   const dashWidths = [[2, 4], [3, 1], [4, 2], [2, 8], [8, 6], [1, 5]]

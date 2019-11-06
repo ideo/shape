@@ -45,11 +45,15 @@ class ChartLabelWithTooltip extends React.Component {
 
   render() {
     const { props } = this
-    const { maxTickLength, text } = props
+    const { maxTickLength, text, totalColumns } = props
     const truncatedText =
       text.length > maxTickLength
         ? `${text.substring(0, maxTickLength)} …`
         : text
+    // Nudge the lables over to the right or left if first or last in chart
+    let dx = 0
+    if (props.index === 0) dx = 7
+    if (props.index === totalColumns - 1) dx = -7
     return (
       <Fragment>
         <VictoryLabel
@@ -58,6 +62,7 @@ class ChartLabelWithTooltip extends React.Component {
             onMouseEnter: this.toggleHover,
             onMouseLeave: this.toggleHover,
           }}
+          dx={dx}
           text={truncatedText}
         />
         <ChartTooltip

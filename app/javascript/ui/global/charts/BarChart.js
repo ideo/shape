@@ -24,7 +24,6 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
     values,
     maxDomain: max_domain,
   })
-  console.log('values fdkljs', values)
   const totalBars = dataset.data.length
   const barWidth = barWidthPx(totalBars, barsInGroup)
   // Only show labels if theres room for them

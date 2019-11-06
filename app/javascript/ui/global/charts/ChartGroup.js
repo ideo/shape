@@ -208,11 +208,16 @@ class ChartGroup extends React.Component {
 
     if (this.primaryDatasetBarChart) {
       const barLength = barWidthPx(this.totalColumns, this.totalGroupings)
-      const avgCharToPxRatio = 4
-      const maxTickLength = (this.totalGroupings * barLength) / avgCharToPxRatio
+      const avgCharToPxRatio = 2.85
+      const maxTickLength = barLength / avgCharToPxRatio
+      console.log('bar width', { barLength })
 
       const Wrapper = props => (
-        <ChartLabelWithTooltip maxTickLength={maxTickLength} {...props} />
+        <ChartLabelWithTooltip
+          totalColumns={this.totalColumns}
+          maxTickLength={maxTickLength}
+          {...props}
+        />
       )
       let tickValues = 'column'
       let tickFormat
@@ -370,7 +375,12 @@ class ChartGroup extends React.Component {
         <VictoryChart
           theme={victoryTheme}
           domainPadding={{ y: 70 }}
-          padding={{ top: 0, left: barWidth, right: barWidth, bottom: 30 }}
+          padding={{
+            top: 0,
+            left: barWidth * (Math.max(this.totalGroupings, 2) - 1),
+            right: barWidth * (Math.max(this.totalGroupings, 2) - 1),
+            bottom: 30,
+          }}
         >
           <VictoryGroup offset={barWidth}>
             {this.renderedDatasets.map(dataset => dataset)}
