@@ -112,15 +112,10 @@ class SurveyResponse < ApplicationRecord
   private
 
   def create_alias
-    searching_uniq_name = true
-    name = ''
     survey_names = test_collection.survey_responses.pluck(:respondent_alias)
-    while searching_uniq_name
-      name = Faker::Name.first_name
-      if !survey_names.include?(name) && user&.first_name != name
-        break
-      end
-    end
+    survey_names << user&.first_name
+
+    name = UniqNameGenerator.call(disallowed_names: survey_names.compact)
     update_attributes(respondent_alias: name)
   end
 
