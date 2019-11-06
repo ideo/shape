@@ -48,43 +48,9 @@ exports[`TestDesigner renders snapshot 1`] = `
       value=""
     >
       <span
-        data-cy="QuestionSelectOption-idea-content"
+        data-cy="QuestionSelectOption-idea-ratings"
       >
-        Idea Content
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "selectOption",
-          "selected": "selected",
-        }
-      }
-      disabled={false}
-      key="question_description"
-      value="question_description"
-    >
-      <span
-        data-cy="QuestionSelectOption-description"
-      >
-        Description
-      </span>
-    </StyledSelectOption>
-    <StyledSelectOption
-      classes={
-        Object {
-          "root": "category",
-          "selected": "selected",
-        }
-      }
-      disabled={true}
-      key=""
-      value=""
-    >
-      <span
-        data-cy="QuestionSelectOption-scaled-rating"
-      >
-        Scaled Rating
+        Idea Ratings
       </span>
     </StyledSelectOption>
     <StyledSelectOption
@@ -238,6 +204,23 @@ exports[`TestDesigner renders snapshot 1`] = `
         data-cy="QuestionSelectOption-single-choice"
       >
         Single Choice
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_description"
+      value="question_description"
+    >
+      <span
+        data-cy="QuestionSelectOption-text-block"
+      >
+        Text Block
       </span>
     </StyledSelectOption>
   </StyledSelect>

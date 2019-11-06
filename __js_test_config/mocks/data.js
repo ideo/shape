@@ -32,8 +32,8 @@ export const fakeCollectionCard = {
   ...fakeJsonApiAttrs,
 }
 
-export const fakeQuillOp = {insert: "hello world \n"}
-export const fakeQuillData = {ops: [fakeQuillOp]}
+export const fakeQuillOp = { insert: 'hello world \n' }
+export const fakeQuillData = { ops: [fakeQuillOp] }
 
 export const fakeTextItemAttrs = {
   id: '1',
@@ -144,7 +144,7 @@ export const fakeDatasetAttrs = {
   test_collection_id: null,
   timeframe: 'ever',
   total: 1,
-  tiers: []
+  tiers: [],
 }
 
 export const fakeDataset = {
@@ -320,6 +320,8 @@ export const fakeQuestionItem = {
   question_type: 'question_description',
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
+  API_destroyQuestionChoice: jest.fn().mockReturnValue(Promise.resolve()),
+  API_createQuestionChoice: jest.fn().mockReturnValue(Promise.resolve()),
   ...fakeJsonApiAttrs,
 }
 
@@ -327,6 +329,23 @@ export const fakeQuestionAnswer = {
   answer_text: 'Great!',
   answer_number: 1,
   question_id: fakeQuestionItem.id,
+  selected_choice_ids: [],
+}
+
+export const fakeQuestionChoice = {
+  text: 'Option A',
+  question_item_id: fakeQuestionItem.id,
+  order: 0,
+  value: '0',
+  id: 1,
+}
+
+export const fakeQuestionSecondChoice = {
+  text: 'Option B',
+  question_item_id: fakeQuestionItem.id,
+  order: 1,
+  value: '1',
+  id: 2,
 }
 
 export const fakeItemCard = {
@@ -523,7 +542,7 @@ export const fakeComment = {
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
   API_fetchReplies: jest.fn().mockReturnValue(Promise.resolve({})),
-  expandAndFetchReplies: jest.fn().mockReturnValue(Promise.resolve({}))
+  expandAndFetchReplies: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeThread = {
   id: '1',

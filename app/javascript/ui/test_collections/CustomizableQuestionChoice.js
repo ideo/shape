@@ -19,6 +19,7 @@ const ChoiceHolder = styled.div`
     background: white;
   }
 `
+ChoiceHolder.displayName = 'ChoiceHolder'
 
 const IconHolder = styled.button`
   display: inline-block;
@@ -92,12 +93,12 @@ class CustomizableQuestionChoice extends React.Component {
               placeholder="write question here"
               data-cy="CustomizableQuestionTextInput"
               disabled={!editing}
-              inline
+              inline="true"
             />
           </DisplayText>
         </label>
         {editing && (
-          <IconHolder onClick={this.handleDelete}>
+          <IconHolder data-cy="TrashIconHolder" onClick={this.handleDelete}>
             <TrashIcon />
           </IconHolder>
         )}
@@ -120,8 +121,9 @@ CustomizableQuestionChoice.defaultProps = {
   questionAnswer: null,
   isChecked: false,
   editing: false,
-  editing: false,
   onDelete: () => {},
 }
+
+CustomizableQuestionChoice.displayName = 'CustomizableQuestionChoice'
 
 export default CustomizableQuestionChoice

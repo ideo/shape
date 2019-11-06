@@ -9,7 +9,6 @@ import v from '~/utils/variables'
 const MediaWrapper = styled.div`
   ${showOnHoverCss}
   border-top: 4px solid ${props => props.theme.borderColorEditing};
-  border-bottom: 4px solid ${props => props.theme.borderColorEditing};
   height: ${props => props.minHeight}px;
   background-color: ${v.colors.commonLightest};
 `
