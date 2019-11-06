@@ -11,9 +11,9 @@ class UniqNameGenerator < SimpleService
 
   def find_uniq_name
     name = ''
-    total_trys = @disallowed_names.count
+    total_tries = @disallowed_names.count
     try = 0
-    while try < total_trys
+    while try < total_tries
       try += 1
       name = Faker::Name.first_name
       next if @disallowed_names.include?(name)
