@@ -27,13 +27,13 @@ module TestResultsCollection
     def call
       ActiveRecord::Base.transaction do
         super
-      rescue Interactor::Error => e
-       #   ActiveRecord::Rollback
-        debugger
+      rescue Interactor::Failure => e
+        raise ActiveRecord::Rollback, e.message
       end
     end
 
     after do
+      context.test_results_collection ||= test_collection.test_results_collection
       # might not need this next step?
       test_collection.cache_cover!
       test_results_collection.reorder_cards!
