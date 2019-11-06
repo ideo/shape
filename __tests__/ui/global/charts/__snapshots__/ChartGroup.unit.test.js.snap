@@ -2781,7 +2781,7 @@ exports[`ChartGroup renders snapshot 1`] = `
       }
       key="dataset-0"
       labelComponent={
-        <ChartTooltip
+        <TickLabelWithTooltip
           alwaysShowLabels={false}
           cardArea={1}
           displayTicks={true}
@@ -3346,7 +3346,7 @@ exports[`ChartGroup renders snapshot 1`] = `
       }
       key="dataset-1"
       labelComponent={
-        <ChartTooltip
+        <TickLabelWithTooltip
           alwaysShowLabels={false}
           cardArea={1}
           displayTicks={true}

@@ -15,18 +15,21 @@ exports[`BarChart renders snapshot 1`] = `
     Array [
       Object {
         "date": "2018-07-10",
+        "label": undefined,
         "value": 10,
         "x": undefined,
         "y": NaN,
       },
       Object {
         "date": "2018-08-10",
+        "label": undefined,
         "value": 25,
         "x": undefined,
         "y": NaN,
       },
       Object {
         "date": "2018-09-10",
+        "label": undefined,
         "value": 30,
         "x": undefined,
         "y": NaN,
@@ -69,7 +72,7 @@ exports[`BarChart renders snapshot 1`] = `
   }
   key="dataset-0"
   labelComponent={
-    <ChartTooltip
+    <TickLabelWithTooltip
       alwaysShowLabels={true}
       cardArea={1}
       displayTicks={false}
@@ -80,7 +83,7 @@ exports[`BarChart renders snapshot 1`] = `
     />
   }
   labels={[Function]}
-  padding={10}
+  padding={0}
   samples={50}
   scale="linear"
   sortOrder="ascending"

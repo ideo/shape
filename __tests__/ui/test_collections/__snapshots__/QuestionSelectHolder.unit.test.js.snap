@@ -180,6 +180,23 @@ exports[`TestDesigner renders snapshot 1`] = `
         }
       }
       disabled={false}
+      key="question_multiple_choice"
+      value="question_multiple_choice"
+    >
+      <span
+        data-cy="QuestionSelectOption-multiple-choice"
+      >
+        Multiple Choice
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
       key="question_open"
       value="question_open"
     >
@@ -204,6 +221,23 @@ exports[`TestDesigner renders snapshot 1`] = `
         data-cy="QuestionSelectOption-photo-video"
       >
         Photo/Video
+      </span>
+    </StyledSelectOption>
+    <StyledSelectOption
+      classes={
+        Object {
+          "root": "selectOption",
+          "selected": "selected",
+        }
+      }
+      disabled={false}
+      key="question_single_choice"
+      value="question_single_choice"
+    >
+      <span
+        data-cy="QuestionSelectOption-single-choice"
+      >
+        Single Choice
       </span>
     </StyledSelectOption>
   </StyledSelect>
