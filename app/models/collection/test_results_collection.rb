@@ -139,7 +139,8 @@ class Collection
 
     def create_media_item_link(media_question_items: nil)
       if media_question_items.blank?
-        items = test_collection.items + ideas_collection.items
+        items = test_collection.items
+        items += ideas_collection.items if ideas_collection.present?
         media_question_items = items.reject { |item| item.type == 'Item::QuestionItem' }
       end
       # since we're placing things at the front one by one, we reverse the order

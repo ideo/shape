@@ -488,7 +488,7 @@ class Collection
     end
 
     def idea_cards
-      ideas_collection.items
+      ideas_collection&.items || Item.none
     end
 
     def cloned_or_templated?

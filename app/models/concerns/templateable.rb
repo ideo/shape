@@ -117,6 +117,8 @@ module Templateable
       # copy more details over if we are still setting up our submission template test
       test = card.parent
       next unless test.is_a?(Collection::TestCollection) && !test.launchable?
+      # Skip if we reach the ideas collection
+      next if master.record.is_a?(Collection)
 
       card.item.update(
         type: master.item.type,

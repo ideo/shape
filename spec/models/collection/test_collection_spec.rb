@@ -737,8 +737,8 @@ describe Collection::TestCollection, type: :model do
     it 'returns false with test_status errors' do
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([
+        'Please add your content to idea 1',
         'Please add your category to question 1',
-        'Please add your idea content to question 2',
         'Please add your open response to question 6',
         'Please add your open response to question 7',
       ])
