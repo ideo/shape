@@ -537,11 +537,13 @@ describe Collection::TestCollection, type: :model do
       create(:test_collection, :completed, master_template: true, parent_collection: submission_template)
     end
     let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
-    let!(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
+    let(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
 
     before do
       submission_box.setup_submissions_collection!
       submission_box.update(submission_template: submission_template)
+      # persist this now that submissions_collection exists
+      submission_test
       # copy cards into the template the way it actually would happen
       test_collection.update_template_instances
     end
@@ -552,9 +554,6 @@ describe Collection::TestCollection, type: :model do
 
     describe '#launch!' do
       context 'with valid draft collection (default status)' do
-        # for testing UpdateTemplateInstancesWorker below
-        let!(:test_instance) { create(:test_collection, template: test_collection) }
-
         it 'should launch without creating a TestResults collection' do
           expect(test_collection.launch!(initiated_by: user)).to be true
           expect(test_collection.test_status).to eq 'live'
@@ -591,6 +590,7 @@ describe Collection::TestCollection, type: :model do
         # make sure this is now persisted
         submission_test.reload
         test_collection.launch!(initiated_by: user)
+        puts "submission is #{submission.id} #{submission.name}"
         test_collection.update_submissions_launch_status
         submission.reload
         submission_template.reload

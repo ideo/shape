@@ -17,13 +17,15 @@ class Role extends BaseRecord {
   @observable
   pendingCount = 0
   @observable
+  archivedCount = 0
+  @observable
   prevUsers = []
   @observable
   prevGroups = []
 
   @action
   updateCount(type, count) {
-    if (['pending', 'active'].indexOf(type) === -1) return
+    if (['pending', 'active', 'archived'].indexOf(type) === -1) return
     this[`${type}Count`] = count
   }
 

@@ -177,7 +177,7 @@ class User < ApplicationRecord
   after_commit :reindex
   alias searchkick_reindex reindex
   scope :search_import, -> do
-    where(status: %i[active pending]).includes(:application)
+    where(status: %i[active pending archived]).includes(:application)
   end
 
   def search_data
@@ -216,7 +216,7 @@ class User < ApplicationRecord
   end
 
   def should_index?
-    active? || pending?
+    !limited?
   end
 
   def should_reindex?

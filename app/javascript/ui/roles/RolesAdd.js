@@ -90,8 +90,13 @@ class RolesAdd extends React.Component {
     }
     apiStore[searchMethod](term)
       .then(res => {
-        uiStore.update('autocompleteValues', res.data.length)
-        callback(this.mapItems(res.data))
+        if (!!res.data) {
+          uiStore.update('autocompleteValues', res.data.length)
+          const activeAndPendingUsers = _.filter(res.data, u => {
+            return u.status === 'active' || u.status === 'pending'
+          })
+          callback(this.mapItems(activeAndPendingUsers))
+        }
       })
       .catch(e => {
         trackError(e)

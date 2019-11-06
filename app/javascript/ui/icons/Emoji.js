@@ -7,7 +7,6 @@ import EmojiExplodingHead from '~/assets/emoji/exploding-head_1f92f.png'
 import EmojiSlightlySmilingFace from '~/assets/emoji/slightly-smiling-face.png'
 import EmojiWomanShrugging from '~/assets/emoji/woman-shrugging.png'
 import EmojiError from '~/assets/emoji/error.png'
-import trackError from '~/utils/trackError'
 
 const emojiFallbackMap = {
   '🤯': EmojiExplodingHead,
@@ -18,15 +17,8 @@ const emojiFallbackMap = {
 }
 
 function emojiFallback(symbol) {
-  const fallback = emojiFallbackMap[symbol]
-  if (!fallback) {
-    trackError(new Error(`Missing emoji: ${symbol}`), {
-      source: 'Emoji',
-      name: 'emojiFallback',
-    })
-    return EmojiError
-  }
-  return fallback
+  // no longer throwing an AppSignal error here, it was getting too noisy
+  return emojiFallbackMap[symbol] || EmojiError
 }
 function emojiSupported() {
   const ctx = document.createElement('canvas').getContext('2d')
@@ -63,7 +55,7 @@ const Emoji = props => {
 
   return emojiSupported(symbol) ? (
     <span
-      className="emoji"
+      data-cy="emoji"
       role="img"
       aria-label={name || ''}
       aria-hidden={name ? 'false' : 'true'}
@@ -76,6 +68,7 @@ const Emoji = props => {
     </span>
   ) : (
     <EmojiImage
+      data-cy="emoji"
       style={{ width: emojiSize() }}
       src={emojiFallback(symbol)}
       alt={name}

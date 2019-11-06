@@ -31,7 +31,6 @@ describe('TestDesigner', () => {
     const select = wrapper.find('StyledSelect StyledSelectOption')
     const values = _.compact(select.map(n => n.props().value))
     expect(values).toEqual([
-      'question_description',
       'question_clarity',
       'question_different',
       'question_excitement',
@@ -40,6 +39,7 @@ describe('TestDesigner', () => {
       'question_open',
       'question_media',
       'question_single_choice',
+      'question_description',
     ])
   })
 })
