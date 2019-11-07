@@ -5,27 +5,22 @@
 #  id                    :bigint(8)        not null, primary key
 #  answer_number         :integer
 #  answer_text           :text
+#  selected_choice_ids   :jsonb            not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
-#  idea_id               :bigint(8)
 #  open_response_item_id :integer
 #  question_id           :bigint(8)
 #  survey_response_id    :bigint(8)
 #
 # Indexes
 #
-#  index_question_answers_on_survey_response_id    (survey_response_id)
-#  index_question_answers_on_unique_idea_response  (question_id,idea_id,survey_response_id) UNIQUE WHERE (idea_id IS NOT NULL)
-#  index_question_answers_on_unique_response       (question_id,survey_response_id) UNIQUE WHERE (idea_id IS NULL)
+#  index_question_answers_on_survey_response_id_and_question_id  (survey_response_id,question_id) UNIQUE
 #
 
 class QuestionAnswer < ApplicationRecord
   # NOTE: survey_response then touches its test_collection,
   # so that answering one question can bust the collection caching for viewing charts
   belongs_to :survey_response, touch: true
-  # class_name is generic Item because the ideas might be FileItem, LinkItem, etc.
-  belongs_to :idea, class_name: 'Item', optional: true
-
   belongs_to :question, class_name: 'Item::QuestionItem'
   belongs_to :open_response_item,
              class_name: 'Item::TextItem',
@@ -35,7 +30,6 @@ class QuestionAnswer < ApplicationRecord
   delegate :completed?, to: :survey_response, prefix: true
 
   validates :answer_number, presence: true, if: :answer_number_required?
-  validates :question_id, uniqueness: { scope: %i[survey_response_id idea_id] }
 
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
@@ -75,13 +69,79 @@ class QuestionAnswer < ApplicationRecord
     question.test_open_responses_collection.present? && open_response_item.blank?
   end
 
+  def quote_url(object)
+    return "/link" if object.blank?
+    "/#{survey_response.test_collection.organization.slug}/collections/#{object.id}"
+  end
+
+  def quote_card_ops(
+    test_results_collection:,
+    idea:,
+    question:,
+    audience:,
+    survey_response:,
+    answer:
+  )
+    {ops:
+      [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
+       {insert: " | "},
+       {insert: "Idea", attributes: { link: "/ideo/collections/761971"}},
+       {insert: "\n"},
+       {insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection)}},
+       {insert: "\n", attributes: { header: 2}},
+       {insert: "“#{answer.answer_text}”"},
+       {insert: "\n", attributes: { header: 1}},
+       {insert: "- "},
+       {insert: "Todd", attributes: { link: "/link"}},
+       {insert: ", "},
+       {insert: audience.name, attributes: {link: "/link"}},
+      ],
+    }
+  end
+
+  def quote_card_template(
+    test_results_collection:,
+    idea:,
+    question:,
+    audience:,
+    survey_response:,
+    answer:
+  )
+    "<p><a href=\"#{quote_url(test_results_collection)}\">#{test_results_collection.name}</a> | <a href=\"#{quote_url(idea)}\">#{idea.name || 'idea'}</a></p>
+    <h2><a href=\"#{quote_url(question.test_open_responses_collection)}\">#{question.content}</a></h2>
+    <h1>“#{answer.answer_text}”</h1>
+    <p>- <a href=\"#{quote_url(nil)}\">Todd</a>, <a href=\"#{quote_url(nil)}\">#{audience.name || 'aud'}</a></p>
+    "
+  end
+
+  def quote_quill_content
+    quote = quote_card_template(
+      test_results_collection: survey_response.test_collection.test_results_collection,
+      idea: survey_response.test_collection.ideas_collection,
+      question: question,
+      audience: survey_response.test_audience,
+      survey_response: survey_response,
+      answer: self
+    )
+    QuillContentConverter.new(quote).html_to_quill_ops
+  end
+
   def create_open_response_item
     # Create the open response item on the Test Responses collection
+    ops = quote_card_ops(
+      test_results_collection: survey_response.test_collection.test_results_collection,
+      idea: survey_response.test_collection.ideas_collection,
+      question: question,
+      audience: survey_response.test_audience,
+      survey_response: survey_response,
+      answer: self
+    )
     card_params = {
+      width: 2,
       item_attributes: {
         type: 'Item::TextItem',
         content: answer_text,
-        data_content: QuillContentConverter.new(answer_text).text_to_quill_ops,
+        data_content: ops,
       },
     }
     builder = CollectionCardBuilder.new(
