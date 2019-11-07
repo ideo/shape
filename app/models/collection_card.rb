@@ -54,6 +54,8 @@ class CollectionCard < ApplicationRecord
   # for the purpose of accepting these params via deserializable
   attr_accessor :external_id
   attr_accessor :card_type
+  # for test survey
+  attr_accessor :idea_id
 
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
@@ -429,6 +431,12 @@ class CollectionCard < ApplicationRecord
       parent.cached_cover['no_cover'] = true
     end
     parent.cache_cover!
+  end
+
+  # used by serializer to have multiple "versions" of a card, one per idea
+  def id_with_idea_id
+    idea_suffix = idea_id ? "_#{idea_id}" : ''
+    "#{id}#{idea_suffix}"
   end
 
   private

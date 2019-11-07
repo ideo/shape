@@ -90,6 +90,10 @@ class Collection
 
     has_many :survey_responses, through: :test_collection
 
+    def base_name
+      name
+    end
+
     ###########
     def migrate!
       tc = Collection.find(test_collection_id)
@@ -111,6 +115,9 @@ class Collection
       [SurveyResponse, TestAudience].each do |klass|
         klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
       end
+
+      # these used to have question_type: nil
+      items.where.not(type: 'Item::QuestionItem').update_all(question_type: :question_media)
 
       return unless inside_a_submission?
 

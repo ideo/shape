@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_01_212918) do
+ActiveRecord::Schema.define(version: 2019_11_05_225848) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -550,7 +550,10 @@ ActiveRecord::Schema.define(version: 2019_11_01_212918) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
+    t.bigint "idea_id"
+    t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
+    t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
+    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
 
   create_table "roles", force: :cascade do |t|

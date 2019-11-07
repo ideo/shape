@@ -455,7 +455,7 @@ class Collection
     end
 
     def incomplete_question_items
-      incomplete_items = idea_cards.joins(
+      incomplete_items = idea_items.joins(
         :parent_collection_card,
       ).select(&:question_item_incomplete?)
 
@@ -472,6 +472,7 @@ class Collection
       end.each(&:destroy)
     end
 
+    # used in SurveyResponse#all_questions_answered?
     def answerable_complete_question_items
       complete_question_items(answerable_only: true)
     end
@@ -483,12 +484,12 @@ class Collection
       questions.reject(&:question_item_incomplete?)
     end
 
-    def complete_question_cards
-      complete_question_items.collect(&:parent_collection_card)
+    def idea_items
+      ideas_collection&.items || Item.none
     end
 
     def idea_cards
-      ideas_collection&.items || Item.none
+      ideas_collection&.collection_cards || CollectionCard.none
     end
 
     def cloned_or_templated?
