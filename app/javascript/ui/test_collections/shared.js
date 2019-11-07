@@ -35,10 +35,10 @@ export const QuestionText = styled.p`
 QuestionText.propTypes = {
   fontSizeEm: PropTypes.number,
 }
-
 QuestionText.defaultProps = {
   fontSizeEm: 1,
 }
+QuestionText.displayName = 'QuestionText'
 
 export const TestQuestionBorder = styled.div`
   border-bottom: 4px solid ${props => props.theme.borderColorEditing};

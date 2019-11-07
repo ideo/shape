@@ -1,6 +1,15 @@
 class Api::V1::UsersController < Api::V1::BaseController
-  before_action :authenticate_user!, only: %i[update_current_user accept_current_org_terms]
-  skip_before_action :check_api_authentication!, only: %i[me update_current_user accept_current_org_terms create_limited_user]
+  before_action :authenticate_user!, only: %i[
+    update_current_user
+    accept_current_org_terms
+  ]
+  skip_before_action :check_api_authentication!, only: %i[
+    me
+    update_current_user
+    update_survey_respondent
+    accept_current_org_terms
+    create_limited_user
+  ]
 
   before_action :require_application_bot!, only: %i[index]
   before_action :load_and_filter_index, only: %i[index]
@@ -59,6 +68,15 @@ class Api::V1::UsersController < Api::V1::BaseController
     end
   end
 
+  before_action :load_survey_respondent, only: %i[update_survey_respondent]
+  def update_survey_respondent
+    if @user.update(survey_respondent_user_params)
+      render jsonapi: @user, expose: { survey_response: true }
+    else
+      render_api_errors @user.errors
+    end
+  end
+
   def accept_current_org_terms
     if current_user.accept_current_org_terms
       render jsonapi: current_user, class: {
@@ -74,16 +92,13 @@ class Api::V1::UsersController < Api::V1::BaseController
     session_uid = json_api_params[:session_uid]
     creator = LimitedUserCreator.new(contact_info: contact_info)
     if creator.call
-      # sign you in so you can update yourself later (e.g. phone + recontact)
-      # TODO: what if creator found a network user, any issue w/ later fields e.g. recontact?
-      sign_in(:user, creator.limited_user) if creator.created
       if session_uid
         survey_response = SurveyResponse.find_by_session_uid(session_uid)
         survey_response.update(user_id: creator.limited_user.id)
         # run this to capture potential incentive_owed
         SurveyResponseCompletion.call(survey_response)
       end
-      render jsonapi: creator.limited_user
+      render jsonapi: creator.limited_user, expose: { survey_response: true }
     else
       logger.info "** ERROR CREATING LIMITED USER #{creator.errors.inspect} **"
       render json: { errors: creator.errors }, status: :unprocessable_entity
@@ -115,6 +130,17 @@ class Api::V1::UsersController < Api::V1::BaseController
     authorize! :read, @organization
   end
 
+  def load_survey_respondent
+    if user_signed_in?
+      @user = current_user
+      return
+    end
+
+    survey_response = SurveyResponse.find_by_session_uid(json_api_params[:session_uid])
+    @user = survey_response&.user
+    head(:unauthorized) if @user.nil?
+  end
+
   def user_params
     json_api_params.require(:user).permit(
       # these are the only fields you would update via the API
@@ -129,14 +155,14 @@ class Api::V1::UsersController < Api::V1::BaseController
       :feedback_terms_accepted,
       :respondent_terms_accepted,
       :locale,
-      age_list: [],
-      children_age_list: [],
-      country_list: [],
-      education_level_list: [],
-      gender_list: [],
-      adopter_type_list: [],
-      interest_list: [],
-      publication_list: [],
+    )
+  end
+
+  def survey_respondent_user_params
+    json_api_params.require(:user).permit(
+      :feedback_contact_preference,
+      :respondent_terms_accepted,
+      # eventually, also permit demographics here...
     )
   end
 end

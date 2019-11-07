@@ -17,7 +17,7 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
       to: DoubleEntry.account(:revenue_deferred, scope: payment),
       code: :purchase,
     )
-    test_audience.update(price_per_response: 4.50)
+    test_audience.update(price_per_response: 4.50, sample_size: 5)
     allow(NetworkApi::Payment).to receive(:create).and_return(
       network_payment_double,
     )
@@ -109,7 +109,6 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
       before do
         survey_response.update(user: user)
         survey_response2.update(user: user)
-        allow(survey_response2).to receive(:completed?).and_return(true)
       end
 
       it 'updates survey response payment status' do
@@ -117,6 +116,19 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
           service.call
         }.to change(survey_response, :incentive_status)
         expect(survey_response.incentive_status).to eq('incentive_owed')
+      end
+
+      context 'unpaid, but user already has a completed survey response' do
+        before do
+          survey_response.update(status: :completed)
+          test_audience.update(price_per_response: 0)
+        end
+
+        it 'marks the survey_response as duplicate' do
+          expect(survey_response2.duplicate?).to be false
+          SurveyResponseCompletion.call(survey_response2)
+          expect(survey_response2.duplicate?).to be true
+        end
       end
 
       it 'will only mark amount owed once and not for additional dupe survey response' do
@@ -138,6 +150,7 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         ).to eq(TestAudience.incentive_amount)
         # dupe response remains unearned
         expect(survey_response2.incentive_unearned?).to be true
+        expect(survey_response2.duplicate?).to be true
       end
 
       context 'with an existing balance' do

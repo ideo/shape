@@ -51,6 +51,22 @@ class User extends BaseRecord {
     }
   }
 
+  async API_updateSurveyRespondent(session_uid, option = {}) {
+    try {
+      return await this.apiStore.request(
+        'users/update_survey_respondent',
+        'PATCH',
+        {
+          session_uid,
+          user: option,
+        }
+      )
+    } catch (e) {
+      uiStore.defaultAlertError()
+      return Promise.reject(e)
+    }
+  }
+
   async API_acceptCurrentOrgTerms() {
     try {
       return await this.apiStore.request(
