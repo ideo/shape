@@ -64,14 +64,7 @@ class QuestionAnswer < ApplicationRecord
     return destroy_open_response_item_and_card if answer_text.blank?
 
     item.content = answer_text
-    ops = quote_card_ops(
-      test_results_collection: survey_response.test_collection.test_results_collection,
-      idea: idea,
-      question: question,
-      audience: survey_response.test_audience,
-      survey_response: survey_response,
-      answer: self
-    )
+    ops = quote_card_ops
     item.data_content = ops
     item.save
   end
@@ -87,14 +80,13 @@ class QuestionAnswer < ApplicationRecord
     "/#{survey_response.test_collection.organization.slug}/#{object.jsonapi_type_name}/#{object.id}"
   end
 
-  def quote_card_ops(
-    test_results_collection:,
-    idea:,
-    question:,
-    audience:,
-    survey_response:,
-    answer:
-  )
+  def quote_card_ops
+    test_results_collection = survey_response.test_collection.test_results_collection
+    idea = idea
+    question = question
+    audience = survey_response.test_audience
+    survey_response = survey_response
+    answer = self
     {ops:
       [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
        {insert: " | "},
@@ -114,14 +106,7 @@ class QuestionAnswer < ApplicationRecord
 
   def create_open_response_item
     # Create the open response item on the Test Responses collection
-    ops = quote_card_ops(
-      test_results_collection: survey_response.test_collection.test_results_collection,
-      idea: idea,
-      question: question,
-      audience: survey_response.test_audience,
-      survey_response: survey_response,
-      answer: self
-    )
+    ops = quote_card_ops
     card_params = {
       width: 2,
       item_attributes: {
