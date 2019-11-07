@@ -52,7 +52,7 @@ class QuillContentConverter < SimpleService
 
   def write_current_string(element)
     # Need to add a newline if the next element is not a header
-    @current_string += "\n" if %w[h1 h2 h3 h5 img].include?(element.name)
+    @current_string += "\n" unless %w[h1 h2 h3 h5 img].include?(element.name)
     @quill_ops.push(insert: @current_string)
     @current_string = ''
   end

@@ -34,6 +34,14 @@ RSpec.describe SurveyResponse, type: :model do
         ).to be true
       end
     end
+
+    describe '#create_alias' do
+      let!(:survey_response) { create(:survey_response) }
+
+      it 'generates a uniq name as the respondent_alias' do
+        expect(survey_response.respondent_alias).to be_kind_of(String)
+      end
+    end
   end
 
   describe '#all_questions_answered?' do

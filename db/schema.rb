@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_05_225848) do
+ActiveRecord::Schema.define(version: 2019_11_06_190741) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -586,6 +586,7 @@ ActiveRecord::Schema.define(version: 2019_11_05_225848) do
     t.integer "incentive_status"
     t.datetime "incentive_owed_at"
     t.datetime "incentive_paid_at"
+    t.string "respondent_alias"
     t.index ["incentive_status"], name: "index_survey_responses_on_incentive_status"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
