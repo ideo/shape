@@ -90,12 +90,14 @@ class RolesAdd extends React.Component {
     }
     apiStore[searchMethod](term)
       .then(res => {
-        if (!!res.data) {
+        if (res.data && res.data.length) {
           uiStore.update('autocompleteValues', res.data.length)
-          const activeAndPendingUsers = _.filter(res.data, u => {
-            return u.status === 'active' || u.status === 'pending'
+          // NOTE: this is just to reject archived users who are marked on their `status`
+          // whereas archived groups don't get indexed at all
+          const validRecords = _.reject(res.data, {
+            status: 'archived',
           })
-          callback(this.mapItems(activeAndPendingUsers))
+          callback(this.mapItems(validRecords))
         }
       })
       .catch(e => {
