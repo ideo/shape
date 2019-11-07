@@ -82,15 +82,15 @@ class QuestionAnswer < ApplicationRecord
 
   def quote_card_ops
     test_results_collection = survey_response.test_collection.test_results_collection
-    idea = idea
-    question = question
+    idea = self.idea
+    question = self.question
     audience = survey_response.test_audience
     survey_response = survey_response
     answer = self
     {ops:
       [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
        {insert: " | "},
-       {insert: idea.name, attributes: { link: quote_url(idea)}},
+       {insert: idea&.name || 'Idea', attributes: { link: quote_url(idea)}},
        {insert: "\n"},
        {insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection)}},
        {insert: "\n", attributes: { header: 2}},
