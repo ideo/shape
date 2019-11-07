@@ -35,12 +35,12 @@ class TestQuestion extends React.Component {
   handleQuestionAnswer = async answer => {
     const {
       card,
-      item,
       editing,
       createSurveyResponse,
       afterQuestionAnswered,
       apiStore,
     } = this.props
+    const { record } = card
     const { text, number, selected_choice_ids, skipScrolling } = answer
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
@@ -59,7 +59,8 @@ class TestQuestion extends React.Component {
       // create new answer if we didn't have one
       questionAnswer = new QuestionAnswer(
         {
-          question_id: item.id,
+          question_id: record.id,
+          idea_id: card.idea_id,
           answer_text: text,
           answer_number: number,
           selected_choice_ids,
@@ -93,7 +94,6 @@ class TestQuestion extends React.Component {
     const {
       parent,
       card,
-      item,
       editing,
       questionAnswer,
       canEdit,
@@ -101,7 +101,9 @@ class TestQuestion extends React.Component {
       numberOfQuestions,
       testStatus,
       apiStore,
+      hideMedia,
     } = this.props
+    const { record } = card
 
     switch (card.card_question_type) {
       case 'question_useful':
@@ -112,7 +114,7 @@ class TestQuestion extends React.Component {
       case 'question_category_satisfaction':
         return (
           <ScaleQuestion
-            question={item}
+            question={record}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
@@ -122,11 +124,11 @@ class TestQuestion extends React.Component {
       case 'question_multiple_choice':
         return (
           <CustomizableQuestion
-            question={item}
+            question={record}
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
-            question_choices={item.question_choices}
+            question_choices={record.question_choices}
             isTestDraft={testStatus === 'draft'}
           />
         )
@@ -134,23 +136,30 @@ class TestQuestion extends React.Component {
       case 'question_media':
         return <MediaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_idea':
-        return <IdeaQuestion card={card} parent={parent} canEdit={canEdit} />
+        return (
+          <IdeaQuestion
+            card={card}
+            parent={parent}
+            canEdit={canEdit}
+            hideMedia={hideMedia}
+          />
+        )
       case 'question_description':
         if (editing) {
           return (
             <QuestionContentEditor
               placeholder="add text here…"
-              item={item}
+              item={record}
               canEdit={canEdit}
             />
           )
         }
-        return <QuestionText>{item.content}</QuestionText>
+        return <QuestionText>{record.content}</QuestionText>
 
       case 'question_open':
         return (
           <OpenQuestion
-            item={item}
+            item={record}
             editing={editing}
             canEdit={canEdit}
             questionAnswer={questionAnswer}
@@ -201,9 +210,10 @@ class TestQuestion extends React.Component {
   }
 
   get questionIdentifier() {
-    const { card, item } = this.props
-    if (item.question_description || item.content) {
-      return 'question-' + (item.question_description || item.content)
+    const { card } = this.props
+    const { record } = card
+    if (record.question_description || record.content) {
+      return 'question-' + (record.question_description || record.content)
     }
     return card.card_question_type
   }
@@ -225,7 +235,6 @@ TestQuestion.propTypes = {
   // parent is the parent collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  item: MobxPropTypes.objectOrObservableObject.isRequired,
   editing: PropTypes.bool.isRequired,
   surveyResponse: MobxPropTypes.objectOrObservableObject,
   questionAnswer: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
@@ -235,6 +244,7 @@ TestQuestion.propTypes = {
   numberOfQuestions: PropTypes.number,
   question_choices: MobxPropTypes.arrayOrObservableArray,
   testStatus: PropTypes.oneOf(['draft', 'live', 'closed']),
+  hideMedia: PropTypes.bool,
 }
 TestQuestion.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -248,6 +258,7 @@ TestQuestion.defaultProps = {
   canEdit: false,
   numberOfQuestions: null,
   question_choices: [],
+  hideMedia: false,
 }
 
 TestQuestion.displayName = 'TestQuestion'

@@ -2,6 +2,7 @@
   "type": "object",
   "properties": {
     "question_id": { "type": "string" },
+    "idea_id": { "type": ["string", "null"] },
     "answer_text": { "type": ["string", "null"] },
     "answer_number": { "type": ["integer", "null"] },
     "selected_choice_ids": { "type": ["array", "[]"] }

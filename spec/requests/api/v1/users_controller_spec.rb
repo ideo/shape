@@ -166,7 +166,58 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
-  describe 'PATCH #update_current_user' do
+  describe 'PATCH #update_survey_respondent', auth: false, create_org: false do
+    let(:path) { '/api/v1/users/update_survey_respondent' }
+    let(:user) { create(:user, feedback_contact_preference: 'feedback_contact_unanswered', show_helper: true) }
+    let(:survey_response) { create(:survey_response, user: user) }
+    let(:user_params) do
+      {
+        feedback_contact_preference: 'feedback_contact_yes',
+        show_helper: false,
+      }
+    end
+    let(:params) do
+      {
+        user: user_params,
+      }.to_json
+    end
+
+    context 'without a survey session_uid' do
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with a survey session_uid' do
+      let(:params) do
+        {
+          session_uid: survey_response.session_uid,
+          user: user_params,
+        }.to_json
+      end
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'updates feedback_terms_accepted for current_user' do
+        expect(user.feedback_contact_preference).to eq 'feedback_contact_unanswered'
+        patch(path, params: params)
+        expect(user.reload.feedback_contact_preference).to eq 'feedback_contact_yes'
+      end
+
+      it 'does not update unpermitted params' do
+        expect(user.show_helper).to be true
+        patch(path, params: params)
+        # should not have changed via this endpoint
+        expect(user.reload.show_helper).to be true
+      end
+    end
+  end
+
+  describe 'PATCH #accept_current_org_terms' do
     let(:organization) { user.current_organization }
     let(:path) { '/api/v1/users/accept_current_org_terms' }
 
@@ -211,12 +262,6 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq 200
-    end
-
-    it 'signs in the user' do
-      expect {
-        post(path, params: params)
-      }.to change(limited_user, :last_sign_in_at)
     end
 
     context 'with an existing survey response' do

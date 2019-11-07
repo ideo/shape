@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_31_202704) do
+ActiveRecord::Schema.define(version: 2019_11_05_225848) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -189,6 +189,7 @@ ActiveRecord::Schema.define(version: 2019_10_31_202704) do
     t.bigint "joinable_group_id"
     t.datetime "test_closed_at"
     t.integer "default_group_id"
+    t.boolean "test_show_media", default: true
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
@@ -541,13 +542,6 @@ ActiveRecord::Schema.define(version: 2019_10_31_202704) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
-  create_table "question_answer_choices", force: :cascade do |t|
-    t.integer "question_choice_id"
-    t.integer "question_answer_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "question_answers", force: :cascade do |t|
     t.bigint "survey_response_id"
     t.bigint "question_id"
@@ -556,8 +550,11 @@ ActiveRecord::Schema.define(version: 2019_10_31_202704) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
+    t.bigint "idea_id"
     t.jsonb "selected_choice_ids", default: [], null: false
-    t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
+    t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
+    t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
+    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
 
   create_table "question_choices", force: :cascade do |t|

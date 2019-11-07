@@ -8,7 +8,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
+import QuestionLeftSide from '~/ui/test_collections/QuestionLeftSide'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -93,10 +93,14 @@ class TestDesigner extends React.Component {
     this.state = {
       testType: hasCollectionToTest ? 'collection' : 'media',
       collectionToTest: collection_to_test,
+      currentIdeaCardIndex: 0,
     }
   }
 
   async componentDidMount() {
+    // Load idea cards
+    if (this.ideasCollection) this.ideasCollection.API_fetchCards()
+
     if (this.state.collectionToTest) return
     // if none is set, we look up the parent to provide a default value
     const { collection } = this.props
@@ -117,6 +121,14 @@ class TestDesigner extends React.Component {
   get numResponses() {
     const { collection } = this.props
     return collection.num_survey_responses
+  }
+
+  get ideasCollection() {
+    const { collection } = this.props
+    const card = collection.sortedCards.find(
+      card => card.card_question_type === 'ideas_collection'
+    )
+    if (card) return card.record
   }
 
   get cardsBySection() {
@@ -184,8 +196,15 @@ class TestDesigner extends React.Component {
   }
 
   handleTrash = card => {
+    const archiveCard = card => {
+      card.API_archiveSelf({})
+      if (card.card_question_type === 'question_idea') {
+        const { currentIdeaCardIndex } = this.state
+        this.handleSetCurrentIdeaCardIndex(currentIdeaCardIndex - 1)
+      }
+    }
     this.confirmActionIfResponsesExist({
-      action: () => card.API_archiveSelf({}),
+      action: () => archiveCard(card),
       message: 'Are you sure you want to remove this question?',
     })
   }
@@ -202,10 +221,28 @@ class TestDesigner extends React.Component {
     })
   }
 
+  handleSetCurrentIdeaCardIndex = index => {
+    const numIdeas = this.ideasCollection
+      ? this.ideasCollection.sortedCards.length
+      : 0
+    if (index < 0 || index > numIdeas - 1) return
+    this.setState({
+      currentIdeaCardIndex: index,
+    })
+  }
+
   trackQuestionCreation = () => {
     googleTagManager.push({
       event: 'formSubmission',
       formType: `Create ${ITEM_TYPES.QUESTION}`,
+    })
+  }
+
+  handleToggleShowMedia = e => {
+    const { collection } = this.props
+    this.confirmEdit(() => {
+      collection.test_show_media = !collection.test_show_media
+      collection.save()
     })
   }
 
@@ -269,8 +306,10 @@ class TestDesigner extends React.Component {
     order,
     sectionType,
     questionType = '',
+    parentCollection = null,
   }) => {
     const { collection } = this.props
+    const parent = parentCollection ? parentCollection : collection
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
@@ -278,10 +317,10 @@ class TestDesigner extends React.Component {
       },
       section_type: replacingCard ? replacingCard.section_type : sectionType,
       order: replacingCard ? replacingCard.order : order,
-      parent_id: collection.id,
+      parent_id: parent.id,
     }
     const card = new CollectionCard(attrs, apiStore)
-    card.parent = collection
+    card.parent = parent
     if (replacingCard) {
       // Set new card in same place as that you are replacing
       card.order = replacingCard.order
@@ -355,31 +394,52 @@ class TestDesigner extends React.Component {
   renderCard = (card, firstCard, lastCard) => {
     const { collection } = this.props
     const { test_status } = collection
-    const item = card.record
+    const { currentIdeaCardIndex } = this.state
+    let questionParent
+    let questionCard
+    if (card.card_question_type === 'ideas_collection') {
+      questionParent = card.record
+      questionCard = questionParent.sortedCards[currentIdeaCardIndex]
+    } else {
+      questionParent = collection
+      questionCard = card
+    }
+    // Return if it tries to render idea card before they have been loaded
+    if (!questionCard) return
+    const { record } = questionCard
+    // Record is not present momentarily when turning an idea into a media item
+    if (!record) return
     return (
       <Fragment>
-        <QuestionSelectHolder
-          card={card}
+        <QuestionLeftSide
+          card={questionCard}
+          cardNumber={card.order + 1}
           canEdit={this.canEdit}
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}
-          canAddChoice={item.isCustomizableQuestionType}
+          canAddChoice={record.isCustomizableQuestionType}
           onAddChoice={this.onAddQuestionChoice}
+          createNewQuestionCard={this.createNewQuestionCard}
+          ideasCollection={this.ideasCollection}
+          showMedia={collection.test_show_media}
+          handleToggleShowMedia={this.handleToggleShowMedia}
+          handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}
+          currentIdeaCardIndex={currentIdeaCardIndex}
         />
         <TestQuestionHolder
           editing
           firstCard={firstCard}
           lastCard={lastCard}
-          userEditable={userEditableQuestionType(item.question_type)}
+          userEditable={userEditableQuestionType(record.card_question_type)}
         >
           <TestQuestion
             editing
-            parent={collection}
-            card={card}
-            item={item}
-            order={card.order}
+            hideMedia={!collection.test_show_media}
+            parent={questionParent}
+            card={questionCard}
+            order={questionCard.order}
             canEdit={this.canEditQuestions}
-            question_choices={item.question_choices}
+            question_choices={record.question_choices}
             testStatus={test_status}
           />
         </TestQuestionHolder>

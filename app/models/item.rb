@@ -339,6 +339,46 @@ class Item < ApplicationRecord
 
   def quill_data; end
 
+  # So that regular items can respond when working with test collection media items
+  def scale_question?
+    false
+  end
+
+  def question_item_incomplete?
+    return true if (
+      question_category_satisfaction? || question_description? || question_open?
+    ) && content.blank?
+
+    # All other scale questions are valid without anything filled in
+    return false if scale_question?
+
+    # Media items are always transformed to other item types
+    return true if question_media? && is_a?(Item::QuestionItem)
+
+    return true if question_idea? && (
+      is_a?(Item::QuestionItem) || name.blank? || content.blank?
+    )
+
+    # Question cards that are in the blank default state
+    return true if question_type.blank? && filestack_file_id.blank? && url.blank?
+
+    false
+  end
+
+  def incomplete_description
+    if question_category_satisfaction?
+      'your category'
+    elsif question_description?
+      'your description'
+    elsif question_open?
+      'your open response'
+    elsif question_media?
+      'an image or video'
+    elsif question_idea?
+      'your content'
+    end
+  end
+
   private
 
   def name_present?

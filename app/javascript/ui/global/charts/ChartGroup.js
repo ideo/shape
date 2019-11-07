@@ -334,6 +334,7 @@ class ChartGroup extends React.Component {
           simpleDateTooltip,
           cardArea: width * height,
           dashWidth,
+          numPrimaryDatasetValues: this.primaryDatasetValues.length,
         })
       case DATASET_CHART_TYPES.BAR:
         return BarChart({

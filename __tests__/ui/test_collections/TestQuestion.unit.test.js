@@ -10,11 +10,11 @@ describe('TestQuestion', () => {
     props = {
       parent: fakeCollection,
       card: fakeItemCard,
-      item: fakeQuestionItem,
       editing: true,
       numberOfQuestions: 4,
       apiStore: {},
     }
+    props.card.record = fakeQuestionItem
   })
 
   describe('with "useful" type', () => {
@@ -47,7 +47,7 @@ describe('TestQuestion', () => {
 
     it('renders QuestionContentEditor', () => {
       expect(wrapper.find('QuestionContentEditor').props().item).toEqual(
-        props.item
+        props.card.record
       )
     })
   })

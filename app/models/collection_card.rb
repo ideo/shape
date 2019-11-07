@@ -54,6 +54,8 @@ class CollectionCard < ApplicationRecord
   # for the purpose of accepting these params via deserializable
   attr_accessor :external_id
   attr_accessor :card_type
+  # for test survey
+  attr_accessor :idea_id
 
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
@@ -95,6 +97,7 @@ class CollectionCard < ApplicationRecord
   scope :is_cover, -> { where(is_cover: true) }
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
+  scope :ideas_collection_card, -> { where(section_type: :ideas).where.not(collection_id: nil) }
 
   enum filter: {
     nothing: 0,
@@ -115,7 +118,6 @@ class CollectionCard < ApplicationRecord
     nullify :templated_from_id
     # don't recognize any relations, easiest way to turn them all off
     recognize []
-
   end
 
   def self.default_relationships_for_api
@@ -232,6 +234,16 @@ class CollectionCard < ApplicationRecord
   def record
     return item if item.present?
     return collection if collection.present?
+  end
+
+  def record=(record)
+    if record.is_a?(Item)
+      self.item = record
+      self.collection = nil
+    elsif record.is_a?(Collection)
+      self.collection = record
+      self.item = nil
+    end
   end
 
   def record_type
@@ -404,6 +416,8 @@ class CollectionCard < ApplicationRecord
   end
 
   def card_question_type
+    return 'ideas_collection' if section_type.to_s == 'ideas' && collection_id.present?
+
     item&.question_type
   end
 
@@ -418,6 +432,12 @@ class CollectionCard < ApplicationRecord
       parent.cached_cover['no_cover'] = true
     end
     parent.cache_cover!
+  end
+
+  # used by serializer to have multiple "versions" of a card, one per idea
+  def id_with_idea_id
+    idea_suffix = idea_id ? "_#{idea_id}" : ''
+    "#{id}#{idea_suffix}"
   end
 
   private

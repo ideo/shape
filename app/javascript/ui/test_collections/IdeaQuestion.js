@@ -8,7 +8,7 @@ import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 
 class IdeaQuestion extends React.Component {
   render() {
-    const { card, parent, canEdit } = this.props
+    const { card, parent, canEdit, hideMedia } = this.props
     return (
       <Fragment>
         <QuestionContentEditor
@@ -25,7 +25,7 @@ class IdeaQuestion extends React.Component {
           itemAttribute="content"
           canEdit={canEdit}
         />
-        <MediaQuestion parent={parent} card={card} />
+        {!hideMedia && <MediaQuestion parent={parent} card={card} />}
       </Fragment>
     )
   }
@@ -36,9 +36,11 @@ IdeaQuestion.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
+  hideMedia: PropTypes.bool,
 }
 IdeaQuestion.defaultProps = {
   canEdit: false,
+  hideMedia: false,
 }
 IdeaQuestion.displayName = 'IdeaQuestion'
 

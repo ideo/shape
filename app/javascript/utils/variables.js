@@ -18,6 +18,7 @@ export const ITEM_TYPES = {
 
 export const COLLECTION_TYPES = {
   TEST: 'Collection::TestCollection',
+  TEST_RESULTS: 'Collection::TestResultsCollection',
   TEST_DESIGN: 'Collection::TestDesign',
 }
 

@@ -5,6 +5,7 @@ FactoryBot.define do
     status :in_progress
 
     trait :fully_answered do
+      status :completed
       after(:build) do |survey_response|
         survey_response.test_collection.question_items.answerable.each do |question_item|
           survey_response.question_answers << build(

@@ -559,7 +559,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'with record edit access', only: true do
+    context 'with record edit access' do
       before do
         allow(Collection).to receive(:find).and_return(collection)
       end
@@ -583,7 +583,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       context 'with snapshot' do
-        let(:unarchiving_card) { collection.collection_cards.first }
+        let!(:unarchiving_card) { collection.collection_cards.first }
+        let!(:card2) { collection.collection_cards.second }
+        let!(:card3) { collection.collection_cards.third }
         let(:raw_params) do
           {
             card_ids: [unarchiving_card.id],
@@ -592,6 +594,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
               attributes: {
                 collection_cards_attributes: [
                   { id: unarchiving_card.id, order: 0, width: 2, height: 1 },
+                  { id: card2.id, order: 1 },
+                  { id: card3.id, order: 2 },
                 ],
               },
             },
@@ -710,6 +714,15 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         it 'returns a 401' do
           patch(path, params: params)
           expect(response.status).to eq(401)
+        end
+      end
+
+      context 'trying to move into a test collection' do
+        let(:to_collection) { create(:test_collection, add_editors: [user]) }
+
+        it 'returns a 422' do
+          patch(path, params: params)
+          expect(response.status).to eq(422)
         end
       end
     end

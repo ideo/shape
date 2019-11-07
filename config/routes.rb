@@ -141,6 +141,7 @@ Rails.application.routes.draw do
           post 'create_from_emails'
           post 'create_limited_user'
           patch 'update_current_user'
+          patch 'update_survey_respondent'
           patch 'accept_current_org_terms'
         end
         resources :roles, only: %i[destroy]

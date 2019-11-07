@@ -26,4 +26,8 @@ class SerializableUser < BaseJsonSerializer
       hash[@current_user.current_organization_id.to_s].to_s
     end
   end
+
+  attribute :feedback_contact_preference, if: -> { @survey_response } do
+    @object.feedback_contact_preference
+  end
 end

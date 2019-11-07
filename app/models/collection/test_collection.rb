@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -86,7 +87,7 @@ class Collection
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
     after_commit :close_test_after_archive, if: :archived_on_previous_save?
 
-    FEEDBACK_DESIGN_SUFFIX = 'Feedback Design'.freeze
+    FEEDBACK_DESIGN_SUFFIX = ' Feedback Design'.freeze
 
     enum test_status: {
       draft: 0,
@@ -144,7 +145,7 @@ class Collection
           question_category_satisfaction
         ],
         ideas: %i[
-          question_idea
+          ideas_collection
           question_clarity
           question_excitement
           question_useful
@@ -158,8 +159,13 @@ class Collection
     end
 
     # Used so that we can interchangably call this on TestCollection and TestDesign
+    # TODO: check, is this still needed with TestResults?
     def test_collection
       self
+    end
+
+    def base_name
+      name.sub(FEEDBACK_DESIGN_SUFFIX, '')
     end
 
     def test_audience_closed!
@@ -209,9 +215,6 @@ class Collection
                         .find_by(template_id: id)
       return unless launchable_test.present?
 
-      if launchable_test.is_a?(Collection::TestDesign)
-        launchable_test = launchable_test.test_collection
-      end
       submission.update(
         submission_attrs: {
           # this should have already been set but want to preserve the value as true
@@ -267,45 +270,19 @@ class Collection
     end
 
     def questions_valid?
-      complete = true
-      # you don't really need to "complete" your template
       return true if inside_a_submission_box_template?
 
-      unless incomplete_idea_items.count.zero?
-        errors.add(:base,
-                   'Please add your idea content to question ' +
-                   incomplete_idea_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
+      incomplete_items = incomplete_question_items
+      return true if incomplete_items.blank?
+
+      incomplete_items.each do |item|
+        msg = "Please add #{item.incomplete_description} to "
+        msg += item.question_idea? ? 'idea' : 'question'
+        msg += " #{item.parent_collection_card.order + 1}"
+        errors.add(:base, msg)
       end
 
-      unless incomplete_media_items.count.zero?
-        errors.add(:base,
-                   'Please add an image or video to question ' +
-                   incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_description_items.count.zero?
-        errors.add(:base,
-                   'Please add your description to question ' +
-                   incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_category_satisfaction_items.count.zero?
-        errors.add(:base,
-                   'Please add your category to question ' +
-                   incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_open_response_items.count.zero?
-        errors.add(:base,
-                   'Please add your open response to question ' +
-                   incomplete_open_response_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-      complete
+      false
     end
 
     def valid_and_launchable?
@@ -330,7 +307,7 @@ class Collection
         duplicate.collection_to_test = args[:parent]
       elsif !parent.master_template? && !args[:parent].master_template?
         # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}".gsub(" #{FEEDBACK_DESIGN_SUFFIX}", '')
+        duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
       duplicate.save
       duplicate
@@ -338,6 +315,12 @@ class Collection
 
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
+    end
+
+    def ideas_collection
+      collections.joins(:primary_collection_cards).merge(
+        CollectionCard.ideas_collection_card,
+      ).first
     end
 
     def create_uniq_survey_response(user_id: nil, test_audience_id: nil)
@@ -359,7 +342,6 @@ class Collection
     def test_survey_render_class_mappings
       Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
         'Collection::TestCollection': SerializableTestCollection,
-        # 'Collection::TestDesign': SerializableSimpleCollection,
         FilestackFile: SerializableFilestackFile,
         QuestionChoice: SerializableQuestionChoice,
       )
@@ -409,14 +391,23 @@ class Collection
         question_types.each do |question_type|
           # NOTE: this doesn't use CollectionCardBuilder because it's in before_create
           # so just need to make sure logic like pinning cards is set up appropriately
-          primary_collection_cards.build(
-            order: order += 1,
-            pinned: master_template?,
-            section_type: section_type,
-            item: Item::QuestionItem.new(
-              question_type: question_type,
-            ),
-          )
+          if question_type == :ideas_collection
+            primary_collection_cards.build(
+              order: order += 1,
+              section_type: section_type,
+              pinned: master_template?,
+              record: Collection.build_ideas_collection,
+            )
+          else
+            primary_collection_cards.build(
+              order: order += 1,
+              section_type: section_type,
+              pinned: master_template?,
+              record: Item::QuestionItem.new(
+                question_type: question_type,
+              ),
+            )
+          end
         end
       end
     end
@@ -461,54 +452,25 @@ class Collection
       reorder_cards!
     end
 
-    # Return array of incomplete media items, with index of item
-    def incomplete_media_items
-      question_items.joins(
-        :parent_collection_card,
-      ).where(question_type: :question_media)
-    end
-
-    def incomplete_idea_items
-      # TODO: this just checks if it hasn't been transformed into media
-      # however it doesn't really check the name/content (or if media was unselected)
-      question_items.joins(
-        :parent_collection_card,
-      ).where(question_type: :question_idea)
-    end
-
-    def incomplete_description_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_description, content: [nil, ''])
-    end
-
-    def incomplete_category_satisfaction_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_category_satisfaction, content: [nil, ''])
-    end
-
-    def incomplete_open_response_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_open, content: [nil, ''])
-    end
-
-    # Returns the question cards that are in the blank default state
     def incomplete_question_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: nil, filestack_file_id: nil, url: nil)
+      incomplete_items = idea_items.joins(
+        :parent_collection_card,
+      ).select(&:question_item_incomplete?)
+
+      incomplete_items += question_items.joins(
+        :parent_collection_card,
+      ).select(&:question_item_incomplete?)
+
+      incomplete_items.compact
     end
 
-    def remove_incomplete_question_items
-      incomplete_question_items.destroy_all
+    def remove_empty_question_items
+      incomplete_question_items.select do |item|
+        item.question_item.blank?
+      end.each(&:destroy)
     end
 
+    # used in SurveyResponse#all_questions_answered?
     def answerable_complete_question_items
       complete_question_items(answerable_only: true)
     end
@@ -517,22 +479,15 @@ class Collection
       # This is for the purpose of finding all completed items to display in the survey
       # i.e. omitting any unfinished/blanks
       questions = answerable_only ? question_items.answerable : items
-      questions.reject do |i|
-        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
-          i.question_type == 'question_open' && i.content.blank? ||
-          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
-          i.question_type == 'question_media'
-      end
+      questions.reject(&:question_item_incomplete?)
     end
 
-    def complete_question_cards
-      complete_question_items.collect(&:parent_collection_card)
+    def idea_items
+      ideas_collection&.items || Item.none
     end
 
     def idea_cards
-      collection_cards.includes(:item).select do |card|
-        %w[question_idea].include?(card.card_question_type)
-      end
+      ideas_collection&.collection_cards || CollectionCard.none
     end
 
     def cloned_or_templated?
@@ -590,7 +545,7 @@ class Collection
 
     def post_launch_setup!(initiated_by: nil, reopening: false)
       # remove the "blanks"
-      remove_incomplete_question_items
+      remove_empty_question_items
       if submission_box_template_test?
         parent_submission_box_template.update(
           submission_attrs: {
@@ -645,7 +600,7 @@ class Collection
         end
       end
 
-      update(name: "#{name} #{FEEDBACK_DESIGN_SUFFIX}")
+      update(name: "#{name}#{FEEDBACK_DESIGN_SUFFIX}")
       parent_collection_card.update(collection_id: test_results_collection.id)
       # pick up parent_collection_card relationship
       reload
@@ -672,7 +627,8 @@ class Collection
     end
 
     def only_default_cards?
-      collection_cards.map { |card| card.record&.question_type } == self.class.default_question_types_by_section.values.flatten.map(&:to_s)
+      card_question_types = collection_cards.map(&:card_question_type)
+      card_question_types == self.class.default_question_types_by_section.values.flatten.map(&:to_s)
     end
 
     def archive_idea_questions

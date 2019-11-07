@@ -58,6 +58,17 @@ describe Collection, type: :model do
       end
     end
 
+    describe '.build_ideas_collection' do
+      it 'returns unpersisted collection with one ideas card' do
+        collection = Collection.build_ideas_collection
+        cards = collection.primary_collection_cards
+        expect(collection.new_record?).to be true
+        expect(collection.name).to eq('Ideas')
+        expect(cards.size).to eq(1)
+        expect(cards.first.item.question_type).to eq('question_idea')
+      end
+    end
+
     describe '#collection_cover_cards' do
       let!(:collection) { create(:collection, num_cards: 3) }
       let(:collection_cards) { collection.collection_cards }
