@@ -9,8 +9,8 @@ Feature: Sharing a Collection
     When I click ... in the nav and select "sharing"
     Then I should see the "Sharing: Anyone Can See" modal
 
-    When I click "public-sharing-options-title"
-    And I click "anyone-can-join-checkbox"
+    When I click the "public-sharing-options-title"
+    And I click the "anyone-can-join-checkbox"
     And I wait for "@apiUpdateCollection" to finish
     And I wait for "@apiGetGroup" to finish
     Then I should see "CypressTest Guests" in a "public-joinable-group-toggle"

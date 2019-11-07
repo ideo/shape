@@ -174,13 +174,6 @@ class TestSurveyResponder extends React.Component {
     if (card.idea_id) {
       findParams.idea_id = card.idea_id
     }
-    console.log(
-      findParams,
-      _.map(surveyResponse.question_answers, x => ({
-        q_id: x.question_id,
-        idea_id: x.idea_id,
-      }))
-    )
     return _.find(surveyResponse.question_answers, findParams)
   }
 
