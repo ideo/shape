@@ -5,22 +5,26 @@
 #  id                    :bigint(8)        not null, primary key
 #  answer_number         :integer
 #  answer_text           :text
-#  selected_choice_ids   :jsonb            not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
+#  idea_id               :bigint(8)
 #  open_response_item_id :integer
 #  question_id           :bigint(8)
 #  survey_response_id    :bigint(8)
 #
 # Indexes
 #
-#  index_question_answers_on_survey_response_id_and_question_id  (survey_response_id,question_id) UNIQUE
+#  index_question_answers_on_survey_response_id    (survey_response_id)
+#  index_question_answers_on_unique_idea_response  (question_id,idea_id,survey_response_id) UNIQUE WHERE (idea_id IS NOT NULL)
+#  index_question_answers_on_unique_response       (question_id,survey_response_id) UNIQUE WHERE (idea_id IS NULL)
 #
 
 class QuestionAnswer < ApplicationRecord
   # NOTE: survey_response then touches its test_collection,
   # so that answering one question can bust the collection caching for viewing charts
   belongs_to :survey_response, touch: true
+  # class_name is generic Item because the ideas might be FileItem, LinkItem, etc.
+  belongs_to :idea, class_name: 'Item', optional: true
   belongs_to :question, class_name: 'Item::QuestionItem'
   belongs_to :open_response_item,
              class_name: 'Item::TextItem',
@@ -30,6 +34,7 @@ class QuestionAnswer < ApplicationRecord
   delegate :completed?, to: :survey_response, prefix: true
 
   validates :answer_number, presence: true, if: :answer_number_required?
+  validates :question_id, uniqueness: { scope: %i[survey_response_id idea_id] }
 
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
@@ -71,7 +76,7 @@ class QuestionAnswer < ApplicationRecord
 
   def quote_url(object)
     return "/link" if object.blank?
-    "/#{survey_response.test_collection.organization.slug}/collections/#{object.id}"
+    "/#{survey_response.test_collection.organization.slug}/#{object.jsonapi_type_name}/#{object.id}"
   end
 
   def quote_card_ops(
@@ -85,7 +90,7 @@ class QuestionAnswer < ApplicationRecord
     {ops:
       [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
        {insert: " | "},
-       {insert: "Idea", attributes: { link: "/ideo/collections/761971"}},
+       {insert: idea.name, attributes: { link: quote_url(idea)}},
        {insert: "\n"},
        {insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection)}},
        {insert: "\n", attributes: { header: 2}},
@@ -103,7 +108,7 @@ class QuestionAnswer < ApplicationRecord
     # Create the open response item on the Test Responses collection
     ops = quote_card_ops(
       test_results_collection: survey_response.test_collection.test_results_collection,
-      idea: survey_response.test_collection.ideas_collection,
+      idea: idea,
       question: question,
       audience: survey_response.test_audience,
       survey_response: survey_response,
