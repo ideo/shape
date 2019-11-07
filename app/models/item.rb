@@ -147,7 +147,7 @@ class Item < ApplicationRecord
   def anyone_can_view
     return false if private?
 
-    parent.anyone_can_view
+    parent&.anyone_can_view || false
   end
 
   def search_content

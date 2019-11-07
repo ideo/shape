@@ -43,7 +43,7 @@ module Roles
         value = !inherit_from_parent?(child)
         child.mark_as_private!(value)
       end
-      cached['private']
+      child.cached_inheritance['private']
     end
 
     private
