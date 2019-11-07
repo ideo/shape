@@ -214,9 +214,6 @@ class Collection
                         .find_by(template_id: id)
       return unless launchable_test.present?
 
-      if launchable_test.is_a?(Collection::TestDesign)
-        launchable_test = launchable_test.test_collection
-      end
       submission.update(
         submission_attrs: {
           # this should have already been set but want to preserve the value as true
@@ -344,7 +341,6 @@ class Collection
     def test_survey_render_class_mappings
       Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
         'Collection::TestCollection': SerializableTestCollection,
-        # 'Collection::TestDesign': SerializableSimpleCollection,
         FilestackFile: SerializableFilestackFile,
       )
     end
