@@ -183,9 +183,10 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  createLimitedUser({ contactInfo, sessionUid }) {
+  createLimitedUser({ contactInfo, feedbackContactPreference, sessionUid }) {
     return this.request('users/create_limited_user', 'POST', {
       contact_info: contactInfo,
+      feedback_contact_preference: feedbackContactPreference,
       session_uid: sessionUid,
     })
   }

@@ -27,14 +27,17 @@ const IconHolder = styled.div`
   width: 32px;
 `
 
-const PostOptInConfirmation = ({ answer, previouslyAnswered }) => {
+const PostOptInConfirmation = ({
+  feedbackContactPreference,
+  previouslyAnswered,
+}) => {
   let text
   let emoji = '🙌'
   let emojiName = 'Okay gesture'
   if (previouslyAnswered) {
     text = 'Thank you for your time!'
   } else {
-    switch (answer) {
+    switch (feedbackContactPreference) {
       case 'feedback_contact_yes':
         text = `Great, thanks!
           We'll reach out as soon as we have new feedback opportunities for you.`
@@ -61,7 +64,7 @@ const PostOptInConfirmation = ({ answer, previouslyAnswered }) => {
 }
 
 PostOptInConfirmation.propTypes = {
-  answer: PropTypes.string.isRequired,
+  feedbackContactPreference: PropTypes.string.isRequired,
   previouslyAnswered: PropTypes.bool.isRequired,
 }
 
@@ -72,7 +75,7 @@ class RecontactQuestion extends React.Component {
     contactInfo: '',
     submittedContactInfo: false,
     showFeedbackRecontact: 'noIncentiveForGuest',
-    answer: '',
+    feedbackContactPreference: '',
     previouslyAnswered: false,
     createdUser: null,
   }
@@ -93,11 +96,16 @@ class RecontactQuestion extends React.Component {
     }
   }
 
-  async createLimitedUser(contactInfo) {
+  async createLimitedUser() {
     let user
+    const { contactInfo, feedbackContactPreference } = this.state
     const { sessionUid } = this.props
     try {
-      const res = await apiStore.createLimitedUser({ contactInfo, sessionUid })
+      const res = await apiStore.createLimitedUser({
+        contactInfo,
+        feedbackContactPreference,
+        sessionUid,
+      })
       user = res.data
       const { showFeedbackRecontact } = this.state
       this.setState({
@@ -126,7 +134,7 @@ class RecontactQuestion extends React.Component {
   handleClick = choice => ev => {
     const { sessionUid, onAnswer } = this.props
     const user = this.loggedInOrCreatedUser
-    this.setState({ answer: choice })
+    this.setState({ feedbackContactPreference: choice })
 
     if (!user) {
       const showContactInfo = choice === 'feedback_contact_yes'
@@ -144,15 +152,15 @@ class RecontactQuestion extends React.Component {
 
   handleContactInfoSubmit = async ev => {
     const { onAnswer } = this.props
-    const { contactInfo } = this.state
     ev.preventDefault()
-    const user = await this.createLimitedUser(contactInfo)
+    const user = await this.createLimitedUser()
     if (!user) return
-    const existingChoice = user.feedback_contact_preference
-    onAnswer(existingChoice)
-    const previouslyAnswered = existingChoice !== 'feedback_contact_unanswered'
+    const userPreference = user.feedback_contact_preference
+    onAnswer(userPreference)
+    const previouslyAnswered =
+      !user.newly_created && userPreference !== 'feedback_contact_unanswered'
     this.setState({
-      answer: existingChoice,
+      feedbackContactPreference: userPreference,
       previouslyAnswered,
       submittedContactInfo: true,
     })
@@ -166,7 +174,9 @@ class RecontactQuestion extends React.Component {
   // I think this should be a separate question
   get showFeedbackRecontactForm() {
     const user = this.loggedInOrCreatedUser
-    const { answer, previouslyAnswered } = this.state
+    const { feedbackContactPreference, previouslyAnswered } = this.state
+    const selectedPreference =
+      (user && user.feedback_contact_preference) || feedbackContactPreference
     if (previouslyAnswered) return
 
     return (
@@ -177,10 +187,8 @@ class RecontactQuestion extends React.Component {
         <EmojiHolder data-cy="RecontactEmojiHolder">
           <EmojiButton
             selected={
-              (user &&
-                user.feedback_contact_preference === 'feedback_contact_no') ||
-              answer === 'feedback_contact_no' ||
-              !answer
+              selectedPreference === 'feedback_contact_no' ||
+              !selectedPreference
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
@@ -188,10 +196,8 @@ class RecontactQuestion extends React.Component {
           </EmojiButton>
           <EmojiButton
             selected={
-              !answer ||
-              (user &&
-                user.feedback_contact_preference === 'feedback_contact_yes') ||
-              answer === 'feedback_contact_yes'
+              selectedPreference === 'feedback_contact_yes' ||
+              !selectedPreference
             }
             onClick={this.handleClick('feedback_contact_yes')}
             data-cy="RecontactEmojiBtnThumbUp"
@@ -273,19 +279,20 @@ class RecontactQuestion extends React.Component {
       showContactInfo,
       showFeedbackRecontact,
       submittedContactInfo,
-      answer,
+      feedbackContactPreference,
       previouslyAnswered,
     } = this.state
     return (
       <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         {showFeedbackRecontact === 'noIncentiveForGuest' &&
           this.showFeedbackRecontactForm}
-        {answer === 'feedback_contact_no' && !submittedContactInfo && (
-          <PostOptInConfirmation
-            answer={answer}
-            previouslyAnswered={previouslyAnswered}
-          />
-        )}
+        {feedbackContactPreference === 'feedback_contact_no' &&
+          !submittedContactInfo && (
+            <PostOptInConfirmation
+              feedbackContactPreference={feedbackContactPreference}
+              previouslyAnswered={previouslyAnswered}
+            />
+          )}
 
         {showContactInfo && this.showContactInfoForm}
 
@@ -293,7 +300,7 @@ class RecontactQuestion extends React.Component {
           this.showFeedbackRecontactForm}
         {submittedContactInfo && (
           <PostOptInConfirmation
-            answer={answer}
+            feedbackContactPreference={feedbackContactPreference}
             previouslyAnswered={previouslyAnswered}
           />
         )}
