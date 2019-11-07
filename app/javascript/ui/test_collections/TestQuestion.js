@@ -99,6 +99,7 @@ class TestQuestion extends React.Component {
       canEdit,
       surveyResponse,
       numberOfQuestions,
+      testStatus,
       apiStore,
     } = this.props
 
@@ -126,6 +127,7 @@ class TestQuestion extends React.Component {
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             question_choices={item.question_choices}
+            isTestDraft={testStatus === 'draft'}
           />
         )
       case 'media':
@@ -232,6 +234,7 @@ TestQuestion.propTypes = {
   canEdit: PropTypes.bool,
   numberOfQuestions: PropTypes.number,
   question_choices: MobxPropTypes.arrayOrObservableArray,
+  testStatus: PropTypes.oneOf(['draft', 'live', 'closed']),
 }
 TestQuestion.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

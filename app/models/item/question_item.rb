@@ -63,7 +63,7 @@ class Item
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
-    has_many :question_choices
+    has_many :question_choices, -> { order(order: :asc) }
 
     after_create :create_question_dataset
     after_create :add_default_question_choices,
@@ -185,7 +185,15 @@ class Item
       end
     end
 
+    def customizable_title_and_description
+      {
+        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
+        description: content,
+      }
+    end
+
     def question_title_and_description
+      return customizable_title_and_description if question_choices_customizable?
       self.class.question_title_and_description(question_type)
     end
 
@@ -199,6 +207,11 @@ class Item
 
     def scale_question?
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
+    end
+
+    def graphable_question?
+      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym) ||
+        [:question_single_choice, :question_multiple_choice].include?(question_type&.to_sym)
     end
 
     def requires_roles?
@@ -229,7 +242,7 @@ class Item
     end
 
     def find_or_create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
-      return if !scale_question? || test_data_item.present?
+      return if test_data_item.present?
 
       legend_item ||= parent_collection.legend_item
 
@@ -281,11 +294,15 @@ class Item
     end
 
     def org_wide_question_dataset
+      # For customizable questions the org dataset needs the reference
+      # to the actual question
+      data_source = self if question_choices_customizable?
       Dataset::Question.find_or_create_by(
         groupings: [{ type: 'Organization', id: organization.id }],
         question_type: question_type,
         identifier: Dataset::Question::DEFAULT_ORG_NAME,
         chart_type: :bar,
+        data_source: data_source,
       )
     end
 
@@ -301,6 +318,10 @@ class Item
         dataset: audience_dataset,
         selected: false,
       )
+    end
+
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
     end
 
     private
@@ -333,10 +354,6 @@ class Item
 
     def update_test_open_responses_collection?
       saved_change_to_content? && test_open_responses_collection.present?
-    end
-
-    def question_choices_customizable?
-      question_single_choice? || question_multiple_choice?
     end
 
     def update_test_open_responses_collection
