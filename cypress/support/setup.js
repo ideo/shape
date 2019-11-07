@@ -88,6 +88,8 @@ const createNamedRoutes = () => {
   cy.route('GET', '**/cloud.filestackapi.com/**').as('fileStackApi')
   cy.route('POST', '**/cloud.filestackapi.com/**').as('fileStackApiPost')
   cy.route('GET', '**/api.vimeo.com/**').as('vimeoApi')
+  cy.route('GET', '**/*.googleapis.com/**', {}).as('googleApi')
+  cy.route('POST', '**/*.googleapis.com/**', {}).as('googleApiPost')
   cy.route('GET', /passthru/, 'fx:blog').as('externalUrl')
 }
 

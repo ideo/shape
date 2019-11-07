@@ -300,10 +300,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::TestCollection'
   }
 
-  get isTestDesign() {
-    return this.type === 'Collection::TestDesign'
-  }
-
   get isTestResultsCollection() {
     return this.type === 'Collection::TestResultsCollection'
   }

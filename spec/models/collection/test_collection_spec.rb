@@ -6,7 +6,7 @@ describe Collection::TestCollection, type: :model do
   let(:test_collection) do
     create(:test_collection, parent_collection: test_parent, roles_anchor_collection: test_parent)
   end
-  let(:num_default_questions) do
+  let(:num_default_question_items) do
     Collection::TestCollection.default_question_types_by_section.values.flatten.size
   end
 
@@ -32,8 +32,9 @@ describe Collection::TestCollection, type: :model do
       end
 
       it 'should create the default setup with its attached cards and items' do
-        expect(test_collection.collection_cards.count).to eq(num_default_questions)
-        expect(test_collection.items.count).to eq(num_default_questions)
+        expect(test_collection.collection_cards.count).to eq(num_default_question_items)
+        expect(test_collection.items.count).to eq(num_default_question_items - 1)
+        expect(test_collection.collections.count).to eq(1)
 
         expect(
           sections_and_card_types,
@@ -42,15 +43,22 @@ describe Collection::TestCollection, type: :model do
         )
       end
 
-      it 'sets up the anchored roles on the items' do
+      it 'creates the ideas collection with a single question_idea card' do
+        ideas_coll_card = test_collection.collection_cards.ideas_collection_card.first
+        ideas_collection = ideas_coll_card.collection
+        expect(ideas_collection).to be_a(Collection)
+        expect(ideas_collection.items.pluck(:question_type)).to eq(['question_idea'])
+      end
+
+      it 'sets up the anchored roles on the items and colletion' do
         expect(test_collection.roles_anchor_collection_id).to eq test_parent.id
         test_collection.reload
-        items = test_collection.items
-        item = items.first
-        expect(items.all? { |i| i.roles_anchor_collection_id == test_parent.id }).to be true
-        expect(item.roles_anchor).to eq test_parent
+        records = test_collection.items + test_collection.collections
+        record = records.sample
+        expect(records.all? { |i| i.roles_anchor_collection_id == test_parent.id }).to be true
+        expect(record.roles_anchor).to eq test_parent
         expect(test_collection.can_edit?(user)).to be true
-        expect(item.can_edit?(user)).to be true
+        expect(record.can_edit?(user)).to be true
       end
 
       context 'with roles anchored to itself' do
@@ -58,15 +66,15 @@ describe Collection::TestCollection, type: :model do
           test_collection.unanchor_and_inherit_roles_from_anchor!
         end
 
-        it 'sets up the anchored roles on the items' do
+        it 'sets up the anchored roles on the items and collection' do
           expect(test_collection.roles_anchor.id).to eq test_collection.id
           test_collection.reload
-          items = test_collection.items
-          item = items.first
-          expect(items.all? { |i| i.roles_anchor_collection_id == test_collection.id }).to be true
-          expect(item.roles_anchor).to eq test_collection
+          records = test_collection.items + test_collection.collections
+          record = records.sample
+          expect(records.all? { |i| i.roles_anchor_collection_id == test_collection.id }).to be true
+          expect(record.roles_anchor).to eq test_collection
           expect(test_collection.can_edit?(user)).to be true
-          expect(item.can_edit?(user)).to be true
+          expect(record.can_edit?(user)).to be true
         end
       end
     end
@@ -97,7 +105,7 @@ describe Collection::TestCollection, type: :model do
 
       it 'archives idea cards if collection to test added' do
         idea_cards = test_collection.idea_cards
-        non_idea_cards = test_collection.collection_cards - idea_cards
+        non_idea_cards = test_collection.collection_cards
         expect(idea_cards.all?(&:archived?)).to be false
         test_collection.update(collection_to_test: collection_to_test)
         idea_cards.each(&:reload)
@@ -155,10 +163,10 @@ describe Collection::TestCollection, type: :model do
         expect(test_collection.draft?).to be true
       end
 
-      it 'copies collection' do
+      it 'copies collection and sub-collection' do
         expect do
           duplicate
-        end.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(2)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -168,6 +176,15 @@ describe Collection::TestCollection, type: :model do
           duplicate.question_items.pluck(:question_type),
         ).to match_array(
           test_collection.question_items.pluck(:question_type),
+        )
+      end
+
+      it 'has ideas collection' do
+        expect(duplicate.ideas_collection).not_to be_nil
+        expect(
+          duplicate.ideas_collection.items.map(&:question_type),
+        ).to eq(
+          test_collection.ideas_collection.items.pluck(:question_type),
         )
       end
 
@@ -194,7 +211,7 @@ describe Collection::TestCollection, type: :model do
       it 'always reset its test status to draft' do
         expect do
           duplicate
-        end.to change(Collection, :count).by(1)
+        end.to change(Collection, :count).by(2)
         expect(duplicate).to be_instance_of(Collection::TestCollection)
         expect(duplicate.draft?).to be true
       end
@@ -212,13 +229,22 @@ describe Collection::TestCollection, type: :model do
         )
       end
 
+      it 'has ideas collection' do
+        expect(duplicate.ideas_collection).not_to be_nil
+        expect(
+          duplicate.ideas_collection.items.map(&:question_type),
+        ).to eq(
+          test_collection.ideas_collection.items.pluck(:question_type),
+        )
+      end
+
       it 'does not have any responses' do
         expect(duplicate.survey_responses.count).to eq(0)
       end
 
       it 'renames it to Copy of {name}' do
         duplicate_name = "Copy of #{test_collection.name}"
-                         .gsub(" #{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}", '')
+                         .gsub(Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX, '')
         expect(duplicate.name).to eq(duplicate_name)
       end
 
@@ -232,10 +258,10 @@ describe Collection::TestCollection, type: :model do
           expect(test_collection.closed?).to be true
         end
 
-        it 'only copies test design' do
+        it 'only copies test design + ideas collection' do
           expect do
             duplicate
-          end.to change(Collection, :count).by(1)
+          end.to change(Collection, :count).by(2)
           expect(duplicate).to be_instance_of(Collection::TestCollection)
           expect(duplicate.draft?).to be true
         end
@@ -380,7 +406,8 @@ describe Collection::TestCollection, type: :model do
 
             it 'should output its collection_cards as question cards' do
               data = test_collection.serialized_for_test_survey
-              card_ids = test_collection.complete_question_cards.map(&:id).map(&:to_s)
+              question_cards = TestCollectionCardsForSurvey.call(test_collection)
+              card_ids = question_cards.map(&:id_with_idea_id).map(&:to_s)
               expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
             end
           end
@@ -395,7 +422,7 @@ describe Collection::TestCollection, type: :model do
           it 'returns false with test_status errors' do
             expect(test_collection.launch!(initiated_by: user)).to be false
             expect(test_collection.errors).to match_array(
-              ["You can't launch because the feedback is live"]
+              ["You can't launch because the feedback is live"],
             )
           end
         end
@@ -497,36 +524,6 @@ describe Collection::TestCollection, type: :model do
           test_collection.reopen!(initiated_by: user)
         end
       end
-    end
-  end
-
-  describe '#complete_question_cards' do
-    let!(:test_collection) { create(:test_collection, :completed, parent_collection: create(:collection)) }
-    let!(:extra_question_cards) do
-      create_list(:collection_card_question, 4, parent: test_collection)
-    end
-    before do
-      test_collection.launch!(initiated_by: create(:user))
-
-      card = extra_question_cards.first
-      # incomplete because it doesn't have content
-      card.item.update(question_type: :question_open)
-      card = extra_question_cards.second
-      # incomplete because it doesn't have content
-      card.item.update(question_type: :question_category_satisfaction)
-      card = extra_question_cards.third
-      # incomplete because it doesn't have a type
-      card.item.update(question_type: nil)
-      card = extra_question_cards.fourth
-      # incomplete because it doesn't have media
-      card.item.update(question_type: :question_media)
-    end
-
-    it 'should only get completed question cards' do
-      # all the default cards + 4 incomplete
-      expect(test_collection.items.count).to eq(num_default_questions + 4)
-      # all the default cards only (minus media because it gets removed)
-      expect(test_collection.complete_question_cards & extra_question_cards).to be_empty
     end
   end
 
@@ -711,9 +708,10 @@ describe Collection::TestCollection, type: :model do
     it 'returns false with test_status errors' do
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([
+        'Please add your content to idea 1',
         'Please add your category to question 1',
-        'Please add your idea content to question 2',
-        'Please add your open response to question 6 and 7',
+        'Please add your open response to question 6',
+        'Please add your open response to question 7',
       ])
     end
   end

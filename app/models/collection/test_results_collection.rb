@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -76,15 +77,11 @@ class Collection
              :link_sharing?,
              :test_audiences,
              :question_items,
+             :ideas_collection,
              to: :test_collection
 
     # TODO: revisit what should happen when you archive results or the test
     # after_commit :close_test, if: :archived_on_previous_save?
-    # has_many :question_items,
-    #          -> { questions },
-    #          source: :item,
-    #          class_name: 'Item::QuestionItem',
-    #          through: :primary_collection_cards
 
     def duplicate!(**args)
       # TODO: double check is the right thing to do here...
@@ -141,7 +138,11 @@ class Collection
     end
 
     def create_media_item_link(media_question_items: nil)
-      media_question_items ||= test_collection.items.reject { |i| i.type == 'Item::QuestionItem' }
+      if media_question_items.blank?
+        items = test_collection.items
+        items += ideas_collection.items if ideas_collection.present?
+        media_question_items = items.reject { |item| item.type == 'Item::QuestionItem' }
+      end
       # since we're placing things at the front one by one, we reverse the order
       media_question_items.reverse.map do |media_item|
         next unless media_item.cards_linked_to_this_item.empty?

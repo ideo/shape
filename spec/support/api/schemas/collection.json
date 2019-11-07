@@ -42,7 +42,7 @@
     "submission_attrs": { "type": ["object", "null"] },
     "launchable": { "type": ["boolean", "null"] },
     "gives_incentive": { "type": ["boolean", "null"] },
-    "joinable_group_id": { "type": ["string"] },
+    "joinable_group_id": { "type": ["string", "null"] },
     "test_collection_id": { "type": ["string"] },
     "test_closed_at": { "type": ["string"] },
     "frontend_url": { "type": ["string"] },
@@ -51,7 +51,8 @@
     "has_link_sharing": { "type": ["boolean", "null"] },
     "is_restorable": { "type": ["boolean", "null"] },
     "default_group_id": { "type": ["string", "null"] },
-    "cache_key": { "type": ["string"] }
+    "cache_key": { "type": ["string"] },
+    "test_show_media": { "type": ["boolean"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

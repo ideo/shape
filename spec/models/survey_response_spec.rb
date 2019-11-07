@@ -10,7 +10,7 @@ RSpec.describe SurveyResponse, type: :model do
 
   describe 'callbacks' do
     describe '#create_open_response_items' do
-      let!(:test_collection) { create(:test_collection, :open_response_questions) }
+      let!(:test_collection) { create(:test_collection, :completed, :open_response_questions) }
       let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
       let(:author) { create(:user) }
 

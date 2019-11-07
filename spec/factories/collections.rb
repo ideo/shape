@@ -97,17 +97,28 @@ FactoryBot.define do
           collection.question_items.select(&:question_open?).each do |open_response|
             open_response.update(content: 'What do you think?')
           end
-          idea_question = collection.question_items.detect(&:question_idea?)
-          idea_question&.update(
-            type: 'Item::VideoItem',
-            name: 'Video',
-            content: 'A cool video about something.',
-            url: 'something',
-            thumbnail_url: 'something',
-            question_type: :question_idea,
-          )
+          if collection.ideas_collection.present?
+            idea_question = collection.ideas_collection.items.find(&:question_idea?)
+            idea_question&.update(
+              type: 'Item::VideoItem',
+              name: 'Video',
+              content: 'A cool video about something.',
+              url: 'something',
+              thumbnail_url: 'something',
+              question_type: :question_idea,
+            )
+          end
           description_question = collection.question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
+        end
+      end
+
+      trait :two_ideas do
+        # can use this trait in combo with :completed
+        after(:create) do |collection|
+          ideas_collection = collection.ideas_collection
+          card = create(:collection_card_image, parent: ideas_collection)
+          card.item.update(content: 'my image', question_type: :question_idea)
         end
       end
 
