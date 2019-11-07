@@ -12,13 +12,13 @@ import {
   lineChartDashWithForOrder,
 } from '~/ui/global/charts/ChartUtils'
 
-const formatValuesWithoutDates = (values, numDesiredValues) => {
+export const formatValuesWithoutDates = (values, numDesiredValues) => {
   const formattedValues = [...values]
 
   // Add a duplicate value
   for (let i = formattedValues.length; i < numDesiredValues; i++) {
     const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
-    formattedValues.unshift(duplicateValue)
+    formattedValues.push(duplicateValue)
   }
 
   // Add x/y to show it in the right placement
