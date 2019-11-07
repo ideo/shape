@@ -64,7 +64,15 @@ class QuestionAnswer < ApplicationRecord
     return destroy_open_response_item_and_card if answer_text.blank?
 
     item.content = answer_text
-    item.import_plaintext_content(answer_text)
+    ops = quote_card_ops(
+      test_results_collection: survey_response.test_collection.test_results_collection,
+      idea: idea,
+      question: question,
+      audience: survey_response.test_audience,
+      survey_response: survey_response,
+      answer: self
+    )
+    item.data_content = ops
     item.save
   end
 
