@@ -169,6 +169,7 @@ When('I fill the {word} {string} with {string}', (num, element, string) => {
   cy.locateDataOrClass(element)
     .eq(parseInt(num) - 1)
     .click()
+    .wait(FLIPMOVE_DELAY)
     .type(string)
 })
 
@@ -262,10 +263,12 @@ When('I click the last {string}', el => {
     .click({ force: true })
 })
 
-When('I click {string}', el => {
-  cy.locateDataOrClass(el)
-    .first()
+When('I click the last answerable emoji', () => {
+  cy.locateDataOrClass('ScaleEmojiBtn')
+    .last()
     .click({ force: true })
+    .wait('@apiCreateQuestionAnswer')
+    .wait(FLIPMOVE_DELAY)
 })
 
 When('I wait for {string} to finish', apiCall => {
@@ -455,9 +458,11 @@ When('I click the {word} arrow on the MDL snackbar', direction => {
 // Sharing Modal
 // ----------------------
 When('I add {string} to the sharing modal', email => {
-  cy.get('#react-select-react-select-chip-input').type(email, {
-    force: true,
-  })
+  cy.get('#react-select-react-select-chip-input')
+    .type(email, {
+      force: true,
+    })
+    .wait('@apiSearchUsersAndGroups')
 })
 
 When('I select to invite a new user', () => {

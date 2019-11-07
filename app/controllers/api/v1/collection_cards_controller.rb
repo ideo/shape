@@ -236,6 +236,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def load_and_authorize_moving_collections
     @cards = ordered_cards
     @to_collection = Collection.find(json_api_params[:to_id])
+    prevent_moving_into_test_collection
     @cards.primary.each do |card|
       authorize! :move, card
     end
@@ -253,6 +254,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       authorize! :read, card
     end
     @to_collection = Collection.find(json_api_params[:to_id])
+    prevent_moving_into_test_collection
     authorize! :edit_content, @to_collection
     load_from_collection
   end
@@ -281,7 +283,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  def prevent_moving_into_test_collection
+    head(:unprocessable_entity) if @to_collection.is_a?(Collection::TestCollection)
+  end
+
   def check_valid_duplication
+    prevent_moving_into_test_collection
     @errors = []
     @cards.each do |card|
       collection = card.collection
@@ -361,6 +368,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :filter,
       :show_replace,
       :order,
+      :hidden,
       :section_type,
     )
   end
@@ -383,6 +391,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         external_id
         cover_type
         submissions_enabled
+        test_show_media
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,

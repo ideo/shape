@@ -59,7 +59,7 @@ exports[`TestDesigner renders snapshot 1`] = `
         <styled.div
           className="card 10"
         >
-          <QuestionSelectHolder
+          <QuestionLeftSide
             canEdit={false}
             card={
               Object {
@@ -199,7 +199,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "width": 1,
               }
             }
+            cardNumber={1}
+            createNewQuestionCard={[Function]}
+            currentIdeaCardIndex={0}
             handleSelectChange={[Function]}
+            handleSetCurrentIdeaCardIndex={[Function]}
+            handleToggleShowMedia={[Function]}
             handleTrash={[Function]}
           />
           <styled.div
@@ -351,66 +356,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
               createSurveyResponse={null}
               editing={true}
-              item={
-                Object {
-                  "breadcrumb": Array [
-                    Array [
-                      "collections",
-                      1,
-                      "Some collection",
-                    ],
-                    Array [
-                      "items",
-                      1,
-                      "my item",
-                    ],
-                  ],
-                  "can_edit": false,
-                  "can_view": true,
-                  "fullyLoaded": true,
-                  "id": "1",
-                  "inherited_tag_list": Array [],
-                  "internalType": "items",
-                  "name": "My Cool Item",
-                  "parentPath": "/",
-                  "parent_collection_card": Object {
-                    "API_archive": [MockFunction],
-                    "API_create": [MockFunction],
-                    "API_linkToMyCollection": [MockFunction],
-                    "assign": [MockFunction],
-                    "assignRef": [MockFunction],
-                    "beginReplacing": [MockFunction],
-                    "col": 1,
-                    "create": [MockFunction],
-                    "disableMenu": [MockFunction],
-                    "height": 1,
-                    "id": "11",
-                    "image_contain": false,
-                    "item": Object {},
-                    "maxHeight": 1,
-                    "maxWidth": 1,
-                    "order": 1,
-                    "patch": [MockFunction],
-                    "record": Object {},
-                    "reference": false,
-                    "reselectOnlyEditableCards": [MockFunction],
-                    "row": 0,
-                    "save": [MockFunction],
-                    "section_type": null,
-                    "update": [MockFunction],
-                    "width": 1,
-                  },
-                  "quill_data": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "hello world 
-",
-                      },
-                    ],
-                  },
-                  "type": "Item::TextItem",
-                }
-              }
+              hideMedia={true}
               numberOfQuestions={null}
               order={0}
               parent={
@@ -439,6 +385,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
                     "collections": Array [],
+                    "createLimitedUser": [MockFunction],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
                     "currentThreads": Array [
@@ -2490,7 +2437,7 @@ exports[`TestDesigner renders snapshot 1`] = `
         <styled.div
           className="card 10"
         >
-          <QuestionSelectHolder
+          <QuestionLeftSide
             canEdit={false}
             card={
               Object {
@@ -2630,7 +2577,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "width": 1,
               }
             }
+            cardNumber={1}
+            createNewQuestionCard={[Function]}
+            currentIdeaCardIndex={0}
             handleSelectChange={[Function]}
+            handleSetCurrentIdeaCardIndex={[Function]}
+            handleToggleShowMedia={[Function]}
             handleTrash={[Function]}
           />
           <styled.div
@@ -2782,66 +2734,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
               createSurveyResponse={null}
               editing={true}
-              item={
-                Object {
-                  "breadcrumb": Array [
-                    Array [
-                      "collections",
-                      1,
-                      "Some collection",
-                    ],
-                    Array [
-                      "items",
-                      1,
-                      "my item",
-                    ],
-                  ],
-                  "can_edit": false,
-                  "can_view": true,
-                  "fullyLoaded": true,
-                  "id": "1",
-                  "inherited_tag_list": Array [],
-                  "internalType": "items",
-                  "name": "My Cool Item",
-                  "parentPath": "/",
-                  "parent_collection_card": Object {
-                    "API_archive": [MockFunction],
-                    "API_create": [MockFunction],
-                    "API_linkToMyCollection": [MockFunction],
-                    "assign": [MockFunction],
-                    "assignRef": [MockFunction],
-                    "beginReplacing": [MockFunction],
-                    "col": 1,
-                    "create": [MockFunction],
-                    "disableMenu": [MockFunction],
-                    "height": 1,
-                    "id": "11",
-                    "image_contain": false,
-                    "item": Object {},
-                    "maxHeight": 1,
-                    "maxWidth": 1,
-                    "order": 1,
-                    "patch": [MockFunction],
-                    "record": Object {},
-                    "reference": false,
-                    "reselectOnlyEditableCards": [MockFunction],
-                    "row": 0,
-                    "save": [MockFunction],
-                    "section_type": null,
-                    "update": [MockFunction],
-                    "width": 1,
-                  },
-                  "quill_data": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "hello world 
-",
-                      },
-                    ],
-                  },
-                  "type": "Item::TextItem",
-                }
-              }
+              hideMedia={true}
               numberOfQuestions={null}
               order={0}
               parent={
@@ -2870,6 +2763,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
                     "collections": Array [],
+                    "createLimitedUser": [MockFunction],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
                     "currentThreads": Array [
@@ -4921,7 +4815,7 @@ exports[`TestDesigner renders snapshot 1`] = `
         <styled.div
           className="card 10"
         >
-          <QuestionSelectHolder
+          <QuestionLeftSide
             canEdit={false}
             card={
               Object {
@@ -5061,7 +4955,12 @@ exports[`TestDesigner renders snapshot 1`] = `
                 "width": 1,
               }
             }
+            cardNumber={1}
+            createNewQuestionCard={[Function]}
+            currentIdeaCardIndex={0}
             handleSelectChange={[Function]}
+            handleSetCurrentIdeaCardIndex={[Function]}
+            handleToggleShowMedia={[Function]}
             handleTrash={[Function]}
           />
           <styled.div
@@ -5213,66 +5112,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
               createSurveyResponse={null}
               editing={true}
-              item={
-                Object {
-                  "breadcrumb": Array [
-                    Array [
-                      "collections",
-                      1,
-                      "Some collection",
-                    ],
-                    Array [
-                      "items",
-                      1,
-                      "my item",
-                    ],
-                  ],
-                  "can_edit": false,
-                  "can_view": true,
-                  "fullyLoaded": true,
-                  "id": "1",
-                  "inherited_tag_list": Array [],
-                  "internalType": "items",
-                  "name": "My Cool Item",
-                  "parentPath": "/",
-                  "parent_collection_card": Object {
-                    "API_archive": [MockFunction],
-                    "API_create": [MockFunction],
-                    "API_linkToMyCollection": [MockFunction],
-                    "assign": [MockFunction],
-                    "assignRef": [MockFunction],
-                    "beginReplacing": [MockFunction],
-                    "col": 1,
-                    "create": [MockFunction],
-                    "disableMenu": [MockFunction],
-                    "height": 1,
-                    "id": "11",
-                    "image_contain": false,
-                    "item": Object {},
-                    "maxHeight": 1,
-                    "maxWidth": 1,
-                    "order": 1,
-                    "patch": [MockFunction],
-                    "record": Object {},
-                    "reference": false,
-                    "reselectOnlyEditableCards": [MockFunction],
-                    "row": 0,
-                    "save": [MockFunction],
-                    "section_type": null,
-                    "update": [MockFunction],
-                    "width": 1,
-                  },
-                  "quill_data": Object {
-                    "ops": Array [
-                      Object {
-                        "insert": "hello world 
-",
-                      },
-                    ],
-                  },
-                  "type": "Item::TextItem",
-                }
-              }
+              hideMedia={true}
               numberOfQuestions={null}
               order={0}
               parent={
@@ -5301,6 +5141,7 @@ exports[`TestDesigner renders snapshot 1`] = `
                     "checkInMyCollection": [MockFunction],
                     "collapseReplies": [MockFunction],
                     "collections": Array [],
+                    "createLimitedUser": [MockFunction],
                     "createTemplateInstance": [MockFunction],
                     "currentOrgSlug": "org-slug",
                     "currentThreads": Array [
@@ -7399,6 +7240,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               "checkInMyCollection": [MockFunction],
               "collapseReplies": [MockFunction],
               "collections": Array [],
+              "createLimitedUser": [MockFunction],
               "createTemplateInstance": [MockFunction],
               "currentOrgSlug": "org-slug",
               "currentThreads": Array [

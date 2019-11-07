@@ -58,7 +58,7 @@ class Dataset
         object = klass.find(grouping['id'].to_i)
         "#{object.name} #{klass.display_name}"
       elsif test_collection_id.present? && test_collection.present?
-        test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
+        test_collection.base_name
       else
         identifier
       end
@@ -66,7 +66,7 @@ class Dataset
 
     def identifier
       if groupings.blank? && test_collection.present?
-        test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
+        test_collection.base_name
       else
         self[:identifier]
       end

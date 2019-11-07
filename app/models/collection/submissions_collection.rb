@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime

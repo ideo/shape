@@ -189,6 +189,7 @@ ActiveRecord::Schema.define(version: 2019_11_06_190741) do
     t.bigint "joinable_group_id"
     t.datetime "test_closed_at"
     t.integer "default_group_id"
+    t.boolean "test_show_media", default: true
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
@@ -549,7 +550,10 @@ ActiveRecord::Schema.define(version: 2019_11_06_190741) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
+    t.bigint "idea_id"
+    t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
+    t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
+    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
   end
 
   create_table "roles", force: :cascade do |t|

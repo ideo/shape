@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -445,6 +446,16 @@ class Collection < ApplicationRecord
     end
     # return the set of created duplicates
     CollectionCard.where(id: duplicates.pluck(:id))
+  end
+
+  def self.build_ideas_collection
+    collection = new(name: 'Ideas')
+    collection.primary_collection_cards.build(
+      record: Item::QuestionItem.new(
+        question_type: :question_idea,
+      ),
+    )
+    collection
   end
 
   # NOTE: this refers to the first level of children

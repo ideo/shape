@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -26,6 +27,47 @@ const IconHolder = styled.div`
   width: 32px;
 `
 
+const PostOptInConfirmation = ({
+  feedbackContactPreference,
+  previouslyAnswered,
+}) => {
+  let text
+  let emoji = '🙌'
+  let emojiName = 'Okay gesture'
+  if (previouslyAnswered) {
+    text = 'Thank you for your time!'
+  } else {
+    switch (feedbackContactPreference) {
+      case 'feedback_contact_yes':
+        text = `Great, thanks!
+          We'll reach out as soon as we have new feedback opportunities for you.`
+        break
+      case 'feedback_contact_no':
+        text = `We're sorry to hear that. Have a nice day!`
+        emoji = '😢'
+        emojiName = 'Crying face'
+        break
+      default:
+        // if you haven't answered, then you don't see the PostOptInConfirmation
+        return null
+    }
+  }
+
+  return (
+    <Fragment>
+      <QuestionText>{text}</QuestionText>
+      <EmojiHolder data-cy="PostOptInEmojiHolder">
+        <Emoji size="large" name={emojiName} symbol={emoji} />
+      </EmojiHolder>
+    </Fragment>
+  )
+}
+
+PostOptInConfirmation.propTypes = {
+  feedbackContactPreference: PropTypes.string.isRequired,
+  previouslyAnswered: PropTypes.bool.isRequired,
+}
+
 @observer
 class RecontactQuestion extends React.Component {
   state = {
@@ -33,7 +75,8 @@ class RecontactQuestion extends React.Component {
     contactInfo: '',
     submittedContactInfo: false,
     showFeedbackRecontact: 'noIncentiveForGuest',
-    answer: '',
+    feedbackContactPreference: '',
+    previouslyAnswered: false,
     createdUser: null,
   }
 
@@ -53,11 +96,16 @@ class RecontactQuestion extends React.Component {
     }
   }
 
-  async createLimitedUser(contactInfo) {
+  async createLimitedUser() {
     let user
+    const { contactInfo, feedbackContactPreference } = this.state
     const { sessionUid } = this.props
     try {
-      const res = await apiStore.createLimitedUser({ contactInfo, sessionUid })
+      const res = await apiStore.createLimitedUser({
+        contactInfo,
+        feedbackContactPreference,
+        sessionUid,
+      })
       user = res.data
       const { showFeedbackRecontact } = this.state
       this.setState({
@@ -75,14 +123,18 @@ class RecontactQuestion extends React.Component {
     return user
   }
 
+  get loggedInOrCreatedUser() {
+    return this.props.user || this.state.createdUser
+  }
+
   handleChange = ev => {
     this.setState({ contactInfo: ev.target.value })
   }
 
   handleClick = choice => ev => {
-    const { onAnswer } = this.props
-    const user = this.props.user || this.state.createdUser
-    this.setState({ answer: choice })
+    const { sessionUid, onAnswer } = this.props
+    const user = this.loggedInOrCreatedUser
+    this.setState({ feedbackContactPreference: choice })
 
     if (!user) {
       const showContactInfo = choice === 'feedback_contact_yes'
@@ -90,7 +142,7 @@ class RecontactQuestion extends React.Component {
       return
     }
     if (user) {
-      user.API_updateCurrentUser({
+      user.API_updateSurveyRespondent(sessionUid, {
         feedback_contact_preference: choice,
       })
     }
@@ -100,14 +152,18 @@ class RecontactQuestion extends React.Component {
 
   handleContactInfoSubmit = async ev => {
     const { onAnswer } = this.props
-    const { contactInfo } = this.state
     ev.preventDefault()
-    const created = await this.createLimitedUser(contactInfo)
-    if (!created) return
-    onAnswer('feedback_contact_yes')
-    // Why is this setting feedback contact yes?
-    // Isn't this only for getting money?
-    this.setState({ submittedContactInfo: true })
+    const user = await this.createLimitedUser()
+    if (!user) return
+    const userPreference = user.feedback_contact_preference
+    onAnswer(userPreference)
+    const previouslyAnswered =
+      !user.newly_created && userPreference !== 'feedback_contact_unanswered'
+    this.setState({
+      feedbackContactPreference: userPreference,
+      previouslyAnswered,
+      submittedContactInfo: true,
+    })
   }
 
   get backgroundColor() {
@@ -117,20 +173,22 @@ class RecontactQuestion extends React.Component {
 
   // I think this should be a separate question
   get showFeedbackRecontactForm() {
-    const { user } = this.props
-    const { answer } = this.state
+    const user = this.loggedInOrCreatedUser
+    const { feedbackContactPreference, previouslyAnswered } = this.state
+    const selectedPreference =
+      (user && user.feedback_contact_preference) || feedbackContactPreference
+    if (previouslyAnswered) return
+
     return (
-      <React.Fragment>
+      <Fragment>
         <QuestionText>
           Would you like to be contacted about future feedback opportunities?
         </QuestionText>
         <EmojiHolder data-cy="RecontactEmojiHolder">
           <EmojiButton
             selected={
-              (user &&
-                user.feedback_contact_preference === 'feedback_contact_no') ||
-              answer === 'feedback_contact_no' ||
-              !answer
+              selectedPreference === 'feedback_contact_no' ||
+              !selectedPreference
             }
             onClick={this.handleClick('feedback_contact_no')}
           >
@@ -138,10 +196,8 @@ class RecontactQuestion extends React.Component {
           </EmojiButton>
           <EmojiButton
             selected={
-              !answer ||
-              (user &&
-                user.feedback_contact_preference === 'feedback_contact_yes') ||
-              answer === 'feedback_contact_yes'
+              selectedPreference === 'feedback_contact_yes' ||
+              !selectedPreference
             }
             onClick={this.handleClick('feedback_contact_yes')}
             data-cy="RecontactEmojiBtnThumbUp"
@@ -149,38 +205,8 @@ class RecontactQuestion extends React.Component {
             <Emoji size="large" name="Yes" symbol="👍" />
           </EmojiButton>
         </EmojiHolder>
-      </React.Fragment>
+      </Fragment>
     )
-  }
-
-  get showPostOptInConfirmation() {
-    switch (this.state.answer) {
-      case 'feedback_contact_yes':
-        return (
-          <div>
-            <QuestionText>
-              Great, thanks! We'll reach out as soon as we have new feedback
-              opportunities for you.
-            </QuestionText>
-            <EmojiHolder data-cy="PostOptInEmojiHolder">
-              <Emoji size="large" name="Okay gesture" symbol="🙌" />
-            </EmojiHolder>
-          </div>
-        )
-      case 'feedback_contact_no':
-        return (
-          <div>
-            <QuestionText>
-              We're sorry to hear that. Have a nice day!
-            </QuestionText>
-            <EmojiHolder data-cy="PostOptInEmojiHolder">
-              <Emoji size="large" name="crying face" symbol="😢" />
-            </EmojiHolder>
-          </div>
-        )
-      default:
-        return null
-    }
   }
 
   get showContactInfoForm() {
@@ -253,21 +279,31 @@ class RecontactQuestion extends React.Component {
       showContactInfo,
       showFeedbackRecontact,
       submittedContactInfo,
-      answer,
+      feedbackContactPreference,
+      previouslyAnswered,
     } = this.state
     return (
       <div style={{ width: '100%', backgroundColor: this.backgroundColor }}>
         {showFeedbackRecontact === 'noIncentiveForGuest' &&
           this.showFeedbackRecontactForm}
-        {answer === 'feedback_contact_no' &&
-          !submittedContactInfo &&
-          this.showPostOptInConfirmation}
+        {feedbackContactPreference === 'feedback_contact_no' &&
+          !submittedContactInfo && (
+            <PostOptInConfirmation
+              feedbackContactPreference={feedbackContactPreference}
+              previouslyAnswered={previouslyAnswered}
+            />
+          )}
 
         {showContactInfo && this.showContactInfoForm}
 
         {showFeedbackRecontact === 'afterPaymentInfo' &&
           this.showFeedbackRecontactForm}
-        {submittedContactInfo && this.showPostOptInConfirmation}
+        {submittedContactInfo && (
+          <PostOptInConfirmation
+            feedbackContactPreference={feedbackContactPreference}
+            previouslyAnswered={previouslyAnswered}
+          />
+        )}
       </div>
     )
   }

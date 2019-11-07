@@ -3,7 +3,23 @@ import { apiStore, uiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
-import { fakeGroup } from '#/mocks/data'
+import { fakeGroup, fakeUser } from '#/mocks/data'
+
+const fakeUserAndGroupSearch = [
+  {
+    ...fakeUser,
+    id: '19',
+    status: 'archived',
+  },
+  {
+    ...fakeUser,
+    id: '20',
+    status: 'active',
+  },
+  {
+    ...fakeGroup,
+  },
+]
 
 let props
 let wrapper
@@ -54,12 +70,26 @@ describe('RolesAdd', () => {
 
     describe('with groups', () => {
       beforeEach(() => {
+        apiStore.searchUsersAndGroups = jest
+          .fn()
+          .mockReturnValue(Promise.resolve({ data: fakeUserAndGroupSearch }))
         wrapper = mount(<RolesAdd {...props} ownerType="groups" />)
       })
 
-      it('should call apiStore to search users and groups', () => {
-        wrapper.instance()._autocompleteSearch('person', jest.fn())
+      it('should call apiStore to search users and groups', async () => {
+        const callback = jest.fn()
+        const instance = wrapper.instance()
+        // instance.mapItems = jest.fn()
+        await instance._autocompleteSearch('person', callback)
         expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('person')
+        // expect(instance.mapItems)
+        expect(callback).toHaveBeenCalledWith(
+          instance.mapItems([
+            // the active user and group
+            fakeUserAndGroupSearch[1],
+            fakeUserAndGroupSearch[2],
+          ])
+        )
       })
     })
 
@@ -262,17 +292,17 @@ describe('RolesAdd', () => {
         })
       })
 
-      describe('adding users over the freemium limit with enterprise billing', () => {
-        beforeEach(() => {
-          apiStore.currentUserOrganization.in_app_billing = false
-          apiStore.currentUserOrganization.has_payment_method = false
-          apiStore.currentUserOrganization.active_users_count = 40
-        })
-
-        it('should not ask for payment method', () => {
-          expect(component.shouldAskForPaymentMethod).toBeFalsy()
-        })
-      })
+      // describe('adding users over the freemium limit with enterprise billing', () => {
+      //   beforeEach(() => {
+      //     apiStore.currentUserOrganization.in_app_billing = false
+      //     apiStore.currentUserOrganization.has_payment_method = false
+      //     apiStore.currentUserOrganization.active_users_count = 40
+      //   })
+      //
+      //   it('should not ask for payment method', () => {
+      //     expect(component.shouldAskForPaymentMethod).toBeFalsy()
+      //   })
+      // })
     })
 
     describe('with registered users', () => {
