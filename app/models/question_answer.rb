@@ -92,38 +92,11 @@ class QuestionAnswer < ApplicationRecord
        {insert: "“#{answer.answer_text}”"},
        {insert: "\n", attributes: { header: 1}},
        {insert: "- "},
-       {insert: "Todd", attributes: { link: "/link"}},
+       {insert: survey_response.alias, attributes: { link: quote_url(nil)}},
        {insert: ", "},
-       {insert: audience.name, attributes: {link: "/link"}},
+       {insert: audience.name, attributes: {link: quote_url(nil)}},
       ],
     }
-  end
-
-  def quote_card_template(
-    test_results_collection:,
-    idea:,
-    question:,
-    audience:,
-    survey_response:,
-    answer:
-  )
-    "<p><a href=\"#{quote_url(test_results_collection)}\">#{test_results_collection.name}</a> | <a href=\"#{quote_url(idea)}\">#{idea.name || 'idea'}</a></p>
-    <h2><a href=\"#{quote_url(question.test_open_responses_collection)}\">#{question.content}</a></h2>
-    <h1>“#{answer.answer_text}”</h1>
-    <p>- <a href=\"#{quote_url(nil)}\">Todd</a>, <a href=\"#{quote_url(nil)}\">#{audience.name || 'aud'}</a></p>
-    "
-  end
-
-  def quote_quill_content
-    quote = quote_card_template(
-      test_results_collection: survey_response.test_collection.test_results_collection,
-      idea: survey_response.test_collection.ideas_collection,
-      question: question,
-      audience: survey_response.test_audience,
-      survey_response: survey_response,
-      answer: self
-    )
-    QuillContentConverter.new(quote).html_to_quill_ops
   end
 
   def create_open_response_item
