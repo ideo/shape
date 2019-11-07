@@ -144,8 +144,10 @@ class Item < ApplicationRecord
     )
   end
 
-  def anyone_can_view?
-    false
+  def anyone_can_view
+    return false if cached_attributes['cached_inheritance'] && cached_attributes['cached_inheritance']['private']
+
+    parent.anyone_can_view
   end
 
   def search_content

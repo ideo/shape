@@ -1,6 +1,7 @@
 class Api::V1::CommentThreadsController < Api::V1::BaseController
   deserializable_resource :comment_thread, class: DeserializableCommentThread, only: %i[create]
   load_and_authorize_resource :comment_thread, only: %i[subscribe unsubscribe]
+  skip_before_action :check_api_authentication!, only: %i[find_by_record]
 
   before_action :load_users_comment_threads, only: %i[index]
   def index

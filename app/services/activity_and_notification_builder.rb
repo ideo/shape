@@ -29,7 +29,7 @@ class ActivityAndNotificationBuilder < SimpleService
     @content = content
     @source = source
     @destination = destination
-    @organization = organization || actor.current_organization
+    @organization = organization || actor&.current_organization || target&.organization
     @errors = []
     @activity = nil
     @created_notifications = []
