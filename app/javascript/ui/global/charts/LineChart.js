@@ -12,13 +12,26 @@ import {
   lineChartDashWithForOrder,
 } from '~/ui/global/charts/ChartUtils'
 
-const formatValues = values => {
-  const formatted = addDuplicateValueIfSingleValue(values)
-  return formatted.map((datum, i) => ({
+export const formatValuesWithoutDates = (values, numDesiredValues) => {
+  const formattedValues = [...values]
+
+  // Add a duplicate value
+  for (let i = formattedValues.length; i < numDesiredValues; i++) {
+    const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
+    formattedValues.push(duplicateValue)
+  }
+
+  // Add x/y to show it in the right placement
+  return formattedValues.map((datum, i) => ({
     ...datum,
     x: i + 1,
     y: datum.value,
   }))
+}
+
+const formatValuesWithDates = values => {
+  const rawValues = addDuplicateValueIfSingleValue(values)
+  return rawValues.map(data => ({ ...data }))
 }
 
 const chartStyle = dataset => {
@@ -35,9 +48,20 @@ const chartStyle = dataset => {
   }
 }
 
-const LineChart = ({ dataset, simpleDateTooltip, cardArea }) => {
+const LineChart = ({
+  dataset,
+  simpleDateTooltip,
+  cardArea,
+  numPrimaryDatasetValues,
+}) => {
   const { measure, timeframe } = dataset
-  const values = formatValues(dataset.data)
+  const { data } = dataset
+  let values
+  if (data[0] && !data[0].date) {
+    values = formatValuesWithoutDates(data, numPrimaryDatasetValues)
+  } else {
+    values = formatValuesWithDates(data)
+  }
   const domain = chartDomainForDatasetValues({
     values,
     maxDomain: dataset.max_domain,
@@ -76,11 +100,13 @@ LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
+  numPrimaryDatasetValues: PropTypes.number,
 }
 
 LineChart.defaultProps = {
   cardArea: 1,
   simpleDateTooltip: false,
+  numPrimaryDatasetValues: 0,
 }
 
 export default LineChart
