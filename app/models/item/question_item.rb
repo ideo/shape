@@ -46,7 +46,6 @@ class Item
   class QuestionItem < Item
     has_many :question_answers, inverse_of: :question, foreign_key: :question_id, dependent: :destroy
     has_one :test_open_responses_collection, class_name: 'Collection::TestOpenResponses'
-    has_one :test_results_collection, class_name: 'Collection::TestResultsCollection', inverse_of: :idea
     has_one :question_dataset,
             -> { without_groupings },
             as: :data_source,

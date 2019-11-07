@@ -459,7 +459,7 @@ class Collection
     end
 
     def incomplete_question_items
-      incomplete_items = idea_cards.joins(
+      incomplete_items = idea_items.joins(
         :parent_collection_card,
       ).select(&:question_item_incomplete?)
 
@@ -491,7 +491,7 @@ class Collection
       complete_question_items.collect(&:parent_collection_card)
     end
 
-    def idea_cards
+    def idea_items
       ideas_collection&.items || Item.none
     end
 
@@ -606,7 +606,7 @@ class Collection
     end
 
     def archive_idea_questions
-      idea_cards.each(&:archive!)
+      idea_items.each(&:archive!)
       touch
     end
   end

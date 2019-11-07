@@ -4,28 +4,30 @@ module TestResultsCollection
     include Interactor::Schema
     include CollectionCardBuilderHelpers
 
-    schema :test_results_collection,
+    schema :parent_collection,
            :item,
            :order,
            :created_by,
            :message
 
-    require_in_context :item
+    require_in_context :item, :parent_collection
 
-    delegate :item,
+    delegate :item, :parent_collection, :created_by,
              to: :context
 
     delegate :parent_collection_card, to: :item
 
-    delegate :test_results_collection, to: :test_collection
+    before do
+      context.created_by ||= parent_collection.created_by
+    end
 
     def call
       if existing_card.present?
         existing_card.update(order: order) unless existing_card.order == order
       else
         create_card(
-          attrs: open_response_collection_card_attrs(item),
-          parent_collection: test_results_collection,
+          params: open_response_collection_card_attrs(item),
+          parent_collection: parent_collection,
           created_by: created_by,
         )
       end
@@ -34,7 +36,7 @@ module TestResultsCollection
     private
 
     def existing_card
-      test_results_collection
+      parent_collection
         .primary_collection_cards
         .joins(:collection)
         .where(
@@ -44,10 +46,6 @@ module TestResultsCollection
           },
         )
         .first
-    end
-
-    def created_by
-      context.created_by || test_results_collection.created_by
     end
 
     def open_response_collection_card_attrs(item)

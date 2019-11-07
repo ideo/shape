@@ -1,44 +1,51 @@
 module TestResultsCollection
-  class CreateMediaItemLink
+  class CreateItemLink
     include Interactor
     include Interactor::Schema
 
-    schema :test_results_collection,
+    schema :parent_collection,
            :item,
            :order,
+           :width,
+           :height,
            :created_by,
            :message
 
-    require_in_context :test_results_collection
+    require_in_context :parent_collection, :item
 
-    delegate :test_results_collection,
+    delegate :parent_collection, :item, :width, :height, :order,
              to: :context
 
+    before do
+      context.width ||= 1
+      context.height ||= 2
+      context.order ||= 0
+    end
+
     def call
-      debugger
       if existing_card.present?
         existing_card.update(order: order) unless existing_card.order == order
       else
-        link_media_item
+        link_item
       end
     end
 
     private
 
     def existing_card
-      test_results_collection
+      parent_collection
         .link_collection_cards
         .where(item_id: item.id)
         .first
     end
 
-    def link_media_item
+    def link_item
       link = CollectionCard::Link.create(
-        parent: test_results_collection,
+        parent: parent_collection,
         item_id: item.id,
-        width: 1,
-        height: 2,
-        order: -1,
+        width: width,
+        height: height,
+        order: order,
       )
 
       return link if link.persisted?

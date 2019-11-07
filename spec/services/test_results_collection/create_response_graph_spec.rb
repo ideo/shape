@@ -13,8 +13,8 @@ RSpec.describe TestResultsCollection::CreateResponseGraph, type: :service do
   let(:data_item) { test_results_collection.data_items.first }
   subject do
     TestResultsCollection::CreateResponseGraph.call(
-      question_item: question_item,
-      test_results_collection: test_results_collection,
+      item: question_item,
+      parent_collection: test_results_collection,
     )
   end
 

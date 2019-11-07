@@ -15,8 +15,6 @@ module TestResultsCollection
     delegate :test_results_collection, :test_collection, :idea, :created_by,
              to: :context
 
-    delegate :idea_cards, to: :test_collection
-
     delegate :legend_item, to: :test_results_collection
 
     before do
@@ -64,12 +62,13 @@ module TestResultsCollection
     end
 
     def create_collection
-      collection = test_collection.create_test_results_collection(
+      collection = Collection::TestResultsCollection.create(
         name: test_collection.name,
         organization: test_collection.organization,
         created_by: created_by,
         roles_anchor_collection: test_results_roles_anchor,
-        idea_id: idea&.id,
+        test_collection: test_collection,
+        idea: idea,
       )
 
       return collection if collection.persisted?
@@ -100,7 +99,7 @@ module TestResultsCollection
       reload_collections
 
       create_card(
-        attrs: {
+        params: {
           order: 999,
           collection_id: test_collection.id,
         },

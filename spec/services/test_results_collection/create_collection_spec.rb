@@ -30,10 +30,10 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
           'Item::DataItem',
           'Item::DataItem',
           'Item::DataItem',
-          'Item::DataItem',
-          'Item::DataItem',
           'Collection::TestOpenResponses',
           'Collection::TestOpenResponses',
+          'Item::DataItem',
+          'Item::DataItem',
           'Collection::TestCollection',
         ],
       )

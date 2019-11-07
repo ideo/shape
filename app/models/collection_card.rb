@@ -262,6 +262,10 @@ class CollectionCard < ApplicationRecord
     parent.master_template?
   end
 
+  def ideas_collection_card?
+    section_type == 'ideas' && collection_id.present?
+  end
+
   def pinned_and_locked?
     pinned? && !master_template_card?
   end

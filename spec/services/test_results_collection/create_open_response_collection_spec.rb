@@ -6,8 +6,8 @@ RSpec.describe TestResultsCollection::CreateOpenResponseCollection, type: :servi
   let(:open_response_item) { test_collection.question_items.question_open.first }
   subject do
     TestResultsCollection::CreateOpenResponseCollection.call(
-      test_results_collection: test_results_collection,
-      question_item: open_response_item,
+      parent_collection: test_results_collection,
+      item: open_response_item,
     )
   end
 

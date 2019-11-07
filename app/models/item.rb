@@ -103,11 +103,16 @@ class Item < ApplicationRecord
            -> { none },
            foreign_key: 'data_item_id'
 
+  has_one :question_item, class_name: 'Item::QuestionItem'
+  has_one :test_results_collection,
+          class_name: 'Collection::TestResultsCollection',
+          inverse_of: :idea,
+          foreign_key: :idea_id
+
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
-  has_one :question_item, class_name: 'Item::QuestionItem'
 
   scope :questions, -> { where(type: 'Item::QuestionItem') }
   scope :data_items, -> { where(type: 'Item::DataItem') }

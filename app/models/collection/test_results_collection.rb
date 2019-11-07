@@ -66,7 +66,7 @@ class Collection
   class TestResultsCollection < Collection
     belongs_to :test_collection, class_name: 'Collection::TestCollection'
     belongs_to :idea,
-               class_name: 'Item::QuestionItem',
+               class_name: 'Item',
                inverse_of: :test_results_collection,
                optional: true
 
@@ -85,6 +85,7 @@ class Collection
              :test_audiences,
              :question_items,
              :ideas_collection,
+             :test_show_media?,
              to: :test_collection,
              allow_nil: true
 

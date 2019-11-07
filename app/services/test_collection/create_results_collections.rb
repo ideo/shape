@@ -10,7 +10,7 @@ module TestCollection
 
     delegate :test_collection, :created_by, to: :context
 
-    delegate :idea_cards, to: :test_collection
+    delegate :idea_items, to: :test_collection
 
     def call
       TestResultsCollection::CreateCollection.call(
@@ -19,10 +19,10 @@ module TestCollection
       )
 
       # Create results collections for each idea
-      idea_cards.includes(:test_results_collection, :record).each do |idea_card|
+      idea_items.includes(:test_results_collection).each do |idea|
         TestResultsCollection::CreateCollection.call(
           test_collection: test_collection,
-          idea: idea_card.record,
+          idea: idea,
           created_by: created_by,
         )
       end

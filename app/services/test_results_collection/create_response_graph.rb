@@ -4,36 +4,37 @@ module TestResultsCollection
     include Interactor::Schema
     include CollectionCardBuilderHelpers
 
-    schema :test_results_collection,
+    schema :parent_collection,
            :item,
            :order,
            :legend_item,
            :created_by,
            :message
 
-    require_in_context :item
+    require_in_context :item, :parent_collection
 
-    delegate :test_results_collection, :item, :legend_item, :created_by,
+    delegate :parent_collection, :item, :legend_item, :created_by,
              to: :context
-
-    delegate :test_audiences, to: :test_results_collection
 
     delegate :question_dataset, :org_wide_question_dataset,
              to: :item
 
     before do
-      context.legend_item ||= test_results_collection.legend_item
+      context.legend_item ||= parent_collection.legend_item
+      context.created_by ||= parent_collection.created_by
     end
 
     def call
+      existing_card = find_existing_card
+
       if existing_card.present?
         existing_card.update(order: order) unless existing_card.order == order
-        return existing_card
+        return
       end
 
       @card = create_card(
-        attrs: data_item_card_attrs(item),
-        parent_collection: test_results_collection,
+        params: data_item_card_attrs(item),
+        parent_collection: parent_collection,
         created_by: created_by,
       )
 
@@ -50,8 +51,8 @@ module TestResultsCollection
 
     private
 
-    def existing_card
-      test_results_collection
+    def find_existing_card
+      parent_collection
         .primary_collection_cards
         .joins(item: :data_items_datasets)
         .merge(
@@ -79,6 +80,10 @@ module TestResultsCollection
           legend_item_id: legend_item&.id,
         },
       }
+    end
+
+    def test_audiences
+      item.parent.test_audiences
     end
   end
 end
