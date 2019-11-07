@@ -7,28 +7,48 @@ module TestResultsCollection
     schema :test_collection,
            :test_results_collection,
            :created_by,
+           :idea,
            :message
 
-    require_in_context :test_collection,
-                       :created_by
+    require_in_context :test_collection
 
     delegate :test_results_collection, :test_collection, :idea, :created_by,
              to: :context
 
     delegate :idea_cards, to: :test_collection
 
+    delegate :legend_item, to: :test_results_collection
+
+    before do
+      context.created_by ||= test_collection.created_by
+      context.test_results_collection ||= find_test_results_collection
+    end
+
     def call
-      context.test_results_collection = find_test_results_collection
+      ActiveRecord::Base.transaction do
+        if test_results_collection.blank?
+          context.test_results_collection = create_collection
+          if master_results_collection?
+            update_test_collection_name
+            move_roles_to_results_collection if move_roles?
+            move_test_collection_inside_test_results
+          end
+        end
 
-      return if test_results_collection.present?
+        TestResultsCollection::CreateContent.call!(
+          test_results_collection: test_results_collection,
+          created_by: created_by,
+          idea: idea,
+        )
 
-      context.test_results_collection = create_collection
+        # might not need this next step?
+        test_collection.cache_cover!
+        test_results_collection.reorder_cards!
+        move_legend_item_to_third_spot if legend_item.present?
 
-      return unless master_results_collection?
-
-      update_test_collection_name
-      move_roles_to_results_collection if move_roles?
-      move_test_collection_inside_test_results
+      rescue Interactor::Failure => e
+        raise ActiveRecord::Rollback, e.message
+      end
     end
 
     private
@@ -100,6 +120,13 @@ module TestResultsCollection
 
     def move_roles?
       test_results_roles_anchor.blank?
+    end
+
+    def move_legend_item_to_third_spot
+      legend_card = legend_item.parent_collection_card
+      return if legend_card.order == 2
+
+      legend_card.move_to_order(2)
     end
   end
 end

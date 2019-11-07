@@ -67,9 +67,13 @@ class Collection
     include AASM
 
     has_many :survey_responses, dependent: :destroy
-    has_one :test_results_collection, inverse_of: :test_collection
-    delegate :datasets, to: :test_results_collection, allow_nil: true
-
+    has_one :test_results_collection,
+            -> { master_results },
+            inverse_of: :test_collection
+    has_many :test_results_idea_collections,
+             -> { idea_results },
+             class_name: 'TestCollection::TestResultsCollection',
+             inverse_of: :test_collection
     has_many :question_items,
              -> { questions },
              source: :item,
@@ -79,7 +83,10 @@ class Collection
     has_many :paid_test_audiences,
              -> { paid },
              class_name: 'TestAudience'
+
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
+
+    delegate :datasets, to: :test_results_collection, allow_nil: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_or_templated?
     after_create :add_test_tag

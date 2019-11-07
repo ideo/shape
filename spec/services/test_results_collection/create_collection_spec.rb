@@ -1,24 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe TestResultsCollection::FindOrCreate, type: :service do
+RSpec.describe TestResultsCollection::CreateCollection, type: :service do
   let(:test_collection) { create(:test_collection) }
   subject do
-    TestResultsCollection::FindOrCreate.call(
+    TestResultsCollection::CreateCollection.call(
       test_collection: test_collection,
     )
-  end
-
-  it 'calls organized interactors' do
-    [
-      TestResultsCollection::CreateCollection,
-      TestResultsCollection::CreateOpenResponseCollections,
-      TestResultsCollection::CreateResponseGraphs,
-      TestResultsCollection::CreateMediaItemLinks,
-    ].each do |interactor_klass|
-      allow(interactor_klass).to receive(:call!).and_call_original
-      expect(interactor_klass).to receive(:call!)
-    end
-    subject
   end
 
   context 'with more scaled questions' do

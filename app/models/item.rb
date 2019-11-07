@@ -139,6 +139,11 @@ class Item < ApplicationRecord
     question_idea: 11,
   }
 
+  scope :in_ideas_section, -> {
+    joins(:primary_collection_cards)
+      .merge(CollectionCard.section_types[:ideas])
+  }
+
   amoeba do
     enable
     recognize []
