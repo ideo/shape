@@ -44,10 +44,12 @@ describe('TestDesigner', () => {
       const contactInfo = 'email@isp.net'
       component.setState({
         contactInfo,
+        feedbackContactPreference: 'feedback_contact_yes',
       })
       wrapper.find('form').simulate('submit', fakeEv)
       expect(apiStore.createLimitedUser).toHaveBeenCalledWith({
         contactInfo,
+        feedbackContactPreference: 'feedback_contact_yes',
         sessionUid: props.sessionUid,
       })
     })
