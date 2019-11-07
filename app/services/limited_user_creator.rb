@@ -1,9 +1,15 @@
 class LimitedUserCreator < SimpleService
   attr_accessor :limited_user, :errors, :created
 
-  def initialize(contact_info:, user_info: {}, date_of_participation: nil)
+  def initialize(
+    contact_info:,
+    feedback_contact_preference: '',
+    user_info: {},
+    date_of_participation: nil
+  )
     # IMPORTANT! clean up contact info whitespaces
     @contact_info = contact_info.gsub(/\s+/, '')
+    @feedback_contact_preference = feedback_contact_preference
     @user_info = user_info
     @date_of_participation = date_of_participation
     @email = nil
@@ -94,6 +100,9 @@ class LimitedUserCreator < SimpleService
   def create_user(network_user)
     @limited_user = User.find_or_initialize_from_network(network_user)
     @limited_user.created_at = @date_of_participation if @date_of_participation.present?
+    if @feedback_contact_preference.present?
+      @limited_user.feedback_contact_preference = @feedback_contact_preference
+    end
     saved = @limited_user.save
 
     # this is just for the CSV import
