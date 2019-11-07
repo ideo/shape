@@ -33,8 +33,8 @@ module Roles
       child.reanchor_if_incorrect_anchor!(parent: @parent)
 
       if child.same_roles_anchor? @parent
-        child.unmark_as_private! if cached.blank? || cached['private']
-        return false
+        child.unmark_as_private! if cached.blank?
+        return false unless cached['private']
       end
 
       # otherwise we only compute cached_inheritance if not already set.
@@ -43,7 +43,7 @@ module Roles
         value = !inherit_from_parent?(child)
         child.mark_as_private!(value)
       end
-      child.cached_inheritance['private']
+      cached['private']
     end
 
     private
