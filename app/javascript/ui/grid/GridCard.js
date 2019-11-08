@@ -350,7 +350,7 @@ class GridCard extends React.Component {
       // If this is a special cover with both image and text, pass the text
       // item through
       nestedTextItem = this.coverItem
-    } else if (this.coverItem) {
+    } else if (this.coverItem && record.cover_type !== 'cover_type_carousel') {
       // Instead use the item for the cover rather than the collection
       record = this.coverItem
       cardType = 'items'
@@ -360,7 +360,7 @@ class GridCard extends React.Component {
       <CoverRenderer
         card={card}
         cardType={cardType}
-        isCoverItem={this.coverItem ? true : false}
+        isCoverItem={false}
         record={record}
         height={height}
         dragging={dragging}

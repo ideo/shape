@@ -372,37 +372,37 @@ class CollectionCover extends React.Component {
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
       >
-        <StyledCardContent
-          height={height}
-          width={width}
-          gutter={gutter}
-          gridW={gridW}
-          isTextItem={!!textItem}
-        >
-          <div className="overlay" />
-          {textItem ? (
-            <div className="top text-item">
-              <TextItemCover
-                item={textItem}
-                height={height}
-                dragging={false}
-                cardId={cardId}
-                handleClick={this.handleClick}
-                searchResult={searchResult}
-                initialFontTag={'P'}
-                hideReadMore
-                uneditable
-                isTransparent={true}
-              />
-            </div>
-          ) : (
-            <div>
-              <div className="top">
-                <PositionedCardHeading>
-                  <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                    {true ? (
-                      <CarouselCover collection={collection} />
-                    ) : (
+        {collection.cover_type === 'cover_type_carousel' ? (
+          <CarouselCover collection={collection} dragging={false} />
+        ) : (
+          <StyledCardContent
+            height={height}
+            width={width}
+            gutter={gutter}
+            gridW={gridW}
+            isTextItem={!!textItem}
+          >
+            <div className="overlay" />
+            {textItem ? (
+              <div className="top text-item">
+                <TextItemCover
+                  item={textItem}
+                  height={height}
+                  dragging={false}
+                  cardId={cardId}
+                  handleClick={this.handleClick}
+                  searchResult={searchResult}
+                  initialFontTag={'P'}
+                  hideReadMore
+                  uneditable
+                  isTransparent={true}
+                />
+              </div>
+            ) : (
+              <div>
+                <div className="top">
+                  <PositionedCardHeading>
+                    <Dotdotdot clamp={height > 1 ? 6 : 3}>
                       <PlainLink
                         className="no-select cancelGridClick"
                         onClick={this.handleClick}
@@ -411,24 +411,25 @@ class CollectionCover extends React.Component {
                       >
                         {this.name}
                       </PlainLink>
-                    )}
-                  </Dotdotdot>
-                  {this.button}
-                </PositionedCardHeading>
+                      )}
+                    </Dotdotdot>
+                    {this.button}
+                  </PositionedCardHeading>
+                </div>
+                <div className="bottom">
+                  {this.launchTestButton}
+                  {this.collectionScore}
+                  {this.hasUseTemplateButton && this.useTemplateButton}
+                  {!this.hasLaunchTestButton && (
+                    <Dotdotdot clamp={this.numberOfLinesForDescription}>
+                      {subtitle}
+                    </Dotdotdot>
+                  )}
+                </div>
               </div>
-              <div className="bottom">
-                {this.launchTestButton}
-                {this.collectionScore}
-                {this.hasUseTemplateButton && this.useTemplateButton}
-                {!this.hasLaunchTestButton && (
-                  <Dotdotdot clamp={this.numberOfLinesForDescription}>
-                    {subtitle}
-                  </Dotdotdot>
-                )}
-              </div>
-            </div>
-          )}
-        </StyledCardContent>
+            )}
+          </StyledCardContent>
+        )}
       </StyledCollectionCover>
     )
   }

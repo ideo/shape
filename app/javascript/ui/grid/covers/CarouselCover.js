@@ -1,53 +1,60 @@
 import PropTypes from 'prop-types'
-import { observable, runInAction } from 'mobx'
-import { inject, observer } from 'mobx-react'
+import { computed, observable, runInAction } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
+import CoverRenderer from '~/ui/grid/CoverRenderer'
 
 @inject('apiStore')
 @observer
 class CarouselCover extends React.Component {
   @observable
   records = []
+  @observable
+  currentIdx
 
-  async componentDidMount() {
-    const { apiStore, collectionId } = this.props
-    const collection = apiStore.find('collections', collectionId)
-    const apiPath = `collections/${collection.id}/collection_cards`
+  componentDidMount() {
+    const { collection } = this.props
+    const items = collection.collection_cover_items
 
-    const res = await this.apiStore.request(apiPath)
-
-    const { data } = res
-    const { collection_cards } = data
-    console.log({ res })
-    console.log({ data })
-    console.log({ collection_cards })
-    console.log(collection_cards.length)
-    // Why is the collection card length 0?
     runInAction(() => {
-      this.records = collection_cards
+      this.records = items
+      this.currentIdx = 0
     })
   }
 
+  @computed
   get currentCarouselRecord() {
-    return this.records[0]
+    return this.records[this.currentIdx]
   }
 
   render() {
+    const { collection } = this.props
+    console.log('render')
     if (!this.records.length > 0) return <div>Loading...</div>
 
-    console.log('in render, records: ', this.records)
+    console.log('render', this.records, collection.collection_cover_items)
+
     return (
-      <div>
-        {/* {this.currentCarouselRecord} */}
-        {this.records.map(record => (
-          <span>record ${record.id}</span>
-        ))}
+      <div style={{ color: 'black', height: '100%' }}>
+        <CoverRenderer
+          card={collection.parent_collection_card}
+          cardType={'items'}
+          record={this.currentCarouselRecord}
+          dragging={this.props.dragging}
+          textItemHideReadMore
+        />
       </div>
     )
   }
 }
 
 CarouselCover.propTypes = {
-  collectionId: PropTypes.number.isRequired,
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  dragging: PropTypes.bool,
+}
+
+CarouselCover.defaultProps = {
+  dragging: false,
 }
 
 export default CarouselCover
