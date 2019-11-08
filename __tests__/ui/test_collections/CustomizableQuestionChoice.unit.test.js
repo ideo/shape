@@ -6,7 +6,7 @@ describe('CustomizableQuestionChoice', () => {
   beforeEach(() => {
     props = {
       onChange: () => {},
-      questionType: 'question_single_choice',
+      isSingleChoiceQuestion: true,
       choice: fakeQuestionChoice,
       questionAnswer: fakeQuestionAnswer,
       isChecked: false,
@@ -18,7 +18,7 @@ describe('CustomizableQuestionChoice', () => {
 
   describe('when single choice', () => {
     beforeEach(() => {
-      props.questionType = 'question_single_choice'
+      props.isSingleChoiceQuestion = true
     })
 
     describe('when editing', () => {
@@ -59,7 +59,7 @@ describe('CustomizableQuestionChoice', () => {
 
   describe('when multiple choice', () => {
     beforeEach(() => {
-      props.questionType = 'question_multiple_choice'
+      props.isSingleChoiceQuestion = false
     })
 
     describe('when editing', () => {
