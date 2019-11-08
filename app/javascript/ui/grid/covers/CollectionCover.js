@@ -12,6 +12,7 @@ import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
+import CarouselCover from '~/ui/grid/covers/CarouselCover'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import { FormButton } from '~/ui/global/styled/buttons'
 import { RoundPill } from '~/ui/global/styled/forms'
@@ -399,14 +400,18 @@ class CollectionCover extends React.Component {
               <div className="top">
                 <PositionedCardHeading>
                   <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                    <PlainLink
-                      className="no-select cancelGridClick"
-                      onClick={this.handleClick}
-                      to={routingStore.pathTo('collections', collection.id)}
-                      data-cy="collection-cover-link"
-                    >
-                      {this.name}
-                    </PlainLink>
+                    {true ? (
+                      <CarouselCover collectionId={collection.id} />
+                    ) : (
+                      <PlainLink
+                        className="no-select cancelGridClick"
+                        onClick={this.handleClick}
+                        to={routingStore.pathTo('collections', collection.id)}
+                        data-cy="collection-cover-link"
+                      >
+                        {this.name}
+                      </PlainLink>
+                    )}
                   </Dotdotdot>
                   {this.button}
                 </PositionedCardHeading>
