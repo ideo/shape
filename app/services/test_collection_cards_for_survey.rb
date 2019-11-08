@@ -19,7 +19,7 @@ class TestCollectionCardsForSurvey < SimpleService
   private
 
   def randomize_idea_order
-    # meh...
+    # simple enough way to randomize?
     @idea_cards = @test_collection.idea_cards.shuffle
   end
 
@@ -33,7 +33,7 @@ class TestCollectionCardsForSurvey < SimpleService
         question_card = question_card.clone
         question_card.section_type = :ideas
         # set this attr_accessor
-        question_card.idea_id = idea_card.id
+        question_card.idea_id = idea_card.item_id
         question_card
       end
     end
