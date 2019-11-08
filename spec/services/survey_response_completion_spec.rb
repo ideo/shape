@@ -27,8 +27,10 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
   end
 
   describe '#call' do
+    let(:test_results_collection) { test_collection.test_results_collection }
+
     it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(test_results_collection)
       service.call
     end
 
