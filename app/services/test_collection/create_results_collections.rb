@@ -12,6 +12,10 @@ module TestCollection
 
     delegate :test_results_collection, to: :test_collection
 
+    before do
+      context.created_by ||= test_collection.created_by
+    end
+
     def call
       TestResultsCollection::CreateCollection.call(
         test_collection: test_collection,

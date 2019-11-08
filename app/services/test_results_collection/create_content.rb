@@ -29,28 +29,38 @@ module TestResultsCollection
       end
 
       collection_cards.each do |card|
-        item = card.item
-        if item.present?
-          if item.scale_question?
-            create_response_graph(card)
-          elsif item.question_open?
-            create_open_response_collection(card)
-          elsif item.question_media? || !item.is_a?(Item::QuestionItem)
-            create_media_item_link(card)
-          end
-        elsif card.ideas_collection_card? && !in_collection_test?
-          if idea.present?
-            # Show media + title + description
-            create_idea_collection_cards(card)
-          else
-            # Create collection with ideas
-            create_ideas_collection(card)
-          end
+        if card.item.present?
+          create_content_for_item_card(card)
+        elsif card.ideas_collection_card?
+          create_content_for_ideas_collection_card(card)
         end
       end
     end
 
     private
+
+    def create_content_for_item_card(card)
+      item = card.item
+      if item.scale_question?
+        create_response_graph(card)
+      elsif item.question_open?
+        create_open_response_collection(card)
+      elsif item.question_media? || !item.is_a?(Item::QuestionItem)
+        create_media_item_link(card)
+      end
+    end
+
+    def create_content_for_ideas_collection_card(card)
+      return if in_collection_test?
+
+      if idea.present?
+        # Show media + title + description
+        create_idea_collection_cards(card)
+      else
+        # Create collection with ideas
+        create_ideas_collection(card)
+      end
+    end
 
     def remove_idea_media_link
       test_results_collection

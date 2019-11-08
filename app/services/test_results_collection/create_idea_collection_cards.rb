@@ -114,7 +114,7 @@ module TestResultsCollection
     end
 
     def idea_name_and_description
-      # TODO = link to idea results
+      # TODO: link the idea name to idea results collection
       html = "<h2>#{idea_item.name}</h2>"
       idea_item.content.split(/\n+/).each do |paragraph|
         html += "<p>#{paragraph}</p>"
@@ -123,7 +123,7 @@ module TestResultsCollection
     end
 
     def test_show_media?
-      idea_item.parent.test_show_media?
+      idea_item.parent.parent.test_show_media?
     end
   end
 end

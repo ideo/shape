@@ -98,7 +98,7 @@ FactoryBot.define do
             open_response.update(content: 'What do you think?')
           end
           if collection.ideas_collection.present?
-            idea_question = collection.ideas_collection.items.find(&:question_idea?)
+            idea_question = collection.idea_items.find(&:question_idea?)
             idea_question&.update(
               type: 'Item::VideoItem',
               name: 'Video',
