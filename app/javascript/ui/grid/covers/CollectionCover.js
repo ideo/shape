@@ -401,7 +401,7 @@ class CollectionCover extends React.Component {
                 <PositionedCardHeading>
                   <Dotdotdot clamp={height > 1 ? 6 : 3}>
                     {true ? (
-                      <CarouselCover collectionId={collection.id} />
+                      <CarouselCover collection={collection} />
                     ) : (
                       <PlainLink
                         className="no-select cancelGridClick"

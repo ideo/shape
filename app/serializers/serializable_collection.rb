@@ -37,8 +37,7 @@ class SerializableCollection < BaseJsonSerializer
 
   has_many :collection_cover_items do
     data do
-      # Only include cover items if this collection has indicated to use them
-      @object.cover_type_default? ? [] : @object.collection_cover_items
+      @object.serial_collection_cover_items
     end
   end
 
