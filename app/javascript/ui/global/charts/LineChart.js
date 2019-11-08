@@ -21,16 +21,16 @@ export const formatValuesWithoutDates = (values, numDesiredValues) => {
     formattedValues.push(duplicateValue)
   }
 
-  // Add x/y to show it in the right placement
+  // Add x to show it in the right placement
   return formattedValues.map((datum, i) => ({
     ...datum,
     x: i + 1,
-    y: datum.value,
   }))
 }
 
 const formatValuesWithDates = values => {
   const rawValues = addDuplicateValueIfSingleValue(values)
+  // Transform to regular arrays and objects for Victory
   return rawValues.map(data => ({ ...data }))
 }
 
@@ -57,10 +57,11 @@ const LineChart = ({
   const { measure, timeframe } = dataset
   const { data } = dataset
   let values
-  if (data[0] && !data[0].date) {
-    values = formatValuesWithoutDates(data, numPrimaryDatasetValues)
-  } else {
+  const dataHasDates = data[0] && data[0].date
+  if (dataHasDates) {
     values = formatValuesWithDates(data)
+  } else {
+    values = formatValuesWithoutDates(data, numPrimaryDatasetValues)
   }
   const domain = chartDomainForDatasetValues({
     values,
@@ -78,9 +79,21 @@ const LineChart = ({
         measure,
       })
   }
+
+  const props = {
+    labels: d => d.value,
+    style: chartStyle(dataset),
+    data: values,
+    domain: domain,
+    key: `dataset-${dataset.order}`,
+    y: 'value',
+  }
+
+  if (dataHasDates) props.x = 'date'
+
   return (
     <VictoryLine
-      labels={d => d.value}
+      {...props}
       labelComponent={
         <ChartTooltip
           tooltipTextRenderer={tooltipFn}
@@ -88,10 +101,6 @@ const LineChart = ({
           cardArea={cardArea}
         />
       }
-      style={chartStyle(dataset)}
-      data={values}
-      domain={domain}
-      key={`dataset-${dataset.order}`}
     />
   )
 }
