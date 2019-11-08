@@ -11,7 +11,7 @@ class SurveyResponseCompletion < SimpleService
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
     mark_response_as_payment_owed
-    ping_collection
+    ping_results_collection
     @survey_response
   end
 
@@ -65,9 +65,12 @@ class SurveyResponseCompletion < SimpleService
     @survey_response.record_incentive_owed!
   end
 
-  def ping_collection
+  def ping_results_collection
+    test_results_collection = test_collection.test_results_collection
+    return unless test_results_collection.present?
+
     # real-time update any graphs, etc.
-    test_collection.touch
-    CollectionUpdateBroadcaster.call(test_collection)
+    test_results_collection.touch
+    CollectionUpdateBroadcaster.call(test_results_collection)
   end
 end

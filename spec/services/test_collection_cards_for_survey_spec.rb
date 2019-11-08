@@ -32,7 +32,7 @@ RSpec.describe TestCollectionCardsForSurvey, type: :service do
     end
 
     it 'collects the idea section cards for each idea' do
-      idea_ids = idea_cards.map(&:id) * 5
+      idea_ids = idea_cards.map(&:item_id) * 5
       # we use match_array because the idea order is randomized
       expect(idea_question_cards.map(&:idea_id)).to match_array(idea_ids)
     end

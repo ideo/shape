@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe SurveyResponseCompletion, type: :service, truncate: true do
-  let(:test_collection) { create(:test_collection, :with_test_audience, :completed, num_cards: 1, test_status: :live) }
+  let(:test_collection) { create(:test_collection, :with_test_audience, :completed, :launched) }
   let(:test_audience) { test_collection.test_audiences.first }
   let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
   let(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
@@ -27,8 +27,10 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
   end
 
   describe '#call' do
+    let(:test_results_collection) { test_collection.test_results_collection }
+
     it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(test_results_collection)
       service.call
     end
 
