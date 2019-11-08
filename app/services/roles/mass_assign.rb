@@ -64,6 +64,13 @@ module Roles
         role = user.add_role(@role_name, @object)
         if role.persisted?
           @added_users << user
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_user_ids: [user.id],
+            should_notify: false,
+          )
         else
           @failed_users << user
         end
@@ -82,6 +89,13 @@ module Roles
         role = group.add_role(@role_name, @object)
         if role.persisted?
           @added_groups << group
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_group_ids: [group.id],
+            should_notify: false,
+          )
         else
           @failed_groups << group
         end

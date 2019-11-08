@@ -47,9 +47,16 @@ module Roles
       existing_user_ids = role.users.pluck(:id).to_a
 
       @users.each do |user|
-        if existing_user_ids.include?(user.id)
-          user.remove_role(role.name, role.resource)
-        end
+        next unless existing_user_ids.include?(user.id)
+
+        user.remove_role(role.name, role.resource)
+        ActivityAndNotificationBuilder.call(
+          actor: @removed_by,
+          target: @object,
+          action: :unshared,
+          subject_user_ids: [user.id],
+          should_notify: false,
+        )
       end
 
       true
@@ -59,9 +66,16 @@ module Roles
       existing_group_ids = role.groups.pluck(:id).to_a
 
       @groups.each do |group|
-        if existing_group_ids.include?(group.id)
-          role.groups.destroy(group)
-        end
+        next unless existing_group_ids.include?(group.id)
+
+        role.groups.destroy(group)
+        ActivityAndNotificationBuilder.call(
+          actor: @removed_by,
+          target: @object,
+          action: :unshared,
+          subject_group_ids: [group.id],
+          should_notify: false,
+        )
       end
 
       true
