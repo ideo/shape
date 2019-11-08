@@ -27,14 +27,14 @@ module Roles
     def private_child?(child)
       return false if @parent.nil? || child.common_viewable?
 
-      cached = child.cached_inheritance
+      cached = Mashie.new(child.cached_inheritance)
 
       # special case, fix any messed up records
       child.reanchor_if_incorrect_anchor!(parent: @parent)
 
       if child.same_roles_anchor? @parent
         child.unmark_as_private! if cached.blank?
-        return false unless cached['private']
+        return false unless cached&.private
       end
 
       # otherwise we only compute cached_inheritance if not already set.
