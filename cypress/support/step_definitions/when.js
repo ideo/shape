@@ -439,9 +439,11 @@ When('I click the {word} arrow on the MDL snackbar', direction => {
 // Sharing Modal
 // ----------------------
 When('I add {string} to the sharing modal', email => {
-  cy.get('#react-select-react-select-chip-input').type(email, {
-    force: true,
-  })
+  cy.get('#react-select-react-select-chip-input')
+    .type(email, {
+      force: true,
+    })
+    .wait('@apiSearchUsersAndGroups')
 })
 
 When('I select to invite a new user', () => {
