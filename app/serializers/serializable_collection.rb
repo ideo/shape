@@ -24,6 +24,12 @@ class SerializableCollection < BaseJsonSerializer
     :idea_id,
   )
 
+  stringified_attributes(
+    :organization_id,
+    :joinable_group_id,
+    :default_group_id,
+  )
+
   has_many :roles do
     data do
       @object.anchored_roles(viewing_organization_id: @current_user&.current_organization_id)
@@ -48,14 +54,6 @@ class SerializableCollection < BaseJsonSerializer
   has_many :test_audiences
   has_one :test_results_collection
   has_many :collection_filters
-
-  attribute :organization_id do
-    @object.organization_id.to_s
-  end
-
-  attribute :joinable_group_id do
-    @object.joinable_group_id.to_s
-  end
 
   attribute :system_required do
     @object.system_required?
@@ -234,10 +232,6 @@ class SerializableCollection < BaseJsonSerializer
 
   has_one :restorable_parent do
     @object.try(:restorable_parent)
-  end
-
-  attribute :default_group_id do
-    @object.default_group_id.to_s
   end
 
   attribute :cache_key, if: -> { @object == @current_record } do

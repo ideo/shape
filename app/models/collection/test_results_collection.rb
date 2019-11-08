@@ -94,11 +94,6 @@ class Collection
 
     # TODO: revisit what should happen when you archive results or the test
     # after_commit :close_test, if: :archived_on_previous_save?
-    # has_many :question_items,
-    #          -> { questions },
-    #          source: :item,
-    #          class_name: 'Item::QuestionItem',
-    #          through: :primary_collection_cards
 
     def duplicate!(**args)
       # TODO: double check is the right thing to do here...

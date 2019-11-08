@@ -62,6 +62,11 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #
 
+########################################################################
+# This model is being kept around until we migrate all legacy TestDesigns
+# - see #migrate! function below and migrate_old_test_collections rake task
+########################################################################
+
 class Collection
   class TestDesign < Collection
     belongs_to :test_collection, class_name: 'Collection::TestCollection'
@@ -87,58 +92,8 @@ class Collection
 
     has_many :survey_responses, through: :test_collection
 
-    COLLECTION_SUFFIX = ' Feedback Design'.freeze
-
-    def self.generate_name(name)
-      "#{name}#{COLLECTION_SUFFIX}"
-    end
-
-    def duplicate!(**args)
-      duplicate = super(args)
-      return duplicate unless duplicate.persisted?
-
-      duplicate = duplicate.becomes(Collection::TestCollection)
-      duplicate.update(
-        test_collection_id: nil,
-        type: 'Collection::TestCollection',
-        # Don't set this to be a master template if the parent is a template
-        master_template: parent.master_template? ? false : master_template,
-      )
-      # Had to reload otherwise AASM gets into weird state
-      duplicate.reload
-    end
-
-    def question_item_created(question_item)
-      if question_item.question_open?
-        # Create open response collection for this new question item
-        test_collection.create_open_response_collections(
-          open_question_items: [question_item],
-        )
-      elsif question_item.question_media?
-        test_collection.create_media_item_link(
-          media_question_items: [question_item],
-        )
-      end
-    end
-
-    def answerable_complete_question_items
-      complete_question_items(answerable_only: true)
-    end
-
-    def complete_question_items(answerable_only: false)
-      # This is for the purpose of finding all completed items to display in the survey
-      # i.e. omitting any unfinished/blanks
-      questions = answerable_only ? question_items.answerable : items
-      questions.reject do |i|
-        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
-          i.question_type == 'question_open' && i.content.blank? ||
-          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
-          i.question_type == 'question_media'
-      end
-    end
-
-    def complete_question_cards
-      complete_question_items.collect(&:parent_collection_card)
+    def base_name
+      name
     end
 
     ###########
@@ -163,6 +118,9 @@ class Collection
         klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
       end
 
+      # these used to have question_type: nil
+      items.where.not(type: 'Item::QuestionItem').update_all(question_type: :question_media)
+
       return unless inside_a_submission?
 
       Collection
@@ -173,11 +131,5 @@ class Collection
         end
     end
     ###########
-
-    private
-
-    def close_test
-      test_collection.close! if test_collection.live?
-    end
   end
 end

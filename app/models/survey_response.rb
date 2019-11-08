@@ -6,6 +6,7 @@
 #  incentive_owed_at  :datetime
 #  incentive_paid_at  :datetime
 #  incentive_status   :integer
+#  respondent_alias   :string
 #  session_uid        :text
 #  status             :integer          default("in_progress")
 #  created_at         :datetime         not null
@@ -32,6 +33,7 @@ class SurveyResponse < ApplicationRecord
   has_one :feedback_incentive_record
 
   before_create :set_default_incentive_status, if: :gives_incentive?
+  after_create :create_alias
 
   delegate :question_items, :answerable_complete_question_items,
            to: :test_collection
@@ -49,6 +51,7 @@ class SurveyResponse < ApplicationRecord
     in_progress: 0,
     completed: 1,
     completed_late: 2,
+    duplicate: 3,
   }
 
   enum incentive_status: {
@@ -108,6 +111,14 @@ class SurveyResponse < ApplicationRecord
   end
 
   private
+
+  def create_alias
+    survey_names = test_collection.survey_responses.pluck(:respondent_alias)
+    survey_names << user&.first_name
+
+    name = UniqNameGenerator.call(disallowed_names: survey_names.compact)
+    update_attributes(respondent_alias: name)
+  end
 
   def set_default_incentive_status
     self.incentive_status ||= :incentive_unearned

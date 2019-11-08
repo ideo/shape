@@ -95,7 +95,7 @@ module TestResultsCollection
 
     def update_test_collection_name
       test_collection.update(
-        name: "#{test_collection.name} #{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}",
+        name: "#{test_collection.name}#{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}",
       )
     end
 

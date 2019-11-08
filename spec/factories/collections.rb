@@ -113,6 +113,15 @@ FactoryBot.define do
         end
       end
 
+      trait :two_ideas do
+        # can use this trait in combo with :completed
+        after(:create) do |collection|
+          ideas_collection = collection.ideas_collection
+          card = create(:collection_card_image, parent: ideas_collection)
+          card.item.update(content: 'my image', question_type: :question_idea)
+        end
+      end
+
       trait :with_test_audience do
         after(:create) do |collection|
           create(

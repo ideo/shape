@@ -93,7 +93,7 @@ QuestionLeftSide.propTypes = {
     isPinnedAndLocked: PropTypes.bool,
     order: PropTypes.number.isRequired,
     card_question_type: PropTypes.string,
-    section_type: PropTypes.string.isRequired,
+    section_type: PropTypes.string,
   }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
   cardNumber: PropTypes.number.isRequired,

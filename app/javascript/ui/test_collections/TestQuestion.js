@@ -59,6 +59,7 @@ class TestQuestion extends React.Component {
       questionAnswer = new QuestionAnswer(
         {
           question_id: record.id,
+          idea_id: card.idea_id,
           answer_text: text,
           answer_number: number,
         },

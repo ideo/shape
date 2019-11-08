@@ -1,5 +1,5 @@
 class SurveyResponseCompletion < SimpleService
-  delegate :test_collection, :gives_incentive?, :user, to: :@survey_response
+  delegate :test_collection, :gives_incentive?, :completed?, :user, to: :@survey_response
   delegate :test_audience, to: :@survey_response, allow_nil: true
 
   def initialize(survey_response)
@@ -11,7 +11,7 @@ class SurveyResponseCompletion < SimpleService
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
     mark_response_as_payment_owed
-    ping_collection
+    ping_results_collection
     @survey_response
   end
 
@@ -23,7 +23,10 @@ class SurveyResponseCompletion < SimpleService
     status = :completed
     # For in-collection tests the response may technically be attached to a "share via link" audience;
     # but we only care if the entire test has been closed
-    if test_collection.closed? || (test_collection.collection_to_test.nil? && test_audience&.closed?)
+    test_audience_closed = (test_collection.collection_to_test.nil? && test_audience&.closed?)
+    if user_has_existing_survey_response?
+      status = :duplicate
+    elsif test_collection.closed? || test_audience_closed
       status = :completed_late
     end
     @survey_response.update(status: status)
@@ -43,22 +46,31 @@ class SurveyResponseCompletion < SimpleService
     test_collection.test_audience_closed!
   end
 
+  def user_has_existing_survey_response?
+    where_status = { status: :completed }
+    if gives_incentive?
+      where_status[:incentive_status] = %i[incentive_paid incentive_owed]
+    end
+    SurveyResponse
+      .where(where_status)
+      .find_by(user: user, test_collection: @survey_response.test_collection)
+      .present?
+  end
+
   def mark_response_as_payment_owed
-    return unless gives_incentive? && user&.email.present?
+    return unless completed? && gives_incentive? && user&.email.present?
     # perform some checks: you can only get marked owed + paid once per TestCollection
     return if @survey_response.incentive_owed?
-
-    already_owed_or_paid = SurveyResponse
-                           .where(incentive_status: %i[incentive_paid incentive_owed])
-                           .find_by(user: user, test_collection: @survey_response.test_collection)
-    return if already_owed_or_paid.present?
 
     @survey_response.record_incentive_owed!
   end
 
-  def ping_collection
+  def ping_results_collection
+    test_results_collection = test_collection.test_results_collection
+    return unless test_results_collection.present?
+
     # real-time update any graphs, etc.
-    test_collection.touch
-    CollectionUpdateBroadcaster.call(test_collection)
+    test_results_collection.touch
+    CollectionUpdateBroadcaster.call(test_results_collection)
   end
 end

@@ -96,7 +96,7 @@ class Collection
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
     after_commit :close_test_after_archive, if: :archived_on_previous_save?
 
-    FEEDBACK_DESIGN_SUFFIX = 'Feedback Design'.freeze
+    FEEDBACK_DESIGN_SUFFIX = ' Feedback Design'.freeze
 
     enum test_status: {
       draft: 0,
@@ -167,8 +167,13 @@ class Collection
     end
 
     # Used so that we can interchangably call this on TestCollection and TestDesign
+    # TODO: check, is this still needed with TestResults?
     def test_collection
       self
+    end
+
+    def base_name
+      name.sub(FEEDBACK_DESIGN_SUFFIX, '')
     end
 
     def test_audience_closed!
@@ -218,9 +223,6 @@ class Collection
                         .find_by(template_id: id)
       return unless launchable_test.present?
 
-      if launchable_test.is_a?(Collection::TestDesign)
-        launchable_test = launchable_test.test_collection
-      end
       submission.update(
         submission_attrs: {
           # this should have already been set but want to preserve the value as true
@@ -313,7 +315,7 @@ class Collection
         duplicate.collection_to_test = args[:parent]
       elsif !parent.master_template? && !args[:parent].master_template?
         # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}".gsub(" #{FEEDBACK_DESIGN_SUFFIX}", '')
+        duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
       duplicate.save
       duplicate
@@ -348,7 +350,6 @@ class Collection
     def test_survey_render_class_mappings
       Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
         'Collection::TestCollection': SerializableTestCollection,
-        # 'Collection::TestDesign': SerializableSimpleCollection,
         FilestackFile: SerializableFilestackFile,
       )
     end
@@ -476,6 +477,7 @@ class Collection
       end.each(&:destroy)
     end
 
+    # used in SurveyResponse#all_questions_answered?
     def answerable_complete_question_items
       complete_question_items(answerable_only: true)
     end
@@ -487,12 +489,12 @@ class Collection
       questions.reject(&:question_item_incomplete?)
     end
 
-    def complete_question_cards
-      complete_question_items.collect(&:parent_collection_card)
-    end
-
     def idea_items
       ideas_collection&.items || Item.none
+    end
+
+    def idea_cards
+      ideas_collection&.collection_cards || CollectionCard.none
     end
 
     def cloned_or_templated?

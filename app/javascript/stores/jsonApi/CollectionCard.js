@@ -61,8 +61,8 @@ class CollectionCard extends BaseRecord {
     return this.col + this.width - 1
   }
 
-  get isTestDesignCollection() {
-    return this.record.type === COLLECTION_TYPES.TEST_DESIGN
+  get isTestCollection() {
+    return this.record.type === COLLECTION_TYPES.TEST
   }
 
   get isTextItem() {
@@ -356,7 +356,7 @@ class CollectionCard extends BaseRecord {
         } else if (this.link) {
           iconName = 'Link'
           prompt = 'Are you sure you want to delete this link?'
-        } else if (this.isTestDesignCollection) {
+        } else if (this.isTestCollection) {
           prompt = 'Are you sure you want to delete this test design?'
           prompt += ' It will close your feedback.'
         }

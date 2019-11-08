@@ -105,7 +105,7 @@ describe Collection::TestCollection, type: :model do
 
       it 'archives idea cards if collection to test added' do
         idea_cards = test_collection.idea_items.map(&:parent_collection_card)
-        non_idea_cards = test_collection.collection_cards - idea_cards
+        non_idea_cards = test_collection.collection_cards
         expect(idea_cards.all?(&:archived?)).to be false
         test_collection.update(collection_to_test: collection_to_test)
         idea_cards.each(&:reload)
@@ -244,7 +244,7 @@ describe Collection::TestCollection, type: :model do
 
       it 'renames it to Copy of {name}' do
         duplicate_name = "Copy of #{test_collection.name}"
-                         .gsub(" #{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}", '')
+                         .gsub(Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX, '')
         expect(duplicate.name).to eq(duplicate_name)
       end
 
@@ -406,7 +406,8 @@ describe Collection::TestCollection, type: :model do
 
             it 'should output its collection_cards as question cards' do
               data = test_collection.serialized_for_test_survey
-              card_ids = test_collection.complete_question_cards.map(&:id).map(&:to_s)
+              question_cards = TestCollectionCardsForSurvey.call(test_collection)
+              card_ids = question_cards.map(&:id_with_idea_id).map(&:to_s)
               expect(data[:data][:relationships][:question_cards][:data].map { |i| i[:id] }).to match_array(card_ids)
             end
           end
@@ -421,7 +422,7 @@ describe Collection::TestCollection, type: :model do
           it 'returns false with test_status errors' do
             expect(test_collection.launch!(initiated_by: user)).to be false
             expect(test_collection.errors).to match_array(
-              ["You can't launch because the feedback is live"]
+              ["You can't launch because the feedback is live"],
             )
           end
         end
@@ -523,36 +524,6 @@ describe Collection::TestCollection, type: :model do
           test_collection.reopen!(initiated_by: user)
         end
       end
-    end
-  end
-
-  describe '#complete_question_cards' do
-    let!(:test_collection) { create(:test_collection, :completed, parent_collection: create(:collection)) }
-    let!(:extra_question_cards) do
-      create_list(:collection_card_question, 4, parent: test_collection)
-    end
-    before do
-      test_collection.launch!(initiated_by: create(:user))
-
-      card = extra_question_cards.first
-      # incomplete because it doesn't have content
-      card.item.update(question_type: :question_open)
-      card = extra_question_cards.second
-      # incomplete because it doesn't have content
-      card.item.update(question_type: :question_category_satisfaction)
-      card = extra_question_cards.third
-      # incomplete because it doesn't have a type
-      card.item.update(question_type: nil)
-      card = extra_question_cards.fourth
-      # incomplete because it doesn't have media
-      card.item.update(question_type: :question_media)
-    end
-
-    it 'should only get completed question cards' do
-      # all the default cards, minus ideas collection + 4 incomplete
-      expect(test_collection.items.count).to eq(num_default_question_items - 1 + 4)
-      # all the default cards only (minus media because it gets removed)
-      expect(test_collection.complete_question_cards & extra_question_cards).to be_empty
     end
   end
 

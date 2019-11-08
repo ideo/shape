@@ -55,7 +55,7 @@ module Templateable
   end
 
   def update_test_template_instance_types!
-    return unless is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+    return unless is_a?(Collection::TestCollection)
 
     templated_collections.active.each do |instance|
       instance.update(
@@ -86,7 +86,7 @@ module Templateable
 
   def add_cards_from_master_template(instance)
     cards_added_to_master_template(instance).each do |card|
-      if [Collection::TestCollection, Collection::TestDesign].include?(instance.class)
+      if instance.is_a?(Collection::TestCollection)
         next unless card.card_question_type.present?
       end
       # ABORT: should not allow duplicating a template instance in this manner;
@@ -134,7 +134,7 @@ module Templateable
     cards = cards_removed_from_master_template(instance)
     return unless cards.present?
 
-    if [Collection::TestCollection, Collection::TestDesign].include?(instance.class)
+    if instance.is_a?(Collection::TestCollection)
       # for tests, we just delete any pinned cards that were removed from the master
       CollectionCard.where(id: cards.pluck(:id)).destroy_all
       return

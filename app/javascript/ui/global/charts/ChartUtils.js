@@ -57,8 +57,10 @@ export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
 
 export const emojiTooltipText = datum => `${datum.value}`
 
-export const dateTooltipText = datum =>
-  `${datum.value} on ${utcMoment(datum.date).format('l')}`
+export const dateTooltipText = datum => {
+  if (!datum.date) return datum.value
+  return `${datum.value} on ${utcMoment(datum.date).format('l')}`
+}
 
 export const advancedTooltipText = ({
   datum,

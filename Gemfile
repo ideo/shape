@@ -140,6 +140,9 @@ gem 'active_record_union'
 
 gem 'schmooze', require: false
 
+# Faker needed for generating fake names
+gem 'faker', '~> 1.8.7'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
@@ -149,7 +152,6 @@ group :development, :test do
   gem 'crystalball'
   gem 'database_cleaner'
   gem 'factory_bot_rails'
-  gem 'faker', '~> 1.8.7'
   gem 'lefthook'
   gem 'pry-byebug'
   gem 'pry-rails'

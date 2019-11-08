@@ -7,7 +7,8 @@ class SerializableTestCollection < SerializableSimpleCollection
 
   has_many :question_cards do
     data do
-      @object.complete_question_cards
+      # this will repeat the idea cards per idea
+      TestCollectionCardsForSurvey.call(@object)
     end
   end
 
