@@ -81,6 +81,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get isSingleChoiceQuestion() {
+    return this.question_type === 'question_single_choice'
+  }
+
   get pdfCoverUrl() {
     if (!this.filestack_file) return ''
     return FilestackUpload.pdfCoverUrl(this.filestack_file.handle)

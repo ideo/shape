@@ -141,9 +141,6 @@ class Collection
     def self.default_question_types_by_section
       {
         intro: %i[question_category_satisfaction],
-        intro: %i[
-          question_category_satisfaction
-        ],
         ideas: %i[
           ideas_collection
           question_clarity

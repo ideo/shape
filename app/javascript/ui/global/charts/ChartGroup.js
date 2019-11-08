@@ -210,7 +210,6 @@ class ChartGroup extends React.Component {
       const barLength = barWidthPx(this.totalColumns, this.totalGroupings)
       const avgCharToPxRatio = 2.85
       const maxTickLength = barLength / avgCharToPxRatio
-      console.log('bar width', { barLength })
 
       const Wrapper = props => (
         <ChartLabelWithTooltip
@@ -223,8 +222,7 @@ class ChartGroup extends React.Component {
       let tickFormat
       let tickLabelComponent = <Wrapper />
 
-      // For emoji scale charts the column is always just a number
-      if (this.primaryDataset.data[0].column === 1) {
+      if (this.primaryDataset.isEmojiOrScaleQuestion) {
         tickValues = [1, 2, 3, 4]
         tickFormat = this.emojiScale.map(e => e.symbol)
         tickLabelComponent = <Tick emojiScale={this.emojiScale} />

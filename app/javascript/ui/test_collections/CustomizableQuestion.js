@@ -77,14 +77,14 @@ class CustomizableQuestion extends React.Component {
   }
 
   handleAnswerSelection = choice => ev => {
-    const { questionAnswer } = this.props
+    const { questionAnswer, question } = this.props
     let selected_choice_ids = this.hasSubmittedAnswer
       ? questionAnswer.selected_choice_ids
       : this.state.selected_choice_ids
 
     ev.preventDefault()
 
-    if (this.isSingleChoiceQuestion) {
+    if (question.isSingleChoiceQuestion) {
       selected_choice_ids = this.updateSingleChoiceIds(
         selected_choice_ids,
         choice
@@ -97,7 +97,7 @@ class CustomizableQuestion extends React.Component {
     }
 
     this.setState({ selected_choice_ids }, () => {
-      if (this.isSingleChoiceQuestion || this.isAnswerSavedinDB) {
+      if (question.isSingleChoiceQuestion || this.isAnswerSavedinDB) {
         this.submitAnswer()
       }
     })
@@ -127,11 +127,6 @@ class CustomizableQuestion extends React.Component {
       })
       return selected_choice_ids
     }
-  }
-
-  get isSingleChoiceQuestion() {
-    const { question } = this.props
-    return question.question_type === 'question_single_choice'
   }
 
   isChoiceSelected = choice => {
@@ -239,7 +234,7 @@ class CustomizableQuestion extends React.Component {
               />
             ))}
         </ChoicesHolder>
-        {!this.isSingleChoiceQuestion &&
+        {!question.isSingleChoiceQuestion &&
           !this.state.hasSubmittedAnswer &&
           !editing && (
             <TextResponseHolder style={{ padding: '20px' }}>
