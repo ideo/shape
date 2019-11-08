@@ -208,6 +208,7 @@ class Collection < ApplicationRecord
     cover_type_default: 0,
     cover_type_items: 1,
     cover_type_text_and_media: 2,
+    cover_type_carousel: 3,
   }
 
   # Searchkick Config
