@@ -12,7 +12,7 @@ module TestResultsCollection
 
     require_in_context :item, :parent_collection
 
-    delegate :item, :parent_collection, :created_by,
+    delegate :item, :parent_collection, :created_by, :order,
              to: :context
 
     delegate :parent_collection_card, to: :item
@@ -38,19 +38,15 @@ module TestResultsCollection
     def existing_card
       parent_collection
         .primary_collection_cards
-        .joins(:collection)
-        .where(
-          collections: {
-            type: 'Collection::TestOpenResponses',
-            question_item_id: item.id,
-          },
-        )
+        .collection
+        .identifier("item-#{item.id}-responses")
         .first
     end
 
     def open_response_collection_card_attrs(item)
       {
-        order: parent_collection_card.order,
+        order: order,
+        identifier: "item-#{item.id}-responses",
         collection_attributes: {
           name: "#{item.content} Responses",
           type: 'Collection::TestOpenResponses',

@@ -20,7 +20,8 @@ class SerializableCollection < BaseJsonSerializer
     :archived,
     :unresolved_count,
     :last_unresolved_comment_id,
-    :test_show_media
+    :test_show_media,
+    :idea_id,
   )
 
   has_many :roles do

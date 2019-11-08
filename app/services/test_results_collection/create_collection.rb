@@ -25,7 +25,7 @@ module TestResultsCollection
     def call
       ActiveRecord::Base.transaction do
         if test_results_collection.blank?
-          context.test_results_collection = create_collection
+          context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
           if master_results_collection?
             update_test_collection_name
             move_roles_to_results_collection if move_roles?
@@ -61,7 +61,7 @@ module TestResultsCollection
       idea.blank?
     end
 
-    def create_collection
+    def create_master_collection
       collection = Collection::TestResultsCollection.create(
         name: test_collection.name,
         organization: test_collection.organization,
@@ -76,6 +76,21 @@ module TestResultsCollection
       context.fail!(
         message: collection.errors.full_messages.to_sentence,
       )
+    end
+
+    def create_idea_collection
+      create_card(
+        params: {
+          collection_attributes: {
+            name: idea.name,
+            type: 'Collection::TestResultsCollection',
+            test_collection: test_collection,
+            idea: idea,
+          },
+        },
+        parent_collection: test_collection.test_results_collection,
+        created_by: created_by,
+      ).record
     end
 
     def update_test_collection_name

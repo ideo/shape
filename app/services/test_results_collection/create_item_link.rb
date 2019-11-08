@@ -9,17 +9,18 @@ module TestResultsCollection
            :width,
            :height,
            :created_by,
+           :identifier,
            :message
 
     require_in_context :parent_collection, :item
 
-    delegate :parent_collection, :item, :width, :height, :order,
+    delegate :parent_collection, :item, :width, :height, :order, :identifier,
              to: :context
 
     before do
-      context.width ||= 1
-      context.height ||= 2
-      context.order ||= 0
+      context.width = 1 if width.nil?
+      context.height = 2 if height.nil?
+      context.order = 0 if order.nil?
     end
 
     def call
@@ -33,10 +34,11 @@ module TestResultsCollection
     private
 
     def existing_card
-      parent_collection
-        .link_collection_cards
-        .where(item_id: item.id)
-        .first
+      if identifier.present?
+        parent_collection.link_collection_cards.identifier(identifier).first
+      else
+        parent_collection.link_collection_cards.where(item_id: item.id).first
+      end
     end
 
     def link_item
@@ -46,6 +48,7 @@ module TestResultsCollection
         width: width,
         height: height,
         order: order,
+        identifier: identifier,
       )
 
       return link if link.persisted?

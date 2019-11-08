@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_06_185833) do
+ActiveRecord::Schema.define(version: 2019_11_07_222348) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -124,8 +124,10 @@ ActiveRecord::Schema.define(version: 2019_11_06_185833) do
     t.integer "row"
     t.integer "col"
     t.integer "section_type"
+    t.string "identifier"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
+    t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"

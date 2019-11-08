@@ -13,14 +13,20 @@ module TestResultsCollection
     delegate :test_results_collection, :created_by, :idea,
              to: :context
 
-    delegate :ideas_collection, to: :test_results_collection
+    delegate :ideas_collection, :test_show_media?, :collection_to_test_id,
+             to: :test_results_collection
 
     before do
       @legend_item = test_results_collection.legend_item
+      @order = -1
     end
 
     def call
-      create_idea_media_link
+      if test_show_media?
+        create_idea_media_link
+      else
+        remove_idea_media_link
+      end
 
       collection_cards.each do |card|
         item = card.item
@@ -32,22 +38,41 @@ module TestResultsCollection
           elsif item.question_media? || !item.is_a?(Item::QuestionItem)
             create_media_item_link(card)
           end
-        elsif card.ideas_collection_card? && idea.present?
-          # This assumes any collection is the ideas collection
-          create_idea_collection(card)
+        elsif card.ideas_collection_card? && !in_collection_test?
+          if idea.present?
+            # Show media + title + description
+            create_idea_collection_cards(card)
+          else
+            # Create collection with ideas
+            create_ideas_collection(card)
+          end
         end
       end
     end
 
     private
 
+    def remove_idea_media_link
+      test_results_collection
+        .link_collection_cards
+        .identifier('first-idea-media')
+        .first
+        &.archive!
+    end
+
     def create_idea_media_link
-      idea_item = idea.presence || ideas_collection.items.question_idea.first
+      idea_item = idea.presence
+      idea_item ||= ideas_collection.items.question_idea.first if ideas_collection.present?
+
+      return if idea_item.blank?
 
       TestResultsCollection::CreateItemLink.call!(
         default_attrs.merge(
           item: idea_item,
-          order: -1,
+          width: 1,
+          height: 2,
+          identifier: 'first-idea-media',
+          order: @order += 1,
         ),
       )
     end
@@ -56,26 +81,41 @@ module TestResultsCollection
       TestResultsCollection::CreateItemLink.call!(
         default_attrs.merge(
           item: card.item,
-          order: card.order,
+          order: @order += 1,
+          width: 2,
+          height: 2,
         ),
       )
     end
 
-    def create_idea_collection(card)
-      TestResultsCollection::CreateIdeaCollection.call!(
+    def create_ideas_collection(_card)
+      TestResultsCollection::CreateIdeasCollection.call!(
+        default_attrs
+          .except(:parent_collection)
+          .merge(
+            test_results_collection: test_results_collection,
+            order: @order += 1,
+          ),
+      )
+    end
+
+    def create_idea_collection_cards(_card)
+      result = TestResultsCollection::CreateIdeaCollectionCards.call!(
         default_attrs
           .merge(
             idea_item: idea,
-            order: card.order,
+            num_idea: 1,
+            order: @order += 1,
           ),
       )
+      @order = result.order
     end
 
     def create_open_response_collection(card)
       TestResultsCollection::CreateOpenResponseCollection.call!(
         default_attrs.merge(
           item: card.item,
-          order: card.order,
+          order: @order += 1,
         ),
       )
     end
@@ -84,7 +124,7 @@ module TestResultsCollection
       result = TestResultsCollection::CreateResponseGraph.call!(
         default_attrs.merge(
           item: card.item,
-          order: card.order,
+          order: @order += 1,
           legend_item: @legend_item,
         ),
       )
@@ -108,6 +148,10 @@ module TestResultsCollection
 
     def parent_collection
       idea.present? ? idea.test_results_collection : test_results_collection
+    end
+
+    def in_collection_test?
+      collection_to_test_id.present?
     end
   end
 end

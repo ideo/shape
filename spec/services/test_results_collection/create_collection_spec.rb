@@ -27,6 +27,7 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
           'Item::VideoItem',
           'Item::DataItem',
           'Item::LegendItem',
+          'Collection',
           'Item::DataItem',
           'Item::DataItem',
           'Item::DataItem',
@@ -41,7 +42,7 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
         test_results_collection
         .collection_cards
         .map(&:order),
-      ).to eq(0.upto(10).to_a)
+      ).to eq(0.upto(11).to_a)
     end
   end
 end

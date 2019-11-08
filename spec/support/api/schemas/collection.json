@@ -52,7 +52,8 @@
     "is_restorable": { "type": ["boolean", "null"] },
     "default_group_id": { "type": ["string", "null"] },
     "cache_key": { "type": ["string"] },
-    "test_show_media": { "type": ["boolean"] }
+    "test_show_media": { "type": ["boolean"] },
+    "idea_id": { "type": ["string", "null"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

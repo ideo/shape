@@ -96,6 +96,9 @@ class CollectionCard < ApplicationRecord
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
   scope :ideas_collection_card, -> { where(section_type: :ideas).where.not(collection_id: nil) }
+  scope :identifier, ->(identifier) { where(identifier: identifier) }
+  scope :item, -> { where.not(item_id: nil) }
+  scope :collection, -> { where.not(collection_id: nil) }
 
   enum filter: {
     nothing: 0,

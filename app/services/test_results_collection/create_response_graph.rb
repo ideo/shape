@@ -13,7 +13,7 @@ module TestResultsCollection
 
     require_in_context :item, :parent_collection
 
-    delegate :parent_collection, :item, :legend_item, :created_by,
+    delegate :parent_collection, :item, :legend_item, :created_by, :order,
              to: :context
 
     delegate :question_dataset, :org_wide_question_dataset,
@@ -54,10 +54,9 @@ module TestResultsCollection
     def find_existing_card
       parent_collection
         .primary_collection_cards
-        .joins(item: :data_items_datasets)
-        .merge(
-          DataItemsDataset.where(id: item.question_dataset.id),
-        )
+        .identifier("item-#{item.id}-data-item")
+        .includes(:item)
+        .first
     end
 
     def link_datasets
@@ -71,9 +70,10 @@ module TestResultsCollection
 
     def data_item_card_attrs(item)
       {
-        order: item.parent_collection_card.order,
+        order: order,
         height: 2,
         width: 2,
+        identifier: "item-#{item.id}-data-item",
         item_attributes: {
           type: 'Item::DataItem',
           report_type: :report_type_question_item,
