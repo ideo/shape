@@ -51,12 +51,20 @@ const DeleteIconHolder = styled.span`
 const SymbolHolder = styled.span`
   width: 16px;
   height: 16px;
-  margin-right: 4px;
+  margin-right: ${props =>
+    !props.symbolSize || props.symbolSize === 16 ? 4 : 10}px;
 `
 
 const Pill = props => {
-  const { label, selectable, selected, onSelect, symbol, onDelete } =
-    props.tag || props
+  const {
+    label,
+    selectable,
+    selected,
+    onSelect,
+    symbol,
+    symbolSize,
+    onDelete,
+  } = props.tag || props
   let { deleteIcon } = props.tag || props
   if (props.tag && !props.tag.deleteIcon) {
     deleteIcon = <CloseIcon />
@@ -74,7 +82,7 @@ const Pill = props => {
           value="yes"
         />
       )}
-      {symbol && <SymbolHolder>{symbol}</SymbolHolder>}
+      {symbol && <SymbolHolder symbolSize={symbolSize}>{symbol}</SymbolHolder>}
       <DisplayText>{label}</DisplayText>
       {onDelete && (
         <DeleteIconHolder>
@@ -88,6 +96,7 @@ const Pill = props => {
 Pill.propTypes = {
   label: PropTypes.string.isRequired,
   symbol: PropTypes.node,
+  symbolSize: PropTypes.number,
   onDelete: PropTypes.func,
   deleteIcon: PropTypes.node,
   tag: PropTypes.node,
@@ -99,6 +108,7 @@ Pill.propTypes = {
 
 Pill.defaultProps = {
   symbol: null,
+  symbolSize: 16,
   onDelete: null,
   deleteIcon: <CloseIcon />,
   tag: null,
