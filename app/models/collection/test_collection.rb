@@ -567,15 +567,15 @@ class Collection
         return true
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
-      create_results_collections! unless reopening
+      create_results_collections!(initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
       TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
     end
 
-    def create_results_collections!
+    def create_results_collections!(initiated_by = nil)
       result = ::TestCollection::CreateResultsCollections.call(
         test_collection: self,
-        created_by: initiated_by,
+        created_by: initiated_by || created_by,
       )
 
       return test_results_collection if result.success?
