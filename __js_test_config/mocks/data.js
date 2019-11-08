@@ -83,6 +83,7 @@ export const fakeBarChartDataset = {
     { column: 3, value: 5, percentage: 50, type: 'question_context' },
     { column: 4, value: 0, percentage: 0, type: 'question_context' },
   ],
+  isEmojiOrScaleQuestion: jest.fn(),
 }
 
 export const fakeDataItemCollectionsItemsAttrs = {
@@ -318,6 +319,7 @@ export const fakeQuestionItem = {
   // ...fakeTextItemAttrs,
   type: 'Item::QuestionItem',
   question_type: 'question_description',
+  isSingleChoiceQuestion: false,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
   API_destroyQuestionChoice: jest.fn().mockReturnValue(Promise.resolve()),

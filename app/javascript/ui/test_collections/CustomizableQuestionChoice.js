@@ -58,11 +58,17 @@ class CustomizableQuestionChoice extends React.Component {
   }
 
   render() {
-    const { choice, questionType, onChange, isChecked, editing } = this.props
+    const {
+      choice,
+      isSingleChoiceQuestion,
+      onChange,
+      isChecked,
+      editing,
+    } = this.props
 
     return (
       <ChoiceHolder>
-        {questionType === 'question_single_choice' ? (
+        {isSingleChoiceQuestion ? (
           <Radio
             id={`option-${choice.id}`}
             disabled={editing}
@@ -111,7 +117,7 @@ class CustomizableQuestionChoice extends React.Component {
 
 CustomizableQuestionChoice.propTypes = {
   onChange: PropTypes.func.isRequired,
-  questionType: PropTypes.string.isRequired,
+  isSingleChoiceQuestion: PropTypes.bool.isRequired,
   choice: MobxPropTypes.objectOrObservableObject.isRequired,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   isChecked: PropTypes.bool,

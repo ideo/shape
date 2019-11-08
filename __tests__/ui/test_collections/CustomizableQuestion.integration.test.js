@@ -20,7 +20,7 @@ describe('CustomizableQuestion', () => {
         isTestDraft: true,
       }
 
-      props.question.question_type = 'question_single_choice'
+      props.question.isSingleChoiceQuestion = true
 
       wrapper = mount(<CustomizableQuestion {...props} />)
     })
@@ -78,7 +78,7 @@ describe('CustomizableQuestion', () => {
         handleAnswerSelection: jest.fn(),
       }
 
-      props.question.question_type = 'question_single_choice'
+      props.question.isSingleChoiceQuestion = true
 
       wrapper = mount(<CustomizableQuestion {...props} />)
     })
@@ -131,7 +131,7 @@ describe('CustomizableQuestion', () => {
         handleAnswerSelection: jest.fn(),
       }
 
-      props.question.question_type = 'question_multiple_choice'
+      props.question.isSingleChoiceQuestion = false
 
       wrapper = mount(<CustomizableQuestion {...props} />)
     })
@@ -152,7 +152,7 @@ describe('CustomizableQuestion', () => {
         handleAnswerSelection: jest.fn(),
       }
 
-      props.question.question_type = 'question_multiple_choice'
+      props.question.isSingleChoiceQuestion = false
 
       wrapper = mount(<CustomizableQuestion {...props} />)
     })

@@ -213,7 +213,7 @@ class CustomizableQuestion extends React.Component {
 
   render() {
     const { question, questionAnswer, editing, question_choices } = this.props
-    const { question_type } = question
+
     return (
       <div style={{ width: '100%' }}>
         {this.question}
@@ -224,7 +224,7 @@ class CustomizableQuestion extends React.Component {
               <CustomizableQuestionChoice
                 isChecked={this.isChoiceSelected(choice)}
                 choice={choice}
-                questionType={question_type}
+                isSingleChoiceQuestion={question.isSingleChoiceQuestion}
                 questionAnswer={questionAnswer}
                 onChange={this.handleAnswerSelection(choice)}
                 key={`question-${question.id}-choice-${index}`}
