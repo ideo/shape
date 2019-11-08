@@ -12,11 +12,12 @@ class IdeaQuestion extends React.Component {
     return (
       <Fragment>
         <QuestionContentEditor
-          placeholder="add idea title here…"
           item={card.record}
           itemAttribute="name"
           canEdit={canEdit}
-          maxLength={100}
+          placeholder="add idea title here…"
+          maxLength={40}
+          singleLine
         />
         <TestQuestionBorder />
         <QuestionContentEditor
