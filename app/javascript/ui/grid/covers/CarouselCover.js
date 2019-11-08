@@ -10,8 +10,11 @@ class CarouselCover extends React.Component {
 
   async componentDidMount() {
     const { apiStore, collectionId } = this.props
+    const collection = apiStore.find('collections', collectionId)
+    const apiPath = `collections/${collection.id}/collection_cards`
 
-    const res = await apiStore.fetch('collections', collectionId)
+    const res = await this.apiStore.request(apiPath)
+
     const { data } = res
     const { collection_cards } = data
     console.log({ res })
