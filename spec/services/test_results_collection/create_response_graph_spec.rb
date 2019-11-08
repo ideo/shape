@@ -56,4 +56,21 @@ RSpec.describe TestResultsCollection::CreateResponseGraph, type: :service do
       expect(test_audience_dataset).not_to be_nil
     end
   end
+
+  context 'if data item exists' do
+    before do
+      TestResultsCollection::CreateResponseGraph.call(
+        item: question_item,
+        parent_collection: test_results_collection,
+      )
+    end
+
+    it 'does not create it' do
+      expect {
+        subject
+      }.not_to change(
+        Item::DataItem, :count
+      )
+    end
+  end
 end

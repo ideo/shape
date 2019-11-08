@@ -22,7 +22,7 @@ RSpec.describe TestResultsCollection::CreateItemLink, type: :service do
   end
 
   it 'creates a media item link for each item' do
-    subject
+    expect { subject }.to change(CollectionCard::Link, :count).by(1)
     expect(
       test_results_collection
         .link_collection_cards
@@ -30,5 +30,18 @@ RSpec.describe TestResultsCollection::CreateItemLink, type: :service do
     ).to match_array(
       [test_collection_media_item],
     )
+  end
+
+  context 'if it already exists' do
+    before do
+      TestResultsCollection::CreateItemLink.call(
+        parent_collection: test_results_collection,
+        item: test_collection_media_item,
+      )
+    end
+
+    it 'does not create it' do
+      expect { subject }.not_to change(CollectionCard::Link, :count)
+    end
   end
 end

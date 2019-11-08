@@ -22,4 +22,17 @@ RSpec.describe TestResultsCollection::CreateOpenResponseCollection, type: :servi
       open_response_item.test_open_responses_collection,
     ).not_to be_nil
   end
+
+  context 'if it already exists' do
+    before do
+      TestResultsCollection::CreateOpenResponseCollection.call(
+        parent_collection: test_results_collection,
+        item: open_response_item,
+      )
+    end
+
+    it 'does not create it' do
+      expect { subject }.not_to change(Collection::TestOpenResponses, :count)
+    end
+  end
 end
