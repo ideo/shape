@@ -63,7 +63,7 @@ const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
           cardArea={cardArea}
         />
       }
-      domain={domain}
+      //domain={domain}
       data={values}
       y="value"
       x="date"

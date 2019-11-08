@@ -9,6 +9,15 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
   get identifier() {
     this.rawAttributes().identifier
   }
+
+  get data() {
+    return this.rawAttributes().data.map(datum => {
+      if (datum.date) {
+        datum.date = new Date(datum.date)
+      }
+      return datum
+    })
+  }
 }
 
 export default Dataset

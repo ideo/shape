@@ -12,20 +12,19 @@ import {
   lineChartDashWithForOrder,
 } from '~/ui/global/charts/ChartUtils'
 
-export const formatValuesWithoutDates = (values, numDesiredValues) => {
+export const formatValuesWithoutDates = (values, primaryDatasetDateValues) => {
   const formattedValues = [...values]
 
-  // Add a duplicate value
-  for (let i = formattedValues.length; i < numDesiredValues; i++) {
-    const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
-    formattedValues.push(duplicateValue)
-  }
+  formattedValues[0].date = primaryDatasetDateValues[0]
 
-  // Add x to show it in the right placement
-  return formattedValues.map((datum, i) => ({
-    ...datum,
-    x: i + 1,
-  }))
+  // Add a duplicate value
+  const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
+  duplicateValue.date =
+    primaryDatasetDateValues[primaryDatasetDateValues.length - 1]
+  formattedValues.push(duplicateValue)
+
+  // Transform to regular arrays and objects for Victory
+  return formattedValues.map(data => ({ ...data }))
 }
 
 const formatValuesWithDates = values => {
@@ -52,16 +51,16 @@ const LineChart = ({
   dataset,
   simpleDateTooltip,
   cardArea,
-  numPrimaryDatasetValues,
+  primaryDatasetDateValues,
 }) => {
   const { measure, timeframe } = dataset
   const { data } = dataset
   let values
-  const dataHasDates = data[0] && data[0].date
+  const dataHasDates = data[0] && !!data[0].date
   if (dataHasDates) {
     values = formatValuesWithDates(data)
   } else {
-    values = formatValuesWithoutDates(data, numPrimaryDatasetValues)
+    values = formatValuesWithoutDates(data, primaryDatasetDateValues)
   }
   const domain = chartDomainForDatasetValues({
     values,
@@ -84,12 +83,11 @@ const LineChart = ({
     labels: d => d.value,
     style: chartStyle(dataset),
     data: values,
-    domain: domain,
+    //domain: domain,
     key: `dataset-${dataset.order}`,
     y: 'value',
+    x: 'date',
   }
-
-  if (dataHasDates) props.x = 'date'
 
   return (
     <VictoryLine
@@ -109,13 +107,12 @@ LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
-  numPrimaryDatasetValues: PropTypes.number,
+  primaryDatasetDateValues: PropTypes.arrayOf(PropTypes.number).isRequired,
 }
 
 LineChart.defaultProps = {
   cardArea: 1,
   simpleDateTooltip: false,
-  numPrimaryDatasetValues: 0,
 }
 
 export default LineChart

@@ -231,6 +231,7 @@ class ChartGroup extends React.Component {
 
     // NOTE: The transform property is for IE11 which doesn't recognize CSS
     // transform properties on SVG
+
     return this.primaryDatasetValues.length > 1 ? (
       <VictoryAxis
         dependentAxis={false}
@@ -292,12 +293,15 @@ class ChartGroup extends React.Component {
           cardArea: width * height,
         })
       case DATASET_CHART_TYPES.LINE:
+        const primaryDatasetDateValues = this.primaryDatasetValues.map(
+          datum => datum.date
+        )
         return LineChart({
           dataset,
           simpleDateTooltip,
           cardArea: width * height,
           dashWidth,
-          numPrimaryDatasetValues: this.primaryDatasetValues.length,
+          primaryDatasetDateValues: primaryDatasetDateValues,
         })
       case DATASET_CHART_TYPES.BAR:
         return BarChart({
@@ -348,11 +352,17 @@ class ChartGroup extends React.Component {
         </VictoryChart>
       )
     }
+
     return (
       <VictoryChart
         theme={victoryTheme}
         padding={{ top: 0, left: 0, right: 0, bottom: 8 }}
         containerComponent={<VictoryVoronoiContainer />}
+        scale={{ x: 'time' }}
+        domain={{
+          x: [new Date(2016, 1, 1), new Date(2019, 11, 1)],
+          y: [0, 100],
+        }}
       >
         {this.renderedDatasets.map(dataset => dataset)}
         {this.chartAxis}
