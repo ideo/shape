@@ -37,21 +37,26 @@ describe('AdminFeedback', () => {
       expect(wrapper.find('FeedbackRow').length).toEqual(1)
     })
 
+    // TODO: redo this using data selectors
+    // doing it by index is brittle, re: UI changes
     it('shows audience data for each test', () => {
       const audienceRowItems = wrapper.find('AudienceRowItem')
-      expect(audienceRowItems.length).toEqual(4)
+      expect(audienceRowItems.length).toEqual(5)
 
       const audienceName = audienceRowItems.at(0)
       expect(audienceName.html()).toContain(fakeAudience.name)
 
-      const audienceSampleSize = audienceRowItems.at(1)
+      const audiencePricePerResponse = audienceRowItems.at(1)
+      expect(audiencePricePerResponse.html()).toContain('$3.75')
+
+      const audienceSampleSize = audienceRowItems.at(2)
       expect(audienceSampleSize.html()).toContain(fakeTestAudience.sample_size)
 
       // TODO: wire up "Sourced from INA" column to real data
-      const inaSourcedCount = audienceRowItems.at(2)
+      const inaSourcedCount = audienceRowItems.at(3)
       expect(inaSourcedCount.html()).toContain(0)
 
-      const audienceResponseCount = audienceRowItems.at(3)
+      const audienceResponseCount = audienceRowItems.at(4)
       expect(audienceResponseCount.html()).toContain(
         fakeTestAudience.num_completed_responses
       )
