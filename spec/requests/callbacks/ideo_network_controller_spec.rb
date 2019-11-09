@@ -500,22 +500,27 @@ describe 'Ideo Profile API Requests' do
       end
 
       context 'without an organization' do
-        before do
-          group_data.delete(:organization_id)
+        let(:create_group) do
           post(
             '/callbacks/ideo_network/groups',
             params: { id: group_network_id, event: 'group.created', data: { attributes: group_data } }.to_json,
             headers: valid_headers,
           )
         end
+        before do
+          group_data.delete(:organization_id)
+        end
 
         it 'returns a 200' do
+          create_group
           expect(response.status).to eq(200)
         end
 
-        it 'does not create the group' do
+        it 'creates the group without an org' do
+          expect { create_group }.to change(Group, :count).by(1)
           last_group = Group.last
-          expect(last_group.name).not_to eq(group_data[:name])
+          expect(last_group.name).to eq(group_data[:name])
+          expect(last_group.organization).to be nil
         end
       end
     end
@@ -602,20 +607,58 @@ describe 'Ideo Profile API Requests' do
     end
 
     context 'event: created' do
-      before do
-        post(
-          '/callbacks/ideo_network/users_roles',
-          params: { id: users_role_id, event: 'users_role.created', data: { attributes: users_role_data }, included: [role_data] }.to_json,
-          headers: valid_headers,
-        )
+      let(:included) { [role_data] }
+      let(:params) do
+        { id: users_role_id, event: 'users_role.created', data: { attributes: users_role_data }, included: included }.to_json
       end
 
-      it 'returns a 200' do
-        expect(response.status).to eq(200)
+      context 'with included role data' do
+        before do
+          post(
+            '/callbacks/ideo_network/users_roles',
+            params: params,
+            headers: valid_headers,
+          )
+        end
+
+        it 'returns a 200' do
+          expect(response.status).to eq(200)
+        end
+
+        it 'assigns the new role' do
+          expect(user.has_role?(:member, group)).to be true
+        end
       end
 
-      it 'assigns the new role' do
-        expect(user.has_role?(:member, group)).to be true
+      context 'with included role and user data' do
+        let(:user) { build(:user) }
+        let(:user_data) do
+          {
+            id: SecureRandom.hex,
+            type: 'users',
+            attributes: {
+              uid: user.uid,
+              first_name: 'Fancy',
+              last_name: 'Newname',
+              email: 'fancy@newname.com',
+              picture: 'newpic.jpg',
+            },
+          }
+        end
+        let(:included) { [role_data, user_data] }
+
+        it 'creates the new user and assigns the new role' do
+          expect do
+            post(
+              '/callbacks/ideo_network/users_roles',
+              params: params,
+              headers: valid_headers,
+            )
+          end.to change(User, :count).by(1)
+          user = User.last
+          expect(user.has_role?(:member, group)).to be true
+          expect(user.uid).to eq user_data[:attributes][:uid]
+        end
       end
     end
 

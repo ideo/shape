@@ -53,7 +53,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
     role = find_included('roles')[:attributes]
     return unless role[:resource_type] == 'Group'
 
-    user_attrs = find_included('users')[:attributes]
+    user_attrs = find_included('users').try(:[], :attributes)
     group = Group.find_by(network_id: role[:resource_id])
     user = User.find_by(uid: users_role_params[:user_uid])
     if user.blank? && user_attrs.present?

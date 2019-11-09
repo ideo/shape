@@ -186,7 +186,8 @@ class Group < ApplicationRecord
   end
 
   def requires_org?
-    true
+    # network can create temporarily org-less groups; otherwise org is required
+    network_id.blank?
   end
 
   def update_from_network_profile(params)
@@ -292,7 +293,7 @@ class Group < ApplicationRecord
   end
 
   def update_organization
-    return unless primary?
+    return unless organization_id? && primary?
 
     # regenerate the org's slug if we're changing the primary handle
     organization.slug = nil if saved_change_to_handle?
