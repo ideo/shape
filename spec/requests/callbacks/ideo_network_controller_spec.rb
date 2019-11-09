@@ -286,7 +286,7 @@ describe 'Ideo Profile API Requests' do
     end
   end
 
-  describe 'POST #user' do
+  describe 'POST #users' do
     let!(:user) { create(:user) }
     let(:uid) { user.uid }
     let(:user_data) do
@@ -297,6 +297,52 @@ describe 'Ideo Profile API Requests' do
         email: user.email,
         picture: user.picture,
       }
+    end
+
+    context 'event: created' do
+      let(:user) { build(:user) }
+      let(:params) do
+        {
+          uid: uid,
+          event: :created,
+          data: {
+            attributes: {
+              uid: uid,
+              first_name: 'Fancy',
+              last_name: 'Newname',
+              email: 'fancy@newname.com',
+              picture: 'newpic.jpg',
+            },
+          },
+        }.to_json
+      end
+
+      it 'returns a 200' do
+        post(
+          '/callbacks/ideo_network/users',
+          params: params,
+          headers: valid_headers,
+        )
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates the user' do
+        expect(user.persisted?).to be false
+        expect do
+          post(
+            '/callbacks/ideo_network/users',
+            params: params,
+            headers: valid_headers,
+          )
+        end.to change(User, :count).by(1)
+        user = User.last
+        expect(user.persisted?).to be true
+        expect(user.uid).to eq uid
+        expect(user.first_name).to eq('Fancy')
+        expect(user.last_name).to eq('Newname')
+        expect(user.email).to eq('fancy@newname.com')
+        expect(user.picture).to eq('newpic.jpg')
+      end
     end
 
     context 'event: updated' do

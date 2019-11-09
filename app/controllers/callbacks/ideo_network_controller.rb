@@ -26,16 +26,24 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def users
-    if user.present?
-      if event == :updated
-        process_user_updated
-      elsif event == :deleted
-        process_user_deleted
-      else
-        logger.debug("Unsupported users event: #{event}")
-        head :bad_request
-        return
-      end
+    if event == :created
+      process_user_created(user_params)
+      head :ok
+      return
+    elsif user.blank?
+      logger.debug("User with UID #{users_role_params[:user_uid]} not found.")
+      head :ok
+      return
+    end
+
+    if event == :updated
+      process_user_updated
+    elsif event == :deleted
+      process_user_deleted
+    else
+      logger.debug("Unsupported users event: #{event}")
+      head :bad_request
+      return
     end
 
     head :ok
@@ -45,8 +53,12 @@ class Callbacks::IdeoNetworkController < ApplicationController
     role = find_included('roles')[:attributes]
     return unless role[:resource_type] == 'Group'
 
+    user_attrs = find_included('users')[:attributes]
     group = Group.find_by(network_id: role[:resource_id])
     user = User.find_by(uid: users_role_params[:user_uid])
+    if user.blank? && user_attrs.present?
+      user = process_user_created(user_attrs)
+    end
 
     if group.blank?
       logger.debug("Group with ID #{role[:resource_id]} not found.")
@@ -91,6 +103,12 @@ class Callbacks::IdeoNetworkController < ApplicationController
 
   private
 
+  def process_user_created(user_attrs)
+    user = User.find_or_initialize_from_network(Mashie.new(user_attrs))
+    user.save
+    user
+  end
+
   def process_user_updated
     user.update_from_network_profile(user_params)
   end
@@ -100,13 +118,15 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def process_group_created
-    organization = find_included('organizations').try(:[], :attributes)
-    return if organization.blank?
+    # organization_id will likely be nil if a group was created via provisioning
+    organization_id = find_included('organizations').try(:[], :attributes).try(:[], :external_id)
     return if Group.find_by(network_id: group_params[:id]).present?
 
-    Group.create(name: group_params[:name],
-                 organization_id: organization[:external_id],
-                 network_id: group_params[:id])
+    Group.create(
+      name: group_params[:name],
+      network_id: group_params[:id],
+      organization_id: organization_id,
+    )
   end
 
   def process_group_deleted
