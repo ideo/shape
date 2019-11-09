@@ -416,7 +416,6 @@ class CollectionCover extends React.Component {
                       >
                         {this.name}
                       </PlainLink>
-                      )}
                     </Dotdotdot>
                     {this.button}
                   </PositionedCardHeading>

@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types'
-import { computed, observable, runInAction } from 'mobx'
+import { action, computed, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import CoverRenderer from '~/ui/grid/CoverRenderer'
+import ArrowIcon from '~/ui/icons/ArrowIcon'
 import { DisplayText } from '~/ui/global/styled/typography'
+import { TextEnterButton } from '~/ui/test_collections/shared'
 import v from '~/utils/variables'
 
 const CarouselControl = styled.div`
@@ -12,6 +14,12 @@ const CarouselControl = styled.div`
   bottom: 12px;
   right: 12px;
   z-index: ${v.zIndex.gridCardTop};
+`
+
+const CarouselButton = styled(TextEnterButton)`
+  position: static;
+  height: 32px;
+  width: 32px;
 `
 
 @inject('apiStore', 'routingStore')
@@ -35,6 +43,13 @@ class CarouselCover extends React.Component {
   @computed
   get currentCarouselRecord() {
     return this.records[this.currentIdx]
+  }
+
+  @action
+  handleNavigate = direction => {
+    if (direction === -1 && this.currentIdx === 0) return
+    if (direction === 1 && this.currentIdx === this.records.length - 1) return
+    this.currentIdx += direction
   }
 
   handleClick = ev => {
@@ -63,6 +78,12 @@ class CarouselCover extends React.Component {
           <DisplayText>
             {this.currentIdx + 1} / {this.records.length}
           </DisplayText>
+          <CarouselButton onClick={() => this.handleNavigate(-1)}>
+            <ArrowIcon />
+          </CarouselButton>
+          <CarouselButton onClick={() => this.handleNavigate(1)}>
+            <ArrowIcon />
+          </CarouselButton>
         </CarouselControl>
       </div>
     )
