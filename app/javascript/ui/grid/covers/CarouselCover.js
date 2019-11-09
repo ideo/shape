@@ -28,14 +28,16 @@ class CarouselCover extends React.Component {
   @observable
   records = []
   @observable
-  currentIdx
+  currentIdx = null
 
   componentDidMount() {
     const { collection } = this.props
     const items = collection.collection_cover_items
 
     runInAction(() => {
-      this.records = items
+      if (items) {
+        this.records = items
+      }
       this.currentIdx = 0
     })
   }
@@ -61,7 +63,8 @@ class CarouselCover extends React.Component {
 
   render() {
     const { collection } = this.props
-    if (!this.records.length > 0) return <div>Loading...</div>
+
+    if (!this.records.length > 0) return <div>{collection.name}</div>
 
     return (
       <div style={{ color: 'black', height: '100%' }}>
@@ -101,5 +104,7 @@ CarouselCover.wrappedComponent.propTypes = {
 CarouselCover.defaultProps = {
   dragging: false,
 }
+
+CarouselCover.displayName = 'CarouselCover'
 
 export default CarouselCover
