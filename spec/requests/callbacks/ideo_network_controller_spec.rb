@@ -478,19 +478,18 @@ describe 'Ideo Profile API Requests' do
         member_ids: [],
       }
     end
+    let(:organization_data) do
+      {
+        id: SecureRandom.hex,
+        type: 'organizations',
+        attributes: {
+          external_id: organization.id,
+        },
+      }
+    end
 
     context 'event: created' do
       context 'with an organization' do
-        let(:organization_data) do
-          {
-            id: SecureRandom.hex,
-            type: 'organizations',
-            attributes: {
-              external_id: organization.id,
-            },
-          }
-        end
-
         before do
           post(
             '/callbacks/ideo_network/groups',
@@ -594,6 +593,29 @@ describe 'Ideo Profile API Requests' do
 
         group.reload
         expect(group.name).to eq('Fancy')
+      end
+
+      context 'updating organization_id' do
+        let!(:group) { create(:group, organization_id: nil, network_id: group_network_id) }
+
+        it 'updates the group organization_id' do
+          expect(group.organization).to be nil
+          post(
+            '/callbacks/ideo_network/groups',
+            params: {
+              id: group_network_id,
+              event: 'group.updated',
+              data: {
+                attributes: {
+                  id: group_network_id,
+                },
+              },
+              included: [organization_data],
+            }.to_json,
+            headers: valid_headers,
+          )
+          expect(group.reload.organization).to eq organization
+        end
       end
     end
   end

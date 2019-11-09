@@ -135,7 +135,8 @@ class Callbacks::IdeoNetworkController < ApplicationController
   end
 
   def process_group_updated
-    group.update_from_network_profile(group_params)
+    organization_id = find_included('organizations').try(:[], :attributes).try(:[], :external_id)
+    group.update_from_network_profile(group_params.merge(organization_id: organization_id))
   end
 
   def process_group_role_created(role:, group:, user:)

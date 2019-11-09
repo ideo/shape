@@ -191,7 +191,7 @@ class Group < ApplicationRecord
   end
 
   def update_from_network_profile(params)
-    %i[name external_id].each do |field|
+    %i[name external_id organization_id].each do |field|
       send("#{field}=", params[field]) if params[field].present?
     end
     save
