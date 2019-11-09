@@ -8,19 +8,17 @@ import {
   dateTooltipText,
   advancedTooltipText,
   addDuplicateValueIfSingleValue,
-  chartDomainForDatasetValues,
   lineChartDashWithForOrder,
 } from '~/ui/global/charts/ChartUtils'
 
-export const formatValuesWithoutDates = (values, primaryDatasetDateValues) => {
+export const formatValuesWithoutDates = (values, domain) => {
   const formattedValues = [...values]
 
-  formattedValues[0].date = primaryDatasetDateValues[0]
+  formattedValues[0].date = domain.x[0]
 
   // Add a duplicate value
   const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
-  duplicateValue.date =
-    primaryDatasetDateValues[primaryDatasetDateValues.length - 1]
+  duplicateValue.date = domain.x[1]
   formattedValues.push(duplicateValue)
 
   // Transform to regular arrays and objects for Victory
@@ -47,12 +45,7 @@ const chartStyle = dataset => {
   }
 }
 
-const LineChart = ({
-  dataset,
-  simpleDateTooltip,
-  cardArea,
-  primaryDatasetDateValues,
-}) => {
+const LineChart = ({ dataset, simpleDateTooltip, cardArea, domain }) => {
   const { measure, timeframe } = dataset
   const { data } = dataset
   let values
@@ -60,12 +53,8 @@ const LineChart = ({
   if (dataHasDates) {
     values = formatValuesWithDates(data)
   } else {
-    values = formatValuesWithoutDates(data, primaryDatasetDateValues)
+    values = formatValuesWithoutDates(data, domain)
   }
-  const domain = chartDomainForDatasetValues({
-    values,
-    maxDomain: dataset.max_domain,
-  })
   let tooltipFn
   if (simpleDateTooltip) {
     tooltipFn = datum => dateTooltipText(datum)
@@ -83,7 +72,6 @@ const LineChart = ({
     labels: d => d.value,
     style: chartStyle(dataset),
     data: values,
-    //domain: domain,
     key: `dataset-${dataset.order}`,
     y: 'value',
     x: 'date',
@@ -107,7 +95,10 @@ LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
-  primaryDatasetDateValues: PropTypes.arrayOf(PropTypes.number).isRequired,
+  domain: PropTypes.shape({
+    x: PropTypes.arrayOf(PropTypes.number),
+    y: PropTypes.arrayOf(PropTypes.number),
+  }).isRequired,
 }
 
 LineChart.defaultProps = {

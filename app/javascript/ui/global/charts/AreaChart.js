@@ -4,7 +4,6 @@ import { VictoryArea } from 'victory'
 import ChartTooltip from '~/ui/global/charts/ChartTooltip'
 import {
   datasetPropType,
-  chartDomainForDatasetValues,
   dateTooltipText,
   advancedTooltipText,
   addDuplicateValueIfSingleValue,
@@ -33,13 +32,9 @@ const formatValues = values => {
   return rawValues.map(data => ({ ...data }))
 }
 
-const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
+const AreaChart = ({ dataset, simpleDateTooltip, domain, cardArea = 1 }) => {
   const { measure, timeframe } = dataset
   const values = formatValues(dataset.data || [])
-  const domain = chartDomainForDatasetValues({
-    values,
-    maxDomain: dataset.max_domain,
-  })
   let tooltipFn
   if (simpleDateTooltip) {
     tooltipFn = datum => dateTooltipText(datum)
@@ -63,7 +58,7 @@ const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
           cardArea={cardArea}
         />
       }
-      //domain={domain}
+      domain={domain}
       data={values}
       y="value"
       x="date"
@@ -76,6 +71,10 @@ AreaChart.propTypes = {
   dataset: datasetPropType.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
+  domain: PropTypes.shape({
+    x: PropTypes.arrayOf(PropTypes.number),
+    y: PropTypes.arrayOf(PropTypes.number),
+  }).isRequired,
 }
 
 AreaChart.defaultProps = {

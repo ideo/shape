@@ -51,9 +51,21 @@ describe('ChartUtils', () => {
 
     it('returns max given', () => {
       const values = [{ value: 10 }, { value: 20 }]
-      expect(chartDomainForDatasetValues({ values, maxDomain: 100 })).toEqual({
+      expect(chartDomainForDatasetValues({ values, maxYDomain: 100 })).toEqual({
         x: [1, 2],
         y: [0, 100],
+      })
+    })
+
+    it('returns date-based domain if in dataset', () => {
+      const values = [
+        { value: 10, date: new Date(2015, 10, 10) },
+        { value: 20, date: new Date(2019, 3, 25) },
+        { value: 15, date: new Date(2016, 4, 9) },
+      ]
+      expect(chartDomainForDatasetValues({ values })).toEqual({
+        x: [values[0].date, values[1].date],
+        y: [0, 20],
       })
     })
   })

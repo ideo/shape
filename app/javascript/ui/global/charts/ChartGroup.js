@@ -22,6 +22,7 @@ import {
   utcMoment,
   victoryTheme,
   emojiSeriesForQuestionType,
+  chartDomainForDatasetValues,
 } from '~/ui/global/charts/ChartUtils'
 
 const calculateTickLabelEdges = labelText => {
@@ -79,6 +80,17 @@ class ChartGroup extends React.Component {
       this.primaryDataset &&
       this.primaryDataset.chart_type === DATASET_CHART_TYPES.BAR
     )
+  }
+
+  get chartDomain() {
+    const values = this.primaryDatasetValues
+    this.secondaryDatasetsWithData.forEach(dataset => {
+      values.push(...dataset.data)
+    })
+    console.log('values', values)
+    const d = chartDomainForDatasetValues({ values })
+    console.log('domain', d)
+    return d
   }
 
   get isSmallChartStyle() {
@@ -291,17 +303,15 @@ class ChartGroup extends React.Component {
           dataset,
           simpleDateTooltip,
           cardArea: width * height,
+          domain: this.chartDomain,
         })
       case DATASET_CHART_TYPES.LINE:
-        const primaryDatasetDateValues = this.primaryDatasetValues.map(
-          datum => datum.date
-        )
         return LineChart({
           dataset,
           simpleDateTooltip,
           cardArea: width * height,
           dashWidth,
-          primaryDatasetDateValues: primaryDatasetDateValues,
+          domain: this.chartDomain,
         })
       case DATASET_CHART_TYPES.BAR:
         return BarChart({
@@ -359,10 +369,7 @@ class ChartGroup extends React.Component {
         padding={{ top: 0, left: 0, right: 0, bottom: 8 }}
         containerComponent={<VictoryVoronoiContainer />}
         scale={{ x: 'time' }}
-        domain={{
-          x: [new Date(2016, 1, 1), new Date(2019, 11, 1)],
-          y: [0, 100],
-        }}
+        domain={this.chartDomain}
       >
         {this.renderedDatasets.map(dataset => dataset)}
         {this.chartAxis}

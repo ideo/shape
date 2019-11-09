@@ -20,7 +20,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
   const { total, max_domain } = dataset
   const domain = chartDomainForDatasetValues({
     values,
-    maxDomain: max_domain,
+    maxYDomain: max_domain,
   })
   const barWidth = barsInGroup > 3 ? 30 / (barsInGroup / 2) : 30
   // Only show labels if theres room for them
