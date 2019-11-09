@@ -36,6 +36,7 @@ class CoverRenderer extends React.Component {
       isTestCollectionCard,
       nestedTextItem,
       textItemHideReadMore,
+      textItemUneditable,
     } = this.props
     if (this.isItem) {
       switch (record.type) {
@@ -50,6 +51,7 @@ class CoverRenderer extends React.Component {
               searchResult={searchResult}
               initialFontTag={isBoardCollection ? 'H1' : 'P'}
               hideReadMore={textItemHideReadMore}
+              uneditable={textItemUneditable}
             />
           )
         case ITEM_TYPES.EXTERNAL_IMAGE:
@@ -166,6 +168,7 @@ CoverRenderer.propTypes = {
   handleClick: PropTypes.func,
   nestedTextItem: MobxPropTypes.objectOrObservableObject,
   textItemHideReadMore: PropTypes.bool,
+  textItemUneditable: PropTypes.bool,
 }
 
 CoverRenderer.defaultProps = {
@@ -178,6 +181,7 @@ CoverRenderer.defaultProps = {
   handleClick: () => null,
   nestedTextItem: null,
   textItemHideReadMore: false,
+  textItemUneditable: false,
 }
 
 export default CoverRenderer

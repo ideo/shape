@@ -328,6 +328,7 @@ class CollectionCover extends React.Component {
   }
 
   handleClick = e => {
+    // TODO is this being used?
     const { searchResult, dragging, uiStore, collection } = this.props
     const { movingCardIds } = uiStore
     const movingCard =
@@ -373,7 +374,11 @@ class CollectionCover extends React.Component {
         isSpecialCollection={collection.isSpecialCollection}
       >
         {collection.cover_type === 'cover_type_carousel' ? (
-          <CarouselCover collection={collection} dragging={false} />
+          <CarouselCover
+            collection={collection}
+            dragging={false}
+            handleClick={this.handleClick}
+          />
         ) : (
           <StyledCardContent
             height={height}

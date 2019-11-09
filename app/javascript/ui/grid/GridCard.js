@@ -279,6 +279,8 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
+    } else if (record.cover_type === 'cover_type_carousel') {
+      return
     } else if (record.isVideo || record.isImage || record.isLegend) {
       return
     } else if (record.mimeBaseType === 'image') {
