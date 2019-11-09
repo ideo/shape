@@ -105,6 +105,7 @@ class Callbacks::IdeoNetworkController < ApplicationController
 
   def process_user_created(user_attrs)
     user = User.find_or_initialize_from_network(Mashie.new(user_attrs))
+    user.status = :pending if user.new_record?
     user.save
     user
   end

@@ -337,11 +337,27 @@ describe 'Ideo Profile API Requests' do
         end.to change(User, :count).by(1)
         user = User.last
         expect(user.persisted?).to be true
+        # sets status to pending
+        expect(user.pending?).to be true
         expect(user.uid).to eq uid
         expect(user.first_name).to eq('Fancy')
         expect(user.last_name).to eq('Newname')
         expect(user.email).to eq('fancy@newname.com')
         expect(user.picture).to eq('newpic.jpg')
+      end
+
+      context 'with existing user' do
+        let!(:user) { create(:user) }
+
+        it 'does not create a new one' do
+          expect do
+            post(
+              '/callbacks/ideo_network/users',
+              params: params,
+              headers: valid_headers,
+            )
+          end.not_to change(User, :count)
+        end
       end
     end
 
@@ -356,6 +372,7 @@ describe 'Ideo Profile API Requests' do
       end
 
       it 'updates the user' do
+        expect(user.active?).to be true
         expect(user.first_name).not_to eq('Fancy')
         expect(user.last_name).not_to eq('Newname')
         expect(user.email).not_to eq('fancy@newname.com')
