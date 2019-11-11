@@ -244,10 +244,12 @@ class Item
       builder = CollectionCardBuilder.new(
         params: {
           order: parent_collection_card.order,
+          width: 2,
           collection_attributes: {
             name: "#{content} Responses",
             type: 'Collection::TestOpenResponses',
             question_item_id: id,
+            cover_type: :cover_type_carousel,
           },
         },
         parent_collection: parent_collection,
