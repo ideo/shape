@@ -10,8 +10,12 @@ import { TextEnterButton } from '~/ui/test_collections/shared'
 import v from '~/utils/variables'
 
 const CarouselControl = styled.div`
-  position: absolute;
+  align-items: center;
   bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  min-width: 125px;
+  position: absolute;
   right: 12px;
   z-index: ${v.zIndex.gridCardTop};
 `
@@ -20,6 +24,13 @@ const CarouselButton = styled(TextEnterButton)`
   position: static;
   height: 32px;
   width: 32px;
+
+  &:hover {
+    border-color: ${v.colors.commonDark};
+    border-style: solid;
+    border-width: 2px;
+    color: ${v.colors.commonDark};
+  }
 `
 
 @inject('apiStore', 'routingStore')
@@ -75,14 +86,14 @@ class CarouselCover extends React.Component {
           textItemUneditable
         />
         <CarouselControl onClick={() => {}}>
-          <DisplayText>
+          <DisplayText color={v.colors.commonDark}>
             {this.currentIdx + 1} / {this.records.length}
           </DisplayText>
           <CarouselButton onClick={() => this.handleNavigate(-1)}>
-            <ArrowIcon />
+            <ArrowIcon rotation={180} />
           </CarouselButton>
           <CarouselButton onClick={() => this.handleNavigate(1)}>
-            <ArrowIcon />
+            <ArrowIcon rotation={0} />
           </CarouselButton>
         </CarouselControl>
       </div>
