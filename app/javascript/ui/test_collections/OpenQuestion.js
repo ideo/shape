@@ -6,7 +6,6 @@ import styled, { css } from 'styled-components'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 import {
-  QuestionText,
   TextResponseHolder,
   TextInput,
   TextEnterButton,
@@ -22,11 +21,6 @@ const QuestionSpacing = css`
 export const QuestionSpacingContainer = styled.div`
   ${QuestionSpacing};
 `
-
-const QuestionTextWithSpacing = styled(QuestionText)`
-  ${QuestionSpacing};
-`
-QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
 
 @observer
 class OpenQuestion extends React.Component {
@@ -60,25 +54,18 @@ class OpenQuestion extends React.Component {
 
   renderQuestion() {
     const { editing, item, canEdit } = this.props
-    let content
-    if (editing) {
-      content = (
-        <QuestionSpacingContainer editing={editing}>
-          <QuestionContentEditor
-            item={item}
-            maxLength={100}
-            placeholder="please enter question here"
-            canEdit={canEdit}
-            optional
-          />
-        </QuestionSpacingContainer>
-      )
-    } else {
-      content = (
-        <QuestionTextWithSpacing>{item.content}</QuestionTextWithSpacing>
-      )
-    }
-    return content
+
+    return (
+      <QuestionSpacingContainer editing={editing}>
+        <QuestionContentEditor
+          item={item}
+          maxLength={100}
+          placeholder="please enter question here"
+          canEdit={canEdit}
+          optional
+        />
+      </QuestionSpacingContainer>
+    )
   }
 
   render() {

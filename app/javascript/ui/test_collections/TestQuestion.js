@@ -14,7 +14,6 @@ import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
 import IdeaQuestion from '~/ui/test_collections/IdeaQuestion'
 import MediaQuestion from '~/ui/test_collections/MediaQuestion'
-import { QuestionText } from '~/ui/test_collections/shared'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
 
@@ -124,17 +123,13 @@ class TestQuestion extends React.Component {
           />
         )
       case 'question_description':
-        if (editing) {
-          return (
-            <QuestionContentEditor
-              placeholder="add text here…"
-              item={record}
-              canEdit={canEdit}
-            />
-          )
-        }
-        return <QuestionText>{record.content}</QuestionText>
-
+        return (
+          <QuestionContentEditor
+            placeholder="add text here…"
+            item={record}
+            canEdit={canEdit}
+          />
+        )
       case 'question_open':
         return (
           <OpenQuestion
