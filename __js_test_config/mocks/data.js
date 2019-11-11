@@ -47,8 +47,8 @@ export const fakeTextItemAttrs = {
   parent_collection_card: { ...fakeCollectionCard },
 }
 
-export const fakeQuillOp = {insert: "hello world \n"}
-export const fakeQuillData = {ops: [fakeQuillOp]}
+export const fakeQuillOp = { insert: 'hello world \n' }
+export const fakeQuillData = { ops: [fakeQuillOp] }
 
 export const fakeAreaChartDataset = {
   identifier: 'question',
@@ -143,7 +143,7 @@ export const fakeDatasetAttrs = {
   test_collection_id: null,
   timeframe: 'ever',
   total: 1,
-  tiers: []
+  tiers: [],
 }
 
 export const fakeDataset = {
@@ -525,7 +525,7 @@ export const fakeComment = {
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
   API_fetchReplies: jest.fn().mockReturnValue(Promise.resolve({})),
-  expandAndFetchReplies: jest.fn().mockReturnValue(Promise.resolve({}))
+  expandAndFetchReplies: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeThread = {
   id: '1',
@@ -587,6 +587,7 @@ export const fakeTestAudience = {
   audience: fakeAudience,
   sample_size: 12,
   num_completed_responses: 6,
+  price_per_response: 3.75,
 }
 export const fakeTestCollection = {
   id: '1',
