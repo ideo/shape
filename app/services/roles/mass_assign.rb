@@ -64,12 +64,24 @@ module Roles
         role = user.add_role(@role_name, @object)
         if role.persisted?
           @added_users << user
-          ActivityAndNotificationBuilder.call(
+          activity_params = {
             actor: @invited_by,
             target: @object,
             action: :shared,
             subject_user_ids: [user.id],
             should_notify: false,
+          }
+          activity = nil
+          if !u.has_any_role?(@object)
+            activity = :shared
+          elsif @role_name == Role::VIEWER
+            activity = :made_viewer
+          elsif @role_name == Role::EDITOR
+            activity = :made_editor
+          end
+          activity_params.merge!(activity: activity)
+          ActivityAndNotificationBuilder.call(
+            activity_params,
           )
         else
           @failed_users << user
