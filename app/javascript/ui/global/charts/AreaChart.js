@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { VictoryArea } from 'victory'
 
-import ChartTooltip from '~/ui/global/charts/ChartTooltip'
+import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
 import {
   datasetPropType,
   chartDomainForDatasetValues,
@@ -57,7 +57,7 @@ const AreaChart = ({ dataset, simpleDateTooltip, cardArea = 1 }) => {
       style={chartStyle(dataset.style || {})}
       labels={d => d.value}
       labelComponent={
-        <ChartTooltip
+        <TickLabelWithTooltip
           tooltipTextRenderer={tooltipFn}
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}

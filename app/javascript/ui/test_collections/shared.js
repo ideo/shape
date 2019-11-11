@@ -65,14 +65,45 @@ export const TextResponseHolder = styled(StyledCommentTextarea)`
 `
 
 export const TextInput = styled(TextareaAutosize)`
-  color: ${props => props.theme[props.type]};
-  font-family: ${v.fonts.sans} !important;
-  width: calc(100% - 20px);
+  && {
+    border: 0;
+    color: ${props => props.theme[props.type]};
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    margin: -1px 2px -4px 5px;
+    padding: 2px 3px;
+    width: calc(100% - 20px);
 
-  ::placeholder {
-    color: ${props => props.theme.placeholder} !important;
+    &:focus {
+      outline: 0;
+    }
+
+    ::placeholder {
+      color: ${props => props.theme.placeholder} !important;
+    }
+
+    ${props =>
+      props.inverse &&
+      `
+      background-color: rgba(255, 255, 255, 0);
+      color: ${v.colors.white};
+
+      &::placeholder {
+        color: ${v.colors.white};
+        opacity: 0.5;
+      }
+    `}
+
+    ${props =>
+      props.inline &&
+      `
+      background: none;
+      display: inline-block;
+      resize: none;
+      vertical-align: text-bottom;
+      width: auto;
+    `}
   }
-}
 `
 TextInput.displayName = 'TextInput'
 
@@ -180,10 +211,6 @@ export const TextEnterButton = styled.button`
     height: 50%;
     margin-top: 4px;
     width: 50%;
-  }
-
-  svg {
-    transform: rotate(180deg);
   }
 
   &:hover {

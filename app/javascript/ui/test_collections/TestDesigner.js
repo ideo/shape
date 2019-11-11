@@ -176,6 +176,10 @@ class TestDesigner extends React.Component {
     }
   }
 
+  onAddQuestionChoice = question => {
+    question.API_createQuestionChoice({})
+  }
+
   handleSelectChange = replacingCard => ev => {
     // If test is already launched, and this isn't a blank card,
     // confirm they want to change the type
@@ -389,6 +393,7 @@ class TestDesigner extends React.Component {
 
   renderCard = (card, firstCard, lastCard) => {
     const { collection } = this.props
+    const { test_status } = collection
     const { currentIdeaCardIndex } = this.state
     let questionParent
     let questionCard
@@ -412,6 +417,8 @@ class TestDesigner extends React.Component {
           canEdit={this.canEdit}
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}
+          canAddChoice={record.isCustomizableQuestionType}
+          onAddChoice={this.onAddQuestionChoice}
           createNewQuestionCard={this.createNewQuestionCard}
           ideasCollection={this.ideasCollection}
           showMedia={collection.test_show_media}
@@ -432,6 +439,8 @@ class TestDesigner extends React.Component {
             card={questionCard}
             order={questionCard.order}
             canEdit={this.canEditQuestions}
+            question_choices={record.question_choices}
+            testStatus={test_status}
           />
         </TestQuestionHolder>
       </Fragment>

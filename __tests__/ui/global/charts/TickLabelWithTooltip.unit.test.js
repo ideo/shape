@@ -1,7 +1,7 @@
-import ChartTooltip from '~/ui/global/charts/ChartTooltip'
+import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
 
 let props, wrapper, render, data
-describe('ChartTooltip', () => {
+describe('TickLabelWithTooltip', () => {
   beforeEach(() => {
     data = [
       { date: '2018-07-01', value: 10, _x: 1 },
@@ -20,7 +20,7 @@ describe('ChartTooltip', () => {
       x: 10,
       y: 50,
     }
-    render = () => (wrapper = shallow(<ChartTooltip {...props} />))
+    render = () => (wrapper = shallow(<TickLabelWithTooltip {...props} />))
 
     render()
   })
@@ -37,11 +37,11 @@ describe('ChartTooltip', () => {
     })
 
     it('should render a tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').exists()).toBe(true)
+      expect(wrapper.find('ChartTooltip').exists()).toBe(true)
     })
 
     it('should not render an active tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').length).toBe(1)
+      expect(wrapper.find('ChartTooltip').length).toBe(1)
     })
 
     it('should not render a line', () => {
@@ -59,21 +59,22 @@ describe('ChartTooltip', () => {
     })
 
     it('should render a tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').exists()).toBe(true)
+      expect(wrapper.find('ChartTooltip').exists()).toBe(true)
     })
 
     it('should not render an active tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').length).toBe(1)
+      expect(wrapper.find('ChartTooltip').length).toBe(1)
     })
   })
 
   describe('on the lowest value item', () => {
     it('should render a tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').exists()).toBe(true)
+      expect(wrapper.find('ChartTooltip').exists()).toBe(true)
     })
 
     it('should render an active tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').length).toBe(2)
+      expect(wrapper.find('ChartTooltip').length).toBe(1)
+      expect(wrapper.find('VictoryTooltip').length).toBe(1)
     })
 
     it('should render a line', () => {
@@ -89,11 +90,12 @@ describe('ChartTooltip', () => {
     })
 
     it('should render a tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').exists()).toBe(true)
+      expect(wrapper.find('ChartTooltip').exists()).toBe(true)
     })
 
     it('should render an active tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').length).toBe(2)
+      expect(wrapper.find('VictoryTooltip').length).toBe(1)
+      expect(wrapper.find('ChartTooltip').length).toBe(1)
     })
 
     it('should render a line', () => {
@@ -110,7 +112,7 @@ describe('ChartTooltip', () => {
       })
 
       it('should only render the tooltip for the first', () => {
-        expect(wrapper.find('VictoryTooltip').length).toBe(1)
+        expect(wrapper.find('ChartTooltip').length).toBe(1)
         expect(wrapper.find('line').exists()).toBe(false)
       })
     })
@@ -128,7 +130,8 @@ describe('ChartTooltip', () => {
     })
 
     it('should render an active tooltip', () => {
-      expect(wrapper.find('VictoryTooltip').length).toBe(2)
+      expect(wrapper.find('VictoryTooltip').length).toBe(1)
+      expect(wrapper.find('ChartTooltip').length).toBe(1)
     })
 
     it('should render a line', () => {

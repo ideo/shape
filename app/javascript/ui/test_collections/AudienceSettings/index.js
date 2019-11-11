@@ -252,6 +252,7 @@ class AudienceSettings extends React.Component {
     const { currentUser } = apiStore
     const currentUserOrganization = currentUser.current_organization
 
+    console.log('locked', uiStore.launchButtonLoading)
     return (
       <React.Fragment>
         <FeedbackTermsModal

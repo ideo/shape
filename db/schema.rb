@@ -551,9 +551,20 @@ ActiveRecord::Schema.define(version: 2019_11_06_190741) do
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
     t.bigint "idea_id"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
     t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
+  end
+
+  create_table "question_choices", force: :cascade do |t|
+    t.text "text"
+    t.integer "order"
+    t.integer "value"
+    t.boolean "archived"
+    t.integer "question_item_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "roles", force: :cascade do |t|
