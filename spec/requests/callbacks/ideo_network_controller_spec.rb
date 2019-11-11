@@ -692,6 +692,11 @@ describe 'Ideo Profile API Requests' do
         let(:included) { [role_data, user_data] }
 
         it 'creates the new user and assigns the new role' do
+          # worker should be called via MassAssign but we just double-check here
+          expect(OrganizationMembershipWorker).to receive(:perform_async).with(
+            anything,
+            group.organization_id,
+          )
           expect do
             post(
               '/callbacks/ideo_network/users_roles',
