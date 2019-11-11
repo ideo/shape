@@ -1,5 +1,5 @@
 class ToggleAnyoneCanView < SimpleService
-  def initialize(collection)
+  def initialize(collection:)
     @collection = collection
   end
 
