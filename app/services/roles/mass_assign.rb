@@ -65,13 +65,10 @@ module Roles
         if role.persisted?
           @added_users << user
 
-          action = assign_role_action
-          next if action.nil?
-
           ActivityAndNotificationBuilder.call(
             actor: @invited_by,
             target: @object,
-            action: action,
+            action: :shared,
             subject_user_ids: [user.id],
             should_notify: false,
           )
@@ -210,16 +207,6 @@ module Roles
       end
 
       true
-    end
-
-    def assign_role_action
-      return :shared if @new_role
-
-      return :made_viewer if @role_name == Role::VIEWER && !user.has_role(Role::VIEWER, @object)
-
-      return :made_editor if @role_name == Role::EDITOR && !user.has_role(Role::EDITOR, @object)
-
-      nil
     end
   end
 end

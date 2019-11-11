@@ -1,4 +1,5 @@
 class MarkAsPrivate < SimpleService
+  # NOTE: only used for user-initiated actions via the controller
   def initialize(object:,
                  marked_by: nil)
     @object = object
