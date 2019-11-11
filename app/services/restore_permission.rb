@@ -12,7 +12,7 @@ class RestorePermission < SimpleService
 
     return unless @object.collection?
 
-    unmarked = object.unmark_as_private!
+    unmarked = @object.unmark_as_private!
     log_activity if unmarked
   end
 
@@ -23,7 +23,7 @@ class RestorePermission < SimpleService
       actor: @restored_by,
       target: @object,
       action: :permissions_restored,
-      subject_user_ids: [@marked_by.id],
+      subject_user_ids: [@restored_by.id],
       should_notify: false,
     )
   end

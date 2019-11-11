@@ -108,7 +108,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def restore_permissions
-    RestorePermissions.call(@collection, current_user)
+    restore_permission = RestorePermission.new(object: @collection, restored_by: current_user)
+    restore_permission.call
     render_collection
     # no error case needed... ?
   end

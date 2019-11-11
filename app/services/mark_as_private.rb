@@ -7,7 +7,7 @@ class MarkAsPrivate < SimpleService
   end
 
   def call
-    marked = object.mark_as_private!
+    marked = @object.mark_as_private!
     log_activity if marked
   end
 
