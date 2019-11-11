@@ -108,6 +108,8 @@ describe('ChartGroup', () => {
     beforeEach(() => {
       props.dataItem.datasets = [fakeBarChartDataset]
       props.dataItem.primaryDataset = fakeBarChartDataset
+      props.dataItem.primaryDataset.isEmojiOrScaleQuestion.mockReset()
+      props.dataItem.primaryDataset.isEmojiOrScaleQuestion.mockReturnValue(true)
       render()
     })
 

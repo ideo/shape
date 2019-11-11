@@ -3,6 +3,7 @@ import { kebabCase } from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import CustomizableQuestion from '~/ui/test_collections/CustomizableQuestion'
 import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 import FinishQuestion from '~/ui/test_collections/FinishQuestion'
 import RecontactQuestion from '~/ui/test_collections/RecontactQuestion'
@@ -14,7 +15,6 @@ import TermsQuestion from '~/ui/test_collections/TermsQuestion'
 import WelcomeQuestion from '~/ui/test_collections/WelcomeQuestion'
 import IdeaQuestion from '~/ui/test_collections/IdeaQuestion'
 import MediaQuestion from '~/ui/test_collections/MediaQuestion'
-import { QuestionText } from '~/ui/test_collections/shared'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import QuestionAnswer from '~/stores/jsonApi/QuestionAnswer'
 
@@ -40,7 +40,7 @@ class TestQuestion extends React.Component {
       apiStore,
     } = this.props
     const { record } = card
-    const { text, number } = answer
+    const { text, number, selected_choice_ids, skipScrolling } = answer
     let { surveyResponse, questionAnswer } = this.props
     // components should never trigger this when editing, but double-check here
     if (editing) return
@@ -62,6 +62,7 @@ class TestQuestion extends React.Component {
           idea_id: card.idea_id,
           answer_text: text,
           answer_number: number,
+          selected_choice_ids,
         },
         apiStore
       )
@@ -74,7 +75,12 @@ class TestQuestion extends React.Component {
       await questionAnswer.API_update({
         answer_text: text,
         answer_number: number,
+        selected_choice_ids,
       })
+    }
+
+    if (skipScrolling) {
+      return
     }
     afterQuestionAnswered(card)
   }
@@ -92,6 +98,7 @@ class TestQuestion extends React.Component {
       canEdit,
       surveyResponse,
       numberOfQuestions,
+      testStatus,
       apiStore,
       hideMedia,
     } = this.props
@@ -112,6 +119,19 @@ class TestQuestion extends React.Component {
             onAnswer={this.handleQuestionAnswer}
           />
         )
+      case 'question_single_choice':
+      case 'question_multiple_choice':
+        return (
+          <CustomizableQuestion
+            question={record}
+            editing={editing}
+            questionAnswer={questionAnswer}
+            onAnswer={this.handleQuestionAnswer}
+            question_choices={record.question_choices}
+            isTestDraft={testStatus === 'draft'}
+          />
+        )
+      case 'media':
       case 'question_media':
         return <MediaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_idea':
@@ -124,17 +144,13 @@ class TestQuestion extends React.Component {
           />
         )
       case 'question_description':
-        if (editing) {
-          return (
-            <QuestionContentEditor
-              placeholder="add text here…"
-              item={record}
-              canEdit={canEdit}
-            />
-          )
-        }
-        return <QuestionText>{record.content}</QuestionText>
-
+        return (
+          <QuestionContentEditor
+            placeholder="add text here…"
+            item={record}
+            canEdit={canEdit}
+          />
+        )
       case 'question_open':
         return (
           <OpenQuestion
@@ -221,6 +237,8 @@ TestQuestion.propTypes = {
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
   numberOfQuestions: PropTypes.number,
+  question_choices: MobxPropTypes.arrayOrObservableArray,
+  testStatus: PropTypes.oneOf(['draft', 'live', 'closed']),
   hideMedia: PropTypes.bool,
 }
 TestQuestion.wrappedComponent.propTypes = {
@@ -234,6 +252,7 @@ TestQuestion.defaultProps = {
   afterQuestionAnswered: null,
   canEdit: false,
   numberOfQuestions: null,
+  question_choices: [],
   hideMedia: false,
 }
 

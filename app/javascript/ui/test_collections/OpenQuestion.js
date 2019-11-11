@@ -6,7 +6,6 @@ import styled, { css } from 'styled-components'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 import {
-  QuestionText,
   TextResponseHolder,
   TextInput,
   TextEnterButton,
@@ -23,32 +22,37 @@ export const QuestionSpacingContainer = styled.div`
   ${QuestionSpacing};
 `
 
-const QuestionTextWithSpacing = styled(QuestionText)`
-  ${QuestionSpacing};
-`
-QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
-
 @observer
 class OpenQuestion extends React.Component {
   constructor(props) {
     super(props)
     const { questionAnswer } = props
-    this.save = _.debounce(this._save, 1000)
+    this.saveAnswer = _.debounce(this._saveAnswer, 1000)
     this.state = {
       response: questionAnswer ? questionAnswer.answer_text : '',
       focused: false,
     }
   }
 
-  _save = () => {
-    const { item } = this.props
-    item.save()
+  _saveAnswer = () => {
+    const { onAnswer } = this.props
+    onAnswer({ text: this.state.response, skipScrolling: true })
   }
 
   handleResponse = ev => {
-    this.setState({
-      response: ev.target.value,
-    })
+    const { questionAnswer } = this.props
+
+    this.setState(
+      {
+        response: ev.target.value,
+      },
+      () => {
+        if (!questionAnswer || questionAnswer.answer_text.length === 0) {
+          return
+        }
+        this.saveAnswer()
+      }
+    )
   }
 
   handleSubmit = ev => {
@@ -60,25 +64,18 @@ class OpenQuestion extends React.Component {
 
   renderQuestion() {
     const { editing, item, canEdit } = this.props
-    let content
-    if (editing) {
-      content = (
-        <QuestionSpacingContainer editing={editing}>
-          <QuestionContentEditor
-            item={item}
-            maxLength={100}
-            placeholder="please enter question here"
-            canEdit={canEdit}
-            optional
-          />
-        </QuestionSpacingContainer>
-      )
-    } else {
-      content = (
-        <QuestionTextWithSpacing>{item.content}</QuestionTextWithSpacing>
-      )
-    }
-    return content
+
+    return (
+      <QuestionSpacingContainer editing={editing}>
+        <QuestionContentEditor
+          item={item}
+          maxLength={100}
+          placeholder="please enter question here"
+          canEdit={canEdit}
+          optional
+        />
+      </QuestionSpacingContainer>
+    )
   }
 
   render() {
@@ -102,7 +99,7 @@ class OpenQuestion extends React.Component {
               focused={this.state.focused}
               data-cy="OpenQuestionTextButton"
             >
-              <ArrowIcon />
+              <ArrowIcon rotation={90} />
             </TextEnterButton>
           </TextResponseHolder>
         </form>

@@ -335,6 +335,8 @@ class Item < ApplicationRecord
 
   def question_description; end
 
+  def question_choices; end
+
   def jsonapi_type_name
     'items'
   end

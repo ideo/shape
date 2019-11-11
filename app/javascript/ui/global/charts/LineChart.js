@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { VictoryLine } from 'victory'
 import v from '~/utils/variables'
 
-import ChartTooltip from '~/ui/global/charts/ChartTooltip'
+import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
 import {
   datasetPropType,
   dateTooltipText,
@@ -82,7 +82,7 @@ const LineChart = ({
     <VictoryLine
       labels={d => d.value}
       labelComponent={
-        <ChartTooltip
+        <TickLabelWithTooltip
           tooltipTextRenderer={tooltipFn}
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}

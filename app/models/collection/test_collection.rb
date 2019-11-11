@@ -149,9 +149,7 @@ class Collection
 
     def self.default_question_types_by_section
       {
-        intro: %i[
-          question_category_satisfaction
-        ],
+        intro: %i[question_category_satisfaction],
         ideas: %i[
           ideas_collection
           question_clarity
@@ -351,6 +349,7 @@ class Collection
       Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
         'Collection::TestCollection': SerializableTestCollection,
         FilestackFile: SerializableFilestackFile,
+        QuestionChoice: SerializableQuestionChoice,
       )
     end
 
@@ -358,7 +357,7 @@ class Collection
       {
         question_cards: [
           :parent,
-          record: [:filestack_file],
+          record: [:filestack_file, :question_choices],
         ],
       }
     end

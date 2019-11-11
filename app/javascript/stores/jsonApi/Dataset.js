@@ -9,6 +9,17 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
   get identifier() {
     this.rawAttributes().identifier
   }
+
+  get isEmojiOrScaleQuestion() {
+    return [
+      'question_clarity',
+      'question_excitement',
+      'question_different',
+      'question_useful',
+      'question_category_satisfaction',
+      'question_context',
+    ].includes(this.question_type)
+  }
 }
 
 export default Dataset
