@@ -6834,6 +6834,8 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -14380,6 +14382,8 @@ exports[`GridCard when selected renders snapshot 1`] = `
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -22662,6 +22666,8 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -30239,6 +30245,8 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -37785,6 +37793,8 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -45364,6 +45374,8 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -46959,6 +46971,8 @@ exports[`GridCard with item as editor renders snapshot 1`] = `
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -47849,6 +47863,8 @@ exports[`GridCard with item as viewer renders snapshot 1`] = `
         }
       }
       searchResult={false}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore
@@ -55570,6 +55586,8 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         }
       }
       searchResult={true}
+      textItemHideReadMore={false}
+      textItemUneditable={false}
     />
   </StyledGridCardInner>
   <inject-CollectionCardsTagEditorModal-with-uiStore

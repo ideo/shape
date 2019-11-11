@@ -69,6 +69,11 @@ describe('TextItemCover', () => {
   })
 
   describe('handleClick', () => {
+    it('calls props handleClick if it exists', () => {
+      component.handleClick(e)
+      expect(props.handleClick).toHaveBeenCalled()
+    })
+
     it('returns false if you are dragging', async () => {
       wrapper.setProps({ dragging: true })
       const result = await component.handleClick(e)

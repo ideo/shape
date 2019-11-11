@@ -33,7 +33,7 @@ const CarouselButton = styled(TextEnterButton)`
   }
 `
 
-@inject('apiStore', 'routingStore')
+@inject('routingStore')
 @observer
 class CarouselCover extends React.Component {
   @observable
@@ -78,7 +78,6 @@ class CarouselCover extends React.Component {
 
   render() {
     const { collection } = this.props
-    if (!this.records.length > 0) return <div>Loading...</div>
 
     return (
       <div style={{ color: 'black', height: '100%' }}>
@@ -92,7 +91,7 @@ class CarouselCover extends React.Component {
           textItemUneditable
         />
         <CarouselControl onClick={() => {}}>
-          <DisplayText color={v.colors.commonDark}>
+          <DisplayText color={v.colors.commonDark} data-cy="ItemCount">
             {this.currentIdx + 1} / {this.records.length}
           </DisplayText>
           <CarouselButton onClick={() => this.handleNavigate(-1)}>
@@ -118,5 +117,6 @@ CarouselCover.wrappedComponent.propTypes = {
 CarouselCover.defaultProps = {
   dragging: false,
 }
+CarouselCover.displayName = 'CarouselCover'
 
 export default CarouselCover
