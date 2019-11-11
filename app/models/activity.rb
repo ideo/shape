@@ -81,10 +81,8 @@ class Activity < ApplicationRecord
     resolved_comment: 17,
     shared: 18,
     unshared: 19,
-    made_viewer: 20,
-    made_editor: 21,
-    made_private: 22,
-    permissions_restored: 23,
+    made_private: 20,
+    permissions_restored: 21,
   }
 
   def self.participant_actions
