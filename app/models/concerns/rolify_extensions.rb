@@ -82,15 +82,6 @@ module RolifyExtensions
       .positive?
   end
 
-  def has_any_role?(resource)
-    # NOTE: should be a global constant value to avoid querying
-    all_roles = Role.all.group(:name).pluck(:name)
-    all_roles.map do |role|
-      return true if has_role?(role, resource)
-    end
-    false
-  end
-
   def has_cached_role?(role_name)
     @has_cached_role ||= Hash.new do |h, key|
       h[key] = has_role?(key)
