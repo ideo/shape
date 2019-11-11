@@ -58,8 +58,14 @@ class CarouselCover extends React.Component {
 
   @action
   handleNavigate = direction => {
-    if (direction === -1 && this.currentIdx === 0) return
-    if (direction === 1 && this.currentIdx === this.records.length - 1) return
+    if (direction === -1 && this.currentIdx === 0) {
+      this.currentIdx = this.records.length - 1
+      return
+    }
+    if (direction === 1 && this.currentIdx === this.records.length - 1) {
+      this.currentIdx = 0
+      return
+    }
     this.currentIdx += direction
   }
 
