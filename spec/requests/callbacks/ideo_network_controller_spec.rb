@@ -600,6 +600,11 @@ describe 'Ideo Profile API Requests' do
 
         it 'updates the group organization_id' do
           expect(group.organization).to be nil
+          # worker should get called via Group after_save
+          expect(OrganizationMembershipWorker).to receive(:perform_async).with(
+            group.user_ids,
+            organization.id,
+          )
           post(
             '/callbacks/ideo_network/groups',
             params: {
