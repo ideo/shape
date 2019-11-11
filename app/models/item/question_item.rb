@@ -63,7 +63,11 @@ class Item
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
+    has_many :question_choices, -> { order(order: :asc) }
+
     after_create :create_question_dataset
+    after_create :add_default_question_choices,
+                 if: :question_choices_customizable?
 
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
@@ -87,6 +91,23 @@ class Item
       )
     }
 
+    enum question_type: {
+      question_context: 0,
+      question_useful: 1,
+      question_open: 2,
+      # Is there supposed to be no #3 for this enum?
+      question_media: 4,
+      question_description: 5,
+      question_finish: 6,
+      question_clarity: 7,
+      question_excitement: 8,
+      question_different: 9,
+      question_category_satisfaction: 10,
+      question_idea: 11,
+      question_single_choice: 12,
+      question_multiple_choice: 13,
+    }
+
     def self.question_type_categories
       {
         idea_content: %i[
@@ -106,6 +127,8 @@ class Item
           question_category_satisfaction
           question_context
           question_open
+          question_single_choice
+          question_multiple_choice
         ],
       }
     end
@@ -162,7 +185,15 @@ class Item
       end
     end
 
+    def customizable_title_and_description
+      {
+        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
+        description: content,
+      }
+    end
+
     def question_title_and_description
+      return customizable_title_and_description if question_choices_customizable?
       self.class.question_title_and_description(question_type)
     end
 
@@ -176,6 +207,11 @@ class Item
 
     def scale_question?
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
+    end
+
+    def graphable_question?
+      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym) ||
+        [:question_single_choice, :question_multiple_choice].include?(question_type&.to_sym)
     end
 
     def requires_roles?
@@ -206,7 +242,7 @@ class Item
     end
 
     def find_or_create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
-      return if !scale_question? || test_data_item.present?
+      return if test_data_item.present?
 
       legend_item ||= parent_collection.legend_item
 
@@ -258,11 +294,15 @@ class Item
     end
 
     def org_wide_question_dataset
+      # For customizable questions the org dataset needs the reference
+      # to the actual question
+      data_source = self if question_choices_customizable?
       Dataset::Question.find_or_create_by(
         groupings: [{ type: 'Organization', id: organization.id }],
         question_type: question_type,
         identifier: Dataset::Question::DEFAULT_ORG_NAME,
         chart_type: :bar,
+        data_source: data_source,
       )
     end
 
@@ -280,6 +320,10 @@ class Item
       )
     end
 
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
+    end
+
     private
 
     def create_question_dataset
@@ -290,13 +334,23 @@ class Item
       )
     end
 
-    # def test_collection_is_live?
-    #   parent.is_a?(Collection::TestCollection) && parent.live?
-    # end
-    #
-    # def notify_test_collection_of_creation
-    #   parent.question_item_created(self)
-    # end
+    def add_default_question_choices
+      (0..3).each do |i|
+        self.question_choices.create(
+          text: "Option #{i + 1}",
+          value: i,
+          order: i,
+        )
+      end
+    end
+
+    def notify_test_design_collection_of_creation?
+      parent.is_a?(Collection::TestDesign)
+    end
+
+    def notify_test_design_of_creation
+      parent.question_item_created(self)
+    end
 
     def update_test_open_responses_collection?
       saved_change_to_content? && test_open_responses_collection.present?

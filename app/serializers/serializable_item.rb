@@ -28,6 +28,12 @@ class SerializableItem < BaseJsonSerializer
     end
   end
 
+  has_many :question_choices do
+    data do
+      @object.question_choices&.viewable_in_ui
+    end
+  end
+
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source

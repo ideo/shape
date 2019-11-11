@@ -119,7 +119,7 @@ class Collection
       legend = nil
       graphs = []
       question_items
-        .select(&:scale_question?)
+        .select(&:graphable_question?)
         .each_with_index do |question, i|
         data_item_card = question.find_or_create_response_graph(
           parent_collection: self,

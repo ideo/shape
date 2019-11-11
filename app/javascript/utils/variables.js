@@ -81,6 +81,16 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
         label: 'Text Block',
         sections: ['intro', 'ideas', 'outro'],
       },
+      {
+        value: 'question_single_choice',
+        label: 'Single Choice',
+        sections: ['intro', 'ideas', 'outro'],
+      },
+      {
+        value: 'question_multiple_choice',
+        label: 'Multiple Choice',
+        sections: ['intro', 'ideas', 'outro'],
+      },
     ],
   },
 ]

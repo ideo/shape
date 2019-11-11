@@ -5,6 +5,18 @@ RSpec.describe Item::QuestionItem, type: :model do
     it { should have_many(:question_answers) }
   end
 
+  context 'callbacks' do
+    context 'after_create' do
+      context 'with a customizable question' do
+        let!(:question_item) { create(:question_item, question_type: :question_single_choice) }
+
+        it 'should create 4 default question choices' do
+          expect(question_item.question_choices.count).to be 4
+        end
+      end
+    end
+  end
+
   context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }

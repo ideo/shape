@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
 import { VictoryBar } from 'victory'
 
-import ChartTooltip from '~/ui/global/charts/ChartTooltip'
+import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
 import {
+  barWidthPx,
   datasetPropType,
   chartDomainForDatasetValues,
 } from '~/ui/global/charts/ChartUtils'
@@ -12,6 +13,7 @@ const formatValues = (values, datasetOrder) => {
     ...datum,
     x: datum.column,
     y: Math.max(datum.percentage, 0.5),
+    label: datum.column,
   }))
 }
 
@@ -22,7 +24,8 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
     values,
     maxDomain: max_domain,
   })
-  const barWidth = barsInGroup > 3 ? 30 / (barsInGroup / 2) : 30
+  const totalBars = dataset.data.length
+  const barWidth = barWidthPx(totalBars, barsInGroup)
   // Only show labels if theres room for them
   const labelRenderer = datum =>
     barsInGroup > 4 ? () => {} : `${datum.percentage}%`
@@ -39,7 +42,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
     <VictoryBar
       labels={d => d.percentage}
       labelComponent={
-        <ChartTooltip
+        <TickLabelWithTooltip
           tooltipTextRenderer={tooltipRenderer}
           labelTextRenderer={labelRenderer}
           cardArea={cardArea}
@@ -47,7 +50,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
           alwaysShowLabels={true}
         />
       }
-      padding={10 / barsInGroup}
+      padding={0}
       barWidth={barWidth}
       data={values}
       domain={domain}
