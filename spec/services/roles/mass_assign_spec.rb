@@ -247,7 +247,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         let!(:users) { [user] }
         let!(:groups) { [] }
         let!(:linked_collection) { create(:collection) }
-        let!(:object) { create(:group) }
+        let!(:object) { create(:group, organization: organization) }
         let!(:comment_thread) { create(:item_comment_thread) }
         let!(:groups_thread) { create(:groups_thread, group: object, comment_thread: comment_thread) }
         let(:thread_ids) { object.groups_threads.pluck(:comment_thread_id) }
