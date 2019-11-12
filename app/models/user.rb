@@ -283,7 +283,7 @@ class User < ApplicationRecord
       end
     end
     %w[picture picture_medium picture_large].each do |field|
-      user.network_data[field] = attrs.try(:extra).try(field)
+      user.network_data[field] = attrs.try(field) || attrs.try(:extra).try(field)
     end
 
     user

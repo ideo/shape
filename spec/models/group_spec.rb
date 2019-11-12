@@ -14,6 +14,26 @@ RSpec.describe Group, type: :model do
         expect(group_2.handle).to eq(group.handle + '-1')
       end
     end
+
+    describe '#setup_user_organization_memberships' do
+      let(:group) { create(:group, organization: nil, network_id: '99') }
+
+      context 'with no org change' do
+        it 'does not call OrganizationMembershipWorker' do
+          expect(OrganizationMembershipWorker).not_to receive(:perform_async)
+          group.update(name: 'Lala')
+        end
+      end
+      context 'going from nil org_id to org being present' do
+        it 'calls OrganizationMembershipWorker' do
+          expect(OrganizationMembershipWorker).to receive(:perform_async).with(
+            group.user_ids,
+            organization.id,
+          )
+          group.update(organization_id: organization.id)
+        end
+      end
+    end
   end
 
   it 'should create a group shared collection' do
