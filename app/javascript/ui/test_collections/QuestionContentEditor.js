@@ -7,6 +7,7 @@ import {
   QuestionHelperText,
   TextInputHolder,
   TextInput,
+  SingleLineInput,
 } from '~/ui/test_collections/shared'
 
 const StyledSmallText = styled(QuestionHelperText)`
@@ -59,11 +60,13 @@ class QuestionContentEditor extends React.Component {
   }
 
   render() {
-    const { maxLength, placeholder, canEdit, optional } = this.props
+    const { maxLength, placeholder, canEdit, singleLine, optional } = this.props
     const { focused, countLeft } = this.state
+    const InputComponent = singleLine ? SingleLineInput : TextInput
+
     return (
       <TextInputHolder hasFocus={focused}>
-        <TextInput
+        <InputComponent
           ref={this.inputRef}
           data-cy="QuestionContentEditorText"
           disabled={!canEdit}
@@ -101,12 +104,14 @@ QuestionContentEditor.propTypes = {
   maxLength: PropTypes.number,
   canEdit: PropTypes.bool,
   optional: PropTypes.bool,
+  singleLine: PropTypes.bool,
 }
 QuestionContentEditor.defaultProps = {
   itemAttribute: 'content',
   maxLength: 500,
   canEdit: false,
   optional: false,
+  singleLine: false,
 }
 
 export default QuestionContentEditor

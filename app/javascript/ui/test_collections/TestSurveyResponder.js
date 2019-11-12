@@ -306,7 +306,6 @@ class TestSurveyResponder extends React.Component {
       createSurveyResponse,
       questionAnswerForCard,
       afterQuestionAnswered,
-      canEdit,
       numAnswerableQuestionItems,
     } = this
 
@@ -338,7 +337,7 @@ class TestSurveyResponder extends React.Component {
                   item={card.record}
                   order={card.order}
                   editing={false}
-                  canEdit={canEdit}
+                  canEdit={false}
                   numberOfQuestions={numAnswerableQuestionItems}
                 />
               </TestQuestionHolder>
