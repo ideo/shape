@@ -421,6 +421,7 @@ class User < ApplicationRecord
     if has_cached_role?(Role::SUPER_ADMIN)
       return current_organization.groups.not_global
     end
+    return [] unless current_organization.present?
 
     groups = Group.where(id: all_current_org_group_ids).not_global.to_a
     return [] if groups.blank?
