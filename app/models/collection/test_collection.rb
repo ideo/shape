@@ -459,6 +459,14 @@ class Collection
       reorder_cards!
     end
 
+    def ideas_question_items
+      question_items_from_sections(%i[ideas])
+    end
+
+    def non_repeating_question_items
+      question_items_from_sections(%i[intro outro])
+    end
+
     def incomplete_question_items
       incomplete_items = idea_items.joins(
         :parent_collection_card,
@@ -535,6 +543,16 @@ class Collection
     end
 
     private
+
+    def question_items_from_sections(section_names)
+      question_items.joins(:primary_collection_card).where(
+        CollectionCard.arel_table[:section_type].in(
+          section_names.map do |section_name|
+            CollectionCard.section_types[section_name]
+          end,
+        ),
+      )
+    end
 
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
       return true if test_audience_params.blank?

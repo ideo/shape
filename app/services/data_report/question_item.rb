@@ -1,6 +1,6 @@
 module DataReport
   class QuestionItem < SimpleService
-    delegate :test_collection, to: :@dataset
+    delegate :test_collection, :groupings, to: :@dataset
 
     def initialize(dataset:)
       @dataset = dataset
@@ -16,11 +16,27 @@ module DataReport
 
     def self.base_data
       (1..4).map do |n|
-        { value: 0, column: n, percentage: 0 }
+        {
+          value: 0,
+          column: n,
+          percentage: 0,
+          search_tag: search_key(n),
+        }
       end
     end
 
     private
+
+    def search_key(answer_value)
+      GenerateTestSearchKey.call(
+        test_collection: test_collection,
+        audience_id: group_by_audience_id,
+        idea_id: group_by_idea_id,
+        question_type: question_type,
+        answer_value: answer_value,
+        organization_id: group_by_organization_id,
+      )
+    end
 
     def question_item
       @dataset.data_source
@@ -63,16 +79,30 @@ module DataReport
       end
     end
 
+    def group_by_audience_id
+      group_by_type_id('TestAudience')
+    end
+
+    def group_by_organization_id
+      group_by_type_id('Organization')
+    end
+
+    def group_by_idea_id
+      group_by_type_id('Organization')
+    end
+
+    def group_by_type_id(type)
+      groupings.find { |g| g['type'] == type }.try(:[], 'id')
+    end
+
     def survey_answers
-      if @dataset.grouping.present? &&
-         @dataset.grouping['type'] == 'Organization'
+      if group_by_organization_id.present?
         org_survey_answers
-      elsif @dataset.grouping.present? &&
-            @dataset.grouping['type'] == 'TestAudience'
+      elsif group_by_audience_id.present?
         question_item.completed_survey_answers
                      .where(
                        SurveyResponse.arel_table[:test_audience_id].eq(
-                         @dataset.grouping['id'],
+                         group_by_audience_id,
                        ),
                      )
       else
@@ -81,7 +111,8 @@ module DataReport
     end
 
     def org_survey_answers
-      organization_id = @dataset.grouping['id']
+      return QuestionAnswer.none if group_by_organization_id.blank?
+
       QuestionAnswer
         .joins(
           :question,
@@ -94,7 +125,7 @@ module DataReport
             SurveyResponse.arel_table[:status].eq(:completed),
           ).and(
             Collection::TestCollection.arel_table[:organization_id].eq(
-              organization_id,
+              group_by_organization_id,
             ),
           ),
         )

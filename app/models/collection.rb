@@ -264,7 +264,15 @@ class Collection < ApplicationRecord
       updated_at: updated_at,
       archived: archived,
       master_template: master_template,
-    }
+    }.merge(search_keys)
+  end
+
+  def search_keys
+    return {} unless respondent_collection?
+
+    # {
+    #   test_audience_keys: keys
+    # }
   end
 
   # just for reindexing, you can call:
