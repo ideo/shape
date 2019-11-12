@@ -373,7 +373,9 @@ class CollectionCover extends React.Component {
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
       >
-        {collection.isCarousel && collection.collection_cover_items.length ? (
+        {collection.isCarousel &&
+        collection.collection_cover_items &&
+        collection.collection_cover_items.length > 0 ? (
           <CarouselCover
             collection={collection}
             dragging={false}
