@@ -20,22 +20,28 @@ module DataReport
           value: 0,
           column: n,
           percentage: 0,
-          search_tag: search_key(n),
+          search_key: search_key(n),
         }
       end
     end
 
     private
 
-    def search_key(answer_value)
-      GenerateTestSearchKey.call(
-        test_collection: test_collection,
-        audience_id: group_by_audience_id,
-        idea_id: group_by_idea_id,
-        question_type: question_type,
-        answer_value: answer_value,
-        organization_id: group_by_organization_id,
+    def search_key(answer_number)
+      answer = QuestionAnswer.new(
+        question: question_item,
+        answer_number: answer_number,
       )
+      answer_key = TestCollection::AnswerSearchKey.new(
+        answer, group_by_audience_id
+      )
+      if group_by_organization_id.present?
+        answer_key.for_organization(group_by_organization_id)
+      else
+        # TODO: need to be able to get the Idea ID
+        idea_id = nil
+        answer_key.for_test(test_collection.id, idea_id)
+      end
     end
 
     def question_item
