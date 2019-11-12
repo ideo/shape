@@ -174,18 +174,19 @@ RSpec.describe Roles::MassAssign, type: :service do
     context 'when it should create activities and notifications' do
       let(:invited_by) { create(:user) }
       let(:new_role) { true }
-      let(:role_name) { Role::EDITOR.to_s }
+      let!(:role_name) { Role::EDITOR.to_s }
 
-      it 'should call the activity and notification builder' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: invited_by,
-          target: object,
-          action: :added_editor,
-          subject_user_ids: users.pluck(:id),
-          subject_group_ids: groups.pluck(:id),
-          should_notify: true,
-        )
-        assign_role.call
+      context 'with an editor and a group which contains the same user' do
+        it 'add activities with shared and added_editor activity' do
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :shared),
+          ).exactly(users.count + groups.count).times
+
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :added_editor),
+          ).once
+          assign_role.call
+        end
       end
     end
 
@@ -298,7 +299,12 @@ RSpec.describe Roles::MassAssign, type: :service do
             invited_to_id: object.id,
             application: nil,
           )
-          expect(ActivityAndNotificationBuilder).to receive(:call)
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :shared),
+          ).exactly(users.count + groups.count).times
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :added_editor),
+          ).once
           assign_role.call
         end
 
@@ -309,9 +315,11 @@ RSpec.describe Roles::MassAssign, type: :service do
             expect(InvitationMailer).not_to receive(:invite)
             expect(ActivityAndNotificationBuilder).to receive(:call).with(
               hash_including(
+                action: :shared,
                 should_notify: false,
               ),
-            )
+            ).exactly(users.count + groups.count).times
+            expect(ActivityAndNotificationBuilder).to receive(:call).with(hash_including(action: :added_editor)).once
             assign_role.call
           end
         end

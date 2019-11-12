@@ -290,12 +290,17 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
 
     it 'notifies the editors that the item was archived' do
       group.archived = true
+
       expect(ActivityAndNotificationBuilder).to receive(:call).with(
         actor: @user,
         target: group,
         action: :archived,
-        subject_user_ids: (members << user).pluck(:id),
+        subject_user_ids: array_including((members << user).pluck(:id)),
       )
+
+      expect(ActivityAndNotificationBuilder).to receive(:call).with(
+        hash_including(action: :unshared),
+      ).once
       patch(path)
     end
 
