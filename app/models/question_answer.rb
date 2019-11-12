@@ -85,8 +85,7 @@ class QuestionAnswer < ApplicationRecord
     test_results_collection = survey_response.test_collection.test_results_collection
     idea = self.idea
     question = self.question
-    audience = survey_response.test_audience
-    survey_response = survey_response
+    audience = survey_response&.test_audience&.audience
     answer = self
     ops =
       [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
@@ -96,15 +95,18 @@ class QuestionAnswer < ApplicationRecord
        {insert: "“#{answer.answer_text}”"},
        {insert: "\n", attributes: { header: 1}},
        {insert: "- "},
-       {insert: survey_response.alias, attributes: { link: quote_url(nil)}},
-       {insert: ", "},
-       {insert: audience.name, attributes: {link: quote_url(nil)}},
-      ],
+       {insert: survey_response.respondent_alias, attributes: { link: quote_url(nil)}},
+      ]
     if idea.present?
       ops.insert(1, {insert: " | "})
       ops.insert(2, {insert: idea.name, attributes: { link: quote_url(idea)}})
     end
-    {ops: ops }
+    if audience.present? && audience.global_default.nil?
+      ops.push({insert: ", "})
+      ops.push({insert: audience.name, attributes: {link: quote_url(nil)}})
+
+    end
+    {ops: ops.map(&:stringify_keys) }
   end
 
   def create_open_response_item

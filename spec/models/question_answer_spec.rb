@@ -147,13 +147,13 @@ RSpec.describe QuestionAnswer, type: :model do
         end
 
         it 'updates open response item with updated answer' do
-          expect(question_answer.open_response_item.plain_content).not_to eq(
+          expect(question_answer.open_response_item.plain_content).not_to include(
             'What a jolly prototype',
           )
           question_answer.update(
             answer_text: 'What a jolly prototype',
           )
-          expect(question_answer.open_response_item.reload.plain_content).to eq(
+          expect(question_answer.open_response_item.reload.plain_content).to include(
             'What a jolly prototype',
           )
         end
