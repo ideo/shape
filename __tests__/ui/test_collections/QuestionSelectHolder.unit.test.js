@@ -35,8 +35,10 @@ describe('QuestionSelector', () => {
       'question_different',
       'question_excitement',
       'question_useful',
+      'question_multiple_choice',
       'question_open',
       'question_media',
+      'question_single_choice',
       'question_description',
     ])
   })

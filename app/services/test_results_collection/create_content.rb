@@ -41,7 +41,7 @@ module TestResultsCollection
 
     def create_content_for_item_card(card)
       item = card.item
-      if item.scale_question?
+      if item.graphable_question?
         create_response_graph(card)
       elsif item.question_open?
         create_open_response_collection(card)

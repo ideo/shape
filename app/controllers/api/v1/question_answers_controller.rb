@@ -14,6 +14,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
 
   load_resource :question_answer, only: %i[update]
   def update
+    p question_answer_params
     if @question_answer.update(question_answer_params)
       render jsonapi: @question_answer
     else
@@ -29,6 +30,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
       :answer_number,
       :question_id,
       :idea_id,
+      selected_choice_ids: [],
     )
   end
 
@@ -36,6 +38,7 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
     params.require(:question_answer).permit(
       :answer_text,
       :answer_number,
+      selected_choice_ids: [],
     )
   end
 

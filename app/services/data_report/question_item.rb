@@ -19,18 +19,20 @@ module DataReport
         {
           value: 0,
           column: n,
-          percentage: 0,
-          search_key: search_key(n),
+          percentage: 0
         }
       end
     end
 
     private
 
-    def search_key(answer_number)
+    def search_key(answer_number: nil, question_choice: nil)
+      return if answer_number.blank? && question_choice.blank?
+
       answer = QuestionAnswer.new(
         question: question_item,
         answer_number: answer_number,
+        question_choice: question_choice
       )
       answer_key = TestCollection::AnswerSearchKey.new(
         answer, group_by_audience_id
@@ -44,6 +46,31 @@ module DataReport
       end
     end
 
+    def question_choice_data
+      return self.class.base_data if question_item.blank?
+
+      if question_choices_customizable?
+        question_item.question_choices.each_with_index.map do |qc, i|
+          {
+            value: 0,
+            column: qc.text,
+            percentage: 0,
+            id: qc.id,
+            search_key: search_key(question_choice: qc),
+          }
+        end
+      else
+        (1..4).map do |answer_number|
+          {
+            value: 0,
+            column: answer_number,
+            percentage: 0,
+            search_key: search_key(answer_number: answer_number),
+          }
+        end
+      end
+    end
+
     def question_item
       @dataset.data_source
     end
@@ -54,12 +81,18 @@ module DataReport
       @dataset.question_type
     end
 
+    def question_choices_customizable?
+      question_item&.question_choices_customizable?
+    end
+
     def grouped_response_data(survey_answers)
-      data = self.class.base_data
+      data = question_choice_data
       num_answers = survey_answers.count
-      counts = survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
+      counts = total_answer_count(survey_answers)
+
       counts.each do |answer_number, count|
-        answer_data = data.find { |d| d[:column] == answer_number }
+        lookup = question_choices_customizable? ? :id : :column
+        answer_data = data.find { |d| d[lookup] == answer_number }
         next if answer_data.nil?
 
         begin
@@ -73,6 +106,19 @@ module DataReport
         end
       end
       add_percentage_to_data(data, num_answers)
+    end
+
+    def total_answer_count(survey_answers)
+      if question_choices_customizable?
+        question_item.question_choices.each_with_object({}) do |qc, h|
+          total = survey_answers
+            .where('selected_choice_ids @> ?', [qc.id.to_s].to_s)
+            .count
+          h[qc.id] = total
+        end
+      else
+        survey_answers.group(QuestionAnswer.arel_table[:answer_number]).count
+      end
     end
 
     def add_percentage_to_data(data, num_answers)
@@ -119,7 +165,7 @@ module DataReport
     def org_survey_answers
       return QuestionAnswer.none if group_by_organization_id.blank?
 
-      QuestionAnswer
+      query = QuestionAnswer
         .joins(
           :question,
           survey_response: :test_collection,
@@ -135,6 +181,12 @@ module DataReport
             ),
           ),
         )
+      if question_item&.question_choices_customizable?
+        query = query.where(
+          Item::QuestionItem.arel_table[:id].eq(question_item.id),
+        )
+      end
+      query
     end
   end
 end

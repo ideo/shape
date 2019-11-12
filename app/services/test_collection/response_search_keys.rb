@@ -1,5 +1,5 @@
 module TestCollection
-  class ResponseSearchKeys < BaseService
+  class ResponseSearchKeys < SimpleService
     delegate :test_collection, :test_audience, to: :@survey_response
 
     delegate :non_repeating_question_items, :ideas_question_items, :idea_items,
