@@ -51,10 +51,11 @@ class CollectionUpdater < SimpleService
   def mark_subcollection_as_private
     return unless @collection.anyone_can_view_changed?
 
-    ToggleAnyoneCanView.call(@collection)
-    return unless @collection.anyone_can_view_in_database && @collection.parent.anyone_can_view
+    ToggleAnyoneCanView.call(collection: @collection)
 
-    @collection.mark_as_private! unless @collection.private?
+    return unless @collection.anyone_can_view_in_database && @collection.parent.anyone_can_view && !@collection.private?
+
+    @collection.mark_as_private!
   end
 
   def clean_collection_card_attributes

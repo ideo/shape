@@ -134,7 +134,7 @@ class CardMover
         if @to_collection.anyone_can_view && card.primary?
           card.record.update(anyone_can_view: true)
           card.record.reload
-          ToggleAnyoneCanView.call(card.record)
+          ToggleAnyoneCanView.call(collection: card.record)
         end
       end
 
