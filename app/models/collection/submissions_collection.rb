@@ -38,6 +38,7 @@
 #  roles_anchor_collection_id :bigint(8)
 #  submission_box_id          :bigint(8)
 #  submission_template_id     :integer
+#  survey_response_id         :integer
 #  template_id                :integer
 #  test_collection_id         :bigint(8)
 #

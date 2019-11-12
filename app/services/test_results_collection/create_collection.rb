@@ -71,9 +71,8 @@ module TestResultsCollection
         idea: idea,
       )
 
-      TestCollection::CreateResponsesCollections(
+      TestResultsCollection::CreateResponsesCollection.call(
         test_results_collection: collection,
-        idea: idea,
         survey_responses: test_collection.survey_responses,
         test_audiences: test_collection.test_audiences,
         created_by: created_by,
@@ -100,7 +99,7 @@ module TestResultsCollection
         created_by: created_by,
       ).record
 
-      TestCollection::CreateResponsesCollections.call(
+      TestCollection::CreateResponsesCollection.call(
         test_results_collection: collection,
         idea: idea,
         survey_responses: test_collection.survey_responses,

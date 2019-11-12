@@ -38,6 +38,7 @@
 #  roles_anchor_collection_id :bigint(8)
 #  submission_box_id          :bigint(8)
 #  submission_template_id     :integer
+#  survey_response_id         :integer
 #  template_id                :integer
 #  test_collection_id         :bigint(8)
 #
@@ -68,6 +69,8 @@ class Collection
     belongs_to :idea,
                class_name: 'Item',
                inverse_of: :test_results_collection,
+               optional: true
+    belongs_to :survey_response,
                optional: true
 
     has_many :datasets,

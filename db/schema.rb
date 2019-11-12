@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_07_222348) do
+ActiveRecord::Schema.define(version: 2019_11_12_190014) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -193,6 +193,7 @@ ActiveRecord::Schema.define(version: 2019_11_07_222348) do
     t.integer "default_group_id"
     t.boolean "test_show_media", default: true
     t.integer "idea_id"
+    t.integer "survey_response_id"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin

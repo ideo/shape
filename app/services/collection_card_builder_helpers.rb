@@ -13,7 +13,7 @@ module CollectionCardBuilderHelpers
     return builder.collection_card if builder.errors.blank?
 
     context.fail!(
-      message: builder.errors.to_sentence,
+      message: builder.errors.full_messages.to_sentence,
     )
   end
 end
