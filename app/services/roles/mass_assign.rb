@@ -38,7 +38,7 @@ module Roles
 
       unanchor_object # from shared methods
       assign_role_to_users
-      setup_org_membership if newly_invited?
+      setup_org_membership
       notify_users if should_notify?
       assign_role_to_groups
       add_editors_as_comment_thread_followers
@@ -79,10 +79,14 @@ module Roles
     end
 
     def setup_org_membership
-      @users.each do |user|
-        # if it's an item, @object.organization delegates to the parent collection
-        @object.organization.setup_user_membership_and_collections(user)
-      end
+      # if it's an item, @object.organization delegates to the parent collection
+      organization_id = @object.organization&.id
+      return unless organization_id.present?
+
+      OrganizationMembershipWorker.perform_async(
+        @added_users.pluck(:id),
+        organization_id,
+      )
     end
 
     def assign_role_to_groups

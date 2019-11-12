@@ -49,6 +49,14 @@ RSpec.describe Roles::MassAssign, type: :service do
       expect(users.all? { |user| user.has_role?(:editor, object) }).to be true
     end
 
+    it 'sets up user membership on the object\'s organization' do
+      expect(OrganizationMembershipWorker).to receive(:perform_async).with(
+        users.pluck(:id),
+        object.organization_id,
+      )
+      assign_role.call
+    end
+
     it 'assigns role to groups' do
       expect(assign_role.call).to be true
       expect(groups.all? { |group| group.has_role?(:editor, object) }).to be true
@@ -239,7 +247,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         let!(:users) { [user] }
         let!(:groups) { [] }
         let!(:linked_collection) { create(:collection) }
-        let!(:object) { create(:group) }
+        let!(:object) { create(:group, organization: organization) }
         let!(:comment_thread) { create(:item_comment_thread) }
         let!(:groups_thread) { create(:groups_thread, group: object, comment_thread: comment_thread) }
         let(:thread_ids) { object.groups_threads.pluck(:comment_thread_id) }
