@@ -71,6 +71,14 @@ module TestResultsCollection
         idea: idea,
       )
 
+      TestCollection::CreateResponsesCollections(
+        test_results_collection: collection,
+        idea: idea,
+        survey_responses: test_collection.survey_responses,
+        test_audiences: test_collection.test_audiences,
+        created_by: created_by,
+      )
+
       return collection if collection.persisted?
 
       context.fail!(
@@ -79,7 +87,7 @@ module TestResultsCollection
     end
 
     def create_idea_collection
-      create_card(
+      collection = create_card(
         params: {
           collection_attributes: {
             name: idea.name,
@@ -91,6 +99,16 @@ module TestResultsCollection
         parent_collection: test_collection.test_results_collection,
         created_by: created_by,
       ).record
+
+      TestCollection::CreateResponsesCollections.call(
+        test_results_collection: collection,
+        idea: idea,
+        survey_responses: test_collection.survey_responses,
+        test_audiences: test_collection.test_audiences,
+        created_by: created_by,
+      )
+
+      collection
     end
 
     def update_test_collection_name

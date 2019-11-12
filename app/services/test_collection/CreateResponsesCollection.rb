@@ -1,5 +1,6 @@
 module TestCollection
   class CreateResultsCollections
+    include Interactor::Organizer
     include Interactor::Schema
 
     schema :test_collection,
