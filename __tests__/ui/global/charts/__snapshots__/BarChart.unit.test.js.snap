@@ -57,7 +57,9 @@ exports[`BarChart renders snapshot 1`] = `
   events={
     Array [
       Object {
+        "childName": "all",
         "eventHandlers": Object {
+          "onClick": [Function],
           "onMouseOut": [Function],
           "onMouseOver": [Function],
         },

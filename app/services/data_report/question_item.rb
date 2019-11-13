@@ -20,24 +20,26 @@ module DataReport
           value: 0,
           column: n,
           percentage: 0,
+          search_key: nil,
         }
       end
     end
 
     private
 
-    def search_key(answer_number: nil, question_choice: nil)
-      return if answer_number.blank? && question_choice.blank?
+    def search_key(answer_number: nil, question_choice_id: nil)
+      return if answer_number.blank? && question_choice_id.blank?
 
       answer_key = TestCollection::AnswerSearchKey.new(
         question: question_item,
+        question_type: question_type,
         answer_number: answer_number,
-        question_choice: question_choice,
+        question_choice_id: question_choice_id,
         audience_id: group_by_audience_id,
       )
       if group_by_organization_id.present?
         answer_key.for_organization(group_by_organization_id)
-      else
+      elsif test_collection.present?
         # TODO: need to be able to get the Idea ID
         idea_id = nil
         answer_key.for_test(test_collection.id, idea_id)
@@ -45,27 +47,46 @@ module DataReport
     end
 
     def question_choice_data
-      return self.class.base_data if question_item.blank?
-
-      if question_choices_customizable?
-        question_item.question_choices.each_with_index.map do |qc, i|
-          {
-            value: 0,
-            column: qc.text,
-            percentage: 0,
-            id: qc.id,
-            search_key: search_key(question_choice: qc),
-          }
+      if question_item.blank?
+        if question_type.present? && group_by_organization_id.present?
+          org_wide_question_choice_data
+        else
+          self.class.base_data
         end
+      elsif question_choices_customizable?
+        customizable_question_choice_data
       else
-        (1..4).map do |answer_number|
-          {
-            value: 0,
-            column: answer_number,
-            percentage: 0,
-            search_key: search_key(answer_number: answer_number),
-          }
-        end
+        scale_question_choice_data
+      end
+    end
+
+    def org_wide_question_choice_data
+      self.class.base_data.map do |d|
+        d[:search_key] = search_key(answer_number: d[:column])
+        d
+      end
+    end
+
+    def customizable_question_choice_data
+      question_item.question_choices.map do |question_choice|
+        {
+          value: 0,
+          column: question_choice.text,
+          percentage: 0,
+          id: question_choice.id,
+          search_key: search_key(question_choice_id: question_choice.id),
+        }
+      end
+    end
+
+    def scale_question_choice_data
+      (1..4).map do |answer_number|
+        {
+          value: 0,
+          column: answer_number,
+          percentage: 0,
+          search_key: search_key(answer_number: answer_number),
+        }
       end
     end
 
@@ -74,9 +95,7 @@ module DataReport
     end
 
     def question_type
-      return question_item.question_type if question_item.present?
-
-      @dataset.question_type
+      question_item&.question_type || @dataset.question_type
     end
 
     def question_choices_customizable?

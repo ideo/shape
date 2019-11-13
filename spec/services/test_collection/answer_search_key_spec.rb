@@ -7,9 +7,11 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
   let(:question_choice_id) { nil }
   let(:answer_number) { nil }
   let(:audience_id) { nil }
+  let(:question_type) { nil }
   subject do
     TestCollection::AnswerSearchKey.new(
       question: question,
+      question_type: question_type,
       question_choice_id: question_choice_id,
       answer_number: answer_number,
       audience_id: audience_id,
@@ -22,13 +24,13 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
 
     it 'returns question key' do
       expect(subject.for_test(test_id)).to eq(
-        "test_#{test_id}_question_#{question.id}_answer_2",
+        "test_answer(test_#{test_id}_question_#{question.id}_answer_2)",
       )
     end
 
     it 'returns org-wide key' do
       expect(subject.for_organization(org_id)).to eq(
-        "organization_#{org_id}_question_#{question.question_type}_answer_2",
+        "test_answer(organization_#{org_id}_#{question.question_type}_answer_2)",
       )
     end
 
@@ -37,7 +39,7 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
 
       it 'returns key with audience' do
         expect(subject.for_test(test_id)).to eq(
-          "test_#{test_id}_question_#{question.id}_answer_2_audience_18",
+          "test_answer(test_#{test_id}_question_#{question.id}_answer_2_audience_18)",
         )
       end
     end
@@ -45,7 +47,7 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
     context 'with idea' do
       it 'returns question key' do
         expect(subject.for_test(test_id, 5)).to eq(
-          "test_#{test_id}_idea_5_question_#{question.id}_answer_2",
+          "test_answer(test_#{test_id}_idea_5_question_#{question.id}_answer_2)",
         )
       end
     end
@@ -57,13 +59,13 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
 
     it 'returns question key' do
       expect(subject.for_test(test_id)).to eq(
-        "test_#{test_id}_question_#{question.id}_answer_#{question_choice_id}",
+        "test_answer(test_#{test_id}_question_#{question.id}_answer_#{question_choice_id})",
       )
     end
 
     it 'returns org-wide key' do
       expect(subject.for_organization(org_id)).to eq(
-        "organization_#{org_id}_question_#{question.question_type}_answer_#{question_choice_id}",
+        "test_answer(organization_#{org_id}_#{question.question_type}_answer_#{question_choice_id})",
       )
     end
 
@@ -72,7 +74,7 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
 
       it 'returns key with audience' do
         expect(subject.for_test(test_id)).to eq(
-          "test_#{test_id}_question_#{question.id}_answer_#{question_choice_id}_audience_18",
+          "test_answer(test_#{test_id}_question_#{question.id}_answer_#{question_choice_id}_audience_18)",
         )
       end
     end
@@ -80,9 +82,21 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
     context 'with idea' do
       it 'returns key' do
         expect(subject.for_test(test_id, 7)).to eq(
-          "test_#{test_id}_idea_7_question_#{question.id}_answer_#{question_choice_id}",
+          "test_answer(test_#{test_id}_idea_7_question_#{question.id}_answer_#{question_choice_id})",
         )
       end
+    end
+  end
+
+  context 'with empty question and question type' do
+    let!(:question) { nil }
+    let(:question_type) { :question_useful }
+    let(:answer_number) { 1 }
+
+    it 'returns org-wide key' do
+      expect(subject.for_organization(org_id)).to eq(
+        "test_answer(organization_#{org_id}_#{question_type}_answer_1)",
+      )
     end
   end
 end

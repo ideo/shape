@@ -1,8 +1,9 @@
 module TestCollection
   class AnswerSearchKey
 
-    def initialize(question:, question_choice_id: nil, answer_number: nil, audience_id: nil)
+    def initialize(question: nil, question_type: nil, question_choice_id: nil, answer_number: nil, audience_id: nil)
       @question = question
+      @question_type = question_type
       @question_choice_id = question_choice_id
       @answer_number = answer_number
       @audience_id = audience_id
@@ -14,23 +15,27 @@ module TestCollection
       str = "test_#{test_id}"
       str += "_idea_#{idea_id}" if idea_id.present?
 
-      "#{str}#{question_key}#{answer_key}#{audience_key}"
+      query("#{str}#{question_key}#{answer_key}#{audience_key}")
     end
 
     def for_organization(organization_id)
-      return if question_choice_and_answer_number_blank?
+      return if question_and_question_type_blank? && question_choice_and_answer_number_blank?
 
-      "organization_#{organization_id}#{org_wide_question_key}#{answer_key}#{audience_key}"
+      query("organization_#{organization_id}#{org_wide_question_key}#{answer_key}#{audience_key}")
     end
 
     private
 
+    def query(answer_key)
+      "test_answer(#{answer_key})"
+    end
+
     def org_wide_question_key
-      "_question_#{@question.question_type}"
+      "_#{@question&.question_type || @question_type}"
     end
 
     def answer_key
-      key = @question.question_choices_customizable? ? @question_choice_id : @answer_number
+      key = @question&.question_choices_customizable? ? @question_choice_id : @answer_number
       "_answer_#{key}"
     end
 
@@ -46,6 +51,10 @@ module TestCollection
 
     def question_choice_and_answer_number_blank?
       @question_choice_id.blank? && @answer_number.blank?
+    end
+
+    def question_and_question_type_blank?
+      @question.blank? && @question_type.blank?
     end
   end
 end

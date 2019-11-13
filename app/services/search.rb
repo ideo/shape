@@ -28,6 +28,7 @@ class Search
 
   def filters
     [
+      Filters::TestAnswer,
       Filters::Tag,
       Filters::WithinCollection,
       Filters::ActivityDateRange,

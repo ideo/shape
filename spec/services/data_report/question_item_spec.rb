@@ -7,10 +7,10 @@ RSpec.describe DataReport::QuestionItem, type: :service do
   context 'no responses' do
     let(:empty_dataset) do
       [
-        { column: 1, value: 0, percentage: 0 },
-        { column: 2, value: 0, percentage: 0 },
-        { column: 3, value: 0, percentage: 0 },
-        { column: 4, value: 0, percentage: 0 },
+        { column: 1, value: 0, percentage: 0, search_key: nil },
+        { column: 2, value: 0, percentage: 0, search_key: nil },
+        { column: 3, value: 0, percentage: 0, search_key: nil },
+        { column: 4, value: 0, percentage: 0, search_key: nil },
       ]
     end
     let(:question_item) { create(:question_item) }
@@ -18,7 +18,9 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
     describe '#call' do
       it 'returns datasets for question item' do
-        expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(empty_dataset)
+        expect(
+          DataReport::QuestionItem.call(dataset: dataset),
+        ).to match_array(empty_dataset)
       end
     end
   end
@@ -51,15 +53,23 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       let!(:dataset) do
         create(:question_dataset, data_source: question_item)
       end
+      let(:answer_search_key) do
+        proc do |answer_number|
+          TestCollection::AnswerSearchKey.new(
+            question: question_item,
+            answer_number: answer_number,
+          ).for_test(test_collection.id)
+        end
+      end
 
       describe '#call' do
         it 'returns data for question' do
           expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
             [
-              { column: 1, value: 1, percentage: 100 },
-              { column: 2, value: 0, percentage: 0 },
-              { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 },
+              { column: 1, value: 1, percentage: 100, search_key: answer_search_key.call(1) },
+              { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },
+              { column: 3, value: 0, percentage: 0, search_key: answer_search_key.call(3) },
+              { column: 4, value: 0, percentage: 0, search_key: answer_search_key.call(4) },
             ],
           )
         end
@@ -80,15 +90,23 @@ RSpec.describe DataReport::QuestionItem, type: :service do
                question_type: question_item.question_type,
                groupings: [{ type: 'Organization', id: organization.id }])
       end
+      let(:answer_search_key) do
+        proc do |answer_number|
+          TestCollection::AnswerSearchKey.new(
+            question_type: question_item.question_type,
+            answer_number: answer_number,
+          ).for_organization(organization.id)
+        end
+      end
 
       describe '#call' do
         it 'returns org-wide data' do
           expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
             [
-              { column: 1, value: 7, percentage: 100 },
-              { column: 2, value: 0, percentage: 0 },
-              { column: 3, value: 0, percentage: 0 },
-              { column: 4, value: 0, percentage: 0 },
+              { column: 1, value: 7, percentage: 100, search_key: answer_search_key.call(1) },
+              { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },
+              { column: 3, value: 0, percentage: 0, search_key: answer_search_key.call(3) },
+              { column: 4, value: 0, percentage: 0, search_key: answer_search_key.call(4) },
             ],
           )
         end
@@ -121,14 +139,23 @@ RSpec.describe DataReport::QuestionItem, type: :service do
                  question: question_item)
         end
       end
+      let(:answer_search_key) do
+        proc do |answer_number|
+          TestCollection::AnswerSearchKey.new(
+            question: question_item,
+            answer_number: answer_number,
+            audience_id: test_audience.id,
+          ).for_test(test_collection.id)
+        end
+      end
 
       it 'returns test audience data' do
         expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
           [
-            { column: 1, value: 1, percentage: 100 },
-            { column: 2, value: 0, percentage: 0 },
-            { column: 3, value: 0, percentage: 0 },
-            { column: 4, value: 0, percentage: 0 },
+            { column: 1, value: 1, percentage: 100, search_key: answer_search_key.call(1) },
+            { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },
+            { column: 3, value: 0, percentage: 0, search_key: answer_search_key.call(3) },
+            { column: 4, value: 0, percentage: 0, search_key: answer_search_key.call(4) },
           ],
         )
       end
