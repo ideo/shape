@@ -8,6 +8,7 @@ module TestResultsCollection
            :test_results_collection,
            :created_by,
            :idea,
+           :survey_response_id,
            :message
 
     require_in_context :test_collection

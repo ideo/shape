@@ -100,6 +100,14 @@ module DataReport
          @dataset.grouping['type'] == 'Organization'
         org_survey_answers
       elsif @dataset.grouping.present? &&
+            @dataset.grouping['type'] == 'SurveyResponse'
+        question_item.completed_survey_answers
+                     .where(
+                       SurveyResponse.arel_table[:id].eq(
+                         @dataset.grouping['id'],
+                       ),
+                     )
+      elsif @dataset.grouping.present? &&
             @dataset.grouping['type'] == 'TestAudience'
         question_item.completed_survey_answers
                      .where(

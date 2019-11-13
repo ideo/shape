@@ -17,7 +17,7 @@ module TestResultsCollection
              to: :context
 
     def call
-      create_alias_collection
+      collection = create_alias_collection
       link_to_test_audience
     end
 
@@ -31,7 +31,7 @@ module TestResultsCollection
     end
 
     def create_alias_collection
-      collection = create_card(
+      context.test_results_collection = create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
             name: "#{test_collection.name} - #{survey_response.respondent_alias}",
@@ -44,6 +44,17 @@ module TestResultsCollection
         parent_collection: responses_collection,
         created_by: created_by,
       ).record
+
+      TestResultsCollection::CreateContent.call!(
+        test_results_collection: test_results_collection,
+        created_by: created_by,
+        survey_response: survey_response,
+      )
+
+      # Create results collections for each idea
+      # idea_items.each do |idea|
+
+      # end
 
       return collection if collection.persisted?
 
@@ -77,5 +88,12 @@ module TestResultsCollection
 
       link_alias_collection(test_audience_collection_card.collection)
     end
+  end
+
+  # TODO share this with CreateResultsCollection
+  def idea_items
+    test_collection
+      .idea_items
+      .includes(:test_results_collection)
   end
 end

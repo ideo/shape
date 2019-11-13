@@ -9,6 +9,7 @@ module TestResultsCollection
            :order,
            :legend_item,
            :created_by,
+           :survey_response,
            :message
 
     require_in_context :item, :parent_collection
@@ -47,6 +48,10 @@ module TestResultsCollection
           test_audience, @card.record
         )
       end
+
+      if survey_response.present?
+        item.create_survey_response_dataset(survey_response, @card.record)
+      end
     end
 
     private
@@ -83,6 +88,8 @@ module TestResultsCollection
     end
 
     def test_audiences
+      return [survey_response.test_audience] if survey_response.present?
+
       item.parent.test_audiences
     end
   end

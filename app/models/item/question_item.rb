@@ -311,6 +311,20 @@ class Item
       )
     end
 
+    def create_survey_response_dataset(survey_response, data_item)
+      response_dataset = Dataset::Question.create(
+        groupings: [{ type: 'SurveyResponse', id: @survey_response.id }],
+        question_type: question_type,
+        chart_type: :bar,
+        data_source: self,
+        identifier: Dataset.identifier_for_object(@survey_response),
+      )
+      question.data_item.data_items_datasets.create(
+        dataset: response_dataset,
+        selected: true,
+      )
+    end
+
     def question_choices_customizable?
       question_single_choice? || question_multiple_choice?
     end

@@ -10,6 +10,7 @@ class SurveyResponseCompletion < SimpleService
     mark_as_completed!
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
+    create_alias_datasets
     create_alias_collection
     mark_response_as_payment_owed
     ping_results_collection
@@ -56,6 +57,23 @@ class SurveyResponseCompletion < SimpleService
       .where(where_status)
       .find_by(user: user, test_collection: @survey_response.test_collection)
       .present?
+  end
+
+  def create_alias_datasets
+    # alias_collection = CollectionCard.find_by(
+    #   identifier: CardIdentifier.call([test_results_collection, survey_response])
+    # )
+    test_collection = @survey_response.test_collection
+    all_responses = CollectionCard.find_by(
+      identifier: CardIdentifier.call([test_collection.test_results_collection], 'Responses'),
+    )
+    TestResultsCollection::CreateOrLinkAliasCollection.call(
+      test_collection: test_collection,
+      test_results_collection: all_responses,
+      survey_response: @survey_response,
+      responses_collection: all_responses,
+      created_by: user,
+    )
   end
 
   def create_alias_collection

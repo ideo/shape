@@ -30,6 +30,7 @@ module TestCollection
         )
       end
 
+      # TODO alias collections should remove test design
       move_test_design_to_end
     end
 

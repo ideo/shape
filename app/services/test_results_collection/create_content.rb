@@ -6,11 +6,12 @@ module TestResultsCollection
     schema :test_results_collection,
            :created_by,
            :idea,
+           :survey_response,
            :message
 
     require_in_context :test_results_collection
 
-    delegate :test_results_collection, :created_by, :idea,
+    delegate :test_results_collection, :created_by, :idea, :survey_response,
              to: :context
 
     delegate :ideas_collection, :test_show_media?, :collection_to_test_id,
@@ -65,7 +66,7 @@ module TestResultsCollection
     def remove_idea_media_link
       test_results_collection
         .link_collection_cards
-        .identifier('first-idea-media')
+        .where(identifier_type: 'first-idea-media')
         .first
         &.archive!
     end
@@ -81,7 +82,8 @@ module TestResultsCollection
           item: idea_item,
           width: 1,
           height: 2,
-          identifier: 'first-idea-media',
+          identifier_type: 'Item::QuestionItem',
+          identifier_id: idea_item.id,
           order: @order += 1,
         ),
       )
@@ -136,6 +138,7 @@ module TestResultsCollection
           item: card.item,
           order: @order += 1,
           legend_item: @legend_item,
+          survey_response: survey_response,
         ),
       )
       @legend_item ||= result.legend_item

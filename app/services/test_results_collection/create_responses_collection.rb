@@ -101,18 +101,6 @@ module TestResultsCollection
         )
         return
       end
-
-      link_all_aliases(test_audience, collection)
-    end
-
-    def link_all_aliases(test_audience, parent)
-      test_audience.survey_responses.each do |survey_response|
-        TestResultsCollection::CreateOrLinkAliasCollection.call(
-          survey_response: survey_response,
-          responses_collection: parent,
-          idea: idea,
-        )
-      end
     end
   end
 end
