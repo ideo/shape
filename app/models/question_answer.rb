@@ -106,12 +106,22 @@ class QuestionAnswer < ApplicationRecord
     "/#{survey_response.test_collection.organization.slug}/#{object.jsonapi_type_name}/#{object.id}"
   end
 
+  def alias_collection(test_results_collection)
+    CollectionCard.find_by(
+      identifier: CardIdentifier.call([test_results_collection, survey_response])
+    ).collection
+  end
+
   def quote_card_ops
     test_results_collection = survey_response.test_collection.test_results_collection
     idea = self.idea
     question = self.question
     audience = survey_response&.test_audience&.audience
     answer = self
+    alias_collection = alias_collection(test_results_collection)
+    audience_collection = CollectionCard.find_by(
+      identifier: CardIdentifier.call([test_results_collection, survey_response&.test_audience])
+    ).collection
     ops =
       [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
        {insert: "\n"},
@@ -120,7 +130,7 @@ class QuestionAnswer < ApplicationRecord
        {insert: "“#{answer.answer_text}”"},
        {insert: "\n", attributes: { header: 1}},
        {insert: "- "},
-       {insert: survey_response.respondent_alias, attributes: { link: quote_url(nil)}},
+       {insert: survey_response.respondent_alias, attributes: { link: quote_url(alias_collection)}},
       ]
     if idea.present?
       ops.insert(1, {insert: " | "})
@@ -128,7 +138,7 @@ class QuestionAnswer < ApplicationRecord
     end
     if audience.present? && audience.global_default.nil?
       ops.push({insert: ", "})
-      ops.push({insert: audience.name, attributes: {link: quote_url(nil)}})
+      ops.push({insert: audience.name, attributes: {link: quote_url(audience_collection)}})
 
     end
     {ops: ops.map(&:stringify_keys) }
