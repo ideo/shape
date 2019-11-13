@@ -15,11 +15,11 @@ module DataReport
     end
 
     def self.base_data
-      (1..4).map do |n|
+      Item::QuestionItem.scale_answer_numbers.map do |n|
         {
           value: 0,
           column: n,
-          percentage: 0
+          percentage: 0,
         }
       end
     end
@@ -29,13 +29,11 @@ module DataReport
     def search_key(answer_number: nil, question_choice: nil)
       return if answer_number.blank? && question_choice.blank?
 
-      answer = QuestionAnswer.new(
+      answer_key = TestCollection::AnswerSearchKey.new(
         question: question_item,
         answer_number: answer_number,
-        question_choice: question_choice
-      )
-      answer_key = TestCollection::AnswerSearchKey.new(
-        answer, group_by_audience_id
+        question_choice: question_choice,
+        audience_id: group_by_audience_id,
       )
       if group_by_organization_id.present?
         answer_key.for_organization(group_by_organization_id)

@@ -33,6 +33,8 @@ class QuestionAnswer < ApplicationRecord
              inverse_of: :question_answer,
              optional: true
 
+  delegate :question_choices_customizable?, to: :question
+
   delegate :completed?, to: :survey_response, prefix: true
 
   validates :answer_number, presence: true, if: :answer_number_required?

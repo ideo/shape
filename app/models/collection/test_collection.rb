@@ -544,7 +544,7 @@ class Collection
     private
 
     def question_items_from_sections(section_names)
-      question_items.joins(:primary_collection_card).where(
+      question_items.joins(:parent_collection_card).where(
         CollectionCard.arel_table[:section_type].in(
           section_names.map do |section_name|
             CollectionCard.section_types[section_name]

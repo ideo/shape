@@ -1,43 +1,51 @@
 module TestCollection
   class AnswerSearchKey
-    delegate :question, to: :@answer
 
-    def initialize(answer, audience_id = nil)
-      @answer = answer
+    def initialize(question:, question_choice_id: nil, answer_number: nil, audience_id: nil)
+      @question = question
+      @question_choice_id = question_choice_id
+      @answer_number = answer_number
       @audience_id = audience_id
     end
 
     def for_test(test_id, idea_id = nil)
-      return if @answer.blank?
+      return if question_choice_and_answer_number_blank?
 
       str = "test_#{test_id}"
       str += "_idea_#{idea_id}" if idea_id.present?
 
-      "#{str}#{question_key}#{audience_key}"
+      "#{str}#{question_key}#{answer_key}#{audience_key}"
     end
 
     def for_organization(organization_id)
-      return if @answer.blank?
+      return if question_choice_and_answer_number_blank?
 
-      "organization_#{organization_id}_#{org_wide_question_key}#{audience_key}"
+      "organization_#{organization_id}#{org_wide_question_key}#{answer_key}#{audience_key}"
     end
 
     private
 
     def org_wide_question_key
-      answer_num = question.question_choices_customizable? ? @answer.question_choice_id : @answer.answer_number
-      "_question_#{question.question_type}_answer_#{answer_num}"
+      "_question_#{@question.question_type}"
+    end
+
+    def answer_key
+      key = @question.question_choices_customizable? ? @question_choice_id : @answer_number
+      "_answer_#{key}"
     end
 
     def question_key
-      answer_num = question.question_choices_customizable? ? @answer.id : @answer.answer_number
-      "_question_#{question.id}_answer_#{answer_num}"
+      "_question_#{@question.id}"
     end
 
     def audience_key
       return if @audience_id.blank?
 
       "_audience_#{@audience_id}"
+    end
+
+    def question_choice_and_answer_number_blank?
+      @question_choice_id.blank? && @answer_number.blank?
     end
   end
 end

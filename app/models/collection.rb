@@ -268,8 +268,8 @@ class Collection < ApplicationRecord
   end
 
   def search_test_keys
-    return {} unless respondent_collection?
-
+    return {}
+    # return {} unless survey_response_id.present?
     {
       test_keys: TestCollection::ResponseSearchKeys.call(survey_response),
     }

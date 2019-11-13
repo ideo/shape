@@ -90,6 +90,11 @@ class Item
         question_type: question_type_categories[:scaled_rating],
       )
     }
+    scope :graphable_questions, -> {
+      where(
+        question_type: question_type_categories[:scaled_rating] + %i[question_single_choice question_multiple_choice],
+      )
+    }
 
     enum question_type: {
       question_context: 0,
@@ -140,6 +145,10 @@ class Item
         question_finish
         question_idea
       ]
+    end
+
+    def self.scale_answer_numbers
+      (1..4).to_a
     end
 
     def self.question_title_and_description(question_type = nil)
