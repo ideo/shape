@@ -15,6 +15,7 @@ module TestResultsCollection
     require_in_context :item, :parent_collection
 
     delegate :parent_collection, :item, :legend_item, :created_by, :order,
+             :survey_response,
              to: :context
 
     delegate :question_dataset, :org_wide_question_dataset,
@@ -50,7 +51,7 @@ module TestResultsCollection
       end
 
       if survey_response.present?
-        item.create_survey_response_dataset(survey_response, @card.record)
+        # item.create_survey_response_dataset(survey_response, @card.record)
       end
     end
 

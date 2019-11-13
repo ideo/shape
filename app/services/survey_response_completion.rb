@@ -10,7 +10,6 @@ class SurveyResponseCompletion < SimpleService
     mark_as_completed!
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
-    create_alias_datasets
     create_alias_collection
     mark_response_as_payment_owed
     ping_results_collection

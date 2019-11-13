@@ -2,6 +2,7 @@ module TestResultsCollection
   class CreateContent
     include Interactor
     include Interactor::Schema
+    include CollectionCardBuilderHelpers
 
     schema :test_results_collection,
            :created_by,
@@ -29,6 +30,8 @@ module TestResultsCollection
         remove_idea_media_link
       end
 
+      create_alias_open_response_collection if survey_response.present?
+
       collection_cards.each do |card|
         if card.item.present?
           create_content_for_item_card(card)
@@ -44,7 +47,7 @@ module TestResultsCollection
       item = card.item
       if item.graphable_question?
         create_response_graph(card)
-      elsif item.question_open?
+      elsif item.question_open? && survey_response.blank?
         create_open_response_collection(card)
       elsif item.question_media? || !item.is_a?(Item::QuestionItem)
         create_media_item_link(card)
@@ -123,10 +126,24 @@ module TestResultsCollection
       @order = result.order
     end
 
+    def create_alias_open_response_collection
+      create_card(
+        params: {
+          identifier: CardIdentifier.call([test_results_collection], 'Responses'),
+          order: @order += 1,
+          collection_attributes: {
+            name:"#{survey_response.respondent_alias} Responses",
+          },
+        },
+        parent_collection: test_results_collection,
+        created_by: created_by,
+      )
+    end
+
     def create_open_response_collection(card)
       TestResultsCollection::CreateOpenResponseCollection.call!(
         default_attrs.merge(
-          item: card.item,
+          question_item: card.item,
           order: @order += 1,
         ),
       )

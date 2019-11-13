@@ -18,6 +18,7 @@ module TestResultsCollection
 
     def call
       collection = create_alias_collection
+      create_and_link_open_responses
       link_to_test_audience
     end
 
@@ -50,17 +51,6 @@ module TestResultsCollection
         created_by: created_by,
         survey_response: survey_response,
       )
-
-      # Create results collections for each idea
-      # idea_items.each do |idea|
-
-      # end
-
-      return collection if collection.persisted?
-
-      context.fail!(
-        message: collection.errors.full_messages.to_sentence,
-      )
     end
 
     def link_alias_collection(parent)
@@ -88,12 +78,16 @@ module TestResultsCollection
 
       link_alias_collection(test_audience_collection_card.collection)
     end
-  end
 
-  # TODO share this with CreateResultsCollection
-  def idea_items
-    test_collection
-      .idea_items
-      .includes(:test_results_collection)
+    def create_and_link_open_responses
+      survey_response.question_answers.each do |question_answer|
+        next unless question_answer.question.question_open?
+        TestResultsCollection::CreateAndLinkOpenResponse.call(
+          test_collection: test_collection,
+          alias_test_results_collection: test_results_collection,
+          question_answer: question_answer,
+        )
+      end
+    end
   end
 end

@@ -39,9 +39,32 @@ class QuestionAnswer < ApplicationRecord
 
   after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
-  before_save :create_open_response_item, if: :create_open_response_item?
   after_update :update_open_response_item, if: :update_open_response_item?
   before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
+
+  def create_open_response_item(parent)
+    # Create the open response item on the Test Responses collection
+    ops = quote_card_ops
+    card_params = {
+      width: 2,
+      item_attributes: {
+        type: 'Item::TextItem',
+        content: answer_text,
+        data_content: ops,
+      },
+    }
+    builder = CollectionCardBuilder.new(
+      params: card_params,
+      parent_collection: parent,
+      user: question.test_open_responses_collection.created_by,
+    )
+    if builder.create
+      self.open_response_item = builder.collection_card.record
+    else
+      errors.add(:open_response_item, builder.errors.full_messages.join('. '))
+      throw :abort
+    end
+  end
 
   private
 
@@ -107,30 +130,6 @@ class QuestionAnswer < ApplicationRecord
 
     end
     {ops: ops.map(&:stringify_keys) }
-  end
-
-  def create_open_response_item
-    # Create the open response item on the Test Responses collection
-    ops = quote_card_ops
-    card_params = {
-      width: 2,
-      item_attributes: {
-        type: 'Item::TextItem',
-        content: answer_text,
-        data_content: ops,
-      },
-    }
-    builder = CollectionCardBuilder.new(
-      params: card_params,
-      parent_collection: question.test_open_responses_collection,
-      user: question.test_open_responses_collection.created_by,
-    )
-    if builder.create
-      self.open_response_item = builder.collection_card.record
-    else
-      errors.add(:open_response_item, builder.errors.full_messages.join('. '))
-      throw :abort
-    end
   end
 
   def destroy_open_response_item_and_card
