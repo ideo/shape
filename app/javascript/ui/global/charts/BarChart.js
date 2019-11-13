@@ -17,7 +17,7 @@ const formatValues = (values, datasetOrder) => {
   }))
 }
 
-const BarChart = ({ dataset, cardArea, barsInGroup }) => {
+const BarChart = ({ dataset, cardArea, barsInGroup, routeToSearch }) => {
   const values = formatValues(dataset.data, dataset.order)
   const { total, max_domain } = dataset
   const domain = chartDomainForDatasetValues({
@@ -57,6 +57,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
       key={`dataset-${dataset.order}`}
       events={[
         {
+          childName: 'all',
           target: 'data',
           eventHandlers: {
             onMouseOver: () => [
@@ -73,6 +74,12 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
                 mutation: props => null,
               },
             ],
+            onClick: (_data, el) => {
+              const searchKey = el.datum.search_key
+              if (searchKey) {
+                routeToSearch(searchKey)
+              }
+            },
           },
         },
       ]}
@@ -82,6 +89,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup }) => {
 
 BarChart.propTypes = {
   dataset: datasetPropType.isRequired,
+  routeToSearch: PropTypes.func.isRequired,
   cardArea: PropTypes.number,
   barsInGroup: PropTypes.number,
 }

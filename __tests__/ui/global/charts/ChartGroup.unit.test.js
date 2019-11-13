@@ -1,6 +1,7 @@
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import {
   fakeDataItem,
   fakeAreaChartDataset,
@@ -27,7 +28,11 @@ describe('ChartGroup', () => {
     dataItem.secondaryDatasets.mockReturnValue([dataItem.datasets[1]])
     props.dataItem = dataItem
     props.simpleDateTooltip = true
-    render = () => (wrapper = shallow(<ChartGroup {...props} />))
+    props.width = 1
+    props.height = 1
+    props.routingStore = fakeRoutingStore
+    render = () =>
+      (wrapper = shallow(<ChartGroup.wrappedComponent {...props} />))
     render()
   })
 
@@ -123,6 +128,18 @@ describe('ChartGroup', () => {
       expect(axis.props().tickValues).toEqual([1, 2, 3, 4])
       expect(axis.props().tickLabelComponent.props.emojiScale).toEqual(
         emojiSeriesForQuestionType(fakeBarChartDataset.question_type)
+      )
+    })
+  })
+
+  describe('routeToSearch', () => {
+    it('calls routingStore', () => {
+      wrapper
+        .instance()
+        .routeToSearch('test_answer(test_3_question_excitement_answer_3)')
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith(
+        'search',
+        'test_answer(test_3_question_excitement_answer_3)'
       )
     })
   })

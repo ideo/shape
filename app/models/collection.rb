@@ -265,6 +265,14 @@ class Collection < ApplicationRecord
       updated_at: updated_at,
       archived: archived,
       master_template: master_template,
+    }.merge(search_test_answers)
+  end
+
+  def search_test_answers
+    return {}
+    # return {} unless survey_response_id.present?
+    {
+      test_answer: TestCollection::ResponseSearchKeys.call(survey_response),
     }
   end
 

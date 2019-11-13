@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   LineSegment,
@@ -59,6 +59,7 @@ const ChartContainer = styled.div`
   right: 0;
 `
 
+@inject('routingStore')
 @observer
 class ChartGroup extends React.Component {
   get primaryDataset() {
@@ -119,6 +120,11 @@ class ChartGroup extends React.Component {
   }
 
   fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
+
+  routeToSearch = searchText => {
+    const { routingStore } = this.props
+    routingStore.routeTo('search', searchText)
+  }
 
   get totalBarsPerGroup() {
     return this.secondaryDatasetsWithData.length + 1
@@ -339,6 +345,7 @@ class ChartGroup extends React.Component {
           dataset,
           cardArea: width * height,
           barsInGroup: total,
+          routeToSearch: this.routeToSearch,
         })
       default:
         return AreaChart({
@@ -429,6 +436,10 @@ ChartGroup.defaultProps = {
   simpleDateTooltip: false,
   width: 1,
   height: 1,
+}
+
+ChartGroup.wrappedComponent.propTypes = {
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default ChartGroup
