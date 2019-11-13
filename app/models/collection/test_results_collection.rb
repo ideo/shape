@@ -92,7 +92,7 @@ class Collection
              to: :test_collection,
              allow_nil: true
 
-    scope :master_results, -> { where(idea_id: nil) }
+    scope :master_results, -> { where(idea_id: nil, survey_response_id: nil) }
     scope :idea_results, -> { where.not(idea_id: nil) }
 
     # TODO: revisit what should happen when you archive results or the test

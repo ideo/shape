@@ -20,9 +20,6 @@ module TestCollection
         test_collection: test_collection,
         created_by: created_by,
       )
-      TestResultsCollection::CreateResponsesCollection.call(
-        test_collection_results_collection: test_results_collection,
-      )
 
       # Create results collections for each idea
       idea_items.each do |idea|

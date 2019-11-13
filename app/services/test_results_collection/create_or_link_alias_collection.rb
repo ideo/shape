@@ -8,8 +8,7 @@ module TestResultsCollection
            :test_results_collection,
            :survey_response,
            :responses_collection,
-           :created_by,
-           :idea
+           :created_by
 
     require_in_context :responses_collection
 
@@ -17,13 +16,9 @@ module TestResultsCollection
              :survey_response, :responses_collection,
              to: :context
 
-    delegate :idea,
-             to: :context,
-             allow_nil: true
-
     def call
       create_alias_collection
-      # link_to_test_audience
+      link_to_test_audience
     end
 
     private
@@ -71,13 +66,16 @@ module TestResultsCollection
     end
 
     def link_to_test_audience
-      test_audience_collection = CollectionCard.where(
+      test_audience_collection_card = CollectionCard.find_by(
         identifier: CardIdentifier.call(
           [test_results_collection, survey_response.test_audience],
         ),
-      ).record
+      )
+      if test_audience_collection_card.blank?
+        context.fail!(message: 'Missing audience card')
+      end
 
-      link_alias_collection(test_audience_collection)
+      link_alias_collection(test_audience_collection_card.collection)
     end
   end
 end

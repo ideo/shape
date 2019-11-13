@@ -575,6 +575,8 @@ class Collection
     def create_results_collections!(initiated_by = nil)
       result = ::TestCollection::CreateResultsCollections.call(
         test_collection: self,
+        test_results_collection: test_results_collection,
+        test_audiences: test_audiences,
         created_by: initiated_by || created_by,
       )
 

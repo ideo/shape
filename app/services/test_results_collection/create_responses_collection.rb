@@ -25,8 +25,11 @@ module TestResultsCollection
     def call
       context.all_responses_collection = create_or_link_all_responses_collection
 
-      test_audiences.each do |test_audience|
-        create_audience_collection(test_audience)
+      # Don't create duplicate audience collections for ideas
+      if idea.blank?
+        test_audiences.each do |test_audience|
+          create_audience_collection(test_audience)
+        end
       end
 
       survey_responses.each do |survey_response|
@@ -69,7 +72,7 @@ module TestResultsCollection
           ),
           identifier: CardIdentifier.call([test_results_collection], 'Responses'),
         },
-        parent_collection: test_collection.test_results_collection,
+        parent_collection: test_results_collection,
         created_by: created_by,
       ).record
 
