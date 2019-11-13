@@ -60,6 +60,17 @@ describe('PageHeader', () => {
       })
     })
 
+    describe('for a publicly joinable collection', () => {
+      beforeEach(() => {
+        props.record = fakeCollection
+        props.record.isPublicJoinable = true
+        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      })
+      it('should render the JoinCollectionButton', () => {
+        expect(wrapper.find('FormButton').html()).toContain('Join')
+      })
+    })
+
     describe('for a normal collection', () => {
       it('passes canEdit through to EditableName', () => {
         expect(wrapper.find('EditableName').props().canEdit).toEqual(
@@ -135,10 +146,6 @@ describe('PageHeader', () => {
 
     it('should not show the template icon', () => {
       expect(wrapper.find('TemplateIcon').exists()).toBeFalsy()
-    })
-
-    it('should not show the Use Template button', () => {
-      expect(wrapper.find('FormButton').length).toBe(0)
     })
   })
 

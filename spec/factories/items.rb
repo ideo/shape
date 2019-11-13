@@ -74,6 +74,10 @@ FactoryBot.define do
 
     factory :legend_item, class: 'Item::LegendItem'
 
+    factory :private_item, class: 'Item::TextItem' do
+      after(:create, &:mark_as_private!)
+    end
+
     after(:build) do |item, evaluator|
       if evaluator.parent_collection
         item.parent_collection_card = build(

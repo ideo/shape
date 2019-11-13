@@ -11,7 +11,6 @@ import v from '~/utils/variables'
 const StyledAvatar = styled(MuiAvatar)`
   &.avatar {
     width: ${props => props.size}px;
-    margin-left: 5px;
     margin-right: 5px;
     height: ${props => props.size}px;
     cursor: ${props => props.cursor};

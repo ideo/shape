@@ -15,6 +15,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         end
       end
 
+      context 'with a normal publicly shared collection' do
+        let(:collection) { create(:collection, anyone_can_view: true) }
+        it 'returns a 200' do
+          get(path)
+          expect(response.status).to eq(200)
+        end
+      end
+
       context 'with an anyone_can_view collection' do
         let(:collection) { create(:collection, anyone_can_view: true) }
         it 'returns a 200' do

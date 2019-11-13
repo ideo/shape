@@ -227,4 +227,19 @@ RSpec.describe Item, type: :model do
       end
     end
   end
+
+  describe 'public items' do
+    context 'with a public parent collection' do
+      let(:collection) { create(:collection, anyone_can_view: true) }
+      let(:item) {
+        create(
+          :text_item,
+          parent_collection: collection,
+        )
+      }
+      it 'item is viewable by anyone if collection can be viewed by anyone' do
+        expect(item.anyone_can_view).to be(true)
+      end
+    end
+  end
 end

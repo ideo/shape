@@ -47,10 +47,12 @@ class ItemPage extends React.Component {
       uiStore.setViewingRecord(item)
       if (item.parent)
         apiStore.checkCurrentOrg({ id: item.parent.organization_id })
-      const thread = await apiStore.findOrBuildCommentThread(item)
-      uiStore.expandThread(thread.key)
-      if (routingStore.query) {
-        uiStore.openOptionalMenus(routingStore.query)
+      if (apiStore.currentUser) {
+        const thread = await apiStore.findOrBuildCommentThread(item)
+        uiStore.expandThread(thread.key)
+        if (routingStore.query) {
+          uiStore.openOptionalMenus(routingStore.query)
+        }
       }
     })
   }

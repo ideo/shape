@@ -110,6 +110,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def restore_permissions
     Roles::MergeToChild.call(parent: @collection.parent, child: @collection)
     @collection.unmark_as_private!
+    @collection.update(anyone_can_view: @collection.parent.anyone_can_view)
+    if @collection.parent.anyone_can_view?
+      Sharing::PropagateAnyoneCanView.call(collection: @collection)
+    end
     render_collection
     # no error case needed... ?
   end

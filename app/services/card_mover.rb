@@ -131,6 +131,11 @@ class CardMover
         else
           card.assign_attributes(pinned: false)
         end
+        if @to_collection.anyone_can_view? && card.primary? && card.collection.present?
+          collection = card.collection
+          collection.update(anyone_can_view: true)
+          Sharing::PropagateAnyoneCanView.call(collection: collection)
+        end
       end
 
       if card.changed?

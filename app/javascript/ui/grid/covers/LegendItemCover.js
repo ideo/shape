@@ -245,6 +245,9 @@ class LegendItemCover extends React.Component {
 
   searchTestCollections = (term, callback) => {
     const { item, apiStore } = this.props
+    if (!apiStore.currentUser) {
+      return
+    }
     if (!term) {
       callback()
       return
@@ -390,7 +393,7 @@ class LegendItemCover extends React.Component {
         <br />
         <StyledAddComparison>
           {comparisonMenuOpen && this.renderComparisonMenu}
-          {!comparisonMenuOpen && (
+          {item.can_edit_content && !comparisonMenuOpen && (
             <Heading3
               onClick={this.toggleComparisonSearch}
               role="button"
