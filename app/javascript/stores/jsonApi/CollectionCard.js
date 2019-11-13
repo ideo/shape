@@ -221,7 +221,7 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  reselectOnlyEditableCards(cardIds) {
+  reselectOnlyEditableCards(cardIds = this.uiStore.selectedCardIds) {
     const { uiStore } = this
     const filteredCardIds = this.apiStore
       .findAll('collection_cards')
@@ -236,7 +236,7 @@ class CollectionCard extends BaseRecord {
   // Don't show if empty collection, or just link card / item card(s)
   get shouldShowArchiveWarning() {
     return _.some(
-      this.selectedCards,
+      this.apiStore.selectedCards,
       card =>
         // look for any records you can't edit, that way this will trigger reselectOnlyEditableCards()
         !card.record.can_edit ||
@@ -245,13 +245,6 @@ class CollectionCard extends BaseRecord {
           card.record.className === 'Collection' &&
           card.record.collection_card_count > 0)
     )
-  }
-
-  get selectedCards() {
-    const { selectedCardIds } = this.uiStore
-    return this.apiStore
-      .findAll('collection_cards')
-      .filter(card => selectedCardIds.indexOf(card.id) > -1)
   }
 
   get isSelected() {

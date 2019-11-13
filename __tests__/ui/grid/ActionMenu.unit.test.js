@@ -34,6 +34,8 @@ describe('ActionMenu', () => {
       ]
       actions = _.without(allActions, 'Replace')
       props.card.isPinnedAndLocked = false
+      props.card.record.can_edit = true
+      props.card.reselectOnlyEditableCards = jest.fn()
       wrapper = shallow(<ActionMenu.wrappedComponent {...props} canEdit />)
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
@@ -99,6 +101,15 @@ describe('ActionMenu', () => {
         from: props.uiStore.viewingCollection,
         cardAction: 'link',
       })
+    })
+
+    it('calls reselectOnlyEditableCards on showTags action', () => {
+      component.showTags()
+      expect(props.card.reselectOnlyEditableCards).toHaveBeenCalled()
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'tagsModalOpenId',
+        props.card.id
+      )
     })
   })
 
