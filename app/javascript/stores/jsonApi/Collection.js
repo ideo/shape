@@ -364,6 +364,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return undefined
   }
 
+  get isCarousel() {
+    return this.cover_type === 'cover_type_carousel'
+  }
+
   @computed
   get launchableTestStatus() {
     if (this.isTestCollectionOrResults) {

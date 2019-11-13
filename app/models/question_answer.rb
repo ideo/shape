@@ -26,7 +26,6 @@ class QuestionAnswer < ApplicationRecord
   belongs_to :survey_response, touch: true
   # class_name is generic Item because the ideas might be FileItem, LinkItem, etc.
   belongs_to :idea, class_name: 'Item', optional: true
-
   belongs_to :question, class_name: 'Item::QuestionItem'
   belongs_to :open_response_item,
              class_name: 'Item::TextItem',
@@ -66,7 +65,8 @@ class QuestionAnswer < ApplicationRecord
     return destroy_open_response_item_and_card if answer_text.blank?
 
     item.content = answer_text
-    item.import_plaintext_content(answer_text)
+    ops = quote_card_ops
+    item.data_content = ops
     item.save
   end
 
@@ -76,13 +76,48 @@ class QuestionAnswer < ApplicationRecord
     question.test_open_responses_collection.present? && open_response_item.blank?
   end
 
+  def quote_url(object)
+    return "/link" if object.blank?
+    "/#{survey_response.test_collection.organization.slug}/#{object.jsonapi_type_name}/#{object.id}"
+  end
+
+  def quote_card_ops
+    test_results_collection = survey_response.test_collection.test_results_collection
+    idea = self.idea
+    question = self.question
+    audience = survey_response&.test_audience&.audience
+    answer = self
+    ops =
+      [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
+       {insert: "\n"},
+       {insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection)}},
+       {insert: "\n", attributes: { header: 2}},
+       {insert: "“#{answer.answer_text}”"},
+       {insert: "\n", attributes: { header: 1}},
+       {insert: "- "},
+       {insert: survey_response.respondent_alias, attributes: { link: quote_url(nil)}},
+      ]
+    if idea.present?
+      ops.insert(1, {insert: " | "})
+      ops.insert(2, {insert: idea.name, attributes: { link: quote_url(idea)}})
+    end
+    if audience.present? && audience.global_default.nil?
+      ops.push({insert: ", "})
+      ops.push({insert: audience.name, attributes: {link: quote_url(nil)}})
+
+    end
+    {ops: ops.map(&:stringify_keys) }
+  end
+
   def create_open_response_item
     # Create the open response item on the Test Responses collection
+    ops = quote_card_ops
     card_params = {
+      width: 2,
       item_attributes: {
         type: 'Item::TextItem',
         content: answer_text,
-        data_content: QuillContentConverter.new(answer_text).text_to_quill_ops,
+        data_content: ops,
       },
     }
     builder = CollectionCardBuilder.new(

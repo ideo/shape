@@ -1,6 +1,6 @@
 import CollectionCover from '~/ui/grid/covers/CollectionCover'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeTextItem } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const props = {
@@ -70,6 +70,18 @@ describe('CollectionCover', () => {
 
   it('does not show the cover button', () => {
     expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
+  })
+
+  describe('with a carousel collection with items', () => {
+    beforeEach(() => {
+      props.collection.isCarousel = true
+      props.collection.collection_cover_items = [fakeTextItem]
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+    })
+
+    it('should render the CarouselCover', () => {
+      expect(wrapper.find('CarouselCover').exists()).toBe(true)
+    })
   })
 
   describe('with a launchable submission test', () => {
