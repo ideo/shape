@@ -53,7 +53,16 @@ class GoogleAuthService
       # TODO: look into "claims" which will allow us to add group roles...
       # that way we can store group + user ids on objects for acccess
     }
-    JWT.encode payload, private_key, 'RS256'
+    token = JWT.encode payload, private_key, 'RS256'
+  end
+
+  def self.validate_token(token)
+    decoded_token = Mashie.new(JWT.decode(token, nil, false).first)
+    # check if JWT is not expired
+    token_exp = decoded_token&.exp
+    return false if !token_exp || token_exp < Time.now.to_i
+
+    true
   end
 
   def self.google_cloud_credentials

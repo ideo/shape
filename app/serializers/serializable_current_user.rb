@@ -9,7 +9,14 @@ class SerializableCurrentUser < SerializableUser
 
   attribute :google_auth_token do
     # generate user login token for firebase
-    GoogleAuthService.create_custom_token(@object.id)
+    token = GoogleAuthService.create_custom_token(@object.id)
+    token_valid = GoogleAuthService.validate_token(token)
+    # retry until token is valid
+    until token_valid
+      token = GoogleAuthService.create_custom_token(@object.id)
+      token_valid = GoogleAuthService.validate_token(token)
+    end
+    token
   end
 
   attribute :current_user_collection_id do
