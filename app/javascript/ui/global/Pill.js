@@ -94,7 +94,7 @@ const Pill = props => {
 }
 
 Pill.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   symbol: PropTypes.node,
   symbolSize: PropTypes.number,
   onDelete: PropTypes.func,
@@ -107,6 +107,7 @@ Pill.propTypes = {
 }
 
 Pill.defaultProps = {
+  label: '',
   symbol: null,
   symbolSize: 16,
   onDelete: null,
