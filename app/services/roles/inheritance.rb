@@ -32,9 +32,9 @@ module Roles
       # special case, fix any messed up records
       child.reanchor_if_incorrect_anchor!(parent: @parent)
 
-      if child.same_roles_anchor? @parent
-        child.unmark_as_private! if cached.blank?
-        return false unless cached&.private
+      if child.same_roles_anchor?(@parent) && !cached&.private
+        child.unmark_as_private!
+        return false
       end
 
       # otherwise we only compute cached_inheritance if not already set.
