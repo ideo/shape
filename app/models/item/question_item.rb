@@ -90,6 +90,11 @@ class Item
         question_type: question_type_categories[:scaled_rating],
       )
     }
+    scope :graphable_questions, -> {
+      where(
+        question_type: question_type_categories[:scaled_rating] + %i[question_single_choice question_multiple_choice],
+      )
+    }
 
     enum question_type: {
       question_context: 0,
@@ -140,6 +145,10 @@ class Item
         question_finish
         question_idea
       ]
+    end
+
+    def self.scale_answer_numbers
+      (1..4).to_a
     end
 
     def self.question_title_and_description(question_type = nil)
@@ -239,39 +248,6 @@ class Item
       return 0 if total.zero?
 
       (points * 100.0 / total).round
-    end
-
-    def find_or_create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
-      return if test_data_item.present?
-
-      legend_item ||= parent_collection.legend_item
-
-      builder = CollectionCardBuilder.new(
-        params: {
-          order: parent_collection_card.order,
-          height: 2,
-          width: 2,
-          item_attributes: {
-            type: 'Item::DataItem',
-            report_type: :report_type_question_item,
-            legend_item_id: legend_item&.id,
-          },
-        },
-        parent_collection: parent_collection,
-        user: initiated_by,
-      )
-      builder.create
-      if builder.collection_card.persisted?
-        data_item = builder.collection_card.record
-        question_dataset.data_items_datasets.create(
-          data_item: data_item,
-        )
-        data_item.data_items_datasets.create(
-          dataset: org_wide_question_dataset,
-        )
-      end
-
-      builder.collection_card
     end
 
     def org_wide_question_dataset

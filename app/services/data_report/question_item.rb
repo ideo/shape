@@ -1,6 +1,6 @@
 module DataReport
   class QuestionItem < SimpleService
-    delegate :test_collection, to: :@dataset
+    delegate :test_collection, :groupings, to: :@dataset
 
     def initialize(dataset:)
       @dataset = dataset
@@ -15,23 +15,78 @@ module DataReport
     end
 
     def self.base_data
-      (1..4).map do |n|
-        { value: 0, column: n, percentage: 0 }
+      Item::QuestionItem.scale_answer_numbers.map do |n|
+        {
+          value: 0,
+          column: n,
+          percentage: 0,
+          search_key: nil,
+        }
       end
     end
 
     private
 
+    def search_key(answer_number: nil, question_choice_id: nil)
+      return if answer_number.blank? && question_choice_id.blank?
+
+      answer_key = TestCollection::AnswerSearchKey.new(
+        question: question_item,
+        question_type: question_type,
+        answer_number: answer_number,
+        question_choice_id: question_choice_id,
+        audience_id: group_by_audience_id,
+      )
+      if group_by_organization_id.present?
+        answer_key.for_organization(group_by_organization_id)
+      elsif test_collection.present?
+        # TODO: need to be able to get the Idea ID
+        idea_id = nil
+        answer_key.for_test(test_collection.id, idea_id)
+      end
+    end
+
     def question_choice_data
-      return self.class.base_data if question_item.blank?
-      if question_choices_customizable?
-        question_item.question_choices.each_with_index.map do |qc, i|
-          { value: 0, column: qc.text, percentage: 0, id: qc.id }
+      if question_item.blank?
+        if question_type.present? && group_by_organization_id.present?
+          org_wide_question_choice_data
+        else
+          self.class.base_data
         end
+      elsif question_choices_customizable?
+        customizable_question_choice_data
       else
-        (1..4).map do |n|
-          { value: 0, column: n, percentage: 0 }
-        end
+        scale_question_choice_data
+      end
+    end
+
+    def org_wide_question_choice_data
+      self.class.base_data.map do |d|
+        d[:search_key] = search_key(answer_number: d[:column])
+        d
+      end
+    end
+
+    def customizable_question_choice_data
+      question_item.question_choices.map do |question_choice|
+        {
+          value: 0,
+          column: question_choice.text,
+          percentage: 0,
+          id: question_choice.id,
+          search_key: search_key(question_choice_id: question_choice.id),
+        }
+      end
+    end
+
+    def scale_question_choice_data
+      (1..4).map do |answer_number|
+        {
+          value: 0,
+          column: answer_number,
+          percentage: 0,
+          search_key: search_key(answer_number: answer_number),
+        }
       end
     end
 
@@ -40,9 +95,7 @@ module DataReport
     end
 
     def question_type
-      return question_item.question_type if question_item.present?
-
-      @dataset.question_type
+      question_item&.question_type || @dataset.question_type
     end
 
     def question_choices_customizable?
@@ -95,24 +148,43 @@ module DataReport
       end
     end
 
+    def group_by_audience_id
+      group_by_type_id('TestAudience')
+    end
+
+    def group_by_organization_id
+      group_by_type_id('Organization')
+    end
+
+    def group_by_idea_id
+      group_by_type_id('Organization')
+    end
+
+    def group_by_survey_response_id
+      group_by_type_id('SurveyResponse')
+    end
+
+    def group_by_idea_id
+      group_by_type_id('Idea')
+    end
+
     def survey_answers
-      if @dataset.grouping.present? &&
-         @dataset.grouping['type'] == 'Organization'
+      if group_by_organization_id.present?
         org_survey_answers
-      elsif @dataset.grouping.present? &&
-            @dataset.grouping['type'] == 'SurveyResponse'
+      elsif group_by_survey_response_id
+        #TODO: be able to also group with idea
         question_item.completed_survey_answers
                      .where(
                        SurveyResponse.arel_table[:id].eq(
                          @dataset.grouping['id'],
                        ),
                      )
-      elsif @dataset.grouping.present? &&
-            @dataset.grouping['type'] == 'TestAudience'
+      elsif group_by_audience_id.present?
+        #TODO: be able to also group with idea
         question_item.completed_survey_answers
                      .where(
                        SurveyResponse.arel_table[:test_audience_id].eq(
-                         @dataset.grouping['id'],
+                         group_by_audience_id,
                        ),
                      )
       else
@@ -121,7 +193,8 @@ module DataReport
     end
 
     def org_survey_answers
-      organization_id = @dataset.grouping['id']
+      return QuestionAnswer.none if group_by_organization_id.blank?
+
       query = QuestionAnswer
         .joins(
           :question,
@@ -134,16 +207,20 @@ module DataReport
             SurveyResponse.arel_table[:status].eq(:completed),
           ).and(
             Collection::TestCollection.arel_table[:organization_id].eq(
-              organization_id,
+              group_by_organization_id,
             ),
           ),
         )
       if question_item&.question_choices_customizable?
         query = query.where(
-          Item::QuestionItem.arel_table[:id].eq(question_item.id)
+          Item::QuestionItem.arel_table[:id].eq(question_item.id),
         )
       end
       query
+    end
+
+    def group_by_type_id(type)
+      groupings.find { |g| g['type'] == type }.try(:[], 'id')
     end
   end
 end
