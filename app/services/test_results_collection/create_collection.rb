@@ -96,6 +96,7 @@ module TestResultsCollection
             test_collection: test_collection,
             idea: idea,
           },
+          identifier: CardIdentifier.call([test_collection.test_results_collection, idea]),
         },
         parent_collection: test_collection.test_results_collection,
         created_by: created_by,

@@ -33,11 +33,28 @@ module TestResultsCollection
         item_id: open_response_item.id,
         width: 2,
       )
+
+      idea_items.each do |idea_item|
+        CollectionCard::Link.create(
+          parent: question_idea_open_responses_collection(idea_item),
+          item_id: open_response_item.id,
+          width: 2,
+        )
+      end
     end
 
     def question_open_responses_collection
+      open_responses_collection(test_collection.test_results_collection)
+    end
+
+    def question_idea_open_responses_collection(idea_item)
+      idea_collection = idea_collection(idea_item)
+      open_responses_collection(idea_collection)
+    end
+
+    def open_responses_collection(parent_collection)
       identifier = CardIdentifier.call(
-        [test_collection.test_results_collection, question],
+        [parent_collection, question],
         'Responses',
       )
       CollectionCard.find_by(
@@ -49,6 +66,20 @@ module TestResultsCollection
       CollectionCard.find_by(
         identifier: CardIdentifier.call([alias_test_results_collection], 'Responses'),
       ).collection
+    end
+
+    def idea_collection(idea_item)
+      CollectionCard.find_by(
+        identifier: CardIdentifier.call([
+          test_collection.test_results_collection, idea_item
+        ]),
+      ).collection
+    end
+
+    def idea_items
+      test_collection
+        .idea_items
+        .includes(:test_results_collection)
     end
   end
 end
