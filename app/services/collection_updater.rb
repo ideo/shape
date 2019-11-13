@@ -51,7 +51,7 @@ class CollectionUpdater < SimpleService
   def mark_subcollection_as_private
     return unless @collection.anyone_can_view_changed?
 
-    ToggleAnyoneCanView.call(collection: @collection)
+    Sharing::PropagateAnyoneCanView.call(collection: @collection)
 
     return unless @collection.anyone_can_view_in_database && @collection.parent.anyone_can_view && !@collection.private?
 

@@ -112,7 +112,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     @collection.unmark_as_private!
     @collection.update(anyone_can_view: @collection.parent.anyone_can_view)
     if @collection.parent.anyone_can_view?
-      ToggleAnyoneCanView.call(collection: @collection)
+      Sharing::PropagateAnyoneCanView.call(collection: @collection)
     end
     render_collection
     # no error case needed... ?
