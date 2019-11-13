@@ -297,10 +297,6 @@ describe Api::V1::GroupsController, type: :request, json: true, auth: true do
         action: :archived,
         subject_user_ids: array_including((members << user).pluck(:id)),
       )
-
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        hash_including(action: :unshared),
-      ).once
       patch(path)
     end
 
