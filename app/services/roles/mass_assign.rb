@@ -65,15 +65,15 @@ module Roles
         if role.persisted?
           @added_users << user
 
-          unless @invited_by.nil? && newly_invited?
-            ActivityAndNotificationBuilder.call(
-              actor: @invited_by,
-              target: @object,
-              action: :shared,
-              subject_user_ids: [user.id],
-              should_notify: false,
-            )
-          end
+          next unless newly_invited?
+
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_user_ids: [user.id],
+            should_notify: false,
+          )
         else
           @failed_users << user
         end
@@ -96,15 +96,15 @@ module Roles
         role = group.add_role(@role_name, @object)
         if role.persisted?
           @added_groups << group
-          unless @invited_by.nil? && newly_invited?
-            ActivityAndNotificationBuilder.call(
-              actor: @invited_by,
-              target: @object,
-              action: :shared,
-              subject_group_ids: [group.id],
-              should_notify: false,
-            )
-          end
+          next unless newly_invited?
+
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_group_ids: [group.id],
+            should_notify: false,
+          )
         else
           @failed_groups << group
         end
@@ -133,7 +133,8 @@ module Roles
     end
 
     def create_activities_and_notifications
-      action = Activity.role_name_to_action(@role_name.to_sym)
+      action = Activity.role_name_to_action(role_name: @role_name.to_sym, adding: true)
+
       return if action.nil?
 
       ActivityAndNotificationBuilder.call(

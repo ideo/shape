@@ -174,9 +174,9 @@ RSpec.describe Roles::MassAssign, type: :service do
     context 'when it should create activities and notifications' do
       let(:invited_by) { create(:user) }
       let(:new_role) { true }
-      let!(:role_name) { Role::EDITOR.to_s }
 
-      context 'with an editor and a group which contains the same user' do
+      describe 'added editor' do
+        let!(:role_name) { Role::EDITOR.to_s }
         it 'add activities with shared and added_editor activity' do
           expect(ActivityAndNotificationBuilder).to receive(:call).with(
             hash_including(action: :shared),
@@ -184,6 +184,20 @@ RSpec.describe Roles::MassAssign, type: :service do
 
           expect(ActivityAndNotificationBuilder).to receive(:call).with(
             hash_including(action: :added_editor),
+          ).once
+          assign_role.call
+        end
+      end
+
+      describe 'added viewer' do
+        let!(:role_name) { Role::VIEWER.to_s }
+        it 'add activities with shared and added_member activity' do
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :shared),
+          ).exactly(users.count + groups.count).times
+
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :added_viewer),
           ).once
           assign_role.call
         end

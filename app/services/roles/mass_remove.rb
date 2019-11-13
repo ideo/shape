@@ -27,6 +27,7 @@ module Roles
       remove_role_from_object(@object)
       unfollow_comment_thread
       unfollow_groups_comment_threads
+      create_activities_and_notifications if @fully_remove
       remove_links_from_shared_collections if @fully_remove
       remove_org_membership_if_necessary if @fully_remove
       remove_roles_from_children if @propagate_to_children
@@ -50,6 +51,8 @@ module Roles
         next unless existing_user_ids.include?(user.id)
 
         user.remove_role(role.name, role.resource)
+        next unless @fully_remove
+
         ActivityAndNotificationBuilder.call(
           actor: @removed_by,
           target: @object,
@@ -69,6 +72,8 @@ module Roles
         next unless existing_group_ids.include?(group.id)
 
         role.groups.destroy(group)
+        next unless @fully_remove
+
         ActivityAndNotificationBuilder.call(
           actor: @removed_by,
           target: @object,
@@ -79,6 +84,20 @@ module Roles
       end
 
       true
+    end
+
+    def create_activities_and_notifications
+      action = Activity.role_name_to_action(role_name: @role_name.to_sym, adding: false)
+      return if action.nil?
+
+      ActivityAndNotificationBuilder.call(
+        actor: @removed_by,
+        target: @object,
+        action: action,
+        subject_user_ids: @users.pluck(:id),
+        subject_group_ids: @groups.pluck(:id),
+        should_notify: false,
+      )
     end
 
     def unfollow_comment_thread
