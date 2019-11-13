@@ -96,14 +96,19 @@ class CollectionPage extends React.Component {
 
   loadCollectionCards = async ({ page, per_page, rows, cols }) => {
     const { collection } = this.props
-    return collection
-      .API_fetchCards({ page, per_page, rows, cols })
-      .then(() => {
-        runInAction(() => {
-          this.cardsFetched = true
-          this.onAPILoad()
-        })
+    let params
+    if (collection.isRegularCollection) {
+      params = { page, per_page, rows, cols }
+    } else {
+      params = { rows }
+    }
+
+    return collection.API_fetchCards(params).then(() => {
+      runInAction(() => {
+        this.cardsFetched = true
+        this.onAPILoad()
       })
+    })
   }
 
   loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
@@ -320,7 +325,11 @@ class CollectionPage extends React.Component {
     const { collection } = this.props
     const per_page =
       collection.collection_cards.length || collection.recordsPerPage
-    this.loadCollectionCards({ per_page })
+    if (collection.isBoard) {
+      this.loadCollectionCards({ rows: [0, collection.loadedRows] })
+    } else {
+      this.loadCollectionCards({ per_page })
+    }
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
       await this.collection.submissions_collection.API_fetchCards()

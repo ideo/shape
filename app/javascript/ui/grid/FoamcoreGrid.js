@@ -114,8 +114,6 @@ class FoamcoreGrid extends React.Component {
   // TODO rename this now that it's also used for resize placeholder
   @observable
   placeholderSpot = { ...this.placeholderDefaults }
-  loadedRows = { loading: false, max: 0 }
-  loadedCols = { loading: false, max: 0 }
   draggingMap = []
   // track whether drag movement is blocked because of overlapping cards
   hasDragCollision = false
@@ -184,6 +182,7 @@ class FoamcoreGrid extends React.Component {
   // Load more cards if we are approaching a boundary of what we have loaded
 
   loadAfterScroll = ev => {
+    const { collection } = this.props
     // Run position cards to re-render cards that were previously out of view
     this.throttledCalculateCardsToRender()
 
@@ -192,13 +191,13 @@ class FoamcoreGrid extends React.Component {
 
     // Load more rows if currently loaded rows is less than
     // one full screen out of view
-    if (this.loadedRows.max < visRows.max + visRows.num) {
+    if (collection.loadedRows < visRows.max + visRows.num) {
       this.loadMoreRows()
     }
 
     // Load more columns if currently loaded columns is less than
     // one full screen out of view
-    if (this.loadedCols.max < visCols.max + visCols.num) {
+    if (collection.loadedCols < visCols.max + visCols.num) {
       this.loadMoreColumns()
     }
   }
@@ -208,7 +207,7 @@ class FoamcoreGrid extends React.Component {
     const visRows = this.visibleRows
     const visCols = this.visibleCols
     const collectionMaxRow = collection.max_row_index
-    const loadMinRow = this.loadedRows.max + 1
+    const loadMinRow = collection.loadedRows + 1
     let loadMaxRow = Math.ceil(loadMinRow + visRows.num)
 
     // Constrain max row to maximum on collection
@@ -232,7 +231,7 @@ class FoamcoreGrid extends React.Component {
     const visCols = this.visibleCols
     const collectionMaxCol = collection.max_col_index
 
-    const loadMinCol = this.loadedCols.max + 1
+    const loadMinCol = collection.loadedCols + 1
     let loadMaxCol = loadMinCol + Math.ceil(visCols.num)
 
     // Constrain max col to maximum on collection
@@ -251,8 +250,17 @@ class FoamcoreGrid extends React.Component {
   }
 
   updateMaxLoaded = ({ row, col }) => {
-    if (row > this.loadedRows.max) this.loadedRows.max = row
-    if (col > this.loadedCols.max) this.loadedCols.max = col
+    const { collection } = this.props
+    if (row > collection.loadedRows) {
+      runInAction(() => {
+        collection.loadedRows = row
+      })
+    }
+    if (col > collection.loadedCols) {
+      runInAction(() => {
+        collection.loadedCols = col
+      })
+    }
   }
 
   get maxCols() {

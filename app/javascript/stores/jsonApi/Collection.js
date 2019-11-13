@@ -40,6 +40,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   scrollBottom = 0
   @observable
   storedCacheKey = null
+  @observable
+  loadedRows = 0
+  @observable
+  loadedCols = 0
 
   attributesForAPI = [
     'name',
@@ -520,6 +524,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (rows && cols) {
       params.rows = rows
       params.cols = cols
+    }
+    if (rows) {
+      params.rows = rows
     }
     const apiPath = `collections/${
       this.id
