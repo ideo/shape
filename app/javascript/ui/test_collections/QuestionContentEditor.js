@@ -18,7 +18,7 @@ const StyledSmallText = styled(QuestionHelperText)`
 
 const QuestionHelperWrapper = styled.div`
   position: relative;
-  top: -10px;
+  top: -4px;
   left: 10px;
 `
 

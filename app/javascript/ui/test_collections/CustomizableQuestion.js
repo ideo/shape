@@ -17,7 +17,8 @@ const Question = styled.div`
   border-bottom-width: 4px;
   box-sizing: border-box;
   color: white;
-  padding: 12px 12px 16px 12px;
+  line-height: 1;
+  padding: 12px 3px;
   width: 100%;
   .editable-text {
     margin: -1px -1px -1px 5px;
@@ -199,7 +200,7 @@ class CustomizableQuestion extends React.Component {
         </DisplayText>
         <SmallHelperText
           color={v.colors.white}
-          style={{ marginLeft: '8px', opacity: '0.5' }}
+          style={{ marginLeft: '10px', opacity: '0.5' }}
         >
           {question.question_type === 'question_multiple_choice' ? (
             <span>please select all options that apply</span>

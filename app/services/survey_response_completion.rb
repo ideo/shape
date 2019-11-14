@@ -48,6 +48,8 @@ class SurveyResponseCompletion < SimpleService
   end
 
   def user_has_existing_survey_response?
+    return false unless user.present?
+
     where_status = { status: :completed }
     if gives_incentive?
       where_status[:incentive_status] = %i[incentive_paid incentive_owed]
