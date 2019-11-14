@@ -195,7 +195,7 @@ export const QuestionHelperText = styled(SmallHelperText)`
 `
 
 export const TextEnterButton = styled.button`
-  bottom: 14px;
+  bottom: 2px;
   color: white;
   right: 18px;
   position: absolute;
