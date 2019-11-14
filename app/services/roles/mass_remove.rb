@@ -27,7 +27,7 @@ module Roles
       remove_role_from_object(@object)
       unfollow_comment_thread
       unfollow_groups_comment_threads
-      create_activities_and_notifications if @fully_remove
+      create_activities_and_notifications if @removed_by
       remove_links_from_shared_collections if @fully_remove
       remove_org_membership_if_necessary if @fully_remove
       remove_roles_from_children if @propagate_to_children

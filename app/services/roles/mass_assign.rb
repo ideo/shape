@@ -45,7 +45,7 @@ module Roles
       add_group_members_as_comment_thread_followers
       link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
-      create_activities_and_notifications if newly_invited?
+      create_activities_and_notifications if @invited_by
       failed_users.blank? && failed_groups.blank?
     end
 
