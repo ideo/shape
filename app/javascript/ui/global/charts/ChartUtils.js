@@ -11,9 +11,9 @@ import v from '~/utils/variables'
 export const barWidthPx = (totalColumns, totalGroupings) => {
   const padding = 16
   const maxWidth = 644
-  const paddingModifier = (totalColumns - 1) * padding
-  const widthModifier = maxWidth / (totalColumns + totalGroupings)
-  const width = Math.min(widthModifier - paddingModifier, 28)
+  const totalBars = totalColumns * totalGroupings
+  const widthModifier = maxWidth / totalBars
+  const width = Math.min(widthModifier - padding, 28)
   return width
 }
 
