@@ -9,11 +9,15 @@ class RestorePermission < SimpleService
 
   def call
     Roles::MergeToChild.call(parent: @object.parent, child: @object)
+    unmarked = @object.unmark_as_private!
+    log_activity if unmarked
 
     return unless @object.collection?
 
-    unmarked = @object.unmark_as_private!
-    log_activity if unmarked
+    @object.update(anyone_can_view: @object.parent.anyone_can_view)
+    return unless @object.parent.anyone_can_view?
+
+    Sharing::PropagateAnyoneCanView.call(collection: @object)
   end
 
   private

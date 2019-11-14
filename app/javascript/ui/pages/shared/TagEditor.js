@@ -83,6 +83,7 @@ class TagEditor extends React.Component {
     }
     this.tags.push(newTag)
     records.forEach(record => {
+      // persist the tag locally on the Item/Collection
       record[tagField].push(newTag.name)
     })
     afterAddTag(newTag.name)

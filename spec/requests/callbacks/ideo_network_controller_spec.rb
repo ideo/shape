@@ -708,6 +708,22 @@ describe 'Ideo Profile API Requests' do
           expect(user.has_role?(:member, group)).to be true
           expect(user.uid).to eq user_data[:attributes][:uid]
         end
+
+        context 'without an organization' do
+          let!(:group) { create(:group, organization_id: nil, network_id: '1') }
+
+          it 'creates the user, but does not call OrganizationMembershipWorker' do
+            expect(OrganizationMembershipWorker).not_to receive(:perform_async)
+            expect do
+              post(
+                '/callbacks/ideo_network/users_roles',
+                params: params,
+                headers: valid_headers,
+              )
+            end.to change(User, :count).by(1)
+            expect(response.status).to eq(200)
+          end
+        end
       end
     end
 

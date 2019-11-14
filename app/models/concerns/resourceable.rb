@@ -287,6 +287,8 @@ module Resourceable
         cached_attributes, '{cached_inheritance}', '#{settings.to_json}'::jsonb
       )
     ))
+    # mark update_at and bust cache
+    touch if value
     # make sure to set this in memory as well (saves having to do a `reload`)
     self.cached_inheritance = settings.as_json
   end

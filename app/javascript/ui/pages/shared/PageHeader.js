@@ -62,6 +62,7 @@ const LiveTestIndicator = styled.span`
 const HeaderButtonContainer = styled.span`
   margin-top: 10px;
 `
+HeaderButtonContainer.displayName = 'HeaderButtonContainer'
 
 @inject('uiStore', 'apiStore')
 @observer

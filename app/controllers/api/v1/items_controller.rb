@@ -2,6 +2,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   deserializable_resource :item, class: DeserializableItem, only: %i[create update highlight]
   load_and_authorize_resource :collection_card, only: :create
   load_and_authorize_resource except: %i[update highlight in_my_collection]
+  skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :load_and_filter_index, only: %i[index]
   def index

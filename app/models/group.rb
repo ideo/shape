@@ -146,15 +146,15 @@ class Group < ApplicationRecord
   end
 
   def primary?
-    organization.primary_group_id == id
+    persisted? && organization&.primary_group_id == id
   end
 
   def guest?
-    organization.guest_group_id == id
+    persisted? && organization&.guest_group_id == id
   end
 
   def admin?
-    organization.admin_group_id == id
+    persisted? && organization&.admin_group_id == id
   end
 
   def org_group?
