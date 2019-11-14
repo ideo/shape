@@ -62,8 +62,7 @@ class ActionMenu extends React.Component {
     if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
     if (cardAction === 'move') {
-      const { selectedCardIds } = uiStore
-      card.reselectOnlyEditableCards(selectedCardIds)
+      card.reselectOnlyEditableCards()
     }
     uiStore.openMoveMenu({ from: viewingCollection, cardAction })
   }
@@ -101,6 +100,10 @@ class ActionMenu extends React.Component {
 
   showTags = () => {
     const { card, uiStore } = this.props
+    if (card.record.can_edit) {
+      // you can't select a mix of editable and non-editable for tagging
+      card.reselectOnlyEditableCards()
+    }
     uiStore.update('tagsModalOpenId', card.id)
   }
 

@@ -313,7 +313,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isPublicJoinable() {
-    return this.anyone_can_join && !this.apiStore.currentUser
+    return (
+      (this.anyone_can_join ||
+        (this.anyone_can_view && this.parent.anyone_can_join)) &&
+      !this.apiStore.currentUser
+    )
   }
 
   get requiresSubmissionBoxSettings() {

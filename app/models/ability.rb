@@ -137,6 +137,7 @@ class Ability
     # for logged-out users and fallback for all users
     can :read, Collection, anyone_can_view: true
     can :read, Collection, anyone_can_join: true
+    can :read, Item, anyone_can_view: true
 
     # don't allow any of the editing actions unless you've accepted terms
     # (i.e. user becomes view-only)

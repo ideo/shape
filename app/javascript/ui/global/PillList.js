@@ -21,6 +21,11 @@ const PillIconHolder = styled.span`
   }
 `
 
+const StyledAvatar = styled(Avatar)`
+  margin-left: -3px;
+  margin-top: -5px;
+`
+
 @observer
 class PillList extends React.Component {
   handleDelete = item => () => {
@@ -33,15 +38,17 @@ class PillList extends React.Component {
       <ChipHolder>
         {itemList.map(item => {
           let avatar = null
+          let symbolSize = 16
           if (item.pic_url_square) {
             avatar = (
-              <Avatar
+              <StyledAvatar
                 className="avatar"
                 size={26}
                 title={item.name}
                 url={item.pic_url_square}
               />
             )
+            symbolSize = 26
           }
           if (item.icon) {
             avatar = <PillIconHolder>{item.icon}</PillIconHolder>
@@ -53,6 +60,7 @@ class PillList extends React.Component {
             <Pill
               key={identifier}
               symbol={avatar}
+              symbolSize={symbolSize}
               label={item.name || identifier}
               id={item.id || identifier}
               onDelete={this.handleDelete(item)}

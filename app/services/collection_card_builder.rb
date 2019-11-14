@@ -77,7 +77,14 @@ class CollectionCardBuilder
       # NOTE: should items created in My Collection get this access as well?
       # this will change the roles_anchor, which will get re-cached later
       record.enable_org_view_access_if_allowed(@parent_collection)
-      record.update(created_by: @user) if @user.present?
+      update_params = {}
+      if @user.present?
+        update_params[:created_by] = @user
+      end
+      if record.parent.anyone_can_view?
+        update_params[:anyone_can_view] = true
+      end
+      record.update(update_params)
     end
     @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
     @collection_card.update_collection_cover if @collection_card.is_cover

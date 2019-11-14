@@ -172,8 +172,10 @@ class Item < ApplicationRecord
     'Idea'
   end
 
-  def anyone_can_view?
-    false
+  def anyone_can_view
+    return false if private?
+
+    parent&.anyone_can_view || false
   end
 
   def search_content

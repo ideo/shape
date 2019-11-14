@@ -312,7 +312,7 @@ class ApiStore extends jsonapi(datxCollection) {
     const { uiStore } = this
     const { selectedCardIds } = uiStore
     return this.findAll('collection_cards').filter(
-      card => selectedCardIds.indexOf(card.id) > -1 && card.canEdit
+      card => selectedCardIds.indexOf(card.id) > -1
     )
   }
 

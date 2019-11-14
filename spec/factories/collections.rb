@@ -32,6 +32,10 @@ FactoryBot.define do
     factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection
 
+    factory :private_collection do
+      after(:create, &:mark_as_private!)
+    end
+
     trait :submission do
       after(:create) do |collection|
         # needed for `inside_a_submission?` check

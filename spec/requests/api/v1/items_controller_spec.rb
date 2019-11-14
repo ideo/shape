@@ -66,6 +66,49 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       get(path)
     end
 
+    context 'with a private item inside a private collection' do
+      let(:collection) { create(:private_collection) }
+      let(:item) {
+        create(
+          :private_item,
+          parent_collection: collection,
+          add_viewers: [user],
+        )
+      }
+      it 'returns private as true' do
+        get(path)
+        expect(json['data']['attributes']['is_private']).to eq(true)
+      end
+    end
+
+    context 'with a public parent collection' do
+      let(:collection) { create(:collection, anyone_can_view: true) }
+      let(:item) {
+        create(
+          :text_item,
+          parent_collection: collection,
+        )
+      }
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'with an non public parent collection' do
+      let(:collection) { create(:collection, anyone_can_view: false) }
+      let(:item) {
+        create(
+          :text_item,
+          parent_collection: collection,
+        )
+      }
+      it 'returns a 401' do
+        get(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
     context 'with editor' do
       let!(:item) { create(:text_item, add_editors: [user]) }
 

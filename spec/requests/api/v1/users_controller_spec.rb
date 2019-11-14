@@ -93,6 +93,14 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
         expect(assigns(:current_user)).to eq(user)
       end
     end
+
+    context 'without an organization, but member of an org', create_org: false do
+      let!(:no_org_group) { create(:group, organization: nil, network_id: '1', add_members: [user]) }
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
+    end
   end
 
   describe 'POST #create_from_emails', :vcr do
