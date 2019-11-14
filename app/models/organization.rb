@@ -129,7 +129,7 @@ class Organization < ApplicationRecord
       .where.not(overdue_at: nil)
   end
 
-  def self.display_name
+  def self.dataset_display_name
     'Organization'
   end
 

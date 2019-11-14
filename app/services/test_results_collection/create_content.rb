@@ -151,13 +151,13 @@ module TestResultsCollection
     def create_alias_open_response_collection
       create_card(
         params: {
-          identifier: CardIdentifier.call([test_results_collection], 'Responses'),
+          identifier: CardIdentifier.call(survey_response, 'Responses'),
           order: @order += 1,
           collection_attributes: {
             name: "#{survey_response.respondent_alias} Responses",
           },
         },
-        parent_collection: test_results_collection,
+        parent_collection: parent_collection,
         created_by: created_by,
       )
     end
@@ -178,6 +178,7 @@ module TestResultsCollection
           order: @order += 1,
           legend_item: @legend_item,
           survey_response: survey_response,
+          idea: idea,
         ),
       )
       @legend_item ||= result.legend_item
@@ -199,7 +200,13 @@ module TestResultsCollection
     end
 
     def parent_collection
-      idea.present? ? idea.test_results_collection : test_results_collection
+      if survey_response.present?
+        survey_response.test_results_collection
+      elsif idea.present?
+        idea.test_results_collection
+      else
+        test_results_collection
+      end
     end
 
     def in_collection_test?

@@ -1,10 +1,13 @@
 class CardIdentifier
-  def self.call(objects, custom_name = nil)
-    identifiers = objects.compact.sort_by{ |obj| obj.class.name}.map do |obj|
-      "#{obj.class.name}_#{obj.id}"
-    end
-    identifiers.push(custom_name) if custom_name.present?
 
-    identifiers.join('-')
+  def self.call(*objects)
+    objects = [objects] unless objects.is_a?(Array)
+    objects.compact.map do |obj|
+      if obj.is_a?(String)
+        obj
+      else
+        "#{obj.class.name}_#{obj.id}"
+      end
+    end.join('-')
   end
 end

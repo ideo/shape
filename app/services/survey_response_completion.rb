@@ -60,11 +60,11 @@ class SurveyResponseCompletion < SimpleService
 
   def create_alias_datasets
     # alias_collection = CollectionCard.find_by(
-    #   identifier: CardIdentifier.call([test_results_collection, survey_response])
+    #   identifier: CardIdentifier.call(test_results_collection, survey_response)
     # )
     test_collection = @survey_response.test_collection
     all_responses = CollectionCard.find_by(
-      identifier: CardIdentifier.call([test_collection.test_results_collection], 'Responses'),
+      identifier: CardIdentifier.call(test_collection.test_results_collection, 'Responses'),
     )
     TestResultsCollection::CreateOrLinkAliasCollection.call(
       test_collection: test_collection,
@@ -78,7 +78,7 @@ class SurveyResponseCompletion < SimpleService
   def create_alias_collection
     test_collection = @survey_response.test_collection
     responses_collection = CollectionCard.where(
-      identifier: CardIdentifier.call([test_collection.test_results_collection], 'Responses'),
+      identifier: CardIdentifier.call(@survey_response, 'Responses'),
     ).first.record
 
     TestResultsCollection::CreateOrLinkAliasCollection.call(

@@ -20,7 +20,7 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
   it 'creates an all_responses collection in the TRC' do
     expect(subject).to be_a_success
     expect(test_results_collection.collection_cards.where(
-      identifier: CardIdentifier.call([test_results_collection], 'Responses')
+      identifier: CardIdentifier.call(test_results_collection, 'Responses')
     ).count).to be 1
   end
 

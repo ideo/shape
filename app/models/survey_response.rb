@@ -29,6 +29,7 @@ class SurveyResponse < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :test_audience, optional: true
   has_many :question_answers, dependent: :destroy
+  has_one :test_results_collection, class_name: 'Collection::TestResultsCollection'
   # Deprecating this - storing status on this record and in accounting double entry records
   has_one :feedback_incentive_record
 
@@ -59,6 +60,10 @@ class SurveyResponse < ApplicationRecord
     incentive_owed: 1,
     incentive_paid: 2,
   }
+
+  def self.dataset_display_name
+    'Response'
+  end
 
   def record_incentive_owed!
     return if !incentive_unearned? || amount_earned.zero? || user&.email.blank?

@@ -108,7 +108,7 @@ class QuestionAnswer < ApplicationRecord
 
   def alias_collection(test_results_collection)
     CollectionCard.find_by(
-      identifier: CardIdentifier.call([test_results_collection, survey_response])
+      identifier: CardIdentifier.call(test_results_collection, survey_response),
     ).collection
   end
 
@@ -120,7 +120,7 @@ class QuestionAnswer < ApplicationRecord
     answer = self
     alias_collection = alias_collection(test_results_collection)
     audience_collection = CollectionCard.find_by(
-      identifier: CardIdentifier.call([test_results_collection, survey_response&.test_audience])
+      identifier: CardIdentifier.call(test_results_collection, survey_response&.test_audience),
     ).collection
     ops =
       [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},

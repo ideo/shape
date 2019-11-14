@@ -168,6 +168,10 @@ class Item < ApplicationRecord
     )
   end
 
+  def self.dataset_display_name
+    'Idea'
+  end
+
   def anyone_can_view?
     false
   end
