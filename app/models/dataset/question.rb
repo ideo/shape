@@ -55,7 +55,6 @@ class Dataset
       if grouping.present?
         # Just name off the first grouping for now, change in future
         klass = grouping['type'].safe_constantize
-        debugger if klass == Class
         object = klass.find(grouping['id'].to_i)
         "#{object.name} #{klass.dataset_display_name}"
       elsif test_collection_id.present? && test_collection.present?

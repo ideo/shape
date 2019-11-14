@@ -129,7 +129,7 @@ module TestResultsCollection
     def create_alias_open_response_collection
       create_card(
         params: {
-          identifier: CardIdentifier.call([survey_response], 'Responses'),
+          identifier: CardIdentifier.call(survey_response, 'Responses'),
           order: @order += 1,
           collection_attributes: {
             name: "#{survey_response.respondent_alias} Responses",

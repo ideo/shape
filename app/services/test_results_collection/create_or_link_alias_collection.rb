@@ -40,7 +40,7 @@ module TestResultsCollection
             survey_response_id: survey_response.id,
             test_collection: test_collection,
           ),
-          identifier: CardIdentifier.call([test_results_collection, survey_response]),
+          identifier: CardIdentifier.call(test_results_collection, survey_response),
         },
         parent_collection: responses_collection,
         created_by: created_by,

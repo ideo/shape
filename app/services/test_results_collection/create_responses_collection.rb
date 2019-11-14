@@ -55,7 +55,7 @@ module TestResultsCollection
     def create_or_link_all_responses_collection
       if idea.present?
         all_responses_collection = CollectionCard.where(
-          identifier: CardIdentifier.call([test_collection.test_results_collection], 'Responses'),
+          identifier: CardIdentifier.call(test_collection.test_results_collection, 'Responses'),
         ).first.record
 
         CollectionCard::Link.create(
@@ -68,9 +68,9 @@ module TestResultsCollection
       collection = create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
-            name: "Responses",
+            name: 'Responses',
           ),
-          identifier: CardIdentifier.call([test_results_collection], 'Responses'),
+          identifier: CardIdentifier.call(test_results_collection, 'Responses'),
         },
         parent_collection: test_results_collection,
         created_by: created_by,
@@ -89,18 +89,17 @@ module TestResultsCollection
           collection_attributes: default_collection_attrs.merge(
             name: "#{test_collection.name} - #{test_audience.audience_name}",
           ),
-          identifier: CardIdentifier.call([test_results_collection, test_audience]),
+          identifier: CardIdentifier.call(test_results_collection, test_audience),
         },
         parent_collection: context.all_responses_collection,
         created_by: created_by,
       ).record
 
-      if !collection.persisted?
-        context.fail!(
-          message: collection.errors.full_messages.to_sentence,
-        )
-        return
-      end
+      return if collection.persisted?
+
+      context.fail!(
+        message: collection.errors.full_messages.to_sentence,
+      )
     end
   end
 end

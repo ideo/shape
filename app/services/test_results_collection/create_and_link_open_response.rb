@@ -64,15 +64,15 @@ module TestResultsCollection
 
     def master_open_responses_collection
       CollectionCard.find_by(
-        identifier: CardIdentifier.call([alias_test_results_collection], 'Responses'),
+        identifier: CardIdentifier.call(alias_test_results_collection, 'Responses'),
       ).collection
     end
 
     def idea_collection(idea_item)
       CollectionCard.find_by(
-        identifier: CardIdentifier.call([
+        identifier: CardIdentifier.call(
           test_collection.test_results_collection, idea_item
-        ]),
+        ),
       ).collection
     end
 
