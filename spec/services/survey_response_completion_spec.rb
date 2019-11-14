@@ -191,6 +191,7 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
     end
 
     context 'with link sharing' do
+      let(:survey_response2) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
       before do
         test_audience.update(price_per_response: 0.0)
       end
@@ -200,6 +201,15 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         expect do
           service.call
         end.not_to change(DoubleEntry::Line, :count)
+      end
+
+      it 'does not mark anonymous survey_responses as duplicates' do
+        SurveyResponseCompletion.call(survey_response)
+        SurveyResponseCompletion.call(survey_response2)
+        expect(survey_response.completed?).to be true
+        expect(survey_response.duplicate?).to be false
+        expect(survey_response2.completed?).to be true
+        expect(survey_response2.duplicate?).to be false
       end
     end
   end
