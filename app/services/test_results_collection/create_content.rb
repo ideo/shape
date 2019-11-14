@@ -178,7 +178,13 @@ module TestResultsCollection
     end
 
     def parent_collection
-      idea.present? ? idea.test_results_collection : test_results_collection
+      if survey_response.present?
+        survey_response.test_results_collection
+      elsif idea.present?
+        idea.test_results_collection
+      else
+        test_results_collection
+      end
     end
 
     def in_collection_test?

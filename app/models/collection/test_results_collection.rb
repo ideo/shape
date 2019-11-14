@@ -71,7 +71,8 @@ class Collection
                inverse_of: :test_results_collection,
                optional: true
     belongs_to :survey_response,
-               optional: true
+               optional: true,
+               inverse_of: :test_results_collection
 
     has_many :datasets,
              through: :data_items
