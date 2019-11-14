@@ -39,9 +39,11 @@ class CarouselCover extends React.Component {
   @observable
   records = []
   @observable
-  currentIdx
+  currentIdx = 0
 
-  componentDidMount() {
+  constructor(props) {
+    super(props)
+
     const { collection } = this.props
     const items = collection.collection_cover_items
 
@@ -79,6 +81,8 @@ class CarouselCover extends React.Component {
   render() {
     const { collection } = this.props
 
+    if (!this.currentCarouselRecord) return null
+
     return (
       <div style={{ color: 'black', height: '100%' }}>
         <CoverRenderer
@@ -90,7 +94,7 @@ class CarouselCover extends React.Component {
           textItemHideReadMore
           textItemUneditable
         />
-        <CarouselControl onClick={() => {}}>
+        <CarouselControl>
           <DisplayText color={v.colors.commonDark} data-cy="ItemCount">
             {this.currentIdx + 1} / {this.records.length}
           </DisplayText>
