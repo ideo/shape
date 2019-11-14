@@ -24,13 +24,15 @@ module TestResultsCollection
     end
 
     def call
+      initial_creation = false
       ActiveRecord::Base.transaction do
         if test_results_collection.blank?
+          # marking when the tests_results_collection is first created
+          initial_creation = true
           context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
           if master_results_collection?
             update_test_collection_name
             move_roles_to_results_collection if move_roles?
-            move_test_collection_inside_test_results
           end
         end
 
@@ -40,10 +42,9 @@ module TestResultsCollection
           idea: idea,
         )
 
-        # might not need this next step?
-        test_collection.cache_cover!
-        test_results_collection.reorder_cards!
-        move_legend_item_to_third_spot if legend_item.present?
+        if master_results_collection? && initial_creation
+          move_test_collection_inside_test_results
+        end
 
       rescue Interactor::Failure => e
         raise ActiveRecord::Rollback, e.message
@@ -71,15 +72,6 @@ module TestResultsCollection
         test_collection: test_collection,
         idea: idea,
       )
-
-      TestResultsCollection::CreateResponsesCollection.call(
-        test_results_collection: collection,
-        test_collection: test_collection,
-        survey_responses: test_collection.survey_responses,
-        test_audiences: test_collection.test_audiences,
-        created_by: created_by,
-      )
-
       return collection if collection.persisted?
 
       context.fail!(
@@ -101,16 +93,6 @@ module TestResultsCollection
         parent_collection: test_collection.test_results_collection,
         created_by: created_by,
       ).record
-
-      TestResultsCollection::CreateResponsesCollection.call(
-        test_collection: test_collection,
-        test_results_collection: collection,
-        survey_responses: test_collection.survey_responses,
-        test_audiences: test_collection.test_audiences,
-        created_by: created_by,
-        idea: idea,
-      )
-
       collection
     end
 
@@ -155,13 +137,6 @@ module TestResultsCollection
 
     def move_roles?
       test_results_roles_anchor.blank?
-    end
-
-    def move_legend_item_to_third_spot
-      legend_card = legend_item.parent_collection_card
-      return if legend_card.order == 2
-
-      legend_card.move_to_order(2)
     end
   end
 end

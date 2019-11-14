@@ -4,18 +4,19 @@ module TestResultsCollection
     include Interactor::Schema
     include CollectionCardBuilderHelpers
 
-    schema :test_results_collection,
+    schema :parent_collection,
            :survey_responses,
            :test_audiences,
            :test_collection,
            :created_by,
            :all_responses_collection,
-           :idea
+           :idea,
+           :order
 
-    require_in_context :test_results_collection, :test_audiences
+    require_in_context :parent_collection, :test_audiences
 
-    delegate :test_results_collection, :test_collection, :created_by,
-             :test_audiences, :survey_responses,
+    delegate :parent_collection, :test_collection, :created_by,
+             :test_audiences, :survey_responses, :order,
              to: :context
 
     delegate :idea,
@@ -58,9 +59,13 @@ module TestResultsCollection
           identifier: CardIdentifier.call([test_collection.test_results_collection], 'Responses'),
         ).first.record
 
-        CollectionCard::Link.create(
-          parent: test_results_collection,
-          collection_id: all_responses_collection.id,
+        create_card(
+          params: {
+            order: order,
+            collection_id: all_responses_collection.id,
+          },
+          type: 'link',
+          parent_collection: parent_collection,
         )
         return all_responses_collection
       end
@@ -68,11 +73,11 @@ module TestResultsCollection
       collection = create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
-            name: "Responses",
+            name: 'Responses',
           ),
-          identifier: CardIdentifier.call([test_results_collection], 'Responses'),
+          identifier: CardIdentifier.call([parent_collection], 'Responses'),
         },
-        parent_collection: test_results_collection,
+        parent_collection: parent_collection,
         created_by: created_by,
       ).record
 
@@ -89,7 +94,7 @@ module TestResultsCollection
           collection_attributes: default_collection_attrs.merge(
             name: "#{test_collection.name} - #{test_audience.audience_name}",
           ),
-          identifier: CardIdentifier.call([test_results_collection, test_audience]),
+          identifier: CardIdentifier.call([parent_collection, test_audience]),
         },
         parent_collection: context.all_responses_collection,
         created_by: created_by,

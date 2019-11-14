@@ -35,7 +35,7 @@ module TestResultsCollection
       context.test_results_collection = create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
-            name: "#{test_collection.name} - #{survey_response.respondent_alias}",
+            name: "#{test_collection.base_name} - #{survey_response.respondent_alias}",
             type: 'Collection::TestResultsCollection',
             survey_response_id: survey_response.id,
             test_collection: test_collection,

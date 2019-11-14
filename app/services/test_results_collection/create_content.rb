@@ -12,10 +12,16 @@ module TestResultsCollection
 
     require_in_context :test_results_collection
 
-    delegate :test_results_collection, :created_by, :idea, :survey_response,
+    delegate :test_results_collection,
+             :created_by,
+             :idea,
+             :survey_response,
              to: :context
 
-    delegate :ideas_collection, :test_show_media?, :collection_to_test_id,
+    delegate :ideas_collection,
+             :test_show_media?,
+             :collection_to_test_id,
+             :test_collection,
              to: :test_results_collection
 
     before do
@@ -30,8 +36,6 @@ module TestResultsCollection
         remove_idea_media_link
       end
 
-      create_alias_open_response_collection if survey_response.present?
-
       collection_cards.each do |card|
         if card.item.present?
           create_content_for_item_card(card)
@@ -39,6 +43,24 @@ module TestResultsCollection
           create_content_for_ideas_collection_card(card)
         end
       end
+
+      if survey_response.present?
+        create_alias_open_response_collection
+      else
+        TestResultsCollection::CreateResponsesCollection.call(
+          parent_collection: parent_collection,
+          test_collection: test_collection,
+          survey_responses: test_collection.survey_responses,
+          test_audiences: test_collection.test_audiences,
+          created_by: created_by,
+          idea: idea,
+          order: @order += 1,
+        )
+      end
+
+      test_collection.cache_cover!
+      test_results_collection.reorder_cards!
+      move_legend_item_to_third_spot if @legend_item.present?
     end
 
     private
@@ -132,7 +154,7 @@ module TestResultsCollection
           identifier: CardIdentifier.call([test_results_collection], 'Responses'),
           order: @order += 1,
           collection_attributes: {
-            name:"#{survey_response.respondent_alias} Responses",
+            name: "#{survey_response.respondent_alias} Responses",
           },
         },
         parent_collection: test_results_collection,
@@ -182,6 +204,13 @@ module TestResultsCollection
 
     def in_collection_test?
       collection_to_test_id.present?
+    end
+
+    def move_legend_item_to_third_spot
+      legend_card = @legend_item.parent_collection_card
+      return if legend_card.order == 2
+
+      legend_card.move_to_order(2)
     end
   end
 end
