@@ -1,8 +1,11 @@
 import PropTypes from 'prop-types'
 import v from '~/utils/variables'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+
+import { NamedActionButton } from '~/ui/global/styled/buttons'
 import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIcon'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
 import IdeaCollectionControls from '~/ui/test_collections/IdeaCollectionControls'
 import QuestionSelector from '~/ui/test_collections/QuestionSelector'
@@ -43,6 +46,8 @@ const QuestionLeftSide = ({
   handleToggleShowMedia,
   handleSetCurrentIdeaCardIndex,
   currentIdeaCardIndex,
+  canAddChoice,
+  onAddChoice,
 }) => {
   return (
     <LeftSideContainer>
@@ -83,6 +88,15 @@ const QuestionLeftSide = ({
         {card.isPinnedAndLocked && <PinnedIcon locked />}
         {card.isPinnedInTemplate && <PinnedIcon />}
       </div>
+      {canAddChoice && (
+        <NamedActionButton
+          onClick={() => onAddChoice(card.record)}
+          svgSize={{ width: '20px', height: '20px' }}
+        >
+          <PlusIcon />
+          Option
+        </NamedActionButton>
+      )}
     </LeftSideContainer>
   )
 }
@@ -105,10 +119,14 @@ QuestionLeftSide.propTypes = {
   ideasCollection: MobxPropTypes.objectOrObservableObject.isRequired,
   handleSetCurrentIdeaCardIndex: PropTypes.func.isRequired,
   currentIdeaCardIndex: PropTypes.number,
+  canAddChoice: PropTypes.bool,
+  onAddChoice: PropTypes.func,
 }
 
 QuestionLeftSide.defaultProps = {
   currentIdeaCardIndex: 0,
+  canAddChoice: false,
+  onAddChoice: null,
 }
 
 export default QuestionLeftSide

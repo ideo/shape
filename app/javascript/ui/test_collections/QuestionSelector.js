@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { kebabCase } from 'lodash'
+
 import { TEST_COLLECTION_SELECT_OPTIONS } from '~/utils/variables'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 

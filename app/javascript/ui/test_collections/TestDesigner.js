@@ -425,6 +425,8 @@ class TestDesigner extends React.Component {
           handleToggleShowMedia={this.handleToggleShowMedia}
           handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}
           currentIdeaCardIndex={currentIdeaCardIndex}
+          canAddChoice={record.isCustomizableQuestionType}
+          onAddChoice={this.onAddQuestionChoice}
         />
         <TestQuestionHolder
           editing
