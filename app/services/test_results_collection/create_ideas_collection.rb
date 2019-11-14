@@ -77,7 +77,7 @@ module TestResultsCollection
         height: 2,
         identifier: 'ideas-collection',
         collection_attributes: {
-          name: "#{test_collection.name} - Ideas",
+          name: "#{test_collection.base_name} - Ideas",
         },
       }
     end

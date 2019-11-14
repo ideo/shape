@@ -118,6 +118,29 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(builder.collection_card.link?).to be true
           expect(builder.collection_card.collection).to eq collection
         end
+
+        context 'with multiple ordered cards' do
+          let!(:parent) do
+            create(:collection,
+                   num_cards: 5,
+                   organization: organization,
+                   add_editors: [user])
+          end
+
+          before do
+            # just to simulate things being out of whack
+            parent.collection_cards.last.update(order: 10)
+          end
+
+          it 'should put things in the correct order' do
+            builder.create
+            card = builder.collection_card
+            expect(parent.reload.collection_cards.map(&:order)).to eq(
+              [0, 1, 2, 3, 4, 5],
+            )
+            expect(card.order).to eq 1
+          end
+        end
       end
 
       describe 'creating card with collection in UserCollection' do

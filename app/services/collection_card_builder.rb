@@ -59,6 +59,7 @@ class CollectionCardBuilder
         post_creation_record_update if @collection_card.primary?
 
         @collection_card.increment_card_orders!
+        @parent_collection.reorder_cards!
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
           @parent_collection.queue_update_template_instances

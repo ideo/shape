@@ -46,6 +46,7 @@ module TestResultsCollection
     def open_response_collection_card_attrs(question_item)
       {
         order: order,
+        width: 2,
         identifier: identifier,
         collection_attributes: {
           name: "#{question_item.content} Responses",
@@ -63,7 +64,7 @@ module TestResultsCollection
     def identifier
       CardIdentifier.call(
         [parent_collection, question_item],
-        'Responses'
+        'Responses',
       )
     end
   end

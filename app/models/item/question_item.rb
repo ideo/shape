@@ -258,7 +258,8 @@ class Item
         identifier: Dataset::Question::DEFAULT_ORG_NAME,
         chart_type: :bar,
       ).where(
-        'groupings @> ?', org_grouping.to_json,
+        'groupings @> ?',
+        org_grouping.to_json,
       ).first
 
       return dataset if dataset.present?
