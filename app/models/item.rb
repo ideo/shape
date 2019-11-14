@@ -172,7 +172,7 @@ class Item < ApplicationRecord
   def dataset_display_name
     return unless question_idea?
 
-    "#{name} Idea"
+    name
   end
 
   def anyone_can_view
