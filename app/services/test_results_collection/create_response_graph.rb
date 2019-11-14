@@ -10,12 +10,13 @@ module TestResultsCollection
            :legend_item,
            :created_by,
            :survey_response,
+           :idea,
            :message
 
     require_in_context :item, :parent_collection
 
     delegate :parent_collection, :item, :legend_item, :created_by, :order,
-             :survey_response,
+             :survey_response, :idea,
              to: :context
 
     delegate :question_dataset, :org_wide_question_dataset,
@@ -42,17 +43,10 @@ module TestResultsCollection
 
       context.legend_item ||= @card.record.legend_item
 
-      link_datasets
-
-      test_audiences.each do |test_audience|
-        item.create_test_audience_dataset(
-          test_audience, @card.record
-        )
-      end
-
-      if survey_response.present?
-        # item.create_survey_response_dataset(survey_response, @card.record)
-      end
+      create_test_audiences_datasets
+      create_idea_datasets if idea.present?
+      create_survey_response_datasets if survey_response.present?
+      link_question_and_org_wide_datasets
     end
 
     private
@@ -65,7 +59,32 @@ module TestResultsCollection
         .first
     end
 
-    def link_datasets
+    def create_test_audiences_datasets
+      test_audiences.each do |test_audience|
+        item.create_test_audience_dataset(
+          test_audience: test_audience,
+          data_item: @card.record,
+          idea: idea,
+        )
+      end
+    end
+
+    def create_idea_datasets
+      item.create_idea_question_dataset(
+        idea: idea,
+        data_item: @card.record,
+      )
+    end
+
+    def create_survey_response_datasets
+      item.create_survey_response_idea_dataset(
+        survey_response: survey_response,
+        idea: idea,
+        data_item: @card.record,
+      )
+    end
+
+    def link_question_and_org_wide_datasets
       question_dataset.data_items_datasets.create(
         data_item: @card.record,
       )

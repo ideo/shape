@@ -250,6 +250,12 @@ class Item
       (points * 100.0 / total).round
     end
 
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
+    end
+
+    # TODO: these dataset creation methods should really be broken out into a service
+
     def org_wide_question_dataset
       org_grouping = [{ type: 'Organization', id: organization.id }]
 
@@ -273,13 +279,20 @@ class Item
       )
     end
 
-    def create_test_audience_dataset(test_audience, data_item)
+    def create_test_audience_dataset(test_audience:, data_item:, idea: nil)
+      groupings = [{ type: 'TestAudience', id: test_audience.id }]
+      identifier = Dataset.identifier_for_object(test_audience)
+      if idea.present?
+        groupings.push(type: 'Idea', id: idea.id)
+        identifier += Dataset.identifier_for_object(idea)
+      end
+
       audience_dataset = Dataset::Question.create(
-        groupings: [{ type: 'TestAudience', id: test_audience.id }],
+        groupings: groupings,
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
-        identifier: Dataset.identifier_for_object(test_audience),
+        identifier: identifier,
       )
       data_item.data_items_datasets.create(
         dataset: audience_dataset,
@@ -287,22 +300,35 @@ class Item
       )
     end
 
-    def create_survey_response_dataset(survey_response, data_item)
-      response_dataset = Dataset::Question.create(
-        groupings: [{ type: 'SurveyResponse', id: @survey_response.id }],
+    def create_idea_question_dataset(idea:, data_item:)
+      idea_dataset = Dataset::Question.create(
+        groupings: [{ type: 'Idea', id: idea.id }],
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
-        identifier: Dataset.identifier_for_object(@survey_response),
+        identifier: Dataset.identifier_for_object(idea),
       )
-      question.data_item.data_items_datasets.create(
-        dataset: response_dataset,
+      data_item.data_items_datasets.create(
+        dataset: idea_dataset,
         selected: true,
       )
     end
 
-    def question_choices_customizable?
-      question_single_choice? || question_multiple_choice?
+    def create_survey_response_idea_dataset(survey_response:, idea:, data_item:)
+      response_dataset = Dataset::Question.create(
+        groupings: [
+          { type: 'SurveyResponse', id: survey_response.id },
+          { type: 'Idea', id: idea.id },
+        ],
+        question_type: question_type,
+        chart_type: :bar,
+        data_source: self,
+        identifier: Dataset.identifier_for_object(survey_response),
+      )
+      data_item.data_items_datasets.create(
+        dataset: response_dataset,
+        selected: true,
+      )
     end
 
     private

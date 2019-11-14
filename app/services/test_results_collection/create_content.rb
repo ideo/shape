@@ -132,7 +132,7 @@ module TestResultsCollection
           identifier: CardIdentifier.call([test_results_collection], 'Responses'),
           order: @order += 1,
           collection_attributes: {
-            name:"#{survey_response.respondent_alias} Responses",
+            name: "#{survey_response.respondent_alias} Responses",
           },
         },
         parent_collection: test_results_collection,
@@ -156,6 +156,7 @@ module TestResultsCollection
           order: @order += 1,
           legend_item: @legend_item,
           survey_response: survey_response,
+          idea: idea,
         ),
       )
       @legend_item ||= result.legend_item

@@ -270,8 +270,10 @@ class Collection < ApplicationRecord
   end
 
   def search_test_answers
-    return {}
-    # return {} unless survey_response_id.present?
+    return {} if survey_response_id.blank?
+
+    # Index all the answers this person has chosen,
+    # so we can surface this collection in global search
     {
       test_answer: TestCollection::ResponseSearchKeys.call(survey_response),
     }
