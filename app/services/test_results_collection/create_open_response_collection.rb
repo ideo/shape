@@ -50,6 +50,7 @@ module TestResultsCollection
         collection_attributes: {
           name: "#{question_item.content} Responses",
           type: 'Collection::TestOpenResponses',
+          cover_type: :cover_type_carousel,
           question_item_id: question_item.id,
         },
       }
