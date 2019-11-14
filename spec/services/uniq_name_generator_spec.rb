@@ -1,8 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe UniqNameGenerator do
-  let(:disallowed_names) { ['John', 'Mark', 'Paul'] }
+  let(:disallowed_names) { %w[John Mark Paul] }
   let(:generator) { UniqNameGenerator.new(disallowed_names: disallowed_names) }
+
+  context 'when disallowed_names is blank' do
+    let(:disallowed_names) { [] }
+    before do
+      allow(Faker::Name)
+        .to receive(:first_name)
+        .and_return('Jane')
+    end
+
+    it 'should return that name' do
+      expect(generator.call).to eq 'Jane'
+    end
+  end
 
   context 'when faker picks a uniq name' do
     before do
@@ -36,7 +49,7 @@ RSpec.describe UniqNameGenerator do
     end
 
     it 'should return the last try' do
-      expect(generator.call).to eq 'Paul'
+      expect(generator.call).to eq 'Mark'
     end
   end
 end
