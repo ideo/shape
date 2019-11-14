@@ -15,7 +15,10 @@
 class QuestionChoice < ApplicationRecord
   belongs_to :question,
              class_name: 'Item::QuestionItem',
-             foreign_key: 'question_item_id'
+             foreign_key: 'question_item_id',
+             # because we build duplicate question_choices along with a question_item
+             # turning off `optional` allows that to validate properly
+             optional: true
 
   delegate :can_edit?,
            :can_view?,

@@ -96,6 +96,11 @@ class Item
       )
     }
 
+    amoeba do
+      recognize [:has_many]
+      include_association :question_choices
+    end
+
     enum question_type: {
       question_context: 0,
       question_useful: 1,
@@ -343,8 +348,10 @@ class Item
     end
 
     def add_default_question_choices
+      return if question_choices.any?
+
       (0..3).each do |i|
-        self.question_choices.create(
+        question_choices.create(
           text: "Option #{i + 1}",
           value: i,
           order: i,
