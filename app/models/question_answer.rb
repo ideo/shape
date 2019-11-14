@@ -62,6 +62,8 @@ class QuestionAnswer < ApplicationRecord
     )
     if builder.create
       self.open_response_item = builder.collection_card.record
+      save
+      return self.open_response_item
     else
       errors.add(:open_response_item, builder.errors.full_messages.join('. '))
       throw :abort

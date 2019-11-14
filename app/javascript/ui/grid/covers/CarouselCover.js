@@ -21,6 +21,7 @@ const CarouselControl = styled.div`
 `
 
 const CarouselButton = styled(TextEnterButton)`
+  bottom: 14px;
   position: static;
   height: 32px;
   width: 32px;

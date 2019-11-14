@@ -100,7 +100,8 @@ class CollectionCard < ApplicationRecord
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
   scope :ideas_collection_card, -> { where(section_type: :ideas).where.not(collection_id: nil) }
-  scope :identifier, ->(identifier) { where(identifier: identifier) }
+  # this scope orders by identifier because the default order(:id) is very slow when getting .first
+  scope :identifier, ->(identifier) { where(identifier: identifier).order(:identifier) }
   scope :item, -> { where.not(item_id: nil) }
   scope :collection, -> { where.not(collection_id: nil) }
 

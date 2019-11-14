@@ -47,7 +47,7 @@ export const TestQuestionBorder = styled.div`
 export const TextInputHolder = styled(StyledCommentTextarea)`
   position: relative;
   color: white;
-  padding: 6px;
+  padding: 12px 3px;
   width: calc(100% - 12px);
   background-color: ${props =>
     props.hasFocus
@@ -195,7 +195,7 @@ export const QuestionHelperText = styled(SmallHelperText)`
 `
 
 export const TextEnterButton = styled.button`
-  bottom: 14px;
+  bottom: 2px;
   color: white;
   right: 18px;
   position: absolute;

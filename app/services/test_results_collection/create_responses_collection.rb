@@ -73,8 +73,8 @@ module TestResultsCollection
     end
 
     def link_all_responses_collection
-      all_responses_collection = CollectionCard.where(
-        identifier: CardIdentifier.call(test_results_collection, 'Responses'),
+      all_responses_collection = CollectionCard.identifier(
+        CardIdentifier.call(test_results_collection, 'Responses'),
       ).first.record
 
       create_card(
