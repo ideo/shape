@@ -8,6 +8,7 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
   let(:answer_number) { nil }
   let(:audience_id) { nil }
   let(:question_type) { nil }
+  let(:dont_include_test_answer_wrapper) { nil }
   subject do
     TestCollection::AnswerSearchKey.new(
       question: question,
@@ -15,6 +16,7 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
       question_choice_id: question_choice_id,
       answer_number: answer_number,
       audience_id: audience_id,
+      dont_include_test_answer_wrapper: dont_include_test_answer_wrapper,
     )
   end
 
@@ -48,6 +50,16 @@ RSpec.describe TestCollection::AnswerSearchKey, type: :service do
       it 'returns question key' do
         expect(subject.for_test(test_id, 5)).to eq(
           "test_answer(test_#{test_id}_idea_5_question_#{question.id}_answer_2)",
+        )
+      end
+    end
+
+    context 'with dont_include_test_answer_wrapper true' do
+      let!(:dont_include_test_answer_wrapper) { true }
+
+      it 'just returns key' do
+        expect(subject.for_test(test_id)).to eq(
+          "test_#{test_id}_question_#{question.id}_answer_2",
         )
       end
     end

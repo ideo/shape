@@ -52,16 +52,8 @@ class Dataset
     end
 
     def name
-      if grouping.present?
-        # Just name off the first grouping for now, change in future
-        klass = grouping['type'].safe_constantize
-        object = klass.find(grouping['id'].to_i)
-        if object.is_a?(SurveyResponse)
-          name = object.respondent_alias
-        else
-          name = object.name
-        end
-        "#{name} #{klass.dataset_display_name}"
+      if groupings.present?
+        grouping_objects.map(&:dataset_display_name).join(' ')
       elsif test_collection_id.present? && test_collection.present?
         test_collection.base_name
       else

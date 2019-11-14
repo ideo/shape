@@ -319,7 +319,7 @@ class Item
       response_dataset = Dataset::Question.create(
         groupings: [
           { type: 'SurveyResponse', id: survey_response.id },
-          { type: 'Idea', id: idea.id },
+          { type: 'Item', id: idea.id },
         ],
         question_type: question_type,
         chart_type: :bar,

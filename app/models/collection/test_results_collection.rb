@@ -108,6 +108,16 @@ class Collection
       items.legend_items.first
     end
 
+    def search_data
+      opts = super
+      return opts if survey_response_id.blank?
+
+      # Index all the answers this person has chosen,
+      # so we can surface this collection in global search
+      opts[:test_answer] = ::TestCollection::ResponseSearchKeys.call(survey_response: survey_response)
+      opts
+    end
+
     private
 
     def close_test

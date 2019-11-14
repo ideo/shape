@@ -51,6 +51,9 @@ module TestResultsCollection
         created_by: created_by,
       ).record
 
+      # Reload to get test_results_collection relationship
+      survey_response.reload
+
       TestResultsCollection::CreateContent.call!(
         test_results_collection: alias_test_results_collection,
         created_by: created_by,

@@ -14,7 +14,7 @@ RSpec.describe Search::Filters::TestAnswer do
         result = Search::Filters::TestAnswer.new('foo test_answer(test_123_question_useful_answer_1) baz').options
         expect(result).to eq(
           where: {
-            test_answers: 'test_123_question_useful_answer_1',
+            test_answer: 'test_123_question_useful_answer_1',
           },
         )
       end

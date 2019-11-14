@@ -158,7 +158,8 @@ class Item < ApplicationRecord
 
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
-  searchkick callbacks: :queue
+  searchkick callbacks: :queue,
+             word_start: %i[name]
 
   # active == don't index archived items
   scope :search_import, -> do
@@ -168,8 +169,10 @@ class Item < ApplicationRecord
     )
   end
 
-  def self.dataset_display_name
-    'Idea'
+  def dataset_display_name
+    return unless question_idea?
+
+    "#{name} Idea"
   end
 
   def anyone_can_view
