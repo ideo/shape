@@ -60,6 +60,10 @@ class SurveyResponse < ApplicationRecord
     incentive_paid: 2,
   }
 
+  def self.dataset_display_name
+    'Response'
+  end
+
   def record_incentive_owed!
     return if !incentive_unearned? || amount_earned.zero? || user&.email.blank?
 

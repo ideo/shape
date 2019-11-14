@@ -283,7 +283,7 @@ class Item
       groupings = [{ type: 'TestAudience', id: test_audience.id }]
       identifier = Dataset.identifier_for_object(test_audience)
       if idea.present?
-        groupings.push(type: 'Idea', id: idea.id)
+        groupings.push(type: 'Item', id: idea.id)
         identifier += Dataset.identifier_for_object(idea)
       end
 
@@ -302,7 +302,7 @@ class Item
 
     def create_idea_question_dataset(idea:, data_item:)
       idea_dataset = Dataset::Question.create(
-        groupings: [{ type: 'Idea', id: idea.id }],
+        groupings: [{ type: 'Item', id: idea.id }],
         question_type: question_type,
         chart_type: :bar,
         data_source: self,

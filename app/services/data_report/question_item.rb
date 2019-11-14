@@ -156,67 +156,76 @@ module DataReport
       group_by_type_id('Organization')
     end
 
-    def group_by_idea_id
-      group_by_type_id('Organization')
-    end
-
     def group_by_survey_response_id
       group_by_type_id('SurveyResponse')
     end
 
     def group_by_idea_id
-      group_by_type_id('Idea')
+      group_by_type_id('Item')
     end
 
     def survey_answers
       if group_by_organization_id.present?
         org_survey_answers
       elsif group_by_survey_response_id
-        #TODO: be able to also group with idea
-        question_item.completed_survey_answers
-                     .where(
-                       SurveyResponse.arel_table[:id].eq(
-                         @dataset.grouping['id'],
-                       ),
-                     )
+        survey_response_answers
       elsif group_by_audience_id.present?
-        #TODO: be able to also group with idea
-        question_item.completed_survey_answers
-                     .where(
-                       SurveyResponse.arel_table[:test_audience_id].eq(
-                         group_by_audience_id,
-                       ),
-                     )
+        audience_answers
       else
         question_item.completed_survey_answers
       end
+    end
+
+    def survey_response_answers
+      scope = question_item.completed_survey_answers
+                           .where(
+                             SurveyResponse.arel_table[:id].eq(
+                               group_by_survey_response_id,
+                             ),
+                           )
+
+      return scope if group_by_idea_id.blank?
+
+      scope.where(idea_id: group_by_idea_id)
+    end
+
+    def audience_answers
+      scope = question_item.completed_survey_answers
+                           .where(
+                             SurveyResponse.arel_table[:test_audience_id].eq(
+                               group_by_audience_id,
+                             ),
+                           )
+      return scope if group_by_idea_id.blank?
+
+      scope.where(idea_id: group_by_idea_id)
     end
 
     def org_survey_answers
       return QuestionAnswer.none if group_by_organization_id.blank?
 
       query = QuestionAnswer
-        .joins(
-          :question,
-          survey_response: :test_collection,
-        )
-        .where(
-          Item::QuestionItem.arel_table[:question_type].eq(
-            question_type,
-          ).and(
-            SurveyResponse.arel_table[:status].eq(:completed),
-          ).and(
-            Collection::TestCollection.arel_table[:organization_id].eq(
-              group_by_organization_id,
-            ),
+      .joins(
+        :question,
+        survey_response: :test_collection,
+      )
+      .where(
+        Item::QuestionItem.arel_table[:question_type].eq(
+          question_type,
+        ).and(
+          SurveyResponse.arel_table[:status].eq(:completed),
+        ).and(
+          Collection::TestCollection.arel_table[:organization_id].eq(
+            group_by_organization_id,
           ),
-        )
-      if question_item&.question_choices_customizable?
-        query = query.where(
-          Item::QuestionItem.arel_table[:id].eq(question_item.id),
-        )
-      end
-      query
+        ),
+      )
+
+      return query unless question_item&.question_choices_customizable?
+
+      query.where(
+        Item::QuestionItem.arel_table[:id].eq(question_item.id),
+      )
     end
 
     def group_by_type_id(type)

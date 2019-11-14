@@ -129,13 +129,13 @@ module TestResultsCollection
     def create_alias_open_response_collection
       create_card(
         params: {
-          identifier: CardIdentifier.call([test_results_collection], 'Responses'),
+          identifier: CardIdentifier.call([survey_response], 'Responses'),
           order: @order += 1,
           collection_attributes: {
             name: "#{survey_response.respondent_alias} Responses",
           },
         },
-        parent_collection: test_results_collection,
+        parent_collection: parent_collection,
         created_by: created_by,
       )
     end
