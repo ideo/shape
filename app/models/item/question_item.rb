@@ -329,7 +329,7 @@ class Item
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
-        identifier: Dataset.identifier_for_object(survey_response),
+        identifier: Dataset.identifier_for_object(survey_response, idea),
       )
       data_item.data_items_datasets.create(
         dataset: response_dataset,
