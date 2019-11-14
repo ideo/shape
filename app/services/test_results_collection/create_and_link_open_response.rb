@@ -13,7 +13,7 @@ module TestResultsCollection
              :open_response_item, :test_collection,
              to: :context
 
-    delegate :question,
+    delegate :question, :survey_response,
              to: :question_answer
 
     def call
@@ -24,7 +24,7 @@ module TestResultsCollection
     private
 
     def create_open_response_item
-      question_answer.create_open_response_item(master_open_responses_collection)
+      question_answer.create_open_response_item(alias_open_responses_collection)
     end
 
     def link_open_response_item
@@ -54,13 +54,13 @@ module TestResultsCollection
 
     def open_responses_collection(parent_collection)
       CollectionCard.find_by(
-        identifier: CardIdentifier.call(parent_collection, question, 'Responses'),
+        identifier: CardIdentifier.call(parent_collection, question, 'OpenResponses'),
       ).collection
     end
 
-    def master_open_responses_collection
+    def alias_open_responses_collection
       CollectionCard.find_by(
-        identifier: CardIdentifier.call(test_collection.test_results_collection, 'Responses'),
+        identifier: CardIdentifier.call(survey_response, 'OpenResponses'),
       ).collection
     end
 
