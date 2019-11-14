@@ -1,5 +1,5 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
@@ -12,7 +12,22 @@ let wrapper, props, instance, component
 describe('TestDesigner', () => {
   beforeEach(() => {
     props = {
-      collection: fakeCollection,
+      collection: {
+        ...fakeCollection,
+        test_show_media: true,
+        sortedCards: [
+          {
+            id: '99',
+            card_question_type: 'ideas_collection',
+            section_type: 'ideas',
+            record: { ...fakeCollection },
+          },
+          {
+            ...fakeCollectionCard,
+            section_type: 'ideas',
+          },
+        ],
+      },
     }
     // very basic way to turn fakeCollection into a "test collection"
     props.collection.collection_cards[0].card_question_type = 'question_useful'
@@ -32,7 +47,7 @@ describe('TestDesigner', () => {
 
   it('renders TestQuestions for each card', () => {
     expect(wrapper.find('TestQuestion').length).toEqual(
-      fakeCollection.collection_cards.length
+      props.collection.sortedCards.length
     )
   })
 

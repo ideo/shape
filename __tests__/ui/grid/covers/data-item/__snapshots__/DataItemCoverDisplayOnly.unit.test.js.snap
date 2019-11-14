@@ -159,7 +159,7 @@ exports[`DataItemCoverDisplayOnly renders snapshot 1`] = `
       </styled.div>
     </styled.div>
   </styled.div>
-  <ChartGroup
+  <inject-ChartGroup-with-routingStore
     dataItem={
       Object {
         "breadcrumb": Array [
