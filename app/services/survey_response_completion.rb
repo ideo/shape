@@ -10,9 +10,8 @@ class SurveyResponseCompletion < SimpleService
     mark_as_completed!
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
-    find_or_create_alias_collection
     mark_response_as_payment_owed
-    ping_results_collection
+    find_or_create_alias_collection
     @survey_response
   end
 
@@ -63,19 +62,7 @@ class SurveyResponseCompletion < SimpleService
   def find_or_create_alias_collection
     return @survey_response.test_results_collection if @survey_response.test_results_collection.present?
 
-    TestResultsCollection::CreateOrLinkAliasCollection.call(
-      test_collection: test_collection,
-      test_results_collection: test_collection.test_results_collection,
-      all_responses_collection: all_responses_collection,
-      survey_response: @survey_response,
-      created_by: user,
-    )
-  end
-
-  def all_responses_collection
-    @all_responses_collection ||= CollectionCard.find_by(
-      identifier: CardIdentifier.call(test_collection.test_results_collection, 'Responses'),
-    )&.record
+    CreateSurveyResponseAliasCollectionWorker.perform_async(@survey_response.id)
   end
 
   def mark_response_as_payment_owed
@@ -84,14 +71,5 @@ class SurveyResponseCompletion < SimpleService
     return if @survey_response.incentive_owed?
 
     @survey_response.record_incentive_owed!
-  end
-
-  def ping_results_collection
-    test_results_collection = test_collection.test_results_collection
-    return unless test_results_collection.present?
-
-    # real-time update any graphs, etc.
-    test_results_collection.touch
-    CollectionUpdateBroadcaster.call(test_results_collection)
   end
 end
