@@ -58,36 +58,20 @@ class SurveyResponseCompletion < SimpleService
       .present?
   end
 
-  def create_alias_datasets
-    # alias_collection = CollectionCard.find_by(
-    #   identifier: CardIdentifier.call(test_results_collection, survey_response)
-    # )
-    test_collection = @survey_response.test_collection
-    all_responses = CollectionCard.find_by(
-      identifier: CardIdentifier.call(test_collection.test_results_collection, 'Responses'),
-    )
+  def create_alias_collection
     TestResultsCollection::CreateOrLinkAliasCollection.call(
       test_collection: test_collection,
-      test_results_collection: all_responses,
+      test_results_collection: test_collection.test_results_collection,
+      all_responses_collection: all_responses_collection,
       survey_response: @survey_response,
-      responses_collection: all_responses,
       created_by: user,
     )
   end
 
-  def create_alias_collection
-    test_collection = @survey_response.test_collection
-    responses_collection = CollectionCard.where(
-      identifier: CardIdentifier.call(@survey_response, 'Responses'),
-    ).first.record
-
-    TestResultsCollection::CreateOrLinkAliasCollection.call(
-      test_collection: test_collection,
-      test_results_collection: test_collection.test_results_collection,
-      responses_collection: responses_collection,
-      survey_response: @survey_response,
-      created_by: user,
-    )
+  def all_responses_collection
+    @all_responses_collection ||= CollectionCard.find_by(
+      identifier: CardIdentifier.call(test_collection.test_results_collection, 'Responses'),
+    )&.record
   end
 
   def mark_response_as_payment_owed

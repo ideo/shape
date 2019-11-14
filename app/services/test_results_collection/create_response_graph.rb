@@ -29,27 +29,27 @@ module TestResultsCollection
 
     def call
       existing_card = find_existing_card
-
       if existing_card.present?
         existing_card.update(order: order) unless existing_card.order == order
         return
       end
+      @card = create_data_item
+      context.legend_item ||= @card.record.legend_item
+      link_question_and_org_wide_datasets
+      create_test_audiences_datasets
+      create_idea_datasets if idea.present?
+      create_survey_response_idea_datasets if survey_response.present?
+    end
 
-      @card = create_card(
+    private
+
+    def create_data_item
+      create_card(
         params: data_item_card_attrs(item),
         parent_collection: parent_collection,
         created_by: created_by,
       )
-
-      context.legend_item ||= @card.record.legend_item
-
-      create_test_audiences_datasets
-      create_idea_datasets if idea.present?
-      create_survey_response_datasets if survey_response.present?
-      link_question_and_org_wide_datasets
     end
-
-    private
 
     def find_existing_card
       parent_collection
@@ -76,12 +76,14 @@ module TestResultsCollection
       )
     end
 
-    def create_survey_response_datasets
-      item.create_survey_response_idea_dataset(
-        survey_response: survey_response,
-        idea: idea,
-        data_item: @card.record,
-      )
+    def create_survey_response_idea_datasets
+      survey_response.test_collection.idea_items.each do |idea|
+        item.create_survey_response_idea_dataset(
+          survey_response: survey_response,
+          idea: idea,
+          data_item: @card.record,
+        )
+      end
     end
 
     def link_question_and_org_wide_datasets

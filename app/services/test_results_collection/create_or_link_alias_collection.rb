@@ -4,20 +4,25 @@ module TestResultsCollection
     include Interactor::Schema
     include CollectionCardBuilderHelpers
 
-    schema :test_collection,
-           :test_results_collection,
-           :survey_response,
-           :responses_collection,
+    schema :survey_response,
+           :all_responses_collection,
+           :alias_test_results_collection,
            :created_by
 
-    require_in_context :responses_collection
+    require_in_context :survey_response, :all_responses_collection
 
-    delegate :test_collection, :test_results_collection, :created_by,
-             :survey_response, :responses_collection,
+    delegate :alias_test_results_collection, :created_by,
+             :survey_response, :all_responses_collection,
              to: :context
 
+    delegate :test_collection,
+             to: :survey_response
+
+    delegate :test_results_collection,
+             to: :test_collection
+
     def call
-      collection = create_alias_collection
+      create_alias_collection
       create_and_link_open_responses
       link_to_test_audience
     end
@@ -32,7 +37,7 @@ module TestResultsCollection
     end
 
     def create_alias_collection
-      context.test_results_collection = create_card(
+      context.alias_test_results_collection = create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
             name: "#{test_collection.base_name} - #{survey_response.respondent_alias}",
@@ -42,12 +47,12 @@ module TestResultsCollection
           ),
           identifier: CardIdentifier.call(test_results_collection, survey_response),
         },
-        parent_collection: responses_collection,
+        parent_collection: all_responses_collection,
         created_by: created_by,
       ).record
 
       TestResultsCollection::CreateContent.call!(
-        test_results_collection: test_results_collection,
+        test_results_collection: alias_test_results_collection,
         created_by: created_by,
         survey_response: survey_response,
       )
@@ -69,7 +74,7 @@ module TestResultsCollection
     def link_to_test_audience
       test_audience_collection_card = CollectionCard.find_by(
         identifier: CardIdentifier.call(
-          [test_results_collection, survey_response.test_audience],
+          test_results_collection, survey_response.test_audience
         ),
       )
       if test_audience_collection_card.blank?
@@ -82,9 +87,10 @@ module TestResultsCollection
     def create_and_link_open_responses
       survey_response.question_answers.each do |question_answer|
         next unless question_answer.question.question_open?
+
         TestResultsCollection::CreateAndLinkOpenResponse.call(
           test_collection: test_collection,
-          alias_test_results_collection: test_results_collection,
+          alias_test_results_collection: alias_test_results_collection,
           question_answer: question_answer,
         )
       end

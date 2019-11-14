@@ -274,8 +274,9 @@ class Collection < ApplicationRecord
 
     # Index all the answers this person has chosen,
     # so we can surface this collection in global search
+    test_answer_keys = ::TestCollection::ResponseSearchKeys.call(survey_response: survey_response)
     {
-      test_answer: TestCollection::ResponseSearchKeys.call(survey_response),
+      test_answer: test_answer_keys,
     }
   end
 

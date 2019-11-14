@@ -47,15 +47,7 @@ module TestResultsCollection
       if survey_response.present?
         create_alias_open_response_collection
       else
-        TestResultsCollection::CreateResponsesCollection.call(
-          parent_collection: parent_collection,
-          test_collection: test_collection,
-          survey_responses: test_collection.survey_responses,
-          test_audiences: test_collection.test_audiences,
-          created_by: created_by,
-          idea: idea,
-          order: @order += 1,
-        )
+        create_responses_collection
       end
 
       test_collection.cache_cover!
@@ -159,6 +151,16 @@ module TestResultsCollection
         },
         parent_collection: parent_collection,
         created_by: created_by,
+      )
+    end
+
+    def create_responses_collection
+      TestResultsCollection::CreateResponsesCollection.call(
+        parent_collection: parent_collection,
+        test_collection: test_collection,
+        created_by: created_by,
+        idea: idea,
+        order: @order += 1,
       )
     end
 
