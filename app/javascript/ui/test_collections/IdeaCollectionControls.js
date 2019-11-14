@@ -71,14 +71,21 @@ class IdeaCollectionControls extends React.Component {
     handleSetCurrentIdeaCardIndex(index)
   }
 
-  addNewIdeaItem = () => {
-    const { createNewIdea, collection } = this.props
-    createNewIdea({
+  addNewIdeaItem = async () => {
+    const {
+      handleSetCurrentIdeaCardIndex,
+      createNewIdea,
+      collection,
+    } = this.props
+    // create new idea at the end
+    await createNewIdea({
       parentCollection: collection,
       questionType: 'question_idea',
       sectionType: 'ideas',
-      order: this.currentIdea.order + 0.5,
+      order: collection.collection_card_count + 1,
     })
+    // now jump to the end
+    handleSetCurrentIdeaCardIndex(this.ideaCards.length - 1)
   }
 
   confirmWithDialog = ({ prompt, onConfirm }) => {

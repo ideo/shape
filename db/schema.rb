@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_06_190741) do
+ActiveRecord::Schema.define(version: 2019_11_07_222348) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -124,8 +124,10 @@ ActiveRecord::Schema.define(version: 2019_11_06_190741) do
     t.integer "row"
     t.integer "col"
     t.integer "section_type"
+    t.string "identifier"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
+    t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -190,11 +192,13 @@ ActiveRecord::Schema.define(version: 2019_11_06_190741) do
     t.datetime "test_closed_at"
     t.integer "default_group_id"
     t.boolean "test_show_media", default: true
+    t.integer "idea_id"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["created_at"], name: "index_collections_on_created_at"
+    t.index ["idea_id"], name: "index_collections_on_idea_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
     t.index ["roles_anchor_collection_id"], name: "index_collections_on_roles_anchor_collection_id"
     t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"

@@ -274,37 +274,26 @@ class Item
       builder.collection_card
     end
 
-    def find_or_create_open_response_collection(parent_collection:, initiated_by:)
-      return if !question_open? || test_open_responses_collection.present?
-
-      builder = CollectionCardBuilder.new(
-        params: {
-          order: parent_collection_card.order,
-          width: 2,
-          collection_attributes: {
-            name: "#{content} Responses",
-            type: 'Collection::TestOpenResponses',
-            question_item_id: id,
-            cover_type: :cover_type_carousel,
-          },
-        },
-        parent_collection: parent_collection,
-        user: initiated_by,
-      )
-      builder.create
-      builder.collection_card
-    end
-
     def org_wide_question_dataset
-      # For customizable questions the org dataset needs the reference
-      # to the actual question
-      data_source = self if question_choices_customizable?
-      Dataset::Question.find_or_create_by(
-        groupings: [{ type: 'Organization', id: organization.id }],
+      org_grouping = [{ type: 'Organization', id: organization.id }]
+      dataset = Dataset::Question.where(
         question_type: question_type,
         identifier: Dataset::Question::DEFAULT_ORG_NAME,
         chart_type: :bar,
-        data_source: data_source,
+      ).where(
+        'groupings @> ?',
+        org_grouping.to_json,
+      ).first
+
+      return dataset if dataset.present?
+
+      org_data_source = question_choices_customizable? ? self : nil
+      Dataset::Question.create(
+        question_type: question_type,
+        identifier: Dataset::Question::DEFAULT_ORG_NAME,
+        chart_type: :bar,
+        groupings: org_grouping,
+        data_source: org_data_source,
       )
     end
 
