@@ -286,6 +286,7 @@ class Collection
         msg = "Please add #{item.incomplete_description} to "
         msg += item.question_idea? ? 'idea' : 'question'
         msg += " #{item.parent_collection_card.order + 1}"
+        # TODO: Make this handle order when people delete and then add questions
         errors.add(:base, msg)
       end
 

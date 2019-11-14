@@ -375,6 +375,10 @@ class Item < ApplicationRecord
       is_a?(Item::QuestionItem) || name.blank? || content.blank?
     )
 
+    # Must fill in question (content) and all choices for question items
+    return true if is_a?(Item::QuestionItem) && question_choices_customizable? &&
+      (question_choices.any? { |choice| choice.text.blank? } || content.blank?)
+
     # Question cards that are in the blank default state
     return true if question_type.blank? && filestack_file_id.blank? && url.blank?
 
@@ -392,6 +396,8 @@ class Item < ApplicationRecord
       'an image or video'
     elsif question_idea?
       'your content'
+    elsif question_single_choice? || question_multiple_choice?
+      content.blank? ? 'your question' : 'your choice(s)'
     end
   end
 
