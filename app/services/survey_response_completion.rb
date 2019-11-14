@@ -1,6 +1,11 @@
 class SurveyResponseCompletion < SimpleService
-  delegate :test_collection, :gives_incentive?, :completed?, :user, to: :@survey_response
-  delegate :test_audience, to: :@survey_response, allow_nil: true
+  delegate :test_collection,
+           :gives_incentive?,
+           :completed?,
+           :user,
+           :test_audience,
+           :test_results_collection,
+           to: :@survey_response
 
   def initialize(survey_response)
     @survey_response = survey_response
@@ -11,7 +16,7 @@ class SurveyResponseCompletion < SimpleService
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
     mark_response_as_payment_owed
-    find_or_create_alias_collection
+    create_alias_collection unless test_results_collection.present?
     @survey_response
   end
 
@@ -59,9 +64,7 @@ class SurveyResponseCompletion < SimpleService
       .present?
   end
 
-  def find_or_create_alias_collection
-    return @survey_response.test_results_collection if @survey_response.test_results_collection.present?
-
+  def create_alias_collection
     CreateSurveyResponseAliasCollectionWorker.perform_async(@survey_response.id)
   end
 
