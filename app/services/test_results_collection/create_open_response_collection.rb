@@ -62,7 +62,7 @@ module TestResultsCollection
     end
 
     def identifier
-      CardIdentifier.call(parent_collection, question_item, 'Responses')
+      CardIdentifier.call(parent_collection, question_item, 'OpenResponses')
     end
   end
 end
