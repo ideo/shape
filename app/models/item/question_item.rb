@@ -352,7 +352,6 @@ class Item
 
       (0..3).each do |i|
         question_choices.create(
-          text: "Option #{i + 1}",
           value: i,
           order: i,
         )

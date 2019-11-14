@@ -225,6 +225,7 @@ class CustomizableQuestion extends React.Component {
               <CustomizableQuestionChoice
                 isChecked={this.isChoiceSelected(choice)}
                 choice={choice}
+                placeholder={`Option ${index + 1}`}
                 isSingleChoiceQuestion={question.isSingleChoiceQuestion}
                 questionAnswer={questionAnswer}
                 onChange={this.handleAnswerSelection(choice)}
