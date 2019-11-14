@@ -326,7 +326,7 @@ class Organization < ApplicationRecord
       # allows copies to continue even if the user can't view the original content
       system_collection: true,
     )
-    user_collection.save if user_collection.cached_attributes.delete 'awaiting_first_user_content'
+    user_collection.save if user_collection.cached_attributes.delete 'loading_content'
     user_collection
   end
 
