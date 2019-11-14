@@ -104,7 +104,7 @@ describe Collection::TestCollection, type: :model do
       let(:collection_to_test) { create(:collection) }
 
       it 'archives idea cards if collection to test added' do
-        idea_cards = test_collection.idea_cards
+        idea_cards = test_collection.idea_items.map(&:parent_collection_card)
         non_idea_cards = test_collection.collection_cards
         expect(idea_cards.all?(&:archived?)).to be false
         test_collection.update(collection_to_test: collection_to_test)
@@ -353,7 +353,7 @@ describe Collection::TestCollection, type: :model do
                 test_collection.launch!(initiated_by: user)
               end.to change(
                 Dataset::Question, :count
-              ).by(scale_question_num * 2) # All scale questions get one dataset + one more for the org
+              ).by(scale_question_num * 3) # All scale questions get one dataset + one more for the org + for the audience
               expect(Dataset::Question.last.groupings).to eq(
                 [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
               )

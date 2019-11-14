@@ -176,8 +176,8 @@ describe Api::V1::TestCollectionsController, type: :request, json: true, auth: t
       csv_report_api_v1_test_collection_path(collection)
     end
 
-    it 'should call TestCollectionToCsv to generate report' do
-      expect(TestCollectionToCsv).to receive(:call).with(collection)
+    it 'should call TestCollection::ExportToCsv to generate report' do
+      expect(TestCollection::ExportToCsv).to receive(:call).with(collection)
       get(path)
     end
   end

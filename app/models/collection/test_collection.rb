@@ -31,6 +31,7 @@
 #  collection_to_test_id      :bigint(8)
 #  created_by_id              :integer
 #  default_group_id           :integer
+#  idea_id                    :integer
 #  joinable_group_id          :bigint(8)
 #  organization_id            :bigint(8)
 #  question_item_id           :integer
@@ -47,6 +48,7 @@
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
 #  index_collections_on_created_at                  (created_at)
+#  index_collections_on_idea_id                     (idea_id)
 #  index_collections_on_organization_id             (organization_id)
 #  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
 #  index_collections_on_submission_box_id           (submission_box_id)
@@ -65,9 +67,13 @@ class Collection
     include AASM
 
     has_many :survey_responses, dependent: :destroy
-    has_one :test_results_collection, inverse_of: :test_collection
-    delegate :datasets, to: :test_results_collection, allow_nil: true
-
+    has_one :test_results_collection,
+            -> { master_results },
+            inverse_of: :test_collection
+    has_many :test_results_idea_collections,
+             -> { idea_results },
+             class_name: 'TestCollection::TestResultsCollection',
+             inverse_of: :test_collection
     has_many :question_items,
              -> { questions },
              source: :item,
@@ -77,7 +83,10 @@ class Collection
     has_many :paid_test_audiences,
              -> { paid },
              class_name: 'TestAudience'
+
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
+
+    delegate :datasets, to: :test_results_collection, allow_nil: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_or_templated?
     after_create :add_test_tag
@@ -557,13 +566,21 @@ class Collection
         return true
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
-      unless reopening
-        create_test_results_collection_and_move_inside!(initiated_by: initiated_by)
-      end
-      # this finds_or_creates corresponding graphs/response collections
-      test_results_collection.initialize_cards!
+      create_results_collections!(initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
       TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
+    end
+
+    def create_results_collections!(initiated_by = nil)
+      result = ::TestCollection::CreateResultsCollections.call(
+        test_collection: self,
+        created_by: initiated_by || created_by,
+      )
+
+      return test_results_collection if result.success?
+
+      errors.add(:base, result.message)
+      false
     end
 
     def after_close_test
@@ -575,42 +592,6 @@ class Collection
         update_cached_submission_status(parent_submission_box_template)
         close_all_submissions_tests!
       end
-    end
-
-    def create_test_results_collection_and_move_inside!(initiated_by: created_by)
-      if roles_anchor == self
-        results_roles_anchor = nil
-      else
-        # we're anchored above, so the results can be as well
-        results_roles_anchor = roles_anchor
-      end
-      create_test_results_collection(
-        name: name,
-        organization: organization,
-        created_by: initiated_by,
-        roles_anchor_collection: results_roles_anchor,
-      )
-
-      if results_roles_anchor.nil?
-        roles.each do |role|
-          role.update(resource: test_results_collection)
-        end
-      end
-
-      update(name: "#{name}#{FEEDBACK_DESIGN_SUFFIX}")
-      parent_collection_card.update(collection_id: test_results_collection.id)
-      # pick up parent_collection_card relationship
-      reload
-      test_results_collection.reload
-      CollectionCardBuilder.call(
-        params: {
-          order: 999,
-          collection_id: id,
-        },
-        parent_collection: test_results_collection,
-        user: initiated_by,
-      )
-      test_results_collection
     end
 
     def close_test_after_archive
@@ -629,7 +610,7 @@ class Collection
     end
 
     def archive_idea_questions
-      idea_cards.each(&:archive!)
+      idea_items.each(&:archive!)
       touch
     end
   end

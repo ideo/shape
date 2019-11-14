@@ -10,6 +10,7 @@
 #  filter            :integer          default("transparent_gray")
 #  height            :integer
 #  hidden            :boolean          default(FALSE)
+#  identifier        :string
 #  image_contain     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
@@ -29,13 +30,14 @@
 #
 # Indexes
 #
-#  index_collection_cards_on_archive_batch          (archive_batch)
-#  index_collection_cards_on_collection_id          (collection_id)
-#  index_collection_cards_on_item_id                (item_id)
-#  index_collection_cards_on_order_and_row_and_col  (order,row,col)
-#  index_collection_cards_on_parent_id              (parent_id)
-#  index_collection_cards_on_templated_from_id      (templated_from_id)
-#  index_collection_cards_on_type                   (type)
+#  index_collection_cards_on_archive_batch             (archive_batch)
+#  index_collection_cards_on_collection_id             (collection_id)
+#  index_collection_cards_on_identifier_and_parent_id  (identifier,parent_id)
+#  index_collection_cards_on_item_id                   (item_id)
+#  index_collection_cards_on_order_and_row_and_col     (order,row,col)
+#  index_collection_cards_on_parent_id                 (parent_id)
+#  index_collection_cards_on_templated_from_id         (templated_from_id)
+#  index_collection_cards_on_type                      (type)
 #
 
 class CollectionCard < ApplicationRecord
@@ -98,6 +100,9 @@ class CollectionCard < ApplicationRecord
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
   scope :ideas_collection_card, -> { where(section_type: :ideas).where.not(collection_id: nil) }
+  scope :identifier, ->(identifier) { where(identifier: identifier) }
+  scope :item, -> { where.not(item_id: nil) }
+  scope :collection, -> { where.not(collection_id: nil) }
 
   enum filter: {
     nothing: 0,
@@ -263,6 +268,10 @@ class CollectionCard < ApplicationRecord
   def master_template_card?
     # does this card live in a MasterTemplate?
     parent.master_template?
+  end
+
+  def ideas_collection_card?
+    section_type == 'ideas' && collection_id.present?
   end
 
   def pinned_and_locked?

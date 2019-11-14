@@ -31,6 +31,7 @@
 #  collection_to_test_id      :bigint(8)
 #  created_by_id              :integer
 #  default_group_id           :integer
+#  idea_id                    :integer
 #  joinable_group_id          :bigint(8)
 #  organization_id            :bigint(8)
 #  question_item_id           :integer
@@ -47,6 +48,7 @@
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
 #  index_collections_on_created_at                  (created_at)
+#  index_collections_on_idea_id                     (idea_id)
 #  index_collections_on_organization_id             (organization_id)
 #  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
 #  index_collections_on_submission_box_id           (submission_box_id)
