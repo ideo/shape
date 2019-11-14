@@ -63,7 +63,8 @@ module TestResultsCollection
 
     def identifier
       CardIdentifier.call(
-        [parent_collection, question_item],
+        parent_collection,
+        question_item,
         'Responses',
       )
     end
