@@ -62,7 +62,7 @@ class SurveyResponse < ApplicationRecord
   }
 
   def dataset_display_name
-    "#{respondent_alias} Response"
+    respondent_alias
   end
 
   def record_incentive_owed!

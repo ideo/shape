@@ -321,6 +321,7 @@ class Item
     end
 
     def create_survey_response_idea_dataset(survey_response:, idea:, data_item:)
+      identifier = Dataset.identifier_for_object(survey_response) + Dataset.identifier_for_object(idea)
       response_dataset = Dataset::Question.create(
         groupings: [
           { type: 'SurveyResponse', id: survey_response.id },
@@ -329,7 +330,7 @@ class Item
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
-        identifier: Dataset.identifier_for_object(survey_response, idea),
+        identifier: identifier,
       )
       data_item.data_items_datasets.create(
         dataset: response_dataset,

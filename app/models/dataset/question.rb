@@ -53,7 +53,7 @@ class Dataset
 
     def name
       if groupings.present?
-        grouping_objects.map(&:dataset_display_name).join(' ')
+        grouping_objects.map(&:dataset_display_name).join(' - ')
       elsif test_collection_id.present? && test_collection.present?
         test_collection.base_name
       else
