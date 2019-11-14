@@ -216,7 +216,8 @@ class Collection < ApplicationRecord
 
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
-  searchkick callbacks: :queue
+  searchkick callbacks: :queue,
+             word_start: %i[name]
 
   # searchable == don't index User/SharedWithMe collections
   scope :search_import, -> do
@@ -266,17 +267,6 @@ class Collection < ApplicationRecord
       updated_at: updated_at,
       archived: archived,
       master_template: master_template,
-    }.merge(search_test_answers)
-  end
-
-  def search_test_answers
-    return {} if survey_response_id.blank?
-
-    # Index all the answers this person has chosen,
-    # so we can surface this collection in global search
-    test_answer_keys = ::TestCollection::ResponseSearchKeys.call(survey_response: survey_response)
-    {
-      test_answer: test_answer_keys,
     }
   end
 
@@ -917,7 +907,7 @@ class Collection < ApplicationRecord
   #
 
   def serial_collection_cover_items
-    return items if cover_type_carousel?
+    return items_and_linked_items if cover_type_carousel?
 
     # Only include cover items if this collection has indicated to use them
     cover_type_default? ? [] : collection_cover_items

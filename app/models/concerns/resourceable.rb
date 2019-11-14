@@ -191,11 +191,11 @@ module Resourceable
   def search_user_ids
     # slightly different from allowed_user_ids because the search methods
     # intentionally separate user_ids and group_ids
-    anchored_roles.includes(:users).pluck(User.arel_table[:id]).uniq
+    anchored_roles.includes(:users).pluck(User.arel_table[:id]).uniq.compact
   end
 
   def search_group_ids
-    anchored_roles.includes(:groups).pluck(Group.arel_table[:id]).uniq
+    anchored_roles.includes(:groups).pluck(Group.arel_table[:id]).uniq.compact
   end
 
   # # get all [role] users, both individual and via group, for this item/collection

@@ -10,7 +10,7 @@ class SurveyResponseCompletion < SimpleService
     mark_as_completed!
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
-    create_alias_collection
+    find_or_create_alias_collection
     mark_response_as_payment_owed
     ping_results_collection
     @survey_response
@@ -60,7 +60,9 @@ class SurveyResponseCompletion < SimpleService
       .present?
   end
 
-  def create_alias_collection
+  def find_or_create_alias_collection
+    return @survey_response.test_results_collection if @survey_response.test_results_collection.present?
+
     TestResultsCollection::CreateOrLinkAliasCollection.call(
       test_collection: test_collection,
       test_results_collection: test_collection.test_results_collection,

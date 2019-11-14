@@ -96,6 +96,11 @@ class Item
       )
     }
 
+    amoeba do
+      recognize [:has_many]
+      include_association :question_choices
+    end
+
     enum question_type: {
       question_context: 0,
       question_useful: 1,
@@ -316,15 +321,16 @@ class Item
     end
 
     def create_survey_response_idea_dataset(survey_response:, idea:, data_item:)
+      identifier = Dataset.identifier_for_object(survey_response) + Dataset.identifier_for_object(idea)
       response_dataset = Dataset::Question.create(
         groupings: [
           { type: 'SurveyResponse', id: survey_response.id },
-          { type: 'Idea', id: idea.id },
+          { type: 'Item', id: idea.id },
         ],
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
-        identifier: Dataset.identifier_for_object(survey_response),
+        identifier: identifier,
       )
       data_item.data_items_datasets.create(
         dataset: response_dataset,
@@ -343,8 +349,10 @@ class Item
     end
 
     def add_default_question_choices
+      return if question_choices.any?
+
       (0..3).each do |i|
-        self.question_choices.create(
+        question_choices.create(
           text: "Option #{i + 1}",
           value: i,
           order: i,

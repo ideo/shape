@@ -1,12 +1,20 @@
 module TestCollection
   class AnswerSearchKey
 
-    def initialize(question: nil, question_type: nil, question_choice_id: nil, answer_number: nil, audience_id: nil)
+    def initialize(
+      question: nil,
+      question_type: nil,
+      question_choice_id: nil,
+      answer_number: nil,
+      audience_id: nil,
+      dont_include_test_answer_wrapper: false
+    )
       @question = question
       @question_type = question_type
       @question_choice_id = question_choice_id
       @answer_number = answer_number
       @audience_id = audience_id
+      @dont_include_test_answer_wrapper = dont_include_test_answer_wrapper
     end
 
     def for_test(test_id, idea_id = nil)
@@ -27,6 +35,8 @@ module TestCollection
     private
 
     def query(answer_key)
+      return answer_key if @dont_include_test_answer_wrapper
+
       "test_answer(#{answer_key})"
     end
 

@@ -129,8 +129,8 @@ class Organization < ApplicationRecord
       .where.not(overdue_at: nil)
   end
 
-  def self.dataset_display_name
-    'Organization'
+  def dataset_display_name
+    "#{name} Organization"
   end
 
   def can_view?(user)

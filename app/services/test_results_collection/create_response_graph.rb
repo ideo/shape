@@ -35,10 +35,12 @@ module TestResultsCollection
       end
       @card = create_data_item
       context.legend_item ||= @card.record.legend_item
-      link_question_and_org_wide_datasets
-      create_test_audiences_datasets
+
+      # Create datasets (in specific order so they appear that way in the legend)
       create_idea_datasets if idea.present?
       create_survey_response_idea_datasets if survey_response.present?
+      link_question_and_org_wide_datasets
+      create_test_audiences_datasets
     end
 
     private

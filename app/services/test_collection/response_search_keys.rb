@@ -22,7 +22,7 @@ module TestCollection
     def add_non_repeating_question_items
       non_repeating_question_items.graphable_questions.each do |question|
         answers_by_question_id[question.id].each do |answer|
-          add_question_answer_keys(question: question, answer: answer)
+          generate_question_answer_keys(question: question, answer: answer)
         end
       end
     end
@@ -33,18 +33,37 @@ module TestCollection
           answers_by_question_id[question.id].each do |answer|
             next unless answer.idea_id == idea.id
 
-            add_question_answer_keys(question: question, answer: answer, idea_id: idea.id)
+            generate_question_answer_keys(question: question, answer: answer, idea_id: idea.id)
           end
         end
       end
     end
 
-    def add_question_answer_keys(question:, answer:, idea_id: nil)
+    def generate_question_answer_keys(question:, answer:, idea_id: nil)
       answer_key_attrs = {
         question: question,
-        audience_id: test_audience_id,
+        dont_include_test_answer_wrapper: true,
       }
+      # Generate keys without audience
+      generate_keys_for_question(
+        question: question,
+        answer: answer,
+        idea_id: idea_id,
+        answer_key_attrs: answer_key_attrs,
+      )
 
+      # Generate keys with audience
+      generate_keys_for_question(
+        question: question,
+        answer: answer,
+        idea_id: idea_id,
+        answer_key_attrs: answer_key_attrs.merge(
+          audience_id: test_audience_id,
+        ),
+      )
+    end
+
+    def generate_keys_for_question(question:, answer:, idea_id: nil, answer_key_attrs: {})
       if question.question_choices_customizable?
         answer.selected_choice_ids.each do |question_choice_id|
           answer_key = TestCollection::AnswerSearchKey.new(
