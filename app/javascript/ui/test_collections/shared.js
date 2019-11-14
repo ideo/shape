@@ -59,7 +59,7 @@ export const TextInputHolder = styled(StyledCommentTextarea)`
 export const TextResponseHolder = styled(StyledCommentTextarea)`
   position: relative;
   background-color: ${props => props.theme.responseHolder};
-  padding: 6px;
+  padding: 12px 6px;
   /* to account for the arrow button */
   padding-right: 24px;
 `
@@ -195,7 +195,7 @@ export const QuestionHelperText = styled(SmallHelperText)`
 `
 
 export const TextEnterButton = styled.button`
-  bottom: 2px;
+  bottom: 8px;
   color: white;
   right: 18px;
   position: absolute;
