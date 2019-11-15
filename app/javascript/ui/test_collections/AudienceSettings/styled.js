@@ -32,9 +32,6 @@ StyledRowFlexParent.defaultProps = {
 // flex-grow, flex-shrink and flex-basis combined
 const StyledRowFlexItem = styled(Box)`
   width: 250px;
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    /* width: 100px; */
-  }
 `
 
 const StyledRowFlexCell = styled(StyledRowFlexItem)`
