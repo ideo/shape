@@ -207,15 +207,10 @@ class Item
       end
     end
 
-    def customizable_title_and_description
-      {
-        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
-        description: content,
-      }
-    end
-
     def question_title_and_description
       return customizable_title_and_description if question_choices_customizable?
+      return category_satisfaction_title_and_description if question_category_satisfaction?
+
       self.class.question_title_and_description(question_type)
     end
 
@@ -352,6 +347,22 @@ class Item
     end
 
     private
+
+    def category_satisfaction_title_and_description
+      attrs = self.class.question_title_and_description(:question_category_satisfaction)
+
+      {
+        title: attrs[:title],
+        description: "#{attrs[:description]} #{content}?",
+      }
+    end
+
+    def customizable_title_and_description
+      {
+        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
+        description: content,
+      }
+    end
 
     def create_question_dataset
       self.question_dataset = Dataset::Question.create(
