@@ -29,16 +29,20 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
   describe '#call' do
     let(:test_results_collection) { test_collection.test_results_collection }
 
-    it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(test_results_collection)
-      service.call
-    end
-
     context 'when test audience is open' do
+      before do
+        allow(CreateSurveyResponseAliasCollectionWorker).to receive(:perform_async).and_call_original
+      end
+
       it 'marks the survey_response as completed' do
         expect(survey_response.completed?).to be false
         service.call
         expect(survey_response.completed?).to be true
+      end
+
+      it 'calls CreateSurveyResponseAliasCollectionWorker' do
+        expect(CreateSurveyResponseAliasCollectionWorker).to receive(:perform_async).with(survey_response.id)
+        service.call
       end
     end
 
