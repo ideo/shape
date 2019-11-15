@@ -112,7 +112,7 @@ module TestResultsCollection
     end
 
     def test_audiences
-      return [survey_response.test_audience] if survey_response.present?
+      return [survey_response.test_audience].compact if survey_response.present?
 
       item.parent.test_audiences
     end

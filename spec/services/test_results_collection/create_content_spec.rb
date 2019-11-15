@@ -2,11 +2,10 @@ require 'rails_helper'
 
 RSpec.describe TestResultsCollection::CreateContent, type: :service do
   let(:test_collection) { create(:test_collection, :completed) }
-  before do
-    TestResultsCollection::CreateCollection.call(
-      test_collection: test_collection,
-    )
-  end
+  let(:test_results_collection) { test_collection.test_results_collection }
+  let(:idea) { test_collection.idea_items.first }
+  let(:idea_in_context) { nil }
+
   before do
     [
       TestResultsCollection::CreateContent,
@@ -18,10 +17,19 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     ].each do |interactor_klass|
       allow(interactor_klass).to receive(:call!).and_call_original
     end
+
+    # create the TestResultsCollection for the content to appear in
+    TestResultsCollection::CreateCollection.call(
+      test_collection: test_collection,
+    )
+    if idea_in_context
+      TestResultsCollection::CreateCollection.call(
+        test_collection: test_collection,
+        idea: idea_in_context,
+      )
+    end
   end
-  let(:test_results_collection) { test_collection.test_results_collection }
-  let(:idea) { test_collection.idea_items.first }
-  let(:idea_in_context) { nil }
+
   subject do
     TestResultsCollection::CreateContent.call!(
       test_results_collection: test_results_collection,
@@ -38,6 +46,13 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       ),
     )
     expect(subject).to be_a_success
+  end
+
+  it 'places the legend in the 3rd spot' do
+    expect(subject).to be_a_success
+    expect(
+      test_results_collection.collection_cards[2].record,
+    ).to be_instance_of(Item::LegendItem)
   end
 
   context 'with media disabled' do
@@ -88,11 +103,22 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     test_collection.question_items.question_open.each do |question_item|
       expect(TestResultsCollection::CreateOpenResponseCollection).to receive(:call!).with(
         hash_including(
-          item: question_item,
+          question_item: question_item,
         ),
       )
     end
     expect(subject).to be_a_success
+  end
+
+  it 'moves test design collection to the end of the collection' do
+    expect(subject).to be_a_success
+    expect(
+      test_collection
+        .test_results_collection
+        .collection_cards
+        .last
+        .collection,
+    ).to eq(test_collection)
   end
 
   it 'creates ideas collection' do
@@ -105,13 +131,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
   end
 
   context 'with idea in the context' do
-    let!(:idea_in_context) { idea }
-    before do
-      TestResultsCollection::CreateCollection.call(
-        test_collection: test_collection,
-        idea: idea,
-      )
-    end
+    let(:idea_in_context) { idea }
 
     it 'links idea media + description inline' do
       expect(idea.test_results_collection).to be_instance_of(Collection::TestResultsCollection)
@@ -137,6 +157,52 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
 
     it 'does not create ideas collection' do
       expect(subject).to be_a_success
+    end
+  end
+
+  context 'with more scaled questions' do
+    let!(:test_collection) { create(:test_collection, :completed) }
+    let(:test_results_collection) { test_collection.test_results_collection }
+    let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
+    let(:legend_item) { test_results_collection.legend_item }
+
+    it 'should create a LegendItem at the 3rd spot (order == 2)' do
+      expect(subject).to be_a_success
+      expect(legend_item.parent_collection_card.order).to eq 2
+      expect(
+        test_results_collection
+        .collection_cards
+        .reload
+        .map { |card| card.record.class.name },
+      ).to eq(
+        [
+          'Item::VideoItem',
+          'Item::DataItem',
+          'Item::LegendItem',
+          # ideas collection
+          'Collection',
+          # all the default questions
+          'Item::DataItem',
+          'Item::DataItem',
+          'Item::DataItem',
+          'Collection::TestOpenResponses',
+          'Collection::TestOpenResponses',
+          # 2 additional scaled
+          'Item::DataItem',
+          'Item::DataItem',
+          # all responses
+          'Collection',
+          # idea results
+          'Collection::TestResultsCollection',
+          # original test collection (feedback design)
+          'Collection::TestCollection',
+        ],
+      )
+      expect(
+        test_results_collection
+        .collection_cards
+        .map(&:order),
+      ).to eq(0.upto(13).to_a)
     end
   end
 end

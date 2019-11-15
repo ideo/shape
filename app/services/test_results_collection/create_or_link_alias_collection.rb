@@ -57,7 +57,6 @@ module TestResultsCollection
       TestResultsCollection::CreateContent.call!(
         test_results_collection: alias_test_results_collection,
         created_by: created_by,
-        survey_response: survey_response,
       )
     end
 

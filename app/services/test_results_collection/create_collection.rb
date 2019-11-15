@@ -36,12 +36,6 @@ module TestResultsCollection
           end
         end
 
-        TestResultsCollection::CreateContent.call!(
-          test_results_collection: test_results_collection,
-          created_by: created_by,
-          idea: idea,
-        )
-
         if master_results_collection? && initial_creation
           move_test_collection_inside_test_results
         end
@@ -49,6 +43,11 @@ module TestResultsCollection
       rescue Interactor::Failure => e
         raise ActiveRecord::Rollback, e.message
       end
+
+      TestResultsCollection::CreateContentWorker.perform_async(
+        test_results_collection.id,
+        created_by&.id,
+      )
     end
 
     private
@@ -71,6 +70,7 @@ module TestResultsCollection
         roles_anchor_collection: test_results_roles_anchor,
         test_collection: test_collection,
         idea: idea,
+        loading_content: true,
       )
       return collection if collection.persisted?
 
@@ -87,6 +87,7 @@ module TestResultsCollection
             type: 'Collection::TestResultsCollection',
             test_collection: test_collection,
             idea: idea,
+            loading_content: true,
           },
           identifier: CardIdentifier.call(test_collection.test_results_collection, idea),
         },

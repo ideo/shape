@@ -591,13 +591,10 @@ class Collection
     end
 
     def create_results_collections!(initiated_by = nil)
-      result = ::TestCollection::CreateResultsCollections.call(
+      result = ::TestResultsCollection::CreateCollection.call(
         test_collection: self,
-        test_results_collection: test_results_collection,
-        test_audiences: test_audiences,
         created_by: initiated_by || created_by,
       )
-
       return test_results_collection if result.success?
 
       errors.add(:base, result.message)

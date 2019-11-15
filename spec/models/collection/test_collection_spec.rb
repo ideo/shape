@@ -136,11 +136,14 @@ describe Collection::TestCollection, type: :model do
   describe '#duplicate!' do
     let!(:parent_collection) { create(:collection) }
     let(:duplicate) do
-      test_collection.duplicate!(
-        for_user: user,
-        copy_parent_card: false,
-        parent: parent_collection,
-      )
+      # Run background jobs to clone cards
+      Sidekiq::Testing.inline! do
+        test_collection.duplicate!(
+          for_user: user,
+          copy_parent_card: false,
+          parent: parent_collection,
+        )
+      end
     end
 
     before do
@@ -149,13 +152,6 @@ describe Collection::TestCollection, type: :model do
       test_collection.children.each do |record|
         user.add_role(Role::EDITOR, record)
       end
-
-      # Run background jobs to clone cards
-      Sidekiq::Testing.inline!
-    end
-
-    after do
-      Sidekiq::Testing.fake!
     end
 
     context 'if in draft status' do
@@ -195,17 +191,11 @@ describe Collection::TestCollection, type: :model do
 
     context 'if live' do
       let(:test_collection) do
-        create(:test_collection, :completed, parent_collection: test_parent, roles_anchor_collection_id: test_parent.id)
+        create(:test_collection, :completed, :launched, parent_collection: test_parent, roles_anchor_collection_id: test_parent.id)
       end
+      let!(:test_audience) { create(:test_audience, :link_sharing, test_collection: test_collection, launched_by: user) }
       let!(:survey_response) do
         create(:survey_response, test_collection: test_collection)
-      end
-
-      before do
-        test_collection.launch!(initiated_by: user)
-        expect(test_collection.errors.size).to eq(0)
-        test_collection.reload
-        expect(test_collection.live?).to be true
       end
 
       it 'always reset its test status to draft' do
@@ -350,10 +340,12 @@ describe Collection::TestCollection, type: :model do
             it 'should create test audience datasets for each question' do
               scale_question_num = test_collection.question_items.scale_questions.count
               expect do
-                test_collection.launch!(initiated_by: user)
+                Sidekiq::Testing.inline! do
+                  test_collection.launch!(initiated_by: user)
+                end
               end.to change(
                 Dataset::Question, :count
-              ).by(scale_question_num * 3) # All scale questions get one dataset + one more for the org + for the audience
+              ).by(scale_question_num * 2) # All scale questions get one dataset + for each audience
               expect(Dataset::Question.last.groupings).to eq(
                 [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
               )

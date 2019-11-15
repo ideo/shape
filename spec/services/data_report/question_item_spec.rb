@@ -53,7 +53,11 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
     context 'question dataset' do
       let!(:dataset) do
-        create(:question_dataset, data_source: question_item)
+        create(
+          :question_dataset,
+          groupings: [{ type: 'Item', id: idea.id }],
+          data_source: question_item,
+        )
       end
       let(:answer_search_key) do
         proc do |answer_number|
