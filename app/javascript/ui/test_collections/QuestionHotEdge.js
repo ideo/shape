@@ -7,14 +7,13 @@ import { uiStore } from '~/stores'
 
 const HotEdge = styled.div`
   height: 0;
-  margin-left: 300px;
+  margin-left: -14px;
   position: relative;
   top: ${props => (props.lastCard ? -30 : -20)}px;
-  width: 100%;
+  width: calc(100% + 42px);
   z-index: ${v.zIndex.floatOverContent};
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    margin-left: 0;
     width: 376px;
   }
 `
@@ -85,7 +84,10 @@ class QuestionHotEdge extends React.Component {
 
   render() {
     return (
-      <HotEdge lastCard={this.props.lastCard}>
+      <HotEdge
+        lastCard={this.props.lastCard}
+        leftHandedCard={this.props.leftHandedCard}
+      >
         <HotAreaButton
           data-cy="QuestionHotEdgeButton"
           onClick={this.handleAdd}
@@ -107,9 +109,11 @@ class QuestionHotEdge extends React.Component {
 QuestionHotEdge.propTypes = {
   onAdd: PropTypes.func.isRequired,
   lastCard: PropTypes.bool,
+  leftHandedCard: PropTypes.bool,
 }
 QuestionHotEdge.defaultProps = {
   lastCard: false,
+  leftHandedCard: false,
 }
 
 export default QuestionHotEdge

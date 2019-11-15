@@ -336,9 +336,11 @@ class TestDesigner extends React.Component {
     lastCard = false,
   } = {}) {
     if (!this.canEdit) return
+    const leftHandedCard = sectionType === 'intro' || sectionType === 'ideas'
     return (
       <QuestionHotEdge
         lastCard={lastCard}
+        leftHandedCard={leftHandedCard}
         onAdd={this.handleNew({ card, sectionType, addBefore })}
       />
     )
@@ -391,7 +393,7 @@ class TestDesigner extends React.Component {
     )
   }
 
-  renderCard = (card, firstCard, lastCard) => {
+  renderCard = (card, firstCard, lastCard, i, sectionType) => {
     const { collection } = this.props
     const { test_status } = collection
     const { currentIdeaCardIndex } = this.state
@@ -434,6 +436,8 @@ class TestDesigner extends React.Component {
           lastCard={lastCard}
           userEditable={userEditableQuestionType(record.card_question_type)}
         >
+          {i === 0 &&
+            this.renderHotEdge({ card, sectionType, addBefore: true })}
           <TestQuestion
             editing
             hideMedia={!collection.test_show_media}
@@ -444,6 +448,8 @@ class TestDesigner extends React.Component {
             question_choices={record.question_choices}
             testStatus={test_status}
           />
+          {card.card_question_type !== 'question_finish' &&
+            this.renderHotEdge({ card, sectionType, lastCard })}
         </TestQuestionHolder>
       </Fragment>
     )
@@ -477,11 +483,7 @@ class TestDesigner extends React.Component {
           return (
             <FlipMove appearAnimation="fade" key={card.id}>
               <TestQuestionFlexWrapper className={`card ${card.id}`}>
-                {i === 0 &&
-                  this.renderHotEdge({ card, sectionType, addBefore: true })}
-                {this.renderCard(card, firstCard, lastCard)}
-                {card.card_question_type !== 'question_finish' &&
-                  this.renderHotEdge({ card, sectionType, lastCard })}
+                {this.renderCard(card, firstCard, lastCard, i, sectionType)}
               </TestQuestionFlexWrapper>
             </FlipMove>
           )
