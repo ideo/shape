@@ -24,7 +24,7 @@ ChoiceHolder.displayName = 'ChoiceHolder'
 const IconHolder = styled.button`
   display: inline-block;
   height: 27px;
-  vertical-align: bottom;
+  vertical-align: middle;
   width: 22px;
 `
 
