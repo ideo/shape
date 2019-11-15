@@ -203,10 +203,17 @@ class TestDesigner extends React.Component {
         this.handleSetCurrentIdeaCardIndex(currentIdeaCardIndex - 1)
       }
     }
-    this.confirmActionIfResponsesExist({
-      action: () => archiveCard(card),
-      message: 'Are you sure you want to remove this question?',
-    })
+    // Idea cards already have a different warning modal, and our system does
+    // not support two confirm modals. We have to change how confirm modals work
+    // to do both warnings, which might not be a good user exp anyway.
+    if (card.card_question_type === 'question_idea') {
+      archiveCard(card)
+    } else {
+      this.confirmActionIfResponsesExist({
+        action: () => archiveCard(card),
+        message: 'Are you sure you want to remove this question?',
+      })
+    }
   }
 
   handleNew = ({ card, sectionType, addBefore } = {}) => () => {
@@ -301,6 +308,12 @@ class TestDesigner extends React.Component {
     return can_edit_content && !this.locked
   }
 
+  get canAddNewIdea() {
+    if (!this.ideasCollection) return false
+    console.log('this', this.ideasCollection.collection_cards.length)
+    return this.ideasCollection.collection_cards.length < 6
+  }
+
   createNewQuestionCard = async ({
     replacingCard,
     order,
@@ -310,6 +323,12 @@ class TestDesigner extends React.Component {
   }) => {
     const { collection } = this.props
     const parent = parentCollection ? parentCollection : collection
+    if (!this.canAddNewIdea) {
+      collection.apiStore.uiStore.alert(
+        'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
+      )
+      return
+    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
