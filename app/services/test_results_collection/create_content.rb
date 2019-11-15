@@ -83,7 +83,7 @@ module TestResultsCollection
     def remove_idea_media_link
       test_results_collection
         .link_collection_cards
-        .where(identifier_type: 'first-idea-media')
+        .identifier('first-idea-media')
         .first
         &.archive!
     end
@@ -99,8 +99,7 @@ module TestResultsCollection
           item: idea_item,
           width: 1,
           height: 2,
-          identifier_type: 'Item::QuestionItem',
-          identifier_id: idea_item.id,
+          identifier: 'first-idea-media',
           order: @order += 1,
         ),
       )
