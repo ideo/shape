@@ -25,6 +25,11 @@ export const StyledIconsWrapper = styled.div`
   color: ${v.colors.commonMedium};
   height: 45px;
   display: flex;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 StyledIconsWrapper.displayName = 'StyledIconsWrapper'
 
