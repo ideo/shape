@@ -99,7 +99,7 @@ class Collection < ApplicationRecord
                  :cached_last_card_order,
                  :submission_attrs,
                  :getting_started_shell,
-                 :awaiting_first_user_content,
+                 :loading_content,
                  :cached_inheritance,
                  :common_viewable
 
@@ -900,6 +900,10 @@ class Collection < ApplicationRecord
   def inside_an_application_collection?
     is_a?(Collection::ApplicationCollection) ||
       parent_application_collection.present?
+  end
+
+  def awaiting_updates?
+    getting_started_shell || loading_content
   end
 
   # =================================
