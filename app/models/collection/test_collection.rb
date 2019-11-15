@@ -283,11 +283,7 @@ class Collection
       return true if incomplete_items.blank?
 
       incomplete_items.each do |item|
-        msg = "Please add #{item.incomplete_description} to "
-        msg += item.question_idea? ? 'idea' : 'question'
-        msg += " #{item.parent_collection_card.order + 1}"
-        # TODO: Make this handle order when people delete and then add questions
-        errors.add(:base, msg)
+        errors.add(:base, item.incomplete_description)
       end
 
       false
