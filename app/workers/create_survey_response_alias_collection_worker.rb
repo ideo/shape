@@ -1,7 +1,9 @@
 class CreateSurveyResponseAliasCollectionWorker
   include Sidekiq::Worker
 
-  delegate :test_results_collection, :test_collection, :user,
+  delegate :test_results_collection,
+           :test_collection,
+           :user,
            to: :@survey_response
 
   def perform(survey_response_id)
@@ -30,9 +32,10 @@ class CreateSurveyResponseAliasCollectionWorker
   end
 
   def all_responses_collection
-    CollectionCard.find_by(
-      identifier: CardIdentifier.call(master_test_results_collection, 'Responses'),
-    )&.record
+    CollectionCard.find_record_by_identifier(
+      master_test_results_collection,
+      'Responses',
+    )
   end
 
   def master_test_results_collection

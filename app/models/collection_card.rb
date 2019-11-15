@@ -450,6 +450,10 @@ class CollectionCard < ApplicationRecord
     "#{id}#{idea_suffix}"
   end
 
+  def self.find_record_by_identifier(*args)
+    identifier(CardIdentifier.call(*args)).first&.record
+  end
+
   private
 
   def assign_default_height_and_width

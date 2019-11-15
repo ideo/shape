@@ -132,12 +132,13 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
 
   context 'with idea in the context' do
     let(:idea_in_context) { idea }
+    let(:test_results_collection) { idea.test_results_collection }
 
     it 'links idea media + description inline' do
-      expect(idea.test_results_collection).to be_instance_of(Collection::TestResultsCollection)
+      expect(test_results_collection).to be_instance_of(Collection::TestResultsCollection)
       expect(TestResultsCollection::CreateIdeaCollectionCards).to receive(:call!).with(
         hash_including(
-          parent_collection: idea.test_results_collection,
+          parent_collection: test_results_collection,
           idea_item: idea,
         ),
       )
@@ -161,19 +162,19 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
   end
 
   context 'with more scaled questions' do
-    let!(:test_collection) { create(:test_collection, :completed) }
-    let(:test_results_collection) { test_collection.test_results_collection }
     let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
     let(:legend_item) { test_results_collection.legend_item }
 
     it 'should create a LegendItem at the 3rd spot (order == 2)' do
       expect(subject).to be_a_success
       expect(legend_item.parent_collection_card.order).to eq 2
+    end
+
+    it 'should create all test results cards, correctly ordered' do
+      expect(subject).to be_a_success
+      results_cards = test_results_collection.collection_cards.reload
       expect(
-        test_results_collection
-        .collection_cards
-        .reload
-        .map { |card| card.record.class.name },
+        results_cards.map { |card| card.record.class.name },
       ).to eq(
         [
           'Item::VideoItem',
@@ -199,9 +200,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
         ],
       )
       expect(
-        test_results_collection
-        .collection_cards
-        .map(&:order),
+        results_cards.map(&:order),
       ).to eq(0.upto(13).to_a)
     end
   end

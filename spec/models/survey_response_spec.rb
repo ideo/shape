@@ -9,32 +9,6 @@ RSpec.describe SurveyResponse, type: :model do
   end
 
   describe 'callbacks' do
-    describe '#create_open_response_items' do
-      let!(:test_collection) { create(:test_collection, :completed, :open_response_questions) }
-      let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
-      let(:author) { create(:user) }
-
-      before do
-        test_collection.launch!(initiated_by: author)
-      end
-
-      it 'creates open response items for each open response question' do
-        expect {
-          # Answer all questions
-          test_collection.question_items.map do |question|
-            create(:question_answer,
-                   survey_response: survey_response,
-                   question: question)
-          end
-        }.to change(Item::TextItem, :count).by(test_collection.question_items.size)
-        expect(
-          survey_response.question_answers.all? do |answer|
-            answer.open_response_item.present?
-          end,
-        ).to be true
-      end
-    end
-
     describe '#create_alias' do
       let!(:survey_response) { create(:survey_response) }
 

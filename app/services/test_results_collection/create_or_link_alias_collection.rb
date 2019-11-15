@@ -9,10 +9,13 @@ module TestResultsCollection
            :alias_test_results_collection,
            :created_by
 
-    require_in_context :survey_response, :all_responses_collection
+    require_in_context :survey_response,
+                       :all_responses_collection
 
-    delegate :alias_test_results_collection, :created_by,
-             :survey_response, :all_responses_collection,
+    delegate :alias_test_results_collection,
+             :created_by,
+             :survey_response,
+             :all_responses_collection,
              to: :context
 
     delegate :test_collection,
@@ -92,7 +95,6 @@ module TestResultsCollection
 
         TestResultsCollection::CreateAndLinkOpenResponse.call(
           test_collection: test_collection,
-          alias_test_results_collection: alias_test_results_collection,
           question_answer: question_answer,
         )
       end

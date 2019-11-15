@@ -1,22 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe CreateSurveyResponseAliasCollectionWorker, type: :worker do
-  subject do
-    CreateSurveyResponseAliasCollectionWorker.new
-  end
   describe '#perform' do
     let(:user) { create(:user) }
-    let(:test_collection) { create(:test_collection, :completed) }
+    let(:test_collection) { create(:test_collection, :launched) }
     let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
-    before do
-      expect(test_collection.launch!(initiated_by: user)).to be true
-      expect(test_collection.live?).to be true
-    end
     let(:test_results_collection) { test_collection.test_results_collection }
     let(:all_responses_collection) do
-      CollectionCard.identifier(
-        CardIdentifier.call(test_results_collection, 'Responses'),
-      ).first.record
+      CollectionCard.find_record_by_identifier(
+        test_results_collection,
+        'Responses',
+      )
     end
     let(:survey_response) do
       create(
@@ -27,7 +21,14 @@ RSpec.describe CreateSurveyResponseAliasCollectionWorker, type: :worker do
       )
     end
 
+    subject do
+      CreateSurveyResponseAliasCollectionWorker.new
+    end
+
     before do
+      TestResultsCollection::CreateContent.call(
+        test_results_collection: test_collection.test_results_collection,
+      )
       allow(TestResultsCollection::CreateOrLinkAliasCollection).to receive(:call).and_call_original
     end
 

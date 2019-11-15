@@ -81,19 +81,6 @@ FactoryBot.define do
         end
       end
 
-      trait :launched do
-        after(:create) do |collection|
-          collection.create_test_results_collection(
-            name: collection.name,
-            organization: collection.organization,
-            created_by: collection.created_by,
-            roles_anchor_collection: collection.roles_anchor,
-          )
-          # do this after_create so that it doesn't get confused when creating questions
-          collection.update(test_status: :live)
-        end
-      end
-
       trait :completed do
         after(:create) do |collection|
           category_satisfaction_question = collection.question_items.detect(&:question_category_satisfaction?)
@@ -115,6 +102,22 @@ FactoryBot.define do
           description_question = collection.question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
         end
+      end
+
+      trait :launched do
+        # bring in the :completed trait above
+        completed
+        after(:create) do |collection|
+          collection.create_test_results_collection(
+            name: collection.name,
+            organization: collection.organization,
+            created_by: collection.created_by,
+            roles_anchor_collection: collection.roles_anchor,
+          )
+          # do this after_create so that it doesn't get confused when creating questions
+          collection.update(test_status: :live)
+        end
+        # note that TestResultsCollection::CreateContent will need to be called if you are testing the inner content
       end
 
       trait :two_ideas do

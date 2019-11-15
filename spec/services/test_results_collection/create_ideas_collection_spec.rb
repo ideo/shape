@@ -21,7 +21,7 @@ RSpec.describe TestResultsCollection::CreateIdeasCollection, type: :service do
   it 'creates collection' do
     expect { subject }.to change(Collection, :count).by(1)
     expect(subject.ideas_collection_card.record.name).to eq(
-      test_collection.name + ' - Ideas',
+      test_collection.base_name + ' - Ideas',
     )
   end
 

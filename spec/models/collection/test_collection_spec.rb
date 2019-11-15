@@ -191,7 +191,7 @@ describe Collection::TestCollection, type: :model do
 
     context 'if live' do
       let(:test_collection) do
-        create(:test_collection, :completed, :launched, parent_collection: test_parent, roles_anchor_collection_id: test_parent.id)
+        create(:test_collection, :launched, parent_collection: test_parent, roles_anchor_collection_id: test_parent.id)
       end
       let!(:test_audience) { create(:test_audience, :link_sharing, test_collection: test_collection, launched_by: user) }
       let!(:survey_response) do

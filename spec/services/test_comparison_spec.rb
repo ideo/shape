@@ -5,7 +5,7 @@ RSpec.describe TestComparison do
   let(:test_parent) { create(:collection, add_editors: [user]) }
   let(:test_collection) do
     create(:test_collection,
-           :completed,
+           :launched,
            parent_collection: test_parent,
            roles_anchor_collection: test_parent)
   end
@@ -16,7 +16,7 @@ RSpec.describe TestComparison do
   end
   let(:comparison_collection) do
     create(:test_collection,
-           :completed,
+           :launched,
            parent_collection: test_parent,
            roles_anchor_collection: test_parent)
   end
@@ -27,7 +27,9 @@ RSpec.describe TestComparison do
 
   before do
     [test_collection, comparison_collection].each do |collection|
-      collection.launch!(initiated_by: user)
+      TestResultsCollection::CreateContent.call(
+        test_results_collection: collection.test_results_collection,
+      )
       collection.reload
     end
   end
@@ -62,11 +64,11 @@ RSpec.describe TestComparison do
         )
       end
       let(:not_matching_question_data_item) do
-        not_matching_question_item.find_or_create_response_graph(
+        graph = TestResultsCollection::CreateResponseGraph.call(
+          item: not_matching_question_item,
           parent_collection: test_results_collection,
-          initiated_by: user,
-          legend_item: test_results_collection.legend_item,
-        ).record
+        )
+        graph.data_item
       end
 
       it 'adds empty dataset' do

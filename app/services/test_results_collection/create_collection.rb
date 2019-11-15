@@ -24,20 +24,17 @@ module TestResultsCollection
     end
 
     def call
-      initial_creation = false
+      # initial_creation = false
       ActiveRecord::Base.transaction do
         if test_results_collection.blank?
           # marking when the tests_results_collection is first created
-          initial_creation = true
+          # initial_creation = true
           context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
           if master_results_collection?
             update_test_collection_name
+            move_test_collection_inside_test_results
             move_roles_to_results_collection if move_roles?
           end
-        end
-
-        if master_results_collection? && initial_creation
-          move_test_collection_inside_test_results
         end
 
       rescue Interactor::Failure => e
@@ -107,6 +104,10 @@ module TestResultsCollection
       test_collection.roles.each do |role|
         role.update(resource: test_results_collection)
       end
+      # reload to re-associate the roles
+      reload_collections
+      # reanchor the test collection and children to test_results_collection
+      test_collection.reanchor!(parent: test_results_collection, propagate: true)
     end
 
     def move_test_collection_inside_test_results
@@ -133,7 +134,8 @@ module TestResultsCollection
     end
 
     def test_results_roles_anchor
-      return test_collection.roles_anchor if test_collection.roles_anchor != test_collection
+      # anchor the test results to whatever the test collection was anchored to (could be nil for itself)
+      test_collection.roles_anchor_collection
     end
 
     def move_roles?

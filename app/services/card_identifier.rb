@@ -1,5 +1,4 @@
 class CardIdentifier
-
   def self.call(*objects)
     objects = [objects] unless objects.is_a?(Array)
     objects.compact.map do |obj|

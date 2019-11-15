@@ -127,8 +127,8 @@ module DataReport
       if question_choices_customizable?
         question_item.question_choices.each_with_object({}) do |qc, h|
           total = survey_answers
-            .where('selected_choice_ids @> ?', [qc.id.to_s].to_s)
-            .count
+                  .where('selected_choice_ids @> ?', [qc.id.to_s].to_s)
+                  .count
           h[qc.id] = total
         end
       else
@@ -202,21 +202,21 @@ module DataReport
       return QuestionAnswer.none if group_by_organization_id.blank?
 
       query = QuestionAnswer
-      .joins(
-        :question,
-        survey_response: :test_collection,
-      )
-      .where(
-        Item::QuestionItem.arel_table[:question_type].eq(
-          question_type,
-        ).and(
-          SurveyResponse.arel_table[:status].eq(:completed),
-        ).and(
-          Collection::TestCollection.arel_table[:organization_id].eq(
-            group_by_organization_id,
-          ),
-        ),
-      )
+              .joins(
+                :question,
+                survey_response: :test_collection,
+              )
+              .where(
+                Item::QuestionItem.arel_table[:question_type].eq(
+                  question_type,
+                ).and(
+                  SurveyResponse.arel_table[:status].eq(:completed),
+                ).and(
+                  Collection::TestCollection.arel_table[:organization_id].eq(
+                    group_by_organization_id,
+                  ),
+                ),
+              )
 
       return query unless question_item&.question_choices_customizable?
 

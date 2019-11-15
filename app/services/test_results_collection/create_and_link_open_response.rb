@@ -5,26 +5,44 @@ module TestResultsCollection
     include CollectionCardBuilderHelpers
 
     schema :test_collection,
-           :alias_test_results_collection,
            :question_answer,
            :open_response_item
 
-    delegate :alias_test_results_collection, :question_answer,
-             :open_response_item, :test_collection,
+    delegate :question_answer,
+             :open_response_item,
+             :test_collection,
              to: :context
 
-    delegate :question, :survey_response,
+    delegate :question,
+             :answer_text,
+             :survey_response,
+             :quote_card_ops,
              to: :question_answer
 
     def call
-      context.open_response_item = create_open_response_item
+      create_open_response_item
       link_open_response_item
     end
 
     private
 
     def create_open_response_item
-      question_answer.create_open_response_item(alias_open_responses_collection)
+      # Create the open response item on the Test Responses collection
+      card = create_card(
+        params: {
+          width: 2,
+          item_attributes: {
+            type: 'Item::TextItem',
+            content: answer_text,
+            data_content: quote_card_ops,
+          },
+        },
+        parent_collection: alias_open_responses_collection,
+        created_by: question.test_open_responses_collection.created_by,
+      )
+      item = card.record
+      context.open_response_item = item
+      question_answer.update(open_response_item: item)
     end
 
     def link_open_response_item
@@ -53,23 +71,21 @@ module TestResultsCollection
     end
 
     def open_responses_collection(parent_collection)
-      CollectionCard.find_by(
-        identifier: CardIdentifier.call(parent_collection, question, 'OpenResponses'),
-      ).collection
+      CollectionCard.find_record_by_identifier(
+        parent_collection, question, 'OpenResponses'
+      )
     end
 
     def alias_open_responses_collection
-      CollectionCard.find_by(
-        identifier: CardIdentifier.call(survey_response, 'OpenResponses'),
-      ).collection
+      CollectionCard.find_record_by_identifier(
+        survey_response, 'OpenResponses'
+      )
     end
 
     def idea_collection(idea_item)
-      CollectionCard.find_by(
-        identifier: CardIdentifier.call(
-          test_collection.test_results_collection, idea_item
-        ),
-      ).collection
+      CollectionCard.find_record_by_identifier(
+        test_collection.test_results_collection, idea_item
+      )
     end
 
     def idea_items

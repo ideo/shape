@@ -20,7 +20,7 @@ class Search
       end
 
       def test_answer
-        @query.scan(REGEXP).flatten[0]
+        @query.scan(REGEXP).flatten.first
       end
     end
   end

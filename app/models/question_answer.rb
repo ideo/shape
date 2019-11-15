@@ -44,30 +44,36 @@ class QuestionAnswer < ApplicationRecord
   after_update :update_open_response_item, if: :update_open_response_item?
   before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
 
-  def create_open_response_item(parent)
-    # Create the open response item on the Test Responses collection
-    ops = quote_card_ops
-    card_params = {
-      width: 2,
-      item_attributes: {
-        type: 'Item::TextItem',
-        content: answer_text,
-        data_content: ops,
-      },
-    }
-    builder = CollectionCardBuilder.new(
-      params: card_params,
-      parent_collection: parent,
-      user: question.test_open_responses_collection.created_by,
+  def quote_card_ops
+    test_results_collection = survey_response.test_collection.test_results_collection
+    idea = self.idea
+    question = self.question
+    audience = survey_response&.test_audience&.audience
+    answer = self
+    alias_collection = alias_collection(test_results_collection)
+    audience_collection = CollectionCard.find_record_by_identifier(
+      test_results_collection,
+      survey_response&.test_audience,
     )
-    if builder.create
-      self.open_response_item = builder.collection_card.record
-      save
-      return self.open_response_item
-    else
-      errors.add(:open_response_item, builder.errors.full_messages.join('. '))
-      throw :abort
+    ops =
+      [{ insert: test_results_collection.name, attributes: { link: quote_url(test_results_collection) } },
+       { insert: "\n" },
+       { insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection) } },
+       { insert: "\n", attributes: { header: 2 } },
+       { insert: "“#{answer.answer_text}”" },
+       { insert: "\n", attributes: { header: 1 } },
+       { insert: '- ' },
+       { insert: survey_response.respondent_alias, attributes: { link: quote_url(alias_collection) } }]
+    if idea.present?
+      ops.insert(1, insert: ' | ')
+      ops.insert(2, insert: idea.name, attributes: { link: quote_url(idea) })
     end
+    if audience.present? && audience.global_default.nil?
+      ops.push(insert: ', ')
+      ops.push(insert: audience.name, attributes: { link: quote_url(audience_collection) })
+
+    end
+    { ops: ops.map(&:stringify_keys) }
   end
 
   private
@@ -104,46 +110,16 @@ class QuestionAnswer < ApplicationRecord
   end
 
   def quote_url(object)
-    return "/link" if object.blank?
+    return '/link' if object.blank?
+
     "/#{survey_response.test_collection.organization.slug}/#{object.jsonapi_type_name}/#{object.id}"
   end
 
   def alias_collection(test_results_collection)
-    CollectionCard.find_by(
-      identifier: CardIdentifier.call(test_results_collection, survey_response),
-    ).collection
-  end
-
-  def quote_card_ops
-    test_results_collection = survey_response.test_collection.test_results_collection
-    idea = self.idea
-    question = self.question
-    audience = survey_response&.test_audience&.audience
-    answer = self
-    alias_collection = alias_collection(test_results_collection)
-    audience_collection = CollectionCard.find_by(
-      identifier: CardIdentifier.call(test_results_collection, survey_response&.test_audience),
-    ).collection
-    ops =
-      [{insert: test_results_collection.name, attributes: {link: quote_url(test_results_collection)}},
-       {insert: "\n"},
-       {insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection)}},
-       {insert: "\n", attributes: { header: 2}},
-       {insert: "“#{answer.answer_text}”"},
-       {insert: "\n", attributes: { header: 1}},
-       {insert: "- "},
-       {insert: survey_response.respondent_alias, attributes: { link: quote_url(alias_collection)}},
-      ]
-    if idea.present?
-      ops.insert(1, {insert: " | "})
-      ops.insert(2, {insert: idea.name, attributes: { link: quote_url(idea)}})
-    end
-    if audience.present? && audience.global_default.nil?
-      ops.push({insert: ", "})
-      ops.push({insert: audience.name, attributes: {link: quote_url(audience_collection)}})
-
-    end
-    {ops: ops.map(&:stringify_keys) }
+    CollectionCard.find_record_by_identifier(
+      test_results_collection,
+      survey_response,
+    )
   end
 
   def destroy_open_response_item_and_card
