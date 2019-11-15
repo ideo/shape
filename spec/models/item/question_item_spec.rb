@@ -17,20 +17,61 @@ RSpec.describe Item::QuestionItem, type: :model do
     end
   end
 
+  context 'validations' do
+    context 'adding more than 6 ideas to a test' do
+      let(:idea_collection) { create(:collection) }
+      let(:collection_card) do
+        create(:collection_card,
+               parent: idea_collection,
+               section_type: :ideas,
+              )
+      end
+
+      before do
+        (0..6).each do
+          create(:question_item,
+                 question_type: :question_idea,
+                 parent_collection: idea_collection,
+                )
+        end
+      end
+
+      it 'should fail validation' do
+        idea_item = Item::QuestionItem.create(
+            parent_collection_card: collection_card,
+            question_type: :question_idea,
+          )
+        expect(idea_item.valid?).to be false
+        expect(idea_item.errors.messages[:base]).to eq ['too many ideas']
+      end
+    end
+  end
+
   context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
     let(:test_collection) { create(:test_collection, :completed) }
 
     describe '#score' do
+      before do
+        # Stub out so it doesn't create all result collections
+        allow(TestCollection::CreateResultsCollections).to receive(:call).and_return(
+          double(success?: true),
+        )
+        allow(TestResultsCollection::CreateOrLinkAliasCollection).to receive(:call).and_return(
+          double(success?: true),
+        )
+      end
       before { test_collection.launch! }
       let(:question_item) { test_collection.question_items.select(&:question_useful?).first }
-      let!(:response) { create(:survey_response, test_collection: test_collection) }
+      let(:test_audience) { create(:test_audience, test_collection: test_collection) }
+      let!(:response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
       let!(:responses) do
         create_list(:survey_response,
                     4,
                     :fully_answered,
-                    test_collection: test_collection)
+                    test_collection: test_collection,
+                    test_audience: test_audience)
       end
       let!(:question_answers) { question_item.question_answers }
       before do
@@ -68,6 +109,25 @@ RSpec.describe Item::QuestionItem, type: :model do
         expect(question_item.can_edit?(user)).to be true
         expect(question_item.can_edit?(user2)).to be false
         expect(question_item.can_view?(user2)).to be true
+      end
+    end
+  end
+
+  describe '#question_title_and_description' do
+    context 'for category satisfaction question' do
+      let(:question) do
+        create(
+          :question_item,
+          question_type: :question_category_satisfaction,
+          content: 'socks',
+        )
+      end
+
+      it 'returns customized version' do
+        expect(question.question_title_and_description).to eq(
+          title: 'Category Satisfaction',
+          description: 'How satisfied are you with your current socks?',
+        )
       end
     end
   end

@@ -73,6 +73,8 @@ export const TextInput = styled(TextareaAutosize)`
     margin: -1px 2px -4px 5px;
     padding: 2px 3px;
     width: calc(100% - 20px);
+    -webkit-text-fill-color: ${props => props.theme[props.type]};
+    -webkit-opacity: 1;
 
     &:focus {
       outline: 0;
@@ -111,6 +113,8 @@ export const SingleLineInput = styled.input`
   color: ${props => props.theme[props.type]};
   font-family: ${v.fonts.sans} !important;
   width: calc(100% - 20px);
+  -webkit-text-fill-color: ${props => props.theme[props.type]};
+  -webkit-opacity: 1;
 
   ::placeholder {
     color: ${props => props.theme.placeholder} !important;

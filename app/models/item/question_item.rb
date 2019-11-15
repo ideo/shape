@@ -65,6 +65,14 @@ class Item
 
     has_many :question_choices, -> { order(order: :asc) }
 
+    validate on: :create do
+      if question_idea?
+        if parent.collection_cards.count > 6
+          errors.add(:base, 'too many ideas')
+        end
+      end
+    end
+
     after_create :create_question_dataset
     after_create :add_default_question_choices,
                  if: :question_choices_customizable?
@@ -199,15 +207,10 @@ class Item
       end
     end
 
-    def customizable_title_and_description
-      {
-        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
-        description: content,
-      }
-    end
-
     def question_title_and_description
       return customizable_title_and_description if question_choices_customizable?
+      return category_satisfaction_title_and_description if question_category_satisfaction?
+
       self.class.question_title_and_description(question_type)
     end
 
@@ -257,6 +260,11 @@ class Item
 
     def question_choices_customizable?
       question_single_choice? || question_multiple_choice?
+    end
+
+    def unarchived_question_choices
+      # Don't consider archived choices when validating completeness of question
+      question_choices.reject(&:archived)
     end
 
     # TODO: these dataset creation methods should really be broken out into a service
@@ -340,6 +348,22 @@ class Item
 
     private
 
+    def category_satisfaction_title_and_description
+      attrs = self.class.question_title_and_description(:question_category_satisfaction)
+
+      {
+        title: attrs[:title],
+        description: "#{attrs[:description]} #{content}?",
+      }
+    end
+
+    def customizable_title_and_description
+      {
+        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
+        description: content,
+      }
+    end
+
     def create_question_dataset
       self.question_dataset = Dataset::Question.create(
         data_source: self,
@@ -353,7 +377,6 @@ class Item
 
       (0..3).each do |i|
         question_choices.create(
-          text: "Option #{i + 1}",
           value: i,
           order: i,
         )

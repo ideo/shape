@@ -346,6 +346,10 @@ class Item < ApplicationRecord
 
   def question_choices; end
 
+  def unarchived_question_choices
+    []
+  end
+
   def jsonapi_type_name
     'items'
   end
@@ -363,6 +367,7 @@ class Item < ApplicationRecord
     false
   end
 
+  # this method also applies to Idea items (e.g. FileItem) which is why it is defined here in item.rb
   def question_item_incomplete?
     return true if (
       question_category_satisfaction? || question_description? || question_open?
@@ -382,6 +387,12 @@ class Item < ApplicationRecord
       return true if name.blank? || content.blank?
     end
 
+    # Must fill in question (content) and all choices for question items
+    return true if
+      is_a?(Item::QuestionItem) &&
+      question_choices_customizable? &&
+      (unarchived_question_choices.any? { |choice| choice.text.blank? } || content.blank?)
+
     # Question cards that are in the blank default state
     return true if question_type.blank? && filestack_file_id.blank? && url.blank?
 
@@ -389,6 +400,21 @@ class Item < ApplicationRecord
   end
 
   def incomplete_description
+    # TODO: Make this handle order when people delete and then add questions
+    question_number = parent_collection_card.order + 1
+
+    if question_single_choice? || question_multiple_choice?
+      return "Question #{question_number} needs question text" if content.blank?
+
+      return "There are empty options in question #{question_number}"
+    end
+
+    "Please add #{missing_value_by_question_type} to #{incomplete_question_noun} #{question_number}"
+  end
+
+  private
+
+  def missing_value_by_question_type
     if question_category_satisfaction?
       'your category'
     elsif question_description?
@@ -402,7 +428,9 @@ class Item < ApplicationRecord
     end
   end
 
-  private
+  def incomplete_question_noun
+    question_idea? ? 'idea' : 'question'
+  end
 
   def name_present?
     name.present?

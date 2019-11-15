@@ -349,5 +349,28 @@ RSpec.describe Item, type: :model do
         end
       end
     end
+
+    context 'customizable question (single or multiple choice)' do
+      let!(:question_type) { :question_single_choice }
+
+      it 'returns true if content is blank' do
+        expect(question.question_item_incomplete?).to be true
+      end
+
+      it 'returns true if the text of one of its question choices is blank' do
+        question.content = 'What is your favorite color?'
+        expect(question.question_item_incomplete?).to be true
+      end
+
+      it 'return false if the question has content and all of its choices have text' do
+        question.content = 'Which verse are 🔥 on Forever?'
+        choices = ['Drake', 'Eminem', 'Kanye West', 'Lil Wayne']
+        question.question_choices.each_with_index do |choice, index|
+          choice.update(text: choices[index])
+        end
+        # question.question_choices.reload
+        expect(question.question_item_incomplete?).to be false
+      end
+    end
   end
 end
