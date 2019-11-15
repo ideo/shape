@@ -60,6 +60,7 @@ exports[`TestDesigner renders snapshot 1`] = `
           className="card 99"
         >
           <QuestionLeftSide
+            canAddChoice={false}
             canEdit={false}
             card={
               Object {
@@ -4060,6 +4061,7 @@ exports[`TestDesigner renders snapshot 1`] = `
           className="card 11"
         >
           <QuestionLeftSide
+            canAddChoice={false}
             canEdit={false}
             card={
               Object {

@@ -442,4 +442,6 @@ ChartGroup.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+ChartGroup.displayName = 'ChartGroup'
+
 export default ChartGroup
