@@ -374,9 +374,13 @@ class Item < ApplicationRecord
     # Media items are always transformed to other item types
     return true if question_media? && is_a?(Item::QuestionItem)
 
-    return true if question_idea? && (
-      is_a?(Item::QuestionItem) || name.blank? || content.blank?
-    )
+    if question_idea?
+      test_show_media = parent.parent.test_show_media?
+      # Return false if this hasn't been transformed to a media-type item
+      return true if test_show_media && is_a?(Item::QuestionItem)
+
+      return true if name.blank? || content.blank?
+    end
 
     # Question cards that are in the blank default state
     return true if question_type.blank? && filestack_file_id.blank? && url.blank?

@@ -242,4 +242,112 @@ RSpec.describe Item, type: :model do
       end
     end
   end
+
+  describe '#question_item_incomplete?' do
+    let!(:test_collection) { create(:test_collection) }
+    let(:question_type) { nil }
+    let(:question) do
+      create(
+        :question_item,
+        question_type: question_type,
+        parent_collection: test_collection,
+        name: nil,
+      )
+    end
+
+    context 'for questions in default state' do
+      it 'returns true' do
+        expect(question.question_item_incomplete?).to be true
+      end
+    end
+
+    context 'for category satisfaction' do
+      let!(:question_type) { :question_category_satisfaction }
+
+      it 'returns true if content is blank' do
+        expect(question.question_item_incomplete?).to be true
+      end
+
+      it 'returns false if content is present' do
+        question.content = 'socks'
+        expect(question.question_item_incomplete?).to be false
+      end
+    end
+
+    context 'for description question' do
+      let!(:question_type) { :question_description }
+
+      it 'returns true if content is blank' do
+        expect(question.question_item_incomplete?).to be true
+      end
+
+      it 'returns false if content is present' do
+        question.content = 'It smells like a wet blanket'
+        expect(question.question_item_incomplete?).to be false
+      end
+    end
+
+    context 'for open question' do
+      let!(:question_type) { :question_open }
+
+      it 'returns true if content is blank' do
+        expect(question.question_item_incomplete?).to be true
+      end
+
+      it 'returns false if content is present' do
+        question.content = 'What do your socks smell like?'
+        expect(question.question_item_incomplete?).to be false
+      end
+    end
+
+    context 'for scale questions' do
+      let!(:question_type) { :question_useful }
+
+      it 'returns false if content is blank' do
+        expect(question.question_item_incomplete?).to be false
+      end
+    end
+
+    context 'for idea questions' do
+      let!(:idea_question) do
+        iq = test_collection.idea_items.first
+        iq.update(name: nil)
+        iq
+      end
+
+      it 'returns true if content or name is blank or it is still a question item' do
+        expect(idea_question.question_item_incomplete?).to be true
+        idea_question.content = 'Sweet smelling socks'
+        expect(idea_question.question_item_incomplete?).to be true
+        idea_question.content = nil
+        idea_question.name = 'Sock it to me!'
+        expect(idea_question.question_item_incomplete?).to be true
+        idea_question.content = 'Sweet smelling socks'
+        expect(idea_question).to be_a(Item::QuestionItem)
+        expect(idea_question.question_item_incomplete?).to be true
+      end
+
+      it 'returns false if content and name are present and it is not a question item' do
+        id = idea_question.id
+        idea_question.update(type: 'Item::LinkItem', url: 'https://www.sockittome.com/cool-socks.html')
+        idea_question = Item.find(id)
+        idea_question.name = 'Sock it to me!'
+        idea_question.content = 'Sweet smelling socks'
+        expect(idea_question.question_item_incomplete?).to be false
+      end
+
+      context 'if test_show_media is false' do
+        before do
+          test_collection.update(test_show_media: false)
+        end
+
+        it 'returns false if content and name are present but it is a question item' do
+          idea_question.name = 'Sock it to me!'
+          idea_question.content = 'Sweet smelling socks'
+          expect(idea_question).to be_a(Item::QuestionItem)
+          expect(idea_question.question_item_incomplete?).to be false
+        end
+      end
+    end
+  end
 end
