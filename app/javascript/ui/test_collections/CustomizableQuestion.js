@@ -190,11 +190,10 @@ class CustomizableQuestion extends React.Component {
               onKeyPress={this.handleKeyPress}
               onBlur={this.stopEditingIfContent}
               value={questionContent}
-              type="questionText"
+              type="descriptionText"
               placeholder="write question here"
               data-cy="CustomizableQuestionTextInput"
               disabled={!editing}
-              inverse="true"
             />
           </EditableInputHolder>
         </DisplayText>

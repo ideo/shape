@@ -91,7 +91,11 @@ class CustomizableQuestionChoice extends React.Component {
         <label
           htmlFor={`option-${choice.id}`}
           onClick={this.handleLabelClick}
-          style={{ width: 'calc(100% - 55px', display: 'inline-block' }}
+          style={{
+            width: 'calc(100% - 55px',
+            display: 'inline-block',
+            verticalAlign: 'middle',
+          }}
         >
           <DisplayText color={v.colors.commonDark}>
             <TextInput

@@ -73,6 +73,8 @@ export const TextInput = styled(TextareaAutosize)`
     margin: -1px 2px -4px 5px;
     padding: 2px 3px;
     width: calc(100% - 20px);
+    -webkit-text-fill-color: ${props => props.theme[props.type]};
+    -webkit-opacity: 1;
 
     &:focus {
       outline: 0;
