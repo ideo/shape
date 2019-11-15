@@ -113,6 +113,8 @@ export const SingleLineInput = styled.input`
   color: ${props => props.theme[props.type]};
   font-family: ${v.fonts.sans} !important;
   width: calc(100% - 20px);
+  -webkit-text-fill-color: ${props => props.theme[props.type]};
+  -webkit-opacity: 1;
 
   ::placeholder {
     color: ${props => props.theme.placeholder} !important;
