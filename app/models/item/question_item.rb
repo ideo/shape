@@ -267,6 +267,11 @@ class Item
       question_single_choice? || question_multiple_choice?
     end
 
+    def unarchived_question_choices
+      # Don't consider archived choices when validating completeness of question
+      question_choices.reject(&:archived)
+    end
+
     # TODO: these dataset creation methods should really be broken out into a service
 
     def org_wide_question_dataset
@@ -361,7 +366,6 @@ class Item
 
       (0..3).each do |i|
         question_choices.create(
-          text: "Option #{i + 1}",
           value: i,
           order: i,
         )
