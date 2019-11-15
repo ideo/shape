@@ -343,6 +343,10 @@ class Item < ApplicationRecord
 
   def question_choices; end
 
+  def unarchived_question_choices
+    []
+  end
+
   def jsonapi_type_name
     'items'
   end
@@ -360,15 +364,7 @@ class Item < ApplicationRecord
     false
   end
 
-  # TODO: move to Item::QuestionItem?
-  def unarchived_question_choices
-    return false unless is_a?(Item::QuestionItem)
-
-    # Don't consider archived choices when validating completeness of question
-    question_choices.reject { |choice| choice.archived }
-  end
-
-  # TODO: move to Item::QuestionItem?
+  # this method also applies to Idea items (e.g. FileItem) which is why it is defined here in item.rb
   def question_item_incomplete?
     return true if (
       question_category_satisfaction? || question_description? || question_open?
@@ -389,7 +385,9 @@ class Item < ApplicationRecord
     end
 
     # Must fill in question (content) and all choices for question items
-    return true if is_a?(Item::QuestionItem) && question_choices_customizable? &&
+    return true if
+      is_a?(Item::QuestionItem) &&
+      question_choices_customizable? &&
       (unarchived_question_choices.any? { |choice| choice.text.blank? } || content.blank?)
 
     # Question cards that are in the blank default state
@@ -404,6 +402,7 @@ class Item < ApplicationRecord
 
     if question_single_choice? || question_multiple_choice?
       return "Question #{question_number} needs question text" if content.blank?
+
       return "There are empty options in question #{question_number}"
     end
 
