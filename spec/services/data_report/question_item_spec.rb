@@ -28,6 +28,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
   context 'with responses' do
     let!(:test_collection) { create(:test_collection, :completed, num_cards: 1, organization: organization) }
     before { test_collection.launch! }
+    let(:idea) { test_collection.idea_items.first }
     # Create another test collection so we have other responses in the org
     let(:other_test_collection) do
       create(:test_collection,
@@ -41,7 +42,8 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       survey_response.question_items.map do |question_item|
         create(:question_answer,
                survey_response: survey_response,
-               question: question_item)
+               question: question_item,
+               idea: idea)
       end
     end
 
@@ -58,7 +60,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
           TestCollection::AnswerSearchKey.new(
             question: question_item,
             answer_number: answer_number,
-          ).for_test(test_collection.id)
+          ).for_test(test_collection.id, idea.id)
         end
       end
 
@@ -145,11 +147,48 @@ RSpec.describe DataReport::QuestionItem, type: :service do
             question: question_item,
             answer_number: answer_number,
             audience_id: test_audience.id,
-          ).for_test(test_collection.id)
+          ).for_test(test_collection.id, idea.id)
         end
       end
 
       it 'returns test audience data' do
+        expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
+          [
+            { column: 1, value: 1, percentage: 100, search_key: answer_search_key.call(1) },
+            { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },
+            { column: 3, value: 0, percentage: 0, search_key: answer_search_key.call(3) },
+            { column: 4, value: 0, percentage: 0, search_key: answer_search_key.call(4) },
+          ],
+        )
+      end
+    end
+
+    context 'filtering by idea' do
+      let(:question_item) { test_collection.ideas_question_items.first }
+      let(:idea_2) { create(:question_item, question_type: :question_idea, parent_collection: test_collection.ideas_collection) }
+      let!(:idea_2_question_answers) do
+        create(:question_answer,
+               survey_response: survey_response,
+               question: question_item,
+               idea: idea_2)
+      end
+      let!(:dataset) do
+        create(:question_dataset,
+               data_source: question_item,
+               question_type: question_item.question_type,
+               groupings: [{ type: 'Item', id: idea_2.id }])
+      end
+      let(:answer_search_key) do
+        proc do |answer_number|
+          TestCollection::AnswerSearchKey.new(
+            question: question_item,
+            answer_number: answer_number,
+          ).for_test(test_collection.id, idea_2.id)
+        end
+      end
+
+      it 'returns idea-specific data' do
+        expect(question_item.question_answers.size).to eq(2)
         expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
           [
             { column: 1, value: 1, percentage: 100, search_key: answer_search_key.call(1) },

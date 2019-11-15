@@ -40,9 +40,7 @@ module DataReport
       if group_by_organization_id.present?
         answer_key.for_organization(group_by_organization_id)
       elsif test_collection.present?
-        # TODO: need to be able to get the Idea ID
-        idea_id = nil
-        answer_key.for_test(test_collection.id, idea_id)
+        answer_key.for_test(test_collection.id, group_by_idea_id)
       end
     end
 
@@ -168,34 +166,33 @@ module DataReport
       if group_by_organization_id.present?
         org_survey_answers
       elsif group_by_survey_response_id
-        survey_response_answers
+        scope_by_idea_id(survey_response_answers)
       elsif group_by_audience_id.present?
-        audience_answers
+        scope_by_idea_id(audience_answers)
       else
-        question_item.completed_survey_answers
+        scope_by_idea_id(question_item.completed_survey_answers)
       end
     end
 
     def survey_response_answers
-      scope = question_item.completed_survey_answers
-                           .where(
-                             SurveyResponse.arel_table[:id].eq(
-                               group_by_survey_response_id,
-                             ),
-                           )
-
-      return scope if group_by_idea_id.blank?
-
-      scope.where(idea_id: group_by_idea_id)
+      question_item.completed_survey_answers
+                   .where(
+                     SurveyResponse.arel_table[:id].eq(
+                       group_by_survey_response_id,
+                     ),
+                   )
     end
 
     def audience_answers
-      scope = question_item.completed_survey_answers
-                           .where(
-                             SurveyResponse.arel_table[:test_audience_id].eq(
-                               group_by_audience_id,
-                             ),
-                           )
+      question_item.completed_survey_answers
+                   .where(
+                     SurveyResponse.arel_table[:test_audience_id].eq(
+                       group_by_audience_id,
+                     ),
+                   )
+    end
+
+    def scope_by_idea_id(scope)
       return scope if group_by_idea_id.blank?
 
       scope.where(idea_id: group_by_idea_id)
