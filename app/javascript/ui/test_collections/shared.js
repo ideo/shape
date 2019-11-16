@@ -67,12 +67,12 @@ export const TextResponseHolder = styled(StyledCommentTextarea)`
 export const TextInput = styled(TextareaAutosize)`
   && {
     border: 0;
-    color: ${props => props.theme[props.type]};
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     margin: -1px 2px -4px 5px;
     padding: 2px 3px;
     width: calc(100% - 20px);
+    color: ${props => props.theme[props.type]};
     -webkit-text-fill-color: ${props => props.theme[props.type]};
     -webkit-opacity: 1;
 
@@ -82,6 +82,7 @@ export const TextInput = styled(TextareaAutosize)`
 
     ::placeholder {
       color: ${props => props.theme.placeholder} !important;
+      -webkit-text-fill-color: ${props => props.theme.placeholder};
     }
 
     ${props =>
@@ -89,9 +90,12 @@ export const TextInput = styled(TextareaAutosize)`
       `
       background-color: rgba(255, 255, 255, 0);
       color: ${v.colors.white};
+      -webkit-text-fill-color: ${v.colors.white};
 
       &::placeholder {
         color: ${v.colors.white};
+        -webkit-text-fill-color: ${v.colors.white};
+        -webkit-opacity: 0.5;
         opacity: 0.5;
       }
     `}

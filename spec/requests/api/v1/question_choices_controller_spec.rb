@@ -25,7 +25,8 @@ describe Api::V1::QuestionChoicesController, type: :request, json: true, auth: t
       expect(question.question_choices.last.order).to eq(5)
       post(path, params: params)
       expect(question.reload.question_choices.last.order).to eq(6)
-      expect(question.question_choices.last.text).to eq('Option 6')
+      # it creates a question with nil text (to be filled by frontend placeholder)
+      expect(question.question_choices.last.text).to be_nil
     end
   end
 

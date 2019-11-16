@@ -98,17 +98,15 @@ class CustomizableQuestionChoice extends React.Component {
             verticalAlign: 'middle',
           }}
         >
-          <DisplayText color={v.colors.commonDark}>
-            <TextInput
-              onChange={this.handleInputChange}
-              type="questionText"
-              placeholder={placeholder}
-              value={choice.text}
-              data-cy="CustomizableQuestionTextInput"
-              disabled={!editing}
-              inline="true"
-            />
-          </DisplayText>
+          <TextInput
+            onChange={this.handleInputChange}
+            type="questionText"
+            placeholder={placeholder}
+            value={choice.text}
+            data-cy="CustomizableQuestionTextInput"
+            disabled={!editing}
+            inline="true"
+          />
         </label>
         {editing && (
           <IconHolder data-cy="TrashIconHolder" onClick={this.handleDelete}>
