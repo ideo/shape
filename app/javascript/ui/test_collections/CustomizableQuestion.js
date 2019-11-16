@@ -179,13 +179,14 @@ class CustomizableQuestion extends React.Component {
   }
 
   get question() {
-    const { question, editing } = this.props
+    const { question, editing, handleFocus } = this.props
     const { questionContent } = this.state
     return (
       <Question editing={editing}>
         <DisplayText color={v.colors.white}>
           <EditableInputHolder>
             <TextInput
+              onFocus={handleFocus}
               onChange={this.handleInputChange}
               onKeyPress={this.handleKeyPress}
               onBlur={this.stopEditingIfContent}
@@ -254,6 +255,7 @@ CustomizableQuestion.propTypes = {
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
+  handleFocus: PropTypes.func,
   question_choices: MobxPropTypes.arrayOrObservableArray,
   isTestDraft: PropTypes.bool,
 }
@@ -261,6 +263,7 @@ CustomizableQuestion.defaultProps = {
   questionAnswer: null,
   editing: false,
   onAnswer: () => null,
+  handleFocus: () => true,
   question_choices: [],
   isTestDraft: false,
 }

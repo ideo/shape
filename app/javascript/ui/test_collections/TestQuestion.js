@@ -101,6 +101,7 @@ class TestQuestion extends React.Component {
       testStatus,
       apiStore,
       hideMedia,
+      handleFocus,
     } = this.props
     const { record } = card
 
@@ -127,6 +128,7 @@ class TestQuestion extends React.Component {
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
+            handleFocus={handleFocus}
             question_choices={record.question_choices}
             isTestDraft={testStatus === 'draft'}
           />
@@ -141,6 +143,7 @@ class TestQuestion extends React.Component {
             parent={parent}
             canEdit={canEdit}
             hideMedia={hideMedia}
+            handleFocus={handleFocus}
           />
         )
       case 'question_description':
@@ -149,6 +152,7 @@ class TestQuestion extends React.Component {
             placeholder="add text here…"
             item={record}
             canEdit={canEdit}
+            handleFocus={handleFocus}
           />
         )
       case 'question_open':
@@ -159,6 +163,7 @@ class TestQuestion extends React.Component {
             canEdit={canEdit}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
+            handleFocus={handleFocus}
           />
         )
       case 'question_finish':
@@ -236,6 +241,7 @@ TestQuestion.propTypes = {
   createSurveyResponse: PropTypes.func,
   afterQuestionAnswered: PropTypes.func,
   canEdit: PropTypes.bool,
+  handleFocus: PropTypes.func,
   numberOfQuestions: PropTypes.number,
   question_choices: MobxPropTypes.arrayOrObservableArray,
   testStatus: PropTypes.oneOf(['draft', 'live', 'closed']),
@@ -254,6 +260,8 @@ TestQuestion.defaultProps = {
   numberOfQuestions: null,
   question_choices: [],
   hideMedia: false,
+  handleFocus: () => true,
+  testStatus: 'draft',
 }
 
 TestQuestion.displayName = 'TestQuestion'

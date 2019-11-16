@@ -64,6 +64,7 @@ class CustomizableQuestionChoice extends React.Component {
       onChange,
       isChecked,
       editing,
+      handleFocus,
     } = this.props
 
     return (
@@ -95,6 +96,7 @@ class CustomizableQuestionChoice extends React.Component {
         >
           <DisplayText color={v.colors.commonDark}>
             <TextInput
+              onFocus={handleFocus}
               onChange={this.handleInputChange}
               value={choice.text}
               type="questionText"
@@ -123,6 +125,7 @@ CustomizableQuestionChoice.propTypes = {
   isChecked: PropTypes.bool,
   editing: PropTypes.bool,
   onDelete: PropTypes.func,
+  handleFocus: PropTypes.func,
 }
 
 CustomizableQuestionChoice.defaultProps = {
@@ -130,6 +133,7 @@ CustomizableQuestionChoice.defaultProps = {
   isChecked: false,
   editing: false,
   onDelete: () => {},
+  handleFocus: () => true,
 }
 
 CustomizableQuestionChoice.displayName = 'CustomizableQuestionChoice'

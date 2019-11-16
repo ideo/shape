@@ -48,6 +48,7 @@ const QuestionLeftSide = ({
   currentIdeaCardIndex,
   canAddChoice,
   onAddChoice,
+  canAddIdeas,
 }) => {
   return (
     <LeftSideContainer>
@@ -65,6 +66,7 @@ const QuestionLeftSide = ({
           handleTrash={handleTrash}
           createNewIdea={createNewQuestionCard}
           showMedia={showMedia}
+          canAddIdeas={canAddIdeas}
           handleToggleShowMedia={handleToggleShowMedia}
           handleSetCurrentIdeaCardIndex={handleSetCurrentIdeaCardIndex}
           currentIdeaCardIndex={currentIdeaCardIndex}
@@ -118,6 +120,7 @@ QuestionLeftSide.propTypes = {
   handleToggleShowMedia: PropTypes.func.isRequired,
   ideasCollection: MobxPropTypes.objectOrObservableObject.isRequired,
   handleSetCurrentIdeaCardIndex: PropTypes.func.isRequired,
+  canAddIdeas: PropTypes.bool.isRequired,
   currentIdeaCardIndex: PropTypes.number,
   canAddChoice: PropTypes.bool,
   onAddChoice: PropTypes.func,

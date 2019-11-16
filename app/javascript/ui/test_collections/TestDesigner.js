@@ -90,6 +90,7 @@ class TestDesigner extends React.Component {
     super(props)
     const { collection_to_test, collection_to_test_id } = props.collection
     const hasCollectionToTest = collection_to_test && collection_to_test_id
+    this.seenEditWarningAt = null
     this.state = {
       testType: hasCollectionToTest ? 'collection' : 'media',
       collectionToTest: collection_to_test,
@@ -118,6 +119,16 @@ class TestDesigner extends React.Component {
     }
   }
 
+  get showEditWarning() {
+    if (!this.seenEditWarningAt) return true
+    const oneHourAgo = Date.now() - 1000 * 60 * 60
+    if (this.seenEditWarningAt < oneHourAgo) {
+      this.seenEditWarningAt = null
+      return true
+    }
+    return false
+  }
+
   get numResponses() {
     const { collection } = this.props
     return collection.num_survey_responses
@@ -144,26 +155,42 @@ class TestDesigner extends React.Component {
   // This shows a dialog immediately
   confirmWithDialog = ({ prompt, onConfirm }) => {
     const { collection } = this.props
-    collection.apiStore.uiStore.confirm({
-      prompt,
-      confirmText: 'Continue',
-      iconName: 'Alert',
-      onConfirm: () => onConfirm(),
+    return new Promise((resolve, reject) => {
+      collection.apiStore.uiStore.confirm({
+        prompt,
+        confirmText: 'Continue',
+        iconName: 'Alert',
+        onConfirm: () => {
+          resolve(true)
+          onConfirm()
+        },
+        onCancel: () => {
+          // Reset so they can confirm again if they'd like to edit
+          this.seenEditWarningAt = null
+          resolve(false)
+        },
+      })
     })
   }
 
   // This shows a dialog only if the collection is a template
   confirmEdit = action => {
     const { collection } = this.props
-    collection.confirmEdit({
-      onConfirm: () => action(),
+    // Return a promise that resolves true so editing can continue
+    return new Promise((resolve, reject) => {
+      resolve(true)
+      collection.confirmEdit({
+        onConfirm: () => action(),
+      })
     })
   }
 
+  // Make sure that any path through this function returns a promise
   confirmActionIfResponsesExist = ({ action, message, conditions = true }) => {
     const confirmableAction = () => this.confirmEdit(action)
-    if (this.numResponses > 0 && conditions) {
-      this.confirmWithDialog({
+    if (this.numResponses > 0 && conditions && this.showEditWarning) {
+      this.seenEditWarningAt = new Date()
+      return this.confirmWithDialog({
         prompt: `This test has ${pluralize(
           'response',
           this.numResponses,
@@ -172,7 +199,7 @@ class TestDesigner extends React.Component {
         onConfirm: confirmableAction,
       })
     } else {
-      confirmableAction()
+      return confirmableAction()
     }
   }
 
@@ -189,6 +216,7 @@ class TestDesigner extends React.Component {
           replacingCard,
           questionType: ev.target.value,
         })
+        return true
       },
       message: 'Are you sure you want to change the question type?',
       conditions: replacingCard.card_question_type,
@@ -202,6 +230,7 @@ class TestDesigner extends React.Component {
         const { currentIdeaCardIndex } = this.state
         this.handleSetCurrentIdeaCardIndex(currentIdeaCardIndex - 1)
       }
+      return true
     }
     this.confirmActionIfResponsesExist({
       action: () => archiveCard(card),
@@ -214,8 +243,8 @@ class TestDesigner extends React.Component {
       action: () => {
         const order = addBefore ? card.order : card.order + 1
         const createdCard = this.createNewQuestionCard({ order, sectionType })
-
         if (createdCard) this.trackQuestionCreation()
+        return true
       },
       message: 'Are you sure you want to add a new question?',
     })
@@ -264,16 +293,23 @@ class TestDesigner extends React.Component {
     })
   }
 
+  handleQuestionFocus = async () => {
+    if (!this.canEditQuestions) return false
+    if (!this.testIsLive) return true
+    const result = await this.confirmActionIfResponsesExist({
+      action: () => {
+        return true
+      },
+      message: 'Are you sure you want to edit this question?',
+    })
+    return result
+  }
+
   get styledTheme() {
     if (this.state.testType === 'collection') {
       return styledTestTheme('secondary')
     }
     return styledTestTheme('primary')
-  }
-
-  get locked() {
-    const { collection } = this.props
-    return collection.is_test_locked
   }
 
   get canEditQuestions() {
@@ -298,7 +334,12 @@ class TestDesigner extends React.Component {
     // NOTE: if we ever allow template instance editors to add their own questions at the end
     // (before the finish card?) then we may want to individually check canEdit on a per card basis
     if (isTemplated) return false
-    return can_edit_content && !this.locked
+    return can_edit_content
+  }
+
+  get testIsLive() {
+    const { test_status } = this.props.collection
+    return test_status === 'live'
   }
 
   createNewQuestionCard = async ({
@@ -426,6 +467,7 @@ class TestDesigner extends React.Component {
           handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}
           currentIdeaCardIndex={currentIdeaCardIndex}
           canAddChoice={record.isCustomizableQuestionType}
+          canAddIdeas={!this.testIsLive}
           onAddChoice={this.onAddQuestionChoice}
         />
         <TestQuestionHolder
@@ -440,6 +482,7 @@ class TestDesigner extends React.Component {
             parent={questionParent}
             card={questionCard}
             order={questionCard.order}
+            handleFocus={this.handleQuestionFocus}
             canEdit={this.canEditQuestions}
             question_choices={record.question_choices}
             testStatus={test_status}
