@@ -379,10 +379,6 @@ class Item < ApplicationRecord
     # All other scale questions are valid without anything filled in
     return false if scale_question?
 
-    if question_single_choice? || question_multiple_choice?
-      return false if content.blank? || question_choices.any? { |qc| qc.text.blank? }
-    end
-
     # Media items are always transformed to other item types
     return true if question_media? && is_a?(Item::QuestionItem)
 
