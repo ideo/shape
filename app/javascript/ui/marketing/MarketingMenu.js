@@ -9,6 +9,7 @@ import { Box } from 'reflexbox'
 import v from '~/utils/variables'
 import Logo from '~/ui/layout/Logo.js'
 import Hamburger from '~/ui/layout/Hamburger.js'
+import MenuDropdown from '~/ui/layout/MenuDropdown'
 import { MarketingFlex } from '~/ui/global/styled/marketing.js'
 import { scroller } from 'react-scroll'
 import { browserHistory } from '~/ui/MarketingRoutes'
@@ -123,6 +124,11 @@ function handleScrollToTop() {
   })
 }
 
+const MobileSubNavLink = styled(NavLink)`
+  position: relative;
+  left: 10px;
+`
+
 const MobileLinks = ({ isHome }) => {
   return (
     <MarketingFlex align="left" justify="left" w={1} column>
@@ -136,6 +142,21 @@ const MobileLinks = ({ isHome }) => {
         <NavLink align="left" onClick={() => handleScrollToContent(isHome)}>
           PRODUCT
         </NavLink>
+      </Box>
+
+      <Box>
+        <MobileSubNavLink
+          align="left"
+          onClick={() => handleScrollToContent(isHome)}
+        >
+          OVERVIEW
+        </MobileSubNavLink>
+      </Box>
+
+      <Box>
+        <MobileSubNavLink href="/product/feedback" align="left">
+          FEEDBACK
+        </MobileSubNavLink>
       </Box>
 
       <Box>
@@ -197,6 +218,7 @@ class MarketingMenu extends React.PureComponent {
 
   renderDesktop = () => {
     const { isHome } = this
+    const items = [{ label: 'Overview' }, { label: 'Feedback' }]
     return (
       <Fragment>
         <MenuBar className="MenuBar top">
@@ -204,9 +226,7 @@ class MarketingMenu extends React.PureComponent {
             <MarketingFlex align="center" justify="center" w={1}>
               <Box w={15 / 32}>
                 <MarketingFlex align="center" justify="flex-start">
-                  <NavLink onClick={() => handleScrollToContent(isHome)}>
-                    Product
-                  </NavLink>
+                  <MenuDropdown items={items} isHome={isHome} />
                   <NavLink href="/product/pricing">Pricing</NavLink>
                   <NavLink href="/product/open-innovation">
                     CHALLENGES AND OPEN INNOVATION
