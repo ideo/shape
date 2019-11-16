@@ -5,7 +5,6 @@ import { action } from 'mobx'
 import styled from 'styled-components'
 
 import { Checkbox, Radio } from '~/ui/global/styled/forms'
-import { DisplayText } from '~/ui/global/styled/typography'
 import { TextInput } from '~/ui/test_collections/shared'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import v from '~/utils/variables'
