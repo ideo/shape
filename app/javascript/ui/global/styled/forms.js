@@ -214,6 +214,7 @@ export const Checkbox = styled(MuiCheckbox)`
     && {
       height: auto;
       margin-right: 0;
+      vertical-align: middle;
       width: 28px;
     }
   `}
@@ -237,6 +238,7 @@ export const Radio = styled(MuiRadio)`
     `
     && {
       height: auto;
+      vertical-align: middle;
       width: 28px;
     }
   `}

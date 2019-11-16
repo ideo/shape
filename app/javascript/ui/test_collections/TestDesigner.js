@@ -232,10 +232,17 @@ class TestDesigner extends React.Component {
       }
       return true
     }
-    this.confirmActionIfResponsesExist({
-      action: () => archiveCard(card),
-      message: 'Are you sure you want to remove this question?',
-    })
+    // Idea cards already have a different warning modal, and our system does
+    // not support two confirm modals. We have to change how confirm modals work
+    // to do both warnings, which might not be a good user exp anyway.
+    if (card.card_question_type === 'question_idea') {
+      archiveCard(card)
+    } else {
+      this.confirmActionIfResponsesExist({
+        action: () => archiveCard(card),
+        message: 'Are you sure you want to remove this question?',
+      })
+    }
   }
 
   handleNew = ({ card, sectionType, addBefore } = {}) => () => {
@@ -342,6 +349,12 @@ class TestDesigner extends React.Component {
     return test_status === 'live'
   }
 
+  get canAddNewIdea() {
+    if (!this.ideasCollection) return false
+    console.log('this', this.ideasCollection.collection_cards.length)
+    return this.ideasCollection.collection_cards.length < 6
+  }
+
   createNewQuestionCard = async ({
     replacingCard,
     order,
@@ -351,6 +364,12 @@ class TestDesigner extends React.Component {
   }) => {
     const { collection } = this.props
     const parent = parentCollection ? parentCollection : collection
+    if (!this.canAddNewIdea) {
+      collection.apiStore.uiStore.alert(
+        'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
+      )
+      return
+    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
@@ -377,9 +396,11 @@ class TestDesigner extends React.Component {
     lastCard = false,
   } = {}) {
     if (!this.canEdit) return
+    const leftHandedCard = sectionType === 'intro' || sectionType === 'ideas'
     return (
       <QuestionHotEdge
         lastCard={lastCard}
+        leftHandedCard={leftHandedCard}
         onAdd={this.handleNew({ card, sectionType, addBefore })}
       />
     )
@@ -432,7 +453,7 @@ class TestDesigner extends React.Component {
     )
   }
 
-  renderCard = (card, firstCard, lastCard) => {
+  renderCard = (card, firstCard, lastCard, i, sectionType) => {
     const { collection } = this.props
     const { test_status } = collection
     const { currentIdeaCardIndex } = this.state
@@ -476,6 +497,8 @@ class TestDesigner extends React.Component {
           lastCard={lastCard}
           userEditable={userEditableQuestionType(record.card_question_type)}
         >
+          {i === 0 &&
+            this.renderHotEdge({ card, sectionType, addBefore: true })}
           <TestQuestion
             editing
             hideMedia={!collection.test_show_media}
@@ -487,6 +510,8 @@ class TestDesigner extends React.Component {
             question_choices={record.question_choices}
             testStatus={test_status}
           />
+          {card.card_question_type !== 'question_finish' &&
+            this.renderHotEdge({ card, sectionType, lastCard })}
         </TestQuestionHolder>
       </Fragment>
     )
@@ -520,11 +545,7 @@ class TestDesigner extends React.Component {
           return (
             <FlipMove appearAnimation="fade" key={card.id}>
               <TestQuestionFlexWrapper className={`card ${card.id}`}>
-                {i === 0 &&
-                  this.renderHotEdge({ card, sectionType, addBefore: true })}
-                {this.renderCard(card, firstCard, lastCard)}
-                {card.card_question_type !== 'question_finish' &&
-                  this.renderHotEdge({ card, sectionType, lastCard })}
+                {this.renderCard(card, firstCard, lastCard, i, sectionType)}
               </TestQuestionFlexWrapper>
             </FlipMove>
           )

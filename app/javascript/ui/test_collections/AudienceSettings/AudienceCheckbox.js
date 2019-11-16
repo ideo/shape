@@ -9,15 +9,24 @@ import {
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
 import InfoIcon from '~/ui/icons/InfoIcon'
 import styled from 'styled-components'
+import v from '~/utils/variables'
 
 const StyledInfoIconWrapper = styled.span`
-  width: 8%;
   opacity: 0.5;
-  transform: translateY(1px);
+  margin-top: 1rem;
+
   &:hover {
     opacity: 1;
   }
-  float: right;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    opacity: 1; // Make full opacity because there's no hover on mobile
+  }
+
+  span {
+    width: 1rem;
+    height: 1rem;
+  }
 `
 
 const AudienceCheckbox = ({
@@ -48,25 +57,23 @@ const AudienceCheckbox = ({
           label={
             <div>
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-                <StyledLabelText>
-                  {name}
-                  {!global_default && (
-                    <StyledInfoIconWrapper
-                      onClick={e => {
-                        e.preventDefault()
-                        openAudienceMenu(audience)
-                      }}
-                      className="audienceLabel"
-                    >
-                      <InfoIcon />
-                    </StyledInfoIconWrapper>
-                  )}
-                </StyledLabelText>
+                <StyledLabelText>{name}</StyledLabelText>
               </div>
             </div>
           }
         />
       </StyledRowFlexItem>
+      {!global_default && (
+        <StyledInfoIconWrapper
+          onClick={e => {
+            e.preventDefault()
+            openAudienceMenu(audience)
+          }}
+          className="audienceLabel"
+        >
+          <InfoIcon />
+        </StyledInfoIconWrapper>
+      )}
     </StyledRowFlexParent>
   )
 }

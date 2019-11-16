@@ -191,11 +191,10 @@ class CustomizableQuestion extends React.Component {
               onKeyPress={this.handleKeyPress}
               onBlur={this.stopEditingIfContent}
               value={questionContent}
-              type="questionText"
+              type="descriptionText"
               placeholder="write question here"
               data-cy="CustomizableQuestionTextInput"
               disabled={!editing}
-              inverse="true"
             />
           </EditableInputHolder>
         </DisplayText>
@@ -226,6 +225,7 @@ class CustomizableQuestion extends React.Component {
               <CustomizableQuestionChoice
                 isChecked={this.isChoiceSelected(choice)}
                 choice={choice}
+                placeholder={`Option ${index + 1}`}
                 isSingleChoiceQuestion={question.isSingleChoiceQuestion}
                 questionAnswer={questionAnswer}
                 onChange={this.handleAnswerSelection(choice)}

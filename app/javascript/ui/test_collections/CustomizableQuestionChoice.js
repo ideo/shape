@@ -24,7 +24,7 @@ ChoiceHolder.displayName = 'ChoiceHolder'
 const IconHolder = styled.button`
   display: inline-block;
   height: 27px;
-  vertical-align: bottom;
+  vertical-align: middle;
   width: 22px;
 `
 
@@ -65,6 +65,7 @@ class CustomizableQuestionChoice extends React.Component {
       isChecked,
       editing,
       handleFocus,
+      placeholder,
     } = this.props
 
     return (
@@ -92,15 +93,19 @@ class CustomizableQuestionChoice extends React.Component {
         <label
           htmlFor={`option-${choice.id}`}
           onClick={this.handleLabelClick}
-          style={{ width: 'calc(100% - 55px', display: 'inline-block' }}
+          style={{
+            width: 'calc(100% - 55px',
+            display: 'inline-block',
+            verticalAlign: 'middle',
+          }}
         >
           <DisplayText color={v.colors.commonDark}>
             <TextInput
               onFocus={handleFocus}
               onChange={this.handleInputChange}
-              value={choice.text}
               type="questionText"
-              placeholder={`Option ${parseInt(choice.value) + 1}`}
+              placeholder={placeholder}
+              value={choice.text}
               data-cy="CustomizableQuestionTextInput"
               disabled={!editing}
               inline="true"
@@ -126,6 +131,7 @@ CustomizableQuestionChoice.propTypes = {
   editing: PropTypes.bool,
   onDelete: PropTypes.func,
   handleFocus: PropTypes.func,
+  placeholder: PropTypes.string,
 }
 
 CustomizableQuestionChoice.defaultProps = {
@@ -134,6 +140,7 @@ CustomizableQuestionChoice.defaultProps = {
   editing: false,
   onDelete: () => {},
   handleFocus: () => true,
+  placeholder: 'Write your option here',
 }
 
 CustomizableQuestionChoice.displayName = 'CustomizableQuestionChoice'
