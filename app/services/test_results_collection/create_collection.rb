@@ -120,7 +120,6 @@ module TestResultsCollection
 
       create_card(
         params: {
-          order: 999,
           collection_id: test_collection.id,
         },
         parent_collection: test_results_collection,

@@ -42,16 +42,19 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       hash_including(
         item: idea,
         identifier: 'first-idea-media',
-        order: 0,
+        # it gets put at order 1 until the TestCollection gets moved to the end
+        order: 1,
       ),
     )
     expect(subject).to be_a_success
+    # now it should be first
+    expect(test_results_collection.collection_cards.first.identifier).to eq 'first-idea-media'
   end
 
   it 'places the legend in the 3rd spot' do
     expect(subject).to be_a_success
     expect(
-      test_results_collection.collection_cards[2].record,
+      test_results_collection.collection_cards.third.record,
     ).to be_instance_of(Item::LegendItem)
   end
 
@@ -110,7 +113,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     expect(subject).to be_a_success
   end
 
-  it 'moves test design collection to the end of the collection' do
+  it 'moves original test_collection to the end of the results collection' do
     expect(subject).to be_a_success
     expect(
       test_collection
@@ -165,14 +168,12 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
     let(:legend_item) { test_results_collection.legend_item }
 
-    it 'should create a LegendItem at the 3rd spot (order == 2)' do
-      expect(subject).to be_a_success
-      expect(legend_item.parent_collection_card.order).to eq 2
-    end
-
     it 'should create all test results cards, correctly ordered' do
       expect(subject).to be_a_success
+      # legend item should be in the 3rd spot (order == 2)
+      expect(legend_item.parent_collection_card.order).to eq 2
       results_cards = test_results_collection.collection_cards.reload
+
       expect(
         results_cards.map { |card| card.record.class.name },
       ).to eq(

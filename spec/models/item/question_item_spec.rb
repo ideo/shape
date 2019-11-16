@@ -23,24 +23,22 @@ RSpec.describe Item::QuestionItem, type: :model do
       let(:collection_card) do
         create(:collection_card,
                parent: idea_collection,
-               section_type: :ideas,
-              )
+               section_type: :ideas)
       end
 
       before do
-        (0..6).each do
+        7.times do
           create(:question_item,
                  question_type: :question_idea,
-                 parent_collection: idea_collection,
-                )
+                 parent_collection: idea_collection)
         end
       end
 
       it 'should fail validation' do
         idea_item = Item::QuestionItem.create(
-            parent_collection_card: collection_card,
-            question_type: :question_idea,
-          )
+          parent_collection_card: collection_card,
+          question_type: :question_idea,
+        )
         expect(idea_item.valid?).to be false
         expect(idea_item.errors.messages[:base]).to eq ['too many ideas']
       end

@@ -23,7 +23,7 @@ module TestResultsCollection
 
     before do
       @legend_item = test_results_collection.legend_item
-      @order = -1
+      @order = max_order
     end
 
     def call
@@ -246,14 +246,18 @@ module TestResultsCollection
         .includes(:test_results_collection)
     end
 
+    def max_order
+      return -1 if test_results_collection.collection_cards.empty?
+
+      test_results_collection.collection_cards.maximum(:order)
+    end
+
     def move_test_design_to_end
       # Move feedback design to the end
       test_collection
         .reload
         .parent_collection_card
-        .move_to_order(
-          test_results_collection.collection_cards.maximum(:order) + 1,
-        )
+        .move_to_order(max_order + 1)
     end
   end
 end

@@ -66,10 +66,8 @@ class Item
     has_many :question_choices, -> { order(order: :asc) }
 
     validate on: :create do
-      if question_idea?
-        if parent.collection_cards.count > 6
-          errors.add(:base, 'too many ideas')
-        end
+      if question_idea? && parent.present? && parent.collection_cards.count > 6
+        errors.add(:base, 'too many ideas')
       end
     end
 
