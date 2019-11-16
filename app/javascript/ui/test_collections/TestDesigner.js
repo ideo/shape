@@ -8,7 +8,9 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import QuestionLeftSide from '~/ui/test_collections/QuestionLeftSide'
+import QuestionLeftSide, {
+  LeftSideContainer,
+} from '~/ui/test_collections/QuestionLeftSide'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -76,6 +78,13 @@ const OuterContainer = styled.div`
       margin-left: 0px;
     }
   }
+`
+
+const EmptySectionHotEdgeWrapper = styled.div`
+  background: ${v.colors.primaryMedium};
+  height: 48px;
+  width: 354px;
+  border-radius: 7px;
 `
 
 const userEditableQuestionType = questionType => {
@@ -356,8 +365,14 @@ class TestDesigner extends React.Component {
   } = {}) {
     if (!this.canEdit) return
     const leftHandedCard = sectionType === 'intro' || sectionType === 'ideas'
+    let noCard = false
+    if (card && !card.hasOwnProperty('id')) {
+      noCard = true
+    }
+
     return (
       <QuestionHotEdge
+        noCard={noCard}
         lastCard={lastCard}
         leftHandedCard={leftHandedCard}
         onAdd={this.handleNew({ card, sectionType, addBefore })}
@@ -483,12 +498,15 @@ class TestDesigner extends React.Component {
           </LargerH3>
         </Section>
         {cards.length === 0 && (
-          <TestQuestionFlexWrapper className="card">
-            {this.renderHotEdge({
-              card: { order: 0 },
-              sectionType,
-              addBefore: true,
-            })}
+          <TestQuestionFlexWrapper>
+            <LeftSideContainer></LeftSideContainer>
+            <EmptySectionHotEdgeWrapper>
+              {this.renderHotEdge({
+                card: { order: 0 },
+                sectionType,
+                addBefore: true,
+              })}
+            </EmptySectionHotEdgeWrapper>
           </TestQuestionFlexWrapper>
         )}
         {cards.map((card, i) => {
