@@ -60,6 +60,8 @@ exports[`TestDesigner renders snapshot 1`] = `
           className="card 99"
         >
           <QuestionLeftSide
+            canAddChoice={false}
+            canAddIdeas={true}
             canEdit={false}
             card={
               Object {
@@ -2194,6 +2196,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
               createSurveyResponse={null}
               editing={true}
+              handleFocus={[Function]}
               hideMedia={false}
               numberOfQuestions={null}
               order={0}
@@ -4036,6 +4039,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               questionAnswer={null}
               question_choices={Array []}
               surveyResponse={null}
+              testStatus="draft"
             />
           </styled.div>
         </styled.div>
@@ -4060,6 +4064,8 @@ exports[`TestDesigner renders snapshot 1`] = `
           className="card 11"
         >
           <QuestionLeftSide
+            canAddChoice={false}
+            canAddIdeas={true}
             canEdit={false}
             card={
               Object {
@@ -7838,6 +7844,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
               createSurveyResponse={null}
               editing={true}
+              handleFocus={[Function]}
               hideMedia={false}
               numberOfQuestions={null}
               order={1}
@@ -12307,6 +12314,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               questionAnswer={null}
               question_choices={Array []}
               surveyResponse={null}
+              testStatus="draft"
             />
           </styled.div>
         </styled.div>

@@ -134,6 +134,7 @@ class Item < ApplicationRecord
     question_context: 0,
     question_useful: 1,
     question_open: 2,
+    # 3 - end is deprecated
     question_media: 4,
     question_description: 5,
     question_finish: 6,
@@ -142,6 +143,8 @@ class Item < ApplicationRecord
     question_different: 9,
     question_category_satisfaction: 10,
     question_idea: 11,
+    question_single_choice: 12,
+    question_multiple_choice: 13,
   }
 
   scope :in_ideas_section, -> {
@@ -370,6 +373,10 @@ class Item < ApplicationRecord
 
     # All other scale questions are valid without anything filled in
     return false if scale_question?
+
+    if question_single_choice? || question_multiple_choice?
+      return false if content.blank? || question_choices.any? { |qc| qc.text.blank? }
+    end
 
     # Media items are always transformed to other item types
     return true if question_media? && is_a?(Item::QuestionItem)

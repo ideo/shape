@@ -100,7 +100,7 @@ class CustomizableQuestionChoice extends React.Component {
               onChange={this.handleInputChange}
               value={choice.text}
               type="questionText"
-              placeholder="write question here"
+              placeholder={`Option ${parseInt(choice.value) + 1}`}
               data-cy="CustomizableQuestionTextInput"
               disabled={!editing}
               inline="true"

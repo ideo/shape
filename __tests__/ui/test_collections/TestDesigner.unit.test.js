@@ -95,6 +95,7 @@ describe('TestDesigner', () => {
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to change the question type?',
         })
@@ -114,6 +115,7 @@ describe('TestDesigner', () => {
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to remove this question?',
         })
@@ -142,6 +144,7 @@ describe('TestDesigner', () => {
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to add a new question?',
         })
