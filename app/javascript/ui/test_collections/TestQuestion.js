@@ -254,6 +254,7 @@ TestQuestion.defaultProps = {
   numberOfQuestions: null,
   question_choices: [],
   hideMedia: false,
+  testStatus: 'draft',
 }
 
 TestQuestion.displayName = 'TestQuestion'

@@ -310,7 +310,6 @@ class TestDesigner extends React.Component {
 
   get canAddNewIdea() {
     if (!this.ideasCollection) return false
-    console.log('this', this.ideasCollection.collection_cards.length)
     return this.ideasCollection.collection_cards.length < 6
   }
 
