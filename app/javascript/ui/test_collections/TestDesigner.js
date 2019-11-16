@@ -216,7 +216,6 @@ class TestDesigner extends React.Component {
           replacingCard,
           questionType: ev.target.value,
         })
-        return true
       },
       message: 'Are you sure you want to change the question type?',
       conditions: replacingCard.card_question_type,
@@ -230,7 +229,6 @@ class TestDesigner extends React.Component {
         const { currentIdeaCardIndex } = this.state
         this.handleSetCurrentIdeaCardIndex(currentIdeaCardIndex - 1)
       }
-      return true
     }
     // Idea cards already have a different warning modal, and our system does
     // not support two confirm modals. We have to change how confirm modals work
@@ -251,7 +249,6 @@ class TestDesigner extends React.Component {
         const order = addBefore ? card.order : card.order + 1
         const createdCard = this.createNewQuestionCard({ order, sectionType })
         if (createdCard) this.trackQuestionCreation()
-        return true
       },
       message: 'Are you sure you want to add a new question?',
     })
@@ -349,9 +346,8 @@ class TestDesigner extends React.Component {
     return test_status === 'live'
   }
 
-  get canAddNewIdea() {
-    if (!this.ideasCollection) return false
-    console.log('this', this.ideasCollection.collection_cards.length)
+  get canAddIdeas() {
+    if (!this.testIsLive || !this.ideasCollection) return false
     return this.ideasCollection.collection_cards.length < 6
   }
 
@@ -487,8 +483,7 @@ class TestDesigner extends React.Component {
           handleToggleShowMedia={this.handleToggleShowMedia}
           handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}
           currentIdeaCardIndex={currentIdeaCardIndex}
-          canAddChoice={record.isCustomizableQuestionType}
-          canAddIdeas={!this.testIsLive}
+          canAddIdeas={this.canAddIdeas}
           onAddChoice={this.onAddQuestionChoice}
         />
         <TestQuestionHolder
