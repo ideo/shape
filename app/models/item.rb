@@ -142,6 +142,8 @@ class Item < ApplicationRecord
     question_different: 9,
     question_category_satisfaction: 10,
     question_idea: 11,
+    question_single_choice: 12,
+    question_multiple_choice: 13,
   }
 
   scope :in_ideas_section, -> {

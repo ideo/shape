@@ -207,7 +207,6 @@ class Item
 
     def question_title_and_description
       return customizable_title_and_description if question_choices_customizable?
-      return category_satisfaction_title_and_description if question_category_satisfaction?
 
       self.class.question_title_and_description(question_type)
     end
@@ -216,8 +215,11 @@ class Item
       question_title_and_description[:title]
     end
 
-    def question_description
-      question_title_and_description[:description]
+    def question_description(with_content: false)
+      description = question_title_and_description[:description]
+      return "#{description} #{content}?" if question_category_satisfaction? && with_content
+
+      description
     end
 
     def scale_question?
@@ -345,15 +347,6 @@ class Item
     end
 
     private
-
-    def category_satisfaction_title_and_description
-      attrs = self.class.question_title_and_description(:question_category_satisfaction)
-
-      {
-        title: attrs[:title],
-        description: "#{attrs[:description]} #{content}?",
-      }
-    end
 
     def customizable_title_and_description
       {
