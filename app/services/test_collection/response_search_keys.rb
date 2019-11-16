@@ -21,7 +21,7 @@ module TestCollection
 
     def add_non_repeating_question_items
       non_repeating_question_items.graphable_questions.each do |question|
-        answers_by_question_id[question.id].each do |answer|
+        answers_by_question_id[question.id]&.each do |answer|
           generate_question_answer_keys(question: question, answer: answer)
         end
       end
@@ -30,7 +30,7 @@ module TestCollection
     def add_idea_question_items
       ideas_question_items.graphable_questions.each do |question|
         idea_items.each do |idea|
-          answers_by_question_id[question.id].each do |answer|
+          answers_by_question_id[question.id]&.each do |answer|
             next unless answer.idea_id == idea.id
 
             generate_question_answer_keys(question: question, answer: answer, idea_id: idea.id)

@@ -5,6 +5,7 @@ module TestResultsCollection
     include CollectionCardBuilderHelpers
 
     schema :parent_collection,
+           :data_item,
            :item,
            :order,
            :legend_item,
@@ -15,11 +16,18 @@ module TestResultsCollection
 
     require_in_context :item, :parent_collection
 
-    delegate :parent_collection, :item, :legend_item, :created_by, :order,
-             :survey_response, :idea,
+    delegate :parent_collection,
+             :item,
+             :data_item,
+             :legend_item,
+             :created_by,
+             :order,
+             :survey_response,
+             :idea,
              to: :context
 
-    delegate :question_dataset, :org_wide_question_dataset,
+    delegate :question_dataset,
+             :org_wide_question_dataset,
              to: :item
 
     before do
@@ -33,8 +41,8 @@ module TestResultsCollection
         existing_card.update(order: order) unless existing_card.order == order
         return
       end
-      @card = create_data_item
-      context.legend_item ||= @card.record.legend_item
+      create_data_item
+      context.legend_item ||= data_item.legend_item
 
       # Create datasets (in specific order so they appear that way in the legend)
       create_idea_datasets if idea.present?
@@ -46,11 +54,12 @@ module TestResultsCollection
     private
 
     def create_data_item
-      create_card(
+      card = create_card(
         params: data_item_card_attrs(item),
         parent_collection: parent_collection,
         created_by: created_by,
       )
+      context.data_item = card.item
     end
 
     def find_existing_card
@@ -65,7 +74,7 @@ module TestResultsCollection
       test_audiences.each do |test_audience|
         item.create_test_audience_dataset(
           test_audience: test_audience,
-          data_item: @card.record,
+          data_item: data_item,
           idea: idea,
         )
       end
@@ -74,7 +83,7 @@ module TestResultsCollection
     def create_idea_datasets
       item.create_idea_question_dataset(
         idea: idea,
-        data_item: @card.record,
+        data_item: data_item,
       )
     end
 
@@ -83,16 +92,16 @@ module TestResultsCollection
         item.create_survey_response_idea_dataset(
           survey_response: survey_response,
           idea: idea,
-          data_item: @card.record,
+          data_item: data_item,
         )
       end
     end
 
     def link_question_and_org_wide_datasets
       question_dataset.data_items_datasets.create(
-        data_item: @card.record,
+        data_item: data_item,
       )
-      @card.record.data_items_datasets.create(
+      data_item.data_items_datasets.create(
         dataset: org_wide_question_dataset,
       )
     end
@@ -112,7 +121,7 @@ module TestResultsCollection
     end
 
     def test_audiences
-      return [survey_response.test_audience] if survey_response.present?
+      return [survey_response.test_audience].compact if survey_response.present?
 
       item.parent.test_audiences
     end

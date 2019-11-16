@@ -7,7 +7,7 @@ RSpec.describe TestResultsCollection::CreateOpenResponseCollection, type: :servi
   subject do
     TestResultsCollection::CreateOpenResponseCollection.call(
       parent_collection: test_results_collection,
-      item: open_response_item,
+      question_item: open_response_item,
     )
   end
 
@@ -25,9 +25,10 @@ RSpec.describe TestResultsCollection::CreateOpenResponseCollection, type: :servi
 
   context 'if it already exists' do
     before do
+      # call this an extra time
       TestResultsCollection::CreateOpenResponseCollection.call(
         parent_collection: test_results_collection,
-        item: open_response_item,
+        question_item: open_response_item,
       )
     end
 

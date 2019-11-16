@@ -128,6 +128,9 @@ RSpec.describe QuestionAnswer, type: :model do
     end
 
     context 'completed response' do
+      # NOTE: this test is also effectively testing some of the underlying services e.g.
+      # TestResultsCollection::CreateAndLinkOpenResponse
+      let!(:test_collection) { create(:test_collection, :open_response_questions, :launched) }
       let!(:question_answers) do
         survey_response.question_items.map do |question|
           create(:question_answer,
@@ -138,6 +141,9 @@ RSpec.describe QuestionAnswer, type: :model do
       let(:question_answer) { question_answers.first.reload }
 
       before do
+        TestResultsCollection::CreateContent.call(
+          test_results_collection: test_collection.test_results_collection,
+        )
         expect(survey_response.reload.completed?).to be true
       end
 

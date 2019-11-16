@@ -249,13 +249,16 @@ describe Resourceable, type: :concern do
       end
 
       context 'with a test collection' do
-        let(:test_collection) { create(:test_collection, parent_collection: collection, roles_anchor_collection: collection) }
+        let(:test_collection) { create(:test_collection, :completed, parent_collection: collection, roles_anchor_collection: collection) }
         let(:question_item) { test_collection.question_items.first }
+        let(:ideas_collection) { test_collection.ideas_collection }
 
         it 'should update the question_items roles_anchor to be itself' do
           expect(question_item.roles_anchor_collection_id).to eq collection.id
+          expect(ideas_collection.reload.roles_anchor_collection_id).to eq collection.id
           test_collection.unanchor_and_inherit_roles_from_anchor!
           expect(question_item.reload.roles_anchor_collection_id).to eq test_collection.id
+          expect(ideas_collection.reload.roles_anchor_collection_id).to eq test_collection.id
         end
       end
 

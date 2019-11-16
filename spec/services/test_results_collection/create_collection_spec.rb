@@ -20,11 +20,11 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
     }.to change(Collection::TestResultsCollection, :count).by(1)
   end
 
-  it 'calls TestResultsCollection::CreateContent' do
-    expect(TestResultsCollection::CreateContent).to receive(:call!).with(
-      test_results_collection: instance_of(Collection::TestResultsCollection),
-      created_by: test_collection.created_by,
-      idea: nil,
+  it 'calls TestResultsCollection::CreateContentWorker' do
+    expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+      # newly created collection id
+      anything,
+      test_collection.created_by.id,
     )
     expect(subject).to be_a_success
   end
@@ -40,13 +40,6 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
   it 'moves test collection to be inside results collection' do
     expect(subject).to be_a_success
     expect(test_results_collection.collections).to include(test_collection)
-  end
-
-  it 'places the legend in the 3rd spot' do
-    expect(subject).to be_a_success
-    expect(
-      test_results_collection.collection_cards[2].record,
-    ).to be_instance_of(Item::LegendItem)
   end
 
   context 'if idea provided' do
@@ -65,59 +58,37 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
     end
   end
 
-  context 'with roles on test collection' do
-    let(:editor) { create(:user) }
-    before do
-      test_collection.update_column(:roles_anchor_collection_id, nil)
-    end
-    let!(:role) { editor.add_role(Role::EDITOR, test_collection) }
-    before do
-      test_collection.roles.reload
+  context 'updating roles' do
+    context 'with roles on test collection' do
+      let(:editor) { create(:user) }
+      before do
+        test_collection.unanchor_and_inherit_roles_from_anchor!
+        editor.add_role(Role::EDITOR, test_collection)
+      end
+
+      it 'moves roles to results collection' do
+        role = test_collection.roles.first
+        expect(subject).to be_a_success
+        expect(test_results_collection.roles).to eq([role])
+        expect(test_collection.roles.reload).to be_empty
+        expect(test_collection.roles_anchor).to eq(test_results_collection)
+      end
+
+      it 'correctly anchors the children (items and ideas collection)' do
+        expect(subject).to be_a_success
+        expect(test_collection.children.all? { |child| child.roles_anchor == test_results_collection }).to be true
+      end
     end
 
-    it 'moves roles to results collection' do
-      expect(subject).to be_a_success
-      expect(test_results_collection.roles).to eq([role])
-      expect(test_collection.roles.reload).to be_empty
-      expect(test_collection.roles_anchor).to eq(test_results_collection)
-    end
-  end
+    context 'with test collection anchored to another collection' do
+      let(:parent) { test_collection.parent }
 
-  context 'with more scaled questions' do
-    let!(:test_collection) { create(:test_collection, :completed) }
-    let(:test_results_collection) { test_collection.test_results_collection }
-    let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
-    let(:legend_item) { test_results_collection.legend_item }
-
-    it 'should create a LegendItem at the 3rd spot (order == 2)' do
-      subject
-      expect(legend_item.parent_collection_card.order).to eq 2
-      expect(
-        test_results_collection
-        .collection_cards
-        .reload
-        .map { |card| card.record.class.name },
-      ).to eq(
-        [
-          'Item::VideoItem',
-          'Item::DataItem',
-          'Item::LegendItem',
-          'Collection',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Collection::TestOpenResponses',
-          'Collection::TestOpenResponses',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Collection::TestCollection',
-        ],
-      )
-      expect(
-        test_results_collection
-        .collection_cards
-        .map(&:order),
-      ).to eq(0.upto(11).to_a)
+      it 'keeps everything anchored to the original roles anchor' do
+        expect(test_collection.roles_anchor).to eq parent
+        expect(subject).to be_a_success
+        collections = [test_results_collection] + [test_collection] + test_collection.children
+        expect(collections.all? { |c| c.roles_anchor == parent }).to be true
+      end
     end
   end
 end
