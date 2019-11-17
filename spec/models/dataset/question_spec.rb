@@ -27,5 +27,21 @@ RSpec.describe Dataset::Question, type: :model do
         expect(dataset.name).to eq(test_collection.base_name)
       end
     end
+
+    context 'for category satisfaction question' do
+      let(:question_item) do
+        create(
+          :question_item,
+          question_type: :question_category_satisfaction,
+          parent_collection: test_collection,
+          content: 'socks',
+        )
+      end
+
+      it 'uses the description with full content' do
+        expect(dataset.description).to eq 'How satisfied are you with your current socks?'
+        expect(dataset.name).to eq test_collection.name
+      end
+    end
   end
 end

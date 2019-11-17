@@ -228,7 +228,7 @@ class Item
 
     def graphable_question?
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym) ||
-        [:question_single_choice, :question_multiple_choice].include?(question_type&.to_sym)
+        %i[question_single_choice question_multiple_choice].include?(question_type&.to_sym)
     end
 
     def requires_roles?

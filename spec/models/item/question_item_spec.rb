@@ -48,19 +48,9 @@ RSpec.describe Item::QuestionItem, type: :model do
   context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
-    let(:test_collection) { create(:test_collection, :completed) }
+    let(:test_collection) { create(:test_collection, :launched) }
 
     describe '#score' do
-      before do
-        # Stub out so it doesn't create all result collections
-        allow(TestCollection::CreateResultsCollections).to receive(:call).and_return(
-          double(success?: true),
-        )
-        allow(TestResultsCollection::CreateOrLinkAliasCollection).to receive(:call).and_return(
-          double(success?: true),
-        )
-      end
-      before { test_collection.launch! }
       let(:question_item) { test_collection.question_items.select(&:question_useful?).first }
       let(:test_audience) { create(:test_audience, test_collection: test_collection) }
       let!(:response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
@@ -111,7 +101,7 @@ RSpec.describe Item::QuestionItem, type: :model do
     end
   end
 
-  describe '#question_title_and_description' do
+  describe '#question_description' do
     context 'for category satisfaction question' do
       let(:question) do
         create(
@@ -122,9 +112,11 @@ RSpec.describe Item::QuestionItem, type: :model do
       end
 
       it 'returns customized version' do
-        expect(question.question_title_and_description).to eq(
-          title: 'Category Satisfaction',
-          description: 'How satisfied are you with your current socks?',
+        expect(question.question_description).to eq(
+          'How satisfied are you with your current',
+        )
+        expect(question.question_description(with_content: true)).to eq(
+          'How satisfied are you with your current socks?',
         )
       end
     end
