@@ -202,6 +202,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
             }
             cardNumber={NaN}
+            createNewIdea={[Function]}
             createNewQuestionCard={[Function]}
             currentIdeaCardIndex={0}
             handleSelectChange={[Function]}
@@ -5028,6 +5029,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
             }
             cardNumber={2}
+            createNewIdea={[Function]}
             createNewQuestionCard={[Function]}
             currentIdeaCardIndex={0}
             handleSelectChange={[Function]}

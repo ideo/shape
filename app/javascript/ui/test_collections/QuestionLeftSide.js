@@ -40,7 +40,7 @@ const QuestionLeftSide = ({
   cardNumber,
   handleSelectChange,
   handleTrash,
-  createNewQuestionCard,
+  createNewIdea,
   ideasCollection,
   showMedia,
   handleToggleShowMedia,
@@ -64,7 +64,7 @@ const QuestionLeftSide = ({
           cardNumber={cardNumber}
           canEdit={canEdit}
           handleTrash={handleTrash}
-          createNewIdea={createNewQuestionCard}
+          createNewIdea={createNewIdea}
           showMedia={showMedia}
           canAddIdeas={canAddIdeas}
           handleToggleShowMedia={handleToggleShowMedia}
@@ -115,7 +115,7 @@ QuestionLeftSide.propTypes = {
   cardNumber: PropTypes.number.isRequired,
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,
-  createNewQuestionCard: PropTypes.func.isRequired,
+  createNewIdea: PropTypes.func.isRequired,
   showMedia: PropTypes.bool.isRequired,
   handleToggleShowMedia: PropTypes.func.isRequired,
   ideasCollection: MobxPropTypes.objectOrObservableObject.isRequired,

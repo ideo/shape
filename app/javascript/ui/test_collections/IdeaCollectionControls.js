@@ -81,9 +81,6 @@ class IdeaCollectionControls extends React.Component {
     } = this.props
     // create new idea at the end
     await createNewIdea({
-      parentCollection: collection,
-      questionType: 'question_idea',
-      sectionType: 'ideas',
       order: collection.collection_card_count + 1,
     })
     // now jump to the end

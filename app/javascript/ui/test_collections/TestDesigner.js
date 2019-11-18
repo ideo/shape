@@ -38,6 +38,8 @@ const TestQuestionFlexWrapper = styled.div`
 
 const SECTIONS = ['intro', 'ideas', 'outro']
 
+const NUM_IDEAS_LIMIT = 6
+
 const Section = styled.div`
   border-top: 1px solid ${v.colors.black};
   margin: 1.25rem 0 -1.25rem 0;
@@ -346,9 +348,39 @@ class TestDesigner extends React.Component {
     return test_status === 'live'
   }
 
+  get reachedNumIdeasLimit() {
+    return this.ideasCollection.collection_cards.length >= NUM_IDEAS_LIMIT
+  }
+
   get canAddIdeas() {
-    if (!this.canEdit || !this.testIsLive || !this.ideasCollection) return false
-    return this.ideasCollection.collection_cards.length < 6
+    if (!this.canEdit || this.testIsLive || !this.ideasCollection) return false
+    return true
+  }
+
+  // A method specifically designed for adding new idea cards
+  // All other cards can be created using createNewQuestionCard
+  createNewIdea = async ({ order }) => {
+    const { collection } = this.props
+    if (this.reachedNumIdeasLimit) {
+      collection.apiStore.uiStore.alert(
+        `To ensure quality responses, a single test is limited to a maximum of ${NUM_IDEAS_LIMIT} ideas total. To evaluate more ideas, please create an additional test.`
+      )
+      return
+    }
+    const result = await this.confirmActionIfResponsesExist({
+      action: () => {
+        return true
+      },
+      message: 'Are you sure you want to add a new idea?',
+    })
+    if (!result) return
+
+    return this.createNewQuestionCard({
+      questionType: 'question_idea',
+      sectionType: 'ideas',
+      parentCollection: this.ideasCollection,
+      order,
+    })
   }
 
   createNewQuestionCard = async ({
@@ -360,12 +392,6 @@ class TestDesigner extends React.Component {
   }) => {
     const { collection } = this.props
     const parent = parentCollection ? parentCollection : collection
-    if (!this.canAddNewIdea) {
-      collection.apiStore.uiStore.alert(
-        'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
-      )
-      return
-    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
@@ -478,6 +504,7 @@ class TestDesigner extends React.Component {
           canAddChoice={record.isCustomizableQuestionType}
           onAddChoice={this.onAddQuestionChoice}
           createNewQuestionCard={this.createNewQuestionCard}
+          createNewIdea={this.createNewIdea}
           ideasCollection={this.ideasCollection}
           showMedia={collection.test_show_media}
           handleToggleShowMedia={this.handleToggleShowMedia}
