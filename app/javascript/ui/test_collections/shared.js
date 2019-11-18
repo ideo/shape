@@ -48,7 +48,7 @@ export const TextInputHolder = styled(StyledCommentTextarea)`
   position: relative;
   color: white;
   padding: 12px 3px;
-  width: calc(100% - 12px);
+  width: calc(100% - 6px);
   background-color: ${props =>
     props.hasFocus
       ? props.theme.backgroundColorEditable

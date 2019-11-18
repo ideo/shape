@@ -18,6 +18,7 @@ const IdeaLabel = styled.div`
   border-bottom: 1px solid ${v.colors.black};
   display: inline-block;
   width: 200px;
+  margin-top: 17px;
 `
 
 const StyledAddIdea = styled.div`
@@ -27,6 +28,7 @@ const StyledAddIdea = styled.div`
   display: inline-block;
   position: relative;
   top: 10px;
+  margin-left: 5px;
 `
 
 const StyledNavigationAndCheckboxWrapper = styled.div`
@@ -79,9 +81,6 @@ class IdeaCollectionControls extends React.Component {
     } = this.props
     // create new idea at the end
     await createNewIdea({
-      parentCollection: collection,
-      questionType: 'question_idea',
-      sectionType: 'ideas',
       order: collection.collection_card_count + 1,
     })
     // now jump to the end
@@ -126,15 +125,18 @@ class IdeaCollectionControls extends React.Component {
       cardNumber,
       handleToggleShowMedia,
       currentIdeaCardIndex,
+      canAddIdeas,
     } = this.props
     return (
       <IdeaCollectionControlsWrapper>
         <NumberListText>{cardNumber}.</NumberListText>
         <DisplayText>
           <IdeaLabel>Idea</IdeaLabel>
-          <StyledAddIdea onClick={this.addNewIdeaItem} data-cy="add-new-idea">
-            <PlusCircleIcon />
-          </StyledAddIdea>
+          {canAddIdeas && (
+            <StyledAddIdea onClick={this.addNewIdeaItem} data-cy="add-new-idea">
+              <PlusCircleIcon />
+            </StyledAddIdea>
+          )}
         </DisplayText>
         <StyledNavigationAndCheckboxWrapper>
           <ChevronCircleWrapper
@@ -200,6 +202,7 @@ class IdeaCollectionControls extends React.Component {
 IdeaCollectionControls.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool.isRequired,
+  canAddIdeas: PropTypes.bool.isRequired,
   handleTrash: PropTypes.func.isRequired,
   createNewIdea: PropTypes.func.isRequired,
   showMedia: PropTypes.bool.isRequired,

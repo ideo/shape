@@ -163,17 +163,20 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  async API_replace({ replacingId }) {
+  async API_replace({ replacingId = null, replacingCard = null }) {
     const { uiStore } = this
     try {
       // NOTE: in this context, `this` is a new CollectionCard model
       // that has the data we want to send for replacing the card
-      const replacing = this.apiStore.find('collection_cards', replacingId)
+      const replacing =
+        replacingCard || this.apiStore.find('collection_cards', replacingId)
       const data = this.toJsonApi()
       // need to remove the item to reset its type (in case it changed)
       this.apiStore.remove(replacing.record)
+      // just give it a placeholder so that it doesn't totally disappear e.g. from TestDesigner
+      replacing.record = {}
       const res = await this.apiStore.request(
-        `collection_cards/${replacingId}/replace`,
+        `collection_cards/${replacing.id}/replace`,
         'PATCH',
         { data }
       )

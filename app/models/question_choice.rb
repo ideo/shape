@@ -23,5 +23,6 @@ class QuestionChoice < ApplicationRecord
   delegate :can_edit?,
            :can_view?,
            to: :question
+
   scope :viewable_in_ui, -> { where(archived: nil) }
 end

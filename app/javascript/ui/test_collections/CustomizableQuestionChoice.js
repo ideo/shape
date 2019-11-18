@@ -63,6 +63,7 @@ class CustomizableQuestionChoice extends React.Component {
       onChange,
       isChecked,
       editing,
+      handleFocus,
       placeholder,
     } = this.props
 
@@ -98,6 +99,7 @@ class CustomizableQuestionChoice extends React.Component {
           }}
         >
           <TextInput
+            onFocus={handleFocus}
             onChange={this.handleInputChange}
             type="questionText"
             placeholder={placeholder}
@@ -125,6 +127,7 @@ CustomizableQuestionChoice.propTypes = {
   isChecked: PropTypes.bool,
   editing: PropTypes.bool,
   onDelete: PropTypes.func,
+  handleFocus: PropTypes.func,
   placeholder: PropTypes.string,
 }
 
@@ -133,6 +136,7 @@ CustomizableQuestionChoice.defaultProps = {
   isChecked: false,
   editing: false,
   onDelete: () => {},
+  handleFocus: () => true,
   placeholder: 'Write your option here',
 }
 

@@ -107,23 +107,6 @@ class Item
       include_association :question_choices
     end
 
-    enum question_type: {
-      question_context: 0,
-      question_useful: 1,
-      question_open: 2,
-      # Is there supposed to be no #3 for this enum?
-      question_media: 4,
-      question_description: 5,
-      question_finish: 6,
-      question_clarity: 7,
-      question_excitement: 8,
-      question_different: 9,
-      question_category_satisfaction: 10,
-      question_idea: 11,
-      question_single_choice: 12,
-      question_multiple_choice: 13,
-    }
-
     def self.question_type_categories
       {
         idea_content: %i[

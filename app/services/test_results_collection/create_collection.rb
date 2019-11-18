@@ -6,17 +6,19 @@ module TestResultsCollection
 
     schema :test_collection,
            :test_results_collection,
-           :created_by,
            :idea,
-           :survey_response_id,
-           :message
+           :created_by
 
     require_in_context :test_collection
 
-    delegate :test_results_collection, :test_collection, :idea, :created_by,
+    delegate :test_collection,
+             :test_results_collection,
+             :idea,
+             :created_by,
              to: :context
 
-    delegate :legend_item, to: :test_results_collection
+    delegate :legend_item,
+             to: :test_results_collection
 
     before do
       context.created_by ||= test_collection.created_by
