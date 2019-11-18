@@ -328,12 +328,16 @@ class TestDesigner extends React.Component {
       )
       return
     }
+    let newSectionType = 'ideas'
+    if (this.state.testType === 'media') {
+      newSectionType = replacingCard ? replacingCard.section_type : sectionType
+    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
         question_type: questionType,
       },
-      section_type: replacingCard ? replacingCard.section_type : sectionType,
+      section_type: newSectionType,
       order: replacingCard ? replacingCard.order : order,
       parent_id: parent.id,
     }
@@ -473,6 +477,25 @@ class TestDesigner extends React.Component {
     )
   }
 
+  renderCards(cards, sectionType = null) {
+    return cards.map((card, i) => {
+      // blank item can occur briefly while the placeholder card/item is being replaced
+      let firstCard = false
+      let lastCard = false
+      if (!card.record) return null
+      const cardCount = cards.length
+      if (i === 0) firstCard = true
+      if (i === cardCount - 1) lastCard = true
+      return (
+        <FlipMove appearAnimation="fade" key={card.id}>
+          <TestQuestionFlexWrapper className={`card ${card.id}`}>
+            {this.renderCard(card, firstCard, lastCard, i, sectionType)}
+          </TestQuestionFlexWrapper>
+        </FlipMove>
+      )
+    })
+  }
+
   renderSections() {
     return _.map(this.cardsBySection, (cards, sectionType) => (
       <Fragment key={`section-${sectionType}`}>
@@ -490,34 +513,27 @@ class TestDesigner extends React.Component {
             })}
           </TestQuestionFlexWrapper>
         )}
-        {cards.map((card, i) => {
-          // blank item can occur briefly while the placeholder card/item is being replaced
-          let firstCard = false
-          let lastCard = false
-          if (!card.record) return null
-          const cardCount = cards.length
-          if (i === 0) firstCard = true
-          if (i === cardCount - 1) lastCard = true
-          return (
-            <FlipMove appearAnimation="fade" key={card.id}>
-              <TestQuestionFlexWrapper className={`card ${card.id}`}>
-                {this.renderCard(card, firstCard, lastCard, i, sectionType)}
-              </TestQuestionFlexWrapper>
-            </FlipMove>
-          )
-        })}
+        {this.renderCards(cards, sectionType)}
       </Fragment>
     ))
   }
 
+  renderQuestions() {
+    const { collection } = this.props
+    return this.renderCards(collection.sortedCards)
+  }
+
   render() {
     const { collection } = this.props
+    const { testType } = this.state
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
           <div className={'design-column'}>
             <LargerH3>Feedback Design</LargerH3>
-            {this.renderSections()}
+            {testType === 'media'
+              ? this.renderSections()
+              : this.renderQuestions()}
           </div>
           <div className={'settings-column'}>
             <LargerH3>Feedback Settings</LargerH3>

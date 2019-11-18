@@ -7,15 +7,15 @@ import styled from 'styled-components'
 import { Checkbox, Radio } from '~/ui/global/styled/forms'
 import { TextInput } from '~/ui/test_collections/shared'
 import TrashIcon from '~/ui/icons/TrashIcon'
-import v from '~/utils/variables'
 
 const ChoiceHolder = styled.div`
-  background: ${v.colors.commonLight};
+  background: ${props => props.theme.responseHolder};
+  color: ${props => props.theme.questionText};
   padding: 12px 17px;
   vertical-align: baseline;
 
   &:hover {
-    background: white;
+    filter: brightness(110%);
   }
 `
 ChoiceHolder.displayName = 'ChoiceHolder'
@@ -75,7 +75,7 @@ class CustomizableQuestionChoice extends React.Component {
             checked={isChecked}
             onClick={onChange}
             value={choice.value}
-            color="primary"
+            color="#f2f1ee"
             removePadding
           />
         ) : (

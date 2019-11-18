@@ -573,6 +573,42 @@ describe Collection::TestCollection, type: :model do
       end
     end
 
+    describe '#hide_or_show_section_questions!' do
+      context 'when its a in collection test' do
+        before do
+          test_collection.collection_to_test_id = 1
+          test_collection.hide_or_show_section_questions!
+        end
+
+        it 'should hide intro/outro questions' do
+          cards = test_collection.question_cards_from_sections(%i[intro outro])
+          expect(cards.pluck(:hidden)).to all(be true)
+        end
+
+        it 'should hide idea colleciton' do
+          card = test_collection.primary_collection_cards.ideas_collection_card.first
+          expect(card.hidden).to be true
+        end
+      end
+
+      context 'when its a idea test' do
+        before do
+          test_collection.collection_to_test_id = nil
+          test_collection.hide_or_show_section_questions!
+        end
+
+        it 'should unhide intro/outro questions' do
+          cards = test_collection.question_cards_from_sections(%i[intro outro])
+          expect(cards.pluck(:hidden)).to all(be false)
+        end
+
+        it 'should hide idea colleciton' do
+          card = test_collection.primary_collection_cards.ideas_collection_card.first
+          expect(card.hidden).to be false
+        end
+      end
+    end
+
     describe '#update_submissions_launch_status' do
       # gets called from within UpdateTemplateInstancesWorker
       it 'should find all submissions and mark their tests as launchable when launching' do

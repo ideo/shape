@@ -456,6 +456,16 @@ class Collection
       reorder_cards!
     end
 
+    def hide_or_show_section_questions!
+      hidden = collection_to_test_id.present? ? true : false
+      question_cards_from_sections(%i[intro outro]).update_all(
+        hidden: hidden,
+      )
+      primary_collection_cards.ideas_collection_card.update(
+        hidden: hidden
+      )
+    end
+
     def ideas_question_items
       question_items_from_sections(%i[ideas])
     end
@@ -465,13 +475,14 @@ class Collection
     end
 
     def incomplete_question_items
-      incomplete_items = idea_items.joins(
-        :parent_collection_card,
-      ).select(&:question_item_incomplete?)
+      incomplete_items = idea_items
+                         .joins(:parent_collection_card)
+                         .select(&:question_item_incomplete?)
 
-      incomplete_items += question_items.joins(
-        :parent_collection_card,
-      ).select(&:question_item_incomplete?)
+      incomplete_items += question_items
+                          .joins(:parent_collection_card)
+                          .where(CollectionCard.arel_table[:hidden].eq(false))
+                          .select(&:question_item_incomplete?)
 
       incomplete_items.compact
     end
@@ -495,7 +506,12 @@ class Collection
     end
 
     def idea_items
-      ideas_collection&.items || Item.none
+      return Item.none if ideas_collection.blank?
+      return Item.none if ideas_collection.parent_collection_card.hidden == true
+
+      ideas_collection.items
+                      .joins(:parent_collection_card)
+                      .where(CollectionCard.arel_table[:hidden].eq(false))
     end
 
     def idea_cards
@@ -537,6 +553,16 @@ class Collection
 
     def paid_audiences_sample_size
       test_audiences.paid.sum(:sample_size)
+    end
+
+    def question_cards_from_sections(section_names)
+      primary_collection_cards.where(
+        CollectionCard.arel_table[:section_type].in(
+          section_names.map do |section_name|
+            CollectionCard.section_types[section_name]
+          end,
+        ),
+      )
     end
 
     private

@@ -243,14 +243,17 @@ export const Radio = styled(MuiRadio)`
     }
   `}
 
-  &.checkbox--error {
+  &.radio--error {
     color: ${v.colors.alert};
   }
-  &.checkbox--black {
+  &.radio--black {
     color: ${v.colors.black} !important;
   }
-  &.checkbox--white,
-  &.checkbox--checked-white {
+  &.radio--disabled {
+    color: ${v.colors.commonLight} !important;
+  }
+  &.radio--white,
+  &.radio--checked-white {
     color: white !important;
   }
 `

@@ -20,7 +20,7 @@ class TestCollectionCardsForSurvey < SimpleService
 
   def randomize_idea_order
     # simple enough way to randomize?
-    @idea_cards = @test_collection.idea_cards.shuffle
+    @idea_cards = @test_collection.idea_cards.visible.shuffle
   end
 
   def collect_idea_cards
@@ -45,6 +45,7 @@ class TestCollectionCardsForSurvey < SimpleService
 
   def complete_cards_for_section(section_type)
     collection_cards
+      .visible
       .where(section_type: section_type)
       .includes(:item)
       .reject { |card| card.item&.question_item_incomplete? }
