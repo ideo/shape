@@ -73,9 +73,12 @@ module TestResultsCollection
     end
 
     def link_all_responses_collection
-      all_responses_collection = CollectionCard.identifier(
-        CardIdentifier.call(test_results_collection, 'Responses'),
-      ).first.record
+      all_responses_collection = CollectionCard.find_record_by_identifier(
+        test_results_collection,
+        'Responses',
+      )
+      # e.g. for unit tests where this has not been created
+      return unless all_responses_collection.present?
 
       create_card(
         params: {

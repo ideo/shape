@@ -24,31 +24,26 @@ module TestResultsCollection
     end
 
     def call
-      initial_creation = false
       ActiveRecord::Base.transaction do
+        # this inner block only happens when first launching/creating the test results collection
+        # (either master, or per idea)
         if test_results_collection.blank?
-          # marking when the tests_results_collection is first created
-          initial_creation = true
           context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
           if master_results_collection?
             update_test_collection_name
+            move_test_collection_inside_test_results
             move_roles_to_results_collection if move_roles?
           end
-        end
-
-        TestResultsCollection::CreateContent.call!(
-          test_results_collection: test_results_collection,
-          created_by: created_by,
-          idea: idea,
-        )
-
-        if master_results_collection? && initial_creation
-          move_test_collection_inside_test_results
         end
 
       rescue Interactor::Failure => e
         raise ActiveRecord::Rollback, e.message
       end
+
+      TestResultsCollection::CreateContentWorker.perform_async(
+        test_results_collection.id,
+        created_by&.id,
+      )
     end
 
     private
@@ -71,6 +66,7 @@ module TestResultsCollection
         roles_anchor_collection: test_results_roles_anchor,
         test_collection: test_collection,
         idea: idea,
+        loading_content: true,
       )
       return collection if collection.persisted?
 
@@ -87,6 +83,7 @@ module TestResultsCollection
             type: 'Collection::TestResultsCollection',
             test_collection: test_collection,
             idea: idea,
+            loading_content: true,
           },
           identifier: CardIdentifier.call(test_collection.test_results_collection, idea),
         },
@@ -106,6 +103,10 @@ module TestResultsCollection
       test_collection.roles.each do |role|
         role.update(resource: test_results_collection)
       end
+      # reload to re-associate the roles
+      reload_collections
+      # reanchor the test collection and children to test_results_collection
+      test_collection.reanchor!(parent: test_results_collection, propagate: true)
     end
 
     def move_test_collection_inside_test_results
@@ -118,7 +119,6 @@ module TestResultsCollection
 
       create_card(
         params: {
-          order: 999,
           collection_id: test_collection.id,
         },
         parent_collection: test_results_collection,
@@ -132,7 +132,8 @@ module TestResultsCollection
     end
 
     def test_results_roles_anchor
-      return test_collection.roles_anchor if test_collection.roles_anchor != test_collection
+      # anchor the test results to whatever the test collection was anchored to (could be nil for itself)
+      test_collection.roles_anchor_collection
     end
 
     def move_roles?

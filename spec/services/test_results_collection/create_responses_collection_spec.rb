@@ -1,38 +1,38 @@
 require 'rails_helper'
 
 RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service do
-  let(:test_collection) { create(:test_collection, :completed, :with_responses, :with_test_audience, num_responses: 5) }
+  let(:num_responses) { 2 }
+  let(:test_collection) { create(:test_collection, :completed, :with_responses, :with_test_audience, num_responses: num_responses) }
   let(:test_results_collection) { create(:test_results_collection, test_collection: test_collection) }
   let(:created_by) { create(:user) }
   let(:idea) { nil }
 
   subject do
     TestResultsCollection::CreateResponsesCollection.call(
+      parent_collection: test_results_collection,
       test_collection: test_collection,
-      test_results_collection: test_results_collection,
-      survey_responses: test_collection.survey_responses,
       test_audiences: test_collection.test_audiences,
       created_by: created_by,
-      idea: idea
+      idea: idea,
     )
   end
 
-  it 'creates an all_responses collection in the TRC' do
+  it 'creates a responses collection in the master results collection' do
     expect(subject).to be_a_success
-    expect(test_results_collection.collection_cards.where(
-      identifier: CardIdentifier.call(test_results_collection, 'Responses')
+    expect(test_results_collection.collection_cards.identifier(
+      CardIdentifier.call(test_results_collection, 'Responses'),
     ).count).to be 1
   end
 
-  it 'should set the name to "All Responses"' do
-    expect(subject.all_responses_collection.name).to eq 'Responses'
+  it 'should sets the master responses name to "All Responses"' do
+    expect(subject.all_responses_collection.name).to eq 'All Responses'
   end
 
   it 'should create alias collections for each respondent' do
     alias_collections = subject.all_responses_collection.collections.where.not(
       survey_response_id: nil,
     )
-    expect(alias_collections.count).to eq 5
+    expect(alias_collections.count).to eq num_responses
   end
 
   it 'should name alias collections for each respondent' do
@@ -56,11 +56,30 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
     expect(audience_collection.name).to eq "#{test_collection.name} - #{test_collection.test_audiences.first.audience_name}"
   end
 
-  # context 'with an idea' do
-  #   let!(:idea) { test_collection.idea_items.first }
+  context 'with an idea' do
+    let(:test_collection) { create(:test_collection, :completed) }
+    let(:master_test_results_collection) { create(:test_results_collection, test_collection: test_collection) }
+    let(:idea) { test_collection.idea_items.first }
+    before do
+      # create the All Responses collection so we can link from that
+      TestResultsCollection::CreateResponsesCollection.call(
+        parent_collection: master_test_results_collection,
+        test_collection: test_collection,
+        test_audiences: test_collection.test_audiences,
+        created_by: created_by,
+      )
+    end
 
-  #   it 'should link the TSRC responses collection into the current TRC' do
-  #     expect(subject.all_responses_collection).to exist
-  #   end
-  # end
+    it 'should link the TSRC responses collection into the current TRC' do
+      subject
+      link_card = test_results_collection.collection_cards.last
+      expect(link_card.link?).to be true
+
+      master_responses = CollectionCard.find_record_by_identifier(
+        master_test_results_collection,
+        'Responses',
+      )
+      expect(link_card.record).to eq master_responses
+    end
+  end
 end

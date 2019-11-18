@@ -28,7 +28,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
 
   def load_org_audiences
     @audiences = Audience
-                 .includes(:base_tags)
+                 .includes(:base_tags, :organizations)
                  .viewable_by_user_in_org(user: current_user, organization: @organization)
   end
 

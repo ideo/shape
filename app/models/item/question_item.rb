@@ -66,10 +66,8 @@ class Item
     has_many :question_choices, -> { order(order: :asc) }
 
     validate on: :create do
-      if question_idea?
-        if parent.collection_cards.count > 6
-          errors.add(:base, 'too many ideas')
-        end
+      if question_idea? && parent.present? && parent.collection_cards.count > 6
+        errors.add(:base, 'too many ideas')
       end
     end
 
@@ -192,7 +190,6 @@ class Item
 
     def question_title_and_description
       return customizable_title_and_description if question_choices_customizable?
-      return category_satisfaction_title_and_description if question_category_satisfaction?
 
       self.class.question_title_and_description(question_type)
     end
@@ -201,17 +198,23 @@ class Item
       question_title_and_description[:title]
     end
 
-    def question_description
-      question_title_and_description[:description]
+    def question_description(with_content: false)
+      description = question_title_and_description[:description]
+      return "#{description} #{content}?" if question_category_satisfaction? && with_content
+
+      description
     end
 
     def scale_question?
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
 
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
+    end
+
     def graphable_question?
-      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym) ||
-        [:question_single_choice, :question_multiple_choice].include?(question_type&.to_sym)
+      scale_question? || question_choices_customizable?
     end
 
     def requires_roles?
@@ -239,10 +242,6 @@ class Item
       return 0 if total.zero?
 
       (points * 100.0 / total).round
-    end
-
-    def question_choices_customizable?
-      question_single_choice? || question_multiple_choice?
     end
 
     def unarchived_question_choices
@@ -330,15 +329,6 @@ class Item
     end
 
     private
-
-    def category_satisfaction_title_and_description
-      attrs = self.class.question_title_and_description(:question_category_satisfaction)
-
-      {
-        title: attrs[:title],
-        description: "#{attrs[:description]} #{content}?",
-      }
-    end
 
     def customizable_title_and_description
       {

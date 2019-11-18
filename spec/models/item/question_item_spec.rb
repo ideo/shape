@@ -17,30 +17,61 @@ RSpec.describe Item::QuestionItem, type: :model do
     end
   end
 
+  context 'boolean matchers' do
+    let!(:question_customizable) { create(:question_item, question_type: :question_single_choice) }
+    let!(:question_scale) { create(:question_item, question_type: :question_excitement) }
+    let!(:question_description) { create(:question_item, question_type: :question_description) }
+    let!(:file_item) { create(:file_item) }
+
+    describe '#question_choices_customizable?' do
+      it 'should return true for single/multi choice' do
+        expect(question_customizable.question_choices_customizable?).to be true
+        expect(question_scale.question_choices_customizable?).to be false
+        expect(question_description.question_choices_customizable?).to be false
+      end
+    end
+
+    describe '#question_scale?' do
+      it 'should return true for scaled question' do
+        expect(question_customizable.scale_question?).to be false
+        expect(question_scale.scale_question?).to be true
+        expect(question_description.scale_question?).to be false
+        expect(file_item.scale_question?).to be false
+      end
+    end
+
+    describe '#graphable_question?' do
+      it 'should return true for both customizable and scale' do
+        expect(question_customizable.graphable_question?).to be true
+        expect(question_scale.graphable_question?).to be true
+        expect(question_description.graphable_question?).to be false
+        expect(file_item.graphable_question?).to be false
+      end
+    end
+  end
+
   context 'validations' do
     context 'adding more than 6 ideas to a test' do
       let(:idea_collection) { create(:collection) }
       let(:collection_card) do
         create(:collection_card,
                parent: idea_collection,
-               section_type: :ideas,
-              )
+               section_type: :ideas)
       end
 
       before do
-        (0..6).each do
+        7.times do
           create(:question_item,
                  question_type: :question_idea,
-                 parent_collection: idea_collection,
-                )
+                 parent_collection: idea_collection)
         end
       end
 
       it 'should fail validation' do
         idea_item = Item::QuestionItem.create(
-            parent_collection_card: collection_card,
-            question_type: :question_idea,
-          )
+          parent_collection_card: collection_card,
+          question_type: :question_idea,
+        )
         expect(idea_item.valid?).to be false
         expect(idea_item.errors.messages[:base]).to eq ['too many ideas']
       end
@@ -50,19 +81,9 @@ RSpec.describe Item::QuestionItem, type: :model do
   context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
-    let(:test_collection) { create(:test_collection, :completed) }
+    let(:test_collection) { create(:test_collection, :launched) }
 
     describe '#score' do
-      before do
-        # Stub out so it doesn't create all result collections
-        allow(TestCollection::CreateResultsCollections).to receive(:call).and_return(
-          double(success?: true),
-        )
-        allow(TestResultsCollection::CreateOrLinkAliasCollection).to receive(:call).and_return(
-          double(success?: true),
-        )
-      end
-      before { test_collection.launch! }
       let(:question_item) { test_collection.question_items.select(&:question_useful?).first }
       let(:test_audience) { create(:test_audience, test_collection: test_collection) }
       let!(:response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
@@ -113,7 +134,7 @@ RSpec.describe Item::QuestionItem, type: :model do
     end
   end
 
-  describe '#question_title_and_description' do
+  describe '#question_description' do
     context 'for category satisfaction question' do
       let(:question) do
         create(
@@ -124,9 +145,11 @@ RSpec.describe Item::QuestionItem, type: :model do
       end
 
       it 'returns customized version' do
-        expect(question.question_title_and_description).to eq(
-          title: 'Category Satisfaction',
-          description: 'How satisfied are you with your current socks?',
+        expect(question.question_description).to eq(
+          'How satisfied are you with your current',
+        )
+        expect(question.question_description(with_content: true)).to eq(
+          'How satisfied are you with your current socks?',
         )
       end
     end

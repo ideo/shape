@@ -5,28 +5,25 @@ module TestResultsCollection
     include CollectionCardBuilderHelpers
 
     schema :test_results_collection,
-           :created_by,
-           :idea,
-           :survey_response,
-           :message
+           :created_by
 
     require_in_context :test_results_collection
 
     delegate :test_results_collection,
              :created_by,
-             :idea,
-             :survey_response,
              to: :context
 
     delegate :ideas_collection,
              :test_show_media?,
              :collection_to_test_id,
              :test_collection,
+             :idea,
+             :survey_response,
              to: :test_results_collection
 
     before do
       @legend_item = test_results_collection.legend_item
-      @order = -1
+      @order = max_order
     end
 
     def call
@@ -50,12 +47,30 @@ module TestResultsCollection
         create_responses_collection
       end
 
-      test_collection.cache_cover!
-      test_results_collection.reorder_cards!
-      move_legend_item_to_third_spot if @legend_item.present?
+      finish_creating_content
     end
 
     private
+
+    def finish_creating_content
+      # Create results collections for each idea
+      if master_results_collection?
+        idea_items.each do |idea_item|
+          TestResultsCollection::CreateCollection.call(
+            test_collection: test_collection,
+            idea: idea_item,
+            created_by: created_by,
+          )
+        end
+        move_test_design_to_end
+      end
+
+      test_collection.cache_cover!
+      test_results_collection.reorder_cards!
+      move_legend_item_to_third_spot if @legend_item.present?
+
+      test_results_collection.update(loading_content: false)
+    end
 
     def create_content_for_item_card(card)
       item = card.item
@@ -214,11 +229,35 @@ module TestResultsCollection
       collection_to_test_id.present?
     end
 
+    def master_results_collection?
+      idea.blank? && survey_response.blank?
+    end
+
     def move_legend_item_to_third_spot
       legend_card = @legend_item.parent_collection_card
       return if legend_card.order == 2
 
       legend_card.move_to_order(2)
+    end
+
+    def idea_items
+      test_collection
+        .idea_items
+        .includes(:test_results_collection)
+    end
+
+    def max_order
+      return -1 if test_results_collection.collection_cards.empty?
+
+      test_results_collection.collection_cards.maximum(:order)
+    end
+
+    def move_test_design_to_end
+      # Move feedback design to the end
+      test_collection
+        .reload
+        .parent_collection_card
+        .move_to_order(max_order + 1)
     end
   end
 end

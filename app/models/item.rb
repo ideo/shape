@@ -370,6 +370,10 @@ class Item < ApplicationRecord
     false
   end
 
+  def graphable_question?
+    false
+  end
+
   # this method also applies to Idea items (e.g. FileItem) which is why it is defined here in item.rb
   def question_item_incomplete?
     return true if (

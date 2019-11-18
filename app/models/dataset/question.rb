@@ -78,7 +78,7 @@ class Dataset
     end
 
     def description
-      question_item.question_description
+      question_item.question_description(with_content: true)
     end
 
     def test_collection_id

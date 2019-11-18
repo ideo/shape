@@ -128,20 +128,4 @@ class SurveyResponse < ApplicationRecord
   def set_default_incentive_status
     self.incentive_status ||= :incentive_unearned
   end
-
-  def create_open_response_items
-    question_answers
-      .joins(:question)
-      .includes(:open_response_item)
-      .where(
-        Item::QuestionItem
-          .arel_table[:question_type]
-          .eq(Item::QuestionItem.question_types[:question_open]),
-      ).each do |question_answer|
-        next if question_answer.open_response_item.present?
-
-        # Save will trigger the callback to create the item
-        question_answer.save
-      end
-  end
 end

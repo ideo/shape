@@ -347,7 +347,7 @@ class TestDesigner extends React.Component {
   }
 
   get canAddIdeas() {
-    if (!this.testIsLive || !this.ideasCollection) return false
+    if (!this.canEdit || !this.testIsLive || !this.ideasCollection) return false
     return this.ideasCollection.collection_cards.length < 6
   }
 

@@ -246,10 +246,6 @@ module Resourceable
 
     # ensure that any existing children are also updated accordingly
     reanchor_children!(from: previous_anchor_id, to: id)
-    # special case for QuestionItems because they don't really retain any roles
-    return unless respond_to? :question_items
-
-    question_items.each(&:reanchor!)
   end
 
   def unanchor!

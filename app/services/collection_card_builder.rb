@@ -100,9 +100,10 @@ class CollectionCardBuilder
     # If this is a live test collection...
     if @parent_collection.test_collection? &&
        @parent_collection.live_or_was_launched? &&
+       @parent_collection.test_results_collection.present? &&
        record.is_a?(Item::QuestionItem)
 
-      TestResultsCollectionUpdateWorker.perform_async(@parent_collection.id, @user.id)
+      TestResultsCollection::CreateContentWorker.perform_async(@parent_collection.test_results_collection.id, @user.id)
     end
 
     return unless @parent_collection.is_a? Collection::SubmissionsCollection

@@ -7,7 +7,6 @@ class Api::V1::QuestionChoicesController < Api::V1::BaseController
     next_order = @question.question_choices.count + 1
     @question_choice = QuestionChoice.new(
       order: next_order,
-      text: "Option #{next_order}",
       question_item_id: @question.id,
     )
     if @question_choice.save

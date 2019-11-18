@@ -12,10 +12,14 @@ module TestResultsCollection
 
     require_in_context :test_results_collection
 
-    delegate :test_results_collection, :ideas_collection_card, :created_by, :order,
+    delegate :test_results_collection,
+             :ideas_collection_card,
+             :created_by,
+             :order,
              to: :context
 
-    delegate :test_collection, to: :test_results_collection
+    delegate :test_collection,
+             to: :test_results_collection
 
     before do
       context.created_by ||= test_results_collection.created_by

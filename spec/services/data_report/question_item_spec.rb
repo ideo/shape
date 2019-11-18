@@ -3,6 +3,9 @@ require 'rails_helper'
 RSpec.describe DataReport::QuestionItem, type: :service do
   let(:organization) { create(:organization) }
   let(:collection) { create(:collection, organization: organization) }
+  let(:report) do
+    DataReport::QuestionItem.call(dataset: dataset)
+  end
 
   context 'no responses' do
     let(:empty_dataset) do
@@ -19,7 +22,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
     describe '#call' do
       it 'returns datasets for question item' do
         expect(
-          DataReport::QuestionItem.call(dataset: dataset),
+          report,
         ).to match_array(empty_dataset)
       end
     end
@@ -53,7 +56,11 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
     context 'question dataset' do
       let!(:dataset) do
-        create(:question_dataset, data_source: question_item)
+        create(
+          :question_dataset,
+          groupings: [{ type: 'Item', id: idea.id }],
+          data_source: question_item,
+        )
       end
       let(:answer_search_key) do
         proc do |answer_number|
@@ -66,7 +73,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
       describe '#call' do
         it 'returns data for question' do
-          expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
+          expect(report).to match_array(
             [
               { column: 1, value: 1, percentage: 100, search_key: answer_search_key.call(1) },
               { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },
@@ -103,7 +110,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
       describe '#call' do
         it 'returns org-wide data' do
-          expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
+          expect(report).to match_array(
             [
               { column: 1, value: 7, percentage: 100, search_key: answer_search_key.call(1) },
               { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },
@@ -128,17 +135,24 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
       let!(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
       let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
+      let(:groupings) do
+        [
+          { type: 'TestAudience', id: test_audience.id },
+          { type: 'Item', id: idea.id },
+        ]
+      end
       let!(:dataset) do
         create(:question_dataset,
                data_source: question_item,
                question_type: question_item.question_type,
-               groupings: [{ type: 'TestAudience', id: test_audience.id }])
+               groupings: groupings)
       end
       let!(:question_answers) do
         survey_response.question_items.map do |question_item|
           create(:question_answer,
                  survey_response: survey_response,
-                 question: question_item)
+                 question: question_item,
+                 idea: idea)
         end
       end
       let(:answer_search_key) do
@@ -152,7 +166,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
       end
 
       it 'returns test audience data' do
-        expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
+        expect(report).to match_array(
           [
             { column: 1, value: 1, percentage: 100, search_key: answer_search_key.call(1) },
             { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },
@@ -189,7 +203,7 @@ RSpec.describe DataReport::QuestionItem, type: :service do
 
       it 'returns idea-specific data' do
         expect(question_item.question_answers.size).to eq(2)
-        expect(DataReport::QuestionItem.call(dataset: dataset)).to match_array(
+        expect(report).to match_array(
           [
             { column: 1, value: 1, percentage: 100, search_key: answer_search_key.call(1) },
             { column: 2, value: 0, percentage: 0, search_key: answer_search_key.call(2) },

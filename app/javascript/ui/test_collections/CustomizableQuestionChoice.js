@@ -5,7 +5,6 @@ import { action } from 'mobx'
 import styled from 'styled-components'
 
 import { Checkbox, Radio } from '~/ui/global/styled/forms'
-import { DisplayText } from '~/ui/global/styled/typography'
 import { TextInput } from '~/ui/test_collections/shared'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import v from '~/utils/variables'
@@ -99,18 +98,16 @@ class CustomizableQuestionChoice extends React.Component {
             verticalAlign: 'middle',
           }}
         >
-          <DisplayText color={v.colors.commonDark}>
-            <TextInput
-              onFocus={handleFocus}
-              onChange={this.handleInputChange}
-              type="questionText"
-              placeholder={placeholder}
-              value={choice.text}
-              data-cy="CustomizableQuestionTextInput"
-              disabled={!editing}
-              inline="true"
-            />
-          </DisplayText>
+          <TextInput
+            onFocus={handleFocus}
+            onChange={this.handleInputChange}
+            type="questionText"
+            placeholder={placeholder}
+            value={choice.text}
+            data-cy="CustomizableQuestionTextInput"
+            disabled={!editing}
+            inline="true"
+          />
         </label>
         {editing && (
           <IconHolder data-cy="TrashIconHolder" onClick={this.handleDelete}>
