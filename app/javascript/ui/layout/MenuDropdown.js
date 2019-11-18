@@ -10,15 +10,18 @@ const MenuListItem = styled.li``
 
 const SubmenuList = styled.ul`
   display: none;
+  top: 54px;
   position: absolute;
-  padding-top: 12px;
   ${MenuListItem}:hover & {
     display: block;
-    background: rgb(255, 255, 255, 0.7);
+    background: rgb(246, 245, 244, 0.7);
   }
 `
 const SubmenuListItem = styled.li`
   padding: 12px 0 12px;
+  :hover {
+    border-bottom: 2px solid black;
+  }
 `
 
 const DropdownLink = styled.a`
