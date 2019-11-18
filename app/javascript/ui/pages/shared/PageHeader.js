@@ -60,7 +60,12 @@ const LiveTestIndicator = styled.span`
 `
 
 const HeaderButtonContainer = styled.span`
+  display: flex;
   margin-top: 10px;
+
+  button {
+    margin-right: 10px;
+  }
 `
 HeaderButtonContainer.displayName = 'HeaderButtonContainer'
 
