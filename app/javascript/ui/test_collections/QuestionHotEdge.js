@@ -33,14 +33,17 @@ const HotEdgeVisuals = styled.div`
 const VisualBar = styled.div`
   background-color: ${props => props.theme.hotEdge};
   border-radius: 5px;
-  height: 10px;
+  height: ${props => (props.noCard ? 2 : 10)}px;
+  border-bottom: ${props => {
+    if (props.noCard) return `5px solid ${props.theme.hotEdge}`
+  }};
   position: absolute;
-  top: 20px;
-  width: calc(100% - 42px);
-  left: 15px;
+  top: ${props => (props.noCard ? 22 : 20)}px;
+  width: calc(100% - ${props => (props.noCard ? 60 : 42)}px);
+  left: ${props => (props.noCard ? 25 : 15)}px;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    left: ${props => (props.noCard ? 25 : 15)}px;
+    left: ${props => (props.noCard ? 35 : 15)}px;
   }
 `
 const RoundAddButton = styled.button`
@@ -48,7 +51,7 @@ const RoundAddButton = styled.button`
   border-radius: 50%;
   color: white;
   height: 32px;
-  left: calc(50% - 16px);
+  left: calc(50% - ${props => (props.noCard ? 26 : 16)}px);
   position: absolute;
   top: 10px;
   width: 32px;
