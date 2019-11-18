@@ -226,9 +226,12 @@ class Item
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
 
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
+    end
+
     def graphable_question?
-      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym) ||
-        %i[question_single_choice question_multiple_choice].include?(question_type&.to_sym)
+      scale_question? || question_choices_customizable?
     end
 
     def requires_roles?
@@ -256,10 +259,6 @@ class Item
       return 0 if total.zero?
 
       (points * 100.0 / total).round
-    end
-
-    def question_choices_customizable?
-      question_single_choice? || question_multiple_choice?
     end
 
     def unarchived_question_choices
