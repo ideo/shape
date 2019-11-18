@@ -33,6 +33,7 @@ class QuestionContentEditor extends React.Component {
     this.state = {
       countLeft: props.maxLength - len,
       focused: false,
+      readOnly: false,
     }
   }
 
@@ -59,9 +60,23 @@ class QuestionContentEditor extends React.Component {
     this.setState({ focused: false })
   }
 
+  onClick = async ev => {
+    const { handleFocus } = this.props
+    const result = await handleFocus()
+    if (!result) {
+      // Make it temporarily readonly before we can blur the focus
+      this.setState({ focused: false, readOnly: true })
+      // Set timeout is needed to actually blur the element
+      setTimeout(() => {
+        this.inputRef.current.blur()
+        this.setState({ readOnly: false })
+      }, 250)
+    }
+  }
+
   render() {
     const { maxLength, placeholder, canEdit, singleLine, optional } = this.props
-    const { focused, countLeft } = this.state
+    const { focused, countLeft, readOnly } = this.state
     const InputComponent = singleLine ? SingleLineInput : TextInput
 
     return (
@@ -70,8 +85,10 @@ class QuestionContentEditor extends React.Component {
           ref={this.inputRef}
           data-cy="QuestionContentEditorText"
           disabled={!canEdit}
+          onClick={this.onClick}
           onFocus={() => this.setState({ focused: true })}
           onBlur={this.handleBlur}
+          readOnly={readOnly}
           onChange={this.handleChange}
           type="descriptionText"
           placeholder={placeholder}
@@ -105,6 +122,7 @@ QuestionContentEditor.propTypes = {
   canEdit: PropTypes.bool,
   optional: PropTypes.bool,
   singleLine: PropTypes.bool,
+  handleFocus: PropTypes.func,
 }
 QuestionContentEditor.defaultProps = {
   itemAttribute: 'content',
@@ -112,6 +130,7 @@ QuestionContentEditor.defaultProps = {
   canEdit: false,
   optional: false,
   singleLine: false,
+  handleFocus: () => true,
 }
 
 export default QuestionContentEditor
