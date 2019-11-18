@@ -1,7 +1,8 @@
 // slightly based off: https://blog.lunarlogic.io/2018/slidedown-menu-in-react/
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import v from '~/utils/variables'
+
+import { NavLink } from '~/ui/marketing/MarketingMenu'
 
 const MenuList = styled.ul``
 const MenuListItem = styled.li`
@@ -28,20 +29,6 @@ const DropdownSpacer = styled.li`
   padding: 5px;
 `
 
-const DropdownLink = styled.a`
-  font-weight: ${v.weights.medium};
-  font-family: ${v.fonts.sans};
-  font-size: 12px;
-  letter-spacing: 0.4px;
-  color: black;
-  margin: 1em;
-  padding: 6px 12px;
-  text-transform: uppercase;
-  text-decoration: none;
-  cursor: pointer
-}
-`
-
 class SubmenuDropdown extends React.Component {
   renderDropdownItems = item => {
     const { isHome, handleScrollToContent } = this.props
@@ -52,9 +39,9 @@ class SubmenuDropdown extends React.Component {
         : { href: '/product/feedback' }
     return (
       <SubmenuListItem>
-        <DropdownLink {...props} key={label}>
+        <NavLink {...props} key={label}>
           {label}
-        </DropdownLink>
+        </NavLink>
       </SubmenuListItem>
     )
   }
@@ -80,9 +67,9 @@ class MenuDropdown extends React.Component {
     return (
       <MenuList>
         <MenuListItem>
-          <DropdownLink onClick={() => handleScrollToContent(isHome)}>
+          <NavLink onClick={() => handleScrollToContent(isHome)}>
             Product
-          </DropdownLink>
+          </NavLink>
           <DropdownSpacer />
           <SubmenuDropdown
             items={items}

@@ -14,7 +14,7 @@ import { MarketingFlex } from '~/ui/global/styled/marketing.js'
 import { scroller } from 'react-scroll'
 import { browserHistory } from '~/ui/MarketingRoutes'
 
-const NavLink = styled.a`
+export const NavLink = styled.a`
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
   font-size: 12px;
