@@ -24,11 +24,10 @@ module TestResultsCollection
     end
 
     def call
-      # initial_creation = false
       ActiveRecord::Base.transaction do
+        # this inner block only happens when first launching/creating the test results collection
+        # (either master, or per idea)
         if test_results_collection.blank?
-          # marking when the tests_results_collection is first created
-          # initial_creation = true
           context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
           if master_results_collection?
             update_test_collection_name
