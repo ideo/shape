@@ -2,19 +2,19 @@
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import v from '~/utils/variables'
-import { browserHistory } from '~/ui/MarketingRoutes'
-import { scroller } from 'react-scroll'
 
 const MenuList = styled.ul``
-const MenuListItem = styled.li``
+const MenuListItem = styled.li`
+  position: relative;
+  top: 5px;
+`
 
 const SubmenuList = styled.ul`
   display: none;
-  top: 54px;
   position: absolute;
   ${MenuListItem}:hover & {
     display: block;
-    background: rgb(246, 245, 244, 0.7);
+    background: rgb(255, 255, 255, 0.7);
   }
 `
 const SubmenuListItem = styled.li`
@@ -22,6 +22,10 @@ const SubmenuListItem = styled.li`
   :hover {
     border-bottom: 2px solid black;
   }
+`
+
+const DropdownSpacer = styled.li`
+  padding: 5px;
 `
 
 const DropdownLink = styled.a`
@@ -39,25 +43,12 @@ const DropdownLink = styled.a`
 `
 
 class SubmenuDropdown extends React.Component {
-  handleScrollToContent(isHome) {
-    if (!isHome) {
-      browserHistory.push('/')
-      return
-    }
-    scroller.scrollTo('ContentAnchor', {
-      duration: 1500,
-      delay: 100,
-      smooth: true,
-      offset: 0,
-    })
-  }
-
   renderDropdownItems = item => {
-    const { isHome } = this.props
+    const { isHome, handleScrollToContent } = this.props
     const { label } = item
     const props =
       label === 'Overview'
-        ? { onClick: () => this.handleScrollToContent(isHome) }
+        ? { onClick: () => handleScrollToContent(isHome) }
         : { href: '/product/feedback' }
     return (
       <SubmenuListItem>
@@ -79,17 +70,25 @@ class SubmenuDropdown extends React.Component {
 SubmenuDropdown.propTypes = {
   items: PropTypes.array.isRequired,
   isHome: PropTypes.bool.isRequired,
+  handleScrollToContent: PropTypes.func.isRequired,
 }
 
 class MenuDropdown extends React.Component {
   render() {
-    const { items, isHome } = this.props
+    const { items, isHome, handleScrollToContent } = this.props
 
     return (
       <MenuList>
         <MenuListItem>
-          <DropdownLink>Product</DropdownLink>
-          <SubmenuDropdown items={items} isHome={isHome} />
+          <DropdownLink onClick={() => handleScrollToContent(isHome)}>
+            Product
+          </DropdownLink>
+          <DropdownSpacer />
+          <SubmenuDropdown
+            items={items}
+            isHome={isHome}
+            handleScrollToContent={handleScrollToContent}
+          />
         </MenuListItem>
       </MenuList>
     )
@@ -99,6 +98,7 @@ class MenuDropdown extends React.Component {
 MenuDropdown.propTypes = {
   items: PropTypes.array.isRequired,
   isHome: PropTypes.bool.isRequired,
+  handleScrollToContent: PropTypes.func.isRequired,
 }
 
 export default MenuDropdown

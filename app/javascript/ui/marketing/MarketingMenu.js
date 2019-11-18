@@ -226,7 +226,11 @@ class MarketingMenu extends React.PureComponent {
             <MarketingFlex align="center" justify="center" w={1}>
               <Box w={15 / 32}>
                 <MarketingFlex align="center" justify="flex-start">
-                  <MenuDropdown items={items} isHome={isHome} />
+                  <MenuDropdown
+                    items={items}
+                    isHome={isHome}
+                    handleScrollToContent={() => handleScrollToContent(isHome)}
+                  />
                   <NavLink href="/product/pricing">Pricing</NavLink>
                   <NavLink href="/product/open-innovation">
                     CHALLENGES AND OPEN INNOVATION
