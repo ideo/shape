@@ -39,7 +39,7 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
     alias_collection = subject.all_responses_collection.collections.where.not(
       survey_response_id: nil,
     ).first
-    expect(alias_collection.name).to eq "#{test_collection.name} - #{test_collection.survey_responses.first.respondent_alias}"
+    expect(alias_collection.name).to eq "#{test_collection.base_name} - #{test_collection.survey_responses.first.respondent_alias}"
   end
 
   it 'should create audience TRCs for each audience' do
@@ -53,7 +53,7 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
     audience_collection = subject.all_responses_collection.collections.where(
       survey_response_id: nil,
     ).first
-    expect(audience_collection.name).to eq "#{test_collection.name} - #{test_collection.test_audiences.first.audience_name}"
+    expect(audience_collection.name).to eq "#{test_collection.base_name} - #{test_collection.test_audiences.first.audience_name}"
   end
 
   context 'with an idea' do

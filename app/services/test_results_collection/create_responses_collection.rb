@@ -96,7 +96,7 @@ module TestResultsCollection
       create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
-            name: "#{test_collection.name} - #{test_audience.audience_name}",
+            name: "#{test_collection.base_name} - #{test_audience.audience_name}",
           ),
           identifier: CardIdentifier.call(test_results_collection, test_audience),
         },

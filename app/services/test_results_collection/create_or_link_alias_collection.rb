@@ -40,6 +40,7 @@ module TestResultsCollection
     end
 
     def create_alias_collection
+      # TODO: refactor this to also use TestResultsCollection::CreateCollection?
       context.alias_test_results_collection = create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
@@ -68,7 +69,7 @@ module TestResultsCollection
         survey_response_id: survey_response.id,
       )
 
-      alias_collection = create_alias_collection(survey_response) if alias_collection.blank?
+      alias_collection = create_alias_collection if alias_collection.blank?
 
       CollectionCard::Link.create(
         parent: parent,
