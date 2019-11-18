@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
 import { Fragment } from 'react'
 import FlipMove from 'react-flip-move'
@@ -17,7 +17,6 @@ import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
 import trackError from '~/utils/trackError'
-import { apiStore } from '~/stores'
 import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
@@ -84,6 +83,7 @@ const userEditableQuestionType = questionType => {
   )
 }
 
+@inject('apiStore', 'uiStore')
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
@@ -103,10 +103,10 @@ class TestDesigner extends React.Component {
 
     if (this.state.collectionToTest) return
     // if none is set, we look up the parent to provide a default value
-    const { collection } = this.props
+    const { collection, apiStore } = this.props
     const { parent_id } = collection.parent_collection_card
     try {
-      const res = await collection.apiStore.fetch('collections', parent_id)
+      const res = await apiStore.fetch('collections', parent_id)
       // default setting to the parent collection
       this.setState({
         collectionToTest: res.data,
@@ -143,8 +143,8 @@ class TestDesigner extends React.Component {
 
   // This shows a dialog immediately
   confirmWithDialog = ({ prompt, onConfirm }) => {
-    const { collection } = this.props
-    collection.apiStore.uiStore.confirm({
+    const { uiStore } = this.props
+    uiStore.confirm({
       prompt,
       confirmText: 'Continue',
       iconName: 'Alert',
@@ -313,17 +313,17 @@ class TestDesigner extends React.Component {
     return this.ideasCollection.collection_cards.length < 6
   }
 
-  createNewQuestionCard = async ({
+  createNewQuestionCard = ({
     replacingCard,
     order,
     sectionType,
     questionType = '',
     parentCollection = null,
   }) => {
-    const { collection } = this.props
+    const { collection, apiStore, uiStore } = this.props
     const parent = parentCollection ? parentCollection : collection
     if (!this.canAddNewIdea) {
-      collection.apiStore.uiStore.alert(
+      uiStore.alert(
         'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
       )
       return
@@ -342,9 +342,10 @@ class TestDesigner extends React.Component {
     if (replacingCard) {
       // Set new card in same place as that you are replacing
       card.order = replacingCard.order
-      await replacingCard.API_archiveSelf({})
+      return card.API_replace({ replacingCard })
+    } else {
+      return card.API_create()
     }
-    return card.API_create()
   }
 
   renderHotEdge({
@@ -491,7 +492,6 @@ class TestDesigner extends React.Component {
           </TestQuestionFlexWrapper>
         )}
         {cards.map((card, i) => {
-          // blank item can occur briefly while the placeholder card/item is being replaced
           let firstCard = false
           let lastCard = false
           if (!card.record) return null
@@ -511,7 +511,7 @@ class TestDesigner extends React.Component {
   }
 
   render() {
-    const { collection } = this.props
+    const { collection, apiStore } = this.props
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
@@ -533,6 +533,10 @@ class TestDesigner extends React.Component {
 }
 TestDesigner.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+TestDesigner.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default TestDesigner
