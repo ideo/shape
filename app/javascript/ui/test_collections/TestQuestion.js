@@ -100,7 +100,6 @@ class TestQuestion extends React.Component {
       numberOfQuestions,
       testStatus,
       apiStore,
-      hideMedia,
     } = this.props
     const { record } = card
 
@@ -135,14 +134,7 @@ class TestQuestion extends React.Component {
       case 'question_media':
         return <MediaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_idea':
-        return (
-          <IdeaQuestion
-            card={card}
-            parent={parent}
-            canEdit={canEdit}
-            hideMedia={hideMedia}
-          />
-        )
+        return <IdeaQuestion card={card} parent={parent} canEdit={canEdit} />
       case 'question_description':
         return (
           <QuestionContentEditor
@@ -239,7 +231,6 @@ TestQuestion.propTypes = {
   numberOfQuestions: PropTypes.number,
   question_choices: MobxPropTypes.arrayOrObservableArray,
   testStatus: PropTypes.oneOf(['draft', 'live', 'closed']),
-  hideMedia: PropTypes.bool,
 }
 TestQuestion.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -253,7 +244,6 @@ TestQuestion.defaultProps = {
   canEdit: false,
   numberOfQuestions: null,
   question_choices: [],
-  hideMedia: false,
   testStatus: 'draft',
 }
 

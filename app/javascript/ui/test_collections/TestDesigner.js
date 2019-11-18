@@ -458,7 +458,6 @@ class TestDesigner extends React.Component {
             this.renderHotEdge({ card, sectionType, addBefore: true })}
           <TestQuestion
             editing
-            hideMedia={!collection.test_show_media}
             parent={questionParent}
             card={questionCard}
             order={questionCard.order}
