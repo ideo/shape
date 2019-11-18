@@ -390,14 +390,8 @@ class TestDesigner extends React.Component {
     questionType = '',
     parentCollection = null,
   }) => {
-    const { collection, apiStore, uiStore } = this.props
+    const { collection, apiStore } = this.props
     const parent = parentCollection ? parentCollection : collection
-    if (!this.canAddNewIdea) {
-      uiStore.alert(
-        'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
-      )
-      return
-    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
