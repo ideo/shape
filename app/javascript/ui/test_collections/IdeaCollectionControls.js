@@ -26,7 +26,8 @@ const StyledAddIdea = styled.div`
   color: ${v.colors.primaryMedium};
   display: inline-block;
   position: relative;
-  top: 10px;
+  top: 5px;
+  left: 5px;
 `
 
 const StyledNavigationAndCheckboxWrapper = styled.div`
@@ -36,9 +37,8 @@ const StyledNavigationAndCheckboxWrapper = styled.div`
 
 const TrashButton = styled.button`
   position: relative;
-  top: 6px;
+  top: 4px;
   width: 26px;
-  margin-left: 20px;
 `
 
 const ChevronCircleWrapper = styled.div`
@@ -47,8 +47,7 @@ const ChevronCircleWrapper = styled.div`
   position: relative;
   top: 3px;
   display: inline-block;
-  ${props => props.first && 'margin-right: 7px;'}
-  ${props => props.last && 'margin-left: 7px;'}
+  ${props => props.first && 'margin-right: 5px;'}
   cursor: pointer;
   border-radius: 50%;
   background-color: ${v.colors.commonMedium};
@@ -146,12 +145,6 @@ class IdeaCollectionControls extends React.Component {
           <DisplayText data-cy="num-ideas">
             {currentIdeaCardIndex + 1}/{this.numIdeas}
           </DisplayText>
-          <ChevronCircleWrapper
-            last
-            onClick={() => this.showNextPrevIdea('next')}
-          >
-            <ChevronRightIcon />
-          </ChevronCircleWrapper>
           {this.canDelete && (
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}
@@ -171,6 +164,12 @@ class IdeaCollectionControls extends React.Component {
               </TrashButton>
             </Tooltip>
           )}
+          <ChevronCircleWrapper
+            last
+            onClick={() => this.showNextPrevIdea('next')}
+          >
+            <ChevronRightIcon />
+          </ChevronCircleWrapper>
           <div style={{ marginLeft: '9px' }}>
             <LabelContainer
               classes={{ label: 'form-control' }}
