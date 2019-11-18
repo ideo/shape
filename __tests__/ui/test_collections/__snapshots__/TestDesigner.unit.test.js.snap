@@ -61,6 +61,7 @@ exports[`TestDesigner renders snapshot 1`] = `
         >
           <QuestionLeftSide
             canAddChoice={false}
+            canAddIdeas={false}
             canEdit={false}
             card={
               Object {
@@ -201,6 +202,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
             }
             cardNumber={NaN}
+            createNewIdea={[Function]}
             createNewQuestionCard={[Function]}
             currentIdeaCardIndex={0}
             handleSelectChange={[Function]}
@@ -2195,6 +2197,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
               createSurveyResponse={null}
               editing={true}
+              handleFocus={[Function]}
               hideMedia={false}
               numberOfQuestions={null}
               order={0}
@@ -4063,6 +4066,7 @@ exports[`TestDesigner renders snapshot 1`] = `
         >
           <QuestionLeftSide
             canAddChoice={false}
+            canAddIdeas={false}
             canEdit={false}
             card={
               Object {
@@ -5025,6 +5029,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
             }
             cardNumber={2}
+            createNewIdea={[Function]}
             createNewQuestionCard={[Function]}
             currentIdeaCardIndex={0}
             handleSelectChange={[Function]}
@@ -7841,6 +7846,7 @@ exports[`TestDesigner renders snapshot 1`] = `
               }
               createSurveyResponse={null}
               editing={true}
+              handleFocus={[Function]}
               hideMedia={false}
               numberOfQuestions={null}
               order={1}

@@ -63,7 +63,7 @@ class OpenQuestion extends React.Component {
   }
 
   renderQuestion() {
-    const { editing, item, canEdit } = this.props
+    const { editing, item, canEdit, handleFocus } = this.props
 
     return (
       <QuestionSpacingContainer editing={editing}>
@@ -72,6 +72,7 @@ class OpenQuestion extends React.Component {
           maxLength={100}
           placeholder="please enter question here"
           canEdit={canEdit}
+          handleFocus={handleFocus}
           optional
         />
       </QuestionSpacingContainer>
@@ -112,12 +113,14 @@ OpenQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
+  handleFocus: PropTypes.func,
   onAnswer: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 OpenQuestion.defaultProps = {
   questionAnswer: null,
   editing: false,
+  handleFocus: () => true,
   onAnswer: () => null,
   canEdit: false,
 }
