@@ -23,7 +23,7 @@ const StyledCommentSubject = styled.div`
   display: flex;
   font-family: ${v.fonts.sans};
   color: ${v.colors.commonMedium};
-  padding-top: 10px;
+  padding: 10px 0px 10px;
   overflow: hidden;
 `
 
@@ -31,6 +31,7 @@ const CommentTextContent = styled.div`
   flex: 1;
   font-style: italic;
   word-wrap: break-word;
+  margin-left: 10px;
 `
 StyledCommentSubject.displayName = 'StyledCommentSubject'
 

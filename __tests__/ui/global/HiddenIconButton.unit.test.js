@@ -1,4 +1,4 @@
-import HiddenIconButton from '~/ui/icons/HiddenIconButton'
+import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import { uiStore } from '~/stores'
 import { fakeTextItem } from '#/mocks/data'
 
@@ -17,13 +17,13 @@ describe('HiddenIconButton', () => {
 
   describe('render', () => {
     it('should render a button with a Tooltip', () => {
-      expect(wrapper.find('button').exists()).toBeTruthy()
+      expect(wrapper.find('StyledHiddenIconButton').exists()).toBeTruthy()
       expect(wrapper.find('Tooltip').exists()).toBeTruthy()
     })
 
     describe('not clickable', () => {
       it('should not trigger the uiStore confirm dialog', () => {
-        wrapper.find('button').simulate('click')
+        wrapper.find('StyledHiddenIconButton').simulate('click')
         expect(uiStore.confirm).not.toHaveBeenCalled()
       })
     })
@@ -38,7 +38,7 @@ describe('HiddenIconButton', () => {
       })
 
       it('should trigger the uiStore confirm dialog', () => {
-        wrapper.find('button').simulate('click')
+        wrapper.find('StyledHiddenIconButton').simulate('click')
         expect(uiStore.confirm).toHaveBeenCalled()
       })
     })

@@ -1,10 +1,19 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import { uiStore } from '~/stores'
 import Tooltip from '~/ui/global/Tooltip'
-import HiddenIcon from './HiddenIcon'
-import HiddenIconSm from './HiddenIconSm'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
+import HiddenIconSm from '~/ui/icons/HiddenIconSm'
+
+const StyledHiddenIconButton = styled.button`
+  position: relative;
+  bottom: 10%;
+  right: 2px;
+`
+
+StyledHiddenIconButton.displayName = 'StyledHiddenIconButton'
 
 const HiddenIconButton = ({ record, size, clickable, IconWrapper }) => {
   const parent = record.parent || uiStore.viewingCollection
@@ -54,9 +63,9 @@ const HiddenIconButton = ({ record, size, clickable, IconWrapper }) => {
     wrappedIcon = <IconWrapper>{wrappedIcon}</IconWrapper>
   }
   return (
-    <button style={{ display: 'block' }} onClick={onClick}>
+    <StyledHiddenIconButton onClick={onClick}>
       {wrappedIcon}
-    </button>
+    </StyledHiddenIconButton>
   )
 }
 

@@ -469,7 +469,13 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record &&
           !record.archived &&
           this.renderTopRightActions()}
-        <BottomLeftCardIcons card={card} cardType={cardType} record={record} />
+        {uiStore.viewingRecord && !uiStore.viewingRecord.isTestCollection && (
+          <BottomLeftCardIcons
+            card={card}
+            cardType={cardType}
+            record={record}
+          />
+        )}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}
