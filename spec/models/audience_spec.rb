@@ -74,6 +74,17 @@ RSpec.describe Audience, type: :model, seed: true do
     end
   end
 
+  describe '.minimum_price_per_response' do
+    it 'returns minimum value so we do not lose money' do
+      incentive_amount = Audience::MIN_INCENTIVE_PER_RESPONDENT + Audience::MIN_NUM_PAID_QUESTIONS * Audience::INCENTIVE_PRICE_PER_QUESTION
+      paypal_fee = (incentive_amount * BigDecimal('0.05')).round(2)
+      stripe_fee = (((incentive_amount + paypal_fee) * BigDecimal('0.029')) + BigDecimal('0.30')).round(2)
+      expect(Audience.minimum_price_per_response).to eq(
+        (incentive_amount + paypal_fee + stripe_fee).to_f,
+      )
+    end
+  end
+
   describe '#all_tags' do
     let!(:audience) { create(:audience, country_list: %w[canada usa], interest_list: %w[fun music]) }
 

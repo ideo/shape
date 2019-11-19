@@ -46,6 +46,7 @@ class Audience < ApplicationRecord
   TEST_PRICE_PER_QUESTION = BigDecimal('0.12')
   INCENTIVE_PRICE_PER_QUESTION = BigDecimal('0.1')
   MIN_INCENTIVE_PER_RESPONDENT = BigDecimal('1.75')
+  PAYMENT_WAITING_PERIOD = 1.week
 
   def self.global_defaults
     where.not(global_default: nil).order(global_default: :asc)
@@ -83,8 +84,22 @@ class Audience < ApplicationRecord
     {
       'MIN_NUM_PAID_QUESTIONS' => MIN_NUM_PAID_QUESTIONS,
       'TEST_PRICE_PER_QUESTION' => TEST_PRICE_PER_QUESTION,
-      'TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE' => TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE
+      'TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE' => TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE,
     }
+  end
+
+  # The absolute minimum we can charge per response and not be losing money
+  def self.minimum_price_per_response
+    min_incentive = incentive_per_response(MIN_NUM_PAID_QUESTIONS)
+    payout_cost = min_incentive + Accounting::RecordTransfer.paypal_fee(min_incentive)
+    stripe_cost = Accounting::RecordTransfer.stripe_fee(payout_cost)
+    (payout_cost + stripe_cost).to_f
+  end
+
+  def self.incentive_per_response(num_questions)
+    num_questions -= MIN_NUM_PAID_QUESTIONS
+    num_questions = MIN_NUM_PAID_QUESTIONS if num_questions < MIN_NUM_PAID_QUESTIONS
+    MIN_INCENTIVE_PER_RESPONDENT + (num_questions * INCENTIVE_PRICE_PER_QUESTION)
   end
 
   def price_per_response(num_questions)
@@ -98,9 +113,7 @@ class Audience < ApplicationRecord
   def incentive_per_response(num_questions)
     return 0 if link_sharing?
 
-    num_questions -= MIN_NUM_PAID_QUESTIONS
-    num_questions = MIN_NUM_PAID_QUESTIONS if num_questions < MIN_NUM_PAID_QUESTIONS
-    MIN_INCENTIVE_PER_RESPONDENT + (num_questions * INCENTIVE_PRICE_PER_QUESTION)
+    self.class.incentive_per_response(num_questions)
   end
 
   def link_sharing?

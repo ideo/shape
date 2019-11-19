@@ -764,7 +764,7 @@ describe User, type: :model do
         expect(user.incentive_owed_account_balance.to_f).to eq(2.50)
         expect(user.incentive_paid_account_balance.to_f).to eq(2.50)
         expect(user.incentive_due_date).to be_within(0.1).of(
-          prev_survey_completed_at + TestAudience::PAYMENT_WAITING_PERIOD,
+          prev_survey_completed_at + Audience::PAYMENT_WAITING_PERIOD,
         )
       end
 

@@ -85,11 +85,11 @@ class SurveyResponse < ApplicationRecord
   def potential_incentive
     return 0 unless gives_incentive?
 
-    audience.incentive_amount(test_collection.paid_question_items.size)
+    audience.incentive_per_response(test_collection.paid_question_items.size)
   end
 
   def amount_earned
-    completed ? potential_incentive : 0
+    completed? ? potential_incentive : 0
   end
 
   def question_answer_created_or_destroyed

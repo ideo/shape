@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :audience do
     name { Faker::Superhero.power }
     # Need to set a minimum or else our price will be below a valid amount
-    min_price_per_response { 4 }
+    min_price_per_response { Audience::TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE }
     age_list []
     children_age_list []
     country_list []

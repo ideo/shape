@@ -36,6 +36,7 @@ class TestAudience < ApplicationRecord
   delegate :name,
            :link_sharing?,
            to: :audience
+
   validate :price_per_response_greater_than_minimum
 
   before_validation :set_price_per_response_from_audience, on: :create
@@ -57,20 +58,10 @@ class TestAudience < ApplicationRecord
   scope :link_sharing, -> { where(price_per_response: 0) }
   scope :paid, -> { where('price_per_response > 0') }
 
-  PAYMENT_WAITING_PERIOD = 1.week
-
   enum status: {
     open: 0,
     closed: 1,
   }
-
-  # The absolute minimum we can charge per response and not be losing money
-  def self.minimum_price_per_response
-    min_incentive = Audience::MIN_INCENTIVE_PER_RESPONDENT
-    payout_cost = min_incentive + Accounting::RecordTransfer.paypal_fee(min_incentive)
-    stripe_cost = Accounting::RecordTransfer.stripe_fee(payout_cost)
-    (payout_cost + stripe_cost).to_f
-  end
 
   def dataset_display_name
     "#{name} Audience"
@@ -135,10 +126,10 @@ class TestAudience < ApplicationRecord
     if price_per_response.nil?
       errors.add(:price_per_response, 'must be present')
     elsif !price_per_response.zero? &&
-          (price_per_response <= TestAudience.minimum_price_per_response)
+          (price_per_response <= Audience.minimum_price_per_response)
       errors.add(
         :price_per_response,
-        "must be greater than minimum of $#{TestAudience.minimum_price_per_response}",
+        "must be greater than minimum of $#{Audience.minimum_price_per_response}",
       )
     end
   end

@@ -38,17 +38,6 @@ RSpec.describe TestAudience, type: :model do
     )
   end
 
-  describe '.minimum_price_per_response' do
-    it 'returns minimum value so we do not lose money' do
-      incentive_amount = Shape::FEEDBACK_INCENTIVE_AMOUNT
-      paypal_fee = (incentive_amount * BigDecimal('0.05')).round(2)
-      stripe_fee = (((incentive_amount + paypal_fee) * BigDecimal('0.029')) + BigDecimal('0.30')).round(2)
-      expect(TestAudience.minimum_price_per_response).to eq(
-        (incentive_amount + paypal_fee + stripe_fee).to_f,
-      )
-    end
-  end
-
   describe 'callbacks' do
     describe '#purchase', truncate: true do
       it 'charges organization payment method' do
