@@ -70,11 +70,38 @@ describe Collection::TestDesign, type: :model do
         # do other migration
         @test_collection.migrate!
         @test_collection.reload
+        video_card.reload
       end
 
       it 'migrates question into the Ideas collection' do
-        expect(video_card.reload.parent.name).to eq 'Ideas'
-        expect(video_card.reload.parent.parent).to eq @test_collection
+        expect(video_card.parent.name).to eq 'Ideas'
+        expect(video_card.parent.parent).to eq @test_collection
+      end
+    end
+
+    context 'with a blank question item that we can turn into an idea' do
+      let!(:blank_question_card) { create(:collection_card_question, parent: test_collection) }
+      let!(:blank_question_card2) { create(:collection_card_question, order: 99, parent: test_collection) }
+
+      before do
+        # more simulating legacy
+        blank_question_card.item.update(question_type: nil)
+        blank_question_card2.item.update(question_type: nil)
+        @test_collection.collection_cards.update_all(section_type: nil)
+        # do other migration
+        @test_collection.migrate!
+        @test_collection.reload
+        blank_question_card.reload
+        blank_question_card2.reload
+      end
+
+      it 'migrates question into the Ideas collection' do
+        expect(blank_question_card.parent.name).to eq 'Ideas'
+        expect(blank_question_card.parent.parent).to eq @test_collection
+        expect(blank_question_card.item.question_idea?).to be true
+
+        expect(blank_question_card2.parent).to eq @test_collection
+        expect(blank_question_card2.item.question_media?).to be true
       end
     end
   end

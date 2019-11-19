@@ -329,6 +329,7 @@ class Collection
         end
       end
       duplicate.save
+      duplicate.reorder_cards!
       duplicate
     end
 
@@ -589,6 +590,11 @@ class Collection
         )
         first_media_item = items.where(
           type: ['Item::FileItem', 'Item::LinkItem', 'Item::VideoItem'],
+        ).or(
+          items.where(
+            type: 'Item::QuestionItem',
+            question_type: nil,
+          ),
         ).first
         first_description_item = items.question_description.first
 
@@ -617,6 +623,10 @@ class Collection
           )
         end
       end
+
+      question_items.where(question_type: nil).update_all(
+        question_type: :question_media
+      )
 
       primary_collection_cards.update_all(
         section_type: :ideas,
