@@ -8,9 +8,6 @@ class SurveyResponseValidation < SimpleService
   end
 
   def call
-    # puts '***' * 3
-    # puts answerable_ids.to_s
-    # puts answered_ids.to_s
     (answerable_ids - answered_ids).empty?
   end
 
