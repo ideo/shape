@@ -568,6 +568,11 @@ class Collection
     # This migrates unlaunched pre-feedback-3.0 test collections to a feedback-3.0
     # style test collection, ready to be launched.
     def migrate!
+      # exit if this is already 3.0
+      return if !draft? ||
+                ideas_collection.present? ||
+                collection_cards.where.not(section_type: nil).any?
+
       ideas_collection_card = primary_collection_cards.create(
         order: 0,
         section_type: :ideas,
