@@ -1111,10 +1111,12 @@ class FoamcoreGrid extends React.Component {
   @action
   calculateCardsToRender() {
     const { collection, movingCardIds, uiStore, canEditCollection } = this.props
+    const { cardAction } = uiStore
     // any cards that are being moved don't appear at all
     const collectionCards = _.reject(
       collection.collection_cards,
-      c => _.includes(movingCardIds, c.id) || c.hidden
+      c =>
+        (cardAction === 'move' && _.includes(movingCardIds, c.id)) || c.hidden
     )
 
     let cards = []
