@@ -13,8 +13,8 @@ import PinnedIcon from '~/ui/icons/PinnedIcon'
 
 import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
-import UnresolvedCount from '~/ui/threads/UnresolvedCount'
-import HiddenIconButton from '../icons/HiddenIconButton'
+import HiddenIconButton from '~/ui/icons/HiddenIconButton'
+import UnresolvedButton from '~/ui/icons/UnresolvedButton'
 import { apiStore } from '~/stores/'
 
 export const StyledIconsWrapper = styled.div`
@@ -25,7 +25,6 @@ export const StyledIconsWrapper = styled.div`
   color: ${v.colors.commonMedium};
   height: 45px;
   display: flex;
-  width: 45px;
   height: 45px;
   display: flex;
   justify-content: center;
@@ -57,13 +56,6 @@ const PinnedCardIcon = () => (
     <PinnedIcon />
   </Tooltip>
 )
-
-const UnresolvedButton = styled.button`
-  position: relative;
-  ${props => props.hasNoOtherIcons && `left: 8px;`}
-  top: 30%;
-  height: 40%;
-`
 
 class BottomLeftCardIcons extends React.Component {
   handleUnreadIconClick = e => {
@@ -153,14 +145,14 @@ class BottomLeftCardIcons extends React.Component {
 
     if (record.unresolved_count && record.unresolved_count > 0) {
       icons.push(
-        <Tooltip title="Add comment" placement="top">
-          <UnresolvedButton
-            onClick={this.handleUnreadIconClick}
-            hasNoOtherIcons={hasNoOtherIcons}
-          >
-            <UnresolvedCount count={record.unresolved_count} size={'large'} />
-          </UnresolvedButton>
-        </Tooltip>
+        <UnresolvedButton
+          record={record}
+          onClick={this.handleUnreadIconClick}
+          hasNoOtherIcons={hasNoOtherIcons}
+          IconWrapper={({ children }) => (
+            <StyledSmallIconWrapper>{children}</StyledSmallIconWrapper>
+          )}
+        ></UnresolvedButton>
       )
     }
 

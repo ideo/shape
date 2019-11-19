@@ -212,7 +212,7 @@ export const emojiSeries = {
   ],
   question_category_satisfaction: [
     { number: 1, name: 'Very unsatisfied', symbol: '😡' },
-    { number: 2, name: 'Somewhat unsatisfied', scale: 0.6, symbol: '☹️' },
+    { number: 2, name: 'Somewhat unsatisfied', scale: 0.6, symbol: '🙁' },
     { number: 3, name: 'Mostly Satisfied', scale: 0.6, symbol: '😊' },
     { number: 4, name: 'Very satisfied', symbol: '😍' },
   ],
