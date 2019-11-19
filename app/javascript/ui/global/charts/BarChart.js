@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { VictoryBar } from 'victory'
+import color from 'color'
 
 import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
 import {
@@ -67,11 +68,31 @@ const BarChart = ({ dataset, cardArea, barsInGroup, routeToSearch }) => {
                   return { active: true }
                 },
               },
+              {
+                target: 'data',
+                mutation: props => {
+                  if (!props.style || !props.style.fill) return null
+                  const darkerFill = color(props.style.fill)
+                    .darken(0.11)
+                    .string()
+                  return {
+                    style: Object.assign({}, props.style, {
+                      fill: darkerFill,
+                    }),
+                  }
+                },
+              },
             ],
             onMouseOut: () => [
               {
                 target: 'labels',
                 mutation: props => null,
+              },
+              {
+                target: 'data',
+                mutation: props => {
+                  return null
+                },
               },
             ],
             onClick: (_data, el) => {
