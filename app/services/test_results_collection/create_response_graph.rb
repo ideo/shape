@@ -48,6 +48,7 @@ module TestResultsCollection
       create_idea_datasets if idea.present?
       create_survey_response_idea_datasets if survey_response.present?
       link_question_and_org_wide_datasets
+      create_all_ideas_datasets if idea.blank? && survey_response.blank?
       create_test_audiences_datasets
     end
 
@@ -76,6 +77,15 @@ module TestResultsCollection
           test_audience: test_audience,
           data_item: data_item,
           idea: idea,
+        )
+      end
+    end
+
+    def create_all_ideas_datasets
+      item.parent.idea_items.each do |idea|
+        item.create_idea_question_dataset(
+          idea: idea,
+          data_item: data_item,
         )
       end
     end

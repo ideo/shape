@@ -89,6 +89,7 @@ class Collection
              :test_audiences,
              :question_items,
              :ideas_collection,
+             :idea_items,
              :test_show_media?,
              to: :test_collection,
              allow_nil: true
