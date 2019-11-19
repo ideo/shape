@@ -11,7 +11,7 @@ import IdeaCollectionControls from '~/ui/test_collections/IdeaCollectionControls
 import QuestionSelector from '~/ui/test_collections/QuestionSelector'
 import styled from 'styled-components'
 
-const LeftSideContainer = styled.div`
+export const LeftSideContainer = styled.div`
   margin-top: 10px;
   margin-right: 14px;
   width: 300px;
