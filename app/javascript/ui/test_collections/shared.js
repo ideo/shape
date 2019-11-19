@@ -181,6 +181,7 @@ export const styledTestTheme = (themeName = 'primary') => {
       placeholder: v.colors.primaryMedium,
       questionText: v.colors.primaryDark,
       hotEdge: v.colors.primaryLight,
+      questionChoiceHolder: v.colors.commonLight,
     }
   }
   // secondary theme used for TestType == Collection
@@ -194,6 +195,7 @@ export const styledTestTheme = (themeName = 'primary') => {
     descriptionText: v.colors.commonLightest,
     placeholder: v.colors.commonMediumTint,
     hotEdge: v.colors.primaryDarkest,
+    questionChoiceHolder: v.colors.secondaryLight,
   }
 }
 
