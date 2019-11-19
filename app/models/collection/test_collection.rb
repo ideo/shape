@@ -629,6 +629,9 @@ class Collection
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
       return true if test_audience_params.blank?
 
+      # Make sure all prices are up-to-date
+      test_audiences.each(&:update_price_per_response_from_audience!)
+
       purchaser = PurchaseTestAudience.call(
         test_collection: self,
         test_audience_params: test_audience_params,

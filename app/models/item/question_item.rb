@@ -389,10 +389,7 @@ class Item
     end
 
     def set_price_per_response_on_test_audiences
-      test_collection.test_audiences.each do |test_audience|
-        test_audience.set_price_per_response_from_audience
-        test_audience.save
-      end
+      test_collection.test_audiences.each(&:update_price_per_response_from_audience!)
     end
   end
 end

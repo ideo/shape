@@ -93,11 +93,16 @@ class TestAudience < ApplicationRecord
     sample_size * price_per_response
   end
 
-  def set_price_per_response_from_audience
-    self.price_per_response = audience&.price_per_response(test_collection.paid_question_items.size)
+  def update_price_per_response_from_audience!
+    set_price_per_response_from_audience
+    save
   end
 
   private
+
+  def set_price_per_response_from_audience
+    self.price_per_response = audience&.price_per_response(test_collection.paid_question_items.size)
+  end
 
   # This callback only gets called when using PurchaseTestAudience and setting payment_method
   def purchase
