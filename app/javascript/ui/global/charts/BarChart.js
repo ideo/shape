@@ -70,13 +70,13 @@ const BarChart = ({ dataset, cardArea, barsInGroup, routeToSearch }) => {
               },
               {
                 target: 'data',
-                mutation: props => {
-                  if (!props.style || !props.style.fill) return null
-                  const darkerFill = color(props.style.fill)
+                mutation: _props => {
+                  if (!_props.style || !_props.style.fill) return null
+                  const darkerFill = color(_props.style.fill)
                     .darken(0.11)
                     .string()
                   return {
-                    style: Object.assign({}, props.style, {
+                    style: Object.assign({}, _props.style, {
                       fill: darkerFill,
                     }),
                   }
