@@ -6,17 +6,19 @@ module TestResultsCollection
 
     schema :test_collection,
            :test_results_collection,
-           :created_by,
            :idea,
-           :survey_response_id,
-           :message
+           :created_by
 
     require_in_context :test_collection
 
-    delegate :test_results_collection, :test_collection, :idea, :created_by,
+    delegate :test_collection,
+             :test_results_collection,
+             :idea,
+             :created_by,
              to: :context
 
-    delegate :legend_item, to: :test_results_collection
+    delegate :legend_item,
+             to: :test_results_collection
 
     before do
       context.created_by ||= test_collection.created_by
@@ -24,11 +26,10 @@ module TestResultsCollection
     end
 
     def call
-      # initial_creation = false
       ActiveRecord::Base.transaction do
+        # this inner block only happens when first launching/creating the test results collection
+        # (either master, or per idea)
         if test_results_collection.blank?
-          # marking when the tests_results_collection is first created
-          # initial_creation = true
           context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
           if master_results_collection?
             update_test_collection_name

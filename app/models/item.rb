@@ -134,6 +134,7 @@ class Item < ApplicationRecord
     question_context: 0,
     question_useful: 1,
     question_open: 2,
+    # 3 - end is deprecated
     question_media: 4,
     question_description: 5,
     question_finish: 6,
@@ -366,6 +367,10 @@ class Item < ApplicationRecord
 
   # So that regular items can respond when working with test collection media items
   def scale_question?
+    false
+  end
+
+  def graphable_question?
     false
   end
 

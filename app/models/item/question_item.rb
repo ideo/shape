@@ -107,23 +107,6 @@ class Item
       include_association :question_choices
     end
 
-    enum question_type: {
-      question_context: 0,
-      question_useful: 1,
-      question_open: 2,
-      # Is there supposed to be no #3 for this enum?
-      question_media: 4,
-      question_description: 5,
-      question_finish: 6,
-      question_clarity: 7,
-      question_excitement: 8,
-      question_different: 9,
-      question_category_satisfaction: 10,
-      question_idea: 11,
-      question_single_choice: 12,
-      question_multiple_choice: 13,
-    }
-
     def self.question_type_categories
       {
         idea_content: %i[
@@ -226,9 +209,12 @@ class Item
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
     end
 
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
+    end
+
     def graphable_question?
-      self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym) ||
-        %i[question_single_choice question_multiple_choice].include?(question_type&.to_sym)
+      scale_question? || question_choices_customizable?
     end
 
     def requires_roles?
@@ -256,10 +242,6 @@ class Item
       return 0 if total.zero?
 
       (points * 100.0 / total).round
-    end
-
-    def question_choices_customizable?
-      question_single_choice? || question_multiple_choice?
     end
 
     def unarchived_question_choices
