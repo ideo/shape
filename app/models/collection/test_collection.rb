@@ -468,16 +468,11 @@ class Collection
 
     def hide_or_show_section_questions!
       hidden = collection_to_test_id.present? ? true : false
-      conditions = CollectionCard.all
-      if hidden
-        conditions = CollectionCard.joins(:item)
-                                   .where.not(
-                                     Item.arel_table[:question_type].eq(:question_finish),
-                                   )
-      end
-
       question_cards_from_sections(%i[intro outro])
-        .merge(conditions)
+        .joins(:item)
+        .where.not(
+          Item.arel_table[:question_type].eq(:question_finish),
+        )
         .update_all(
           hidden: hidden,
         )
@@ -511,18 +506,6 @@ class Collection
       incomplete_question_items.select do |item|
         item.question_item.blank?
       end.each(&:destroy)
-    end
-
-    # used in SurveyResponse#all_questions_answered?
-    def answerable_complete_question_items
-      complete_question_items(answerable_only: true)
-    end
-
-    def complete_question_items(answerable_only: false)
-      # This is for the purpose of finding all completed items to display in the survey
-      # i.e. omitting any unfinished/blanks
-      questions = answerable_only ? question_items.answerable : items
-      questions.reject(&:question_item_incomplete?)
     end
 
     def idea_items

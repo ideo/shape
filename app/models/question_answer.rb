@@ -21,9 +21,7 @@
 #
 
 class QuestionAnswer < ApplicationRecord
-  # NOTE: survey_response then touches its test_collection,
-  # so that answering one question can bust the collection caching for viewing charts
-  belongs_to :survey_response, touch: true
+  belongs_to :survey_response
   # class_name is generic Item because the ideas might be FileItem, LinkItem, etc.
   belongs_to :idea, class_name: 'Item', optional: true
   belongs_to :question, class_name: 'Item::QuestionItem'
@@ -39,7 +37,7 @@ class QuestionAnswer < ApplicationRecord
   validates :answer_number, presence: true, if: :answer_number_required?
   validates :question_id, uniqueness: { scope: %i[survey_response_id idea_id] }
 
-  after_commit :update_survey_response, on: %i[create destroy], if: :survey_response_present?
+  after_commit :update_survey_response, if: :survey_response_present?
   after_commit :update_collection_test_scores, if: :survey_response_present?
   after_update :update_open_response_item, if: :update_open_response_item?
   before_destroy :destroy_open_response_item_and_card, if: :open_response_item_present?
@@ -132,6 +130,8 @@ class QuestionAnswer < ApplicationRecord
   def update_survey_response
     return if survey_response.destroyed?
 
+    # NOTE: survey_response then touches its test_collection,
+    # so that answering one question can bust the collection caching for viewing charts
     survey_response.question_answer_created_or_destroyed
   end
 

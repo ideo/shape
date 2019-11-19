@@ -114,10 +114,6 @@ class Item < ApplicationRecord
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
 
-  scope :questions, -> { where(type: 'Item::QuestionItem') }
-  scope :data_items, -> { where(type: 'Item::DataItem') }
-  scope :legend_items, -> { where(type: 'Item::LegendItem') }
-
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name_present?
 
@@ -128,6 +124,25 @@ class Item < ApplicationRecord
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_parent_collection, unless: :destroyed?
   after_commit :update_parent_collection_if_needed, unless: :destroyed?
+
+  scope :questions, -> { where(type: 'Item::QuestionItem') }
+  scope :data_items, -> { where(type: 'Item::DataItem') }
+  scope :legend_items, -> { where(type: 'Item::LegendItem') }
+  scope :answerable, -> {
+    where.not(
+      question_type: unanswerable_question_types,
+    )
+  }
+  scope :not_answerable, -> {
+    where(
+      question_type: unanswerable_question_types,
+    )
+  }
+
+  scope :in_ideas_section, -> {
+    joins(:primary_collection_cards)
+      .merge(CollectionCard.section_types[:ideas])
+  }
 
   # declared in Item so that media (e.g. Files/Links) can utilize this
   enum question_type: {
@@ -147,10 +162,14 @@ class Item < ApplicationRecord
     question_multiple_choice: 13,
   }
 
-  scope :in_ideas_section, -> {
-    joins(:primary_collection_cards)
-      .merge(CollectionCard.section_types[:ideas])
-  }
+  def self.unanswerable_question_types
+    %i[
+      question_media
+      question_description
+      question_finish
+      question_idea
+    ]
+  end
 
   amoeba do
     enable
@@ -372,6 +391,12 @@ class Item < ApplicationRecord
 
   def graphable_question?
     false
+  end
+
+  def answerable?
+    return false if Item.unanswerable_question_types.include?(question_type.to_sym)
+
+    question_type.present?
   end
 
   # this method also applies to Idea items (e.g. FileItem) which is why it is defined here in item.rb

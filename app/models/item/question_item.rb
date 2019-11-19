@@ -81,16 +81,6 @@ class Item
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
 
-    scope :answerable, -> {
-      where.not(
-        question_type: unanswerable_question_types,
-      )
-    }
-    scope :not_answerable, -> {
-      where(
-        question_type: unanswerable_question_types,
-      )
-    }
     scope :scale_questions, -> {
       where(
         question_type: question_type_categories[:scaled_rating],
@@ -130,15 +120,6 @@ class Item
           question_multiple_choice
         ],
       }
-    end
-
-    def self.unanswerable_question_types
-      %i[
-        question_media
-        question_description
-        question_finish
-        question_idea
-      ]
     end
 
     def self.scale_answer_numbers

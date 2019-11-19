@@ -202,7 +202,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "width": 1,
               }
             }
-            cardNumber={NaN}
             createNewIdea={[Function]}
             createNewQuestionCard={[Function]}
             currentIdeaCardIndex={0}
@@ -5033,7 +5032,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "width": 1,
               }
             }
-            cardNumber={2}
             createNewIdea={[Function]}
             createNewQuestionCard={[Function]}
             currentIdeaCardIndex={0}

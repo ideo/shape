@@ -18,57 +18,9 @@ RSpec.describe SurveyResponse, type: :model do
     end
   end
 
-  describe '#all_questions_answered?' do
-    # Turn the 4 default cards into 4 answerable cards
-    let(:test_collection) { create(:test_collection, :answerable_questions) }
-    let(:survey_response) { create(:survey_response, test_collection: test_collection) }
-
-    before do
-      # this will move the questions into the TestDesign and allow the delegation to work
-      test_collection.launch!
-    end
-
-    context 'no questions answered' do
-      it 'returns false' do
-        expect(survey_response.all_questions_answered?).to be false
-      end
-    end
-
-    context 'some questions answered' do
-      let!(:question_answer) do
-        create(:question_answer,
-               survey_response: survey_response,
-               question: survey_response.answerable_complete_question_items.first)
-      end
-
-      it 'returns false' do
-        expect(survey_response.all_questions_answered?).to be false
-      end
-    end
-
-    context 'all questions answered' do
-      let!(:question_answers) do
-        survey_response.answerable_complete_question_items.map do |question|
-          create(:question_answer,
-                 survey_response: survey_response,
-                 question: question)
-        end
-      end
-
-      it 'returns true' do
-        expect(survey_response.all_questions_answered?).to be true
-      end
-    end
-  end
-
   describe '#question_answer_created_or_destroyed' do
-    let(:test_collection) { create(:test_collection, :answerable_questions) }
+    let(:test_collection) { create(:test_collection, :launched) }
     let(:survey_response) { create(:survey_response, test_collection: test_collection) }
-
-    before do
-      # this will move the questions into the TestDesign and allow the delegation to work
-      test_collection.launch!
-    end
 
     it 'changes updated_at' do
       expect {
@@ -82,10 +34,11 @@ RSpec.describe SurveyResponse, type: :model do
 
     context 'with all questions answered' do
       let(:question_answers) do
-        survey_response.answerable_complete_question_items.map do |question|
+        SurveyResponseValidation.new(survey_response).answerable_ids.each do |item_id, idea_id|
           create(:question_answer,
                  survey_response: survey_response,
-                 question: question)
+                 question_id: item_id,
+                 idea_id: idea_id)
         end
       end
 
@@ -99,7 +52,7 @@ RSpec.describe SurveyResponse, type: :model do
 
   describe '#cache_test_scores!' do
     let(:submission) { create(:collection) }
-    let!(:test_collection) { create(:test_collection, :answerable_questions, parent_collection: submission) }
+    let!(:test_collection) { create(:test_collection, parent_collection: submission) }
     let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
 
     before do
@@ -107,8 +60,15 @@ RSpec.describe SurveyResponse, type: :model do
     end
 
     it 'should call cache_test_scores! on the parent_submission' do
+      expect(test_collection.parent_submission.cached_test_scores).to be_nil
       survey_response.cache_test_scores!
-      expect(test_collection.parent_submission.cached_test_scores).to eq('total' => 0, 'question_context' => 0)
+      expect(test_collection.parent_submission.cached_test_scores).to eq(
+        'total' => 0,
+        'question_category_satisfaction' => 0,
+        'question_clarity' => 0,
+        'question_excitement' => 0,
+        'question_useful' => 0,
+      )
     end
   end
 

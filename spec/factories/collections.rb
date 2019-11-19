@@ -50,14 +50,6 @@ FactoryBot.define do
         num_responses 1
       end
 
-      trait :answerable_questions do
-        after(:create) do |collection|
-          collection.question_items.each do |item|
-            item.update(question_type: :question_context)
-          end
-        end
-      end
-
       trait :open_response_questions do
         after(:create) do |collection|
           collection.question_items.each_with_index do |item, index|

@@ -598,7 +598,10 @@ describe Collection::TestCollection, type: :model do
         end
 
         it 'should hide intro/outro questions' do
-          cards = test_collection.question_cards_from_sections(%i[intro outro])
+          cards = test_collection
+                  .question_cards_from_sections(%i[intro outro])
+                  .includes(:item)
+                  .reject { |card| card.item.question_finish? }
           expect(cards.pluck(:hidden)).to all(be true)
         end
 
