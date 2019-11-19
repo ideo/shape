@@ -258,6 +258,7 @@ class TestSurveyResponder extends React.Component {
     runInAction(() => {
       this.currentCardIdx = answerableIdx + 1
     })
+    if (this.currentCardIdx > this.numAnswerableQuestionItems) return
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
     if (this.hasFinishedSurvey(nextCard)) this.refreshUserAfterSurvey()
