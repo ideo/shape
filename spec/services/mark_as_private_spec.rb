@@ -4,8 +4,7 @@ RSpec.describe MarkAsPrivate, type: :service do
   let(:user) { create(:user) }
   let(:organization) { create(:organization) }
   let!(:collection) { create(:collection, add_editors: [user]) }
-
-  let!(:mark_as_private) do
+  subject do
     MarkAsPrivate.new(
       object: collection,
       marked_by: user,
@@ -18,7 +17,7 @@ RSpec.describe MarkAsPrivate, type: :service do
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           hash_including(action: :made_private),
         ).once
-        mark_as_private.call
+        subject.call
         expect(collection.cached_inheritance['private']).to be_truthy
       end
     end

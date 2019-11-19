@@ -90,10 +90,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   # similar method exists in collections_controller
   def restore_permissions
-    restore_permission = RestorePermission.new(object: @item, restored_by: current_user)
-    restore_permission.call
+    RestorePermission.call(
+      object: @item,
+      restored_by: current_user,
+    )
     render jsonapi: @item.reload
-    # no error case needed... ?
   end
 
   private

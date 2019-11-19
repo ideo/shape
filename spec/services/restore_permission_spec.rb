@@ -5,8 +5,7 @@ RSpec.describe RestorePermission, type: :service do
   let(:organization) { create(:organization) }
   let!(:collection) { create(:collection, add_editors: [user]) }
   let!(:child) { create(:collection, parent_collection: collection, add_editors: [user]) }
-
-  let!(:restore_permission) do
+  subject do
     RestorePermission.new(
       object: child,
       restored_by: user,
@@ -20,7 +19,7 @@ RSpec.describe RestorePermission, type: :service do
           hash_including(action: :permissions_restored),
         ).once
         expect(child.cached_inheritance['private']).to be_falsy
-        restore_permission.call
+        subject.call
       end
     end
   end
