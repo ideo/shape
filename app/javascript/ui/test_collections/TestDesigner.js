@@ -318,8 +318,8 @@ class TestDesigner extends React.Component {
   }
 
   get canAddNewIdea() {
-    if (!this.ideasCollection) return false
-    console.log('this', this.ideasCollection.collection_cards.length)
+    // e.g. for in-collection test
+    if (!this.ideasCollection) return true
     return this.ideasCollection.collection_cards.length < 6
   }
 
@@ -332,7 +332,7 @@ class TestDesigner extends React.Component {
   }) => {
     const { collection } = this.props
     const parent = parentCollection ? parentCollection : collection
-    if (!this.canAddNewIdea) {
+    if (sectionType === 'ideas' && !this.canAddNewIdea) {
       collection.apiStore.uiStore.alert(
         'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
       )
