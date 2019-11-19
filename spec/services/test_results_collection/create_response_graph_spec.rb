@@ -40,6 +40,15 @@ RSpec.describe TestResultsCollection::CreateResponseGraph, type: :service do
     )
   end
 
+  it 'links data item to idea datasets' do
+    subject
+    expect(test_collection.idea_items.size).to eq(1)
+    test_collection.idea_items.each do |idea|
+      idea_dataset = data_item.datasets.find { |dataset| dataset.group_by_type_id('Item').to_i == idea.id }
+      expect(idea_dataset).not_to be_nil
+    end
+  end
+
   context 'with test audiences' do
     let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
 

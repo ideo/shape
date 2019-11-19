@@ -81,6 +81,7 @@ module TestResultsCollection
       end
     end
 
+    # Datasets of each idea that get attached to master results
     def create_all_ideas_datasets
       item.parent.idea_items.each do |idea|
         item.create_idea_question_dataset(
@@ -90,6 +91,7 @@ module TestResultsCollection
       end
     end
 
+    # Dataset for an idea that show up in idea collection
     def create_idea_datasets
       item.create_idea_question_dataset(
         idea: idea,
@@ -97,6 +99,7 @@ module TestResultsCollection
       )
     end
 
+    # Dataset for each response - idea combination
     def create_survey_response_idea_datasets
       survey_response.test_collection.idea_items.each do |idea|
         item.create_survey_response_idea_dataset(

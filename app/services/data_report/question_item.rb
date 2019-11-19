@@ -159,7 +159,17 @@ module DataReport
     end
 
     def group_by_idea_id
-      group_by_type_id('Item')
+      return @group_by_idea_id unless @group_by_idea_id.nil?
+
+      idea_id = group_by_type_id('Item')
+
+      # Only group by idea if this question is in the ideas section
+      # because answers outside of that section aren't tagged with an idea_id
+      # so we wouldn't want to scope the dataset on them
+      return if idea_id.blank? ||
+                !question_item.parent_collection_card.ideas?
+
+      @group_by_idea_id = idea_id
     end
 
     def survey_answers
