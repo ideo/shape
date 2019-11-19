@@ -167,6 +167,27 @@ RSpec.describe Roles::MassRemove, type: :service do
           mass_remove.call
         end
 
+        context 'when it should create activities and notifications' do
+          describe 'removed editor' do
+            let!(:role_name) { Role::EDITOR.to_s }
+            it 'add activities with shared and removed_editor activity' do
+              expect(ActivityAndNotificationBuilder).to receive(:call).with(
+                hash_including(action: :removed_editor),
+              ).once
+              mass_remove.call
+            end
+          end
+          describe 'removed viewer' do
+            let!(:role_name) { Role::VIEWER.to_s }
+            it 'add activities with shared and added_member activity' do
+              expect(ActivityAndNotificationBuilder).to receive(:call).with(
+                hash_including(action: :removed_viewer),
+              ).once
+              mass_remove.call
+            end
+          end
+        end
+
         context 'with propagate_to_children true' do
           it 'still should not call ModifyChildrenRolesWorker' do
             expect(ModifyChildrenRolesWorker).not_to receive(:perform_async)
