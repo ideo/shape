@@ -20,7 +20,8 @@ class CollectionUpdater < SimpleService
           @collection.update_test_template_instance_types!
         end
       end
-      if @collection.saved_change_to_collection_to_test_id
+      if @collection.saved_change_to_collection_to_test_id &&
+         @collection.is_a?(Collection::TestCollection)
         @collection.hide_or_show_section_questions!
       end
 
