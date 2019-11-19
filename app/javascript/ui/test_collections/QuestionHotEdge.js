@@ -7,9 +7,12 @@ import { uiStore } from '~/stores'
 
 const HotEdge = styled.div`
   height: 0;
-  margin-left: -14px;
+  margin-left: -15px;
   position: relative;
-  top: ${props => (props.lastCard ? -30 : -20)}px;
+  top: ${props => {
+    if (props.noCard) return 0
+    return props.lastCard ? -30 : -20
+  }}px;
   width: calc(100% + 42px);
   z-index: ${v.zIndex.floatOverContent};
 
@@ -29,18 +32,25 @@ const HotEdgeVisuals = styled.div`
 const VisualBar = styled.div`
   background-color: ${props => props.theme.hotEdge};
   border-radius: 5px;
-  height: 10px;
-  left: 15px;
+  height: ${props => (props.noCard ? 2 : 10)}px;
+  border-bottom: ${props => {
+    if (props.noCard) return `5px solid ${props.theme.hotEdge}`
+  }};
   position: absolute;
-  top: 20px;
-  width: calc(100% - 42px);
+  top: ${props => (props.noCard ? 22 : 20)}px;
+  width: calc(100% - ${props => (props.noCard ? 60 : 42)}px);
+  left: ${props => (props.noCard ? 25 : 15)}px;
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    left: ${props => (props.noCard ? 35 : 15)}px;
+  }
 `
+
 const RoundAddButton = styled.button`
   background-color: ${props => props.theme.hotEdge};
   border-radius: 50%;
   color: white;
   height: 32px;
-  left: calc(50% - 16px);
+  left: calc(50% - ${props => (props.noCard ? 26 : 16)}px);
   position: absolute;
   top: 10px;
   width: 32px;
@@ -84,7 +94,7 @@ class QuestionHotEdge extends React.Component {
 
   render() {
     return (
-      <HotEdge lastCard={this.props.lastCard}>
+      <HotEdge noCard={this.props.noCard} lastCard={this.props.lastCard}>
         <HotAreaButton
           data-cy="QuestionHotEdgeButton"
           onClick={this.handleAdd}
@@ -93,8 +103,8 @@ class QuestionHotEdge extends React.Component {
           onFocus={this.handleMouseOver}
           onBlur={this.handleMouseOut}
         />
-        <HotEdgeVisuals showing={this.state.showing}>
-          <VisualBar />
+        <HotEdgeVisuals showing={this.props.noCard || this.state.showing}>
+          <VisualBar noCard={this.props.noCard} />
           <RoundAddButton onClick={this.handleAdd}>
             <PlusIcon />
           </RoundAddButton>
@@ -106,19 +116,11 @@ class QuestionHotEdge extends React.Component {
 QuestionHotEdge.propTypes = {
   onAdd: PropTypes.func.isRequired,
   lastCard: PropTypes.bool,
-}
-QuestionHotEdge.defaultProps = {
-  lastCard: false,
-}
-
-export default QuestionHotEdge
-
-QuestionHotEdge.propTypes = {
-  onAdd: PropTypes.func.isRequired,
-  lastCard: PropTypes.bool,
   noCard: PropTypes.bool,
 }
 QuestionHotEdge.defaultProps = {
   lastCard: false,
   noCard: false,
 }
+
+export default QuestionHotEdge
