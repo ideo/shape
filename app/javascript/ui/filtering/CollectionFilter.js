@@ -3,11 +3,31 @@ import { Flex } from 'reflexbox'
 import { computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
+import styled from 'styled-components'
 
 import { apiStore, uiStore } from '~/stores'
 import FilterBar from './FilterBar'
-import FilterMenu from './FilterMenu'
+import FilterMenu, { FilterIconHolder } from './FilterMenu'
 import FilterSearchModal from './FilterSearchModal'
+import v from '~/utils/variables'
+
+export const SubmissionsFilterPositioner = styled.div`
+  left: 0;
+  position: absolute;
+  right: 215px;
+  top: 10px;
+  z-index: ${v.zIndex.pageHeader};
+
+  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+    right: -20px;
+    left: 0;
+    top: 34px;
+  }
+
+  ${FilterIconHolder} {
+    margin-top: 7px !important;
+  }
+`
 
 @observer
 class CollectionFilter extends React.Component {

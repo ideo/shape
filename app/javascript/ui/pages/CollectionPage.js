@@ -8,6 +8,9 @@ import { animateScroll as scroll } from 'react-scroll'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+import CollectionFilter, {
+  SubmissionsFilterPositioner,
+} from '~/ui/filtering/CollectionFilter'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
@@ -423,8 +426,14 @@ class CollectionPage extends React.Component {
     }
 
     return (
-      <div>
+      <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
+        <SubmissionsFilterPositioner>
+          <CollectionFilter
+            collection={submissions_collection}
+            canEdit={collection.can_edit_content}
+          />
+        </SubmissionsFilterPositioner>
         <CollectionGrid
           {...gridSettings}
           loadCollectionCards={this.loadSubmissionsCollectionCards}
