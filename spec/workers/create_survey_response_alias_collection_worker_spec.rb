@@ -45,7 +45,18 @@ RSpec.describe CreateSurveyResponseAliasCollectionWorker, type: :worker do
     it 'updates master TestResultsCollection collection' do
       prev_updated_at = test_results_collection.updated_at
       subject.perform(survey_response.id)
+
       expect(test_results_collection.reload.updated_at).to be > prev_updated_at
+    end
+
+    it 'updates test result collections inside the master TestResultsCollection collection' do
+      prev_updated_at = test_results_collection.updated_at
+      collections_to_update = Collection::TestResultsCollection.in_collection(test_results_collection)
+      subject.perform(survey_response.id)
+
+      collections_to_update.each do |collection|
+        expect(collection.updated_at > prev_updated_at).to be true
+      end
     end
   end
 end
