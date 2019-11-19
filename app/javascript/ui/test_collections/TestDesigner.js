@@ -419,11 +419,9 @@ class TestDesigner extends React.Component {
     lastCard = false,
   } = {}) {
     if (!this.canEdit) return
-    const leftHandedCard = sectionType === 'intro' || sectionType === 'ideas'
     return (
       <QuestionHotEdge
         lastCard={lastCard}
-        leftHandedCard={leftHandedCard}
         onAdd={this.handleNew({ card, sectionType, addBefore })}
       />
     )

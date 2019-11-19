@@ -84,10 +84,7 @@ class QuestionHotEdge extends React.Component {
 
   render() {
     return (
-      <HotEdge
-        lastCard={this.props.lastCard}
-        leftHandedCard={this.props.leftHandedCard}
-      >
+      <HotEdge lastCard={this.props.lastCard}>
         <HotAreaButton
           data-cy="QuestionHotEdgeButton"
           onClick={this.handleAdd}
@@ -109,11 +106,9 @@ class QuestionHotEdge extends React.Component {
 QuestionHotEdge.propTypes = {
   onAdd: PropTypes.func.isRequired,
   lastCard: PropTypes.bool,
-  leftHandedCard: PropTypes.bool,
 }
 QuestionHotEdge.defaultProps = {
   lastCard: false,
-  leftHandedCard: false,
 }
 
 export default QuestionHotEdge
