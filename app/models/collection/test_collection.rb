@@ -265,11 +265,15 @@ class Collection
         end
       end
       # standalone tests otherwise don't really have any restrictions
-      return true unless collection_to_test_id.present?
+      return true unless collection_to_test.present?
 
-      # lastly -- make sure there is not another live in-collection test for the same collection
-      # TODO: should we let the client know if they already have a live in-collection test?
-      collection_to_test.live_test_collection.blank?
+      # lastly, make sure there is not another live in-collection test for the same collection
+      if collection_to_test.live_test_collection.present?
+        errors.add(:base, 'You already have another test running on this same collection. Please close that one before proceeding.')
+        return false
+      end
+
+      true
     end
 
     def submission_test_launchable?
@@ -464,11 +468,21 @@ class Collection
 
     def hide_or_show_section_questions!
       hidden = collection_to_test_id.present? ? true : false
-      question_cards_from_sections(%i[intro outro]).update_all(
-        hidden: hidden,
-      )
+      conditions = CollectionCard.all
+      if hidden
+        conditions = CollectionCard.joins(:item)
+                                   .where.not(
+                                     Item.arel_table[:question_type].eq(:question_finish),
+                                   )
+      end
+
+      question_cards_from_sections(%i[intro outro])
+        .merge(conditions)
+        .update_all(
+          hidden: hidden,
+        )
       primary_collection_cards.ideas_collection_card.update(
-        hidden: hidden
+        hidden: hidden,
       )
     end
 
@@ -563,11 +577,7 @@ class Collection
 
     def question_cards_from_sections(section_names)
       primary_collection_cards.where(
-        CollectionCard.arel_table[:section_type].in(
-          section_names.map do |section_name|
-            CollectionCard.section_types[section_name]
-          end,
-        ),
+        CollectionCard.arel_table[:section_type].in(section_names),
       )
     end
 
@@ -581,7 +591,7 @@ class Collection
         record: Collection.build_ideas_collection,
       )
       first_media_item = items.where(
-        type: ['Item::FileItem', 'Item::LinkItem', 'Item::VideoItem']
+        type: ['Item::FileItem', 'Item::LinkItem', 'Item::VideoItem'],
       ).first
       first_description_item = items.question_description.first
 
@@ -606,10 +616,10 @@ class Collection
       end
 
       primary_collection_cards.update_all(
-        section_type: :ideas
+        section_type: :ideas,
       )
       items.question_finish.parent_collection_card.update(
-        section_type: :outro
+        section_type: :outro,
       )
     end
 
@@ -617,11 +627,7 @@ class Collection
 
     def question_items_from_sections(section_names)
       question_items.joins(:parent_collection_card).where(
-        CollectionCard.arel_table[:section_type].in(
-          section_names.map do |section_name|
-            CollectionCard.section_types[section_name]
-          end,
-        ),
+        CollectionCard.arel_table[:section_type].in(section_names),
       )
     end
 

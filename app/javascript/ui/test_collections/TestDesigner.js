@@ -295,7 +295,7 @@ class TestDesigner extends React.Component {
     })
   }
 
-  handleTestTypeChange = async e => {
+  handleTestTypeChange = e => {
     const { collection } = this.props
     const { collectionToTest } = this.state
     const { value } = e.target

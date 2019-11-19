@@ -14,7 +14,6 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
 
   load_resource :question_answer, only: %i[update]
   def update
-    p question_answer_params
     if @question_answer.update(question_answer_params)
       render jsonapi: @question_answer
     else

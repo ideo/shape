@@ -9,23 +9,23 @@ class TestCollectionCardsForSurvey < SimpleService
   end
 
   def call
-    initialize_idea_cards
-    collect_complete_cards_for_section(:intro)
-    collect_idea_cards
-    collect_complete_cards_for_section(:outro)
+    if @test_collection.collection_to_test.present?
+      collect_complete_cards_for_section(:ideas)
+      @cards += finish_survey_card
+    else
+      randomize_idea_cards
+      collect_complete_cards_for_section(:intro)
+      collect_idea_cards
+      collect_complete_cards_for_section(:outro)
+    end
     @cards
   end
 
   private
 
-  def initialize_idea_cards
-    if @test_collection.collection_to_test.present?
-      # just collect "one idea" to be iterated over
-      @idea_cards = [CollectionCard.new]
-    else
-      # simple enough way to randomize?
-      @idea_cards = @test_collection.idea_cards.visible.shuffle
-    end
+  def randomize_idea_cards
+    # simple enough way to randomize?
+    @idea_cards = @test_collection.idea_cards.visible.shuffle
   end
 
   def collect_idea_cards
@@ -54,5 +54,13 @@ class TestCollectionCardsForSurvey < SimpleService
       .where(section_type: section_type)
       .includes(:item)
       .reject { |card| card.item&.question_item_incomplete? }
+  end
+
+  def finish_survey_card
+    # returns an array so we can join to our @cards array
+    collection_cards
+      .where(section_type: :outro)
+      .joins(:item)
+      .where(Item.arel_table[:question_type].eq(:question_finish))
   end
 end

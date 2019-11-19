@@ -733,10 +733,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   checkLaunchability() {
     if (!this.can_edit_content || !this.launchable) {
       // TODO: More specific messaging around why e.g. if this is a submission template...
-      let message = 'Only editors are allowed to launch the test.'
-      if (this.is_submission_box_template_test) {
-        message =
-          'You must close any other live tests before launching this one.'
+      let message =
+        'You must close any other live tests before launching this one.'
+      if (this.is_inside_a_submission) {
+        message = 'Only editors are allowed to launch the test.'
       }
       this.uiStore.alert(message)
       return false
@@ -841,7 +841,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       let prompt = `You have questions that have not yet been finalized:\n
          ${errorMessages}
         `
-      if (_.includes(prompt, 'Test audiences')) {
+      if (
+        _.includes(prompt, 'Test audiences') ||
+        _.includes(prompt, 'already have')
+      ) {
         prompt = `Test unable to launch:\n
            ${errorMessages}
           `

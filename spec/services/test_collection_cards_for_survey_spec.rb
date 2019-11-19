@@ -43,12 +43,13 @@ RSpec.describe TestCollectionCardsForSurvey, type: :service do
         test_collection.update(collection_to_test: collection_to_test)
       end
 
-      it 'only collects the idea section once' do
-        sections = ['intro']
-        # does not collect ideas cards x2
-        sections += ['ideas'] * 5
-        sections += ['outro'] * 2
+      it 'only collects the idea section, and only once' do
+        # collects ideas cards once
+        sections = ['ideas'] * 5
+        # just the single finish card
+        sections += ['outro']
         expect(survey_cards.map(&:section_type)).to eq(sections)
+        expect(survey_cards.last.card_question_type).to eq('question_finish')
       end
     end
   end
