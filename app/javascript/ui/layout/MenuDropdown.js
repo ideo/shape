@@ -25,33 +25,31 @@ const SubmenuListItem = styled.li`
   }
 `
 
-const DropdownSpacer = styled.li`
+const DropdownSpacer = styled.ul`
   padding: 5px;
 `
 
-class SubmenuDropdown extends React.Component {
-  renderDropdownItems = item => {
-    const { isHome, handleScrollToContent } = this.props
-    const { label } = item
-    const props =
-      label === 'Overview'
-        ? { onClick: () => handleScrollToContent(isHome) }
-        : { href: '/product/feedback' }
-    return (
-      <SubmenuListItem>
-        <NavLink {...props} key={label}>
-          {label}
-        </NavLink>
-      </SubmenuListItem>
-    )
-  }
+const renderDropdownItems = (item, isHome, handleScrollToContent) => {
+  const { label } = item
+  const props =
+    label === 'Overview'
+      ? { onClick: () => handleScrollToContent(isHome) }
+      : { href: '/product/feedback' }
+  return (
+    <SubmenuListItem key={label}>
+      <NavLink {...props}>{label}</NavLink>
+    </SubmenuListItem>
+  )
+}
 
-  render() {
-    const { items } = this.props
-    return (
-      <SubmenuList>{items.map(i => this.renderDropdownItems(i))}</SubmenuList>
-    )
-  }
+const SubmenuDropdown = ({ items, isHome, handleScrollToContent }) => {
+  return (
+    <SubmenuList>
+      {items.map(item =>
+        renderDropdownItems(item, isHome, handleScrollToContent)
+      )}
+    </SubmenuList>
+  )
 }
 
 SubmenuDropdown.propTypes = {
@@ -60,26 +58,20 @@ SubmenuDropdown.propTypes = {
   handleScrollToContent: PropTypes.func.isRequired,
 }
 
-class MenuDropdown extends React.Component {
-  render() {
-    const { items, isHome, handleScrollToContent } = this.props
-
-    return (
-      <MenuList>
-        <MenuListItem>
-          <NavLink onClick={() => handleScrollToContent(isHome)}>
-            Product
-          </NavLink>
-          <DropdownSpacer />
-          <SubmenuDropdown
-            items={items}
-            isHome={isHome}
-            handleScrollToContent={handleScrollToContent}
-          />
-        </MenuListItem>
-      </MenuList>
-    )
-  }
+const MenuDropdown = ({ items, isHome, handleScrollToContent }) => {
+  return (
+    <MenuList>
+      <MenuListItem>
+        <NavLink onClick={() => handleScrollToContent(isHome)}>Product</NavLink>
+        <DropdownSpacer />
+        <SubmenuDropdown
+          items={items}
+          isHome={isHome}
+          handleScrollToContent={handleScrollToContent}
+        />
+      </MenuListItem>
+    </MenuList>
+  )
 }
 
 MenuDropdown.propTypes = {
