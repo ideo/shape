@@ -81,7 +81,7 @@ const OuterContainer = styled.div`
 `
 
 const EmptySectionHotEdgeWrapper = styled.div`
-  background: ${v.colors.primaryMedium};
+  background: ${props => props.theme.borderColorEditing};
   height: 48px;
   width: 354px;
   border-radius: 7px;
