@@ -35,10 +35,10 @@ RSpec.describe TestCollection::ResponseSearchKeys, type: :service do
         org_question_type = answer.question.question_type
       end
       answer_vals.map do |val|
+        # always include the one without the idea
+        keys << "test_#{test_collection.id}_question_#{answer.question.id}_answer_#{val}"
         if answer.idea_id.present?
           keys << "test_#{test_collection.id}_idea_#{answer.idea_id}_question_#{answer.question.id}_answer_#{val}"
-        else
-          keys << "test_#{test_collection.id}_question_#{answer.question.id}_answer_#{val}"
         end
         keys << "organization_#{test_collection.organization_id}_#{org_question_type}_answer_#{val}"
       end
@@ -46,10 +46,10 @@ RSpec.describe TestCollection::ResponseSearchKeys, type: :service do
     keys
   end
   let(:expected_keys) do
-    expected_keys_without_audience +
+    (expected_keys_without_audience +
       expected_keys_without_audience.map do |key|
         "#{key}_audience_#{test_audience.id}"
-      end
+      end).uniq.sort
   end
   subject do
     TestCollection::ResponseSearchKeys.call(
@@ -59,7 +59,7 @@ RSpec.describe TestCollection::ResponseSearchKeys, type: :service do
 
   describe '#call' do
     it 'returns keys for all graphable questions' do
-      expect(subject).to match_array(expected_keys)
+      expect(subject).to eq(expected_keys)
     end
   end
 end
