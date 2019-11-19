@@ -100,7 +100,6 @@ class TestQuestion extends React.Component {
       numberOfQuestions,
       testStatus,
       apiStore,
-      hideMedia,
       handleFocus,
     } = this.props
     const { record } = card
@@ -142,7 +141,6 @@ class TestQuestion extends React.Component {
             card={card}
             parent={parent}
             canEdit={canEdit}
-            hideMedia={hideMedia}
             handleFocus={handleFocus}
           />
         )
@@ -245,7 +243,6 @@ TestQuestion.propTypes = {
   numberOfQuestions: PropTypes.number,
   question_choices: MobxPropTypes.arrayOrObservableArray,
   testStatus: PropTypes.oneOf(['draft', 'live', 'closed']),
-  hideMedia: PropTypes.bool,
 }
 TestQuestion.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -259,7 +256,6 @@ TestQuestion.defaultProps = {
   canEdit: false,
   numberOfQuestions: null,
   question_choices: [],
-  hideMedia: false,
   handleFocus: () => true,
   testStatus: 'draft',
 }

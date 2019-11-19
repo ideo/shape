@@ -112,3 +112,13 @@ QuestionHotEdge.defaultProps = {
 }
 
 export default QuestionHotEdge
+
+QuestionHotEdge.propTypes = {
+  onAdd: PropTypes.func.isRequired,
+  lastCard: PropTypes.bool,
+  noCard: PropTypes.bool,
+}
+QuestionHotEdge.defaultProps = {
+  lastCard: false,
+  noCard: false,
+}
