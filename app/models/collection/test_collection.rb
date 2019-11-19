@@ -94,6 +94,7 @@ class Collection
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
     after_update :touch_test_results_collection, if: :saved_change_to_test_status?
+    after_update :update_ideas_collection, if: :saved_change_to_test_show_media?
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
     after_commit :close_test_after_archive, if: :archived_on_previous_save?
 
@@ -377,6 +378,10 @@ class Collection
 
     def touch_test_results_collection
       test_results_collection.try(:touch)
+    end
+
+    def update_ideas_collection
+      ideas_collection&.update(test_show_media: test_show_media)
     end
 
     def aasm_event_failed(event, current_state = '')

@@ -164,13 +164,13 @@ describe('TestDesigner', () => {
     describe('handleQuestionFocus', () => {
       beforeEach(() => {
         // Clear mock calls so we can isolate them to our test
-        props.collection.apiStore.uiStore.confirm.mockClear()
+        props.uiStore.confirm.mockClear()
         instance = wrapper.instance()
       })
 
       it('prompts user when editing a question', () => {
         instance.handleQuestionFocus()
-        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+        expect(props.uiStore.confirm).toHaveBeenCalledWith({
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
@@ -183,7 +183,7 @@ describe('TestDesigner', () => {
       describe('if confirm is clicked', () => {
         let confirmCalls
         beforeEach(() => {
-          confirmCalls = props.collection.apiStore.uiStore.confirm.mock.calls
+          confirmCalls = props.uiStore.confirm.mock.calls
         })
 
         it('does not prompt (for an hour)', () => {
@@ -192,16 +192,14 @@ describe('TestDesigner', () => {
           confirmCalls[0][0].onConfirm()
           instance.handleQuestionFocus()
           expect(confirmCalls.length).toEqual(1)
-          expect(
-            props.collection.apiStore.uiStore.confirm
-          ).toHaveBeenCalledTimes(1)
+          expect(props.uiStore.confirm).toHaveBeenCalledTimes(1)
         })
       })
 
       describe('if cancel is clicked', () => {
         let confirmCalls
         beforeEach(() => {
-          confirmCalls = props.collection.apiStore.uiStore.confirm.mock.calls
+          confirmCalls = props.uiStore.confirm.mock.calls
         })
 
         it('continues to prompt', () => {
@@ -211,9 +209,7 @@ describe('TestDesigner', () => {
           instance.handleQuestionFocus()
           // Simulate clicking 'cancel'
           confirmCalls[1][0].onCancel()
-          expect(
-            props.collection.apiStore.uiStore.confirm
-          ).toHaveBeenCalledTimes(2)
+          expect(props.uiStore.confirm).toHaveBeenCalledTimes(2)
         })
       })
     })

@@ -8,7 +8,9 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import QuestionLeftSide from '~/ui/test_collections/QuestionLeftSide'
+import QuestionLeftSide, {
+  LeftSideContainer,
+} from '~/ui/test_collections/QuestionLeftSide'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -77,6 +79,13 @@ const OuterContainer = styled.div`
       margin-left: 0px;
     }
   }
+`
+
+const EmptySectionHotEdgeWrapper = styled.div`
+  background: ${props => props.theme.borderColorEditing};
+  height: 48px;
+  width: 354px;
+  border-radius: 7px;
 `
 
 const userEditableQuestionType = questionType => {
@@ -274,9 +283,14 @@ class TestDesigner extends React.Component {
   }
 
   handleToggleShowMedia = e => {
+    const { ideasCollection } = this
     const { collection } = this.props
     this.confirmEdit(() => {
       collection.test_show_media = !collection.test_show_media
+      if (ideasCollection) {
+        // simulate backend update that will happen in tandem
+        ideasCollection.test_show_media = collection.test_show_media
+      }
       collection.save()
     })
   }
@@ -361,9 +375,9 @@ class TestDesigner extends React.Component {
   // A method specifically designed for adding new idea cards
   // All other cards can be created using createNewQuestionCard
   createNewIdea = async ({ order }) => {
-    const { collection } = this.props
+    const { uiStore } = this.props
     if (this.reachedNumIdeasLimit) {
-      collection.apiStore.uiStore.alert(
+      uiStore.alert(
         `To ensure quality responses, a single test is limited to a maximum of ${NUM_IDEAS_LIMIT} ideas total. To evaluate more ideas, please create an additional test.`
       )
       return
@@ -391,14 +405,8 @@ class TestDesigner extends React.Component {
     questionType = '',
     parentCollection = null,
   }) => {
-    const { collection, apiStore, uiStore } = this.props
+    const { collection, apiStore } = this.props
     const parent = parentCollection ? parentCollection : collection
-    if (!this.canAddNewIdea) {
-      uiStore.alert(
-        'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
-      )
-      return
-    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
@@ -426,11 +434,15 @@ class TestDesigner extends React.Component {
     lastCard = false,
   } = {}) {
     if (!this.canEdit) return
-    const leftHandedCard = sectionType === 'intro' || sectionType === 'ideas'
+    let noCard = false
+    if (card && !card.hasOwnProperty('id')) {
+      noCard = true
+    }
+
     return (
       <QuestionHotEdge
+        noCard={noCard}
         lastCard={lastCard}
-        leftHandedCard={leftHandedCard}
         onAdd={this.handleNew({ card, sectionType, addBefore })}
       />
     )
@@ -531,7 +543,6 @@ class TestDesigner extends React.Component {
             this.renderHotEdge({ card, sectionType, addBefore: true })}
           <TestQuestion
             editing
-            hideMedia={!collection.test_show_media}
             parent={questionParent}
             card={questionCard}
             order={questionCard.order}
@@ -556,12 +567,15 @@ class TestDesigner extends React.Component {
           </LargerH3>
         </Section>
         {cards.length === 0 && (
-          <TestQuestionFlexWrapper className="card">
-            {this.renderHotEdge({
-              card: { order: 0 },
-              sectionType,
-              addBefore: true,
-            })}
+          <TestQuestionFlexWrapper>
+            <LeftSideContainer></LeftSideContainer>
+            <EmptySectionHotEdgeWrapper>
+              {this.renderHotEdge({
+                card: { order: 0 },
+                sectionType,
+                addBefore: true,
+              })}
+            </EmptySectionHotEdgeWrapper>
           </TestQuestionFlexWrapper>
         )}
         {cards.map((card, i) => {

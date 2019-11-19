@@ -77,6 +77,23 @@ describe Collection::TestCollection, type: :model do
           expect(record.can_edit?(user)).to be true
         end
       end
+
+      describe '#update_ideas_collection' do
+        let(:test_collection) do
+          create(:test_collection, :completed, parent_collection: test_parent, roles_anchor_collection: test_parent)
+        end
+        let(:ideas_collection) { test_collection.ideas_collection }
+
+        it 'should update the ideas collection to match test_show_media setting' do
+          expect(test_collection.test_show_media).to be true
+          expect(ideas_collection.test_show_media).to be true
+          expect {
+            test_collection.update(test_show_media: false)
+            ideas_collection.reload
+          }.to change(ideas_collection, :test_show_media)
+          expect(ideas_collection.test_show_media).to be false
+        end
+      end
     end
 
     describe '#add_test_tag' do
