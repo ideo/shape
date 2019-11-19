@@ -14,7 +14,7 @@ module TestCollection
     def call
       add_non_repeating_question_items
       add_idea_question_items
-      @keys.sort
+      @keys.uniq.sort
     end
 
     private
@@ -52,7 +52,16 @@ module TestCollection
         answer_key_attrs: answer_key_attrs,
       )
 
-      # Generate keys without audience
+      # Generate keys without idea, with audience
+      generate_keys_for_question(
+        question: question,
+        answer: answer,
+        answer_key_attrs: answer_key_attrs.merge(
+          audience_id: test_audience_id,
+        ),
+      )
+
+      # Generate keys with idea, without audience
       generate_keys_for_question(
         question: question,
         answer: answer,
@@ -60,7 +69,7 @@ module TestCollection
         answer_key_attrs: answer_key_attrs,
       )
 
-      # Generate keys with audience
+      # Generate keys with audience and idea
       generate_keys_for_question(
         question: question,
         answer: answer,
