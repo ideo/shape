@@ -1,4 +1,4 @@
-class CardMover
+class CardMover < SimpleService
   attr_reader :errors
   attr_reader :moving_cards
 
