@@ -7,11 +7,12 @@ FactoryBot.define do
     trait :fully_answered do
       status :completed
       after(:build) do |survey_response|
-        survey_response.test_collection.question_items.answerable.each do |question_item|
+        SurveyResponseValidation.new(survey_response).answerable_ids.each do |question_id, idea_id|
           survey_response.question_answers << build(
             :question_answer,
             survey_response: survey_response,
-            question: question_item,
+            question_id: question_id,
+            idea_id: idea_id,
           )
         end
       end

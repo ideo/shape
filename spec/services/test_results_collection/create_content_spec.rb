@@ -18,6 +18,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     ].each do |interactor_klass|
       allow(interactor_klass).to receive(:call!).and_call_original
     end
+    allow(TestResultsCollection::CreateCollection).to receive(:call).and_call_original
 
     # create the TestResultsCollection for the content to appear in
     TestResultsCollection::CreateCollection.call(
@@ -112,7 +113,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
 
   context 'with multiple ideas' do
     let!(:second_idea_card) do
-      create(:collection_card_video, parent: test_collection.ideas_collection)
+      create(:collection_card_video, order: 1, parent: test_collection.ideas_collection)
     end
     let(:second_idea) { second_idea_card.item }
 

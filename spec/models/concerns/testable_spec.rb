@@ -4,6 +4,7 @@ describe Testable, type: :concern do
   context 'with scored collections' do
     let(:collection) { create(:collection, :submission) }
     let(:test_collection) { create(:test_collection, collection_to_test: collection, test_status: :live) }
+    let(:idea) { test_collection.idea_items.first }
     let(:useful_question) { test_collection.question_items.question_useful.first }
     let(:clarity_question) { test_collection.question_items.question_clarity.first }
     let(:cat_sat_question) { test_collection.question_items.question_category_satisfaction.first }
@@ -13,12 +14,11 @@ describe Testable, type: :concern do
     before do
       collection.submission_attrs['launchable_test_id'] = test_collection.id
       collection.save
-      clarity_question.update(question_type: :question_clarity)
       survey_responses.each_with_index do |sr, i|
-        sr.question_answers.create(question: useful_question, answer_number: i + 1)
-        sr.question_answers.create(question: clarity_question, answer_number: i + 2)
-        sr.question_answers.create(question: cat_sat_question, answer_number: i + 1)
-        sr.question_answers.create(question: excitement_question, answer_number: i + 1)
+        sr.question_answers.create(question: useful_question, answer_number: i + 1, idea_id: idea.id)
+        sr.question_answers.create(question: clarity_question, answer_number: i + 2, idea_id: idea.id)
+        sr.question_answers.create(question: cat_sat_question, answer_number: i + 1, idea_id: idea.id)
+        sr.question_answers.create(question: excitement_question, answer_number: i + 1, idea_id: idea.id)
       end
     end
 

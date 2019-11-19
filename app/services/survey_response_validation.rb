@@ -17,7 +17,7 @@ class SurveyResponseValidation < SimpleService
 
   def answerable_ids
     TestCollectionCardsForSurvey.call(test_collection).map do |card|
-      [card.item.id, card.idea_id] if card.item.answerable?
+      [card.item.id, card.idea_id] if card.item.present? && card.item.answerable?
     end.compact
   end
 end
