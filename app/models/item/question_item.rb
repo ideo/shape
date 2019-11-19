@@ -71,6 +71,11 @@ class Item
       end
     end
 
+    delegate :gives_incentive?,
+             to: :test_collection,
+             prefix: true,
+             allow_nil: true
+
     after_create :create_question_dataset
     after_create :add_default_question_choices,
                  if: :question_choices_customizable?
@@ -80,6 +85,12 @@ class Item
 
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
+
+    after_create :set_price_per_response_on_test_audiences,
+                 if: :test_collection_gives_incentive?
+
+    after_update :set_price_per_response_on_test_audiences,
+                 if: :update_test_audience_price_after_update?
 
     scope :scale_questions, -> {
       where(
@@ -167,6 +178,10 @@ class Item
       else
         {}
       end
+    end
+
+    def test_collection
+      question_idea? ? parent.parent : parent
     end
 
     def question_title_and_description
@@ -367,6 +382,17 @@ class Item
       test_open_responses_collection.update(
         name: "#{content} Responses",
       )
+    end
+
+    def update_test_audience_price_after_update?
+      test_collection_gives_incentive? && saved_change_to_archived?
+    end
+
+    def set_price_per_response_on_test_audiences
+      test_collection.test_audiences.each do |test_audience|
+        test_audience.set_price_per_response_from_audience
+        test_audience.save
+      end
     end
   end
 end

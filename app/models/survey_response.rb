@@ -39,7 +39,7 @@ class SurveyResponse < ApplicationRecord
   delegate :question_items,
            to: :test_collection
 
-  delegate :price_per_response,
+  delegate :price_per_response, :audience,
            to: :test_audience,
            allow_nil: true
 
@@ -82,11 +82,14 @@ class SurveyResponse < ApplicationRecord
     incentive_paid_account_balance
   end
 
-  def amount_earned
-    return 0 if !completed? || !gives_incentive?
+  def potential_incentive
+    return 0 unless gives_incentive?
 
-    # NOTE: incentive amount is currently global, not per test_audience
-    TestAudience.incentive_amount
+    audience.incentive_amount(test_collection.paid_question_items.size)
+  end
+
+  def amount_earned
+    completed ? potential_incentive : 0
   end
 
   def question_answer_created_or_destroyed

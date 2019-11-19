@@ -609,7 +609,7 @@ export const fakeTestAudience = {
   audience: fakeAudience,
   sample_size: 12,
   num_completed_responses: 6,
-  price_per_response: 3.75,
+  min_price_per_response: 3.75,
 }
 export const fakeTestCollection = {
   id: '1',

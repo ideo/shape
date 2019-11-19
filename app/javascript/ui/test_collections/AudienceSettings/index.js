@@ -85,6 +85,9 @@ class AudienceSettings extends React.Component {
   @computed
   get totalPrice() {
     const { audiences, audienceSettings } = this
+    const {
+      testCollection: { numPaidQuestions },
+    } = this.props
     if (!this.showAudienceSettings) return 0
     return _.round(
       audiences
@@ -94,7 +97,7 @@ class AudienceSettings extends React.Component {
           const sampleSize = setting.sample_size
             ? parseInt(setting.sample_size)
             : 0
-          return sampleSize * audience.price_per_response
+          return sampleSize * audience.pricePerResponse(numPaidQuestions)
         })
         .reduce((acc, price) => price + acc, 0),
       2
@@ -252,6 +255,7 @@ class AudienceSettings extends React.Component {
   render() {
     const { uiStore, testCollection } = this.props
     const { apiStore } = this.props
+    const { numPaidQuestions } = testCollection
     const { currentUser } = apiStore
     const currentUserOrganization = currentUser.current_organization
 
@@ -278,6 +282,7 @@ class AudienceSettings extends React.Component {
             onInputChange={this.onInputChange}
             totalPrice={this.totalPriceDollars}
             audiences={this.audiences}
+            numPaidQuestions={numPaidQuestions}
             audienceSettings={this.audienceSettings}
             afterAddAudience={this.afterAddAudience}
             locked={this.locked}

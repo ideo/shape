@@ -89,6 +89,12 @@ class TestQuestion extends React.Component {
     return this.props.parent.gives_incentive
   }
 
+  get potentialIncentive() {
+    if (!this.givesIncentive) return 0
+    const { surveyResponse } = this.props
+    return surveyResponse.potential_incentive
+  }
+
   renderQuestion() {
     const {
       parent,
@@ -196,7 +202,7 @@ class TestQuestion extends React.Component {
       case 'question_welcome':
         return (
           <WelcomeQuestion
-            givesIncentive={this.givesIncentive}
+            potentialIncentive={this.potentialIncentive}
             numberOfQuestions={numberOfQuestions}
             onAnswer={this.handleQuestionAnswer}
           />

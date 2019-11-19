@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_12_190014) do
+ActiveRecord::Schema.define(version: 2019_11_19_202037) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -95,7 +95,7 @@ ActiveRecord::Schema.define(version: 2019_11_12_190014) do
     t.string "criteria"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
+    t.decimal "min_price_per_response", precision: 10, scale: 2, default: "0.0"
     t.integer "global_default"
     t.index ["global_default"], name: "index_audiences_on_global_default"
   end

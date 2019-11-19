@@ -13,7 +13,7 @@ import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Modal from '~/ui/global/modals/Modal'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import TrashIcon from '~/ui/icons/TrashIcon'
-import v, { TARGETED_AUDIENCE_PRICE_PER_RESPONSE } from '~/utils/variables'
+import v, { AUDIENCE_PRICES } from '~/utils/variables'
 import {
   groupCriteriaByGroup,
   getCriterionByName,
@@ -424,7 +424,6 @@ class AddAudienceModal extends React.Component {
 
   render() {
     const numSelectedOptions = this.allSelectedCriteriaOptions.length
-
     return (
       <React.Fragment>
         <Modal
@@ -474,7 +473,7 @@ class AddAudienceModal extends React.Component {
           <Box mt={2} mb={35}>
             <DisplayText>
               The default price per respondent for a custom audience is $
-              {TARGETED_AUDIENCE_PRICE_PER_RESPONSE.toFixed(2)}.
+              {AUDIENCE_PRICES.TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE}.
             </DisplayText>
           </Box>
           <Grid container alignItems="center" style={{ paddingBottom: '32px' }}>

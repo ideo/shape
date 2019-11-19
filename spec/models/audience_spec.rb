@@ -83,4 +83,64 @@ RSpec.describe Audience, type: :model, seed: true do
       expect(all_tags[:interests]).to match_array(%w[fun music])
     end
   end
+
+  describe '#price_per_response' do
+    let!(:all_people) { create(:audience, min_price_per_response: 3.75) }
+    let!(:targeted_audience) { create(:audience, min_price_per_response: 4, interest_list: %w[fun music]) }
+
+    it 'returns correct amount for # of questions' do
+      # $3.75 + ((43 - 10) x $0.12) = $7.71
+      expect(all_people.price_per_response(43)).to eq(7.71)
+      # $4 + ((43 - 10) x $0.12) = $7.96
+      expect(targeted_audience.price_per_response(43)).to eq(7.96)
+    end
+
+    context 'if less than 10 questions' do
+      it 'returns minimum price of 10 questions' do
+        # $3.75 + (10 x $0.12) = $4.95
+        expect(all_people.price_per_response(9)).to eq(4.95)
+        # $4 + (10 x $0.12) = $5.20
+        expect(targeted_audience.price_per_response(9)).to eq(5.2)
+      end
+    end
+
+    context 'if link sharing audience' do
+      before do
+        all_people.update(min_price_per_response: 0)
+      end
+
+      it 'returns 0' do
+        expect(all_people.price_per_response(43)).to eq(0)
+      end
+    end
+  end
+
+  describe '#incentive_per_response' do
+    let!(:all_people) { create(:audience, min_price_per_response: 3.75) }
+    let!(:targeted_audience) { create(:audience, min_price_per_response: 4, interest_list: %w[fun music]) }
+
+    it 'returns correct amount for # of questions' do
+      # $1.75 + ((43 - 10) x $0.10) = $5.05
+      expect(all_people.incentive_per_response(43)).to eq(5.05)
+      expect(targeted_audience.incentive_per_response(43)).to eq(5.05)
+    end
+
+    context 'if less than 10 questions' do
+      it 'returns minimum price of 10 questions' do
+        # $1.75 + (10 x $0.10) = $2.75
+        expect(all_people.incentive_per_response(9)).to eq(2.75)
+        expect(targeted_audience.incentive_per_response(9)).to eq(2.75)
+      end
+    end
+
+    context 'if link sharing audience' do
+      before do
+        all_people.update(min_price_per_response: 0)
+      end
+
+      it 'returns 0' do
+        expect(all_people.incentive_per_response(43)).to eq(0)
+      end
+    end
+  end
 end

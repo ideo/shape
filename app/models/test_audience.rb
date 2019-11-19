@@ -41,7 +41,7 @@ class TestAudience < ApplicationRecord
   before_validation :set_price_per_response_from_audience, on: :create
   after_create :purchase, if: :requires_payment?
 
-  delegate :name, :price_per_response,
+  delegate :name,
            to: :audience,
            prefix: true
 
@@ -66,13 +66,10 @@ class TestAudience < ApplicationRecord
 
   # The absolute minimum we can charge per response and not be losing money
   def self.minimum_price_per_response
-    payout_cost = incentive_amount + Accounting::RecordTransfer.paypal_fee(incentive_amount)
+    min_incentive = Audience::MIN_INCENTIVE_PER_RESPONDENT
+    payout_cost = min_incentive + Accounting::RecordTransfer.paypal_fee(min_incentive)
     stripe_cost = Accounting::RecordTransfer.stripe_fee(payout_cost)
     (payout_cost + stripe_cost).to_f
-  end
-
-  def self.incentive_amount
-    Shape::FEEDBACK_INCENTIVE_AMOUNT
   end
 
   def dataset_display_name
@@ -105,6 +102,10 @@ class TestAudience < ApplicationRecord
     sample_size * price_per_response
   end
 
+  def set_price_per_response_from_audience
+    self.price_per_response = audience&.price_per_response(test_collection.paid_question_items.size)
+  end
+
   private
 
   # This callback only gets called when using PurchaseTestAudience and setting payment_method
@@ -128,10 +129,6 @@ class TestAudience < ApplicationRecord
 
   def requires_payment?
     @network_payment_method.present? && total_price.positive?
-  end
-
-  def set_price_per_response_from_audience
-    self.price_per_response ||= audience&.price_per_response
   end
 
   def price_per_response_greater_than_minimum

@@ -457,6 +457,38 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.collection_cards.length === 0
   }
 
+  get numPaidQuestions() {
+    if (!this.isTestCollection) return 0
+
+    // TODO: I don't like repeating this here, but in order to calculate this quickly on the front-end
+    // it needs to be replicated here and in TestCollectionCardsForSurvey
+    const numNonIdeaCards = this.collection_cards.filter(
+      card =>
+        card.section_type !== 'ideas' &&
+        card.card_question_type !== 'question_finish'
+    ).length
+
+    let numCardsInIdeasSection = 0
+    let numIdeas = 0
+
+    this.collection_cards.forEach(card => {
+      if (card.section_type === 'ideas') {
+        numCardsInIdeasSection += 1
+        if (
+          card.card_question_type === 'ideas_collection' &&
+          card.record.collection_cards
+        ) {
+          numIdeas = card.record.collection_cards.length
+        }
+      }
+    })
+
+    // Total number of cards is all in the non-ideas section (they are only shown once),
+    // plus the number of cards in the ideas section * number of ideas, as they are repeated for each idea
+
+    return numNonIdeaCards + numCardsInIdeasSection * numIdeas
+  }
+
   @action
   addCard(card) {
     this.collection_cards.unshift(card)

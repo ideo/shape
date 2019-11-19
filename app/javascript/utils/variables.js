@@ -1,8 +1,19 @@
 // global vars from Rails application (or undefined, e.g. in a unit test)
-export const FEEDBACK_INCENTIVE_AMOUNT = window.FEEDBACK_INCENTIVE_AMOUNT || 2.5
-export const TARGETED_AUDIENCE_PRICE_PER_RESPONSE =
-  window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE || 2
 export const FREEMIUM_USER_LIMIT = window.FREEMIUM_USER_LIMIT || 5
+
+export const AUDIENCE_PRICES = {
+  MIN_NUM_PAID_QUESTIONS:
+    (window.AUDIENCE_PRICES && window.AUDIENCE_PRICES.MIN_NUM_PAID_QUESTIONS) ||
+    10,
+  TEST_PRICE_PER_QUESTION:
+    (window.AUDIENCE_PRICES &&
+      window.AUDIENCE_PRICES.TEST_PRICE_PER_QUESTION) ||
+    0.12,
+  TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE:
+    (window.AUDIENCE_PRICES &&
+      window.AUDIENCE_PRICES.TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE) ||
+    4.0,
+}
 
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',

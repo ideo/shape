@@ -103,7 +103,7 @@ describe Collection::TestCollection, type: :model do
     end
 
     describe '#setup_link_sharing_test_audience' do
-      let!(:link_sharing_audience) { create(:audience, price_per_response: 0) }
+      let!(:link_sharing_audience) { create(:audience, min_price_per_response: 0) }
       let(:test_audience) { test_collection.test_audiences.first }
 
       it 'should add the test_audience with status of "closed"' do

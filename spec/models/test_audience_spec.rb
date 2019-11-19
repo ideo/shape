@@ -8,7 +8,7 @@ RSpec.describe TestAudience, type: :model do
   end
   let(:test_collection) { create(:test_collection) }
   let(:user) { create(:user) }
-  let(:audience) { create(:audience, price_per_response: 9.99) }
+  let(:audience) { create(:audience, min_price_per_response: 9.99) }
   let!(:test_audience) do
     build(:test_audience,
           audience: audience,
