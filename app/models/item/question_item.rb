@@ -323,6 +323,17 @@ class Item
       )
     end
 
+    def add_default_question_choices
+      return if question_choices.any?
+
+      (0..3).each do |i|
+        question_choices.create(
+          value: i,
+          order: i,
+        )
+      end
+    end
+
     private
 
     def customizable_title_and_description
@@ -338,17 +349,6 @@ class Item
         timeframe: :month,
         chart_type: :bar,
       )
-    end
-
-    def add_default_question_choices
-      return if question_choices.any?
-
-      (0..3).each do |i|
-        question_choices.create(
-          value: i,
-          order: i,
-        )
-      end
     end
 
     def notify_test_design_collection_of_creation?

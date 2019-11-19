@@ -43,6 +43,14 @@ class CollectionCardReplacer
     # the class type may have changed
     @item = @item.becomes(@attrs[:type].constantize)
 
+    if @item.is_a?(Item::QuestionItem)
+      if @item.question_choices_customizable?
+        @item.add_default_question_choices
+      else
+        @item.question_choices.destroy_all
+      end
+    end
+
     # clearing data means removing any existing translated content
     @item.translations.destroy_all
 

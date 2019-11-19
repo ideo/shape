@@ -28,6 +28,11 @@ class CreateSurveyResponseAliasCollectionWorker
   def ping_results_collection
     # real-time update any graphs, etc.
     master_test_results_collection.touch
+    Collection::TestResultsCollection.in_collection(master_test_results_collection).each do |collection|
+      collection.touch
+      CollectionUpdateBroadcaster.call(collection)
+    end
+
     CollectionUpdateBroadcaster.call(master_test_results_collection)
   end
 
