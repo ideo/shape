@@ -4,7 +4,6 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { action } from 'mobx'
 import styled from 'styled-components'
 
-import v from '~/utils/variables'
 import { Checkbox, Radio } from '~/ui/global/styled/forms'
 import { TextInput } from '~/ui/test_collections/shared'
 import TrashIcon from '~/ui/icons/TrashIcon'
@@ -77,8 +76,7 @@ class CustomizableQuestionChoice extends React.Component {
             checked={isChecked}
             onClick={onChange}
             value={choice.value}
-            color={v.colors.commonLight}
-            removePadding
+            classes={{ root: 'remove-padding' }}
           />
         ) : (
           <Checkbox
@@ -87,7 +85,7 @@ class CustomizableQuestionChoice extends React.Component {
             onClick={onChange}
             value={choice.value}
             color="primary"
-            removePadding
+            classes={{ root: 'remove-padding' }}
           />
         )}
         <label
@@ -104,7 +102,7 @@ class CustomizableQuestionChoice extends React.Component {
             onChange={this.handleInputChange}
             type="questionText"
             placeholder={placeholder}
-            value={choice.text}
+            value={choice.text || ''}
             data-cy="CustomizableQuestionTextInput"
             disabled={!editing}
             inline="true"

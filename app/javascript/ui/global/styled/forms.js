@@ -208,16 +208,12 @@ Select.displayName = 'StyledSelect'
 
 /** @component */
 export const Checkbox = styled(MuiCheckbox)`
-  ${props =>
-    props.removePadding &&
-    `
-    && {
-      height: auto;
-      margin-right: 0;
-      vertical-align: middle;
-      width: 28px;
-    }
-  `}
+  &.remove-padding {
+    height: auto;
+    margin-right: 0;
+    vertical-align: middle;
+    width: 28px;
+  }
 
   &.checkbox--error {
     color: ${v.colors.alert};
@@ -233,15 +229,11 @@ export const Checkbox = styled(MuiCheckbox)`
 Checkbox.displayName = 'StyledCheckbox'
 
 export const Radio = styled(MuiRadio)`
-  ${props =>
-    props.removePadding &&
-    `
-    && {
-      height: auto;
-      vertical-align: middle;
-      width: 28px;
-    }
-  `}
+  &.remove-padding {
+    height: auto;
+    vertical-align: middle;
+    width: 28px;
+  }
 
   &.radio--error {
     color: ${v.colors.alert};

@@ -520,7 +520,6 @@ class TestDesigner extends React.Component {
       <Fragment>
         <QuestionLeftSide
           card={questionCard}
-          cardNumber={card.order + 1}
           canEdit={this.canEdit}
           handleSelectChange={this.handleSelectChange}
           handleTrash={this.handleTrash}

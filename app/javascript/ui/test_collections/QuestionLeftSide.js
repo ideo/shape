@@ -3,7 +3,7 @@ import v from '~/utils/variables'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { NamedActionButton } from '~/ui/global/styled/buttons'
-import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
+import { DisplayText } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import PinnedIcon from '~/ui/icons/PinnedIcon'
@@ -37,7 +37,6 @@ const showTrash = (card, canEdit) => {
 const QuestionLeftSide = ({
   card,
   canEdit,
-  cardNumber,
   handleSelectChange,
   handleTrash,
   createNewIdea,
@@ -52,16 +51,12 @@ const QuestionLeftSide = ({
 }) => {
   return (
     <LeftSideContainer>
-      {!card.card_question_type === 'question_idea' && (
-        <NumberListText>{cardNumber}.</NumberListText>
-      )}
       {card.card_question_type === 'question_finish' && (
         <DisplayText>End of Survey</DisplayText>
       )}
-      {card.card_question_type === 'question_idea' && (
+      {ideasCollection && card.card_question_type === 'question_idea' && (
         <IdeaCollectionControls
           collection={ideasCollection}
-          cardNumber={cardNumber}
           canEdit={canEdit}
           handleTrash={handleTrash}
           createNewIdea={createNewIdea}
@@ -112,13 +107,12 @@ QuestionLeftSide.propTypes = {
     section_type: PropTypes.string,
   }).isRequired, // specify or use MobxPropTypes?
   canEdit: PropTypes.bool.isRequired,
-  cardNumber: PropTypes.number.isRequired,
   handleSelectChange: PropTypes.func.isRequired,
   handleTrash: PropTypes.func.isRequired,
   createNewIdea: PropTypes.func.isRequired,
   showMedia: PropTypes.bool.isRequired,
   handleToggleShowMedia: PropTypes.func.isRequired,
-  ideasCollection: MobxPropTypes.objectOrObservableObject.isRequired,
+  ideasCollection: MobxPropTypes.objectOrObservableObject,
   handleSetCurrentIdeaCardIndex: PropTypes.func.isRequired,
   canAddIdeas: PropTypes.bool.isRequired,
   currentIdeaCardIndex: PropTypes.number,
@@ -130,6 +124,7 @@ QuestionLeftSide.defaultProps = {
   currentIdeaCardIndex: 0,
   canAddChoice: false,
   onAddChoice: null,
+  ideasCollection: null,
 }
 
 export default QuestionLeftSide

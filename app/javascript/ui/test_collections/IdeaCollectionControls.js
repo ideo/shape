@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import v from '~/utils/variables'
-import { DisplayText, NumberListText } from '~/ui/global/styled/typography'
+import { DisplayText } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
 import ChevronLeftIcon from '~/ui/icons/ChevronLeftIcon'
@@ -120,14 +120,12 @@ class IdeaCollectionControls extends React.Component {
     const {
       handleTrash,
       showMedia,
-      cardNumber,
       handleToggleShowMedia,
       currentIdeaCardIndex,
       canAddIdeas,
     } = this.props
     return (
       <IdeaCollectionControlsWrapper>
-        <NumberListText>{cardNumber}.</NumberListText>
         <DisplayText>
           <IdeaLabel>Idea</IdeaLabel>
           {canAddIdeas && (
@@ -206,7 +204,6 @@ IdeaCollectionControls.propTypes = {
   showMedia: PropTypes.bool.isRequired,
   handleToggleShowMedia: PropTypes.func.isRequired,
   handleSetCurrentIdeaCardIndex: PropTypes.func.isRequired,
-  cardNumber: PropTypes.number.isRequired,
   currentIdeaCardIndex: PropTypes.number,
 }
 
