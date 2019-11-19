@@ -53,13 +53,20 @@ class QuestionAnswer < ApplicationRecord
       test_results_collection,
       survey_response&.test_audience,
     )
+    lines = answer.answer_text.split("\n")
+    answer_ops = lines.map.with_index do |line, i|
+      last = i == lines.count - 1
+      [
+        { insert: "#{i.zero? ? '“' : ''}#{line}#{last ? '”' : ''}" },
+        { insert: "\n", attributes: { header: 1 } },
+      ]
+    end
     ops =
       [{ insert: test_results_collection.name, attributes: { link: quote_url(test_results_collection) } },
        { insert: "\n" },
        { insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection) } },
        { insert: "\n", attributes: { header: 2 } },
-       { insert: "“#{answer.answer_text}”" },
-       { insert: "\n", attributes: { header: 1 } },
+       *answer_ops.flatten,
        { insert: '- ' },
        { insert: survey_response.respondent_alias, attributes: { link: quote_url(alias_collection) } }]
     if idea.present?
