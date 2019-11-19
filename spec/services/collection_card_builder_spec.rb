@@ -243,7 +243,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
           test_collection.children.each do |record|
             user.add_role(Role::EDITOR, record)
           end
-          allow(TestResultsCollectionUpdateWorker).to receive(:perform_async).and_call_original
+          allow(TestResultsCollection::CreateContentWorker).to receive(:perform_async).and_call_original
         end
 
         context 'when item is a scale question' do
@@ -262,9 +262,9 @@ RSpec.describe CollectionCardBuilder, type: :service do
           end
 
           context 'and test is not live' do
-            it 'does not call TestResultsCollectionUpdateWorker' do
+            it 'does not call TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be false
-              expect(TestResultsCollectionUpdateWorker).not_to receive(:perform_async)
+              expect(TestResultsCollection::CreateContentWorker).not_to receive(:perform_async)
               builder.create
             end
           end
@@ -274,10 +274,10 @@ RSpec.describe CollectionCardBuilder, type: :service do
               test_collection.launch!(initiated_by: user)
             end
 
-            it 'calls TestResultsCollectionUpdateWorker' do
+            it 'calls TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be true
-              expect(TestResultsCollectionUpdateWorker).to receive(:perform_async).with(
-                test_collection.id, user.id
+              expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+                test_collection.test_results_collection.id, user.id
               )
               builder.create
             end
@@ -301,9 +301,9 @@ RSpec.describe CollectionCardBuilder, type: :service do
           end
 
           context 'and test is not live' do
-            it 'does not not call TestResultsCollectionUpdateWorker' do
+            it 'does not not call TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be false
-              expect(TestResultsCollectionUpdateWorker).not_to receive(:perform_async)
+              expect(TestResultsCollection::CreateContentWorker).not_to receive(:perform_async)
               builder.create
             end
           end
@@ -313,10 +313,10 @@ RSpec.describe CollectionCardBuilder, type: :service do
               test_collection.launch!(initiated_by: user)
             end
 
-            it 'calls TestResultsCollectionUpdateWorker' do
+            it 'calls TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be true
-              expect(TestResultsCollectionUpdateWorker).to receive(:perform_async).with(
-                test_collection.id, user.id
+              expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+                test_collection.test_results_collection.id, user.id
               )
               builder.create
             end

@@ -17,6 +17,39 @@ RSpec.describe Item::QuestionItem, type: :model do
     end
   end
 
+  context 'boolean matchers' do
+    let!(:question_customizable) { create(:question_item, question_type: :question_single_choice) }
+    let!(:question_scale) { create(:question_item, question_type: :question_excitement) }
+    let!(:question_description) { create(:question_item, question_type: :question_description) }
+    let!(:file_item) { create(:file_item) }
+
+    describe '#question_choices_customizable?' do
+      it 'should return true for single/multi choice' do
+        expect(question_customizable.question_choices_customizable?).to be true
+        expect(question_scale.question_choices_customizable?).to be false
+        expect(question_description.question_choices_customizable?).to be false
+      end
+    end
+
+    describe '#question_scale?' do
+      it 'should return true for scaled question' do
+        expect(question_customizable.scale_question?).to be false
+        expect(question_scale.scale_question?).to be true
+        expect(question_description.scale_question?).to be false
+        expect(file_item.scale_question?).to be false
+      end
+    end
+
+    describe '#graphable_question?' do
+      it 'should return true for both customizable and scale' do
+        expect(question_customizable.graphable_question?).to be true
+        expect(question_scale.graphable_question?).to be true
+        expect(question_description.graphable_question?).to be false
+        expect(file_item.graphable_question?).to be false
+      end
+    end
+  end
+
   context 'validations' do
     context 'adding more than 6 ideas to a test' do
       let(:idea_collection) { create(:collection) }

@@ -8,13 +8,14 @@ import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 
 class IdeaQuestion extends React.Component {
   render() {
-    const { card, parent, canEdit } = this.props
+    const { card, parent, canEdit, handleFocus } = this.props
     return (
       <Fragment>
         <QuestionContentEditor
           item={card.record}
           itemAttribute="name"
           canEdit={canEdit}
+          handleFocus={handleFocus}
           placeholder="add idea title here…"
           maxLength={40}
           singleLine
@@ -23,6 +24,7 @@ class IdeaQuestion extends React.Component {
         <QuestionContentEditor
           placeholder="add idea description here…"
           item={card.record}
+          handleFocus={handleFocus}
           itemAttribute="content"
           canEdit={canEdit}
         />
@@ -39,9 +41,11 @@ IdeaQuestion.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
+  handleFocus: PropTypes.func,
 }
 IdeaQuestion.defaultProps = {
   canEdit: false,
+  handleFocus: () => true,
 }
 IdeaQuestion.displayName = 'IdeaQuestion'
 
