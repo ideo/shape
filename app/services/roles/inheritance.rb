@@ -33,7 +33,7 @@ module Roles
       child.reanchor_if_incorrect_anchor!(parent: @parent)
 
       if child.same_roles_anchor?(@parent) && !cached&.private
-        child.unmark_as_private!
+        child.unmark_as_private! if cached.blank?
         return false
       end
 
