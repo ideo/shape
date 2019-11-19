@@ -1,6 +1,7 @@
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeUiStore from '#/mocks/fakeUiStore'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import v from '~/utils/variables'
@@ -8,7 +9,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 jest.mock('../../../app/javascript/vendor/googleTagManager')
 
-let wrapper, props, instance, component
+let wrapper, props, instance, component, rerender
 describe('TestDesigner', () => {
   beforeEach(() => {
     props = {
@@ -28,33 +29,41 @@ describe('TestDesigner', () => {
           },
         ],
       },
+      apiStore: fakeApiStore({
+        requestResult: { data: { id: 99, name: 'Parent Collection' } },
+      }),
+      uiStore: fakeUiStore,
     }
     // very basic way to turn fakeCollection into a "test collection"
     props.collection.collection_cards[0].card_question_type = 'question_useful'
     props.collection.collection_cards.forEach(
       card => (card.section_type = 'ideas')
     )
-    props.collection.apiStore = fakeApiStore({
-      requestResult: { data: { id: 99, name: 'Parent Collection' } },
+    rerender = () => {
+      wrapper = shallow(<TestDesigner.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
+  })
+
+  describe('with default params', () => {
+    beforeEach(() => {
+      rerender()
     })
-    wrapper = shallow(<TestDesigner {...props} />)
-    component = wrapper.instance()
-  })
+    it('renders snapshot', () => {
+      expectTreeToMatchSnapshot(wrapper)
+    })
 
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
-  })
-
-  it('renders TestQuestions for each card', () => {
-    expect(wrapper.find('TestQuestion').length).toEqual(
-      props.collection.sortedCards.length
-    )
+    it('renders TestQuestions for each card', () => {
+      expect(wrapper.find('TestQuestion').length).toEqual(
+        props.collection.sortedCards.length
+      )
+    })
   })
 
   describe('with draft test_collection', () => {
     beforeEach(() => {
       props.collection.test_status = 'draft'
-      wrapper = shallow(<TestDesigner {...props} />)
+      rerender()
     })
     it('should render the testTypeForm set to "media" by default', () => {
       expect(wrapper.find('RadioControl').exists()).toBeTruthy()
@@ -66,9 +75,10 @@ describe('TestDesigner', () => {
 
   describe('with responses', () => {
     beforeEach(() => {
+      props.collection.test_status = 'live'
       props.collection.can_edit_content = true
       props.collection.num_survey_responses = 5
-      wrapper = shallow(<TestDesigner {...props} />)
+      rerender()
     })
 
     describe('handleSelectChange', () => {
@@ -85,16 +95,17 @@ describe('TestDesigner', () => {
       it('does not prompt if adding a new question without a type', () => {
         card.card_question_type = null
         instance.handleSelectChange(card)(fakeEv)
-        expect(props.collection.apiStore.uiStore.confirm).not.toHaveBeenCalled()
+        expect(props.uiStore.confirm).not.toHaveBeenCalled()
       })
 
       it('prompts user when changing a question type', () => {
         card.card_question_type = 'question_clarity'
         instance.handleSelectChange(card)(fakeEv)
-        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+        expect(props.uiStore.confirm).toHaveBeenCalledWith({
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to change the question type?',
         })
@@ -110,10 +121,11 @@ describe('TestDesigner', () => {
 
       it('prompts user when removing a question', () => {
         instance.handleTrash(card)
-        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+        expect(props.uiStore.confirm).toHaveBeenCalledWith({
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to remove this question?',
         })
@@ -138,14 +150,119 @@ describe('TestDesigner', () => {
           .first()
           .props()
           .onAdd()
-        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+        expect(props.uiStore.confirm).toHaveBeenCalledWith({
           confirmText: 'Continue',
           iconName: 'Alert',
           onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
           prompt:
             'This test has 5 responses. Are you sure you want to add a new question?',
         })
       })
+    })
+
+    describe('handleQuestionFocus', () => {
+      beforeEach(() => {
+        // Clear mock calls so we can isolate them to our test
+        props.collection.apiStore.uiStore.confirm.mockClear()
+        instance = wrapper.instance()
+      })
+
+      it('prompts user when editing a question', () => {
+        instance.handleQuestionFocus()
+        expect(props.collection.apiStore.uiStore.confirm).toHaveBeenCalledWith({
+          confirmText: 'Continue',
+          iconName: 'Alert',
+          onConfirm: expect.any(Function),
+          onCancel: expect.any(Function),
+          prompt:
+            'This test has 5 responses. Are you sure you want to edit this question?',
+        })
+      })
+
+      describe('if confirm is clicked', () => {
+        let confirmCalls
+        beforeEach(() => {
+          confirmCalls = props.collection.apiStore.uiStore.confirm.mock.calls
+        })
+
+        it('does not prompt (for an hour)', () => {
+          instance.handleQuestionFocus()
+          // Simulate clicking 'confirm'
+          confirmCalls[0][0].onConfirm()
+          instance.handleQuestionFocus()
+          expect(confirmCalls.length).toEqual(1)
+          expect(
+            props.collection.apiStore.uiStore.confirm
+          ).toHaveBeenCalledTimes(1)
+        })
+      })
+
+      describe('if cancel is clicked', () => {
+        let confirmCalls
+        beforeEach(() => {
+          confirmCalls = props.collection.apiStore.uiStore.confirm.mock.calls
+        })
+
+        it('continues to prompt', () => {
+          instance.handleQuestionFocus()
+          // Simulate clicking 'cancel'
+          confirmCalls[0][0].onCancel()
+          instance.handleQuestionFocus()
+          // Simulate clicking 'cancel'
+          confirmCalls[1][0].onCancel()
+          expect(
+            props.collection.apiStore.uiStore.confirm
+          ).toHaveBeenCalledTimes(2)
+        })
+      })
+    })
+  })
+
+  describe('createNewQuestionCard', () => {
+    beforeEach(() => {
+      props.apiStore = fakeApiStore({
+        requestResult: {
+          data: {
+            order: 1,
+            record: {
+              name: 'some name',
+            },
+            card_question_type: 'question_useful',
+            section_type: 'ideas',
+          },
+        },
+      })
+      rerender()
+    })
+
+    it('calls CollectionCard.API_create with params', async () => {
+      const card = await component.createNewQuestionCard({
+        order: 1,
+        section_type: 'ideas',
+      })
+      expect(props.apiStore.request).toHaveBeenCalledWith(
+        'collection_cards',
+        'POST',
+        expect.any(Object)
+      )
+      expect(card.record.name).toEqual('some name')
+    })
+
+    it('calls CollectionCard.API_replace with params', async () => {
+      const card = await component.createNewQuestionCard({
+        replacingCard: {
+          id: '99',
+          section_type: 'ideas',
+          order: 1,
+        },
+      })
+      expect(props.apiStore.request).toHaveBeenCalledWith(
+        'collection_cards/99/replace',
+        'PATCH',
+        expect.any(Object)
+      )
+      expect(card.record.name).toEqual('some name')
     })
   })
 
@@ -153,8 +270,7 @@ describe('TestDesigner', () => {
     beforeEach(() => {
       props.collection.collection_to_test = { ...fakeCollection }
       props.collection.collection_to_test_id = fakeCollection.id
-      wrapper = shallow(<TestDesigner {...props} />)
-      component = wrapper.instance()
+      rerender()
     })
 
     it('should set the state.testType to collection', () => {
