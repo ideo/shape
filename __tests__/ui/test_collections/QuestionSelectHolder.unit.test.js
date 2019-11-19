@@ -1,9 +1,10 @@
-import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
+import _ from 'lodash'
+import QuestionSelector from '~/ui/test_collections/QuestionSelector'
 import { fakeCollectionCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let wrapper, props
-describe('TestDesigner', () => {
+describe('QuestionSelector', () => {
   beforeEach(() => {
     props = {
       card: fakeCollectionCard,
@@ -12,7 +13,8 @@ describe('TestDesigner', () => {
       canEdit: true,
     }
     props.card.card_question_type = 'question_useful'
-    wrapper = shallow(<QuestionSelectHolder {...props} />)
+    props.card.section_type = 'ideas'
+    wrapper = shallow(<QuestionSelector {...props} />)
   })
 
   it('renders snapshot', () => {
@@ -25,10 +27,19 @@ describe('TestDesigner', () => {
     )
   })
 
-  it('renders the question options alphabetically', () => {
+  it('renders the question options', () => {
     const select = wrapper.find('StyledSelect StyledSelectOption')
-
-    expect(select.get(2).props.value).toEqual('question_description')
-    expect(select.get(3).props.value).toEqual('question_media')
+    const values = _.compact(select.map(n => n.props().value))
+    expect(values).toEqual([
+      'question_clarity',
+      'question_different',
+      'question_excitement',
+      'question_useful',
+      'question_multiple_choice',
+      'question_open',
+      'question_media',
+      'question_single_choice',
+      'question_description',
+    ])
   })
 })

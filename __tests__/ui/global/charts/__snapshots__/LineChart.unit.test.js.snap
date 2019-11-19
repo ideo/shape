@@ -53,7 +53,7 @@ exports[`LineChart renders snapshot 1`] = `
   }
   key="dataset-0"
   labelComponent={
-    <ChartTooltip
+    <TickLabelWithTooltip
       alwaysShowLabels={false}
       cardArea={1}
       displayTicks={true}

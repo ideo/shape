@@ -10,11 +10,13 @@
 #  filter            :integer          default("transparent_gray")
 #  height            :integer
 #  hidden            :boolean          default(FALSE)
+#  identifier        :string
 #  image_contain     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
+#  section_type      :integer
 #  show_replace      :boolean          default(TRUE)
 #  type              :string
 #  unarchived_at     :datetime
@@ -28,13 +30,14 @@
 #
 # Indexes
 #
-#  index_collection_cards_on_archive_batch          (archive_batch)
-#  index_collection_cards_on_collection_id          (collection_id)
-#  index_collection_cards_on_item_id                (item_id)
-#  index_collection_cards_on_order_and_row_and_col  (order,row,col)
-#  index_collection_cards_on_parent_id              (parent_id)
-#  index_collection_cards_on_templated_from_id      (templated_from_id)
-#  index_collection_cards_on_type                   (type)
+#  index_collection_cards_on_archive_batch             (archive_batch)
+#  index_collection_cards_on_collection_id             (collection_id)
+#  index_collection_cards_on_identifier_and_parent_id  (identifier,parent_id)
+#  index_collection_cards_on_item_id                   (item_id)
+#  index_collection_cards_on_order_and_row_and_col     (order,row,col)
+#  index_collection_cards_on_parent_id                 (parent_id)
+#  index_collection_cards_on_templated_from_id         (templated_from_id)
+#  index_collection_cards_on_type                      (type)
 #
 
 class CollectionCard < ApplicationRecord
@@ -53,6 +56,8 @@ class CollectionCard < ApplicationRecord
   # for the purpose of accepting these params via deserializable
   attr_accessor :external_id
   attr_accessor :card_type
+  # for test survey
+  attr_accessor :idea_id
 
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
@@ -73,8 +78,9 @@ class CollectionCard < ApplicationRecord
   validates :row,
             numericality: { greater_than_or_equal_to: 0 },
             if: :parent_board_collection?
+  validates :section_type, presence: true, if: :parent_test_collection?
 
-  delegate :board_collection?,
+  delegate :board_collection?, :test_collection?,
            to: :parent,
            prefix: true,
            allow_nil: true
@@ -93,10 +99,22 @@ class CollectionCard < ApplicationRecord
   scope :is_cover, -> { where(is_cover: true) }
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
+  scope :ideas_collection_card, -> { where(section_type: :ideas).where.not(collection_id: nil) }
+  # this scope orders by identifier because the default order(:id) is very slow when getting .first
+  scope :identifier, ->(identifier) { where(identifier: identifier).order(:identifier) }
+  scope :item, -> { where.not(item_id: nil) }
+  scope :collection, -> { where.not(collection_id: nil) }
 
   enum filter: {
     nothing: 0,
     transparent_gray: 1,
+  }
+
+  enum section_type: {
+    intro: 0,
+    ideas: 1,
+    outro: 2,
+    custom: 3,
   }
 
   amoeba do
@@ -106,7 +124,6 @@ class CollectionCard < ApplicationRecord
     nullify :templated_from_id
     # don't recognize any relations, easiest way to turn them all off
     recognize []
-
   end
 
   def self.default_relationships_for_api
@@ -117,6 +134,7 @@ class CollectionCard < ApplicationRecord
         :datasets,
         :translations,
         :parent_collection_card,
+        :question_choices,
         collection_cover_items: :datasets,
       ],
     ]
@@ -224,6 +242,16 @@ class CollectionCard < ApplicationRecord
     return collection if collection.present?
   end
 
+  def record=(record)
+    if record.is_a?(Item)
+      self.item = record
+      self.collection = nil
+    elsif record.is_a?(Collection)
+      self.collection = record
+      self.item = nil
+    end
+  end
+
   def record_type
     return nil if record.blank?
 
@@ -241,6 +269,10 @@ class CollectionCard < ApplicationRecord
   def master_template_card?
     # does this card live in a MasterTemplate?
     parent.master_template?
+  end
+
+  def ideas_collection_card?
+    section_type == 'ideas' && collection_id.present?
   end
 
   def pinned_and_locked?
@@ -290,6 +322,12 @@ class CollectionCard < ApplicationRecord
 
     CollectionCard.decrement_counter(:order, update_ids)
     true
+  end
+
+  def move_to_order(to_order)
+    increment_card_orders!(to_order)
+    update(order: to_order)
+    parent.reorder_cards!
   end
 
   # gets called by API collection_cards_controller
@@ -388,17 +426,9 @@ class CollectionCard < ApplicationRecord
   end
 
   def card_question_type
-    return nil unless parent.is_a?(Collection::TestCollection) || parent.is_a?(Collection::TestDesign)
-    return nil unless item.present?
+    return 'ideas_collection' if section_type.to_s == 'ideas' && collection_id.present?
 
-    case item.type
-    when 'Item::QuestionItem'
-      return item.question_type
-    when 'Item::TextItem'
-      return 'question_description'
-    when 'Item::FileItem', 'Item::VideoItem', 'Item::LinkItem'
-      return 'question_media'
-    end
+    item&.question_type
   end
 
   def update_collection_cover
@@ -412,6 +442,16 @@ class CollectionCard < ApplicationRecord
       parent.cached_cover['no_cover'] = true
     end
     parent.cache_cover!
+  end
+
+  # used by serializer to have multiple "versions" of a card, one per idea
+  def id_with_idea_id
+    idea_suffix = idea_id ? "_#{idea_id}" : ''
+    "#{id}#{idea_suffix}"
+  end
+
+  def self.find_record_by_identifier(*args)
+    identifier(CardIdentifier.call(*args)).first&.record
   end
 
   private

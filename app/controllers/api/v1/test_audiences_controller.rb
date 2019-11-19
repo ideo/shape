@@ -5,7 +5,6 @@ class Api::V1::TestAudiencesController < Api::V1::BaseController
   def update
     @test_audience.attributes = test_audience_params
     if @test_audience.save
-      @test_audience.test_collection&.test_design&.touch
       render_test_audience
     else
       render_api_errors @test_audience.errors
@@ -16,11 +15,10 @@ class Api::V1::TestAudiencesController < Api::V1::BaseController
 
   def render_test_audience
     render jsonapi: @test_audience,
-           include: [test_collection: [:test_design]],
+           include: %i[test_collection],
            class: {
              TestAudience: SerializableTestAudience,
              'Collection::TestCollection': SerializableCollection,
-             'Collection::TestDesign': SerializableCollection,
            }
   end
 

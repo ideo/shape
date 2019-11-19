@@ -117,12 +117,16 @@ export const NamedActionButton = styled.button`
   svg,
   .icon {
     display: inline-block;
-    height: 30px;
+    height: ${props => props.svgSize.height};
     margin-bottom: 2px;
+    margin-right: 3px;
     vertical-align: middle;
-    width: 30px;
+    width: ${props => props.svgSize.width};
   }
 `
+NamedActionButton.defaultProps = {
+  svgSize: { width: '30px', height: '30px' },
+}
 /* eslint-disable no-nested-ternary */
 /** @component */
 export const FormButton = styled.button`

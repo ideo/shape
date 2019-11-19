@@ -16,6 +16,12 @@ class CollectionCardBuilder
     @user = user
   end
 
+  def self.call(*args)
+    service = new(*args)
+    service.create
+    service.collection_card
+  end
+
   def create
     hide_helper_for_user
     if @collection_card.record.present?
@@ -53,6 +59,7 @@ class CollectionCardBuilder
         post_creation_record_update if @collection_card.primary?
 
         @collection_card.increment_card_orders!
+        @parent_collection.reorder_cards!
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
           @parent_collection.queue_update_template_instances
@@ -93,22 +100,10 @@ class CollectionCardBuilder
     # If this is a live test collection...
     if @parent_collection.test_collection? &&
        @parent_collection.live_or_was_launched? &&
+       @parent_collection.test_results_collection.present? &&
        record.is_a?(Item::QuestionItem)
 
-      test_collection = @parent_collection.test_collection
-
-      # If this is a new scale question, create response graphs
-      if record.scale_question?
-        record.create_response_graph(
-          parent_collection: test_collection,
-          initiated_by: @user,
-        )
-      elsif record.question_open?
-        record.create_open_response_collection(
-          parent_collection: test_collection,
-          initiated_by: @user,
-        )
-      end
+      TestResultsCollection::CreateContentWorker.perform_async(@parent_collection.test_results_collection.id, @user.id)
     end
 
     return unless @parent_collection.is_a? Collection::SubmissionsCollection
@@ -129,5 +124,10 @@ class CollectionCardBuilder
     @datasets_params.to_h.values.each do |dataset_params|
       @collection_card.item.create_dataset(dataset_params)
     end
+  end
+
+  def capture_error_and_rollback(error)
+    @errors << error
+    raise ActiveRecord::Rollback
   end
 end

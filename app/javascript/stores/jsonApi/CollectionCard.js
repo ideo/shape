@@ -27,6 +27,7 @@ class CollectionCard extends BaseRecord {
     'is_cover',
     'hidden',
     'filter',
+    'section_type',
   ]
 
   batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
@@ -60,8 +61,8 @@ class CollectionCard extends BaseRecord {
     return this.col + this.width - 1
   }
 
-  get isTestDesignCollection() {
-    return this.record.type === COLLECTION_TYPES.TEST_DESIGN
+  get isTestCollection() {
+    return this.record.type === COLLECTION_TYPES.TEST
   }
 
   get isTextItem() {
@@ -162,17 +163,20 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  async API_replace({ replacingId }) {
+  async API_replace({ replacingId = null, replacingCard = null }) {
     const { uiStore } = this
     try {
       // NOTE: in this context, `this` is a new CollectionCard model
       // that has the data we want to send for replacing the card
-      const replacing = this.apiStore.find('collection_cards', replacingId)
+      const replacing =
+        replacingCard || this.apiStore.find('collection_cards', replacingId)
       const data = this.toJsonApi()
       // need to remove the item to reset its type (in case it changed)
       this.apiStore.remove(replacing.record)
+      // just give it a placeholder so that it doesn't totally disappear e.g. from TestDesigner
+      replacing.record = {}
       const res = await this.apiStore.request(
-        `collection_cards/${replacingId}/replace`,
+        `collection_cards/${replacing.id}/replace`,
         'PATCH',
         { data }
       )
@@ -282,6 +286,18 @@ class CollectionCard extends BaseRecord {
     return uiStore.dragCardMaster === this.id
   }
 
+  get introSection() {
+    return this.section_type === 'intro'
+  }
+
+  get ideasSection() {
+    return this.section_type === 'ideas'
+  }
+
+  get outroSection() {
+    return this.section_type === 'outro'
+  }
+
   async API_archiveSelf({ undoable = true } = {}) {
     try {
       await this.apiStore.archiveCards({
@@ -336,7 +352,7 @@ class CollectionCard extends BaseRecord {
         } else if (this.link) {
           iconName = 'Link'
           prompt = 'Are you sure you want to delete this link?'
-        } else if (this.isTestDesignCollection) {
+        } else if (this.isTestCollection) {
           prompt = 'Are you sure you want to delete this test design?'
           prompt += ' It will close your feedback.'
         }

@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :activities, only: %i[create]
+      resources :question_choices, only: %i[update]
       resources :collections do
         member do
           get 'in_my_collection'
@@ -58,6 +59,11 @@ Rails.application.routes.draw do
           collection do
             delete '', action: 'destroy'
             get 'will_become_private'
+          end
+        end
+        resources :question_choices, only: %i[create destroy] do
+          member do
+            post 'archive'
           end
         end
       end

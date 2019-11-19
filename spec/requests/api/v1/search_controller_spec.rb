@@ -256,6 +256,44 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
     end
 
+    context 'when searching for test alias collections' do
+      let(:test_collection) do
+        create(
+          :test_collection,
+          :completed,
+          :launched,
+          organization: organization,
+          add_editors: [current_user],
+        )
+      end
+      let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
+      let!(:survey_response) do
+        create(
+          :survey_response,
+          :fully_answered,
+          test_collection: test_collection,
+          test_audience: test_audience,
+        )
+      end
+      let(:survey_response_alias_collection) { survey_response.test_results_collection }
+      before do
+        # create all content which will create the survey_response_alias_collection
+        TestResultsCollection::CreateContent.call(
+          test_results_collection: test_collection.test_results_collection,
+          created_by: current_user,
+        )
+        survey_response.reload
+        batch_reindex(Collection)
+      end
+
+      it 'returns the response that matches' do
+        test_answer = survey_response_alias_collection.search_data[:test_answer].sample
+        expect(test_answer).not_to be_nil
+        get(path, params: { query: "test_answer(#{test_answer})" })
+        expect(json['data'].map { |d| d['id'].to_i }).to eq([survey_response_alias_collection.id])
+      end
+    end
+
     context 'when searching for archived' do
       let(:deleted_collection) do
         create(:collection,

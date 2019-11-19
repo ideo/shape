@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -30,12 +31,14 @@
 #  collection_to_test_id      :bigint(8)
 #  created_by_id              :integer
 #  default_group_id           :integer
+#  idea_id                    :integer
 #  joinable_group_id          :bigint(8)
 #  organization_id            :bigint(8)
 #  question_item_id           :integer
 #  roles_anchor_collection_id :bigint(8)
 #  submission_box_id          :bigint(8)
 #  submission_template_id     :integer
+#  survey_response_id         :integer
 #  template_id                :integer
 #  test_collection_id         :bigint(8)
 #
@@ -46,6 +49,7 @@
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
 #  index_collections_on_created_at                  (created_at)
+#  index_collections_on_idea_id                     (idea_id)
 #  index_collections_on_organization_id             (organization_id)
 #  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
 #  index_collections_on_submission_box_id           (submission_box_id)
@@ -64,9 +68,14 @@ class Collection
     include AASM
 
     has_many :survey_responses, dependent: :destroy
-    has_one :test_design, inverse_of: :test_collection
-    # this relation exists before the items get moved to the test design
-    has_many :prelaunch_question_items,
+    has_one :test_results_collection,
+            -> { master_results },
+            inverse_of: :test_collection
+    has_many :test_results_idea_collections,
+             -> { idea_results },
+             class_name: 'TestCollection::TestResultsCollection',
+             inverse_of: :test_collection
+    has_many :question_items,
              -> { questions },
              source: :item,
              class_name: 'Item::QuestionItem',
@@ -75,18 +84,21 @@ class Collection
     has_many :paid_test_audiences,
              -> { paid },
              class_name: 'TestAudience'
+
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
-    has_many :datasets,
-             through: :data_items
+    delegate :datasets, to: :test_results_collection, allow_nil: true
 
     before_create :setup_default_status_and_questions, unless: :cloned_or_templated?
     after_create :add_test_tag
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
-    after_update :touch_test_design, if: :saved_change_to_test_status?
+    after_update :touch_test_results_collection, if: :saved_change_to_test_status?
+    after_update :update_ideas_collection, if: :saved_change_to_test_show_media?
+    after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
+    after_commit :close_test_after_archive, if: :archived_on_previous_save?
 
-    delegate :answerable_complete_question_items, to: :test_design, allow_nil: true
+    FEEDBACK_DESIGN_SUFFIX = ' Feedback Design'.freeze
 
     enum test_status: {
       draft: 0,
@@ -103,7 +115,7 @@ class Collection
 
       event :launch,
             guards: [
-              :completed_and_launchable?,
+              :valid_and_launchable?,
               proc { |**args|
                 attempt_to_purchase_test_audiences!(
                   user: args[:initiated_by],
@@ -133,18 +145,35 @@ class Collection
       end
     end
 
-    def self.default_question_types
-      %i[
-        question_media
-        question_description
-        question_useful
-        question_finish
-      ]
+    amoeba do
+      set test_status: :draft
+    end
+
+    def self.default_question_types_by_section
+      {
+        intro: %i[question_category_satisfaction],
+        ideas: %i[
+          ideas_collection
+          question_clarity
+          question_excitement
+          question_useful
+          question_open
+        ],
+        outro: %i[
+          question_open
+          question_finish
+        ],
+      }
     end
 
     # Used so that we can interchangably call this on TestCollection and TestDesign
+    # TODO: check, is this still needed with TestResults?
     def test_collection
       self
+    end
+
+    def base_name
+      name.sub(FEEDBACK_DESIGN_SUFFIX, '')
     end
 
     def test_audience_closed!
@@ -194,9 +223,6 @@ class Collection
                         .find_by(template_id: id)
       return unless launchable_test.present?
 
-      if launchable_test.is_a?(Collection::TestDesign)
-        launchable_test = launchable_test.test_collection
-      end
       submission.update(
         submission_attrs: {
           # this should have already been set but want to preserve the value as true
@@ -216,14 +242,13 @@ class Collection
 
         c.submission_attrs['launchable_test_id']
       end.compact
-
       # another one that could maybe use a bg worker (if lots of tests)
       # we use the AASM method to ensure that callbacks are carried through
-      Collection::TestCollection.where(id: test_ids).each(&:close!)
+      Collection::TestCollection.where(id: test_ids).find_each(&:close!)
     end
 
     # various checks for if this test_collection is in a launchable state
-    # note that `test_completed?` is independent from this
+    # note that `questions_valid?` is independent from this
     def launchable?
       return false unless draft? || closed?
 
@@ -240,62 +265,38 @@ class Collection
         end
       end
       # standalone tests otherwise don't really have any restrictions
-      return true unless collection_to_test_id.present?
+      return true unless collection_to_test.present?
 
-      # lastly -- make sure there is not another live in-collection test for the same collection
-      collection_to_test.live_test_collection.blank?
+      # lastly, make sure there is not another live in-collection test for the same collection
+      if collection_to_test.live_test_collection.present?
+        errors.add(:base, 'You already have another test running on this same collection. Please close that one before proceeding.')
+        return false
+      end
+
+      true
     end
 
     def submission_test_launchable?
       # This checks if the parent template has been launched, which indicates that the
       # submission box editors have enabled the related submission tests
-      test_template = nil
-      if templated?
-        test_template = template
-      elsif test_design.present? && test_design.templated?
-        # the template relation gets moved to the test_design after launch, e.g. for 'reopen'
-        test_template = test_design.template
-      end
-      test_template ? test_template.live? : true
+      !templated? || template.live?
     end
 
-    def test_completed?
-      complete = true
-      # you don't really need to "complete" your template
+    def questions_valid?
       return true if inside_a_submission_box_template?
 
-      unless incomplete_media_items.count.zero?
-        errors.add(:base,
-                   'Please add an image or video for your idea to question ' +
-                   incomplete_media_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
+      incomplete_items = incomplete_question_items
+      return true if incomplete_items.blank?
+
+      incomplete_items.each do |item|
+        errors.add(:base, item.incomplete_description)
       end
 
-      unless incomplete_description_items.count.zero?
-        errors.add(:base,
-                   'Please add your idea description to question ' +
-                   incomplete_description_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_category_satisfaction_items.count.zero?
-        errors.add(:base,
-                   'Please add your category to question ' +
-                   incomplete_category_satisfaction_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-
-      unless incomplete_open_response_items.count.zero?
-        errors.add(:base,
-                   'Please add your open response to question ' +
-                   incomplete_open_response_items.map { |i| i.parent_collection_card.order + 1 }.to_sentence)
-        complete = false
-      end
-      complete
+      false
     end
 
-    def completed_and_launchable?
-      test_completed? && launchable?
+    def valid_and_launchable?
+      questions_valid? && launchable?
     end
 
     def live_or_was_launched?
@@ -303,51 +304,33 @@ class Collection
     end
 
     def can_reopen?
-      return false unless launchable? && test_completed?
-
-      test_design.present? || submission_box_template_test?
+      closed? && valid_and_launchable?
     end
 
     def duplicate!(**args)
-      # Only copy over test questions in pre-launch state
-      if test_design.present?
-        # If test design has already been created, just dupe that
-        duplicate = test_design.duplicate!(args)
-      else
-        # Otherwise dupe this collection
-        duplicate = super(args)
-      end
+      duplicate = super(args)
 
       return duplicate if duplicate.new_record? || args[:parent].blank?
 
-      duplicate.type = 'Collection::TestCollection'
-      duplicate = duplicate.becomes(Collection::TestCollection)
       if collection_to_test.present?
         # Point to the new parent as the one to test
         duplicate.collection_to_test = args[:parent]
       elsif !parent.master_template? && !args[:parent].master_template?
         # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}"
+        duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
       duplicate.save
       duplicate
     end
 
-    # alias method, will delegate to test_design if available
-    def question_items
-      if test_design.present?
-        return test_design.question_items
-      end
-
-      prelaunch_question_items
-    end
-
-    def legend_item
-      items.legend_items.first
-    end
-
     def test_open_response_collections
       collections.where(type: 'Collection::TestOpenResponses')
+    end
+
+    def ideas_collection
+      collections.joins(:primary_collection_cards).merge(
+        CollectionCard.ideas_collection_card,
+      ).first
     end
 
     def create_uniq_survey_response(user_id: nil, test_audience_id: nil)
@@ -369,8 +352,8 @@ class Collection
     def test_survey_render_class_mappings
       Firestoreable::JSONAPI_CLASS_MAPPINGS.merge(
         'Collection::TestCollection': SerializableTestCollection,
-        'Collection::TestDesign': SerializableSimpleCollection,
         FilestackFile: SerializableFilestackFile,
+        QuestionChoice: SerializableQuestionChoice,
       )
     end
 
@@ -378,7 +361,7 @@ class Collection
       {
         question_cards: [
           :parent,
-          record: [:filestack_file],
+          record: [:filestack_file, :question_choices],
         ],
       }
     end
@@ -398,8 +381,12 @@ class Collection
       )
     end
 
-    def touch_test_design
-      test_design.try(:touch)
+    def touch_test_results_collection
+      test_results_collection.try(:touch)
+    end
+
+    def update_ideas_collection
+      ideas_collection&.update(test_show_media: test_show_media)
     end
 
     def aasm_event_failed(event, current_state = '')
@@ -409,86 +396,33 @@ class Collection
       errors.add(:base, message)
     end
 
-    def build_test_design_collection_card(initiated_by)
-      # build the TestDesign collection and its card
-      card_params = {
-        # push it to the end, will get resorted after creation is complete
-        order: 999,
-        collection_attributes: {
-          name: Collection::TestDesign.generate_name(name),
-          type: 'Collection::TestDesign',
-          test_collection_id: id,
-          template_id: template_id,
-        },
-      }
-      CollectionCardBuilder.new(
-        params: card_params,
-        parent_collection: self,
-        user: initiated_by,
-      )
-    end
-
-    def create_open_response_collections(open_question_items: nil, initiated_by: nil)
-      open_question_items ||= question_items.question_open
-      open_question_items.map do |open_question|
-        open_question.create_open_response_collection(
-          parent_collection: self,
-          initiated_by: initiated_by,
-        )
-      end
-    end
-
-    def create_response_graphs(initiated_by:)
-      legend = nil
-      graphs = []
-      question_items
-        .select(&:scale_question?)
-        .each_with_index do |question, i|
-        data_item_card = question.create_response_graph(
-          parent_collection: self,
-          initiated_by: initiated_by,
-          legend_item: legend,
-        )
-        legend = data_item_card.item.legend_item if i.zero?
-        graphs << data_item_card
-        test_audiences.each do |test_audience|
-          data_item = data_item_card.item
-          question.create_test_audience_dataset(test_audience, data_item)
-        end
-      end
-
-      graphs
-    end
-
-    def create_media_item_link(media_question_items: nil)
-      media_question_items ||= test_design.items.reject { |i| i.type == 'Item::QuestionItem' }
-      # since we're placing things at the front one by one, we reverse the order
-      media_question_items.reverse.map do |media_item|
-        next unless media_item.cards_linked_to_this_item.empty?
-
-        CollectionCard::Link.create(
-          parent: self,
-          item_id: media_item.id,
-          width: 1,
-          height: 2,
-          order: -1,
-        )
-      end
-    end
-
     def setup_default_status_and_questions
+      order = -1
+
       self.class
-          .default_question_types
-          .each_with_index do |question_type, i|
-        # NOTE: this doesn't use CollectionCardBuilder because it's in before_create
-        # so just need to make sure logic like pinning cards is set up appropriately
-        primary_collection_cards.build(
-          order: i,
-          pinned: master_template?,
-          item: Item::QuestionItem.new(
-            question_type: question_type,
-          ),
-        )
+          .default_question_types_by_section
+          .each do |section_type, question_types|
+        question_types.each do |question_type|
+          # NOTE: this doesn't use CollectionCardBuilder because it's in before_create
+          # so just need to make sure logic like pinning cards is set up appropriately
+          if question_type == :ideas_collection
+            primary_collection_cards.build(
+              order: order += 1,
+              section_type: section_type,
+              pinned: master_template?,
+              record: Collection.build_ideas_collection,
+            )
+          else
+            primary_collection_cards.build(
+              order: order += 1,
+              section_type: section_type,
+              pinned: master_template?,
+              record: Item::QuestionItem.new(
+                question_type: question_type,
+              ),
+            )
+          end
+        end
       end
     end
 
@@ -532,44 +466,59 @@ class Collection
       reorder_cards!
     end
 
-    # Return array of incomplete media items, with index of item
-    def incomplete_media_items
-      question_items.joins(
-        :parent_collection_card,
-      ).where(question_type: :question_media)
+    def hide_or_show_section_questions!
+      hidden = collection_to_test_id.present? ? true : false
+      question_cards_from_sections(%i[intro outro])
+        .joins(:item)
+        .where.not(
+          Item.arel_table[:question_type].eq(:question_finish),
+        )
+        .update_all(
+          hidden: hidden,
+        )
+      primary_collection_cards.ideas_collection_card.update(
+        hidden: hidden,
+      )
     end
 
-    def incomplete_description_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_description, content: [nil, ''])
+    def ideas_question_items
+      question_items_from_sections(%i[ideas])
     end
 
-    def incomplete_category_satisfaction_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_category_satisfaction, content: [nil, ''])
+    def non_repeating_question_items
+      question_items_from_sections(%i[intro outro])
     end
 
-    def incomplete_open_response_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: :question_open, content: [nil, ''])
-    end
-
-    # Returns the question cards that are in the blank default state
     def incomplete_question_items
-      question_items
-        .joins(
-          :parent_collection_card,
-        ).where(question_type: nil, filestack_file_id: nil, url: nil)
+      incomplete_items = idea_items
+                         .joins(:parent_collection_card)
+                         .select(&:question_item_incomplete?)
+
+      incomplete_items += question_items
+                          .joins(:parent_collection_card)
+                          .where(CollectionCard.arel_table[:hidden].eq(false))
+                          .select(&:question_item_incomplete?)
+
+      incomplete_items.compact
     end
 
-    def remove_incomplete_question_items
-      incomplete_question_items.destroy_all
+    def remove_empty_question_items
+      incomplete_question_items.select do |item|
+        item.question_item.blank?
+      end.each(&:destroy)
+    end
+
+    def idea_items
+      return Item.none if ideas_collection.blank? ||
+                          ideas_collection.parent_collection_card.hidden?
+
+      ideas_collection.items
+                      .joins(:parent_collection_card)
+                      .where(CollectionCard.arel_table[:hidden].eq(false))
+    end
+
+    def idea_cards
+      ideas_collection&.collection_cards || CollectionCard.none
     end
 
     def cloned_or_templated?
@@ -609,7 +558,61 @@ class Collection
       test_audiences.paid.sum(:sample_size)
     end
 
+    def question_cards_from_sections(section_names)
+      primary_collection_cards.where(
+        CollectionCard.arel_table[:section_type].in(section_names),
+      )
+    end
+
+    # #########################################################################
+    # This migrates unlaunched pre-feedback-3.0 test collections to a feedback-3.0
+    # style test collection, ready to be launched.
+    def migrate!
+      ideas_collection_card = primary_collection_cards.create(
+        order: 0,
+        section_type: :ideas,
+        record: Collection.build_ideas_collection,
+      )
+      first_media_item = items.where(
+        type: ['Item::FileItem', 'Item::LinkItem', 'Item::VideoItem'],
+      ).first
+      first_description_item = items.question_description.first
+
+      if first_media_item.present?
+        first_media_item.update(
+          question_type: :question_idea,
+          content: first_description_item.content,
+        )
+        # Move this "idea" to the ideas collection
+        first_media_item.parent_collection_card.update(
+          parent_id: ideas_collection_card.collection.id,
+        )
+        first_description_item.destroy
+      elsif first_description_item.present?
+        first_description_item.update(
+          question_type: :question_idea,
+        )
+        first_description_item.parent_collection_card.update(
+          parent_id: ideas_collection_card.collection.id,
+        )
+        update(test_show_media: false)
+      end
+
+      primary_collection_cards.update_all(
+        section_type: :ideas,
+      )
+      items.question_finish.parent_collection_card.update(
+        section_type: :outro,
+      )
+    end
+
     private
+
+    def question_items_from_sections(section_names)
+      question_items.joins(:parent_collection_card).where(
+        CollectionCard.arel_table[:section_type].in(section_names),
+      )
+    end
 
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
       return true if test_audience_params.blank?
@@ -627,7 +630,7 @@ class Collection
 
     def post_launch_setup!(initiated_by: nil, reopening: false)
       # remove the "blanks"
-      remove_incomplete_question_items
+      remove_empty_question_items
       if submission_box_template_test?
         parent_submission_box_template.update(
           submission_attrs: {
@@ -642,9 +645,20 @@ class Collection
         return true
       end
       update_cached_submission_status(parent_submission) if inside_a_submission?
-      create_test_design_and_move_cards!(initiated_by: initiated_by) unless reopening
+      create_results_collections!(initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
       TestCollectionMailer.notify_launch(id).deliver_later if gives_incentive? && ENV['ENABLE_ZENDESK_FOR_TEST_LAUNCH']
+    end
+
+    def create_results_collections!(initiated_by = nil)
+      result = ::TestResultsCollection::CreateCollection.call(
+        test_collection: self,
+        created_by: initiated_by || created_by,
+      )
+      return test_results_collection if result.success?
+
+      errors.add(:base, result.message)
+      false
     end
 
     def after_close_test
@@ -658,37 +672,24 @@ class Collection
       end
     end
 
-    def create_test_design_and_move_cards!(initiated_by:)
-      test_design_card_builder = build_test_design_collection_card(initiated_by)
-      transaction do
-        return false unless test_design_card_builder.create
-
-        self.test_design = test_design_card_builder.collection_card.record
-        self.template_id = nil # Moves association to the TestDesign
-        # move all the cards into the test design collection
-        collection_cards
-          .where.not(
-            id: test_design_card_builder.collection_card.id,
-          )
-          .each_with_index do |card, i|
-            card.update(parent_id: test_design.id, order: i)
-          end
-        create_open_response_collections(initiated_by: initiated_by)
-        create_response_graphs(initiated_by: initiated_by)
-        create_media_item_link
-        test_design.cache_cover!
-      end
-      reorder_cards!
-      move_legend_item_to_third_spot
-      true
+    def close_test_after_archive
+      close! if live?
     end
 
-    def move_legend_item_to_third_spot
-      return unless legend_item.present?
+    def now_in_collection_test_with_default_cards?
+      saved_change_to_collection_to_test_id? &&
+        collection_to_test_id.present? &&
+        only_default_cards?
+    end
 
-      legend_card = legend_item.parent_collection_card
-      legend_card.update(order: 2)
-      legend_card.increment_card_orders!
+    def only_default_cards?
+      card_question_types = collection_cards.map(&:card_question_type)
+      card_question_types == self.class.default_question_types_by_section.values.flatten.map(&:to_s)
+    end
+
+    def archive_idea_questions
+      idea_items.each(&:archive!)
+      touch
     end
   end
 end

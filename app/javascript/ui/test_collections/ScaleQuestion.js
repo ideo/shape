@@ -6,7 +6,8 @@ import { debounce } from 'lodash'
 
 import Tooltip from '~/ui/global/Tooltip'
 import Emoji from '~/ui/icons/Emoji'
-import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
+import { DisplayText } from '~/ui/global/styled/typography'
+import { QuestionHelperText } from '~/ui/test_collections/shared'
 import v from '~/utils/variables'
 import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
 
@@ -154,6 +155,7 @@ class ScaleQuestion extends React.Component {
           onChange={this.handleInputChange}
           onKeyPress={this.handleKeyPress}
           onBlur={this.stopEditingIfContent}
+          data-cy="category-satisfaction-input"
         />
         ?
       </DisplayText>
@@ -174,6 +176,9 @@ class ScaleQuestion extends React.Component {
             {question.content ? ` ${question.content}?` : ''}
           </DisplayText>
         )}
+        <QuestionHelperText block>
+          select your response below
+        </QuestionHelperText>
       </Question>
     )
   }
@@ -186,7 +191,6 @@ class ScaleQuestion extends React.Component {
       <div style={{ width: '100%' }}>
         {this.question}
         <Scale>
-          <SmallHelperText>select your response below</SmallHelperText>
           <EmojiHolder data-cy="ScaleEmojiHolder">
             {emojis.map(emoji => (
               <Tooltip

@@ -2,8 +2,8 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Flyout, VictoryTooltip } from 'victory'
 
+import { ChartTooltip } from './ChartLabelWithTooltip'
 import v from '~/utils/variables'
-import { victoryTheme } from '~/ui/global/charts/ChartUtils'
 
 const DotFlyout = props => (
   <g>
@@ -19,7 +19,7 @@ const DotFlyout = props => (
   </g>
 )
 
-class ChartTooltip extends React.PureComponent {
+class TickLabelWithTooltip extends React.PureComponent {
   static defaultEvents = VictoryTooltip.defaultEvents
 
   get maxValue() {
@@ -128,27 +128,13 @@ class ChartTooltip extends React.PureComponent {
     const tooltipText = tooltipTextRenderer(datum, this.isLastDataPoint)
     return (
       <g>
-        <VictoryTooltip
+        <ChartTooltip
           {...this.props}
-          theme={victoryTheme}
           cornerRadius={cardArea === 1 ? 4 : 2}
           flyoutComponent={displayTicks ? <DotFlyout /> : <Flyout />}
           dx={dx * 5}
           dy={0}
-          style={{
-            fill: 'white',
-            fontFamily: v.fonts.sans,
-            fontSize: this.fontSizes.tooltip,
-            fontWeight: 'normal',
-          }}
           text={tooltipText}
-          orientation="top"
-          pointerLength={0}
-          flyoutStyle={{
-            stroke: 'transparent',
-            fill: v.colors.black,
-            opacity: 0.8,
-          }}
         />
         {showAlways && (
           <Fragment>
@@ -156,11 +142,9 @@ class ChartTooltip extends React.PureComponent {
               active={showAlways}
               {...this.props}
               dx={dx}
-              dy={-10}
+              dy={-20}
               style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
               text={labelText}
-              orientation="top"
-              pointerLength={0}
               flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
             />
             {displayTicks && (
@@ -180,7 +164,7 @@ class ChartTooltip extends React.PureComponent {
     )
   }
 }
-ChartTooltip.propTypes = {
+TickLabelWithTooltip.propTypes = {
   tooltipTextRenderer: PropTypes.func.isRequired,
   labelTextRenderer: PropTypes.func.isRequired,
   maxValue: PropTypes.number,
@@ -189,7 +173,7 @@ ChartTooltip.propTypes = {
   displayTicks: PropTypes.bool,
   alwaysShowLabels: PropTypes.bool,
 }
-ChartTooltip.defaultProps = {
+TickLabelWithTooltip.defaultProps = {
   maxValue: 0,
   minValue: 0,
   cardArea: 1,
@@ -197,4 +181,4 @@ ChartTooltip.defaultProps = {
   alwaysShowLabels: false,
 }
 
-export default ChartTooltip
+export default TickLabelWithTooltip

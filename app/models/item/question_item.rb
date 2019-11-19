@@ -37,6 +37,7 @@
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
 #  index_items_on_type                                 (type)
 #
@@ -62,11 +63,17 @@ class Item
     # TODO: Deprecate once migrating to datasets
     has_one :test_data_item, class_name: 'Item::DataItem', as: :data_source
 
+    has_many :question_choices, -> { order(order: :asc) }
+
+    validate on: :create do
+      if question_idea? && parent.present? && parent.collection_cards.count > 6
+        errors.add(:base, 'too many ideas')
+      end
+    end
+
     after_create :create_question_dataset
-
-    after_commit :notify_test_design_of_creation,
-                 on: :create,
-                 if: :notify_test_design_collection_of_creation?
+    after_create :add_default_question_choices,
+                 if: :question_choices_customizable?
 
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
@@ -74,40 +81,28 @@ class Item
     after_update :update_test_open_responses_collection,
                  if: :update_test_open_responses_collection?
 
-    scope :answerable, -> {
-      where.not(
-        question_type: unanswerable_question_types,
-      )
-    }
-    scope :not_answerable, -> {
-      where(
-        question_type: unanswerable_question_types,
-      )
-    }
     scope :scale_questions, -> {
       where(
         question_type: question_type_categories[:scaled_rating],
       )
     }
-
-    enum question_type: {
-      question_context: 0,
-      question_useful: 1,
-      question_open: 2,
-      question_media: 4,
-      question_description: 5,
-      question_finish: 6,
-      question_clarity: 7,
-      question_excitement: 8,
-      question_different: 9,
-      question_category_satisfaction: 10,
+    scope :graphable_questions, -> {
+      where(
+        question_type: question_type_categories[:scaled_rating] + %i[question_single_choice question_multiple_choice],
+      )
     }
+
+    amoeba do
+      recognize [:has_many]
+      include_association :question_choices
+    end
 
     def self.question_type_categories
       {
         idea_content: %i[
           question_description
           question_media
+          question_idea
         ],
         scaled_rating: %i[
           question_context
@@ -121,12 +116,14 @@ class Item
           question_category_satisfaction
           question_context
           question_open
+          question_single_choice
+          question_multiple_choice
         ],
       }
     end
 
-    def self.unanswerable_question_types
-      %i[question_media question_description question_finish]
+    def self.scale_answer_numbers
+      (1..4).to_a
     end
 
     def self.question_title_and_description(question_type = nil)
@@ -173,6 +170,8 @@ class Item
     end
 
     def question_title_and_description
+      return customizable_title_and_description if question_choices_customizable?
+
       self.class.question_title_and_description(question_type)
     end
 
@@ -180,12 +179,23 @@ class Item
       question_title_and_description[:title]
     end
 
-    def question_description
-      question_title_and_description[:description]
+    def question_description(with_content: false)
+      description = question_title_and_description[:description]
+      return "#{description} #{content}?" if question_category_satisfaction? && with_content
+
+      description
     end
 
     def scale_question?
       self.class.question_type_categories[:scaled_rating].include?(question_type&.to_sym)
+    end
+
+    def question_choices_customizable?
+      question_single_choice? || question_multiple_choice?
+    end
+
+    def graphable_question?
+      scale_question? || question_choices_customizable?
     end
 
     def requires_roles?
@@ -215,74 +225,51 @@ class Item
       (points * 100.0 / total).round
     end
 
-    def create_response_graph(parent_collection:, initiated_by:, legend_item: nil)
-      return if !scale_question? || test_data_item.present?
-
-      legend_item ||= parent_collection.legend_item
-
-      builder = CollectionCardBuilder.new(
-        params: {
-          order: parent_collection_card.order,
-          height: 2,
-          width: 2,
-          item_attributes: {
-            type: 'Item::DataItem',
-            report_type: :report_type_question_item,
-            legend_item_id: legend_item&.id,
-          },
-        },
-        parent_collection: parent_collection,
-        user: initiated_by,
-      )
-      builder.create
-      if builder.collection_card.persisted?
-        data_item = builder.collection_card.record
-        question_dataset.data_items_datasets.create(
-          data_item: data_item,
-        )
-        data_item.data_items_datasets.create(
-          dataset: org_wide_question_dataset,
-        )
-      end
-
-      builder.collection_card
+    def unarchived_question_choices
+      # Don't consider archived choices when validating completeness of question
+      question_choices.reject(&:archived)
     end
 
-    def create_open_response_collection(parent_collection:, initiated_by:)
-      return if !question_open? || test_open_responses_collection.present?
-
-      builder = CollectionCardBuilder.new(
-        params: {
-          order: parent_collection_card.order,
-          collection_attributes: {
-            name: "#{content} Responses",
-            type: 'Collection::TestOpenResponses',
-            question_item_id: id,
-          },
-        },
-        parent_collection: parent_collection,
-        user: initiated_by,
-      )
-      builder.create
-      builder.collection_card
-    end
+    # TODO: these dataset creation methods should really be broken out into a service
 
     def org_wide_question_dataset
-      Dataset::Question.find_or_create_by(
-        groupings: [{ type: 'Organization', id: organization.id }],
+      org_grouping = [{ type: 'Organization', id: organization.id }]
+
+      dataset = Dataset::Question.where(
         question_type: question_type,
         identifier: Dataset::Question::DEFAULT_ORG_NAME,
         chart_type: :bar,
+      ).where(
+        'groupings @> ?',
+        org_grouping.to_json,
+      ).first
+
+      return dataset if dataset.present?
+
+      org_data_source = question_choices_customizable? ? self : nil
+      Dataset::Question.create(
+        question_type: question_type,
+        identifier: Dataset::Question::DEFAULT_ORG_NAME,
+        chart_type: :bar,
+        groupings: org_grouping,
+        data_source: org_data_source,
       )
     end
 
-    def create_test_audience_dataset(test_audience, data_item)
+    def create_test_audience_dataset(test_audience:, data_item:, idea: nil)
+      groupings = [{ type: 'TestAudience', id: test_audience.id }]
+      identifier = Dataset.identifier_for_object(test_audience)
+      if idea.present?
+        groupings.push(type: 'Item', id: idea.id)
+        identifier += Dataset.identifier_for_object(idea)
+      end
+
       audience_dataset = Dataset::Question.create(
-        groupings: [{ type: 'TestAudience', id: test_audience.id }],
+        groupings: groupings,
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
-        identifier: Dataset.identifier_for_object(test_audience),
+        identifier: identifier,
       )
       data_item.data_items_datasets.create(
         dataset: audience_dataset,
@@ -290,7 +277,60 @@ class Item
       )
     end
 
+    def create_idea_question_dataset(idea:, data_item:)
+      idea_grouping = [{ type: 'Item', id: idea.id }]
+
+      attrs = {
+        question_type: question_type,
+        chart_type: :bar,
+        data_source: self,
+        identifier: Dataset.identifier_for_object(idea),
+      }
+
+      idea_dataset = Dataset::Question.where(attrs)
+                                      .where(
+                                        'groupings @> ?', idea_grouping.to_json
+                                      ).first
+      idea_dataset ||= Dataset::Question.create(
+        attrs.merge(
+          groupings: idea_grouping,
+        ),
+      )
+
+      return idea_dataset if data_item.data_items_datasets.find_by(dataset: idea_dataset).present?
+
+      data_item.data_items_datasets.create(
+        dataset: idea_dataset,
+        selected: true,
+      )
+    end
+
+    def create_survey_response_idea_dataset(survey_response:, idea:, data_item:)
+      identifier = Dataset.identifier_for_object(survey_response) + Dataset.identifier_for_object(idea)
+      response_dataset = Dataset::Question.create(
+        groupings: [
+          { type: 'SurveyResponse', id: survey_response.id },
+          { type: 'Item', id: idea.id },
+        ],
+        question_type: question_type,
+        chart_type: :bar,
+        data_source: self,
+        identifier: identifier,
+      )
+      data_item.data_items_datasets.create(
+        dataset: response_dataset,
+        selected: true,
+      )
+    end
+
     private
+
+    def customizable_title_and_description
+      {
+        title: question_single_choice? ? 'Single Choice' : 'Multiple Choice',
+        description: content,
+      }
+    end
 
     def create_question_dataset
       self.question_dataset = Dataset::Question.create(
@@ -298,6 +338,17 @@ class Item
         timeframe: :month,
         chart_type: :bar,
       )
+    end
+
+    def add_default_question_choices
+      return if question_choices.any?
+
+      (0..3).each do |i|
+        question_choices.create(
+          value: i,
+          order: i,
+        )
+      end
     end
 
     def notify_test_design_collection_of_creation?

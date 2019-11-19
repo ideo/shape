@@ -729,7 +729,8 @@ class MovableGridCard extends React.PureComponent {
               !card.isPinnedAndLocked &&
               card.record &&
               !card.record.isChart &&
-              !card.record.isGenericFile,
+              !card.record.isGenericFile &&
+              !card.record.isCarousel,
             bottom: false,
             bottomLeft: false,
             left: false,

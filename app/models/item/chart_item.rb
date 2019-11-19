@@ -37,6 +37,7 @@
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
 #  index_items_on_type                                 (type)
 #

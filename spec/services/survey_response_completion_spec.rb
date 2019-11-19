@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe SurveyResponseCompletion, type: :service, truncate: true do
-  let(:test_collection) { create(:test_collection, :with_test_audience, :completed, num_cards: 1, test_status: :live) }
+  let(:test_collection) { create(:test_collection, :with_test_audience, :launched) }
   let(:test_audience) { test_collection.test_audiences.first }
   let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
   let(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
@@ -27,16 +27,22 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
   end
 
   describe '#call' do
-    it 'should call CollectionUpdateBroadcaster with the test_collection if status changes' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(test_collection)
-      service.call
-    end
+    let(:test_results_collection) { test_collection.test_results_collection }
 
     context 'when test audience is open' do
+      before do
+        allow(CreateSurveyResponseAliasCollectionWorker).to receive(:perform_async).and_call_original
+      end
+
       it 'marks the survey_response as completed' do
         expect(survey_response.completed?).to be false
         service.call
         expect(survey_response.completed?).to be true
+      end
+
+      it 'calls CreateSurveyResponseAliasCollectionWorker' do
+        expect(CreateSurveyResponseAliasCollectionWorker).to receive(:perform_async).with(survey_response.id)
+        service.call
       end
     end
 

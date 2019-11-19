@@ -4,7 +4,12 @@ RSpec.describe Search do
   let(:search_term) { 'foo' }
   let(:expected_defaults) do
     {
-      fields: %w[handle^6 name^5 tags^3 content],
+      fields: [
+        'handle^6',
+        { 'name^5': :word_start },
+        'tags^3',
+        'content',
+      ],
       per_page: 10,
       page: 1,
       where: {},
@@ -31,8 +36,8 @@ RSpec.describe Search do
     )
     expect(Searchkick).to receive(:search)
       .with(search_term,
+            fields: expected_defaults[:fields],
             foo: 'bar',
-            fields: %w[handle^6 name^5 tags^3 content],
             per_page: 10,
             page: 1,
             where: { baz: 'qux' })
@@ -60,7 +65,7 @@ RSpec.describe Search do
 
     expect(Searchkick).to receive(:search)
       .with('derp',
-            fields: %w[handle^6 name^5 tags^3 content],
+            fields: expected_defaults[:fields],
             per_page: 10,
             page: 1,
             where: { foo: 'bar' })

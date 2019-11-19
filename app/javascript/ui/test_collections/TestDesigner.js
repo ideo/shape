@@ -1,12 +1,16 @@
 import _ from 'lodash'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { ThemeProvider } from 'styled-components'
+import { Fragment } from 'react'
 import FlipMove from 'react-flip-move'
 import pluralize from 'pluralize'
 import googleTagManager from '~/vendor/googleTagManager'
 
+import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
-import QuestionSelectHolder from '~/ui/test_collections/QuestionSelectHolder'
+import QuestionLeftSide, {
+  LeftSideContainer,
+} from '~/ui/test_collections/QuestionLeftSide'
 import {
   TestQuestionHolder,
   styledTestTheme,
@@ -15,26 +19,9 @@ import QuestionHotEdge from '~/ui/test_collections/QuestionHotEdge'
 import TestQuestion from '~/ui/test_collections/TestQuestion'
 import RadioControl from '~/ui/global/RadioControl'
 import trackError from '~/utils/trackError'
-import { apiStore } from '~/stores'
 import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 // NOTE: Always import these models after everything else, can lead to odd dependency!
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-
-// TODO: have first and last TestQuestionFlexWrapper replace BottomBorder/TopBorder
-const TopBorder = styled.div`
-  background-color: ${props => props.theme.borderColorEditing};
-  border-radius: 7px 7px 0 0;
-  height: 16px;
-  margin-left: 314px;
-  width: 374px;
-
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    display: none;
-  }
-`
-const BottomBorder = styled(TopBorder)`
-  border-radius: 0 0 7px 7px;
-`
 
 const TestQuestionFlexWrapper = styled.div`
   display: flex;
@@ -50,8 +37,25 @@ const TestQuestionFlexWrapper = styled.div`
   }
 `
 
+const SECTIONS = ['intro', 'ideas', 'outro']
+
+const NUM_IDEAS_LIMIT = 6
+
+const Section = styled.div`
+  border-top: 1px solid ${v.colors.black};
+  margin: 1.25rem 0 -1.25rem 0;
+  padding-top: 0.5rem;
+`
+Section.displayName = 'StyledSection'
+
+const sectionTitle = section => {
+  if (section === 'ideas') return 'Idea(s)'
+  return section
+}
+
 const OuterContainer = styled.div`
   display: flex;
+  margin-bottom: 50px;
 
   .design-column {
     flex: 1 0 0;
@@ -77,25 +81,44 @@ const OuterContainer = styled.div`
   }
 `
 
+const EmptySectionHotEdgeWrapper = styled.div`
+  background: ${props => props.theme.borderColorEditing};
+  height: 48px;
+  width: 354px;
+  border-radius: 7px;
+`
+
+const userEditableQuestionType = questionType => {
+  return ['media', 'question_media', 'question_description'].includes(
+    questionType
+  )
+}
+
+@inject('apiStore', 'uiStore')
 @observer
 class TestDesigner extends React.Component {
   constructor(props) {
     super(props)
     const { collection_to_test, collection_to_test_id } = props.collection
     const hasCollectionToTest = collection_to_test && collection_to_test_id
+    this.seenEditWarningAt = null
     this.state = {
       testType: hasCollectionToTest ? 'collection' : 'media',
       collectionToTest: collection_to_test,
+      currentIdeaCardIndex: 0,
     }
   }
 
   async componentDidMount() {
+    // Load idea cards
+    if (this.ideasCollection) this.ideasCollection.API_fetchCards()
+
     if (this.state.collectionToTest) return
     // if none is set, we look up the parent to provide a default value
-    const { collection } = this.props
+    const { collection, apiStore } = this.props
     const { parent_id } = collection.parent_collection_card
     try {
-      const res = await collection.apiStore.fetch('collections', parent_id)
+      const res = await apiStore.fetch('collections', parent_id)
       // default setting to the parent collection
       this.setState({
         collectionToTest: res.data,
@@ -107,34 +130,78 @@ class TestDesigner extends React.Component {
     }
   }
 
+  get showEditWarning() {
+    if (!this.seenEditWarningAt) return true
+    const oneHourAgo = Date.now() - 1000 * 60 * 60
+    if (this.seenEditWarningAt < oneHourAgo) {
+      this.seenEditWarningAt = null
+      return true
+    }
+    return false
+  }
+
   get numResponses() {
     const { collection } = this.props
     return collection.num_survey_responses
   }
 
+  get ideasCollection() {
+    const { collection } = this.props
+    const card = collection.sortedCards.find(
+      card => card.card_question_type === 'ideas_collection'
+    )
+    if (card) return card.record
+  }
+
+  get cardsBySection() {
+    const { collection } = this.props
+    const sections = {}
+    SECTIONS.forEach(section => (sections[section] = []))
+    collection.sortedCards.forEach(card => {
+      if (sections[card.section_type]) sections[card.section_type].push(card)
+    })
+    return sections
+  }
+
   // This shows a dialog immediately
   confirmWithDialog = ({ prompt, onConfirm }) => {
-    const { collection } = this.props
-    collection.apiStore.uiStore.confirm({
-      prompt,
-      confirmText: 'Continue',
-      iconName: 'Alert',
-      onConfirm: () => onConfirm(),
+    const { uiStore } = this.props
+    return new Promise((resolve, reject) => {
+      uiStore.confirm({
+        prompt,
+        confirmText: 'Continue',
+        iconName: 'Alert',
+        onConfirm: () => {
+          resolve(true)
+          onConfirm()
+        },
+        onCancel: () => {
+          // Reset so they can confirm again if they'd like to edit
+          this.seenEditWarningAt = null
+          resolve(false)
+        },
+      })
     })
   }
 
   // This shows a dialog only if the collection is a template
   confirmEdit = action => {
     const { collection } = this.props
-    collection.confirmEdit({
-      onConfirm: () => action(),
+    // Return a promise that resolves true so editing can continue
+    return new Promise((resolve, reject) => {
+      resolve(true)
+      collection.confirmEdit({
+        onConfirm: () => action(),
+      })
     })
   }
 
+  // Make sure that any path through this function returns a promise
   confirmActionIfResponsesExist = ({ action, message, conditions = true }) => {
     const confirmableAction = () => this.confirmEdit(action)
-    if (this.numResponses > 0 && conditions) {
-      this.confirmWithDialog({
+    if (this.numResponses > 0 && conditions && this.showEditWarning) {
+      this.seenEditWarningAt = new Date()
+      return this.confirmWithDialog({
         prompt: `This test has ${pluralize(
           'response',
           this.numResponses,
@@ -143,8 +210,12 @@ class TestDesigner extends React.Component {
         onConfirm: confirmableAction,
       })
     } else {
-      confirmableAction()
+      return confirmableAction()
     }
+  }
+
+  onAddQuestionChoice = question => {
+    question.API_createQuestionChoice({})
   }
 
   handleSelectChange = replacingCard => ev => {
@@ -163,21 +234,44 @@ class TestDesigner extends React.Component {
   }
 
   handleTrash = card => {
-    this.confirmActionIfResponsesExist({
-      action: () => card.API_archiveSelf({}),
-      message: 'Are you sure you want to remove this question?',
-    })
+    const archiveCard = card => {
+      card.API_archiveSelf({})
+      if (card.card_question_type === 'question_idea') {
+        const { currentIdeaCardIndex } = this.state
+        this.handleSetCurrentIdeaCardIndex(currentIdeaCardIndex - 1)
+      }
+    }
+    // Idea cards already have a different warning modal, and our system does
+    // not support two confirm modals. We have to change how confirm modals work
+    // to do both warnings, which might not be a good user exp anyway.
+    if (card.card_question_type === 'question_idea') {
+      archiveCard(card)
+    } else {
+      this.confirmActionIfResponsesExist({
+        action: () => archiveCard(card),
+        message: 'Are you sure you want to remove this question?',
+      })
+    }
   }
 
-  handleNew = (card, addBefore) => () => {
+  handleNew = ({ card, sectionType, addBefore } = {}) => () => {
     this.confirmActionIfResponsesExist({
       action: () => {
-        const order = addBefore ? card.order - 0.5 : card.order + 1
-        const createdCard = this.createNewQuestionCard({ order })
-
+        const order = addBefore ? card.order : card.order + 1
+        const createdCard = this.createNewQuestionCard({ order, sectionType })
         if (createdCard) this.trackQuestionCreation()
       },
       message: 'Are you sure you want to add a new question?',
+    })
+  }
+
+  handleSetCurrentIdeaCardIndex = index => {
+    const numIdeas = this.ideasCollection
+      ? this.ideasCollection.sortedCards.length
+      : 0
+    if (index < 0 || index > numIdeas - 1) return
+    this.setState({
+      currentIdeaCardIndex: index,
     })
   }
 
@@ -188,21 +282,17 @@ class TestDesigner extends React.Component {
     })
   }
 
-  archiveMediaCardsIfDefaultState() {
-    const { sortedCards } = this.props.collection
-    const [first, second, third] = sortedCards
-    // basic check to see if we are (roughly) in the default state
-    const defaultState =
-      first &&
-      second &&
-      third &&
-      first.card_question_type === 'question_media' &&
-      second.card_question_type === 'question_description' &&
-      third.card_question_type === 'question_useful' &&
-      sortedCards.length === 4
-    if (!defaultState) return false
-    // archive the media and description card when switching to testType -> collection
-    return first.API_archiveCards(_.map([first, second], 'id'))
+  handleToggleShowMedia = e => {
+    const { ideasCollection } = this
+    const { collection } = this.props
+    this.confirmEdit(() => {
+      collection.test_show_media = !collection.test_show_media
+      if (ideasCollection) {
+        // simulate backend update that will happen in tandem
+        ideasCollection.test_show_media = collection.test_show_media
+      }
+      collection.save()
+    })
   }
 
   handleTestTypeChange = e => {
@@ -214,13 +304,25 @@ class TestDesigner extends React.Component {
       if (value === 'media') {
         collection.collection_to_test_id = null
       } else if (collectionToTest) {
-        await this.archiveMediaCardsIfDefaultState()
         collection.collection_to_test_id = collectionToTest.id
       } else {
         return
       }
-      collection.save()
+      await collection.save()
+      collection.API_fetchCards()
     })
+  }
+
+  handleQuestionFocus = async () => {
+    if (!this.canEditQuestions) return false
+    if (!this.testIsLive) return true
+    const result = await this.confirmActionIfResponsesExist({
+      action: () => {
+        return true
+      },
+      message: 'Are you sure you want to edit this question?',
+    })
+    return result
   }
 
   get styledTheme() {
@@ -228,11 +330,6 @@ class TestDesigner extends React.Component {
       return styledTestTheme('secondary')
     }
     return styledTestTheme('primary')
-  }
-
-  get locked() {
-    const { collection } = this.props
-    return collection.is_test_locked
   }
 
   get canEditQuestions() {
@@ -257,35 +354,102 @@ class TestDesigner extends React.Component {
     // NOTE: if we ever allow template instance editors to add their own questions at the end
     // (before the finish card?) then we may want to individually check canEdit on a per card basis
     if (isTemplated) return false
-    return can_edit_content && !this.locked
+    return can_edit_content
   }
 
-  createNewQuestionCard = async ({
+  get testIsLive() {
+    const { test_status } = this.props.collection
+    return test_status === 'live'
+  }
+
+  get reachedNumIdeasLimit() {
+    if (!this.ideasCollection) return false
+    return this.ideasCollection.collection_cards.length >= NUM_IDEAS_LIMIT
+  }
+
+  get canAddIdeas() {
+    if (!this.canEdit || this.testIsLive || !this.ideasCollection) return false
+    return true
+  }
+
+  // A method specifically designed for adding new idea cards
+  // All other cards can be created using createNewQuestionCard
+  createNewIdea = async ({ order }) => {
+    const { uiStore } = this.props
+    if (this.reachedNumIdeasLimit) {
+      uiStore.alert(
+        `To ensure quality responses, a single test is limited to a maximum of ${NUM_IDEAS_LIMIT} ideas total. To evaluate more ideas, please create an additional test.`
+      )
+      return
+    }
+    const result = await this.confirmActionIfResponsesExist({
+      action: () => {
+        return true
+      },
+      message: 'Are you sure you want to add a new idea?',
+    })
+    if (!result) return
+
+    return this.createNewQuestionCard({
+      questionType: 'question_idea',
+      sectionType: 'ideas',
+      parentCollection: this.ideasCollection,
+      order,
+    })
+  }
+
+  createNewQuestionCard = ({
     replacingCard,
     order,
+    sectionType,
     questionType = '',
+    parentCollection = null,
   }) => {
-    const { collection } = this.props
+    const { collection, apiStore } = this.props
+    const parent = parentCollection || collection
+    let newSectionType = 'ideas'
+    if (this.state.testType === 'media') {
+      newSectionType = replacingCard ? replacingCard.section_type : sectionType
+    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.QUESTION,
         question_type: questionType,
       },
+      section_type: newSectionType,
       order: replacingCard ? replacingCard.order : order,
-      parent_id: collection.id,
+      parent_id: parent.id,
     }
     const card = new CollectionCard(attrs, apiStore)
-    card.parent = collection
+    card.parent = parent
     if (replacingCard) {
       // Set new card in same place as that you are replacing
       card.order = replacingCard.order
-      await replacingCard.API_archiveSelf({})
+      return card.API_replace({ replacingCard })
+    } else {
+      return card.API_create()
     }
-    return card.API_create()
   }
 
-  renderHotEdge(card, addBefore = false) {
-    return <QuestionHotEdge onAdd={this.handleNew(card, addBefore)} />
+  renderHotEdge({
+    card,
+    sectionType,
+    addBefore = false,
+    lastCard = false,
+  } = {}) {
+    if (!this.canEdit) return
+    let noCard = false
+    if (card && !card.hasOwnProperty('id')) {
+      noCard = true
+    }
+
+    return (
+      <QuestionHotEdge
+        noCard={noCard}
+        lastCard={lastCard}
+        onAdd={this.handleNew({ card, sectionType, addBefore })}
+      />
+    )
   }
 
   renderTestTypeForm() {
@@ -335,61 +499,130 @@ class TestDesigner extends React.Component {
     )
   }
 
-  render() {
+  renderCard = (card, firstCard, lastCard, i, sectionType) => {
     const { collection } = this.props
-    const cardCount = collection.sortedCards.length
-    const inner = collection.sortedCards.map((card, i) => {
-      let position
-      const item = card.record
-      // blank item can occur briefly while the placeholder card/item is being replaced
-      if (!item) return null
-      if (i === 0) position = 'question_beginning'
-      if (i === cardCount - 1) position = 'question_end'
-      const userEditable = [
-        'media',
-        'question_media',
-        'question_description',
-      ].includes(item.question_type)
+    const { test_status } = collection
+    const { currentIdeaCardIndex } = this.state
+    let questionParent
+    let questionCard
+    if (card.card_question_type === 'ideas_collection') {
+      questionParent = card.record
+      questionCard = questionParent.sortedCards[currentIdeaCardIndex]
+    } else {
+      questionParent = collection
+      questionCard = card
+    }
+    // Return if it tries to render idea card before they have been loaded
+    if (!questionCard) return
+    const { record } = questionCard
+    // Record is not present momentarily when turning an idea into a media item
+    if (!record) return
+    return (
+      <Fragment>
+        <QuestionLeftSide
+          card={questionCard}
+          canEdit={this.canEdit}
+          handleSelectChange={this.handleSelectChange}
+          handleTrash={this.handleTrash}
+          canAddChoice={record.isCustomizableQuestionType}
+          onAddChoice={this.onAddQuestionChoice}
+          createNewQuestionCard={this.createNewQuestionCard}
+          createNewIdea={this.createNewIdea}
+          ideasCollection={this.ideasCollection}
+          showMedia={collection.test_show_media}
+          handleToggleShowMedia={this.handleToggleShowMedia}
+          handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}
+          currentIdeaCardIndex={currentIdeaCardIndex}
+          canAddIdeas={this.canAddIdeas}
+          onAddChoice={this.onAddQuestionChoice}
+        />
+        <TestQuestionHolder
+          editing
+          firstCard={firstCard}
+          lastCard={lastCard}
+          userEditable={userEditableQuestionType(record.card_question_type)}
+        >
+          {i === 0 &&
+            this.renderHotEdge({ card, sectionType, addBefore: true })}
+          <TestQuestion
+            editing
+            parent={questionParent}
+            card={questionCard}
+            order={questionCard.order}
+            handleFocus={this.handleQuestionFocus}
+            canEdit={this.canEditQuestions}
+            question_choices={record.question_choices}
+            testStatus={test_status}
+          />
+          {card.card_question_type !== 'question_finish' &&
+            this.renderHotEdge({ card, sectionType, lastCard })}
+        </TestQuestionHolder>
+      </Fragment>
+    )
+  }
+
+  renderCards(cards, sectionType = null) {
+    return cards.map((card, i) => {
+      let firstCard = false
+      let lastCard = false
+      if (!card.record) return null
+      const cardCount = cards.length
+      if (i === 0) firstCard = true
+      if (i === cardCount - 1) lastCard = true
       return (
         <FlipMove appearAnimation="fade" key={card.id}>
           <TestQuestionFlexWrapper className={`card ${card.id}`}>
-            {i === 0 && this.canEdit && this.renderHotEdge(card, true)}
-            <QuestionSelectHolder
-              card={card}
-              canEdit={this.canEdit}
-              handleSelectChange={this.handleSelectChange}
-              handleTrash={this.handleTrash}
-            />
-            <TestQuestionHolder editing userEditable={userEditable}>
-              <TestQuestion
-                editing
-                parent={collection}
-                card={card}
-                item={item}
-                position={position}
-                order={card.order}
-                canEdit={this.canEditQuestions}
-              />
-            </TestQuestionHolder>
-            {this.canEdit &&
-              card.card_question_type !== 'question_finish' &&
-              this.renderHotEdge(card)}
+            {this.renderCard(card, firstCard, lastCard, i, sectionType)}
           </TestQuestionFlexWrapper>
         </FlipMove>
       )
     })
+  }
 
+  renderSections() {
+    return _.map(this.cardsBySection, (cards, sectionType) => (
+      <Fragment key={`section-${sectionType}`}>
+        <Section>
+          <LargerH3 data-cy="section-title">
+            {sectionTitle(sectionType)}
+          </LargerH3>
+        </Section>
+        {cards.length === 0 && (
+          <TestQuestionFlexWrapper>
+            <LeftSideContainer></LeftSideContainer>
+            <EmptySectionHotEdgeWrapper>
+              {this.renderHotEdge({
+                card: { order: 0 },
+                sectionType,
+                addBefore: true,
+              })}
+            </EmptySectionHotEdgeWrapper>
+          </TestQuestionFlexWrapper>
+        )}
+        {this.renderCards(cards, sectionType)}
+      </Fragment>
+    ))
+  }
+
+  renderQuestions() {
+    const { collection } = this.props
+    return this.renderCards(collection.sortedCards)
+  }
+
+  render() {
+    const { testType } = this.state
+    const { collection, apiStore } = this.props
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
           <div className={'design-column'}>
-            <h3>Feedback Design</h3>
-            <TopBorder />
-            {inner}
-            <BottomBorder />
+            <LargerH3>Feedback Design</LargerH3>
+            {testType === 'media'
+              ? this.renderSections()
+              : this.renderQuestions()}
           </div>
           <div className={'settings-column'}>
-            <h3>Feedback Settings</h3>
+            <LargerH3>Feedback Settings</LargerH3>
             {this.renderTestTypeForm()}
             {apiStore.currentUser && (
               <AudienceSettings testCollection={collection} />
@@ -402,6 +635,10 @@ class TestDesigner extends React.Component {
 }
 TestDesigner.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+TestDesigner.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default TestDesigner

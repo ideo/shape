@@ -8,6 +8,17 @@ import objectAssignDeep from '~/vendor/object-assign-deep'
 
 import v from '~/utils/variables'
 
+export const barWidthPx = (totalColumns, totalGroupings) => {
+  const padding = 16
+  const maxWidth = 644
+  const totalBars = totalColumns * totalGroupings
+  const widthModifier = maxWidth / totalBars
+  const width = Math.min(widthModifier - padding, 28)
+  return width
+}
+
+// 30 / (5 / 1 / 2)
+
 export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
   const dashWidths = [[2, 4], [3, 1], [4, 2], [2, 8], [8, 6], [1, 5]]
   const values = dashWidths[order - 1] ? dashWidths[order - 1] : dashWidths[0]
@@ -194,8 +205,8 @@ export const victoryTheme = objectAssignDeep({}, VictoryTheme.grayscale, {
 
 export const emojiSeries = {
   question_useful: [
-    { number: 1, name: 'Very useless', symbol: '👎' },
-    { number: 2, name: 'Somewhat useless', scale: 0.6, symbol: '👎' },
+    { number: 1, name: 'Not at all useful', symbol: '👎' },
+    { number: 2, name: 'Not very useful', scale: 0.6, symbol: '👎' },
     { number: 3, name: 'Somewhat useful', scale: 0.6, symbol: '👍' },
     { number: 4, name: 'Very useful', symbol: '👍' },
   ],

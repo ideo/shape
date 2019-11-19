@@ -10,16 +10,37 @@ RSpec.describe Dataset::Question, type: :model do
       expect(dataset.name).to eq(test_collection.name)
     end
 
-    context 'if TestDesign collection' do
+    context 'if TestCollection' do
+      let(:name) { 'Innovative Stuff' }
+      let(:feedback_design_name) do
+        "#{name}#{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}"
+      end
       before do
         test_collection.update(
-          name: Collection::TestDesign.generate_name('Innovative Stuff'),
+          name: feedback_design_name,
         )
       end
 
-      it 'removes "Feedback Design" from the name' do
-        expect(test_collection.name).to eq('Innovative Stuff Feedback Design')
-        expect(dataset.name).to eq('Innovative Stuff')
+      it 'uses the test_collection.base_name' do
+        expect(test_collection.name).to eq(feedback_design_name)
+        expect(dataset.name).to eq(name)
+        expect(dataset.name).to eq(test_collection.base_name)
+      end
+    end
+
+    context 'for category satisfaction question' do
+      let(:question_item) do
+        create(
+          :question_item,
+          question_type: :question_category_satisfaction,
+          parent_collection: test_collection,
+          content: 'socks',
+        )
+      end
+
+      it 'uses the description with full content' do
+        expect(dataset.description).to eq 'How satisfied are you with your current socks?'
+        expect(dataset.name).to eq test_collection.name
       end
     end
   end

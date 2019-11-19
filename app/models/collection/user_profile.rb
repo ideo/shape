@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -30,12 +31,14 @@
 #  collection_to_test_id      :bigint(8)
 #  created_by_id              :integer
 #  default_group_id           :integer
+#  idea_id                    :integer
 #  joinable_group_id          :bigint(8)
 #  organization_id            :bigint(8)
 #  question_item_id           :integer
 #  roles_anchor_collection_id :bigint(8)
 #  submission_box_id          :bigint(8)
 #  submission_template_id     :integer
+#  survey_response_id         :integer
 #  template_id                :integer
 #  test_collection_id         :bigint(8)
 #
@@ -46,6 +49,7 @@
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
 #  index_collections_on_created_at                  (created_at)
+#  index_collections_on_idea_id                     (idea_id)
 #  index_collections_on_organization_id             (organization_id)
 #  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
 #  index_collections_on_submission_box_id           (submission_box_id)

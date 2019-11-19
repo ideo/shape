@@ -47,6 +47,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'submission_template_id',
     'submission_box_type',
     'collection_to_test_id',
+    'test_show_media',
   ]
 
   @computed
@@ -300,12 +301,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::TestCollection'
   }
 
-  get isTestDesign() {
-    return this.type === 'Collection::TestDesign'
+  get isTestResultsCollection() {
+    return this.type === 'Collection::TestResultsCollection'
   }
 
-  get isTestCollectionOrTestDesign() {
-    return this.isTestCollection || this.isTestDesign
+  get isTestCollectionOrResults() {
+    return this.isTestCollection || this.isTestResultsCollection
   }
 
   get isBoard() {
@@ -352,24 +353,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       !this.isSubTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
-      !this.isTestDesign &&
+      !this.isTestResultsCollection &&
       !this.isTestCollection
-    )
-  }
-
-  get requiresTestDesigner() {
-    // this determines if it should display the TestDesigner in CollectionPage,
-    return (
-      this.isTestDesign ||
-      (this.isTestCollection && this.test_status === 'draft') ||
-      this.is_submission_box_template_test
     )
   }
 
   get launchableTestId() {
     if (this.isTestCollection) {
       return this.id
-    } else if (this.isTestDesign) {
+    } else if (this.isTestResultsCollection) {
       return this.test_collection_id
     } else if (this.submission_attrs) {
       return this.submission_attrs.launchable_test_id
@@ -377,9 +369,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return undefined
   }
 
+  get isCarousel() {
+    return this.cover_type === 'cover_type_carousel'
+  }
+
   @computed
   get launchableTestStatus() {
-    if (this.isTestCollectionOrTestDesign) {
+    if (this.isTestCollectionOrResults) {
       return this.test_status
     }
     if (!this.submission_attrs) return null
@@ -737,10 +733,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   checkLaunchability() {
     if (!this.can_edit_content || !this.launchable) {
       // TODO: More specific messaging around why e.g. if this is a submission template...
-      let message = 'Only editors are allowed to launch the test.'
-      if (this.is_submission_box_template_test) {
-        message =
-          'You must close any other live tests before launching this one.'
+      let message =
+        'You must close any other live tests before launching this one.'
+      if (this.is_inside_a_submission) {
+        message = 'Only editors are allowed to launch the test.'
       }
       this.uiStore.alert(message)
       return false
@@ -787,15 +783,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.submission_attrs) {
       collection = await this._fetchSubmissionTest()
     }
-    if (_.includes(['launch', 'reopen'], actionName)) {
-      if (collection.checkLaunchability()) {
-        // called with 'this' so that we know if the submission is calling it
-        return this.API_performTestAction(actionName, audiences)
+    if (
+      _.includes(['launch', 'reopen'], actionName) &&
+      collection.checkLaunchability()
+    ) {
+      // called with 'this' so that we know if the submission is calling it
+      await this.API_performTestAction(actionName, audiences)
+      if (actionName === 'launch') {
+        this.routingStore.routeTo(
+          'collections',
+          collection.test_results_collection.id
+        )
       }
-      return false
+    } else if (actionName === 'close') {
+      // e.g. for close
+      return this.API_performTestAction(actionName)
     }
-    // e.g. for close
-    return this.API_performTestAction(actionName)
   }
 
   trackTestAction = actionName => {
@@ -838,7 +841,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       let prompt = `You have questions that have not yet been finalized:\n
          ${errorMessages}
         `
-      if (_.includes(prompt, 'Test audiences')) {
+      if (
+        _.includes(prompt, 'Test audiences') ||
+        _.includes(prompt, 'already have')
+      ) {
         prompt = `Test unable to launch:\n
            ${errorMessages}
           `

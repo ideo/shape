@@ -63,10 +63,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "reselectOnlyEditableCards": [MockFunction],
             "row": 0,
             "save": [MockFunction],
+            "section_type": null,
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "maxWidth": 1,
@@ -124,10 +132,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "reselectOnlyEditableCards": [MockFunction],
             "row": 0,
             "save": [MockFunction],
+            "section_type": null,
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "save": [MockFunction],
@@ -175,6 +191,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
         "API_updateNameAndCover": [MockFunction],
+        "addCard": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
@@ -248,10 +265,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -309,10 +334,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -374,10 +407,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -435,10 +476,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -500,10 +549,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -561,10 +618,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -634,6 +699,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
             "API_updateNameAndCover": [MockFunction],
+            "addCard": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -707,10 +773,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -768,10 +842,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -833,10 +915,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -894,10 +984,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -959,10 +1057,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1020,10 +1126,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1121,10 +1235,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1182,10 +1304,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1247,10 +1377,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1308,10 +1446,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1373,10 +1519,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -1434,10 +1588,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -1459,6 +1621,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "reselectOnlyEditableCards": [MockFunction],
           "row": 0,
           "save": [MockFunction],
+          "section_type": null,
           "update": [MockFunction],
           "width": 1,
         },
@@ -1521,10 +1684,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -1582,10 +1753,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -1647,10 +1826,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -1708,10 +1895,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -1773,10 +1968,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -1834,10 +2037,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -1909,10 +2120,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "reselectOnlyEditableCards": [MockFunction],
           "row": 0,
           "save": [MockFunction],
+          "section_type": null,
           "update": [MockFunction],
           "width": 1,
         },
-        "quill_data": undefined,
+        "quill_data": Object {
+          "ops": Array [
+            Object {
+              "insert": "hello world 
+",
+            },
+          ],
+        },
         "type": "Item::TextItem",
       }
     }
@@ -1979,10 +2198,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "reselectOnlyEditableCards": [MockFunction],
             "row": 0,
             "save": [MockFunction],
+            "section_type": null,
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "maxWidth": 1,
@@ -2040,10 +2267,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "reselectOnlyEditableCards": [MockFunction],
             "row": 0,
             "save": [MockFunction],
+            "section_type": null,
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "save": [MockFunction],
@@ -2091,6 +2326,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
         "API_updateNameAndCover": [MockFunction],
+        "addCard": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
@@ -2164,10 +2400,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -2225,10 +2469,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -2290,10 +2542,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -2351,10 +2611,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -2416,10 +2684,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -2477,10 +2753,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -2550,6 +2834,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
             "API_updateNameAndCover": [MockFunction],
+            "addCard": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -2623,10 +2908,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2684,10 +2977,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -2749,10 +3050,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2810,10 +3119,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -2875,10 +3192,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -2936,10 +3261,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3037,10 +3370,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -3098,10 +3439,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3163,10 +3512,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -3224,10 +3581,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3289,10 +3654,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -3350,10 +3723,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -3375,6 +3756,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "reselectOnlyEditableCards": [MockFunction],
           "row": 0,
           "save": [MockFunction],
+          "section_type": null,
           "update": [MockFunction],
           "width": 1,
         },
@@ -3437,10 +3819,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -3498,10 +3888,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -3563,10 +3961,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -3624,10 +4030,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -3689,10 +4103,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -3750,10 +4172,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -3825,10 +4255,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "reselectOnlyEditableCards": [MockFunction],
           "row": 0,
           "save": [MockFunction],
+          "section_type": null,
           "update": [MockFunction],
           "width": 1,
         },
-        "quill_data": undefined,
+        "quill_data": Object {
+          "ops": Array [
+            Object {
+              "insert": "hello world 
+",
+            },
+          ],
+        },
         "type": "Item::TextItem",
       }
     }
@@ -3895,10 +4333,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "reselectOnlyEditableCards": [MockFunction],
             "row": 0,
             "save": [MockFunction],
+            "section_type": null,
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "maxWidth": 1,
@@ -3956,10 +4402,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "reselectOnlyEditableCards": [MockFunction],
             "row": 0,
             "save": [MockFunction],
+            "section_type": null,
             "update": [MockFunction],
             "width": 1,
           },
-          "quill_data": undefined,
+          "quill_data": Object {
+            "ops": Array [
+              Object {
+                "insert": "hello world 
+",
+              },
+            ],
+          },
           "type": "Item::TextItem",
         },
         "save": [MockFunction],
@@ -4007,6 +4461,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "API_unselectDatasetsWithIdentifier": [MockFunction],
         "API_updateCard": [MockFunction],
         "API_updateNameAndCover": [MockFunction],
+        "addCard": [MockFunction],
         "anyone_can_join": false,
         "anyone_can_view": false,
         "assign": [MockFunction],
@@ -4080,10 +4535,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -4141,10 +4604,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -4206,10 +4677,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -4267,10 +4746,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -4332,10 +4819,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -4393,10 +4888,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -4466,6 +4969,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
             "API_updateNameAndCover": [MockFunction],
+            "addCard": [MockFunction],
             "anyone_can_join": false,
             "anyone_can_view": false,
             "assign": [MockFunction],
@@ -4539,10 +5043,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4600,10 +5112,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -4665,10 +5185,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4726,10 +5254,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -4791,10 +5327,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -4852,10 +5396,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -4953,10 +5505,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -5014,10 +5574,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5079,10 +5647,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -5140,10 +5716,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5205,10 +5789,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "maxWidth": 1,
@@ -5266,10 +5858,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                     "reselectOnlyEditableCards": [MockFunction],
                     "row": 0,
                     "save": [MockFunction],
+                    "section_type": null,
                     "update": [MockFunction],
                     "width": 1,
                   },
-                  "quill_data": undefined,
+                  "quill_data": Object {
+                    "ops": Array [
+                      Object {
+                        "insert": "hello world 
+",
+                      },
+                    ],
+                  },
                   "type": "Item::TextItem",
                 },
                 "save": [MockFunction],
@@ -5291,6 +5891,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "reselectOnlyEditableCards": [MockFunction],
           "row": 0,
           "save": [MockFunction],
+          "section_type": null,
           "update": [MockFunction],
           "width": 1,
         },
@@ -5353,10 +5954,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -5414,10 +6023,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -5479,10 +6096,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -5540,10 +6165,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -5605,10 +6238,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "maxWidth": 1,
@@ -5666,10 +6307,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
                 "reselectOnlyEditableCards": [MockFunction],
                 "row": 0,
                 "save": [MockFunction],
+                "section_type": null,
                 "update": [MockFunction],
                 "width": 1,
               },
-              "quill_data": undefined,
+              "quill_data": Object {
+                "ops": Array [
+                  Object {
+                    "insert": "hello world 
+",
+                  },
+                ],
+              },
               "type": "Item::TextItem",
             },
             "save": [MockFunction],
@@ -5741,10 +6390,18 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "reselectOnlyEditableCards": [MockFunction],
           "row": 0,
           "save": [MockFunction],
+          "section_type": null,
           "update": [MockFunction],
           "width": 1,
         },
-        "quill_data": undefined,
+        "quill_data": Object {
+          "ops": Array [
+            Object {
+              "insert": "hello world 
+",
+            },
+          ],
+        },
         "type": "Item::TextItem",
       }
     }

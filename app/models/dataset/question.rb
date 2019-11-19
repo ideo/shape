@@ -52,13 +52,10 @@ class Dataset
     end
 
     def name
-      if grouping.present?
-        # Just name off the first grouping for now, change in future
-        klass = grouping['type'].constantize
-        object = klass.find(grouping['id'].to_i)
-        "#{object.name} #{klass.display_name}"
+      if groupings.present?
+        grouping_objects.map(&:dataset_display_name).join(' - ')
       elsif test_collection_id.present? && test_collection.present?
-        test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
+        test_collection.base_name
       else
         identifier
       end
@@ -66,7 +63,7 @@ class Dataset
 
     def identifier
       if groupings.blank? && test_collection.present?
-        test_collection.name.sub(Collection::TestDesign::COLLECTION_SUFFIX, '')
+        test_collection.base_name
       else
         self[:identifier]
       end
@@ -81,7 +78,7 @@ class Dataset
     end
 
     def description
-      question_item.question_description
+      question_item.question_description(with_content: true)
     end
 
     def test_collection_id

@@ -27,6 +27,7 @@ FactoryBot.define do
 
     factory :collection_card_question do
       item factory: :question_item
+      section_type :ideas
       collection nil
     end
 

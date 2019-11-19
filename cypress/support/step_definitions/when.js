@@ -147,11 +147,13 @@ When('I add a link URL', () => {
   )
   cy.locate('LinkCreatorFormButton').click()
   cy.wait('@apiReplaceCollectionCard')
+  // wait for card to reappear with the link media
+  cy.wait(FLIPMOVE_DELAY)
 })
 
-When('I fill {string} with some text', string => {
+When('I fill the last {string} with some text', string => {
   cy.locateDataOrClass(string)
-    .first()
+    .last()
     .click()
     .type('Let me introduce my lovely prototype.')
 })
@@ -163,6 +165,14 @@ When('I fill {string} with {string}', (string, url) => {
     .type(url)
 })
 
+When('I fill the {word} {string} with {string}', (num, element, string) => {
+  cy.locateDataOrClass(element)
+    .eq(parseInt(num) - 1)
+    .click()
+    .wait(FLIPMOVE_DELAY)
+    .type(string)
+})
+
 When('I add a test email for {string}', string => {
   cy.locateDataOrClass(string)
     .first()
@@ -170,30 +180,37 @@ When('I add a test email for {string}', string => {
     .type('name@example.com')
 })
 
-When('I add an open response question', () => {
+When('I enter {string} as my category', string => {
+  cy.locate('category-satisfaction-input')
+    .first()
+    .click()
+    .type(string)
+})
+
+// NOTE: this just adds an open response in the "last" spot
+When('I add an open response question with {string}', text => {
   cy.locate('QuestionHotEdgeButton')
     .last()
     .click()
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY + 500)
-  cy.locateDataOrClass('.SelectHolderContainer')
-    .eq(3)
-    .find('.select')
-    .click()
-  cy.locateWith('QuestionSelectOption', 'Open Response')
-    .first()
+  cy.locateDataOrClass('QuestionSelectOption-customizable')
+    .last()
     .click()
   cy.wait(FLIPMOVE_DELAY)
+  cy.locateDataOrClass('QuestionSelectOption-open-response')
+    .last()
+    .click()
   cy.wait('@apiArchiveCollectionCards')
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
 
-  cy.locate('DescriptionQuestionText')
+  cy.locate('QuestionContentEditorText')
     .last()
     .click()
-    .type('What do you think about pizza?')
+    .type(text)
   cy.wait('@apiUpdateItem')
 })
 
@@ -246,10 +263,12 @@ When('I click the last {string}', el => {
     .click({ force: true })
 })
 
-When('I click {string}', el => {
-  cy.locateDataOrClass(el)
-    .first()
+When('I click the last answerable emoji', () => {
+  cy.locateDataOrClass('ScaleEmojiBtn')
+    .last()
     .click({ force: true })
+    .wait('@apiCreateQuestionAnswer')
+    .wait(FLIPMOVE_DELAY)
 })
 
 When('I wait for {string} to finish', apiCall => {

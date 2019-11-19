@@ -10,17 +10,42 @@ RSpec.describe QuestionAnswer, type: :model do
   context 'associations' do
     it { should belong_to(:survey_response) }
     it { should belong_to(:question) }
+    it { should belong_to(:idea) }
   end
 
   describe 'validations' do
-    describe 'answer_number presence' do
-      let(:question_answer) do
+    let(:question_answer) do
+      build(:question_answer,
+            :unanswered,
+            survey_response: survey_response,
+            question: question)
+    end
+
+    describe 'unique survey_response, question_id, idea_id' do
+      let(:question_answer2) do
         build(:question_answer,
               :unanswered,
               survey_response: survey_response,
               question: question)
       end
 
+      it 'validates uniqueness' do
+        expect(question_answer.save).to be true
+        expect(question_answer2.save).to be false
+      end
+
+      context 'with multiple ideas' do
+        it 'validates uniqueness' do
+          expect(question_answer.update(idea_id: 1)).to be true
+          # this won't work
+          expect(question_answer2.update(idea_id: 1)).to be false
+          # but unique idea will
+          expect(question_answer2.update(idea_id: 2)).to be true
+        end
+      end
+    end
+
+    describe 'answer_number presence' do
       context 'scale question' do
         before do
           question.update(question_type: :question_clarity)
@@ -103,6 +128,9 @@ RSpec.describe QuestionAnswer, type: :model do
     end
 
     context 'completed response' do
+      # NOTE: this test is also effectively testing some of the underlying services e.g.
+      # TestResultsCollection::CreateAndLinkOpenResponse
+      let!(:test_collection) { create(:test_collection, :open_response_questions, :launched) }
       let!(:question_answers) do
         survey_response.question_items.map do |question|
           create(:question_answer,
@@ -113,6 +141,9 @@ RSpec.describe QuestionAnswer, type: :model do
       let(:question_answer) { question_answers.first.reload }
 
       before do
+        TestResultsCollection::CreateContent.call(
+          test_results_collection: test_collection.test_results_collection,
+        )
         expect(survey_response.reload.completed?).to be true
       end
 
@@ -122,13 +153,13 @@ RSpec.describe QuestionAnswer, type: :model do
         end
 
         it 'updates open response item with updated answer' do
-          expect(question_answer.open_response_item.plain_content).not_to eq(
+          expect(question_answer.open_response_item.plain_content).not_to include(
             'What a jolly prototype',
           )
           question_answer.update(
             answer_text: 'What a jolly prototype',
           )
-          expect(question_answer.open_response_item.reload.plain_content).to eq(
+          expect(question_answer.open_response_item.reload.plain_content).to include(
             'What a jolly prototype',
           )
         end

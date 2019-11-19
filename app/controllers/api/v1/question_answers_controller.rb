@@ -28,6 +28,8 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
       :answer_text,
       :answer_number,
       :question_id,
+      :idea_id,
+      selected_choice_ids: [],
     )
   end
 
@@ -35,12 +37,17 @@ class Api::V1::QuestionAnswersController < Api::V1::BaseController
     params.require(:question_answer).permit(
       :answer_text,
       :answer_number,
+      selected_choice_ids: [],
     )
   end
 
   def load_survey_response
     @survey_response = SurveyResponse.find_by_session_uid(params[:survey_response_id])
-    head(:unprocessable_entity) unless @survey_response.present? && @survey_response.test_collection.still_accepting_answers?
+    accepting_answers = @survey_response.present? && @survey_response.test_collection.still_accepting_answers?
+    return if accepting_answers
+
+    @survey_response.errors.add(:base, 'no longer accepting answers')
+    render_api_errors @survey_response.errors
   end
 
   def build_question_answer

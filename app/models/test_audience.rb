@@ -75,8 +75,8 @@ class TestAudience < ApplicationRecord
     Shape::FEEDBACK_INCENTIVE_AMOUNT
   end
 
-  def self.display_name
-    'Audience'
+  def dataset_display_name
+    "#{name} Audience"
   end
 
   def paid?
