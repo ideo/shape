@@ -8,9 +8,6 @@ class SurveyResponseValidation < SimpleService
   end
 
   def call
-    # puts '***' * 3
-    # puts answerable_ids.to_s
-    # puts answered_ids.to_s
     (answerable_ids - answered_ids).empty?
   end
 
@@ -20,7 +17,7 @@ class SurveyResponseValidation < SimpleService
 
   def answerable_ids
     TestCollectionCardsForSurvey.call(test_collection).map do |card|
-      [card.item.id, card.idea_id] if card.item.answerable?
+      [card.item.id, card.idea_id] if card.item.present? && card.item.answerable?
     end.compact
   end
 end

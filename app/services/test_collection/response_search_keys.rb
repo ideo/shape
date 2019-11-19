@@ -44,6 +44,14 @@ module TestCollection
         question: question,
         dont_include_test_answer_wrapper: true,
       }
+
+      # Generate keys without idea
+      generate_keys_for_question(
+        question: question,
+        answer: answer,
+        answer_key_attrs: answer_key_attrs,
+      )
+
       # Generate keys without audience
       generate_keys_for_question(
         question: question,

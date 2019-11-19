@@ -107,21 +107,14 @@ RSpec.describe QuestionAnswer, type: :model do
     end
 
     context 'complete after test closed' do
+      let(:survey_response) { create(:survey_response, :fully_answered, status: :in_progress, test_collection: test_collection) }
       before do
         test_collection.close!
-      end
-      let!(:question_answers) do
-        # Note - if you create survey response above at the top of the test,
-        # it will already be marked as completed because it thinks it has no questions
-        survey_response.question_items.map do |question|
-          create(:question_answer,
-                 survey_response: survey_response,
-                 question: question)
-        end
       end
 
       describe 'within allowable window' do
         it 'marks the survey_response as completed_late' do
+          survey_response.question_answer_created_or_destroyed
           expect(survey_response.reload.status).to eq 'completed_late'
         end
       end
@@ -131,14 +124,8 @@ RSpec.describe QuestionAnswer, type: :model do
       # NOTE: this test is also effectively testing some of the underlying services e.g.
       # TestResultsCollection::CreateAndLinkOpenResponse
       let!(:test_collection) { create(:test_collection, :open_response_questions, :launched) }
-      let!(:question_answers) do
-        survey_response.question_items.map do |question|
-          create(:question_answer,
-                 survey_response: survey_response,
-                 question: question)
-        end
-      end
-      let(:question_answer) { question_answers.first.reload }
+      let!(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection) }
+      let(:question_answer) { survey_response.question_answers.first.reload }
 
       before do
         TestResultsCollection::CreateContent.call(

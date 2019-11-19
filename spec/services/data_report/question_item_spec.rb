@@ -39,16 +39,8 @@ RSpec.describe DataReport::QuestionItem, type: :service do
              num_responses: 5,
              organization: organization)
     end
-    let!(:survey_response) { create(:survey_response, test_collection: test_collection) }
+    let!(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection) }
     let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
-    let!(:question_answers) do
-      survey_response.question_items.map do |question_item|
-        create(:question_answer,
-               survey_response: survey_response,
-               question: question_item,
-               idea: idea)
-      end
-    end
 
     before do
       other_test_collection.reload
@@ -133,7 +125,9 @@ RSpec.describe DataReport::QuestionItem, type: :service do
     context 'filtering by test audience' do
       let!(:audience) { create(:audience, organizations: [organization]) }
       let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection) }
-      let!(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
+      let!(:survey_response) do
+        create(:survey_response, :fully_answered, test_collection: test_collection, test_audience: test_audience)
+      end
       let!(:question_item) { survey_response.question_items.select(&:question_useful?).first }
       let(:groupings) do
         [
@@ -147,14 +141,14 @@ RSpec.describe DataReport::QuestionItem, type: :service do
                question_type: question_item.question_type,
                groupings: groupings)
       end
-      let!(:question_answers) do
-        survey_response.question_items.map do |question_item|
-          create(:question_answer,
-                 survey_response: survey_response,
-                 question: question_item,
-                 idea: idea)
-        end
-      end
+      # let!(:question_answers) do
+      #   survey_response.question_items.map do |question_item|
+      #     create(:question_answer,
+      #            survey_response: survey_response,
+      #            question: question_item,
+      #            idea: question_item.parent_collection_card.ideas? ? idea : nil)
+      #   end
+      # end
       let(:answer_search_key) do
         proc do |answer_number|
           TestCollection::AnswerSearchKey.new(
