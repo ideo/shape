@@ -278,13 +278,27 @@ class Item
     end
 
     def create_idea_question_dataset(idea:, data_item:)
-      idea_dataset = Dataset::Question.create(
-        groupings: [{ type: 'Item', id: idea.id }],
+      idea_grouping = [{ type: 'Item', id: idea.id }]
+
+      attrs = {
         question_type: question_type,
         chart_type: :bar,
         data_source: self,
         identifier: Dataset.identifier_for_object(idea),
+      }
+
+      idea_dataset = Dataset::Question.where(attrs)
+                                      .where(
+                                        'groupings @> ?', idea_grouping.to_json
+                                      ).first
+      idea_dataset ||= Dataset::Question.create(
+        attrs.merge(
+          groupings: idea_grouping,
+        ),
       )
+
+      return idea_dataset if data_item.data_items_datasets.find_by(dataset: idea_dataset).present?
+
       data_item.data_items_datasets.create(
         dataset: idea_dataset,
         selected: true,

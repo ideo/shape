@@ -48,6 +48,7 @@ module TestResultsCollection
       create_idea_datasets if idea.present?
       create_survey_response_idea_datasets if survey_response.present?
       link_question_and_org_wide_datasets
+      create_all_ideas_datasets if idea.blank? && survey_response.blank?
       create_test_audiences_datasets
     end
 
@@ -80,6 +81,17 @@ module TestResultsCollection
       end
     end
 
+    # Datasets of each idea that get attached to master results
+    def create_all_ideas_datasets
+      item.parent.idea_items.each do |idea|
+        item.create_idea_question_dataset(
+          idea: idea,
+          data_item: data_item,
+        )
+      end
+    end
+
+    # Dataset for an idea that show up in idea collection
     def create_idea_datasets
       item.create_idea_question_dataset(
         idea: idea,
@@ -87,6 +99,7 @@ module TestResultsCollection
       )
     end
 
+    # Dataset for each response - idea combination
     def create_survey_response_idea_datasets
       survey_response.test_collection.idea_items.each do |idea|
         item.create_survey_response_idea_dataset(

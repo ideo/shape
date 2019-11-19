@@ -363,6 +363,7 @@ class TestDesigner extends React.Component {
   }
 
   get reachedNumIdeasLimit() {
+    if (!this.ideasCollection) return false
     return this.ideasCollection.collection_cards.length >= NUM_IDEAS_LIMIT
   }
 

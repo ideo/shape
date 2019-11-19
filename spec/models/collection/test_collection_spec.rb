@@ -362,9 +362,9 @@ describe Collection::TestCollection, type: :model do
                 end
               end.to change(
                 Dataset::Question, :count
-              ).by(scale_question_num * 2) # All scale questions get one dataset + for each audience
-              expect(Dataset::Question.last.groupings).to eq(
-                [{ 'id' => test_audience.id, 'type' => 'TestAudience' }],
+              ).by(scale_question_num * 4) # All scale questions get test dataset, idea(s) datasets and audience dataset
+              expect(Dataset::Question.last.groupings).to include(
+                'id' => test_audience.id, 'type' => 'TestAudience',
               )
             end
 
