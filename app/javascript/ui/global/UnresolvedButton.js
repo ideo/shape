@@ -6,9 +6,11 @@ import UnresolvedCount from '~/ui/threads/UnresolvedCount'
 
 const StyledUnresolvedButton = styled.button`
   position: relative;
-  bottom: 10%;
+  bottom: 5%;
   ${props => props.hasNoOtherIcons && `left: 8px;`}
 `
+
+StyledUnresolvedButton.displayName = 'StyledUnresolvedButton'
 
 const UnresolvedButton = ({
   record,

@@ -13,8 +13,8 @@ import PinnedIcon from '~/ui/icons/PinnedIcon'
 
 import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
-import HiddenIconButton from '~/ui/icons/HiddenIconButton'
-import UnresolvedButton from '~/ui/icons/UnresolvedButton'
+import HiddenIconButton from '~/ui/global/HiddenIconButton'
+import UnresolvedButton from '~/ui/global/UnresolvedButton'
 import { apiStore } from '~/stores/'
 
 export const StyledIconsWrapper = styled.div`
@@ -39,7 +39,7 @@ StyledIconWrapper.displayName = 'StyledIconWrapper'
 
 /* LinkIcon (and HiddenIcon) appears larger than CollectionIcon so we need to make it smaller */
 export const StyledSmallIconWrapper = styled.div`
-  width: 18px;
+  width: ${props => (props.width ? props.width : 18)}px;
   height: 18px;
   bottom: 0.75rem;
 `
@@ -111,7 +111,7 @@ class BottomLeftCardIcons extends React.Component {
       }
     } else if (card.link) {
       icons.push(
-        <StyledSmallIconWrapper>
+        <StyledSmallIconWrapper width={45}>
           <LinkIcon />
         </StyledSmallIconWrapper>
       )

@@ -4,14 +4,16 @@ import styled from 'styled-components'
 
 import { uiStore } from '~/stores'
 import Tooltip from '~/ui/global/Tooltip'
-import HiddenIcon from './HiddenIcon'
-import HiddenIconSm from './HiddenIconSm'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
+import HiddenIconSm from '~/ui/icons/HiddenIconSm'
 
 const StyledHiddenIconButton = styled.button`
   position: relative;
   bottom: 10%;
   right: 2px;
 `
+
+StyledHiddenIconButton.displayName = 'StyledHiddenIconButton'
 
 const HiddenIconButton = ({ record, size, clickable, IconWrapper }) => {
   const parent = record.parent || uiStore.viewingCollection
