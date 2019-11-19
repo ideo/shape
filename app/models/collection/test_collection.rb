@@ -544,6 +544,48 @@ class Collection
       test_audiences.paid.sum(:sample_size)
     end
 
+    # #########################################################################
+    # This migrates unlaunched pre-feedback-3.0 test collections to a feedback-3.0
+    # style test collection, ready to be launched.
+    def migrate!
+      ideas_collection_card = primary_collection_cards.create(
+        order: 0,
+        section_type: :ideas,
+        record: Collection.build_ideas_collection,
+      )
+      first_media_item = items.where(
+        type: ['Item::FileItem', 'Item::LinkItem', 'Item::VideoItem']
+      ).first
+      first_description_item = items.question_description.first
+
+      if first_media_item.present?
+        first_media_item.update(
+          question_type: :question_idea,
+          content: first_description_item.content,
+        )
+        # Move this "idea" to the ideas collection
+        first_media_item.parent_collection_card.update(
+          parent_id: ideas_collection_card.collection.id,
+        )
+        first_description_item.destroy
+      elsif first_description_item.present?
+        first_description_item.update(
+          question_type: :question_idea,
+        )
+        first_description_item.parent_collection_card.update(
+          parent_id: ideas_collection_card.collection.id,
+        )
+        update(test_show_media: false)
+      end
+
+      primary_collection_cards.update_all(
+        section_type: :ideas
+      )
+      items.question_finish.parent_collection_card.update(
+        section_type: :outro
+      )
+    end
+
     private
 
     def question_items_from_sections(section_names)
