@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import PropTypes from 'prop-types'
 import { Box } from 'reflexbox'
 import v from '~/utils/variables'
+import { kebabCase } from 'lodash'
 
 import {
   MarketingH1Bold,
@@ -120,7 +121,11 @@ const Description = styled(MarketingContent)`
  */
 
 const PriceCard = props => {
-  const { title, price, price_unit, button, description } = props
+  const { pageName, title, price, price_unit, button, description } = props
+  const buttonId = [pageName, title, button.text]
+    .map(string => kebabCase(string))
+    .join('-')
+
   return (
     <PriceCardBase>
       <MarketingFlex justify="center" px={40} py={40}>
@@ -138,7 +143,11 @@ const PriceCard = props => {
             <div dangerouslySetInnerHTML={{ __html: price_unit }} />
           </Unit>
           <Box mt={[0, 0, 0]} mb={[20, 20, 20]} w={[1, 1, 1]}>
-            <CTAButton variant={'solid-yellow'} href={button.link}>
+            <CTAButton
+              variant={'solid-yellow'}
+              href={button.link}
+              id={buttonId}
+            >
               {button.text}
             </CTAButton>
           </Box>
@@ -151,6 +160,7 @@ const PriceCard = props => {
   )
 }
 PriceCard.propTypes = {
+  pageName: PropTypes.string,
   title: PropTypes.string.isRequired,
   price: PropTypes.number,
   price_unit: PropTypes.string.isRequired,
