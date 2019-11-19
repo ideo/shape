@@ -9,7 +9,7 @@ class TestCollectionCardsForSurvey < SimpleService
   end
 
   def call
-    randomize_idea_order
+    initialize_idea_cards
     collect_complete_cards_for_section(:intro)
     collect_idea_cards
     collect_complete_cards_for_section(:outro)
@@ -18,9 +18,14 @@ class TestCollectionCardsForSurvey < SimpleService
 
   private
 
-  def randomize_idea_order
-    # simple enough way to randomize?
-    @idea_cards = @test_collection.idea_cards.visible.shuffle
+  def initialize_idea_cards
+    if @test_collection.collection_to_test.present?
+      # just collect "one idea" to be iterated over
+      @idea_cards = [CollectionCard.new]
+    else
+      # simple enough way to randomize?
+      @idea_cards = @test_collection.idea_cards.visible.shuffle
+    end
   end
 
   def collect_idea_cards

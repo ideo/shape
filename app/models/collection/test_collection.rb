@@ -511,8 +511,8 @@ class Collection
     end
 
     def idea_items
-      return Item.none if ideas_collection.blank?
-      return Item.none if ideas_collection.parent_collection_card.hidden == true
+      return Item.none if ideas_collection.blank? ||
+                          ideas_collection.parent_collection_card.hidden?
 
       ideas_collection.items
                       .joins(:parent_collection_card)

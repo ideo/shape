@@ -405,13 +405,7 @@ class TestDesigner extends React.Component {
     parentCollection = null,
   }) => {
     const { collection, apiStore } = this.props
-    const parent = parentCollection ? parentCollection : collection
-    if (!this.canAddNewIdea) {
-      collection.apiStore.uiStore.alert(
-        'To ensure quality responses, a single test is limited to a maximum of 6 ideas total. To evaluate more ideas, please create an additional test.'
-      )
-      return
-    }
+    const parent = parentCollection || collection
     let newSectionType = 'ideas'
     if (this.state.testType === 'media') {
       newSectionType = replacingCard ? replacingCard.section_type : sectionType

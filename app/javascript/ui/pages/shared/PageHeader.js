@@ -211,8 +211,8 @@ class PageHeader extends React.Component {
     const { record, uiStore } = this.props
     if (record.idea_id) return
     if (
-      (record.isLiveTest && record.has_link_sharing) ||
-      record.collection_to_test_id
+      record.isLiveTest &&
+      (record.has_link_sharing || record.collection_to_test_id)
     ) {
       return (
         <Fragment>

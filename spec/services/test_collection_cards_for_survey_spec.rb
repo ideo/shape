@@ -36,6 +36,21 @@ RSpec.describe TestCollectionCardsForSurvey, type: :service do
       # we use match_array because the idea order is randomized
       expect(idea_question_cards.map(&:idea_id)).to match_array(idea_ids)
     end
+
+    context 'switching to in-collection test' do
+      let(:collection_to_test) { create(:collection) }
+      before do
+        test_collection.update(collection_to_test: collection_to_test)
+      end
+
+      it 'only collects the idea section once' do
+        sections = ['intro']
+        # does not collect ideas cards x2
+        sections += ['ideas'] * 5
+        sections += ['outro'] * 2
+        expect(survey_cards.map(&:section_type)).to eq(sections)
+      end
+    end
   end
 
   context 'with incomplete cards' do
