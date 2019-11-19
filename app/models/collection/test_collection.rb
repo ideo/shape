@@ -268,6 +268,7 @@ class Collection
       return true unless collection_to_test_id.present?
 
       # lastly -- make sure there is not another live in-collection test for the same collection
+      # TODO: should we let the client know if they already have a live in-collection test?
       collection_to_test.live_test_collection.blank?
     end
 
