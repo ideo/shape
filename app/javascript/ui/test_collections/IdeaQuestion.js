@@ -1,14 +1,15 @@
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { TestQuestionBorder } from '~/ui/test_collections/shared'
 import MediaQuestion from '~/ui/test_collections/MediaQuestion'
 import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 
+@observer
 class IdeaQuestion extends React.Component {
   render() {
-    const { card, parent, canEdit, hideMedia, handleFocus } = this.props
+    const { card, parent, canEdit, handleFocus } = this.props
     return (
       <Fragment>
         <QuestionContentEditor
@@ -28,7 +29,9 @@ class IdeaQuestion extends React.Component {
           itemAttribute="content"
           canEdit={canEdit}
         />
-        {!hideMedia && <MediaQuestion parent={parent} card={card} />}
+        {parent.test_show_media && (
+          <MediaQuestion parent={parent} card={card} />
+        )}
       </Fragment>
     )
   }
@@ -39,12 +42,10 @@ IdeaQuestion.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
-  hideMedia: PropTypes.bool,
   handleFocus: PropTypes.func,
 }
 IdeaQuestion.defaultProps = {
   canEdit: false,
-  hideMedia: false,
   handleFocus: () => true,
 }
 IdeaQuestion.displayName = 'IdeaQuestion'

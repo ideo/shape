@@ -30,9 +30,10 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
           intro
         </StyledLargerH3>
       </StyledSection>
-      <styled.div
-        className="card"
-      />
+      <styled.div>
+        <styled.div />
+        <styled.div />
+      </styled.div>
       <StyledSection>
         <StyledLargerH3
           data-cy="section-title"
@@ -12104,9 +12105,10 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
           outro
         </StyledLargerH3>
       </StyledSection>
-      <styled.div
-        className="card"
-      />
+      <styled.div>
+        <styled.div />
+        <styled.div />
+      </styled.div>
     </div>
     <div
       className="settings-column"

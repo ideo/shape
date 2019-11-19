@@ -47,6 +47,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'submission_template_id',
     'submission_box_type',
     'collection_to_test_id',
+    'test_show_media',
   ]
 
   @computed
