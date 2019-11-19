@@ -428,6 +428,12 @@ class Item < ApplicationRecord
     # Question cards that are in the blank default state
     return true if question_type.blank? && filestack_file_id.blank? && url.blank?
 
+    # Single choice question cards with no options
+    return true if question_single_choice? && question_choices.blank?
+
+    # Single choice question cards with no options
+    return true if question_multiple_choice? && question_choices.blank?
+
     false
   end
 
