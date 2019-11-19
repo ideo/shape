@@ -9,7 +9,7 @@ class TestComparison < SimpleService
   end
 
   def add
-    return false if same_collection?
+    return false if same_collection? || @comparison_collection.test_results_collection.blank?
 
     collection_question_data_items.includes(primary_dataset: :question_item).each do |data_item|
       question_item = data_item.primary_dataset.question_item
@@ -86,6 +86,7 @@ class TestComparison < SimpleService
 
   def collection_question_data_items
     @collection
+      .test_results_collection
       .data_items
       .report_type_question_item
       .includes(primary_dataset: :question_item)

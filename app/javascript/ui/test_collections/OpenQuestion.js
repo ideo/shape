@@ -4,13 +4,12 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
 
 import ArrowIcon from '~/ui/icons/ArrowIcon'
-import DescriptionQuestion from './DescriptionQuestion'
+import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 import {
-  QuestionText,
   TextResponseHolder,
   TextInput,
   TextEnterButton,
-} from './shared'
+} from '~/ui/test_collections/shared'
 
 const QuestionSpacing = css`
   border-bottom-color: ${props =>
@@ -23,32 +22,37 @@ export const QuestionSpacingContainer = styled.div`
   ${QuestionSpacing};
 `
 
-const QuestionTextWithSpacing = styled(QuestionText)`
-  ${QuestionSpacing};
-`
-QuestionTextWithSpacing.displayName = 'QuestionTextWithSpacing'
-
 @observer
 class OpenQuestion extends React.Component {
   constructor(props) {
     super(props)
     const { questionAnswer } = props
-    this.save = _.debounce(this._save, 1000)
+    this.saveAnswer = _.debounce(this._saveAnswer, 1000)
     this.state = {
       response: questionAnswer ? questionAnswer.answer_text : '',
       focused: false,
     }
   }
 
-  _save = () => {
-    const { item } = this.props
-    item.save()
+  _saveAnswer = () => {
+    const { onAnswer } = this.props
+    onAnswer({ text: this.state.response, skipScrolling: true })
   }
 
   handleResponse = ev => {
-    this.setState({
-      response: ev.target.value,
-    })
+    const { questionAnswer } = this.props
+
+    this.setState(
+      {
+        response: ev.target.value,
+      },
+      () => {
+        if (!questionAnswer || questionAnswer.answer_text.length === 0) {
+          return
+        }
+        this.saveAnswer()
+      }
+    )
   }
 
   handleSubmit = ev => {
@@ -59,25 +63,20 @@ class OpenQuestion extends React.Component {
   }
 
   renderQuestion() {
-    const { editing, item, canEdit } = this.props
-    let content
-    if (editing) {
-      content = (
-        <QuestionSpacingContainer editing={editing}>
-          <DescriptionQuestion
-            item={item}
-            maxLength={100}
-            placeholder="this question is optional"
-            canEdit={canEdit}
-          />
-        </QuestionSpacingContainer>
-      )
-    } else {
-      content = (
-        <QuestionTextWithSpacing>{item.content}</QuestionTextWithSpacing>
-      )
-    }
-    return content
+    const { editing, item, canEdit, handleFocus } = this.props
+
+    return (
+      <QuestionSpacingContainer editing={editing}>
+        <QuestionContentEditor
+          item={item}
+          maxLength={100}
+          placeholder="please enter question here"
+          canEdit={canEdit}
+          handleFocus={handleFocus}
+          optional
+        />
+      </QuestionSpacingContainer>
+    )
   }
 
   render() {
@@ -93,7 +92,7 @@ class OpenQuestion extends React.Component {
               onBlur={() => this.setState({ focused: false })}
               value={this.state.response}
               type="questionText"
-              placeholder="this question is optional"
+              placeholder="please enter your response"
               disabled={editing}
               data-cy="OpenQuestionTextInput"
             />
@@ -101,7 +100,7 @@ class OpenQuestion extends React.Component {
               focused={this.state.focused}
               data-cy="OpenQuestionTextButton"
             >
-              <ArrowIcon />
+              <ArrowIcon rotation={90} />
             </TextEnterButton>
           </TextResponseHolder>
         </form>
@@ -114,12 +113,14 @@ OpenQuestion.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
+  handleFocus: PropTypes.func,
   onAnswer: PropTypes.func,
   canEdit: PropTypes.bool,
 }
 OpenQuestion.defaultProps = {
   questionAnswer: null,
   editing: false,
+  handleFocus: () => true,
   onAnswer: () => null,
   canEdit: false,
 }

@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -30,12 +31,14 @@
 #  collection_to_test_id      :bigint(8)
 #  created_by_id              :integer
 #  default_group_id           :integer
+#  idea_id                    :integer
 #  joinable_group_id          :bigint(8)
 #  organization_id            :bigint(8)
 #  question_item_id           :integer
 #  roles_anchor_collection_id :bigint(8)
 #  submission_box_id          :bigint(8)
 #  submission_template_id     :integer
+#  survey_response_id         :integer
 #  template_id                :integer
 #  test_collection_id         :bigint(8)
 #
@@ -46,6 +49,7 @@
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
 #  index_collections_on_created_at                  (created_at)
+#  index_collections_on_idea_id                     (idea_id)
 #  index_collections_on_organization_id             (organization_id)
 #  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
 #  index_collections_on_submission_box_id           (submission_box_id)
@@ -95,7 +99,7 @@ class Collection < ApplicationRecord
                  :cached_last_card_order,
                  :submission_attrs,
                  :getting_started_shell,
-                 :awaiting_first_user_content,
+                 :loading_content,
                  :cached_inheritance,
                  :common_viewable
 
@@ -207,11 +211,13 @@ class Collection < ApplicationRecord
     cover_type_default: 0,
     cover_type_items: 1,
     cover_type_text_and_media: 2,
+    cover_type_carousel: 3,
   }
 
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
-  searchkick callbacks: :queue
+  searchkick callbacks: :queue,
+             word_start: %i[name]
 
   # searchable == don't index User/SharedWithMe collections
   scope :search_import, -> do
@@ -447,6 +453,16 @@ class Collection < ApplicationRecord
     CollectionCard.where(id: duplicates.pluck(:id))
   end
 
+  def self.build_ideas_collection
+    collection = new(name: 'Ideas')
+    collection.primary_collection_cards.build(
+      record: Item::QuestionItem.new(
+        question_type: :question_idea,
+      ),
+    )
+    collection
+  end
+
   # NOTE: this refers to the first level of children
   # i.e. things directly in this collection
   def children
@@ -665,7 +681,7 @@ class Collection < ApplicationRecord
 
   def cache_key(card_order = 'order', user_id = nil)
     test_details = ''
-    if test_collection?
+    if test_or_test_results_collection?
       # make sure these details factor into caching
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
     end
@@ -774,7 +790,11 @@ class Collection < ApplicationRecord
   # - could perhaps be moved into a helper module?
   # =================================
   def test_collection?
-    is_a?(Collection::TestCollection) || is_a?(Collection::TestDesign)
+    is_a?(Collection::TestCollection)
+  end
+
+  def test_or_test_results_collection?
+    test_collection? || is_a?(Collection::TestResultsCollection)
   end
 
   def board_collection?
@@ -882,8 +902,20 @@ class Collection < ApplicationRecord
       parent_application_collection.present?
   end
 
+  def awaiting_updates?
+    getting_started_shell || loading_content
+  end
+
   # =================================
   # <--- end boolean checks
+  #
+
+  def serial_collection_cover_items
+    return items_and_linked_items if cover_type_carousel?
+
+    # Only include cover items if this collection has indicated to use them
+    cover_type_default? ? [] : collection_cover_items
+  end
 
   private
 

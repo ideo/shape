@@ -125,10 +125,19 @@ class Ability
         test_audience.link_sharing? &&
           test_audience.test_collection.can_edit?(user)
       end
+
+      can :manage, QuestionChoice do |question_choice|
+        question_choice.can_edit?(user)
+      end
+
+      can :read, QuestionChoice do |question_choice|
+        question_choice.can_view?(user)
+      end
     end
     # for logged-out users and fallback for all users
     can :read, Collection, anyone_can_view: true
     can :read, Collection, anyone_can_join: true
+    can :read, Item, anyone_can_view: true
 
     # don't allow any of the editing actions unless you've accepted terms
     # (i.e. user becomes view-only)

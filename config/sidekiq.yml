@@ -15,6 +15,7 @@ default_schedule: &default_schedule
   searchkick_reindex_worker:
     every: '1m'
     class: SearchkickReindexWorker
+    enabled: true # always enabled to ensure records are indexed
   notification_mention_mailer:
     every: '5m'
     class: NotificationMentionMailerWorker

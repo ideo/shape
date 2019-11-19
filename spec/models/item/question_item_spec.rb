@@ -5,29 +5,75 @@ RSpec.describe Item::QuestionItem, type: :model do
     it { should have_many(:question_answers) }
   end
 
-  describe 'callbacks' do
-    describe '#notify_test_design_of_creation' do
-      it 'does not notify if test design does not exist' do
-        allow_any_instance_of(Collection::TestDesign).to receive(:question_item_created)
-        expect_any_instance_of(Collection::TestDesign).not_to receive(:question_item_created)
-        create(:question_item)
+  context 'callbacks' do
+    context 'after_create' do
+      context 'with a customizable question' do
+        let!(:question_item) { create(:question_item, question_type: :question_single_choice) }
+
+        it 'should create 4 default question choices' do
+          expect(question_item.question_choices.count).to be 4
+        end
+      end
+    end
+  end
+
+  context 'boolean matchers' do
+    let!(:question_customizable) { create(:question_item, question_type: :question_single_choice) }
+    let!(:question_scale) { create(:question_item, question_type: :question_excitement) }
+    let!(:question_description) { create(:question_item, question_type: :question_description) }
+    let!(:file_item) { create(:file_item) }
+
+    describe '#question_choices_customizable?' do
+      it 'should return true for single/multi choice' do
+        expect(question_customizable.question_choices_customizable?).to be true
+        expect(question_scale.question_choices_customizable?).to be false
+        expect(question_description.question_choices_customizable?).to be false
+      end
+    end
+
+    describe '#question_scale?' do
+      it 'should return true for scaled question' do
+        expect(question_customizable.scale_question?).to be false
+        expect(question_scale.scale_question?).to be true
+        expect(question_description.scale_question?).to be false
+        expect(file_item.scale_question?).to be false
+      end
+    end
+
+    describe '#graphable_question?' do
+      it 'should return true for both customizable and scale' do
+        expect(question_customizable.graphable_question?).to be true
+        expect(question_scale.graphable_question?).to be true
+        expect(question_description.graphable_question?).to be false
+        expect(file_item.graphable_question?).to be false
+      end
+    end
+  end
+
+  context 'validations' do
+    context 'adding more than 6 ideas to a test' do
+      let(:idea_collection) { create(:collection) }
+      let(:collection_card) do
+        create(:collection_card,
+               parent: idea_collection,
+               section_type: :ideas)
       end
 
-      context 'with test design' do
-        let!(:survey_response) { create(:survey_response) }
-        let!(:test_design) do
-          create(:test_design, test_collection: survey_response.test_collection)
+      before do
+        7.times do
+          create(:question_item,
+                 question_type: :question_idea,
+                 parent_collection: idea_collection)
         end
+      end
 
-        it 'does notify of question creation' do
-          # Stub out parent so it's simpler to setup test
-          allow(test_design).to receive(:question_item_created)
-          allow_any_instance_of(Item::QuestionItem).to receive(:parent).and_return(test_design)
-          question_item = create(:question_item)
-          expect(
-            test_design,
-          ).to have_received(:question_item_created).with(question_item)
-        end
+      it 'should fail validation' do
+        idea_item = Item::QuestionItem.create(
+          parent_collection_card: collection_card,
+          question_type: :question_idea,
+        )
+        expect(idea_item.valid?).to be false
+        expect(idea_item.errors.messages[:base]).to eq ['too many ideas']
       end
     end
   end
@@ -35,17 +81,18 @@ RSpec.describe Item::QuestionItem, type: :model do
   context 'with a launched test collection' do
     let(:user) { create(:user) }
     let(:user2) { create(:user) }
-    let(:test_collection) { create(:test_collection, :completed) }
+    let(:test_collection) { create(:test_collection, :launched) }
 
     describe '#score' do
-      before { test_collection.launch! }
       let(:question_item) { test_collection.question_items.select(&:question_useful?).first }
-      let!(:response) { create(:survey_response, test_collection: test_collection) }
+      let(:test_audience) { create(:test_audience, test_collection: test_collection) }
+      let!(:response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
       let!(:responses) do
         create_list(:survey_response,
                     4,
                     :fully_answered,
-                    test_collection: test_collection)
+                    test_collection: test_collection,
+                    test_audience: test_audience)
       end
       let!(:question_answers) { question_item.question_answers }
       before do
@@ -62,23 +109,20 @@ RSpec.describe Item::QuestionItem, type: :model do
       end
     end
 
-    context 'and a useful question' do
-      let(:test_design) do
-        create(:test_design, test_collection: test_collection, add_editors: [user], add_viewers: [user2])
-      end
+    context 'with roles on the test_collection' do
+      let(:test_collection) { create(:test_collection, :completed, add_editors: [user], add_viewers: [user2]) }
       let(:question_card) do
         # use builder so that it actually handles the right permissions
-        builder = CollectionCardBuilder.new(
+        CollectionCardBuilder.call(
           params: {
+            section_type: :ideas,
             item_attributes: {
               type: 'Item::QuestionItem',
               question_type: :question_useful,
             },
           },
-          parent_collection: test_design,
+          parent_collection: test_collection,
         )
-        builder.create
-        builder.collection_card
       end
       let(:question_item) { question_card.item }
 
@@ -86,6 +130,27 @@ RSpec.describe Item::QuestionItem, type: :model do
         expect(question_item.can_edit?(user)).to be true
         expect(question_item.can_edit?(user2)).to be false
         expect(question_item.can_view?(user2)).to be true
+      end
+    end
+  end
+
+  describe '#question_description' do
+    context 'for category satisfaction question' do
+      let(:question) do
+        create(
+          :question_item,
+          question_type: :question_category_satisfaction,
+          content: 'socks',
+        )
+      end
+
+      it 'returns customized version' do
+        expect(question.question_description).to eq(
+          'How satisfied are you with your current',
+        )
+        expect(question.question_description(with_content: true)).to eq(
+          'How satisfied are you with your current socks?',
+        )
       end
     end
   end

@@ -37,6 +37,7 @@
 #  index_items_on_cloned_from_id                       (cloned_from_id)
 #  index_items_on_created_at                           (created_at)
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
+#  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
 #  index_items_on_type                                 (type)
 #
@@ -72,8 +73,6 @@ class Item < ApplicationRecord
 
   store_accessor :cached_attributes,
                  :cached_tag_list,
-                 :cached_filestack_file_url,
-                 :cached_filestack_file_info,
                  :previous_thumbnail_urls,
                  :cached_inheritance,
                  :pending_transcoding_uuid,
@@ -104,15 +103,16 @@ class Item < ApplicationRecord
            -> { none },
            foreign_key: 'data_item_id'
 
+  has_one :question_item, class_name: 'Item::QuestionItem'
+  has_one :test_results_collection,
+          class_name: 'Collection::TestResultsCollection',
+          inverse_of: :idea,
+          foreign_key: :idea_id
+
   delegate :parent, :pinned, :pinned?, :pinned_and_locked?,
            to: :parent_collection_card, allow_nil: true
   delegate :organization, to: :parent, allow_nil: true
   belongs_to :cloned_from, class_name: 'Item', optional: true
-  has_one :question_item, class_name: 'Item::QuestionItem'
-
-  scope :questions, -> { where(type: 'Item::QuestionItem') }
-  scope :data_items, -> { where(type: 'Item::DataItem') }
-  scope :legend_items, -> { where(type: 'Item::LegendItem') }
 
   before_validation :format_url, if: :saved_change_to_url?
   before_create :generate_name, unless: :name_present?
@@ -125,6 +125,52 @@ class Item < ApplicationRecord
   after_commit :reindex_parent_collection, unless: :destroyed?
   after_commit :update_parent_collection_if_needed, unless: :destroyed?
 
+  scope :questions, -> { where(type: 'Item::QuestionItem') }
+  scope :data_items, -> { where(type: 'Item::DataItem') }
+  scope :legend_items, -> { where(type: 'Item::LegendItem') }
+  scope :answerable, -> {
+    where.not(
+      question_type: unanswerable_question_types,
+    )
+  }
+  scope :not_answerable, -> {
+    where(
+      question_type: unanswerable_question_types,
+    )
+  }
+
+  scope :in_ideas_section, -> {
+    joins(:primary_collection_cards)
+      .merge(CollectionCard.section_types[:ideas])
+  }
+
+  # declared in Item so that media (e.g. Files/Links) can utilize this
+  enum question_type: {
+    question_context: 0,
+    question_useful: 1,
+    question_open: 2,
+    # 3 - end is deprecated
+    question_media: 4,
+    question_description: 5,
+    question_finish: 6,
+    question_clarity: 7,
+    question_excitement: 8,
+    question_different: 9,
+    question_category_satisfaction: 10,
+    question_idea: 11,
+    question_single_choice: 12,
+    question_multiple_choice: 13,
+  }
+
+  def self.unanswerable_question_types
+    %i[
+      question_media
+      question_description
+      question_finish
+      question_idea
+    ]
+  end
+
   amoeba do
     enable
     recognize []
@@ -134,7 +180,8 @@ class Item < ApplicationRecord
 
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
-  searchkick callbacks: :queue
+  searchkick callbacks: :queue,
+             word_start: %i[name]
 
   # active == don't index archived items
   scope :search_import, -> do
@@ -144,8 +191,16 @@ class Item < ApplicationRecord
     )
   end
 
-  def anyone_can_view?
-    false
+  def dataset_display_name
+    return unless question_idea?
+
+    name
+  end
+
+  def anyone_can_view
+    return false if private?
+
+    parent&.anyone_can_view || false
   end
 
   def search_content
@@ -311,6 +366,12 @@ class Item < ApplicationRecord
 
   def question_description; end
 
+  def question_choices; end
+
+  def unarchived_question_choices
+    []
+  end
+
   def jsonapi_type_name
     'items'
   end
@@ -323,7 +384,85 @@ class Item < ApplicationRecord
 
   def quill_data; end
 
+  # So that regular items can respond when working with test collection media items
+  def scale_question?
+    false
+  end
+
+  def graphable_question?
+    false
+  end
+
+  def answerable?
+    return false if Item.unanswerable_question_types.include?(question_type.to_sym)
+
+    question_type.present?
+  end
+
+  # this method also applies to Idea items (e.g. FileItem) which is why it is defined here in item.rb
+  def question_item_incomplete?
+    return true if (
+      question_category_satisfaction? || question_description? || question_open?
+    ) && content.blank?
+
+    # All other scale questions are valid without anything filled in
+    return false if scale_question?
+
+    # Media items are always transformed to other item types
+    return true if question_media? && is_a?(Item::QuestionItem)
+
+    if question_idea?
+      test_show_media = parent.parent.test_show_media?
+      # Return false if this hasn't been transformed to a media-type item
+      return true if test_show_media && is_a?(Item::QuestionItem)
+
+      return true if name.blank? || content.blank?
+    end
+
+    # Must fill in question (content) and all choices for question items
+    return true if
+      is_a?(Item::QuestionItem) &&
+      question_choices_customizable? &&
+      (unarchived_question_choices.any? { |choice| choice.text.blank? } || content.blank?)
+
+    # Question cards that are in the blank default state
+    return true if question_type.blank? && filestack_file_id.blank? && url.blank?
+
+    false
+  end
+
+  def incomplete_description
+    # TODO: Make this handle order when people delete and then add questions
+    question_number = parent_collection_card.order + 1
+
+    if question_single_choice? || question_multiple_choice?
+      return "Question #{question_number} needs question text" if content.blank?
+
+      return "There are empty options in question #{question_number}"
+    end
+
+    "Please add #{missing_value_by_question_type} to #{incomplete_question_noun} #{question_number}"
+  end
+
   private
+
+  def missing_value_by_question_type
+    if question_category_satisfaction?
+      'your category'
+    elsif question_description?
+      'your description'
+    elsif question_open?
+      'your open response'
+    elsif question_media?
+      'an image or video'
+    elsif question_idea?
+      'your content'
+    end
+  end
+
+  def incomplete_question_noun
+    question_idea? ? 'idea' : 'question'
+  end
 
   def name_present?
     name.present?

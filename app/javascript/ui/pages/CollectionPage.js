@@ -96,6 +96,12 @@ class CollectionPage extends React.Component {
 
   loadCollectionCards = async ({ page, per_page, rows, cols }) => {
     const { collection } = this.props
+    // if the collection is still awaiting updates, there are no cards to load
+    if (collection.awaiting_updates) {
+      this.pollForUpdates()
+      return
+    }
+
     let params
     if (collection.isRegularCollection) {
       params = { page, per_page, rows, cols }
@@ -139,9 +145,6 @@ class CollectionPage extends React.Component {
       // back to the SubmissionBox instead
       routingStore.routeTo('collections', collection.submission_box_id)
       return
-    }
-    if (collection.awaiting_updates) {
-      this.pollForUpdates()
     }
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
@@ -218,17 +221,24 @@ class CollectionPage extends React.Component {
 
   pollForUpdates() {
     const { collection, apiStore, uiStore } = this.props
+    if (uiStore.dialogConfig.open !== 'loading') {
+      let prompt =
+        'Please wait while we build your account. This should take from 15 to 30 seconds.'
+      if (collection.isTestCollectionOrResults) {
+        prompt =
+          'Please wait while we generate your feedback results collection. This should take 5 to 10 seconds.'
+      }
+      uiStore.loadingDialog({
+        prompt,
+        iconName: 'Celebrate',
+      })
+    }
+
     this.updatePoller = setInterval(async () => {
       if (collection.awaiting_updates) {
         const res = await apiStore.fetch('collections', collection.id, true)
         if (!res.data.awaiting_updates) {
           this.loadCollectionCards({})
-        } else if (uiStore.dialogConfig.open !== 'loading') {
-          uiStore.loadingDialog({
-            prompt:
-              'Please wait while we build your account. This should take from 15 to 30 seconds.',
-            iconName: 'Celebrate',
-          })
         }
       } else {
         clearInterval(this.updatePoller)
@@ -510,7 +520,7 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox, requiresTestDesigner } = collection
+    const { isSubmissionBox, isTestCollection } = collection
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
@@ -526,7 +536,7 @@ class CollectionPage extends React.Component {
           cardIdMenuOpen={cardMenuOpen.id}
         />
       )
-    } else if (requiresTestDesigner) {
+    } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {
       inner = (

@@ -90,7 +90,11 @@ class Api::V1::UsersController < Api::V1::BaseController
   def create_limited_user
     contact_info = json_api_params[:contact_info]
     session_uid = json_api_params[:session_uid]
-    creator = LimitedUserCreator.new(contact_info: contact_info)
+    feedback_contact_preference = json_api_params[:feedback_contact_preference]
+    creator = LimitedUserCreator.new(
+      contact_info: contact_info,
+      feedback_contact_preference: feedback_contact_preference,
+    )
     if creator.call
       if session_uid
         survey_response = SurveyResponse.find_by_session_uid(session_uid)
@@ -98,7 +102,10 @@ class Api::V1::UsersController < Api::V1::BaseController
         # run this to capture potential incentive_owed
         SurveyResponseCompletion.call(survey_response)
       end
-      render jsonapi: creator.limited_user, expose: { survey_response: true }
+      render jsonapi: creator.limited_user, expose: {
+        survey_response: true,
+        created: creator.created,
+      }
     else
       logger.info "** ERROR CREATING LIMITED USER #{creator.errors.inspect} **"
       render json: { errors: creator.errors }, status: :unprocessable_entity

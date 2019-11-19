@@ -74,15 +74,20 @@ FactoryBot.define do
 
     factory :legend_item, class: 'Item::LegendItem'
 
+    factory :private_item, class: 'Item::TextItem' do
+      after(:create, &:mark_as_private!)
+    end
+
     after(:build) do |item, evaluator|
       if evaluator.parent_collection
-        item.parent_collection_card = build(
-          :collection_card,
+        attrs = {
           parent: evaluator.parent_collection,
           order: evaluator.parent_collection.collection_cards.count,
           width: 1,
           height: 1,
-        )
+        }
+        attrs[:section_type] = :ideas if evaluator.parent_collection.is_a?(Collection::TestCollection)
+        item.parent_collection_card = build(:collection_card, attrs)
       end
     end
 

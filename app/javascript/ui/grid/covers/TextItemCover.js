@@ -79,6 +79,7 @@ class TextItemCover extends React.Component {
   }
 
   handleClick = async e => {
+    if (this.props.handleClick) this.props.handleClick(e)
     e.stopPropagation()
     const { item, dragging, cardId, searchResult, uneditable } = this.props
     if (dragging || uiStore.dragging || this.isEditing || uneditable)
@@ -286,6 +287,7 @@ TextItemCover.defaultProps = {
   hideReadMore: false,
   uneditable: false,
   isTransparent: false,
+  handleClick: null,
 }
 
 export default TextItemCover

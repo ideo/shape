@@ -60,8 +60,14 @@ const LiveTestIndicator = styled.span`
 `
 
 const HeaderButtonContainer = styled.span`
+  display: flex;
   margin-top: 10px;
+
+  button {
+    margin-right: 10px;
+  }
 `
+HeaderButtonContainer.displayName = 'HeaderButtonContainer'
 
 @inject('uiStore', 'apiStore')
 @observer
@@ -107,7 +113,6 @@ class PageHeader extends React.Component {
 
   handleFilterClick = ev => {
     ev.preventDefault()
-    console.log('filter click')
   }
 
   openMoveMenuForTemplate = e => {
@@ -204,9 +209,10 @@ class PageHeader extends React.Component {
 
   get renderTestUi() {
     const { record, uiStore } = this.props
+    if (record.idea_id) return
     if (
-      (record.isLiveTest && record.has_link_sharing) ||
-      record.collection_to_test_id
+      record.isLiveTest &&
+      (record.has_link_sharing || record.collection_to_test_id)
     ) {
       return (
         <Fragment>

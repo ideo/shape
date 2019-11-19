@@ -3,11 +3,12 @@ class SerializableTestCollection < SerializableSimpleCollection
 
   has_many :test_audiences
 
-  attributes :test_status, :test_closed_at
+  attributes :test_status, :test_closed_at, :test_show_media
 
   has_many :question_cards do
     data do
-      @object.try(:test_design).try(:complete_question_cards)
+      # this will repeat the idea cards per idea
+      TestCollectionCardsForSurvey.call(@object)
     end
   end
 

@@ -1,6 +1,8 @@
-import { apiUrl } from '~/utils/url'
-import trackError from '~/utils/trackError'
+import _ from 'lodash'
 import { runInAction } from 'mobx'
+
+import { apiUrl } from '~/utils/url'
+import { objectsEqual } from '~/utils/objectUtils'
 import BaseRecord from './BaseRecord'
 
 class QuestionAnswer extends BaseRecord {
@@ -17,12 +19,17 @@ class QuestionAnswer extends BaseRecord {
       )
       return res.data
     } catch (e) {
-      const test_collection = this.apiStore.find(
-        'collections',
-        this.survey_response.test_collection_id
-      )
-      test_collection.test_status = 'closed'
-      trackError(e, { source: 'QuestionAnswer.API_save' })
+      if (
+        e.error &&
+        _.includes(_.map(e.error, 'detail'), 'no longer accepting answers')
+      ) {
+        const test_collection = this.apiStore.find(
+          'collections',
+          this.survey_response.test_collection_id
+        )
+        test_collection.test_status = 'closed'
+      }
+      // else probably just a uniqueness constraint from double-clicking, ok to ignore and move on
       return false
     }
   }
@@ -39,8 +46,18 @@ class QuestionAnswer extends BaseRecord {
   }
 
   API_update(attrs) {
+    const previous = this.answerAttributes()
+    // update the local model
     this.update(attrs)
+    const updated = this.answerAttributes()
+    // no need to API save if there was no change
+    if (objectsEqual(previous, updated)) return
     return this.API_save('PATCH')
+  }
+
+  answerAttributes() {
+    // only pick key/values that are present
+    return _.pickBy(this.toJsonApi().attributes)
   }
 }
 

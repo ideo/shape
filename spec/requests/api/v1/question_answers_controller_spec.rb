@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe Api::V1::QuestionAnswersController, type: :request, json: true do
   let(:test_collection) { create(:test_collection, test_status: :live) }
-  let!(:test_design) { create(:test_design, num_cards: 2, test_collection: test_collection) }
 
   describe 'POST #create' do
     let(:survey_response) { create(:survey_response, test_collection: test_collection) }
@@ -11,8 +10,8 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     let(:params) {
       json_api_params(
         'question_answers',
-        'answer_number': 2,
-        'question_id': question.id,
+        answer_number: 2,
+        question_id: question.id,
       )
     }
 
@@ -28,6 +27,26 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
 
     it 'saves the question answer' do
       expect { post(path, params: params) }.to change(QuestionAnswer, :count).by(1)
+    end
+
+    context 'with idea_id' do
+      let!(:idea) { create(:video_item, question_type: :question_idea) }
+      let(:params) {
+        json_api_params(
+          'question_answers',
+          answer_number: 2,
+          question_id: question.id,
+          idea_id: idea.id,
+        )
+      }
+
+      it 'saves the question answer' do
+        expect { post(path, params: params) }.to change(QuestionAnswer, :count).by(1)
+        expect(json['data']['attributes']).to match_json_schema('question_answer')
+        expect(json['data']['attributes']['idea_id']).to eq idea.id.to_s
+        answer = QuestionAnswer.find(json['data']['id'])
+        expect(answer.idea).to eq idea
+      end
     end
 
     context 'with closed test collection' do
@@ -83,8 +102,8 @@ describe Api::V1::QuestionAnswersController, type: :request, json: true do
     let(:params) {
       json_api_params(
         'question_answers',
-        'answer_number': 3,
-        'question_id': question.id,
+        answer_number: 3,
+        question_id: question.id,
       )
     }
 

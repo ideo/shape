@@ -522,6 +522,20 @@ RSpec.describe CollectionCard, type: :model do
         )
       end
     end
+
+    describe '#move_to_order' do
+      let(:moving_card) { collection_cards.fourth }
+      before do
+        # Make sure cards are in sequential order
+        collection.reorder_cards!
+      end
+
+      it 'should move the card to the specified order and keep things sequential' do
+        moving_card.move_to_order(1)
+        expect(collection.collection_cards.map(&:order)).to eq [0, 1, 2, 3, 4]
+        expect(moving_card.order).to eq 1
+      end
+    end
   end
 
   describe 'should_update_parent_collection_cover?' do

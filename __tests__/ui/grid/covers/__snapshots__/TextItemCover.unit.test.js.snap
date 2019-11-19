@@ -23,6 +23,16 @@ exports[`TextItemCover renders snapshot 1`] = `
       onChangeSelection={[Function]}
       readOnly={true}
       theme={null}
+      value={
+        Object {
+          "ops": Array [
+            Object {
+              "insert": "hello world 
+",
+            },
+          ],
+        }
+      }
     />
   </styled.div>
 </Styled(styled.div)>

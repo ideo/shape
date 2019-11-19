@@ -6,6 +6,7 @@ class CollectionUpdater < SimpleService
 
   def call
     assign_attributes
+    mark_subcollection_as_private
     @collection.save.tap do |result|
       # caching collection cover needs to happen after cards have been updated
       cache_collection_cover_if_needed if result
@@ -18,6 +19,10 @@ class CollectionUpdater < SimpleService
         if @collection.saved_change_to_collection_to_test_id
           @collection.update_test_template_instance_types!
         end
+      end
+      if @collection.saved_change_to_collection_to_test_id &&
+         @collection.is_a?(Collection::TestCollection)
+        @collection.hide_or_show_section_questions!
       end
 
       # check if hide_submissions was toggled off, in which case we want to un-hide all submissions
@@ -45,6 +50,16 @@ class CollectionUpdater < SimpleService
     @collection.update_cached_tag_lists
     # always touch the updated timestamp even though we may just be updating the related cards
     @collection.updated_at = Time.now
+  end
+
+  def mark_subcollection_as_private
+    return unless @collection.anyone_can_view_changed?
+
+    Sharing::PropagateAnyoneCanView.call(collection: @collection)
+
+    return unless @collection.anyone_can_view_in_database && @collection.parent.anyone_can_view && !@collection.private?
+
+    @collection.mark_as_private!
   end
 
   def clean_collection_card_attributes

@@ -16,6 +16,12 @@ class CollectionCardBuilder
     @user = user
   end
 
+  def self.call(*args)
+    service = new(*args)
+    service.create
+    service.collection_card
+  end
+
   def create
     hide_helper_for_user
     if @collection_card.record.present?
@@ -53,6 +59,7 @@ class CollectionCardBuilder
         post_creation_record_update if @collection_card.primary?
 
         @collection_card.increment_card_orders!
+        @parent_collection.reorder_cards!
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
           @parent_collection.queue_update_template_instances
@@ -70,7 +77,14 @@ class CollectionCardBuilder
       # NOTE: should items created in My Collection get this access as well?
       # this will change the roles_anchor, which will get re-cached later
       record.enable_org_view_access_if_allowed(@parent_collection)
-      record.update(created_by: @user) if @user.present?
+      update_params = {}
+      if @user.present?
+        update_params[:created_by] = @user
+      end
+      if record.parent.anyone_can_view?
+        update_params[:anyone_can_view] = true
+      end
+      record.update(update_params)
     end
     @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
     @collection_card.update_collection_cover if @collection_card.is_cover
@@ -86,22 +100,10 @@ class CollectionCardBuilder
     # If this is a live test collection...
     if @parent_collection.test_collection? &&
        @parent_collection.live_or_was_launched? &&
+       @parent_collection.test_results_collection.present? &&
        record.is_a?(Item::QuestionItem)
 
-      test_collection = @parent_collection.test_collection
-
-      # If this is a new scale question, create response graphs
-      if record.scale_question?
-        record.create_response_graph(
-          parent_collection: test_collection,
-          initiated_by: @user,
-        )
-      elsif record.question_open?
-        record.create_open_response_collection(
-          parent_collection: test_collection,
-          initiated_by: @user,
-        )
-      end
+      TestResultsCollection::CreateContentWorker.perform_async(@parent_collection.test_results_collection.id, @user.id)
     end
 
     return unless @parent_collection.is_a? Collection::SubmissionsCollection
@@ -122,5 +124,10 @@ class CollectionCardBuilder
     @datasets_params.to_h.values.each do |dataset_params|
       @collection_card.item.create_dataset(dataset_params)
     end
+  end
+
+  def capture_error_and_rollback(error)
+    @errors << error
+    raise ActiveRecord::Rollback
   end
 end

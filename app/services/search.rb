@@ -1,7 +1,12 @@
 class Search
   def initialize(options = {})
     default_options = {
-      fields: %w[handle^6 name^5 tags^3 content],
+      fields: [
+        'handle^6',
+        { 'name^5': :word_start },
+        'tags^3',
+        'content',
+      ],
       per_page: 10,
       page: 1,
       where: {},
@@ -28,6 +33,7 @@ class Search
 
   def filters
     [
+      Filters::TestAnswer,
       Filters::Tag,
       Filters::WithinCollection,
       Filters::ActivityDateRange,

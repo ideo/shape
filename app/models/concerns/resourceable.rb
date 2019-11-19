@@ -191,11 +191,11 @@ module Resourceable
   def search_user_ids
     # slightly different from allowed_user_ids because the search methods
     # intentionally separate user_ids and group_ids
-    anchored_roles.includes(:users).pluck(User.arel_table[:id]).uniq
+    anchored_roles.includes(:users).pluck(User.arel_table[:id]).uniq.compact
   end
 
   def search_group_ids
-    anchored_roles.includes(:groups).pluck(Group.arel_table[:id]).uniq
+    anchored_roles.includes(:groups).pluck(Group.arel_table[:id]).uniq.compact
   end
 
   # # get all [role] users, both individual and via group, for this item/collection
@@ -246,10 +246,6 @@ module Resourceable
 
     # ensure that any existing children are also updated accordingly
     reanchor_children!(from: previous_anchor_id, to: id)
-    # special case for QuestionItems because they don't really retain any roles
-    return unless respond_to? :question_items
-
-    question_items.each(&:reanchor!)
   end
 
   def unanchor!
@@ -287,6 +283,8 @@ module Resourceable
         cached_attributes, '{cached_inheritance}', '#{settings.to_json}'::jsonb
       )
     ))
+    # mark update_at and bust cache
+    touch if value
     # make sure to set this in memory as well (saves having to do a `reload`)
     self.cached_inheritance = settings.as_json
   end

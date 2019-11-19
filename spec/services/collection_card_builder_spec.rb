@@ -26,6 +26,22 @@ RSpec.describe CollectionCardBuilder, type: :service do
     )
   end
 
+  describe '.call' do
+    let(:options) do
+      {
+        params: full_params,
+        parent_collection: parent,
+        user: user,
+        type: card_type,
+      }
+    end
+
+    it 'should return the CollectionCard' do
+      result = CollectionCardBuilder.call(options)
+      expect(result.is_a?(CollectionCard)).to be true
+    end
+  end
+
   describe '#create' do
     context 'success creating card with collection' do
       let(:builder) do
@@ -101,6 +117,29 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(builder.create).to be true
           expect(builder.collection_card.link?).to be true
           expect(builder.collection_card.collection).to eq collection
+        end
+
+        context 'with multiple ordered cards' do
+          let!(:parent) do
+            create(:collection,
+                   num_cards: 5,
+                   organization: organization,
+                   add_editors: [user])
+          end
+
+          before do
+            # just to simulate things being out of whack
+            parent.collection_cards.last.update(order: 10)
+          end
+
+          it 'should put things in the correct order' do
+            builder.create
+            card = builder.collection_card
+            expect(parent.reload.collection_cards.map(&:order)).to eq(
+              [0, 1, 2, 3, 4, 5],
+            )
+            expect(card.order).to eq 1
+          end
         end
       end
 
@@ -196,7 +235,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(builder.create).to be true
       end
 
-      context 'with test design collection' do
+      context 'with test collections' do
         let(:test_collection) { create(:test_collection, :completed) }
         let(:parent_collection) { test_collection }
         before do
@@ -204,12 +243,14 @@ RSpec.describe CollectionCardBuilder, type: :service do
           test_collection.children.each do |record|
             user.add_role(Role::EDITOR, record)
           end
+          allow(TestResultsCollection::CreateContentWorker).to receive(:perform_async).and_call_original
         end
 
         context 'when item is a scale question' do
           let(:builder) do
             CollectionCardBuilder.new(
               params: params.merge(
+                section_type: :ideas,
                 item_attributes: {
                   type: 'Item::QuestionItem',
                   question_type: :question_clarity,
@@ -221,11 +262,10 @@ RSpec.describe CollectionCardBuilder, type: :service do
           end
 
           context 'and test is not live' do
-            it 'does not create data item' do
+            it 'does not call TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be false
-              expect do
-                builder.create
-              end.not_to change(Item::DataItem, :count)
+              expect(TestResultsCollection::CreateContentWorker).not_to receive(:perform_async)
+              builder.create
             end
           end
 
@@ -233,14 +273,13 @@ RSpec.describe CollectionCardBuilder, type: :service do
             before do
               test_collection.launch!(initiated_by: user)
             end
-            let!(:parent_collection) { test_collection.test_design }
 
-            it 'creates data item and legend' do
+            it 'calls TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be true
-              expect do
-                builder.create
-              end.to change(Item::DataItem, :count).by(1)
-              expect(test_collection.legend_item).not_to be_nil
+              expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+                test_collection.test_results_collection.id, user.id
+              )
+              builder.create
             end
           end
         end
@@ -249,6 +288,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
           let(:builder) do
             CollectionCardBuilder.new(
               params: params.merge(
+                section_type: :ideas,
                 item_attributes: {
                   type: 'Item::QuestionItem',
                   question_type: :question_open,
@@ -261,11 +301,10 @@ RSpec.describe CollectionCardBuilder, type: :service do
           end
 
           context 'and test is not live' do
-            it 'does not create open response collection' do
+            it 'does not not call TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be false
-              expect do
-                builder.create
-              end.not_to change(Collection::TestOpenResponses, :count)
+              expect(TestResultsCollection::CreateContentWorker).not_to receive(:perform_async)
+              builder.create
             end
           end
 
@@ -273,13 +312,13 @@ RSpec.describe CollectionCardBuilder, type: :service do
             before do
               test_collection.launch!(initiated_by: user)
             end
-            let!(:parent_collection) { test_collection.test_design }
 
-            it 'creates open response collection' do
+            it 'calls TestResultsCollection::CreateContentWorker' do
               expect(test_collection.live?).to be true
-              expect do
-                builder.create
-              end.to change(Collection::TestOpenResponses, :count).by(1)
+              expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+                test_collection.test_results_collection.id, user.id
+              )
+              builder.create
             end
           end
         end

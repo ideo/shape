@@ -92,6 +92,23 @@ describe('MovableGridCard', () => {
       expect(wrapper.find('GridCard').props().cardType).toBe('items')
       expect(wrapper.find('GridCard').props().record).toBe(fakeTextItem)
     })
+
+    describe('with a collection thats a carousel', () => {
+      beforeEach(() => {
+        props.card.record.isCarousel = true
+        wrapper = shallow(<MovableGridCard {...props} />)
+      })
+
+      afterEach(() => {
+        props.card.record.isCarousel = false
+      })
+
+      it('disables resizing', () => {
+        expect(
+          wrapper.find('Rnd').props().enableResizing.bottomRight
+        ).toBeFalsy()
+      })
+    })
   })
 
   describe('as editor, with grid cards for items and collections', () => {

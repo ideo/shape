@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
   LineSegment,
@@ -10,6 +10,7 @@ import {
   VictoryVoronoiContainer,
 } from 'victory'
 
+import ChartLabelWithTooltip from '~/ui/global/charts/ChartLabelWithTooltip'
 import { DisplayText } from '~/ui/global/styled/typography'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
 import monthEdge from '~/utils/monthEdge'
@@ -19,6 +20,7 @@ import BarChart from '~/ui/global/charts/BarChart'
 import LineChart from '~/ui/global/charts/LineChart'
 import Tick from '~/ui/global/charts/Tick'
 import {
+  barWidthPx,
   utcMoment,
   victoryTheme,
   emojiSeriesForQuestionType,
@@ -57,6 +59,7 @@ const ChartContainer = styled.div`
   right: 0;
 `
 
+@inject('routingStore')
 @observer
 class ChartGroup extends React.Component {
   get primaryDataset() {
@@ -118,6 +121,11 @@ class ChartGroup extends React.Component {
 
   fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
+  routeToSearch = searchText => {
+    const { routingStore } = this.props
+    routingStore.routeTo('search', searchText)
+  }
+
   get totalBarsPerGroup() {
     return this.secondaryDatasetsWithData.length + 1
   }
@@ -151,6 +159,14 @@ class ChartGroup extends React.Component {
         transform: 'translateY(22px)',
       },
     }
+  }
+
+  get totalColumns() {
+    return this.primaryDataset.data.length
+  }
+
+  get totalGroupings() {
+    return this.renderedDatasets.length
   }
 
   get tierAxis() {
@@ -197,14 +213,39 @@ class ChartGroup extends React.Component {
     }
 
     if (this.primaryDatasetBarChart) {
+      const barLength = barWidthPx(this.totalColumns, this.totalGroupings)
+      const avgCharToPxRatio = 2.85
+      const maxTickLength = barLength / avgCharToPxRatio
+
+      const Wrapper = props => (
+        <ChartLabelWithTooltip
+          totalColumns={this.totalColumns}
+          maxTickLength={maxTickLength}
+          {...props}
+        />
+      )
+      let tickValues = 'column'
+      let tickFormat
+      let tickLabelComponent = <Wrapper />
+
+      if (this.primaryDataset.isEmojiOrScaleQuestion) {
+        tickValues = [1, 2, 3, 4]
+        tickFormat = this.emojiScale.map(e => e.symbol)
+        tickLabelComponent = <Tick emojiScale={this.emojiScale} />
+      }
       return (
         <VictoryAxis
           style={{
-            axis: { stroke: 'transparent' },
+            axis: {
+              strokeWidth: 0,
+            },
+            tickLabels: {
+              textTransform: 'none',
+            },
           }}
-          tickValues={[1, 2, 3, 4]}
-          tickFormat={this.emojiScale.map(e => e.symbol)}
-          tickLabelComponent={<Tick emojiScale={this.emojiScale} />}
+          tickValues={tickValues}
+          tickFormat={tickFormat}
+          tickLabelComponent={tickLabelComponent}
           events={[
             {
               eventHandlers: {
@@ -304,6 +345,7 @@ class ChartGroup extends React.Component {
           dataset,
           cardArea: width * height,
           barsInGroup: total,
+          routeToSearch: this.routeToSearch,
         })
       default:
         return AreaChart({
@@ -334,13 +376,19 @@ class ChartGroup extends React.Component {
 
   get renderVictoryChart() {
     if (this.primaryDatasetBarChart) {
+      const barWidth = barWidthPx(this.totalColumns, this.totalGroupings)
       return (
         <VictoryChart
           theme={victoryTheme}
           domainPadding={{ y: 70 }}
-          padding={{ top: 0, left: 60, right: 60, bottom: 30 }}
+          padding={{
+            top: 0,
+            left: barWidth * (Math.max(this.totalGroupings, 2) - 1),
+            right: barWidth * (Math.max(this.totalGroupings, 2) - 1),
+            bottom: 30,
+          }}
         >
-          <VictoryGroup offset={30 / (this.totalBarsPerGroup / 3)}>
+          <VictoryGroup offset={barWidth}>
             {this.renderedDatasets.map(dataset => dataset)}
           </VictoryGroup>
           {this.chartAxis}
@@ -389,5 +437,11 @@ ChartGroup.defaultProps = {
   width: 1,
   height: 1,
 }
+
+ChartGroup.wrappedComponent.propTypes = {
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+ChartGroup.displayName = 'ChartGroup'
 
 export default ChartGroup

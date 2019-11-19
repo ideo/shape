@@ -368,6 +368,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :filter,
       :show_replace,
       :order,
+      :hidden,
+      :section_type,
     )
   end
 
@@ -389,6 +391,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         external_id
         cover_type
         submissions_enabled
+        test_show_media
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
@@ -463,6 +466,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       hidden
       show_replace
       card_type
+      section_type
     ]
     # Allow pinning, replacing if this is an application/bot user
     attrs << :pinned if current_application.present?

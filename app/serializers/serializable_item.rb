@@ -28,9 +28,16 @@ class SerializableItem < BaseJsonSerializer
     end
   end
 
+  has_many :question_choices do
+    data do
+      @object.question_choices&.viewable_in_ui
+    end
+  end
+
   has_one :parent_collection_card
   has_one :parent
   belongs_to :data_source
+  belongs_to :filestack_file
   has_many :comments
 
   attribute :tag_list do
@@ -66,8 +73,6 @@ class SerializableItem < BaseJsonSerializer
     @object.replaced_media?
   end
 
-  belongs_to :filestack_file
-
   attribute :breadcrumb, if: -> { @object == @current_record || @force_breadcrumbs } do
     Breadcrumb::ForUser.new(
       @object,
@@ -76,7 +81,7 @@ class SerializableItem < BaseJsonSerializer
   end
 
   attribute :can_view do
-    @current_user ? @object.can_view?(@current_user) : false
+    @current_ability.can?(:read, @object)
   end
 
   attribute :can_edit do
