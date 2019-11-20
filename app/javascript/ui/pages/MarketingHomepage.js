@@ -104,7 +104,10 @@ class MarketingPage extends React.Component {
                   </MarketingMainBtn>
                 </a>
                 {hero && hero.videoUrl && (
-                  <MarketingAlternateBtn onClick={this.toggleVideoPlaying}>
+                  <MarketingAlternateBtn
+                    id="home-watch-video"
+                    onClick={this.toggleVideoPlaying}
+                  >
                     {videoPlayingButtonText}
                   </MarketingAlternateBtn>
                 )}
