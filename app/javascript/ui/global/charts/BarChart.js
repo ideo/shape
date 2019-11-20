@@ -49,6 +49,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup, routeToSearch }) => {
           cardArea={cardArea}
           displayTicks={false}
           alwaysShowLabels={true}
+          fontSize={10}
         />
       }
       padding={0}

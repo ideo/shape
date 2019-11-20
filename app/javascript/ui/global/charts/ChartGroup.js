@@ -48,7 +48,7 @@ class ChartGroup extends React.Component {
 
   get primaryDatasetValues() {
     if (!this.primaryDataset || !this.primaryDataset.data) return []
-    return this.primaryDataset.data
+    return this.primaryDataset.dataWithDates
   }
 
   get secondaryDatasetsWithData() {
@@ -66,7 +66,7 @@ class ChartGroup extends React.Component {
   get chartDomain() {
     const values = this.primaryDatasetValues
     this.secondaryDatasetsWithData.forEach(dataset => {
-      values.push(...dataset.data)
+      values.push(...dataset.dataWithDates)
     })
     return chartDomainForDatasetValues({
       values,

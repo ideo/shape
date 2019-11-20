@@ -47,7 +47,7 @@ const chartStyle = dataset => {
 
 const LineChart = ({ dataset, simpleDateTooltip, cardArea, domain }) => {
   const { measure, timeframe } = dataset
-  const { data } = dataset
+  const data = dataset.dataWithDates
   let values
   const dataHasDates = data[0] && !!data[0].date
   if (dataHasDates) {
@@ -57,7 +57,7 @@ const LineChart = ({ dataset, simpleDateTooltip, cardArea, domain }) => {
   }
   let tooltipFn
   if (simpleDateTooltip) {
-    tooltipFn = datum => dateTooltipText(datum)
+    tooltipFn = datum => dateTooltipText(datum, dataset.name)
   } else {
     tooltipFn = (datum, isLastDataPoint) =>
       advancedTooltipText({
@@ -81,6 +81,7 @@ const LineChart = ({ dataset, simpleDateTooltip, cardArea, domain }) => {
           tooltipTextRenderer={tooltipFn}
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}
+          fontSize={18}
         />
       }
     />
@@ -92,7 +93,7 @@ LineChart.propTypes = {
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
   domain: PropTypes.shape({
-    x: PropTypes.arrayOf(PropTypes.number),
+    x: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
     y: PropTypes.arrayOf(PropTypes.number),
   }).isRequired,
 }

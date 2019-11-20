@@ -87,9 +87,11 @@ export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
 
 export const emojiTooltipText = datum => `${datum.value}`
 
-export const dateTooltipText = datum => {
+export const dateTooltipText = (datum, datasetName = null) => {
   if (!datum.date) return datum.value
-  return `${datum.value} on ${utcMoment(datum.date).format('l')}`
+  const text = `${datum.value} on ${utcMoment(datum.date).format('l')}`
+  if (!datasetName) return text
+  return `${datasetName}\n${text}`
 }
 
 export const advancedTooltipText = ({
@@ -133,9 +135,7 @@ export const addDuplicateValueIfSingleValue = values => {
   const duplicateValue = Object.assign({ isDuplicate: true }, valuesWithDupe[0])
   // Set date to 3 months ago
   if (duplicateValue.date) {
-    duplicateValue.date = utcMoment(duplicateValue.date)
-      .subtract('3', 'months')
-      .format('YYYY-MM-DD')
+    duplicateValue.date = utcMoment(duplicateValue.date).subtract('3', 'months')
     if (duplicateValue.month) duplicateValue.month = duplicateValue.date
   }
   valuesWithDupe.unshift(duplicateValue)

@@ -172,6 +172,7 @@ TickLabelWithTooltip.propTypes = {
   cardArea: PropTypes.number,
   displayTicks: PropTypes.bool,
   alwaysShowLabels: PropTypes.bool,
+  fontSize: PropTypes.number,
 }
 TickLabelWithTooltip.defaultProps = {
   maxValue: 0,
@@ -179,6 +180,7 @@ TickLabelWithTooltip.defaultProps = {
   cardArea: 1,
   displayTicks: true,
   alwaysShowLabels: false,
+  fontSize: 18,
 }
 
 export default TickLabelWithTooltip

@@ -152,7 +152,7 @@ ChartAxis.propTypes = {
   datasetValues: MobxPropTypes.objectOrObservableObject.isRequired,
   datasetTimeframe: PropTypes.string.isRequired,
   domain: PropTypes.shape({
-    x: PropTypes.arrayOf(PropTypes.number),
+    x: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
     y: PropTypes.arrayOf(PropTypes.number),
   }).isRequired,
   isSmallChartStyle: PropTypes.bool.isRequired,

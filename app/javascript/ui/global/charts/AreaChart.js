@@ -35,10 +35,10 @@ const formatValues = values => {
 
 const AreaChart = ({ dataset, simpleDateTooltip, domain, cardArea = 1 }) => {
   const { measure, timeframe } = dataset
-  const values = formatValues(dataset.data || [])
+  const values = formatValues(dataset.dataWithDates || [])
   let tooltipFn
   if (simpleDateTooltip) {
-    tooltipFn = datum => dateTooltipText(datum)
+    tooltipFn = datum => dateTooltipText(datum, dataset.name)
   } else {
     tooltipFn = (datum, isLastDataPoint) =>
       advancedTooltipText({
@@ -57,6 +57,7 @@ const AreaChart = ({ dataset, simpleDateTooltip, domain, cardArea = 1 }) => {
           tooltipTextRenderer={tooltipFn}
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}
+          fontSize={18}
         />
       }
       domain={domain}
@@ -73,7 +74,7 @@ AreaChart.propTypes = {
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
   domain: PropTypes.shape({
-    x: PropTypes.arrayOf(PropTypes.number),
+    x: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
     y: PropTypes.arrayOf(PropTypes.number),
   }).isRequired,
 }
