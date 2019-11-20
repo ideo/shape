@@ -201,6 +201,17 @@ RSpec.describe Roles::Inheritance, type: :service do
         expect(inheritance.private_child?(item)).to be true
         expect(item.cached_inheritance['private']).to be true
       end
+
+      it 'will keep the private setting even if the roles anchor matches' do
+        expect(inheritance.private_child?(item)).to be true
+        # now the setting should be cached
+        expect(item.cached_inheritance['private']).to be true
+        # don't call reanchor as that will also unmark_as_private
+        item.update(roles_anchor_collection_id: collection.id)
+        # should remain marked private
+        expect(inheritance.private_child?(item)).to be true
+        expect(item.cached_inheritance['private']).to be true
+      end
     end
 
     context 'with private = false' do

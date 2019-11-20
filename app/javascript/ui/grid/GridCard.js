@@ -279,6 +279,8 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
+    } else if (record.isCarousel) {
+      return
     } else if (record.isVideo || record.isImage || record.isLegend) {
       return
     } else if (record.mimeBaseType === 'image') {
@@ -350,7 +352,7 @@ class GridCard extends React.Component {
       // If this is a special cover with both image and text, pass the text
       // item through
       nestedTextItem = this.coverItem
-    } else if (this.coverItem) {
+    } else if (this.coverItem && record.cover_type !== 'cover_type_carousel') {
       // Instead use the item for the cover rather than the collection
       record = this.coverItem
       cardType = 'items'
@@ -360,7 +362,7 @@ class GridCard extends React.Component {
       <CoverRenderer
         card={card}
         cardType={cardType}
-        isCoverItem={this.coverItem ? true : false}
+        isCoverItem={false}
         record={record}
         height={height}
         dragging={dragging}
@@ -467,7 +469,13 @@ class GridCard extends React.Component {
           uiStore.textEditingItem !== record &&
           !record.archived &&
           this.renderTopRightActions()}
-        <BottomLeftCardIcons card={card} cardType={cardType} record={record} />
+        {uiStore.viewingRecord && !uiStore.viewingRecord.isTestCollection && (
+          <BottomLeftCardIcons
+            card={card}
+            cardType={cardType}
+            record={record}
+          />
+        )}
         {/* onClick placed here so it's separate from hotspot click */}
         <StyledGridCardInner
           onClick={this.handleClick}

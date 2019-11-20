@@ -13,8 +13,8 @@ import PinnedIcon from '~/ui/icons/PinnedIcon'
 
 import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
-import UnresolvedCount from '~/ui/threads/UnresolvedCount'
-import HiddenIconButton from '../icons/HiddenIconButton'
+import HiddenIconButton from '~/ui/global/HiddenIconButton'
+import UnresolvedButton from '~/ui/global/UnresolvedButton'
 import { apiStore } from '~/stores/'
 
 export const StyledIconsWrapper = styled.div`
@@ -25,6 +25,10 @@ export const StyledIconsWrapper = styled.div`
   color: ${v.colors.commonMedium};
   height: 45px;
   display: flex;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 StyledIconsWrapper.displayName = 'StyledIconsWrapper'
 
@@ -35,7 +39,7 @@ StyledIconWrapper.displayName = 'StyledIconWrapper'
 
 /* LinkIcon (and HiddenIcon) appears larger than CollectionIcon so we need to make it smaller */
 export const StyledSmallIconWrapper = styled.div`
-  width: 18px;
+  width: ${props => (props.width ? props.width : 18)}px;
   height: 18px;
   bottom: 0.75rem;
 `
@@ -52,13 +56,6 @@ const PinnedCardIcon = () => (
     <PinnedIcon />
   </Tooltip>
 )
-
-const UnresolvedButton = styled.button`
-  position: relative;
-  ${props => props.hasNoOtherIcons && `left: 8px;`}
-  top: 30%;
-  height: 40%;
-`
 
 class BottomLeftCardIcons extends React.Component {
   handleUnreadIconClick = e => {
@@ -114,7 +111,7 @@ class BottomLeftCardIcons extends React.Component {
       }
     } else if (card.link) {
       icons.push(
-        <StyledSmallIconWrapper>
+        <StyledSmallIconWrapper width={45}>
           <LinkIcon />
         </StyledSmallIconWrapper>
       )
@@ -148,14 +145,14 @@ class BottomLeftCardIcons extends React.Component {
 
     if (record.unresolved_count && record.unresolved_count > 0) {
       icons.push(
-        <Tooltip title="Add comment" placement="top">
-          <UnresolvedButton
-            onClick={this.handleUnreadIconClick}
-            hasNoOtherIcons={hasNoOtherIcons}
-          >
-            <UnresolvedCount count={record.unresolved_count} size={'large'} />
-          </UnresolvedButton>
-        </Tooltip>
+        <UnresolvedButton
+          record={record}
+          onClick={this.handleUnreadIconClick}
+          hasNoOtherIcons={hasNoOtherIcons}
+          IconWrapper={({ children }) => (
+            <StyledSmallIconWrapper>{children}</StyledSmallIconWrapper>
+          )}
+        ></UnresolvedButton>
       )
     }
 

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -9,7 +10,7 @@ class CollectionCardsTagEditor extends React.Component {
   _apiAddRemoveTag = (action, tag) => {
     const { cards, apiStore } = this.props
     apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
-      card_ids: cards.map(card => card.id),
+      card_ids: _.map(cards, 'id'),
       tag: tag,
     })
   }
@@ -24,7 +25,7 @@ class CollectionCardsTagEditor extends React.Component {
 
   get records() {
     const { cards } = this.props
-    return cards.map(card => card.record)
+    return _.compact(_.map(cards, 'record'))
   }
 
   render() {

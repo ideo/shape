@@ -371,8 +371,9 @@ describe('FoamcoreGrid', () => {
 
     describe('loadAfterScroll', () => {
       beforeEach(() => {
-        instance.loadedRows = { min: 0, max: 9 }
-        instance.loadedCols = { min: 0, max: 9 }
+        const { collection } = props
+        collection.loadedRows = 9
+        collection.loadedCols = 9
         instance.loadCards = jest.fn()
       })
 
@@ -405,8 +406,11 @@ describe('FoamcoreGrid', () => {
 
         it('calls loadMoreRows', () => {
           const expectedRowsCols = {
-            cols: [0, 10],
-            rows: [10, 14],
+            cols: [0, instance.visibleCols.num * 2],
+            rows: [
+              props.collection.loadedRows + 1,
+              props.collection.loadedRows + 1 + instance.visibleRows.num,
+            ],
           }
           instance.loadAfterScroll()
           expect(instance.loadCards).toHaveBeenCalledWith(expectedRowsCols)
@@ -423,10 +427,13 @@ describe('FoamcoreGrid', () => {
           })
         })
 
-        it('calls loadMoreRows', () => {
+        it('calls loadMoreColumns', () => {
           const expectedRowsCols = {
-            cols: [10, 15],
-            rows: [0, 8],
+            cols: [
+              props.collection.loadedCols + 1,
+              props.collection.loadedCols + 1 + instance.visibleCols.num,
+            ],
+            rows: [0, instance.visibleRows.num * 2],
           }
           instance.loadAfterScroll()
           expect(instance.loadCards).toHaveBeenCalledWith(expectedRowsCols)

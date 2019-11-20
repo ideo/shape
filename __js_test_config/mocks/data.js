@@ -23,6 +23,7 @@ export const fakeCollectionCard = {
   item: {},
   reference: false,
   image_contain: false,
+  section_type: null,
   beginReplacing: jest.fn(),
   reselectOnlyEditableCards: jest.fn(),
   API_create: jest.fn(),
@@ -30,6 +31,9 @@ export const fakeCollectionCard = {
   API_linkToMyCollection: jest.fn(),
   ...fakeJsonApiAttrs,
 }
+
+export const fakeQuillOp = { insert: 'hello world \n' }
+export const fakeQuillData = { ops: [fakeQuillOp] }
 
 export const fakeTextItemAttrs = {
   id: '1',
@@ -46,9 +50,6 @@ export const fakeTextItemAttrs = {
   fullyLoaded: true,
   parent_collection_card: { ...fakeCollectionCard },
 }
-
-export const fakeQuillOp = {insert: "hello world \n"}
-export const fakeQuillData = {ops: [fakeQuillOp]}
 
 export const fakeAreaChartDataset = {
   identifier: 'question',
@@ -82,6 +83,7 @@ export const fakeBarChartDataset = {
     { column: 3, value: 5, percentage: 50, type: 'question_context' },
     { column: 4, value: 0, percentage: 0, type: 'question_context' },
   ],
+  isEmojiOrScaleQuestion: jest.fn(),
 }
 
 export const fakeDataItemCollectionsItemsAttrs = {
@@ -143,7 +145,7 @@ export const fakeDatasetAttrs = {
   test_collection_id: null,
   timeframe: 'ever',
   total: 1,
-  tiers: []
+  tiers: [],
 }
 
 export const fakeDataset = {
@@ -234,7 +236,6 @@ export const fakeTextItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   pushUndo: jest.fn(),
-  quill_data: jest.fn().mockReturnValue(fakeQuillData),
   version: 1,
   ...fakeJsonApiAttrs,
 }
@@ -318,8 +319,11 @@ export const fakeQuestionItem = {
   // ...fakeTextItemAttrs,
   type: 'Item::QuestionItem',
   question_type: 'question_description',
+  isSingleChoiceQuestion: false,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
+  API_destroyQuestionChoice: jest.fn().mockReturnValue(Promise.resolve()),
+  API_createQuestionChoice: jest.fn().mockReturnValue(Promise.resolve()),
   ...fakeJsonApiAttrs,
 }
 
@@ -327,6 +331,23 @@ export const fakeQuestionAnswer = {
   answer_text: 'Great!',
   answer_number: 1,
   question_id: fakeQuestionItem.id,
+  selected_choice_ids: [],
+}
+
+export const fakeQuestionChoice = {
+  text: 'Option A',
+  question_item_id: fakeQuestionItem.id,
+  order: 0,
+  value: '0',
+  id: 1,
+}
+
+export const fakeQuestionSecondChoice = {
+  text: 'Option B',
+  question_item_id: fakeQuestionItem.id,
+  order: 1,
+  value: '1',
+  id: 2,
 }
 
 export const fakeItemCard = {
@@ -390,6 +411,7 @@ export const fakeCollection = {
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
   cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
+  addCard: jest.fn(),
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
@@ -525,7 +547,7 @@ export const fakeComment = {
   created_at: new Date('2019-05-09T03:18:00'),
   updated_at: new Date('2019-05-09T03:18:00'),
   API_fetchReplies: jest.fn().mockReturnValue(Promise.resolve({})),
-  expandAndFetchReplies: jest.fn().mockReturnValue(Promise.resolve({}))
+  expandAndFetchReplies: jest.fn().mockReturnValue(Promise.resolve({})),
 }
 export const fakeThread = {
   id: '1',
@@ -587,6 +609,7 @@ export const fakeTestAudience = {
   audience: fakeAudience,
   sample_size: 12,
   num_completed_responses: 6,
+  price_per_response: 3.75,
 }
 export const fakeTestCollection = {
   id: '1',

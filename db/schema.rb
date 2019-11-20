@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_30_230157) do
+ActiveRecord::Schema.define(version: 2019_11_12_190014) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -123,8 +123,11 @@ ActiveRecord::Schema.define(version: 2019_10_30_230157) do
     t.boolean "show_replace", default: true
     t.integer "row"
     t.integer "col"
+    t.integer "section_type"
+    t.string "identifier"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
+    t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
     t.index ["item_id"], name: "index_collection_cards_on_item_id"
     t.index ["order", "row", "col"], name: "index_collection_cards_on_order_and_row_and_col"
     t.index ["parent_id"], name: "index_collection_cards_on_parent_id"
@@ -188,11 +191,15 @@ ActiveRecord::Schema.define(version: 2019_10_30_230157) do
     t.bigint "joinable_group_id"
     t.datetime "test_closed_at"
     t.integer "default_group_id"
+    t.boolean "test_show_media", default: true
+    t.integer "idea_id"
+    t.integer "survey_response_id"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
     t.index ["cloned_from_id"], name: "index_collections_on_cloned_from_id"
     t.index ["created_at"], name: "index_collections_on_created_at"
+    t.index ["idea_id"], name: "index_collections_on_idea_id"
     t.index ["organization_id"], name: "index_collections_on_organization_id"
     t.index ["roles_anchor_collection_id"], name: "index_collections_on_roles_anchor_collection_id"
     t.index ["submission_box_id"], name: "index_collections_on_submission_box_id"
@@ -471,6 +478,7 @@ ActiveRecord::Schema.define(version: 2019_10_30_230157) do
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"
     t.index ["created_at"], name: "index_items_on_created_at"
     t.index ["data_source_type", "data_source_id"], name: "index_items_on_data_source_type_and_data_source_id"
+    t.index ["question_type"], name: "index_items_on_question_type"
     t.index ["roles_anchor_collection_id"], name: "index_items_on_roles_anchor_collection_id"
     t.index ["type"], name: "index_items_on_type"
   end
@@ -547,7 +555,21 @@ ActiveRecord::Schema.define(version: 2019_10_30_230157) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.index ["survey_response_id", "question_id"], name: "index_question_answers_on_survey_response_id_and_question_id", unique: true
+    t.jsonb "selected_choice_ids", default: [], null: false
+    t.bigint "idea_id"
+    t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
+    t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
+    t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
+  end
+
+  create_table "question_choices", force: :cascade do |t|
+    t.text "text"
+    t.integer "order"
+    t.integer "value"
+    t.boolean "archived"
+    t.integer "question_item_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "roles", force: :cascade do |t|
@@ -573,6 +595,7 @@ ActiveRecord::Schema.define(version: 2019_10_30_230157) do
     t.integer "incentive_status"
     t.datetime "incentive_owed_at"
     t.datetime "incentive_paid_at"
+    t.string "respondent_alias"
     t.index ["incentive_status"], name: "index_survey_responses_on_incentive_status"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"

@@ -20,10 +20,14 @@ import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
+  'question_idea',
   'question_description',
   'question_finish',
   'question_recontact',
 ]
+
+// note that card.id will have the idea_id appended by the serializer if present
+const scrollIdentifier = card => `card-${card.id}`
 
 @inject('apiStore')
 @observer
@@ -163,9 +167,14 @@ class TestSurveyResponder extends React.Component {
     if (card.card_question_type === 'question_recontact') {
       return this.recontactAnswered
     }
-    return _.find(surveyResponse.question_answers, {
+
+    const findParams = {
       question_id: card.record.id,
-    })
+    }
+    if (card.idea_id) {
+      findParams.idea_id = card.idea_id
+    }
+    return _.find(surveyResponse.question_answers, findParams)
   }
 
   answerableCard = card =>
@@ -253,7 +262,7 @@ class TestSurveyResponder extends React.Component {
     if (!nextCard) return
     if (this.hasFinishedSurvey(nextCard)) this.refreshUserAfterSurvey()
 
-    scroller.scrollTo(`card-${nextCard.id}`, {
+    scroller.scrollTo(scrollIdentifier(nextCard), {
       duration: 400,
       smooth: true,
       // will default to document if none set (e.g. for standalone page)
@@ -297,7 +306,6 @@ class TestSurveyResponder extends React.Component {
       createSurveyResponse,
       questionAnswerForCard,
       afterQuestionAnswered,
-      canEdit,
       numAnswerableQuestionItems,
     } = this
 
@@ -314,7 +322,10 @@ class TestSurveyResponder extends React.Component {
           />
           <GreetingMessage />
           {this.viewableCards.map(card => (
-            <ScrollingModule key={card.id} name={`card-${card.id}`}>
+            <ScrollingModule
+              key={scrollIdentifier(card)}
+              name={scrollIdentifier(card)}
+            >
               <TestQuestionHolder editing={false} userEditable={false}>
                 <TestQuestion
                   createSurveyResponse={createSurveyResponse}
@@ -326,7 +337,7 @@ class TestSurveyResponder extends React.Component {
                   item={card.record}
                   order={card.order}
                   editing={false}
-                  canEdit={canEdit}
+                  canEdit={false}
                   numberOfQuestions={numAnswerableQuestionItems}
                 />
               </TestQuestionHolder>

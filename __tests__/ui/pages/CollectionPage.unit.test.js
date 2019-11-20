@@ -188,7 +188,7 @@ describe('CollectionPage', () => {
     describe('when an update happens on the current collection', () => {
       beforeEach(() => {
         wrapper.setProps({
-          collection: { ...collection, id: 99 },
+          collection: { ...collection, id: 99, loadedRows: [0, 8] },
         })
         wrapper
           .instance()
@@ -198,7 +198,7 @@ describe('CollectionPage', () => {
 
       it('should reload the data', () => {
         expect(collection.API_fetchCards).toHaveBeenCalledWith({
-          per_page: collection.collection_cards.length,
+          rows: collection.loadedRows,
         })
       })
     })

@@ -10,17 +10,42 @@ RSpec.describe QuestionAnswer, type: :model do
   context 'associations' do
     it { should belong_to(:survey_response) }
     it { should belong_to(:question) }
+    it { should belong_to(:idea) }
   end
 
   describe 'validations' do
-    describe 'answer_number presence' do
-      let(:question_answer) do
+    let(:question_answer) do
+      build(:question_answer,
+            :unanswered,
+            survey_response: survey_response,
+            question: question)
+    end
+
+    describe 'unique survey_response, question_id, idea_id' do
+      let(:question_answer2) do
         build(:question_answer,
               :unanswered,
               survey_response: survey_response,
               question: question)
       end
 
+      it 'validates uniqueness' do
+        expect(question_answer.save).to be true
+        expect(question_answer2.save).to be false
+      end
+
+      context 'with multiple ideas' do
+        it 'validates uniqueness' do
+          expect(question_answer.update(idea_id: 1)).to be true
+          # this won't work
+          expect(question_answer2.update(idea_id: 1)).to be false
+          # but unique idea will
+          expect(question_answer2.update(idea_id: 2)).to be true
+        end
+      end
+    end
+
+    describe 'answer_number presence' do
       context 'scale question' do
         before do
           question.update(question_type: :question_clarity)
@@ -82,37 +107,30 @@ RSpec.describe QuestionAnswer, type: :model do
     end
 
     context 'complete after test closed' do
+      let(:survey_response) { create(:survey_response, :fully_answered, status: :in_progress, test_collection: test_collection) }
       before do
         test_collection.close!
-      end
-      let!(:question_answers) do
-        # Note - if you create survey response above at the top of the test,
-        # it will already be marked as completed because it thinks it has no questions
-        survey_response.question_items.map do |question|
-          create(:question_answer,
-                 survey_response: survey_response,
-                 question: question)
-        end
       end
 
       describe 'within allowable window' do
         it 'marks the survey_response as completed_late' do
+          survey_response.question_answer_created_or_destroyed
           expect(survey_response.reload.status).to eq 'completed_late'
         end
       end
     end
 
     context 'completed response' do
-      let!(:question_answers) do
-        survey_response.question_items.map do |question|
-          create(:question_answer,
-                 survey_response: survey_response,
-                 question: question)
-        end
-      end
-      let(:question_answer) { question_answers.first.reload }
+      # NOTE: this test is also effectively testing some of the underlying services e.g.
+      # TestResultsCollection::CreateAndLinkOpenResponse
+      let!(:test_collection) { create(:test_collection, :open_response_questions, :launched) }
+      let!(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection) }
+      let(:question_answer) { survey_response.question_answers.first.reload }
 
       before do
+        TestResultsCollection::CreateContent.call(
+          test_results_collection: test_collection.test_results_collection,
+        )
         expect(survey_response.reload.completed?).to be true
       end
 
@@ -122,15 +140,33 @@ RSpec.describe QuestionAnswer, type: :model do
         end
 
         it 'updates open response item with updated answer' do
-          expect(question_answer.open_response_item.plain_content).not_to eq(
+          expect(question_answer.open_response_item.plain_content).not_to include(
             'What a jolly prototype',
           )
           question_answer.update(
             answer_text: 'What a jolly prototype',
           )
-          expect(question_answer.open_response_item.reload.plain_content).to eq(
+          expect(question_answer.open_response_item.reload.plain_content).to include(
             'What a jolly prototype',
           )
+        end
+
+        context 'when open response item is not there' do
+          before do
+            question_answer.open_response_item = nil
+            question_answer.save
+            question_answer.reload
+          end
+
+          it 'should create a new open response item' do
+            question_answer.reload.update(
+              answer_text: 'What a jolly prototype'
+            )
+            expect(question_answer.reload.open_response_item.present?).to be true
+            expect(question_answer.open_response_item.content).to include(
+              'What a jolly prototype'
+            )
+          end
         end
       end
 

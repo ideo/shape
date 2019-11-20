@@ -115,10 +115,23 @@ class Dataset < ApplicationRecord
   end
 
   def group
-    # see note above about only currently supporting one grouping
-    return nil unless grouping.present? && grouping['type'] == 'Group'
+    return nil unless group_by_type_id('Group').present?
 
-    Group.find(grouping['id'])
+    Group.find(group_by_type_id('Group'))
+  end
+
+  def group_by_type_id(type)
+    groupings.find { |g| g['type'] == type }.try(:[], 'id')
+  end
+
+  def grouping_objects
+    groupings.map do |grouping|
+      klass = grouping['type'].safe_constantize
+
+      next if klass.blank? || grouping['id'].blank?
+
+      klass.find_by(id: grouping['id'].to_i)
+    end.compact
   end
 
   # Implement in each sub-class

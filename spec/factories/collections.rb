@@ -32,6 +32,10 @@ FactoryBot.define do
     factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection
 
+    factory :private_collection do
+      after(:create, &:mark_as_private!)
+    end
+
     trait :submission do
       after(:create) do |collection|
         # needed for `inside_a_submission?` check
@@ -39,28 +43,16 @@ FactoryBot.define do
       end
     end
 
-    factory :test_design, class: Collection::TestDesign do
-      transient do
-        record_type :question
-      end
-    end
+    factory :test_results_collection, class: Collection::TestResultsCollection
     factory :test_collection, class: Collection::TestCollection do
       transient do
         record_type :question
         num_responses 1
       end
 
-      trait :answerable_questions do
-        after(:create) do |collection|
-          collection.prelaunch_question_items.each do |item|
-            item.update(question_type: :question_context)
-          end
-        end
-      end
-
       trait :open_response_questions do
         after(:create) do |collection|
-          collection.prelaunch_question_items.each_with_index do |item, index|
+          collection.question_items.each_with_index do |item, index|
             item.update(question_type: :question_open, content: "Item #{index}")
           end
         end
@@ -83,15 +75,49 @@ FactoryBot.define do
 
       trait :completed do
         after(:create) do |collection|
-          media_question = collection.prelaunch_question_items.detect(&:question_media?)
-          media_question&.update(
-            type: 'Item::VideoItem',
-            url: 'something',
-            thumbnail_url: 'something',
-            question_type: nil,
-          )
-          description_question = collection.prelaunch_question_items.detect(&:question_description?)
+          category_satisfaction_question = collection.question_items.detect(&:question_category_satisfaction?)
+          category_satisfaction_question&.update(content: 'solutions')
+          collection.question_items.select(&:question_open?).each do |open_response|
+            open_response.update(content: 'What do you think?')
+          end
+          if collection.ideas_collection.present?
+            idea_question = collection.idea_items.find(&:question_idea?)
+            idea_question&.update(
+              type: 'Item::VideoItem',
+              name: 'Video',
+              content: 'A cool video about something.',
+              url: 'something',
+              thumbnail_url: 'something',
+              question_type: :question_idea,
+            )
+          end
+          description_question = collection.question_items.detect(&:question_description?)
           description_question&.update(content: 'something')
+        end
+      end
+
+      trait :launched do
+        # bring in the :completed trait above
+        completed
+        after(:create) do |collection|
+          collection.create_test_results_collection(
+            name: collection.name,
+            organization: collection.organization,
+            created_by: collection.created_by,
+            roles_anchor_collection: collection.roles_anchor,
+          )
+          # do this after_create so that it doesn't get confused when creating questions
+          collection.update(test_status: :live)
+        end
+        # note that TestResultsCollection::CreateContent will need to be called if you are testing the inner content
+      end
+
+      trait :two_ideas do
+        # can use this trait in combo with :completed
+        after(:create) do |collection|
+          ideas_collection = collection.ideas_collection
+          card = create(:collection_card_image, parent: ideas_collection)
+          card.item.update(content: 'my image', question_type: :question_idea)
         end
       end
 
@@ -141,11 +167,13 @@ FactoryBot.define do
         end
       end
 
-      if evaluator.parent_collection
+      parent_collection = evaluator.parent_collection
+      parent_collection ||= create(:collection) if collection.is_a?(Collection::TestCollection)
+      if parent_collection
         collection.parent_collection_card = build(
           :collection_card,
-          parent: evaluator.parent_collection,
-          order: evaluator.parent_collection.collection_cards.count,
+          parent: parent_collection,
+          order: parent_collection.collection_cards.count,
           width: 1,
           height: 1,
           pinned: evaluator.pin_cards,

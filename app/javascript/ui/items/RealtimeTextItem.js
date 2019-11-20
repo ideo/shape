@@ -657,7 +657,7 @@ RealtimeTextItem.displayName = 'RealtimeTextItem'
 
 RealtimeTextItem.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
-  currentUserId: PropTypes.string.isRequired,
+  currentUserId: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
@@ -666,6 +666,7 @@ RealtimeTextItem.propTypes = {
   containerRef: PropTypes.func,
 }
 RealtimeTextItem.defaultProps = {
+  currentUserId: null,
   onExpand: null,
   fullPageView: false,
   initialFontTag: 'P',

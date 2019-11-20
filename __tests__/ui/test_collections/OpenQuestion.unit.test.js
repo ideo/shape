@@ -16,7 +16,7 @@ describe('OpenQuestion', () => {
   describe('render()', () => {
     describe('on editing', () => {
       it('should render a description question', () => {
-        expect(wrapper.find('DescriptionQuestion').exists()).toBe(true)
+        expect(wrapper.find('QuestionContentEditor').exists()).toBe(true)
       })
 
       it('should enable the text input', () => {
@@ -31,7 +31,7 @@ describe('OpenQuestion', () => {
       })
 
       it('should render the question with a simple question text', () => {
-        expect(wrapper.find('QuestionTextWithSpacing').exists()).toBe(true)
+        expect(wrapper.find('QuestionContentEditor').exists()).toBe(true)
       })
 
       it('should disable the text input', () => {

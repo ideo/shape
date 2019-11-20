@@ -1,4 +1,4 @@
-class CardMover
+class CardMover < SimpleService
   attr_reader :errors
   attr_reader :moving_cards
 
@@ -130,6 +130,11 @@ class CardMover
           end
         else
           card.assign_attributes(pinned: false)
+        end
+        if @to_collection.anyone_can_view? && card.primary? && card.collection.present?
+          collection = card.collection
+          collection.update(anyone_can_view: true)
+          Sharing::PropagateAnyoneCanView.call(collection: collection)
         end
       end
 

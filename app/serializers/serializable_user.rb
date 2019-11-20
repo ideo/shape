@@ -30,4 +30,8 @@ class SerializableUser < BaseJsonSerializer
   attribute :feedback_contact_preference, if: -> { @survey_response } do
     @object.feedback_contact_preference
   end
+
+  attribute :newly_created, if: -> { @survey_response } do
+    @created
+  end
 end

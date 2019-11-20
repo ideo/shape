@@ -236,7 +236,7 @@ class AdminFeedback extends React.Component {
 
               return (
                 <React.Fragment key={testAudience.id}>
-                  <AudienceRowItem item xs={5}>
+                  <AudienceRowItem item xs={4}>
                     <AudienceWrapper align="center">
                       <div style={audienceNameStyle}>
                         {testAudience.audience.name}
@@ -291,9 +291,14 @@ class AdminFeedback extends React.Component {
                     </AudienceWrapper>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
+                    <Flex justify="flex-end">
+                      ${testAudience.price_per_response}
+                    </Flex>
+                  </AudienceRowItem>
+                  <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">{testAudience.sample_size}</Flex>
                   </AudienceRowItem>
-                  <AudienceRowItem item xs={3}>
+                  <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">0</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
@@ -401,13 +406,16 @@ class AdminFeedback extends React.Component {
                 <Flex column>
                   <Heading3>Audience(s)</Heading3>
                   <Grid container>
-                    <Grid item xs={5}>
+                    <Grid item xs={4}>
                       <SubHeading>Audience Name</SubHeading>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <SubHeading>$/Response</SubHeading>
                     </Grid>
                     <Grid item xs={2}>
                       <SubHeadingRight>n Requested</SubHeadingRight>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={2}>
                       <SubHeadingRight>Sourced from INA</SubHeadingRight>
                     </Grid>
                     <Grid item xs={2}>

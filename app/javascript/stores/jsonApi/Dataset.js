@@ -10,13 +10,25 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
     this.rawAttributes().identifier
   }
 
-  get data() {
-    return this.rawAttributes().data.map(datum => {
-      if (datum.date) {
-        datum.date = new Date(datum.date)
-      }
-      return datum
-    })
+  // get dataWithDates() {
+  //   return this.data.map(datum => {
+  //     // Turn date strings into real dates
+  //     if (datum.date) {
+  //       datum.date = new Date(datum.date)
+  //     }
+  //     return datum
+  //   })
+  // }
+
+  get isEmojiOrScaleQuestion() {
+    return [
+      'question_clarity',
+      'question_excitement',
+      'question_different',
+      'question_useful',
+      'question_category_satisfaction',
+      'question_context',
+    ].includes(this.question_type)
   }
 }
 

@@ -31,6 +31,7 @@ import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import QuestionChoice from './jsonApi/QuestionChoice'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -182,9 +183,10 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  createLimitedUser({ contactInfo, sessionUid }) {
+  createLimitedUser({ contactInfo, feedbackContactPreference, sessionUid }) {
     return this.request('users/create_limited_user', 'POST', {
       contact_info: contactInfo,
+      feedback_contact_preference: feedbackContactPreference,
       session_uid: sessionUid,
     })
   }
@@ -310,7 +312,7 @@ class ApiStore extends jsonapi(datxCollection) {
     const { uiStore } = this
     const { selectedCardIds } = uiStore
     return this.findAll('collection_cards').filter(
-      card => selectedCardIds.indexOf(card.id) > -1 && card.canEdit
+      card => selectedCardIds.indexOf(card.id) > -1
     )
   }
 
@@ -858,6 +860,7 @@ ApiStore.types = [
   Notification,
   Organization,
   QuestionAnswer,
+  QuestionChoice,
   Role,
   SurveyResponse,
   TestAudience,

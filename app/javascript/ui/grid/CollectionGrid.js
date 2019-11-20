@@ -41,7 +41,7 @@ StyledGrid.displayName = 'StyledGrid'
 const SortContainer = styled.div`
   margin-bottom: 15px;
   margin-left: auto;
-  margin-right: 5px;
+  margin-right: 0;
   margin-top: -15px;
   text-align: right;
 `

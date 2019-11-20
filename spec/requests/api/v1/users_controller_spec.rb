@@ -93,6 +93,14 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
         expect(assigns(:current_user)).to eq(user)
       end
     end
+
+    context 'without an organization, but member of an org', create_org: false do
+      let!(:no_org_group) { create(:group, organization: nil, network_id: '1', add_members: [user]) }
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
+    end
   end
 
   describe 'POST #create_from_emails', :vcr do
@@ -242,7 +250,10 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     let(:path) { '/api/v1/users/create_limited_user' }
     let(:session_uid) { nil }
     let(:contact_info) do
-      { contact_info: 'something@somewhere.com' }
+      {
+        contact_info: 'something@somewhere.com',
+        feedback_contact_preference: 'feedback_contact_yes',
+      }
     end
     let(:raw_params) do
       contact_info.merge(session_uid: session_uid)
@@ -262,6 +273,11 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq 200
+    end
+
+    it 'returns newly_created = true' do
+      post(path, params: params)
+      expect(json['data']['attributes']['newly_created']).to be true
     end
 
     context 'with an existing survey response' do
@@ -291,6 +307,16 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
         expect {
           post(path, params: params)
         }.not_to change(limited_user, :last_sign_in_at)
+      end
+
+      it 'updates the survey response to be marked with the user id' do
+        post(path, params: params)
+        expect(survey_response.reload.user_id).to eq limited_user.id
+      end
+
+      it 'returns newly_created = false' do
+        post(path, params: params)
+        expect(json['data']['attributes']['newly_created']).to be false
       end
     end
   end

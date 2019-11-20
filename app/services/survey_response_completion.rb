@@ -1,6 +1,11 @@
 class SurveyResponseCompletion < SimpleService
-  delegate :test_collection, :gives_incentive?, :completed?, :user, to: :@survey_response
-  delegate :test_audience, to: :@survey_response, allow_nil: true
+  delegate :test_collection,
+           :gives_incentive?,
+           :completed?,
+           :user,
+           :test_audience,
+           :test_results_collection,
+           to: :@survey_response
 
   def initialize(survey_response)
     @survey_response = survey_response
@@ -11,7 +16,7 @@ class SurveyResponseCompletion < SimpleService
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
     mark_response_as_payment_owed
-    ping_collection
+    create_alias_collection unless test_results_collection.present?
     @survey_response
   end
 
@@ -47,6 +52,8 @@ class SurveyResponseCompletion < SimpleService
   end
 
   def user_has_existing_survey_response?
+    return false unless user.present?
+
     where_status = { status: :completed }
     if gives_incentive?
       where_status[:incentive_status] = %i[incentive_paid incentive_owed]
@@ -57,17 +64,15 @@ class SurveyResponseCompletion < SimpleService
       .present?
   end
 
+  def create_alias_collection
+    CreateSurveyResponseAliasCollectionWorker.perform_async(@survey_response.id)
+  end
+
   def mark_response_as_payment_owed
     return unless completed? && gives_incentive? && user&.email.present?
     # perform some checks: you can only get marked owed + paid once per TestCollection
     return if @survey_response.incentive_owed?
 
     @survey_response.record_incentive_owed!
-  end
-
-  def ping_collection
-    # real-time update any graphs, etc.
-    test_collection.touch
-    CollectionUpdateBroadcaster.call(test_collection)
   end
 end

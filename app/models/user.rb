@@ -283,7 +283,7 @@ class User < ApplicationRecord
       end
     end
     %w[picture picture_medium picture_large].each do |field|
-      user.network_data[field] = attrs.try(:extra).try(field)
+      user.network_data[field] = attrs.try(field) || attrs.try(:extra).try(field)
     end
 
     user
@@ -421,6 +421,7 @@ class User < ApplicationRecord
     if has_cached_role?(Role::SUPER_ADMIN)
       return current_organization.groups.not_global
     end
+    return [] unless current_organization.present?
 
     groups = Group.where(id: all_current_org_group_ids).not_global.to_a
     return [] if groups.blank?

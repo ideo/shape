@@ -75,7 +75,7 @@ describe('PublicSharingOptions', () => {
 
       expect(props.apiStore.uiStore.confirm).toHaveBeenCalledWith({
         prompt:
-          'This content will be available to anyone with this link. Are you sure you want to share this content?',
+          'All content in this collection and any nested collections will be available to anyone with this link. Are you sure you want to share this content?',
         iconName: 'Alert',
         confirmText: 'Continue',
         onConfirm: expect.any(Function),

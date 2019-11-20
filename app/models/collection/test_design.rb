@@ -21,6 +21,7 @@
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime
 #  test_launched_at           :datetime
+#  test_show_media            :boolean          default(TRUE)
 #  test_status                :integer
 #  type                       :string
 #  unarchived_at              :datetime
@@ -30,12 +31,14 @@
 #  collection_to_test_id      :bigint(8)
 #  created_by_id              :integer
 #  default_group_id           :integer
+#  idea_id                    :integer
 #  joinable_group_id          :bigint(8)
 #  organization_id            :bigint(8)
 #  question_item_id           :integer
 #  roles_anchor_collection_id :bigint(8)
 #  submission_box_id          :bigint(8)
 #  submission_template_id     :integer
+#  survey_response_id         :integer
 #  template_id                :integer
 #  test_collection_id         :bigint(8)
 #
@@ -46,6 +49,7 @@
 #  index_collections_on_cached_test_scores          (cached_test_scores) USING gin
 #  index_collections_on_cloned_from_id              (cloned_from_id)
 #  index_collections_on_created_at                  (created_at)
+#  index_collections_on_idea_id                     (idea_id)
 #  index_collections_on_organization_id             (organization_id)
 #  index_collections_on_roles_anchor_collection_id  (roles_anchor_collection_id)
 #  index_collections_on_submission_box_id           (submission_box_id)
@@ -59,9 +63,16 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #
 
+########################################################################
+# This model is being kept around until we migrate all legacy TestDesigns
+# - see #migrate! function below and migrate_old_test_collections rake task
+########################################################################
+
 class Collection
   class TestDesign < Collection
-    belongs_to :test_collection, class_name: 'Collection::TestCollection'
+    belongs_to :test_collection,
+               optional: true,
+               class_name: 'Collection::TestCollection'
     delegate :can_reopen?,
              :launchable?,
              :live_or_was_launched?,
@@ -84,64 +95,87 @@ class Collection
 
     has_many :survey_responses, through: :test_collection
 
-    COLLECTION_SUFFIX = ' Feedback Design'.freeze
-
-    def self.generate_name(name)
-      "#{name}#{COLLECTION_SUFFIX}"
+    def base_name
+      name
     end
 
-    def duplicate!(**args)
-      duplicate = super(args)
-      return duplicate unless duplicate.persisted?
+    ###########
+    def migrate!
+      tc = Collection.find(test_collection_id)
+      # error case
+      return if tc.blank?
 
-      duplicate = duplicate.becomes(Collection::TestCollection)
-      duplicate.update(
-        test_collection_id: nil,
+      to_test_id = tc.collection_to_test_id
+
+      test_status = tc.test_status
+
+      becomes(Collection::TestCollection).update(
         type: 'Collection::TestCollection',
-        # Don't set this to be a master template if the parent is a template
-        master_template: parent.master_template? ? false : master_template,
+        test_collection_id: nil,
+        collection_to_test_id: to_test_id,
+        test_status: nil,
       )
-      # Had to reload otherwise AASM gets into weird state
-      duplicate.reload
-    end
+      tc.update(
+        type: 'Collection::TestResultsCollection',
+        test_collection_id: id,
+        collection_to_test_id: nil,
+        test_status: nil,
+      )
 
-    def question_item_created(question_item)
-      if question_item.question_open?
-        # Create open response collection for this new question item
-        test_collection.create_open_response_collections(
-          open_question_items: [question_item],
-        )
-      elsif question_item.question_media?
-        test_collection.create_media_item_link(
-          media_question_items: [question_item],
-        )
+      trc = Collection::TestResultsCollection.find(tc.id)
+      test_collection = trc.test_collection
+      test_collection.update(test_status: test_status)
+      # now migrate itself into the new format
+      test_collection.migrate!
+
+      previous_results_card = CollectionCardBuilder.call(
+        params: {
+          collection_attributes: {
+            name: 'Previous Results',
+          },
+        },
+        parent_collection: trc,
+      )
+
+      moving_cards = tc.collection_cards.where.not(
+        id: [parent_collection_card.id, previous_results_card.id],
+      ).to_a
+      CardMover.call(
+        from_collection: trc,
+        to_collection: previous_results_card.collection,
+        cards: moving_cards,
+      )
+      # CardMover will have called everything appropriately, but the
+      # card save won't have validated because it wants them to have a section type
+      CollectionCard.import(moving_cards, validate: false, on_duplicate_key_update: %i[parent_id])
+
+      [SurveyResponse, TestAudience].each do |klass|
+        klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
       end
-    end
 
-    def answerable_complete_question_items
-      complete_question_items(answerable_only: true)
-    end
+      test_collection.reload
+      test_collection.survey_responses.each(&:create_alias)
 
-    def complete_question_items(answerable_only: false)
-      # This is for the purpose of finding all completed items to display in the survey
-      # i.e. omitting any unfinished/blanks
-      questions = answerable_only ? question_items.answerable : items
-      questions.reject do |i|
-        i.is_a?(Item::QuestionItem) && i.question_type.blank? ||
-          i.question_type == 'question_open' && i.content.blank? ||
-          i.question_type == 'question_category_satisfaction' && i.content.blank? ||
-          i.question_type == 'question_media'
-      end
-    end
+      ::TestResultsCollection::CreateContent.call(
+        test_results_collection: trc,
+        created_by: created_by,
+      )
 
-    def complete_question_cards
-      complete_question_items.collect(&:parent_collection_card)
-    end
+      previous_results_card.update(order: 999)
+      trc.reorder_cards!
 
-    private
+      # these used to have question_type: nil
+      items.where.not(type: 'Item::QuestionItem').update_all(question_type: :question_media)
 
-    def close_test
-      test_collection.close! if test_collection.live?
+      return unless inside_a_submission?
+
+      Collection
+        .where("cached_attributes->'submission_attrs'->>'launchable_test_id' = '#{tc.id}'")
+        .find_each do |submission|
+          submission.submission_attrs['launchable_test_id'] = id
+          submission.save
+        end
     end
+    ###########
   end
 end

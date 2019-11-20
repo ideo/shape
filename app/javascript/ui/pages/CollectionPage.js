@@ -8,6 +8,9 @@ import { animateScroll as scroll } from 'react-scroll'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
+import CollectionFilter, {
+  SubmissionsFilterPositioner,
+} from '~/ui/filtering/CollectionFilter'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
@@ -96,14 +99,25 @@ class CollectionPage extends React.Component {
 
   loadCollectionCards = async ({ page, per_page, rows, cols }) => {
     const { collection } = this.props
-    return collection
-      .API_fetchCards({ page, per_page, rows, cols })
-      .then(() => {
-        runInAction(() => {
-          this.cardsFetched = true
-          this.onAPILoad()
-        })
+    // if the collection is still awaiting updates, there are no cards to load
+    if (collection.awaiting_updates) {
+      this.pollForUpdates()
+      return
+    }
+
+    let params
+    if (collection.isRegularCollection) {
+      params = { page, per_page, rows, cols }
+    } else {
+      params = { rows }
+    }
+
+    return collection.API_fetchCards(params).then(() => {
+      runInAction(() => {
+        this.cardsFetched = true
+        this.onAPILoad()
       })
+    })
   }
 
   loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
@@ -134,9 +148,6 @@ class CollectionPage extends React.Component {
       // back to the SubmissionBox instead
       routingStore.routeTo('collections', collection.submission_box_id)
       return
-    }
-    if (collection.awaiting_updates) {
-      this.pollForUpdates()
     }
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
@@ -213,17 +224,24 @@ class CollectionPage extends React.Component {
 
   pollForUpdates() {
     const { collection, apiStore, uiStore } = this.props
+    if (uiStore.dialogConfig.open !== 'loading') {
+      let prompt =
+        'Please wait while we build your account. This should take from 15 to 30 seconds.'
+      if (collection.isTestCollectionOrResults) {
+        prompt =
+          'Please wait while we generate your feedback results collection. This should take 5 to 10 seconds.'
+      }
+      uiStore.loadingDialog({
+        prompt,
+        iconName: 'Celebrate',
+      })
+    }
+
     this.updatePoller = setInterval(async () => {
       if (collection.awaiting_updates) {
         const res = await apiStore.fetch('collections', collection.id, true)
         if (!res.data.awaiting_updates) {
           this.loadCollectionCards({})
-        } else if (uiStore.dialogConfig.open !== 'loading') {
-          uiStore.loadingDialog({
-            prompt:
-              'Please wait while we build your account. This should take from 15 to 30 seconds.',
-            iconName: 'Celebrate',
-          })
         }
       } else {
         clearInterval(this.updatePoller)
@@ -320,7 +338,11 @@ class CollectionPage extends React.Component {
     const { collection } = this.props
     const per_page =
       collection.collection_cards.length || collection.recordsPerPage
-    this.loadCollectionCards({ per_page })
+    if (collection.isBoard) {
+      this.loadCollectionCards({ rows: [0, collection.loadedRows] })
+    } else {
+      this.loadCollectionCards({ per_page })
+    }
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
       await this.collection.submissions_collection.API_fetchCards()
@@ -404,8 +426,14 @@ class CollectionPage extends React.Component {
     }
 
     return (
-      <div>
+      <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
+        <SubmissionsFilterPositioner>
+          <CollectionFilter
+            collection={submissions_collection}
+            canEdit={collection.can_edit_content}
+          />
+        </SubmissionsFilterPositioner>
         <CollectionGrid
           {...gridSettings}
           loadCollectionCards={this.loadSubmissionsCollectionCards}
@@ -501,7 +529,7 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox, requiresTestDesigner } = collection
+    const { isSubmissionBox, isTestCollection } = collection
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
@@ -517,7 +545,7 @@ class CollectionPage extends React.Component {
           cardIdMenuOpen={cardMenuOpen.id}
         />
       )
-    } else if (requiresTestDesigner) {
+    } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {
       inner = (

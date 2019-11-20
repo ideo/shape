@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { VictoryArea } from 'victory'
 
-import ChartTooltip from '~/ui/global/charts/ChartTooltip'
+import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
 import {
   datasetPropType,
   dateTooltipText,
@@ -29,6 +29,7 @@ const chartStyle = style => {
 const formatValues = values => {
   const rawValues = addDuplicateValueIfSingleValue(values)
   // Transform to regular arrays and objects for Victory
+  return rawValues
   return rawValues.map(data => ({ ...data }))
 }
 
@@ -52,7 +53,7 @@ const AreaChart = ({ dataset, simpleDateTooltip, domain, cardArea = 1 }) => {
       style={chartStyle(dataset.style || {})}
       labels={d => d.value}
       labelComponent={
-        <ChartTooltip
+        <TickLabelWithTooltip
           tooltipTextRenderer={tooltipFn}
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}

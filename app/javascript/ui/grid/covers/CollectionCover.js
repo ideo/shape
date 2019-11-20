@@ -12,6 +12,7 @@ import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
+import CarouselCover from '~/ui/grid/covers/CarouselCover'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import { FormButton } from '~/ui/global/styled/buttons'
 import { RoundPill } from '~/ui/global/styled/forms'
@@ -168,7 +169,7 @@ class CollectionCover extends React.Component {
       (collection.isTemplated ||
         collection.isMasterTemplate ||
         collection.isSubmissionBox ||
-        collection.isTestCollectionOrTestDesign)
+        collection.isTestCollectionOrResults)
     )
   }
 
@@ -192,7 +193,7 @@ class CollectionCover extends React.Component {
         rightIcon = <TemplateIcon circled />
       } else if (collection.isSubmissionBox) {
         rightIcon = <SubmissionBoxIconLg />
-      } else if (collection.isTestCollectionOrTestDesign) {
+      } else if (collection.isTestCollectionOrResults) {
         rightIcon = <TestCollectionIcon />
       }
       return (
@@ -327,6 +328,7 @@ class CollectionCover extends React.Component {
   }
 
   handleClick = e => {
+    // TODO is this being used?
     const { searchResult, dragging, uiStore, collection } = this.props
     const { movingCardIds } = uiStore
     const movingCard =
@@ -371,59 +373,69 @@ class CollectionCover extends React.Component {
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
       >
-        <StyledCardContent
-          height={height}
-          width={width}
-          gutter={gutter}
-          gridW={gridW}
-          isTextItem={!!textItem}
-        >
-          <div className="overlay" />
-          {textItem ? (
-            <div className="top text-item">
-              <TextItemCover
-                item={textItem}
-                height={height}
-                dragging={false}
-                cardId={cardId}
-                handleClick={this.handleClick}
-                searchResult={searchResult}
-                initialFontTag={'P'}
-                hideReadMore
-                uneditable
-                isTransparent={true}
-              />
-            </div>
-          ) : (
-            <div>
-              <div className="top">
-                <PositionedCardHeading>
-                  <Dotdotdot clamp={height > 1 ? 6 : 3}>
-                    <PlainLink
-                      className="no-select cancelGridClick"
-                      onClick={this.handleClick}
-                      to={routingStore.pathTo('collections', collection.id)}
-                      data-cy="collection-cover-link"
-                    >
-                      {this.name}
-                    </PlainLink>
-                  </Dotdotdot>
-                  {this.button}
-                </PositionedCardHeading>
+        {collection.isCarousel &&
+        collection.collection_cover_items &&
+        collection.collection_cover_items.length > 0 ? (
+          <CarouselCover
+            collection={collection}
+            dragging={false}
+            handleClick={this.handleClick}
+          />
+        ) : (
+          <StyledCardContent
+            height={height}
+            width={width}
+            gutter={gutter}
+            gridW={gridW}
+            isTextItem={!!textItem}
+          >
+            <div className="overlay" />
+            {textItem ? (
+              <div className="top text-item">
+                <TextItemCover
+                  item={textItem}
+                  height={height}
+                  dragging={false}
+                  cardId={cardId}
+                  handleClick={this.handleClick}
+                  searchResult={searchResult}
+                  initialFontTag={'P'}
+                  hideReadMore
+                  uneditable
+                  isTransparent={true}
+                />
               </div>
-              <div className="bottom">
-                {this.launchTestButton}
-                {this.collectionScore}
-                {this.hasUseTemplateButton && this.useTemplateButton}
-                {!this.hasLaunchTestButton && (
-                  <Dotdotdot clamp={this.numberOfLinesForDescription}>
-                    {subtitle}
-                  </Dotdotdot>
-                )}
+            ) : (
+              <div>
+                <div className="top">
+                  <PositionedCardHeading>
+                    <Dotdotdot clamp={height > 1 ? 6 : 3}>
+                      <PlainLink
+                        className="no-select cancelGridClick"
+                        onClick={this.handleClick}
+                        to={routingStore.pathTo('collections', collection.id)}
+                        data-cy="collection-cover-link"
+                      >
+                        {this.name}
+                      </PlainLink>
+                    </Dotdotdot>
+                    {this.button}
+                  </PositionedCardHeading>
+                </div>
+                <div className="bottom">
+                  {this.launchTestButton}
+                  {this.collectionScore}
+                  {this.hasUseTemplateButton && this.useTemplateButton}
+                  {!this.hasLaunchTestButton && (
+                    <Dotdotdot clamp={this.numberOfLinesForDescription}>
+                      {subtitle}
+                    </Dotdotdot>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </StyledCardContent>
+            )}
+          </StyledCardContent>
+        )}
       </StyledCollectionCover>
     )
   }

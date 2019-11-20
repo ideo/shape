@@ -38,14 +38,14 @@ module Roles
 
       unanchor_object # from shared methods
       assign_role_to_users
-      setup_org_membership if newly_invited?
+      setup_org_membership
       notify_users if should_notify?
       assign_role_to_groups
       add_editors_as_comment_thread_followers
       add_group_members_as_comment_thread_followers
       link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
-      create_activities_and_notifications if newly_invited?
+      create_activities_and_notifications if @invited_by
       failed_users.blank? && failed_groups.blank?
     end
 
@@ -64,6 +64,16 @@ module Roles
         role = user.add_role(@role_name, @object)
         if role.persisted?
           @added_users << user
+
+          next unless newly_invited?
+
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_user_ids: [user.id],
+            should_notify: false,
+          )
         else
           @failed_users << user
         end
@@ -71,10 +81,14 @@ module Roles
     end
 
     def setup_org_membership
-      @users.each do |user|
-        # if it's an item, @object.organization delegates to the parent collection
-        @object.organization.setup_user_membership_and_collections(user)
-      end
+      # if it's an item, @object.organization delegates to the parent collection
+      organization_id = @object.organization&.id
+      return unless organization_id.present?
+
+      OrganizationMembershipWorker.perform_async(
+        @added_users.pluck(:id),
+        organization_id,
+      )
     end
 
     def assign_role_to_groups
@@ -82,6 +96,15 @@ module Roles
         role = group.add_role(@role_name, @object)
         if role.persisted?
           @added_groups << group
+          next unless newly_invited?
+
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_group_ids: [group.id],
+            should_notify: false,
+          )
         else
           @failed_groups << group
         end
@@ -110,7 +133,8 @@ module Roles
     end
 
     def create_activities_and_notifications
-      action = Activity.role_name_to_action(@role_name.to_sym)
+      action = Activity.role_name_to_action(role_name: @role_name.to_sym, adding: true)
+
       return if action.nil?
 
       ActivityAndNotificationBuilder.call(

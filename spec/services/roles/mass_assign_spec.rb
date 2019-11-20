@@ -49,6 +49,14 @@ RSpec.describe Roles::MassAssign, type: :service do
       expect(users.all? { |user| user.has_role?(:editor, object) }).to be true
     end
 
+    it 'sets up user membership on the object\'s organization' do
+      expect(OrganizationMembershipWorker).to receive(:perform_async).with(
+        users.pluck(:id),
+        object.organization_id,
+      )
+      assign_role.call
+    end
+
     it 'assigns role to groups' do
       expect(assign_role.call).to be true
       expect(groups.all? { |group| group.has_role?(:editor, object) }).to be true
@@ -166,18 +174,33 @@ RSpec.describe Roles::MassAssign, type: :service do
     context 'when it should create activities and notifications' do
       let(:invited_by) { create(:user) }
       let(:new_role) { true }
-      let(:role_name) { Role::EDITOR.to_s }
 
-      it 'should call the activity and notification builder' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: invited_by,
-          target: object,
-          action: :added_editor,
-          subject_user_ids: users.pluck(:id),
-          subject_group_ids: groups.pluck(:id),
-          should_notify: true,
-        )
-        assign_role.call
+      describe 'added editor' do
+        let!(:role_name) { Role::EDITOR.to_s }
+        it 'add activities with shared and added_editor activity' do
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :shared),
+          ).exactly(users.count + groups.count).times
+
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :added_editor),
+          ).once
+          assign_role.call
+        end
+      end
+
+      describe 'added viewer' do
+        let!(:role_name) { Role::VIEWER.to_s }
+        it 'add activities with shared and added_member activity' do
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :shared),
+          ).exactly(users.count + groups.count).times
+
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :added_viewer),
+          ).once
+          assign_role.call
+        end
       end
     end
 
@@ -239,7 +262,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         let!(:users) { [user] }
         let!(:groups) { [] }
         let!(:linked_collection) { create(:collection) }
-        let!(:object) { create(:group) }
+        let!(:object) { create(:group, organization: organization) }
         let!(:comment_thread) { create(:item_comment_thread) }
         let!(:groups_thread) { create(:groups_thread, group: object, comment_thread: comment_thread) }
         let(:thread_ids) { object.groups_threads.pluck(:comment_thread_id) }
@@ -290,7 +313,12 @@ RSpec.describe Roles::MassAssign, type: :service do
             invited_to_id: object.id,
             application: nil,
           )
-          expect(ActivityAndNotificationBuilder).to receive(:call)
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :shared),
+          ).exactly(users.count + groups.count).times
+          expect(ActivityAndNotificationBuilder).to receive(:call).with(
+            hash_including(action: :added_editor),
+          ).once
           assign_role.call
         end
 
@@ -301,9 +329,11 @@ RSpec.describe Roles::MassAssign, type: :service do
             expect(InvitationMailer).not_to receive(:invite)
             expect(ActivityAndNotificationBuilder).to receive(:call).with(
               hash_including(
+                action: :shared,
                 should_notify: false,
               ),
-            )
+            ).exactly(users.count + groups.count).times
+            expect(ActivityAndNotificationBuilder).to receive(:call).with(hash_including(action: :added_editor)).once
             assign_role.call
           end
         end

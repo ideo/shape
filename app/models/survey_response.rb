@@ -6,6 +6,7 @@
 #  incentive_owed_at  :datetime
 #  incentive_paid_at  :datetime
 #  incentive_status   :integer
+#  respondent_alias   :string
 #  session_uid        :text
 #  status             :integer          default("in_progress")
 #  created_at         :datetime         not null
@@ -28,12 +29,14 @@ class SurveyResponse < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :test_audience, optional: true
   has_many :question_answers, dependent: :destroy
+  has_one :test_results_collection, class_name: 'Collection::TestResultsCollection'
   # Deprecating this - storing status on this record and in accounting double entry records
   has_one :feedback_incentive_record
 
   before_create :set_default_incentive_status, if: :gives_incentive?
+  after_create :create_alias
 
-  delegate :question_items, :answerable_complete_question_items,
+  delegate :question_items,
            to: :test_collection
 
   delegate :price_per_response,
@@ -57,6 +60,10 @@ class SurveyResponse < ApplicationRecord
     incentive_owed: 1,
     incentive_paid: 2,
   }
+
+  def dataset_display_name
+    respondent_alias
+  end
 
   def record_incentive_owed!
     return if !incentive_unearned? || amount_earned.zero? || user&.email.blank?
@@ -82,20 +89,12 @@ class SurveyResponse < ApplicationRecord
     TestAudience.incentive_amount
   end
 
-  def all_questions_answered?
-    # nil case should only happen in test env (test_design is not created)
-    return false if answerable_complete_question_items.nil?
-
-    # compare answerable question items to the ones we've answered
-    (answerable_complete_question_items.pluck(:id) - question_answers.pluck(:question_id)).empty?
-  end
-
   def question_answer_created_or_destroyed
-    if all_questions_answered?
-      SurveyResponseCompletion.call(self)
-    else
-      update(updated_at: Time.current)
-    end
+    touch
+    # service will validate that all questions have been answered
+    return unless SurveyResponseValidation.call(self)
+
+    SurveyResponseCompletion.call(self)
   end
 
   def cache_test_scores!
@@ -108,25 +107,19 @@ class SurveyResponse < ApplicationRecord
     test_audience&.paid? ? true : false
   end
 
+  def create_alias
+    return if respondent_alias.present?
+
+    survey_names = test_collection.survey_responses.pluck(:respondent_alias)
+    survey_names << user&.first_name
+
+    name = UniqNameGenerator.call(disallowed_names: survey_names.compact)
+    update_attributes(respondent_alias: name)
+  end
+
   private
 
   def set_default_incentive_status
     self.incentive_status ||= :incentive_unearned
-  end
-
-  def create_open_response_items
-    question_answers
-      .joins(:question)
-      .includes(:open_response_item)
-      .where(
-        Item::QuestionItem
-          .arel_table[:question_type]
-          .eq(Item::QuestionItem.question_types[:question_open]),
-      ).each do |question_answer|
-        next if question_answer.open_response_item.present?
-
-        # Save will trigger the callback to create the item
-        question_answer.save
-      end
   end
 end

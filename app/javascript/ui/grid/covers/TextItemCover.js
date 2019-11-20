@@ -19,12 +19,17 @@ const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 const StyledPaddedCover = styled(PaddedCardCover)`
   border-top: ${props =>
     !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
-  background: ${props =>
-    (!props.isEditing && !props.dragging && props.hasTitleText) ||
-    props.isTransparent ||
-    (props.isEditing && props.hasTitleText)
-      ? v.colors.transparent
-      : v.colors.white};
+  background: ${props => {
+    const { hasTitleText, isTransparent, uneditable } = props
+    if (hasTitleText && uneditable) {
+      // for carousel covers w/ title text
+      return `${v.colors.white}`
+    }
+    if (isTransparent || hasTitleText) {
+      return `${v.colors.transparent}`
+    }
+    return `${v.colors.white}`
+  }};
 `
 
 const StyledReadMore = styled(ShowMoreButton)`
@@ -79,6 +84,7 @@ class TextItemCover extends React.Component {
   }
 
   handleClick = async e => {
+    if (this.props.handleClick) this.props.handleClick(e)
     e.stopPropagation()
     const { item, dragging, cardId, searchResult, uneditable } = this.props
     if (dragging || uiStore.dragging || this.isEditing || uneditable)
@@ -230,7 +236,7 @@ class TextItemCover extends React.Component {
 
   render() {
     const { isEditing, hasTitleText, props } = this
-    const { isTransparent, dragging } = props
+    const { isTransparent, uneditable } = props
     const content = isEditing ? this.renderEditing() : this.renderDefault()
 
     return (
@@ -241,10 +247,9 @@ class TextItemCover extends React.Component {
         }}
         className="cancelGridClick"
         onClick={this.handleClick}
-        isEditing={isEditing}
         hasTitleText={hasTitleText}
         isTransparent={isTransparent}
-        dragging={dragging}
+        uneditable={uneditable}
       >
         <QuillStyleWrapper
           notEditing={!isEditing}
@@ -286,6 +291,7 @@ TextItemCover.defaultProps = {
   hideReadMore: false,
   uneditable: false,
   isTransparent: false,
+  handleClick: null,
 }
 
 export default TextItemCover

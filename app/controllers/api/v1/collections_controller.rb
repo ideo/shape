@@ -108,8 +108,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def restore_permissions
-    Roles::MergeToChild.call(parent: @collection.parent, child: @collection)
-    @collection.unmark_as_private!
+    RestorePermission.call(
+      object: @collection,
+      restored_by: current_user,
+    )
     render_collection
     # no error case needed... ?
   end
@@ -241,6 +243,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :default_group_id,
       :hardcoded_subtitle,
       :subtitle_hidden,
+      :test_show_media,
       collection_cards_attributes: %i[id order width height row col],
     ].concat(Collection.globalize_attribute_names)
   end

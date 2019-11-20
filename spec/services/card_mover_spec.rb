@@ -288,6 +288,22 @@ RSpec.describe CardMover, type: :service do
       end
     end
 
+    context 'with to_collection.anyone_can_view' do
+      let!(:from_collection) { create(:collection, organization: organization, num_cards: 1, record_type: :collection) }
+      let(:subcollection) { from_collection.collections.first }
+      before do
+        to_collection.update(anyone_can_view: true)
+      end
+
+      it 'should call Sharing::PropagateAnyoneCanView on any collections being moved' do
+        expect(Sharing::PropagateAnyoneCanView).to receive(:call).with(collection: subcollection)
+        expect do
+          card_mover.call
+          subcollection.reload
+        end.to change(subcollection, :anyone_can_view)
+      end
+    end
+
     context 'with data items that have legends' do
       let!(:data_item) do
         create(

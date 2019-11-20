@@ -51,6 +51,7 @@ class Group < ApplicationRecord
   alias resourceable_can_edit? can_edit?
 
   after_save :update_organization
+  after_save :setup_user_organization_memberships, if: :saved_change_to_organization_id?
   after_create :create_shared_collection
 
   rolify after_add: :after_role_update,
@@ -145,15 +146,15 @@ class Group < ApplicationRecord
   end
 
   def primary?
-    organization.primary_group_id == id
+    persisted? && organization&.primary_group_id == id
   end
 
   def guest?
-    organization.guest_group_id == id
+    persisted? && organization&.guest_group_id == id
   end
 
   def admin?
-    organization.admin_group_id == id
+    persisted? && organization&.admin_group_id == id
   end
 
   def org_group?
@@ -186,11 +187,12 @@ class Group < ApplicationRecord
   end
 
   def requires_org?
-    true
+    # network can create temporarily org-less groups; otherwise org is required
+    network_id.blank?
   end
 
   def update_from_network_profile(params)
-    %i[name external_id].each do |field|
+    %i[name external_id organization_id].each do |field|
       send("#{field}=", params[field]) if params[field].present?
     end
     save
@@ -292,10 +294,18 @@ class Group < ApplicationRecord
   end
 
   def update_organization
-    return unless primary?
+    return unless organization_id? && primary?
 
     # regenerate the org's slug if we're changing the primary handle
     organization.slug = nil if saved_change_to_handle?
     organization.update(name: name)
+  end
+
+  # gets called when updating a group from no org to belonging to an org;
+  # all group users should be setup into the org (My Collection, etc)
+  def setup_user_organization_memberships
+    return unless organization_id? && organization_id_before_last_save.nil?
+
+    OrganizationMembershipWorker.perform_async(user_ids, organization_id)
   end
 end

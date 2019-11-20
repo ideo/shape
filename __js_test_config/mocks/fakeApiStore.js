@@ -34,6 +34,7 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve(requestResult))
       .mockName('fetchTestCollections'),
+    remove: jest.fn(),
     sync: jest.fn().mockName('sync'),
     loadCurrentUser: jest.fn().mockReturnValue(Promise.resolve()),
     createLimitedUser: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),

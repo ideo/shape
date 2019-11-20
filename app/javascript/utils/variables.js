@@ -18,6 +18,7 @@ export const ITEM_TYPES = {
 
 export const COLLECTION_TYPES = {
   TEST: 'Collection::TestCollection',
+  TEST_RESULTS: 'Collection::TestResultsCollection',
   TEST_DESIGN: 'Collection::TestDesign',
 }
 
@@ -39,22 +40,21 @@ export const DATA_MEASURES = [
 
 export const TEST_COLLECTION_SELECT_OPTIONS = [
   {
-    values: [{ value: '', label: 'select question type' }],
-  },
-  {
-    category: 'Idea Content',
     values: [
-      { value: 'question_description', label: 'Description' },
-      { value: 'question_media', label: 'Photo/Video' },
+      {
+        value: '',
+        label: 'select question type',
+        sections: ['intro', 'ideas', 'outro'],
+      },
     ],
   },
   {
-    category: 'Scaled Rating',
+    category: 'Idea Ratings',
     values: [
-      { value: 'question_clarity', label: 'Clear' },
-      { value: 'question_different', label: 'Different' },
-      { value: 'question_excitement', label: 'Exciting' },
-      { value: 'question_useful', label: 'Useful' },
+      { value: 'question_clarity', label: 'Clear', sections: ['ideas'] },
+      { value: 'question_different', label: 'Different', sections: ['ideas'] },
+      { value: 'question_excitement', label: 'Exciting', sections: ['ideas'] },
+      { value: 'question_useful', label: 'Useful', sections: ['ideas'] },
     ],
   },
   {
@@ -63,9 +63,34 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
       {
         value: 'question_category_satisfaction',
         label: 'Category Satisfaction',
+        sections: ['intro'],
       },
-      { value: 'question_context', label: 'Context Setting' },
-      { value: 'question_open', label: 'Open Response' },
+      {
+        value: 'question_open',
+        label: 'Open Response',
+        sections: ['intro', 'ideas', 'outro'],
+      },
+      {
+        value: 'question_media',
+        label: 'Photo/Video',
+        // check on final AC...
+        sections: ['intro', 'ideas', 'outro'],
+      },
+      {
+        value: 'question_description',
+        label: 'Text Block',
+        sections: ['intro', 'ideas', 'outro'],
+      },
+      {
+        value: 'question_single_choice',
+        label: 'Single Choice',
+        sections: ['intro', 'ideas', 'outro'],
+      },
+      {
+        value: 'question_multiple_choice',
+        label: 'Multiple Choice',
+        sections: ['intro', 'ideas', 'outro'],
+      },
     ],
   },
 ]

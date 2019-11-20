@@ -2,6 +2,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   deserializable_resource :item, class: DeserializableItem, only: %i[create update highlight]
   load_and_authorize_resource :collection_card, only: :create
   load_and_authorize_resource except: %i[update highlight in_my_collection]
+  skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -89,9 +90,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   # similar method exists in collections_controller
   def restore_permissions
-    Roles::MergeToChild.call(parent: @item.parent, child: @item)
+    RestorePermission.call(
+      object: @item,
+      restored_by: current_user,
+    )
     render jsonapi: @item.reload
-    # no error case needed... ?
   end
 
   private

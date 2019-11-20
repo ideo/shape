@@ -5,6 +5,7 @@ class CollectionCardReplacer
   def initialize(replacing_card:, params:)
     @replacing_card = replacing_card
     @item = @replacing_card.item
+    @image_contain = params[:image_contain]
     @attrs = params[:item_attributes]
     @errors = nil
   end
@@ -16,6 +17,7 @@ class CollectionCardReplacer
       @errors = @replacing_card.errors
       return false
     end
+    @replacing_card.update(image_contain: @image_contain) unless @image_contain.nil?
     # now capture errors on the item
     @errors = @item.errors
     assign_item_attributes
@@ -40,6 +42,14 @@ class CollectionCardReplacer
     @item.attributes = @attrs
     # the class type may have changed
     @item = @item.becomes(@attrs[:type].constantize)
+
+    if @item.is_a?(Item::QuestionItem)
+      if @item.question_choices_customizable?
+        @item.add_default_question_choices
+      else
+        @item.question_choices.destroy_all
+      end
+    end
 
     # clearing data means removing any existing translated content
     @item.translations.destroy_all

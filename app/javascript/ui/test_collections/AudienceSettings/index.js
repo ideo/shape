@@ -151,11 +151,14 @@ class AudienceSettings extends React.Component {
   closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
 
   openWarningDialog = () => {
+    const { errorMessages } = this
     const { uiStore } = this.props
-    const errorMessages = this.errors.map(e => ` ${e.detail}`)
-    const prompt = `You have questions that have not yet been finalized:\n
-         ${errorMessages}
-        `
+    let intro = ''
+    // omit intro message for "You already have another test running..."
+    if (!_.includes(errorMessages, 'You already have')) {
+      intro = 'You have questions that have not yet been finalized:\n'
+    }
+    const prompt = `${intro}${errorMessages}`
 
     uiStore.popupAlert({
       prompt,
@@ -172,13 +175,13 @@ class AudienceSettings extends React.Component {
       )
       return true
     } catch (err) {
-      this.errors = err.error
+      this.errorMessages = err.error.map(e => ` ${e.detail}`).toString()
       return false
     }
   }
 
   async confirmOrLaunchTest() {
-    this.errors = null
+    this.errorMessages = null
     const readyToLaunch = await this.isReadyToLaunch()
 
     if (!readyToLaunch) {

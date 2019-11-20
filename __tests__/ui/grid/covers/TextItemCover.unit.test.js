@@ -38,8 +38,8 @@ describe('TextItemCover', () => {
     expectTreeToMatchSnapshot(wrapper)
   })
 
-  it('renders Quill with item.data_content', () => {
-    expect(wrapper.find('Quill').props().value).toBe(item.data_content)
+  it('renders Quill with item.quill_data', () => {
+    expect(wrapper.find('Quill').props().value).toBe(item.quill_data)
   })
 
   it('renders Read More if text height exceeds the viewable area', () => {
@@ -69,6 +69,11 @@ describe('TextItemCover', () => {
   })
 
   describe('handleClick', () => {
+    it('calls props handleClick if it exists', () => {
+      component.handleClick(e)
+      expect(props.handleClick).toHaveBeenCalled()
+    })
+
     it('returns false if you are dragging', async () => {
       wrapper.setProps({ dragging: true })
       const result = await component.handleClick(e)

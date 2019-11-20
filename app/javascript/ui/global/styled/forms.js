@@ -2,6 +2,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import MuiSelect from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import MuiCheckbox from '@material-ui/core/Checkbox'
+import MuiRadio from '@material-ui/core/Radio'
 import AutosizeInput from 'react-input-autosize'
 import TextareaAutosize from 'react-autosize-textarea'
 import styled, { css } from 'styled-components'
@@ -207,8 +208,10 @@ Select.displayName = 'StyledSelect'
 
 /** @component */
 export const Checkbox = styled(MuiCheckbox)`
-  && {
-    margin-right: 10px;
+  &.remove-padding {
+    height: auto;
+    margin-right: 0;
+    vertical-align: middle;
     width: 28px;
   }
 
@@ -224,6 +227,29 @@ export const Checkbox = styled(MuiCheckbox)`
   }
 `
 Checkbox.displayName = 'StyledCheckbox'
+
+export const Radio = styled(MuiRadio)`
+  &.remove-padding {
+    height: auto;
+    vertical-align: middle;
+    width: 28px;
+  }
+
+  &.radio--error {
+    color: ${v.colors.alert};
+  }
+  &.radio--black {
+    color: ${v.colors.black} !important;
+  }
+  &.radio--disabled {
+    color: ${v.colors.commonLight} !important;
+  }
+  &.radio--white,
+  &.radio--checked-white {
+    color: white !important;
+  }
+`
+Radio.displayName = 'StyledRadio'
 
 /** @component */
 export const SelectOption = styled(MenuItem)`

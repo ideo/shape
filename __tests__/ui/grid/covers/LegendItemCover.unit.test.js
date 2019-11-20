@@ -1,7 +1,6 @@
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
-import { Heading3 } from '~/ui/global/styled/typography'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import {
@@ -24,6 +23,7 @@ describe('LegendItemCover', () => {
         apiStore: fakeApiStore(),
         uiStore: fakeUiStore,
       }
+      props.item.can_edit_content = true
       wrapper = shallow(<LegendItemCover.wrappedComponent {...props} />)
       instance = wrapper.instance()
     }
@@ -180,7 +180,7 @@ describe('LegendItemCover', () => {
 
   describe('toggle comparison search', () => {
     const comparisonClick = () => {
-      wrapper.find(Heading3).simulate('click')
+      wrapper.find('.test-add-comparison-button').simulate('click')
     }
 
     it('should remove/open the empty space click handler', () => {
@@ -225,6 +225,17 @@ describe('LegendItemCover', () => {
           props.card.parent.API_selectDatasetsWithIdentifier
         ).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('without edit access', () => {
+    beforeEach(() => {
+      props.item.can_edit_content = false
+      wrapper = shallow(<LegendItemCover.wrappedComponent {...props} />)
+    })
+
+    it('should not show the comparison button', () => {
+      expect(wrapper.find('.test-add-comparison-button').exists()).toBe(false)
     })
   })
 })
