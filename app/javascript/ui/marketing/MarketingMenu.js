@@ -10,7 +10,10 @@ import v from '~/utils/variables'
 import Logo from '~/ui/layout/Logo.js'
 import Hamburger from '~/ui/layout/Hamburger.js'
 import MenuDropdown from '~/ui/layout/MenuDropdown'
-import { MarketingFlex } from '~/ui/global/styled/marketing.js'
+import {
+  MarketingFlex,
+  MarketingMainBtn,
+} from '~/ui/global/styled/marketing.js'
 import { scroller } from 'react-scroll'
 import { browserHistory } from '~/ui/MarketingRoutes'
 
@@ -182,6 +185,12 @@ const MobileLinks = ({ isHome }) => {
           Login
         </NavLink>
       </Box>
+
+      <Box>
+        <NavLink href="/signup" align="left">
+          Signup
+        </NavLink>
+      </Box>
     </MarketingFlex>
   )
 }
@@ -250,6 +259,11 @@ class MarketingMenu extends React.PureComponent {
                 <MarketingFlex align="center" justify="flex-end">
                   <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
                   <NavLink href="/login">Login</NavLink>
+                  <MarketingMainBtn
+                    onClick={() => browserHistory.push('/sign_up')}
+                  >
+                    Sign up
+                  </MarketingMainBtn>
                 </MarketingFlex>
               </Box>
             </MarketingFlex>

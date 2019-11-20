@@ -9,6 +9,9 @@ import {
   MarketingFlex,
   MarketingStandaloneVideoWrapper,
   MarketingH1Bold,
+  MarketingMainBtn,
+  MarketingAlternateBtn,
+  MarketingHeroButtonContainer,
 } from '~/ui/global/styled/marketing.js'
 import { DisplayText } from '~/ui/global/styled/typography'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
@@ -18,6 +21,7 @@ import { Pricing } from '~/ui/marketing/Pricing'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
+import { browserHistory } from '~/ui/MarketingRoutes'
 
 import styled from 'styled-components'
 
@@ -50,11 +54,62 @@ class MarketingProductPage extends React.Component {
     this.setState({ footer: footer })
   }
 
+  handleRedirect = href => {
+    browserHistory.push(href)
+    return
+  }
+
+  get renderProductCta() {
+    const {
+      content: { hero },
+    } = this.state
+    if (!hero || _.isEmpty(hero.cta)) return ''
+
+    const { cta } = hero
+    const { type, value, href } = cta
+    const { page } = this
+    const buttonId = `${page}-cta`
+    const ctaProps = {
+      onClick: () => {
+        this.handleRedirect(href)
+      },
+      id: buttonId,
+    }
+
+    let ctaButton
+
+    switch (type) {
+      case 1: // render yellow filled button
+        ctaButton = <MarketingMainBtn {...ctaProps}>{value}</MarketingMainBtn>
+        break
+      case 2: // render transparent black bordered button
+        ctaButton = (
+          <MarketingAlternateBtn {...ctaProps}>{value}</MarketingAlternateBtn>
+        )
+        break
+      default:
+        return ''
+        break
+    }
+
+    return (
+      <Fragment>
+        <MarketingFlex align="center" justify="center" wrap w={1}>
+          <Box w={[590, 0.6, 0.32]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
+            <MarketingHeroButtonContainer>
+              {ctaButton}
+            </MarketingHeroButtonContainer>
+          </Box>
+        </MarketingFlex>
+      </Fragment>
+    )
+  }
+
   get renderVideoPlayer() {
     const {
       content: { hero },
     } = this.state
-    if (!hero || !hero.videoUrl) return ''
+    if (!hero || _.isEmpty(hero.videoUrl)) return ''
     return (
       <Fragment>
         <MarketingFlex align="center" justify="center" wrap w={1}>
@@ -71,7 +126,9 @@ class MarketingProductPage extends React.Component {
         </MarketingFlex>
         <MarketingFlex align="center" justify="center" wrap w={1}>
           <Box w={[590, 0.6, 0.32]} mt={44} pr={[3, 0, 0]} pl={[3, 0, 0]}>
-            <Subtitle>{hero.videoCaption}</Subtitle>
+            {!_.isEmpty(hero.videoCaption) && (
+              <Subtitle>{hero.videoCaption}</Subtitle>
+            )}
           </Box>
         </MarketingFlex>
       </Fragment>
@@ -109,6 +166,7 @@ class MarketingProductPage extends React.Component {
                 </Box>
               </MarketingFlex>
               {this.renderVideoPlayer}
+              {this.renderProductCta}
               <MarketingFlex align="center" justify="center" wrap w={1}>
                 <Box w={1} justify="center">
                   <ScrollElement name="ContentAnchor" />
