@@ -187,7 +187,7 @@ const MobileLinks = ({ isHome }) => {
       </Box>
 
       <Box>
-        <NavLink href="/signup" align="left">
+        <NavLink href="/sign_up" align="left">
           Signup
         </NavLink>
       </Box>
