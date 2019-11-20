@@ -150,6 +150,24 @@ RSpec.describe QuestionAnswer, type: :model do
             'What a jolly prototype',
           )
         end
+
+        context 'when open response item is not there' do
+          before do
+            question_answer.open_response_item = nil
+            question_answer.save
+            question_answer.reload
+          end
+
+          it 'should create a new open response item' do
+            question_answer.reload.update(
+              answer_text: 'What a jolly prototype'
+            )
+            expect(question_answer.reload.open_response_item.present?).to be true
+            expect(question_answer.open_response_item.content).to include(
+              'What a jolly prototype'
+            )
+          end
+        end
       end
 
       describe '#destroy_open_response_item_and_card' do

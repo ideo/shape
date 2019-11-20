@@ -40,4 +40,22 @@ RSpec.describe TestResultsCollection::CreateAndLinkOpenResponse, type: :service 
       end,
     ).to be true
   end
+
+  context 'when answer_text is blank' do
+    it 'does not create open resonse items' do
+      expect {
+        question = test_collection.question_items.first
+        question_answer = create(
+          :question_answer,
+          survey_response: survey_response,
+          question: question,
+          answer_text: '',
+        )
+        TestResultsCollection::CreateAndLinkOpenResponse.call(
+          test_collection: test_collection,
+          question_answer: question_answer,
+        )
+      }.to change(Item::TextItem, :count).by(0)
+    end
+  end
 end
