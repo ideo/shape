@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, computed, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -5,6 +6,7 @@ import styled from 'styled-components'
 
 import CoverRenderer from '~/ui/grid/CoverRenderer'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { TextEnterButton } from '~/ui/test_collections/shared'
 import v from '~/utils/variables'
@@ -38,25 +40,37 @@ const CarouselButton = styled(TextEnterButton)`
 @observer
 class CarouselCover extends React.Component {
   @observable
-  records = []
-  @observable
   currentIdx = 0
+  @observable
+  loading = false
 
   constructor(props) {
     super(props)
+    this.loading = true
+  }
 
+  async componentDidMount() {
     const { collection } = this.props
-    const items = collection.collection_cover_items
-
+    const data = await collection.API_fetchCards()
     runInAction(() => {
-      this.records = items
-      this.currentIdx = 0
+      collection.collection_cover_items = _.compact(
+        data.map(card => card.record)
+      )
+      this.loading = false
     })
+    if (!data || data.length === 0) this.props.onEmptyCarousel()
   }
 
   @computed
   get currentCarouselRecord() {
+    if (!this.records) return null
     return this.records[this.currentIdx]
+  }
+
+  @computed
+  get records() {
+    const { collection } = this.props
+    return collection.collection_cover_items || []
   }
 
   @action
@@ -82,6 +96,9 @@ class CarouselCover extends React.Component {
   render() {
     const { collection } = this.props
 
+    if (this.loading) return <InlineLoader />
+
+    if (!this.records.length) return null
     if (!this.currentCarouselRecord) return null
 
     return (
@@ -114,6 +131,7 @@ class CarouselCover extends React.Component {
 CarouselCover.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool,
+  onEmptyCarousel: PropTypes.func,
 }
 CarouselCover.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -121,6 +139,7 @@ CarouselCover.wrappedComponent.propTypes = {
 
 CarouselCover.defaultProps = {
   dragging: false,
+  onEmptyCarousel: () => {},
 }
 CarouselCover.displayName = 'CarouselCover'
 

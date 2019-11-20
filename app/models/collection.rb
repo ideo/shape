@@ -911,7 +911,8 @@ class Collection < ApplicationRecord
   #
 
   def serial_collection_cover_items
-    return items_and_linked_items if cover_type_carousel?
+    # Carousels load their data asynchronously on the front end
+    return [] if cover_type_carousel?
 
     # Only include cover items if this collection has indicated to use them
     cover_type_default? ? [] : collection_cover_items

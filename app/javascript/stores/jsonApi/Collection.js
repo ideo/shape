@@ -13,6 +13,7 @@ import BaseRecord from './BaseRecord'
 import CardMoveService from '~/ui/grid/CardMoveService'
 import CollectionCard from './CollectionCard'
 import CollectionFilter from './CollectionFilter'
+import Item from './Item'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
@@ -556,6 +557,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.collection_cards.replace(newData)
       }
     })
+    return data
   }
 
   /*
@@ -1094,6 +1096,11 @@ Collection.refDefaults = {
   },
   collection_filters: {
     model: CollectionFilter,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
+  collection_cover_items: {
+    model: Item,
     type: ReferenceType.TO_MANY,
     defaultValue: [],
   },
