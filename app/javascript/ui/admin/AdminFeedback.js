@@ -208,7 +208,7 @@ class AdminFeedback extends React.Component {
       <React.Fragment key={testCollection.id}>
         <FeedbackRow container>
           <Grid item xs={2}>
-            {testCollection.name}
+            {testCollection.baseName}
           </Grid>
           <Grid item xs={1}>
             <LaunchState>Launched</LaunchState>

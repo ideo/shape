@@ -458,7 +458,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isEmpty() {
-    return this.collection_cards.length === 0
+    // use the cached card count
+    return (
+      this.collection_card_count === 0 && this.collection_cards.length === 0
+    )
   }
 
   get numPaidQuestions() {
@@ -491,6 +494,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // plus the number of cards in the ideas section * number of ideas, as they are repeated for each idea
 
     return numNonIdeaCards + numCardsInIdeasSection * numIdeas
+  }
+
+  get baseName() {
+    if (!this.isTestCollection) return this.name
+    return _.replace(this.name, ' Feedback Design', '')
   }
 
   @action
