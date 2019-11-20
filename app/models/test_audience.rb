@@ -93,6 +93,10 @@ class TestAudience < ApplicationRecord
     sample_size * price_per_response
   end
 
+  def incentive_per_response
+    audience.incentive_per_response(test_collection.paid_question_items.size)
+  end
+
   def update_price_per_response_from_audience!
     set_price_per_response_from_audience
     save

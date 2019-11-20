@@ -9,10 +9,11 @@ RSpec.describe TestAudience, type: :model do
   let(:test_collection) { create(:test_collection) }
   let(:user) { create(:user) }
   let(:audience) { create(:audience, min_price_per_response: 9.99) }
+  let(:num_questions) { test_collection.paid_question_items.size }
   let!(:test_audience) do
     build(:test_audience,
           audience: audience,
-          price_per_response: audience.price_per_response,
+          price_per_response: audience.price_per_response(num_questions),
           test_collection: test_collection,
           sample_size: 10,
           launched_by: user)
@@ -48,7 +49,7 @@ RSpec.describe TestAudience, type: :model do
           amount: test_audience.total_price.to_f,
           description: test_audience.description,
           quantity: test_audience.sample_size,
-          unit_amount: audience.price_per_response.to_f,
+          unit_amount: audience.price_per_response(num_questions).to_f,
         )
 
         # set the payment method

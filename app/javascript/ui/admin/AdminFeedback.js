@@ -292,11 +292,8 @@ class AdminFeedback extends React.Component {
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">
-                      ${testAudience.price_per_response}
+                      ${testAudience.incentive_per_response}
                     </Flex>
-                  </AudienceRowItem>
-                  <AudienceRowItem item xs={2}>
-                    <Flex justify="flex-end">$ ---</Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">{testAudience.sample_size}</Flex>
@@ -414,9 +411,6 @@ class AdminFeedback extends React.Component {
                     </Grid>
                     <Grid item xs={2}>
                       <SubHeading>$/Response</SubHeading>
-                    </Grid>
-                    <Grid item xs={2}>
-                      <SubHeading>Incentive</SubHeading>
                     </Grid>
                     <Grid item xs={2}>
                       <SubHeadingRight>n Requested</SubHeadingRight>

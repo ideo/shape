@@ -13,6 +13,10 @@ class SerializableTestAudience < BaseJsonSerializer
     @object.price_per_response.to_f
   end
 
+  attribute :incentive_per_response do
+    @object.incentive_per_response.to_f
+  end
+
   attribute :num_completed_responses do
     @object.survey_responses.completed.size
   end
