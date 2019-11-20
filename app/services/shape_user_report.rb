@@ -61,7 +61,7 @@ class ShapeUserReport
               user.first_name,
               user.last_name,
               sr.incentive_paid_at,
-              Shape::FEEDBACK_INCENTIVE_AMOUNT.to_f,
+              sr.amount_earned.to_f,
               sr.test_collection.name,
               sr.test_audience.audience.name,
             ]

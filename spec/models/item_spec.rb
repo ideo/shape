@@ -219,7 +219,7 @@ RSpec.describe Item, type: :model do
         video_item = create(:video_item, parent_collection_card: parent_collection_card)
         expect(video_item.search_data[:content]).to eq('')
 
-        question_item = create(:question_item, parent_collection_card: parent_collection_card)
+        question_item = create(:question_item) # Don't pass parent collection card so it can have a test collection parent
         expect(question_item.search_data[:content]).to eq('')
 
         data_item = create(:data_item, :report_type_question_item, parent_collection_card: parent_collection_card)

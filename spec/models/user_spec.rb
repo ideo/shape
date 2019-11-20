@@ -761,8 +761,8 @@ describe User, type: :model do
       end
 
       it 'is first incentive created_at + waiting period' do
-        expect(user.incentive_owed_account_balance.to_f).to eq(2.50)
-        expect(user.incentive_paid_account_balance.to_f).to eq(2.50)
+        expect(user.incentive_owed_account_balance.to_f).to eq(unpaid_survey_response.potential_incentive)
+        expect(user.incentive_paid_account_balance.to_f).to eq(paid_survey_response.amount_earned)
         expect(user.incentive_due_date).to be_within(0.1).of(
           prev_survey_completed_at + Audience::PAYMENT_WAITING_PERIOD,
         )
@@ -772,7 +772,7 @@ describe User, type: :model do
         Accounting::RecordTransfer.incentive_paid(unpaid_survey_response)
         expect(user.incentive_due_date).to be_nil
         expect(user.incentive_owed_account_balance.to_f).to eq(0.0)
-        expect(user.incentive_paid_account_balance.to_f).to eq(5.00)
+        expect(user.incentive_paid_account_balance.to_f).to eq(unpaid_survey_response.amount_earned + paid_survey_response.amount_earned)
       end
     end
   end

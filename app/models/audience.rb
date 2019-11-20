@@ -40,7 +40,6 @@ class Audience < ApplicationRecord
            to: :organization,
            allow_nil: true
 
-  # FEEDBACK_INCENTIVE_AMOUNT = BigDecimal('2.50')
   TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE = BigDecimal('4.00')
   MIN_NUM_PAID_QUESTIONS = 10
   TEST_PRICE_PER_QUESTION = BigDecimal('0.12')

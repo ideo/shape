@@ -141,28 +141,29 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         service.call
         expect(
           user.incentive_owed_account_balance.to_f,
-        ).to eq(TestAudience.incentive_amount)
+        ).to eq(survey_response.potential_incentive)
 
         # call it again, balance shouldn't change
         service.call
         expect(
           user.reload.incentive_owed_account_balance.to_f,
-        ).to eq(TestAudience.incentive_amount)
+        ).to eq(survey_response.potential_incentive)
 
         # call it with a 2nd response
         SurveyResponseCompletion.call(survey_response2)
         expect(
           user.reload.incentive_owed_account_balance.to_f,
-        ).to eq(TestAudience.incentive_amount)
+        ).to eq(survey_response2.potential_incentive)
         # dupe response remains unearned
         expect(survey_response2.incentive_unearned?).to be true
         expect(survey_response2.duplicate?).to be true
       end
 
       context 'with an existing balance' do
+        let(:existing_balance) { survey_response.potential_incentive }
         before do
           DoubleEntry.transfer(
-            Money.new(TestAudience.incentive_amount * 100),
+            Money.new(existing_balance * 100),
             from: DoubleEntry.account(:revenue_deferred, scope: payment),
             to: DoubleEntry.account(:individual_owed, scope: user),
             code: :incentive_owed,
@@ -171,9 +172,9 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         end
 
         it 'calculates the correct balance' do
-          expect(user.incentive_owed_account_balance.to_f).to eq 2.50
+          expect(user.incentive_owed_account_balance.to_f).to eq existing_balance
           service.call
-          expect(user.incentive_owed_account_balance.to_f).to eq 2.50 + Shape::FEEDBACK_INCENTIVE_AMOUNT
+          expect(user.incentive_owed_account_balance.to_f).to eq existing_balance + survey_response.amount_earned
         end
       end
     end

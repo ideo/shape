@@ -15,7 +15,7 @@ class Api::V1::AudiencesController < Api::V1::BaseController
   before_action :authorize_current_organization, only: %i[create]
   def create
     @audience = Audience.new(audience_params)
-    @audience.min_price_per_response = Shape::TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE
+    @audience.min_price_per_response = Audience::TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE
     @audience.organizations << current_organization
     if @audience.save
       render jsonapi: @audience.reload
