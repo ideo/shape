@@ -21,7 +21,6 @@ import { Pricing } from '~/ui/marketing/Pricing'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
-import { browserHistory } from '~/ui/MarketingRoutes'
 
 import styled from 'styled-components'
 
@@ -55,7 +54,7 @@ class MarketingProductPage extends React.Component {
   }
 
   handleRedirect = href => {
-    browserHistory.push(href)
+    window.location = `${process.env.BASE_HOST}${href}`
     return
   }
 
@@ -65,10 +64,12 @@ class MarketingProductPage extends React.Component {
     } = this.state
     if (!hero || _.isEmpty(hero.cta)) return ''
 
-    const { cta } = hero
+    const { cta, title } = hero
     const { type, value, href } = cta
     const { page } = this
-    const buttonId = `${page}-cta`
+    const buttonId = [page, title, value]
+      .map(string => _.kebabCase(string))
+      .join('-')
     const ctaProps = {
       onClick: () => {
         this.handleRedirect(href)

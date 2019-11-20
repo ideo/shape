@@ -260,7 +260,10 @@ class MarketingMenu extends React.PureComponent {
                   <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
                   <NavLink href="/login">Login</NavLink>
                   <MarketingMainBtn
-                    onClick={() => browserHistory.push('/sign_up')}
+                    id="header-sign-up"
+                    onClick={() => {
+                      window.location = `${process.env.BASE_HOST}/sign_up`
+                    }}
                   >
                     Sign up
                   </MarketingMainBtn>
