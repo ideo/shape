@@ -90,6 +90,11 @@ class SurveyResponse < ApplicationRecord
   def potential_incentive
     return 0 unless gives_incentive?
 
+    if incentive_owed_at.present? &&
+       incentive_owed_at < Time.parse(ENV.fetch('TEST_DYNAMIC_PRICING_LAUNCHED_AT', '2019-11-21'))
+      return Audience::LEGACY_INCENTIVE_PER_RESPONDENT
+    end
+
     audience.incentive_per_response(test_collection.paid_question_items.size)
   end
 

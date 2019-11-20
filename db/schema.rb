@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_20_180804) do
+ActiveRecord::Schema.define(version: 2019_11_20_192557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -332,17 +332,6 @@ ActiveRecord::Schema.define(version: 2019_11_20_180804) do
     t.index ["application_id"], name: "index_external_records_on_application_id"
     t.index ["external_id", "application_id", "externalizable_type", "externalizable_id"], name: "index_external_records_common_fields"
     t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
-  end
-
-  create_table "feedback_incentive_records", force: :cascade do |t|
-    t.bigint "user_id"
-    t.bigint "survey_response_id"
-    t.decimal "amount", precision: 10, scale: 2
-    t.decimal "current_balance", precision: 10, scale: 2
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["survey_response_id"], name: "index_feedback_incentive_records_on_survey_response_id"
-    t.index ["user_id"], name: "index_feedback_incentive_records_on_user_id"
   end
 
   create_table "filestack_files", force: :cascade do |t|
@@ -724,8 +713,6 @@ ActiveRecord::Schema.define(version: 2019_11_20_180804) do
   end
 
   add_foreign_key "collections", "organizations"
-  add_foreign_key "feedback_incentive_records", "survey_responses"
-  add_foreign_key "feedback_incentive_records", "users"
   add_foreign_key "test_audience_invitations", "test_audiences"
   add_foreign_key "test_audience_invitations", "users"
   add_foreign_key "test_audiences", "audiences"

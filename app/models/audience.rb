@@ -45,6 +45,8 @@ class Audience < ApplicationRecord
   TEST_PRICE_PER_QUESTION = BigDecimal('0.12')
   INCENTIVE_PRICE_PER_QUESTION = BigDecimal('0.1')
   MIN_INCENTIVE_PER_RESPONDENT = BigDecimal('1.75')
+  # Only used for old survey responses
+  LEGACY_INCENTIVE_PER_RESPONDENT = BigDecimal('2.50')
   PAYMENT_WAITING_PERIOD = 1.week
 
   def self.global_defaults

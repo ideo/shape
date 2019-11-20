@@ -7,7 +7,7 @@
 #  anyone_can_view            :boolean          default(FALSE)
 #  archive_batch              :string
 #  archived                   :boolean          default(FALSE)
-#  archived_at          ©      :datetime
+#  archived_at                :datetime
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
 #  cached_test_scores         :jsonb
