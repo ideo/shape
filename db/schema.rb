@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_19_202037) do
+ActiveRecord::Schema.define(version: 2019_11_20_180804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -555,8 +555,8 @@ ActiveRecord::Schema.define(version: 2019_11_19_202037) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.jsonb "selected_choice_ids", default: [], null: false
     t.bigint "idea_id"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
     t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
@@ -596,6 +596,7 @@ ActiveRecord::Schema.define(version: 2019_11_19_202037) do
     t.datetime "incentive_owed_at"
     t.datetime "incentive_paid_at"
     t.string "respondent_alias"
+    t.decimal "incentive_paid_amount", precision: 10, scale: 2
     t.index ["incentive_status"], name: "index_survey_responses_on_incentive_status"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"

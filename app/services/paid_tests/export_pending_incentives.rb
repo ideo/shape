@@ -19,7 +19,7 @@ module PaidTests
               .where(user: user)
               .includes(:test_collection, test_audience: :audience)
           end
-          earned = responses.map(&:amount_earned).sum
+          earned = responses.map(&:incentive_paid_amount).sum
           test_names = responses.map { |r| r.test_collection&.name }
           audience_names = responses.map { |r| r.test_audience&.name }
           csv << [

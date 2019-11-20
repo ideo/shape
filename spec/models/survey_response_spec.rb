@@ -127,6 +127,7 @@ RSpec.describe SurveyResponse, type: :model do
         survey_response.record_incentive_paid!
       }.to change(survey_response, :incentive_status)
       expect(survey_response.incentive_paid?).to be true
+      expect(survey_response.incentive_paid_amount).to eq(incentive_amount)
     end
 
     it 'increases individual_paid balance' do

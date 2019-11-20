@@ -2,18 +2,19 @@
 #
 # Table name: survey_responses
 #
-#  id                 :bigint(8)        not null, primary key
-#  incentive_owed_at  :datetime
-#  incentive_paid_at  :datetime
-#  incentive_status   :integer
-#  respondent_alias   :string
-#  session_uid        :text
-#  status             :integer          default("in_progress")
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  test_audience_id   :bigint(8)
-#  test_collection_id :bigint(8)
-#  user_id            :bigint(8)
+#  id                    :bigint(8)        not null, primary key
+#  incentive_owed_at     :datetime
+#  incentive_paid_amount :decimal(10, 2)
+#  incentive_paid_at     :datetime
+#  incentive_status      :integer
+#  respondent_alias      :string
+#  session_uid           :text
+#  status                :integer          default("in_progress")
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  test_audience_id      :bigint(8)
+#  test_collection_id    :bigint(8)
+#  user_id               :bigint(8)
 #
 # Indexes
 #
@@ -77,7 +78,11 @@ class SurveyResponse < ApplicationRecord
   def record_incentive_paid!
     return if !incentive_owed? || amount_earned.zero? || !incentive_owed_account_balance.positive?
 
-    update(incentive_status: :incentive_paid, incentive_paid_at: Time.current)
+    update(
+      incentive_status: :incentive_paid,
+      incentive_paid_at: Time.current,
+      incentive_paid_amount: amount_earned,
+    )
     Accounting::RecordTransfer.incentive_paid(self)
     incentive_paid_account_balance
   end
@@ -88,6 +93,8 @@ class SurveyResponse < ApplicationRecord
     audience.incentive_per_response(test_collection.paid_question_items.size)
   end
 
+  # This is a dynamic amount that is based on number of paid questions
+  # Use `incentive_paid_amount` if you want to see how much they were actually paid
   def amount_earned
     completed? ? potential_incentive : 0
   end

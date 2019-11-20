@@ -21,7 +21,7 @@ module PaidTests
     def amount_paid
       paid_survey_responses.where(
         incentive_paid_at: @start_time..@end_time,
-      ).sum(&:amount_earned)
+      ).sum(&:incentive_paid_amount)
     end
 
     private
