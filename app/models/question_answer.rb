@@ -68,7 +68,8 @@ class QuestionAnswer < ApplicationRecord
        { insert: "\n", attributes: { header: 2 } },
        *answer_ops.flatten,
        { insert: '- ' },
-       { insert: survey_response.respondent_alias, attributes: { link: quote_url(alias_collection) } }]
+       { insert: survey_response.respondent_alias || 'Respondent',
+         attributes: { link: quote_url(alias_collection) } }]
     if idea.present?
       ops.insert(1, insert: ' | ')
       ops.insert(2, insert: idea.name, attributes: { link: quote_url(idea) })
