@@ -472,8 +472,10 @@ class AddAudienceModal extends React.Component {
           </Box>
           <Box mt={2} mb={35}>
             <DisplayText>
-              The default price per respondent for a custom audience is $
-              {AUDIENCE_PRICES.TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE}.
+              Custom audiences start at $
+              {AUDIENCE_PRICES.TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE} per
+              respondent. The price may increase based on the difficulty of
+              sourcing respondents who match your criteria.
             </DisplayText>
           </Box>
           <Grid container alignItems="center" style={{ paddingBottom: '32px' }}>

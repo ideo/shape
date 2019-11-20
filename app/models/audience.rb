@@ -90,7 +90,7 @@ class Audience < ApplicationRecord
 
   # The absolute minimum we can charge per response and not be losing money
   def self.minimum_price_per_response
-    min_incentive = incentive_per_response(MIN_NUM_PAID_QUESTIONS)
+    min_incentive = incentive_per_response(0)
     payout_cost = min_incentive + Accounting::RecordTransfer.paypal_fee(min_incentive)
     stripe_cost = Accounting::RecordTransfer.stripe_fee(payout_cost)
     (payout_cost + stripe_cost).to_f
@@ -98,7 +98,7 @@ class Audience < ApplicationRecord
 
   def self.incentive_per_response(num_questions)
     num_questions -= MIN_NUM_PAID_QUESTIONS
-    num_questions = MIN_NUM_PAID_QUESTIONS if num_questions < MIN_NUM_PAID_QUESTIONS
+    num_questions = 0 if num_questions < 0
     MIN_INCENTIVE_PER_RESPONDENT + (num_questions * INCENTIVE_PRICE_PER_QUESTION)
   end
 
@@ -106,7 +106,7 @@ class Audience < ApplicationRecord
     return 0 if link_sharing?
 
     num_questions -= MIN_NUM_PAID_QUESTIONS
-    num_questions = MIN_NUM_PAID_QUESTIONS if num_questions < MIN_NUM_PAID_QUESTIONS
+    num_questions = 0 if num_questions < 0
     min_price_per_response + (num_questions * TEST_PRICE_PER_QUESTION)
   end
 

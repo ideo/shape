@@ -76,7 +76,7 @@ RSpec.describe Audience, type: :model, seed: true do
 
   describe '.minimum_price_per_response' do
     it 'returns minimum value so we do not lose money' do
-      incentive_amount = Audience::MIN_INCENTIVE_PER_RESPONDENT + Audience::MIN_NUM_PAID_QUESTIONS * Audience::INCENTIVE_PRICE_PER_QUESTION
+      incentive_amount = Audience::MIN_INCENTIVE_PER_RESPONDENT
       paypal_fee = (incentive_amount * BigDecimal('0.05')).round(2)
       stripe_fee = (((incentive_amount + paypal_fee) * BigDecimal('0.029')) + BigDecimal('0.30')).round(2)
       expect(Audience.minimum_price_per_response).to eq(
@@ -108,10 +108,10 @@ RSpec.describe Audience, type: :model, seed: true do
 
     context 'if less than 10 questions' do
       it 'returns minimum price of 10 questions' do
-        # $3.75 + (10 x $0.12) = $4.95
-        expect(all_people.price_per_response(9)).to eq(4.95)
-        # $4 + (10 x $0.12) = $5.20
-        expect(targeted_audience.price_per_response(9)).to eq(5.2)
+        # $3.75 + (0 x $0.12) = $3.75
+        expect(all_people.price_per_response(9)).to eq(3.75)
+        # $4 + (0 x $0.12) = $4
+        expect(targeted_audience.price_per_response(9)).to eq(4)
       end
     end
 
@@ -138,9 +138,9 @@ RSpec.describe Audience, type: :model, seed: true do
 
     context 'if less than 10 questions' do
       it 'returns minimum price of 10 questions' do
-        # $1.75 + (10 x $0.10) = $2.75
-        expect(all_people.incentive_per_response(9)).to eq(2.75)
-        expect(targeted_audience.incentive_per_response(9)).to eq(2.75)
+        # $1.75 + (0 x $0.10) = $2.75
+        expect(all_people.incentive_per_response(9)).to eq(1.75)
+        expect(targeted_audience.incentive_per_response(9)).to eq(1.75)
       end
     end
 

@@ -31,8 +31,7 @@ class Audience extends BaseRecord {
     if (this.isLinkSharing) return 0
 
     let numQuestions = numPaidQuestions - AUDIENCE_PRICES.MIN_NUM_PAID_QUESTIONS
-    if (numQuestions < AUDIENCE_PRICES.MIN_NUM_PAID_QUESTIONS)
-      numQuestions = AUDIENCE_PRICES.MIN_NUM_PAID_QUESTIONS
+    if (numQuestions < 0) numQuestions = 0
 
     return (
       this.min_price_per_response +
