@@ -410,7 +410,7 @@ class AdminFeedback extends React.Component {
                       <SubHeading>Audience Name</SubHeading>
                     </Grid>
                     <Grid item xs={2}>
-                      <SubHeading>$/Response</SubHeading>
+                      <SubHeading>Incentive</SubHeading>
                     </Grid>
                     <Grid item xs={2}>
                       <SubHeadingRight>n Requested</SubHeadingRight>
