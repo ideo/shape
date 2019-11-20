@@ -178,6 +178,7 @@ export default {
     transparent: 'transparent',
     respondentBannerBackground: '#41d3bd',
     respondentBannerText: '#305d6c',
+    collectionCover: '#b6aaa6',
   },
 
   buttonSizes: {
