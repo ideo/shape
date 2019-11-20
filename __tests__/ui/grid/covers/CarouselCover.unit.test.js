@@ -16,12 +16,40 @@ describe('CarouselCover', () => {
       collection: fakeCollection,
       dragging: false,
       routingStore: fakeRoutingStore,
+      onEmptyCarousel: jest.fn(),
     }
+    props.collection.API_fetchCards.mockReturnValue(
+      Promise.resolve(
+        fakeCollection.collection_cover_items.map(item => ({ record: item }))
+      )
+    )
     rerender = function() {
       wrapper = shallow(<CarouselCover.wrappedComponent {...props} />)
       return wrapper
     }
     rerender()
+  })
+
+  describe('componentDidMount', () => {
+    it("should fetch the collection's cards", () => {
+      expect(props.collection.API_fetchCards).toHaveBeenCalled()
+    })
+
+    it('should set loading to false', () => {
+      expect(wrapper.instance().loading).toBe(false)
+    })
+
+    describe('if there are no collections cards in the collection', () => {
+      beforeEach(() => {
+        props.collection.API_fetchCards.mockReset()
+        props.collection.API_fetchCards.mockReturnValue(Promise.resolve([]))
+        rerender()
+      })
+
+      it('should call onEmptyCarousel prop', () => {
+        expect(props.onEmptyCarousel).toHaveBeenCalled()
+      })
+    })
   })
 
   describe('handleNavigate()', () => {
