@@ -22,11 +22,13 @@ module TestResultsCollection
     def call
       create_open_response_item
       link_open_response_item
+      context.open_response_item
     end
 
     private
 
     def create_open_response_item
+      return if answer_text.blank?
       # Create the open response item on the Test Responses collection
       card = create_card(
         params: {
@@ -46,6 +48,7 @@ module TestResultsCollection
     end
 
     def link_open_response_item
+      return if answer_text.blank?
       CollectionCard::Link.create(
         parent: question_open_responses_collection,
         item_id: open_response_item.id,
