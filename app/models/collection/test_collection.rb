@@ -625,9 +625,8 @@ class Collection
       end
 
       question_items.where(question_type: nil).update_all(
-        question_type: :question_media
+        question_type: :question_media,
       )
-
       primary_collection_cards.update_all(
         section_type: :ideas,
       )

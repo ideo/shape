@@ -107,15 +107,17 @@ class SurveyResponse < ApplicationRecord
     test_audience&.paid? ? true : false
   end
 
-  private
-
   def create_alias
+    return if respondent_alias.present?
+
     survey_names = test_collection.survey_responses.pluck(:respondent_alias)
     survey_names << user&.first_name
 
     name = UniqNameGenerator.call(disallowed_names: survey_names.compact)
     update_attributes(respondent_alias: name)
   end
+
+  private
 
   def set_default_incentive_status
     self.incentive_status ||= :incentive_unearned

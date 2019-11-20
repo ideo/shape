@@ -106,19 +106,27 @@ class Collection
       return if tc.blank?
 
       to_test_id = tc.collection_to_test_id
+
+      test_status = tc.test_status
+
       becomes(Collection::TestCollection).update(
         type: 'Collection::TestCollection',
         test_collection_id: nil,
         collection_to_test_id: to_test_id,
-        test_status: tc.test_status.to_sym,
+        test_status: nil,
       )
       tc.update(
         type: 'Collection::TestResultsCollection',
         test_collection_id: id,
         collection_to_test_id: nil,
+        test_status: nil,
       )
 
       trc = Collection::TestResultsCollection.find(tc.id)
+      test_collection = trc.test_collection
+      test_collection.update(test_status: test_status)
+      # now migrate itself into the new format
+      test_collection.migrate!
 
       previous_results_card = CollectionCardBuilder.call(
         params: {
@@ -141,10 +149,15 @@ class Collection
       # card save won't have validated because it wants them to have a section type
       CollectionCard.import(moving_cards, validate: false, on_duplicate_key_update: %i[parent_id])
 
-      ::TestResultsCollection::CreateContentWorker.perform_async(
-        trc.id,
-        created_by_id,
+      test_collection.survey_responses.each(&:create_alias)
+
+      ::TestResultsCollection::CreateContent.call(
+        test_results_collection: trc,
+        created_by: created_by,
       )
+
+      previous_results_card.update(order: 999)
+      trc.reorder_cards!
 
       [SurveyResponse, TestAudience].each do |klass|
         klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
