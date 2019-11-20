@@ -74,11 +74,11 @@ class Dataset
     end
 
     def title
-      question_item.question_title
+      question_item&.question_title
     end
 
     def description
-      question_item.question_description(with_content: true)
+      question_item&.question_description(with_content: true)
     end
 
     def test_collection_id

@@ -149,6 +149,11 @@ class Collection
       # card save won't have validated because it wants them to have a section type
       CollectionCard.import(moving_cards, validate: false, on_duplicate_key_update: %i[parent_id])
 
+      [SurveyResponse, TestAudience].each do |klass|
+        klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
+      end
+
+      test_collection.reload
       test_collection.survey_responses.each(&:create_alias)
 
       ::TestResultsCollection::CreateContent.call(
@@ -158,10 +163,6 @@ class Collection
 
       previous_results_card.update(order: 999)
       trc.reorder_cards!
-
-      [SurveyResponse, TestAudience].each do |klass|
-        klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
-      end
 
       # these used to have question_type: nil
       items.where.not(type: 'Item::QuestionItem').update_all(question_type: :question_media)

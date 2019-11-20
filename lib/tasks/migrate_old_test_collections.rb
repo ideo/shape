@@ -2,9 +2,16 @@ namespace :old_test_collections do
   desc 'Migrate TestCollection/TestDesign setup to TestResultsCollection'
   task migrate: :environment do
     puts "migrating #{Collection::TestDesign.count} TestDesigns..."
-    Collection::TestDesign.find_each(&:migrate!)
-    # now this next step will include the migrated ones above...
+    puts '***'
+    Collection::TestDesign.find_each do |td|
+      puts "migrating #{td.name}"
+      td.migrate!
+    end
     puts "migrating #{Collection::TestCollection.draft.count} draft TestCollections..."
-    Collection::TestCollection.find_each(&:migrate!)
+    puts '***'
+    Collection::TestCollection.draft.find_each do |tc|
+      puts "migrating #{tc.name}"
+      tc.migrate!
+    end
   end
 end
