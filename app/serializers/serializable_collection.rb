@@ -38,7 +38,7 @@ class SerializableCollection < BaseJsonSerializer
 
   has_many :collection_cover_items do
     data do
-      []
+      @object.serial_collection_cover_items
     end
   end
 
