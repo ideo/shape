@@ -90,8 +90,8 @@ class TestQuestion extends React.Component {
   }
 
   get potentialIncentive() {
-    if (!this.givesIncentive) return 0
     const { surveyResponse } = this.props
+    if (!this.givesIncentive || !surveyResponse) return 0
     return surveyResponse.potential_incentive
   }
 

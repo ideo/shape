@@ -99,7 +99,7 @@ class Audience < ApplicationRecord
 
   def self.incentive_per_response(num_questions)
     num_questions -= MIN_NUM_PAID_QUESTIONS
-    num_questions = 0 if num_questions < 0
+    num_questions = 0 if num_questions.negative?
     MIN_INCENTIVE_PER_RESPONDENT + (num_questions * INCENTIVE_PRICE_PER_QUESTION)
   end
 
@@ -107,7 +107,7 @@ class Audience < ApplicationRecord
     return 0 if link_sharing?
 
     num_questions -= MIN_NUM_PAID_QUESTIONS
-    num_questions = 0 if num_questions < 0
+    num_questions = 0 if num_questions.negative?
     min_price_per_response + (num_questions * TEST_PRICE_PER_QUESTION)
   end
 
