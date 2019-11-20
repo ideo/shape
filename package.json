@@ -10,7 +10,7 @@
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --watch"
   },
   "engines": {
-    "node": "^8.15.0",
+    "node": "^10.15.0",
     "yarn": "^1.10.0"
   },
   "browserslist": [
