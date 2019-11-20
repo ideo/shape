@@ -4,9 +4,7 @@ exports[`TextItemCover renders snapshot 1`] = `
 <Styled(styled.div)
   className="cancelGridClick"
   data-cy="TextItemCover"
-  dragging={false}
   hasTitleText={false}
-  isEditing={false}
   isTransparent={false}
   onClick={[Function]}
   style={
@@ -14,6 +12,7 @@ exports[`TextItemCover renders snapshot 1`] = `
       "height": "calc(100% - 30px)",
     }
   }
+  uneditable={false}
 >
   <styled.div
     notEditing={true}
