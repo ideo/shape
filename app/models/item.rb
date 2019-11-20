@@ -412,9 +412,9 @@ class Item < ApplicationRecord
     return true if question_media? && is_a?(Item::QuestionItem)
 
     if question_idea?
-      test_show_media = parent.parent.test_show_media?
-      # Return false if this hasn't been transformed to a media-type item
-      return false if test_show_media && is_a?(Item::QuestionItem)
+      test_show_media = parents.find_by(type: 'Collection::TestCollection')&.test_show_media?
+      # Return true if this hasn't been transformed to a media-type item
+      return true if test_show_media && is_a?(Item::QuestionItem)
 
       return true if name.blank? || content.blank?
     end

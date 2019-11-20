@@ -14,6 +14,7 @@ FactoryBot.define do
 
     trait :link_sharing do
       min_price_per_response 0
+      global_default 1
     end
   end
 end

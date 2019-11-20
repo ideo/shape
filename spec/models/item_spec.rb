@@ -341,7 +341,8 @@ RSpec.describe Item, type: :model do
           test_collection.update(test_show_media: false)
         end
 
-        it 'returns false if content and name are present but it is a question item' do
+        it 'returns false if content and name are present and is a question item' do
+          # It is valid because test_show_media doesn't require idea to be a media item
           idea_question.name = 'Sock it to me!'
           idea_question.content = 'Sweet smelling socks'
           expect(idea_question).to be_a(Item::QuestionItem)

@@ -181,7 +181,7 @@ class Item
     end
 
     def test_collection
-      question_idea? ? parent.parent : parent
+      parents.find_by(type: 'Collection::TestCollection')
     end
 
     def question_title_and_description
