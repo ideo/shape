@@ -53,15 +53,23 @@ class QuestionAnswer < ApplicationRecord
       test_results_collection,
       survey_response&.test_audience,
     )
+    lines = answer.answer_text.split("\n")
+    answer_ops = lines.map.with_index do |line, i|
+      last = i == lines.count - 1
+      [
+        { insert: "#{i.zero? ? '“' : ''}#{line}#{last ? '”' : ''}" },
+        { insert: "\n", attributes: { header: 1 } },
+      ]
+    end
     ops =
       [{ insert: test_results_collection.name, attributes: { link: quote_url(test_results_collection) } },
        { insert: "\n" },
        { insert: question.content, attributes: { link: quote_url(question.test_open_responses_collection) } },
        { insert: "\n", attributes: { header: 2 } },
-       { insert: "“#{answer.answer_text}”" },
-       { insert: "\n", attributes: { header: 1 } },
+       *answer_ops.flatten,
        { insert: '- ' },
-       { insert: survey_response.respondent_alias, attributes: { link: quote_url(alias_collection) } }]
+       { insert: survey_response.respondent_alias || 'Respondent',
+         attributes: { link: quote_url(alias_collection) } }]
     if idea.present?
       ops.insert(1, insert: ' | ')
       ops.insert(2, insert: idea.name, attributes: { link: quote_url(idea) })
@@ -94,6 +102,16 @@ class QuestionAnswer < ApplicationRecord
   def update_open_response_item
     item = open_response_item
     return destroy_open_response_item_and_card if answer_text.blank?
+
+    if item.blank?
+      item = TestResultsCollection::CreateAndLinkOpenResponse.call(
+        test_collection: survey_response.test_collection,
+        question_answer: self,
+      ).open_response_item
+      self.open_response_item_id = item.id
+      save
+      return true
+    end
 
     item.content = answer_text
     ops = quote_card_ops

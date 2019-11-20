@@ -27,6 +27,7 @@ module Roles
       remove_role_from_object(@object)
       unfollow_comment_thread
       unfollow_groups_comment_threads
+      create_activities_and_notifications if @removed_by
       remove_links_from_shared_collections if @fully_remove
       remove_org_membership_if_necessary if @fully_remove
       remove_roles_from_children if @propagate_to_children
@@ -47,9 +48,18 @@ module Roles
       existing_user_ids = role.users.pluck(:id).to_a
 
       @users.each do |user|
-        if existing_user_ids.include?(user.id)
-          user.remove_role(role.name, role.resource)
-        end
+        next unless existing_user_ids.include?(user.id)
+
+        user.remove_role(role.name, role.resource)
+        next unless @fully_remove
+
+        ActivityAndNotificationBuilder.call(
+          actor: @removed_by,
+          target: @object,
+          action: :unshared,
+          subject_user_ids: [user.id],
+          should_notify: false,
+        )
       end
 
       true
@@ -59,12 +69,35 @@ module Roles
       existing_group_ids = role.groups.pluck(:id).to_a
 
       @groups.each do |group|
-        if existing_group_ids.include?(group.id)
-          role.groups.destroy(group)
-        end
+        next unless existing_group_ids.include?(group.id)
+
+        role.groups.destroy(group)
+        next unless @fully_remove
+
+        ActivityAndNotificationBuilder.call(
+          actor: @removed_by,
+          target: @object,
+          action: :unshared,
+          subject_group_ids: [group.id],
+          should_notify: false,
+        )
       end
 
       true
+    end
+
+    def create_activities_and_notifications
+      action = Activity.role_name_to_action(role_name: @role_name.to_sym, adding: false)
+      return if action.nil?
+
+      ActivityAndNotificationBuilder.call(
+        actor: @removed_by,
+        target: @object,
+        action: action,
+        subject_user_ids: @users.pluck(:id),
+        subject_group_ids: @groups.pluck(:id),
+        should_notify: false,
+      )
     end
 
     def unfollow_comment_thread

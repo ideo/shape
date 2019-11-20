@@ -316,11 +316,21 @@ class Collection
       if collection_to_test.present?
         # Point to the new parent as the one to test
         duplicate.collection_to_test = args[:parent]
-      elsif !parent.master_template? && !args[:parent].master_template?
-        # Prefix with 'Copy' if it isn't still within a template
-        duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
+      else
+        if ideas_collection.blank?
+          duplicate.primary_collection_cards.build(
+            order: -1,
+            section_type: :ideas,
+            record: Collection.build_ideas_collection,
+          )
+        end
+        if !parent.master_template? && !args[:parent].master_template?
+          # Prefix with 'Copy' if it isn't still within a template
+          duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
+        end
       end
       duplicate.save
+      duplicate.reorder_cards!
       duplicate
     end
 
@@ -576,44 +586,61 @@ class Collection
     # style test collection, ready to be launched.
     def migrate!
       # exit if this is already 3.0
-      return if !draft? ||
-                ideas_collection.present? ||
+      return if ideas_collection.present? ||
                 collection_cards.where.not(section_type: nil).any?
 
-      ideas_collection_card = primary_collection_cards.create(
-        order: 0,
-        section_type: :ideas,
-        record: Collection.build_ideas_collection,
-      )
-      first_media_item = items.where(
-        type: ['Item::FileItem', 'Item::LinkItem', 'Item::VideoItem'],
-      ).first
-      first_description_item = items.question_description.first
+      if draft?
+        ideas_collection_card = primary_collection_cards.create(
+          order: 0,
+          section_type: :ideas,
+          record: Collection.new(name: 'Ideas'),
+        )
+        first_media_item = items.where(
+          type: ['Item::FileItem', 'Item::LinkItem', 'Item::VideoItem'],
+        ).or(
+          items.where(
+            type: 'Item::QuestionItem',
+            question_type: nil,
+          ),
+        ).first
+        first_description_item = items.question_description.first
 
-      if first_media_item.present?
-        first_media_item.update(
-          question_type: :question_idea,
-          content: first_description_item.content,
-        )
-        # Move this "idea" to the ideas collection
-        first_media_item.parent_collection_card.update(
-          parent_id: ideas_collection_card.collection.id,
-        )
-        first_description_item.destroy
-      elsif first_description_item.present?
-        first_description_item.update(
-          question_type: :question_idea,
-        )
-        first_description_item.parent_collection_card.update(
-          parent_id: ideas_collection_card.collection.id,
-        )
-        update(test_show_media: false)
+        if first_media_item.present?
+          first_media_item.update(
+            question_type: :question_idea,
+            content: first_description_item&.content,
+          )
+          # Move this "idea" to the ideas collection
+          first_media_item.parent_collection_card.update(
+            parent_id: ideas_collection_card.collection.id,
+          )
+          first_description_item&.destroy
+        elsif first_description_item.present?
+          first_description_item.update(
+            question_type: :question_idea,
+          )
+          first_description_item.parent_collection_card.update(
+            parent_id: ideas_collection_card.collection.id,
+          )
+        else
+          ideas_collection_card.collection.primary_collection_cards.create(
+            record: Item::QuestionItem.new(
+              question_type: :question_idea,
+            ),
+          )
+        end
       end
 
+      question_items.where(question_type: nil).update_all(
+        question_type: :question_media,
+      )
       primary_collection_cards.update_all(
         section_type: :ideas,
       )
-      items.question_finish.parent_collection_card.update(
+      question_finish = items.question_finish.first
+      return unless question_finish.present?
+
+      question_finish.parent_collection_card.update(
         section_type: :outro,
       )
     end

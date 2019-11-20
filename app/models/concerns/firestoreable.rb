@@ -24,6 +24,7 @@ module Firestoreable
     'Collection::SharedWithMeCollection': SerializableSimpleCollection,
     'Collection::TestCollection': SerializableSimpleCollection,
     'Collection::TestDesign': SerializableSimpleCollection,
+    'Collection::TestResultsCollection': SerializableSimpleCollection,
     'Collection::TestOpenResponses': SerializableSimpleCollection,
     'Collection::SubmissionBox': SerializableSimpleCollection,
     'Collection::UserProfile': SerializableSimpleCollection,

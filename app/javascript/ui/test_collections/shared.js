@@ -180,6 +180,7 @@ export const styledTestTheme = (themeName = 'primary') => {
       descriptionText: v.colors.commonLightest,
       placeholder: v.colors.primaryMedium,
       questionText: v.colors.primaryDark,
+      questionTrashIcon: v.colors.black,
       hotEdge: v.colors.primaryLight,
     }
   }
@@ -191,6 +192,7 @@ export const styledTestTheme = (themeName = 'primary') => {
     backgroundColorEditable: v.colors.secondaryLight,
     responseHolder: v.colors.secondaryLight,
     questionText: v.colors.commonLightest,
+    questionTrashIcon: v.colors.commonLightest,
     descriptionText: v.colors.commonLightest,
     placeholder: v.colors.commonMediumTint,
     hotEdge: v.colors.primaryDarkest,

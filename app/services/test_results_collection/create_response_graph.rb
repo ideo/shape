@@ -111,9 +111,12 @@ module TestResultsCollection
     end
 
     def link_question_and_org_wide_datasets
-      question_dataset.data_items_datasets.create(
-        data_item: data_item,
-      )
+      # this check is mainly for legacy collections
+      if question_dataset.present?
+        question_dataset.data_items_datasets.create(
+          data_item: data_item,
+        )
+      end
       data_item.data_items_datasets.create(
         dataset: org_wide_question_dataset,
       )

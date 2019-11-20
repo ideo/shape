@@ -79,6 +79,13 @@ class Activity < ApplicationRecord
     viewed: 15,
     edited_comment: 16,
     resolved_comment: 17,
+    shared: 18,
+    unshared: 19,
+    made_private: 20,
+    permissions_restored: 21,
+    added_viewer: 22,
+    removed_editor: 23,
+    removed_viewer: 24,
   }
 
   def self.participant_actions
@@ -122,14 +129,20 @@ class Activity < ApplicationRecord
     end
   end
 
-  def self.role_name_to_action(role_name)
+  def self.role_name_to_action(role_name:, adding: true)
     case role_name
     when Role::EDITOR
-      :added_editor
+      return :added_editor if adding
+
+      :removed_editor
     when Role::MEMBER
-      :added_member
+      return :added_member if adding
     when Role::ADMIN
-      :added_admin
+      return :added_admin if adding
+    when Role::VIEWER
+      return :added_viewer if adding
+
+      :removed_viewer
     end
   end
 

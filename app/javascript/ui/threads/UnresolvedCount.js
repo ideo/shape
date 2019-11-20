@@ -6,7 +6,6 @@ import CommentIconFilled from '~/ui/icons/CommentIconFilled'
 
 const CommentIconWrapper = styled.div`
   color: ${v.colors.alert};
-  height: 18px;
   width: 18px;
   svg {
     height: ${props => (props.size === 'small' ? 100 : 120)}%;

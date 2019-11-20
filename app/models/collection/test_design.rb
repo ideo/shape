@@ -70,7 +70,9 @@
 
 class Collection
   class TestDesign < Collection
-    belongs_to :test_collection, class_name: 'Collection::TestCollection'
+    belongs_to :test_collection,
+               optional: true,
+               class_name: 'Collection::TestCollection'
     delegate :can_reopen?,
              :launchable?,
              :live_or_was_launched?,
@@ -104,20 +106,63 @@ class Collection
       return if tc.blank?
 
       to_test_id = tc.collection_to_test_id
+
+      test_status = tc.test_status
+
       becomes(Collection::TestCollection).update(
         type: 'Collection::TestCollection',
         test_collection_id: nil,
         collection_to_test_id: to_test_id,
+        test_status: nil,
       )
       tc.update(
         type: 'Collection::TestResultsCollection',
         test_collection_id: id,
         collection_to_test_id: nil,
+        test_status: nil,
       )
+
+      trc = Collection::TestResultsCollection.find(tc.id)
+      test_collection = trc.test_collection
+      test_collection.update(test_status: test_status)
+      # now migrate itself into the new format
+      test_collection.migrate!
+
+      previous_results_card = CollectionCardBuilder.call(
+        params: {
+          collection_attributes: {
+            name: 'Previous Results',
+          },
+        },
+        parent_collection: trc,
+      )
+
+      moving_cards = tc.collection_cards.where.not(
+        id: [parent_collection_card.id, previous_results_card.id],
+      ).to_a
+      CardMover.call(
+        from_collection: trc,
+        to_collection: previous_results_card.collection,
+        cards: moving_cards,
+      )
+      # CardMover will have called everything appropriately, but the
+      # card save won't have validated because it wants them to have a section type
+      CollectionCard.import(moving_cards, validate: false, on_duplicate_key_update: %i[parent_id])
 
       [SurveyResponse, TestAudience].each do |klass|
         klass.where(test_collection_id: tc.id).update_all(test_collection_id: id)
       end
+
+      test_collection.reload
+      test_collection.survey_responses.each(&:create_alias)
+
+      ::TestResultsCollection::CreateContent.call(
+        test_results_collection: trc,
+        created_by: created_by,
+      )
+
+      previous_results_card.update(order: 999)
+      trc.reorder_cards!
 
       # these used to have question_type: nil
       items.where.not(type: 'Item::QuestionItem').update_all(question_type: :question_media)

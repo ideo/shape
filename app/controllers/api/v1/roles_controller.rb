@@ -64,7 +64,10 @@ class Api::V1::RolesController < Api::V1::BaseController
     )
     if service.call
       if root_object_params[:mark_private]
-        record.mark_as_private!
+        MarkAsPrivate.call(
+          object: record,
+          marked_by: current_user,
+        )
       end
       head :no_content
     else

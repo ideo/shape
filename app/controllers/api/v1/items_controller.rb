@@ -90,10 +90,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   # similar method exists in collections_controller
   def restore_permissions
-    Roles::MergeToChild.call(parent: @item.parent, child: @item)
-    @item.unmark_as_private!
+    RestorePermission.call(
+      object: @item,
+      restored_by: current_user,
+    )
     render jsonapi: @item.reload
-    # no error case needed... ?
   end
 
   private

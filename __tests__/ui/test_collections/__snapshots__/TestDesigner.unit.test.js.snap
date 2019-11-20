@@ -12,6 +12,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
       "hotEdge": "#c0dbde",
       "placeholder": "#9ec1cc",
       "questionText": "#5698ae",
+      "questionTrashIcon": "#120f0e",
       "responseHolder": "#f5f4f3",
     }
   }

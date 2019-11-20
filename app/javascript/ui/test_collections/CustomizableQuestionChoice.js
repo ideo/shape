@@ -14,17 +14,26 @@ const ChoiceHolder = styled.div`
   padding: 12px 17px;
   vertical-align: baseline;
 
+  .TrashIcon {
+    display: none;
+  }
+
   &:hover {
     filter: brightness(110%);
+
+    .TrashIcon {
+      display: inline-block;
+    }
   }
 `
 ChoiceHolder.displayName = 'ChoiceHolder'
 
 const IconHolder = styled.button`
+  color: ${props => props.theme.questionTrashIcon};
   display: inline-block;
-  height: 27px;
+  height: 22px;
   vertical-align: middle;
-  width: 22px;
+  width: 27px;
 `
 
 @observer
@@ -109,7 +118,11 @@ class CustomizableQuestionChoice extends React.Component {
           />
         </label>
         {editing && (
-          <IconHolder data-cy="TrashIconHolder" onClick={this.handleDelete}>
+          <IconHolder
+            className="TrashIcon"
+            data-cy="TrashIconHolder"
+            onClick={this.handleDelete}
+          >
             <TrashIcon />
           </IconHolder>
         )}

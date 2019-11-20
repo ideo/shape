@@ -33,7 +33,7 @@ const StyledAddIdea = styled.div`
 
 const StyledNavigationAndCheckboxWrapper = styled.div`
   margin-top: 10px;
-  margin-left: 25px;
+  margin-left: 0;
 `
 
 const TrashButton = styled.button`
@@ -141,7 +141,7 @@ class IdeaCollectionControls extends React.Component {
           >
             <ChevronLeftIcon />
           </ChevronCircleWrapper>
-          <DisplayText data-cy="num-ideas">
+          <DisplayText data-cy="num-ideas" style={{ marginRight: '5px' }}>
             {currentIdeaCardIndex + 1}/{this.numIdeas}
           </DisplayText>
           {this.canDelete && (
@@ -169,7 +169,7 @@ class IdeaCollectionControls extends React.Component {
           >
             <ChevronRightIcon />
           </ChevronCircleWrapper>
-          <div style={{ marginLeft: '9px' }}>
+          <div>
             <LabelContainer
               classes={{ label: 'form-control' }}
               labelPlacement={'end'}

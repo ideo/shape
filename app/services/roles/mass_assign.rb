@@ -45,7 +45,7 @@ module Roles
       add_group_members_as_comment_thread_followers
       link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
-      create_activities_and_notifications if newly_invited?
+      create_activities_and_notifications if @invited_by
       failed_users.blank? && failed_groups.blank?
     end
 
@@ -64,6 +64,16 @@ module Roles
         role = user.add_role(@role_name, @object)
         if role.persisted?
           @added_users << user
+
+          next unless newly_invited?
+
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_user_ids: [user.id],
+            should_notify: false,
+          )
         else
           @failed_users << user
         end
@@ -86,6 +96,15 @@ module Roles
         role = group.add_role(@role_name, @object)
         if role.persisted?
           @added_groups << group
+          next unless newly_invited?
+
+          ActivityAndNotificationBuilder.call(
+            actor: @invited_by,
+            target: @object,
+            action: :shared,
+            subject_group_ids: [group.id],
+            should_notify: false,
+          )
         else
           @failed_groups << group
         end
@@ -114,7 +133,8 @@ module Roles
     end
 
     def create_activities_and_notifications
-      action = Activity.role_name_to_action(@role_name.to_sym)
+      action = Activity.role_name_to_action(role_name: @role_name.to_sym, adding: true)
+
       return if action.nil?
 
       ActivityAndNotificationBuilder.call(

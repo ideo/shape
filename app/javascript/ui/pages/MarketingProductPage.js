@@ -112,9 +112,10 @@ class MarketingProductPage extends React.Component {
               <MarketingFlex align="center" justify="center" wrap w={1}>
                 <Box w={1} justify="center">
                   <ScrollElement name="ContentAnchor" />
-                  {this.sortedBlocks.map((block, i) => (
+                  {this.sortedBlocks.map((block, index) => (
                     <ContentBlock
-                      order={i + 1}
+                      key={index}
+                      order={index + 1}
                       title={block.title}
                       content={block.content}
                       imageUrl={block.imageUrl}

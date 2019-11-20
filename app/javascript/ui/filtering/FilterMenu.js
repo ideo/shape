@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import FilterIcon from '~/ui/icons/FilterIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 
-const FilterIconHolder = styled.div`
+export const FilterIconHolder = styled.div`
   height: 40px;
   margin-right: 10px;
   ${props =>
