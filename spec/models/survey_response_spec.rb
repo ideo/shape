@@ -5,7 +5,10 @@ RSpec.describe SurveyResponse, type: :model do
     it { should belong_to(:test_collection) }
     it { should belong_to(:user) }
     it { should have_many(:question_answers) }
-    it { should have_one(:feedback_incentive_record) }
+  end
+
+  before do
+    ENV['TEST_DYNAMIC_PRICING_LAUNCHED_AT'] = 1.day.ago.to_s
   end
 
   describe 'callbacks' do
@@ -176,7 +179,7 @@ RSpec.describe SurveyResponse, type: :model do
   describe '#amount_earned' do
     let!(:test_collection) { create(:test_collection) }
     let(:test_audience) { create(:test_audience, test_collection: test_collection) }
-    let(:survey_response) { create(:survey_response, test_audience: test_audience, status: :completed) }
+    let(:survey_response) { create(:survey_response, test_audience: test_audience, status: :completed, incentive_owed_at: Time.current) }
     let(:incentive_per_response) { Audience.incentive_per_response(test_collection.paid_question_items.size) }
 
     it 'returns fixed incentive amount' do
@@ -200,6 +203,16 @@ RSpec.describe SurveyResponse, type: :model do
 
       it 'is 0' do
         expect(survey_response.amount_earned).to eq(0)
+      end
+    end
+
+    context 'for response paid out before before TEST_DYNAMIC_PRICING_LAUNCHED_AT' do
+      before do
+        ENV['TEST_DYNAMIC_PRICING_LAUNCHED_AT'] = 1.day.from_now.to_s
+      end
+
+      it 'returns LEGACY_INCENTIVE_PER_RESPONDENT' do
+        expect(survey_response.amount_earned).to eq(Audience::LEGACY_INCENTIVE_PER_RESPONDENT)
       end
     end
   end
