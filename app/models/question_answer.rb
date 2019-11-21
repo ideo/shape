@@ -103,6 +103,16 @@ class QuestionAnswer < ApplicationRecord
     item = open_response_item
     return destroy_open_response_item_and_card if answer_text.blank?
 
+    if item.blank?
+      item = TestResultsCollection::CreateAndLinkOpenResponse.call(
+        test_collection: survey_response.test_collection,
+        question_answer: self,
+      ).open_response_item
+      self.open_response_item_id = item.id
+      save
+      return true
+    end
+
     item.content = answer_text
     ops = quote_card_ops
     item.data_content = ops
