@@ -13,23 +13,10 @@ import MenuDropdown from '~/ui/layout/MenuDropdown'
 import {
   MarketingFlex,
   MarketingMainBtn,
+  NavLink,
 } from '~/ui/global/styled/marketing.js'
 import { scroller } from 'react-scroll'
 import { browserHistory } from '~/ui/MarketingRoutes'
-
-export const NavLink = styled.a`
-  font-weight: ${v.weights.medium};
-  font-family: ${v.fonts.sans};
-  font-size: 12px;
-  letter-spacing: 0.4px;
-  color: black;
-  margin: 1em;
-  padding: 6px 12px;
-  cursor: pointer;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-`
 
 const ToggleLogo = styled(Logo)`
   margin-top: 15px;
@@ -227,7 +214,16 @@ class MarketingMenu extends React.PureComponent {
 
   renderDesktop = () => {
     const { isHome } = this
-    const items = [{ label: 'Overview' }, { label: 'Feedback' }]
+    const items = [
+      { label: 'Overview' },
+      { label: 'Collaboration', href: '/product/collaboration' },
+      { label: 'Feedback', href: '/product/feedback' },
+      { label: 'Templates', href: '/product/templates' },
+      {
+        label: 'Open Innovation And Challenges',
+        href: '/product/open-innovation',
+      },
+    ]
     return (
       <Fragment>
         <MenuBar className="MenuBar top">
@@ -241,9 +237,6 @@ class MarketingMenu extends React.PureComponent {
                     handleScrollToContent={() => handleScrollToContent(isHome)}
                   />
                   <NavLink href="/product/pricing">Pricing</NavLink>
-                  <NavLink href="/product/open-innovation">
-                    CHALLENGES AND OPEN INNOVATION
-                  </NavLink>
                 </MarketingFlex>
               </Box>
 
