@@ -131,7 +131,7 @@ class MarketingPage extends React.Component {
 
           {this.state.content.pricing && (
             <Pricing
-              pageName="workshop"
+              pageName="shape"
               {...this.state.content.pricing.blocks[0]}
             />
           )}
