@@ -32,6 +32,8 @@ module TestResultsCollection
       else
         context.all_responses_collection = create_all_responses_collection
         test_audiences.each do |test_audience|
+          next if test_audience.closed?
+
           create_audience_collection(test_audience)
         end
       end
@@ -42,14 +44,6 @@ module TestResultsCollection
     end
 
     private
-
-    def create_or_link_alias_collection(survey_response)
-      TestResultsCollection::CreateOrLinkAliasCollection.call(
-        survey_response: survey_response,
-        all_responses_collection: all_responses_collection,
-        created_by: created_by,
-      )
-    end
 
     def default_collection_attrs
       {
@@ -103,6 +97,14 @@ module TestResultsCollection
         parent_collection: all_responses_collection,
         created_by: created_by,
       ).record
+    end
+
+    def create_or_link_alias_collection(survey_response)
+      TestResultsCollection::CreateOrLinkAliasCollection.call(
+        survey_response: survey_response,
+        all_responses_collection: all_responses_collection,
+        created_by: created_by,
+      )
     end
   end
 end

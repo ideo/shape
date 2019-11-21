@@ -111,7 +111,7 @@ class Collection
 
     def search_data
       opts = super
-      return opts if survey_response_id.blank?
+      return opts if survey_response.nil?
 
       # Index all the answers this person has chosen,
       # so we can surface this collection in global search

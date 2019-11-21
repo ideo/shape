@@ -635,7 +635,6 @@ describe Collection::TestCollection, type: :model do
         # make sure this is now persisted
         submission_test.reload
         test_collection.launch!(initiated_by: user)
-        puts "submission is #{submission.id} #{submission.name}"
         test_collection.update_submissions_launch_status
         submission.reload
         submission_template.reload
