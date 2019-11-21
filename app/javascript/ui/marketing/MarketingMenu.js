@@ -144,20 +144,29 @@ const MobileLinks = ({ isHome }) => {
       </Box>
 
       <Box>
+        <MobileSubNavLink href="/product/collaboration" align="left">
+          COLLABORATION
+        </MobileSubNavLink>
+      </Box>
+      <Box>
         <MobileSubNavLink href="/product/feedback" align="left">
           FEEDBACK
+        </MobileSubNavLink>
+      </Box>
+      <Box>
+        <MobileSubNavLink href="/product/templates" align="left">
+          TEMPLATES
+        </MobileSubNavLink>
+      </Box>
+      <Box>
+        <MobileSubNavLink href="/product/open-innovation" align="left">
+          OPEN INNOVATION AND CHALLENGES
         </MobileSubNavLink>
       </Box>
 
       <Box>
         <NavLink align="left" href="/product/pricing">
           PRICING
-        </NavLink>
-      </Box>
-
-      <Box>
-        <NavLink align="left" href="/product/open-innovation">
-          CHALLENGES AND OPEN INNOVATION
         </NavLink>
       </Box>
 
