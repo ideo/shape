@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable } from 'mobx'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 import Hypher from 'hypher'
@@ -162,6 +163,9 @@ function namePartTooLong(fullName) {
 @inject('uiStore', 'apiStore')
 @observer
 class CollectionCover extends React.Component {
+  @observable
+  hasEmptyCarousel = false
+
   get hasIcon() {
     const { collection } = this.props
     return (
@@ -327,6 +331,11 @@ class CollectionCover extends React.Component {
     return cover.image_url
   }
 
+  @action
+  setEmptyCarousel = () => {
+    this.hasEmptyCarousel = true
+  }
+
   handleClick = e => {
     // TODO is this being used?
     const { searchResult, dragging, uiStore, collection } = this.props
@@ -373,13 +382,14 @@ class CollectionCover extends React.Component {
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
       >
-        {collection.isCarousel &&
-        collection.collection_cover_items &&
-        collection.collection_cover_items.length > 0 ? (
+        {collection.isCarousel && !this.hasEmptyCarousel ? (
           <CarouselCover
             collection={collection}
+            // trigger a reload
+            updatedAt={collection.updated_at}
             dragging={false}
             handleClick={this.handleClick}
+            onEmptyCarousel={this.setEmptyCarousel}
           />
         ) : (
           <StyledCardContent
