@@ -285,9 +285,10 @@ class TestSurveyResponder extends React.Component {
   trackResponseEvent(event) {
     const { apiStore, collection } = this.props
     const { id, gives_incentive } = collection
+    const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
       event: event,
-      organization: apiStore.currentUserOrganization.name,
+      organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: id,
       hasPaidAudience: gives_incentive, // fixme: why is this false when gives_incentive is true?

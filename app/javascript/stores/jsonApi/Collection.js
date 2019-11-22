@@ -854,10 +854,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     hasPaidAudience = false,
     ideasCount = 0
   ) => {
+    const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
       event: 'formSubmission',
       formType: `${actionName} Feedback Test`,
-      organization: apiStore.currentUserOrganization.name,
+      organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: this.launchableTestId,
       hasLinkSharingAudience: hasLinkSharingAudience,
