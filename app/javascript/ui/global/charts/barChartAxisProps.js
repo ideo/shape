@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { VictoryAxis } from 'victory'
 
 import {
   barWidthPx,
@@ -43,50 +42,48 @@ const emojiTickProperties = questionType => {
   }
 }
 
-const BarChartAxis = ({ primaryDataset, totalColumns, totalGroupings }) => {
-  const { question_type } = primaryDataset
-  const tickProperties = primaryDataset.isEmojiOrScaleQuestion
+const barChartAxisProps = ({ dataset, totalColumns, totalGroupings }) => {
+  const { question_type } = dataset
+  const tickProperties = dataset.isEmojiOrScaleQuestion
     ? emojiTickProperties(question_type)
     : columnTickProperties(totalColumns, totalGroupings)
-  return (
-    <VictoryAxis
-      style={{
-        axis: {
-          strokeWidth: 0,
+  return {
+    ...tickProperties,
+    style: {
+      axis: {
+        strokeWidth: 0,
+      },
+      tickLabels: {
+        textTransform: 'none',
+      },
+    },
+    events: [
+      {
+        eventHandlers: {
+          onMouseOver: () => [
+            {
+              target: 'tickLabels',
+              mutation: props => ({
+                isHovered: true,
+              }),
+            },
+          ],
+          onMouseOut: () => [
+            {
+              target: 'labels',
+              mutation: props => null,
+            },
+          ],
         },
-        tickLabels: {
-          textTransform: 'none',
-        },
-      }}
-      {...tickProperties}
-      events={[
-        {
-          eventHandlers: {
-            onMouseOver: () => [
-              {
-                target: 'tickLabels',
-                mutation: props => ({
-                  isHovered: true,
-                }),
-              },
-            ],
-            onMouseOut: () => [
-              {
-                target: 'labels',
-                mutation: props => null,
-              },
-            ],
-          },
-        },
-      ]}
-    />
-  )
+      },
+    ],
+  }
 }
 
-BarChartAxis.propTypes = {
-  primaryDataset: MobxPropTypes.objectOrObservableObject.isRequired,
+barChartAxisProps.propTypes = {
+  dataset: MobxPropTypes.objectOrObservableObject.isRequired,
   totalColumns: PropTypes.number.isRequired,
   totalGroupings: PropTypes.number.isRequired,
 }
 
-export default BarChartAxis
+export default barChartAxisProps

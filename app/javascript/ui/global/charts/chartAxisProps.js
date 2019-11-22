@@ -1,14 +1,13 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { LineSegment, VictoryAxis, VictoryLabel } from 'victory'
+import { LineSegment, VictoryLabel } from 'victory'
 
 import monthEdge from '~/utils/monthEdge'
-import { utcMoment } from '~/ui/global/charts/ChartUtils'
+import { utcMoment, domainProps } from '~/ui/global/charts/ChartUtils'
 import v from '~/utils/variables'
 
 const tickLabelStyle = isSmallChartStyle => {
-  if (this.isSmallChartStyle) {
+  if (isSmallChartStyle) {
     return {
       fontSize: '18px',
       dy: -5,
@@ -67,10 +66,9 @@ const TickLabel = props => {
 
 const fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
 
-const monthlyXAxisText = (
+export const monthlyXAxisText = (
   datasetValues,
   datasetTimeframe,
-  primary,
   date,
   index
 ) => {
@@ -100,7 +98,7 @@ const monthlyXAxisText = (
   return ''
 }
 
-const ChartAxis = ({
+const ChartAxisProps = ({
   datasetValues,
   datasetTimeframe,
   domain,
@@ -117,45 +115,45 @@ const ChartAxis = ({
     axisComponent: <LineSegment transform="translate(10 26) scale(0.955)" />,
   }
 
-  const datasetXAxisText = (primary, date, index) => {
-    return monthlyXAxisText(
-      datasetValues,
-      datasetTimeframe,
-      primary,
-      date,
-      index
-    )
+  const datasetXAxisText = (date, index) => {
+    return monthlyXAxisText(datasetValues, datasetTimeframe, date, index)
   }
 
-  return datasetValues.length > 1 ? (
-    <VictoryAxis
-      {...axisProps}
-      tickFormat={isSmallChartStyle ? fullDate : datasetXAxisText}
-      tickLabelComponent={
-        <TickLabel fontSize={tickLabelStyle.fontSize} dy={tickLabelStyle.dy} />
+  const tickLabelStyleProps = tickLabelStyle(isSmallChartStyle)
+
+  console.log('full date for', datasetValues[0].date)
+
+  return datasetValues.length > 1
+    ? {
+        ...axisProps,
+        tickFormat: isSmallChartStyle ? fullDate : datasetXAxisText,
+        tickLabelComponent: (
+          <TickLabel
+            fontSize={tickLabelStyleProps.fontSize}
+            dy={tickLabelStyleProps.dy}
+          />
+        ),
+        orientation: 'bottom',
+        axisComponent: (
+          <LineSegment transform="translate(10 26) scale(0.955)" />
+        ),
       }
-      orientation="bottom"
-      axisComponent={<LineSegment transform="translate(10 26) scale(0.955)" />}
-    />
-  ) : (
-    <VictoryAxis
-      {...axisProps}
-      tickFormat={t => null}
-      axisLabelComponent={<TickLabel fontSize={tickLabelStyle.fontSize} />}
-      style={chartAxisStyle(isSmallChartStyle)}
-      label={fullDate(datasetValues[0].date)}
-    />
-  )
+    : {
+        ...axisProps,
+        tickFormat: t => null,
+        axisLabelComponent: (
+          <TickLabel fontSize={tickLabelStyleProps.fontSize} />
+        ),
+        style: chartAxisStyle(isSmallChartStyle),
+        label: fullDate(datasetValues[0].date),
+      }
 }
 
-ChartAxis.propTypes = {
-  datasetValues: MobxPropTypes.objectOrObservableObject.isRequired,
+ChartAxisProps.propTypes = {
+  datasetValues: PropTypes.arrayOf(PropTypes.object).isRequired,
   datasetTimeframe: PropTypes.string.isRequired,
-  domain: PropTypes.shape({
-    x: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
-    y: PropTypes.arrayOf(PropTypes.number),
-  }).isRequired,
+  domain: domainProps.isRequired,
   isSmallChartStyle: PropTypes.bool.isRequired,
 }
 
-export default ChartAxis
+export default ChartAxisProps

@@ -6,7 +6,8 @@ import {
   datasetPropType,
   dateTooltipText,
   advancedTooltipText,
-  addDuplicateValueIfSingleValue,
+  domainProps,
+  formatValuesForVictory,
 } from '~/ui/global/charts/ChartUtils'
 
 const chartStyle = style => {
@@ -26,16 +27,20 @@ const chartStyle = style => {
   }
 }
 
-const formatValues = values => {
-  const rawValues = addDuplicateValueIfSingleValue(values)
-  // Transform to regular arrays and objects for Victory
-  return rawValues
-  return rawValues.map(data => ({ ...data }))
-}
-
-const AreaChart = ({ dataset, simpleDateTooltip, domain, cardArea = 1 }) => {
-  const { measure, timeframe } = dataset
-  const values = formatValues(dataset.dataWithDates || [])
+const AreaChart = ({
+  dataset,
+  order,
+  simpleDateTooltip,
+  domain,
+  cardArea = 1,
+}) => {
+  const { measure, timeframe, dataWithDates } = dataset
+  // Add dates to data if there are none
+  const values = formatValuesForVictory({
+    values: dataWithDates || [],
+    addStartDate: dataWithDates[0].date ? null : domain.x[0],
+    addEndDate: dataWithDates[0].date ? null : domain.x[1],
+  })
   let tooltipFn
   if (simpleDateTooltip) {
     tooltipFn = datum => dateTooltipText(datum, dataset.name)
@@ -64,19 +69,17 @@ const AreaChart = ({ dataset, simpleDateTooltip, domain, cardArea = 1 }) => {
       data={values}
       y="value"
       x="date"
-      key={`dataset-${dataset.order}`}
+      key={`dataset-${order}`}
     />
   )
 }
 
 AreaChart.propTypes = {
   dataset: datasetPropType.isRequired,
+  order: PropTypes.number.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
-  domain: PropTypes.shape({
-    x: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
-    y: PropTypes.arrayOf(PropTypes.number),
-  }).isRequired,
+  domain: domainProps.isRequired,
 }
 
 AreaChart.defaultProps = {

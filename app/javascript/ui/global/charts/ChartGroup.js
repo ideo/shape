@@ -15,13 +15,14 @@ import v, { DATASET_CHART_TYPES } from '~/utils/variables'
 import AreaChart from '~/ui/global/charts/AreaChart'
 import BarChart from '~/ui/global/charts/BarChart'
 import LineChart from '~/ui/global/charts/LineChart'
-import BarChartAxis from '~/ui/global/charts/BarChartAxis'
-import ChartAxis from '~/ui/global/charts/ChartAxis'
+import barChartAxisProps from '~/ui/global/charts/barChartAxisProps'
+import chartAxisProps from '~/ui/global/charts/chartAxisProps'
 import {
   barWidthPx,
   victoryTheme,
   emojiSeriesForQuestionType,
   chartDomainForDatasetValues,
+  formatValuesForVictory,
 } from '~/ui/global/charts/ChartUtils'
 
 const NotEnoughDataContainer = styled.div`
@@ -38,6 +39,23 @@ const ChartContainer = styled.div`
   right: 0;
 `
 
+// Adds duplicate values (if only 1 value), and dates if primary dataset has them
+const formatSecondaryDatasetValues = (
+  values = [],
+  primaryDatasetValues = []
+) => {
+  if (values.length > 1) return values
+
+  // Get values from primary dataset
+  const startDate = primaryDatasetValues[0].date
+  const endDate = primaryDatasetValues[primaryDatasetValues.length - 1].date
+  return formatValuesForVictory({
+    values,
+    startDate,
+    endDate,
+  })
+}
+
 @inject('routingStore')
 @observer
 class ChartGroup extends React.Component {
@@ -47,13 +65,15 @@ class ChartGroup extends React.Component {
   }
 
   get primaryDatasetValues() {
-    if (!this.primaryDataset || !this.primaryDataset.data) return []
+    if (!this.primaryDataset || !this.primaryDataset.dataWithDates) return []
     return this.primaryDataset.dataWithDates
   }
 
   get secondaryDatasetsWithData() {
     const { secondaryDatasets } = this.props.dataItem
-    return secondaryDatasets().filter(dataset => dataset.data.length > 0)
+    return secondaryDatasets().filter(
+      dataset => dataset.dataWithDates.length > 0
+    )
   }
 
   get primaryDatasetBarChart() {
@@ -64,12 +84,18 @@ class ChartGroup extends React.Component {
   }
 
   get chartDomain() {
-    const values = this.primaryDatasetValues
+    const allValues = [...this.primaryDatasetValues]
     this.secondaryDatasetsWithData.forEach(dataset => {
-      values.push(...dataset.dataWithDates)
+      // Format data in the same way it will show up in other secondary charts
+      allValues.push(
+        ...formatSecondaryDatasetValues(
+          dataset.dataWithDates,
+          this.primaryDatasetValues
+        )
+      )
     })
     return chartDomainForDatasetValues({
-      values,
+      values: allValues,
       maxYDomain: this.primaryDataset.max_domain,
     })
   }
@@ -127,30 +153,29 @@ class ChartGroup extends React.Component {
             style={{ fill: v.colors.black, fontSize: '20px' }}
           />
         }
-      ></VictoryAxis>
+      />
     )
   }
 
   get chartAxis() {
+    let axisProps
     if (this.primaryDatasetBarChart) {
-      return (
-        <BarChartAxis
-          primaryDataset={this.primaryDataset}
-          totalColumns={this.totalColumns}
-          totalGroupings={this.totalGroupings}
-        />
-      )
+      axisProps = barChartAxisProps({
+        dataset: this.primaryDataset,
+        totalColumns: this.totalColumns,
+        totalGroupings: this.totalGroupings,
+      })
     } else {
       const { timeframe } = this.primaryDataset
-      return (
-        <ChartAxis
-          datasetValues={this.primaryDatasetValues}
-          datasetTimeframe={timeframe}
-          domain={this.chartDomain}
-          isSmallChartStyle={this.isSmallChartStyle}
-        />
-      )
+      axisProps = chartAxisProps({
+        datasetValues: this.primaryDatasetValues,
+        datasetTimeframe: timeframe,
+        domain: this.chartDomain,
+        isSmallChartStyle: this.isSmallChartStyle,
+      })
     }
+
+    return <VictoryAxis {...axisProps} />
   }
 
   // Oddly es-lint complains when this is a get function
@@ -162,6 +187,7 @@ class ChartGroup extends React.Component {
 
   renderDataset = (dataset, index, total) => {
     const { simpleDateTooltip, width, height } = this.props
+    const order = index
     let modifiedChartType = dataset.chart_type
     // Secondary datasets to primary area type datasets should use line charts
     // instead of default area charts.
@@ -177,6 +203,7 @@ class ChartGroup extends React.Component {
         return AreaChart({
           dataset,
           simpleDateTooltip,
+          order,
           cardArea: width * height,
           domain: this.chartDomain,
         })
@@ -184,6 +211,7 @@ class ChartGroup extends React.Component {
         return LineChart({
           dataset,
           simpleDateTooltip,
+          order,
           cardArea: width * height,
           dashWidth,
           domain: this.chartDomain,
@@ -198,6 +226,7 @@ class ChartGroup extends React.Component {
       default:
         return AreaChart({
           dataset,
+          order,
           simpleDateTooltip,
           cardArea: width * height,
           domain: this.chartDomain,

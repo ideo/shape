@@ -85,6 +85,17 @@ export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
   }
 }
 
+export const domainProps = PropTypes.shape({
+  x: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ])
+  ),
+  y: PropTypes.arrayOf(PropTypes.number),
+})
+
 export const emojiTooltipText = datum => `${datum.value}`
 
 export const dateTooltipText = (datum, datasetName = null) => {
@@ -125,21 +136,44 @@ export const advancedTooltipText = ({
   return text
 }
 
-export const addDuplicateValueIfSingleValue = values => {
+export const addDuplicateValueIfSingleValue = (
+  values,
+  addStartDate,
+  addEndDate
+) => {
   if (values.length === 0 || values.length > 1) return values
 
   // Copy array so we can modify it
   const valuesWithDupe = [...values]
 
+  if (!valuesWithDupe[0].date && addStartDate)
+    valuesWithDupe[0].date = addStartDate
+
   // Add a duplicate value
   const duplicateValue = Object.assign({ isDuplicate: true }, valuesWithDupe[0])
-  // Set date to 3 months ago
-  if (duplicateValue.date) {
-    duplicateValue.date = utcMoment(duplicateValue.date).subtract('3', 'months')
+  // Set given date
+  if (duplicateValue.date && addEndDate) {
+    duplicateValue.date = addEndDate
     if (duplicateValue.month) duplicateValue.month = duplicateValue.date
   }
   valuesWithDupe.unshift(duplicateValue)
   return valuesWithDupe
+}
+
+export const formatValuesForVictory = ({
+  values,
+  addStartDate = null,
+  addEndDate = null,
+}) => {
+  // Victory doesn't support single data points, so duplicate if we have only one
+  const rawValues = addDuplicateValueIfSingleValue(
+    values,
+    addStartDate,
+    addEndDate
+  )
+
+  // Transform to regular arrays and objects for Victory
+  return rawValues.map(data => ({ ...data }))
 }
 
 export const AboveChartContainer = styled.div`

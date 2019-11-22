@@ -7,55 +7,32 @@ import {
   datasetPropType,
   dateTooltipText,
   advancedTooltipText,
-  addDuplicateValueIfSingleValue,
   lineChartDashWithForOrder,
+  domainProps,
+  formatValuesForVictory,
 } from '~/ui/global/charts/ChartUtils'
 
-export const formatValuesWithoutDates = (values, domain) => {
-  const formattedValues = [...values]
-
-  formattedValues[0].date = domain.x[0]
-
-  // Add a duplicate value
-  const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
-  duplicateValue.date = domain.x[1]
-  formattedValues.push(duplicateValue)
-
-  // Transform to regular arrays and objects for Victory
-  return formattedValues.map(data => ({ ...data }))
-}
-
-const formatValuesWithDates = values => {
-  const rawValues = addDuplicateValueIfSingleValue(values)
-  // Transform to regular arrays and objects for Victory
-  return rawValues.map(data => ({ ...data }))
-}
-
-const chartStyle = dataset => {
-  const { style } = dataset
+const chartStyle = (style, order) => {
   return {
     data: {
       stroke: (style && style.fill) || v.colors.black,
       strokeWidth: 3,
       strokeDasharray: lineChartDashWithForOrder({
-        order: dataset.order,
+        order: order,
         scale: 1.5,
       }),
     },
   }
 }
 
-const LineChart = ({ dataset, simpleDateTooltip, cardArea, domain }) => {
-  const { measure, timeframe } = dataset
-  const data = dataset.dataWithDates
-  let values
-  const dataHasDates = data[0] && !!data[0].date
-  if (dataHasDates) {
-    values = formatValuesWithDates(data)
-  } else {
-    values = formatValuesWithoutDates(data, domain)
-  }
+const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
+  const { measure, timeframe, style, dataWithDates } = dataset
   let tooltipFn
+  const values = formatValuesForVictory({
+    values: dataWithDates || [],
+    addStartDate: dataWithDates[0].date ? null : domain.x[0],
+    addEndDate: dataWithDates[0].date ? null : domain.x[1],
+  })
   if (simpleDateTooltip) {
     tooltipFn = datum => dateTooltipText(datum, dataset.name)
   } else {
@@ -71,9 +48,9 @@ const LineChart = ({ dataset, simpleDateTooltip, cardArea, domain }) => {
   return (
     <VictoryLine
       labels={d => d.value}
-      style={chartStyle(dataset)}
+      style={chartStyle(style, order)}
       data={values}
-      key={`dataset-${dataset.order}`}
+      key={`dataset-${order}`}
       y="value"
       x="date"
       labelComponent={
@@ -90,12 +67,10 @@ const LineChart = ({ dataset, simpleDateTooltip, cardArea, domain }) => {
 
 LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
+  order: PropTypes.number.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
-  domain: PropTypes.shape({
-    x: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
-    y: PropTypes.arrayOf(PropTypes.number),
-  }).isRequired,
+  domain: domainProps.isRequired,
 }
 
 LineChart.defaultProps = {
