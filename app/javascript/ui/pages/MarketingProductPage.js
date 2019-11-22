@@ -152,6 +152,7 @@ class MarketingProductPage extends React.Component {
     return (
       <Fragment>
         <MarketingBack>
+          <ScrollElement name="TopAnchor" />
           <MarketingMenu location={location} />
           {this.page === 'pricing' && content.blocks && (
             <Pricing pageName={this.page} {...content.blocks[0]} />

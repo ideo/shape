@@ -406,3 +406,17 @@ export const Card = styled.div`
   background-color: white;
   border: solid 1px rgba(0, 0, 0, 0.1);
 `
+
+export const NavLink = styled.a`
+  font-weight: ${v.weights.medium};
+  font-family: ${v.fonts.sans};
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  color: black;
+  margin: 1em;
+  padding: 6px 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+`

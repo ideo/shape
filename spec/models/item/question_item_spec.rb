@@ -132,6 +132,28 @@ RSpec.describe Item::QuestionItem, type: :model do
         expect(question_item.can_view?(user2)).to be true
       end
     end
+
+    context 'with audiences on the test collection' do
+      let(:audience) { create(:audience, min_price_per_response: 4.00) }
+      let!(:test_audience) { create(:test_audience, test_collection: test_collection, audience: audience) }
+
+      it 'updates price per response when question is created' do
+        num_questions = test_collection.paid_question_items.size
+        expect(test_audience.price_per_response).to eq(audience.price_per_response(num_questions))
+        create(:question_item, question_type: :question_useful, parent_collection: test_collection)
+        expect(test_collection.reload.paid_question_items.size).to eq(num_questions + 1)
+        expect(test_audience.reload.price_per_response).to eq(audience.price_per_response(num_questions))
+      end
+
+      it 'updates price per response when question is archived' do
+        num_questions = test_collection.paid_question_items.size
+        question_item = test_collection.question_items.select(&:question_useful?).first
+        expect(test_audience.price_per_response).to eq(audience.price_per_response(num_questions))
+        question_item.archive!
+        expect(test_collection.reload.paid_question_items.size).to eq(num_questions - 1)
+        expect(test_audience.reload.price_per_response).to eq(audience.price_per_response(num_questions - 1))
+      end
+    end
   end
 
   describe '#question_description' do

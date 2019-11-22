@@ -11,7 +11,6 @@ describe Api::V1::Admin::PaidTestsController, type: :request, json: true, auth: 
     let!(:test_audience) { test_collection.test_audiences.first }
     let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
     let(:user) { create(:user) }
-    let(:amount_owed) { TestAudience.incentive_amount }
     let(:survey_response) do
       create(
         :survey_response,
@@ -21,6 +20,7 @@ describe Api::V1::Admin::PaidTestsController, type: :request, json: true, auth: 
         user: user,
       )
     end
+    let(:amount_owed) { survey_response.potential_incentive }
 
     before do
       # Add balance to revenue_deferred account so we can debit from it

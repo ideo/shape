@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_12_190014) do
+ActiveRecord::Schema.define(version: 2019_11_20_192557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -95,7 +95,7 @@ ActiveRecord::Schema.define(version: 2019_11_12_190014) do
     t.string "criteria"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "price_per_response", precision: 10, scale: 2, default: "0.0"
+    t.decimal "min_price_per_response", precision: 10, scale: 2, default: "0.0"
     t.integer "global_default"
     t.index ["global_default"], name: "index_audiences_on_global_default"
   end
@@ -334,17 +334,6 @@ ActiveRecord::Schema.define(version: 2019_11_12_190014) do
     t.index ["externalizable_type", "externalizable_id"], name: "index_on_externalizable"
   end
 
-  create_table "feedback_incentive_records", force: :cascade do |t|
-    t.bigint "user_id"
-    t.bigint "survey_response_id"
-    t.decimal "amount", precision: 10, scale: 2
-    t.decimal "current_balance", precision: 10, scale: 2
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["survey_response_id"], name: "index_feedback_incentive_records_on_survey_response_id"
-    t.index ["user_id"], name: "index_feedback_incentive_records_on_user_id"
-  end
-
   create_table "filestack_files", force: :cascade do |t|
     t.string "url"
     t.string "handle"
@@ -555,8 +544,8 @@ ActiveRecord::Schema.define(version: 2019_11_12_190014) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.jsonb "selected_choice_ids", default: [], null: false
     t.bigint "idea_id"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
     t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"
@@ -596,6 +585,7 @@ ActiveRecord::Schema.define(version: 2019_11_12_190014) do
     t.datetime "incentive_owed_at"
     t.datetime "incentive_paid_at"
     t.string "respondent_alias"
+    t.decimal "incentive_paid_amount", precision: 10, scale: 2
     t.index ["incentive_status"], name: "index_survey_responses_on_incentive_status"
     t.index ["session_uid"], name: "index_survey_responses_on_session_uid", unique: true
     t.index ["test_audience_id"], name: "index_survey_responses_on_test_audience_id"
@@ -723,8 +713,6 @@ ActiveRecord::Schema.define(version: 2019_11_12_190014) do
   end
 
   add_foreign_key "collections", "organizations"
-  add_foreign_key "feedback_incentive_records", "survey_responses"
-  add_foreign_key "feedback_incentive_records", "users"
   add_foreign_key "test_audience_invitations", "test_audiences"
   add_foreign_key "test_audience_invitations", "users"
   add_foreign_key "test_audiences", "audiences"

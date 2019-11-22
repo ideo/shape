@@ -166,9 +166,13 @@ When('I fill {string} with {string}', (string, url) => {
 })
 
 When('I fill the {word} {string} with {string}', (num, element, string) => {
-  cy.locateDataOrClass(element)
-    .eq(parseInt(num) - 1)
-    .click()
+  let el = cy.locateDataOrClass(element)
+  if (num === 'last') {
+    el = el.last()
+  } else {
+    el = el.eq(parseInt(num) - 1)
+  }
+  el.click({ force: true })
     .wait(FLIPMOVE_DELAY)
     .type(string)
 })
@@ -202,8 +206,7 @@ When('I add an open response question with {string}', text => {
   cy.locateDataOrClass('QuestionSelectOption-open-response')
     .last()
     .click()
-  cy.wait('@apiArchiveCollectionCards')
-  cy.wait('@apiCreateCollectionCard')
+  cy.wait('@apiReplaceCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY)
 

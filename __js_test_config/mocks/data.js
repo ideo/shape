@@ -318,7 +318,7 @@ export const fakeQuestionItem = {
   id: '3',
   // ...fakeTextItemAttrs,
   type: 'Item::QuestionItem',
-  question_type: 'question_description',
+  question_type: 'question_open',
   isSingleChoiceQuestion: false,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
@@ -603,13 +603,15 @@ export const fakeSurveyResponse = {
 export const fakeAudience = {
   id: '1',
   name: 'Anybody',
+  min_price_per_response: 4.0,
 }
 export const fakeTestAudience = {
   id: '1',
   audience: fakeAudience,
   sample_size: 12,
   num_completed_responses: 6,
-  price_per_response: 3.75,
+  price_per_response: 4.24,
+  incentive_per_response: 1.95 
 }
 export const fakeTestCollection = {
   id: '1',

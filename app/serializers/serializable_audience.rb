@@ -9,8 +9,8 @@ class SerializableAudience < BaseJsonSerializer
     end
   end
 
-  attribute :price_per_response do
-    @object.price_per_response.to_f
+  attribute :min_price_per_response do
+    @object.min_price_per_response.to_f
   end
 
   attribute :order do

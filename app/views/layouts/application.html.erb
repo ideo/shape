@@ -42,9 +42,8 @@
         LOGGED_IN: <%= user_signed_in? %>,
       }
       // this is just for frontend display, still important to make sure this is aligned with application.rb
-      window.FEEDBACK_INCENTIVE_AMOUNT = <%= Shape::FEEDBACK_INCENTIVE_AMOUNT %>;
-      window.TARGETED_AUDIENCE_PRICE_PER_RESPONSE = <%= Shape::TARGETED_AUDIENCE_PRICE_PER_RESPONSE %>;
-      window.FREEMIUM_USER_LIMIT = <%= Organization::FREEMIUM_USER_LIMIT %>; 
+      window.FREEMIUM_USER_LIMIT = <%= Organization::FREEMIUM_USER_LIMIT %>;
+      window.AUDIENCE_PRICES = <%= Audience.price_constants.to_json.html_safe %>
     </script>
     <%= render 'layouts/trackers_and_widgets_head' %>
 

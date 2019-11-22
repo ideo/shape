@@ -210,12 +210,13 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   renderTableBody(audience) {
-    const { onInputChange } = this.props
+    const { onInputChange, numPaidQuestions } = this.props
     return (
       <TableBody
         audience={audience}
         onInputChange={onInputChange}
         selected={this.isAudienceSelected(audience)}
+        numPaidQuestions={numPaidQuestions}
         sampleSize={this.sampleSize(audience)}
         locked={this.isAudienceLocked(audience)}
       />
@@ -351,6 +352,7 @@ AudienceSettingsWidget.propTypes = {
   onToggleCheckbox: PropTypes.func.isRequired,
   afterAddAudience: PropTypes.func.isRequired,
   totalPrice: PropTypes.string.isRequired,
+  numPaidQuestions: PropTypes.number.isRequired,
   locked: PropTypes.bool,
 }
 

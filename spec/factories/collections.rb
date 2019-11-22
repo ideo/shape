@@ -138,7 +138,7 @@ FactoryBot.define do
           create(
             :test_audience,
             test_collection: collection,
-            audience: create(:audience, price_per_response: 0),
+            audience: create(:audience, min_price_per_response: 0),
             sample_size: nil,
             price_per_response: 0,
           )

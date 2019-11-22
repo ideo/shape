@@ -44,10 +44,16 @@ class TableBody extends React.Component {
   }
 
   render() {
-    const { audience, sampleSize, selected, locked } = this.props
+    const {
+      audience,
+      sampleSize,
+      selected,
+      locked,
+      numPaidQuestions,
+    } = this.props
     const textColor =
       selected && !locked ? v.colors.black : v.colors.commonMedium
-    const selectedWithPrice = audience.price_per_response && selected
+    const selectedWithPrice = audience.min_price_per_response && selected
 
     return (
       <StyledRowFlexParent>
@@ -55,7 +61,7 @@ class TableBody extends React.Component {
           <DisplayText color={textColor}>
             <strong>
               {selectedWithPrice
-                ? `$${audience.price_per_response.toFixed(2)}`
+                ? `$${audience.pricePerResponse(numPaidQuestions).toFixed(2)}`
                 : '–'}
             </strong>
           </DisplayText>
@@ -78,7 +84,9 @@ class TableBody extends React.Component {
           <DisplayText color={textColor}>
             <strong>
               {sampleSize > 0 && selected
-                ? `$${(audience.price_per_response * sampleSize).toFixed(2)}`
+                ? `$${(
+                    audience.pricePerResponse(numPaidQuestions) * sampleSize
+                  ).toFixed(2)}`
                 : '–'}
             </strong>
           </DisplayText>
@@ -93,6 +101,7 @@ TableBody.propTypes = {
   sampleSize: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
   onInputChange: PropTypes.func.isRequired,
+  numPaidQuestions: PropTypes.number.isRequired,
   locked: PropTypes.bool,
 }
 TableBody.defaultProps = {

@@ -521,7 +521,7 @@ class User < ApplicationRecord
     end
     return if first_line_owed.blank?
 
-    first_line_owed.created_at + TestAudience::PAYMENT_WAITING_PERIOD
+    first_line_owed.created_at + Audience::PAYMENT_WAITING_PERIOD
   end
 
   def sync_network_groups

@@ -96,6 +96,7 @@ class CollectionCard < ApplicationRecord
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }
   scope :visible, -> { where(hidden: false) }
+  scope :hidden, -> { where(hidden: true) }
   scope :is_cover, -> { where(is_cover: true) }
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
