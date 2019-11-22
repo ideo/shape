@@ -19,21 +19,21 @@ const SubmenuList = styled.ul`
   }
 `
 const SubmenuListItem = styled.li`
-  height: 45px;
   display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: left;
   line-height: 16px;
+  flex-direction: column;
+  justify-content: center;
   :hover {
     box-shadow: 0 2px 0px 0px black;
   }
 `
 
 const FlexNavLink = styled(NavLink)`
-  flex-grow: 1;
-  padding: 0px;
   margin: 0px 0px 0px 24px;
+  height: 100%;
+  padding: 12px 0px;
+  position: relative;
 `
 
 const DropdownSpacer = styled.ul`
