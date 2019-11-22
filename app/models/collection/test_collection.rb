@@ -529,7 +529,7 @@ class Collection
     end
 
     def idea_cards
-      ideas_collection&.collection_cards || CollectionCard.none
+      ideas_collection&.collection_cards&.visible || CollectionCard.none
     end
 
     def paid_question_items
