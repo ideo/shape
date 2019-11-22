@@ -3888,7 +3888,7 @@ exports[`ChartGroup renders snapshot 1`] = `
       style={
         Object {
           "axis": Object {
-            "stroke": "#b6aaa6",
+            "stroke": "#c6c1bf",
             "strokeWidth": 30,
             "transform": "translateY(26px)",
           },

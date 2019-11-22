@@ -164,7 +164,7 @@ export default {
     commonLightest: '#f5f4f3',
     commonLight: '#f2f1ee',
     commonMediumTint: '#e3dedc',
-    commonMedium: '#b6aaa6',
+    commonMedium: '#c6c1bf',
     commonDark: '#a89f9b',
     commonDarkest: '#787878',
     primaryLightest: '#f0f4f6',
