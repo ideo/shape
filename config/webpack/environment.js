@@ -4,7 +4,8 @@ const webpack = require('webpack')
 const { environment } = require('@rails/webpacker')
 const path = require('path')
 const { castArray, identity, flow, mapValues } = require('lodash/fp')
-const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 const DEV = process.env.RAILS_ENV === 'development'
 const PROD = process.env.SHAPE_APP === 'production'
@@ -12,6 +13,11 @@ const root = p => path.resolve(__dirname, '..', '..', p)
 
 const addReactHotLoader = env => {
   env.config.set('devtool', 'cheap-module-source-map')
+  return env
+}
+
+const addCleanWebpack = env => {
+  env.plugins.insert('CleanWebpackPlugin', new CleanWebpackPlugin())
   return env
 }
 
@@ -116,6 +122,7 @@ const updateEnvironment = flow(
   addReactSVGLoader,
   addTypescriptLoader,
   addIdeoSSOExternal,
+  addCleanWebpack,
   process.env.ANALYZE ? addBundleAnalyzerPlugin : identity
 )
 
