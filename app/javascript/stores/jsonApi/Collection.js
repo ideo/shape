@@ -848,10 +848,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  trackTestAction = actionName => {
+  trackTestAction = (
+    actionName,
+    hasLinkSharingAudience = false,
+    hasPaidAudience = false,
+    ideasCount = 0
+  ) => {
     googleTagManager.push({
       event: 'formSubmission',
       formType: `${actionName} Feedback Test`,
+      organization: apiStore.currentUserOrganization.name,
+      timestamp: new Date().toUTCString(),
+      testId: this.launchableTestId,
+      hasLinkSharingAudience: hasLinkSharingAudience,
+      hasPaidAudience: hasPaidAudience,
+      ideasCount: ideasCount,
     })
   }
 
@@ -875,13 +886,26 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         { audiences }
       )
 
-      if (launchedTest) this.trackTestAction(actionName)
-
       if (launchedTest && actionName === 'launch' && audiences) {
         audiences.forEach((value, key, _map) => {
-          if (value.selected && !value.audience.isLinkSharing)
+          if (value.selected && !value.audience.isLinkSharing) {
             this.trackAudienceTargeting(value.audience)
+          }
         })
+      }
+      const { data: launchedTestCollection } = launchedTest
+      const {
+        has_link_sharing,
+        gives_incentive,
+        ideas_count,
+      } = launchedTestCollection
+      if (launchedTest) {
+        this.trackTestAction(
+          actionName,
+          has_link_sharing,
+          gives_incentive,
+          ideas_count
+        )
       }
     } catch (e) {
       const errorMessages = e.error.map(e => ` ${e.detail}`)

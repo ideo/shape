@@ -192,6 +192,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.test_collection.id.to_s
   end
 
+  attribute :ideas_count, if: -> { @object.test_or_test_results_collection? } do
+    @object&.ideas_collection&.items&.count || 0
+  end
+
   attribute :awaiting_updates do
     @object.awaiting_updates?
   end

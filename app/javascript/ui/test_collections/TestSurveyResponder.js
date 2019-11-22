@@ -17,6 +17,7 @@ import GreetingMessage from '~/ui/test_collections/GreetingMessage'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import ScrollingModule from '~/ui/test_collections/ScrollingModule'
 import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
+import googleTagManager from '~/vendor/googleTagManager'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -258,9 +259,18 @@ class TestSurveyResponder extends React.Component {
     runInAction(() => {
       this.currentCardIdx = answerableIdx + 1
     })
+    if (answerableIdx === 1 || answerableIdx === 2) {
+      // first actual answerable card is in index 1 or 2 since terms may appear
+      if (card.card_question_type !== 'question_terms') {
+        this.trackResponseEvent('responseStart')
+      }
+    }
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
-    if (this.hasFinishedSurvey(nextCard)) this.refreshUserAfterSurvey()
+    if (this.hasFinishedSurvey(nextCard)) {
+      this.trackResponseEvent('responseComplete')
+      this.refreshUserAfterSurvey()
+    }
 
     scroller.scrollTo(scrollIdentifier(nextCard), {
       duration: 400,
@@ -269,6 +279,18 @@ class TestSurveyResponder extends React.Component {
       containerId,
       // when inside ActivityLog we want to account for the header at the top
       offset: containerId ? -75 : 0,
+    })
+  }
+
+  trackResponseEvent(event) {
+    const { apiStore, collection } = this.props
+    const { id, gives_incentive } = collection
+    googleTagManager.push({
+      event: event,
+      organization: apiStore.currentUserOrganization.name,
+      timestamp: new Date().toUTCString(),
+      testId: id,
+      hasPaidAudience: gives_incentive, // fixme: why is this false when gives_incentive is true?
     })
   }
 

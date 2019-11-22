@@ -11,6 +11,7 @@ import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
 import routeToLogin from '~/utils/routeToLogin'
 import _ from 'lodash'
+import googleTagManager from '~/vendor/googleTagManager'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -102,6 +103,20 @@ class PageWithApiWrapper extends React.Component {
     return true
   }
 
+  trackPageView(record) {
+    const { apiStore } = this.props
+    const { type } = record
+    const isCollection = !!record.isCollection
+
+    googleTagManager.push({
+      event: 'pageView',
+      organization: apiStore.currentUserOrganization.name,
+      timestamp: new Date().toUTCString(),
+      objectType: type,
+      isMasterTemplate: (isCollection && record.isMasterTemplate) || false,
+    })
+  }
+
   fetchData = async () => {
     const { apiStore, uiStore, match } = this.props
     uiStore.update('pageError', null)
@@ -128,6 +143,7 @@ class PageWithApiWrapper extends React.Component {
 
         runInAction(() => (data.fullyLoaded = true))
         this.setState({ data })
+        this.trackPageView(data)
       })
       .catch(err => {
         this.setState({ data: null }, () => {
