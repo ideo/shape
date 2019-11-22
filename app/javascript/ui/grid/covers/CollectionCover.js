@@ -58,7 +58,7 @@ const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${props =>
-    props.isSpecialCollection ? v.colors.offset : v.colors.commonMedium};
+    props.isSpecialCollection ? v.colors.offset : v.colors.collectionCover};
   color: white;
   position: relative;
   overflow: hidden;
@@ -363,6 +363,13 @@ class CollectionCover extends React.Component {
     return false
   }
 
+  get requiresOverlay() {
+    const { collection } = this.props
+    const { cover } = collection
+
+    return !!(cover && cover.image_url)
+  }
+
   render() {
     const {
       height,
@@ -399,7 +406,7 @@ class CollectionCover extends React.Component {
             gridW={gridW}
             isTextItem={!!textItem}
           >
-            <div className="overlay" />
+            <div className={this.requiresOverlay ? 'overlay' : ''} />
             {textItem ? (
               <div className="top text-item">
                 <TextItemCover
