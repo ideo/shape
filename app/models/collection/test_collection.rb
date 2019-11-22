@@ -99,6 +99,7 @@ class Collection
     after_commit :close_test_after_archive, if: :archived_on_previous_save?
 
     FEEDBACK_DESIGN_SUFFIX = ' Feedback Design'.freeze
+    MIN_NUM_PAID_QUESTIONS = 10
 
     enum test_status: {
       draft: 0,
@@ -438,7 +439,7 @@ class Collection
 
     def setup_link_sharing_test_audience
       # find the link sharing audience
-      audience = Audience.find_by(price_per_response: 0)
+      audience = Audience.find_by(min_price_per_response: 0)
       # e.g. in unit tests
       return unless audience.present?
 
@@ -528,7 +529,13 @@ class Collection
     end
 
     def idea_cards
-      ideas_collection&.collection_cards || CollectionCard.none
+      ideas_collection&.collection_cards&.visible || CollectionCard.none
+    end
+
+    def paid_question_items
+      TestCollectionCardsForSurvey
+        .call(self)
+        .reject { |card| card.item&.question_finish? }
     end
 
     def cloned_or_templated?
@@ -648,6 +655,9 @@ class Collection
 
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
       return true if test_audience_params.blank?
+
+      # Make sure all prices are up-to-date
+      test_audiences.each(&:update_price_per_response_from_audience!)
 
       purchaser = PurchaseTestAudience.call(
         test_collection: self,

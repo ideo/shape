@@ -9,11 +9,12 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
 
   describe 'GET #index' do
     let!(:collection) { create(:test_collection, test_status: :live, test_launched_at: Time.now) }
-    let!(:audience) { create(:audience) }
+    let!(:targeted_audience) { create(:audience) }
+    let!(:link_share_audience) { create(:audience, :link_sharing) }
     let!(:test_audience) do
       create(
         :test_audience,
-        audience: audience,
+        audience: targeted_audience,
         test_collection: collection,
         price_per_response: 4.50,
       )
@@ -33,7 +34,7 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
     let!(:link_share_test_audience) do
       create(
         :test_audience,
-        audience: audience,
+        audience: link_share_audience,
         test_collection: collection_with_link_share_test_audience,
         price_per_response: 0,
       )
@@ -68,8 +69,8 @@ describe Api::V1::Admin::TestCollectionsController, type: :request, json: true, 
       expect(actual_test_audience['attributes']['num_completed_responses']).to eq(1)
 
       actual_audience = json['included'][1]
-      expect(actual_audience['id'].to_i).to eq(audience.id)
-      expect(actual_audience['attributes']['name']).to eq(audience.name)
+      expect(actual_audience['id'].to_i).to eq(targeted_audience.id)
+      expect(actual_audience['attributes']['name']).to eq(targeted_audience.name)
     end
 
     it 'paginates' do

@@ -1,5 +1,10 @@
 import TestQuestion from '~/ui/test_collections/TestQuestion'
-import { fakeCollection, fakeItemCard, fakeQuestionItem } from '#/mocks/data'
+import {
+  fakeCollection,
+  fakeItemCard,
+  fakeQuestionItem,
+  fakeSurveyResponse,
+} from '#/mocks/data'
 
 let wrapper, props
 const rerender = () => {
@@ -9,6 +14,7 @@ describe('TestQuestion', () => {
   beforeEach(() => {
     props = {
       parent: fakeCollection,
+      surveyResponse: fakeSurveyResponse,
       card: fakeItemCard,
       editing: true,
       numberOfQuestions: 4,
@@ -55,15 +61,14 @@ describe('TestQuestion', () => {
   describe('with "question_finish" type', () => {
     beforeEach(() => {
       props.parent.gives_incentive = true
+      props.surveyResponse.potential_incentive = 1.75
       props.card.card_question_type = 'question_finish'
       rerender()
     })
 
     it('renders QuestionContentEditor', () => {
       const finishQuestion = wrapper.find('FinishQuestion')
-      expect(finishQuestion.props().givesIncentive).toEqual(
-        props.parent.gives_incentive
-      )
+      expect(finishQuestion.props().incentiveAmount).toEqual(1.75)
     })
   })
 })

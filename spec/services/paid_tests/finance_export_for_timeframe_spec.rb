@@ -7,10 +7,10 @@ RSpec.describe PaidTests::FinanceExportForTimeframe, type: :service, truncate: t
   let!(:test_collection) { create(:test_collection) }
   let(:user) { create(:user) }
   let(:user_2) { create(:user) }
-  let(:test_audience) { create(:test_audience, :payment, sample_size: 10, price_per_response: 4.75, test_collection: test_collection) }
+  let(:test_audience) { create(:test_audience, :payment, sample_size: 10, test_collection: test_collection) }
   let(:survey_response_owed) { create(:survey_response, user: user, test_audience: test_audience, test_collection: test_collection) }
   let(:survey_response_paid) { create(:survey_response, user: user_2, test_audience: test_audience, test_collection: test_collection) }
-  let(:incentive_amount) { TestAudience.incentive_amount }
+  let(:incentive_amount) { survey_response_owed.potential_incentive }
   let(:sample_size) { test_audience.sample_size }
 
   before do
@@ -80,7 +80,7 @@ RSpec.describe PaidTests::FinanceExportForTimeframe, type: :service, truncate: t
 
     context 'with additional purchases the next month' do
       before { Timecop.travel(end_time + 1.day) }
-      let!(:test_audience) { create(:test_audience, :payment, sample_size: 10, price_per_response: 4.75, test_collection: test_collection) }
+      let!(:test_audience) { create(:test_audience, :payment, sample_size: 10, test_collection: test_collection) }
       let!(:survey_response_owed_next_month) do
         create(:survey_response, user: user, test_audience: test_audience, test_collection: test_collection)
       end

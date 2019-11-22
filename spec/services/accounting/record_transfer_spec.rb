@@ -12,7 +12,7 @@ RSpec.describe Accounting::RecordTransfer, type: :service, truncate: true do
     let!(:survey_responses) do
       create_list(:survey_response, sample_size, status: :completed, test_audience: test_audience, user: create(:user))
     end
-    let(:incentive) { TestAudience.incentive_amount }
+    let(:incentive) { survey_responses.first.potential_incentive }
     let(:owed) { incentive * sample_size }
     let(:payment_amount_after_fee) { payment.amount_without_stripe_fee.to_f }
     let(:deferred_total_after_responses) { payment_amount_after_fee - incentive * sample_size }

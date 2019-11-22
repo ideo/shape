@@ -261,6 +261,60 @@ describe('Collection', () => {
     })
   })
 
+  describe('numPaidQuestions', () => {
+    beforeEach(() => {
+      const testCardAttrs = [
+        { section_type: 'intro', card_question_type: 'question_open' },
+        { section_type: 'intro', card_question_type: 'question_open' },
+        { section_type: 'ideas', card_question_type: 'ideas_collection' },
+        { section_type: 'ideas', card_question_type: 'question_open' },
+        { section_type: 'ideas', card_question_type: 'question_open' },
+        { section_type: 'ideas', card_question_type: 'question_open' },
+        { section_type: 'ideas', card_question_type: 'question_open' },
+        { section_type: 'ideas', card_question_type: 'question_open' },
+        { section_type: 'outro', card_question_type: 'question_open' },
+        { section_type: 'outro', card_question_type: 'question_finish' },
+      ]
+      // Create Test Collection
+      collection = new Collection(
+        {
+          name: 'My Test',
+          type: 'Collection::TestCollection',
+        },
+        apiStore
+      )
+      // Add all questions
+      collection.addReference('collection_cards', testCardAttrs, {
+        model: CollectionCard,
+        type: ReferenceType.TO_MANY,
+      })
+      // Find the ideas collection card
+      const ideasCollectionCard = collection.collection_cards.find(
+        card => card.card_question_type === 'ideas_collection'
+      )
+      // Add the ideas collection
+      ideasCollectionCard.addReference(
+        'record',
+        { name: 'Ideas' },
+        { model: Collection, type: ReferenceType.TO_ONE }
+      )
+      // Add both ideas
+      const ideaAttrs = [
+        { name: 'Idea 1', question_type: 'question_idea' },
+        { name: 'Idea 2', question_type: 'question_idea' },
+      ]
+      ideasCollectionCard.record.addReference('collection_cards', ideaAttrs, {
+        model: CollectionCard,
+        type: ReferenceType.TO_MANY,
+      })
+    })
+
+    it('returns count of non-idea cards + ideas * num idea cards', () => {
+      // 2 in intro, 2 ideas * 6 cards in ideas, 1 in outro
+      expect(collection.numPaidQuestions).toEqual(15)
+    })
+  })
+
   describe('API_fetchCards', () => {
     const collectionCard_1 = new CollectionCard()
     updateModelId(collectionCard_1, '1')

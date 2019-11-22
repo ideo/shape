@@ -42,7 +42,7 @@ describe PurchaseTestAudience, type: :service do
   end
 
   context 'with a paid audience', truncate: true do
-    let(:audiences) { create_list(:audience, 2, price_per_response: 5) }
+    let(:audiences) { create_list(:audience, 2, min_price_per_response: 5) }
 
     it 'is successful' do
       expect(result.success?).to be true
@@ -95,7 +95,7 @@ describe PurchaseTestAudience, type: :service do
   end
 
   context 'with a free (link sharing) audience' do
-    let!(:audiences) { create_list(:audience, 1, price_per_response: 0) }
+    let!(:audiences) { create_list(:audience, 1, min_price_per_response: 0) }
 
     it 'is successful' do
       expect(result.success?).to be true

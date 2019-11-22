@@ -5,7 +5,6 @@ import pluralize from 'pluralize'
 import Emoji from '~/ui/icons/Emoji'
 import { EmojiButton, EmojiHolder } from '~/ui/test_collections/ScaleQuestion'
 import { QuestionText } from '~/ui/test_collections/shared'
-import { FEEDBACK_INCENTIVE_AMOUNT } from '~/utils/variables'
 import { QuestionSpacingContainer } from '~/ui/test_collections/OpenQuestion'
 
 @observer
@@ -15,18 +14,14 @@ class WelcomeQuestion extends React.Component {
     onAnswer(choice)
   }
 
-  get incentive() {
-    return FEEDBACK_INCENTIVE_AMOUNT.toFixed(2)
-  }
-
   render() {
-    const { givesIncentive, numberOfQuestions } = this.props
-
+    const { potentialIncentive, numberOfQuestions } = this.props
     let incentiveMessage = ''
-    if (givesIncentive) {
+    if (potentialIncentive > 0) {
       incentiveMessage = (
         <span>
-          , and we’ll reward you <strong>${this.incentive}</strong> for your
+          , and we’ll reward you{' '}
+          <strong>${potentialIncentive.toFixed(2)}</strong> for your
           participation
         </span>
       )
@@ -61,7 +56,7 @@ class WelcomeQuestion extends React.Component {
 WelcomeQuestion.propTypes = {
   onAnswer: PropTypes.func.isRequired,
   numberOfQuestions: PropTypes.number.isRequired,
-  givesIncentive: PropTypes.bool.isRequired,
+  potentialIncentive: PropTypes.number.isRequired,
 }
 WelcomeQuestion.defaultProps = {}
 

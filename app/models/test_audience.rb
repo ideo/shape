@@ -36,12 +36,13 @@ class TestAudience < ApplicationRecord
   delegate :name,
            :link_sharing?,
            to: :audience
+
   validate :price_per_response_greater_than_minimum
 
   before_validation :set_price_per_response_from_audience, on: :create
   after_create :purchase, if: :requires_payment?
 
-  delegate :name, :price_per_response,
+  delegate :name,
            to: :audience,
            prefix: true
 
@@ -57,23 +58,10 @@ class TestAudience < ApplicationRecord
   scope :link_sharing, -> { where(price_per_response: 0) }
   scope :paid, -> { where('price_per_response > 0') }
 
-  PAYMENT_WAITING_PERIOD = 1.week
-
   enum status: {
     open: 0,
     closed: 1,
   }
-
-  # The absolute minimum we can charge per response and not be losing money
-  def self.minimum_price_per_response
-    payout_cost = incentive_amount + Accounting::RecordTransfer.paypal_fee(incentive_amount)
-    stripe_cost = Accounting::RecordTransfer.stripe_fee(payout_cost)
-    (payout_cost + stripe_cost).to_f
-  end
-
-  def self.incentive_amount
-    Shape::FEEDBACK_INCENTIVE_AMOUNT
-  end
 
   def dataset_display_name
     "#{name} Audience"
@@ -105,7 +93,20 @@ class TestAudience < ApplicationRecord
     sample_size * price_per_response
   end
 
+  def incentive_per_response
+    audience.incentive_per_response(test_collection.paid_question_items.size)
+  end
+
+  def update_price_per_response_from_audience!
+    set_price_per_response_from_audience
+    save
+  end
+
   private
+
+  def set_price_per_response_from_audience
+    self.price_per_response = audience&.price_per_response(test_collection.paid_question_items.size)
+  end
 
   # This callback only gets called when using PurchaseTestAudience and setting payment_method
   def purchase
@@ -130,18 +131,14 @@ class TestAudience < ApplicationRecord
     @network_payment_method.present? && total_price.positive?
   end
 
-  def set_price_per_response_from_audience
-    self.price_per_response ||= audience&.price_per_response
-  end
-
   def price_per_response_greater_than_minimum
     if price_per_response.nil?
       errors.add(:price_per_response, 'must be present')
     elsif !price_per_response.zero? &&
-          (price_per_response <= TestAudience.minimum_price_per_response)
+          (price_per_response <= Audience.minimum_price_per_response)
       errors.add(
         :price_per_response,
-        "must be greater than minimum of $#{TestAudience.minimum_price_per_response}",
+        "must be greater than minimum of $#{Audience.minimum_price_per_response}",
       )
     end
   end
