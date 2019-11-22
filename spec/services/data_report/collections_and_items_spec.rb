@@ -125,8 +125,8 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       let(:other_collection) { create(:collection, organization: organization) }
       let(:parent_collection) { create(:collection, organization: organization) }
       let(:child_collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
-      let(:child_child_collection) { create(:test_collection, organization: organization, parent_collection: child_collection) }
-      let(:item) { create(:question_item, parent_collection: child_child_collection) }
+      let(:child_child_collection) { create(:collection, organization: organization, parent_collection: child_collection) }
+      let(:item) { create(:text_item, parent_collection: child_child_collection) }
       let(:actor) { create(:user) }
 
       before do
