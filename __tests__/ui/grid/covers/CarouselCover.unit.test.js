@@ -14,6 +14,7 @@ describe('CarouselCover', () => {
     ]
     props = {
       collection: fakeCollection,
+      updatedAt: fakeCollection.updated_at,
       dragging: false,
       routingStore: fakeRoutingStore,
       onEmptyCarousel: jest.fn(),
@@ -49,6 +50,21 @@ describe('CarouselCover', () => {
       it('should call onEmptyCarousel prop', () => {
         expect(props.onEmptyCarousel).toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('componentDidUpdate', () => {
+    it("should re-fetch the collection's cards if updatedAt changes", () => {
+      expect(props.collection.API_fetchCards).toHaveBeenCalled()
+      props.collection.API_fetchCards.mockClear()
+      wrapper.setProps({ updatedAt: new Date().toString() })
+      expect(props.collection.API_fetchCards).toHaveBeenCalled()
+    })
+    it("should not re-fetch the collection's cards if updatedAt does not change", () => {
+      expect(props.collection.API_fetchCards).toHaveBeenCalled()
+      props.collection.API_fetchCards.mockClear()
+      wrapper.setProps({ updatedAt: fakeCollection.updated_at })
+      expect(props.collection.API_fetchCards).not.toHaveBeenCalled()
     })
   })
 

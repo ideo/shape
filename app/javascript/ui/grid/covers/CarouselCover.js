@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, computed, observable, runInAction } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -49,25 +49,38 @@ class CarouselCover extends React.Component {
     this.loading = true
   }
 
-  async componentDidMount() {
-    const { collection } = this.props
-    const data = await collection.API_fetchCards()
-    runInAction(() => {
-      collection.collection_cover_items = _.compact(
-        data.map(card => card.record)
-      )
-      this.loading = false
-    })
-    if (!data || data.length === 0) this.props.onEmptyCarousel()
+  componentDidMount() {
+    this.fetchCarouselCards()
   }
 
-  @computed
+  componentDidUpdate(prevProps) {
+    if (prevProps.updatedAt !== this.props.updatedAt) {
+      this.fetchCarouselCards()
+    }
+  }
+
+  fetchCarouselCards = async () => {
+    const { collection } = this.props
+    try {
+      const data = await collection.API_fetchCards()
+      runInAction(() => {
+        collection.collection_cover_items = _.compact(
+          data.map(card => card.record)
+        )
+        this.loading = false
+      })
+      if (!data || data.length === 0) this.props.onEmptyCarousel()
+    } catch {
+      this.loading = false
+      this.props.onEmptyCarousel()
+    }
+  }
+
   get currentCarouselRecord() {
     if (!this.records) return null
     return this.records[this.currentIdx]
   }
 
-  @computed
   get records() {
     const { collection } = this.props
     return collection.collection_cover_items || []
@@ -130,6 +143,7 @@ class CarouselCover extends React.Component {
 
 CarouselCover.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  updatedAt: PropTypes.string.isRequired,
   dragging: PropTypes.bool,
   onEmptyCarousel: PropTypes.func,
 }

@@ -393,6 +393,7 @@ export const fakeCollection = {
   num_survey_responses: 0,
   anyone_can_view: false,
   anyone_can_join: false,
+  updated_at: "2019-11-22T18:57:12.863Z",
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
@@ -609,7 +610,8 @@ export const fakeTestAudience = {
   audience: fakeAudience,
   sample_size: 12,
   num_completed_responses: 6,
-  price_per_response: 3.75,
+  price_per_response: 4.24,
+  incentive_per_response: 1.95
 }
 export const fakeTestCollection = {
   id: '1',

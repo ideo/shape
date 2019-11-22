@@ -653,8 +653,10 @@ class Collection < ApplicationRecord
     self.cached_attributes ||= {}
     self.cached_attributes['cached_last_card_order'] = collection_cards.maximum(:order)
     self.cached_attributes['cached_card_count'] = collection_cards.count
-    # update without callbacks/timestamps
-    update_column :cached_attributes, cached_attributes
+    # update without callbacks
+    return unless changes.present?
+
+    update_columns cached_attributes: cached_attributes, updated_at: Time.current
   end
 
   def update_cover_text!(text_item)

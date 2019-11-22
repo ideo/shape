@@ -385,6 +385,8 @@ class CollectionCover extends React.Component {
         {collection.isCarousel && !this.hasEmptyCarousel ? (
           <CarouselCover
             collection={collection}
+            // trigger a reload
+            updatedAt={collection.updated_at}
             dragging={false}
             handleClick={this.handleClick}
             onEmptyCarousel={this.setEmptyCarousel}
