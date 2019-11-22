@@ -1,45 +1,45 @@
 Feature: Creating an "in-collection" Test Collection
 
-  Scenario: Adding and launching an in-collection test
+  Scenario: Creating an in-collection test
     Given I login and visit the Test Area
     When I create a test collection named "Cypress Test"
     Then I should see a collection card named "Cypress Test"
     When I navigate to the collection named "Cypress Test" via the "CollectionCover"
+    # the extra cards load for ideas collection
+    And I wait for "@apiGetCollectionCards" to finish
+    And I wait for "@apiGetOrganizationAudiences" to finish
     Then I should see "Cypress Test" in a "EditableNameHeading"
     When I click the "Radio-collection"
     And I wait for "@apiUpdateCollection" to finish
     And I wait for "@apiGetCollectionCards" to finish
 
-    # verify existence of all three sections
-    # TODO: in-collection tests will eventually not have these same sections
-    Then I should see "intro" in a "section-title"
-    Then I should see "Idea(s)" in a "section-title"
-    Then I should see "outro" in a "section-title"
-    Then I should see 1 "QuestionSelectOption-useful"
+    # should not have the sections
+    Then I should see "Feedback Design" in a ".Heading3"
+    Then I should see "Clear" in a "QuestionSelectOption-clear"
+    Then I should see "Exciting" in a "QuestionSelectOption-exciting"
     Then I should see "Useful" in a "QuestionSelectOption-useful"
+    Then I should see "Open Response" in a "QuestionSelectOption-open-response"
     Then I should see "End of Survey" in a ".DisplayText"
 
-    # Setting up the questions and launching the test
-    # (similar to CreateTestCollection)
-    When I enter "solutions{enter}" as my category
-    And I fill the 1st "QuestionContentEditorText" with "Space Elevator"
-    And I fill the 2nd "QuestionContentEditorText" with "Take this elevator to the stratosphere"
-    When I add a link URL
+    # Setting up the open response question
+    And I wait for 1 second
+    And I fill the last "QuestionContentEditorText" with "What do you think?"
     And I wait for "@apiUpdateItem" to finish
-    # 3rd and 4th are after the first 2 content editors inside the Idea
-    And I fill the 3rd "QuestionContentEditorText" with "What do you think?"
-    And I fill the 4th "QuestionContentEditorText" with "Would you buy it?"
 
     # Launch the test
     When I click the "LaunchFormButton" containing "Get Feedback"
+    And I wait for "@apiValidateLaunch" to finish
     And I wait for "@apiLaunchTest" to finish
+
+    # Now you are in the Test Results
     And I wait for "@apiGetCollectionCards" to finish
-    Then I should see "Category Satisfaction" in a "DataItemCover"
+    # should only generate 3 graphs; category satisfaction was hidden
+    Then I should see 3 "DataItemCover"
     Then I should see "Clarity" in a "DataItemCover"
     Then I should see "Excitement" in a "DataItemCover"
     Then I should see "Usefulness" in a "DataItemCover"
     Then I should see "Cypress Test" in a "LegendItemCover"
-
+    Then I should see a collection card named "All Responses"
     # assuming the collection cover is not truncated...
     Then I should see a collection card named "Cypress Test Feedback Design"
     Then I should see "Get Link" in a "HeaderFormButton"
@@ -58,7 +58,21 @@ Feature: Creating an "in-collection" Test Collection
     And I wait for 1 second
     Then I should see a "ActivityLogSurveyResponder"
 
-    # starting to fill it out (otherwise repetitive of CreateTestCollection)
+    # ----- Filling out the test -----
+
+    # steps are similar to CreateTestCollection
     Then I should see a question with "question-welcome" and 1 emojis
     When I click the last "WelcomeQuestionEmojiButton"
-    Then I should see a question with "question-how-satisfied-are-you-with-your-current" and 4 emojis
+    Then I should see a question with "question-how-clear-is-this-idea-for-you" and 4 emojis
+    When I click the last answerable emoji
+    Then I should see "ScaleEmojiBtn" deselected
+    Then I should see a question with "question-how-exciting-is-this-idea-for-you" and 4 emojis
+    When I click the last answerable emoji
+    Then I should see a question with "question-how-useful-is-this-idea-for-you" and 4 emojis
+    When I click the last answerable emoji
+    Then I should see "What do you think?" in a "question-what-do-you-think"
+    When I fill the last "OpenQuestionTextInput" with some text
+    And I click the last "OpenQuestionTextButton"
+    And I wait for "@apiCreateQuestionAnswer" to finish
+    And I wait for 1 second
+    Then I should see a question with "question-finish" and 1 emojis

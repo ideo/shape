@@ -27,11 +27,12 @@ const StyledDialog = styled(Dialog)`
     padding: 20px 35px;
     padding-top: 35px;
     max-width: 560px;
-    max-height: 480px;
+    max-height: 75vh;
 
     @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
       margin: 0;
       max-width: 100%;
+      max-height: 100vh;
       min-height: 100vh;
     }
   }

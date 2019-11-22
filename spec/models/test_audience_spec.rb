@@ -8,11 +8,12 @@ RSpec.describe TestAudience, type: :model do
   end
   let(:test_collection) { create(:test_collection) }
   let(:user) { create(:user) }
-  let(:audience) { create(:audience, price_per_response: 9.99) }
+  let(:audience) { create(:audience, min_price_per_response: 9.99) }
+  let(:num_questions) { test_collection.paid_question_items.size }
   let!(:test_audience) do
     build(:test_audience,
           audience: audience,
-          price_per_response: audience.price_per_response,
+          price_per_response: audience.price_per_response(num_questions),
           test_collection: test_collection,
           sample_size: 10,
           launched_by: user)
@@ -38,17 +39,6 @@ RSpec.describe TestAudience, type: :model do
     )
   end
 
-  describe '.minimum_price_per_response' do
-    it 'returns minimum value so we do not lose money' do
-      incentive_amount = Shape::FEEDBACK_INCENTIVE_AMOUNT
-      paypal_fee = (incentive_amount * BigDecimal('0.05')).round(2)
-      stripe_fee = (((incentive_amount + paypal_fee) * BigDecimal('0.029')) + BigDecimal('0.30')).round(2)
-      expect(TestAudience.minimum_price_per_response).to eq(
-        (incentive_amount + paypal_fee + stripe_fee).to_f,
-      )
-    end
-  end
-
   describe 'callbacks' do
     describe '#purchase', truncate: true do
       it 'charges organization payment method' do
@@ -59,7 +49,7 @@ RSpec.describe TestAudience, type: :model do
           amount: test_audience.total_price.to_f,
           description: test_audience.description,
           quantity: test_audience.sample_size,
-          unit_amount: audience.price_per_response.to_f,
+          unit_amount: audience.price_per_response(num_questions).to_f,
         )
 
         # set the payment method

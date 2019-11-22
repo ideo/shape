@@ -5,6 +5,8 @@ Feature: Creating a Test Collection
     When I create a test collection named "Test Prototype"
     Then I should see a collection card named "Test Prototype"
     When I navigate to the collection named "Test Prototype" via the "CollectionCover"
+    # the extra cards load for ideas collection
+    And I wait for "@apiGetCollectionCards" to finish
     And I wait for "@apiGetOrganizationAudiences" to finish
     Then I should see "Test Prototype" in a "EditableNameHeading"
     # verify existence of all three sections
@@ -31,7 +33,7 @@ Feature: Creating a Test Collection
 
     # Add another idea
     When I click the "add-new-idea"
-    Then I should see "1/2" in a "num-ideas"
+    Then I should see "2/2" in a "num-ideas"
     And I fill the 1st "QuestionContentEditorText" with "Space Escalator Idea"
     And I fill the 2nd "QuestionContentEditorText" with "Slowly ride up into the stratosphere"
     When I add a link URL
@@ -52,6 +54,12 @@ Feature: Creating a Test Collection
     # Share Via Link makes an API call to "open" when you check the checkbox
     And I wait for "@apiUpdateTestAudience" to finish
     When I click the "LaunchFormButton" containing "Get Feedback"
+
+    # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
+    # this is used in the "visit current Test URL" below; capture before redirect to results
+    When I capture the current URL
+
+    And I wait for "@apiValidateLaunch" to finish
     And I wait for "@apiLaunchTest" to finish
     And I wait for "@apiGetCollectionCards" to finish
 
@@ -63,12 +71,8 @@ Feature: Creating a Test Collection
     Then I should see "Get Link" in a "HeaderFormButton"
     Then I should see "Stop Feedback" in a "HeaderFormButton"
 
-    When I navigate to the collection named "Test Prototype Feedback Design" via the "CollectionCover"
+    # ----- Filling out the test -----
 
-  Scenario: Filling out a test
-    # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")
-    # this is used in the "visit current Test URL" below
-    When I capture the current URL
     Given I logout
     And I visit the current Test URL
     Then I should see a "StandaloneTestSurvey"

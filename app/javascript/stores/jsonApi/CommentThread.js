@@ -73,6 +73,8 @@ class CommentThread extends BaseRecord {
 
   // use next param to get the "next page" of comments
   async API_fetchComments({ next = false } = {}) {
+    if (!this.persisted) return
+
     // always fire an async request to markViewed
     this.API_markViewed()
 

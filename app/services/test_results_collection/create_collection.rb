@@ -42,10 +42,15 @@ module TestResultsCollection
         raise ActiveRecord::Rollback, e.message
       end
 
-      TestResultsCollection::CreateContentWorker.perform_async(
+      opts = [
         test_results_collection.id,
         created_by&.id,
-      )
+      ]
+      if ENV['CYPRESS'].present?
+        TestResultsCollection::CreateContentWorker.new.perform(*opts)
+      else
+        TestResultsCollection::CreateContentWorker.perform_async(*opts)
+      end
     end
 
     private

@@ -74,6 +74,17 @@ RSpec.describe Audience, type: :model, seed: true do
     end
   end
 
+  describe '.minimum_price_per_response' do
+    it 'returns minimum value so we do not lose money' do
+      incentive_amount = Audience::MIN_INCENTIVE_PER_RESPONDENT
+      paypal_fee = (incentive_amount * BigDecimal('0.05')).round(2)
+      stripe_fee = (((incentive_amount + paypal_fee) * BigDecimal('0.029')) + BigDecimal('0.30')).round(2)
+      expect(Audience.minimum_price_per_response).to eq(
+        (incentive_amount + paypal_fee + stripe_fee).to_f,
+      )
+    end
+  end
+
   describe '#all_tags' do
     let!(:audience) { create(:audience, country_list: %w[canada usa], interest_list: %w[fun music]) }
 
@@ -81,6 +92,66 @@ RSpec.describe Audience, type: :model, seed: true do
       all_tags = audience.all_tags
       expect(all_tags[:countries]).to match_array(%w[canada usa])
       expect(all_tags[:interests]).to match_array(%w[fun music])
+    end
+  end
+
+  describe '#price_per_response' do
+    let!(:all_people) { create(:audience, min_price_per_response: 3.75) }
+    let!(:targeted_audience) { create(:audience, min_price_per_response: 4, interest_list: %w[fun music]) }
+
+    it 'returns correct amount for # of questions' do
+      # $3.75 + ((43 - 10) x $0.12) = $7.71
+      expect(all_people.price_per_response(43)).to eq(7.71)
+      # $4 + ((43 - 10) x $0.12) = $7.96
+      expect(targeted_audience.price_per_response(43)).to eq(7.96)
+    end
+
+    context 'if less than 10 questions' do
+      it 'returns minimum price of 10 questions' do
+        # $3.75 + (0 x $0.12) = $3.75
+        expect(all_people.price_per_response(9)).to eq(3.75)
+        # $4 + (0 x $0.12) = $4
+        expect(targeted_audience.price_per_response(9)).to eq(4)
+      end
+    end
+
+    context 'if link sharing audience' do
+      before do
+        all_people.update(min_price_per_response: 0)
+      end
+
+      it 'returns 0' do
+        expect(all_people.price_per_response(43)).to eq(0)
+      end
+    end
+  end
+
+  describe '#incentive_per_response' do
+    let!(:all_people) { create(:audience, min_price_per_response: 3.75) }
+    let!(:targeted_audience) { create(:audience, min_price_per_response: 4, interest_list: %w[fun music]) }
+
+    it 'returns correct amount for # of questions' do
+      # $1.75 + ((43 - 10) x $0.10) = $5.05
+      expect(all_people.incentive_per_response(43)).to eq(5.05)
+      expect(targeted_audience.incentive_per_response(43)).to eq(5.05)
+    end
+
+    context 'if less than 10 questions' do
+      it 'returns minimum price of 10 questions' do
+        # $1.75 + (0 x $0.10) = $2.75
+        expect(all_people.incentive_per_response(9)).to eq(1.75)
+        expect(targeted_audience.incentive_per_response(9)).to eq(1.75)
+      end
+    end
+
+    context 'if link sharing audience' do
+      before do
+        all_people.update(min_price_per_response: 0)
+      end
+
+      it 'returns 0' do
+        expect(all_people.incentive_per_response(43)).to eq(0)
+      end
     end
   end
 end

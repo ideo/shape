@@ -208,7 +208,7 @@ class AdminFeedback extends React.Component {
       <React.Fragment key={testCollection.id}>
         <FeedbackRow container>
           <Grid item xs={2}>
-            {testCollection.name}
+            {testCollection.baseName}
           </Grid>
           <Grid item xs={1}>
             <LaunchState>Launched</LaunchState>
@@ -292,7 +292,7 @@ class AdminFeedback extends React.Component {
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
                     <Flex justify="flex-end">
-                      ${testAudience.price_per_response}
+                      ${testAudience.incentive_per_response}
                     </Flex>
                   </AudienceRowItem>
                   <AudienceRowItem item xs={2}>
@@ -410,7 +410,7 @@ class AdminFeedback extends React.Component {
                       <SubHeading>Audience Name</SubHeading>
                     </Grid>
                     <Grid item xs={2}>
-                      <SubHeading>$/Response</SubHeading>
+                      <SubHeading>Incentive</SubHeading>
                     </Grid>
                     <Grid item xs={2}>
                       <SubHeadingRight>n Requested</SubHeadingRight>
