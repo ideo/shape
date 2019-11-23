@@ -83,7 +83,7 @@ RSpec.describe Item::QuestionItem, type: :model do
     let(:user2) { create(:user) }
     let(:test_collection) { create(:test_collection, :launched) }
 
-    describe '#score' do
+    describe '#score_of_best_idea' do
       let(:question_item) { test_collection.question_items.select(&:question_useful?).first }
       let(:test_audience) { create(:test_audience, test_collection: test_collection) }
       let!(:response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
@@ -103,9 +103,9 @@ RSpec.describe Item::QuestionItem, type: :model do
         question_item.update(question_type: :question_useful)
       end
 
-      it 'should calculate the score based on answer_numbers' do
+      it 'should calculate the score_of_best_idea based on answer_numbers' do
         # should be 0 + 1 + 1 + 3 / 12 = 42%
-        expect(question_item.score).to eq 42
+        expect(question_item.score_of_best_idea).to eq 42
       end
     end
 

@@ -32,11 +32,11 @@ module Testable
     return scores unless launchable_test.present?
 
     launchable_test.question_items.scale_questions.each do |question|
-      scores[question.question_type] = question.score
+      scores[question.question_type] = question.score_of_best_idea
     end
     unless scores.empty?
       # total == average score
-      scores['total'] = (scores.values.sum / scores.values.count).round
+      scores['total'] = launchable_test.score_of_best_idea
     end
     scores
   end
