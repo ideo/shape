@@ -11,7 +11,7 @@ class CreateSurveyResponseAliasCollectionWorker
     return if !@survey_response.completed? || test_results_collection.present?
 
     create_alias_collection
-    ping_results_collection
+    ping_results_collections
   end
 
   private
@@ -25,15 +25,14 @@ class CreateSurveyResponseAliasCollectionWorker
     )
   end
 
-  def ping_results_collection
+  def ping_results_collections
     # real-time update any graphs, etc.
     master_test_results_collection.touch
+    CollectionUpdateBroadcaster.call(master_test_results_collection)
     Collection::TestResultsCollection.in_collection(master_test_results_collection).each do |collection|
       collection.touch
       CollectionUpdateBroadcaster.call(collection)
     end
-
-    CollectionUpdateBroadcaster.call(master_test_results_collection)
   end
 
   def all_responses_collection
