@@ -68,6 +68,7 @@ class Collection
     include AASM
 
     has_many :survey_responses, dependent: :destroy
+    has_many :question_answers, through: :survey_responses
     has_one :test_results_collection,
             -> { master_results },
             inverse_of: :test_collection
@@ -372,7 +373,7 @@ class Collection
       {
         question_cards: [
           :parent,
-          record: [:filestack_file, :question_choices],
+          record: %i[filestack_file question_choices],
         ],
       }
     end
@@ -538,6 +539,39 @@ class Collection
         .reject { |card| card.item&.question_finish? }
     end
 
+    def completed_scale_question_survey_answers
+      question_answers
+        .joins(:survey_response)
+        .joins(:question)
+        .where(
+          SurveyResponse.arel_table[:status].eq(:completed),
+        )
+        .merge(
+          Item::QuestionItem.scale_questions,
+        )
+    end
+
+    def score_of_best_idea
+      # answers are 1-4, but scored on a scale of 0-3
+      # TODO: change the answer_numbers on the emojiScale to go 0-3 to match? (would need to migrate old answers)
+
+      # get the score of the max scoring idea for this question
+      points_by_idea =
+        completed_scale_question_survey_answers
+        .group(:idea_id)
+        .sum('answer_number - 1')
+        .sort_by { |_idea, points| points }
+        .reverse
+      return 0 if points_by_idea.empty?
+
+      idea_id, points = points_by_idea.first
+      total = completed_scale_question_survey_answers.where(idea_id: idea_id).count * 3
+      # don't want to divide by 0
+      return 0 if total.zero?
+
+      (points * 100.0 / total).round
+    end
+
     def cloned_or_templated?
       cloned_from.present? || template_id.present?
     end
@@ -671,8 +705,6 @@ class Collection
     end
 
     def post_launch_setup!(initiated_by: nil, reopening: false)
-      # remove the "blanks"
-      remove_empty_question_items
       if submission_box_template_test?
         parent_submission_box_template.update(
           submission_attrs: {
@@ -686,6 +718,8 @@ class Collection
         # submission box master template test doesn't create a test_design, move cards, etc.
         return true
       end
+      # remove the "blanks"
+      remove_empty_question_items
       update_cached_submission_status(parent_submission) if inside_a_submission?
       create_results_collections!(initiated_by) unless reopening
       update(test_launched_at: Time.current, test_closed_at: nil)
