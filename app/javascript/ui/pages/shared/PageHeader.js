@@ -132,7 +132,7 @@ class PageHeader extends React.Component {
           <FilledProfileIcon />
         </IconHolder>
       )
-    } else if (record.isMasterTemplate && !record.isSubTemplate) {
+    } else if (record.isTrueMasterTemplate) {
       return (
         <IconHolder align="left">
           <TemplateIcon circled filled />
@@ -212,7 +212,9 @@ class PageHeader extends React.Component {
     if (record.idea_id) return
     if (
       record.isLiveTest &&
-      (record.has_link_sharing || record.collection_to_test_id)
+      (record.has_link_sharing ||
+        record.collection_to_test_id ||
+        record.is_submission_box_template_test)
     ) {
       return (
         <Fragment>

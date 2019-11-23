@@ -158,7 +158,11 @@ class AudienceSettings extends React.Component {
     const { uiStore } = this.props
     let intro = ''
     // omit intro message for "You already have another test running..."
-    if (!_.includes(errorMessages, 'You already have')) {
+    console.log({ errorMessages })
+    if (
+      !_.includes(errorMessages, 'You already have') &&
+      !_.includes(errorMessages, 'has not launched')
+    ) {
       intro = 'You have questions that have not yet been finalized:\n'
     }
     const prompt = `${intro}${errorMessages}`

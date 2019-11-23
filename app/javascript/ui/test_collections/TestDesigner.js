@@ -333,18 +333,9 @@ class TestDesigner extends React.Component {
   }
 
   get canEditQuestions() {
-    const {
-      isTemplated,
-      can_edit_content,
-      test_status,
-      launchable,
-    } = this.props.collection
     // We allow content editors (e.g. template instance) to edit the question content
-    // but not necessarily add or change the questions themselves, once the editor "launches"
-    if (isTemplated)
-      return can_edit_content && (test_status !== 'draft' || launchable)
-    // this is where we do allow editing if it's locked/purchased
-    return can_edit_content
+    // but not necessarily add or change the questions themselves
+    return this.props.collection.can_edit_content
   }
 
   get canEdit() {
@@ -368,7 +359,8 @@ class TestDesigner extends React.Component {
   }
 
   get canAddIdeas() {
-    if (!this.canEdit || this.testIsLive || !this.ideasCollection) return false
+    if (!this.canEditQuestions || this.testIsLive || !this.ideasCollection)
+      return false
     return true
   }
 

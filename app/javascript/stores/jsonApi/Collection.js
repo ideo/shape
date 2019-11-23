@@ -349,13 +349,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.master_template
   }
 
+  get isTrueMasterTemplate() {
+    return this.isMasterTemplate && !this.isSubTemplate
+  }
+
   get isUsableTemplate() {
     // you aren't allowed to use the profile template;
     // you also don't use test templates, since duplicating them or
     // creating them within another template is the way to do that
     return (
-      this.isMasterTemplate &&
-      !this.isSubTemplate &&
+      this.isTrueMasterTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestResultsCollection &&
@@ -838,7 +841,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     ) {
       // called with 'this' so that we know if the submission is calling it
       await this.API_performTestAction(actionName, audiences)
-      if (actionName === 'launch') {
+      // launching a submission box test will not have a test_results_collection
+      if (actionName === 'launch' && collection.test_results_collection) {
         this.routingStore.routeTo(
           'collections',
           collection.test_results_collection.id
@@ -892,7 +896,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         `
       if (
         _.includes(prompt, 'Test audiences') ||
-        _.includes(prompt, 'already have')
+        _.includes(prompt, 'has not launched') ||
+        _.includes(prompt, 'You already have')
       ) {
         prompt = `Test unable to launch:\n
            ${errorMessages}

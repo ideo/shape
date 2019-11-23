@@ -169,11 +169,10 @@ class CollectionCover extends React.Component {
   get hasIcon() {
     const { collection } = this.props
     return (
-      !collection.isSubTemplate &&
-      (collection.isTemplated ||
-        collection.isMasterTemplate ||
-        collection.isSubmissionBox ||
-        collection.isTestCollectionOrResults)
+      collection.isTemplated ||
+      collection.isTrueMasterTemplate ||
+      collection.isSubmissionBox ||
+      collection.isTestCollectionOrResults
     )
   }
 
@@ -189,16 +188,16 @@ class CollectionCover extends React.Component {
       let rightIcon
       if (collection.isProfileTemplate) {
         rightIcon = <FilledProfileIcon />
-      } else if (collection.isMasterTemplate) {
+      } else if (collection.isTrueMasterTemplate) {
         leftIcon = <TemplateIcon circled filled />
       } else if (collection.isUserProfile) {
         rightIcon = <ProfileIcon />
+      } else if (collection.isTestCollectionOrResults) {
+        rightIcon = <TestCollectionIcon />
       } else if (collection.isTemplated) {
         rightIcon = <TemplateIcon circled />
       } else if (collection.isSubmissionBox) {
         rightIcon = <SubmissionBoxIconLg />
-      } else if (collection.isTestCollectionOrResults) {
-        rightIcon = <TestCollectionIcon />
       }
       return (
         <span style={{ hyphens }}>
@@ -251,10 +250,10 @@ class CollectionCover extends React.Component {
 
   get hasLaunchTestButton() {
     const { collection } = this.props
-    // This button only appears for tests inside submissions
-    if (!collection.is_inside_a_submission) return false
     return (
-      collection.launchableTestId === collection.id &&
+      // This button only appears for tests inside submissions
+      collection.is_inside_a_submission &&
+      collection.launchableTestId &&
       // if it's live you have the option to close
       // otherwise it must be launchable to see a launch or re-open button
       (collection.isLiveTest || collection.launchable)
