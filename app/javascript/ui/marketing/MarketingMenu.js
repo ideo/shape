@@ -119,74 +119,82 @@ const MobileSubNavLink = styled(NavLink)`
   left: 10px;
 `
 
+const MobileLogo = styled(Box)`
+  padding-left: 24px;
+`
+
+const MobileMenuItem = styled(Box)`
+  padding: 12px 0px;
+`
+
 const MobileLinks = ({ isHome }) => {
   return (
     <MarketingFlex align="left" justify="left" w={1} column>
-      <Box>
+      <MobileLogo>
         <NavLink align="center" onClick={handleScrollToTop}>
           <ToggleLogo className="ToggleLogo" width={48} />
         </NavLink>
-      </Box>
+      </MobileLogo>
 
-      <Box>
+      <MobileMenuItem>
         <NavLink align="left" onClick={() => handleScrollToContent(isHome)}>
           PRODUCT
         </NavLink>
-      </Box>
+      </MobileMenuItem>
 
-      <Box>
+      <MobileMenuItem>
         <MobileSubNavLink
           align="left"
           onClick={() => handleScrollToContent(isHome)}
         >
           OVERVIEW
         </MobileSubNavLink>
-      </Box>
+      </MobileMenuItem>
 
-      <Box>
+      <MobileMenuItem>
         <MobileSubNavLink href="/product/collaboration" align="left">
           COLLABORATION
         </MobileSubNavLink>
-      </Box>
-      <Box>
+      </MobileMenuItem>
+      <MobileMenuItem>
         <MobileSubNavLink href="/product/feedback" align="left">
           FEEDBACK
         </MobileSubNavLink>
-      </Box>
-      <Box>
+      </MobileMenuItem>
+      <MobileMenuItem>
         <MobileSubNavLink href="/product/templates" align="left">
           TEMPLATES
         </MobileSubNavLink>
-      </Box>
-      <Box>
+      </MobileMenuItem>
+      <MobileMenuItem>
         <MobileSubNavLink href="/product/open-innovation" align="left">
           OPEN INNOVATION AND CHALLENGES
         </MobileSubNavLink>
-      </Box>
+      </MobileMenuItem>
 
-      <Box>
+      <MobileMenuItem>
         <NavLink align="left" href="/product/pricing">
           PRICING
         </NavLink>
-      </Box>
+      </MobileMenuItem>
 
-      <Box>
+      <MobileMenuItem>
         <NavLink align="left" onClick={handleScrollToFooter}>
           CONTACT
         </NavLink>
-      </Box>
+      </MobileMenuItem>
 
-      <Box>
+      <MobileMenuItem>
         <NavLink href="/login" align="left">
           Login
         </NavLink>
-      </Box>
+      </MobileMenuItem>
 
-      <Box>
+      <MobileMenuItem>
         <NavLink href="/sign_up" align="left">
           Signup
         </NavLink>
-      </Box>
+      </MobileMenuItem>
     </MarketingFlex>
   )
 }
