@@ -45,8 +45,8 @@ exports[`BarChart renders snapshot 1`] = `
   domain={
     Object {
       "x": Array [
-        1,
-        3,
+        "2018-07-10",
+        "2018-09-10",
       ],
       "y": Array [
         0,
@@ -78,6 +78,7 @@ exports[`BarChart renders snapshot 1`] = `
       alwaysShowLabels={true}
       cardArea={1}
       displayTicks={false}
+      fontSize={10}
       labelTextRenderer={[Function]}
       maxValue={0}
       minValue={0}

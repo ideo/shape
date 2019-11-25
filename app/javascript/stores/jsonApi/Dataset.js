@@ -10,6 +10,19 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
     this.rawAttributes().identifier
   }
 
+  get dataWithDates() {
+    if (!this.data) return []
+
+    return this.data.map(datum => {
+      const d = { ...datum }
+      // Turn date strings into real dates
+      if (d.date) {
+        d.date = new Date(d.date)
+      }
+      return d
+    })
+  }
+
   get isEmojiOrScaleQuestion() {
     return [
       'question_clarity',

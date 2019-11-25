@@ -1,7 +1,10 @@
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
-import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
+import {
+  emojiSeriesForQuestionType,
+  utcMoment,
+} from '~/ui/global/charts/ChartUtils'
 import {
   fakeDataItem,
   fakeAreaChartDataset,
@@ -16,16 +19,14 @@ describe('ChartGroup', () => {
     dataItem = {
       ...fakeDataItem,
     }
-    dataItem.datasets = [
-      fakeAreaChartDataset,
-      {
-        ...fakeAreaChartDataset,
-        order: 1,
-        chart_type: 'line',
-      },
-    ]
+    const secondaryDataset = {
+      ...fakeAreaChartDataset,
+      order: 1,
+      chart_type: 'line',
+    }
+    dataItem.datasets = [fakeAreaChartDataset, secondaryDataset]
     dataItem.primaryDataset = fakeAreaChartDataset
-    dataItem.secondaryDatasets.mockReturnValue([dataItem.datasets[1]])
+    dataItem.secondaryDatasets.mockReturnValue([{ ...secondaryDataset }])
     props.dataItem = dataItem
     props.simpleDateTooltip = true
     props.width = 1
@@ -48,16 +49,24 @@ describe('ChartGroup', () => {
     expect(chart.find('VictoryAxis').exists()).toBe(true)
   })
 
-  it('displays x-axis labels for dates near the end of the month', () => {
-    let label
-    // if it's not near month end, the label is blank
-    label = wrapper.instance().monthlyXAxisText('2018-10-06')
-    expect(label).toEqual('')
-    // should display the short name of the month that previously ended
-    label = wrapper.instance().monthlyXAxisText('2018-01-02')
-    expect(label).toEqual('Dec')
-    label = wrapper.instance().monthlyXAxisText('2018-12-31')
-    expect(label).toEqual('Dec')
+  describe('with a single data point in values', () => {
+    beforeEach(() => {
+      const dataset = fakeAreaChartDataset
+      dataset.data = [fakeAreaChartDataset.data[0]]
+      dataset.dataWithDates = [fakeAreaChartDataset.dataWithDates[0]]
+      dataItem.datasets = [dataset]
+      props.dataItem.primaryDataset = dataset
+      props.dataItem.secondaryDatasets.mockReturnValue([])
+      render()
+    })
+
+    it('renders one label on X axis of the chart', () => {
+      const date = new Date(fakeAreaChartDataset.data[0].date)
+
+      expect(wrapper.find('VictoryAxis').props().label).toEqual(
+        utcMoment(date).format('MM/DD/YY')
+      )
+    })
   })
 
   describe('secondary dataset of an area chart', () => {
@@ -79,23 +88,11 @@ describe('ChartGroup', () => {
     })
   })
 
-  describe('with a single data point in values', () => {
-    beforeEach(() => {
-      props.datasets = [fakeAreaChartDataset]
-      props.dataItem.primaryDataset.data = [{ value: 24, date: '2018-09-10' }]
-      // NOTE: this test passes, but warns:
-      // Failed prop type: Invalid prop `domain` supplied to `VictoryBar`
-      render()
-    })
-
-    it('renders one label on X axis of the chart', () => {
-      expect(wrapper.find('VictoryAxis').props().label).toEqual('09/10/18')
-    })
-  })
-
   describe('with not enough data', () => {
     beforeEach(() => {
       props.dataItem.primaryDataset.data = []
+      props.dataItem.primaryDataset.dataWithDates = []
+      props.dataItem.secondaryDatasets = () => []
       render()
     })
 
@@ -115,6 +112,7 @@ describe('ChartGroup', () => {
       props.dataItem.primaryDataset = fakeBarChartDataset
       props.dataItem.primaryDataset.isEmojiOrScaleQuestion.mockReset()
       props.dataItem.primaryDataset.isEmojiOrScaleQuestion.mockReturnValue(true)
+      props.dataItem.secondaryDatasets = () => []
       render()
     })
 

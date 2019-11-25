@@ -7,68 +7,34 @@ import {
   datasetPropType,
   dateTooltipText,
   advancedTooltipText,
-  addDuplicateValueIfSingleValue,
-  chartDomainForDatasetValues,
   lineChartDashWithForOrder,
+  domainProps,
+  formatValuesForVictory,
 } from '~/ui/global/charts/ChartUtils'
 
-export const formatValuesWithoutDates = (values, numDesiredValues) => {
-  const formattedValues = [...values]
-
-  // Add a duplicate value
-  for (let i = formattedValues.length; i < numDesiredValues; i++) {
-    const duplicateValue = Object.assign({ isDuplicate: true }, values[0])
-    formattedValues.push(duplicateValue)
-  }
-
-  // Add x/y to show it in the right placement
-  return formattedValues.map((datum, i) => ({
-    ...datum,
-    x: i + 1,
-    y: datum.value,
-  }))
-}
-
-const formatValuesWithDates = values => {
-  const rawValues = addDuplicateValueIfSingleValue(values)
-  return rawValues.map(data => ({ ...data }))
-}
-
-const chartStyle = dataset => {
-  const { style } = dataset
+const chartStyle = (style, order) => {
   return {
     data: {
       stroke: (style && style.fill) || v.colors.black,
       strokeWidth: 3,
       strokeDasharray: lineChartDashWithForOrder({
-        order: dataset.order,
+        order: order,
         scale: 1.5,
       }),
     },
   }
 }
 
-const LineChart = ({
-  dataset,
-  simpleDateTooltip,
-  cardArea,
-  numPrimaryDatasetValues,
-}) => {
-  const { measure, timeframe } = dataset
-  const { data } = dataset
-  let values
-  if (data[0] && !data[0].date) {
-    values = formatValuesWithoutDates(data, numPrimaryDatasetValues)
-  } else {
-    values = formatValuesWithDates(data)
-  }
-  const domain = chartDomainForDatasetValues({
-    values,
-    maxDomain: dataset.max_domain,
-  })
+const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
+  const { measure, timeframe, style, dataWithDates } = dataset
   let tooltipFn
+  const values = formatValuesForVictory({
+    values: dataWithDates || [],
+    addStartDate: dataWithDates[0].date ? null : domain.x[0],
+    addEndDate: dataWithDates[0].date ? null : domain.x[1],
+  })
   if (simpleDateTooltip) {
-    tooltipFn = datum => dateTooltipText(datum)
+    tooltipFn = datum => dateTooltipText(datum, dataset.name)
   } else {
     tooltipFn = (datum, isLastDataPoint) =>
       advancedTooltipText({
@@ -78,35 +44,38 @@ const LineChart = ({
         measure,
       })
   }
+
   return (
     <VictoryLine
       labels={d => d.value}
+      style={chartStyle(style, order)}
+      data={values}
+      key={`dataset-${order}`}
+      y="value"
+      x="date"
       labelComponent={
         <TickLabelWithTooltip
           tooltipTextRenderer={tooltipFn}
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}
+          fontSize={cardArea === 1 ? 18 : 9}
         />
       }
-      style={chartStyle(dataset)}
-      data={values}
-      domain={domain}
-      key={`dataset-${dataset.order}`}
     />
   )
 }
 
 LineChart.propTypes = {
   dataset: datasetPropType.isRequired,
+  order: PropTypes.number.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
-  numPrimaryDatasetValues: PropTypes.number,
+  domain: domainProps.isRequired,
 }
 
 LineChart.defaultProps = {
   cardArea: 1,
   simpleDateTooltip: false,
-  numPrimaryDatasetValues: 0,
 }
 
 export default LineChart

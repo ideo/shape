@@ -23,7 +23,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup, routeToSearch }) => {
   const { total, max_domain } = dataset
   const domain = chartDomainForDatasetValues({
     values,
-    maxDomain: max_domain,
+    maxYDomain: max_domain,
   })
   const totalBars = dataset.data.length
   const barWidth = barWidthPx(totalBars, barsInGroup)
@@ -49,6 +49,7 @@ const BarChart = ({ dataset, cardArea, barsInGroup, routeToSearch }) => {
           cardArea={cardArea}
           displayTicks={false}
           alwaysShowLabels={true}
+          fontSize={10}
         />
       }
       padding={0}

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { maxBy, minBy } from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import moment from 'moment-mini'
 import styled from 'styled-components'
@@ -52,25 +53,56 @@ export const primaryFillColorFromDataset = dataset => {
   return dataset.style && dataset.style.fill ? dataset.style.fill : '#000000'
 }
 
-export const chartDomainForDatasetValues = ({ values, maxDomain }) => {
-  let domain
-  if (maxDomain) {
-    domain = maxDomain
+export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
+  if (values.length === 0) {
+    return {
+      x: [0, 0],
+      y: [0, 0],
+    }
+  }
+
+  let minXDomain
+  let maxXDomain
+  let calculatedMaxYDomain
+  if (maxYDomain) {
+    calculatedMaxYDomain = maxYDomain
   } else {
-    const vals = values.map(datum => datum.value)
-    domain = Math.max(...vals)
+    calculatedMaxYDomain = maxBy(values, 'value').value
+  }
+
+  const numValuesWithDates = values.filter(datum => !!datum.date).length
+
+  if (numValuesWithDates > 0) {
+    minXDomain = minBy(values, 'date').date
+    maxXDomain = maxBy(values, 'date').date
+  } else {
+    minXDomain = 1
+    maxXDomain = values.length
   }
   return {
-    x: [1, values.length],
-    y: [0, domain],
+    x: [minXDomain, maxXDomain],
+    y: [0, calculatedMaxYDomain],
   }
 }
 
+export const domainProps = PropTypes.shape({
+  x: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+      PropTypes.instanceOf(Date),
+    ])
+  ),
+  y: PropTypes.arrayOf(PropTypes.number),
+})
+
 export const emojiTooltipText = datum => `${datum.value}`
 
-export const dateTooltipText = datum => {
+export const dateTooltipText = (datum, datasetName = null) => {
   if (!datum.date) return datum.value
-  return `${datum.value} on ${utcMoment(datum.date).format('l')}`
+  const text = `${datum.value} on ${utcMoment(datum.date).format('l')}`
+  if (!datasetName) return text
+  return `${datasetName}\n${text}`
 }
 
 export const advancedTooltipText = ({
@@ -104,23 +136,44 @@ export const advancedTooltipText = ({
   return text
 }
 
-export const addDuplicateValueIfSingleValue = values => {
+export const addDuplicateValueIfSingleValue = (
+  values,
+  addStartDate,
+  addEndDate
+) => {
   if (values.length === 0 || values.length > 1) return values
 
   // Copy array so we can modify it
   const valuesWithDupe = [...values]
 
+  if (!valuesWithDupe[0].date && addStartDate)
+    valuesWithDupe[0].date = addStartDate
+
   // Add a duplicate value
-  const duplicateValue = Object.assign({ isDuplicate: true }, valuesWithDupe[0])
-  // Set date to 3 months ago
-  if (duplicateValue.date) {
-    duplicateValue.date = utcMoment(duplicateValue.date)
-      .subtract('3', 'months')
-      .format('YYYY-MM-DD')
+  const duplicateValue = { ...valuesWithDupe[0], isDuplicate: true }
+  // Set given date
+  if (duplicateValue.date && addEndDate) {
+    duplicateValue.date = addEndDate
     if (duplicateValue.month) duplicateValue.month = duplicateValue.date
   }
-  valuesWithDupe.unshift(duplicateValue)
+  valuesWithDupe.push(duplicateValue)
   return valuesWithDupe
+}
+
+export const formatValuesForVictory = ({
+  values,
+  addStartDate,
+  addEndDate,
+}) => {
+  // Victory doesn't support single dta points, so duplicate if we have only one
+  const rawValues = addDuplicateValueIfSingleValue(
+    values,
+    addStartDate,
+    addEndDate
+  )
+
+  // Transform to regular arrays and objects for Victory
+  return rawValues.map(data => ({ ...data }))
 }
 
 export const AboveChartContainer = styled.div`
