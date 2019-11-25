@@ -111,15 +111,15 @@ RSpec.describe SurveyResponse, type: :model do
   describe '#record_incentive_paid!', truncate: true do
     let(:user) { create(:user) }
     let!(:test_collection) { create(:test_collection) }
-    let(:test_audience) { create(:test_audience, :payment, test_collection: test_collection) }
+    let(:test_audience) { create(:test_audience, :payment, sample_size: 10, test_collection: test_collection) }
     let(:survey_response) { create(:survey_response, user: user, test_audience: test_audience, status: :completed) }
     let(:revenue_deferred_account) { DoubleEntry.account(:revenue_deferred, scope: test_audience.payment) }
     let(:payment_processor_account) { DoubleEntry.account(:payment_processor, scope: test_audience.payment) }
     let(:revenue_account) { DoubleEntry.account(:revenue, scope: test_audience.payment) }
     let(:incentive_amount) { Audience.incentive_per_response(test_collection.paid_question_items.size) }
-    let(:paypal_fee) { (incentive_amount * 0.05).round(2) }
-    let(:divided_stripe_fee) { test_audience.payment.stripe_fee / test_audience.sample_size }
-    let(:our_earning) { test_audience.price_per_response - divided_stripe_fee - incentive_amount - paypal_fee }
+    let(:calculator) { Accounting::SurveyResponseRevenue.new(survey_response) }
+    let(:paypal_fee) { calculator.paypal_fee }
+    let(:our_earning) { calculator.revenue }
 
     before do
       survey_response.record_incentive_owed!
@@ -152,7 +152,6 @@ RSpec.describe SurveyResponse, type: :model do
       expect {
         survey_response.record_incentive_paid!
       }.to change(revenue_deferred_account, :balance)
-      expect(revenue_deferred_account.balance).to eq 0
       expect(revenue_deferred_account.balance.to_f).to eq(
         previous_balance - paypal_fee - our_earning,
       )

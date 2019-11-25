@@ -42,20 +42,15 @@ RSpec.describe CreateSurveyResponseAliasCollectionWorker, type: :worker do
       subject.perform(survey_response.id)
     end
 
-    it 'updates master TestResultsCollection collection' do
+    it 'updates all test result collections' do
       prev_updated_at = test_results_collection.updated_at
+      # test_results, idea, alias (DefaultCollectionCover also pings...)
+      expect(CollectionUpdateBroadcaster).to receive(:call).at_least(3).times
+      # call the worker -- this will create the alias results
       subject.perform(survey_response.id)
-
-      expect(test_results_collection.reload.updated_at).to be > prev_updated_at
-    end
-
-    it 'updates test result collections inside the master TestResultsCollection collection' do
-      prev_updated_at = test_results_collection.updated_at
-      collections_to_update = Collection::TestResultsCollection.in_collection(test_results_collection)
-      subject.perform(survey_response.id)
-
+      collections_to_update = [test_results_collection] + Collection::TestResultsCollection.in_collection(test_results_collection)
       collections_to_update.each do |collection|
-        expect(collection.updated_at > prev_updated_at).to be true
+        expect(collection.reload.updated_at > prev_updated_at).to be true
       end
     end
   end

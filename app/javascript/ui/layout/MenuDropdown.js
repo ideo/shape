@@ -12,28 +12,28 @@ const MenuListItem = styled.li`
 const SubmenuList = styled.ul`
   display: none;
   position: absolute;
+  width: 150%;
   ${MenuListItem}:hover & {
     display: block;
     background: rgb(255, 255, 255, 0.95);
   }
 `
 const SubmenuListItem = styled.li`
-  padding: 12px 0 12px;
-  height: 48px;
   display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: left;
   line-height: 16px;
-  width: 180px;
+  flex-direction: column;
+  justify-content: center;
   :hover {
     box-shadow: 0 2px 0px 0px black;
   }
 `
 
 const FlexNavLink = styled(NavLink)`
-  flex-grow: 1;
-  width: 100%;
+  margin: 0px 0px 0px 24px;
+  height: 100%;
+  padding: 12px 0px;
+  position: relative;
 `
 
 const DropdownSpacer = styled.ul`

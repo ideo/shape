@@ -25,7 +25,7 @@ module TestResultsCollection
              to: :test_collection
 
     def call
-      create_alias_collection
+      find_or_create_alias_collection
       create_and_link_open_responses
       link_to_test_audience
     end
@@ -39,7 +39,10 @@ module TestResultsCollection
       }
     end
 
-    def create_alias_collection
+    def find_or_create_alias_collection
+      existing_card = CollectionCard.identifier(identifier).first
+      return existing_card.record if existing_card.present?
+
       # TODO: refactor this to also use TestResultsCollection::CreateCollection?
       context.alias_test_results_collection = create_card(
         params: {
@@ -49,7 +52,7 @@ module TestResultsCollection
             survey_response_id: survey_response.id,
             test_collection: test_collection,
           ),
-          identifier: CardIdentifier.call(test_results_collection, survey_response),
+          identifier: identifier,
         },
         parent_collection: all_responses_collection,
         created_by: created_by,
@@ -62,32 +65,8 @@ module TestResultsCollection
         test_results_collection: alias_test_results_collection,
         created_by: created_by,
       )
-    end
 
-    def link_alias_collection(parent)
-      alias_collection = Collection.find_by(
-        survey_response_id: survey_response.id,
-      )
-
-      alias_collection = create_alias_collection if alias_collection.blank?
-
-      CollectionCard::Link.create(
-        parent: parent,
-        collection_id: alias_collection.id,
-      )
-    end
-
-    def link_to_test_audience
-      test_audience_collection_card = CollectionCard.find_by(
-        identifier: CardIdentifier.call(
-          test_results_collection, survey_response.test_audience
-        ),
-      )
-      if test_audience_collection_card.blank?
-        context.fail!(message: 'Missing audience card')
-      end
-
-      link_alias_collection(test_audience_collection_card.collection)
+      context.alias_test_results_collection
     end
 
     def create_and_link_open_responses
@@ -99,6 +78,30 @@ module TestResultsCollection
           question_answer: question_answer,
         )
       end
+    end
+
+    def link_alias_collection(parent)
+      alias_collection = find_or_create_alias_collection
+
+      CollectionCard::Link.find_or_create_by(
+        parent: parent,
+        collection_id: alias_collection.id,
+      )
+    end
+
+    def link_to_test_audience
+      test_audience_collection = CollectionCard.find_record_by_identifier(
+        test_results_collection, survey_response.test_audience
+      )
+      if test_audience_collection.blank?
+        context.fail!(message: 'Missing audience collection')
+      end
+
+      link_alias_collection(test_audience_collection)
+    end
+
+    def identifier
+      CardIdentifier.call(test_results_collection, survey_response)
     end
   end
 end
