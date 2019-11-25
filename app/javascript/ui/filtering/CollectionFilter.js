@@ -6,27 +6,14 @@ import pluralize from 'pluralize'
 import styled from 'styled-components'
 
 import { apiStore, uiStore } from '~/stores'
+import CollectionSort from '~/ui/grid/CollectionSort'
 import FilterBar from './FilterBar'
-import FilterMenu, { FilterIconHolder } from './FilterMenu'
+import FilterMenu from './FilterMenu'
 import FilterSearchModal from './FilterSearchModal'
-import v from '~/utils/variables'
 
-export const SubmissionsFilterPositioner = styled.div`
-  left: 0;
-  position: absolute;
-  right: 215px;
-  top: 10px;
-  z-index: ${v.zIndex.pageHeader};
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    right: -20px;
-    left: 0;
-    top: 34px;
-  }
-
-  ${FilterIconHolder} {
-    margin-top: 7px !important;
-  }
+const SortContainer = styled.div`
+  position: relative;
+  top: -15px;
 `
 
 @observer
@@ -128,6 +115,7 @@ class CollectionFilter extends React.Component {
       collection,
       collection: { collection_filters },
       canEdit,
+      sortable,
     } = this.props
     const isFilterBarActive =
       collection_filters && collection_filters.length > 0
@@ -146,10 +134,15 @@ class CollectionFilter extends React.Component {
         )}
         {canEdit && (
           <FilterMenu
-            isFilterBarActive={isFilterBarActive}
+            alignTop={isFilterBarActive || sortable}
             onFilterByTag={this.openSearchModal('Tags')}
             onFilterBySearch={this.openSearchModal('Search Term')}
           />
+        )}
+        {sortable && (
+          <SortContainer>
+            <CollectionSort collection={collection} />
+          </SortContainer>
         )}
         {!!this.currentFilterLookupType && (
           <FilterSearchModal
@@ -174,10 +167,12 @@ class CollectionFilter extends React.Component {
 CollectionFilter.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
+  sortable: PropTypes.bool,
 }
 
 CollectionFilter.defaultProps = {
   canEdit: false,
+  sortable: false,
 }
 
 export default CollectionFilter

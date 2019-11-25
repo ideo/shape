@@ -27,7 +27,7 @@ const Holder = styled.div`
   display: flex;
   justify-content: center;
   flex-basis: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   margin-top: 20px;
   text-align: center;
 

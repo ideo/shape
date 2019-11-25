@@ -9,13 +9,13 @@ export const FilterIconHolder = styled.div`
   height: 40px;
   margin-right: 10px;
   ${props =>
-    props.filterBarActive
+    props.alignTop
       ? `
-      margin-top: 5px;
-    `
+    margin-top: 5px;
+  `
       : `
-      margin-bottom: 12px;
-      margin-top: -24px;
+    margin-bottom: 12px;
+    margin-top: -24px;
     `}
   width: 35px;
 `
@@ -50,11 +50,11 @@ class FilterMenu extends React.Component {
   }
 
   render() {
-    const { isFilterBarActive } = this.props
+    const { alignTop } = this.props
 
     return (
       <Box ml={'auto'}>
-        <FilterIconHolder filterBarActive={isFilterBarActive}>
+        <FilterIconHolder alignTop={alignTop}>
           <button onClick={this.handleFilterClick}>
             <FilterIcon />
           </button>
@@ -82,11 +82,11 @@ class FilterMenu extends React.Component {
 FilterMenu.propTypes = {
   onFilterByTag: PropTypes.func.isRequired,
   onFilterBySearch: PropTypes.func.isRequired,
-  isFilterBarActive: PropTypes.bool,
+  alignTop: PropTypes.bool,
 }
 
 FilterMenu.defaultProps = {
-  isFilterBarActive: false,
+  alignTop: false,
 }
 
 export default FilterMenu
