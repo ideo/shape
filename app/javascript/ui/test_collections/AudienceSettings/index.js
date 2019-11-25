@@ -158,7 +158,6 @@ class AudienceSettings extends React.Component {
     const { uiStore } = this.props
     let intro = ''
     // omit intro message for "You already have another test running..."
-    console.log({ errorMessages })
     if (
       !_.includes(errorMessages, 'You already have') &&
       !_.includes(errorMessages, 'has not launched')

@@ -109,7 +109,7 @@ describe('PageHeader', () => {
   describe('with a MasterTemplate collection', () => {
     beforeEach(() => {
       props.record = fakeCollection
-      props.record.isMasterTemplate = true
+      props.record.isTrueMasterTemplate = true
       props.record.isUsableTemplate = true
       props.record.inherited_tag_list = ['template']
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
@@ -139,7 +139,7 @@ describe('PageHeader', () => {
   describe('with template whose a child of a master template', () => {
     beforeEach(() => {
       props.record = fakeCollection
-      props.record.isSubTemplate = true
+      props.record.isTrueMasterTemplate = false
       props.record.isUsableTemplate = false
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
