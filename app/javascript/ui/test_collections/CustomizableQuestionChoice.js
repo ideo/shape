@@ -115,6 +115,7 @@ class CustomizableQuestionChoice extends React.Component {
             data-cy="CustomizableQuestionTextInput"
             disabled={!editing}
             inline="true"
+            className="test-designer-text-input"
           />
         </label>
         {editing && (
