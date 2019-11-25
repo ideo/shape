@@ -56,6 +56,37 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
     expect(audience_collection.name).to eq "#{test_collection.base_name} - #{test_collection.test_audiences.first.audience_name}"
   end
 
+  context 'with link sharing' do
+    let(:test_collection) do
+      create(:test_collection, :completed, :with_responses, :with_test_audience, :with_link_sharing, num_responses: num_responses)
+    end
+    let(:link_sharing) { test_collection.test_audiences.where(price_per_response: 0).first }
+
+    it 'should create two audience TRCs with audience names' do
+      audience_collections = subject.all_responses_collection.collections.where(
+        survey_response_id: nil,
+      )
+      expect(audience_collections.count).to eq 2
+      expect(audience_collections.map(&:name)).to match_array([
+        "#{test_collection.base_name} - #{test_collection.test_audiences.first.audience_name}",
+        "#{test_collection.base_name} - #{test_collection.test_audiences.last.audience_name}",
+      ])
+    end
+
+    context 'with link sharing turned off' do
+      before do
+        link_sharing.update(status: :closed)
+      end
+
+      it 'should create one audience TRC' do
+        audience_collections = subject.all_responses_collection.collections.where(
+          survey_response_id: nil,
+        )
+        expect(audience_collections.count).to eq 1
+      end
+    end
+  end
+
   context 'with an idea' do
     let(:test_collection) { create(:test_collection, :completed) }
     let(:master_test_results_collection) { create(:test_results_collection, test_collection: test_collection) }

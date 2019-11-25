@@ -89,6 +89,12 @@ class TestQuestion extends React.Component {
     return this.props.parent.gives_incentive
   }
 
+  get potentialIncentive() {
+    const { surveyResponse } = this.props
+    if (!this.givesIncentive || !surveyResponse) return 0
+    return surveyResponse.potential_incentive
+  }
+
   renderQuestion() {
     const {
       parent,
@@ -170,7 +176,7 @@ class TestQuestion extends React.Component {
         }
         return (
           <FinishQuestion
-            givesIncentive={this.givesIncentive}
+            incentiveAmount={this.potentialIncentive}
             submissionBox={
               parent.is_submission_box_template_test ||
               parent.is_submission_test
@@ -196,7 +202,7 @@ class TestQuestion extends React.Component {
       case 'question_welcome':
         return (
           <WelcomeQuestion
-            givesIncentive={this.givesIncentive}
+            potentialIncentive={this.potentialIncentive}
             numberOfQuestions={numberOfQuestions}
             onAnswer={this.handleQuestionAnswer}
           />

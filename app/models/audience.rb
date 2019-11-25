@@ -2,13 +2,13 @@
 #
 # Table name: audiences
 #
-#  id                 :bigint(8)        not null, primary key
-#  criteria           :string
-#  global_default     :integer
-#  name               :string
-#  price_per_response :decimal(10, 2)   default(0.0)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
+#  id                     :bigint(8)        not null, primary key
+#  criteria               :string
+#  global_default         :integer
+#  min_price_per_response :decimal(10, 2)   default(0.0)
+#  name                   :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
 #
 # Indexes
 #
@@ -39,6 +39,15 @@ class Audience < ApplicationRecord
            :can_view?,
            to: :organization,
            allow_nil: true
+
+  TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE = BigDecimal('4.00')
+  MIN_NUM_PAID_QUESTIONS = 10
+  TEST_PRICE_PER_QUESTION = BigDecimal('0.12')
+  INCENTIVE_PRICE_PER_QUESTION = BigDecimal('0.1')
+  MIN_INCENTIVE_PER_RESPONDENT = BigDecimal('1.75')
+  # Only used for old survey responses
+  LEGACY_INCENTIVE_PER_RESPONDENT = BigDecimal('2.50')
+  PAYMENT_WAITING_PERIOD = 1.week
 
   def self.global_defaults
     where.not(global_default: nil).order(global_default: :asc)
@@ -72,10 +81,46 @@ class Audience < ApplicationRecord
       .order(order_sql)
   end
 
+  def self.price_constants
+    {
+      'MIN_NUM_PAID_QUESTIONS' => MIN_NUM_PAID_QUESTIONS,
+      'TEST_PRICE_PER_QUESTION' => TEST_PRICE_PER_QUESTION,
+      'TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE' => TARGETED_AUDIENCE_MIN_PRICE_PER_RESPONSE,
+    }
+  end
+
+  # The absolute minimum we can charge per response and not be losing money
+  def self.minimum_price_per_response
+    min_incentive = incentive_per_response(0)
+    payout_cost = min_incentive + Accounting::RecordTransfer.paypal_fee(min_incentive)
+    stripe_cost = Accounting::RecordTransfer.stripe_fee(payout_cost)
+    (payout_cost + stripe_cost).to_f
+  end
+
+  def self.incentive_per_response(num_questions)
+    num_questions -= MIN_NUM_PAID_QUESTIONS
+    num_questions = 0 if num_questions.negative?
+    MIN_INCENTIVE_PER_RESPONDENT + (num_questions * INCENTIVE_PRICE_PER_QUESTION)
+  end
+
+  def price_per_response(num_questions)
+    return 0 if link_sharing?
+
+    num_questions -= MIN_NUM_PAID_QUESTIONS
+    num_questions = 0 if num_questions.negative?
+    min_price_per_response + (num_questions * TEST_PRICE_PER_QUESTION)
+  end
+
+  def incentive_per_response(num_questions)
+    return 0 if link_sharing?
+
+    self.class.incentive_per_response(num_questions)
+  end
+
   def link_sharing?
     # NOTE: for now this logic should suffice, however we could eventually change it
     # to be more explicit, like a bool field on the model
-    price_per_response.blank? || price_per_response.zero?
+    min_price_per_response.blank? || min_price_per_response.zero?
   end
 
   def all_tags

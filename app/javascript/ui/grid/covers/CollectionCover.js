@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable } from 'mobx'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
 import Hypher from 'hypher'
@@ -57,7 +58,7 @@ const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${props =>
-    props.isSpecialCollection ? v.colors.offset : v.colors.commonMedium};
+    props.isSpecialCollection ? v.colors.offset : v.colors.collectionCover};
   color: white;
   position: relative;
   overflow: hidden;
@@ -162,6 +163,9 @@ function namePartTooLong(fullName) {
 @inject('uiStore', 'apiStore')
 @observer
 class CollectionCover extends React.Component {
+  @observable
+  hasEmptyCarousel = false
+
   get hasIcon() {
     const { collection } = this.props
     return (
@@ -327,6 +331,11 @@ class CollectionCover extends React.Component {
     return cover.image_url
   }
 
+  @action
+  setEmptyCarousel = () => {
+    this.hasEmptyCarousel = true
+  }
+
   handleClick = e => {
     // TODO is this being used?
     const { searchResult, dragging, uiStore, collection } = this.props
@@ -354,6 +363,13 @@ class CollectionCover extends React.Component {
     return false
   }
 
+  get requiresOverlay() {
+    const { collection } = this.props
+    const { cover } = collection
+
+    return !!(cover && cover.image_url)
+  }
+
   render() {
     const {
       height,
@@ -373,13 +389,14 @@ class CollectionCover extends React.Component {
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
       >
-        {collection.isCarousel &&
-        collection.collection_cover_items &&
-        collection.collection_cover_items.length > 0 ? (
+        {collection.isCarousel && !this.hasEmptyCarousel ? (
           <CarouselCover
             collection={collection}
+            // trigger a reload
+            updatedAt={collection.updated_at}
             dragging={false}
             handleClick={this.handleClick}
+            onEmptyCarousel={this.setEmptyCarousel}
           />
         ) : (
           <StyledCardContent
@@ -389,7 +406,7 @@ class CollectionCover extends React.Component {
             gridW={gridW}
             isTextItem={!!textItem}
           >
-            <div className="overlay" />
+            <div className={this.requiresOverlay ? 'overlay' : ''} />
             {textItem ? (
               <div className="top text-item">
                 <TextItemCover

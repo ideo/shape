@@ -330,7 +330,7 @@ export const fakeQuestionItem = {
   id: '3',
   // ...fakeTextItemAttrs,
   type: 'Item::QuestionItem',
-  question_type: 'question_description',
+  question_type: 'question_open',
   isSingleChoiceQuestion: false,
   rawAttributes: jest.fn().mockReturnValue(fakeTextItemAttrs),
   getRecordType: jest.fn().mockReturnValue('items'),
@@ -405,6 +405,7 @@ export const fakeCollection = {
   num_survey_responses: 0,
   anyone_can_view: false,
   anyone_can_join: false,
+  updated_at: "2019-11-22T18:57:12.863Z",
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
@@ -615,13 +616,15 @@ export const fakeSurveyResponse = {
 export const fakeAudience = {
   id: '1',
   name: 'Anybody',
+  min_price_per_response: 4.0,
 }
 export const fakeTestAudience = {
   id: '1',
   audience: fakeAudience,
   sample_size: 12,
   num_completed_responses: 6,
-  price_per_response: 3.75,
+  price_per_response: 4.24,
+  incentive_per_response: 1.95
 }
 export const fakeTestCollection = {
   id: '1',

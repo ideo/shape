@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "name": { "type": "string" },
-    "price_per_response": { "type": ["number", "null"] },
+    "min_price_per_response": { "type": ["number", "null"] },
     "age_list": { "type": "array" },
     "children_age_list": { "type": "array" },
     "country_list": { "type": "array" },

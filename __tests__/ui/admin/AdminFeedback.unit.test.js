@@ -47,7 +47,7 @@ describe('AdminFeedback', () => {
       expect(audienceName.html()).toContain(fakeAudience.name)
 
       const audiencePricePerResponse = audienceRowItems.at(1)
-      expect(audiencePricePerResponse.html()).toContain('$3.75')
+      expect(audiencePricePerResponse.html()).toContain('$1.95')
 
       const audienceSampleSize = audienceRowItems.at(2)
       expect(audienceSampleSize.html()).toContain(fakeTestAudience.sample_size)

@@ -62,11 +62,11 @@ class PurchaseTestAudience
       sample_size = settings[:sample_size].to_i
       # skip any TestAudience for audiences that cost money,
       # where no sample_size was indicated
-      next if audience.price_per_response.positive? && sample_size.zero?
+      next if audience.min_price_per_response.positive? && sample_size.zero?
       # skip any TestAudience that this test already has
       next if test_collection.test_audiences.find_by_audience_id(id).present?
 
-      ensure_valid_payment_method if audience.price_per_response.positive?
+      ensure_valid_payment_method if audience.min_price_per_response.positive?
 
       test_collection.test_audiences.create(
         sample_size: sample_size,

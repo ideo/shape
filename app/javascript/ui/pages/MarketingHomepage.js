@@ -9,10 +9,10 @@ import {
   MarketingHeroButtonContainer,
   Center,
   MarketingTagLine,
-  MarketingVideoLink,
+  MarketingAlternateBtn,
   MarketingShapeLogo,
   MarketingVideoWrapper,
-  MarketingCallToAction,
+  MarketingMainBtn,
   MarketingGradientTop,
 } from '~/ui/global/styled/marketing.js'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
@@ -99,14 +99,17 @@ class MarketingPage extends React.Component {
             <Center>
               <MarketingHeroButtonContainer>
                 <a className="get-early-access-header" href="/sign_up">
-                  <MarketingCallToAction>
+                  <MarketingMainBtn>
                     {hero && hero.getStartedButton}
-                  </MarketingCallToAction>
+                  </MarketingMainBtn>
                 </a>
                 {hero && hero.videoUrl && (
-                  <MarketingVideoLink onClick={this.toggleVideoPlaying}>
+                  <MarketingAlternateBtn
+                    id="home-watch-video"
+                    onClick={this.toggleVideoPlaying}
+                  >
                     {videoPlayingButtonText}
-                  </MarketingVideoLink>
+                  </MarketingAlternateBtn>
                 )}
               </MarketingHeroButtonContainer>
             </Center>
@@ -128,7 +131,7 @@ class MarketingPage extends React.Component {
 
           {this.state.content.pricing && (
             <Pricing
-              pageName="workshop"
+              pageName="shape"
               {...this.state.content.pricing.blocks[0]}
             />
           )}

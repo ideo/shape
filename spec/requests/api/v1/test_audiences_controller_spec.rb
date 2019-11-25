@@ -4,7 +4,7 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
   let(:current_user) { @user }
   let(:organization) { create(:organization, admin: current_user) }
   let!(:link_sharing_audience) { create(:audience, :link_sharing, organizations: [organization]) }
-  let!(:paid_audience) { create(:audience, organizations: [organization], price_per_response: 5) }
+  let!(:paid_audience) { create(:audience, organizations: [organization]) }
   let!(:test_collection) { create(:test_collection, :completed, add_editors: [current_user]) }
 
   describe 'PATCH #update' do

@@ -209,9 +209,9 @@ module TestResultsCollection
     end
 
     def collection_cards
-      test_results_collection
-        .test_collection
+      test_collection
         .primary_collection_cards
+        .visible
         .includes(:item, :collection)
     end
 

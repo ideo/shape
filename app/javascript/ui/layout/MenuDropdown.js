@@ -1,8 +1,7 @@
 // slightly based off: https://blog.lunarlogic.io/2018/slidedown-menu-in-react/
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-
-import { NavLink } from '~/ui/marketing/MarketingMenu'
+import { NavLink } from '~/ui/global/styled/marketing'
 
 const MenuList = styled.ul``
 const MenuListItem = styled.li`
@@ -13,16 +12,28 @@ const MenuListItem = styled.li`
 const SubmenuList = styled.ul`
   display: none;
   position: absolute;
+  width: 150%;
   ${MenuListItem}:hover & {
     display: block;
-    background: rgb(255, 255, 255, 0.7);
+    background: rgb(255, 255, 255, 0.95);
   }
 `
 const SubmenuListItem = styled.li`
-  padding: 12px 0 12px;
+  display: flex;
+  text-align: left;
+  line-height: 16px;
+  flex-direction: column;
+  justify-content: center;
   :hover {
-    border-bottom: 2px solid black;
+    box-shadow: 0 2px 0px 0px black;
   }
+`
+
+const FlexNavLink = styled(NavLink)`
+  margin: 0px 0px 0px 24px;
+  height: 100%;
+  padding: 12px 0px;
+  position: relative;
 `
 
 const DropdownSpacer = styled.ul`
@@ -30,14 +41,14 @@ const DropdownSpacer = styled.ul`
 `
 
 const renderDropdownItems = (item, isHome, handleScrollToContent) => {
-  const { label } = item
+  const { label, href } = item
   const props =
     label === 'Overview'
       ? { onClick: () => handleScrollToContent(isHome) }
-      : { href: '/product/feedback' }
+      : { href: href }
   return (
     <SubmenuListItem key={label}>
-      <NavLink {...props}>{label}</NavLink>
+      <FlexNavLink {...props}>{label}</FlexNavLink>
     </SubmenuListItem>
   )
 }

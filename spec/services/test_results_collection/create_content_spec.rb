@@ -223,6 +223,50 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     end
   end
 
+  context 'for in-collection test' do
+    let(:test_collection) do
+      create(:test_collection, :completed, collection_to_test: create(:collection))
+    end
+    # these default questions will get hidden
+    let(:hidden_scale_item) do
+      test_collection.collection_cards.hidden.first.item
+    end
+    let(:hidden_open_response_item) do
+      test_collection.collection_cards.hidden.last.item
+    end
+    let(:visible_scale_items) do
+      test_collection
+        .question_items
+        .scale_questions
+        .joins(:parent_collection_card)
+        .where(CollectionCard.arel_table[:hidden].eq(false))
+    end
+    before do
+      test_collection.hide_or_show_section_questions!
+    end
+
+    it 'does not generate content for hidden cards' do
+      visible_scale_items.each do |question_item|
+        expect(TestResultsCollection::CreateResponseGraph).to receive(:call!).with(
+          hash_including(
+            item: question_item,
+          ),
+        )
+      end
+      expect(TestResultsCollection::CreateResponseGraph).not_to receive(:call!).with(
+        hash_including(
+          item: hidden_scale_item,
+        ),
+      )
+      expect(TestResultsCollection::CreateOpenResponseCollection).not_to receive(:call!).with(
+        hash_including(
+          question_item: hidden_open_response_item,
+        ),
+      )
+      expect(subject).to be_a_success
+    end
+  end
+
   context 'with more scaled questions' do
     let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
     let(:legend_item) { test_results_collection.legend_item }

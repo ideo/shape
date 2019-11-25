@@ -205,7 +205,7 @@ export const MarketingHeroButtonContainer = styled.div`
 MarketingHeroButtonContainer.displayName = 'StyledMarketingButtonContainer'
 
 /** @component */
-export const MarketingCallToAction = styled(MarketingContentLink)`
+export const MarketingMainBtn = styled(MarketingContentLink)`
   background-color: ${v.colors.caution};
   border-radius: 4px;
   border: 2px solid ${v.colors.caution};
@@ -217,16 +217,16 @@ export const MarketingCallToAction = styled(MarketingContentLink)`
   font-size: 14px;
   font-weight: ${v.weights.medium};
 `
-MarketingCallToAction.displayName = 'StyledMarketingCallToAction'
+MarketingMainBtn.displayName = 'StyledMarketingMainBtn'
 
 /** @component */
-export const MarketingVideoLink = styled(MarketingCallToAction)`
+export const MarketingAlternateBtn = styled(MarketingMainBtn)`
   background-color: white;
   border: 2px solid black;
   padding: 12px 16px;
   width: 180px;
 `
-MarketingVideoLink.displayName = 'StyledMarketingVideoLink'
+MarketingAlternateBtn.displayName = 'StyledMarketingAlternateBtn'
 
 const videoRatio = 1.7777777778
 const videoWidth = 780
@@ -270,7 +270,7 @@ MarketingStandaloneVideoWrapper.displayName =
   'StyledMarketingStandaloneVideoWrapper'
 
 /** @component */
-export const MarketingHeavyCTA = styled(MarketingCallToAction)`
+export const MarketingHeavyCTA = styled(MarketingMainBtn)`
   font-weight: ${v.weights.bold};
   font-family: ${v.fonts.sans};
   padding-left: 20px;
@@ -405,4 +405,18 @@ export const Card = styled.div`
   box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.08);
   background-color: white;
   border: solid 1px rgba(0, 0, 0, 0.1);
+`
+
+export const NavLink = styled.a`
+  font-weight: ${v.weights.medium};
+  font-family: ${v.fonts.sans};
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  color: black;
+  margin: 1em;
+  padding: 6px 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-decoration: none;
+}
 `
