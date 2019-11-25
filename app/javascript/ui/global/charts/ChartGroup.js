@@ -47,12 +47,12 @@ const formatSecondaryDatasetValues = (
   if (values.length > 1) return values
 
   // Get values from primary dataset
-  const startDate = primaryDatasetValues[0].date
-  const endDate = primaryDatasetValues[primaryDatasetValues.length - 1].date
+  const addStartDate = primaryDatasetValues[0].date
+  const addEndDate = primaryDatasetValues[primaryDatasetValues.length - 1].date
   return formatValuesForVictory({
     values,
-    startDate,
-    endDate,
+    addStartDate,
+    addEndDate,
   })
 }
 

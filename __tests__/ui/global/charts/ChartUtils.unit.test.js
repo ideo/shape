@@ -4,6 +4,7 @@ import {
   advancedTooltipText,
   addDuplicateValueIfSingleValue,
   primaryFillColorFromDataset,
+  formatValuesForVictory,
 } from '~/ui/global/charts/ChartUtils'
 
 describe('ChartUtils', () => {
@@ -70,6 +71,35 @@ describe('ChartUtils', () => {
     })
   })
 
+  describe('formatValuesForVictory', () => {
+    let data
+    beforeEach(() => {
+      data = [{ value: 25 }]
+    })
+
+    xit('duplicates value n times for use in VictoryLine', () => {
+      expect(formatValuesForVictory({ values: data })).toEqual([
+        { value: 25 },
+        { value: 25, isDuplicate: true },
+      ])
+    })
+
+    it('adds dates if provided', () => {
+      const startDate = '2017-11-01'
+      const endDate = '2019-11-01'
+      expect(
+        formatValuesForVictory({
+          values: data,
+          addStartDate: startDate,
+          addEndDate: endDate,
+        })
+      ).toEqual([
+        { value: 25, date: startDate },
+        { value: 25, date: endDate, isDuplicate: true },
+      ])
+    })
+  })
+
   describe('addDuplicateValueIfSingleValue', () => {
     it('returns empty array if no data', () => {
       const values = []
@@ -77,10 +107,14 @@ describe('ChartUtils', () => {
     })
 
     it('duplicates if single value provided', () => {
-      const values = [{ date: '2019-01-01', value: 25 }]
-      expect(addDuplicateValueIfSingleValue(values)).toEqual([
-        { date: '2018-10-01', value: 25, isDuplicate: true },
-        { date: '2019-01-01', value: 25 },
+      const values = [{ date: '2018-01-01', value: 25 }]
+      const addStartDate = null
+      const addEndDate = '2019-10-01'
+      expect(
+        addDuplicateValueIfSingleValue(values, addStartDate, addEndDate)
+      ).toEqual([
+        { date: '2018-01-01', value: 25 },
+        { date: '2019-10-01', value: 25, isDuplicate: true },
       ])
     })
 

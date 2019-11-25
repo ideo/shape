@@ -150,22 +150,22 @@ export const addDuplicateValueIfSingleValue = (
     valuesWithDupe[0].date = addStartDate
 
   // Add a duplicate value
-  const duplicateValue = Object.assign({ isDuplicate: true }, valuesWithDupe[0])
+  const duplicateValue = { ...valuesWithDupe[0], isDuplicate: true }
   // Set given date
   if (duplicateValue.date && addEndDate) {
     duplicateValue.date = addEndDate
     if (duplicateValue.month) duplicateValue.month = duplicateValue.date
   }
-  valuesWithDupe.unshift(duplicateValue)
+  valuesWithDupe.push(duplicateValue)
   return valuesWithDupe
 }
 
 export const formatValuesForVictory = ({
   values,
-  addStartDate = null,
-  addEndDate = null,
+  addStartDate,
+  addEndDate,
 }) => {
-  // Victory doesn't support single data points, so duplicate if we have only one
+  // Victory doesn't support single dta points, so duplicate if we have only one
   const rawValues = addDuplicateValueIfSingleValue(
     values,
     addStartDate,
