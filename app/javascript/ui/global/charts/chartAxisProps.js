@@ -111,7 +111,7 @@ const ChartAxisProps = ({
     dependentAxis: false,
     domain: domain,
     style: chartAxisStyle(isSmallChartStyle),
-    offsetY: 13,
+    offsetY: isSmallChartStyle ? 13 : 22,
     axisComponent: <LineSegment transform="translate(10 26) scale(0.955)" />,
   }
 
@@ -120,8 +120,6 @@ const ChartAxisProps = ({
   }
 
   const tickLabelStyleProps = tickLabelStyle(isSmallChartStyle)
-
-  console.log('full date for', datasetValues[0].date)
 
   return datasetValues.length > 1
     ? {

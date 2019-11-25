@@ -11,6 +11,8 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
   }
 
   get dataWithDates() {
+    if (!this.data) return []
+
     return this.data.map(datum => {
       const d = { ...datum }
       // Turn date strings into real dates

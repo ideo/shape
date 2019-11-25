@@ -58,7 +58,7 @@ const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
           tooltipTextRenderer={tooltipFn}
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}
-          fontSize={18}
+          fontSize={cardArea === 1 ? 18 : 9}
         />
       }
     />
