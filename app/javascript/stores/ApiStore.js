@@ -137,9 +137,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   get currentUserOrganizationName() {
-    return !!this.currentUserOrganization
-      ? this.currentUserOrganization.name
-      : null
+    return this.currentUserOrganization.name
   }
 
   get currentUserCollectionId() {

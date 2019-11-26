@@ -903,16 +903,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           }
         })
       }
-      const { data: launchedTestCollection } = launchedTest
-      const { has_link_sharing, gives_incentive } = launchedTestCollection
-      const { ideasCollection } = launchedTestCollection
-      const { collection_card_count } = ideasCollection
+      const { has_link_sharing, gives_incentive } = this
+      const ideasCount = _.get(this, 'ideasCollection.collection_card_count', 0)
       if (launchedTest) {
         this.trackTestAction({
           actionName,
           hasLinkSharingAudience: has_link_sharing,
           hasPaidAudience: gives_incentive,
-          ideasCount: collection_card_count,
+          ideasCount: ideasCount,
         })
       }
     } catch (e) {
