@@ -94,8 +94,6 @@ class QuestionContentEditor extends React.Component {
           placeholder={placeholder}
           value={this.value}
           maxLength={maxLength}
-          // for ignoring global keypress
-          className="test-designer-text-input"
         />
         {optional && (
           <QuestionHelperWrapper
