@@ -293,6 +293,8 @@ class Collection
       incomplete_items.each do |item|
         errors.add(:base, item.incomplete_description)
       end
+      # this lets the frontend/API know that invalid question_items was the failure point
+      errors.add(:question_items)
 
       false
     end
@@ -317,18 +319,16 @@ class Collection
       if collection_to_test.present?
         # Point to the new parent as the one to test
         duplicate.collection_to_test = args[:parent]
-      else
-        if ideas_collection.blank?
-          duplicate.primary_collection_cards.build(
-            order: -1,
-            section_type: :ideas,
-            record: Collection.build_ideas_collection,
-          )
-        end
-        if !parent.master_template? && !args[:parent].master_template?
-          # Prefix with 'Copy' if it isn't still within a template
-          duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
-        end
+      elsif ideas_collection.blank?
+        duplicate.primary_collection_cards.build(
+          order: -1,
+          section_type: :ideas,
+          record: Collection.build_ideas_collection,
+        )
+      end
+      if !parent.master_template? && !args[:parent].master_template?
+        # Prefix with 'Copy' if it isn't still within a template
+        duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
       duplicate.save
       duplicate.reorder_cards!
@@ -491,6 +491,8 @@ class Collection
       primary_collection_cards.ideas_collection_card.update(
         hidden: hidden,
       )
+      question_items.question_finish.first&.parent_collection_card&.update(order: 999)
+      reorder_cards!
     end
 
     def ideas_question_items
