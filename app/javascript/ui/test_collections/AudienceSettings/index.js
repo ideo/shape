@@ -153,25 +153,6 @@ class AudienceSettings extends React.Component {
   @action
   closeConfirmPriceModal = () => (this.confirmPriceModalOpen = false)
 
-  openWarningDialog = () => {
-    const { errorMessages } = this
-    const { uiStore } = this.props
-    let intro = ''
-    // omit intro message for "You already have another test running..."
-    if (
-      !_.includes(errorMessages, 'You already have') &&
-      !_.includes(errorMessages, 'has not launched')
-    ) {
-      intro = 'You have questions that have not yet been finalized:\n'
-    }
-    const prompt = `${intro}${errorMessages}`
-
-    uiStore.popupAlert({
-      prompt,
-      fadeOutTime: 10 * 1000,
-    })
-  }
-
   async isReadyToLaunch() {
     const { testCollection, apiStore } = this.props
 
@@ -181,17 +162,14 @@ class AudienceSettings extends React.Component {
       )
       return true
     } catch (err) {
-      this.errorMessages = err.error.map(e => ` ${e.detail}`).toString()
       return false
     }
   }
 
   async confirmOrLaunchTest() {
-    this.errorMessages = null
-    const readyToLaunch = await this.isReadyToLaunch()
-
+    const { testCollection } = this.props
+    const readyToLaunch = await testCollection.API_validateLaunch()
     if (!readyToLaunch) {
-      this.openWarningDialog()
       return
     }
     if (this.totalPrice === 0) {
