@@ -125,10 +125,7 @@ export default class CardMoveService {
   moveErrors({ viewingCollection, movingFromCollection, cardAction }) {
     if (!viewingCollection.can_edit_content) {
       return 'You only have view access to this collection. Would you like to keep moving the cards?'
-    } else if (
-      cardAction === 'useTemplate' &&
-      viewingCollection.isMasterTemplate
-    ) {
+    } else if (cardAction === 'useTemplate' && viewingCollection.isTemplate) {
       return "You can't create a template instance inside another template. You may be intending to create or duplicate a master template into here instead."
     } else if (viewingCollection.isTestCollection) {
       return "You can't move cards into a test collection"

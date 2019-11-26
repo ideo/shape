@@ -170,7 +170,7 @@ class CollectionCover extends React.Component {
     const { collection } = this.props
     return (
       collection.isTemplated ||
-      collection.isTrueMasterTemplate ||
+      collection.isMasterTemplate ||
       collection.isSubmissionBox ||
       collection.isTestCollectionOrResults
     )
@@ -188,7 +188,7 @@ class CollectionCover extends React.Component {
       let rightIcon
       if (collection.isProfileTemplate) {
         rightIcon = <FilledProfileIcon />
-      } else if (collection.isTrueMasterTemplate) {
+      } else if (collection.isMasterTemplate) {
         leftIcon = <TemplateIcon circled filled />
       } else if (collection.isUserProfile) {
         rightIcon = <ProfileIcon />

@@ -201,8 +201,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get shouldShowEditWarning() {
-    if (!this.isMasterTemplate || this.template_num_instances === 0)
-      return false
+    if (!this.isTemplate || this.template_num_instances === 0) return false
     // if we already have the confirmation open, don't try to re-open
     if (this.uiStore.dialogConfig.open === 'confirm') return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
@@ -345,12 +344,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       : 0
   }
 
-  get isMasterTemplate() {
+  get isTemplate() {
+    // returns true for master and subtemplates
     return this.master_template
   }
 
-  get isTrueMasterTemplate() {
-    return this.isMasterTemplate && !this.isSubTemplate
+  get isMasterTemplate() {
+    // the meaning of "MasterTemplate" on the frontend is more truly "master" aka "top-level"
+    return this.master_template && !this.isSubTemplate
+  }
+
+  get isSubTemplate() {
+    // a subtemplate is a collection or a template within a template or an instance of it
+    return this.is_subtemplate_or_instance
+  }
+
+  get isTemplated() {
+    return !!this.template_id
   }
 
   get isUsableTemplate() {
@@ -358,7 +368,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // you also don't use test templates, since duplicating them or
     // creating them within another template is the way to do that
     return (
-      this.isTrueMasterTemplate &&
+      this.isMasterTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestResultsCollection &&
@@ -406,15 +416,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get publicTestURL() {
     // TODO: for the submission_box_template_test, this will eventually go to the global "submission box test link"
     return `${process.env.BASE_HOST}/tests/${this.launchableTestId}`
-  }
-
-  get isTemplated() {
-    return !!this.template_id
-  }
-
-  get isSubTemplate() {
-    // a subtemplate is a collection or a template within a template or an instance of it
-    return this.is_subtemplate_or_instance
   }
 
   get isUserProfile() {

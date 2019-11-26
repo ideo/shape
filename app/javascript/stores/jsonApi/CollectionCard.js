@@ -329,7 +329,7 @@ class CollectionCard extends BaseRecord {
         let iconName = 'Trash'
         let snoozeChecked = null
         let onToggleSnoozeDialog = null
-        if (collection.isMasterTemplate && collection.shouldShowEditWarning) {
+        if (collection.isTemplate && collection.shouldShowEditWarning) {
           ;({
             snoozeChecked,
             prompt,
