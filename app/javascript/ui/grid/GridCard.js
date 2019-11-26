@@ -30,6 +30,7 @@ import {
 } from './shared'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
+import _ from 'lodash'
 
 @observer
 class GridCard extends React.Component {
@@ -432,6 +433,7 @@ class GridCard extends React.Component {
 
     return (
       <StyledGridCard
+        contextMenuOpen={_.get(uiStore, 'cardMenuOpen.id', null)}
         background={
           this.transparentBackground ? v.colors.transparent : v.colors.white
         }

@@ -9,12 +9,15 @@ import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
+  border: 1px solid red;
   position: relative;
+  z-index: 600;
   .menu-wrapper {
     display: none;
     opacity: 0;
   }
   &.open .menu-wrapper {
+    z-index: 600;
     display: block;
     opacity: 1;
     animation: fadeInFromNone 0.25s;
@@ -43,9 +46,10 @@ export const StyledMenuButtonWrapper = styled.div`
 `
 
 export const StyledMenuWrapper = styled.div`
+  border: 1px solid pink;
   position: absolute;
   padding: 10px;
-  z-index: ${v.zIndex.aboveClickWrapper};
+  z-index: 600;
   ${props => {
     const { position, offsetPosition, location } = props
     // dynamic positioning based on component dimensions, click position relative to the screen
@@ -91,6 +95,8 @@ export const StyledMenuWrapper = styled.div`
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
+  border: 1px solid orange;
+  z-index: 600;
   background-color: white;
   width: ${props => props.width}px;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
