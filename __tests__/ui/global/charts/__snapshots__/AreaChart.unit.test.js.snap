@@ -13,15 +13,15 @@ exports[`AreaChart renders snapshot 1`] = `
   data={
     Array [
       Object {
-        "date": "2018-07-10",
+        "date": 2018-07-10T00:00:00.000Z,
         "value": 10,
       },
       Object {
-        "date": "2018-08-10",
+        "date": 2018-08-10T00:00:00.000Z,
         "value": 25,
       },
       Object {
-        "date": "2018-09-10",
+        "date": 2018-09-10T00:00:00.000Z,
         "value": 30,
       },
     ]
@@ -32,18 +32,6 @@ exports[`AreaChart renders snapshot 1`] = `
       pathComponent={<Path />}
     />
   }
-  domain={
-    Object {
-      "x": Array [
-        1,
-        3,
-      ],
-      "y": Array [
-        0,
-        30,
-      ],
-    }
-  }
   groupComponent={
     <VictoryClipContainer
       circleComponent={<Circle />}
@@ -52,12 +40,13 @@ exports[`AreaChart renders snapshot 1`] = `
       rectComponent={<Rect />}
     />
   }
-  key="dataset-0"
+  key="dataset-undefined"
   labelComponent={
     <TickLabelWithTooltip
       alwaysShowLabels={false}
       cardArea={1}
       displayTicks={true}
+      fontSize={18}
       labelTextRenderer={[Function]}
       maxValue={0}
       minValue={0}
