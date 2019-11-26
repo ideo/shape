@@ -939,8 +939,10 @@ class CollectionGrid extends React.Component {
       // don't add space for an empty row if we don't want it to appear
       // because `rows` gets calculated for minHeight of grid
       rows -= 1
-    } else if (canEditCollection && shouldAddEmptyRow && !opts.dragging) {
-      matrix.push(_.fill(Array(cols), null))
+    } else if (canEditCollection && !opts.dragging) {
+      if (shouldAddEmptyRow) {
+        matrix.push(_.fill(Array(cols), null))
+      }
       this.addEmptyCards(cards, matrix)
     }
 
