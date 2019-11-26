@@ -132,7 +132,7 @@ class PageHeader extends React.Component {
           <FilledProfileIcon />
         </IconHolder>
       )
-    } else if (record.isTrueMasterTemplate) {
+    } else if (record.isMasterTemplate) {
       return (
         <IconHolder align="left">
           <TemplateIcon circled filled />
