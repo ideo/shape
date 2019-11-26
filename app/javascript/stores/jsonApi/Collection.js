@@ -869,6 +869,48 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  openLaunchValidationDialog = (apiError, actionName = 'launch') => {
+    const { uiStore } = this
+    const errorMessages = apiError.error.map(e => ` ${e.detail}`).toString()
+
+    let intro = 'You have questions that have not yet been finalized:'
+    if (
+      // change intro message e.g. for "You already have another test running..."
+      _.includes(prompt, 'Test audiences') ||
+      _.includes(prompt, 'has not launched') ||
+      _.includes(prompt, 'You already have') ||
+      // omit the extra wording for close and reopen
+      // for reopen: what if there are actually incomplete questions... ?
+      _.includes(['close', 'reopen'], actionName)
+    ) {
+      intro = `Test unable to ${actionName}:`
+    }
+    const prompt = `${intro}\n${errorMessages}`
+
+    uiStore.popupAlert({
+      prompt,
+      maxWidth: 'sm',
+      fadeOutTime: 10 * 1000,
+    })
+  }
+
+  API_validateLaunch = async () => {
+    const { apiStore, uiStore } = this
+    if (!this.launchableTestId) return false
+    uiStore.update('launchButtonLoading', true)
+    try {
+      await apiStore.request(
+        `test_collections/${this.launchableTestId}/validate_launch`
+      )
+      uiStore.update('launchButtonLoading', false)
+      return true
+    } catch (err) {
+      this.openLaunchValidationDialog(err)
+      uiStore.update('launchButtonLoading', false)
+      return false
+    }
+  }
+
   API_performTestAction = async (actionName, audiences = null) => {
     const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete
@@ -889,28 +931,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             this.trackAudienceTargeting(value.audience)
         })
       }
-    } catch (e) {
-      const errorMessages = e.error.map(e => ` ${e.detail}`)
-      let prompt = `You have questions that have not yet been finalized:\n
-         ${errorMessages}
-        `
-      if (
-        _.includes(prompt, 'Test audiences') ||
-        _.includes(prompt, 'has not launched') ||
-        _.includes(prompt, 'You already have')
-      ) {
-        prompt = `Test unable to launch:\n
-           ${errorMessages}
-          `
-      }
-      // omit the extra wording for close and reopen
-      // for reopen: what if there are actually incomplete questions... ?
-      if (_.includes(['close', 'reopen'], actionName))
-        prompt = errorMessages.toString()
-      uiStore.popupAlert({
-        prompt,
-        fadeOutTime: 10 * 1000,
-      })
+    } catch (err) {
+      this.openLaunchValidationDialog(err, actionName)
       uiStore.update('launchButtonLoading', false)
       return false
     }
