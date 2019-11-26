@@ -286,7 +286,7 @@ class TestSurveyResponder extends React.Component {
       organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: id,
-      hasPaidAudience: gives_incentive, // fixme: why is this false when gives_incentive is true?
+      hasPaidAudience: gives_incentive,
     })
   }
 

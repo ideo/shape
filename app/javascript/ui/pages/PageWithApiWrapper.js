@@ -105,8 +105,7 @@ class PageWithApiWrapper extends React.Component {
 
   trackPageView(record) {
     const { apiStore } = this.props
-    const { type } = record
-    const isCollection = !!record.isCollection
+    const { type, isCollection, isMasterTemplate } = record
     const { currentUserOrganizationName } = apiStore
 
     googleTagManager.push({
@@ -114,7 +113,7 @@ class PageWithApiWrapper extends React.Component {
       organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       objectType: type,
-      isMasterTemplate: (isCollection && record.isMasterTemplate) || false,
+      isMasterTemplate: (isCollection && isMasterTemplate) || false,
     })
   }
 
