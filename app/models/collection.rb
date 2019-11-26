@@ -923,7 +923,7 @@ class Collection < ApplicationRecord
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)
     cards_to_update = []
-    cards = all_collection_cards.active.visible.joins(joins).order(order)
+    cards = all_collection_cards.active.joins(joins).order(order)
     cards.each_with_index do |card, i|
       next if card.order == i
 
