@@ -109,6 +109,7 @@ class TestSurveyResponder extends React.Component {
         runInAction(() => {
           this.surveyResponse = surveyResponse
         })
+        this.trackResponseEvent('responseStart')
       }
       return surveyResponse
     } catch (e) {
@@ -259,12 +260,6 @@ class TestSurveyResponder extends React.Component {
     runInAction(() => {
       this.currentCardIdx = answerableIdx + 1
     })
-    if (answerableIdx === 1 || answerableIdx === 2) {
-      // first actual answerable card is in index 1 or 2 since terms may appear
-      if (card.card_question_type !== 'question_terms') {
-        this.trackResponseEvent('responseStart')
-      }
-    }
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
     if (this.hasFinishedSurvey(nextCard)) {
