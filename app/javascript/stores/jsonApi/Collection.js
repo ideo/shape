@@ -871,20 +871,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   openLaunchValidationDialog = (apiError, actionName = 'launch') => {
     const { uiStore } = this
-    const errorMessages = apiError.error.map(e => ` ${e.detail}`).toString()
-
-    let intro = 'You have questions that have not yet been finalized:'
-    if (
-      // change intro message e.g. for "You already have another test running..."
-      _.includes(prompt, 'Test audiences') ||
-      _.includes(prompt, 'has not launched') ||
-      _.includes(prompt, 'You already have') ||
-      // omit the extra wording for close and reopen
-      // for reopen: what if there are actually incomplete questions... ?
-      _.includes(['close', 'reopen'], actionName)
-    ) {
-      intro = `Test unable to ${actionName}:`
+    const errors = apiError.error
+    let intro = `Test unable to ${actionName}:`
+    // look for the invalid questions error case
+    const invalidQuestions = _.remove(errors, {
+      title: 'Invalid question_items',
+    })
+    if (invalidQuestions.length) {
+      intro = 'You have questions that have not yet been finalized:'
     }
+    const errorMessages = errors.map(e => ` ${e.detail}`).toString()
     const prompt = `${intro}\n${errorMessages}`
 
     uiStore.popupAlert({
