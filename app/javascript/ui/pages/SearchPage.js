@@ -170,7 +170,7 @@ class SearchPage extends React.Component {
 
     return (
       <Fragment>
-        <PageContainer>
+        <PageContainer marginTop={40}>
           {this.renderSearchResults()}
           <MoveModal />
         </PageContainer>

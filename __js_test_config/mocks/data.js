@@ -51,6 +51,12 @@ export const fakeTextItemAttrs = {
   parent_collection_card: { ...fakeCollectionCard },
 }
 
+const areaChartData = [
+  { date: '2018-07-10', value: 10 },
+  { date: '2018-08-10', value: 25 },
+  { date: '2018-09-10', value: 30 },
+]
+
 export const fakeAreaChartDataset = {
   identifier: 'question',
   measure: 'participants',
@@ -59,12 +65,19 @@ export const fakeAreaChartDataset = {
   chart_type: 'area',
   order: 0,
   tiers: [],
-  data: [
-    { date: '2018-07-10', value: 10 },
-    { date: '2018-08-10', value: 25 },
-    { date: '2018-09-10', value: 30 },
-  ],
+  data: areaChartData,
+  dataWithDates: areaChartData.map(d => ({
+    date: new Date(d.date),
+    value: d.value
+  }))
 }
+
+const fakeBarChartData = [
+  { column: 1, value: 5, percentage: 50, type: 'question_context' },
+  { column: 2, value: 0, percentage: 0, type: 'question_context' },
+  { column: 3, value: 5, percentage: 50, type: 'question_context' },
+  { column: 4, value: 0, percentage: 0, type: 'question_context' },
+]
 
 export const fakeBarChartDataset = {
   identifier: 'question',
@@ -77,12 +90,8 @@ export const fakeBarChartDataset = {
   total: 10,
   max_domain: 95,
   tiers: [],
-  data: [
-    { column: 1, value: 5, percentage: 50, type: 'question_context' },
-    { column: 2, value: 0, percentage: 0, type: 'question_context' },
-    { column: 3, value: 5, percentage: 50, type: 'question_context' },
-    { column: 4, value: 0, percentage: 0, type: 'question_context' },
-  ],
+  data: fakeBarChartData,
+  dataWithDates: fakeBarChartData,
   isEmojiOrScaleQuestion: jest.fn(),
 }
 
@@ -105,6 +114,12 @@ export const fakeDataItemCollectionsItemsAttrs = {
   datasets: [fakeAreaChartDataset],
 }
 
+const creativeDifferenceData = [
+  { date: '2018-07-10', value: 10 },
+  { date: '2018-08-10', value: 25 },
+  { date: '2018-09-10', value: 30 },
+]
+
 export const creativeDifferenceQualityDataset = {
   name: 'purpose',
   identifier: 'purpose',
@@ -125,11 +140,8 @@ export const creativeDifferenceQualityDataset = {
     { value: 20, name: 'Learning' },
     { value: 40, name: 'Expert' },
   ],
-  data: [
-    { date: '2018-07-10', value: 10 },
-    { date: '2018-08-10', value: 25 },
-    { date: '2018-09-10', value: 30 },
-  ],
+  data: creativeDifferenceData,
+  dataWithDates: creativeDifferenceData
 }
 
 export const fakeDatasetAttrs = {
@@ -393,6 +405,7 @@ export const fakeCollection = {
   num_survey_responses: 0,
   anyone_can_view: false,
   anyone_can_join: false,
+  updated_at: "2019-11-22T18:57:12.863Z",
   cover: {
     image_url: 'http://fake.url.net',
     text: 'Lorem ipsum blockchain boogie',
@@ -611,7 +624,7 @@ export const fakeTestAudience = {
   sample_size: 12,
   num_completed_responses: 6,
   price_per_response: 4.24,
-  incentive_per_response: 1.95 
+  incentive_per_response: 1.95
 }
 export const fakeTestCollection = {
   id: '1',

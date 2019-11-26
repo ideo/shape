@@ -1615,6 +1615,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "type": "Collection",
                     "update": [MockFunction],
                     "updateScrollBottom": [MockFunction],
+                    "updated_at": "2019-11-22T18:57:12.863Z",
                   },
                   "patch": [MockFunction],
                   "record": Object {},
@@ -2046,6 +2047,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "type": "Collection",
                 "update": [MockFunction],
                 "updateScrollBottom": [MockFunction],
+                "updated_at": "2019-11-22T18:57:12.863Z",
               }
             }
             onAddChoice={[Function]}
@@ -3608,6 +3610,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "updated_at": "2019-11-22T18:57:12.863Z",
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -4039,6 +4042,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "updated_at": "2019-11-22T18:57:12.863Z",
                 }
               }
               questionAnswer={null}
@@ -5021,6 +5025,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "updated_at": "2019-11-22T18:57:12.863Z",
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -6445,6 +6450,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "type": "Collection",
                     "update": [MockFunction],
                     "updateScrollBottom": [MockFunction],
+                    "updated_at": "2019-11-22T18:57:12.863Z",
                   },
                   "patch": [MockFunction],
                   "record": Object {},
@@ -6876,6 +6882,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "type": "Collection",
                 "update": [MockFunction],
                 "updateScrollBottom": [MockFunction],
+                "updated_at": "2019-11-22T18:57:12.863Z",
               }
             }
             onAddChoice={[Function]}
@@ -7839,6 +7846,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "type": "Collection",
                     "update": [MockFunction],
                     "updateScrollBottom": [MockFunction],
+                    "updated_at": "2019-11-22T18:57:12.863Z",
                   },
                   "patch": [MockFunction],
                   "record": Object {},
@@ -9261,6 +9269,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "updated_at": "2019-11-22T18:57:12.863Z",
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -10683,6 +10692,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                             "type": "Collection",
                             "update": [MockFunction],
                             "updateScrollBottom": [MockFunction],
+                            "updated_at": "2019-11-22T18:57:12.863Z",
                           },
                           "patch": [MockFunction],
                           "record": Object {},
@@ -11114,6 +11124,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "updated_at": "2019-11-22T18:57:12.863Z",
                       },
                       "section_type": "ideas",
                     },
@@ -12065,6 +12076,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "type": "Collection",
                         "update": [MockFunction],
                         "updateScrollBottom": [MockFunction],
+                        "updated_at": "2019-11-22T18:57:12.863Z",
                       },
                       "patch": [MockFunction],
                       "record": Object {},
@@ -12085,6 +12097,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "updated_at": "2019-11-22T18:57:12.863Z",
                 }
               }
               questionAnswer={null}
@@ -13541,6 +13554,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "type": "Collection",
                 "update": [MockFunction],
                 "updateScrollBottom": [MockFunction],
+                "updated_at": "2019-11-22T18:57:12.863Z",
               },
               "patch": [MockFunction],
               "record": Object {},
@@ -14963,6 +14977,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "type": "Collection",
                       "update": [MockFunction],
                       "updateScrollBottom": [MockFunction],
+                      "updated_at": "2019-11-22T18:57:12.863Z",
                     },
                     "patch": [MockFunction],
                     "record": Object {},
@@ -15394,6 +15409,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "updated_at": "2019-11-22T18:57:12.863Z",
                 },
                 "section_type": "ideas",
               },
@@ -16345,6 +16361,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "type": "Collection",
                   "update": [MockFunction],
                   "updateScrollBottom": [MockFunction],
+                  "updated_at": "2019-11-22T18:57:12.863Z",
                 },
                 "patch": [MockFunction],
                 "record": Object {},
@@ -16365,6 +16382,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
             "type": "Collection",
             "update": [MockFunction],
             "updateScrollBottom": [MockFunction],
+            "updated_at": "2019-11-22T18:57:12.863Z",
           }
         }
       />

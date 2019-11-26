@@ -22,13 +22,18 @@ module TestResultsCollection
     def call
       create_open_response_item
       link_open_response_item
-      context.open_response_item
+      open_response_item
     end
 
     private
 
     def create_open_response_item
       return if answer_text.blank?
+
+      if question_answer.open_response_item.present?
+        context.open_response_item = question_answer.open_response_item
+        return
+      end
 
       # Create the open response item on the Test Responses collection
       card = create_card(
@@ -51,14 +56,14 @@ module TestResultsCollection
     def link_open_response_item
       return if answer_text.blank?
 
-      CollectionCard::Link.create(
+      CollectionCard::Link.find_or_create_by(
         parent: question_open_responses_collection,
         item_id: open_response_item.id,
         width: 2,
       )
 
       idea_items.each do |idea_item|
-        CollectionCard::Link.create(
+        CollectionCard::Link.find_or_create_by(
           parent: question_idea_open_responses_collection(idea_item),
           item_id: open_response_item.id,
           width: 2,

@@ -180,8 +180,7 @@ class Item < ApplicationRecord
 
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
-  searchkick callbacks: :queue,
-             word_start: %i[name]
+  searchkick callbacks: :queue
 
   # active == don't index archived items
   scope :search_import, -> do

@@ -3,7 +3,7 @@ class Search
     default_options = {
       fields: [
         'handle^6',
-        { 'name^5': :word_start },
+        'name^5',
         'tags^3',
         'content',
       ],
