@@ -536,6 +536,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return { q: activeFilters.join(' ') }
   }
 
+  get ideasCollection() {
+    const card = this.sortedCards.find(
+      card => card.card_question_type === 'ideas_collection'
+    )
+    if (card) return card.record
+  }
+
   async API_fetchCards({
     page = 1,
     per_page = null,
@@ -897,17 +904,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         })
       }
       const { data: launchedTestCollection } = launchedTest
-      const {
-        has_link_sharing,
-        gives_incentive,
-        ideas_count,
-      } = launchedTestCollection
+      const { has_link_sharing, gives_incentive } = launchedTestCollection
+      const { ideasCollection } = launchedTestCollection
+      const { collection_card_count } = ideasCollection
       if (launchedTest) {
         this.trackTestAction({
           actionName,
           hasLinkSharingAudience: has_link_sharing,
           hasPaidAudience: gives_incentive,
-          ideasCount: ideas_count,
+          ideasCount: collection_card_count,
         })
       }
     } catch (e) {
