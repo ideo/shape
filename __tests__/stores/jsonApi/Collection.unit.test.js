@@ -6,6 +6,7 @@ import { ReferenceType, updateModelId } from 'datx'
 // or else you run into a circular dependency issue
 import { apiStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
+import Organization from '~/stores/jsonApi/Organization'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import googleTagManager from '~/vendor/googleTagManager'
 
@@ -13,17 +14,28 @@ import { fakeRole } from '#/mocks/data'
 jest.mock('../../../app/javascript/vendor/googleTagManager')
 
 describe('Collection', () => {
-  let collection
+  let collection, organization
 
   beforeEach(() => {
     collection = new Collection(
       {
         name: 'fakeCollection',
         roles: [fakeRole],
-        organization_id: '4',
+        organization_id: '1',
       },
       apiStore
     )
+    organization = new Organization(
+      {
+        name: 'MyOrg',
+      },
+      apiStore
+    )
+    updateModelId(organization, '1')
+    runInAction(() => {
+      apiStore.currentUserOrganizationId = '1'
+    })
+    apiStore.add(organization, 'organizations')
   })
 
   describe('isNormalCollection', () => {
@@ -228,12 +240,21 @@ describe('Collection', () => {
 
   describe('trackTestAction', () => {
     describe('when launching a test', () => {
+      beforeEach(() => {
+        collection.class_type = 'Collection::TestCollection'
+      })
       it('pushes a feedback test launch event to google tag manager', () => {
-        collection.trackTestAction('launch')
+        collection.trackTestAction({ actionName: 'launch' })
 
         expect(googleTagManager.push).toHaveBeenCalledWith({
           event: 'formSubmission',
           formType: 'launch Feedback Test',
+          hasLinkSharingAudience: false,
+          hasPaidAudience: false,
+          ideasCount: 0,
+          organization: 'MyOrg',
+          testId: collection.id,
+          timestamp: expect.any(String),
         })
       })
     })
