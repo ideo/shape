@@ -759,6 +759,7 @@ describe Collection::TestCollection, type: :model do
         'Please add your category to question 1',
         'Please add your open response to question 6',
         'Please add your open response to question 7',
+        'Question items are invalid',
       ])
     end
   end

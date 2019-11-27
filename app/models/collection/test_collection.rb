@@ -294,7 +294,7 @@ class Collection
         errors.add(:base, item.incomplete_description)
       end
       # this lets the frontend/API know that invalid question_items was the failure point
-      errors.add(:question_items)
+      errors.add(:question_items, 'are invalid')
 
       false
     end
