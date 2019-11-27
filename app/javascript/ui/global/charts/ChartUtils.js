@@ -26,7 +26,15 @@ export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
   return values.map(val => val * scale).join(',')
 }
 
-export const utcMoment = date => moment(`${date} 00+0000`).utc()
+export const utcMoment = date => {
+  if (typeof date === 'object') {
+    return moment(date)
+      .startOf('day')
+      .utc()
+  } else {
+    return moment(`${date} 00+0000`).utc()
+  }
+}
 
 export const datasetPropType = PropTypes.shape({
   measure: PropTypes.string.isRequired,
