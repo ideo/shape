@@ -91,6 +91,7 @@ Cypress.Commands.add('createCard', cardType => {
       cy.get('.ql-editor')
         .first()
         .type('Testing')
+      cy.wait('@apiCreateCollectionCard')
       cy.wait(300)
       cy.locate('TextItemClose')
         .first()
@@ -142,18 +143,19 @@ Cypress.Commands.add('resizeCard', (pos, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
   const [width, height] = _.map(sizes, Number)
-  cy.window().then(win => {
-    const collection = win.uiStore.viewingCollection
-    const f = pos === 'last' ? _.last : _.first
-    const card = f(collection.sortedCards)
-    collection.API_updateCard({
-      card,
-      updates: { width, height },
-      undoMessage: 'Card resize undone',
+  cy.window()
+    .then(win => {
+      const collection = win.uiStore.viewingCollection
+      const f = pos === 'last' ? _.last : _.first
+      const card = f(collection.sortedCards)
+      collection.API_updateCard({
+        card,
+        updates: { width, height },
+        undoMessage: 'Card resize undone',
+      })
     })
-    cy.wait('@apiUpdateCollection')
-    cy.wait(100)
-  })
+    .wait('@apiUpdateCollection')
+    .wait(1000)
 })
 
 Cypress.Commands.add('reorderFirstTwoCards', () => {

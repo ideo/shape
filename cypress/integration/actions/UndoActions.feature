@@ -37,6 +37,7 @@ Feature: Undo actions
     Then I should see the last of 3 cards as 2x2
 
     When I click the "CardAction-edit cover"
+    And I wait for "@apiGetCollectionCards" to finish
     Then I should see a 'EditCoverOptions'
 
     When I type "Undo" in the title textarea
