@@ -449,6 +449,7 @@ class GridCard extends React.Component {
         ref={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
+        inSearchPage={searchResult}
       >
         <StyledTopRightActions>
           <TextActionMenu card={card} />
