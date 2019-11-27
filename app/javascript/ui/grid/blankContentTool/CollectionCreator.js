@@ -47,7 +47,7 @@ class CollectionCreator extends React.Component {
         // `collection` is the collection being created within the card
         collection_attributes: {
           name: this.state.inputText,
-          master_template: this.shouldCreateAsMasterTemplate,
+          master_template: this.shouldCreateAsSubTemplate,
           type: this.dbType,
         },
       },
@@ -57,10 +57,10 @@ class CollectionCreator extends React.Component {
     )
   }
 
-  get shouldCreateAsMasterTemplate() {
+  get shouldCreateAsSubTemplate() {
     const { type } = this.props
     const { viewingCollection } = uiStore
-    return type === 'template' || viewingCollection.isMasterTemplate
+    return type === 'template' || viewingCollection.isTemplate
   }
 
   get dbType() {

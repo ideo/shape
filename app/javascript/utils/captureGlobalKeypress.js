@@ -40,6 +40,10 @@ export const handleMouseDownSelection = e => {
 const captureGlobalKeypress = e => {
   const { activeElement } = document
 
+  // none of the following card editing actions apply when you are editing a test
+  if (_.get(uiStore, 'viewingCollection.isTestCollection')) {
+    return false
+  }
   // allow normal keypress on input element, quill, and draftjs
   const shouldNormalKeyPressBeAllowed =
     activeElement.nodeName === 'INPUT' ||
@@ -48,7 +52,6 @@ const captureGlobalKeypress = e => {
       'public-DraftEditor-content',
       'edit-cover-title',
       'edit-cover-subtitle',
-      'test-designer-text-input',
     ]).length > 0
 
   if (shouldNormalKeyPressBeAllowed) return false

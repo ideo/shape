@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { Checkbox, Radio } from '~/ui/global/styled/forms'
 import { TextInput } from '~/ui/test_collections/shared'
 import TrashIcon from '~/ui/icons/TrashIcon'
+import v from '~/utils/variables'
 
 const ChoiceHolder = styled.div`
   background: ${props => props.theme.responseHolder};
@@ -23,6 +24,10 @@ const ChoiceHolder = styled.div`
 
     .TrashIcon {
       display: inline-block;
+      &:focus,
+      &:hover {
+        color: ${v.colors.commonDarkest};
+      }
     }
   }
 `

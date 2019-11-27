@@ -7,7 +7,7 @@ describe('FilterMenu', () => {
     props = {
       onFilterByTag: jest.fn(),
       onFilterBySearch: jest.fn(),
-      isFilterBarActive: true,
+      alignTop: true,
     }
     rerender = function() {
       wrapper = shallow(<FilterMenu {...props} />)
@@ -32,7 +32,7 @@ describe('FilterMenu', () => {
 
     describe('when the filterBar is inactive', () => {
       beforeEach(() => {
-        props.isFilterBarActive = false
+        props.alignTop = false
         rerender()
       })
 

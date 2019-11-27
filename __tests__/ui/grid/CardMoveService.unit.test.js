@@ -42,7 +42,7 @@ describe('CardMoveService', () => {
           viewingCollection: {
             id: 1,
             can_edit_content: true,
-            isMasterTemplate: true,
+            isTemplate: true,
           },
           movingFromCollection: { id: 1 },
           cardAction: 'useTemplate',

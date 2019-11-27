@@ -201,8 +201,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get shouldShowEditWarning() {
-    if (!this.isMasterTemplate || this.template_num_instances === 0)
-      return false
+    if (!this.isTemplate || this.template_num_instances === 0) return false
     // if we already have the confirmation open, don't try to re-open
     if (this.uiStore.dialogConfig.open === 'confirm') return false
     const oneHourAgo = Date.now() - 1000 * 60 * 60
@@ -345,8 +344,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       : 0
   }
 
-  get isMasterTemplate() {
+  get isTemplate() {
+    // returns true for master and subtemplates
     return this.master_template
+  }
+
+  get isMasterTemplate() {
+    // the meaning of "MasterTemplate" on the frontend is more truly "master" aka "top-level"
+    return this.master_template && !this.isSubTemplate
+  }
+
+  get isSubTemplate() {
+    // a subtemplate is a collection or a template within a template or an instance of it
+    return this.is_subtemplate_or_instance
+  }
+
+  get isTemplated() {
+    return !!this.template_id
   }
 
   get isUsableTemplate() {
@@ -355,7 +369,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // creating them within another template is the way to do that
     return (
       this.isMasterTemplate &&
-      !this.isSubTemplate &&
       !this.isProfileTemplate &&
       !this.is_submission_box_template &&
       !this.isTestResultsCollection &&
@@ -403,15 +416,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get publicTestURL() {
     // TODO: for the submission_box_template_test, this will eventually go to the global "submission box test link"
     return `${process.env.BASE_HOST}/tests/${this.launchableTestId}`
-  }
-
-  get isTemplated() {
-    return !!this.template_id
-  }
-
-  get isSubTemplate() {
-    // a subtemplate is a collection or a template within a template or an instance of it
-    return this.is_subtemplate_or_instance
   }
 
   get isUserProfile() {
@@ -845,7 +849,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     ) {
       // called with 'this' so that we know if the submission is calling it
       await this.API_performTestAction(actionName, audiences)
-      if (actionName === 'launch') {
+      // launching a submission box test will not have a test_results_collection
+      if (actionName === 'launch' && collection.test_results_collection) {
         this.routingStore.routeTo(
           'collections',
           collection.test_results_collection.id
@@ -884,6 +889,44 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  openLaunchValidationDialog = (apiError, actionName = 'launch') => {
+    const { uiStore } = this
+    const errors = apiError.error
+    let intro = `Test unable to ${actionName}:`
+    // look for the invalid questions error case
+    const invalidQuestions = _.remove(errors, {
+      title: 'Invalid question_items',
+    })
+    if (invalidQuestions.length) {
+      intro = 'You have questions that have not yet been finalized:'
+    }
+    const errorMessages = errors.map(e => ` ${e.detail}`).toString()
+    const prompt = `${intro}\n${errorMessages}`
+
+    uiStore.popupAlert({
+      prompt,
+      maxWidth: 'sm',
+      fadeOutTime: 10 * 1000,
+    })
+  }
+
+  API_validateLaunch = async () => {
+    const { apiStore, uiStore } = this
+    if (!this.launchableTestId) return false
+    uiStore.update('launchButtonLoading', true)
+    try {
+      await apiStore.request(
+        `test_collections/${this.launchableTestId}/validate_launch`
+      )
+      uiStore.update('launchButtonLoading', false)
+      return true
+    } catch (err) {
+      this.openLaunchValidationDialog(err)
+      uiStore.update('launchButtonLoading', false)
+      return false
+    }
+  }
+
   API_performTestAction = async (actionName, audiences = null) => {
     const { uiStore } = this
     // this will disable any test launch/close/reopen buttons until loading is complete
@@ -913,27 +956,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           ideasCount: ideasCount,
         })
       }
-    } catch (e) {
-      const errorMessages = e.error.map(e => ` ${e.detail}`)
-      let prompt = `You have questions that have not yet been finalized:\n
-         ${errorMessages}
-        `
-      if (
-        _.includes(prompt, 'Test audiences') ||
-        _.includes(prompt, 'already have')
-      ) {
-        prompt = `Test unable to launch:\n
-           ${errorMessages}
-          `
-      }
-      // omit the extra wording for close and reopen
-      // for reopen: what if there are actually incomplete questions... ?
-      if (_.includes(['close', 'reopen'], actionName))
-        prompt = errorMessages.toString()
-      uiStore.popupAlert({
-        prompt,
-        fadeOutTime: 10 * 1000,
-      })
+    } catch (err) {
+      this.openLaunchValidationDialog(err, actionName)
       uiStore.update('launchButtonLoading', false)
       return false
     }

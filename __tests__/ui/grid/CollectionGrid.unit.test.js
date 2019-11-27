@@ -49,7 +49,8 @@ describe('CollectionGrid', () => {
         .props().record
     ).toBe(fakeTextItem)
     // 3 cards + 1 empty card
-    expect(wrapper.find('MovableGridCard').length).toBe(3)
+    expect(wrapper.find('MovableGridCard').length).toBe(4)
+    expect(wrapper.find('MovableGridCard[cardType="items"]').length).toBe(3)
   })
 
   it('re-renders when cardProperties have changed', () => {
@@ -57,13 +58,13 @@ describe('CollectionGrid', () => {
       collection: { ...fakeCollection, collection_cards: [fakeItemCard] },
     })
     // no changes because we did not change cardProperties
-    expect(wrapper.find('MovableGridCard').length).toBe(3)
+    expect(wrapper.find('MovableGridCard[cardType="items"]').length).toBe(3)
     wrapper.setProps({
       collection: { ...fakeCollection, collection_cards: [fakeItemCard] },
       cardProperties: [{ id: 'new' }],
     })
     // it does re-render with a change to cardProperties
-    expect(wrapper.find('MovableGridCard').length).toBe(1)
+    expect(wrapper.find('MovableGridCard[cardType="items"]').length).toBe(1)
   })
 
   describe('calculateOrderForMovingCard', () => {

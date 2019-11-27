@@ -10,7 +10,7 @@ const uiStore = fakeUiStore
 
 uiStore.viewingCollection = {
   id: 3,
-  isMasterTemplate: false,
+  isTemplate: false,
 }
 
 const e = { preventDefault: jest.fn() }
@@ -126,13 +126,13 @@ describe('MovableGridCard', () => {
 
       it('creates a template collection', () => {
         component.createCollection(e)
-        expect(component.shouldCreateAsMasterTemplate).toBeTruthy()
+        expect(component.shouldCreateAsSubTemplate).toBeTruthy()
       })
     })
 
     describe('when a viewing collection is a master template', () => {
       beforeEach(() => {
-        props.uiStore.viewingCollection.isMasterTemplate = true
+        props.uiStore.viewingCollection.isTemplate = true
         props.createCard.mockClear()
         wrapper = shallow(<CollectionCreator {...props} />)
         component = wrapper.instance()
@@ -140,7 +140,7 @@ describe('MovableGridCard', () => {
 
       it('creates a template collection', () => {
         component.createCollection(e)
-        expect(component.shouldCreateAsMasterTemplate).toBeTruthy()
+        expect(component.shouldCreateAsSubTemplate).toBeTruthy()
       })
     })
   })

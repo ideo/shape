@@ -227,13 +227,18 @@ class Item
         )
     end
 
-    def score
+    def score_of_best_idea
       return unless scale_question?
 
       # answers are 1-4, but scored on a scale of 0-3
       # TODO: change the answer_numbers on the emojiScale to go 0-3 to match? (would need to migrate old answers)
-      points = completed_survey_answers.sum('answer_number - 1') || 0
-      total = completed_survey_answers.count * 3
+
+      # get the score of the max scoring idea for this question
+      points_by_idea = completed_survey_answers.group(:idea_id).sum('answer_number - 1').sort_by { |_idea, points| points }.reverse
+      return 0 if points_by_idea.empty?
+
+      idea_id, points = points_by_idea.first
+      total = completed_survey_answers.where(idea_id: idea_id).count * 3
       # don't want to divide by 0
       return 0 if total.zero?
 

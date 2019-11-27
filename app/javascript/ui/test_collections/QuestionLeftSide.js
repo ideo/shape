@@ -49,6 +49,13 @@ const QuestionLeftSide = ({
   onAddChoice,
   canAddIdeas,
 }) => {
+  let { isPinnedInTemplate, isPinnedAndLocked } = card
+  if (ideasCollection && ideasCollection.parent_collection_card) {
+    isPinnedInTemplate =
+      ideasCollection.parent_collection_card.isPinnedInTemplate
+    isPinnedAndLocked = ideasCollection.parent_collection_card.isPinnedAndLocked
+  }
+
   return (
     <LeftSideContainer>
       {card.card_question_type === 'question_finish' && (
@@ -82,8 +89,8 @@ const QuestionLeftSide = ({
         </TrashButton>
       )}
       <div style={{ color: v.colors.commonMedium }}>
-        {card.isPinnedAndLocked && <PinnedIcon locked />}
-        {card.isPinnedInTemplate && <PinnedIcon />}
+        {isPinnedAndLocked && <PinnedIcon locked />}
+        {isPinnedInTemplate && <PinnedIcon />}
       </div>
       {canAddChoice && (
         <NamedActionButton

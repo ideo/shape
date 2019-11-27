@@ -83,7 +83,7 @@ export const StyledGridCard = styled.div`
   padding: 0;
   position: relative;
   width: 100%;
-  z-index: 1;
+  ${props => !props.inSearchPage && `z-index: 1`};
 
   ${props =>
     props.selected &&

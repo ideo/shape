@@ -139,7 +139,7 @@ describe('PageHeader', () => {
   describe('with template whose a child of a master template', () => {
     beforeEach(() => {
       props.record = fakeCollection
-      props.record.isSubTemplate = true
+      props.record.isMasterTemplate = false
       props.record.isUsableTemplate = false
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })

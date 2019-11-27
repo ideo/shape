@@ -6,7 +6,6 @@ import _ from 'lodash'
 import styled from 'styled-components'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-import CollectionSort from '~/ui/grid/CollectionSort'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import IconAvatar from '~/ui/global/IconAvatar'
@@ -37,14 +36,6 @@ const StyledGrid = styled.div`
   `}
 `
 StyledGrid.displayName = 'StyledGrid'
-
-const SortContainer = styled.div`
-  margin-bottom: 15px;
-  margin-left: auto;
-  margin-right: 0;
-  margin-top: -15px;
-  text-align: right;
-`
 
 const groupByConsecutive = (array, value) => {
   const groups = []
@@ -948,8 +939,10 @@ class CollectionGrid extends React.Component {
       // don't add space for an empty row if we don't want it to appear
       // because `rows` gets calculated for minHeight of grid
       rows -= 1
-    } else if (canEditCollection && shouldAddEmptyRow && !opts.dragging) {
-      matrix.push(_.fill(Array(cols), null))
+    } else if (canEditCollection && !opts.dragging) {
+      if (shouldAddEmptyRow) {
+        matrix.push(_.fill(Array(cols), null))
+      }
       this.addEmptyCards(cards, matrix)
     }
 
@@ -1054,7 +1047,7 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    const { sorting, uiStore, collection } = this.props
+    const { uiStore, collection } = this.props
     const { gridSettings } = uiStore
     const { rows } = this.state
     if (uiStore.isLoading || collection.reloading) return <Loader />
@@ -1067,11 +1060,6 @@ class CollectionGrid extends React.Component {
         minHeight={minHeight}
         isLargeScreen={uiStore.isLargeBreakpoint}
       >
-        {sorting && (
-          <SortContainer>
-            <CollectionSort collection={collection} />
-          </SortContainer>
-        )}
         {this.renderPositionedCards()}
         {uiStore.isMobile && this.renderMobileHotspot()}
       </StyledGrid>
@@ -1104,7 +1092,6 @@ CollectionGrid.propTypes = {
     template: MobxPropTypes.objectOrObservableObject,
     enabled: PropTypes.bool,
   }),
-  sorting: PropTypes.bool,
 }
 CollectionGrid.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -1116,7 +1103,6 @@ CollectionGrid.defaultProps = {
   submissionSettings: null,
   blankContentToolState: null,
   canEditCollection: false,
-  sorting: false,
   isMovingCards: false,
 }
 CollectionGrid.displayName = 'CollectionGrid'
