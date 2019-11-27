@@ -17,6 +17,7 @@ import GreetingMessage from '~/ui/test_collections/GreetingMessage'
 import SurveyResponse from '~/stores/jsonApi/SurveyResponse'
 import ScrollingModule from '~/ui/test_collections/ScrollingModule'
 import ClosedSurvey from '~/ui/test_collections/ClosedSurvey'
+import googleTagManager from '~/vendor/googleTagManager'
 
 const UNANSWERABLE_QUESTION_TYPES = [
   'question_media',
@@ -108,6 +109,7 @@ class TestSurveyResponder extends React.Component {
         runInAction(() => {
           this.surveyResponse = surveyResponse
         })
+        this.trackResponseEvent('responseStart')
       }
       return surveyResponse
     } catch (e) {
@@ -260,7 +262,10 @@ class TestSurveyResponder extends React.Component {
     })
     const nextCard = questionCards[index + 1]
     if (!nextCard) return
-    if (this.hasFinishedSurvey(nextCard)) this.refreshUserAfterSurvey()
+    if (this.hasFinishedSurvey(nextCard)) {
+      this.trackResponseEvent('responseComplete')
+      this.refreshUserAfterSurvey()
+    }
 
     scroller.scrollTo(scrollIdentifier(nextCard), {
       duration: 400,
@@ -269,6 +274,19 @@ class TestSurveyResponder extends React.Component {
       containerId,
       // when inside ActivityLog we want to account for the header at the top
       offset: containerId ? -75 : 0,
+    })
+  }
+
+  trackResponseEvent(event) {
+    const { apiStore, collection } = this.props
+    const { id, gives_incentive } = collection
+    const { currentUserOrganizationName } = apiStore
+    googleTagManager.push({
+      event: event,
+      organization: currentUserOrganizationName,
+      timestamp: new Date().toUTCString(),
+      testId: id,
+      hasPaidAudience: gives_incentive,
     })
   }
 

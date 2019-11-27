@@ -110,12 +110,11 @@ class TestDesigner extends React.Component {
   }
 
   async componentDidMount() {
-    // Load idea cards
-    if (this.ideasCollection) this.ideasCollection.API_fetchCards()
-
     if (this.state.collectionToTest) return
     // if none is set, we look up the parent to provide a default value
     const { collection, apiStore } = this.props
+    // Load idea cards
+    if (collection.ideasCollection) collection.ideasCollection.API_fetchCards()
     const { parent_id } = collection.parent_collection_card
     try {
       const res = await apiStore.fetch('collections', parent_id)
@@ -143,14 +142,6 @@ class TestDesigner extends React.Component {
   get numResponses() {
     const { collection } = this.props
     return collection.num_survey_responses
-  }
-
-  get ideasCollection() {
-    const { collection } = this.props
-    const card = collection.sortedCards.find(
-      card => card.card_question_type === 'ideas_collection'
-    )
-    if (card) return card.record
   }
 
   get cardsBySection() {
@@ -266,8 +257,9 @@ class TestDesigner extends React.Component {
   }
 
   handleSetCurrentIdeaCardIndex = index => {
-    const numIdeas = this.ideasCollection
-      ? this.ideasCollection.sortedCards.length
+    const { collection } = this.props
+    const numIdeas = collection.ideasCollection
+      ? collection.ideasCollection.sortedCards.length
       : 0
     if (index < 0 || index > numIdeas - 1) return
     this.setState({
@@ -283,13 +275,12 @@ class TestDesigner extends React.Component {
   }
 
   handleToggleShowMedia = e => {
-    const { ideasCollection } = this
     const { collection } = this.props
     this.confirmEdit(() => {
       collection.test_show_media = !collection.test_show_media
-      if (ideasCollection) {
+      if (collection.ideasCollection) {
         // simulate backend update that will happen in tandem
-        ideasCollection.test_show_media = collection.test_show_media
+        collection.ideasCollection.test_show_media = collection.test_show_media
       }
       collection.save()
     })
@@ -314,8 +305,9 @@ class TestDesigner extends React.Component {
   }
 
   handleQuestionFocus = async () => {
+    const { collection } = this.props
     if (!this.canEditQuestions) return false
-    if (!this.testIsLive) return true
+    if (!collection.isLiveTest) return true
     const result = await this.confirmActionIfResponsesExist({
       action: () => {
         return true
@@ -348,26 +340,23 @@ class TestDesigner extends React.Component {
     return can_edit_content
   }
 
-  get testIsLive() {
-    const { test_status } = this.props.collection
-    return test_status === 'live'
-  }
-
   get reachedNumIdeasLimit() {
-    if (!this.ideasCollection) return false
-    return this.ideasCollection.collection_cards.length >= NUM_IDEAS_LIMIT
+    const { collection } = this.props
+    if (!collection.ideasCollection) return false
+    return collection.ideasCollection.collection_cards.length >= NUM_IDEAS_LIMIT
   }
 
   get canAddIdeas() {
-    if (!this.canEditQuestions || this.testIsLive || !this.ideasCollection)
-      return false
-    return true
+    const { isTemplate, isDraftTest, ideasCollection } = this.props.collection
+    return Boolean(
+      this.canEditQuestions && !isTemplate && isDraftTest && ideasCollection
+    )
   }
 
   // A method specifically designed for adding new idea cards
   // All other cards can be created using createNewQuestionCard
   createNewIdea = async ({ order }) => {
-    const { uiStore } = this.props
+    const { uiStore, collection } = this.props
     if (this.reachedNumIdeasLimit) {
       uiStore.alert(
         `To ensure quality responses, a single test is limited to a maximum of ${NUM_IDEAS_LIMIT} ideas total. To evaluate more ideas, please create an additional test.`
@@ -385,7 +374,7 @@ class TestDesigner extends React.Component {
     return this.createNewQuestionCard({
       questionType: 'question_idea',
       sectionType: 'ideas',
-      parentCollection: this.ideasCollection,
+      parentCollection: collection.ideasCollection,
       order,
     })
   }
@@ -450,7 +439,7 @@ class TestDesigner extends React.Component {
     const { collectionToTest, testType } = this.state
     // also searchvalue comes from collection_to_test.name.... or something
 
-    const isDraft = collection.test_status === 'draft'
+    const isDraft = collection.isDraftTest
     let options = [
       {
         value: 'media',
@@ -520,7 +509,7 @@ class TestDesigner extends React.Component {
           onAddChoice={this.onAddQuestionChoice}
           createNewQuestionCard={this.createNewQuestionCard}
           createNewIdea={this.createNewIdea}
-          ideasCollection={this.ideasCollection}
+          ideasCollection={collection.ideasCollection}
           showMedia={collection.test_show_media}
           handleToggleShowMedia={this.handleToggleShowMedia}
           handleSetCurrentIdeaCardIndex={this.handleSetCurrentIdeaCardIndex}

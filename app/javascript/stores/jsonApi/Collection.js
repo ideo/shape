@@ -540,6 +540,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return { q: activeFilters.join(' ') }
   }
 
+  get ideasCollection() {
+    const card = this.sortedCards.find(
+      card => card.card_question_type === 'ideas_collection'
+    )
+    if (card) return card.record
+  }
+
   async API_fetchCards({
     page = 1,
     per_page = null,
@@ -855,10 +862,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  trackTestAction = actionName => {
+  trackTestAction = ({
+    actionName,
+    hasLinkSharingAudience = false,
+    hasPaidAudience = false,
+    ideasCount = 0,
+  }) => {
+    const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
       event: 'formSubmission',
       formType: `${actionName} Feedback Test`,
+      organization: currentUserOrganizationName,
+      timestamp: new Date().toUTCString(),
+      testId: this.launchableTestId,
+      hasLinkSharingAudience: hasLinkSharingAudience,
+      hasPaidAudience: hasPaidAudience,
+      ideasCount: ideasCount,
     })
   }
 
@@ -920,12 +939,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         { audiences }
       )
 
-      if (launchedTest) this.trackTestAction(actionName)
-
       if (launchedTest && actionName === 'launch' && audiences) {
         audiences.forEach((value, key, _map) => {
-          if (value.selected && !value.audience.isLinkSharing)
+          if (value.selected && !value.audience.isLinkSharing) {
             this.trackAudienceTargeting(value.audience)
+          }
+        })
+      }
+      const { has_link_sharing, gives_incentive } = this
+      const ideasCount = _.get(this, 'ideasCollection.collection_card_count', 0)
+      if (launchedTest) {
+        this.trackTestAction({
+          actionName,
+          hasLinkSharingAudience: has_link_sharing,
+          hasPaidAudience: gives_incentive,
+          ideasCount: ideasCount,
         })
       }
     } catch (err) {
