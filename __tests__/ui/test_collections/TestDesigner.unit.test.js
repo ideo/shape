@@ -15,13 +15,16 @@ describe('TestDesigner', () => {
     props = {
       collection: {
         ...fakeCollection,
+        can_edit: true,
+        can_edit_content: true,
         test_show_media: true,
+        ideasCollection: { id: '101', ...fakeCollection },
         sortedCards: [
           {
             id: '99',
             card_question_type: 'ideas_collection',
             section_type: 'ideas',
-            record: { ...fakeCollection },
+            record: { id: '101', ...fakeCollection },
           },
           {
             ...fakeCollectionCard,
@@ -30,7 +33,7 @@ describe('TestDesigner', () => {
         ],
       },
       apiStore: fakeApiStore({
-        requestResult: { data: { id: 99, name: 'Parent Collection' } },
+        requestResult: { data: { id: '99', name: 'Parent Collection' } },
       }),
       uiStore: fakeUiStore,
     }
@@ -62,7 +65,7 @@ describe('TestDesigner', () => {
 
   describe('with draft test_collection', () => {
     beforeEach(() => {
-      props.collection.test_status = 'draft'
+      props.collection.isDraftTest = true
       rerender()
     })
     it('should render the testTypeForm set to "media" by default', () => {
@@ -71,12 +74,32 @@ describe('TestDesigner', () => {
         'media'
       )
     })
+
+    describe('canAddIdeas', () => {
+      describe('without edit access', () => {
+        beforeEach(() => {
+          props.collection.can_edit_content = false
+          rerender()
+        })
+        it('should return false', () => {
+          expect(component.canAddIdeas).toEqual(false)
+        })
+      })
+      describe('with edit access', () => {
+        beforeEach(() => {
+          props.collection.can_edit_content = true
+          rerender()
+        })
+        it('should return true if the ideasCollection is present', () => {
+          expect(component.canAddIdeas).toEqual(true)
+        })
+      })
+    })
   })
 
   describe('with responses', () => {
     beforeEach(() => {
       props.collection.test_status = 'live'
-      props.collection.can_edit_content = true
       props.collection.num_survey_responses = 5
       rerender()
     })
@@ -165,6 +188,8 @@ describe('TestDesigner', () => {
       beforeEach(() => {
         // Clear mock calls so we can isolate them to our test
         props.uiStore.confirm.mockClear()
+        // set it as a live test so that the warning does pop up
+        props.collection.isLiveTest = true
         instance = wrapper.instance()
       })
 

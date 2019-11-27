@@ -305,8 +305,9 @@ class TestDesigner extends React.Component {
   }
 
   handleQuestionFocus = async () => {
+    const { collection } = this.props
     if (!this.canEditQuestions) return false
-    if (!this.testIsLive) return true
+    if (!collection.isLiveTest) return true
     const result = await this.confirmActionIfResponsesExist({
       action: () => {
         return true
@@ -339,11 +340,6 @@ class TestDesigner extends React.Component {
     return can_edit_content
   }
 
-  get testIsLive() {
-    const { test_status } = this.props.collection
-    return test_status === 'live'
-  }
-
   get reachedNumIdeasLimit() {
     const { collection } = this.props
     if (!collection.ideasCollection) return false
@@ -351,9 +347,9 @@ class TestDesigner extends React.Component {
   }
 
   get canAddIdeas() {
-    const { collection } = this.props
-    return (
-      this.canEditQuestions && !this.testIsLive && collection.ideasCollection
+    const { isTemplate, isDraftTest, ideasCollection } = this.props.collection
+    return Boolean(
+      this.canEditQuestions && !isTemplate && isDraftTest && ideasCollection
     )
   }
 
@@ -443,7 +439,7 @@ class TestDesigner extends React.Component {
     const { collectionToTest, testType } = this.state
     // also searchvalue comes from collection_to_test.name.... or something
 
-    const isDraft = collection.test_status === 'draft'
+    const isDraft = collection.isDraftTest
     let options = [
       {
         value: 'media',
