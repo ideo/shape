@@ -29,7 +29,6 @@ class CommentEntryForm extends React.Component {
   editorHeight = null
   state = {
     editorState: EditorState.createEmpty(),
-    updating: false,
     focused: false,
   }
 
@@ -60,7 +59,6 @@ class CommentEntryForm extends React.Component {
   handleInputChange = editorState => {
     const { uiStore } = this.props
     const { replyingToCommentId } = uiStore
-    if (this.state.updating) return
     const editorSelection = editorState.getSelection()
     const focused = editorSelection.getHasFocus()
     const appendingToInput = editorSelection.getFocusOffset() > 0
@@ -123,15 +121,15 @@ class CommentEntryForm extends React.Component {
     const { thread } = this.props
     this.setState(
       {
-        updating: true,
         editorState: EditorState.createEmpty(),
       },
-      async () => {
-        await thread.API_saveComment(rawData)
+      () => {
+        thread.API_saveComment(rawData)
+        // NOTE: the next steps do not need to await the API save to finish,
+        // your temp comment will get added to apiStore and you can continue typing your next comment.
+        // also, awaiting led to some clunky issues with the comment cursor.
         this.props.afterSubmit()
-        this.setState({ updating: false }, () => {
-          this.focusTextArea()
-        })
+        this.focusTextArea()
       }
     )
   }
@@ -161,7 +159,7 @@ class CommentEntryForm extends React.Component {
   }
 
   render() {
-    const { editorState, updating } = this.state
+    const { editorState } = this.state
     const { uiStore } = this.props
 
     return (
@@ -169,7 +167,6 @@ class CommentEntryForm extends React.Component {
         <StyledCommentInputWrapper replying={!!uiStore.replyingToCommentId}>
           {this.renderSubjectOfComment}
           <CommentInput
-            disabled={updating}
             editorState={editorState}
             onChange={this.handleInputChange}
             handleSubmit={this.handleSubmit}
