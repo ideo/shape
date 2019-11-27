@@ -112,6 +112,7 @@ class MovableGridCard extends React.PureComponent {
     }
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
       if (this.unmounted) return
+      // TODO: handle in-between drag-and-drop state; prevent scroll when debounce is active
       this.setState({ allowTouchDeviceDragging: true })
     }, v.touchDeviceHoldToDragTime * 2)
   }
@@ -165,6 +166,7 @@ class MovableGridCard extends React.PureComponent {
     }
 
     // Vertical Scroll
+    // FIXME: does not work on mobile
     if (e.clientY < v.topScrollTrigger) {
       // At top of viewport
       this.scrolling = true
