@@ -101,17 +101,30 @@ class Routes extends React.Component {
   }
 
   componentDidMount() {
-    const { apiStore } = this.props
+    const { apiStore, uiStore } = this.props
     apiStore.loadCurrentUser({
       onSuccess: currentUser => {
         firebaseClient.authenticate(currentUser.google_auth_token)
       },
     })
+
     document.addEventListener('keydown', captureGlobalKeypress)
+    document.addEventListener(
+      'touchmove',
+      e => {
+        if (uiStore.dragging) {
+          e.preventDefault()
+        }
+      },
+      { passive: false }
+    )
   }
 
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
+    document.addEventListener('touchmove', e => {
+      e.preventDefault()
+    })
   }
 
   handleWindowResize = ({ windowWidth }) => {

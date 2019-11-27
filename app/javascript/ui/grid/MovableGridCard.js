@@ -113,7 +113,7 @@ class MovableGridCard extends React.PureComponent {
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
       if (this.unmounted) return
       this.setState({ allowTouchDeviceDragging: true })
-    }, v.touchDeviceHoldToDragTime)
+    }, v.touchDeviceHoldToDragTime * 2)
   }
 
   componentWillReceiveProps({ position }) {
@@ -718,8 +718,6 @@ class MovableGridCard extends React.PureComponent {
           default={defaultPosition}
           disableDragging={
             !canEditCollection ||
-            // NOTE: disabling dragging for touchscreens because of conflict with touch scrolling
-            (uiStore.isTouchDevice && cols === 1) ||
             card.isPinnedAndLocked ||
             !!uiStore.editingCardCover
           }
