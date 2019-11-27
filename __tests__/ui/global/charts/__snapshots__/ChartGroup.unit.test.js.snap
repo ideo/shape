@@ -2208,8 +2208,8 @@ exports[`ChartGroup renders snapshot 1`] = `
     domain={
       Object {
         "x": Array [
-          "2018-07-10",
-          "2018-09-10",
+          2018-07-10T00:00:00.000Z,
+          2018-09-10T00:00:00.000Z,
         ],
         "y": Array [
           0,
@@ -2757,15 +2757,15 @@ exports[`ChartGroup renders snapshot 1`] = `
       data={
         Array [
           Object {
-            "date": "2018-07-10",
+            "date": 2018-07-10T00:00:00.000Z,
             "value": 10,
           },
           Object {
-            "date": "2018-08-10",
+            "date": 2018-08-10T00:00:00.000Z,
             "value": 25,
           },
           Object {
-            "date": "2018-09-10",
+            "date": 2018-09-10T00:00:00.000Z,
             "value": 30,
           },
         ]
@@ -2779,8 +2779,8 @@ exports[`ChartGroup renders snapshot 1`] = `
       domain={
         Object {
           "x": Array [
-            "2018-07-10",
-            "2018-09-10",
+            2018-07-10T00:00:00.000Z,
+            2018-09-10T00:00:00.000Z,
           ],
           "y": Array [
             0,
@@ -3318,15 +3318,15 @@ exports[`ChartGroup renders snapshot 1`] = `
       data={
         Array [
           Object {
-            "date": "2018-07-10",
+            "date": 2018-07-10T00:00:00.000Z,
             "value": 10,
           },
           Object {
-            "date": "2018-08-10",
+            "date": 2018-08-10T00:00:00.000Z,
             "value": 25,
           },
           Object {
-            "date": "2018-09-10",
+            "date": 2018-09-10T00:00:00.000Z,
             "value": 30,
           },
         ]
@@ -3881,8 +3881,8 @@ exports[`ChartGroup renders snapshot 1`] = `
       domain={
         Object {
           "x": Array [
-            "2018-07-10",
-            "2018-09-10",
+            2018-07-10T00:00:00.000Z,
+            2018-09-10T00:00:00.000Z,
           ],
           "y": Array [
             0,

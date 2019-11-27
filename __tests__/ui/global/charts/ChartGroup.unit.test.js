@@ -61,8 +61,9 @@ describe('ChartGroup', () => {
     })
 
     it('renders one label on X axis of the chart', () => {
+      const date = new Date(fakeAreaChartDataset.data[0].date)
       expect(wrapper.find('VictoryAxis').props().label).toEqual(
-        utcMoment(fakeAreaChartDataset.data[0].date).format('MM/DD/YY')
+        utcMoment(date).format('MM/DD/YY')
       )
     })
   })
