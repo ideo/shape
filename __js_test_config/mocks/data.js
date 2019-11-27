@@ -66,10 +66,7 @@ export const fakeAreaChartDataset = {
   order: 0,
   tiers: [],
   data: areaChartData,
-  dataWithDates: areaChartData.map(d => ({
-    date: new Date(d.date),
-    value: d.value
-  }))
+  dataWithDates: areaChartData
 }
 
 const fakeBarChartData = [

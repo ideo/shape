@@ -13,15 +13,15 @@ exports[`LineChart renders snapshot 1`] = `
   data={
     Array [
       Object {
-        "date": 2018-07-10T00:00:00.000Z,
+        "date": "2018-07-10",
         "value": 10,
       },
       Object {
-        "date": 2018-08-10T00:00:00.000Z,
+        "date": "2018-08-10",
         "value": 25,
       },
       Object {
-        "date": 2018-09-10T00:00:00.000Z,
+        "date": "2018-09-10",
         "value": 30,
       },
     ]
