@@ -123,8 +123,11 @@ class CommentEntryForm extends React.Component {
       {
         editorState: EditorState.createEmpty(),
       },
-      async () => {
-        await thread.API_saveComment(rawData)
+      () => {
+        thread.API_saveComment(rawData)
+        // NOTE: the next steps do not need to await the API save to finish,
+        // your temp comment will get added to apiStore and you can continue typing your next comment.
+        // also, awaiting led to some clunky issues with the comment cursor.
         this.props.afterSubmit()
         this.focusTextArea()
       }

@@ -160,18 +160,18 @@ class CommentThread extends BaseRecord {
   async afterCommentCreate(comment) {
     const { uiStore } = this
     const { commentingOnRecord, currentQuillEditor } = uiStore
-    if (comment.persisted && commentingOnRecord.isCollection) {
+    if (!comment.persisted || !commentingOnRecord) {
+      uiStore.setCommentingOnRecord(null)
+      return
+    }
+    if (commentingOnRecord.isCollection) {
       // increment unresolved count by 1 for collection cover to get recent count
       commentingOnRecord.unresolved_count =
         commentingOnRecord.unresolved_count + 1
       uiStore.setCommentingOnRecord(null)
       return
     }
-    if (
-      comment.persisted &&
-      uiStore.isCommentingOnTextRange() &&
-      currentQuillEditor
-    ) {
+    if (uiStore.isCommentingOnTextRange() && currentQuillEditor) {
       // set this now as it won't be present until the text item has saved
       comment.text_highlight = uiStore.selectedTextRangeForCard.textContent
       // capture contents so that we can now safely set commentingOnRecord to false (???)
