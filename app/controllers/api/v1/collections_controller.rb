@@ -224,6 +224,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :height,
       :is_cover,
       :hidden,
+      :pinned,
     )
   end
 
