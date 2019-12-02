@@ -306,16 +306,12 @@ class RealtimeTextItem extends React.Component {
 
   get quillData() {
     const { item } = this.props
-    const quillData = toJS(item.quill_data)
+    const quillData = toJS(item.quill_data) || {}
+    if (!quillData.ops) quillData.ops = []
     // Set initial font size - if text item is blank,
     // and user has chosen a h* tag (e.g. h1)
     // (p tag does not require any ops changes)
-    if (
-      quillData &&
-      quillData.ops &&
-      quillData.ops.length === 0 &&
-      this.headerSize
-    ) {
+    if (quillData.ops.length === 0 && this.headerSize) {
       quillData.ops.push({
         insert: '\n',
         attributes: { header: this.headerSize },
@@ -383,10 +379,7 @@ class RealtimeTextItem extends React.Component {
     const newlineOpIndices = this.newlineIndicesForDelta(delta)
     // Return if there wasn't a specified header size in previous newline operation
     const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
-    if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header) {
-      return null
-    }
-    return prevHeaderSizeOp.attributes.header
+    return _.get(prevHeaderSizeOp, 'attributes.header')
   }
 
   adjustHeaderSizeIfNewline = delta => {
