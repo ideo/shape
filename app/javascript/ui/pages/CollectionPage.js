@@ -45,7 +45,8 @@ class CollectionPage extends React.Component {
 
   constructor(props) {
     super(props)
-    this.reloadData = _.debounce(this._reloadData, 1500)
+    this.reloadData = _.throttle(this._reloadData, 3000)
+    this.setEditor = _.throttle(this._setEditor, 4000)
   }
 
   componentDidMount() {
@@ -271,12 +272,12 @@ class CollectionPage extends React.Component {
   }
 
   @action
-  setEditor = editor => {
+  _setEditor = editor => {
     this.currentEditor = editor
     if (this.editorTimeout) clearTimeout(this.editorTimeout)
     // this.unmounted comes from PageWithApi
     if (this.unmounted || _.isEmpty(editor)) return
-    this.editorTimeout = setTimeout(() => this.setEditor({}), 4000)
+    this.editorTimeout = setTimeout(() => this._setEditor({}), 4000)
   }
 
   handleAllClick = ev => {
