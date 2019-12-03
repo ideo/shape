@@ -518,6 +518,14 @@ class MovableGridCard extends React.PureComponent {
     )
   }
 
+  renderResizeIcon = menuOpen => {
+    return (
+      <StyledResizeIcon menuOpen={menuOpen} className="show-on-hover">
+        <ResizeIcon />
+      </StyledResizeIcon>
+    )
+  }
+
   render() {
     const {
       card,
@@ -622,9 +630,6 @@ class MovableGridCard extends React.PureComponent {
       showHotEdge,
     }
 
-    const draggingMultiple =
-      cardProps.dragging && uiStore.multiMoveCardIds.length > 1
-
     let _zIndex = 1
     if (!moveComplete) _zIndex = cardDragging
     if (uiStore.cardMenuOpen.id === card.id) {
@@ -667,7 +672,6 @@ class MovableGridCard extends React.PureComponent {
       x: xPos,
       y: yPos,
     }
-    const mdlPlaceholder = !dragging && card.isMDLPlaceholder
 
     if (card.isMDLPlaceholder) {
       _zIndex = cardDragging
@@ -676,6 +680,72 @@ class MovableGridCard extends React.PureComponent {
       shouldHide = shouldHide || !uiStore.shouldOpenMoveModal
     }
 
+    const draggingMultiple =
+      cardProps.dragging && uiStore.multiMoveCardIds.length > 1
+
+    const mdlPlaceholder = !dragging && card.isMDLPlaceholder
+
+    const dragPosition = mdlPlaceholder ? null : { x, y }
+    const isTouchDeviceSingleColumn = uiStore.isTouchDevice && cols === 1
+
+    const disableDragging =
+      !canEditCollection ||
+      card.isPinnedAndLocked ||
+      !!uiStore.editingCardCover ||
+      isTouchDeviceSingleColumn
+
+    const rndProps = {
+      ref: c => {
+        this.rnd = c
+      },
+      bounds: null,
+      onDragStart: this.handleStart,
+      onDrag: this.handleDrag,
+      onDragStop: this.handleStop('drag'),
+      onResizeStart: this.handleStart,
+      onResize: this.handleResize,
+      onResizeStop: this.handleStop('resize'),
+      minWidth: minWidth,
+      minHeight: minHeight,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      dragAxis: 'none',
+      cancel: '.no-drag',
+      size: {
+        width: adjustedWidth,
+        height: adjustedHeight,
+      },
+      // the position that updates as you drag the card
+      position: dragPosition,
+      // "home base" for this card; where it actually sits in the grid
+      default: defaultPosition,
+      disableDragging: disableDragging,
+      enableResizing: {
+        bottomRight:
+          canEditCollection &&
+          !card.isPinnedAndLocked &&
+          card.record &&
+          !card.record.isChart &&
+          !card.record.isGenericFile &&
+          !card.record.isCarousel,
+        bottom: false,
+        bottomLeft: false,
+        left: false,
+        right: false,
+        top: false,
+        topLeft: false,
+        topRight: false,
+      },
+      extendsProps: {
+        handleComponent: {
+          bottomRight: () => this.renderResizeIcon(menuOpen),
+        },
+      },
+      style: {
+        // animate grid items that are moving as they're being displaced
+        transition,
+      },
+    }
     return (
       <StyledCardWrapper
         className={touchDeviceClass}
@@ -693,66 +763,7 @@ class MovableGridCard extends React.PureComponent {
         selectedMultiple={uiStore.movingCardIds.length > 1}
         // <-----
       >
-        <Rnd
-          ref={c => {
-            this.rnd = c
-          }}
-          bounds={null}
-          onDragStart={this.handleStart}
-          onDrag={this.handleDrag}
-          onDragStop={this.handleStop('drag')}
-          onResizeStart={this.handleStart}
-          onResize={this.handleResize}
-          onResizeStop={this.handleStop('resize')}
-          minWidth={minWidth}
-          minHeight={minHeight}
-          maxWidth={maxWidth}
-          maxHeight={maxHeight}
-          dragAxis="none"
-          cancel=".no-drag"
-          size={{
-            width: adjustedWidth,
-            height: adjustedHeight,
-          }}
-          // the position that updates as you drag the card
-          position={mdlPlaceholder ? null : { x, y }}
-          // "home base" for this card; where it actually sits in the grid
-          default={defaultPosition}
-          disableDragging={
-            !canEditCollection ||
-            card.isPinnedAndLocked ||
-            !!uiStore.editingCardCover
-          }
-          enableResizing={{
-            bottomRight:
-              canEditCollection &&
-              !card.isPinnedAndLocked &&
-              card.record &&
-              !card.record.isChart &&
-              !card.record.isGenericFile &&
-              !card.record.isCarousel,
-            bottom: false,
-            bottomLeft: false,
-            left: false,
-            right: false,
-            top: false,
-            topLeft: false,
-            topRight: false,
-          }}
-          extendsProps={{
-            handleComponent: {
-              bottomRight: () => (
-                <StyledResizeIcon menuOpen={menuOpen} className="show-on-hover">
-                  <ResizeIcon />
-                </StyledResizeIcon>
-              ),
-            },
-          }}
-          style={{
-            // animate grid items that are moving as they're being displaced
-            transition,
-          }}
-        >
+        <Rnd {...rndProps}>
           <InnerCardWrapper
             animatedBounce={holdingOver}
             width={width + resizeWidth}
