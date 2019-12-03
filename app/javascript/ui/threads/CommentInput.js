@@ -41,6 +41,13 @@ class CommentInput extends React.Component {
       transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
       const { y } = uiStore.activityLogPosition
       top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1))}px`
+      if (uiStore.isTouchDevice) {
+        if (uiStore.gridSettings.cols == 1) {
+          top = `${window.innerHeight - (50 * suggestions.length + 1) - 35}px`
+        } else if (uiStore.gridSettings.cols == 4) {
+          top = `${decoratorRect.top + -(y + 30)}px`
+        }
+      }
     } else if (isActive) {
       transform = 'scaleY(0)'
       transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
