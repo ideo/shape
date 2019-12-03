@@ -299,35 +299,9 @@ class CollectionPage extends React.Component {
         // don't reload your own updates
         return
       }
-      if (data.data && data.data.item) {
-        const { item } = data.data
-        if (item && item.quill_data) {
-          this.handleTextItemUpdate(item, data.current_editor)
-          return
-        }
-      }
       this.setEditor(data.current_editor)
       this.reloadData()
     }
-  }
-
-  handleTextItemUpdate = (item, current_editor) => {
-    const { apiStore, uiStore } = this.props
-    const localItem = apiStore.find('items', item.id)
-    if (localItem) {
-      // update with incoming content UNLESS we are editing that item
-      if (
-        uiStore.textEditingItem &&
-        uiStore.textEditingItem.id === localItem.id
-      ) {
-        return
-      }
-      localItem.quill_data = item.quill_data
-    } else {
-      // we don't have the item, it must be a new card that we need to fetch
-      this.reloadData()
-    }
-    this.setEditor(current_editor)
   }
 
   async _reloadData() {

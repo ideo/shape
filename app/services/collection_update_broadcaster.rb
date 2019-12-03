@@ -11,6 +11,9 @@ class CollectionUpdateBroadcaster < SimpleService
     @collection.single_edit(@user)
   end
 
+  # NOTE: this method is not currently used as we investigate whether the frequency of updates
+  # was causing some of the collaborative issues.
+  # Resurrect `CollectionPage.js#handleTextItemUpdate` from this commit if you wish to restore.
   def text_item_updated(item)
     return if @collection.nil?
 
