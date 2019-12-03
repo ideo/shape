@@ -294,11 +294,8 @@ class CollectionPage extends React.Component {
     const submissions = collection.submissions_collection
     const submissionsId = submissions ? submissions.id : ''
 
-    if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
-      if (
-        !_.isEmpty(data.current_editor) &&
-        data.current_editor.id === apiStore.currentUserId
-      ) {
+    if (_.includes(_.compact([currentId, submissionsId]), data.record_id)) {
+      if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
         // don't reload your own updates
         return
       }
