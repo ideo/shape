@@ -94,7 +94,7 @@ class Item
       # new_data may include an error message
       received_changes(new_data, user)
 
-      return if parent.num_viewers < 2 || parent.broadcasting?
+      return if parent.nil? || parent.num_viewers < 2 || parent.broadcasting?
 
       parent.update(broadcasting: true)
       CollectionBroadcastWorker.perform_in(3.seconds, parent.id)
