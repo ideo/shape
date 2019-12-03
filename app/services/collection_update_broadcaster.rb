@@ -18,7 +18,7 @@ class CollectionUpdateBroadcaster < SimpleService
       {
         item: {
           id: item.id,
-          data_content: item.data_content,
+          quill_data: item.quill_data,
         },
       },
       @user,
