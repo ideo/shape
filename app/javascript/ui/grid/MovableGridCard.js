@@ -256,6 +256,7 @@ class MovableGridCard extends React.PureComponent {
     // When zooming browser in or out, it multiplies pageX and pageY by that zoom
     // e.g. 50% zoom multiplies all coordinate values by 2
     uiStore.drag({ x: pageX, y: pageY })
+    this.debouncedAllowTouchDeviceDrag.cancel()
 
     // x, y represent the current drag position
     const { x, y } = data
@@ -331,6 +332,7 @@ class MovableGridCard extends React.PureComponent {
           this.scrolling = false
         }, 350)
         uiStore.stopDragging()
+        this.debouncedAllowTouchDeviceDrag.cancel()
         this.setState({
           timeoutId,
         })
