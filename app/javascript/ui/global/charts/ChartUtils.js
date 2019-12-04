@@ -106,6 +106,62 @@ export const domainProps = PropTypes.shape({
 
 export const emojiTooltipText = datum => `${datum.value}`
 
+export const tierTooltipLabel = ({ tiers, datum, dataset }) => {
+  if (!datum.date) return datum.value
+  const { value } = datum
+  let currentTier = 0
+  tiers.forEach(tier => {
+    if (value >= tier.value) currentTier = tier
+  })
+  let nextTier = tiers[tiers.length - 1]
+  let isFinalTier = false
+  const currentTierIdx = tiers.indexOf(currentTier)
+  if (currentTierIdx !== tiers.length - 1) {
+    nextTier = tiers[currentTierIdx + 1]
+  } else {
+    isFinalTier = true
+  }
+
+  return `${currentTier.name}\n${dataset.name}${
+    isFinalTier
+      ? ''
+      : `\n${nextTier.value - datum.value}pts away from ${nextTier.name}`
+  }\n${utcMoment(datum.date).format('l')} | ${datum.value}/100`
+}
+
+export const TierTooltipLabel = ({ tiers, datum, dataset }) => {
+  if (!datum.date) return datum.value
+  const { value } = datum
+  let currentTier = 0
+  tiers.forEach(tier => {
+    if (value >= tier.value) currentTier = tier
+  })
+  let nextTier = tiers[tiers.length - 1]
+  let isFinalTier = false
+  const currentTierIdx = tiers.indexOf(currentTier)
+  if (currentTierIdx !== tiers.length - 1) {
+    nextTier = tiers[currentTierIdx + 1]
+  } else {
+    isFinalTier = true
+  }
+
+  // return `${currentTier.name}\n${dataset.name}\n${!isFinalTier &&
+  //   `${nextTier.value - datum.value}pts away from ${
+  //     nextTier.name
+  //   }`}\n${utcMoment(datum.date).format('l')} | ${datum.value}/100`
+  console.log('in tooltip label', { tiers, datum, dataset })
+
+  return (
+    <text>
+      <tspan style={{ fontSize: '30px' }}>{currentTier.name}</tspan>
+      <tspan>{dataset.name}</tspan>
+      <tspan>
+        {utcMoment(datum.date).format('l')} | {datum.value}/100
+      </tspan>
+    </text>
+  )
+}
+
 export const dateTooltipText = (datum, datasetName = null) => {
   if (!datum.date) return datum.value
   const text = `${datum.value} on ${utcMoment(datum.date).format('l')}`

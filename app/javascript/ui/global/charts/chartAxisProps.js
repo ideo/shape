@@ -64,7 +64,10 @@ const TickLabel = props => {
   )
 }
 
-const fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
+const fullDate = (date, index) => {
+  const momentDate = utcMoment(date)
+  return `Q${momentDate.quarter()} ${momentDate.year()}`
+}
 
 export const monthlyXAxisText = (
   datasetValues,
@@ -113,6 +116,7 @@ const ChartAxisProps = ({
     style: chartAxisStyle(isSmallChartStyle),
     offsetY: isSmallChartStyle ? 13 : 22,
     axisComponent: <LineSegment transform="translate(10 26) scale(0.955)" />,
+    tickCount: 5,
   }
 
   const datasetXAxisText = (date, index) => {

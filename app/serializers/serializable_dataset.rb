@@ -24,12 +24,6 @@ class SerializableDataset < BaseJsonSerializer
   belongs_to :data_source
 
   attribute :style do
-    if @object.order.blank? || @object.order.zero? || @object.style.blank?
-      @object.style
-    else
-      @object.style.symbolize_keys.merge(
-        fill: '#000000',
-      )
-    end
+    @object.style
   end
 end

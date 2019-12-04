@@ -23,6 +23,10 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  get hasDates() {
+    return !!this.dataWithDates[0].date
+  }
+
   get isEmojiOrScaleQuestion() {
     return [
       'question_clarity',

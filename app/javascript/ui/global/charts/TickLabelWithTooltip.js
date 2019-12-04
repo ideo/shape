@@ -112,12 +112,14 @@ class TickLabelWithTooltip extends React.PureComponent {
   render() {
     const {
       alwaysShowLabels,
+      neverShowLabels,
       cardArea,
       data,
       datum,
       displayTicks,
       labelTextRenderer,
       tooltipTextRenderer,
+      tooltipLabelComponent,
       x,
       y,
     } = this.props
@@ -134,15 +136,15 @@ class TickLabelWithTooltip extends React.PureComponent {
           flyoutComponent={displayTicks ? <DotFlyout /> : <Flyout />}
           dx={dx * 5}
           dy={0}
+          labelComponent={tooltipLabelComponent}
           text={tooltipText}
         />
-        {showAlways && (
+        {showAlways && !neverShowLabels && (
           <Fragment>
             <VictoryTooltip
               active={showAlways}
               {...this.props}
               dx={dx}
-              dy={-20}
               style={{ fontSize: this.fontSizes.label, fontWeight: 'normal' }}
               text={labelText}
               flyoutStyle={{ stroke: 'transparent', fill: 'transparent' }}
@@ -172,6 +174,7 @@ TickLabelWithTooltip.propTypes = {
   cardArea: PropTypes.number,
   displayTicks: PropTypes.bool,
   alwaysShowLabels: PropTypes.bool,
+  neverShowLabels: PropTypes.bool,
   fontSize: PropTypes.number,
 }
 TickLabelWithTooltip.defaultProps = {
@@ -180,6 +183,7 @@ TickLabelWithTooltip.defaultProps = {
   cardArea: 1,
   displayTicks: true,
   alwaysShowLabels: false,
+  neverShowLabels: false,
   fontSize: 18,
 }
 
