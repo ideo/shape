@@ -139,6 +139,10 @@ class MovableGridCard extends React.PureComponent {
     )
   }
 
+  get isAndroid() {
+    return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
+  }
+
   handleStart = (e, data) => {
     e.preventDefault()
     this.scrolling = false
@@ -166,12 +170,21 @@ class MovableGridCard extends React.PureComponent {
     }
 
     // Vertical Scroll
-    if (e.clientY < v.topScrollTrigger) {
+    if (
+      e.clientY < v.topScrollTrigger ||
+      (uiStore.isTouchDevice &&
+        e.changedTouches[0].clientY < v.topScrollTrigger)
+    ) {
       // At top of viewport
       this.scrolling = true
       this.scrollUp(null, e.clientY)
       return
-    } else if (e.clientY > window.innerHeight - v.topScrollTrigger) {
+    } else if (
+      e.clientY > window.innerHeight - v.topScrollTrigger ||
+      (uiStore.isTouchDevice &&
+        !this.isAndroid &&
+        e.changedTouches[0].clientY > window.innerHeight - v.topScrollTrigger)
+    ) {
       // At bottom of viewport
       this.scrolling = true
       this.scrollDown()
@@ -691,7 +704,7 @@ class MovableGridCard extends React.PureComponent {
       !canEditCollection ||
       card.isPinnedAndLocked ||
       !!uiStore.editingCardCover ||
-      getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
+      this.isAndroid
 
     const rndProps = {
       ref: c => {
