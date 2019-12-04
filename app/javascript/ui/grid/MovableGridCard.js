@@ -6,7 +6,8 @@ import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
-import v from '~/utils/variables'
+import v, { TOUCH_DEVICE_OS } from '~/utils/variables'
+import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
@@ -112,9 +113,8 @@ class MovableGridCard extends React.PureComponent {
     }
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
       if (this.unmounted) return
-      // TODO: handle in-between drag-and-drop state; prevent scroll when debounce is active
       this.setState({ allowTouchDeviceDragging: true })
-    }, v.touchDeviceHoldToDragTime * 2)
+    }, v.touchDeviceHoldToDragTime)
   }
 
   componentWillReceiveProps({ position }) {
@@ -166,7 +166,6 @@ class MovableGridCard extends React.PureComponent {
     }
 
     // Vertical Scroll
-    // FIXME: does not work on mobile
     if (e.clientY < v.topScrollTrigger) {
       // At top of viewport
       this.scrolling = true
@@ -313,31 +312,31 @@ class MovableGridCard extends React.PureComponent {
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
     if (horizontalScroll) document.body.style['overflow-x'] = 'auto'
-    this.setState({
-      allowTouchDeviceDragging: false,
-    })
-    this.setState({ dragging: false, resizing: false }, () => {
-      // Resizing has to be reset first, before the handler or the card dimensions
-      // will jump back in forth as the grid resizes the actual card while this
-      // resize state is still set.
-      this.setState({
-        resizeWidth: 0,
-        resizeHeight: 0,
-      })
-      onDragOrResizeStop(this.props.card.id, type, ev)
-      const timeoutId = setTimeout(() => {
-        // have this item remain "on top" while it animates back
+    this.setState(
+      { dragging: false, resizing: false, allowTouchDeviceDragging: false },
+      () => {
+        // Resizing has to be reset first, before the handler or the card dimensions
+        // will jump back in forth as the grid resizes the actual card while this
+        // resize state is still set.
         this.setState({
-          moveComplete: true,
+          resizeWidth: 0,
+          resizeHeight: 0,
+        })
+        onDragOrResizeStop(this.props.card.id, type, ev)
+        const timeoutId = setTimeout(() => {
+          // have this item remain "on top" while it animates back
+          this.setState({
+            moveComplete: true,
+          })
+          this.scrolling = false
+        }, 350)
+        uiStore.stopDragging()
+        this.setState({
+          timeoutId,
         })
         this.scrolling = false
-      }, 350)
-      uiStore.stopDragging()
-      this.setState({
-        timeoutId,
-      })
-      this.scrolling = false
-    })
+      }
+    )
   }
 
   handleResize = (e, dir, ref, delta, position) => {
@@ -660,10 +659,9 @@ class MovableGridCard extends React.PureComponent {
       transition = cardHoverTransition
     }
 
+    const isTouchDeviceSingleColumn = uiStore.isTouchDevice && cols === 1
     const touchDeviceClass =
-      (uiStore.isTouchDevice && cols === 1) || uiStore.isCypress
-        ? 'touch-device'
-        : ''
+      isTouchDeviceSingleColumn || uiStore.isCypress ? 'touch-device' : ''
 
     let shouldHide = !dragging && hidden
     const defaultPosition = {
@@ -686,13 +684,12 @@ class MovableGridCard extends React.PureComponent {
     const mdlPlaceholder = !dragging && card.isMDLPlaceholder
 
     const dragPosition = mdlPlaceholder ? null : { x, y }
-    const isTouchDeviceSingleColumn = uiStore.isTouchDevice && cols === 1
 
     const disableDragging =
       !canEditCollection ||
       card.isPinnedAndLocked ||
       !!uiStore.editingCardCover ||
-      isTouchDeviceSingleColumn
+      getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
 
     const rndProps = {
       ref: c => {

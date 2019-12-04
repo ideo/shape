@@ -101,7 +101,7 @@ class Routes extends React.Component {
   }
 
   componentDidMount() {
-    const { apiStore, uiStore } = this.props
+    const { apiStore } = this.props
     apiStore.loadCurrentUser({
       onSuccess: currentUser => {
         firebaseClient.authenticate(currentUser.google_auth_token)
@@ -109,21 +109,15 @@ class Routes extends React.Component {
     })
 
     document.addEventListener('keydown', captureGlobalKeypress)
-    document.addEventListener(
-      'touchmove',
-      e => {
-        if (uiStore.dragging) {
-          e.preventDefault()
-        }
-      },
-      { passive: false }
-    )
+    document.addEventListener('touchmove', this.handleTouchMove, {
+      passive: false,
+    })
   }
 
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
-    document.addEventListener('touchmove', e => {
-      e.preventDefault()
+    document.removeEventListener('touchmove', this.handleTouchMove, {
+      passive: false,
     })
   }
 
@@ -181,6 +175,13 @@ class Routes extends React.Component {
         maxY: null,
       })
     }, 500)
+  }
+
+  handleTouchMove = e => {
+    const { uiStore } = this.props
+    if (uiStore.dragging) {
+      e.preventDefault()
+    }
   }
 
   _setSelectedArea = coords => {
