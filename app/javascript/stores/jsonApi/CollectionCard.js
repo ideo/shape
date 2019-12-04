@@ -229,7 +229,7 @@ class CollectionCard extends BaseRecord {
     const { uiStore } = this
     const filteredCardIds = this.apiStore
       .findAll('collection_cards')
-      .filter(card => cardIds.indexOf(card.id) > -1 && card.canEdit)
+      .filter(card => _.includes(cardIds, card.id) && card.canEdit)
       .map(card => card.id)
     const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
     uiStore.reselectCardIds(filteredCardIds)
