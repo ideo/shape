@@ -154,7 +154,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
         before do
           visible_card_1.record.update(
-            name: 'a plant'
+            name: 'a plant',
           )
           Collection.reindex
           Collection.searchkick_index.refresh
@@ -162,8 +162,16 @@ RSpec.describe CollectionCardFilter, type: :service do
 
         it 'should only return the cards that match the filter query' do
           expect(subject).to match_array(
-            [visible_card_1,]
+            [visible_card_1],
           )
+        end
+      end
+
+      context 'with ids_only setting' do
+        let(:ids_only) { true }
+
+        it 'returns ids of all visible cards' do
+          expect(subject).to match_array(visible_cards.map(&:id))
         end
       end
     end
@@ -275,14 +283,6 @@ RSpec.describe CollectionCardFilter, type: :service do
           expect(collection.can_view?(user)).to be true
           expect(subject).to match_array([visible_card_1, visible_card_2, private_card])
         end
-      end
-    end
-
-    context 'with ids_only setting' do
-      let(:ids_only) { true }
-
-      it 'returns ids of all visible cards' do
-        expect(subject).to match_array(visible_cards.map(&:id))
       end
     end
   end
