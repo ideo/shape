@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import moment from 'moment-mini'
 
 import { LineSegment, VictoryLabel } from 'victory'
 
@@ -95,7 +96,12 @@ export const monthlyXAxisText = (
       if (index < allDates.length - 1) return ''
     }
 
-    return `${dateNearMonthEdge.format('MMM')}`
+    let format = 'MMM'
+    // If this chart has over a year of data, show the year
+    if (moment().diff(moment(datasetValues[0].date), 'years') > 0) {
+      format += ' YYY'
+    }
+    return `${dateNearMonthEdge.format(format)}`
   }
   // Don't show the label if it's not within a certain month range
   return ''

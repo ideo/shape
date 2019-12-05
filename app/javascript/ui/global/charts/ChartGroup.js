@@ -182,7 +182,6 @@ class ChartGroup extends React.Component {
         isSmallChartStyle: this.isSmallChartStyle,
       })
     }
-
     return <VictoryAxis {...axisProps} />
   }
 
