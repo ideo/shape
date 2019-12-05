@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
-import color from 'color'
 import styled from 'styled-components'
 import {
   VictoryAxis,
@@ -132,9 +132,7 @@ class ChartGroup extends React.Component {
   get tierAxis() {
     const { tiers } = this.primaryDataset
     if (!tiers.length) return
-    const renderedColor = color(tiers[0].fill)
-      // .darken(0.12 * this.secondaryDatasetsWithData.length)
-      .string()
+    const renderedColor = _.get(tiers[0], 'style.fill') || 'black'
     return (
       <VictoryAxis
         dependentAxis
