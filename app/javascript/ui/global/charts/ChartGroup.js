@@ -12,7 +12,7 @@ import {
 
 import { DisplayText } from '~/ui/global/styled/typography'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
-import { DATASET_CHART_TYPES } from '~/utils/variables'
+import v, { DATASET_CHART_TYPES } from '~/utils/variables'
 import AreaChart from '~/ui/global/charts/AreaChart'
 import BarChart from '~/ui/global/charts/BarChart'
 import LineChart from '~/ui/global/charts/LineChart'
@@ -299,7 +299,9 @@ class ChartGroup extends React.Component {
       <VictoryChart
         theme={victoryTheme}
         padding={{ top: 0, left: 0, right: 0, bottom: 8 }}
-        containerComponent={<VictoryVoronoiContainer />}
+        containerComponent={
+          <VictoryVoronoiContainer portalZIndex={v.zIndex.gridCard} />
+        }
         scale={{ x: 'time' }}
         domain={this.chartDomain}
       >

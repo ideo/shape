@@ -70,6 +70,9 @@ const fullDate = (date, index) => {
   return `Q${momentDate.quarter()} ${momentDate.year()}`
 }
 
+const isDataYearOld = datasetValues =>
+  moment().diff(moment(datasetValues[0].date), 'years') > 0
+
 export const monthlyXAxisText = (
   datasetValues,
   datasetTimeframe,
@@ -98,7 +101,7 @@ export const monthlyXAxisText = (
 
     let format = 'MMM'
     // If this chart has over a year of data, show the year
-    if (moment().diff(moment(datasetValues[0].date), 'years') > 0) {
+    if (isDataYearOld(datasetValues)) {
       format += ' YYY'
     }
     return `${dateNearMonthEdge.format(format)}`
@@ -116,13 +119,20 @@ const ChartAxisProps = ({
   // NOTE: The transform property is for IE11 which doesn't recognize CSS
   // transform properties on SVG
 
+  let tickCount = 12
+  if (isSmallChartStyle) {
+    tickCount = 5
+  } else {
+    // There's less room when we also render the year in the tick labels
+    if (isDataYearOld(datasetValues)) tickCount = 8
+  }
   const axisProps = {
     dependentAxis: false,
     domain: domain,
     style: chartAxisStyle(isSmallChartStyle),
     offsetY: isSmallChartStyle ? 13 : 22,
     axisComponent: <LineSegment transform="translate(10 26) scale(0.955)" />,
-    tickCount: 5,
+    tickCount,
   }
 
   const datasetXAxisText = (date, index) => {

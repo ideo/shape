@@ -126,7 +126,7 @@ export const tierTooltipLabel = ({ tiers, datum, dataset }) => {
     isFinalTier
       ? ''
       : `\n${nextTier.value - datum.value}pts away from ${nextTier.name}`
-  }\n${utcMoment(datum.date).format('l')} | ${datum.value}/100`
+  }\n${utcMoment(datum.date).format('MMM YYYY')} | ${datum.value}/100`
 }
 
 export const dateTooltipText = (datum, datasetName = null) => {
