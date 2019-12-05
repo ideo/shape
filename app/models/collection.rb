@@ -368,6 +368,10 @@ class Collection < ApplicationRecord
     end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
+    if c.is_a?(Collection::UserProfile)
+      c = c.becomes(Collection)
+      c.type = nil
+    end
     if parent.master_template?
       # when duplicating into a master_template, this collection should be a subtemplate
       c.template_id = nil
