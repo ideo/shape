@@ -104,10 +104,10 @@ class CollectionPage extends React.Component {
     }
 
     let params
-    if (collection.isRegularCollection) {
-      params = { page, per_page, rows, cols }
-    } else {
+    if (collection.isBoard) {
       params = { rows }
+    } else {
+      params = { page, per_page, rows, cols }
     }
 
     return collection.API_fetchCards(params).then(() => {
