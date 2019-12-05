@@ -617,7 +617,6 @@ ActiveRecord::Schema.define(version: 2019_12_04_221155) do
     t.integer "taggings_count", default: 0
     t.jsonb "organization_ids", default: []
     t.string "color"
-    t.integer "application_id"
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 

@@ -5,7 +5,7 @@ describe Api::V1::TagsController, type: :request, json: true, auth: false, api_t
   let(:application) { @api_token&.application }
 
   describe 'GET #index' do
-    let!(:tags) { create_list(:tag, 3, application: application) }
+    let!(:tags) { create_list(:tag, 3) }
     let(:path) { api_v1_tags_path }
 
     it 'returns a 200' do
@@ -18,6 +18,17 @@ describe Api::V1::TagsController, type: :request, json: true, auth: false, api_t
       expect(json_object_ids).to match_array(tags.map(&:id))
     end
 
+    it 'filters tag that match organization_ids' do
+      org_tag = tags.sample
+      org_tag.update(organization_ids: [123])
+      get(
+        path,
+        params: { filter: { organization_ids: [123] } },
+        headers: { Authorization: "Bearer #{@api_token.token}" },
+      )
+      expect(json_object_ids).to match_array([org_tag.id])
+    end
+
     it 'filters tag that match name' do
       get(
         path,
@@ -28,19 +39,16 @@ describe Api::V1::TagsController, type: :request, json: true, auth: false, api_t
     end
 
     context 'with user auth', auth: true, api_token: false do
-      let!(:organization) { create(:organization, admin: current_user) }
-      let!(:user_tags) { create_list(:tag, 3, organization_ids: [organization.id]) }
-
-      it 'returns the tags' do
+      it 'returns all tags' do
         get(path)
         expect(response.status).to eq(200)
-        expect(json_object_ids).to match_array(user_tags.map(&:id))
+        expect(json_object_ids).to match_array(tags.map(&:id))
       end
     end
   end
 
   describe 'GET #show' do
-    let(:tag) { create(:tag, application: application) }
+    let(:tag) { create(:tag) }
     let(:path) { api_v1_tag_path(tag) }
 
     it 'returns 200' do
@@ -77,7 +85,7 @@ describe Api::V1::TagsController, type: :request, json: true, auth: false, api_t
   end
 
   describe 'PATCH #update' do
-    let(:tag) { create(:tag, application: application) }
+    let(:tag) { create(:tag) }
     let(:params) do
       json_api_params(
         'tags',

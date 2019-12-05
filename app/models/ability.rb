@@ -135,7 +135,7 @@ class Ability
       end
 
       if current_application.present?
-        can :manage, ActsAsTaggableOn::Tag, application_id: current_application.id
+        can :manage, ActsAsTaggableOn::Tag
       elsif user.current_organization.present?
         can :manage, ActsAsTaggableOn::Tag do |tag|
           tag.organization_ids&.include?(user.current_organization.id)

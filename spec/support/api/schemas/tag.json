@@ -3,8 +3,7 @@
   "properties": {
     "name": { "type": "string" },
     "color": { "type": ["string", "null"] },
-    "organization_ids": { "type": "array" },
-    "application_id": { "type": ["integer", "null"] }
+    "organization_ids": { "type": "array" }
   },
   "required": ["name"]
 }

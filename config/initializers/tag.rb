@@ -22,14 +22,4 @@ module CustomTaggingMethods
   end
 end
 
-# Adds support for application relationship on tag
-module CustomTagMethods
-  extend ActiveSupport::Concern
-
-  included do
-    belongs_to :application, optional: true
-  end
-end
-
 ActsAsTaggableOn::Tagging.send(:include, CustomTaggingMethods)
-ActsAsTaggableOn::Tag.send(:include, CustomTagMethods)
