@@ -488,6 +488,7 @@ class GridCard extends React.Component {
           filter={card.filter}
           forceFilter={!this.hasCover}
           isText={record.isText}
+          visibleOverflow={record.isReportTypeRecord}
         >
           {showRestore && (
             <StyledTopRightActions

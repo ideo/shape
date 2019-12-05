@@ -209,7 +209,7 @@ export const StyledGridCardInner = styled.div`
   ${props =>
     !props.hasOverflow &&
     `
-  overflow: hidden;
+  overflow: ${props => (props.visibleOverflow ? 'visible' : 'hidden')};
   `} z-index: 1;
   ${props =>
     !props.isText &&
