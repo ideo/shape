@@ -88,7 +88,6 @@ export const StyledCommentInput = styled.div`
     max-width: 440px;
     background: #fff;
     border-radius: 2px;
-    box-shadow: 0px 4px 30px 0px rgba(220, 220, 220, 1);
     cursor: pointer;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -127,11 +126,14 @@ export const StyledCommentInput = styled.div`
   }
 
   .mentionSuggestionsEntryText {
+    font-size: 80%;
+    color: #a7a7a7;
   }
 
   .mentionSuggestionsEntryTitle {
-    font-size: 80%;
-    color: #a7a7a7;
+    color: ${v.colors.black};
+    font-family: ${v.fonts.sans};
+    font-weight: ${v.weights.book};
   }
 `
 
@@ -147,11 +149,10 @@ export const CustomMentionSuggestion = props => {
         </div>
 
         <div className="mentionSuggestionsEntryContainerRight">
-          <div className="mentionSuggestionsEntryText">{mention.name}</div>
-
           <div className="mentionSuggestionsEntryTitle">
             {mention.full_name}
           </div>
+          <div className="mentionSuggestionsEntryText">{mention.name}</div>
         </div>
       </div>
     </div>

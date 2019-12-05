@@ -32,6 +32,7 @@ class CommentInput extends React.Component {
   positionSuggestions = ({ decoratorRect, state, props }) => {
     const { suggestions } = props
     const { isActive } = state
+    const cols = _.get(uiStore, 'gridSettings.cols')
     let transform
     let transition
     let top = '-36px'
@@ -40,11 +41,20 @@ class CommentInput extends React.Component {
       transform = `scaleY(1)`
       transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
       const { y } = uiStore.activityLogPosition
-      top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1))}px`
+      top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1)) + 16}px`
       if (uiStore.isTouchDevice) {
-        if (uiStore.gridSettings.cols == 1) {
+        if (cols == 1) {
           top = `${window.innerHeight - (50 * suggestions.length + 1) - 35}px`
-        } else if (uiStore.gridSettings.cols == 4) {
+        } else if (cols == 2) {
+          const hasEnoughSpace =
+            (window.innerHeight - decoratorRect.top) / 2 >
+            45 * (suggestions.length + 1)
+          top = `${
+            hasEnoughSpace
+              ? decoratorRect.top - y + 30 // bottom
+              : decoratorRect.top - (y + 45 * (suggestions.length + 1)) - 2 // top
+          }px`
+        } else if (cols == 4) {
           top = `${decoratorRect.top + -(y + 30)}px`
         }
       }
