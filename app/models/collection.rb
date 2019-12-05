@@ -510,8 +510,8 @@ class Collection < ApplicationRecord
     Collection
   end
 
-  def recalculate_child_breadcrumbs_async
-    BreadcrumbRecalculationWorker.perform_async(id)
+  def recalculate_child_breadcrumbs_async(cards)
+    BreadcrumbRecalculationWorker.perform_async(id, cards.pluck(:id))
   end
 
   # Cards are explicitly passed in when moving them from another collection to this one
