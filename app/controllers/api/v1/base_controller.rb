@@ -15,6 +15,7 @@ class Api::V1::BaseController < ApplicationController
   # See: https://github.com/jsonapi-rb/jsonapi-rails/issues/68
   def jsonapi_class
     super.merge(
+      'ActsAsTaggableOn::Tag': SerializableTag,
       'Item::VideoItem': SerializableItem,
       'Item::TextItem': SerializableItem,
       'Item::FileItem': SerializableItem,

@@ -9,6 +9,7 @@ module Firestoreable
     Group: SerializableSimpleGroup,
     Collection: SerializableSimpleCollection,
     CommentThread: SerializableCommentThread,
+    'ActsAsTaggableOn::Tag': SerializableTag,
     'Item::VideoItem': SerializableSimpleItem,
     'Item::TextItem': SerializableSimpleItem,
     'Item::FileItem': SerializableSimpleItem,

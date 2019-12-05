@@ -49,10 +49,12 @@ module Controller
 
     def apply_filters
       return if @filter.empty?
+
       filter_id
       filter_uid
       filter_external_id
       filter_collection_id
+      filter_name
       # if results is an empty array it won't be pagination-friendly
       @results.present? ? @results.page(@page) : @results
     end
@@ -65,6 +67,7 @@ module Controller
 
     def filter_id
       return if @filter[:id].blank?
+
       @results = @results.where(
         id: @filter[:id],
       )
@@ -72,6 +75,7 @@ module Controller
 
     def filter_uid
       return if @filter[:uid].blank?
+
       @results = @results.where(
         uid: @filter[:uid],
       )
@@ -95,6 +99,14 @@ module Controller
 
       @results = @results.where(
         collection_id: @filter[:collection_id],
+      )
+    end
+
+    def filter_name
+      return if @filter[:name].blank?
+
+      @results = @results.where(
+        name: @filter[:name],
       )
     end
   end

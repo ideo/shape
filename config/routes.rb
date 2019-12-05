@@ -191,6 +191,8 @@ Rails.application.routes.draw do
 
       resources :audiences, only: %i[index show create]
 
+      resources :tags, except: %i[destroy]
+
       namespace :admin do
         resources :users, only: %i[index destroy create] do
           collection do

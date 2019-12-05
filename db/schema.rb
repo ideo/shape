@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_20_192557) do
+ActiveRecord::Schema.define(version: 2019_12_04_221155) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -616,6 +616,8 @@ ActiveRecord::Schema.define(version: 2019_11_20_192557) do
     t.string "name"
     t.integer "taggings_count", default: 0
     t.jsonb "organization_ids", default: []
+    t.string "color"
+    t.integer "application_id"
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
