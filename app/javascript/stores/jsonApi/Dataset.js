@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 import SharedRecordMixin from './SharedRecordMixin'
@@ -24,7 +26,7 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
   }
 
   get hasDates() {
-    return !!this.dataWithDates[0].date
+    return _.some(this.dataWithDates, datum => datum.date)
   }
 
   get isEmojiOrScaleQuestion() {

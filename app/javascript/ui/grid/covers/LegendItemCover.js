@@ -1,14 +1,13 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import color from 'color'
 import styled from 'styled-components'
 
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import XIcon from '~/ui/icons/XIcon'
 import v from '~/utils/variables'
-import { colorScale } from '~/ui/global/charts/ChartUtils'
+import { colorScale, darkenColor } from '~/ui/global/charts/ChartUtils'
 import {
   DisplayText,
   Heading3,
@@ -358,11 +357,7 @@ class LegendItemCover extends React.Component {
       const { item } = this.props
       const itemStyle = item.style
       let renderedColor =
-        style && style.fill
-          ? color(style.fill)
-              .darken(0.18 * colorOrder)
-              .string()
-          : colorScale[order]
+        style && style.fill ? darkenColor(style.fill) : colorScale[order]
       // Style on the item itself should aways override dataset style.
       if (itemStyle && itemStyle.fill) {
         renderedColor = itemStyle.fill

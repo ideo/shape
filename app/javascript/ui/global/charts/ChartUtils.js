@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import color from 'color'
 import { maxBy, minBy } from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import moment from 'moment-mini'
@@ -135,6 +136,11 @@ export const dateTooltipText = (datum, datasetName = null) => {
   if (!datasetName) return text
   return `${datasetName}\n${text}`
 }
+
+export const darkenColor = (fill, multiplier) =>
+  color(fill)
+    .darken(0.18 * multiplier)
+    .string()
 
 export const advancedTooltipText = ({
   datum,
