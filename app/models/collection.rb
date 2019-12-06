@@ -216,6 +216,13 @@ class Collection < ApplicationRecord
     cover_type_carousel: 3,
   }
 
+  enum collection_type: {
+    collection: 0,
+    project: 1,
+    method: 2,
+    prototype: 3,
+  }, _prefix: true
+
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
