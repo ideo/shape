@@ -32,6 +32,27 @@ const chartStyle = (style, order) => {
   }
 }
 
+const createTooltipLabelComponent = () => {
+  const baseStyle = Object.assign({}, themeLabelStyles, {
+    fill: 'white',
+    fontSize: 16,
+    textTransform: 'none',
+  })
+  const style = [
+    Object.assign({}, baseStyle, {
+      fontSize: 26,
+      fontWeight: 'bold',
+    }),
+  ]
+  // Have to assign the base style for each subsequent line as Victory will
+  // otherwise think that the first style is the default style
+  Array(5)
+    .fill()
+    .forEach((_, i) => style.push(baseStyle))
+
+  return <VictoryLabel style={style} lineHeight={1.3} dy={10} />
+}
+
 const AreaChart = ({
   dataset,
   order,
@@ -50,26 +71,7 @@ const AreaChart = ({
   let tooltipFn
   let tooltipLabelComponent = <VictoryLabel />
   if (dataset.tiers.length > 0) {
-    const baseStyle = Object.assign({}, themeLabelStyles, {
-      fill: 'white',
-      fontSize: 16,
-      textTransform: 'none',
-    })
-    const style = [
-      Object.assign({}, baseStyle, {
-        fontSize: 26,
-        fontWeight: 'bold',
-      }),
-    ]
-    // Have to assign the base style for each subsequent line as Victory will
-    // otherwise think that the first style is the default style
-    Array(5)
-      .fill()
-      .forEach((_, i) => style.push(baseStyle))
-
-    tooltipLabelComponent = (
-      <VictoryLabel style={style} lineHeight={1.3} dy={10} />
-    )
+    tooltipLabelComponent = createTooltipLabelComponent()
   }
 
   if (dataset.tiers.length > 0) {

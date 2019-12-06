@@ -71,7 +71,6 @@ const UnselectDataset = styled(DisplayText)`
 UnselectDataset.displayName = 'UnselectDataset'
 
 const AreaChartIcon = styled.span`
-  // opacity: ${props => (props.isPrimary ? 1 : 0.8)};
   opacity: 0.8;
   display: inline-block;
   width: 100%;
