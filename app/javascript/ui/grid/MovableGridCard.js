@@ -6,8 +6,7 @@ import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
-import v, { TOUCH_DEVICE_OS } from '~/utils/variables'
-import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
+import v from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
@@ -139,10 +138,6 @@ class MovableGridCard extends React.PureComponent {
     )
   }
 
-  get isAndroid() {
-    return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
-  }
-
   handleStart = (e, data) => {
     e.preventDefault()
     this.scrolling = false
@@ -182,7 +177,6 @@ class MovableGridCard extends React.PureComponent {
     } else if (
       e.clientY > window.innerHeight - v.topScrollTrigger ||
       (uiStore.isTouchDevice &&
-        !this.isAndroid &&
         e.changedTouches[0].clientY > window.innerHeight - v.topScrollTrigger)
     ) {
       // At bottom of viewport
@@ -265,7 +259,11 @@ class MovableGridCard extends React.PureComponent {
     const { card, position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
-    const { pageX, pageY } = e
+    let { pageX, pageY } = e
+    if (typeof pageX === 'undefined' && e.targetTouches) {
+      pageX = e.targetTouches[0].pageX
+      pageY = e.targetTouches[0].pageY
+    }
     // When zooming browser in or out, it multiplies pageX and pageY by that zoom
     // e.g. 50% zoom multiplies all coordinate values by 2
     uiStore.drag({ x: pageX, y: pageY })
@@ -281,8 +279,8 @@ class MovableGridCard extends React.PureComponent {
 
     this.scrollIfNearPageBounds(e)
 
-    const cardX = e.pageX - dragOffset.x
-    const cardY = e.pageY - dragOffset.y
+    const cardX = pageX - dragOffset.x
+    const cardY = pageY - dragOffset.y
 
     // Set x and y to be in the middle of the card
     // Zoom levels multiply coordinates,
@@ -701,10 +699,7 @@ class MovableGridCard extends React.PureComponent {
     const dragPosition = mdlPlaceholder ? null : { x, y }
 
     const disableDragging =
-      !canEditCollection ||
-      card.isPinnedAndLocked ||
-      !!uiStore.editingCardCover ||
-      this.isAndroid
+      !canEditCollection || card.isPinnedAndLocked || !!uiStore.editingCardCover
 
     const rndProps = {
       ref: c => {
