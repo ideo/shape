@@ -360,7 +360,6 @@ class LegendItemCover extends React.Component {
         style && style.fill
           ? darkenColor(style.fill, colorOrder)
           : colorScale[order]
-      console.log('rendered', style.fill, renderedColor, itemStyle)
       // Style on the item itself should aways override dataset style.
       if (itemStyle && itemStyle.fill) {
         renderedColor = itemStyle.fill
