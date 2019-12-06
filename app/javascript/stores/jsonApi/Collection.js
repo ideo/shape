@@ -395,6 +395,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.cover_type === 'cover_type_carousel'
   }
 
+  get isCreativeDifferenceChartCover() {
+    return (
+      this.cover_type === 'cover_type_items' &&
+      this.collection_cover_items[0].isData
+    )
+  }
+
   @computed
   get launchableTestStatus() {
     if (this.isTestCollectionOrResults) {

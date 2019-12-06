@@ -292,6 +292,13 @@ StyledTopRightActions.defaultProps = {
 }
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
+export const BottomRightActionHolder = styled.div`
+  bottom: 20px;
+  right: 10px;
+  position: absolute;
+  z-index: ${v.zIndex.gridCardTop};
+`
+
 export class GridCardIconWithName extends React.PureComponent {
   render() {
     const { icon, text } = this.props
