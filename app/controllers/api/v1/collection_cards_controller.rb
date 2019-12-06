@@ -24,7 +24,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   # return all collection_card_ids for this particular collection
   def ids
-    render json: @collection_cards.map(&:to_s)
+    render json: @collection_card_ids.map(&:to_s)
   end
 
   def create
@@ -211,8 +211,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                           ids_only: ids_only,
                         )
     return unless user_signed_in?
+
     # ids_only does not need to precache roles
-    return if ids_only
+    if ids_only
+      @collection_card_ids = @collection_cards
+      return
+    end
     # precache roles because these will be referred to in the serializers (e.g. can_edit?)
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],

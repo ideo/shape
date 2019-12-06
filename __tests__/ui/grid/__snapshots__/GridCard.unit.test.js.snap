@@ -35,6 +35,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -742,6 +743,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         "height": 1,
         "id": "11",
         "image_contain": false,
+        "isLoadingPlaceholder": false,
         "item": Object {},
         "maxHeight": 1,
         "maxWidth": 1,
@@ -1449,6 +1451,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         "height": 1,
         "id": "11",
         "image_contain": false,
+        "isLoadingPlaceholder": false,
         "item": Object {},
         "maxHeight": 1,
         "maxWidth": 1,
@@ -2279,6 +2282,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -2482,6 +2486,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -2685,6 +2690,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -2829,6 +2835,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -3625,6 +3632,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -3828,6 +3836,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -4031,6 +4040,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -4161,6 +4171,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -4852,24 +4863,11 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={
-        [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "type": "return",
-              "value": undefined,
-            },
-          ],
-        }
-      }
+      handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
       isCoverItem={null}
+      isLoadingPlaceholder={false}
       isTestCollectionCard={false}
       nestedTextItem={null}
       record={
@@ -5012,6 +5010,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -5215,6 +5214,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -5418,6 +5418,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -5562,6 +5563,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
             "height": 1,
             "id": "11",
             "image_contain": false,
+            "isLoadingPlaceholder": false,
             "item": Object {},
             "maxHeight": 1,
             "maxWidth": 1,
@@ -6358,6 +6360,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -6561,6 +6564,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -6764,6 +6768,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -6896,6 +6901,7 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -7626,6 +7632,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -8333,6 +8340,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
         "height": 1,
         "id": "11",
         "image_contain": false,
+        "isLoadingPlaceholder": false,
         "item": Object {},
         "maxHeight": 1,
         "maxWidth": 1,
@@ -9040,6 +9048,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
         "height": 1,
         "id": "11",
         "image_contain": false,
+        "isLoadingPlaceholder": false,
         "item": Object {},
         "maxHeight": 1,
         "maxWidth": 1,
@@ -9870,6 +9879,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -10073,6 +10083,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -10276,6 +10287,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -10420,6 +10432,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -11216,6 +11229,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -11419,6 +11433,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -11622,6 +11637,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -11752,6 +11768,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -12443,24 +12460,11 @@ exports[`GridCard when selected renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={
-        [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "type": "return",
-              "value": undefined,
-            },
-          ],
-        }
-      }
+      handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
       isCoverItem={null}
+      isLoadingPlaceholder={false}
       isTestCollectionCard={false}
       nestedTextItem={null}
       record={
@@ -12603,6 +12607,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -12806,6 +12811,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -13009,6 +13015,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -13153,6 +13160,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
             "height": 1,
             "id": "11",
             "image_contain": false,
+            "isLoadingPlaceholder": false,
             "item": Object {},
             "maxHeight": 1,
             "maxWidth": 1,
@@ -13949,6 +13957,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -14152,6 +14161,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -14355,6 +14365,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -14487,6 +14498,7 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -20774,21 +20786,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={
-        [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "type": "return",
-              "value": undefined,
-            },
-          ],
-        }
-      }
+      handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
       isCoverItem={null}
@@ -28396,21 +28394,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={
-        [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "type": "return",
-              "value": undefined,
-            },
-          ],
-        }
-      }
+      handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
       isCoverItem={null}
@@ -35985,21 +35969,7 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
       }
       cardType="collections"
       dragging={false}
-      handleClick={
-        [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "type": "return",
-              "value": undefined,
-            },
-          ],
-        }
-      }
+      handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
       isCoverItem={null}
@@ -43610,21 +43580,7 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={
-        [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "type": "return",
-              "value": undefined,
-            },
-          ],
-        }
-      }
+      handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
       isCoverItem={null}
@@ -47911,6 +47867,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -48618,6 +48575,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         "height": 1,
         "id": "11",
         "image_contain": false,
+        "isLoadingPlaceholder": false,
         "item": Object {},
         "maxHeight": 1,
         "maxWidth": 1,
@@ -49345,6 +49303,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -50067,6 +50026,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         "height": 1,
         "id": "11",
         "image_contain": false,
+        "isLoadingPlaceholder": false,
         "item": Object {},
         "maxHeight": 1,
         "maxWidth": 1,
@@ -50897,6 +50857,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -51100,6 +51061,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -51303,6 +51265,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -51447,6 +51410,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -52243,6 +52207,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -52446,6 +52411,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -52649,6 +52615,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "height": 1,
                 "id": "11",
                 "image_contain": false,
+                "isLoadingPlaceholder": false,
                 "item": Object {},
                 "maxHeight": 1,
                 "maxWidth": 1,
@@ -52779,6 +52746,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,
@@ -53470,24 +53438,11 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
       }
       cardType="collections"
       dragging={false}
-      handleClick={
-        [MockFunction] {
-          "calls": Array [
-            Array [
-              Object {},
-            ],
-          ],
-          "results": Array [
-            Object {
-              "type": "return",
-              "value": undefined,
-            },
-          ],
-        }
-      }
+      handleClick={[MockFunction]}
       height={100}
       isBoardCollection={false}
       isCoverItem={null}
+      isLoadingPlaceholder={false}
       isTestCollectionCard={false}
       nestedTextItem={null}
       record={
@@ -53630,6 +53585,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -53833,6 +53789,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -54036,6 +53993,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -54180,6 +54138,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             "height": 1,
             "id": "11",
             "image_contain": false,
+            "isLoadingPlaceholder": false,
             "item": Object {},
             "maxHeight": 1,
             "maxWidth": 1,
@@ -54976,6 +54935,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -55179,6 +55139,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -55382,6 +55343,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "height": 1,
                   "id": "11",
                   "image_contain": false,
+                  "isLoadingPlaceholder": false,
                   "item": Object {},
                   "maxHeight": 1,
                   "maxWidth": 1,
@@ -55514,6 +55476,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "height": 1,
           "id": "11",
           "image_contain": false,
+          "isLoadingPlaceholder": false,
           "item": Object {},
           "maxHeight": 1,
           "maxWidth": 1,

@@ -33,6 +33,12 @@ export const COLLECTION_TYPES = {
   TEST_DESIGN: 'Collection::TestDesign',
 }
 
+export const COLLECTION_CARD_TYPES = {
+  PRIMARY: 'CollectionCard::Primary',
+  LINK: 'CollectionCard::Link',
+  PLACEHOLDER: 'CollectionCard::Placeholder',
+}
+
 export const DATASET_CHART_TYPES = {
   AREA: 'area',
   LINE: 'line',
@@ -229,8 +235,8 @@ export default {
     popoutMenu: 201,
     scrollIndicator: 200,
     cardHovering: 160,
-    gridCard: 150,
     gridCardTop: 151,
+    gridCard: 150,
     itemClose: 10,
     floatOverContent: 2,
     gridCardBg: 1,

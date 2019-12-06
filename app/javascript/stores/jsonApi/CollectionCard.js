@@ -1,7 +1,11 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 
-import { ITEM_TYPES, COLLECTION_TYPES } from '~/utils/variables'
+import {
+  ITEM_TYPES,
+  COLLECTION_TYPES,
+  COLLECTION_CARD_TYPES,
+} from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 
@@ -81,6 +85,10 @@ class CollectionCard extends BaseRecord {
     // pinned in a collection means it is locked in that place
     // i.e. pinned in a templated collection
     return this.pinned_and_locked
+  }
+
+  get isLoadingPlaceholder() {
+    return this.type === COLLECTION_CARD_TYPES.PLACEHOLDER
   }
 
   get parentCollection() {
