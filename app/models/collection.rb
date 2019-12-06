@@ -101,7 +101,8 @@ class Collection < ApplicationRecord
                  :getting_started_shell,
                  :loading_content,
                  :cached_inheritance,
-                 :common_viewable
+                 :common_viewable,
+                 :broadcasting
 
   # validations
   validates :name, presence: true
@@ -905,6 +906,10 @@ class Collection < ApplicationRecord
 
   def awaiting_updates?
     getting_started_shell || loading_content
+  end
+
+  def broadcasting?
+    broadcasting.present?
   end
 
   # =================================
