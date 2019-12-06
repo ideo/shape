@@ -479,6 +479,7 @@ class GridCardBlank extends React.Component {
       case 'template':
       case 'submissionBox':
       case 'foamcoreBoard':
+      case 'search':
         inner = (
           <CollectionCreator
             type={creating}
@@ -687,6 +688,11 @@ class GridCardBlank extends React.Component {
                   name: 'Create Template',
                   iconLeft: <TemplateIcon />,
                   onClick: this.startCreating('template'),
+                },
+                {
+                  name: 'Create Search Collection',
+                  iconLeft: <AddCollectionIcon />,
+                  onClick: this.startCreating('search'),
                 },
                 {
                   name: 'Create Report',

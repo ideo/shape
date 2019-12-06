@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_20_192557) do
+ActiveRecord::Schema.define(version: 2019_12_06_221958) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -194,6 +194,7 @@ ActiveRecord::Schema.define(version: 2019_11_20_192557) do
     t.boolean "test_show_media", default: true
     t.integer "idea_id"
     t.integer "survey_response_id"
+    t.string "search_term"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
@@ -534,6 +535,13 @@ ActiveRecord::Schema.define(version: 2019_11_20_192557) do
     t.index ["organization_id"], name: "index_payments_on_organization_id"
     t.index ["purchasable_type", "purchasable_id"], name: "index_payments_on_purchasable_type_and_purchasable_id"
     t.index ["user_id"], name: "index_payments_on_user_id"
+  end
+
+  create_table "question_answer_choices", force: :cascade do |t|
+    t.integer "question_choice_id"
+    t.integer "question_answer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "question_answers", force: :cascade do |t|
