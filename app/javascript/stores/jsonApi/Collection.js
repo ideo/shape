@@ -1091,6 +1091,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
+    // clearing placeholder will properly clear out multiMoveCardIds for the next step
+    uiStore.clearMdlPlaceholder()
     if (_.isEmpty(uiStore.multiMoveCardIds)) {
       uiStore.update('multiMoveCardIds', cardIds)
     }

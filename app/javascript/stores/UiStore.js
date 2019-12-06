@@ -1202,4 +1202,11 @@ export default class UiStore {
   closeAdminUsersMenu() {
     this.adminUsersMenuOpen = null
   }
+
+  @action
+  clearMdlPlaceholder() {
+    this.multiMoveCardIds.replace(
+      _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
+    )
+  }
 }
