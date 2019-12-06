@@ -1,5 +1,5 @@
 Rails.application.configure do
-  config.log_level = :info
+  config.log_level = ENV.fetch('LOG_LEVEL') { :debug }
   # Settings specified here will take precedence over those in config/application.rb.
 
   # we turn this off because it gets confused about our "resolutions" in package.json
