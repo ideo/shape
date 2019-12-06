@@ -782,14 +782,6 @@ class Collection < ApplicationRecord
     result
   end
 
-  def last_non_blank_row
-    collection_cards.map(&:row).compact.max.to_i
-  end
-
-  def empty_row_for_moving_cards
-    last_non_blank_row + 2
-  end
-
   def default_group_id
     return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
