@@ -595,9 +595,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       context 'with snapshot' do
-        let!(:unarchiving_card) { collection.collection_cards.first }
-        let!(:card2) { collection.collection_cards.second }
-        let!(:card3) { collection.collection_cards.third }
+        let(:cards) { collection.collection_cards.to_a }
+        let!(:unarchiving_card) { cards.first }
+        let!(:card2) { cards.second }
+        let!(:card3) { cards.third }
         let(:raw_params) do
           {
             card_ids: [unarchiving_card.id],
@@ -630,6 +631,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           # should be mapped to snapshot
           expect(unarchiving_card.active?).to be true
           expect(unarchiving_card.width).to eq 2
+          expect(unarchiving_card.order).to eq 0
           expect(collection.collection_cards.first).to eq unarchiving_card
         end
       end
@@ -1108,34 +1110,13 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'duplicates cards from one collection to the other' do
-        expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
+        expect(CollectionCardDuplicator).to receive(:call).with(
+          to_collection: to_collection,
+          cards: moving_cards,
+          placement: placement,
+          for_user: user,
+        ).and_call_original
         post(path, params: params)
-        # newly created cards should be duplicates
-        first_cards = to_collection.collection_cards.first(2)
-        expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
-        # names should match, in same order
-        expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
-        expect(to_collection.collection_cards.first.primary?).to be true
-      end
-
-      it 'calls reorder_cards! to make sure card orders are not wacky' do
-        expect_any_instance_of(Collection).to receive(:reorder_cards!)
-        post(path, params: params)
-      end
-
-      context 'with integer order' do
-        let(:placement) { 1 }
-
-        it 'duplicates cards from one collection to the other, preserving order' do
-          expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
-          post(path, params: params)
-          # newly created cards should be duplicates
-          dupe_cards = to_collection.collection_cards[1..2]
-          # names should match, in same order
-          expect(dupe_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
-          expect(dupe_cards.map(&:item).map(&:cloned_from)).to eq moving_cards.map(&:item)
-          expect(dupe_cards.first.primary?).to be true
-        end
       end
     end
   end

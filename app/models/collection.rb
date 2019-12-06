@@ -579,6 +579,12 @@ class Collection < ApplicationRecord
     )
   end
 
+  def increment_card_orders_at(order, amount: 1)
+    collection_cards
+      .where(CollectionCard.arel_table[:order].gteq(order))
+      .update_all(['"order" = "order" + ?', amount])
+  end
+
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
     if card_attrs_snapshot.present?

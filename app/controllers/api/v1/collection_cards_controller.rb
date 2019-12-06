@@ -170,19 +170,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
     placement = json_api_params[:placement]
+    # notifications will get created in the worker that ends up running
     new_cards = CollectionCardDuplicator.call(
       to_collection: @to_collection,
       cards: @cards,
       placement: placement,
       for_user: current_user,
     )
-    new_cards.each do |card|
-      create_notification(card, :duplicated)
-    end
-    # NOTE: for some odd reason the json api refuses to render the newly created cards here,
-    # so we end up re-fetching the to_collection later in the front-end
     render jsonapi: @to_collection.reload,
-           include: Collection.default_relationships_for_api,
            meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
            expose: { current_record: @to_collection }
   end
@@ -215,7 +210,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                           application: current_application,
                           ids_only: ids_only,
                         )
-
     return unless user_signed_in?
     # ids_only does not need to precache roles
     return if ids_only
@@ -426,10 +420,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :mimetype,
           docinfo: {},
         ],
-        data_items_datasets_attributes: [
-          :order,
-          :selected,
-          :dataset_id,
+        data_items_datasets_attributes: %i[
+          order
+          selected
+          dataset_id
         ],
         datasets_attributes: [
           :identifier,

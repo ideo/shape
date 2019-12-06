@@ -677,8 +677,6 @@ class ApiStore extends jsonapi(datxCollection) {
       })
       return
     }
-    // update UI for collection that cards were moved away from
-    await fromCollection.API_fetchCards()
 
     // reverse to and from values for potential undo operation
     const reversedData = Object.assign({}, data, {

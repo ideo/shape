@@ -93,7 +93,8 @@ class LegendMover < SimpleService
 
   def to_collection_data_items
     @cards.select do |card|
-      card.item&.is_a?(Item::DataItem)
+      # don't count placeholders or links
+      card.primary? && card.item&.is_a?(Item::DataItem)
     end.map(&:item).uniq
   end
 
@@ -106,7 +107,7 @@ class LegendMover < SimpleService
 
   def to_collection_legend_items
     @cards.select do |card|
-      card.item.is_a?(Item::LegendItem)
+      card.primary? && card.item.is_a?(Item::LegendItem)
     end.map(&:item).uniq
   end
 
