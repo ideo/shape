@@ -19,11 +19,8 @@ class SerializableDataset < BaseJsonSerializer
     :data_source_type,
     :groupings,
     :tiers,
+    :style,
   )
 
   belongs_to :data_source
-
-  attribute :style do
-    @object.style
-  end
 end

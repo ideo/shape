@@ -14,12 +14,18 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
 
   get dataWithDates() {
     if (!this.data) return []
+    const today = new Date()
 
     return this.data.map(datum => {
       const d = { ...datum }
       // Turn date strings into real dates
       if (d.date) {
         d.date = new Date(d.date)
+        // Constrain any future date to today (Creative Difference sends dates
+        // based on a whole quarter)
+        if (d.date > today) {
+          d.date = today
+        }
       }
       return d
     })
