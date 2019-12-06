@@ -102,7 +102,7 @@ export const monthlyXAxisText = (
     let format = 'MMM'
     // If this chart has over a year of data, show the year
     if (isDataYearOld(datasetValues)) {
-      format += ' YYY'
+      format += ' YYYY'
     }
     return `${dateNearMonthEdge.format(format)}`
   }
