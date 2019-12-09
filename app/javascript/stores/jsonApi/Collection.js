@@ -273,6 +273,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SharedWithMeCollection'
   }
 
+  get isSearchCollection() {
+    return this.type === 'Collection::SearchCollection'
+  }
+
   get canSetACover() {
     return !this.isSharedCollection && !this.isUserCollection
   }
@@ -554,6 +558,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     hidden = false,
     rows,
     cols,
+    searchTerm,
   } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
@@ -580,13 +585,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (rows) {
       params.rows = rows
     }
-    const apiPath = `collections/${
+    let apiPath = `collections/${
       this.id
     }/collection_cards?${queryString.stringify(params, {
       arrayFormat: 'bracket',
     })}`
+    if (searchTerm) {
+      const query = `${searchTerm} ${this.collectionFilterQuery}`
+      params.q = query
+      const stringifiedParams = queryString.stringify(params, {
+        arrayFormat: 'bracket',
+      })
+      apiPath = `organizations/${this.organization_id}/search?${stringifiedParams}`
+    }
     const res = await this.apiStore.request(apiPath)
     const { data, links } = res
+    if (searchTerm) return data
     runInAction(() => {
       this.totalPages = links.last
       this.currentPage = page

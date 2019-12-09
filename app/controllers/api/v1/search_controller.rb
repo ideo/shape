@@ -12,9 +12,9 @@ class Api::V1::SearchController < Api::V1::BaseController
         size: results.size,
       },
       jsonapi: results,
-      include: %i[parent_collection_card filestack_file],
+      include: CollectionCard.default_relationships_for_api,
       class: jsonapi_class.merge(
-        Collection: SerializableSimpleCollection,
+        Collection: SerializableCollection,
       ),
       expose: {
         force_breadcrumbs: true,

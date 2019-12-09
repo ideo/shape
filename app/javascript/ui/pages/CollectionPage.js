@@ -19,6 +19,7 @@ import PageSeparator from '~/ui/global/PageSeparator'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 import EditorPill from '~/ui/items/EditorPill'
+import SearchCollection from '~/ui/grid/SearchCollection'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
@@ -432,8 +433,12 @@ class CollectionPage extends React.Component {
     )
   }
 
+  renderSearchCollection() {
+    return <SearchCollection collection={this.props.collection} />
+  }
+
   renderTestDesigner() {
-    return <TestDesigner collection={this.collection} />
+    return <TestDesigner collection={this.props.collection} />
   }
 
   loader = () => (
@@ -516,6 +521,8 @@ class CollectionPage extends React.Component {
       )
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
+    } else if (collection.isSearchCollection) {
+      inner = this.renderSearchCollection()
     } else {
       inner = (
         <CollectionGrid
