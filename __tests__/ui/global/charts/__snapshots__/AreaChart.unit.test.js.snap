@@ -50,6 +50,16 @@ exports[`AreaChart renders snapshot 1`] = `
       labelTextRenderer={[Function]}
       maxValue={0}
       minValue={0}
+      neverShowLabels={true}
+      tooltipLabelComponent={
+        <VictoryLabel
+          capHeight={0.71}
+          direction="inherit"
+          lineHeight={1}
+          textComponent={<Text />}
+          tspanComponent={<TSpan />}
+        />
+      }
       tooltipTextRenderer={[Function]}
     />
   }

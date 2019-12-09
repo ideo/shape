@@ -1,10 +1,7 @@
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import {
-  emojiSeriesForQuestionType,
-  utcMoment,
-} from '~/ui/global/charts/ChartUtils'
+import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
 import {
   fakeDataItem,
   fakeAreaChartDataset,
@@ -61,10 +58,7 @@ describe('ChartGroup', () => {
     })
 
     it('renders one label on X axis of the chart', () => {
-      const date = new Date(fakeAreaChartDataset.data[0].date)
-      expect(wrapper.find('VictoryAxis').props().label).toEqual(
-        utcMoment(date).format('MM/DD/YY')
-      )
+      expect(wrapper.find('VictoryAxis').props().label).toEqual('Q3 2018')
     })
   })
 

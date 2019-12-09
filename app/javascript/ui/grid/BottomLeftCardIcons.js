@@ -102,7 +102,7 @@ class BottomLeftCardIcons extends React.Component {
             <FoamcoreBoardIcon />
           </StyledIconWrapper>
         )
-      } else {
+      } else if (!record.isCreativeDifferenceChartCover) {
         icons.push(
           <StyledIconWrapper>
             <CollectionIcon />
