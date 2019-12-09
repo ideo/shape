@@ -626,6 +626,7 @@ class CollectionGrid extends React.Component {
           encountered.push(cell)
         } else if (cell === null) {
           const previousCard = cards.find(c => c.id === previousCell)
+          console.log('previouscard', previousCard)
           if (!previousCard) return
           const order = previousCard.order + 1
           const id = `empty-${order}-${colIdx}-${rowIdx}`

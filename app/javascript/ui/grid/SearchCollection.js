@@ -88,7 +88,7 @@ class SearchCollection extends React.Component {
 
   render() {
     const { uiStore, collection, trackCollectionUpdated } = this.props
-    const { gridSettings } = uiStore
+    const { blankContentToolState, gridSettings } = uiStore
     if (uiStore.isLoading || collection.reloading) return <Loader />
 
     return (
@@ -97,6 +97,7 @@ class SearchCollection extends React.Component {
           {...gridSettings}
           loadCollectionCards={this.loadCollectionCards}
           trackCollectionUpdated={trackCollectionUpdated}
+          blankContentToolState={blankContentToolState}
           cardProperties={collection.cardProperties}
           collection={collection}
           canEditCollection={collection.can_edit_content}
