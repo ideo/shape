@@ -418,7 +418,7 @@ class RolesAdd extends React.Component {
                 disableUnderline
                 name="group"
                 onChange={this.handleGroupSelect}
-                value={this.selectedGroupId}
+                value={this.selectedGroupId || ''}
                 data-cy="permissionsGroupSelect"
               >
                 <MenuItem key="no-group" value={''}>

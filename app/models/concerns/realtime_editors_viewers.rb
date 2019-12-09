@@ -49,11 +49,11 @@ module RealtimeEditorsViewers
     ActionCable.server.broadcast stream_name, {}, code: :unprocessable_entity
   end
 
-  private
-
   def num_viewers
     Cache.set_members(viewing_cache_key).size
   end
+
+  private
 
   def currently_editing_user_as_json
     user_id = Cache.get(editing_cache_key, raw: true)

@@ -11,7 +11,10 @@ RSpec.describe Item::TextItem, type: :model do
         ],
       }
     end
-    let(:text_item) { create(:text_item, name: nil, content: '<p>How might we do <b>X</b></p>', data_content: data_content) }
+    let(:parent) { create(:collection) }
+    let(:text_item) do
+      create(:text_item, name: nil, content: '<p>How might we do <b>X</b></p>', data_content: data_content, parent_collection: parent)
+    end
 
     describe '#plain_content' do
       it 'should create plaintext content based on data_content' do
@@ -28,7 +31,9 @@ RSpec.describe Item::TextItem, type: :model do
     context 'realtime text editing' do
       let(:saved_version) { 1 }
       let(:edit_version) { 1 }
-      let(:text_item) { create(:text_item, data_content: { ops: [], version: saved_version }) }
+      let(:text_item) do
+        create(:text_item, data_content: { ops: [], version: saved_version }, parent_collection: parent)
+      end
       let(:user) { create(:user) }
       let(:data) do
         Mashie.new(
@@ -91,6 +96,42 @@ RSpec.describe Item::TextItem, type: :model do
               version: 2,
               error: 'locked',
             )
+          end
+        end
+      end
+
+      describe '#save_and_broadcast_quill_data' do
+        let(:data) do
+          Mashie.new(
+            delta: { insert: 'hello' },
+            version: 1,
+            full_content: text_item.quill_data,
+          )
+        end
+        it 'should not queue up the CollectionBroadcastWorker unless there are multiple viewers' do
+          expect(CollectionBroadcastWorker).not_to receive(:perform_in).with(3.seconds, parent.id)
+          text_item.save_and_broadcast_quill_data(user, data)
+        end
+
+        context 'with multiple viewers' do
+          before do
+            parent.started_viewing(user, dont_notify: true)
+            parent.started_viewing(create(:user), dont_notify: true)
+          end
+          context 'not already broadcasting' do
+            it 'should queue up the CollectionBroadcastWorker' do
+              expect(CollectionBroadcastWorker).to receive(:perform_in).with(3.seconds, parent.id)
+              text_item.save_and_broadcast_quill_data(user, data)
+            end
+          end
+          context 'already broadcasting' do
+            before do
+              parent.update(broadcasting: true)
+            end
+            it 'should not queue up the CollectionBroadcastWorker' do
+              expect(CollectionBroadcastWorker).not_to receive(:perform_in).with(3.seconds, parent.id)
+              text_item.save_and_broadcast_quill_data(user, data)
+            end
           end
         end
       end
