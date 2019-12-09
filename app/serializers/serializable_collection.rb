@@ -22,6 +22,7 @@ class SerializableCollection < BaseJsonSerializer
     :last_unresolved_comment_id,
     :test_show_media,
     :idea_id,
+    :search_term,
   )
 
   stringified_attributes(

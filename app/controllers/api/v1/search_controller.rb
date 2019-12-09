@@ -5,7 +5,13 @@ class Api::V1::SearchController < Api::V1::BaseController
   before_action :switch_to_organization, only: %i[search]
   def search
     render(
-      render_attrs(search_records, full_collection: params[:full_collection].present?),
+      render_attrs(search_records, simple_collection: true),
+    )
+  end
+
+  def search_collection
+    render(
+      render_attrs(search_records),
     )
   end
 
@@ -84,6 +90,10 @@ class Api::V1::SearchController < Api::V1::BaseController
       per_page: params[:per_page] || 10,
       page: @page,
       order: order_opts,
+      model_includes: {
+        Collection: CollectionCard.default_includes_for_api[:collection],
+        Item: CollectionCard.default_includes_for_api[:item],
+      },
     ).search(@query)
   end
 
@@ -185,7 +195,6 @@ class Api::V1::SearchController < Api::V1::BaseController
         total: results.total_count,
         size: results.size,
       },
-      jsonapi: results,
       include: %i[parent_collection_card filestack_file],
       expose: {
         force_breadcrumbs: true,
@@ -193,16 +202,18 @@ class Api::V1::SearchController < Api::V1::BaseController
     }
   end
 
-  def render_attrs(results, full_collection: false)
-    if full_collection
+  def render_attrs(results, simple_collection: false)
+    if simple_collection
       default_render_attrs(results).merge(
-        include: CollectionCard.default_relationships_for_api,
-      )
-    else
-      default_render_attrs(results).merge(
+        jsonapi: results,
         class: jsonapi_class.merge(
           Collection: SerializableSimpleCollection,
         ),
+      )
+    else
+      default_render_attrs(results).merge(
+        include: CollectionCard.default_relationships_for_api,
+        jsonapi: results.results.map(&:parent_collection_card),
       )
     end
   end

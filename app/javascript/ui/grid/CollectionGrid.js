@@ -110,7 +110,14 @@ class CollectionGrid extends React.Component {
   }
 
   initialize(props) {
-    const cards = this.positionMovingCardsAndBCT(props)
+    let cards = []
+    const { collectionCardsOverride } = this.props
+    if (collectionCardsOverride) {
+      cards = collectionCardsOverride
+    } else {
+      cards = this.positionMovingCardsAndBCT(props)
+    }
+    console.log('init', cards.length)
     this.positionCards(cards)
   }
 
@@ -1054,6 +1061,7 @@ class CollectionGrid extends React.Component {
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
+    console.log('collection grid render', rows)
     return (
       <StyledGrid
         data-empty-space-click
@@ -1082,10 +1090,11 @@ CollectionGrid.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
-  canEditCollection: PropTypes.bool,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
-  isMovingCards: PropTypes.bool,
   loadCollectionCards: PropTypes.func.isRequired,
+  collectionCardsOverride: MobxPropTypes.arrayOrObservableArray,
+  canEditCollection: PropTypes.bool,
+  isMovingCards: PropTypes.bool,
   shouldAddEmptyRow: PropTypes.bool,
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
@@ -1104,6 +1113,7 @@ CollectionGrid.defaultProps = {
   blankContentToolState: null,
   canEditCollection: false,
   isMovingCards: false,
+  collectionCardsOverride: null,
 }
 CollectionGrid.displayName = 'CollectionGrid'
 
