@@ -129,6 +129,7 @@ Rails.application.routes.draw do
         end
 
         get 'search', to: 'search#search'
+        get 'search_collection_cards', to: 'search#search_collection_cards'
         resources :collections, only: %i[create]
         resources :groups, only: %i[index create update]
         resources :users, only: %i[index]

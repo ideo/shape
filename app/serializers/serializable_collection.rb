@@ -237,4 +237,8 @@ class SerializableCollection < BaseJsonSerializer
   attribute :cache_key, if: -> { @object == @current_record } do
     Digest::MD5.hexdigest(@object.cache_key(@card_order || 'order', @current_user.try(:id)))
   end
+
+  attribute :serializer do
+    'SerializableCollection'
+  end
 end
