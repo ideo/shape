@@ -5,16 +5,19 @@ class Api::V1::SearchController < Api::V1::BaseController
   before_action :switch_to_organization, only: %i[search]
   def search
     results = search_records
+    cards = results.results.map(&:parent_collection_card)
     render(
       meta: {
         page: @page,
         total: results.total_count,
+        total_pages: results.total_pages,
         size: results.size,
       },
-      jsonapi: results,
+      jsonapi: cards,
       include: CollectionCard.default_relationships_for_api,
       class: jsonapi_class.merge(
         Collection: SerializableCollection,
+        CollectionCard: SerializableCollectionCard,
       ),
       expose: {
         force_breadcrumbs: true,
@@ -97,6 +100,10 @@ class Api::V1::SearchController < Api::V1::BaseController
       per_page: params[:per_page] || 10,
       page: @page,
       order: order_opts,
+      model_includes: {
+        Collection: CollectionCard.default_includes_for_api[:collection],
+        Item: CollectionCard.default_includes_for_api[:item],
+      },
     ).search(@query)
   end
 

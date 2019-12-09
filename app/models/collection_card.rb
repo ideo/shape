@@ -141,6 +141,16 @@ class CollectionCard < ApplicationRecord
     ]
   end
 
+  def self.default_includes_for_api
+    {
+      collection: [:collection_cover_items],
+      item: [
+        :filestack_file,
+        data_items_datasets: [:dataset],
+      ],
+    }
+  end
+
   def duplicate!(
     for_user: nil,
     parent: self.parent,

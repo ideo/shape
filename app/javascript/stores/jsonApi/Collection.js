@@ -45,6 +45,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   loadedRows = 0
   @observable
   loadedCols = 0
+  @observable
+  totalCollectionSearchResults = 0
 
   attributesForAPI = [
     'name',
@@ -599,8 +601,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       apiPath = `organizations/${this.organization_id}/search?${stringifiedParams}`
     }
     const res = await this.apiStore.request(apiPath)
-    const { data, links } = res
-    if (searchTerm) return data
+    const { data, links, meta } = res
+    if (searchTerm) {
+      runInAction(() => {
+        this.totalPages = meta.total_pages
+        this.currentPage = page
+      })
+      return data
+    }
     runInAction(() => {
       this.totalPages = links.last
       this.currentPage = page

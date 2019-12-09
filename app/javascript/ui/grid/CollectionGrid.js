@@ -117,7 +117,7 @@ class CollectionGrid extends React.Component {
     } else {
       cards = this.positionMovingCardsAndBCT(props)
     }
-    console.log('init grid', cards.length)
+    console.log('init', cards.length)
     this.positionCards(cards)
   }
 
@@ -1059,10 +1059,9 @@ class CollectionGrid extends React.Component {
     const { rows } = this.state
     if (uiStore.isLoading || collection.reloading) return <Loader />
 
-    console.log('grid render', rows, this.state.cards.length)
-
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
+    console.log('collection grid render', rows)
     return (
       <StyledGrid
         data-empty-space-click

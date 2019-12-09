@@ -434,7 +434,12 @@ class CollectionPage extends React.Component {
   }
 
   renderSearchCollection() {
-    return <SearchCollection collection={this.props.collection} />
+    return (
+      <SearchCollection
+        collection={this.props.collection}
+        trackCollectionUpdated={this.trackCollectionUpdated}
+      />
+    )
   }
 
   renderTestDesigner() {

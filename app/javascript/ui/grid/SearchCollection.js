@@ -35,12 +35,29 @@ class SearchCollection extends React.Component {
   loadSearchedCards = async ({ page, per_page, rows, cols } = {}) => {
     const { collection } = this.props
     const { search_term } = collection
+    console.log('load', page)
     const cards = await collection.API_fetchCards({
       searchTerm: search_term,
-      per_page: 20,
+      page,
+      per_page: 40,
     })
     runInAction(() => {
-      this.searchCollectionCards = cards
+      if (page > 1) {
+        console.log('push', this.searchCollectionCards.length)
+        // TODO copied from Collection.js
+        const newData = _.reverse(
+          // de-dupe merged data (deferring to new cards first)
+          // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
+          _.unionBy(
+            _.reverse([...cards]),
+            _.reverse([...this.searchCollectionCards]),
+            'id'
+          )
+        )
+        this.searchCollectionCards.replace(newData)
+      } else {
+        this.searchCollectionCards = cards
+      }
     })
   }
 
@@ -50,7 +67,7 @@ class SearchCollection extends React.Component {
   }
 
   render() {
-    const { uiStore, collection } = this.props
+    const { uiStore, collection, trackCollectionUpdated } = this.props
     const { gridSettings } = uiStore
     if (uiStore.isLoading || collection.reloading) return <Loader />
 
@@ -59,7 +76,7 @@ class SearchCollection extends React.Component {
         <CollectionGrid
           {...gridSettings}
           loadCollectionCards={this.loadCollectionCards}
-          trackCollectionUpdated={this.trackCollectionUpdated}
+          trackCollectionUpdated={trackCollectionUpdated}
           cardProperties={collection.cardProperties}
           collection={collection}
           canEditCollection={collection.can_edit_content}
@@ -75,7 +92,7 @@ class SearchCollection extends React.Component {
         <CollectionGrid
           {...gridSettings}
           loadCollectionCards={this.loadSearchedCards}
-          trackCollectionUpdated={this.trackCollectionUpdated}
+          trackCollectionUpdated={trackCollectionUpdated}
           collectionCardsOverride={this.searchCollectionCards}
           cardProperties={this.searchCardProperties}
           collection={collection}
@@ -90,6 +107,7 @@ class SearchCollection extends React.Component {
 
 SearchCollection.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  trackCollectionUpdate: PropTypes.func.isRequired,
 }
 SearchCollection.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
