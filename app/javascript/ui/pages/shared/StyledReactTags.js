@@ -1,6 +1,16 @@
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import { creativeQualities } from '~/utils/creativeDifferenceVariables'
+
+export const tagColor = (tagName, defaultColor = null) => {
+  if (creativeQualities[tagName]) {
+    return creativeQualities[tagName].color
+  } else if (defaultColor) {
+    return defaultColor
+  }
+  return v.colors.commonMediumTint
+}
 
 // adapted from https://raw.githubusercontent.com/i-like-robots/react-tags/master/example/styles.css
 export default styled.div`
@@ -31,8 +41,7 @@ export default styled.div`
     display: inline-block;
     margin: 5px;
     padding: 2px 7px;
-    background: ${props =>
-      props.tagColor === 'white' ? 'white' : v.colors.commonMediumTint};
+    background: ${props => tagColor(props.tagName, props.tagColor)};
     /* match the font styles */
     font-size: inherit;
     font-weight: ${v.weights.medium};

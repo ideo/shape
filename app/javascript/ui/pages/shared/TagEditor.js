@@ -1,12 +1,17 @@
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
 import Pill from '~/ui/global/Pill'
-import StyledReactTags from './StyledReactTags'
+import StyledReactTags, { tagColor } from './StyledReactTags'
+
+const ReadonlyTag = styled.div`
+  background-color: ${props => tagColor(props.tagName, props.defaultColor)};
+`
 
 export const tagsInCommon = (records, tagField) => {
   const tags = []
@@ -108,9 +113,13 @@ class TagEditor extends React.Component {
       return 'No tags added.'
     }
     const inner = this.tags.map(tag => (
-      <div key={tag.id} className="react-tags__selected-tag read-only">
+      <ReadonlyTag
+        key={tag.id}
+        tagName={tag.name}
+        className="react-tags__selected-tag read-only"
+      >
         <span className="react-tags__selected-tag-name">{tag.name}</span>
-      </div>
+      </ReadonlyTag>
     ))
     return <div className="react-tags__selected">{inner}</div>
   }

@@ -1,6 +1,7 @@
 class Api::V1::TagsController < Api::V1::BaseController
   deserializable_resource :tag, class: DeserializableTag, only: %i[create update]
   load_and_authorize_resource class: 'ActsAsTaggableOn::Tag', except: :index
+  load_and_authorize_resource :organization, only: :index
 
   before_action :load_tags, only: %i[index]
   before_action :load_and_filter_index, only: %i[index]
@@ -53,6 +54,11 @@ class Api::V1::TagsController < Api::V1::BaseController
   end
 
   def load_tags
-    @tags = ActsAsTaggableOn::Tag.order(name: :asc).limit(100)
+    @tags = ActsAsTaggableOn::Tag.order(taggings_count: :desc).limit(1000)
+    return @tags if @organization.blank?
+
+    @tags.where(
+      'organization_ids @> ?', [@organization.id].to_json
+    )
   end
 end
