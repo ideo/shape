@@ -762,6 +762,8 @@ class Collection < ApplicationRecord
   def submit_submission!
     return unless submission?
 
+    submission_attrs['previously_submitted'] = true
+    cached_inheritance['private'] = false
     # have to unset this before we can call MergeToChild
     submission_attrs['hidden'] = false
     result = save

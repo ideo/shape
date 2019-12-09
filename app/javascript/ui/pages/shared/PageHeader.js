@@ -258,34 +258,34 @@ class PageHeader extends React.Component {
 
   get renderLaunchTestButton() {
     const { record, uiStore } = this.props
-    if (record.can_edit_content && record.isClosedTest) {
-      return (
-        <FormButton
-          onClick={record.reopenTest}
-          color={v.colors.transparent}
-          width="200"
-          disabled={uiStore.launchButtonLoading}
-          fontSize={v.buttonSizes.header.fontSize}
-          data-cy="HeaderFormButton"
-        >
-          Re-open Feedback
-        </FormButton>
-      )
-    }
-    if (this.isCurrentlyHiddenSubmission) {
-      return (
-        <FormButton
-          color={v.colors.alert}
-          onClick={record.API_submitSubmission}
-          disabled={uiStore.launchButtonLoading}
-          fontSize={v.buttonSizes.header.fontSize}
-          data-cy="HeaderFormButton"
-        >
-          Submit
-        </FormButton>
-      )
-    }
-    return null
+    return !record.can_edit_content || !record.isClosedTest ? null : (
+      <FormButton
+        onClick={record.reopenTest}
+        color={v.colors.transparent}
+        width="200"
+        disabled={uiStore.launchButtonLoading}
+        fontSize={v.buttonSizes.header.fontSize}
+        data-cy="HeaderFormButton"
+      >
+        Re-open Feedback
+      </FormButton>
+    )
+  }
+
+  get renderSubmissionSubmitButton() {
+    const { record, uiStore } = this.props
+
+    return !this.isCurrentlyHiddenSubmission ? null : (
+      <FormButton
+        color={v.colors.alert}
+        onClick={record.API_submitSubmission}
+        disabled={uiStore.launchButtonLoading}
+        fontSize={v.buttonSizes.header.fontSize}
+        data-cy="HeaderFormButton"
+      >
+        Submit
+      </FormButton>
+    )
   }
 
   get renderJoinCollectionButton() {
@@ -421,6 +421,7 @@ class PageHeader extends React.Component {
                 <HeaderButtonContainer>
                   {this.renderTemplateButton}
                   {this.renderRestoreButton}
+                  {this.renderSubmissionSubmitButton}
                   {this.renderLaunchTestButton}
                   {this.renderJoinCollectionButton}
                   {this.renderTestUi}
