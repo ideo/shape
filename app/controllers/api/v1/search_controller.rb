@@ -2,14 +2,15 @@ class Api::V1::SearchController < Api::V1::BaseController
   before_action :capture_query_params
 
   before_action :load_and_authorize_organization_from_slug, only: %i[search]
-  before_action :switch_to_organization, only: %i[search]
+  load_and_authorize_resource :organization, only: %i[search_collection_cards]
+  before_action :switch_to_organization, only: %i[search search_collection_cards]
   def search
     render(
       render_attrs(search_records, simple_collection: true),
     )
   end
 
-  def search_collection
+  def search_collection_cards
     render(
       render_attrs(search_records),
     )
@@ -213,7 +214,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     else
       default_render_attrs(results).merge(
         include: CollectionCard.default_relationships_for_api,
-        jsonapi: results.results.map(&:parent_collection_card),
+        jsonapi: results.results.map(&:parent_collection_card).compact,
       )
     end
   end

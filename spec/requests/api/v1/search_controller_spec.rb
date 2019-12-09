@@ -403,10 +403,22 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       expect(json['data'].first['attributes']['serializer']).to eq('SerializableSimpleCollection')
     end
 
-    context 'with full_collection param' do
+    describe 'GET #search_collection_cards' do
+      let!(:path) { "/api/v1/organizations/#{organization.id}/search_collection_cards" }
+      # Parent card is necessary as that is what is returned
+      let!(:parent_collection_card) { create(:collection_card, collection: find_collection) }
+      before { batch_reindex(Collection) }
+
+      it 'returns a 200' do
+        get(path, params: { query: '' })
+        expect(response.status).to eq(200)
+      end
+
       it 'returns full serialized collection' do
-        get(path, params: { query: find_collection.name, full_collection: true })
-        expect(json['data'].first['attributes']['serializer']).to eq('SerializableCollection')
+        get(path, params: { query: find_collection.name })
+        expect(
+          json_included_objects_of_type('collections').first['attributes']['serializer'],
+        ).to eq('SerializableCollection')
       end
     end
   end
