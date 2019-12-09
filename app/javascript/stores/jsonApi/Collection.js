@@ -598,7 +598,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       const stringifiedParams = queryString.stringify(params, {
         arrayFormat: 'bracket',
       })
-      apiPath = `organizations/${this.organization_id}/search?${stringifiedParams}`
+      apiPath = `organizations/${this.organization_id}/search_collection_cards?${stringifiedParams}`
     }
     const res = await this.apiStore.request(apiPath)
     const { data, links, meta } = res

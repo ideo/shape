@@ -1,17 +1,13 @@
 import PropTypes from 'prop-types'
-import { observable, computed, action, runInAction } from 'mobx'
-import { updateModelId } from 'datx'
+import { observable, computed, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
-import styled from 'styled-components'
 
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import EditableSearchInput from '~/ui/global/EditableSearchInput'
 import PageSeparator from '~/ui/global/PageSeparator'
-import PlusIcon from '~/ui/icons/PlusIcon'
 import Loader from '~/ui/layout/Loader'
-import v from '~/utils/variables'
 
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
