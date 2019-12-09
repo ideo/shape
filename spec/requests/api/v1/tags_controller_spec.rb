@@ -15,6 +15,11 @@ describe Api::V1::TagsController, type: :request, json: true, auth: true do
       expect(response.status).to eq(200)
     end
 
+    it 'matches JSON schema' do
+      get(path)
+      expect(json['data'].first['attributes']).to match_json_schema('tag')
+    end
+
     it 'returns expected tags' do
       get(path)
       expect(json_object_ids).to match_array(tags.map(&:id))

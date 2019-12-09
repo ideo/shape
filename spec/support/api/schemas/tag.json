@@ -1,9 +1,7 @@
 {
   "type": "object",
   "properties": {
-    "name": { "type": "string" },
-    "color": { "type": ["string", "null"] },
-    "organization_ids": { "type": "array" }
+    "name": { "type": "string" }
   },
   "required": ["name"]
 }
