@@ -117,7 +117,6 @@ class CollectionGrid extends React.Component {
     } else {
       cards = this.positionMovingCardsAndBCT(props)
     }
-    console.log('init', cards.length)
     this.positionCards(cards)
   }
 

@@ -143,7 +143,7 @@ class CollectionCard < ApplicationRecord
 
   def self.default_includes_for_api
     {
-      collection: [:collection_cover_items],
+      collection: [:collection_cover_items, :collection_translations],
       item: [
         :filestack_file,
         data_items_datasets: [:dataset],

@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { observable, computed, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import { DisplayText } from '~/ui/global/styled/typography'
 import EditableSearchInput from '~/ui/global/EditableSearchInput'
 import PageSeparator from '~/ui/global/PageSeparator'
 import Loader from '~/ui/layout/Loader'
@@ -14,14 +16,19 @@ import Loader from '~/ui/layout/Loader'
 class SearchCollection extends React.Component {
   @observable
   searchCollectionCards = []
+  @observable
+  loading = true
 
   constructor(props) {
     super(props)
-    this.debouncedUpdateSearchTerm = _.debounce(this._updateSearchTerm, 300)
+    this.debouncedUpdateSearchTerm = _.debounce(this._updateSearchTerm, 1000)
   }
 
-  componentDidMount() {
-    this.loadSearchedCards()
+  async componentDidMount() {
+    await this.loadSearchedCards()
+    runInAction(() => {
+      this.loading = false
+    })
   }
 
   @computed
@@ -93,6 +100,7 @@ class SearchCollection extends React.Component {
           cardProperties={collection.cardProperties}
           collection={collection}
           canEditCollection={collection.can_edit_content}
+          shouldAddEmptyRow={false}
           movingCardIds={[]}
         />
         <PageSeparator title={<h3>Search Results</h3>} />
@@ -106,17 +114,29 @@ class SearchCollection extends React.Component {
           canEdit={collection.can_edit_content}
           sortable
         />
-        <CollectionGrid
-          {...gridSettings}
-          loadCollectionCards={this.loadSearchedCards}
-          trackCollectionUpdated={trackCollectionUpdated}
-          collectionCardsOverride={this.searchCollectionCards}
-          cardProperties={this.searchCardProperties}
-          collection={collection}
-          canEditCollection={false}
-          movingCardIds={[]}
-          sorting
-        />
+        {this.loading ? (
+          <Loader />
+        ) : (
+          <Fragment>
+            {this.searchCollectionCards.length === 0 ? (
+              <DisplayText>
+                Enter search criteria to populate this collection
+              </DisplayText>
+            ) : (
+              <CollectionGrid
+                {...gridSettings}
+                loadCollectionCards={this.loadSearchedCards}
+                trackCollectionUpdated={trackCollectionUpdated}
+                collectionCardsOverride={this.searchCollectionCards}
+                cardProperties={this.searchCardProperties}
+                collection={collection}
+                canEditCollection={false}
+                movingCardIds={[]}
+                sorting
+              />
+            )}
+          </Fragment>
+        )}
       </div>
     )
   }

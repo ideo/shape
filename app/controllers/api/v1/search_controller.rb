@@ -86,7 +86,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       ]
     end
 
-    Search.new(
+    results = Search.new(
       # NOTE: This index may get replaced based on filters e.g. "type:item"
       index_name: index_name,
       where: where_clause,
@@ -98,6 +98,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         Item: CollectionCard.default_includes_for_api[:item],
       },
     ).search(@query)
+    results
   end
 
   def search_users_and_groups

@@ -593,8 +593,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       arrayFormat: 'bracket',
     })}`
     if (searchTerm) {
-      const query = `${searchTerm} ${this.collectionFilterQuery}`
-      params.q = query
+      const query = `${searchTerm} ${queryString.stringify(
+        this.collectionFilterQuery
+      )}`
+      params.query = query
       const stringifiedParams = queryString.stringify(params, {
         arrayFormat: 'bracket',
       })
