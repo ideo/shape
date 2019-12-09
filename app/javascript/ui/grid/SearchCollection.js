@@ -7,6 +7,7 @@ import styled from 'styled-components'
 
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import EditableSearchInput from '~/ui/global/EditableSearchInput'
 import PageSeparator from '~/ui/global/PageSeparator'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import Loader from '~/ui/layout/Loader'
@@ -18,8 +19,25 @@ class SearchCollection extends React.Component {
   @observable
   searchCollectionCards = []
 
+  constructor(props) {
+    super(props)
+    this.debouncedUpdateSearchTerm = _.debounce(this._updateSearchTerm, 300)
+  }
+
   componentDidMount() {
     this.loadSearchedCards()
+  }
+
+  @computed
+  get searchCardProperties() {
+    return this.searchCollectionCards.map(c => _.pick(c, ['id', 'updated_at']))
+  }
+
+  _updateSearchTerm(term) {
+    const { collection } = this.props
+    collection.save().then(() => {
+      this.loadSearchedCards()
+    })
   }
 
   loadCollectionCards = async ({ page, per_page, rows, cols } = {}) => {
@@ -35,7 +53,6 @@ class SearchCollection extends React.Component {
   loadSearchedCards = async ({ page, per_page, rows, cols } = {}) => {
     const { collection } = this.props
     const { search_term } = collection
-    console.log('load', page)
     const cards = await collection.API_fetchCards({
       searchTerm: search_term,
       page,
@@ -43,7 +60,6 @@ class SearchCollection extends React.Component {
     })
     runInAction(() => {
       if (page > 1) {
-        console.log('push', this.searchCollectionCards.length)
         // TODO copied from Collection.js
         const newData = _.reverse(
           // de-dupe merged data (deferring to new cards first)
@@ -61,9 +77,10 @@ class SearchCollection extends React.Component {
     })
   }
 
-  @computed
-  get searchCardProperties() {
-    return this.searchCollectionCards.map(c => _.pick(c, ['id', 'updated_at']))
+  onSearchChange = term => {
+    const { collection } = this.props
+    collection.search_term = term
+    this.debouncedUpdateSearchTerm(term)
   }
 
   render() {
@@ -81,9 +98,13 @@ class SearchCollection extends React.Component {
           collection={collection}
           canEditCollection={collection.can_edit_content}
           movingCardIds={[]}
-          sorting
         />
         <PageSeparator title={<h3>Search Results</h3>} />
+        <EditableSearchInput
+          value={collection.search_term}
+          onChange={this.onSearchChange}
+          canEdit={collection.can_edit}
+        />
         <CollectionFilter
           collection={collection}
           canEdit={collection.can_edit_content}

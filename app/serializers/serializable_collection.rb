@@ -95,11 +95,11 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :can_view do
-    @current_ability.can?(:read, @object)
+    @search_collection ? true : @current_ability.can?(:read, @object)
   end
 
   attribute :can_edit do
-    @current_ability.can?(:edit, @object)
+    @search_collection ? false : @current_ability.can?(:edit, @object)
   end
 
   attribute :can_edit_content do

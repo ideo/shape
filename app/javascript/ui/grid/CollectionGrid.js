@@ -1061,7 +1061,6 @@ class CollectionGrid extends React.Component {
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 
-    console.log('collection grid render', rows)
     return (
       <StyledGrid
         data-empty-space-click
