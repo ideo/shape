@@ -1,4 +1,4 @@
-ActsAsTaggableOn.remove_unused_tags = false
+ActsAsTaggableOn.remove_unused_tags = true
 ActsAsTaggableOn.strict_case_match = false
 ActsAsTaggableOn.force_lowercase = false
 # ActsAsTaggableOn.force_parameterize = true

@@ -26,9 +26,8 @@ class FilterSearchModal extends React.Component {
   }
 
   async componentDidMount() {
-    const results = await this.getOrganizationTagList()
     runInAction(() => {
-      this.tagNames = results
+      this.tagNames = this.getOrganizationTagList()
     })
   }
 
@@ -57,10 +56,11 @@ class FilterSearchModal extends React.Component {
     })
   }
 
-  getOrganizationTagList() {
+  async getOrganizationTagList() {
     const { currentUserOrganizationId } = apiStore
     const apiPath = `organizations/${currentUserOrganizationId}/tags`
-    return apiStore.requestJson(apiPath)
+    const tags = await apiStore.requestJson(apiPath)
+    return tags.map(tag => tag.attributes.name)
   }
 
   _autocompleteTermSearch = async term => {

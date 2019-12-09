@@ -125,10 +125,10 @@ Rails.application.routes.draw do
           get 'check_payments'
           get 'my_collection'
           get 'admin_users'
-          get 'tags' => 'tags#index'
         end
 
         get 'search', to: 'search#search'
+        resources :tags, only: %i[index]
         resources :collections, only: %i[create]
         resources :groups, only: %i[index create update]
         resources :users, only: %i[index]
@@ -190,8 +190,6 @@ Rails.application.routes.draw do
       end
 
       resources :audiences, only: %i[index show create]
-
-      resources :tags, except: %i[destroy]
 
       namespace :admin do
         resources :users, only: %i[index destroy create] do

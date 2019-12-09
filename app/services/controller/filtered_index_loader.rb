@@ -54,8 +54,6 @@ module Controller
       filter_uid
       filter_external_id
       filter_collection_id
-      filter_organization_ids
-      filter_name
       # if results is an empty array it won't be pagination-friendly
       @results.present? ? @results.page(@page) : @results
     end
@@ -100,25 +98,6 @@ module Controller
 
       @results = @results.where(
         collection_id: @filter[:collection_id],
-      )
-    end
-
-    def filter_name
-      return if @filter[:name].blank?
-
-      @results = @results.where(
-        name: @filter[:name],
-      )
-    end
-
-    def filter_organization_ids
-      return if @filter[:organization_ids].blank?
-
-      # Ensure org ids are in an array
-      org_ids = Array.wrap(@filter[:organization_ids]).map(&:to_i)
-
-      @results = @results.where(
-        'organization_ids @> ?', org_ids.to_json
       )
     end
   end
