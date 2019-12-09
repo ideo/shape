@@ -4,21 +4,8 @@ class Api::V1::SearchController < Api::V1::BaseController
   before_action :load_and_authorize_organization_from_slug, only: %i[search]
   before_action :switch_to_organization, only: %i[search]
   def search
-    results = search_records
     render(
-      meta: {
-        page: @page,
-        total: results.total_count,
-        size: results.size,
-      },
-      jsonapi: results,
-      include: %i[parent_collection_card filestack_file],
-      class: jsonapi_class.merge(
-        Collection: SerializableSimpleCollection,
-      ),
-      expose: {
-        force_breadcrumbs: true,
-      },
+      render_attrs(search_records, full_collection: params[:full_collection].present?),
     )
   end
 
@@ -189,5 +176,34 @@ class Api::V1::SearchController < Api::V1::BaseController
     return unless @organization.present?
 
     current_user.switch_to_organization(@organization)
+  end
+
+  def default_render_attrs(results)
+    {
+      meta: {
+        page: @page,
+        total: results.total_count,
+        size: results.size,
+      },
+      jsonapi: results,
+      include: %i[parent_collection_card filestack_file],
+      expose: {
+        force_breadcrumbs: true,
+      },
+    }
+  end
+
+  def render_attrs(results, full_collection: false)
+    if full_collection
+      default_render_attrs(results).merge(
+        include: CollectionCard.default_relationships_for_api,
+      )
+    else
+      default_render_attrs(results).merge(
+        class: jsonapi_class.merge(
+          Collection: SerializableSimpleCollection,
+        ),
+      )
+    end
   end
 end

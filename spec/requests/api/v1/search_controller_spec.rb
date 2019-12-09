@@ -397,6 +397,18 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         expect(json['data'].first['id'].to_i).not_to eq(find_collection.id)
       end
     end
+
+    it 'uses simple serializer' do
+      get(path, params: { query: find_collection.name })
+      expect(json['data'].first['attributes']['serializer']).to eq('SerializableSimpleCollection')
+    end
+
+    context 'with full_collection param' do
+      it 'returns full serialized collection' do
+        get(path, params: { query: find_collection.name, full_collection: true })
+        expect(json['data'].first['attributes']['serializer']).to eq('SerializableCollection')
+      end
+    end
   end
 
   describe 'GET #search_users_and_groups' do
