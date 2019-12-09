@@ -12,7 +12,9 @@ class Api::V1::SearchController < Api::V1::BaseController
 
   def search_collection_cards
     render(
-      render_attrs(search_records),
+      render_attrs(
+        search_records(index_name: [Collection, Item]),
+      ),
     )
   end
 
@@ -50,7 +52,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     @query = params[:query] || ''
   end
 
-  def search_records
+  def search_records(index_name: Collection)
     # search for tags via hashtag e.g. "#template"
     where_clause = {
       organization_id: current_organization.id,
@@ -86,7 +88,7 @@ class Api::V1::SearchController < Api::V1::BaseController
 
     Search.new(
       # NOTE: This index may get replaced based on filters e.g. "type:item"
-      index_name: Collection,
+      index_name: index_name,
       where: where_clause,
       per_page: params[:per_page] || 10,
       page: @page,
