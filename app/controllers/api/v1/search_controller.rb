@@ -86,6 +86,11 @@ class Api::V1::SearchController < Api::V1::BaseController
       ]
     end
 
+    if params[:current_collection_id].present?
+      where_clause[:parent_id] = {not: params[:current_collection_id]}
+      where_clause[:id] = {not: params[:current_collection_id]}
+    end
+
     results = Search.new(
       # NOTE: This index may get replaced based on filters e.g. "type:item"
       index_name: index_name,

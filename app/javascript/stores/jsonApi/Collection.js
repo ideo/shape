@@ -597,6 +597,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         this.collectionFilterQuery
       )}`
       params.query = query
+      params.current_collection_id = this.id
       const stringifiedParams = queryString.stringify(params, {
         arrayFormat: 'bracket',
       })
