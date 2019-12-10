@@ -5,13 +5,3 @@ heroku auth:token
 
 # Set the BASE_HOST and ACTION_CABLE_URL from the review app name
 heroku config:set BASE_HOST=https://${HEROKU_APP_NAME}.herokuapp.com ACTION_CABLE_URL=wss://${HEROKU_APP_NAME}.herokuapp.com/cable --app ${HEROKU_APP_NAME}
-
-# Data-specific keys
-# COMMON_RESOURCE_GROUP_ID=- run seeds and create common resource group
-# GETTING_STARTED_TEMPLATE_ID=?
-# ORG_MASTER_TEMPLATES_ID=
-
-# Everyone on products team needs to have access
-
-# May need to allow blank URI for review apps, otherwise they need to have a Profile API key that allows them to add a redirect URI
-# https://github.com/doorkeeper-gem/doorkeeper/wiki/Allow-blank-redirect-URI-for-Applications

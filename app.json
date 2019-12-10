@@ -47,6 +47,7 @@
   },
   "environments": {
     "review": {
+      "addons": ["rediscloud", "memcachedcloud", "sendgrid"],
       "buildpacks": [
         { "url": "heroku-community/cli" },
         {

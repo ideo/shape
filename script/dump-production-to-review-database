@@ -1,4 +1,7 @@
 heroku auth:token
 
 # Take the latest production backup and populate the review app database
-heroku pg:backups:restore `heroku pg:backups public-url -a shape-production` DATABASE_URL -a heroku-review-app-template
+heroku pg:backups:restore `heroku pg:backups public-url -a shape-production` DATABASE_URL -a shape-review-app-template --confirm
+
+# Reindex collections and items updated in last 24 hours
+rake searchkick:reindex_collections_items_last_day
