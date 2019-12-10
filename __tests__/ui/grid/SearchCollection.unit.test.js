@@ -4,7 +4,9 @@ import { fakeCollection } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/stores')
 
-const collection = Object.assign({}, fakeCollection, {isSearchCollection: true })
+const collection = Object.assign({}, fakeCollection, {
+  isSearchCollection: true,
+})
 const collectionCards = []
 let wrapper, uiStore
 let props, component, rerender
@@ -46,12 +48,17 @@ describe('SearchCollection', () => {
     describe('after loading search collection results', () => {
       beforeEach(async () => {
         component.loading = false
-        component.searchCollectionCards = [{id: 1}]
+        component.searchCollectionCards = [{ id: 1 }]
         wrapper.update()
       })
 
       it('should render a second collection grid', () => {
-        expect(wrapper.find('CollectionGrid').at(1).exists()).toBe(true)
+        expect(
+          wrapper
+            .find('CollectionGrid')
+            .at(1)
+            .exists()
+        ).toBe(true)
       })
     })
 
@@ -94,20 +101,15 @@ describe('SearchCollection', () => {
   })
 
   describe('loadSearchedCards', () => {
-    let searchCards =[]
+    let searchCards = []
     beforeEach(() => {
-      searchCards = [
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-        { id: 4 },
-      ]
+      searchCards = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]
       collection.API_fetchCards.mockReturnValue(Promise.resolve(searchCards))
     })
 
     describe('when on a new page', () => {
       beforeEach(() => {
-        component.searchCollectionCards = [{ id: 6}]
+        component.searchCollectionCards = [{ id: 6 }]
         component.loadSearchedCards({ page: 2, per_page: 40 })
       })
 
