@@ -11,7 +11,7 @@ import EditableSearchInput from '~/ui/global/EditableSearchInput'
 import PageSeparator from '~/ui/global/PageSeparator'
 import Loader from '~/ui/layout/Loader'
 
-@inject('apiStore', 'routingStore', 'uiStore')
+@inject('uiStore')
 @observer
 class SearchCollection extends React.Component {
   @observable
@@ -33,10 +33,11 @@ class SearchCollection extends React.Component {
 
   @computed
   get searchCardProperties() {
+    if (!this.searchCollectionCards) return []
     return this.searchCollectionCards.map(c => _.pick(c, ['id', 'updated_at']))
   }
 
-  _updateSearchTerm(term) {
+  _updateSearchTerm() {
     const { collection } = this.props
     collection.save().then(() => {
       this.loadSearchedCards()
@@ -83,7 +84,7 @@ class SearchCollection extends React.Component {
   onSearchChange = term => {
     const { collection } = this.props
     collection.search_term = term
-    this.debouncedUpdateSearchTerm(term)
+    this.debouncedUpdateSearchTerm()
   }
 
   render() {
@@ -106,7 +107,7 @@ class SearchCollection extends React.Component {
         />
         <PageSeparator title={<h3>Search Results</h3>} />
         <EditableSearchInput
-          value={collection.search_term}
+          value={collection.search_term || ''}
           onChange={this.onSearchChange}
           canEdit={collection.can_edit}
         />
@@ -148,8 +149,6 @@ SearchCollection.propTypes = {
   trackCollectionUpdate: PropTypes.func.isRequired,
 }
 SearchCollection.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 SearchCollection.defaultProps = {}
