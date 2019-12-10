@@ -169,7 +169,6 @@ class CardMover < SimpleService
       cards: @to_collection_cards,
       action: @card_action,
     )
-
     return unless mover.call
 
     @moving_cards += mover.legend_item_cards
