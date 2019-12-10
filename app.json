@@ -50,6 +50,9 @@
       "buildpacks": [
         { "url": "heroku-community/cli" },
         {
+          "url": "https://github.com/SectorLabs/heroku-buildpack-git-submodule.git"
+        },
+        {
           "url": "heroku/nodejs"
         },
         {

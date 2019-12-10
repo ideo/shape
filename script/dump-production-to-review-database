@@ -1,0 +1,4 @@
+heroku auth:token
+
+# Take the latest production backup and populate the review app database
+heroku pg:backups:restore `heroku pg:backups public-url -a shape-production` DATABASE_URL -a heroku-review-app-template
