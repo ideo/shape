@@ -47,8 +47,15 @@
   },
   "environments": {
     "review": {
-      "buildpacks": [{ "url": "heroku-community/cli" }],
-      "addons": ["papertrail:choklad"],
+      "buildpacks": [
+        { "url": "heroku-community/cli" },
+        {
+          "url": "heroku/nodejs"
+        },
+        {
+          "url": "heroku/ruby"
+        }
+      ],
       "scripts": {
         "postdeploy": "script/review-app-setup"
       },
