@@ -20,7 +20,7 @@ exports[`MovableGridCard renders snapshot 1`] = `
       disabled={false}
       width={125}
     >
-      Add
+      Create
     </FormButton>
   </form>
 </styled.div>
