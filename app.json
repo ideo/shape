@@ -49,7 +49,7 @@
     "review": {
       "addons": ["rediscloud", "memcachedcloud", "sendgrid"],
       "buildpacks": [
-        { "url": "heroku-community/cli" },
+        { "url": "heroku/heroku-buildpack-cli" },
         {
           "url": "https://github.com/SectorLabs/heroku-buildpack-git-submodule.git"
         },

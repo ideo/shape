@@ -1,1 +1,1 @@
-Searchkick.redis = ConnectionPool.new { Redis.new(url: ENV['REDIS_URL']) }
+Searchkick.redis = ConnectionPool.new { Redis.new(url: ENV['REDIS_URL'] || ENV['REDISCLOUD_URL']) }
