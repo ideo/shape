@@ -9,12 +9,7 @@
       "url": "heroku/ruby"
     }
   ],
-  "addons": [
-    "heroku-postgresql",
-    "rediscloud",
-    "bonsai",
-    "sendgrid"
-  ],
+  "addons": ["heroku-postgresql", "rediscloud", "bonsai", "sendgrid"],
   "env": {
     "FILESTACK_API_KEY": {
       "required": true
@@ -48,6 +43,32 @@
     },
     "GOOGLE_CLOUD_BROWSER_KEY": {
       "required": true
+    }
+  },
+  "environments": {
+    "review": {
+      "buildpacks": [{ "url": "heroku-community/cli" }],
+      "addons": [
+        "heroku-postgresql:hobby-dev",
+        "bonsai:staging",
+        "memcachedcloud:30",
+        "rediscloud:30",
+        "papertrail:choklad",
+        "sendgrid:starter"
+      ],
+      "scripts": {
+        "postdeploy": "script/review-app-setup"
+      },
+      "formation": {
+        "web": {
+          "quantity": 1,
+          "size": "Standard-1X"
+        },
+        "worker": {
+          "quantity": 1,
+          "size": "Standard-1X"
+        }
+      }
     }
   }
 }
