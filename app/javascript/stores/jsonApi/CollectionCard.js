@@ -100,10 +100,11 @@ class CollectionCard extends BaseRecord {
     return null
   }
 
-  get canEdit() {
+  get canMove() {
+    // basically replicating what's in Ability.rb
     return (
-      (this.link && this.can_edit_parent) ||
-      (this.record && this.record.can_edit)
+      !this.isPinnedAndLocked &&
+      (this.can_edit_parent || (this.record && this.record.can_edit))
     )
   }
 
@@ -233,13 +234,33 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  reselectOnlyEditableCards(cardIds = this.uiStore.selectedCardIds) {
+  reselectOnlyEditableRecords(cardIds = this.uiStore.selectedCardIds) {
     const { uiStore } = this
-    const filteredCardIds = this.apiStore
-      .findAll('collection_cards')
-      .filter(card => _.includes(cardIds, card.id) && card.canEdit)
-      .map(card => card.id)
+    const filteredCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card =>
+        _.includes(cardIds, card.id) && card.record && card.record.can_edit
+    )
+    const filteredCardIds = _.map(filteredCards, 'id')
     const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
+    uiStore.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
+  reselectOnlyMovableCards(cardIds = this.uiStore.selectedCardIds) {
+    // NOTE: this will only *reject* ones that we know we can't move
+    const { uiStore } = this
+    const rejectCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card => _.includes(cardIds, card.id) && !card.canMove
+    )
+    if (rejectCards.length === 0) return
+
+    const rejectCardIds = _.map(rejectCards, 'id')
+    const filteredCardIds = _.reject(cardIds, id =>
+      _.includes(rejectCardIds, id)
+    )
+    const removedCount = rejectCardIds.length
     uiStore.reselectCardIds(filteredCardIds)
     return removedCount
   }

@@ -19,6 +19,7 @@ exports[`GridCardPagination renders snapshot 1`] = `
   scrollThrottle={-1}
 >
   <Loader
+    animation="cube"
     containerHeight="100%"
     size={60}
   />
