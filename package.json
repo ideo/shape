@@ -6,6 +6,7 @@
     "cypress-ci": "./node_modules/.bin/cypress run",
     "lint": "./node_modules/.bin/eslint",
     "styleguide": "yarn styleguidist server",
+    "storybook": "start-storybook -p 9001 -c .storybook",
     "test": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --watch"
   },
@@ -86,6 +87,7 @@
     "@rails/webpacker": "4.0.7",
     "@sentry/browser": "^5.4.0",
     "@sentry/webpack-plugin": "^1.6.2",
+    "@storybook/react": "^5.2.8",
     "actioncable": "^5.2.0",
     "axios": "^0.18.1",
     "babel-engine-plugin": "^0.2.1",
@@ -181,6 +183,8 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
+    "@storybook/addon-actions": "^5.2.8",
+    "@storybook/addon-notes": "^5.2.8",
     "cypress": "3.4.1",
     "cypress-cucumber-preprocessor": "^1.16.0",
     "enzyme": "^3.3.0",
