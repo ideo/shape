@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import { VictoryLine } from 'victory'
 import v from '~/utils/variables'
-
 import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
+
 import {
   datasetPropType,
   dateTooltipText,
@@ -59,6 +59,7 @@ const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}
           fontSize={cardArea === 1 ? 18 : 9}
+          neverShowLabels
         />
       }
     />

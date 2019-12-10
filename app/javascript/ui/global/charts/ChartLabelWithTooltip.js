@@ -14,11 +14,13 @@ export const ChartTooltip = props => (
     active={props.active}
     orientation="top"
     theme={victoryTheme}
+    flyoutHeight={350}
     style={{
       fill: 'white',
       fontFamily: v.fonts.sans,
       fontSize: props.fontSize || 10,
       fontWeight: 'normal',
+      padding: 16,
     }}
     pointerLength={0}
     flyoutStyle={{

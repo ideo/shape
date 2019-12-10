@@ -209,7 +209,7 @@ export const StyledGridCardInner = styled.div`
   ${props =>
     !props.hasOverflow &&
     `
-  overflow: hidden;
+  overflow: ${props => (props.visibleOverflow ? 'visible' : 'hidden')};
   `} z-index: 1;
   ${props =>
     !props.isText &&
@@ -291,6 +291,13 @@ StyledTopRightActions.defaultProps = {
   color: v.colors.commonMedium,
 }
 StyledTopRightActions.displayName = 'StyledTopRightActions'
+
+export const BottomRightActionHolder = styled.div`
+  bottom: 20px;
+  right: 10px;
+  position: absolute;
+  z-index: ${v.zIndex.gridCardTop};
+`
 
 export class GridCardIconWithName extends React.PureComponent {
   render() {

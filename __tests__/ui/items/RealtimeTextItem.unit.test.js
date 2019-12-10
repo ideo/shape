@@ -12,6 +12,7 @@ const props = {
   onExpand: jest.fn(),
   fullPageView: false,
   fullyLoaded: true,
+  initialFontTag: 'P',
   uiStore: fakeUiStore,
   apiStore: fakeApiStore(),
 }
@@ -87,6 +88,36 @@ describe('TextItem', () => {
 
     it('does not render the editor pill', () => {
       expect(wrapper.find('EditorPill').exists()).toBe(false)
+    })
+  })
+
+  describe('initialFontTag', () => {
+    beforeEach(() => {
+      props.item.quill_data = { ops: null }
+      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    describe('with P (default)', () => {
+      it('should not affect quillData', () => {
+        expect(component.quillData).toEqual({ ops: [] })
+      })
+    })
+
+    describe('with H1', () => {
+      beforeEach(() => {
+        props.item.quill_data = { ops: null }
+        props.initialFontTag = 'H1'
+        wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('should insert a newline with H1', () => {
+        const quillData = {
+          ops: [{ insert: '\n', attributes: { header: '1' } }],
+        }
+        expect(component.quillData).toEqual(quillData)
+      })
     })
   })
 
