@@ -12,3 +12,6 @@ heroku config:set BASE_HOST=https://${HEROKU_APP_NAME}.herokuapp.com ACTION_CABL
 # ORG_MASTER_TEMPLATES_ID=
 
 # Everyone on products team needs to have access
+
+# May need to allow blank URI for review apps, otherwise they need to have a Profile API key that allows them to add a redirect URI
+# https://github.com/doorkeeper-gem/doorkeeper/wiki/Allow-blank-redirect-URI-for-Applications

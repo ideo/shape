@@ -48,14 +48,7 @@
   "environments": {
     "review": {
       "buildpacks": [{ "url": "heroku-community/cli" }],
-      "addons": [
-        "heroku-postgresql:hobby-dev",
-        "bonsai:staging",
-        "memcachedcloud:30",
-        "rediscloud:30",
-        "papertrail:choklad",
-        "sendgrid:starter"
-      ],
+      "addons": ["papertrail:choklad"],
       "scripts": {
         "postdeploy": "script/review-app-setup"
       },
