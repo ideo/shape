@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+import React from 'react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 import { Heading1, Heading2, Anchor } from '~/ui/global/styled/typography'
