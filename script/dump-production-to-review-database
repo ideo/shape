@@ -15,6 +15,6 @@ then
 
   heroku run rake db:migrate --app=shape-review-app-template
 
-  # Reindex collections and items updated in last 24 hours
-  rake searchkick:reindex_collections_items_last_day
+  # Reindex collections and items updated in last week
+  rake searchkick:reindex_collections_items_last_week
 fi
