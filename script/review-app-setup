@@ -1,4 +1,4 @@
-# Env setup vars
+#!/usr/bin/env bash
 
 # We get authenticated using the HEROKU_API_TOKEN value
 # You can generate a long-lived token using `heroku authorizations:create`
