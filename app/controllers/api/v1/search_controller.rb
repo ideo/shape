@@ -203,6 +203,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       meta: {
         page: @page,
         total: results.total_count,
+        total_pages: results.total_pages,
         size: results.size,
       },
       include: %i[parent_collection_card filestack_file],
