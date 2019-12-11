@@ -1177,6 +1177,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
             "sortedCards": Array [
@@ -1627,6 +1628,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
         "sortedCards": Array [
@@ -3314,6 +3316,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
             "sortedCards": Array [
@@ -3764,6 +3767,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
         "sortedCards": Array [
@@ -5451,6 +5455,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
             "sortedCards": Array [
@@ -5901,6 +5906,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
         "sortedCards": Array [
@@ -7463,6 +7469,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
             "sortedCards": Array [
@@ -7913,6 +7920,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
         "sortedCards": Array [

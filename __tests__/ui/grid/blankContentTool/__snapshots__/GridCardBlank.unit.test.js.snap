@@ -102,7 +102,7 @@ exports[`GridCardBlank renders snapshot 1`] = `
                 "onClick": [Function],
               },
               Object {
-                "iconLeft": <AddCollectionIcon />,
+                "iconLeft": <AddSearchCollectionIcon />,
                 "name": "Create Search Collection",
                 "onClick": [Function],
               },
