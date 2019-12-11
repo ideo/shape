@@ -8,6 +8,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
+import AddSearchCollectionIcon from '~/ui/icons/AddSearchCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
@@ -691,7 +692,7 @@ class GridCardBlank extends React.Component {
                 },
                 {
                   name: 'Create Search Collection',
-                  iconLeft: <AddCollectionIcon />,
+                  iconLeft: <AddSearchCollectionIcon />,
                   onClick: this.startCreating('search'),
                 },
                 {
