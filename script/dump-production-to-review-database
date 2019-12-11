@@ -1,10 +1,20 @@
-# We get authenticated using the HEROKU_API_TOKEN value
-# You can generate a long-lived token using `heroku authorizations:create`
+#!/usr/bin/env bash
 
-# Take the latest production backup and populate the review app database
-heroku pg:backups:restore `heroku pg:backups public-url --app=shape-production` DATABASE_URL --app=shape-review-app-template --confirm=shape-review-app-template
+# Heroku scheduler runs this script every day
+# But we only want to reset the database on Sunday
 
-heroku run rake db:migrate --app=shape-review-app-template
+DOW=$(date +%u)
 
-# Reindex collections and items updated in last 24 hours
-rake searchkick:reindex_collections_items_last_day
+if [ "$DOW" -eq 7 ]
+then
+  # We get authenticated using the HEROKU_API_TOKEN value
+  # You can generate a long-lived token using `heroku authorizations:create`
+
+  # Take the latest production backup and populate the review app database
+  heroku pg:backups:restore `heroku pg:backups public-url --app=shape-production` DATABASE_URL --app=shape-review-app-template --confirm=shape-review-app-template
+
+  heroku run rake db:migrate --app=shape-review-app-template
+
+  # Reindex collections and items updated in last 24 hours
+  rake searchkick:reindex_collections_items_last_day
+fi
