@@ -81,7 +81,7 @@ describe('SearchCollection', () => {
       expect(collection.API_fetchCards).toHaveBeenCalledWith({
         searchTerm: 'plants',
         page: undefined,
-        per_page: 40,
+        per_page: 50,
       })
     })
   })
