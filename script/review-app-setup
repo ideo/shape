@@ -5,3 +5,6 @@
 
 # Set the BASE_HOST and ACTION_CABLE_URL from the review app name
 heroku config:set BASE_HOST=https://${HEROKU_APP_NAME}.herokuapp.com ACTION_CABLE_URL=wss://${HEROKU_APP_NAME}.herokuapp.com/cable --app ${HEROKU_APP_NAME}
+
+# Add the redirect URI for this review app to the whitelist of redirect URIs
+rake network_api:application_add_redirect_uri

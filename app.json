@@ -63,7 +63,8 @@
         }
       ],
       "scripts": {
-        "postdeploy": "script/review-app-setup"
+        "postdeploy": "script/review-app-setup",
+        "pr-predestroy": "script/review-app-teardown"
       },
       "formation": {
         "web": {
