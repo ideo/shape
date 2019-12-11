@@ -45,7 +45,7 @@ class EditableSearchInput extends React.Component {
   }
 
   render() {
-    const { value, onChange, canEdit } = this.props
+    const { value, onChange, canEdit, dataCy } = this.props
     const { editing } = this.state
     return (
       <Holder>
@@ -55,9 +55,10 @@ class EditableSearchInput extends React.Component {
           value={value}
           onChange={onChange}
           disabled={!editing}
+          dataCy={dataCy}
         />
         {canEdit && (
-          <EditButton onClick={this.onEdit}>
+          <EditButton onClick={this.onEdit} data-cy="SearchCollectionEditTerm">
             {editing ? <CloseIcon /> : <EditPencilIcon />}
             {editing ? 'close' : 'edit'}
           </EditButton>
@@ -71,10 +72,12 @@ EditableSearchInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
+  dataCy: PropTypes.string,
 }
 
 EditableSearchInput.defaultProps = {
   canEdit: false,
+  dataCy: '',
 }
 
 export default EditableSearchInput

@@ -110,6 +110,7 @@ class SearchCollection extends React.Component {
           value={collection.search_term || ''}
           onChange={this.onSearchChange}
           canEdit={collection.can_edit}
+          dataCy="SearchCollectionInput"
         />
         <CollectionFilter
           collection={collection}
@@ -121,7 +122,7 @@ class SearchCollection extends React.Component {
         ) : (
           <Fragment>
             {this.searchCollectionCards.length === 0 ? (
-              <DisplayText>
+              <DisplayText data-cy="SearchCollectionEmptyMessage">
                 Enter search criteria to populate this collection
               </DisplayText>
             ) : (

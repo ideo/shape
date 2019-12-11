@@ -132,7 +132,7 @@ class ExpandableSearchInput extends React.Component {
   }
 
   render() {
-    const { value, background, disabled, onClear } = this.props
+    const { value, background, disabled, onClear, dataCy } = this.props
     const { open } = this
     return (
       <StyledExpandableSearchInput open={open} background={background}>
@@ -148,6 +148,7 @@ class ExpandableSearchInput extends React.Component {
           value={value}
           onChange={this.handleTextChange}
           disabled={disabled}
+          data-cy={dataCy}
         />
         {!!onClear && (
           <button open={open} onClick={this.handleClose} className="close">
@@ -169,6 +170,7 @@ ExpandableSearchInput.propTypes = {
   controlled: PropTypes.bool,
   open: PropTypes.bool,
   disabled: PropTypes.bool,
+  dataCy: PropTypes.string,
 }
 
 ExpandableSearchInput.defaultProps = {
@@ -180,6 +182,7 @@ ExpandableSearchInput.defaultProps = {
   controlled: false,
   open: false,
   disabled: false,
+  dataCy: '',
 }
 
 export default ExpandableSearchInput
