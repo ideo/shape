@@ -60,7 +60,7 @@ class SearchCollection extends React.Component {
     const cards = await collection.API_fetchCards({
       searchTerm: search_term,
       page,
-      per_page: 40,
+      per_page: collection.recordsPerPage,
     })
     runInAction(() => {
       if (page > 1) {
