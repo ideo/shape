@@ -34,10 +34,9 @@ namespace :searchkick do
     end
   end
 
-  task reindex_collections_items_last_day: :environment do
+  task reindex_collections_items_last_week: :environment do
     [Collection, Item].each do |klass|
-      # Add a 2 hour buffer to import anything updated in last 26 hours
-      scope = klass.where('updated_at > ?', 26.hours.ago)
+      scope = klass.where('updated_at > ?', 1.week.ago)
       agg = 0
       total = scope.count
       scope
