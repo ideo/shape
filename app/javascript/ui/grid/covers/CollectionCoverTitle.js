@@ -1,13 +1,8 @@
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { css } from 'styled-components'
+import styled from 'styled-components'
 import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
-import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
-import TemplateIcon from '~/ui/icons/TemplateIcon'
-import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
-import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-import ProfileIcon from '~/ui/icons/ProfileIcon'
 
 function namePartTooLong(fullName) {
   const parts = fullName.split(' ')
@@ -27,7 +22,7 @@ function hyphenate(namePart) {
   return `${parts.slice(0, -1).join('')}\u00AD${parts.slice(-1)}`
 }
 
-const IconHolderCss = css`
+const IconHolder = styled.span`
   display: inline-block;
   line-height: 31px;
   margin-right: 5px;
@@ -41,11 +36,8 @@ class CollectionCoverTitle extends React.Component {
   }
 
   get hasIcon() {
-    return this.isSpecialCollection // should this always true now?
-  }
-
-  get isSpecialCollection() {
     const { collection } = this.props
+
     return (
       collection.isTemplated ||
       collection.isMasterTemplate ||
@@ -54,55 +46,55 @@ class CollectionCoverTitle extends React.Component {
     )
   }
 
-  get collectionName() {}
+  get leftIcon() {
+    const { collection } = this.props
+
+    // if (collection.isMasterTemplate) {
+    //   return <TemplateIcon circled filled />
+    // }
+
+    const leftConditions = [collection.isMasterTemplate]
+    if (leftConditions.some(bool => bool)) {
+      return <CollectionTypeIcon record={collection} />
+    }
+    return null
+  }
+
+  get rightIcon() {
+    const { collection } = this.props
+
+    const rightConditions = [
+      collection.isSubmissionBox,
+      collection.isTemplated,
+      collection.isTestCollectionOrResults,
+      collection.isUserProfile,
+      collection.isProfileTemplate,
+    ]
+
+    if (rightConditions.some(bool => bool)) {
+      return <CollectionTypeIcon record={collection} />
+    }
+    return null
+  }
 
   render() {
     const { collection } = this.props
     const tooLong = namePartTooLong(collection.name)
     const hyphens = tooLong ? 'auto' : 'initial'
+
     if (this.hasIcon) {
       const nameParts = splitName(collection.name)
       if (!nameParts) return collection.name
       const lastName = nameParts.pop()
-      let leftIcon
-      let rightIcon
-      this.isSpecialCollection ? (
-        <div>foo</div>
-      ) : (
-        // <SpecialTemplateIcon record={collection} />
-        <CollectionTypeIcon record={collection} />
-      )
-      if (collection.isProfileTemplate) {
-        rightIcon = <FilledProfileIcon />
-      } else if (collection.isMasterTemplate) {
-        leftIcon = <TemplateIcon circled filled />
-      } else if (collection.isUserProfile) {
-        rightIcon = <ProfileIcon />
-      } else if (collection.isTestCollectionOrResults) {
-        rightIcon = <TestCollectionIcon />
-      } else if (collection.isTemplated) {
-        rightIcon = <TemplateIcon circled />
-      } else if (collection.isSubmissionBox) {
-        rightIcon = <SubmissionBoxIconLg />
-      }
+
       return (
         <span style={{ hyphens }}>
-          {leftIcon && (
-            <CollectionTypeIcon
-              css={IconHolderCss}
-              record={collection}
-            ></CollectionTypeIcon>
-          )}
+          <IconHolder>{this.leftIcon}</IconHolder>
           {nameParts.join(' ')}{' '}
           <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
             {hyphenate(lastName)}
             &nbsp;
-            {rightIcon && (
-              <CollectionTypeIcon
-                css={IconHolderCss}
-                record={collection}
-              ></CollectionTypeIcon>
-            )}
+            <IconHolder>{this.rightIcon}</IconHolder>
           </span>
         </span>
       )

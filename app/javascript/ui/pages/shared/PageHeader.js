@@ -2,15 +2,13 @@ import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
-import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
-import TemplateIcon from '~/ui/icons/TemplateIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -22,11 +20,10 @@ import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 import { ACTION_SOURCES } from '~/enums/actionEnums'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
-import CollectionIconHolder from '~/ui/global/CollectionIconHolder'
 
 /* global IdeoSSO */
 
-const IconHolderCss = css`
+const IconHolder = styled.span`
   color: ${v.colors.commonDark};
   display: block;
   height: 32px;
@@ -121,21 +118,39 @@ class PageHeader extends React.Component {
     })
   }
 
-  get specialTemplateIcon() {
+  get leftIcon() {
     const { record } = this.props
-    if (record.isProfileTemplate) {
+    const leftConditions = [record.isProfileTemplate, record.isMasterTemplate]
+
+    if (leftConditions.some(bool => bool)) {
       return (
-        <CollectionIconHolder css={IconHolderCss} align="left">
-          <FilledProfileIcon />
-        </CollectionIconHolder>
-      )
-    } else if (record.isMasterTemplate) {
-      return (
-        <CollectionIconHolder css={IconHolderCss} align="left">
-          <TemplateIcon circled filled />
-        </CollectionIconHolder>
+        <IconHolder align="right">
+          <CollectionTypeIcon record={record} />
+        </IconHolder>
       )
     }
+    return null
+  }
+
+  get rightIcon() {
+    const { record } = this.props
+    const rightConditions = [
+      record.isUserProfile,
+      record.isProfileCollection,
+      record.isTemplated && !record.isSubTemplate,
+      record.isSubmissionBox,
+      record.launchableTestId,
+      record.isBoard,
+    ]
+
+    if (rightConditions.some(bool => bool)) {
+      return (
+        <IconHolder align="right">
+          <CollectionTypeIcon record={record} />
+        </IconHolder>
+      )
+    }
+    return null
   }
 
   get hiddenIcon() {
@@ -148,9 +163,7 @@ class PageHeader extends React.Component {
           size="lg"
           record={record}
           IconWrapper={({ children }) => (
-            <CollectionIconHolder css={IconHolderCss} align="right">
-              {children}
-            </CollectionIconHolder>
+            <IconHolder align="right">{children}</IconHolder>
           )}
         />
       )
@@ -377,7 +390,7 @@ class PageHeader extends React.Component {
                 className="title"
                 onClick={this.handleTitleClick}
               >
-                {this.specialTemplateIcon}
+                {this.leftIcon}
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
@@ -391,9 +404,7 @@ class PageHeader extends React.Component {
                     this.updateIconAndTagsWidth(ref)
                   }}
                 >
-                  {record.isCollection && (
-                    <CollectionTypeIcon record={record} css={IconHolderCss} />
-                  )}
+                  {this.rightIcon}
                   {this.hiddenIcon}
                   {record.isLiveTest && (
                     <LiveTestIndicator>Live</LiveTestIndicator>

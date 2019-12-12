@@ -352,7 +352,7 @@ class CollectionCover extends React.Component {
                         to={routingStore.pathTo('collections', collection.id)}
                         data-cy="collection-cover-link"
                       >
-                        <CollectionCoverTitle record={collection} />
+                        <CollectionCoverTitle collection={collection} />
                       </PlainLink>
                     </Dotdotdot>
                     {this.button}
