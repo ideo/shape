@@ -74,6 +74,7 @@ const Pill = props => {
   if (props.tag) {
     wrapperProps.tagName = props.tag.name
   }
+
   return (
     <PillWrapper {...wrapperProps}>
       {selectable && (

@@ -28,8 +28,7 @@ const StyledAvatar = styled(Avatar)`
 
 @observer
 class PillList extends React.Component {
-  handleDelete = item => () => {
-    console.log('pill handle delete')
+  handleDelete = item => {
     this.props.onItemDelete(item)
   }
 
@@ -59,7 +58,7 @@ class PillList extends React.Component {
             selectable: item.selectable,
             selected: item.selected,
             onSelect: item.onSelect,
-            onDelete: this.handleDelete(item),
+            onDelete: ev => this.handleDelete(item),
           }
 
           const identifier = item.name || item.id || item.email
@@ -67,9 +66,10 @@ class PillList extends React.Component {
           let tag
           if (item.type === 'tag') {
             // Need to move props into tag because Pill will pull them from tag if present
+            // Must be assigned in this order so we can override onDelete
             tag = {
-              ...pillProps,
               ...item,
+              ...pillProps,
             }
           }
           return (

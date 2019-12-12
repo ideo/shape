@@ -90,7 +90,6 @@ class CollectionFilter extends React.Component {
   }
 
   onDeleteFilter = async tag => {
-    console.log('on delete filter', tag)
     return this.onFilterChange(async () => {
       const { collection } = this.props
       const filter = apiStore.find('collection_filters', tag.id)
