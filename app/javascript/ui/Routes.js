@@ -107,11 +107,18 @@ class Routes extends React.Component {
         firebaseClient.authenticate(currentUser.google_auth_token)
       },
     })
+
     document.addEventListener('keydown', captureGlobalKeypress)
+    document.addEventListener('touchmove', this.handleTouchMove, {
+      passive: false,
+    })
   }
 
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
+    document.removeEventListener('touchmove', this.handleTouchMove, {
+      passive: false,
+    })
   }
 
   handleWindowResize = ({ windowWidth }) => {
@@ -168,6 +175,13 @@ class Routes extends React.Component {
         maxY: null,
       })
     }, 500)
+  }
+
+  handleTouchMove = e => {
+    const { uiStore } = this.props
+    if (uiStore.dragging) {
+      e.preventDefault()
+    }
   }
 
   _setSelectedArea = coords => {
