@@ -15,20 +15,23 @@ import Loader from '~/ui/layout/Loader'
 @observer
 class SearchCollection extends React.Component {
   @observable
-  searchCollectionCards = []
-  @observable
-  loading = true
+  loading = false
 
   constructor(props) {
     super(props)
     this.debouncedUpdateSearchTerm = _.debounce(this._updateSearchTerm, 1000)
   }
 
-  async componentDidMount() {
-    await this.loadSearchedCards()
-    runInAction(() => {
-      this.loading = false
-    })
+  componentDidMount() {
+    this.loadSearchedCards()
+  }
+
+  @computed
+  get searchCollectionCards() {
+    const { collection } = this.props
+    return collection.searchResultsCollection
+      ? collection.searchResultsCollection.collection_cards
+      : []
   }
 
   @computed
@@ -54,31 +57,24 @@ class SearchCollection extends React.Component {
     })
   }
 
-  loadSearchedCards = async ({ page, per_page, rows, cols } = {}) => {
+  loadSearchedCards = async ({ page = 1, per_page, rows, cols } = {}) => {
     const { collection } = this.props
+    const { searchResultsCollection } = collection
     const { search_term } = collection
-    const cards = await collection.API_fetchCards({
+    if (page === 1) {
+      runInAction(() => {
+        this.loading = true
+      })
+    }
+    await searchResultsCollection.API_fetchCards({
       searchTerm: search_term,
       page,
-      per_page: collection.recordsPerPage,
+      per_page: collection.searchRecordsPerPage,
     })
     runInAction(() => {
-      if (page > 1) {
-        // TODO copied from Collection.js
-        const newData = _.reverse(
-          // de-dupe merged data (deferring to new cards first)
-          // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
-          _.unionBy(
-            _.reverse([...cards]),
-            _.reverse([...this.searchCollectionCards]),
-            'id'
-          )
-        )
-        this.searchCollectionCards.replace(newData)
-      } else {
-        this.searchCollectionCards = cards
-      }
+      this.loading = false
     })
+    return
   }
 
   onSearchChange = term => {
@@ -115,7 +111,6 @@ class SearchCollection extends React.Component {
         <CollectionFilter
           collection={collection}
           canEdit={collection.can_edit_content}
-          sortable
         />
         {this.loading ? (
           <Loader />
@@ -130,12 +125,10 @@ class SearchCollection extends React.Component {
                 {...gridSettings}
                 loadCollectionCards={this.loadSearchedCards}
                 trackCollectionUpdated={trackCollectionUpdated}
-                collectionCardsOverride={this.searchCollectionCards}
                 cardProperties={this.searchCardProperties}
-                collection={collection}
+                collection={collection.searchResultsCollection}
                 canEditCollection={false}
                 movingCardIds={[]}
-                sorting
               />
             )}
           </Fragment>

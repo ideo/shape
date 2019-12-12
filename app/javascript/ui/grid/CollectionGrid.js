@@ -110,13 +110,7 @@ class CollectionGrid extends React.Component {
   }
 
   initialize(props) {
-    let cards = []
-    const { collectionCardsOverride } = this.props
-    if (collectionCardsOverride) {
-      cards = collectionCardsOverride
-    } else {
-      cards = this.positionMovingCardsAndBCT(props)
-    }
+    const cards = this.positionMovingCardsAndBCT(props)
     this.positionCards(cards)
   }
 
@@ -1090,7 +1084,6 @@ CollectionGrid.propTypes = {
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   loadCollectionCards: PropTypes.func.isRequired,
-  collectionCardsOverride: MobxPropTypes.arrayOrObservableArray,
   canEditCollection: PropTypes.bool,
   isMovingCards: PropTypes.bool,
   shouldAddEmptyRow: PropTypes.bool,
@@ -1111,7 +1104,6 @@ CollectionGrid.defaultProps = {
   blankContentToolState: null,
   canEditCollection: false,
   isMovingCards: false,
-  collectionCardsOverride: null,
 }
 CollectionGrid.displayName = 'CollectionGrid'
 
