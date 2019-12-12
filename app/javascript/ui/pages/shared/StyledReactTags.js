@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import CreativeDifferenceLogoSmall from '~/ui/icons/CreativeDifferenceLogoSmall'
 import { creativeQualities } from '~/utils/creativeDifferenceVariables'
 
 export const tagColor = (tagName, defaultColor = null) => {
@@ -10,6 +11,13 @@ export const tagColor = (tagName, defaultColor = null) => {
     return defaultColor
   }
   return v.colors.commonMediumTint
+}
+
+export const creativeDifferenceTagIcon = tagName => {
+  if (creativeQualities[tagName]) {
+    return <CreativeDifferenceLogoSmall />
+  }
+  return null
 }
 
 // adapted from https://raw.githubusercontent.com/i-like-robots/react-tags/master/example/styles.css

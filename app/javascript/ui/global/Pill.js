@@ -50,8 +50,8 @@ const DeleteIconHolder = styled.span`
 `
 
 const SymbolHolder = styled.span`
-  width: 16px;
-  height: 16px;
+  width: ${props => props.symbolSize || 16}px;
+  height: ${props => props.symbolSize || 16}px;
   margin-right: ${props =>
     !props.symbolSize || props.symbolSize === 16 ? 4 : 10}px;
 `

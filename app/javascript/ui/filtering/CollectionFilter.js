@@ -61,6 +61,18 @@ class CollectionFilter extends React.Component {
     }
   }
 
+  filterIsDupe = filter => {
+    const {
+      collection: { collection_filters },
+    } = this.props
+    const existingFilter = collection_filters.find(
+      backendFilter =>
+        backendFilter.text.localeCompare(filter.text) >= 0 &&
+        backendFilter.filter_type === filter.filter_type
+    )
+    return !!existingFilter
+  }
+
   onCreateFilter = async tag => {
     const { collection } = this.props
     if (!this.currentFilterLookupType) return
@@ -73,7 +85,8 @@ class CollectionFilter extends React.Component {
       filter_type: backendFilterType,
       selected: false,
     }
-    return collection.API_createCollectionFilter(filter)
+    if (!this.filterIsDupe(filter))
+      return collection.API_createCollectionFilter(filter)
   }
 
   onDeleteFilter = async tag => {
