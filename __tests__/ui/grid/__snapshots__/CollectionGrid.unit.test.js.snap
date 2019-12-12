@@ -1180,6 +1180,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -1631,6 +1632,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -3319,6 +3321,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -3770,6 +3773,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -5458,6 +5462,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -5909,6 +5914,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -7472,6 +7478,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -7923,6 +7930,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],

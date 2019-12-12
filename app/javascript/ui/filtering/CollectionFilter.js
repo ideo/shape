@@ -122,8 +122,8 @@ class CollectionFilter extends React.Component {
       sortable,
     } = this.props
     const isFilterBarActive =
-      (collection_filters && collection_filters.length > 0 ||
-       collection.isSearchCollection)
+      (collection_filters && collection_filters.length > 0) ||
+      collection.isSearchCollection
     return (
       <GrowFlex align="flex-end">
         {isFilterBarActive && (

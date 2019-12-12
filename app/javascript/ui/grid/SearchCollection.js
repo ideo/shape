@@ -27,7 +27,6 @@ class SearchCollection extends React.Component {
     this.loadSearchedCards()
   }
 
-  @computed
   get searchCollectionCards() {
     const { collection } = this.props
     return collection.searchResultsCollection
