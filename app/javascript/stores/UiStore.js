@@ -210,6 +210,29 @@ export default class UiStore {
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
+  hoveringOverDefaults = {
+    order: null,
+    direction: null,
+    card: null,
+    record: null,
+    holdingOver: false,
+  }
+  @observable
+  hoveringOver = {
+    ...this.hoveringOverDefaults,
+  }
+  placeholderDefaults = {
+    xPos: 0,
+    yPos: 0,
+    width: 0,
+    height: 0,
+    cardWidth: 1,
+    cardHeight: 1,
+  }
+  @observable
+  placeholderPosition = {
+    ...this.placeholderDefaults,
+  }
 
   @action
   toggleEditingCardId(cardId) {
@@ -1171,5 +1194,19 @@ export default class UiStore {
   @action
   closeAdminUsersMenu() {
     this.adminUsersMenuOpen = null
+  }
+
+  @action
+  setHoveringOver(opts) {
+    if (!opts) {
+      this.hoveringOver = { ...this.hoveringOverDefaults }
+    } else {
+      this.hoveringOver = { ...this.hoveringOverDefaults, ...opts }
+    }
+  }
+
+  @action
+  updatePlaceholderPosition(position = {}) {
+    _.assign(this.placeholderPosition, position)
   }
 }
