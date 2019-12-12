@@ -2,34 +2,31 @@ import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
-import ProfileIcon from '~/ui/icons/ProfileIcon'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
-import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
-import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
-import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { FormButton } from '~/ui/global/styled/buttons'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
-import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 import { ACTION_SOURCES } from '~/enums/actionEnums'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import CollectionIconHolder from '~/ui/global/CollectionIconHolder'
 
 /* global IdeoSSO */
 
-const IconHolder = styled.span`
+const IconHolderCss = css`
   color: ${v.colors.commonDark};
   display: block;
   height: 32px;
@@ -124,22 +121,21 @@ class PageHeader extends React.Component {
     })
   }
 
-  get collectionIcon() {
+  get specialTemplateIcon() {
     const { record } = this.props
     if (record.isProfileTemplate) {
       return (
-        <IconHolder align="left">
+        <CollectionIconHolder css={IconHolderCss} align="left">
           <FilledProfileIcon />
-        </IconHolder>
+        </CollectionIconHolder>
       )
     } else if (record.isMasterTemplate) {
       return (
-        <IconHolder align="left">
+        <CollectionIconHolder css={IconHolderCss} align="left">
           <TemplateIcon circled filled />
-        </IconHolder>
+        </CollectionIconHolder>
       )
     }
-    return null
   }
 
   get hiddenIcon() {
@@ -152,7 +148,9 @@ class PageHeader extends React.Component {
           size="lg"
           record={record}
           IconWrapper={({ children }) => (
-            <IconHolder align="right">{children}</IconHolder>
+            <CollectionIconHolder css={IconHolderCss} align="right">
+              {children}
+            </CollectionIconHolder>
           )}
         />
       )
@@ -176,28 +174,6 @@ class PageHeader extends React.Component {
         )
       }
       return <SubduedHeading1>{tagList}</SubduedHeading1>
-    }
-    return null
-  }
-
-  get collectionTypeIcon() {
-    const { record } = this.props
-    let icon = ''
-    if (record.isUserProfile) {
-      icon = <ProfileIcon />
-    } else if (record.isProfileCollection) {
-      icon = <SystemIcon />
-    } else if (record.isTemplated && !record.isSubTemplate) {
-      icon = <TemplateIcon circled />
-    } else if (record.isSubmissionBox) {
-      icon = <SubmissionBoxIconLg />
-    } else if (record.launchableTestId) {
-      icon = <TestCollectionIcon />
-    } else if (record.isBoard) {
-      icon = <FoamcoreBoardIcon large />
-    }
-    if (icon) {
-      return <IconHolder align="right">{icon}</IconHolder>
     }
     return null
   }
@@ -401,7 +377,7 @@ class PageHeader extends React.Component {
                 className="title"
                 onClick={this.handleTitleClick}
               >
-                {this.collectionIcon}
+                {this.specialTemplateIcon}
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
@@ -415,7 +391,9 @@ class PageHeader extends React.Component {
                     this.updateIconAndTagsWidth(ref)
                   }}
                 >
-                  {this.collectionTypeIcon}
+                  {record.isCollection && (
+                    <CollectionTypeIcon record={record} css={IconHolderCss} />
+                  )}
                   {this.hiddenIcon}
                   {record.isLiveTest && (
                     <LiveTestIndicator>Live</LiveTestIndicator>
