@@ -133,14 +133,6 @@ class Ability
       can :read, QuestionChoice do |question_choice|
         question_choice.can_view?(user)
       end
-
-      if current_application.present?
-        can :manage, ActsAsTaggableOn::Tag
-      elsif user.current_organization.present?
-        can :manage, ActsAsTaggableOn::Tag do |tag|
-          tag.organization_ids&.include?(user.current_organization.id)
-        end
-      end
     end
     # for logged-out users and fallback for all users
     can :read, Collection, anyone_can_view: true
