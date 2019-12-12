@@ -7,6 +7,14 @@ import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import CollectionIcon from '../icons/CollectionIcon'
+
+export const editableCollectionTypes = {
+  collection: <CollectionIcon />,
+  project: <TemplateIcon />,
+  method: <ProfileIcon />,
+  prototype: <TestCollectionIcon />,
+}
 
 const CollectionTypeIcon = ({ record }) => {
   let icon = ''

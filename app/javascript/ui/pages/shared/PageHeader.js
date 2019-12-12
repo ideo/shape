@@ -20,6 +20,7 @@ import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 import { ACTION_SOURCES } from '~/enums/actionEnums'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 
 /* global IdeoSSO */
 
@@ -145,9 +146,11 @@ class PageHeader extends React.Component {
 
     if (rightConditions.some(bool => bool)) {
       return (
-        <IconHolder align="right">
-          <CollectionTypeIcon record={record} />
-        </IconHolder>
+        <CollectionTypeSelector collection={record}>
+          <IconHolder align="right">
+            <CollectionTypeIcon record={record} />
+          </IconHolder>
+        </CollectionTypeSelector>
       )
     }
     return null
