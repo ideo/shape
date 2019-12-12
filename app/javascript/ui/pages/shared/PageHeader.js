@@ -256,9 +256,12 @@ class PageHeader extends React.Component {
     }
   }
 
-  get renderLaunchTestButton() {
+  get renderReopenTestButton() {
     const { record, uiStore } = this.props
-    return !record.can_edit_content || !record.isClosedTest ? null : (
+    if (!record.can_edit_content || !record.isClosedTest) return null
+    // NOTE: this button is just for re-open, since "launch feedback"
+    // appears inside of AudienceSettings
+    return (
       <FormButton
         onClick={record.reopenTest}
         color={v.colors.transparent}
@@ -274,8 +277,9 @@ class PageHeader extends React.Component {
 
   get renderSubmissionSubmitButton() {
     const { record, uiStore } = this.props
+    if (!this.isCurrentlyHiddenSubmission) return null
 
-    return !this.isCurrentlyHiddenSubmission ? null : (
+    return (
       <FormButton
         color={v.colors.alert}
         onClick={record.API_submitSubmission}
@@ -422,7 +426,7 @@ class PageHeader extends React.Component {
                   {this.renderTemplateButton}
                   {this.renderRestoreButton}
                   {this.renderSubmissionSubmitButton}
-                  {this.renderLaunchTestButton}
+                  {this.renderReopenTestButton}
                   {this.renderJoinCollectionButton}
                   {this.renderTestUi}
                 </HeaderButtonContainer>
