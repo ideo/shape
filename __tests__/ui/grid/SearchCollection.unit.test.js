@@ -8,7 +8,7 @@ const collection = Object.assign({}, fakeCollection, {
   isSearchCollection: true,
   searchResultsCollection: Object.assign({}, fakeCollection, {
     isSearchResultsCollection: true,
-  })
+  }),
 })
 const collectionCards = []
 let wrapper, uiStore
@@ -51,9 +51,7 @@ describe('SearchCollection', () => {
     describe('after loading search collection results', () => {
       beforeEach(async () => {
         component.loading = false
-        collection.searchResultsCollection.collection_cards = [
-          { id: 1 },
-        ]
+        collection.searchResultsCollection.collection_cards = [{ id: 1 }]
         wrapper.update()
       })
 
@@ -114,15 +112,17 @@ describe('SearchCollection', () => {
 
     describe('when on a new page', () => {
       beforeEach(() => {
-        collection.searchResultsCollection.collection_cards = [
-          { id: 6 },
-        ]
+        collection.searchResultsCollection.collection_cards = [{ id: 6 }]
         component.loadSearchedCards({ page: 2, per_page: 40 })
       })
 
       it('should search for new results', () => {
-        expect(collection.searchResultsCollection.API_fetchCards).toHaveBeenCalled()
-        expect(collection.searchResultsCollection.API_fetchCards).toHaveBeenCalledWith({
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalled()
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalledWith({
           searchTerm: 'plants',
           page: 2,
           per_page: 20,
@@ -132,15 +132,17 @@ describe('SearchCollection', () => {
 
     describe('when on the first page', () => {
       beforeEach(() => {
-        collection.searchResultsCollection.collection_cards = [
-          { id: 1 },
-        ]
+        collection.searchResultsCollection.collection_cards = [{ id: 1 }]
         component.loadSearchedCards({ page: 1, per_page: 40 })
       })
 
       it('should search for new results', () => {
-        expect(collection.searchResultsCollection.API_fetchCards).toHaveBeenCalled()
-        expect(collection.searchResultsCollection.API_fetchCards).toHaveBeenCalledWith({
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalled()
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalledWith({
           searchTerm: 'plants',
           page: 1,
           per_page: 20,
