@@ -66,9 +66,9 @@ class CollectionFilter extends React.Component {
       collection: { collection_filters },
     } = this.props
     const existingFilter = collection_filters.find(
-      backendFilter =>
-        backendFilter.text.localeCompare(filter.text) >= 0 &&
-        backendFilter.filter_type === filter.filter_type
+      f =>
+        f.text.toUpperCase() === filter.text.toUpperCase() &&
+        f.filter_type === filter.filter_type
     )
     return !!existingFilter
   }
@@ -90,6 +90,7 @@ class CollectionFilter extends React.Component {
   }
 
   onDeleteFilter = async tag => {
+    console.log('on delete filter', tag)
     return this.onFilterChange(async () => {
       const { collection } = this.props
       const filter = apiStore.find('collection_filters', tag.id)

@@ -29,6 +29,7 @@ const StyledAvatar = styled(Avatar)`
 @observer
 class PillList extends React.Component {
   handleDelete = item => () => {
+    console.log('pill handle delete')
     this.props.onItemDelete(item)
   }
 
@@ -54,20 +55,32 @@ class PillList extends React.Component {
             avatar = <PillIconHolder>{item.icon}</PillIconHolder>
           }
 
+          const pillProps = {
+            selectable: item.selectable,
+            selected: item.selected,
+            onSelect: item.onSelect,
+            onDelete: this.handleDelete(item),
+          }
+
           const identifier = item.name || item.id || item.email
           // This could be a user, a group or an unregistered user
+          let tag
+          if (item.type === 'tag') {
+            // Need to move props into tag because Pill will pull them from tag if present
+            tag = {
+              ...pillProps,
+              ...item,
+            }
+          }
           return (
             <Pill
               key={identifier}
-              tag={item.type === 'tag' ? item : null}
+              tag={tag}
               symbol={avatar}
               symbolSize={symbolSize}
               label={item.name || identifier}
               id={item.id || identifier}
-              onDelete={this.handleDelete(item)}
-              selectable={item.selectable}
-              selected={item.selected}
-              onSelect={item.onSelect}
+              {...pillProps}
             />
           )
         })}

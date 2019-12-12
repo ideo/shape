@@ -2,32 +2,21 @@ import TagIcon from '~/ui/icons/TagIcon'
 import SearchIconRight from '~/ui/icons/SearchIconRight'
 import { creativeDifferenceTagIcon } from '~/ui/pages/shared/StyledReactTags'
 
-const symbolAndSize = filter => {
-  let size = 16
-  let symbol
+const filterSymbol = filter => {
   if (filter.filter_type === 'tag') {
-    const cDeltaIcon = creativeDifferenceTagIcon(filter.text)
-    if (cDeltaIcon) {
-      symbol = cDeltaIcon
-      size = 20
-    } else {
-      symbol = <TagIcon />
-    }
+    return creativeDifferenceTagIcon(filter.text) || <TagIcon />
   }
-  if (!symbol) symbol = <SearchIconRight />
-  return { symbol, size }
+  return <SearchIconRight />
 }
 
 export const filtersToTags = ({ filters, onSelect, onDelete }) => {
   return filters.map(filter => {
-    const { symbol, size } = symbolAndSize(filter)
     const tag = {
       id: filter.id,
       type: 'tag',
       name: filter.text,
       label: filter.text,
-      symbol: symbol,
-      symbolSize: size,
+      symbol: filterSymbol(filter),
       selectable: true,
       selected: filter.selected,
     }

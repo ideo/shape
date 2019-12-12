@@ -71,7 +71,8 @@ class TagEditor extends React.Component {
     this.error = ''
 
     // Return if tag is a duplicate
-    if (this.tags.find(t => t.name.localeCompare(newTag.name) >= 0)) return
+    if (this.tags.find(t => t.name.toUpperCase() === newTag.name.toUpperCase()))
+      return
 
     // If a validateTag function is provided, validate tag
     if (validateTag) {

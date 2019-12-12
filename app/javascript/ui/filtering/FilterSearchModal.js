@@ -47,8 +47,9 @@ class FilterSearchModal extends React.Component {
   async getOrganizationTagList() {
     const { currentUserOrganizationId } = apiStore
     const apiPath = `organizations/${currentUserOrganizationId}/tags`
-    const tags = await apiStore.requestJson(apiPath)
-    return tags.map(tag => tag.attributes.name)
+    const result = await apiStore.requestJson(apiPath)
+    if (!result.data) return []
+    return result.data.map(tag => tag.attributes.name)
   }
 
   _autocompleteTermSearch = async term => {
@@ -68,7 +69,7 @@ class FilterSearchModal extends React.Component {
     this.props.onCreateTag(tag)
   }
 
-  onRemoveTag = tag => ev => {
+  onRemoveTag = tag => {
     this.props.onRemoveTag(tag)
   }
 
@@ -112,7 +113,7 @@ class FilterSearchModal extends React.Component {
               delimiterChars={[',']}
               placeholder={placeholder}
               handleAddition={this.onNewTag}
-              handleDelete={this.onRemoveTag}
+              handleDelete={tag => ev => this.onRemoveTag(tag)}
               handleInputChange={this.onInputChange}
               tagComponent={Pill}
               allowNew
