@@ -107,34 +107,7 @@ module Templateable
       master = master_cards[card.templated_from_id]
       next if master.blank? # Blank if this card was just added
 
-      if card.item.is_a?(Item::TextItem)
-        instance_data_content = Mashie.new(card.item.data_content)
-        master_data_content = Mashie.new(master.item.data_content)
-        unless instance_data_content&.last_10&.empty?
-          card.item.update(data_content: Mashie.new(ops: master_data_content.ops, version: master_data_content.version))
-        end
-      end
-
-      card.update_columns(
-        height: master.height,
-        width: master.width,
-        order: master.order,
-      )
-      next unless is_a?(Collection::TestCollection) && inside_a_submission_box_template?
-
-      # copy more details over if we are still setting up our submission template test
-      test = card.parent
-      next unless test.is_a?(Collection::TestCollection) && !test.launchable?
-      # Skip if we reach the ideas collection
-      next if master.record.is_a?(Collection)
-
-      card.item.update(
-        type: master.item.type,
-        content: master.item.content,
-        url: master.item.url,
-        filestack_file_id: master.item.filestack_file_id,
-        question_type: master.item.question_type,
-      )
+      TemplateInstanceCardUpdater.call(instance_card: card, master_card: master, master_template: self)
     end
   end
 
