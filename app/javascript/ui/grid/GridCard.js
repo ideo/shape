@@ -13,7 +13,10 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 
 import EditButton from '~/ui/reporting/EditButton'
-import { NamedActionButton } from '~/ui/global/styled/buttons'
+import {
+  NamedActionButton,
+  CollectionCoverTextButton,
+} from '~/ui/global/styled/buttons'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import Loader from '~/ui/layout/Loader'
 import Download from '~/ui/grid/Download'
@@ -25,6 +28,7 @@ import hexToRgba from '~/utils/hexToRgba'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import {
+  BottomRightActionHolder,
   StyledGridCard,
   StyledGridCardInner,
   StyledTopRightActions,
@@ -294,6 +298,10 @@ class GridCard extends React.Component {
     return !!record.thumbnail_url
   }
 
+  handleMoreCoverClick = e => {
+    this.props.handleClick(e)
+  }
+
   handleClick = e => {
     const { card, dragging, record } = this.props
     if (dragging || card.isLoadingPlaceholder) {
@@ -311,6 +319,8 @@ class GridCard extends React.Component {
       Activity.trackActivity('downloaded', record)
       return
     } else if (record.isCarousel) {
+      return
+    } else if (record.isCreativeDifferenceChartCover) {
       return
     } else if (record.isVideo || record.isImage || record.isLegend) {
       return
@@ -512,6 +522,7 @@ class GridCard extends React.Component {
           filter={card.filter}
           forceFilter={!this.hasCover}
           isText={record.isText}
+          visibleOverflow={record.isReportTypeRecord}
         >
           {showRestore && (
             <StyledTopRightActions
@@ -527,6 +538,11 @@ class GridCard extends React.Component {
           {card.isLoadingPlaceholder && <CardLoader />}
           {this.renderCover}
         </StyledGridCardInner>
+        {record.isCreativeDifferenceChartCover && (
+          <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
+            <CollectionCoverTextButton>More…</CollectionCoverTextButton>
+          </BottomRightActionHolder>
+        )}
         <CollectionCardsTagEditorModal
           cards={this.cardsForTagging}
           canEdit={this.canEditCard}

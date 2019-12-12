@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import moment from 'moment-mini'
 
 import { LineSegment, VictoryLabel } from 'victory'
 
@@ -64,7 +65,13 @@ const TickLabel = props => {
   )
 }
 
-const fullDate = (date, index) => `${utcMoment(date).format('MM/DD/YY')}`
+const fullDate = (date, index) => {
+  const momentDate = utcMoment(date)
+  return `Q${momentDate.quarter()} ${momentDate.year()}`
+}
+
+const isDataYearOld = datasetValues =>
+  moment().diff(moment(datasetValues[0].date), 'years') > 0
 
 export const monthlyXAxisText = (
   datasetValues,
@@ -92,7 +99,12 @@ export const monthlyXAxisText = (
       if (index < allDates.length - 1) return ''
     }
 
-    return `${dateNearMonthEdge.format('MMM')}`
+    let format = 'MMM'
+    // If this chart has over a year of data, show the year
+    if (isDataYearOld(datasetValues)) {
+      format += ' YYYY'
+    }
+    return `${dateNearMonthEdge.format(format)}`
   }
   // Don't show the label if it's not within a certain month range
   return ''
@@ -107,12 +119,20 @@ const ChartAxisProps = ({
   // NOTE: The transform property is for IE11 which doesn't recognize CSS
   // transform properties on SVG
 
+  let tickCount = 12
+  if (isSmallChartStyle) {
+    tickCount = 5
+  } else {
+    // There's less room when we also render the year in the tick labels
+    if (isDataYearOld(datasetValues)) tickCount = 8
+  }
   const axisProps = {
     dependentAxis: false,
     domain: domain,
     style: chartAxisStyle(isSmallChartStyle),
     offsetY: isSmallChartStyle ? 13 : 22,
     axisComponent: <LineSegment transform="translate(10 26) scale(0.955)" />,
+    tickCount,
   }
 
   const datasetXAxisText = (date, index) => {

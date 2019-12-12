@@ -275,7 +275,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get canSetACover() {
-    return !this.isSharedCollection && !this.isUserCollection
+    return (
+      !this.isSharedCollection &&
+      !this.isUserCollection &&
+      this.cover_type === 'cover_type_default'
+    )
   }
 
   get isSubmissionBox() {
@@ -390,6 +394,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isCarousel() {
     return this.cover_type === 'cover_type_carousel'
+  }
+
+  get isCreativeDifferenceChartCover() {
+    return (
+      this.cover_type === 'cover_type_items' &&
+      this.collection_cover_items[0].isData
+    )
   }
 
   @computed
