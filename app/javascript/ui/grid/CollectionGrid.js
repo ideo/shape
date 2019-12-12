@@ -741,13 +741,19 @@ class CollectionGrid extends React.Component {
       cols,
       shouldAddEmptyRow,
       canEditCollection,
+      uiStore,
     } = this.props
     const { currentOrder } = collection
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    if (collection.hasMore) this.addPaginationCard(cards)
+    // check if we've selected all and moving all the cards,
+    // in which case there is no need to try to paginate
+    const movingAllCards = uiStore.movingCardIds.length >= cards.length
+    if (collection.hasMore && !movingAllCards) {
+      this.addPaginationCard(cards)
+    }
     let sortedCards = cards
     if (currentOrder === 'order') {
       // For most collections, we will be sorting by `order`. In that case we call

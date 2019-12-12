@@ -100,6 +100,7 @@ class CollectionCard < ApplicationRecord
   scope :is_cover, -> { where(is_cover: true) }
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
+  scope :not_placeholder, -> { where.not(type: 'CollectionCard::Placeholder') }
   scope :ideas_collection_card, -> { where(section_type: :ideas).where.not(collection_id: nil) }
   # this scope orders by identifier because the default order(:id) is very slow when getting .first
   scope :identifier, ->(identifier) { where(identifier: identifier).order(:identifier) }

@@ -362,7 +362,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def ordered_cards
-    CollectionCard.ordered.where(id: json_api_params[:collection_card_ids])
+    CollectionCard
+      .ordered
+      .not_placeholder
+      .where(id: json_api_params[:collection_card_ids])
   end
 
   def collection_card_update_params

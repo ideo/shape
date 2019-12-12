@@ -601,10 +601,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const { data, links } = res
     runInAction(() => {
       this.totalPages = links.last
-      this.currentPage = page
       if (page === 1 && this.storedCacheKey !== this.cache_key) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
+        this.currentPage = 1
       } else {
         // NOTE: (potential pre-optimization) if collection_cards grows in size,
         // at some point do we reset back to a reasonable number?
@@ -617,6 +617,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             'id'
           )
         )
+        if (this.currentPage < page) {
+          this.currentPage = page
+        }
         this.collection_cards.replace(newData)
       }
     })

@@ -378,10 +378,6 @@ export default class UiStore {
     )
     const { offsetX, offsetY } = positionOffset
 
-    // if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
-    //   this.closeCardMenu()
-    // } else {
-    // }
     this.update('cardMenuOpen', {
       id: card.id,
       x,
@@ -396,7 +392,7 @@ export default class UiStore {
       this.selectedCardIds.indexOf(card.id) < 0
     ) {
       // deselect all cards when card menu is opened on a non-selected card
-      this.selectedCardIds.replace([])
+      this.deselectCards()
     }
   }
 
