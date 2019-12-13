@@ -23,9 +23,9 @@ class FilterSearchModal extends React.Component {
     this.debouncedTermSearch = _.debounce(this._autocompleteTermSearch, 400)
   }
 
-  async componentDidMount() {
-    runInAction(() => {
-      this.tagNames = this.getOrganizationTagList()
+  componentDidMount() {
+    runInAction(async () => {
+      this.tagNames = await this.getOrganizationTagList()
     })
   }
 
