@@ -55,4 +55,28 @@ class Cache
   def self.set_remove(key, value)
     client.srem(key, value) == '1'
   end
+
+  def self.hash_set(key, field, value)
+    client.hset(key, field, value)
+  end
+
+  def self.hash_values(key)
+    client.hvals(key)
+  end
+
+  def self.hash_get(key, field)
+    client.hget(key, field)
+  end
+
+  def self.hash_get_all(key, field, value)
+    client.hgetall(key)
+  end
+
+  def self.hash_exists?(key, field)
+    client.hexists(key, field) == '1'
+  end
+
+  def self.hash_delete(key, field)
+    client.hdel(key, field) == '1'
+  end
 end

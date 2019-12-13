@@ -35,22 +35,19 @@ class CollectionFilter < ApplicationRecord
   def duplicate!(assign_collection: collection)
     cf = amoeba_dup
     cf.collection = assign_collection
-    if search? && within_collection_id.present?
-      # Change within filter to link to correct collection
-      # if that collection has been duplicated
-
-      # TODO: how do we find a collection that was cloned in this same batch
-      # from that collection? There will be many copies of "All Methods"
-      cloned_collection = Collection.where(cloned_from_id: within_collection_id).first
-      if cloned_collection.present?
-        cf.text.sub!(
-          %r{within\(#{Organization::SLUG_SUBSTR}\/#{within_collection_id}\)},
-          "within(#{cloned_collection.organization.slug}/#{cloned_collection.id})",
-        )
-      end
-    end
     cf.save
     cf
+  end
+
+  def reassign_within!(from_collection_id:, to_collection_id:)
+    to_org_slug = Organization.joins(:collections)
+                              .where(Collection.arel_table[:id].eq(to_collection_id))
+                              .pluck(:slug)
+    text.sub!(
+      %r{within\(#{Organization::SLUG_SUBSTR}\/#{from_collection_id}\)},
+      "within(#{to_org_slug}/#{to_collection_id})",
+    )
+    save
   end
 
   def within_collection_id

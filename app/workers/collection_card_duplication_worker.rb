@@ -7,7 +7,8 @@ class CollectionCardDuplicationWorker
     parent_collection_id,
     for_user_id = nil,
     system_collection = false,
-    synchronous = false
+    synchronous = false,
+    batch_id = nil
   )
     @collection_cards = CollectionCard.active.where(id: card_ids).ordered
     @for_user = User.find(for_user_id) if for_user_id.present?
@@ -16,6 +17,7 @@ class CollectionCardDuplicationWorker
     @synchronous = synchronous
     @system_collection = system_collection
     @from_collection = nil
+    @batch_id = batch_id
 
     duplicate_cards
     update_parent_collection_status
@@ -41,7 +43,7 @@ class CollectionCardDuplicationWorker
       end
       # capture this for notification builder
       @from_collection ||= source_card.parent
-      source_card.duplicate!(
+      duplicate = source_card.duplicate!(
         for_user: @for_user,
         parent: @parent_collection,
         placement: placement,
@@ -49,6 +51,10 @@ class CollectionCardDuplicationWorker
         synchronous: @synchronous,
         placeholder: placeholder,
       )
+      CardDuplicatorMapper::MapFromTo.new(
+        from_id: source_card.id,
+        batch_id: @batch_id,
+      ).set(duplicate.id)
     end
   end
 

@@ -5,6 +5,7 @@ class CollectionCardDuplicator < SimpleService
     @placement = placement
     @for_user = for_user
     @system_collection = system_collection
+    @batch_id = SecureRandom.hex(20)
     @new_cards = []
     @should_update_cover = false
   end
@@ -67,6 +68,8 @@ class CollectionCardDuplicator < SimpleService
       @to_collection.id,
       @for_user.try(:id),
       @system_collection,
+      false,
+      @batch_id,
     )
   end
 
