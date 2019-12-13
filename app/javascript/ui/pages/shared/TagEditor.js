@@ -89,17 +89,17 @@ class TagEditor extends React.Component {
     afterAddTag(newTag.name)
   }
 
-  @action
-  handleDelete = tagIndex => () => {
-    const { records, tagField, afterRemoveTag } = this.props
-    const tag = this.tags[tagIndex]
+  handleDelete = tagIndex => e => {
     runInAction(() => {
+      const { records, tagField, afterRemoveTag } = this.props
+      const tag = this.tags[tagIndex]
+      // FIXME: tagIndex is out of bounds sometimes
       this.tags.remove(tag)
       records.forEach(record => {
         record[tagField].remove(tag.name)
       })
+      afterRemoveTag(tag.name)
     })
-    afterRemoveTag(tag.name)
   }
 
   // This is displayed instead of the tag input if the user cannot edit the tags

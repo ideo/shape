@@ -369,7 +369,7 @@ class PageHeader extends React.Component {
     if (apiStore.selectedCards.length > 0) {
       return apiStore.selectedCards
     } else {
-      return [record.parent]
+      return [record.parent_collection_card]
     }
   }
 
