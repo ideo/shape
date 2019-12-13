@@ -12,6 +12,7 @@ class CollectionCardDuplicator < SimpleService
 
   def call
     initialize_card_order
+    register_cards_needing_mapping
     duplicate_cards
     duplicate_legend_items
     reorder_and_cache_covers
@@ -34,6 +35,13 @@ class CollectionCardDuplicator < SimpleService
     return if @placement == 'end'
 
     @to_collection.increment_card_orders_at(@order, amount: @cards.count)
+  end
+
+  def register_cards_needing_remapping
+    CardDuplicatorMapper::RegisterDuplicationBatch.call(
+      card_ids: cards.map(&:id),
+      batch_id: @batch_id,
+    )
   end
 
   def duplicate_cards

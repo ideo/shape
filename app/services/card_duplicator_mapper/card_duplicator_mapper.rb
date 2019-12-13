@@ -1,5 +1,7 @@
 module CardDuplicatorMapper
-  class RegisterCardsNeedingMapping < SimpleService
+  class RegisterDuplicationBatch < SimpleService
+    # TODO: Make a worker for this so it can be queued,
+    #       although we'd want all cards map before we start duplicating
     def initialize(card_ids:, batch_id:)
       @collection_cards = CollectionCard.where(id: card_ids)
                                         .includes(record: :collection_filters)
@@ -42,7 +44,7 @@ module CardDuplicatorMapper
             )
           end
         end
-        CardDuplicatorMapper::RegisterCardsNeedingMapping.call(
+        CardDuplicatorMapper::RegisterDuplicationBatch.call(
           card_ids: card.record.collection_card_ids,
           batch_id: @batch_id,
         )
@@ -80,6 +82,7 @@ module CardDuplicatorMapper
     end
   end
 
+  # TODO: May want to turn this into a worker-queued operation
   class RemapAfterDuplication < SimpleService
     def initialize(batch_id:)
       @batch_id = batch_id
