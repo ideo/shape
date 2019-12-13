@@ -9,7 +9,7 @@ import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import CollectionIcon from '../icons/CollectionIcon'
 
-export const editableCollectionTypes = {
+export const collectionTypeToIcon = {
   collection: <CollectionIcon />,
   project: <TemplateIcon />,
   method: <ProfileIcon />,

@@ -1,43 +1,71 @@
 import { PropTypes } from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { runInAction, observable } from 'mobx'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
-import { editableCollectionTypes } from '~/ui/global/CollectionTypeIcon'
+import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import { capitalize } from 'lodash'
-// Need to work around /collections/:id link in CollectionCover
-// Should CollectionCoverTitle be just icon, title, icon
-// in CollectionCover so that only the title is a link?
+
+@observer
 class CollectionTypeSelector extends React.Component {
   @observable
   collection = null
+  @observable
+  showPopoutMenu = false
 
   constructor(props) {
     super(props)
 
-    this.collection = props.collection
+    runInAction(() => {
+      this.collection = props.collection
+    })
+  }
+
+  openPopoutMenu = () => {
+    console.log('opening popout menu')
+    runInAction(() => {
+      this.showPopoutMenu = true
+    })
+  }
+
+  hidePopoutMenu = () => {
+    console.log('hiding popout menu')
+    runInAction(() => {
+      this.showPopoutMenu = false
+    })
   }
 
   updateCollectionType = async collectionType => {
     const { collection } = this.props
-    await collection.API_selectCollectionType
-    // anything else here? error handling?
+    console.log('sending ', collectionType)
+    await collection.API_selectCollectionType(collectionType)
+    // Do we want error handling?
+    // If so, I think this needs a try/catch block?
+    // if (res) {
+    //   console.log(res)
+    // } else {
+    //   // error handling?
+    // }
+    runInAction(() => {
+      this.showPopoutMenu = false
+    })
   }
 
   get collectionTypeMenuItems() {
-    const { collection } = this.props
-    const collectionTypes = [('collection', 'project', 'method', 'prototype')]
+    const collectionTypes = ['collection', 'project', 'method', 'prototype']
 
     return collectionTypes.map(collectionType => {
       return {
         name: collectionType,
-        iconLeft: null,
-        iconRight: editableCollectionTypes[collectionType],
-        onClick: () => {
-          console.log('clicked menu item')
-          collection.API_selectCollectionType('method')
-        },
+        iconLeft:
+          collectionType === this.collection.collection_type ? (
+            <span>⏩</span>
+          ) : (
+            ''
+          ),
+        iconRight: collectionTypeToIcon[collectionType],
+        onClick: () => this.updateCollectionType(collectionType),
         noBorder: true,
         loading: false,
         withAvatar: false,
@@ -47,11 +75,14 @@ class CollectionTypeSelector extends React.Component {
 
   render() {
     const { collection, children } = this.props
-    console.log(this.collectionTypeMenuItems)
+    console.log(this.collection.collection_type)
     if (!collection) return null
     return (
+      // Need to work around /collections/:id link in CollectionCover
+      // Should CollectionCoverTitle be just icon, title, icon
+      // in CollectionCover so that only the title is a link?
       <button
-        onClick={() => console.log('clicked collection selector')}
+        onClick={this.openPopoutMenu}
         style={{ border: '1px red solid', zIndex: 1000 }}
         data-cy="CollectionTypeSelector"
       >
@@ -64,8 +95,9 @@ class CollectionTypeSelector extends React.Component {
         </Tooltip>
         <PopoutMenu
           // need to adjust position/location?
+          onMouseLeave={this.hidePopoutMenu}
           hideDotMenu
-          menuOpen={true}
+          menuOpen={this.showPopoutMenu}
           menuItems={this.collectionTypeMenuItems}
         />
       </button>
