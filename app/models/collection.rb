@@ -410,6 +410,10 @@ class Collection < ApplicationRecord
 
     c.enable_org_view_access_if_allowed(parent)
 
+    collection_filters.each do |cf|
+      cf.duplicate!(assign_collection: c)
+    end
+
     if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
         collection_cards.map(&:id),
