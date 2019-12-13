@@ -52,6 +52,10 @@ class CollectionTypeSelector extends React.Component {
     })
   }
 
+  handleMenuItemClick = collectionType => {
+    this.updateCollectionType(collectionType)
+  }
+
   get collectionTypeMenuItems() {
     const collectionTypes = ['collection', 'project', 'method', 'prototype']
 
@@ -63,9 +67,9 @@ class CollectionTypeSelector extends React.Component {
             <span>⏩</span>
           ) : (
             ''
-          ),
+          ), // Do we even need an "active/selected Icon?"
         iconRight: collectionTypeToIcon[collectionType],
-        onClick: () => this.updateCollectionType(collectionType),
+        onClick: () => this.handleMenuItemClick(collectionType),
         noBorder: true,
         loading: false,
         withAvatar: false,
@@ -74,22 +78,19 @@ class CollectionTypeSelector extends React.Component {
   }
 
   render() {
-    const { collection, children } = this.props
+    const { collection, children, position } = this.props
     console.log(this.collection.collection_type)
     if (!collection) return null
     return (
-      // Need to work around /collections/:id link in CollectionCover
-      // Should CollectionCoverTitle be just icon, title, icon
-      // in CollectionCover so that only the title is a link?
       <button
+        style={{ position: position }}
         onClick={this.openPopoutMenu}
-        style={{ border: '1px red solid', zIndex: 1000 }}
         data-cy="CollectionTypeSelector"
       >
         <Tooltip
           classes={{ tooltip: 'Tooltip' }}
           title={capitalize(collection.collection_type)}
-          placement="bottom"
+          placement="top"
         >
           {children}
         </Tooltip>
@@ -108,6 +109,7 @@ class CollectionTypeSelector extends React.Component {
 CollectionTypeSelector.propTypes = {
   children: PropTypes.node.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  position: PropTypes.string.isRequired,
 }
 
 export default CollectionTypeSelector

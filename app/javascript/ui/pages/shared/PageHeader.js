@@ -19,7 +19,9 @@ import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 import { ACTION_SOURCES } from '~/enums/actionEnums'
-import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon, {
+  collectionTypeToIcon,
+} from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 
 /* global IdeoSSO */
@@ -146,14 +148,30 @@ class PageHeader extends React.Component {
 
     if (rightConditions.some(bool => bool)) {
       return (
-        <CollectionTypeSelector collection={record}>
-          <IconHolder align="right">
-            <CollectionTypeIcon record={record} />
-          </IconHolder>
-        </CollectionTypeSelector>
+        <IconHolder align="right">
+          <CollectionTypeIcon record={record} />
+        </IconHolder>
       )
     }
     return null
+  }
+
+  get collectionLabelSelector() {
+    const { record } = this.props
+
+    // Not allowed to update label/use case for Foamcore or Submission Boxes
+    if (record.isBoard || record.isSubmissionBox) {
+      console.log('hide when board or submissionbox')
+      return null
+    }
+
+    return (
+      <CollectionTypeSelector collection={record} position={'relative'}>
+        <IconHolder align="right">
+          {collectionTypeToIcon[record.collection_type]}
+        </IconHolder>
+      </CollectionTypeSelector>
+    )
   }
 
   get hiddenIcon() {
@@ -408,6 +426,7 @@ class PageHeader extends React.Component {
                   }}
                 >
                   {this.rightIcon}
+                  {this.collectionLabelSelector}
                   {this.hiddenIcon}
                   {record.isLiveTest && (
                     <LiveTestIndicator>Live</LiveTestIndicator>

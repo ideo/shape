@@ -15,7 +15,11 @@ import { FormButton } from '~/ui/global/styled/buttons'
 import { RoundPill } from '~/ui/global/styled/forms'
 import { routingStore } from '~/stores'
 import { ACTION_SOURCES } from '~/enums/actionEnums'
-import CollectionCoverTitle from '~/ui/grid/covers/CollectionCoverTitle'
+import CollectionCoverTitle, {
+  IconHolder,
+} from '~/ui/grid/covers/CollectionCoverTitle'
+import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
+import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 
 const LaunchButton = styled(FormButton)`
   font-size: 0.9rem;
@@ -354,6 +358,14 @@ class CollectionCover extends React.Component {
                       >
                         <CollectionCoverTitle collection={collection} />
                       </PlainLink>
+                      <CollectionTypeSelector
+                        position={'absolute'}
+                        collection={collection}
+                      >
+                        <IconHolder>
+                          {collectionTypeToIcon[collection.collection_type]}
+                        </IconHolder>
+                      </CollectionTypeSelector>
                     </Dotdotdot>
                     {this.button}
                   </PositionedCardHeading>

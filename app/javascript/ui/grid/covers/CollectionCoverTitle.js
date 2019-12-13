@@ -3,7 +3,6 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
-import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 
 function namePartTooLong(fullName) {
   const parts = fullName.split(' ')
@@ -23,7 +22,7 @@ function hyphenate(namePart) {
   return `${parts.slice(0, -1).join('')}\u00AD${parts.slice(-1)}`
 }
 
-const IconHolder = styled.span`
+export const IconHolder = styled.span`
   display: inline-block;
   line-height: 31px;
   margin-right: 5px;
@@ -95,9 +94,7 @@ class CollectionCoverTitle extends React.Component {
           <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
             {hyphenate(lastName)}
             &nbsp;
-            <CollectionTypeSelector collection={collection}>
-              <IconHolder>{this.rightIcon}</IconHolder>
-            </CollectionTypeSelector>
+            <IconHolder>{this.rightIcon}</IconHolder>
           </span>
         </span>
       )
