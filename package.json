@@ -171,7 +171,7 @@
     "reflexbox": "^3.0.1",
     "regenerator-runtime": "^0.13.2",
     "styled-components": "^4.3.2",
-    "styled-loaders-react": "1.0.1",
+    "styled-loaders-react": "1.1.0",
     "svg-react-loader": "^0.4.6",
     "ts-jest": "^23.1.4",
     "ts-loader": "4.2.0",

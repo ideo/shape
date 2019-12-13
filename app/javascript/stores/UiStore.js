@@ -488,6 +488,7 @@ export default class UiStore {
       }
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
+      this.deselectCards()
       this.templateName = ''
     }
   }
@@ -769,6 +770,36 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+  }
+
+  @action
+  async selectAll({ location, card = null } = {}) {
+    const { viewingCollection } = this
+    let collection = viewingCollection
+    if (!viewingCollection) return false
+    if (
+      viewingCollection.isSubmissionBox &&
+      (location !== 'GridCard' || (card && card.parent !== viewingCollection))
+    ) {
+      // if we're viewing a submission box and we did not specifically click a card in the submission box itself
+      // select the submissions instead
+      collection = viewingCollection.submissions_collection
+    }
+    let all_collection_card_ids = _.map(collection.collection_cards, 'id')
+    this.reselectCardIds(all_collection_card_ids)
+    try {
+      const res = await collection.API_fetchAllCardIds()
+      all_collection_card_ids = res.data
+      this.reselectCardIds(all_collection_card_ids)
+      // if the user had already initiated a move action, move the newly selected cards into the move action
+      if (this.movingCardIds.length) {
+        runInAction(() => {
+          this.movingCardIds.replace([...this.selectedCardIds])
+        })
+      }
+    } catch (e) {
+      console.warn(e)
+    }
   }
 
   @computed
@@ -1170,5 +1201,12 @@ export default class UiStore {
   @action
   closeAdminUsersMenu() {
     this.adminUsersMenuOpen = null
+  }
+
+  @action
+  clearMdlPlaceholder() {
+    this.multiMoveCardIds.replace(
+      _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
+    )
   }
 }

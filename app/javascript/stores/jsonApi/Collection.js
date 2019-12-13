@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import axios from 'axios'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType, updateModelId } from 'datx'
 import pluralize from 'pluralize'
@@ -1032,6 +1033,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  API_fetchAllCardIds() {
+    return axios.get(`/api/v1/collections/${this.id}/collection_cards/ids`)
+  }
+
   async API_setSubmissionBoxTemplate(data) {
     await this.apiStore.request(
       `collections/set_submission_box_template`,
@@ -1145,6 +1150,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
+    // clearing placeholder will properly clear out multiMoveCardIds for the next step
+    uiStore.clearMdlPlaceholder()
     if (_.isEmpty(uiStore.multiMoveCardIds)) {
       uiStore.update('multiMoveCardIds', cardIds)
     }

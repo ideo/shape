@@ -369,6 +369,10 @@ class Collection < ApplicationRecord
     end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
+    if c.is_a?(Collection::UserProfile)
+      c = c.becomes(Collection)
+      c.type = nil
+    end
     if parent.master_template?
       # when duplicating into a master_template, this collection should be a subtemplate
       c.template_id = nil
@@ -511,8 +515,8 @@ class Collection < ApplicationRecord
     Collection
   end
 
-  def recalculate_child_breadcrumbs_async
-    BreadcrumbRecalculationWorker.perform_async(id)
+  def recalculate_child_breadcrumbs_async(cards)
+    BreadcrumbRecalculationWorker.perform_async(id, cards.pluck(:id))
   end
 
   # Cards are explicitly passed in when moving them from another collection to this one
@@ -578,6 +582,12 @@ class Collection < ApplicationRecord
       validate: false,
       on_duplicate_key_update: %i[order],
     )
+  end
+
+  def increment_card_orders_at(order, amount: 1)
+    collection_cards
+      .where(CollectionCard.arel_table[:order].gteq(order))
+      .update_all(['"order" = "order" + ?', amount])
   end
 
   def unarchive_cards!(cards, card_attrs_snapshot)
@@ -775,14 +785,6 @@ class Collection < ApplicationRecord
       child: self,
     )
     result
-  end
-
-  def last_non_blank_row
-    collection_cards.map(&:row).compact.max.to_i
-  end
-
-  def empty_row_for_moving_cards
-    last_non_blank_row + 2
   end
 
   def default_group_id

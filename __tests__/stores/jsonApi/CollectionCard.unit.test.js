@@ -25,21 +25,23 @@ beforeEach(() => {
 })
 
 describe('CollectionCard', () => {
-  describe('canEdit', () => {
-    it('returns true if card is a link and you can edit the parent', () => {
-      collectionCard.link = true
+  describe('canMove', () => {
+    it('returns true if card is not pinned and you can edit the parent', () => {
+      collectionCard.pinned_and_locked = false
       collectionCard.can_edit_parent = true
-      expect(collectionCard.canEdit).toBeTruthy()
+      expect(collectionCard.canMove).toBeTruthy()
       collectionCard.can_edit_parent = false
-      expect(collectionCard.canEdit).toBeFalsy()
+      expect(collectionCard.canMove).toBeFalsy()
     })
 
-    it('returns true if card is not a link and you can edit the record', () => {
-      collectionCard.link = false
+    it('returns true if card is not pinned and you can edit the record', () => {
+      collectionCard.pinned_and_locked = true
       collectionCard.record = { can_edit: true }
-      expect(collectionCard.canEdit).toBeTruthy()
+      expect(collectionCard.canMove).toBeFalsy()
+      collectionCard.pinned_and_locked = false
+      expect(collectionCard.canMove).toBeTruthy()
       collectionCard.record = { can_edit: false }
-      expect(collectionCard.canEdit).toBeFalsy()
+      expect(collectionCard.canMove).toBeFalsy()
     })
   })
 

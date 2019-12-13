@@ -15,12 +15,13 @@ import CardActionHolder from '~/ui/icons/CardActionHolder'
 import EditButton from '~/ui/reporting/EditButton'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
-
+import Loader from '~/ui/layout/Loader'
 import Download from '~/ui/grid/Download'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { routingStore, uiStore, apiStore } from '~/stores'
+import hexToRgba from '~/utils/hexToRgba'
 import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import {
@@ -30,6 +31,24 @@ import {
 } from './shared'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
+
+const CardLoader = () => {
+  return (
+    <div
+      style={{
+        top: 0,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        zIndex: v.zIndex.gridCardTop,
+        background: hexToRgba(v.colors.commonDark, 0.5),
+        color: 'white',
+      }}
+    >
+      <Loader size={30} containerHeight="100%" animation="circular" />
+    </div>
+  )
+}
 
 @observer
 class GridCard extends React.Component {
@@ -97,6 +116,16 @@ class GridCard extends React.Component {
       testCollectionCard,
       searchResult,
     } = this.props
+
+    if (
+      record.menuDisabled ||
+      uiStore.textEditingItem === record ||
+      record.archived ||
+      card.isLoadingPlaceholder
+    ) {
+      return null
+    }
+
     return (
       <StyledTopRightActions
         color={this.actionsColor}
@@ -267,7 +296,9 @@ class GridCard extends React.Component {
 
   handleClick = e => {
     const { card, dragging, record } = this.props
-    if (dragging) return
+    if (dragging || card.isLoadingPlaceholder) {
+      return false
+    }
     if (uiStore.captureKeyboardGridClick(e, card.id)) {
       return
     }
@@ -295,7 +326,6 @@ class GridCard extends React.Component {
     if (card.link) {
       this.storeLinkedBreadcrumb(card)
     }
-
     this.props.handleClick(e)
   }
 
@@ -366,6 +396,7 @@ class GridCard extends React.Component {
       <CoverRenderer
         card={card}
         cardType={cardType}
+        isLoadingPlaceholder={card.isLoadingPlaceholder}
         isCoverItem={isCoverItem}
         record={record}
         height={height}
@@ -426,9 +457,10 @@ class GridCard extends React.Component {
       lastPinnedCard,
       testCollectionCard,
       searchResult,
-      showHotEdge,
       zoomLevel,
     } = this.props
+    const showHotEdge =
+      this.props.showHotEdge && canEditCollection && !card.isLoadingPlaceholder
 
     const firstCardInRow = card.position && card.position.x === 0
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
@@ -458,22 +490,14 @@ class GridCard extends React.Component {
         <StyledTopRightActions>
           <TextActionMenu card={card} />
         </StyledTopRightActions>
-        {canEditCollection &&
-          showHotEdge &&
-          (!card.isPinnedAndLocked || lastPinnedCard) && (
-            <GridCardHotspot card={card} dragging={dragging} />
-          )}
-        {canEditCollection &&
-          showHotEdge &&
-          firstCardInRow &&
-          !card.isPinnedAndLocked && (
-            <GridCardHotspot card={card} dragging={dragging} position="left" />
-          )}
+        {showHotEdge && firstCardInRow && !card.isPinnedAndLocked && (
+          <GridCardHotspot card={card} dragging={dragging} position="left" />
+        )}
+        {showHotEdge && (!card.isPinnedAndLocked || lastPinnedCard) && (
+          <GridCardHotspot card={card} dragging={dragging} />
+        )}
         {this.renderReplaceControl()}
-        {!record.menuDisabled &&
-          uiStore.textEditingItem !== record &&
-          !record.archived &&
-          this.renderTopRightActions()}
+        {this.renderTopRightActions()}
         {uiStore.viewingRecord && !uiStore.viewingRecord.isTestCollection && (
           <BottomLeftCardIcons
             card={card}
@@ -500,6 +524,7 @@ class GridCard extends React.Component {
               </NamedActionButton>
             </StyledTopRightActions>
           )}
+          {card.isLoadingPlaceholder && <CardLoader />}
           {this.renderCover}
         </StyledGridCardInner>
         <CollectionCardsTagEditorModal

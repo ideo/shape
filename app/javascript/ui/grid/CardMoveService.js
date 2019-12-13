@@ -68,7 +68,7 @@ export default class CardMoveService {
       switch (cardAction) {
         case 'move':
           await apiStore.moveCards(data)
-          successMessage = 'Items successfully moved !'
+          successMessage = 'Items successfully moved!'
           break
         case 'link':
           await apiStore.linkCards(data)
@@ -106,7 +106,7 @@ export default class CardMoveService {
           uiStore.scrollToBottom()
         }
       }
-      if (cardAction === 'move') {
+      if (cardAction === 'move' && !uiStore.movingIntoCollection) {
         // we actually want to reselect the cards at this point
         uiStore.reselectCardIds(data.collection_card_ids)
       }

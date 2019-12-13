@@ -57,5 +57,7 @@ FactoryBot.define do
         item nil
       end
     end
+
+    factory :collection_card_placeholder, class: 'CollectionCard::Placeholder'
   end
 end
