@@ -53,7 +53,8 @@
     "default_group_id": { "type": ["string", "null"] },
     "cache_key": { "type": ["string"] },
     "test_show_media": { "type": ["boolean"] },
-    "idea_id": { "type": ["string", "null"] }
+    "idea_id": { "type": ["string", "null"] },
+    "serializer": { "type": "string" }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

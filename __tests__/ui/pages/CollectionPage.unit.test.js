@@ -1,6 +1,7 @@
 import { animateScroll } from 'react-scroll'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ChannelManager from '~/utils/ChannelManager'
+import SearchCollection from '~/ui/grid/SearchCollection'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
@@ -274,6 +275,29 @@ describe('CollectionPage', () => {
 
     it('should call uiStore to perform the action', () => {
       expect(uiStore.performActionAfterRoute).toHaveBeenCalled()
+    })
+  })
+
+  describe('with search collection', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          collection={{
+            ...fakeCollection,
+            isSearchCollection: true,
+          }}
+          uiStore={{
+            ...uiStore,
+            loadedSubmissions: true,
+          }}
+        />
+      )
+      component = wrapper.instance()
+    })
+
+    it('should render the SearchCollection', () => {
+      expect(wrapper.find(SearchCollection).exists()).toBe(true)
     })
   })
 

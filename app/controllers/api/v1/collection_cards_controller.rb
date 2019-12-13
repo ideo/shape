@@ -392,6 +392,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         cover_type
         submissions_enabled
         test_show_media
+        search_term
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
