@@ -118,7 +118,7 @@ class RealtimeTextItem extends React.Component {
     this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 200)
     this.instanceDataContentUpdate = _.debounce(
       this._instanceDataContentUpdate,
-      3000
+      30000
     )
     this.sendCursor = _.throttle(this._sendCursor, 100)
   }
@@ -505,7 +505,7 @@ class RealtimeTextItem extends React.Component {
 
   _instanceDataContentUpdate = () => {
     const { item } = this.props
-    if (item.parent.isMasterTemplate) {
+    if (item.parent && item.parent.isMasterTemplate) {
       item.parent.API_backgroundUpdateTemplateInstances()
     }
   }
