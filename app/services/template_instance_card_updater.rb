@@ -48,6 +48,6 @@ class TemplateInstanceCardUpdater < SimpleService
     master_data_content = Mashie.new(@master_card.item.data_content)
     return if instance_data_content&.last_10&.present?
 
-    @instance_card.item.update(data_content: Mashie.new(ops: master_data_content.ops, version: master_data_content.version))
+    @instance_card.item.update_columns(data_content: Mashie.new(ops: master_data_content.ops, version: master_data_content.version))
   end
 end
