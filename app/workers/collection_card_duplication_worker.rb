@@ -51,8 +51,8 @@ class CollectionCardDuplicationWorker
         synchronous: @synchronous,
         placeholder: placeholder,
       )
-      CardDuplicatorMapper::MapFromTo.new(
-        from_id: source_card.id,
+      CardDuplicatorMapper::MapDuplicatedRecord.new(
+        from_card_id: source_card.id,
         batch_id: @batch_id,
       ).set(duplicate.id)
     end

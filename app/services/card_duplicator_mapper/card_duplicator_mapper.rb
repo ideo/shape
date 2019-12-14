@@ -1,57 +1,40 @@
 module CardDuplicatorMapper
-  class RegisterDuplicationBatch < SimpleService
-    # TODO: Make a worker for this so it can be queued,
-    #       although we'd want all cards map before we start duplicating
-    def initialize(card_ids:, batch_id:)
-      @collection_cards = CollectionCard.where(id: card_ids)
-                                        .includes(record: :collection_filters)
+  class Base < SimpleService
+    def initialize(batch_id:)
       @batch_id = batch_id
     end
 
-    def call
-      # Find all link cards and search collection filters
-      # that are in the tree of cards to be duplicated
-      @collection_cards.each do |card|
-        store_card(card)
-      end
+    def card_ids_to_update
+      Cache.hash_get_all(@batch_id) || []
     end
 
-    private
-
-    def store_card(card)
-      if card.record.is?(Item::LinkItem)
-        # Map this to new link item
-        add_to_map(
-          card,
-          data: {
-            type: :link_item,
-          }
-        )
-      elsif card.record.is_a?(Collection)
-        if card.record.collection_filters.present?
-          filters_having_within = card.record.collection_filters.select do |cf|
-            cf.search? && cf.within_collection_id.present?
-          end
-
-          filters_having_within.each do |cf|
-            add_to_map(
-              card,
-              data: {
-                type: :search_filter,
-                collection_filter_id: cf.id,
-                within_collection_id: cf.within_collection_id,
-              },
-            )
-          end
-        end
-        CardDuplicatorMapper::RegisterDuplicationBatch.call(
-          card_ids: card.record.collection_card_ids,
-          batch_id: @batch_id,
-        )
-      end
+    def update_data_for_card_id(card_id:)
+      Cache.hash_get(@batch_id, card_id)
     end
 
-    def add_to_map(card:, data:)
+    def all_mappings_by_card_id
+      Cache.hash_get_all("#{@batch_id}_map") || {}
+    end
+
+    def all_card_ids_mapped
+      Cache.hash_get_all("#{@batch_id}_map") || []
+    end
+
+    def map_set(from_card_id:, to_card_id:)
+      Cache.hash_set("#{@batch_id}_map", from_card_id, to_card_id)
+
+      CardDuplicatorMapper::UpdateAfterDuplication.call(batch_id: @batch_id) if all_cards_mapped?
+    end
+
+    def map_get(from_card_id:)
+      Cache.hash_get("#{@batch_id}_map", from_card_id)
+    end
+
+    def all_cards_mapped?
+      (card_ids_to_update - all_card_ids_mapped).length.zero?
+    end
+
+    def store_card(card:, data:)
       Cache.hash_set(
         @batch_id,
         card.id,
@@ -60,36 +43,68 @@ module CardDuplicatorMapper
     end
   end
 
-  class MapFromTo < SimpleService
-    def initialize(from_card_id:, batch_id:)
-      @from_card_id = from_card_id
-      @batch_id = batch_id
+  # TODO: Make a worker for this so it can be queued,
+  #       although we'd want all cards map before we start duplicating
+
+  class RegisterCardsToUpdate < Base
+    def call(card_ids:)
+      # Find all link cards and search collection filters
+      # that are in the tree of cards to be duplicated
+      load_cards(card_ids).each do |card|
+        if card.record.is?(Item::LinkItem)
+          register_link_card(card)
+        elsif card.record.is_a?(Collection)
+          register_card_with_collection_filters(card) if card.record.collection_filters.present?
+
+          CardDuplicatorMapper::RegisterCardsToUpdate.call(
+            card_ids: card.record.collection_card_ids,
+            batch_id: @batch_id,
+          )
+        end
+      end
     end
 
-    def set(to_card_id)
-      Cache.hash_set("#{@batch_id}_map", @from_card_id, to_card_id)
-      CardDuplicatorMapper::RemapAfterDuplication.call(batch_id: @batch_id) if all_cards_mapped?
+    private
+
+    def load_cards(card_ids)
+      CollectionCard.where(id: card_ids)
+                    .includes(
+                      :item,
+                      collection: :collection_filters,
+                    )
     end
 
-    def get
-      Cache.hash_get("#{@batch_id}_map", @from_card_id)
+    def register_link_card(card)
+      store_card(
+        card,
+        data: {
+          type: :link_item,
+        },
+      )
     end
 
-    def all_cards_mapped?
-      cards_needing_mapping = Cache.hash_get_all(@batch_id) || []
-      cards_mapped = Cache.hash_get_all("#{@batch_id}_map") || []
-      (cards_needing_mapping - cards_mapped).length.zero?
+    def register_card_with_collection_filters(card)
+      filters_having_within = card.record.collection_filters.select do |collection_filter|
+        collection_filter.search? && collection_filter.within_collection_id.present?
+      end
+
+      filters_having_within.each do |collection_filter|
+        add_to_map(
+          card,
+          data: {
+            type: :search_filter,
+            collection_filter_id: collection_filter.id,
+            within_collection_id: collection_filter.within_collection_id,
+          },
+        )
+      end
     end
   end
 
   # TODO: May want to turn this into a worker-queued operation
-  class RemapAfterDuplication < SimpleService
-    def initialize(batch_id:)
-      @batch_id = batch_id
-    end
-
+  class UpdateAfterDuplication < SimpleService
     def call
-      Cache.hash_get_all("#{@batch_id}_map").each do |from_card_id, to_card_id|
+      all_mappings.each do |from_card_id, to_card_id|
         next unless card_needs_remapping?(from_card_id)
 
         data = Cache.hash_get(@batch_id, from_card_id)
@@ -103,6 +118,10 @@ module CardDuplicatorMapper
     end
 
     private
+
+    def all_mappings
+      CardDuplicatorMapper::MapDuplicatedRecord.all_mappings(@batch_id)
+    end
 
     def card_needs_remapping?(from_card_id)
       Cache.hash_exists?(

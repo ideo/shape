@@ -5,7 +5,7 @@ class CollectionCardDuplicator < SimpleService
     @placement = placement
     @for_user = for_user
     @system_collection = system_collection
-    @batch_id = SecureRandom.hex(20)
+    @batch_id = "duplicate-#{SecureRandom.hex(10)}"
     @new_cards = []
     @should_update_cover = false
   end
@@ -38,7 +38,7 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def register_cards_needing_remapping
-    CardDuplicatorMapper::RegisterDuplicationBatch.call(
+    CardDuplicatorMapper::RegisterCardsToUpdate.call(
       card_ids: cards.map(&:id),
       batch_id: @batch_id,
     )
