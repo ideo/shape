@@ -763,7 +763,7 @@ describe User, type: :model do
       it 'is first incentive created_at + waiting period' do
         expect(user.incentive_owed_account_balance.to_f).to eq(unpaid_survey_response.potential_incentive)
         expect(user.incentive_paid_account_balance.to_f).to eq(paid_survey_response.amount_earned)
-        expect(user.incentive_due_date).to be_within(0.1).of(
+        expect(user.incentive_due_date).to be_within(0.5).of(
           prev_survey_completed_at + Audience::PAYMENT_WAITING_PERIOD,
         )
       end
