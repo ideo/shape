@@ -4,7 +4,7 @@ import { observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
-import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
+import v, { TOUCH_DEVICE_OS, EVENT_SOURCE_TYPES } from '~/utils/variables'
 import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
@@ -554,7 +554,7 @@ export default class UiStore {
   }
 
   get isAndroid() {
-    return getTouchDeviceOS() === v.TOUCH_DEVICE_OS.ANDROID
+    return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
