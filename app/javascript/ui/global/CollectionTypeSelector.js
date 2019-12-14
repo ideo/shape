@@ -23,14 +23,12 @@ class CollectionTypeSelector extends React.Component {
   }
 
   openPopoutMenu = () => {
-    console.log('opening popout menu')
     runInAction(() => {
       this.showPopoutMenu = true
     })
   }
 
   hidePopoutMenu = () => {
-    console.log('hiding popout menu')
     runInAction(() => {
       this.showPopoutMenu = false
     })
@@ -38,15 +36,9 @@ class CollectionTypeSelector extends React.Component {
 
   updateCollectionType = async collectionType => {
     const { collection } = this.props
-    console.log('sending ', collectionType)
     await collection.API_selectCollectionType(collectionType)
-    // Do we want error handling?
+    // TODO: Do we want error handling?
     // If so, I think this needs a try/catch block?
-    // if (res) {
-    //   console.log(res)
-    // } else {
-    //   // error handling?
-    // }
     runInAction(() => {
       this.showPopoutMenu = false
     })
@@ -65,12 +57,13 @@ class CollectionTypeSelector extends React.Component {
     return collectionTypes.map(collectionType => {
       return {
         name: collectionType,
+        // Replace iconLeft with other indicator of current collection type
         iconLeft:
           collectionType === this.collection.collection_type ? (
             <span>⏩</span>
           ) : (
             ''
-          ), // Do we even need an "active/selected Icon?"
+          ),
         iconRight: collectionTypeToIcon[collectionType],
         onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
@@ -82,8 +75,9 @@ class CollectionTypeSelector extends React.Component {
 
   render() {
     const { collection, children, position } = this.props
-    console.log(this.collection.collection_type)
+
     if (!collection) return null
+
     return (
       <button
         style={{ position: position }}

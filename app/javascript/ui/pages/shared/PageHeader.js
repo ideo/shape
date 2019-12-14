@@ -161,7 +161,6 @@ class PageHeader extends React.Component {
 
     // Not allowed to update label/use case for Foamcore or Submission Boxes
     if (record.isBoard || record.isSubmissionBox) {
-      console.log('hide when board or submissionbox')
       return null
     }
 
