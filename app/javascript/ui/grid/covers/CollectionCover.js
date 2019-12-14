@@ -51,7 +51,6 @@ const StyledCollectionCover = styled.div`
     props.isSpecialCollection ? v.colors.offset : v.colors.collectionCover};
   color: white;
   position: relative;
-  overflow: hidden;
   ${props =>
     props.url &&
     `

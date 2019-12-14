@@ -52,7 +52,10 @@ class CollectionTypeSelector extends React.Component {
     })
   }
 
-  handleMenuItemClick = collectionType => {
+  handleMenuItemClick = (e, collectionType) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     this.updateCollectionType(collectionType)
   }
 
@@ -69,7 +72,7 @@ class CollectionTypeSelector extends React.Component {
             ''
           ), // Do we even need an "active/selected Icon?"
         iconRight: collectionTypeToIcon[collectionType],
-        onClick: () => this.handleMenuItemClick(collectionType),
+        onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
         loading: false,
         withAvatar: false,
@@ -95,7 +98,7 @@ class CollectionTypeSelector extends React.Component {
           {children}
         </Tooltip>
         <PopoutMenu
-          // need to adjust position/location?
+          offsetPosition={{ x: 0, y: -60 }}
           onMouseLeave={this.hidePopoutMenu}
           hideDotMenu
           menuOpen={this.showPopoutMenu}
