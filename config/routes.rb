@@ -126,11 +126,11 @@ Rails.application.routes.draw do
           get 'check_payments'
           get 'my_collection'
           get 'admin_users'
-          get 'tags'
         end
 
         get 'search', to: 'search#search'
         get 'search_collection_cards', to: 'search#search_collection_cards'
+        resources :tags, only: %i[index]
         resources :collections, only: %i[create]
         resources :groups, only: %i[index create update]
         resources :users, only: %i[index]

@@ -392,6 +392,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         cover_type
         submissions_enabled
         test_show_media
+        tag_list
         search_term
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
@@ -409,6 +410,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :legend_item_id,
         :legend_search_source,
+        :tag_list,
         data_content: {},
         style: {},
         filestack_file_attributes: [
