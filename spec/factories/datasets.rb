@@ -3,6 +3,9 @@ FactoryBot.define do
     timeframe 'month'
     chart_type 'area'
     identifier 'report'
+    cached_data do
+      [{ value: 24, date: '2018-09-10' }]
+    end
 
     trait :with_cached_data do
       measure 'Widgets'
