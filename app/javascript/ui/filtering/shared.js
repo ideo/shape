@@ -9,7 +9,7 @@ const filterSymbol = filter => {
   return <SearchIconRight />
 }
 
-export const filtersToTags = ({ filters, onSelect, onDelete }) => {
+export const filtersToTags = ({ filters, onSelect, onDelete } = {}) => {
   return filters.map(filter => {
     const tag = {
       id: filter.id,
