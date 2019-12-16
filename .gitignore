@@ -43,3 +43,6 @@ cypress/videos
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Ignore generated files for testing
+__js_test_config/factory/data
