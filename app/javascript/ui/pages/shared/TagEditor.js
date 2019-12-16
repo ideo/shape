@@ -65,40 +65,36 @@ class TagEditor extends React.Component {
     this.tags = _.map([...tagArray], t => this.createFormattedTag(t))
   }
 
+  @action
   handleAddition = tagData => {
-    runInAction(() => {
-      const { validateTag, records, tagField, afterAddTag } = this.props
-      tagData.name = tagData.name.trim()
-      const newTag = this.createFormattedTag(tagData.name)
-      this.error = ''
+    const { validateTag, records, tagField, afterAddTag } = this.props
+    tagData.name = tagData.name.trim()
+    const newTag = this.createFormattedTag(tagData.name)
+    this.error = ''
 
-      // Return if tag is a duplicate
-      if (
-        _.find(
-          this.tags,
-          t => t.name.toUpperCase() === newTag.name.toUpperCase()
-        )
-      ) {
+    // Return if tag is a duplicate
+    if (
+      _.find(this.tags, t => t.name.toUpperCase() === newTag.name.toUpperCase())
+    ) {
+      return
+    }
+
+    // If a validateTag function is provided, validate tag
+    if (validateTag) {
+      const { tag, error } = validateTag(newTag.name)
+      if (error) {
+        this.error = error
         return
+      } else {
+        newTag.name = tag
       }
-
-      // If a validateTag function is provided, validate tag
-      if (validateTag) {
-        const { tag, error } = validateTag(newTag.name)
-        if (error) {
-          this.error = error
-          return
-        } else {
-          newTag.name = tag
-        }
-      }
-      this.tags.push(newTag)
-      records.forEach(record => {
-        // persist the tag locally on the Item/Collection
-        record[tagField].push(newTag.name)
-      })
-      afterAddTag(newTag.name)
+    }
+    this.tags.push(newTag)
+    records.forEach(record => {
+      // persist the tag locally on the Item/Collection
+      record[tagField].push(newTag.name)
     })
+    afterAddTag(newTag.name)
   }
 
   handleDelete = label => e => {
