@@ -160,7 +160,7 @@ class PageHeader extends React.Component {
     const { record } = this.props
 
     // Not allowed to update label/use case for Foamcore or Submission Boxes
-    if (record.isBoard || record.isSubmissionBox) {
+    if (record.isBoard || record.isSubmissionBox || record.isUserProfile) {
       return null
     }
 
