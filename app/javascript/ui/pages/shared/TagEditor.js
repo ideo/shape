@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { action, observable, runInAction } from 'mobx'
+import { action, computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import _ from 'lodash'
@@ -36,6 +36,11 @@ class TagEditor extends React.Component {
     this.initTagFields(nextProps.records, nextProps.tagField)
   }
 
+  @computed
+  get nextTagId() {
+    return this.tags.length > 0 ? this.tags.length + 1 : 0
+  }
+
   initTagFields(records, tagField) {
     records.forEach(record => {
       // should be some kind of error if tagField doesn't exist
@@ -61,45 +66,52 @@ class TagEditor extends React.Component {
     this.tags = _.map([...tagArray], (t, i) => this.createFormattedTag(i, t))
   }
 
-  @action
   handleAddition = tagData => {
-    const { validateTag, records, tagField, afterAddTag } = this.props
-    tagData.name = tagData.name.trim()
-    const newTag = this.createFormattedTag(tagData.id, tagData.name)
-    this.error = ''
+    runInAction(() => {
+      const { validateTag, records, tagField, afterAddTag } = this.props
+      tagData.name = tagData.name.trim()
+      const newTag = this.createFormattedTag(this.nextTagId, tagData.name)
+      this.error = ''
 
-    // Return if tag is a duplicate
-    if (this.tags.find(t => t.name === newTag.name)) return
+      // Return if tag is a duplicate
+      if (this.tags.find(t => t.name === newTag.name)) return
 
-    // If a validateTag function is provided, validate tag
-    if (validateTag) {
-      const { tag, error } = validateTag(newTag.name)
-      if (error) {
-        this.error = error
-        return
-      } else {
-        newTag.name = tag
+      // If a validateTag function is provided, validate tag
+      if (validateTag) {
+        const { tag, error } = validateTag(newTag.name)
+        if (error) {
+          this.error = error
+          return
+        } else {
+          newTag.name = tag
+        }
       }
-    }
-    this.tags.push(newTag)
-    records.forEach(record => {
-      // persist the tag locally on the Item/Collection
-      record[tagField].push(newTag.name)
+      this.tags.push(newTag)
+      records.forEach(record => {
+        // persist the tag locally on the Item/Collection
+        record[tagField].push(newTag.name)
+      })
+      afterAddTag(newTag.name)
     })
-    afterAddTag(newTag.name)
   }
 
   handleDelete = tagIndex => e => {
-    runInAction(() => {
-      const { records, tagField, afterRemoveTag } = this.props
-      const tag = this.tags[tagIndex]
-      // FIXME: tagIndex is out of bounds sometimes
-      this.tags.remove(tag)
-      records.forEach(record => {
-        record[tagField].remove(tag.name)
+    // FIXME: deleting multiple tags won't work since tagIndex isn't updated when this.tags is updated
+    const { records, tagField, afterRemoveTag } = this.props
+    const tag = this.tags[tagIndex]
+    if (tag) {
+      runInAction(() => {
+        this.tags.remove(tag)
+        // re-shift tag ids after removing
+        for (let i = 0; i < this.tags.length; i++) {
+          this.tags[i].id = i
+        }
+        records.forEach(record => {
+          record[tagField].remove(tag.name)
+        })
+        afterRemoveTag(tag.name)
       })
-      afterRemoveTag(tag.name)
-    })
+    }
   }
 
   // This is displayed instead of the tag input if the user cannot edit the tags
