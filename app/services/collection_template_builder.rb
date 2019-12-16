@@ -75,6 +75,7 @@ class CollectionTemplateBuilder < SimpleService
       organization_id: @parent.organization.id,
       created_by_id: @created_by&.id,
       type: @template.type,
+      tag_list: @template.tag_list,
     }.merge(@raw_collection_params)
   end
 

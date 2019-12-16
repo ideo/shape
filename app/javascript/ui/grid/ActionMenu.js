@@ -233,7 +233,10 @@ class ActionMenu extends React.Component {
     if (canEdit && !card.isPinnedAndLocked) {
       // Replace action is added later if this.props.canReplace
       items = _.reject(items, { name: 'Replace' })
-      if (record && record.is_submission_box_template) {
+      if (
+        record &&
+        (record.is_submission_box_template || record.isSearchCollection)
+      ) {
         items = _.reject(items, { name: 'Delete' })
         items = _.reject(items, { name: 'Move' })
       }
@@ -297,6 +300,10 @@ class ActionMenu extends React.Component {
       menuItemsCount(items.length)
     }
 
+    if (card.parentCollection && card.parentCollection.isSearchCollection) {
+      items = _.reject(items, { name: 'Move' })
+    }
+
     if (record && record.archived) {
       // Turn off most actions if looking at archived record
       items = _.reject(items, { name: 'Duplicate' })
@@ -308,7 +315,6 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Add to My Collection' })
       items = _.reject(items, { name: 'Sharing' })
     }
-    // items.unshift(_.find(actions, { name: 'Comment' }))
 
     return items
   }
