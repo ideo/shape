@@ -13,6 +13,7 @@ class TemplateInstanceCardUpdater < SimpleService
     if @master_template.is_a?(Collection::TestCollection) && @master_template.inside_a_submission_box_template?
       copy_test_details_from_master!
     elsif @instance_card.item.is_a?(Item::TextItem)
+      @master_card.item.reload
       copy_data_content_from_master!
     end
   end
