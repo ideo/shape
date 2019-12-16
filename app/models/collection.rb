@@ -734,14 +734,11 @@ class Collection < ApplicationRecord
   end
 
   def mark_children_processing_status(status = nil)
-    # also mark self
-    update_processing_status(status)
     collections = Collection.in_collection(self)
     collections.update_all(
       processing_status: status,
       updated_at: Time.now,
     )
-
     # Broadcast that this collection is no longer being edited
     collections.each(&:processing_done) if processing_status.nil?
   end
@@ -925,6 +922,19 @@ class Collection < ApplicationRecord
 
     # Only include cover items if this collection has indicated to use them
     cover_type_default? ? [] : collection_cover_items
+  end
+
+  # convert placement of 'beginning' or 'end' into an integer order
+  def card_order_at(placement)
+    # default to 'beginning', which goes after the first pinned card
+    order = collection_cards.pinned.maximum(:order) || 0
+    if placement == 'end'
+      order = cached_last_card_order || collection_cards.maximum(:order) || -1
+      order += 1
+    elsif placement.is_a?(Integer)
+      order = placement
+    end
+    order
   end
 
   private
