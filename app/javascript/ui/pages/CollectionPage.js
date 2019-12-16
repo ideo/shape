@@ -19,6 +19,7 @@ import PageSeparator from '~/ui/global/PageSeparator'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 import EditorPill from '~/ui/items/EditorPill'
+import SearchCollection from '~/ui/grid/SearchCollection'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
@@ -45,7 +46,8 @@ class CollectionPage extends React.Component {
 
   constructor(props) {
     super(props)
-    this.reloadData = _.debounce(this._reloadData, 1500)
+    this.reloadData = _.throttle(this._reloadData, 3000)
+    this.setEditor = _.throttle(this._setEditor, 4000)
   }
 
   componentDidMount() {
@@ -104,10 +106,10 @@ class CollectionPage extends React.Component {
     }
 
     let params
-    if (collection.isRegularCollection) {
-      params = { page, per_page, rows, cols }
-    } else {
+    if (collection.isBoard) {
       params = { rows }
+    } else {
+      params = { page, per_page, rows, cols }
     }
 
     return collection.API_fetchCards(params).then(() => {
@@ -271,12 +273,12 @@ class CollectionPage extends React.Component {
   }
 
   @action
-  setEditor = editor => {
+  _setEditor = editor => {
     this.currentEditor = editor
     if (this.editorTimeout) clearTimeout(this.editorTimeout)
     // this.unmounted comes from PageWithApi
     if (this.unmounted || _.isEmpty(editor)) return
-    this.editorTimeout = setTimeout(() => this.setEditor({}), 4000)
+    this.editorTimeout = setTimeout(() => this._setEditor({}), 4000)
   }
 
   handleAllClick = ev => {
@@ -293,43 +295,14 @@ class CollectionPage extends React.Component {
     const submissions = collection.submissions_collection
     const submissionsId = submissions ? submissions.id : ''
 
-    if (_.compact([currentId, submissionsId]).indexOf(data.record_id) > -1) {
-      if (
-        !_.isEmpty(data.current_editor) &&
-        data.current_editor.id === apiStore.currentUserId
-      ) {
+    if (_.includes(_.compact([currentId, submissionsId]), data.record_id)) {
+      if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
         // don't reload your own updates
         return
-      }
-      if (data.data && data.data.item) {
-        const { item } = data.data
-        if (item && item.quill_data) {
-          this.handleTextItemUpdate(item, data.current_editor)
-          return
-        }
       }
       this.setEditor(data.current_editor)
       this.reloadData()
     }
-  }
-
-  handleTextItemUpdate = (item, current_editor) => {
-    const { apiStore, uiStore } = this.props
-    const localItem = apiStore.find('items', item.id)
-    if (localItem) {
-      // update with incoming content UNLESS we are editing that item
-      if (
-        uiStore.textEditingItem &&
-        uiStore.textEditingItem.id === localItem.id
-      ) {
-        return
-      }
-      localItem.quill_data = item.quill_data
-    } else {
-      // we don't have the item, it must be a new card that we need to fetch
-      this.reloadData()
-    }
-    this.setEditor(current_editor)
   }
 
   async _reloadData() {
@@ -460,8 +433,17 @@ class CollectionPage extends React.Component {
     )
   }
 
+  renderSearchCollection() {
+    return (
+      <SearchCollection
+        collection={this.props.collection}
+        trackCollectionUpdated={this.trackCollectionUpdated}
+      />
+    )
+  }
+
   renderTestDesigner() {
-    return <TestDesigner collection={this.collection} />
+    return <TestDesigner collection={this.props.collection} />
   }
 
   loader = () => (
@@ -544,6 +526,8 @@ class CollectionPage extends React.Component {
       )
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
+    } else if (collection.isSearchCollection) {
+      inner = this.renderSearchCollection()
     } else {
       inner = (
         <CollectionGrid

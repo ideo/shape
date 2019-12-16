@@ -16,6 +16,10 @@ const SortContainer = styled.div`
   top: -15px;
 `
 
+const GrowFlex = styled(Flex)`
+  flex-grow: 1;
+`
+
 @observer
 class CollectionFilter extends React.Component {
   @observable
@@ -131,9 +135,10 @@ class CollectionFilter extends React.Component {
       sortable,
     } = this.props
     const isFilterBarActive =
-      collection_filters && collection_filters.length > 0
+      (collection_filters && collection_filters.length > 0) ||
+      collection.isSearchCollection
     return (
-      <Flex align="flex-end">
+      <GrowFlex align="flex-end">
         {isFilterBarActive && (
           <FilterBar
             filters={collection_filters}
@@ -172,7 +177,7 @@ class CollectionFilter extends React.Component {
             modalOpen={!!this.currentFilterLookupType}
           />
         )}
-      </Flex>
+      </GrowFlex>
     )
   }
 }

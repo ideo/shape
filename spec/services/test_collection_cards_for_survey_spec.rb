@@ -41,16 +41,35 @@ RSpec.describe TestCollectionCardsForSurvey, type: :service do
       let(:collection_to_test) { create(:collection) }
       before do
         test_collection.update(collection_to_test: collection_to_test)
+        test_collection.hide_or_show_section_questions!
       end
 
-      it 'only collects the idea section, and only once' do
-        # collects ideas cards once
-        sections = ['ideas'] * 5
+      it 'only collects the ideas section, and only once' do
+        # collects ideas cards once (and no "idea")
+        sections = ['ideas'] * 4
         # just the single finish card
         sections += ['outro']
         expect(survey_cards.map(&:section_type)).to eq(sections)
         expect(survey_cards.last.card_question_type).to eq('question_finish')
       end
+    end
+  end
+
+  context 'without an ideas collection' do
+    # should function similar to in-collection test above
+    let!(:test_collection) { create(:test_collection, :completed) }
+    before do
+      test_collection.ideas_collection.destroy
+    end
+
+    it 'should still collect the sections appropriately (ideas section once)' do
+      sections = ['intro']
+      # collects ideas cards once (and no "idea")
+      sections += ['ideas'] * 4
+      # the open response and finish question
+      sections += ['outro'] * 2
+      expect(survey_cards.map(&:section_type)).to eq(sections)
+      expect(survey_cards.last.card_question_type).to eq('question_finish')
     end
   end
 

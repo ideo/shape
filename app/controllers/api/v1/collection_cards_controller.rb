@@ -393,6 +393,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         submissions_enabled
         test_show_media
         tag_list
+        search_term
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,

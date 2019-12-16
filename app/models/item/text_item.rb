@@ -93,7 +93,11 @@ class Item
       new_data = threadlocked_transform_realtime_delta(user, Mashie.new(data))
       # new_data may include an error message
       received_changes(new_data, user)
-      CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
+
+      return if parent.nil? || parent.num_viewers < 2 || parent.broadcasting?
+
+      parent.update(broadcasting: true)
+      CollectionBroadcastWorker.perform_in(3.seconds, parent.id)
     end
 
     def threadlocked_transform_realtime_delta(user, data)
