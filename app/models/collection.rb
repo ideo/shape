@@ -276,6 +276,7 @@ class Collection < ApplicationRecord
       updated_at: updated_at,
       archived: archived,
       master_template: master_template,
+      collection_type: collection_type,
     }
   end
 

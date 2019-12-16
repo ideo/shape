@@ -39,6 +39,7 @@ class Search
       Filters::ActivityDateRange,
       Filters::TypeCollection,
       Filters::TypeItem,
+      Filters::CollectionType,
     ]
   end
 end
