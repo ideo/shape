@@ -102,16 +102,11 @@ class TagEditor extends React.Component {
   }
 
   handleDelete = label => e => {
-    // FIXME: deleting multiple tags won't work since tagIndex isn't updated when this.tags is updated
     const { records, tagField, afterRemoveTag } = this.props
     const tag = _.find(this.tags, { label })
     if (tag) {
       runInAction(() => {
         this.tags.remove(tag)
-        // re-shift tag ids after removing
-        // for (let i = 0; i < this.tags.length; i++) {
-        //   this.tags[i].id = i
-        // }
         records.forEach(record => {
           record[tagField].remove(tag.name)
         })
