@@ -221,6 +221,7 @@ class Collection < ApplicationRecord
     project: 1,
     method: 2,
     prototype: 3,
+    profile: 4, # Different from UserProfile
   }, _prefix: true
 
   # Searchkick Config

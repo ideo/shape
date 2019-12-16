@@ -11,8 +11,10 @@ import CollectionIcon from '../icons/CollectionIcon'
 
 export const collectionTypeToIcon = {
   collection: <CollectionIcon />,
+  profile: <ProfileIcon />,
+  // Replace with proper icons
   project: <TemplateIcon />,
-  method: <ProfileIcon />,
+  method: <SystemIcon />,
   prototype: <TestCollectionIcon />,
 }
 

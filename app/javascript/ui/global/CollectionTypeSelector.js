@@ -52,18 +52,17 @@ class CollectionTypeSelector extends React.Component {
   }
 
   get collectionTypeMenuItems() {
-    const collectionTypes = ['collection', 'project', 'method', 'prototype']
+    const collectionTypes = [
+      'collection',
+      'project',
+      'method',
+      'prototype',
+      'profile',
+    ]
 
     return collectionTypes.map(collectionType => {
       return {
         name: collectionType,
-        // Replace iconLeft with other indicator of current collection type
-        iconLeft:
-          collectionType === this.collection.collection_type ? (
-            <span>⏩</span>
-          ) : (
-            ''
-          ),
         iconRight: collectionTypeToIcon[collectionType],
         onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
