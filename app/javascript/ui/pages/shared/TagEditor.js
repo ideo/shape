@@ -38,7 +38,7 @@ class TagEditor extends React.Component {
 
   @computed
   get nextTagId() {
-    return this.tags.length > 0 ? this.tags.length + 1 : 0
+    return this.tags.length > 0 ? this.tags.length : 0
   }
 
   initTagFields(records, tagField) {
@@ -52,11 +52,11 @@ class TagEditor extends React.Component {
 
   createFormattedTag(id, label) {
     const tag = {
-      id,
+      id: label,
       label,
       name: label,
+      onDelete: this.handleDelete(label),
     }
-    tag.onDelete = this.handleDelete(id)
     return tag
   }
 
@@ -74,7 +74,7 @@ class TagEditor extends React.Component {
       this.error = ''
 
       // Return if tag is a duplicate
-      if (this.tags.find(t => t.name === newTag.name)) return
+      if (_.find(this.tags, { name: newTag.name })) return
 
       // If a validateTag function is provided, validate tag
       if (validateTag) {
@@ -95,17 +95,17 @@ class TagEditor extends React.Component {
     })
   }
 
-  handleDelete = tagIndex => e => {
+  handleDelete = label => e => {
     // FIXME: deleting multiple tags won't work since tagIndex isn't updated when this.tags is updated
     const { records, tagField, afterRemoveTag } = this.props
-    const tag = this.tags[tagIndex]
+    const tag = _.find(this.tags, { label })
     if (tag) {
       runInAction(() => {
         this.tags.remove(tag)
         // re-shift tag ids after removing
-        for (let i = 0; i < this.tags.length; i++) {
-          this.tags[i].id = i
-        }
+        // for (let i = 0; i < this.tags.length; i++) {
+        //   this.tags[i].id = i
+        // }
         records.forEach(record => {
           record[tagField].remove(tag.name)
         })
@@ -130,6 +130,7 @@ class TagEditor extends React.Component {
   render() {
     const { canEdit, placeholder, tagColor } = this.props
 
+    console.log([...this.tags])
     return (
       <StyledReactTags tagColor={tagColor}>
         {!canEdit && this.readonlyTags()}
