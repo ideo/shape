@@ -1,47 +1,47 @@
 export const primaryQualities = {
-  Purpose: {
+  purpose: {
     color: '#9874AB',
   },
-  'Looking Out': {
+  'looking out': {
     color: '#9A4F7A',
   },
-  Experimentation: {
+  experimentation: {
     color: '#D26A3B',
   },
-  Collaboration: {
+  collaboration: {
     color: '#EED950',
   },
-  Empowerment: {
+  empowerment: {
     color: '#83CCB1',
   },
-  Refinement: {
+  refinement: {
     color: '#8A929D',
   },
 }
 
 export const subqualities = {
-  Usefulness: primaryQualities.Purpose,
-  Passion: primaryQualities.Purpose,
-  Clarity: primaryQualities.Purpose,
-  'Market Insightfulness': primaryQualities['Looking Out'],
-  'Tech Insightfulness': primaryQualities['Looking Out'],
-  'Customer Insightfulness': primaryQualities['Looking Out'],
-  'User Testing': primaryQualities.Experimentation,
-  'High-Fidelity Prototyping': primaryQualities.Experimentation,
-  'Low-Fidelity Prototyping': primaryQualities.Experimentation,
-  Modeling: primaryQualities.Experimentation,
-  'Network Informality': primaryQualities.Collaboration,
-  'Team Collaboraiton': primaryQualities.Collaboration,
-  'Collaboration Characteristics': primaryQualities.Collaboration,
-  'Process Clarity': primaryQualities.Empowerment,
-  Opposability: primaryQualities.Empowerment,
-  Fairness: primaryQualities.Empowerment,
-  Autonomy: primaryQualities.Empowerment,
-  'Risk Tolerance': primaryQualities.Empowerment,
-  'Visionary in Implementation': primaryQualities.Refinement,
-  Expert: primaryQualities.Refinement,
-  'Technical Creativity': primaryQualities.Refinement,
-  'Detail Orientation': primaryQualities.Refinement,
+  usefulness: primaryQualities.purpose,
+  passion: primaryQualities.purpose,
+  clarity: primaryQualities.purpose,
+  'market insightfulness': primaryQualities['looking out'],
+  'tech insightfulness': primaryQualities['looking out'],
+  'customer insightfulness': primaryQualities['looking out'],
+  'user testing': primaryQualities.experimentation,
+  'high-fidelity prototyping': primaryQualities.experimentation,
+  'low-fidelity prototyping': primaryQualities.experimentation,
+  modeling: primaryQualities.experimentation,
+  'network informality': primaryQualities.collaboration,
+  'team collaboraiton': primaryQualities.collaboration,
+  'collaboration characteristics': primaryQualities.collaboration,
+  'process clarity': primaryQualities.empowerment,
+  opposability: primaryQualities.empowerment,
+  fairness: primaryQualities.empowerment,
+  autonomy: primaryQualities.empowerment,
+  'risk tolerance': primaryQualities.empowerment,
+  'visionary in implementation': primaryQualities.refinement,
+  expert: primaryQualities.refinement,
+  'technical creativity': primaryQualities.refinement,
+  'detail orientation': primaryQualities.refinement,
 }
 
 export const creativeQualities = {

@@ -4,9 +4,10 @@ import v from '~/utils/variables'
 import CreativeDifferenceLogoSmall from '~/ui/icons/CreativeDifferenceLogoSmall'
 import { creativeQualities } from '~/utils/creativeDifferenceVariables'
 
-export const tagColor = (tagName, defaultColor = null) => {
-  if (creativeQualities[tagName]) {
-    return creativeQualities[tagName].color
+export const tagColor = (tagName = null, defaultColor = null) => {
+  const lowerTagName = tagName ? tagName.toLowerCase() : null
+  if (creativeQualities[lowerTagName]) {
+    return creativeQualities[lowerTagName].color
   } else if (defaultColor) {
     return defaultColor
   }
@@ -14,7 +15,7 @@ export const tagColor = (tagName, defaultColor = null) => {
 }
 
 export const creativeDifferenceTagIcon = tagName => {
-  if (creativeQualities[tagName]) {
+  if (creativeQualities[tagName.toLowerCase()]) {
     return <CreativeDifferenceLogoSmall />
   }
   return null
