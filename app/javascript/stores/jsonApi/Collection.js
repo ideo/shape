@@ -1053,6 +1053,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.API_fetchCards()
   }
 
+  async API_backgroundUpdateTemplateInstances() {
+    await this.apiStore.request(
+      `collections/${this.id}/background_update_template_instances`,
+      'POST'
+    )
+
+    return
+  }
+
   API_clearCollectionCover() {
     return this.apiStore
       .request(`collections/${this.id}/clear_collection_cover`, 'POST')
