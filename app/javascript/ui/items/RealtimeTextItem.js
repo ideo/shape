@@ -116,6 +116,10 @@ class RealtimeTextItem extends React.Component {
     this.reactQuillRef = undefined
     this.quillEditor = undefined
     this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 200)
+    this.instanceDataContentUpdate = _.debounce(
+      this._instanceDataContentUpdate,
+      30000
+    )
     this.sendCursor = _.throttle(this._sendCursor, 100)
   }
 
@@ -326,6 +330,7 @@ class RealtimeTextItem extends React.Component {
     // mark this as it may get called again from unmount, only want to cancel once
     this.canceled = true
     this.sendCombinedDelta.flush()
+    this.instanceDataContentUpdate.flush()
     // NOTE: cancel also means "save current text"!
     // event is passed through because TextItemCover uses it
     if (!this.canEdit) return onCancel({ item: this.props.item, ev, route })
@@ -431,6 +436,7 @@ class RealtimeTextItem extends React.Component {
 
     this.combineAwaitingDeltas(newDelta)
     this.sendCombinedDelta()
+    this.instanceDataContentUpdate()
   }
 
   handleSelectionChange = (range, source, editor) => {
@@ -495,6 +501,13 @@ class RealtimeTextItem extends React.Component {
     // our combinedDelta won't clear out until we know it has successfully sent
     this.bufferDelta = new Delta()
     return this.combinedDelta
+  }
+
+  _instanceDataContentUpdate = () => {
+    const { item } = this.props
+    if (item.parent && item.parent.isMasterTemplate) {
+      item.parent.API_backgroundUpdateTemplateInstances()
+    }
   }
 
   socketSend = (method, data) => {

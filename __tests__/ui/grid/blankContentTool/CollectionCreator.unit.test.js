@@ -15,7 +15,7 @@ uiStore.viewingCollection = {
 
 const e = { preventDefault: jest.fn() }
 let wrapper, props, component
-describe('MovableGridCard', () => {
+describe('CollectionCreator', () => {
   beforeEach(() => {
     props = {
       loading: false,
@@ -79,6 +79,35 @@ describe('MovableGridCard', () => {
               name: component.state.inputText,
               master_template: false,
               type: 'Collection::SubmissionBox',
+            },
+          },
+          {
+            afterCreate: component.afterCreate,
+          }
+        )
+      })
+    })
+
+    describe('when collection is a SearchColleciton', () => {
+      beforeEach(() => {
+        props.type = 'search'
+        props.createCard.mockClear()
+        wrapper = shallow(<CollectionCreator {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('adds the search term to create card', () => {
+        component.state = {
+          inputText: 'plants',
+        }
+        component.createCollection(e)
+        expect(props.createCard).toHaveBeenCalledWith(
+          {
+            collection_attributes: {
+              name: component.state.inputText,
+              master_template: false,
+              type: 'Collection::SearchCollection',
+              search_term: 'plants',
             },
           },
           {

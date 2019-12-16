@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import { Checkbox } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
+import { tagColor } from '~/ui/pages/shared/StyledReactTags'
 import v from '~/utils/variables'
 
 export const PillWrapper = styled.div`
@@ -24,7 +25,7 @@ export const PillWrapper = styled.div`
   cursor: default;
   border-radius: 0;
   border: none;
-  background-color: ${v.colors.commonMediumTint};
+  background-color: ${props => tagColor(props.tagName)};
   align-items: center;
 
   @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
@@ -49,8 +50,8 @@ const DeleteIconHolder = styled.span`
 `
 
 const SymbolHolder = styled.span`
-  width: 16px;
-  height: 16px;
+  width: ${props => props.symbolSize || 16}px;
+  height: ${props => props.symbolSize || 16}px;
   margin-right: ${props =>
     !props.symbolSize || props.symbolSize === 16 ? 4 : 10}px;
 `
@@ -69,8 +70,13 @@ const Pill = props => {
   if (props.tag && !props.tag.deleteIcon) {
     deleteIcon = <CloseIcon />
   }
+  const wrapperProps = {}
+  if (props.tag) {
+    wrapperProps.tagName = props.tag.name
+  }
+
   return (
-    <PillWrapper>
+    <PillWrapper {...wrapperProps}>
       {selectable && (
         <Checkbox
           style={{ marginRight: '6px' }}

@@ -556,6 +556,17 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
+  describe 'POST #background_update_template_instances' do
+    let(:template) { create(:collection, master_template: true, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{template.id}/background_update_template_instances" }
+    let!(:instance) { create(:collection, template: template) }
+
+    it 'should call the UpdateTemplateInstancesWorker' do
+      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(template.id)
+      post(path)
+    end
+  end
+
   describe 'PATCH #submit' do
     let(:submission_box) { create(:submission_box, hide_submissions: true) }
     let(:submissions_collection) { submission_box.submissions_collection }

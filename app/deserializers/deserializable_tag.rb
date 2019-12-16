@@ -1,0 +1,2 @@
+class DeserializableTag < BaseJsonDeserializer
+end

@@ -2,23 +2,19 @@ class Api::V1::SearchController < Api::V1::BaseController
   before_action :capture_query_params
 
   before_action :load_and_authorize_organization_from_slug, only: %i[search]
-  before_action :switch_to_organization, only: %i[search]
+  load_and_authorize_resource :organization, only: %i[search_collection_cards]
+  before_action :switch_to_organization, only: %i[search search_collection_cards]
   def search
-    results = search_records
     render(
-      meta: {
-        page: @page,
-        total: results.total_count,
-        size: results.size,
-      },
-      jsonapi: results,
-      include: %i[parent_collection_card filestack_file],
-      class: jsonapi_class.merge(
-        Collection: SerializableSimpleCollection,
+      render_attrs(search_records, simple_collection: true),
+    )
+  end
+
+  def search_collection_cards
+    render(
+      render_attrs(
+        search_records(index_name: [Collection, Item]),
       ),
-      expose: {
-        force_breadcrumbs: true,
-      },
     )
   end
 
@@ -56,7 +52,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     @query = params[:query] || ''
   end
 
-  def search_records
+  def search_records(index_name: Collection)
     # search for tags via hashtag e.g. "#template"
     where_clause = {
       organization_id: current_organization.id,
@@ -90,14 +86,24 @@ class Api::V1::SearchController < Api::V1::BaseController
       ]
     end
 
-    Search.new(
+    if params[:current_collection_id].present?
+      where_clause[:parent_id] = {not: params[:current_collection_id]}
+      where_clause[:id] = {not: params[:current_collection_id]}
+    end
+
+    results = Search.new(
       # NOTE: This index may get replaced based on filters e.g. "type:item"
-      index_name: Collection,
+      index_name: index_name,
       where: where_clause,
       per_page: params[:per_page] || 10,
       page: @page,
       order: order_opts,
+      model_includes: {
+        Collection: CollectionCard.default_includes_for_api[:collection],
+        Item: CollectionCard.default_includes_for_api[:item],
+      },
     ).search(@query)
+    results
   end
 
   def search_users_and_groups
@@ -157,6 +163,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       meta: {
         page: @page,
         total: results.total_count,
+        total_pages: results.total_pages,
         size: results.size,
       },
       jsonapi: @resource.anchored_roles,
@@ -189,5 +196,36 @@ class Api::V1::SearchController < Api::V1::BaseController
     return unless @organization.present?
 
     current_user.switch_to_organization(@organization)
+  end
+
+  def default_render_attrs(results)
+    {
+      meta: {
+        page: @page,
+        total: results.total_count,
+        total_pages: results.total_pages,
+        size: results.size,
+      },
+      include: %i[parent_collection_card filestack_file],
+      expose: {
+        force_breadcrumbs: true,
+      },
+    }
+  end
+
+  def render_attrs(results, simple_collection: false)
+    if simple_collection
+      default_render_attrs(results).merge(
+        jsonapi: results,
+        class: jsonapi_class.merge(
+          Collection: SerializableSimpleCollection,
+        ),
+      )
+    else
+      default_render_attrs(results).merge(
+        include: CollectionCard.default_relationships_for_api,
+        jsonapi: results.results.map(&:parent_collection_card).compact,
+      )
+    end
   end
 end
