@@ -4,39 +4,51 @@ module CardDuplicatorMapper
       @batch_id = batch_id
     end
 
-    def card_ids_to_update
-      Cache.hash_get_all(@batch_id) || []
+    def dependent_cards
+      Cache.hash_get_all("#{@batch_id}_dependent_cards").presence || {}
     end
 
-    def update_data_for_card_id(card_id:)
-      Cache.hash_get(@batch_id, card_id)
+    def dependent_card_id?(from_card_id:)
+      Cache.hash_exists?(
+        "#{@batch_id}_dependent_cards", from_card_id
+      )
+    end
+
+    def dependent_card_ids
+      dependent_cards.keys
     end
 
     def all_mappings_by_card_id
-      Cache.hash_get_all("#{@batch_id}_map") || {}
+      Cache.hash_get_all("#{@batch_id}_map").presence || {}
     end
 
-    def all_card_ids_mapped
-      Cache.hash_get_all("#{@batch_id}_map") || []
+    def all_mappings_card_ids
+      all_mappings_by_card_id.keys
     end
 
-    def map_set(from_card_id:, to_card_id:)
+    def map_duplication(from_card_id:, to_card_id:)
       Cache.hash_set("#{@batch_id}_map", from_card_id, to_card_id)
+      return unless all_cards_mapped?
 
-      CardDuplicatorMapper::UpdateAfterDuplication.call(batch_id: @batch_id) if all_cards_mapped?
+      CardDuplicatorMapper::UpdateAfterDuplication.call(batch_id: @batch_id)
     end
 
-    def map_get(from_card_id:)
+    def duplication_for_card_id(from_card_id:)
       Cache.hash_get("#{@batch_id}_map", from_card_id)
     end
 
-    def all_cards_mapped?
-      (card_ids_to_update - all_card_ids_mapped).length.zero?
+    def clear_cached_data!
+      Cache.delete(@batch_id)
+      Cache.delete("#{@batch_id}_map")
     end
 
-    def store_card(card:, data:)
+    def all_cards_mapped?
+      (dependent_card_ids - all_mappings_card_ids).length.zero?
+    end
+
+    def register_dependent_card(card:, data:)
       Cache.hash_set(
-        @batch_id,
+        "#{@batch_id}_dependent_cards",
         card.id,
         data.to_hash,
       )
@@ -75,7 +87,7 @@ module CardDuplicatorMapper
     end
 
     def register_link_card(card)
-      store_card(
+      register_dependent_card(
         card,
         data: {
           type: :link_item,
@@ -89,7 +101,7 @@ module CardDuplicatorMapper
       end
 
       filters_having_within.each do |collection_filter|
-        add_to_map(
+        register_dependent_card(
           card,
           data: {
             type: :search_filter,
@@ -104,29 +116,33 @@ module CardDuplicatorMapper
   # TODO: May want to turn this into a worker-queued operation
   class UpdateAfterDuplication < SimpleService
     def call
-      all_mappings.each do |from_card_id, to_card_id|
+      all_mappings_by_card_id.each do |from_card_id, to_card_id|
         next unless card_needs_remapping?(from_card_id)
 
         data = Cache.hash_get(@batch_id, from_card_id)
+        unless defined?("remap_#{data['type']}")
+          raise "Card remapping not defined: #{data['type']}"
+        end
+
         send(
           "remap_#{data['type']}",
           from_card_id: from_card_id,
           to_card_id: to_card_id,
-          data: data
+          data: data,
         )
       end
+
+      clear_cached_data!
     end
 
     private
 
-    def all_mappings
-      CardDuplicatorMapper::MapDuplicatedRecord.all_mappings(@batch_id)
-    end
+    def card_needs_remapping?(from_card_id, to_card_id)
+      # Card is the same, no re-mapping needed
+      return false if from_card_id == to_card_id
 
-    def card_needs_remapping?(from_card_id)
-      Cache.hash_exists?(
-        @batch_id, from_card_id
-      )
+      # Check if the card was marked as dependent
+      dependent_card_id?(from_card_id: from_card_id)
     end
 
     def remap_search_filter(from_card_id:, to_card_id:, data:)

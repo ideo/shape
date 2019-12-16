@@ -43,7 +43,7 @@ class CollectionCardDuplicationWorker
       end
       # capture this for notification builder
       @from_collection ||= source_card.parent
-      duplicate = source_card.duplicate!(
+      duplicate_card = source_card.duplicate!(
         for_user: @for_user,
         parent: @parent_collection,
         placement: placement,
@@ -51,10 +51,12 @@ class CollectionCardDuplicationWorker
         synchronous: @synchronous,
         placeholder: placeholder,
       )
-      CardDuplicatorMapper::MapDuplicatedRecord.new(
-        from_card_id: source_card.id,
+      CardDuplicatorMapper::Base.new(
         batch_id: @batch_id,
-      ).set(duplicate.id)
+      ).map_duplication(
+        from_card_id: source_card.id,
+        to_card_id: duplicate_card.id,
+      )
     end
   end
 
