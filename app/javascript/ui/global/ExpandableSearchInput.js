@@ -39,6 +39,10 @@ const StyledExpandableSearchInput = styled.div`
     &::placeholder {
       color: ${v.colors.commonDark};
     }
+
+    &:disabled {
+      color: ${v.colors.commonDark};
+    }
   }
 
   .icon {
@@ -111,6 +115,7 @@ class ExpandableSearchInput extends React.Component {
   handleOpen = val => () => this.updateOpen(val)
 
   handleTextChange = ev => {
+    if (this.props.disabled) return
     this.props.onChange(ev.target.value)
   }
 
@@ -127,7 +132,7 @@ class ExpandableSearchInput extends React.Component {
   }
 
   render() {
-    const { value, background } = this.props
+    const { value, background, disabled, onClear, dataCy } = this.props
     const { open } = this
     return (
       <StyledExpandableSearchInput open={open} background={background}>
@@ -142,10 +147,14 @@ class ExpandableSearchInput extends React.Component {
           placeholder="search..."
           value={value}
           onChange={this.handleTextChange}
+          disabled={disabled}
+          data-cy={dataCy}
         />
-        <button open={open} onClick={this.handleClose} className="close">
-          <CloseIcon />
-        </button>
+        {!!onClear && (
+          <button open={open} onClick={this.handleClose} className="close">
+            <CloseIcon />
+          </button>
+        )}
       </StyledExpandableSearchInput>
     )
   }
@@ -154,21 +163,26 @@ class ExpandableSearchInput extends React.Component {
 ExpandableSearchInput.propTypes = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  onClear: PropTypes.func.isRequired,
+  onClear: PropTypes.func,
   onToggle: PropTypes.func,
   defaultOpen: PropTypes.bool,
   background: PropTypes.string,
   controlled: PropTypes.bool,
   open: PropTypes.bool,
+  disabled: PropTypes.bool,
+  dataCy: PropTypes.string,
 }
 
 ExpandableSearchInput.defaultProps = {
+  onClear: null,
   defaultOpen: false,
   forceClose: false,
   background: v.colors.commonLightest,
   onToggle: () => {},
   controlled: false,
   open: false,
+  disabled: false,
+  dataCy: '',
 }
 
 export default ExpandableSearchInput

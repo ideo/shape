@@ -6,7 +6,7 @@ import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
 import Pill from '~/ui/global/Pill'
-import StyledReactTags from './StyledReactTags'
+import StyledReactTags, { creativeDifferenceTagIcon } from './StyledReactTags'
 
 export const tagsInCommon = (records, tagField) => {
   const tags = []
@@ -50,6 +50,8 @@ class TagEditor extends React.Component {
       id,
       label,
       name: label,
+      symbol: creativeDifferenceTagIcon(label),
+      symbolSize: 18,
     }
     tag.onDelete = this.handleDelete(id)
     return tag
@@ -69,7 +71,8 @@ class TagEditor extends React.Component {
     this.error = ''
 
     // Return if tag is a duplicate
-    if (this.tags.find(t => t.name === newTag.name)) return
+    if (this.tags.find(t => t.name.toUpperCase() === newTag.name.toUpperCase()))
+      return
 
     // If a validateTag function is provided, validate tag
     if (validateTag) {
@@ -107,12 +110,13 @@ class TagEditor extends React.Component {
     if (this.tags.length === 0) {
       return 'No tags added.'
     }
-    const inner = this.tags.map(tag => (
-      <div key={tag.id} className="react-tags__selected-tag read-only">
-        <span className="react-tags__selected-tag-name">{tag.name}</span>
+    return (
+      <div className="react-tags__selected">
+        {this.tags.map(tag => (
+          <Pill key={tag.id} tag={tag} />
+        ))}
       </div>
-    ))
-    return <div className="react-tags__selected">{inner}</div>
+    )
   }
 
   render() {
