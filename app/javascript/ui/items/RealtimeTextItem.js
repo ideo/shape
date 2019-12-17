@@ -505,7 +505,7 @@ class RealtimeTextItem extends React.Component {
 
   _instanceDataContentUpdate = () => {
     const { item } = this.props
-    if (item.parent && item.parent.isMasterTemplate) {
+    if (item.parent && item.parent.isTemplate) {
       item.parent.API_backgroundUpdateTemplateInstances()
     }
   }
