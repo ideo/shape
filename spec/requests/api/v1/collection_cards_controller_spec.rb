@@ -937,6 +937,33 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           expect(combined_cards.first).to eq moving_cards.last
         end
       end
+
+      context 'with cards > bulk_operation_threshold' do
+        let(:placeholder) { create(:collection_card_placeholder) }
+        let(:moving_cards) { from_collection.collection_cards.first(3) }
+
+        before do
+          ENV['BULK_OPERATION_THRESHOLD'] = '3'
+        end
+        after do
+          ENV['BULK_OPERATION_THRESHOLD'] = nil
+        end
+
+        it 'should call perform_bulk_operation instead of CardMover' do
+          expect(CardMover).not_to receive(:new)
+          expect(BulkCardOperationProcessor).to receive(:call).with(
+            placement: 'beginning',
+            action: 'move',
+            cards: moving_cards,
+            to_collection: to_collection,
+            for_user: user,
+          ).and_return(placeholder)
+          patch(path, params: params)
+          expect(json['data']['attributes']).to match_json_schema('collection_card')
+          expect(json['data']['id']).to eq placeholder.id.to_s
+          expect(json['meta']).to eq('placeholder' => true)
+        end
+      end
     end
   end
 
@@ -1117,6 +1144,33 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           for_user: user,
         ).and_call_original
         post(path, params: params)
+      end
+
+      context 'with cards > bulk_operation_threshold' do
+        let(:placeholder) { create(:collection_card_placeholder) }
+        let(:moving_cards) { from_collection.collection_cards.first(3) }
+
+        before do
+          ENV['BULK_OPERATION_THRESHOLD'] = '3'
+        end
+        after do
+          ENV['BULK_OPERATION_THRESHOLD'] = nil
+        end
+
+        it 'should call perform_bulk_operation instead of CollectionCardDuplicator' do
+          expect(CollectionCardDuplicator).not_to receive(:call)
+          expect(BulkCardOperationProcessor).to receive(:call).with(
+            placement: placement,
+            action: 'duplicate',
+            cards: array_including(moving_cards),
+            to_collection: instance_of(Collection),
+            for_user: user,
+          ).and_return(placeholder)
+          post(path, params: params)
+          expect(json['data']['attributes']).to match_json_schema('collection_card')
+          expect(json['data']['id']).to eq placeholder.id.to_s
+          expect(json['meta']).to eq('placeholder' => true)
+        end
       end
     end
   end

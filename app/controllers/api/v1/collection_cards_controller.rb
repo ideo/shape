@@ -141,12 +141,19 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_moving_collections, only: %i[move]
   after_action :broadcast_moving_collection_updates, only: %i[move link]
   def move
+    placement = json_api_params[:placement]
     @card_action ||= 'move'
+    if @cards.count >= bulk_operation_threshold
+      return perform_bulk_operation(
+        placement: placement,
+        action: @card_action,
+      )
+    end
     mover = CardMover.new(
       from_collection: @from_collection,
       to_collection: @to_collection,
       cards: @cards,
-      placement: json_api_params[:placement],
+      placement: placement,
       card_action: @card_action,
     )
     if mover.call
@@ -170,6 +177,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
     placement = json_api_params[:placement]
+    if @cards.count >= bulk_operation_threshold
+      return perform_bulk_operation(
+        placement: placement,
+        action: 'duplicate',
+      )
+    end
+
     # notifications will get created in the worker that ends up running
     new_cards = CollectionCardDuplicator.call(
       to_collection: @to_collection,
@@ -183,6 +197,26 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   private
+
+  def perform_bulk_operation(placement:, action:)
+    card = BulkCardOperationProcessor.call(
+      placement: placement,
+      action: action,
+      cards: @cards,
+      to_collection: @to_collection,
+      for_user: current_user,
+    )
+    # card is the newly created placeholder
+    render jsonapi: card,
+           include: CollectionCard.default_relationships_for_api,
+           meta: { placeholder: true },
+           expose: { current_record: card.record }
+  end
+
+  def bulk_operation_threshold
+    # env var makes this more editable for tests
+    ENV.fetch('BULK_OPERATION_THRESHOLD') { CollectionCard::DEFAULT_PER_PAGE }.to_i
+  end
 
   def check_cache
     fresh_when(
@@ -320,6 +354,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     # Only notify for archiving of collections (and not link cards)
     return if card.link?
 
+    # TODO: this should be async!
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: card.record,
