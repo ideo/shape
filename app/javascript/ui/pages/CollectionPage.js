@@ -152,7 +152,7 @@ class CollectionPage extends React.Component {
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
     }
-    if (collection.collection_cards.length === 0) {
+    if (collection.isEmpty) {
       uiStore.openBlankContentTool()
     }
     if (undoStore.undoAfterRoute) {

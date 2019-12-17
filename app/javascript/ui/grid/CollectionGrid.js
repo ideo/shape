@@ -15,6 +15,8 @@ import { objectsEqual } from '~/utils/objectUtils'
 import CardMoveService from '~/ui/grid/CardMoveService'
 import v from '~/utils/variables'
 
+const cardMover = new CardMoveService()
+
 const StyledGrid = styled.div`
   min-height: ${props => props.minHeight}px;
   position: relative;
@@ -259,15 +261,11 @@ class CollectionGrid extends React.Component {
     })
   }
 
-  calculateOrderForMovingCard = (order, index) => {
-    return Math.ceil(order) + index
-  }
-
   onDragOrResizeStop = (cardId, dragType) => {
     const { hoveringOver, cards } = this.state
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
     const { original } = placeholder
-    const { uiStore, collection } = this.props
+    const { uiStore, collection, trackCollectionUpdated } = this.props
     const { cardAction, movingFromCollectionId } = uiStore
     this.clearDragTimeout()
     let moved = false
@@ -282,7 +280,7 @@ class CollectionGrid extends React.Component {
     if (draggingFromMDL) {
       if (!_.isEmpty(placeholder) && !movingWithinCollection) {
         const { order } = placeholder
-        CardMoveService.moveCards(Math.ceil(order))
+        cardMover.moveCards(Math.ceil(order))
         this.positionCardsFromProps()
         return
       }
@@ -298,57 +296,20 @@ class CollectionGrid extends React.Component {
       moved = !_.isEqual(placeholderPosition, originalPosition)
     }
 
-    const movingCards = _.filter(cards, card => _.includes(movingIds, card.id))
     if (moved) {
       // we want to update this card to match the placeholder
-      const { order } = placeholder
-      let { width, height } = placeholder
-      let undoMessage = 'Card move undone'
-      const updates = []
-      const { trackCollectionUpdated } = this.props
-
-      // don't resize the card for a drag, only for an actual resize
-      if (dragType === 'resize') {
-        // just some double-checking validations
-        if (height > 2) height = 2
-        if (width > 4) width = 4
-        // set up action to undo
-        if (original.height !== height || original.width !== width) {
-          undoMessage = 'Card resize undone'
-        }
-        updates.push({
-          card: original,
-          order,
-          width,
-          height,
-        })
-      }
-      if (movingIds.length > 0) {
-        // Set order for moved cards so they are between whole integers,
-        // and API_batchUpdateCards will properly set/reorder it amongst the collection
-        const sortedCards = _.sortBy(movingCards, 'order')
-        _.each(sortedCards, (card, idx) => {
-          const sortedOrder = this.calculateOrderForMovingCard(order, idx)
-          updates.push({
-            card,
-            order: sortedOrder,
-          })
-        })
-      }
-
-      const onConfirm = () => {
-        trackCollectionUpdated()
-      }
-      const onCancel = () => this.positionCardsFromProps()
-
-      // Perform batch update on all cards,
-      // and show confirmation if this is a template
-      collection.API_batchUpdateCardsWithUndo({
-        updates,
-        updateAllCards: true,
-        undoMessage,
-        onConfirm,
-        onCancel,
+      cardMover.updateCardsWithinCollection({
+        movingIds,
+        collection,
+        placeholder,
+        undoable: true,
+        action: dragType,
+        onConfirm: () => {
+          trackCollectionUpdated()
+        },
+        onCancel: () => {
+          this.positionCardsFromProps()
+        },
       })
       // this should happen right away, not waiting for the API call (since locally we have the updated cards' positions)
       this.positionCardsFromProps()
@@ -727,6 +688,15 @@ class CollectionGrid extends React.Component {
     return position
   }
 
+  get movingAllCards() {
+    const { collection, uiStore } = this.props
+    return (
+      uiStore.movingFromCollectionId === collection.id &&
+      uiStore.movingCardIds.length >= collection.collection_card_count &&
+      uiStore.cardAction === 'move'
+    )
+  }
+
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
@@ -741,13 +711,21 @@ class CollectionGrid extends React.Component {
       cols,
       shouldAddEmptyRow,
       canEditCollection,
+      uiStore,
     } = this.props
     const { currentOrder } = collection
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    if (collection.hasMore) this.addPaginationCard(cards)
+    if (this.movingAllCards) {
+      // show BCT when collection is emptied for moving all cards
+      uiStore.openBlankContentTool()
+    } else if (collection.hasMore) {
+      // check if we've selected all and moving all the cards,
+      // in which case there is no need to try to paginate
+      this.addPaginationCard(cards)
+    }
     let sortedCards = cards
     if (currentOrder === 'order') {
       // For most collections, we will be sorting by `order`. In that case we call

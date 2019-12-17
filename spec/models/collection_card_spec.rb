@@ -183,18 +183,18 @@ RSpec.describe CollectionCard, type: :model do
     let(:user) { create(:user) }
     let!(:collection_card) { create(:collection_card_text) }
     let(:shallow) { false }
-    let(:duplicate_linked_records) { false }
     let(:parent) { collection_card.parent }
     let(:placement) { 'end' }
     let(:system_collection) { false }
+    let(:placeholder) { nil }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
         parent: parent,
         shallow: shallow,
         placement: placement,
-        duplicate_linked_records: duplicate_linked_records,
         system_collection: system_collection,
+        placeholder: placeholder,
       )
     end
 
@@ -257,7 +257,6 @@ RSpec.describe CollectionCard, type: :model do
         collection_card.duplicate!(
           shallow: shallow,
           placement: placement,
-          duplicate_linked_records: duplicate_linked_records,
         )
       end
 
@@ -320,36 +319,7 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    context 'with linked card and duplicate_linked_records = true' do
-      let(:parent_collection_card) { create(:collection_card_collection) }
-      let(:collection) { parent_collection_card.collection }
-      let(:duplicate_linked_records) { true }
-      let!(:collection_card) { create(:collection_card_link, collection: collection) }
-
-      it 'should duplicate the underlying linked collection record' do
-        expect { duplicate }.to change(Collection, :count).by(1)
-        expect(duplicate.primary?).to be true
-        expect(duplicate.record.id).not_to eq(collection.id)
-      end
-
-      context 'when system_collection is set to true' do
-        let(:system_collection) { true }
-
-        it 'should call duplicate on the parent collection card with system_collection true' do
-          expect(parent_collection_card).to receive(:duplicate!).with(
-            for_user: anything,
-            parent: anything,
-            shallow: anything,
-            placement: anything,
-            system_collection: true,
-            synchronous: false,
-          )
-          duplicate
-        end
-      end
-    end
-
-    context 'with linked card and duplicate_linked_records = false' do
+    context 'with linked card' do
       let(:parent_collection_card) { create(:collection_card_collection) }
       let(:collection) { parent_collection_card.collection }
       let!(:collection_card) { create(:collection_card_link, collection: collection) }
@@ -400,6 +370,24 @@ RSpec.describe CollectionCard, type: :model do
             expect(duplicate.collection.template).to eq collection
           end
         end
+      end
+    end
+
+    context 'with placeholder' do
+      let!(:placeholder) { create(:collection_card_placeholder, item_id: 99, order: 5) }
+      let(:placement) { placeholder.order }
+
+      it 'should turn the placeholder into a primary card' do
+        expect(duplicate.id).to eq placeholder.id
+        expect(duplicate.order).to eq 5
+        expect(duplicate.primary?).to be true
+      end
+
+      it 'should create a new item and nullify the previous item_id' do
+        expect {
+          duplicate
+        }.to change(Item, :count).by(1)
+        expect(duplicate.item_id).not_to eq 99
       end
     end
 

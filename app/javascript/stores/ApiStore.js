@@ -406,10 +406,10 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   @action
-  clearUnpersistedThreads() {
+  clearUnpersistedThreads({ keepRecord } = {}) {
     this.findAll('comment_threads').forEach(ct => {
       // remove any old threads that didn't get persisted
-      if (!ct.persisted) {
+      if (!ct.persisted && (!keepRecord || ct.record !== keepRecord)) {
         this.__removeModel(ct)
       }
     })
@@ -473,7 +473,8 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async findOrBuildCommentThread(record) {
-    this.clearUnpersistedThreads()
+    // clear all *other* unpersisted threads
+    this.clearUnpersistedThreads({ keepRecord: record })
     let thread = this.findThreadForRecord(record)
     // first search for it via API
     try {
@@ -677,14 +678,12 @@ class ApiStore extends jsonapi(datxCollection) {
       })
       return
     }
-    // update UI for collection that cards were moved away from
-    await fromCollection.API_fetchCards()
-
     // reverse to and from values for potential undo operation
-    const reversedData = Object.assign({}, data, {
+    const reversedData = {
+      ...data,
       to_id: data.from_id,
       from_id: data.to_id,
-    })
+    }
 
     // add undo operation to stack so users can undo moving cards
     this.undoStore.pushUndoAction({
@@ -711,6 +710,7 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   linkCards(data) {
+    // TODO: currently no undo action for this
     return this.request('collection_cards/link', 'POST', data)
   }
 
@@ -724,6 +724,19 @@ class ApiStore extends jsonapi(datxCollection) {
       return
     }
     const collection = this.find('collections', data.to_id)
+    const { meta } = res
+    if (!meta.new_cards) {
+      // TODO: how to allow you to undo a bulk duplication?
+      // would probably require an API-based undo
+      this.undoStore.pushUndoAction({
+        message:
+          "Bulk duplication can't be undone. Please manually delete any records you wish to remove.",
+        apiCall: () => {},
+        actionType: POPUP_ACTION_TYPES.ALERT,
+      })
+      return res
+    }
+
     this.undoStore.pushUndoAction({
       message: 'Duplicate undone',
       apiCall: () =>

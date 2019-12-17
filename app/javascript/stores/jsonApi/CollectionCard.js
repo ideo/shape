@@ -1,7 +1,11 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 
-import { ITEM_TYPES, COLLECTION_TYPES } from '~/utils/variables'
+import {
+  ITEM_TYPES,
+  COLLECTION_TYPES,
+  COLLECTION_CARD_TYPES,
+} from '~/utils/variables'
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 
@@ -83,6 +87,10 @@ class CollectionCard extends BaseRecord {
     return this.pinned_and_locked
   }
 
+  get isLoadingPlaceholder() {
+    return this.type === COLLECTION_CARD_TYPES.PLACEHOLDER
+  }
+
   get parentCollection() {
     if (this.parent) return this.parent
     if (this.parent_id) {
@@ -92,10 +100,11 @@ class CollectionCard extends BaseRecord {
     return null
   }
 
-  get canEdit() {
+  get canMove() {
+    // basically replicating what's in Ability.rb
     return (
-      (this.link && this.can_edit_parent) ||
-      (this.record && this.record.can_edit)
+      !this.isPinnedAndLocked &&
+      (this.can_edit_parent || (this.record && this.record.can_edit))
     )
   }
 
@@ -225,13 +234,34 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  reselectOnlyEditableCards(cardIds = this.uiStore.selectedCardIds) {
+  reselectOnlyEditableRecords(cardIds = this.uiStore.selectedCardIds) {
     const { uiStore } = this
-    const filteredCardIds = this.apiStore
-      .findAll('collection_cards')
-      .filter(card => cardIds.indexOf(card.id) > -1 && card.canEdit)
-      .map(card => card.id)
+    const filteredCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card =>
+        _.includes(cardIds, card.id) &&
+        (card.link || (card.record && card.record.can_edit))
+    )
+    const filteredCardIds = _.map(filteredCards, 'id')
     const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
+    uiStore.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
+  reselectOnlyMovableCards(cardIds = this.uiStore.selectedCardIds) {
+    // NOTE: this will only *reject* ones that we know we can't move
+    const { uiStore } = this
+    const rejectCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card => _.includes(cardIds, card.id) && !card.canMove
+    )
+    if (rejectCards.length === 0) return
+
+    const rejectCardIds = _.map(rejectCards, 'id')
+    const filteredCardIds = _.reject(cardIds, id =>
+      _.includes(rejectCardIds, id)
+    )
+    const removedCount = rejectCardIds.length
     uiStore.reselectCardIds(filteredCardIds)
     return removedCount
   }
@@ -242,7 +272,7 @@ class CollectionCard extends BaseRecord {
     return _.some(
       this.apiStore.selectedCards,
       card =>
-        // look for any records you can't edit, that way this will trigger reselectOnlyEditableCards()
+        // look for any records you can't edit, that way this will trigger reselectOnlyEditableRecords()
         !card.record.can_edit ||
         // otherwise warn for collections w/ cards
         (!card.link &&
@@ -337,7 +367,7 @@ class CollectionCard extends BaseRecord {
           } = collection.confirmEditOptions)
         } else if (selectedCardIds.length > 1) {
           // check if multiple cards were selected
-          const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
+          const removedCount = this.reselectOnlyEditableRecords(selectedCardIds)
           prompt = 'Are you sure you want to delete '
           if (selectedCardIds.length > 1) {
             prompt += `these ${selectedCardIds.length} objects?`
