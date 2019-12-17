@@ -303,7 +303,11 @@ class CardCoverEditor extends React.Component {
     const { record } = this.props.card
     const { name } = record
     this.cardTitle = name || record.url
-    this.hardcodedSubtitle = record.subtitle
+    if (record.isCollection) {
+      this.hardcodedSubtitle = record.subtitle
+    } else if (record.isLink) {
+      this.hardcodedSubtitle = record.content
+    }
     this.subtitleHidden = record.subtitleHidden
   }
 
@@ -429,7 +433,7 @@ class CardCoverEditor extends React.Component {
                 />
               )}
               <MediumBreak />
-              {record.isCollection && (
+              {(record.isCollection || record.isLink) && (
                 <div>
                   <h3>Subtitle</h3>
                   <StyledEditTitle>

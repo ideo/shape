@@ -76,6 +76,11 @@ const SharedRecordMixin = superclass =>
         }
         this.cover.subtitle_hidden = subtitleHidden
         data.attributes.subtitle_hidden = subtitleHidden
+      } else if (this.isLink) {
+        if (hardcodedSubtitle !== this.content) {
+          data.attributes.content = hardcodedSubtitle
+          this.content = hardcodedSubtitle
+        }
       }
 
       // cancel sync so that name edits don't roundtrip and interfere with your <input>
