@@ -14,6 +14,7 @@ exports[`LegendItemCover renders snapshot 1`] = `
     <styled.span>
       <AreaChartIcon
         color="#de8f74"
+        isPrimary={true}
       />
     </styled.span>
     <Styled(SmallHelperText)
@@ -28,6 +29,7 @@ exports[`LegendItemCover renders snapshot 1`] = `
     <styled.span>
       <AreaChartIcon
         color="#c0dbde"
+        isPrimary={false}
       />
     </styled.span>
     <Styled(SmallHelperText)

@@ -205,5 +205,53 @@ describe Templateable, type: :concern do
         ).to eq(1)
       end
     end
+
+    context 'with updated text card from master template' do
+      let!(:template) do
+        create(:collection,
+               master_template: true,
+               num_cards: 1,
+               pin_cards: true,
+               created_by: template_admin,
+               add_editors: [template_admin])
+      end
+      let(:organization) { create(:organization) }
+      let!(:template_instance) { create(:collection, template: template, created_by: user) }
+      let(:template_text_item) { template.collection_cards.last.item }
+      let(:instance_text_item) { template_instance.collection_cards.last.item }
+      let(:data) do
+        Mashie.new(
+          delta: { ops: [{ insert: 'hi' }] },
+          version: 1,
+          full_content: { ops: [{ insert: 'hello hi' }] },
+        )
+      end
+
+      it 'should update instance text item data_content when it hasn\'t been updated' do
+        template_text_item.transform_realtime_delta(user: user,
+                                                    delta: data.delta,
+                                                    version: data.version,
+                                                    full_content: data.full_content)
+        template.update_template_instances
+        template_instance.collection_cards.reload
+        expect(instance_text_item.data_content['ops']).to eq(template_text_item.data_content['ops'])
+      end
+      context 'with an updated text card from master template' do
+        before do
+          template.update_template_instances
+          create(:activity, organization: organization, actor: user, action: :edited, target: instance_text_item)
+        end
+
+        it 'should not update instance text item data_content when it has been updated' do
+          template_text_item.transform_realtime_delta(user: user,
+                                                      delta: data.delta,
+                                                      version: data.version,
+                                                      full_content: data.full_content)
+          template.update_template_instances
+          template_instance.collection_cards.reload
+          expect(instance_text_item.data_content['ops']).not_to eq(template_text_item.data_content['ops'])
+        end
+      end
+    end
   end
 end

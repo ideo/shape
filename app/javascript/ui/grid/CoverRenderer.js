@@ -138,7 +138,7 @@ class CoverRenderer extends React.Component {
       isCoverItem,
       card: { record },
     } = this.props
-    if (isCoverItem) {
+    if (isCoverItem && !record.isCreativeDifferenceChartCover) {
       return (
         <PlainLink
           onClick={this.handleClickToCollection}

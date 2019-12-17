@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import {
@@ -131,6 +132,7 @@ class ChartGroup extends React.Component {
   get tierAxis() {
     const { tiers } = this.primaryDataset
     if (!tiers.length) return
+    const renderedColor = _.get(tiers[0], 'style.fill') || 'black'
     return (
       <VictoryAxis
         dependentAxis
@@ -142,7 +144,11 @@ class ChartGroup extends React.Component {
           axis: {
             stroke: 'transparent',
           },
-          grid: { stroke: 'black', strokeWidth: 0.8, strokeDasharray: [1, 1] },
+          grid: {
+            stroke: renderedColor,
+            strokeWidth: 0.8,
+            strokeDasharray: [1, 1],
+          },
           ticks: { padding: 10 },
         }}
         tickLabelComponent={
@@ -150,7 +156,7 @@ class ChartGroup extends React.Component {
             textAnchor="start"
             verticalAnchor="end"
             dy={-5}
-            style={{ fill: v.colors.black, fontSize: '20px' }}
+            style={{ fill: renderedColor, fontSize: '20px' }}
           />
         }
       />
@@ -174,7 +180,6 @@ class ChartGroup extends React.Component {
         isSmallChartStyle: this.isSmallChartStyle,
       })
     }
-
     return <VictoryAxis {...axisProps} />
   }
 
@@ -185,7 +190,7 @@ class ChartGroup extends React.Component {
     </NotEnoughDataContainer>
   )
 
-  renderDataset = (dataset, index, total) => {
+  renderDataset = (dataset, index, total, colorOrder) => {
     const { simpleDateTooltip, width, height } = this.props
     const order = index
     let modifiedChartType = dataset.chart_type
@@ -195,7 +200,11 @@ class ChartGroup extends React.Component {
       dataset !== this.primaryDataset &&
       this.primaryDataset.chart_type === 'area'
     ) {
-      modifiedChartType = 'line'
+      if (dataset.hasDates) {
+        modifiedChartType = 'area'
+      } else {
+        modifiedChartType = 'line'
+      }
     }
     const dashWidth = index * 2
     switch (modifiedChartType) {
@@ -204,6 +213,7 @@ class ChartGroup extends React.Component {
           dataset,
           simpleDateTooltip,
           order,
+          colorOrder,
           cardArea: width * height,
           domain: this.chartDomain,
         })
@@ -236,19 +246,27 @@ class ChartGroup extends React.Component {
 
   get renderedDatasets() {
     let datasetIndex = 0
+    let colorOrder = 0
     const datasets = [
       this.renderDataset(
         this.primaryDataset,
         datasetIndex,
-        this.totalBarsPerGroup
+        this.totalBarsPerGroup,
+        colorOrder
       ),
     ]
     if (!this.secondaryDatasetsWithData) return datasets
-    this.secondaryDatasetsWithData.forEach(dataset =>
+    this.secondaryDatasetsWithData.forEach(dataset => {
+      if (dataset.hasDates) colorOrder += 1
       datasets.push(
-        this.renderDataset(dataset, (datasetIndex += 1), this.totalBarsPerGroup)
+        this.renderDataset(
+          dataset,
+          (datasetIndex += 1),
+          this.totalBarsPerGroup,
+          colorOrder
+        )
       )
-    )
+    })
     return datasets
   }
 
@@ -279,7 +297,9 @@ class ChartGroup extends React.Component {
       <VictoryChart
         theme={victoryTheme}
         padding={{ top: 0, left: 0, right: 0, bottom: 8 }}
-        containerComponent={<VictoryVoronoiContainer />}
+        containerComponent={
+          <VictoryVoronoiContainer portalZIndex={v.zIndex.gridCard} />
+        }
         scale={{ x: 'time' }}
         domain={this.chartDomain}
       >

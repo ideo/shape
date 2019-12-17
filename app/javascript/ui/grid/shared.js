@@ -198,6 +198,11 @@ export const StyledCardWrapper = styled.div`
   ${props => props.dragging && 'position: absolute;'}
   ${props => props.hidden && 'display: none;'}
   ${props => props.moving && mdlPillPlaceholderCss}
+  /* NOTE: for react draggable to scroll when dragging on a touch device, may not work for IE */
+  /* See: https://github.com/mzabriskie/react-draggable/issues/227 */
+  .react-draggable {
+    touch-action: auto !important;
+  }
 `
 StyledCardWrapper.defaultProps = {
   zIndex: 1,
@@ -209,7 +214,7 @@ export const StyledGridCardInner = styled.div`
   ${props =>
     !props.hasOverflow &&
     `
-  overflow: hidden;
+  overflow: ${props => (props.visibleOverflow ? 'visible' : 'hidden')};
   `} z-index: 1;
   ${props =>
     !props.isText &&
@@ -291,6 +296,13 @@ StyledTopRightActions.defaultProps = {
   color: v.colors.commonMedium,
 }
 StyledTopRightActions.displayName = 'StyledTopRightActions'
+
+export const BottomRightActionHolder = styled.div`
+  bottom: 20px;
+  right: 10px;
+  position: absolute;
+  z-index: ${v.zIndex.gridCardTop};
+`
 
 export class GridCardIconWithName extends React.PureComponent {
   render() {

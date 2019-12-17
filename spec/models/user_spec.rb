@@ -183,7 +183,7 @@ describe User, type: :model do
             picture: 'http://new.img.url',
             picture_large: 'http://new.img.url/large',
             locale: 'es',
-            username: 'bob-smith',
+            username: 'bob-smith'
           }
         end
 
@@ -253,15 +253,15 @@ describe User, type: :model do
           email: Faker::Internet.unique.email,
           first_name: Faker::Name.first_name,
           last_name: Faker::Name.last_name,
-          image: 'http://pic.url.net',
+          image: 'http://pic.url.net'
         },
         extra: {
           raw_info: {
             picture: 'http://pic.url.net',
             picture_medium: 'http://pic.url.net/med',
             picture_large: 'http://pic.url.net/lg',
-            locale: 'es',
-          },
+            locale: 'es'
+          }
         },
       )
     end
@@ -303,7 +303,7 @@ describe User, type: :model do
           provider: 'ideo',
           uid: '123',
           info: {
-            email: Faker::Internet.unique.email,
+            email: Faker::Internet.unique.email
           },
           extra: {
             raw_info: {
@@ -311,8 +311,8 @@ describe User, type: :model do
               type: 'User::Limited',
               picture: 'http://pic.url.net',
               picture_medium: 'http://pic.url.net/med',
-              picture_large: 'http://pic.url.net/lg',
-            },
+              picture_large: 'http://pic.url.net/lg'
+            }
           },
         )
       end
@@ -629,7 +629,7 @@ describe User, type: :model do
     end
 
     context 'with active user who has not accepted their org terms' do
-      let(:organization) { create(:organization, terms_version: 2, terms_text_item: create(:text_item))}
+      let(:organization) { create(:organization, terms_version: 2, terms_text_item: create(:text_item)) }
       let(:user) { create(:user, terms_accepted: false, current_organization: organization) }
 
       it 'allows read only access to content' do
@@ -763,7 +763,7 @@ describe User, type: :model do
       it 'is first incentive created_at + waiting period' do
         expect(user.incentive_owed_account_balance.to_f).to eq(unpaid_survey_response.potential_incentive)
         expect(user.incentive_paid_account_balance.to_f).to eq(paid_survey_response.amount_earned)
-        expect(user.incentive_due_date).to be_within(0.1).of(
+        expect(user.incentive_due_date).to be_within(0.6).of(
           prev_survey_completed_at + Audience::PAYMENT_WAITING_PERIOD,
         )
       end

@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import { apiUrl } from '~/utils/url'
 import BaseRecord from './BaseRecord'
 import SharedRecordMixin from './SharedRecordMixin'
@@ -12,15 +14,25 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
 
   get dataWithDates() {
     if (!this.data) return []
+    const today = new Date()
 
     return this.data.map(datum => {
       const d = { ...datum }
       // Turn date strings into real dates
       if (d.date) {
         d.date = new Date(d.date)
+        // Constrain any future date to today (Creative Difference sends dates
+        // based on a whole quarter)
+        if (d.date > today) {
+          d.date = today
+        }
       }
       return d
     })
+  }
+
+  get hasDates() {
+    return _.some(this.dataWithDates, datum => datum.date)
   }
 
   get isEmojiOrScaleQuestion() {

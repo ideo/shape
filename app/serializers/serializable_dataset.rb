@@ -19,17 +19,8 @@ class SerializableDataset < BaseJsonSerializer
     :data_source_type,
     :groupings,
     :tiers,
+    :style,
   )
 
   belongs_to :data_source
-
-  attribute :style do
-    if @object.order.blank? || @object.order.zero? || @object.style.blank?
-      @object.style
-    else
-      @object.style.symbolize_keys.merge(
-        fill: '#000000',
-      )
-    end
-  end
 end

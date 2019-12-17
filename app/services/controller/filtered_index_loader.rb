@@ -49,6 +49,7 @@ module Controller
 
     def apply_filters
       return if @filter.empty?
+
       filter_id
       filter_uid
       filter_external_id
@@ -65,6 +66,7 @@ module Controller
 
     def filter_id
       return if @filter[:id].blank?
+
       @results = @results.where(
         id: @filter[:id],
       )
@@ -72,6 +74,7 @@ module Controller
 
     def filter_uid
       return if @filter[:uid].blank?
+
       @results = @results.where(
         uid: @filter[:uid],
       )

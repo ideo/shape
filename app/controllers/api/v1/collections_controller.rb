@@ -62,6 +62,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render_collection
   end
 
+  load_and_authorize_resource only: %i[background_update_template_instances]
+  def background_update_template_instances
+    render json: { success: false } unless @collection.master_template
+
+    @collection.queue_update_template_instances
+    render json: { success: true }
+  end
+
+
   before_action :load_and_authorize_collection_destroy, only: %i[destroy]
   def destroy
     if @collection.destroy
@@ -245,6 +254,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :hardcoded_subtitle,
       :subtitle_hidden,
       :test_show_media,
+      :search_term,
       collection_cards_attributes: %i[id order width height row col],
     ].concat(Collection.globalize_attribute_names)
   end

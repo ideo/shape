@@ -72,7 +72,15 @@ Cypress.Commands.add(
         type = 'collection'
         break
     }
-    cy.selectBctType({ type, empty })
+    if (collectionType === 'searchCollection') {
+      cy.selectPopoutTemplateBctType({
+        type: 'searchCollection',
+        order: 'first',
+        empty: false,
+      })
+    } else {
+      cy.selectBctType({ type, empty })
+    }
     // force == don't care if it's "covered by tooltip"
     cy.locate('CollectionCreatorTextField').type(name, {
       force: true,
@@ -116,6 +124,13 @@ Cypress.Commands.add('createCard', cardType => {
     case 'template':
       cy.selectPopoutTemplateBctType({
         type: 'template',
+        order: 'first',
+        empty: false,
+      })
+      break
+    case 'searchCollection':
+      cy.selectPopoutTemplateBctType({
+        type: 'searchCollection',
         order: 'first',
         empty: false,
       })
@@ -228,6 +243,12 @@ Cypress.Commands.add(
         cy.locate('PopoutMenu_createReport')
           .first()
           .click({ force: true })
+        return
+      case 'searchCollection':
+        cy.locate('PopoutMenu_createSearchCollection')
+          .first()
+          .click({ force: true })
+        return
         return
       case 'submissionBox':
         cy.locate('PopoutMenu_createSubmissionBox')

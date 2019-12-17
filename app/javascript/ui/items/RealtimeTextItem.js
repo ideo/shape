@@ -116,6 +116,10 @@ class RealtimeTextItem extends React.Component {
     this.reactQuillRef = undefined
     this.quillEditor = undefined
     this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 200)
+    this.instanceDataContentUpdate = _.debounce(
+      this._instanceDataContentUpdate,
+      30000
+    )
     this.sendCursor = _.throttle(this._sendCursor, 100)
   }
 
@@ -306,16 +310,12 @@ class RealtimeTextItem extends React.Component {
 
   get quillData() {
     const { item } = this.props
-    const quillData = toJS(item.quill_data)
+    const quillData = toJS(item.quill_data) || {}
+    if (!quillData.ops) quillData.ops = []
     // Set initial font size - if text item is blank,
     // and user has chosen a h* tag (e.g. h1)
     // (p tag does not require any ops changes)
-    if (
-      quillData &&
-      quillData.ops &&
-      quillData.ops.length === 0 &&
-      this.headerSize
-    ) {
+    if (quillData.ops.length === 0 && this.headerSize) {
       quillData.ops.push({
         insert: '\n',
         attributes: { header: this.headerSize },
@@ -330,6 +330,7 @@ class RealtimeTextItem extends React.Component {
     // mark this as it may get called again from unmount, only want to cancel once
     this.canceled = true
     this.sendCombinedDelta.flush()
+    this.instanceDataContentUpdate.flush()
     // NOTE: cancel also means "save current text"!
     // event is passed through because TextItemCover uses it
     if (!this.canEdit) return onCancel({ item: this.props.item, ev, route })
@@ -383,10 +384,7 @@ class RealtimeTextItem extends React.Component {
     const newlineOpIndices = this.newlineIndicesForDelta(delta)
     // Return if there wasn't a specified header size in previous newline operation
     const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
-    if (!prevHeaderSizeOp.attributes || !prevHeaderSizeOp.attributes.header) {
-      return null
-    }
-    return prevHeaderSizeOp.attributes.header
+    return _.get(prevHeaderSizeOp, 'attributes.header')
   }
 
   adjustHeaderSizeIfNewline = delta => {
@@ -438,6 +436,7 @@ class RealtimeTextItem extends React.Component {
 
     this.combineAwaitingDeltas(newDelta)
     this.sendCombinedDelta()
+    this.instanceDataContentUpdate()
   }
 
   handleSelectionChange = (range, source, editor) => {
@@ -502,6 +501,13 @@ class RealtimeTextItem extends React.Component {
     // our combinedDelta won't clear out until we know it has successfully sent
     this.bufferDelta = new Delta()
     return this.combinedDelta
+  }
+
+  _instanceDataContentUpdate = () => {
+    const { item } = this.props
+    if (item.parent && item.parent.isTemplate) {
+      item.parent.API_backgroundUpdateTemplateInstances()
+    }
   }
 
   socketSend = (method, data) => {
