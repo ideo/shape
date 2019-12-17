@@ -15,11 +15,11 @@ global.IdeoSSO = {
 
 describe('Filtering', function() {
   let currentOrganization,
-      currentUser,
-      genericFilter,
-      collection,
-      props,
-      wrapper
+    currentUser,
+    genericFilter,
+    collection,
+    props,
+    wrapper
 
   fetchMock.get(
     '/api/v1/organizations/2/tags',
@@ -52,7 +52,6 @@ describe('Filtering', function() {
     }
     wrapper = mount(<CollectionFilter {...props} />)
   })
-
 
   it('should render the collection filter', () => {
     expect(wrapper.length).toBe(1)
