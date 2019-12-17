@@ -8,8 +8,6 @@ import { NamedActionButton } from '~/ui/global/styled/buttons'
 import v from '~/utils/variables'
 
 const Holder = styled.div`
-  display: inline-block;
-  position: absolute;
 `
 
 const EditButton = styled(NamedActionButton)`
