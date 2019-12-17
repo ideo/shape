@@ -16,11 +16,15 @@ beforeEach(async () => {
   // const fakeApiStore = Object.assign({}, apiStore, {
   //   request: jest.fn(),
   // })
-  collection = await Factory.create('collection', {
-    name: 'Some collection',
-    id: '2',
-    class_type: 'Collection::SearchCollection',
-  }, apiStore)
+  collection = await Factory.create(
+    'collection',
+    {
+      name: 'Some collection',
+      id: '2',
+      class_type: 'Collection::SearchCollection',
+    },
+    apiStore
+  )
 
   uiStore = fakeUiStore
   collection.search_term = 'plants'
@@ -86,7 +90,9 @@ describe('SearchCollection', () => {
   describe('componentDidMount()', () => {
     it('should load the searched cards', () => {
       expect(apiStore.request).toHaveBeenCalled()
-      expect(apiStore.request).toHaveBeenCalledWith('organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20')
+      expect(apiStore.request).toHaveBeenCalledWith(
+        'organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20'
+      )
     })
   })
 
@@ -111,9 +117,7 @@ describe('SearchCollection', () => {
 
   describe('loadSearchedCards', () => {
     beforeEach(() => {
-      apiStore.request.mockReturnValue(Promise.resolve([
-        collectionCardJson
-      ]))
+      apiStore.request.mockReturnValue(Promise.resolve([collectionCardJson]))
     })
 
     describe('when on a new page', () => {
@@ -123,7 +127,9 @@ describe('SearchCollection', () => {
 
       it('should search for new results', () => {
         expect(apiStore.request).toHaveBeenCalled()
-        expect(apiStore.request).toHaveBeenCalledWith('organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20')
+        expect(apiStore.request).toHaveBeenCalledWith(
+          'organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20'
+        )
       })
     })
 
@@ -134,7 +140,9 @@ describe('SearchCollection', () => {
 
       it('should search for new results', () => {
         expect(apiStore.request).toHaveBeenCalled()
-        expect(apiStore.request).toHaveBeenCalledWith('organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20')
+        expect(apiStore.request).toHaveBeenCalledWith(
+          'organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20'
+        )
       })
     })
   })
