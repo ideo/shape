@@ -12,11 +12,7 @@ global.IdeoSSO = {
 }
 
 describe('Filtering', function() {
-  let currentOrganization,
-    genericFilter,
-    collection,
-    props,
-    wrapper
+  let currentOrganization, genericFilter, collection, props, wrapper
 
   fetchMock.get(
     '/api/v1/organizations/2/tags',
