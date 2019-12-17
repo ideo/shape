@@ -6,13 +6,16 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-
 import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
-import { TextButton } from '~/ui/global/styled/buttons'
+import { TextButton, FormButton } from '~/ui/global/styled/buttons'
 import { Checkbox } from '~/ui/global/styled/forms'
-import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
+import {
+  SpecialDisplayHeading,
+  DisplayText,
+} from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import CardMoveService from '~/ui/grid/CardMoveService'
 
 const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
@@ -53,6 +56,29 @@ const StyledDialogContent = styled(DialogContent)`
   }
 `
 
+const AddToMyCollectionButton = styled(FormButton)`
+  font-family: ${v.fonts.sans};
+  font-weight: ${v.weights.medium};
+  font-size: 12px;
+  margin-bottom: 12px;
+  min-width: 250px;
+`
+AddToMyCollectionButton.displayName = 'LetMeButton'
+
+const LetMeButton = styled(FormButton)`
+  border: 1px solid ${v.colors.commonDark};
+  color: ${v.colors.commonDark};
+  font-family: ${v.fonts.sans};
+  font-weight: ${v.weights.medium};
+  font-size: 12px;
+  margin-top: 8px;
+`
+LetMeButton.displayName = 'LetMeButton'
+
+const ModalButtons = styled.div`
+  margin-top: 18px;
+`
+
 @inject('uiStore')
 @observer
 class MoveHelperModal extends React.Component {
@@ -69,6 +95,15 @@ class MoveHelperModal extends React.Component {
   }
 
   @action
+  handleAddToMyCollection = e => {
+    const { uiStore, currentUser } = this.props
+    uiStore.cardAction = 'useTemplate'
+    CardMoveService.useTemplate('end', {
+      to_id: currentUser.current_user_collection_id,
+    })
+  }
+
+  @action
   handleSubmit = e => {
     e.preventDefault()
     const { currentUser, type, uiStore } = this.props
@@ -80,7 +115,7 @@ class MoveHelperModal extends React.Component {
   }
 
   get helperText() {
-    const { type, recordName } = this.props
+    const { type } = this.props
     let text = ''
     if (type === 'move') {
       text = `
@@ -88,16 +123,34 @@ class MoveHelperModal extends React.Component {
         you can navigate to another collection to place the items there?
       `
     } else if (type === 'template') {
-      text = `
-        Did you know? You can navigate to wherever you would like to place
-        "${recordName}", and use the up or down arrows to place it at the top or
-        bottom of the collection.
-      `
+      text = 'Where would you like to place your template?'
     }
     return text
   }
 
+  get renderModalButtons() {
+    return (
+      <div>
+        <div>
+          <DisplayText>Recommended when getting started</DisplayText>
+        </div>
+        <ModalButtons>
+          <AddToMyCollectionButton onClick={this.handleAddToMyCollection}>
+            Add to my collection
+          </AddToMyCollectionButton>
+          <div>
+            <DisplayText>or</DisplayText>
+          </div>
+          <LetMeButton disabledHover color={v.colors.transparent}>
+            Let me place it
+          </LetMeButton>
+        </ModalButtons>
+      </div>
+    )
+  }
+
   render() {
+    const { currentUser, type } = this.props
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
@@ -119,6 +172,9 @@ class MoveHelperModal extends React.Component {
             <StyledSpecialDisplayHeading>
               {this.helperText}
             </StyledSpecialDisplayHeading>
+            {currentUser.show_template_helper &&
+              type == 'template' &&
+              this.renderModalButtons}
             <FormControl component="fieldset" required>
               <FormControlLabel
                 classes={{ label: 'form-control' }}
@@ -132,17 +188,18 @@ class MoveHelperModal extends React.Component {
                 }
                 label="Thanks, please don't show me this message again."
               />
-              <div style={{ height: '54px' }} />
             </FormControl>
 
-            <div className="button--center">
-              <TextButton
-                data-cy="MoveHelperModal-button"
-                disabled={this.isLoading}
-              >
-                Close
-              </TextButton>
-            </div>
+            {!(currentUser.show_template_helper && type == 'template') && (
+              <div className="button--center">
+                <TextButton
+                  data-cy="MoveHelperModal-button"
+                  disabled={this.isLoading}
+                >
+                  Close
+                </TextButton>
+              </div>
+            )}
           </form>
         </StyledDialogContent>
       </StyledDialog>

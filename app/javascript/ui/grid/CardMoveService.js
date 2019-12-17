@@ -16,6 +16,10 @@ export default class CardMoveService {
     return new this().moveErrors()
   }
 
+  static async useTemplate(placement, overrideData = {}) {
+    return new this().moveCards(placement, overrideData)
+  }
+
   async moveCards(placement, overrideData = {}) {
     const { apiStore, uiStore } = this
     const { viewingCollection, cardAction } = uiStore
