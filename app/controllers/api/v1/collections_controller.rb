@@ -43,9 +43,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   after_action :broadcast_collection_updates, only: %i[update]
   def update
-    p '*' * 100
-    p collection_params
-    p '*' * 100
     updated = CollectionUpdater.call(@collection, collection_params)
     if updated
       log_collection_activity(:edited) if log_activity?
