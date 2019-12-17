@@ -1,19 +1,24 @@
 import PropTypes from 'prop-types'
-import { VictoryArea } from 'victory'
+import { VictoryArea, VictoryLabel } from 'victory'
 
 import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
 import {
+  darkenColor,
   datasetPropType,
   dateTooltipText,
+  tierTooltipLabel,
   advancedTooltipText,
   domainProps,
   formatValuesForVictory,
+  themeLabelStyles,
 } from '~/ui/global/charts/ChartUtils'
 
-const chartStyle = style => {
+const chartStyle = (style, order) => {
   if (style.fill) {
+    const darkFill = darkenColor(style.fill, order)
+    const opacity = 0.8
     return {
-      data: { fill: style.fill },
+      data: { fill: darkFill, opacity },
       labels: {
         fontSize: 18,
       },
@@ -27,14 +32,36 @@ const chartStyle = style => {
   }
 }
 
+const createTooltipLabelComponent = () => {
+  const baseStyle = Object.assign({}, themeLabelStyles, {
+    fill: 'white',
+    fontSize: 16,
+    textTransform: 'none',
+  })
+  const style = [
+    Object.assign({}, baseStyle, {
+      fontSize: 26,
+      fontWeight: 'bold',
+    }),
+  ]
+  // Have to assign the base style for each subsequent line as Victory will
+  // otherwise think that the first style is the default style
+  Array(5)
+    .fill()
+    .forEach((_, i) => style.push(baseStyle))
+
+  return <VictoryLabel style={style} lineHeight={1.3} dy={10} />
+}
+
 const AreaChart = ({
   dataset,
   order,
+  colorOrder,
   simpleDateTooltip,
   domain,
   cardArea = 1,
 }) => {
-  const { measure, timeframe, dataWithDates } = dataset
+  const { measure, timeframe, dataWithDates, tiers } = dataset
   // Add dates to data if there are none
   const values = formatValuesForVictory({
     values: dataWithDates || [],
@@ -42,7 +69,14 @@ const AreaChart = ({
     addEndDate: dataWithDates[0].date ? null : domain.x[1],
   })
   let tooltipFn
-  if (simpleDateTooltip) {
+  let tooltipLabelComponent = <VictoryLabel />
+  if (dataset.tiers.length > 0) {
+    tooltipLabelComponent = createTooltipLabelComponent()
+  }
+
+  if (dataset.tiers.length > 0) {
+    tooltipFn = datum => tierTooltipLabel({ tiers, dataset, datum })
+  } else if (simpleDateTooltip) {
     tooltipFn = datum => dateTooltipText(datum, dataset.name)
   } else {
     tooltipFn = (datum, isLastDataPoint) =>
@@ -55,7 +89,7 @@ const AreaChart = ({
   }
   return (
     <VictoryArea
-      style={chartStyle(dataset.style || {})}
+      style={chartStyle(dataset.style || {}, colorOrder)}
       labels={d => d.value}
       labelComponent={
         <TickLabelWithTooltip
@@ -63,6 +97,8 @@ const AreaChart = ({
           labelTextRenderer={datum => `${datum.value}`}
           cardArea={cardArea}
           fontSize={cardArea === 1 ? 18 : 9}
+          tooltipLabelComponent={tooltipLabelComponent}
+          neverShowLabels
         />
       }
       domain={domain}
@@ -77,6 +113,7 @@ const AreaChart = ({
 AreaChart.propTypes = {
   dataset: datasetPropType.isRequired,
   order: PropTypes.number.isRequired,
+  colorOrder: PropTypes.number.isRequired,
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
   domain: domainProps.isRequired,

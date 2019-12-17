@@ -126,4 +126,12 @@ const updateEnvironment = flow(
   process.env.ANALYZE ? addBundleAnalyzerPlugin : identity
 )
 
+// just using default code-splitting config
+// https://webpack.js.org/guides/code-splitting/
+environment.splitChunks((config) => Object.assign({}, config, {
+  optimization: {
+    splitChunks: { chunks: 'all' }
+  }
+}))
+
 module.exports = updateEnvironment(environment)

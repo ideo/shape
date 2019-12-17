@@ -7,7 +7,7 @@ import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import XIcon from '~/ui/icons/XIcon'
 import v from '~/utils/variables'
-import { colorScale } from '~/ui/global/charts/ChartUtils'
+import { colorScale, darkenColor } from '~/ui/global/charts/ChartUtils'
 import {
   DisplayText,
   Heading3,
@@ -71,6 +71,7 @@ const UnselectDataset = styled(DisplayText)`
 UnselectDataset.displayName = 'UnselectDataset'
 
 const AreaChartIcon = styled.span`
+  opacity: 0.8;
   display: inline-block;
   width: 100%;
   height: 100%;
@@ -137,7 +138,12 @@ class LegendItemCover extends React.Component {
 
   rendersAsLine(selectedDataset, isPrimary) {
     if (selectedDataset.chart_type === 'line') return true
-    if (selectedDataset.chart_type === 'area' && !isPrimary) return true
+    if (
+      selectedDataset.chart_type === 'area' &&
+      !isPrimary &&
+      !selectedDataset.hasDates
+    )
+      return true
     return false
   }
 
@@ -334,7 +340,7 @@ class LegendItemCover extends React.Component {
     }
   }
 
-  renderSelectedDataset = ({ dataset, order }) => {
+  renderSelectedDataset = ({ dataset, order, colorOrder }) => {
     if (!dataset) return ''
     const { identifier, name, style } = dataset
     const primary = order === 0
@@ -349,12 +355,21 @@ class LegendItemCover extends React.Component {
     } else {
       const { item } = this.props
       const itemStyle = item.style
-      let color = style && style.fill ? style.fill : colorScale[order]
+      let renderedColor =
+        style && style.fill
+          ? darkenColor(style.fill, colorOrder)
+          : colorScale[order]
       // Style on the item itself should aways override dataset style.
       if (itemStyle && itemStyle.fill) {
-        color = itemStyle.fill
+        renderedColor = itemStyle.fill
       }
-      icon = <AreaChartIcon color={color} />
+      icon = (
+        <AreaChartIcon
+          color={renderedColor}
+          isPrimary={primary}
+          data-dataset-id={dataset.id}
+        />
+      )
     }
     return (
       <Dataset key={`dataset-${identifier}`}>
@@ -376,6 +391,7 @@ class LegendItemCover extends React.Component {
     const { item } = this.props
     const { comparisonMenuOpen } = this.state
     let order = -1
+    let colorOrder = -1
     return (
       <StyledLegendItem
         data-cy="LegendItemCover"
@@ -384,12 +400,14 @@ class LegendItemCover extends React.Component {
         }
       >
         <StyledLegendTitle>{item.name}</StyledLegendTitle>
-        {this.datasets({ selected: true }).map(dataset =>
-          this.renderSelectedDataset({
+        {this.datasets({ selected: true }).map(dataset => {
+          if (dataset.hasDates) colorOrder += 1
+          return this.renderSelectedDataset({
             dataset,
             order: (order += 1),
+            colorOrder,
           })
-        )}
+        })}
         <br />
         <StyledAddComparison>
           {comparisonMenuOpen && this.renderComparisonMenu}

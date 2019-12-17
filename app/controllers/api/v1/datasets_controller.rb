@@ -118,9 +118,10 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :external_id,
       :anyone_can_view,
       style: {},
-      tiers: %i[
-        value
-        name
+      tiers: [
+        :value,
+        :name,
+        style: {},
       ],
       cached_data: %i[
         value

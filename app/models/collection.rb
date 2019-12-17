@@ -16,6 +16,7 @@
 #  master_template            :boolean          default(FALSE)
 #  name                       :string
 #  processing_status          :integer
+#  search_term                :string
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
 #  submissions_enabled        :boolean          default(TRUE)
@@ -101,7 +102,8 @@ class Collection < ApplicationRecord
                  :getting_started_shell,
                  :loading_content,
                  :cached_inheritance,
-                 :common_viewable
+                 :common_viewable,
+                 :broadcasting
 
   # validations
   validates :name, presence: true
@@ -761,6 +763,7 @@ class Collection < ApplicationRecord
   def submit_submission!
     return unless submission?
 
+    cached_inheritance['private'] = false
     # have to unset this before we can call MergeToChild
     submission_attrs['hidden'] = false
     result = save
@@ -905,6 +908,10 @@ class Collection < ApplicationRecord
 
   def awaiting_updates?
     getting_started_shell || loading_content
+  end
+
+  def broadcasting?
+    broadcasting.present?
   end
 
   # =================================
