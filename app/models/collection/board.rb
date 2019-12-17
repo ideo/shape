@@ -11,6 +11,7 @@
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
 #  cached_test_scores         :jsonb
+#  collection_type            :integer          default("collection")
 #  cover_type                 :integer          default("cover_type_default")
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
