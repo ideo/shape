@@ -688,6 +688,15 @@ class CollectionGrid extends React.Component {
     return position
   }
 
+  get movingAllCards() {
+    const { collection, uiStore } = this.props
+    return (
+      uiStore.movingFromCollectionId === collection.id &&
+      uiStore.movingCardIds.length >= collection.collection_card_count &&
+      uiStore.cardAction === 'move'
+    )
+  }
+
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
@@ -709,10 +718,7 @@ class CollectionGrid extends React.Component {
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    const movingAllCards =
-      uiStore.movingFromCollectionId === collection.id &&
-      uiStore.movingCardIds.length >= collection.collection_card_count
-    if (movingAllCards) {
+    if (this.movingAllCards) {
       // show BCT when collection is emptied for moving all cards
       uiStore.openBlankContentTool()
     } else if (collection.hasMore) {

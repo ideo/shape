@@ -6,7 +6,11 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 
 import { fakeTextItem, fakeCollection, fakeItemCard } from '#/mocks/data'
 
-let props, wrapper
+let props, wrapper, component
+const rerender = () => {
+  wrapper = shallow(<CollectionGrid.wrappedComponent {...props} />)
+  component = wrapper.instance()
+}
 beforeEach(() => {
   props = {
     collection: fakeCollection,
@@ -26,7 +30,7 @@ beforeEach(() => {
       push: jest.fn(),
     },
   }
-  wrapper = shallow(<CollectionGrid.wrappedComponent {...props} />)
+  rerender()
 })
 
 describe('CollectionGrid', () => {
@@ -65,5 +69,36 @@ describe('CollectionGrid', () => {
     })
     // it does re-render with a change to cardProperties
     expect(wrapper.find('MovableGridCard[cardType="items"]').length).toBe(1)
+  })
+
+  describe('movingAllCards', () => {
+    beforeEach(() => {
+      props.collection.collection_card_count = 3
+      props.uiStore.movingFromCollectionId = props.collection.id
+      props.uiStore.movingCardIds = ['1', '2', '3']
+    })
+
+    describe('moving within the same collection', () => {
+      it('returns true if moving all cards in the collection', () => {
+        props.uiStore.cardAction = 'move'
+        rerender()
+        expect(component.movingAllCards).toBe(true)
+      })
+
+      it('returns false if the cardAction is not "move"', () => {
+        props.uiStore.cardAction = 'link'
+        rerender()
+        expect(component.movingAllCards).toBe(false)
+      })
+    })
+
+    describe('moving between collections', () => {
+      it('returns false', () => {
+        props.uiStore.cardAction = 'move'
+        props.uiStore.movingFromCollectionId = '9876'
+        rerender()
+        expect(component.movingAllCards).toBe(false)
+      })
+    })
   })
 })
