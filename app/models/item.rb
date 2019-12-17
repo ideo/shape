@@ -254,7 +254,8 @@ class Item < ApplicationRecord
     copy_parent_card: false,
     parent: self.parent,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    batch_id: nil
   )
     # Clones item
     i = amoeba_dup

@@ -160,7 +160,8 @@ class CollectionCard < ApplicationRecord
     building_template_instance: false,
     system_collection: false,
     synchronous: false,
-    placeholder: nil
+    placeholder: nil,
+    batch_id: nil
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -169,6 +170,9 @@ class CollectionCard < ApplicationRecord
     cc = placeholder || amoeba_dup
     if placeholder
       cc = cc.becomes(CollectionCard::Primary)
+      # Note: when explicitly duplicated on the front-end,
+      # we turn all link cards into real duplicates,
+      # which is why placeholders are always turned into primary collection cards
       cc.type = 'CollectionCard::Primary'
       # nullify these
       cc.item_id = nil
@@ -211,6 +215,7 @@ class CollectionCard < ApplicationRecord
         parent: parent,
         system_collection: system_collection,
         synchronous: synchronous,
+        batch_id: batch_id,
       }
       coll_opts = opts.merge(
         building_template_instance: building_template_instance,
@@ -238,6 +243,17 @@ class CollectionCard < ApplicationRecord
     if parent.master_template?
       # we just added a template card, so update the instances
       parent.queue_update_template_instances
+    end
+
+    if batch_id.present?
+      # Map what card this was duplicated to so we can later re-map
+      # things like link cards and search filters
+      CardDuplicatorMapper::Base.new(
+        batch_id: batch_id,
+      ).register_duplicated_card(
+        original_card_id: id,
+        to_card_id: cc.id,
+      )
     end
 
     cc

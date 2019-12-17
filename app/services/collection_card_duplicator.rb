@@ -12,7 +12,7 @@ class CollectionCardDuplicator < SimpleService
 
   def call
     initialize_card_order
-    register_cards_needing_mapping
+    register_cards_needing_remapping
     duplicate_cards
     duplicate_legend_items
     reorder_and_cache_covers
@@ -38,9 +38,9 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def register_cards_needing_remapping
-    CardDuplicatorMapper::RegisterCardsToUpdate.call(
-      card_ids: cards.map(&:id),
-      batch_id: @batch_id,
+    CollectionCardDuplicatorFindLinkedCardsWorker.perform_async(
+      @cards.map(&:id),
+      @batch_id,
     )
   end
 

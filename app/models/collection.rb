@@ -351,7 +351,8 @@ class Collection < ApplicationRecord
     parent: self.parent,
     building_template_instance: false,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    batch_id: nil
   )
 
     # check if we are cloning a template inside a template instance;
@@ -425,6 +426,7 @@ class Collection < ApplicationRecord
         for_user.try(:id),
         system_collection,
         synchronous,
+        batch_id,
       ]
       if synchronous
         CollectionCardDuplicationWorker.new.perform(*worker_opts)
