@@ -106,13 +106,7 @@ class CollectionCardFilter < SimpleService
     return @cards if @ids_only
 
     @cards = @cards
-             .includes(
-               collection: [:collection_cover_items],
-               item: [
-                 :filestack_file,
-                 data_items_datasets: [:dataset],
-               ],
-             )
+      .includes(CollectionCard.default_includes_for_api)
   end
 
   def filter_for_user

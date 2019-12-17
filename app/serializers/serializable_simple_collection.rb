@@ -45,4 +45,8 @@ class SerializableSimpleCollection < BaseJsonSerializer
 
   has_one :parent_collection_card
   has_many :collection_cards
+
+  attribute :serializer do
+    'SerializableSimpleCollection'
+  end
 end

@@ -16,6 +16,7 @@
 #  master_template            :boolean          default(FALSE)
 #  name                       :string
 #  processing_status          :integer
+#  search_term                :string
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
 #  submissions_enabled        :boolean          default(TRUE)

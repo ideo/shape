@@ -25,6 +25,10 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(instance.name).to eq "My #{template.name}"
     end
 
+    it 'should copy the tags over to the instance' do
+      expect(instance.tag_list).to eq template.tag_list
+    end
+
     it 'should give parent collection users the same access to collection and its items' do
       expect(instance.can_view?(viewer)).to be true
       expect(instance.collection_cards.first.record.can_view?(viewer)).to be true
