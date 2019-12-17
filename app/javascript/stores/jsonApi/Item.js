@@ -150,6 +150,18 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.isVideo || this.isLink
   }
 
+  get subtitle() {
+    console.log('subtitle', this.subtitle_hidden)
+    if (this.subtitle_hidden) {
+      return ''
+    }
+    return this.content
+  }
+
+  get subtitleHidden() {
+    return this.subtitle_hidden
+  }
+
   fileUrl() {
     const { filestack_handle } = this
     if (!filestack_handle) return ''

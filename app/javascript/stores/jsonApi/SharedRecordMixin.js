@@ -81,6 +81,8 @@ const SharedRecordMixin = superclass =>
           data.attributes.content = hardcodedSubtitle
           this.content = hardcodedSubtitle
         }
+        data.attributes.subtitle_hidden = subtitleHidden
+        this.subtitle_hidden = subtitleHidden
       }
 
       // cancel sync so that name edits don't roundtrip and interfere with your <input>

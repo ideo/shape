@@ -304,7 +304,7 @@ class CardCoverEditor extends React.Component {
     const { name } = record
     this.cardTitle = name || record.url
     if (record.isCollection) {
-      this.hardcodedSubtitle = record.subtitle
+      this.hardcodedSubtitle = record.subtitleForEditing
     } else if (record.isLink) {
       this.hardcodedSubtitle = record.content
     }
