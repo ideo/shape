@@ -151,7 +151,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get subtitle() {
-    console.log('subtitle', this.subtitle_hidden)
     if (this.subtitle_hidden) {
       return ''
     }
