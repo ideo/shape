@@ -181,7 +181,7 @@ describe Collection, type: :model do
 
         it 'does not give view access' do
           expect(organization.getting_started_collection).to eq(getting_started_template_collection)
-          expect(collection.enable_org_view_access_if_allowed(collection)).to be false
+          expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be false
           expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
         end
       end
@@ -437,7 +437,7 @@ describe Collection, type: :model do
       let!(:external_records) do
         [
           create(:external_record, externalizable: collection, external_id: '100'),
-          create(:external_record, externalizable: collection, external_id: '101')
+          create(:external_record, externalizable: collection, external_id: '101'),
         ]
       end
 
@@ -611,7 +611,7 @@ describe Collection, type: :model do
       collection_cards[1].update(row: 6, col: 5)
       [
         collection_cards[0],
-        collection_cards[1]
+        collection_cards[1],
       ]
     end
     let!(:non_matching_cards) do
@@ -673,8 +673,8 @@ describe Collection, type: :model do
         attributes: {
           collection_cards_attributes: cards.map do |card|
             { id: card.id, order: 3, width: 2, height: 1 }
-          end
-        }
+          end,
+        },
       }
     end
 

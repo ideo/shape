@@ -205,14 +205,14 @@ class Collection < ApplicationRecord
 
   enum processing_status: {
     processing_breadcrumb: 1,
-    duplicating: 2
+    duplicating: 2,
   }
 
   enum cover_type: {
     cover_type_default: 0,
     cover_type_items: 1,
     cover_type_text_and_media: 2,
-    cover_type_carousel: 3
+    cover_type_carousel: 3,
   }
 
   # Searchkick Config
@@ -226,9 +226,9 @@ class Collection < ApplicationRecord
         {
           items: %i[
             tags
-          ]
+          ],
         },
-        :tags
+        :tags,
       ],
     )
   end
@@ -236,14 +236,14 @@ class Collection < ApplicationRecord
   def self.unsearchable_types
     [
       'Collection::UserCollection',
-      'Collection::SharedWithMeCollection'
+      'Collection::SharedWithMeCollection',
     ]
   end
 
   def self.uncollectable_types
     Collection.unsearchable_types +
       [
-        'Collection::GlobalCollection'
+        'Collection::GlobalCollection',
       ]
   end
 
@@ -266,7 +266,7 @@ class Collection < ApplicationRecord
       created_at: created_at,
       updated_at: updated_at,
       archived: archived,
-      master_template: master_template
+      master_template: master_template,
     }
   end
 
@@ -274,7 +274,7 @@ class Collection < ApplicationRecord
   # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
     {
-      master_template: master_template
+      master_template: master_template,
     }
   end
 
@@ -315,7 +315,7 @@ class Collection < ApplicationRecord
       :test_audiences,
       :restorable_parent,
       :collection_filters,
-      roles: %i[pending_users users groups resource]
+      roles: %i[pending_users users groups resource],
     ]
   end
 
@@ -327,7 +327,7 @@ class Collection < ApplicationRecord
       :organization,
       :translations,
       parent_collection_card: %i[parent],
-      roles: %i[users groups resource]
+      roles: %i[users groups resource],
     ]
   end
 
@@ -415,7 +415,7 @@ class Collection < ApplicationRecord
         c.id,
         for_user.try(:id),
         system_collection,
-        synchronous
+        synchronous,
       ]
       if synchronous
         CollectionCardDuplicationWorker.new.perform(*worker_opts)
@@ -592,7 +592,7 @@ class Collection < ApplicationRecord
     # As long as it isn't the 'Getting Started' collection
     return false unless parent.is_a?(Collection::UserCollection) &&
                         (cloned_from.blank? ||
-                         !cloned_from.getting_started? ||
+                         !cloned_from.getting_started? &&
                          !cloned_from.inside_getting_started?)
 
     # collections created in My Collection always get unanchored
