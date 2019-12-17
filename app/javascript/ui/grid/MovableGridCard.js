@@ -4,6 +4,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import FlipMove from 'react-flip-move'
 import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
+import VisibilitySensor from 'react-visibility-sensor'
 
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
@@ -110,6 +111,7 @@ class MovableGridCard extends React.Component {
       resizeWidth: 0,
       resizeHeight: 0,
       allowTouchDeviceDragging: false,
+      isVisible: true,
     }
     this.debouncedAllowTouchDeviceDrag = _.debounce(() => {
       if (this.unmounted) return
@@ -543,6 +545,10 @@ class MovableGridCard extends React.Component {
     )
   }
 
+  handleVisibilityChange = isVisible => {
+    this.setState({ isVisible })
+  }
+
   get hoveringOver() {
     const { card } = this.props
     const { hoveringOver } = uiStore
@@ -597,6 +603,7 @@ class MovableGridCard extends React.Component {
       resizeHeight,
       x,
       y,
+      isVisible,
     } = this.state
 
     const {
@@ -802,21 +809,41 @@ class MovableGridCard extends React.Component {
         // <-----
       >
         <Rnd {...rndProps}>
-          <InnerCardWrapper
-            animatedBounce={holdingOver}
-            width={width + resizeWidth}
-            height={height + resizeHeight}
-            transition={transition}
-            transform={transform}
-            zoomLevel={zoomLevel}
+          <VisibilitySensor
+            partialVisibility
+            onChange={this.handleVisibilityChange}
+            offset={{ top: -500, bottom: -500 }}
+            // disabled
+            active={false}
           >
-            <GridCard
-              {...cardProps}
-              draggingMultiple={draggingMultiple}
-              hoveringOver={hoveringOverRight}
+            <InnerCardWrapper
+              animatedBounce={holdingOver}
+              width={width + resizeWidth}
+              height={height + resizeHeight}
+              transition={transition}
+              transform={transform}
               zoomLevel={zoomLevel}
-            />
-          </InnerCardWrapper>
+            >
+              {isVisible || dragging ? (
+                <GridCard
+                  {...cardProps}
+                  draggingMultiple={draggingMultiple}
+                  hoveringOver={hoveringOverRight}
+                  zoomLevel={zoomLevel}
+                />
+              ) : (
+                <div
+                  style={{
+                    width,
+                    height,
+                    background: v.colors.commonMedium,
+                  }}
+                >
+                  {/* <Loader size={40} containerHeight={'100px'} /> */}
+                </div>
+              )}
+            </InnerCardWrapper>
+          </VisibilitySensor>
         </Rnd>
       </StyledCardWrapper>
     )
