@@ -71,16 +71,16 @@ const SharedRecordMixin = superclass =>
       // see collection_updater.rb for deserialization
       if (this.internalType === 'collections') {
         if (hardcodedSubtitle !== this.subtitle) {
-          data.attributes.hardcoded_subtitle = hardcodedSubtitle
           this.cover.hardcoded_subtitle = hardcodedSubtitle
         }
+        data.attributes.hardcoded_subtitle = hardcodedSubtitle
         this.cover.subtitle_hidden = subtitleHidden
         data.attributes.subtitle_hidden = subtitleHidden
       } else if (this.isLink) {
         if (hardcodedSubtitle !== this.content) {
-          data.attributes.content = hardcodedSubtitle
           this.content = hardcodedSubtitle
         }
+        data.attributes.content = hardcodedSubtitle
         data.attributes.subtitle_hidden = subtitleHidden
         this.subtitle_hidden = subtitleHidden
       }
