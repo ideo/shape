@@ -319,12 +319,6 @@ class CollectionGrid extends React.Component {
     }
 
     if (!hoveringOver || hoveringOver.direction !== 'left') {
-      // placeholder = _.find(stateCards, { cardType: 'placeholder' })
-      // if (placeholder) {
-      //   runInAction(() => {
-      //     this.cards.remove(placeholder)
-      //   })
-      // }
       uiStore.updatePlaceholderPosition({ order: null, card: null })
     }
 

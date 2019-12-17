@@ -47,11 +47,6 @@ export default class UiStore {
   selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   // stored in case we ever need to reset the text
   quillSnapshot = {}
-  @computed
-  get cardMenuOpenAndPositioned() {
-    const { cardMenuOpen } = this
-    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
-  }
   @observable
   organizationMenuPage = null
   @observable
@@ -377,6 +372,12 @@ export default class UiStore {
   @action
   closeDialog() {
     this.dialogConfig.open = null
+  }
+
+  @computed
+  get cardMenuOpenAndPositioned() {
+    const { cardMenuOpen } = this
+    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
   }
 
   @action
