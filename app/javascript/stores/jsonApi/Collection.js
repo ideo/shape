@@ -1138,7 +1138,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'POST', { data })
   }
 
-  // Do we not have just a basic collection PATCH call?
   async API_selectCollectionType(collectionType) {
     const apiPath = `collections/${this.id}`
     const data = {

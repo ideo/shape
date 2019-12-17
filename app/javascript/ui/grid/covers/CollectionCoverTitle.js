@@ -49,10 +49,6 @@ class CollectionCoverTitle extends React.Component {
   get leftIcon() {
     const { collection } = this.props
 
-    // if (collection.isMasterTemplate) {
-    //   return <TemplateIcon circled filled />
-    // }
-
     const leftConditions = [collection.isMasterTemplate]
     if (leftConditions.some(bool => bool)) {
       return <CollectionTypeIcon record={collection} />

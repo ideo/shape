@@ -16,10 +16,6 @@ class CollectionTypeSelector extends React.Component {
 
   constructor(props) {
     super(props)
-
-    runInAction(() => {
-      this.collection = props.collection
-    })
   }
 
   openPopoutMenu = () => {
@@ -107,5 +103,7 @@ CollectionTypeSelector.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   position: PropTypes.string.isRequired,
 }
+
+CollectionTypeSelector.displayName = 'CollectionTypeSelector'
 
 export default CollectionTypeSelector

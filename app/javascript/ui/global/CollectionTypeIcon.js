@@ -7,7 +7,7 @@ import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-import CollectionIcon from '../icons/CollectionIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 
 export const collectionTypeToIcon = {
   collection: <CollectionIcon />,
@@ -24,16 +24,12 @@ const CollectionTypeIcon = ({ record }) => {
   if (record.isUserProfile) {
     icon = <ProfileIcon />
   } else if (record.isProfileTemplate) {
-    // Why is this showing up left and right of page header?
-    // left icon page header
     icon = <FilledProfileIcon />
   } else if (record.isProfileCollection) {
     icon = <SystemIcon />
   } else if (record.isTemplated && !record.isSubTemplate) {
-    // how to get this to work with just collection.isTemplated?
     icon = <TemplateIcon circled />
   } else if (record.isMasterTemplate) {
-    // left icon page header and collection cover title
     icon = <TemplateIcon circled filled />
   } else if (record.isSubmissionBox) {
     icon = <SubmissionBoxIconLg />
