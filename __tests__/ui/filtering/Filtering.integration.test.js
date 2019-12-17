@@ -1,6 +1,4 @@
 import fetchMock from 'fetch-mock'
-import { updateModelId } from 'datx'
-
 import { apiStore } from '~/stores'
 import Factory from '#/factory'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
@@ -15,7 +13,6 @@ global.IdeoSSO = {
 
 describe('Filtering', function() {
   let currentOrganization,
-    currentUser,
     genericFilter,
     collection,
     props,
@@ -29,7 +26,7 @@ describe('Filtering', function() {
 
   beforeAll(async () => {
     currentOrganization = await Factory.create('organization', { id: '1' })
-    currentUser = await Factory.create('user', { id: '22' })
+    await Factory.create('user', { id: '22' })
     // apiStore.add(currentOrganization, 'organizations')
     // apiStore.add(currentUser, 'users')
     apiStore.currentUserId = '22'
@@ -239,7 +236,7 @@ describe('Filtering', function() {
     let pill, checkbox
 
     const filterResponse = selected => ({
-      data: objectAssignDeep({}, genericFilterData, {
+      data: objectAssignDeep({}, genericFilter, {
         attributes: { selected },
       }),
     })
