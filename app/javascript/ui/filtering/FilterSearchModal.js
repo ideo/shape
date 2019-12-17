@@ -4,14 +4,12 @@ import ReactTags from 'react-tag-autocomplete'
 import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import SearchIconRight from '~/ui/icons/SearchIconRight'
-import TagIcon from '~/ui/icons/TagIcon'
-
 import { apiStore, uiStore } from '~/stores'
 import { SubduedText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import Pill from '~/ui/global/Pill'
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
+import { filtersToTags } from '~/ui/filtering/shared'
 
 @observer
 class FilterSearchModal extends React.Component {
@@ -25,10 +23,9 @@ class FilterSearchModal extends React.Component {
     this.debouncedTermSearch = _.debounce(this._autocompleteTermSearch, 400)
   }
 
-  async componentDidMount() {
-    const results = await this.getOrganizationTagList()
-    runInAction(() => {
-      this.tagNames = results
+  componentDidMount() {
+    runInAction(async () => {
+      this.tagNames = await this.getOrganizationTagList()
     })
   }
 
@@ -39,28 +36,20 @@ class FilterSearchModal extends React.Component {
   }
 
   get filtersFormattedAsTags() {
-    // TODO shared with FilterBar
     const { filters } = this.props
-    return filters.map(filter => {
-      const tag = {
-        id: filter.id,
-        name: filter.text,
-        label: filter.text,
-        symbol:
-          filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
-        selectable: true,
-        selected: filter.selected,
-        onSelect: this.onTagSelect,
-      }
-      tag.onDelete = this.onRemoveTag(tag)
-      return tag
+    return filtersToTags({
+      filters,
+      onDelete: this.onRemoveTag,
+      onSelect: this.onTagSelect,
     })
   }
 
-  getOrganizationTagList() {
+  async getOrganizationTagList() {
     const { currentUserOrganizationId } = apiStore
     const apiPath = `organizations/${currentUserOrganizationId}/tags`
-    return apiStore.requestJson(apiPath)
+    const result = await apiStore.requestJson(apiPath)
+    if (!result.data) return []
+    return result.data.map(tag => tag.attributes.name)
   }
 
   _autocompleteTermSearch = async term => {
@@ -80,7 +69,7 @@ class FilterSearchModal extends React.Component {
     this.props.onCreateTag(tag)
   }
 
-  onRemoveTag = tag => ev => {
+  onRemoveTag = tag => {
     this.props.onRemoveTag(tag)
   }
 
@@ -124,7 +113,7 @@ class FilterSearchModal extends React.Component {
               delimiterChars={[',']}
               placeholder={placeholder}
               handleAddition={this.onNewTag}
-              handleDelete={this.onRemoveTag}
+              handleDelete={tag => ev => this.onRemoveTag(tag)}
               handleInputChange={this.onInputChange}
               tagComponent={Pill}
               allowNew
