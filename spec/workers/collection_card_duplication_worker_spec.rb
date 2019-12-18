@@ -8,7 +8,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
     let(:cards) { collection.collection_cards }
     let(:card_ids) { cards.pluck(:id) }
     let(:system_collection) { false }
-    let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}"}
+    let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}" }
     let(:params) do
       [
         batch_id,

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CollectionCardMapperAndDuplicationWorker, type: :worker do
-  let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}"}
+  let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}" }
   let(:user) { create(:user) }
   let(:collection) { create(:collection, num_cards: 5) }
   let(:to_collection) { create(:collection) }

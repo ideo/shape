@@ -230,7 +230,7 @@ describe Collection, type: :model do
     end
     let(:copy_parent_card) { false }
     let(:parent) { collection.parent }
-    let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}"}
+    let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}" }
     let(:duplicate) do
       dupe = collection.duplicate!(
         for_user: user,
