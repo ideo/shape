@@ -515,7 +515,7 @@ class Collection < ApplicationRecord
   # Cards are explicitly passed in when moving them from another collection to this one
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
-      next if card.link?
+      next unless card.primary?
 
       if card.item.present?
         # have to reload in order to pick up new parent relationship
@@ -527,9 +527,10 @@ class Collection < ApplicationRecord
     end
   end
 
+  # similar to above but runs more slowly, and will correct any issues (above assumes breadcrumb tree is accurate)
   def recursively_fix_breadcrumbs!(cards = collection_cards)
     cards.each do |card|
-      next if card.link?
+      next unless card.primary?
 
       if card.item.present?
         # have to reload in order to pick up new parent relationship
