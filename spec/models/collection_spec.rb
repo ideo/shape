@@ -422,7 +422,7 @@ describe Collection, type: :model do
     end
 
     context 'with a subcollection inside the system-generated getting started collection' do
-      let(:parent_collection) { create(:global_collection) }
+      let(:parent_collection) { create(:global_collection, organization: organization) }
       let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: collection, organization: organization) }
       let(:duplicate) do
         collection.duplicate!(
