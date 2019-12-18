@@ -1,4 +1,4 @@
-class CollectionCardDuplicatorFindLinkedCardsWorker
+class CollectionCardMapperAndDuplicationWorker
   include Sidekiq::Worker
   sidekiq_options queue: 'critical'
 

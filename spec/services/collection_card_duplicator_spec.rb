@@ -31,15 +31,15 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       expect(to_collection.collection_cards.count).to eq 5
     end
 
-    it 'calls CollectionCardDuplicationWorker to finish processing the job' do
-      expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
-        anything, # new card ids
+    it 'calls CollectionCardMapperAndDuplicationWorker to finish processing the job' do
+      expect(CollectionCardMapperAndDuplicationWorker).to receive(:perform_async).with(
+        instance_of(String), # batch id
+        instance_of(Array), # new card ids
         to_collection.id,
         user.id,
         false,
       )
       service.call
-      expect(to_collection.reload.processing_status).to eq 'duplicating'
     end
 
     context 'with integer order' do

@@ -559,7 +559,7 @@ class Collection < ApplicationRecord
   end
 
   def collection_cards_viewable_by(user:, filters: {})
-    CollectionCardFilter.call(
+    CollectionCardFilter::Base.call(
       collection: self,
       user: user,
       filters: filters,

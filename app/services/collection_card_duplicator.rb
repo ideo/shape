@@ -40,7 +40,7 @@ class CollectionCardDuplicator < SimpleService
   def register_cards_needing_remapping
     # Note: the CollectionCardDuplicationWorker is called within this worker
     #       after all mapping is complete
-    CollectionCardDuplicatorFindLinkedCardsWorker.perform_async(
+    CollectionCardMapperAndDuplicationWorker.perform_async(
       @batch_id,
       @cards.map(&:id),
       @to_collection.id,
