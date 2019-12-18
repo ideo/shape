@@ -47,7 +47,7 @@
   },
   "environments": {
     "review": {
-      "addons": ["memcachedcloud", "papertrail"],
+      "addons": ["rediscloud", "memcachedcloud", "sendgrid", "papertrail"],
       "buildpacks": [
         {
           "url": "https://github.com/SectorLabs/heroku-buildpack-git-submodule.git"
