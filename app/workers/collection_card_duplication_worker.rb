@@ -3,13 +3,14 @@ class CollectionCardDuplicationWorker
   sidekiq_options queue: 'critical'
 
   def perform(
+    batch_id,
     card_ids,
     parent_collection_id,
     for_user_id = nil,
     system_collection = false,
-    synchronous = false,
-    batch_id = nil
+    synchronous = false
   )
+    @batch_id = batch_id
     @collection_cards = CollectionCard.active.where(id: card_ids).ordered
     @for_user = User.find(for_user_id) if for_user_id.present?
     @parent_collection = Collection.find(parent_collection_id)
@@ -17,7 +18,6 @@ class CollectionCardDuplicationWorker
     @synchronous = synchronous
     @system_collection = system_collection
     @from_collection = nil
-    @batch_id = batch_id
 
     duplicate_cards
     update_parent_collection_status

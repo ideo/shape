@@ -6,6 +6,7 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
   let(:duplicate_to_collection) do
     create(
       :collection,
+      organization: organization,
       parent_collection: root_collection,
     )
   end
@@ -18,6 +19,7 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
         cards: [parent_collection.parent_collection_card],
         placement: 'end',
         for_user: user,
+        batch_id: batch_id,
       )
     end
     duplicate_to_collection.reload
@@ -53,14 +55,20 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
       expect(
         duplicate_search_collection.collection_filters.first.within_collection_id,
       ).to eq(
-        duplicate_search_collection_target.id.to_s,
+        duplicate_search_collection_target.id,
       )
     end
 
-    it 'clears cached data for this duplication batch' do
+    # TODO: it appears fakeredis may not support expiration using
+    xit 'expires cached data for this duplication batch after one day' do
       base = CardDuplicatorMapper::Base.new(batch_id: batch_id)
-      expect(base.duplicated_cards).to be_empty
-      expect(base.linked_cards).to be_empty
+      expect(base.duplicated_cards).not_to be_empty
+      expect(base.linked_cards).not_to be_empty
+
+      Timecop.travel(25.hours.from_now) do
+        expect(base.duplicated_cards).to be_empty
+        expect(base.linked_cards).to be_empty
+      end
     end
   end
 end

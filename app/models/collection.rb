@@ -421,12 +421,12 @@ class Collection < ApplicationRecord
 
     if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
+        batch_id,
         collection_cards.map(&:id),
         c.id,
         for_user.try(:id),
         system_collection,
         synchronous,
-        batch_id,
       ]
       if synchronous
         CollectionCardDuplicationWorker.new.perform(*worker_opts)

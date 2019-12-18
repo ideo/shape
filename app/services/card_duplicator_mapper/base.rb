@@ -49,6 +49,7 @@ module CardDuplicatorMapper
       (linked_card_ids - duplicated_card_ids).length.zero?
     end
 
+    # Instead of triggering entire remapping... trigger a single remapping for both sides
     def register_duplicated_card(original_card_id:, to_card_id:)
       Cache.hash_set("#{@batch_id}_duplicated_cards", original_card_id, to_card_id)
       return unless all_cards_mapped?
@@ -62,6 +63,11 @@ module CardDuplicatorMapper
         card_id,
         data.to_hash,
       )
+    end
+
+    def expire_data_in_one_day!
+      Cache.expire("#{@batch_id}_linked_cards", 1.day.to_i)
+      Cache.expire("#{@batch_id}_duplicated_cards", 1.day.to_i)
     end
 
     def clear_cached_data!

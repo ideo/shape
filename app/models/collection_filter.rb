@@ -43,6 +43,7 @@ class CollectionFilter < ApplicationRecord
     to_org_slug = Organization.joins(:collections)
                               .where(Collection.arel_table[:id].eq(to_collection_id))
                               .pluck(:slug)
+                              .first
     text.sub!(
       %r{within\(#{Organization::SLUG_SUBSTR}\/#{from_collection_id}\)},
       "within(#{to_org_slug}/#{to_collection_id})",

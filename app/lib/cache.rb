@@ -28,6 +28,10 @@ class Cache
     value
   end
 
+  def self.expire(key, seconds_from_now)
+    client.expire(key, seconds_from_now)
+  end
+
   def self.delete(key)
     client.del(key) == '1'
   end

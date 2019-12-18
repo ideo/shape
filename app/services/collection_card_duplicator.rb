@@ -1,19 +1,19 @@
 class CollectionCardDuplicator < SimpleService
-  def initialize(to_collection:, cards:, placement:, for_user:, system_collection: false)
+  def initialize(to_collection:, cards:, placement:, for_user:, system_collection: false, batch_id: nil)
     @to_collection = to_collection
     @cards = cards
     @placement = placement
     @for_user = for_user
     @system_collection = system_collection
-    @batch_id = "duplicate-#{SecureRandom.hex(10)}"
+    @batch_id = batch_id || "duplicate-#{SecureRandom.hex(10)}"
     @new_cards = []
     @should_update_cover = false
   end
 
   def call
     initialize_card_order
-    register_cards_needing_remapping
     duplicate_cards
+    register_cards_needing_remapping
     duplicate_legend_items
     reorder_and_cache_covers
     @new_cards
@@ -38,9 +38,14 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def register_cards_needing_remapping
+    # Note: the CollectionCardDuplicationWorker is called within this worker
+    #       after all mapping is complete
     CollectionCardDuplicatorFindLinkedCardsWorker.perform_async(
-      @cards.map(&:id),
       @batch_id,
+      @cards.map(&:id),
+      @to_collection.id,
+      @for_user&.id,
+      @system_collection,
     )
   end
 
@@ -71,14 +76,6 @@ class CollectionCardDuplicator < SimpleService
 
     CollectionCard.import(@new_cards)
     @to_collection.update_processing_status(:duplicating)
-    CollectionCardDuplicationWorker.perform_async(
-      @new_cards.map(&:id),
-      @to_collection.id,
-      @for_user.try(:id),
-      @system_collection,
-      false,
-      @batch_id,
-    )
   end
 
   def reorder_and_cache_covers
