@@ -5,37 +5,35 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import { fakeCollection } from '#/mocks/data'
 
 const props = {
+  handleMenuItemClick: jest.fn(),
+  openPopoutMenu: jest.fn(),
+  children: <CollectionIcon />,
   collection: fakeCollection,
   position: 'relative',
-  children: <CollectionIcon />,
 }
-let wrapper, component
+let wrapper
 const types = ['collection', 'project', 'method', 'prototype', 'profile']
 
 describe('CollectionTypeSelector', () => {
   beforeEach(() => {
-    wrapper = shallow(<CollectionTypeSelector {...props} />)
-    component = wrapper.instance()
+    wrapper = mount(<CollectionTypeSelector {...props} />)
   })
 
   it('renders the collection type options and selects one', () => {
     const collectionSelectorButton = wrapper
       .find('[data-cy="CollectionTypeSelector"]')
       .at(0)
+    expect(collectionSelectorButton.exists()).toBeTruthy()
+
     collectionSelectorButton.simulate('click')
+
+    expect(wrapper.instance().showPopoutMenu).toEqual(true)
+
+    expect(wrapper.find('PopoutMenu')).toHaveLength(1)
+
     const popout = wrapper.find('PopoutMenu').at(0)
 
     expect(popout.props().menuItems.length).toEqual(types.length)
     expect(_.map(popout.props().menuItems, i => i.name)).toEqual(types)
-
-    component.openPopoutMenu()
-
-    expect(component.showPopoutMenu).toEqual(true)
-
-    component.updateCollectionType('prototype')
-
-    expect(
-      component.props.collection.API_selectCollectionType
-    ).toHaveBeenCalled()
   })
 })
