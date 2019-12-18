@@ -62,19 +62,7 @@ RSpec.describe CardMover, type: :service do
         end
       end
 
-      context 'with item breadcrumbs' do
-        it 'should recalculate breadcrumbs' do
-          card = moving_cards.first
-          card.item.recalculate_breadcrumb!
-          expect {
-            card_mover.call
-          }.to change(card.item, :breadcrumb)
-          # double check that breadcrumb is showing the new collection
-          expect(card.item.breadcrumb.first).to eq to_collection.id
-        end
-      end
-
-      context 'with subcollection breadcrumbs' do
+      context 'with subcollections' do
         let!(:child_collection) do
           create(
             :collection,
@@ -91,12 +79,8 @@ RSpec.describe CardMover, type: :service do
         end
 
         it 'should recalculate breadcrumbs' do
-          expect {
-            card_mover.call
-            child_collection.reload
-          }.to change(child_collection, :breadcrumb)
-          # double check that breadcrumb is showing the new collection
-          expect(child_collection.breadcrumb.first).to eq to_collection.id
+          expect(to_collection).to receive(:recalculate_child_breadcrumbs_async).with(moving_cards)
+          card_mover.call
         end
 
         it 'should calculate correct roles_anchor' do

@@ -18,22 +18,21 @@ const props = {
   onMoveStart: jest.fn(),
   dragging: false,
   height: 100,
-  menuOpen: false,
   canEditCollection: false,
   isSharedCollection: false,
   searchResult: false,
 }
 
-let wrapper, rerender
+let wrapper, component
+const rerender = function() {
+  props.handleClick.mockClear()
+  wrapper = shallow(<GridCard {...props} />)
+  component = wrapper.instance()
+  return wrapper
+}
+
 describe('GridCard', () => {
   describe('with item', () => {
-    beforeEach(() => {
-      rerender = function() {
-        wrapper = shallow(<GridCard {...props} />)
-        return wrapper
-      }
-    })
-
     describe('as viewer', () => {
       beforeEach(() => {
         props.record.can_edit = false
@@ -97,6 +96,18 @@ describe('GridCard', () => {
       })
     })
 
+    describe('menuOpen', () => {
+      it('opens and closes via openActionMenu and closeMenu', () => {
+        expect(component.menuOpen).toBe(false)
+        const fakeEvent = { target: { closest: jest.fn() } }
+        // NOTE: this test works because this file imports the actual uiStore
+        component.openActionMenu(fakeEvent)
+        expect(component.menuOpen).toBe(true)
+        component.closeMenu()
+        expect(component.menuOpen).toBe(false)
+      })
+    })
+
     describe('as first item in the row', () => {
       beforeEach(() => {
         props.record.can_edit = true
@@ -111,13 +122,13 @@ describe('GridCard', () => {
             .find('GridCardHotspot')
             .at(0)
             .props().position
-        ).toBe('right')
+        ).toBe('left')
         expect(
           wrapper
             .find('GridCardHotspot')
             .at(1)
             .props().position
-        ).toBe('left')
+        ).toBe('right')
       })
     })
 
@@ -135,6 +146,7 @@ describe('GridCard', () => {
           'actionAfterRoute',
           expect.any(Function)
         )
+        expect(props.handleClick).toHaveBeenCalled()
       })
     })
 
@@ -263,6 +275,26 @@ describe('GridCard', () => {
       it('does not render ActionMenu', () => {
         expect(wrapper.find('ActionMenu').exists()).toBe(false)
       })
+    })
+  })
+
+  describe('with loadingPlaceholder', () => {
+    beforeEach(() => {
+      props.card.isLoadingPlaceholder = true
+      rerender()
+    })
+    afterEach(() => {
+      props.card.isLoadingPlaceholder = false
+    })
+
+    it('renders the loader and no ActionMenu', () => {
+      expect(wrapper.find('ActionMenu').exists()).toBe(false)
+      expect(wrapper.find('CardLoader').exists()).toBe(true)
+    })
+
+    it('prevents any action on the click handler', () => {
+      expect(wrapper.instance().handleClick()).toBe(false)
+      expect(props.handleClick).not.toHaveBeenCalled()
     })
   })
 

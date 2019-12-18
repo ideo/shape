@@ -183,6 +183,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         )
         # cheat and move this one inside the parent anyway, to simulate bad issue
         c1.parent_collection_card.update(parent: collection, pinned: true)
+        c1.recalculate_breadcrumb!
       end
 
       after do
@@ -199,13 +200,15 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       end
 
       it 'does not get stuck creating multiple instances of itself' do
-        # NOTE: the fix is the reuslt of a guard clause in templateable#add_cards_from_master_template
+        # NOTE: the fix is the result of a guard clause in templateable#add_cards_from_master_template
         collection.reload.update_template_instances
         templates_created = Collection.in_collection(other_collection).where(template: collection)
-        expect(templates_created.count).to eq 2
+        expect(templates_created.count).to eq 1
         # should not end up creating more instances every time you call update_template_instances
-        collection.reload.update_template_instances
-        expect(templates_created.count).to eq 2
+        expect {
+          collection.reload.update_template_instances
+        }.not_to change(Collection, :count)
+        expect(templates_created.reload.count).to eq 1
       end
     end
   end

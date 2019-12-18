@@ -38,7 +38,10 @@ RSpec.describe PopulateGettingStartedShellCollection, type: :service do
   describe '#call' do
     it 'populates the shell collection by duplicating the cards from the original' do
       expect(user_shape_use_cases.items.count).to eq 0
-      service.call
+      # do inline test to actually duplicate the cards
+      Sidekiq::Testing.inline! do
+        service.call
+      end
       user_shape_use_cases.reload
       shape_use_cases.reload
       expect(user_shape_use_cases.items.count).to eq 3
