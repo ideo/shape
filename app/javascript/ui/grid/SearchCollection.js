@@ -24,7 +24,7 @@ class SearchCollection extends React.Component {
   }
 
   componentDidMount() {
-    this.loadSearchedCards()
+    return this.loadSearchedCards()
   }
 
   get searchCollectionCards() {

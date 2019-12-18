@@ -1,21 +1,21 @@
 import SearchCollection from '~/ui/grid/SearchCollection'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import fakeApiStore from '#/mocks/fakeApiStore'
 import { apiStore } from '~/stores'
-import { fakeCollection } from '#/mocks/data'
 import Factory from '#/factory'
 import collectionCardJson from '#/factory/data/collection_card.json'
 
-const collectionCards = []
 let collection
 let wrapper, uiStore
 let props, component, rerender
 
+const defaultRequestData = {
+  data: [],
+  meta: { total_pages: 0 },
+  links: { last: 0 },
+}
+
 beforeEach(async () => {
   apiStore.request = jest.fn()
-  // const fakeApiStore = Object.assign({}, apiStore, {
-  //   request: jest.fn(),
-  // })
   collection = await Factory.create(
     'collection',
     {
@@ -33,13 +33,16 @@ beforeEach(async () => {
     collection,
     trackCollectionUpdated: jest.fn(),
   }
-  apiStore.request.mockClear()
-  apiStore.request.mockReturnValue(Promise.resolve([]))
+  apiStore.request.mockReturnValue(Promise.resolve(defaultRequestData))
   rerender = () => {
     wrapper = shallow(<SearchCollection.wrappedComponent {...props} />)
     component = wrapper.instance()
   }
   rerender()
+})
+
+afterEach(async () => {
+  apiStore.request.mockClear()
 })
 
 describe('SearchCollection', () => {
@@ -60,8 +63,15 @@ describe('SearchCollection', () => {
 
     describe('after loading search collection results', () => {
       beforeEach(async () => {
-        component.loading = false
-        wrapper.update()
+        apiStore.request.mockReturnValue(
+          Promise.resolve({
+            ...defaultRequestData,
+            data: [collectionCardJson],
+            meta: { total_pages: 1 },
+          })
+        )
+        rerender()
+        await wrapper.instance().componentDidMount()
       })
 
       it('should render a second collection grid', () => {
@@ -75,10 +85,10 @@ describe('SearchCollection', () => {
     })
 
     describe('after loading 0 search results', () => {
-      beforeEach(() => {
-        collection.searchResultsCollection.collection_cards = []
+      beforeEach(async () => {
+        apiStore.request.mockReturnValue(Promise.resolve(defaultRequestData))
         rerender()
-        component.loading = false
+        await wrapper.instance().componentDidMount()
       })
 
       it('should render a second collection grid with text', () => {
@@ -91,7 +101,13 @@ describe('SearchCollection', () => {
     it('should load the searched cards', () => {
       expect(apiStore.request).toHaveBeenCalled()
       expect(apiStore.request).toHaveBeenCalledWith(
-        'organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20'
+        expect.stringContaining('search_collection_cards')
+      )
+    })
+
+    it('should send the search query to fetch the cards', () => {
+      expect(apiStore.request).toHaveBeenCalledWith(
+        expect.stringContaining('query=plants')
       )
     })
   })
@@ -117,10 +133,16 @@ describe('SearchCollection', () => {
 
   describe('loadSearchedCards', () => {
     beforeEach(() => {
-      apiStore.request.mockReturnValue(Promise.resolve([collectionCardJson]))
+      apiStore.request.mockReturnValue(
+        Promise.resolve({
+          ...defaultRequestData,
+          data: [collectionCardJson],
+          meta: { total_pages: 1 },
+        })
+      )
     })
 
-    describe('when on a new page', () => {
+    describe('when on the second page', () => {
       beforeEach(() => {
         component.loadSearchedCards({ page: 2, per_page: 40 })
       })
@@ -128,7 +150,7 @@ describe('SearchCollection', () => {
       it('should search for new results', () => {
         expect(apiStore.request).toHaveBeenCalled()
         expect(apiStore.request).toHaveBeenCalledWith(
-          'organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20'
+          expect.stringContaining('page=2')
         )
       })
     })
@@ -141,7 +163,7 @@ describe('SearchCollection', () => {
       it('should search for new results', () => {
         expect(apiStore.request).toHaveBeenCalled()
         expect(apiStore.request).toHaveBeenCalledWith(
-          'organizations/5352/search_collection_cards?card_order=relevance&current_collection_id=762903&page=1&per_page=20&query=plants%20'
+          expect.stringContaining('page=1')
         )
       })
     })
