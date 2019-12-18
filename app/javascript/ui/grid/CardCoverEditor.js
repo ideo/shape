@@ -17,9 +17,10 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import TextareaAutosize from 'react-autosize-textarea'
-import { CloseButton } from '~/ui/global/styled/buttons'
+import { CloseButton, NamedActionButton } from '~/ui/global/styled/buttons'
 import PropTypes from 'prop-types'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import parseURLMeta from '~/utils/parseURLMeta'
 
 const removeOption = {
   type: 'remove',
@@ -90,6 +91,13 @@ const StyledEditTitle = styled.div`
 `
 
 StyledEditTitle.displayName = 'StyledEditTitle'
+
+const RestoreButton = styled(NamedActionButton)`
+  display: block;
+  margin: 0;
+  margin-bottom: 20px;
+  padding: 0;
+`
 
 export const MediumBreak = styled.div`
   display: block;
@@ -298,6 +306,15 @@ class CardCoverEditor extends React.Component {
     uiStore.setEditingCardCover(null)
   }
 
+  handleRestore = async ev => {
+    const { record } = this.props.card
+    const meta = await parseURLMeta(record.url)
+    runInAction(() => {
+      this.hardcodedSubtitle = meta.description
+      this.cardTitle = meta.title
+    })
+  }
+
   @action
   setObservableInputs = () => {
     const { record } = this.props.card
@@ -453,6 +470,12 @@ class CardCoverEditor extends React.Component {
                       </div>
                     }
                   ></LabelContainer>
+                  <br />
+                  {record.isLink && (
+                    <RestoreButton onClick={this.handleRestore}>
+                      Restore
+                    </RestoreButton>
+                  )}
                 </div>
               )}
             </div>
