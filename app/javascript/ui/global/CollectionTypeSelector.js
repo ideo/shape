@@ -1,11 +1,12 @@
 import { PropTypes } from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction, observable } from 'mobx'
+import { observable, action } from 'mobx'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import { capitalize } from 'lodash'
+import { Fragment } from 'react'
 
 @observer
 class CollectionTypeSelector extends React.Component {
@@ -14,20 +15,14 @@ class CollectionTypeSelector extends React.Component {
   @observable
   showPopoutMenu = false
 
-  constructor(props) {
-    super(props)
-  }
-
+  @action
   openPopoutMenu = () => {
-    runInAction(() => {
-      this.showPopoutMenu = true
-    })
+    this.showPopoutMenu = true
   }
 
+  @action
   hidePopoutMenu = () => {
-    runInAction(() => {
-      this.showPopoutMenu = false
-    })
+    this.showPopoutMenu = false
   }
 
   updateCollectionType = async collectionType => {
@@ -35,9 +30,7 @@ class CollectionTypeSelector extends React.Component {
     await collection.API_selectCollectionType(collectionType)
     // TODO: Do we want error handling?
     // If so, I think this needs a try/catch block?
-    runInAction(() => {
-      this.showPopoutMenu = false
-    })
+    this.hidePopoutMenu()
   }
 
   handleMenuItemClick = (e, collectionType) => {
@@ -62,38 +55,54 @@ class CollectionTypeSelector extends React.Component {
         iconRight: collectionTypeToIcon[collectionType],
         onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
-        loading: false,
         withAvatar: false,
       }
     })
   }
 
   render() {
-    const { collection, children, position } = this.props
-
+    const { collection, children, location } = this.props
+    let positionOffset = {}
     if (!collection) return null
 
+    const position = location === 'CollectionCover' ? 'absolute' : 'relative'
+
+    if (location === 'CollectionCover') {
+      positionOffset = { x: 50, y: -50 }
+    }
+    if (location === 'PageHeader') {
+      positionOffset = { x: -30, y: -10 }
+    }
+
     return (
-      <button
-        style={{ position: position }}
-        onClick={this.openPopoutMenu}
-        data-cy="CollectionTypeSelector"
-      >
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title={capitalize(collection.collection_type)}
-          placement="top"
+      <Fragment>
+        <button
+          style={{
+            position: position,
+          }}
+          onClick={this.openPopoutMenu}
+          data-cy="CollectionTypeSelector"
         >
-          {children}
-        </Tooltip>
-        <PopoutMenu
-          offsetPosition={{ x: 0, y: -60 }}
-          onMouseLeave={this.hidePopoutMenu}
-          hideDotMenu
-          menuOpen={this.showPopoutMenu}
-          menuItems={this.collectionTypeMenuItems}
-        />
-      </button>
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title={capitalize(collection.collection_type)}
+            placement="top"
+          >
+            {children}
+          </Tooltip>
+        </button>
+        <div style={{ position: position }}>
+          <PopoutMenu
+            offsetPosition={positionOffset}
+            // y = top, x = left
+            // need to set differently for page header and grid card
+            onMouseLeave={this.hidePopoutMenu}
+            hideDotMenu
+            menuOpen={this.showPopoutMenu}
+            menuItems={this.collectionTypeMenuItems}
+          />
+        </div>
+      </Fragment>
     )
   }
 }
@@ -101,7 +110,7 @@ class CollectionTypeSelector extends React.Component {
 CollectionTypeSelector.propTypes = {
   children: PropTypes.node.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  position: PropTypes.string.isRequired,
+  location: PropTypes.oneOf(['CollectionCover', 'PageHeader']).isRequired,
 }
 
 CollectionTypeSelector.displayName = 'CollectionTypeSelector'

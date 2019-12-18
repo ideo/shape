@@ -9,7 +9,7 @@ const props = {
   openPopoutMenu: jest.fn(),
   children: <CollectionIcon />,
   collection: fakeCollection,
-  position: 'relative',
+  location: 'CollectionCover',
 }
 let wrapper
 const types = ['collection', 'project', 'method', 'prototype', 'profile']

@@ -358,7 +358,7 @@ class CollectionCover extends React.Component {
                         <CollectionCoverTitle collection={collection} />
                       </PlainLink>
                       <CollectionTypeSelector
-                        position={'absolute'}
+                        location={'CollectionCover'}
                         collection={collection}
                       >
                         <IconHolder>
