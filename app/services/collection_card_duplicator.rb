@@ -13,7 +13,7 @@ class CollectionCardDuplicator < SimpleService
   def call
     initialize_card_order
     duplicate_cards
-    register_cards_needing_remapping
+    register_card_mappings_and_deep_duplicate
     duplicate_legend_items
     reorder_and_cache_covers
     @new_cards
@@ -37,7 +37,7 @@ class CollectionCardDuplicator < SimpleService
     @to_collection.increment_card_orders_at(@order, amount: @cards.count)
   end
 
-  def register_cards_needing_remapping
+  def register_card_mappings_and_deep_duplicate
     # Note: the CollectionCardDuplicationWorker is called within this worker
     #       after all mapping is complete
     CollectionCardMapperAndDuplicationWorker.perform_async(

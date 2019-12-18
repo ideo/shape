@@ -19,15 +19,17 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
 
     it 'registers all linked cards' do
       subject.call
+      linked_card_record_card = linked_text_card.record.parent_collection_card
       expect(subject.linked_cards).to eq(
         search_collection.parent_collection_card.id.to_s => {
-          'type' => 'search_filter',
-          'within_collection_id' => search_collection_target.id.to_s,
-          'collection_filter_id' => collection_filter.id.to_s,
+          'remapper' => 'CardDuplicatorMapper::RemapSearchFilter',
+          'within_collection_id' => search_collection_target.id,
         },
         linked_text_card.id.to_s => {
-          'type' => 'link_item',
+          'remapper' => 'CardDuplicatorMapper::RemapLinkItem',
+          'record_card_id' => linked_card_record_card.id.to_s,
         },
+        linked_card_record_card.id.to_s => {},
       )
     end
   end

@@ -26,10 +26,10 @@ RSpec.describe Search::Filters::WithinCollection do
   describe '#within_collection_id' do
     it 'returns parent collection id' do
       within_collection_id = Search::Filters::WithinCollection.new('foo within(bar/123) baz').within_collection_id
-      expect(within_collection_id).to eq('123')
+      expect(within_collection_id).to eq(123)
 
       within_collection_id = Search::Filters::WithinCollection.new('foo within(bar-counter/123) baz').within_collection_id
-      expect(within_collection_id).to eq('123')
+      expect(within_collection_id).to eq(123)
     end
 
     it 'returns nil if no parent collection id' do

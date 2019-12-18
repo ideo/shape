@@ -52,7 +52,7 @@ RSpec.describe CardDuplicatorMapper::Base, type: :service do
         '789' => { 'type' => 'link_item' },
       )
       expect(subject.linked_card_ids).to eq(['789'])
-      expect(subject.linked_card?(original_card_id: '789')).to be true
+      expect(subject.linked_card?(card_id: '789')).to be true
     end
   end
 end

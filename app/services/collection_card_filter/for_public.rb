@@ -1,5 +1,5 @@
 module CollectionCardFilter
-  class ForUser < Base
+  class ForPublic < Base
     def initialize(cards_scope:, collection_order: nil, ids_only: false)
       @cards_scope = cards_scope
       # Needed for fields method

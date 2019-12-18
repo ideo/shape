@@ -15,7 +15,7 @@ RSpec.shared_context 'CardDuplicatorMapper setup' do
       text: "galactic within(#{organization.slug}/#{search_collection_target.id})",
     )
   end
-  let(:linked_text_card) { create(:collection_card_link_text, parent: parent_collection, item: text_item) }
+  let!(:linked_text_card) { create(:collection_card_link_text, parent: parent_collection, item: text_item) }
   let!(:cards) do
     [
       text_item.parent_collection_card,

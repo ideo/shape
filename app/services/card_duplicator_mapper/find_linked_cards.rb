@@ -29,11 +29,15 @@ module CardDuplicatorMapper
     private
 
     def all_link_cards
-      @all_link_cards ||= filter_cards_for_user(
+      return @all_link_cards if @all_link_cards.present?
+
+      links = filter_cards_for_user(
         CollectionCard::Link.where(
           parent_id: all_collections.map(&:id),
         ),
       )
+      links += load_cards.select(&:link?)
+      @all_link_cards = links.uniq
     end
 
     def all_search_collection_filters_by_collection_id
