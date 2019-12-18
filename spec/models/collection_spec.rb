@@ -802,6 +802,33 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#increment_card_orders_at' do
+    let!(:collection) { create(:collection, num_cards: 3) }
+
+    it 'should bump all card orders by the desired amount' do
+      expect(collection.collection_cards.map(&:order)).to eq [0, 1, 2]
+      collection.increment_card_orders_at(0)
+      collection.reload
+      expect(collection.collection_cards.map(&:order)).to eq [1, 2, 3]
+      collection.increment_card_orders_at(2, amount: 4)
+      collection.reload
+      expect(collection.collection_cards.map(&:order)).to eq [1, 6, 7]
+    end
+  end
+
+  describe '#card_order_at' do
+    let!(:collection) { create(:collection, num_cards: 3) }
+
+    it 'should convert "beginning/end" into the correct order' do
+      expect(collection.card_order_at('beginning')).to eq 0
+      expect(collection.card_order_at('end')).to eq 3
+    end
+
+    it 'should return the order if it\'s an integer' do
+      expect(collection.card_order_at(2)).to eq 2
+    end
+  end
+
   # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do

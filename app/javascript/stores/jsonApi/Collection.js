@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import axios from 'axios'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType, updateModelId } from 'datx'
 import pluralize from 'pluralize'
@@ -656,13 +657,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       } else {
         this.totalPages = links.last
       }
-      this.currentPage = page
       if (
         page === 1 &&
         (searchTerm || this.storedCacheKey !== this.cache_key)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
+        this.currentPage = 1
       } else {
         // NOTE: (potential pre-optimization) if collection_cards grows in size,
         // at some point do we reset back to a reasonable number?
@@ -675,6 +676,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             'id'
           )
         )
+        if (this.currentPage < page) {
+          this.currentPage = page
+        }
         this.collection_cards.replace(newData)
       }
     })
@@ -1043,6 +1047,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  API_fetchAllCardIds() {
+    return axios.get(`/api/v1/collections/${this.id}/collection_cards/ids`)
+  }
+
   async API_setSubmissionBoxTemplate(data) {
     await this.apiStore.request(
       `collections/set_submission_box_template`,
@@ -1165,6 +1173,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
+    // clearing placeholder will properly clear out multiMoveCardIds for the next step
+    uiStore.clearMdlPlaceholder()
     if (_.isEmpty(uiStore.multiMoveCardIds)) {
       uiStore.update('multiMoveCardIds', cardIds)
     }

@@ -47,11 +47,6 @@ export default class UiStore {
   selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   // stored in case we ever need to reset the text
   quillSnapshot = {}
-  @computed
-  get cardMenuOpenAndPositioned() {
-    const { cardMenuOpen } = this
-    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
-  }
   @observable
   organizationMenuPage = null
   @observable
@@ -210,6 +205,29 @@ export default class UiStore {
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
+  hoveringOverDefaults = {
+    order: null,
+    direction: null,
+    card: null,
+    record: null,
+    holdingOver: false,
+  }
+  @observable
+  hoveringOver = {
+    ...this.hoveringOverDefaults,
+  }
+  placeholderDefaults = {
+    xPos: 0,
+    yPos: 0,
+    width: 0,
+    height: 0,
+    cardWidth: 1,
+    cardHeight: 1,
+  }
+  @observable
+  placeholderPosition = {
+    ...this.placeholderDefaults,
+  }
 
   @action
   toggleEditingCardId(cardId) {
@@ -356,6 +374,12 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
+  @computed
+  get cardMenuOpenAndPositioned() {
+    const { cardMenuOpen } = this
+    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
+  }
+
   @action
   openContextMenu = (
     ev,
@@ -378,10 +402,6 @@ export default class UiStore {
     )
     const { offsetX, offsetY } = positionOffset
 
-    // if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
-    //   this.closeCardMenu()
-    // } else {
-    // }
     this.update('cardMenuOpen', {
       id: card.id,
       x,
@@ -396,7 +416,7 @@ export default class UiStore {
       this.selectedCardIds.indexOf(card.id) < 0
     ) {
       // deselect all cards when card menu is opened on a non-selected card
-      this.selectedCardIds.replace([])
+      this.deselectCards()
     }
   }
 
@@ -489,6 +509,7 @@ export default class UiStore {
       }
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
+      this.deselectCards()
       this.templateName = ''
     }
   }
@@ -770,6 +791,36 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+  }
+
+  @action
+  async selectAll({ location, card = null } = {}) {
+    const { viewingCollection } = this
+    let collection = viewingCollection
+    if (!viewingCollection) return false
+    if (
+      viewingCollection.isSubmissionBox &&
+      (location !== 'GridCard' || (card && card.parent !== viewingCollection))
+    ) {
+      // if we're viewing a submission box and we did not specifically click a card in the submission box itself
+      // select the submissions instead
+      collection = viewingCollection.submissions_collection
+    }
+    let all_collection_card_ids = _.map(collection.collection_cards, 'id')
+    this.reselectCardIds(all_collection_card_ids)
+    try {
+      const res = await collection.API_fetchAllCardIds()
+      all_collection_card_ids = res.data
+      this.reselectCardIds(all_collection_card_ids)
+      // if the user had already initiated a move action, move the newly selected cards into the move action
+      if (this.movingCardIds.length) {
+        runInAction(() => {
+          this.movingCardIds.replace([...this.selectedCardIds])
+        })
+      }
+    } catch (e) {
+      console.warn(e)
+    }
   }
 
   @computed
@@ -1171,5 +1222,26 @@ export default class UiStore {
   @action
   closeAdminUsersMenu() {
     this.adminUsersMenuOpen = null
+  }
+
+  @action
+  clearMdlPlaceholder() {
+    this.multiMoveCardIds.replace(
+      _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
+    )
+  }
+
+  @action
+  setHoveringOver(opts) {
+    if (!opts) {
+      this.hoveringOver = { ...this.hoveringOverDefaults }
+    } else {
+      this.hoveringOver = { ...this.hoveringOverDefaults, ...opts }
+    }
+  }
+
+  @action
+  updatePlaceholderPosition(position = {}) {
+    _.assign(this.placeholderPosition, position)
   }
 }
