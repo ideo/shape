@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 
+# This script is run once, after the app is destroyed
+# Docs: https://devcenter.heroku.com/articles/github-integration-review-apps
+
 # Remove the redirect URI for this review app to the whitelist of redirect URIs
 rake network_api:application_remove_redirect_uri

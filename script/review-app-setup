@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
 
+# This script is run once, after the app is first setup
+# Docs: https://devcenter.heroku.com/articles/github-integration-review-apps
+
 # We get authenticated using the HEROKU_API_TOKEN value
 # You can generate a long-lived token using `heroku authorizations:create`
 
 # Set the BASE_HOST and ACTION_CABLE_URL from the review app name
-heroku config:set BASE_HOST=https://${HEROKU_APP_NAME}.herokuapp.com ACTION_CABLE_URL=wss://${HEROKU_APP_NAME}.herokuapp.com/cable REDIS_URL=${REDISCLOUD_URL} --app ${HEROKU_APP_NAME}
+heroku config:set BASE_HOST=https://${HEROKU_APP_NAME}.herokuapp.com ACTION_CABLE_URL=wss://${HEROKU_APP_NAME}.herokuapp.com/cable REDIS_URL=${REDISCLOUD_URL} -a ${HEROKU_APP_NAME}
 
 # Add the redirect URI for this review app to the whitelist of redirect URIs
 rake network_api:application_add_redirect_uri
+
+# Re-deploy the app so that above ENV variables get compiled
+heroku plugins:install heroku-builds
+# Download the branch using our Github access token
+curl -H "Authorization: token ${GITHUB_ACCESS_TOKEN}" -o ./tmp/shape-repo.tar.gz -L https://github.com/ideo/shape/archive/${HEROKU_BRANCH}.tar.gz
+# Create a new build from the branch
+heroku builds:create --source-tar ./tmp/shape-repo.tar.gz -a ${HEROKU_APP_NAME}
+# Clean up
+rm ./tmp/shape-repo.tar.gz
