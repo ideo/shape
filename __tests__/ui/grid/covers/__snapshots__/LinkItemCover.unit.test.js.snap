@@ -25,9 +25,7 @@ exports[`LinkItemCover renders snapshot 1`] = `
         </CardHeading>
         <p
           className="content"
-        >
-          The best news under the sun
-        </p>
+        />
         <GridCardIconWithName
           icon={
             <img
