@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MovableGridCard renders snapshot 1`] = `
+exports[`CollectionCreator renders snapshot 1`] = `
 <styled.div>
   <form
     className="form"
@@ -20,7 +20,7 @@ exports[`MovableGridCard renders snapshot 1`] = `
       disabled={false}
       width={125}
     >
-      Add
+      Create
     </FormButton>
   </form>
 </styled.div>

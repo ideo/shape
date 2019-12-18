@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { observable, computed, action, runInAction } from 'mobx'
-import { ReferenceType } from 'datx'
+import { ReferenceType, updateModelId } from 'datx'
 import pluralize from 'pluralize'
 import queryString from 'query-string'
 import googleTagManager from '~/vendor/googleTagManager'
@@ -37,6 +37,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @observable
   totalPages = 1
   recordsPerPage = 50
+  searchRecordsPerPage = 20
   @observable
   scrollBottom = 0
   @observable
@@ -45,6 +46,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   loadedRows = 0
   @observable
   loadedCols = 0
+  // this stores the "virtual" search results collection
+  searchResultsCollection = null
 
   attributesForAPI = [
     'name',
@@ -54,6 +57,25 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'collection_to_test_id',
     'test_show_media',
   ]
+
+  constructor(...args) {
+    super(...args)
+    if (this.isSearchCollection) {
+      this.searchResultsCollection = new Collection(
+        {
+          ...this.rawAttributes(),
+          // making up a type
+          class_type: 'SearchResultsCollection',
+        },
+        this.apiStore
+      )
+      this.searchResultsCollection.collection = this
+      updateModelId(this.searchResultsCollection, `${this.id}-searchResults`)
+      runInAction(() => {
+        this.searchResultsCollection.currentOrder = 'relevance'
+      })
+    }
+  }
 
   @computed
   get cardIds() {
@@ -271,6 +293,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isSharedCollection() {
     return this.type === 'Collection::SharedWithMeCollection'
+  }
+
+  get isSearchCollection() {
+    return this.type === 'Collection::SearchCollection'
+  }
+
+  get isSearchResultsCollection() {
+    return this.type === 'SearchResultsCollection'
   }
 
   get canSetACover() {
@@ -517,6 +547,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return _.replace(this.name, ' Feedback Design', '')
   }
 
+  get baseId() {
+    return this.id.split('-')[0]
+  }
+
   @action
   addCard(card) {
     this.collection_cards.unshift(card)
@@ -542,7 +576,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get collectionFilterQuery() {
-    const activeFilters = this.collection_filters
+    let { collection_filters } = this
+    if (this.isSearchResultsCollection) {
+      collection_filters = this.collection.collection_filters
+    } else if (this.isSearchCollection) {
+      return {}
+    }
+    const activeFilters = collection_filters
       .filter(filter => filter.selected)
       .map(filter =>
         filter.filter_type === 'tag' ? `#${filter.text}` : filter.text
@@ -565,6 +605,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     hidden = false,
     rows,
     cols,
+    searchTerm,
   } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
@@ -591,17 +632,35 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (rows) {
       params.rows = rows
     }
-    const apiPath = `collections/${
+    let apiPath = `collections/${
       this.id
     }/collection_cards?${queryString.stringify(params, {
       arrayFormat: 'bracket',
     })}`
+    if (searchTerm) {
+      const query = `${searchTerm} ${queryString.stringify(
+        this.collectionFilterQuery
+      )}`
+      params.query = query
+      params.current_collection_id = this.baseId
+      const stringifiedParams = queryString.stringify(params, {
+        arrayFormat: 'bracket',
+      })
+      apiPath = `organizations/${this.organization_id}/search_collection_cards?${stringifiedParams}`
+    }
     const res = await this.apiStore.request(apiPath)
-    const { data, links } = res
+    const { data, links, meta } = res
     runInAction(() => {
-      this.totalPages = links.last
+      if (searchTerm) {
+        this.totalPages = meta.total_pages
+      } else {
+        this.totalPages = links.last
+      }
       this.currentPage = page
-      if (page === 1 && this.storedCacheKey !== this.cache_key) {
+      if (
+        page === 1 &&
+        (searchTerm || this.storedCacheKey !== this.cache_key)
+      ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
       } else {
@@ -992,6 +1051,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
     // refetch cards because we just created a new one, for the template
     return this.API_fetchCards()
+  }
+
+  async API_backgroundUpdateTemplateInstances() {
+    await this.apiStore.request(
+      `collections/${this.id}/background_update_template_instances`,
+      'POST'
+    )
+
+    return
   }
 
   API_clearCollectionCover() {

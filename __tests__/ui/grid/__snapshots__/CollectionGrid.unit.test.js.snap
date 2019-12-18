@@ -1177,8 +1177,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -1627,8 +1629,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -3314,8 +3318,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -3764,8 +3770,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -5451,8 +5459,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -5901,8 +5911,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -7463,8 +7475,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "pageTitle": "My Workspace X | Shape",
             "parent_collection_card": [Circular],
             "patch": [MockFunction],
+            "recordsPerPage": 50,
             "roles": Array [],
             "save": [MockFunction],
+            "searchRecordsPerPage": 20,
             "sortedCards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -7913,8 +7927,10 @@ exports[`CollectionGrid renders snapshot 1`] = `
           "width": 1,
         },
         "patch": [MockFunction],
+        "recordsPerPage": 50,
         "roles": Array [],
         "save": [MockFunction],
+        "searchRecordsPerPage": 20,
         "sortedCards": Array [
           Object {
             "API_archive": [MockFunction],

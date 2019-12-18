@@ -1082,10 +1082,10 @@ CollectionGrid.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
   cardProperties: MobxPropTypes.arrayOrObservableArray.isRequired,
-  canEditCollection: PropTypes.bool,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
-  isMovingCards: PropTypes.bool,
   loadCollectionCards: PropTypes.func.isRequired,
+  canEditCollection: PropTypes.bool,
+  isMovingCards: PropTypes.bool,
   shouldAddEmptyRow: PropTypes.bool,
   submissionSettings: PropTypes.shape({
     type: PropTypes.string,
