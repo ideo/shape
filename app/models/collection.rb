@@ -350,7 +350,8 @@ class Collection < ApplicationRecord
     parent: self.parent,
     building_template_instance: false,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    card: nil
   )
 
     # check if we are cloning a template inside a template instance;
@@ -391,6 +392,7 @@ class Collection < ApplicationRecord
 
     # save the dupe collection first so that we can reference it later
     # return if it didn't work for whatever reason
+    c.parent_collection_card = card if card
     return c unless c.save
 
     c.parent_collection_card.save if c.parent_collection_card.present?
@@ -407,7 +409,7 @@ class Collection < ApplicationRecord
     # Method from Externalizable
     duplicate_external_records(c)
 
-    c.enable_org_view_access_if_allowed(parent)
+    c.enable_org_view_access_if_allowed
 
     if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
@@ -525,6 +527,21 @@ class Collection < ApplicationRecord
     end
   end
 
+  def recursively_fix_breadcrumbs!(cards = collection_cards)
+    cards.each do |card|
+      next if card.link?
+
+      if card.item.present?
+        # have to reload in order to pick up new parent relationship
+        card.item.reload.recalculate_breadcrumb!
+      elsif card.collection_id.present?
+        # this will run recursively rather than using breadcrumb to find all children
+        card.collection.reload.recalculate_breadcrumb!
+        card.collection.recursively_fix_breadcrumbs!
+      end
+    end
+  end
+
   def collection_cards_by_page(page: 1, per_page: CollectionCard::DEFAULT_PER_PAGE)
     all_collection_cards.page(page).per(per_page)
   end
@@ -587,10 +604,10 @@ class Collection < ApplicationRecord
     queue_update_template_instances
   end
 
-  def enable_org_view_access_if_allowed(parent)
+  def enable_org_view_access_if_allowed
     # If parent is user collection, allow primary group to see it
     # As long as it isn't the 'Getting Started' collection
-    return false unless parent.is_a?(Collection::UserCollection) &&
+    return false unless parent&.is_a?(Collection::UserCollection) &&
                         (cloned_from.blank? ||
                          !cloned_from.getting_started? &&
                          !cloned_from.inside_getting_started?)
