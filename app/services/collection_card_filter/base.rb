@@ -54,7 +54,7 @@ module CollectionCardFilter
     def initialize_cards
       if @ids_only
         # start with all_collection_cards to unscope the order, and `active` will be applied below
-        @cards = @collection.all_collection_cards
+        @cards = @collection.all_collection_cards.not_placeholder
       elsif @collection.is_a?(Collection::Board)
         # Defaults to 16x16 since we default to a fully zoomed-out view
         rows = @filters[:rows].is_a?(Array) ? @filters[:rows] : [0, 16]

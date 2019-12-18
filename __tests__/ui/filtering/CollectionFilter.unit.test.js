@@ -138,6 +138,19 @@ describe('CollectionFilter', () => {
       })
     })
 
+    describe('adding duplicate tag', () => {
+      beforeEach(() => {
+        props.collection.API_createCollectionFilter.mockClear()
+        fireEvent('Tags', fakeCollectionFilter.text)
+      })
+
+      it('does not call API_createCollectionFilter if filter is dupe', () => {
+        expect(
+          props.collection.API_createCollectionFilter
+        ).not.toHaveBeenCalled()
+      })
+    })
+
     describe('with the filter type set to null', () => {
       beforeEach(() => {
         props.collection.API_createCollectionFilter.mockClear()

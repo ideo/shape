@@ -125,6 +125,13 @@ export const EVENT_SOURCE_TYPES = {
   TEXT_EDITOR: 'textEditor',
 }
 
+export const TOUCH_DEVICE_OS = {
+  WINDOWS: 'Windows Phone',
+  ANDROID: 'Android',
+  IOS: 'iOS',
+  UNKNOWN: 'Unknown',
+}
+
 // warning: don't change, modify component based offsets instead. see: clickUtils::calculatePopoutMenuOffset
 export const INITIAL_OFFSET_X = 20
 export const INITIAL_OFFSET_Y = 90
@@ -162,7 +169,7 @@ export default {
   navOpacity: 0.9,
 
   cardHoldTime: 0.4 * 1000,
-  touchDeviceHoldToDragTime: 1000,
+  touchDeviceHoldToDragTime: 1500,
 
   colors: {
     black: '#120f0e',

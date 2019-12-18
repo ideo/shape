@@ -827,6 +827,19 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#card_order_at' do
+    let!(:collection) { create(:collection, num_cards: 3) }
+
+    it 'should convert "beginning/end" into the correct order' do
+      expect(collection.card_order_at('beginning')).to eq 0
+      expect(collection.card_order_at('end')).to eq 3
+    end
+
+    it 'should return the order if it\'s an integer' do
+      expect(collection.card_order_at(2)).to eq 2
+    end
+  end
+
   # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do

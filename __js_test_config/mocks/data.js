@@ -25,7 +25,8 @@ export const fakeCollectionCard = {
   image_contain: false,
   section_type: null,
   beginReplacing: jest.fn(),
-  reselectOnlyEditableCards: jest.fn(),
+  reselectOnlyEditableRecords: jest.fn(),
+  reselectOnlyMovableCards: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
@@ -406,6 +407,7 @@ export const fakeCollection = {
   anyone_can_view: false,
   anyone_can_join: false,
   recordsPerPage: 50,
+  searchRecordsPerPage: 20,
   updated_at: "2019-11-22T18:57:12.863Z",
   cover: {
     image_url: 'http://fake.url.net',

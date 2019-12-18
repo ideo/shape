@@ -6,6 +6,9 @@ jest.mock('../../../app/javascript/stores')
 
 const collection = Object.assign({}, fakeCollection, {
   isSearchCollection: true,
+  searchResultsCollection: Object.assign({}, fakeCollection, {
+    isSearchResultsCollection: true,
+  }),
 })
 const collectionCards = []
 let wrapper, uiStore
@@ -48,7 +51,7 @@ describe('SearchCollection', () => {
     describe('after loading search collection results', () => {
       beforeEach(async () => {
         component.loading = false
-        component.searchCollectionCards = [{ id: 1 }]
+        collection.searchResultsCollection.collection_cards = [{ id: 1 }]
         wrapper.update()
       })
 
@@ -63,13 +66,13 @@ describe('SearchCollection', () => {
     })
 
     describe('after loading 0 search results', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
+        collection.searchResultsCollection.collection_cards = []
+        rerender()
         component.loading = false
-        component.searchCollectionCards = []
-        wrapper.update()
       })
 
-      it('should render a second collection grid', () => {
+      it('should render a second collection grid with text', () => {
         expect(wrapper.find('StyledDisplayText').exists()).toBe(true)
       })
     })
@@ -80,8 +83,8 @@ describe('SearchCollection', () => {
       expect(collection.API_fetchCards).toHaveBeenCalled()
       expect(collection.API_fetchCards).toHaveBeenCalledWith({
         searchTerm: 'plants',
-        page: undefined,
-        per_page: 50,
+        page: 1,
+        per_page: 20,
       })
     })
   })
@@ -101,31 +104,49 @@ describe('SearchCollection', () => {
   })
 
   describe('loadSearchedCards', () => {
-    let searchCards = []
     beforeEach(() => {
-      searchCards = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]
-      collection.API_fetchCards.mockReturnValue(Promise.resolve(searchCards))
+      collection.searchResultsCollection.API_fetchCards.mockReturnValue(
+        Promise.resolve([{ id: 1 }])
+      )
     })
 
     describe('when on a new page', () => {
       beforeEach(() => {
-        component.searchCollectionCards = [{ id: 6 }]
+        collection.searchResultsCollection.collection_cards = [{ id: 6 }]
         component.loadSearchedCards({ page: 2, per_page: 40 })
       })
 
-      it('should add the results to the search collection cards', () => {
-        expect(component.searchCollectionCards.length).toEqual(5)
+      it('should search for new results', () => {
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalled()
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalledWith({
+          searchTerm: 'plants',
+          page: 2,
+          per_page: 20,
+        })
       })
     })
 
     describe('when on the first page', () => {
       beforeEach(() => {
-        component.searchCollectionCards = [{ id: 1 }]
-        component.loadSearchedCards({ page: 0, per_page: 40 })
+        collection.searchResultsCollection.collection_cards = [{ id: 1 }]
+        component.loadSearchedCards({ page: 1, per_page: 40 })
       })
 
-      it('should set the search collection cards to the results', () => {
-        expect(component.searchCollectionCards.length).toEqual(4)
+      it('should search for new results', () => {
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalled()
+        expect(
+          collection.searchResultsCollection.API_fetchCards
+        ).toHaveBeenCalledWith({
+          searchTerm: 'plants',
+          page: 1,
+          per_page: 20,
+        })
       })
     })
   })

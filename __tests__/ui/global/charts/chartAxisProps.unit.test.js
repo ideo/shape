@@ -64,9 +64,9 @@ describe('chartAxisProps', () => {
       expect(label).toEqual('')
       // should display the short name of the month that previously ended
       label = monthlyXAxisText(props.datasetValues, 'monthly', '2018-01-02')
-      expect(label).toEqual('Dec')
-      label = monthlyXAxisText(props.datasetValues, 'monthly', '2018-12-31')
-      expect(label).toEqual('Dec')
+      expect(label).toEqual('Dec 2017')
+      label = monthlyXAxisText(props.datasetValues, 'monthly', '2019-12-31')
+      expect(label).toEqual('Dec 2019')
     })
   })
 })

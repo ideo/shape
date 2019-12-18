@@ -1,5 +1,12 @@
 class CollectionCardDuplicator < SimpleService
-  def initialize(to_collection:, cards:, placement:, for_user:, system_collection: false, batch_id: nil)
+  def initialize(
+    to_collection:,
+    cards:,
+    placement:,
+    for_user:,
+    system_collection: false,
+    batch_id: nil
+  )
     @to_collection = to_collection
     @cards = cards
     @placement = placement
@@ -22,14 +29,7 @@ class CollectionCardDuplicator < SimpleService
   private
 
   def initialize_card_order
-    # default to 'beginning', which goes after the first pinned card
-    @order = @to_collection.collection_cards.pinned.maximum(:order) || 0
-    if @placement == 'end'
-      @order = @to_collection.cached_last_card_order || @to_collection.collection_cards.maximum(:order) || -1
-      @order += 1
-    elsif @placement.is_a?(Integer)
-      @order = @placement
-    end
+    @order = @to_collection.card_order_at(@placement)
 
     # now make room for these cards (unless we're at the end)
     return if @placement == 'end'

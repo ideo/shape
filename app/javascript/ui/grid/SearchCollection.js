@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
+import { Flex } from 'reflexbox'
 import { observable, computed, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
@@ -26,7 +27,6 @@ class SearchCollection extends React.Component {
     this.loadSearchedCards()
   }
 
-  @computed
   get searchCollectionCards() {
     const { collection } = this.props
     return collection.searchResultsCollection
@@ -102,16 +102,18 @@ class SearchCollection extends React.Component {
           movingCardIds={[]}
         />
         <PageSeparator title={<h3>Search Results</h3>} />
-        <EditableSearchInput
-          value={collection.search_term || ''}
-          onChange={this.onSearchChange}
-          canEdit={collection.can_edit}
-          dataCy="SearchCollectionInput"
-        />
-        <CollectionFilter
-          collection={collection}
-          canEdit={collection.can_edit_content}
-        />
+        <Flex justify="space-between" align="center" mb="12px">
+          <EditableSearchInput
+            value={collection.search_term || ''}
+            onChange={this.onSearchChange}
+            canEdit={collection.can_edit}
+            dataCy="SearchCollectionInput"
+          />
+          <CollectionFilter
+            collection={collection}
+            canEdit={collection.can_edit_content}
+          />
+        </Flex>
         {this.loading ? (
           <Loader />
         ) : (

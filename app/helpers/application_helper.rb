@@ -24,4 +24,8 @@ module ApplicationHelper
     end
     url
   end
+
+  def javascript_packs_with_polyfill(*packs)
+    javascript_packs_with_chunks_tag 'babel-polyfill', *packs
+  end
 end

@@ -305,7 +305,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get canSetACover() {
-    return !this.isSharedCollection && !this.isUserCollection
+    return (
+      !this.isSharedCollection &&
+      !this.isUserCollection &&
+      this.cover_type === 'cover_type_default'
+    )
   }
 
   get isSubmissionBox() {
@@ -420,6 +424,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isCarousel() {
     return this.cover_type === 'cover_type_carousel'
+  }
+
+  get isCreativeDifferenceChartCover() {
+    return (
+      this.cover_type === 'cover_type_items' &&
+      this.collection_cover_items[0].isData
+    )
   }
 
   @computed
@@ -646,13 +657,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       } else {
         this.totalPages = links.last
       }
-      this.currentPage = page
       if (
         page === 1 &&
         (searchTerm || this.storedCacheKey !== this.cache_key)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
+        this.currentPage = 1
       } else {
         // NOTE: (potential pre-optimization) if collection_cards grows in size,
         // at some point do we reset back to a reasonable number?
@@ -665,6 +676,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             'id'
           )
         )
+        if (this.currentPage < page) {
+          this.currentPage = page
+        }
         this.collection_cards.replace(newData)
       }
     })
@@ -1045,6 +1059,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
     // refetch cards because we just created a new one, for the template
     return this.API_fetchCards()
+  }
+
+  async API_backgroundUpdateTemplateInstances() {
+    await this.apiStore.request(
+      `collections/${this.id}/background_update_template_instances`,
+      'POST'
+    )
+
+    return
   }
 
   API_clearCollectionCover() {

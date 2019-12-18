@@ -25,6 +25,10 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       expect(instance.name).to eq "My #{template.name}"
     end
 
+    it 'should copy the tags over to the instance' do
+      expect(instance.tag_list).to eq template.tag_list
+    end
+
     it 'should give parent collection users the same access to collection and its items' do
       expect(instance.can_view?(viewer)).to be true
       expect(instance.collection_cards.first.record.can_view?(viewer)).to be true
@@ -179,6 +183,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         )
         # cheat and move this one inside the parent anyway, to simulate bad issue
         c1.parent_collection_card.update(parent: collection, pinned: true)
+        c1.recalculate_breadcrumb!
       end
 
       after do
@@ -195,13 +200,15 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       end
 
       it 'does not get stuck creating multiple instances of itself' do
-        # NOTE: the fix is the reuslt of a guard clause in templateable#add_cards_from_master_template
+        # NOTE: the fix is the result of a guard clause in templateable#add_cards_from_master_template
         collection.reload.update_template_instances
         templates_created = Collection.in_collection(other_collection).where(template: collection)
-        expect(templates_created.count).to eq 2
+        expect(templates_created.count).to eq 1
         # should not end up creating more instances every time you call update_template_instances
-        collection.reload.update_template_instances
-        expect(templates_created.count).to eq 2
+        expect {
+          collection.reload.update_template_instances
+        }.not_to change(Collection, :count)
+        expect(templates_created.reload.count).to eq 1
       end
     end
   end

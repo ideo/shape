@@ -239,7 +239,8 @@ class CollectionCard extends BaseRecord {
     const filteredCards = _.filter(
       this.apiStore.findAll('collection_cards'),
       card =>
-        _.includes(cardIds, card.id) && card.record && card.record.can_edit
+        _.includes(cardIds, card.id) &&
+        (card.link || (card.record && card.record.can_edit))
     )
     const filteredCardIds = _.map(filteredCards, 'id')
     const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
@@ -271,7 +272,7 @@ class CollectionCard extends BaseRecord {
     return _.some(
       this.apiStore.selectedCards,
       card =>
-        // look for any records you can't edit, that way this will trigger reselectOnlyEditableCards()
+        // look for any records you can't edit, that way this will trigger reselectOnlyEditableRecords()
         !card.record.can_edit ||
         // otherwise warn for collections w/ cards
         (!card.link &&
@@ -366,7 +367,7 @@ class CollectionCard extends BaseRecord {
           } = collection.confirmEditOptions)
         } else if (selectedCardIds.length > 1) {
           // check if multiple cards were selected
-          const removedCount = this.reselectOnlyEditableCards(selectedCardIds)
+          const removedCount = this.reselectOnlyEditableRecords(selectedCardIds)
           prompt = 'Are you sure you want to delete '
           if (selectedCardIds.length > 1) {
             prompt += `these ${selectedCardIds.length} objects?`

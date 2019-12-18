@@ -21,14 +21,10 @@ const props = {
   onResize: jest.fn(),
   onDragOrResizeStop: jest.fn(),
   routeTo: jest.fn(),
-  menuOpen: false,
   canEditCollection: false,
   isUserCollection: false,
   isSharedCollection: false,
-  hoveringOverLeft: false,
-  hoveringOverRight: false,
   isBoardCollection: false,
-  holdingOver: false,
   dragOffset: { x: 0, y: 0 },
 }
 
@@ -131,7 +127,10 @@ describe('MovableGridCard', () => {
 
   describe('when hoveringOverRight', () => {
     beforeEach(() => {
-      props.hoveringOverRight = true
+      uiStore.hoveringOver = {
+        card: { id: props.card.id },
+        direction: 'right',
+      }
       wrapper = shallow(<MovableGridCard {...props} />)
     })
 

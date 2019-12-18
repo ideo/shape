@@ -4,9 +4,10 @@ import { observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
-import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
+import v, { TOUCH_DEVICE_OS, EVENT_SOURCE_TYPES } from '~/utils/variables'
 import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
+import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 
 export default class UiStore {
   // store this for usage by other components
@@ -46,11 +47,6 @@ export default class UiStore {
   selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   // stored in case we ever need to reset the text
   quillSnapshot = {}
-  @computed
-  get cardMenuOpenAndPositioned() {
-    const { cardMenuOpen } = this
-    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
-  }
   @observable
   organizationMenuPage = null
   @observable
@@ -209,6 +205,29 @@ export default class UiStore {
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
+  hoveringOverDefaults = {
+    order: null,
+    direction: null,
+    card: null,
+    record: null,
+    holdingOver: false,
+  }
+  @observable
+  hoveringOver = {
+    ...this.hoveringOverDefaults,
+  }
+  placeholderDefaults = {
+    xPos: 0,
+    yPos: 0,
+    width: 0,
+    height: 0,
+    cardWidth: 1,
+    cardHeight: 1,
+  }
+  @observable
+  placeholderPosition = {
+    ...this.placeholderDefaults,
+  }
 
   @action
   toggleEditingCardId(cardId) {
@@ -355,6 +374,12 @@ export default class UiStore {
     this.dialogConfig.open = null
   }
 
+  @computed
+  get cardMenuOpenAndPositioned() {
+    const { cardMenuOpen } = this
+    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
+  }
+
   @action
   openContextMenu = (
     ev,
@@ -377,10 +402,6 @@ export default class UiStore {
     )
     const { offsetX, offsetY } = positionOffset
 
-    // if (this.cardMenuOpen.id && !this.textMenuOpenForCard(card.id)) {
-    //   this.closeCardMenu()
-    // } else {
-    // }
     this.update('cardMenuOpen', {
       id: card.id,
       x,
@@ -395,7 +416,7 @@ export default class UiStore {
       this.selectedCardIds.indexOf(card.id) < 0
     ) {
       // deselect all cards when card menu is opened on a non-selected card
-      this.selectedCardIds.replace([])
+      this.deselectCards()
     }
   }
 
@@ -557,7 +578,7 @@ export default class UiStore {
   }
 
   get isAndroid() {
-    return /(android)/i.test(navigator.userAgent)
+    return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
@@ -1208,5 +1229,19 @@ export default class UiStore {
     this.multiMoveCardIds.replace(
       _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
     )
+  }
+
+  @action
+  setHoveringOver(opts) {
+    if (!opts) {
+      this.hoveringOver = { ...this.hoveringOverDefaults }
+    } else {
+      this.hoveringOver = { ...this.hoveringOverDefaults, ...opts }
+    }
+  }
+
+  @action
+  updatePlaceholderPosition(position = {}) {
+    _.assign(this.placeholderPosition, position)
   }
 }

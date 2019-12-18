@@ -189,3 +189,7 @@ export const TextButton = styled.button`
   max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 `
 TextButton.displayName = 'StyledTextButton'
+
+export const CollectionCoverTextButton = styled(TextButton)`
+  font-size: 0.75rem;
+`
