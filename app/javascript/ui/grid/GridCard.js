@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observable, action } from 'mobx'
+import { observable, computed, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ContainImage from '~/ui/grid/ContainImage'
@@ -110,10 +110,15 @@ class GridCard extends React.Component {
     return uiStore.editingCardCover === id
   }
 
+  @computed
+  get menuOpen() {
+    return uiStore.actionMenuOpenForCard(this.props.card.id)
+  }
+
   renderTopRightActions() {
+    const { menuOpen } = this
     const {
       record,
-      menuOpen,
       zoomLevel,
       card,
       canEditCollection,
@@ -252,7 +257,7 @@ class GridCard extends React.Component {
 
   closeMenu = () => {
     // this happens when you mouse off the ActionMenu
-    if (this.props.menuOpen) {
+    if (this.menuOpen) {
       // if we right-clicked, keep the menu open
       if (!uiStore.cardMenuOpenAndPositioned) {
         uiStore.closeCardMenu()
@@ -564,7 +569,6 @@ GridCard.propTypes = {
   handleClick: PropTypes.func,
   dragging: PropTypes.bool,
   hoveringOver: PropTypes.bool,
-  menuOpen: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
   testCollectionCard: PropTypes.bool,
   searchResult: PropTypes.bool,
@@ -581,7 +585,6 @@ GridCard.defaultProps = {
   handleClick: () => null,
   dragging: false,
   hoveringOver: false,
-  menuOpen: false,
   lastPinnedCard: false,
   testCollectionCard: false,
   draggingMultiple: false,

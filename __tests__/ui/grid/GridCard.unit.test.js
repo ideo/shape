@@ -18,22 +18,20 @@ const props = {
   onMoveStart: jest.fn(),
   dragging: false,
   height: 100,
-  menuOpen: false,
   canEditCollection: false,
   isSharedCollection: false,
   searchResult: false,
 }
 
-let wrapper, rerender
-describe('GridCard', () => {
-  beforeEach(() => {
-    rerender = function() {
-      props.handleClick.mockClear()
-      wrapper = shallow(<GridCard {...props} />)
-      return wrapper
-    }
-  })
+let wrapper, component
+const rerender = function() {
+  props.handleClick.mockClear()
+  wrapper = shallow(<GridCard {...props} />)
+  component = wrapper.instance()
+  return wrapper
+}
 
+describe('GridCard', () => {
   describe('with item', () => {
     describe('as viewer', () => {
       beforeEach(() => {
@@ -95,6 +93,18 @@ describe('GridCard', () => {
       it('renders selection circle and hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(true)
+      })
+    })
+
+    describe('menuOpen', () => {
+      it('opens and closes via openActionMenu and closeMenu', () => {
+        expect(component.menuOpen).toBe(false)
+        const fakeEvent = { target: { closest: jest.fn() } }
+        // NOTE: this test works because this file imports the actual uiStore
+        component.openActionMenu(fakeEvent)
+        expect(component.menuOpen).toBe(true)
+        component.closeMenu()
+        expect(component.menuOpen).toBe(false)
       })
     })
 
