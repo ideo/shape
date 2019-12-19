@@ -8,6 +8,14 @@ import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/FilestackUpload')
+jest.mock('../../../app/javascript/utils/parseURLMeta', () =>
+  jest.fn().mockReturnValue(
+    Promise.resolve({
+      title: 'new title',
+      description: 'a new description',
+    })
+  )
+)
 
 let apiStore, card, collection, uiStore
 let props = {}
@@ -203,6 +211,23 @@ describe('CardCoverEditor', () => {
 
     it('should save the card', () => {
       expect(props.card.save).toHaveBeenCalled()
+    })
+  })
+
+  describe('handleRestore()', () => {
+    beforeEach(() => {
+      rerender()
+      component.cardTitle = 'First title'
+      component.hardcodedSubtitle = 'First description'
+      component.handleRestore()
+    })
+
+    it('should set the subtitle to the metadata', () => {
+      expect(component.cardTitle).toEqual('new title')
+    })
+
+    it('should set the title to the metadata title', () => {
+      expect(component.hardcodedSubtitle).toEqual('a new description')
     })
   })
 })
