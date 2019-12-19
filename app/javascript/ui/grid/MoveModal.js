@@ -47,6 +47,39 @@ class MoveModal extends React.Component {
       this.handleMoveToEnd()
       uiStore.update('pastingCards', false)
     }
+    const hideDraggableCard = hidden => {
+      // HACK: selects movingCardId when template helper modal is active is active then hides it
+      const templateCardId = uiStore.movingCardIds[0]
+      const selectedCardIdElement = document.getElementById(
+        `gridCard-${templateCardId}-mdlPlaceholder`
+      )
+      const selectedDraggableElement = selectedCardIdElement.closest(
+        '.react-draggable'
+      )
+      if (selectedCardIdElement && selectedDraggableElement) {
+        if (hidden) {
+          selectedDraggableElement.style.visibility = 'hidden'
+        } else {
+          selectedDraggableElement.style.visibility = 'visible'
+        }
+      }
+    }
+    if (this.templateHelperModalActive) {
+      setTimeout(() => {
+        hideDraggableCard(true)
+      }, 100)
+    } else {
+      hideDraggableCard(false)
+    }
+  }
+
+  get templateHelperModalActive() {
+    const { uiStore, apiStore } = this.props
+    return (
+      uiStore.cardAction === 'useTemplate' &&
+      apiStore.currentUser.show_template_helper &&
+      !uiStore.dismissedMoveHelper
+    )
   }
 
   handleClose = ev => {
@@ -97,10 +130,21 @@ class MoveModal extends React.Component {
 
   get moveHelper() {
     const { uiStore, apiStore } = this.props
+    const { cardAction, templateName } = uiStore
     const helperProps = {
       type: 'move',
     }
-    if (!apiStore.currentUser.show_move_helper || uiStore.dismissedMoveHelper) {
+
+    if (cardAction === 'useTemplate') {
+      if (!apiStore.currentUser.show_template_helper) {
+        return null
+      }
+      helperProps.recordName = templateName
+      helperProps.type = 'template'
+    } else if (
+      !apiStore.currentUser.show_move_helper ||
+      uiStore.dismissedMoveHelper
+    ) {
       return null
     }
     return (
@@ -210,21 +254,11 @@ class MoveModal extends React.Component {
   }
 
   render() {
-    const { apiStore, uiStore } = this.props
+    const { uiStore } = this.props
     if (!uiStore.shouldOpenMoveModal) return null
-    if (
-      uiStore.cardAction === 'useTemplate' &&
-      apiStore.currentUser.show_template_helper
-    ) {
-      if (!uiStore.dismissedMoveHelper) {
-        return this.moveTemplateHelper
-      } else {
-        return this.moveSnackbar
-      }
-    }
     return (
       <div>
-        {this.moveSnackbar}
+        {!this.templateHelperModalActive && this.moveSnackbar}
         {this.moveHelper}
       </div>
     )
