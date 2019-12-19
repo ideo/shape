@@ -97,21 +97,23 @@ class MoveModal extends React.Component {
 
   get moveHelper() {
     const { uiStore, apiStore } = this.props
-    const { cardAction, templateName } = uiStore
     const helperProps = {
       type: 'move',
     }
-    if (cardAction === 'useTemplate') {
-      if (!apiStore.currentUser.show_template_helper) {
-        return null
-      }
-      helperProps.recordName = templateName
-      helperProps.type = 'template'
-    } else if (
-      !apiStore.currentUser.show_move_helper ||
-      uiStore.dismissedMoveHelper
-    ) {
+    if (!apiStore.currentUser.show_move_helper || uiStore.dismissedMoveHelper) {
       return null
+    }
+    return (
+      <MoveHelperModal currentUser={apiStore.currentUser} {...helperProps} />
+    )
+  }
+
+  get moveTemplateHelper() {
+    const { uiStore, apiStore } = this.props
+    const { templateName } = uiStore
+    const helperProps = {
+      type: 'template',
+      recordName: templateName,
     }
     return (
       <MoveHelperModal currentUser={apiStore.currentUser} {...helperProps} />
@@ -174,6 +176,31 @@ class MoveModal extends React.Component {
     )
   }
 
+  get moveSnackbar() {
+    const { uiStore } = this.props
+    return (
+      <StyledSnackbar classes={{ root: 'Snackbar' }} open>
+        {uiStore.isLoadingMoveAction ? (
+          <SnackbarBackground>
+            <InlineLoader />
+          </SnackbarBackground>
+        ) : (
+          <Fragment>
+            <StyledSnackbarContent
+              classes={{ root: 'SnackbarContent' }}
+              message={
+                <StyledSnackbarText id="message-id">
+                  {this.moveMessage}
+                </StyledSnackbarText>
+              }
+              action={this.snackbarActions}
+            />
+          </Fragment>
+        )}
+      </StyledSnackbar>
+    )
+  }
+
   get snackbarActions() {
     return [
       this.upArrowIconHolder,
@@ -183,29 +210,21 @@ class MoveModal extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { apiStore, uiStore } = this.props
     if (!uiStore.shouldOpenMoveModal) return null
+    if (
+      uiStore.cardAction === 'useTemplate' &&
+      apiStore.currentUser.show_template_helper
+    ) {
+      if (!uiStore.dismissedMoveHelper) {
+        return this.moveTemplateHelper
+      } else {
+        return this.moveSnackbar
+      }
+    }
     return (
       <div>
-        <StyledSnackbar classes={{ root: 'Snackbar' }} open>
-          {uiStore.isLoadingMoveAction ? (
-            <SnackbarBackground>
-              <InlineLoader />
-            </SnackbarBackground>
-          ) : (
-            <Fragment>
-              <StyledSnackbarContent
-                classes={{ root: 'SnackbarContent' }}
-                message={
-                  <StyledSnackbarText id="message-id">
-                    {this.moveMessage}
-                  </StyledSnackbarText>
-                }
-                action={this.snackbarActions}
-              />
-            </Fragment>
-          )}
-        </StyledSnackbar>
+        {this.moveSnackbar}
         {this.moveHelper}
       </div>
     )

@@ -56,15 +56,6 @@ const StyledDialogContent = styled(DialogContent)`
   }
 `
 
-const AddToMyCollectionButton = styled(FormButton)`
-  font-family: ${v.fonts.sans};
-  font-weight: ${v.weights.medium};
-  font-size: 12px;
-  margin-bottom: 12px;
-  min-width: 250px;
-`
-AddToMyCollectionButton.displayName = 'LetMeButton'
-
 const LetMeButton = styled(FormButton)`
   border: 1px solid ${v.colors.commonDark};
   color: ${v.colors.commonDark};
@@ -75,11 +66,7 @@ const LetMeButton = styled(FormButton)`
 `
 LetMeButton.displayName = 'LetMeButton'
 
-const ModalButtons = styled.div`
-  margin-top: 18px;
-`
-
-@inject('uiStore')
+@inject('uiStore', 'routingStore')
 @observer
 class MoveHelperModal extends React.Component {
   @observable
@@ -95,12 +82,13 @@ class MoveHelperModal extends React.Component {
   }
 
   @action
-  handleAddToMyCollection = e => {
-    const { uiStore, currentUser } = this.props
+  handleAddToMyCollection = async e => {
+    const { uiStore, routingStore, currentUser } = this.props
     uiStore.cardAction = 'useTemplate'
-    CardMoveService.useTemplate('end', {
+    await CardMoveService.moveCards('end', {
       to_id: currentUser.current_user_collection_id,
     })
+    routingStore.routeTo('homepage')
   }
 
   @action
@@ -131,20 +119,32 @@ class MoveHelperModal extends React.Component {
   get renderModalButtons() {
     return (
       <div>
-        <div>
+        <div style={{ marginBottom: '18px' }}>
           <DisplayText>Recommended when getting started</DisplayText>
         </div>
-        <ModalButtons>
-          <AddToMyCollectionButton onClick={this.handleAddToMyCollection}>
-            Add to my collection
-          </AddToMyCollectionButton>
-          <div>
-            <DisplayText>or</DisplayText>
-          </div>
-          <LetMeButton disabledHover color={v.colors.transparent}>
-            Let me place it
-          </LetMeButton>
-        </ModalButtons>
+        <FormButton
+          onClick={this.handleAddToMyCollection}
+          minWidth={250}
+          fontFamily={v.fonts.sans}
+          fontWeight={v.weights.medium}
+          fontSize={0.75}
+          minWidth={250}
+          color={v.colors.black}
+        >
+          Add to my collection
+        </FormButton>
+        <div style={{ marginBottom: '12px', marginTop: '12px' }}>
+          <DisplayText>or</DisplayText>
+        </div>
+        <FormButton
+          fontFamily={v.fonts.sans}
+          fontWeight={v.weights.medium}
+          fontSize={0.75}
+          color={v.colors.commonDark}
+          transparent
+        >
+          Let me place it
+        </FormButton>
       </div>
     )
   }

@@ -48,12 +48,6 @@ const CardButtonWrapper = styled.div`
 `
 CardButtonWrapper.displayName = 'CardButtonWrapper'
 
-const UseTemplateButton = styled(FormButton)`
-  border-color: white;
-  color: white;
-`
-UseTemplateButton.displayName = 'UseTemplateButton'
-
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
@@ -306,16 +300,17 @@ class CollectionCover extends React.Component {
   get useTemplateButton() {
     return (
       <CardButtonWrapper>
-        <UseTemplateButton
+        <FormButton
           width={v.buttonSizes.header.width}
           fontSize={v.buttonSizes.header.fontSize}
-          color={'transparent'}
           onClick={this.openMoveMenuForTemplate}
           data-cy="CollectionCoverFormButton"
           className="CollectionCoverFormButton"
+          color={v.colors.white}
+          transparent
         >
           Use Template
-        </UseTemplateButton>
+        </FormButton>
       </CardButtonWrapper>
     )
   }

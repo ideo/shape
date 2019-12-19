@@ -132,26 +132,37 @@ NamedActionButton.defaultProps = {
 export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
   text-transform: uppercase;
-  font-family: ${v.fonts.sans};
-  font-size: ${props => (props.fontSize ? props.fontSize : 1)}rem;
-  font-weight: ${v.weights.medium};
+  font-family: ${props => props.fontFamily};
+  font-size: ${props => props.fontSize}rem;
+  font-weight: ${props => props.fontWeight};
+  ${props =>
+    props.minWidth &&
+    `
+    min-width: ${props.minWidth}px
+  `};
   letter-spacing: 0.09375rem;
   height: 40px;
   cursor: pointer;
   border-radius: 20px;
   color: ${props => {
+    if (props.transparent) return props.color
+    // invert text color for non-transparent buttons, add colors as you go
     switch (props.color) {
-      case v.colors.transparent:
-        return v.colors.black
+      case v.colors.commonDark:
+        return v.colors.commonLight
+      case v.colors.black:
       default:
-        return 'white'
+        return v.colors.white
     }
   }};
-  background-color: ${props => props.color};
-  border: ${props =>
-    props.color === v.colors.transparent
-      ? `1px solid ${v.colors.black}`
-      : 'none'};
+  background-color: ${props => {
+    if (props.transparent) return v.colors.transparent
+    return props.color
+  }};
+  border: ${props => {
+    if (props.transparent) return `1px solid ${props.color}`
+    return 'none'
+  }};
   transition: all 0.3s;
   &:hover,
   &:focus {
@@ -161,6 +172,17 @@ export const FormButton = styled.button`
         : props.color === v.colors.primaryDark
         ? v.colors.primaryDarkest
         : v.colors.commonDark};
+    color: ${props => {
+      if (!props.transparent) return v.colors.white
+      switch (props.color) {
+        // invert text color for transparent buttons, add colors as you go
+        case v.colors.commonDark:
+          return v.colors.commonLight
+        case v.colors.black:
+        default:
+          return v.colors.white
+      }
+    }};
   }
   ${props =>
     props.disabled &&
@@ -175,6 +197,10 @@ export const FormButton = styled.button`
 `
 FormButton.displayName = 'FormButton'
 FormButton.defaultProps = {
+  fontFamily: v.fonts.sans,
+  fontWeight: v.weights.medium,
+  fontSize: 1,
+  transparent: false,
   color: v.colors.black,
 }
 
