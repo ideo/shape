@@ -21,7 +21,7 @@ RSpec.describe CollectionFilter, type: :model do
       from_collection.organization.update(slug: 'org-from')
       to_collection.organization.update(slug: 'org-to')
       collection_filter.update(
-        text: "foo within(org-from/#{from_collection.id})",
+        text: "foo within:#{from_collection.id} xyz",
       )
     end
 
@@ -32,7 +32,7 @@ RSpec.describe CollectionFilter, type: :model do
         to_collection_id: to_collection.id,
       )
       expect(collection_filter.text).to eq(
-        "foo within(org-to/#{to_collection.id})",
+        "foo within:#{to_collection.id} xyz",
       )
       expect(collection_filter.within_collection_id).to eq(to_collection.id)
     end

@@ -241,17 +241,16 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         end
 
         before do
-          organization.update(slug: 'the-org')
           batch_reindex(Collection)
         end
 
         it 'should return all collections with no actual query' do
-          get(path, params: { query: "within(the-org/#{parent_collection.id})" })
+          get(path, params: { query: "within:#{parent_collection.id}" })
           expect(json['data'].size).to eq(4)
         end
 
         it 'should return collections within the collection that match the name' do
-          get(path, params: { query: "within(the-org/#{parent_collection.id}) shared" })
+          get(path, params: { query: "within:#{parent_collection.id} shared" })
           expect(json['data'].size).to eq(3)
         end
       end

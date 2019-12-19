@@ -1,11 +1,12 @@
 class Search
   module Filters
     class WithinCollection < Base
-      REGEXP = %r{within\(#{Organization::SLUG_SUBSTR}\/*(\d+)\)}i.freeze
+      REGEXP = /within\:(\d+)/i.freeze
 
       def within_collection_id
         id = @query.scan(REGEXP).flatten[0]
         return if id.nil?
+
         id.to_i
       end
 

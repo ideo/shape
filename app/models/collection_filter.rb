@@ -40,13 +40,9 @@ class CollectionFilter < ApplicationRecord
   end
 
   def reassign_within!(from_collection_id:, to_collection_id:)
-    to_org_slug = Organization.joins(:collections)
-                              .where(Collection.arel_table[:id].eq(to_collection_id))
-                              .pluck(:slug)
-                              .first
     text.sub!(
-      %r{within\(#{Organization::SLUG_SUBSTR}\/#{from_collection_id}\)},
-      "within(#{to_org_slug}/#{to_collection_id})",
+      "within:#{from_collection_id}",
+      "within:#{to_collection_id}",
     )
     save
   end
