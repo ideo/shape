@@ -255,7 +255,8 @@ class Item < ApplicationRecord
     parent: self.parent,
     system_collection: false,
     synchronous: false,
-    batch_id: nil
+    batch_id: nil,
+    card: nil
   )
     # Clones item
     i = amoeba_dup
@@ -263,7 +264,7 @@ class Item < ApplicationRecord
     i.tag_list = tag_list
     # copy roles from parent (i.e. where it's being placed)
     i.roles_anchor_collection_id = parent.roles_anchor.id
-
+    i.parent_collection_card = card if card
     # save the dupe item first so that we can reference it later
     # return if it didn't work for whatever reason
     return i unless i.save
@@ -278,6 +279,7 @@ class Item < ApplicationRecord
         parent: parent,
         system_collection: system_collection,
         synchronous: synchronous,
+        batch_id: batch_id,
       )
       i.parent_collection_card.item = i
     end

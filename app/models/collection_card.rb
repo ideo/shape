@@ -217,6 +217,7 @@ class CollectionCard < ApplicationRecord
         system_collection: system_collection,
         synchronous: synchronous,
         batch_id: batch_id,
+        card: cc,
       }
       coll_opts = opts.merge(
         building_template_instance: building_template_instance,

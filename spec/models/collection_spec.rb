@@ -154,8 +154,8 @@ describe Collection, type: :model do
 
   describe '#enable_org_view_access_if_allowed' do
     let!(:organization) { create(:organization) }
-    # organization: nil == allow organization to inherit
-    let(:collection) { create(:collection, organization: organization) }
+    let(:parent_collection) { create(:collection, organization: organization) }
+    let(:collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
 
     context 'if parent is user collection' do
       let(:parent_collection) do
@@ -163,7 +163,7 @@ describe Collection, type: :model do
       end
 
       it 'does give view access' do
-        expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be true
+        expect(collection.enable_org_view_access_if_allowed).to be true
         expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be true
       end
 
@@ -181,9 +181,30 @@ describe Collection, type: :model do
 
         it 'does not give view access' do
           expect(organization.getting_started_collection).to eq(getting_started_template_collection)
-          expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be false
+          expect(collection.enable_org_view_access_if_allowed).to be false
           expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
         end
+      end
+    end
+
+    context 'if cloned from a parent of a Getting Started collection' do
+      let!(:getting_started_template_collection) do
+        create(:getting_started_template_collection,
+               organization: organization)
+      end
+      let(:cloned) { create(:collection, organization: organization, parent_collection: getting_started_template_collection) }
+
+      before do
+        organization.reload
+        collection.update_attributes(
+          cloned_from: cloned,
+        )
+      end
+
+      it 'does not give view access' do
+        expect(organization.getting_started_collection).to eq(getting_started_template_collection)
+        expect(collection.enable_org_view_access_if_allowed).to be false
+        expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
       end
     end
 
@@ -191,7 +212,7 @@ describe Collection, type: :model do
       let(:parent_collection) { create(:collection, organization: organization) }
 
       it 'does not give view access to its organization\'s primary group' do
-        expect(collection.enable_org_view_access_if_allowed(parent_collection)).to be false
+        expect(collection.enable_org_view_access_if_allowed).to be false
         expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
       end
     end
@@ -220,8 +241,8 @@ describe Collection, type: :model do
     let!(:user) { create(:user) }
     let!(:parent_collection_user) { create(:user) }
     let!(:collection_user) { create(:user) }
-    let!(:parent_collection) { create(:collection) }
-    let(:organization) { parent_collection.organization }
+    let(:organization) { create(:organization) }
+    let!(:parent_collection) { create(:collection, organization: organization) }
     let!(:collection) do
       create(:collection, num_cards: 3, tag_list: %w[Prototype Other], organization: organization)
     end
@@ -231,12 +252,14 @@ describe Collection, type: :model do
     let(:copy_parent_card) { false }
     let(:parent) { collection.parent }
     let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}" }
+    let(:card) { nil }
     let(:duplicate) do
       dupe = collection.duplicate!(
         for_user: user,
         copy_parent_card: copy_parent_card,
         parent: parent,
         batch_id: batch_id,
+        card: card,
       )
       # Necessary because AR-relationship is cached
       user.roles.reload
@@ -254,6 +277,22 @@ describe Collection, type: :model do
       it 'creates a duplicate that is not archived' do
         expect(collection.archived?).to be true
         expect(duplicate.archived?).to be false
+      end
+    end
+
+    context 'enabling org view access' do
+      let(:copy_parent_card) { true }
+
+      it 'should not share with the org by default' do
+        expect(organization.primary_group.has_role?(Role::VIEWER, duplicate)).to be false
+      end
+
+      context 'duplicating into a user_collection' do
+        let!(:parent_collection) { create(:user_collection, organization: organization) }
+
+        it 'should share with the org' do
+          expect(organization.primary_group.has_role?(Role::VIEWER, duplicate)).to be true
+        end
       end
     end
 
@@ -397,7 +436,7 @@ describe Collection, type: :model do
     end
 
     context 'with a subcollection inside the system-generated getting started collection' do
-      let(:parent_collection) { create(:global_collection) }
+      let(:parent_collection) { create(:global_collection, organization: organization) }
       let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: collection, organization: organization) }
       let(:duplicate) do
         collection.duplicate!(
@@ -436,9 +475,9 @@ describe Collection, type: :model do
 
       it 'duplicates external records' do
         expect(collection.external_records.reload.size).to eq(2)
-        expect {
+        expect do
           duplicate
-        }.to change(ExternalRecord, :count).by(2)
+        end.to change(ExternalRecord, :count).by(2)
 
         expect(duplicate.external_records.pluck(:external_id)).to match_array(
           %w[100 101],
@@ -452,6 +491,14 @@ describe Collection, type: :model do
       it 'clears out submission_attrs' do
         expect(collection.submission?).to be true
         expect(duplicate.submission?).to be false
+      end
+    end
+
+    context 'with passed in card' do
+      let(:card) { create(:collection_card) }
+
+      it 'sets the specified card as the parent' do
+        expect(duplicate.parent_collection_card).to eq card
       end
     end
   end

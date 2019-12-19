@@ -75,7 +75,7 @@ class CollectionCardBuilder
     if @collection_card.record_type == :collection
       # NOTE: should items created in My Collection get this access as well?
       # this will change the roles_anchor, which will get re-cached later
-      record.enable_org_view_access_if_allowed(@parent_collection)
+      record.enable_org_view_access_if_allowed
       update_params = {}
       if @user.present?
         update_params[:created_by] = @user
