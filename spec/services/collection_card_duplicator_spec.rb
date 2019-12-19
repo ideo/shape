@@ -4,7 +4,8 @@ RSpec.describe CollectionCardDuplicator, type: :service do
   describe '#call' do
     let(:user) { create(:user) }
     let!(:from_collection) { create(:collection, num_cards: 3, add_viewers: [user]) }
-    let(:moving_cards) { from_collection.collection_cards.first(2) }
+    let(:default_moving_cards) { from_collection.collection_cards.first(2) }
+    let(:moving_cards) { default_moving_cards }
     let!(:to_collection) do
       create(:collection, num_cards: 3, add_editors: [user])
     end
@@ -82,10 +83,9 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       end
       let(:legend_item) { data_item.legend_item }
       let(:duplicated_data_items) { to_collection.items.data_items }
-
+      let!(:moving_cards) { default_moving_cards + [data_item.parent_collection_card] }
       before do
         legend_item.reload # to make sure data_item_ids aren't cached
-        moving_cards.push(data_item.parent_collection_card)
         user.add_role(Role::EDITOR, data_item)
         Sidekiq::Testing.inline!
       end
@@ -112,9 +112,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       end
 
       context 'if legend is selected' do
-        before do
-          moving_cards.push(legend_item.parent_collection_card)
-        end
+        let!(:moving_cards) { default_moving_cards + [legend_item.parent_collection_card] }
 
         it 'duplicates it' do
           expect {

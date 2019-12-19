@@ -236,7 +236,7 @@ describe Collection, type: :model do
         for_user: user,
         copy_parent_card: copy_parent_card,
         parent: parent,
-        batch_id: batch_id
+        batch_id: batch_id,
       )
       # Necessary because AR-relationship is cached
       user.roles.reload
@@ -347,7 +347,10 @@ describe Collection, type: :model do
           false,
           false,
         )
-        collection.duplicate!(for_user: user)
+        collection.duplicate!(
+          for_user: user,
+          batch_id: batch_id,
+        )
       end
 
       it 'clones all roles from parent collection' do
