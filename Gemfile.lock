@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: d687696d84834a18912cb18cabdb9580563fa5d9
+  revision: 4144ff85a9191c7dc2af7deaad8719fc6b264da2
   specs:
-    network-api-ruby (0.0.17)
+    network-api-ruby (0.0.21)
       json_api_client (~> 1.5, >= 1.5.3)
 
 GIT

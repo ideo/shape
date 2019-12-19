@@ -33,6 +33,21 @@ namespace :searchkick do
       User.search_import.where(id: batch.pluck(:id)).reindex(:new_search_data)
     end
   end
+
+  task reindex_collections_items_last_week: :environment do
+    [Collection, Item].each do |klass|
+      scope = klass.where('updated_at > ?', 1.week.ago)
+      agg = 0
+      total = scope.count
+      scope
+      .find_in_batches
+      .with_index do |batch, i|
+        agg += batch.count
+        puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
+        klass.searchkick_index.import(batch)
+      end
+    end
+  end
 end
 
 def reindex_models(klasses)
