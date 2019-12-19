@@ -1,5 +1,5 @@
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 import styled from 'styled-components'
 import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
@@ -30,11 +30,8 @@ export const IconHolder = styled.span`
   width: 27px;
 `
 
+@observer
 class CollectionCoverTitle extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
   get hasIcon() {
     const { collection } = this.props
 
