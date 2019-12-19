@@ -109,7 +109,13 @@ class SurveyResponse < ApplicationRecord
     # service will validate that all questions have been answered
     return unless SurveyResponseValidation.call(self)
 
-    SurveyResponseCompletion.call(self)
+    if user.nil? && gives_incentive?
+      # we queue this up in case they end up adding their info at the end,
+      # so we can properly capture duplicates
+      SurveyResponseCompletionWorker.perform_in(1.minute, id)
+    else
+      SurveyResponseCompletion.call(self)
+    end
   end
 
   def cache_test_scores!
