@@ -44,12 +44,12 @@ namespace :searchkick do
       agg = 0
       total = scope.count
       scope
-      .find_in_batches
-      .with_index do |batch, i|
-        agg += batch.count
-        puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
-        klass.searchkick_index.import(batch)
-      end
+        .find_in_batches
+        .with_index do |batch, i|
+          agg += batch.count
+          puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
+          klass.searchkick_index.import(batch)
+        end
     end
   end
 end
