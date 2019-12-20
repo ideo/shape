@@ -7,4 +7,12 @@ module HasActivities
              class_name: 'Activity',
              dependent: :destroy
   end
+
+  def cache_activity_count!
+    return unless respond_to?(:cached_activity_count)
+
+    cache_attributes!(
+      cached_activity_count: activities.count,
+    )
+  end
 end
