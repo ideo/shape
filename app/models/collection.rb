@@ -423,19 +423,15 @@ class Collection < ApplicationRecord
     end
 
     if collection_cards.any? && !c.getting_started_shell
-      worker_opts = [
+      CollectionCardDuplicationWorker.send(
+        "perform_#{synchronous ? 'sync' : 'async'}",
         batch_id,
         collection_cards.map(&:id),
         c.id,
         for_user.try(:id),
         system_collection,
         synchronous,
-      ]
-      if synchronous
-        CollectionCardDuplicationWorker.new.perform(*worker_opts)
-      else
-        CollectionCardDuplicationWorker.perform_async(*worker_opts)
-      end
+      )
     end
 
     # pick up newly created relationships
@@ -449,20 +445,20 @@ class Collection < ApplicationRecord
     system_collection: false
   )
     cards = placement != 'end' ? collection_cards.reverse : collection_cards
-    duplicates = []
-    cards.each do |card|
+    cards = cards.select do |card|
       # ensures single copy, if existing copies already exist it will skip those
       existing_records = target_collection.collection_cards.map(&:record)
-      next if existing_records.select { |r| r.cloned_from == card.record }.present?
-
-      duplicates << card.duplicate!(
-        parent: target_collection,
-        placement: placement,
-        synchronous: synchronous,
-        # can allow copies to continue even if the user can't view the original content
-        system_collection: system_collection,
-      )
+      existing_records.select { |r| r.cloned_from == card.record }.blank?
     end
+
+    duplicates = CollectionCardDuplicator.call(
+      to_collection: target_collection,
+      cards: cards,
+      placement: placement,
+      system_collection: system_collection,
+      synchronous: synchronous ? :all_levels : :async,
+    )
+
     # return the set of created duplicates
     CollectionCard.where(id: duplicates.pluck(:id))
   end

@@ -1,6 +1,22 @@
 require 'rails_helper'
 
 RSpec.describe CollectionCardDuplicationWorker, type: :worker do
+  describe '#perform_sync' do
+    let(:args) do
+      [
+        'batch-123',
+        ['456'],
+        '789',
+      ]
+    end
+
+    it 'calls new.perform' do
+      allow_any_instance_of(CollectionCardDuplicationWorker).to receive(:perform)
+      expect_any_instance_of(CollectionCardDuplicationWorker).to receive(:perform).with(*args)
+      CollectionCardDuplicationWorker.perform_sync(*args)
+    end
+  end
+
   describe '#perform' do
     let(:user) { create(:user) }
     let(:collection) { create(:collection, num_cards: 5) }
@@ -19,7 +35,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       ]
     end
     let(:run_worker) do
-      CollectionCardDuplicationWorker.new.perform(*params)
+      CollectionCardDuplicationWorker.perform_sync(*params)
     end
 
     before do

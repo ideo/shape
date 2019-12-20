@@ -1,8 +1,13 @@
 module CardDuplicatorMapper
   class FindLinkedCards < Base
-    def initialize(card_ids:, batch_id:, for_user: nil, system_collection: false)
-      @batch_id = batch_id
+    def initialize(
+      card_ids:,
+      batch_id:,
+      for_user: nil,
+      system_collection: false
+    )
       @card_ids = card_ids
+      @batch_id = batch_id
       @for_user = for_user
       @system_collection = system_collection
     end

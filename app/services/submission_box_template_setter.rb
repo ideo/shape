@@ -31,11 +31,15 @@ class SubmissionBoxTemplateSetter < SimpleService
   private
 
   def duplicate_template_card
-    @dup = @template_card.duplicate!(
+    # This will directly duplicate this card and run workers for all children
+    @dup = CollectionCardDuplicator.call(
+      to_collection: @submission_box,
+      cards: [@template_card],
       for_user: @user,
-      parent: @submission_box,
       placement: 'end',
-    )
+      synchronous: :first_level,
+      placeholders: false,
+    ).first
     @dup.collection.remove_all_viewer_roles!
     @dup.collection.update(name: "#{@submission_box.name} #{@dup.collection.name}")
     @dup.update(width: 1, height: 1)

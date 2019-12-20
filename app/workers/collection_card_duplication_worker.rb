@@ -8,7 +8,8 @@ class CollectionCardDuplicationWorker
     parent_collection_id,
     for_user_id = nil,
     system_collection = false,
-    synchronous = false
+    synchronous = false,
+    building_template_instance = false
   )
     @batch_id = batch_id
     @collection_cards = CollectionCard.active.where(id: card_ids).ordered
@@ -18,6 +19,7 @@ class CollectionCardDuplicationWorker
     @synchronous = synchronous
     @system_collection = system_collection
     @from_collection = nil
+    @building_template_instance = building_template_instance
 
     duplicate_cards
     update_parent_collection_status
@@ -51,6 +53,7 @@ class CollectionCardDuplicationWorker
         synchronous: @synchronous,
         placeholder: placeholder,
         batch_id: @batch_id,
+        building_template_instance: @building_template_instance,
       )
     end
   end
