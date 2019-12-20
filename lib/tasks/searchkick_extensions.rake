@@ -24,6 +24,10 @@ namespace :searchkick do
     find_search_import_in_batches
   end
 
+  task cache_activity_counts: :environment do
+    find_search_import_in_batches(with_activities: true)
+  end
+
   task new_user_search_data: :environment do
     total = User.search_import.count
     agg = 0
@@ -62,14 +66,20 @@ def reindex_models(klasses)
   end
 end
 
-def find_search_import_in_batches
+def find_search_import_in_batches(with_activities: false)
   [Collection, Item].each do |klass|
     total = klass.search_import.count
     agg = 0
-    klass.search_import.find_in_batches.with_index do |batch, i|
+    klass.search_import.limit(15_000).find_in_batches.with_index do |batch, i|
       agg += batch.count
       puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
-      klass.search_import.where(id: batch.pluck(:id)).reindex(:new_search_data)
+      ids = batch.pluck(:id)
+      klass.where(id: ids).each(&:cache_activity_count!) if with_activities
+      begin
+        klass.search_import.where(id: ids).reindex(:new_search_data)
+      rescue Searchkick::ImportError
+        puts 'error importing batch'
+      end
     end
   end
 end
