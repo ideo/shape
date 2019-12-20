@@ -270,8 +270,6 @@ class Collection < ApplicationRecord
       updated_at: updated_at,
       archived: archived,
       master_template: master_template,
-      # TODO: count activities INSIDE this collection too...
-      # - also get pinged if any child collections are updated...
       activity_count: activities_and_child_activities_count,
     }
   end
