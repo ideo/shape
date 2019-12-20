@@ -129,7 +129,7 @@ class CollectionGrid extends React.Component {
     const cards = [...collection.collection_cards]
 
     // create the mdlPlaceholder
-    // this is the draggable card that sits in the MDL MoveModal so that you can drag it onto the grid
+    // this is the draggable card that sits in the MDL MoveSnackbar so that you can drag it onto the grid
     if (movingCardIds && movingCardIds.length) {
       const movingCard = apiStore.find(
         'collection_cards',

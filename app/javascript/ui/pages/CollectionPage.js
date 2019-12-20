@@ -12,7 +12,7 @@ import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
-import MoveModal from '~/ui/grid/MoveModal'
+import GlobalPageComponentsContainer from '~/ui/grid/GlobalPageComponentsContainer'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import PageSeparator from '~/ui/global/PageSeparator'
@@ -562,7 +562,9 @@ class CollectionPage extends React.Component {
                 <SubmissionBoxSettingsModal collection={collection} />
               )}
               {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-              <MoveModal pastingCards={uiStore.pastingCards} />
+              <GlobalPageComponentsContainer
+                pastingCards={uiStore.pastingCards}
+              />
               {isSubmissionBox &&
                 apiStore.currentUser &&
                 collection.submission_box_type &&

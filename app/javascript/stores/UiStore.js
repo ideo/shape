@@ -96,6 +96,8 @@ export default class UiStore {
   @observable
   dismissedMoveHelper = false
   @observable
+  showTemplateHelper = false
+  @observable
   movingCardIds = []
   @observable
   movingFromCollectionId = null
@@ -537,7 +539,7 @@ export default class UiStore {
   }
 
   @computed
-  get shouldOpenMoveModal() {
+  get shouldOpenMoveSnackbar() {
     return this.movingCardIds.length > 0 && !this.movingIntoCollection
   }
 

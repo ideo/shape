@@ -212,11 +212,16 @@ class CollectionCover extends React.Component {
     const { collection, uiStore, apiStore } = this.props
     // load additional data needed for moving template from card cover, ie. parent_collection_card
     await apiStore.fetch('collections', collection.id)
-    uiStore.openMoveMenu({
-      from: collection,
-      cardAction: 'useTemplate',
-      context: ACTION_SOURCES.COVER,
-    })
+    if (apiStore.currentUser.show_template_helper) {
+      uiStore.update('showTemplateHelper', true)
+      uiStore.closeMoveMenu()
+    } else {
+      uiStore.openMoveMenu({
+        from: collection,
+        cardAction: 'useTemplate',
+        context: ACTION_SOURCES.COVER,
+      })
+    }
   }
 
   get hasCollectionScore() {

@@ -688,7 +688,7 @@ class MovableGridCard extends React.PureComponent {
       _zIndex = cardDragging
       cardProps.searchResult = true
       cardProps.canEditCollection = false
-      shouldHide = shouldHide || !uiStore.shouldOpenMoveModal
+      shouldHide = shouldHide || !uiStore.shouldOpenMoveSnackbar
     }
 
     const draggingMultiple =

@@ -66,7 +66,7 @@ const LetMeButton = styled(FormButton)`
 `
 LetMeButton.displayName = 'LetMeButton'
 
-@inject('uiStore', 'routingStore')
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class MoveHelperModal extends React.Component {
   @observable
@@ -83,7 +83,8 @@ class MoveHelperModal extends React.Component {
 
   @action
   handleAddToMyCollection = async e => {
-    const { uiStore, routingStore, currentUser } = this.props
+    const { uiStore, apiStore, routingStore } = this.props
+    const { currentUser } = apiStore
     uiStore.cardAction = 'useTemplate'
     await CardMoveService.moveCards('end', {
       to_id: currentUser.current_user_collection_id,
@@ -94,11 +95,20 @@ class MoveHelperModal extends React.Component {
   @action
   handleSubmit = e => {
     e.preventDefault()
-    const { currentUser, type, uiStore } = this.props
+    const { apiStore, type, uiStore } = this.props
+    const { currentUser } = apiStore
     this.submitted = true
     uiStore.update('dismissedMoveHelper', true)
     if (this.dontShowChecked) {
       currentUser.API_hideHelper(type)
+    }
+    if (uiStore.showTemplateHelper) {
+      uiStore.update('showTemplateHelper', false)
+      // FIXME: from should be the card being used as a template not uiStore.viewingCollection...
+      // uiStore.openMoveMenu({
+      //   from: uiStore.viewingCollection,
+      //   cardAction: 'useTemplate',
+      // })
     }
   }
 
@@ -150,7 +160,8 @@ class MoveHelperModal extends React.Component {
   }
 
   render() {
-    const { currentUser, type } = this.props
+    const { apiStore, type } = this.props
+    const { currentUser } = apiStore
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
@@ -208,18 +219,16 @@ class MoveHelperModal extends React.Component {
 }
 
 MoveHelperModal.propTypes = {
-  currentUser: MobxPropTypes.objectOrObservableObject.isRequired,
-  recordName: PropTypes.string,
-  type: PropTypes.string,
+  type: PropTypes.oneOf(['move', 'template']),
 }
 
 MoveHelperModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 MoveHelperModal.defaultProps = {
   type: 'move', // types are 'move' or 'template'
-  recordName: null,
 }
 
 export default MoveHelperModal

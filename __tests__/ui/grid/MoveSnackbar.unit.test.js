@@ -1,4 +1,4 @@
-import MoveModal from '~/ui/grid/MoveModal'
+import MoveSnackbar from '~/ui/grid/MoveSnackbar'
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import { fakeCollection, fakeItemCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
@@ -8,7 +8,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 
 let props, wrapper, component
 const uiStore = fakeUiStore
-describe('MoveModal', () => {
+describe('MoveSnackbar', () => {
   beforeEach(() => {
     uiStore.viewingCollection = {
       id: 3,
@@ -25,8 +25,8 @@ describe('MoveModal', () => {
     props.apiStore.request = jest.fn()
     props.uiStore.alert.mockClear()
     props.uiStore.scrollToTop.mockClear()
-    props.uiStore.shouldOpenMoveModal = true
-    wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
+    props.uiStore.shouldOpenMoveSnackbar = true
+    wrapper = shallow(<MoveSnackbar.wrappedComponent {...props} />)
     component = wrapper.instance()
   })
 
@@ -50,7 +50,7 @@ describe('MoveModal', () => {
       beforeEach(() => {
         props.apiStore.currentUser.show_template_helper = true
         props.uiStore.cardAction = 'useTemplate'
-        wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
+        wrapper = shallow(<MoveSnackbar.wrappedComponent {...props} />)
       })
       it('should display if user.show_template_helper is true', () => {
         expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
@@ -60,7 +60,7 @@ describe('MoveModal', () => {
       beforeEach(() => {
         props.apiStore.currentUser.show_move_helper = true
         props.uiStore.cardAction = 'move'
-        wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
+        wrapper = shallow(<MoveSnackbar.wrappedComponent {...props} />)
       })
       it('should display if user.show_move_helper is true', () => {
         expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
@@ -77,10 +77,10 @@ describe('MoveModal', () => {
     })
   })
 
-  describe('with shouldOpenMoveModal = false', () => {
+  describe('with shouldOpenMoveSnackbar = false', () => {
     beforeEach(() => {
-      props.uiStore.shouldOpenMoveModal = false
-      wrapper = shallow(<MoveModal.wrappedComponent {...props} />)
+      props.uiStore.shouldOpenMoveSnackbar = false
+      wrapper = shallow(<MoveSnackbar.wrappedComponent {...props} />)
       component = wrapper.instance()
     })
 
