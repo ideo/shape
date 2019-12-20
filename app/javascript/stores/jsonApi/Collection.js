@@ -506,10 +506,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isEmpty() {
-    // use the cached card count
-    return (
-      this.collection_card_count === 0 && this.collection_cards.length === 0
-    )
+    return this.collection_cards.length === 0
   }
 
   get numPaidQuestions() {
