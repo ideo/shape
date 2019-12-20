@@ -1035,6 +1035,7 @@ class CollectionGrid extends React.Component {
           lastPinnedCard={card.isPinnedAndLocked && i === this.cards.length - 1}
           loadCollectionCards={loadCollectionCards}
           hidden={shouldHide}
+          searchResult={collection.isSearchResultsCollection}
         />
       )
     })

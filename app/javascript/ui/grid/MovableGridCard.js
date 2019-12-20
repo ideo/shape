@@ -582,6 +582,7 @@ class MovableGridCard extends React.Component {
       maxResizeCol,
       zoomLevel,
       showHotEdge,
+      searchResult,
     } = this.props
 
     let {
@@ -668,6 +669,7 @@ class MovableGridCard extends React.Component {
       isSharedCollection,
       lastPinnedCard,
       showHotEdge,
+      searchResult,
     }
 
     let _zIndex = 1
@@ -846,6 +848,7 @@ MovableGridCard.propTypes = {
   scrollElement: MobxPropTypes.objectOrObservableObject,
   horizontalScroll: PropTypes.bool,
   showHotEdge: PropTypes.bool,
+  searchResult: PropTypes.bool,
 }
 
 MovableGridCard.defaultProps = {
@@ -866,6 +869,7 @@ MovableGridCard.defaultProps = {
     y: 0,
   },
   routeTo: () => null,
+  searchResult: false,
 }
 
 export default MovableGridCard
