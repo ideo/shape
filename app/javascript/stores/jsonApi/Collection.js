@@ -429,6 +429,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get isCreativeDifferenceChartCover() {
     return (
       this.cover_type === 'cover_type_items' &&
+      this.collection_cover_items.length > 0 &&
       this.collection_cover_items[0].isData
     )
   }
