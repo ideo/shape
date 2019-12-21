@@ -33,7 +33,11 @@ Rails.application.routes.draw do
           post 'create_template'
           post 'set_submission_box_template'
         end
-        resources :collection_cards, only: %i[index]
+        resources :collection_cards, only: %i[index] do
+          collection do
+            get 'ids'
+          end
+        end
         resources :roles, only: %i[index create destroy] do
           collection do
             delete '', action: 'destroy'
