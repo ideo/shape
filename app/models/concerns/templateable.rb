@@ -170,6 +170,7 @@ module Templateable
     builder = CollectionCardBuilder.new(
       params: {
         order: 0,
+        identifier: 'deleted-from-template',
         collection_attributes: {
           name: 'Deleted From Template',
         },

@@ -90,6 +90,12 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         run_worker
       end
 
+      it 'returns newly-duplicated cards' do
+        result = run_worker
+        expect(result).to eq(to_collection.collection_cards)
+        expect(result.size).to eq(5)
+      end
+
       context 'with placeholder cards' do
         let!(:placeholders) do
           cards.map do |card|

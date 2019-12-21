@@ -216,7 +216,8 @@ describe Templateable, type: :concern do
                add_editors: [template_admin])
       end
       let(:organization) { create(:organization) }
-      let!(:template_instance) { create(:collection, template: template, created_by: user) }
+      let(:parent_collection) { create(:collection, organization: organization) }
+      let!(:template_instance) { create(:collection, template: template, created_by: user, parent_collection: parent_collection) }
       let(:template_text_item) { template.collection_cards.last.item }
       let(:instance_text_item) { template_instance.collection_cards.last.item }
       let(:data) do

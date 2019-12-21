@@ -20,18 +20,14 @@ class CollectionCardDuplicationWorker
     @system_collection = system_collection
     @from_collection = nil
     @building_template_instance = building_template_instance
-
-    duplicate_cards
+    @new_cards = duplicate_cards
     update_parent_collection_status
+    @new_cards
   end
 
   def duplicate_cards
     @parent_collection.update_processing_status(:duplicating)
-    @collection_cards.each do |card|
-      # Skip duplicating any cards this user can't view (if user provided)
-      # If a system collection don't check if user can view
-      next if @for_user.present? && !@system_collection && !card.record.can_view?(@for_user)
-
+    cards_to_duplicate.map do |card|
       # duplicating each card in order, each subsequent one should be placed at the end
       placement = 'end'
       source_card = card
@@ -45,6 +41,7 @@ class CollectionCardDuplicationWorker
       end
       # capture this for notification builder
       @from_collection ||= source_card.parent
+
       source_card.duplicate!(
         for_user: @for_user,
         parent: @parent_collection,
@@ -55,6 +52,20 @@ class CollectionCardDuplicationWorker
         batch_id: @batch_id,
         building_template_instance: @building_template_instance,
       )
+    end
+  end
+
+  def cards_to_duplicate
+    @collection_cards.select do |card|
+      # Skip duplicating any cards this user can't view (if user provided)
+      # If a system collection don't check if user can view
+      if @building_template_instance || @system_collection
+        true
+      elsif @for_user.present? && !card.record.can_view?(@for_user)
+        false
+      else
+        true
+      end
     end
   end
 

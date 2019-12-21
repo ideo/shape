@@ -30,7 +30,7 @@ class CollectionCardDuplicator < SimpleService
     deep_duplicate_cards
     duplicate_legend_items
     reorder_and_cache_covers
-    return @new_cards if @synchronous != :async
+    return @new_cards if @synchronous == :async
 
     # If synchronous, re-assign @new_cards to actual cards, overriding placeholders
     CollectionCard.where(id: @new_cards.map(&:id))
@@ -62,7 +62,7 @@ class CollectionCardDuplicator < SimpleService
     if @building_template_instance && @cards.size == 1
       # Append the template instance card,
       # so that the mapper will include the entire template in its mapping
-      card_ids = @cards.map(&:id) + [to_collection.parent_collection_card.id]
+      card_ids = @cards.map(&:id) + [@to_collection.parent_collection_card.id]
     else
       card_ids = @cards.map(&:id)
     end
@@ -87,7 +87,7 @@ class CollectionCardDuplicator < SimpleService
     # TODO: how do we handle a fully async process,
     # because we need the mapper to run before this worker starts?
 
-    CollectionCardDuplicationWorker.send(
+    result = CollectionCardDuplicationWorker.send(
       "perform_#{run_worker_sync ? 'sync' : 'async'}",
       @batch_id,
       @cards.map(&:id),
@@ -97,6 +97,7 @@ class CollectionCardDuplicator < SimpleService
       @synchronous == :all_levels,
       @building_template_instance,
     )
+    @new_cards = result if run_worker_sync
   end
 
   def duplicate_cards_with_placeholders
