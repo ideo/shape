@@ -63,7 +63,7 @@ class AudienceSettings extends React.Component {
       audienceSettings.set(audience.id, {
         selected,
         sample_size: testAudience ? testAudience.sample_size : '0',
-        audience: audience,
+        audience,
         test_audience: testAudience,
         displayCheckbox,
       })
@@ -226,7 +226,7 @@ class AudienceSettings extends React.Component {
       audienceSettings.set(audience.id, {
         selected: true,
         sample_size: '0',
-        audience: audience,
+        audience,
         test_audience: null,
         displayCheckbox: true,
       })

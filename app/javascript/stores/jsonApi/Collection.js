@@ -947,9 +947,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: this.launchableTestId,
-      hasLinkSharingAudience: hasLinkSharingAudience,
-      hasPaidAudience: hasPaidAudience,
-      ideasCount: ideasCount,
+      hasLinkSharingAudience,
+      hasPaidAudience,
+      ideasCount,
     })
   }
 
@@ -1025,7 +1025,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           actionName,
           hasLinkSharingAudience: has_link_sharing,
           hasPaidAudience: gives_incentive,
-          ideasCount: ideasCount,
+          ideasCount,
         })
       }
     } catch (err) {

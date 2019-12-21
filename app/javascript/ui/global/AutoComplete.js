@@ -282,7 +282,7 @@ class AutoComplete extends React.Component {
             multi: true,
             value: keepSelectedOptions ? option : null,
             defaultOptions,
-            inputValue: inputValue,
+            inputValue,
             options,
             optionSearch,
             onChange: this.handleChange,

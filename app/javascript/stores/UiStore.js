@@ -1162,7 +1162,7 @@ export default class UiStore {
     this.scroller.scrollTo(bottom, {
       ...v.commentScrollOpts,
       ...scrollOpts,
-      offset: offset,
+      offset,
     })
   }
 

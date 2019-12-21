@@ -744,10 +744,10 @@ class MovableGridCard extends React.Component {
       onResizeStart: this.handleStart,
       onResize: this.handleResize,
       onResizeStop: this.handleStop('resize'),
-      minWidth: minWidth,
-      minHeight: minHeight,
-      maxWidth: maxWidth,
-      maxHeight: maxHeight,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight,
       dragAxis: 'none',
       cancel: '.no-drag',
       size: {
@@ -758,7 +758,7 @@ class MovableGridCard extends React.Component {
       position: dragPosition,
       // "home base" for this card; where it actually sits in the grid
       default: defaultPosition,
-      disableDragging: disableDragging,
+      disableDragging,
       enableResizing: {
         bottomRight:
           canEditCollection &&
