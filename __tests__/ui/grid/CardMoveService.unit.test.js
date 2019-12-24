@@ -12,9 +12,13 @@ uiStore.viewingCollection = {
   API_fetchCards: jest.fn(),
   movingCardIds: [10],
 }
+apiStore.find = (type, id) => {
+  return { ...mockCollection, id }
+}
 
-let service
-const reinitialize = () => {
+let service, mockCollection
+const reinitialize = ({ moveCardsResult = null } = {}) => {
+  apiStore.moveCards = jest.fn().mockReturnValue(moveCardsResult || {})
   service = new CardMoveService({ apiStore, uiStore })
 }
 describe('CardMoveService', () => {
@@ -102,8 +106,7 @@ describe('CardMoveService', () => {
     describe('on a collection nested inside itself', () => {
       beforeEach(() => {
         uiStore.viewingCollection.can_edit_content = true
-        apiStore.moveCards.mockImplementationOnce(() => Promise.reject('e'))
-        reinitialize()
+        reinitialize({ moveCardsResult: Promise.reject('e') })
       })
 
       it('should show an alert dialog on failure', async () => {
@@ -221,6 +224,50 @@ describe('CardMoveService', () => {
       it('should close the move menu', async () => {
         await service.moveCards('beginning')
         expect(uiStore.closeMoveMenu).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('updateCardsWithinCollection', () => {
+    beforeEach(() => {
+      uiStore.cardAction = 'move'
+      mockCollection = {
+        id: '99',
+        name: 'moving collection',
+        API_batchUpdateCardsWithUndo: jest.fn(),
+      }
+      // return the same collection for moving to/from
+      apiStore.find = () => mockCollection
+      reinitialize()
+    })
+
+    it('should call collection.API_batchUpdateCardsWithUndo', async () => {
+      await service.moveCards('beginning')
+      expect(mockCollection.API_batchUpdateCardsWithUndo).toHaveBeenCalled()
+    })
+  })
+
+  describe('calculateOrderForMovingCard', () => {
+    describe('moving to first card position (0 index)', () => {
+      it('returns an integer', () => {
+        const locationOfTargetPlaceholder = -0.5
+        expect(
+          service.calculateOrderForMovingCard(locationOfTargetPlaceholder, 0)
+        ).toBe(0)
+        expect(
+          service.calculateOrderForMovingCard(locationOfTargetPlaceholder, 1)
+        ).toBe(1)
+      })
+    })
+    describe('moving to last card position in collection', () => {
+      it('returns an integer', () => {
+        const locationOfTargetPlaceholder = 3.5
+        expect(
+          service.calculateOrderForMovingCard(locationOfTargetPlaceholder, 0)
+        ).toBe(4)
+        expect(
+          service.calculateOrderForMovingCard(locationOfTargetPlaceholder, 1)
+        ).toBe(5)
       })
     })
   })

@@ -150,33 +150,35 @@ class CollectionFilter extends React.Component {
             onShowAll={this.onShowAll}
           />
         )}
-        {canEdit && (
-          <FilterMenu
-            alignTop={isFilterBarActive || sortable}
-            onFilterByTag={this.openSearchModal('Tags')}
-            onFilterBySearch={this.openSearchModal('Search Term')}
-          />
-        )}
-        {sortable && (
-          <SortContainer>
-            <CollectionSort collection={collection} />
-          </SortContainer>
-        )}
-        {!!this.currentFilterLookupType && (
-          <FilterSearchModal
-            filters={
-              this.currentFilterLookupType === 'Tags'
-                ? [...this.tagFilters]
-                : [...this.searchFilters]
-            }
-            onCreateTag={this.onCreateFilter}
-            onRemoveTag={this.onDeleteFilter}
-            onSelectTag={this.onSelectFilter}
-            onModalClose={this.openSearchModal(null)}
-            filterType={this.currentFilterLookupType}
-            modalOpen={!!this.currentFilterLookupType}
-          />
-        )}
+        <Flex align="flex-end" ml="auto">
+          {canEdit && (
+            <FilterMenu
+              alignTop={isFilterBarActive || sortable}
+              onFilterByTag={this.openSearchModal('Tags')}
+              onFilterBySearch={this.openSearchModal('Search Term')}
+            />
+          )}
+          {sortable && (
+            <SortContainer>
+              <CollectionSort collection={collection} />
+            </SortContainer>
+          )}
+          {!!this.currentFilterLookupType && (
+            <FilterSearchModal
+              filters={
+                this.currentFilterLookupType === 'Tags'
+                  ? [...this.tagFilters]
+                  : [...this.searchFilters]
+              }
+              onCreateTag={this.onCreateFilter}
+              onRemoveTag={this.onDeleteFilter}
+              onSelectTag={this.onSelectFilter}
+              onModalClose={this.openSearchModal(null)}
+              filterType={this.currentFilterLookupType}
+              modalOpen={!!this.currentFilterLookupType}
+            />
+          )}
+        </Flex>
       </GrowFlex>
     )
   }

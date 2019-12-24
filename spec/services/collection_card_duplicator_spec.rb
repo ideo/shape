@@ -18,20 +18,44 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       )
     end
 
-    # NOTE: This test is very similar to collection_cards_controller_spec#duplicate
-    # As a result this test suite is kept pretty sparse to not repeat everything from there
-    it 'duplicates cards from one collection to the other' do
+    it 'creates Placeholder cards that point to the originals' do
       expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
       new_cards = service.call
 
       first_cards = to_collection.reload.collection_cards.first(2)
       # newly created cards should be duplicates
       expect(first_cards).to match_array new_cards
-      expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
-      # names should match, in same order
-      expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
-      expect(to_collection.collection_cards.first.primary?).to be true
+      # should point back to original items
+      expect(first_cards.map(&:item)).to match_array moving_cards.map(&:item)
+      expect(first_cards.all?(&:placeholder?)).to be true
       expect(to_collection.collection_cards.count).to eq 5
+    end
+
+    it 'calls CollectionCardDuplicationWorker to finish processing the job' do
+      expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+        anything, # new card ids
+        to_collection.id,
+        user.id,
+        false,
+      )
+      service.call
+      expect(to_collection.reload.processing_status).to eq 'duplicating'
+    end
+
+    context 'with integer order' do
+      let(:placement) { 1 }
+
+      it 'duplicates cards starting at the specified order' do
+        new_cards = service.call
+        expect(new_cards.map(&:order)).to eq [1, 2]
+        expect(to_collection.collection_cards.pluck(:type, :order)).to eq([
+          ['CollectionCard::Primary', 0],
+          ['CollectionCard::Placeholder', 1],
+          ['CollectionCard::Placeholder', 2],
+          ['CollectionCard::Primary', 3],
+          ['CollectionCard::Primary', 4],
+        ])
+      end
     end
 
     context 'when to_collection is a foamcore board' do
@@ -67,6 +91,11 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         legend_item.reload # to make sure data_item_ids aren't cached
         moving_cards.push(data_item.parent_collection_card)
         user.add_role(Role::EDITOR, data_item)
+        Sidekiq::Testing.inline!
+      end
+
+      after do
+        Sidekiq::Testing.fake!
       end
 
       it 'links legend to duplicated data item' do

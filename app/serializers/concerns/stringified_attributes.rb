@@ -2,10 +2,10 @@ module StringifiedAttributes
   extend ActiveSupport::Concern
 
   included do
-    class_attribute :dingled_attrs
-    dingled_attrs ||= []
+    class_attribute :stringified_attribute_names
+    stringified_attribute_names ||= []
 
-    dingled_attrs.each do |attr|
+    stringified_attribute_names.each do |attr|
       attribute attr do
         @object.send(attr).to_s
       end
@@ -15,7 +15,7 @@ module StringifiedAttributes
   module ClassMethods
     # Assign multiple cached attributes
     def stringified_attributes(*attrs)
-      self.dingled_attrs = attrs
+      self.stringified_attribute_names = attrs
     end
   end
 end

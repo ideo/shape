@@ -160,9 +160,9 @@ const PriceCard = props => {
   )
 }
 PriceCard.propTypes = {
-  pageName: PropTypes.string,
+  pageName: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  price: PropTypes.number,
+  price: PropTypes.number.isRequired,
   price_unit: PropTypes.string.isRequired,
   button: PropTypes.shape({
     link: PropTypes.string,

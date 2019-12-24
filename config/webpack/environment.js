@@ -115,6 +115,12 @@ const addSentryWebpack = env => {
   return env
 }
 
+const splitChunks = env => {
+  // https://github.com/rails/webpacker/blob/master/docs/v4-upgrade.md#splitchunks-configuration
+  env.splitChunks()
+  return env
+}
+
 const updateEnvironment = flow(
   DEV ? addReactHotLoader : identity,
   addReactGlobal,
@@ -123,15 +129,9 @@ const updateEnvironment = flow(
   addTypescriptLoader,
   addIdeoSSOExternal,
   addCleanWebpack,
+  // skip chunk splitting in dev since it messes with HMR
+  !DEV ? splitChunks : identity,
   process.env.ANALYZE ? addBundleAnalyzerPlugin : identity
 )
-
-// just using default code-splitting config
-// https://webpack.js.org/guides/code-splitting/
-environment.splitChunks((config) => Object.assign({}, config, {
-  optimization: {
-    splitChunks: { chunks: 'all' }
-  }
-}))
 
 module.exports = updateEnvironment(environment)

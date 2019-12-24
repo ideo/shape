@@ -74,6 +74,22 @@ describe Archivable, type: :concern do
         expect(collection.archived?).to be false
         expect(collection_card_link.archived?).to be true
       end
+
+      context 'with an already archived record' do
+        let!(:archived_link) { create(:collection_card_link, collection: collection, archived: true) }
+
+        it 'should only archive active relations' do
+          collection.archive!
+          archive_batch = collection.archive_batch
+          expect(archive_batch).not_to be nil
+          expect(collection.archived?).to be true
+          # records archived along with the batch should match
+          expect(collection_card.reload.archive_batch).to eq archive_batch
+          # already archived link remain on its own archive_batch
+          expect(archived_link.reload.archived?).to be true
+          expect(archived_link.archive_batch).not_to eq archive_batch
+        end
+      end
     end
 
     describe '#unarchive!' do

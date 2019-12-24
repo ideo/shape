@@ -37,7 +37,8 @@
     "default_group_id": { "type": ["string", "null"] },
     "unresolved_count": { "type": ["number"] },
     "subtitle_hidden": { "type": ["boolean", "null"] },
-    "last_unresolved_comment_id": { "type": ["number", "null"] }
+    "last_unresolved_comment_id": { "type": ["number", "null"] },
+    "cloned_from_id": { "type": ["string", "null"] }
   },
   "required": ["class_type"]
 }

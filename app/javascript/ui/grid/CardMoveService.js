@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { runInAction } from 'mobx'
 import { apiStore as globalApiStore, uiStore as globalUiStore } from '~/stores'
 
 export default class CardMoveService {
@@ -61,21 +62,41 @@ export default class CardMoveService {
       placement,
     }
     _.assign(data, overrideData)
+    const toCollection = apiStore.find('collections', data.to_id)
+
+    const movingWithinCollection =
+      movingFromCollection === toCollection && cardAction === 'move'
 
     try {
       uiStore.update('isLoadingMoveAction', true)
       let successMessage
+      let res = {}
       switch (cardAction) {
         case 'move':
-          await apiStore.moveCards(data)
-          successMessage = 'Items successfully moved !'
+          if (movingWithinCollection) {
+            const order =
+              placement === 'beginning'
+                ? 0
+                : toCollection.collection_card_count + 100
+            await this.updateCardsWithinCollection({
+              movingIds: data.collection_card_ids,
+              collection: toCollection,
+              action: 'move',
+              placeholder: {
+                order,
+              },
+            })
+          } else {
+            res = await apiStore.moveCards(data)
+          }
+          successMessage = 'Items successfully moved!'
           break
         case 'link':
-          await apiStore.linkCards(data)
+          res = await apiStore.linkCards(data)
           successMessage = 'Items successfully linked!'
           break
         case 'duplicate':
-          await apiStore.duplicateCards(data)
+          res = await apiStore.duplicateCards(data)
           successMessage = 'Items successfully duplicated!'
           break
         case 'useTemplate': {
@@ -84,16 +105,23 @@ export default class CardMoveService {
             template_id: data.from_id,
             placement,
           }
-          await apiStore.createTemplateInstance(data)
+          res = await apiStore.createTemplateInstance(data)
           successMessage = 'Your template instance has been created!'
           break
         }
         default:
           return
       }
-      // always refresh the current collection
-      // TODO: what if you "moved/duplicated to BOTTOM"?
-      await viewingCollection.API_fetchCards()
+      const { meta } = res
+      // if we received a bulk operation placeholder, place that in the collection
+      if (meta && meta.placeholder && toCollection === viewingCollection) {
+        runInAction(() => {
+          toCollection.collection_cards.unshift(res.data)
+        })
+      } else if (!movingWithinCollection) {
+        // always refresh the current collection
+        await viewingCollection.API_fetchCards()
+      }
 
       uiStore.update('isLoadingMoveAction', false)
       uiStore.popupSnackbar({ message: successMessage })
@@ -106,7 +134,7 @@ export default class CardMoveService {
           uiStore.scrollToBottom()
         }
       }
-      if (cardAction === 'move') {
+      if (cardAction === 'move' && !uiStore.movingIntoCollection) {
         // we actually want to reselect the cards at this point
         uiStore.reselectCardIds(data.collection_card_ids)
       }
@@ -120,6 +148,69 @@ export default class CardMoveService {
       uiStore.alert(message)
       return false
     }
+  }
+
+  updateCardsWithinCollection({
+    movingIds,
+    collection,
+    action,
+    placeholder,
+    onConfirm = null,
+    onCancel = null,
+  }) {
+    let undoMessage = 'Card move undone'
+    const updates = []
+    const { apiStore } = this
+
+    const { order, original } = placeholder
+    let { width, height } = placeholder
+
+    // don't resize the card for a drag, only for an actual resize
+    if (action === 'resize') {
+      // just some double-checking validations
+      if (height > 2) height = 2
+      if (width > 4) width = 4
+      // set up action to undo
+      if (original.height !== height || original.width !== width) {
+        undoMessage = 'Card resize undone'
+      }
+      updates.push({
+        card: original,
+        order,
+        width,
+        height,
+      })
+    }
+    if (movingIds.length > 0) {
+      const movingCards = apiStore
+        .findAll('collection_cards')
+        .filter(card => _.includes(movingIds, card.id))
+
+      // Set order for moved cards so they are between whole integers,
+      // and API_batchUpdateCards will properly set/reorder it amongst the collection
+      const sortedCards = _.sortBy(movingCards, 'order')
+      _.each(sortedCards, (card, idx) => {
+        const sortedOrder = this.calculateOrderForMovingCard(order, idx)
+        updates.push({
+          card,
+          order: sortedOrder,
+        })
+      })
+    }
+
+    // Perform batch update on all cards,
+    // and show confirmation if this is a template
+    return collection.API_batchUpdateCardsWithUndo({
+      updates,
+      updateAllCards: true,
+      undoMessage,
+      onConfirm,
+      onCancel,
+    })
+  }
+
+  calculateOrderForMovingCard = (order, index) => {
+    return Math.ceil(order) + index
   }
 
   moveErrors({ viewingCollection, movingFromCollection, cardAction }) {

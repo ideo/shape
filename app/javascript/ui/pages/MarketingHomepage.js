@@ -35,7 +35,7 @@ class MarketingPage extends React.Component {
 
   async componentDidMount() {
     const content = await marketingFirebaseClient.getCollection('home')
-    this.setState({ content: content })
+    this.setState({ content })
 
     const paramString = this.props.location.search
     if (hasKeyValueParam(paramString, 'campaign', 'alphapt7')) {

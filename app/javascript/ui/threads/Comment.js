@@ -311,7 +311,7 @@ class Comment extends React.Component {
         url: value => value,
       },
       formatHref: {
-        mention: function(href) {
+        mention(href) {
           // We don't add a link to mentions since we don't link to user profiles
           return null
         },

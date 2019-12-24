@@ -137,8 +137,8 @@ class OrganizationSettings extends React.Component {
       tag = _.first(matches)
     }
     return {
-      tag: tag,
-      error: error,
+      tag,
+      error,
     }
   }
 

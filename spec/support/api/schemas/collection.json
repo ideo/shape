@@ -54,7 +54,8 @@
     "cache_key": { "type": ["string"] },
     "test_show_media": { "type": ["boolean"] },
     "idea_id": { "type": ["string", "null"] },
-    "serializer": { "type": "string" }
+    "serializer": { "type": "string" },
+    "cloned_from_id": { "type": ["string", "null"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }
