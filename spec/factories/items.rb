@@ -9,12 +9,12 @@ FactoryBot.define do
     name { Faker::Food.dish }
 
     factory :text_item, class: 'Item::TextItem' do
-      content { Faker::BackToTheFuture.quote }
+      content { Faker::Movie.quote }
       data_content { { ops: [{ insert: 'Hola, world.' }] } }
     end
 
     factory :link_item, class: 'Item::LinkItem' do
-      content { Faker::BackToTheFuture.quote }
+      content { Faker::Movie.quote }
       url { Faker::Internet.url('example.com') }
     end
 
