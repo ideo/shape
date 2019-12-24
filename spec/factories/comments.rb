@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :comment do
     author
     comment_thread factory: :item_comment_thread
-    message { Faker::Simpsons.quote }
+    message { Faker::TvShows::Simpsons.quote }
     draftjs_data do
       {
         'entityMap' => {},
@@ -10,7 +10,7 @@ FactoryBot.define do
           {
             'key' => 'dhdfp',
             'data' => {},
-            'text' => Faker::Simpsons.quote,
+            'text' => Faker::TvShows::Simpsons.quote,
             'type' => 'unstyled',
             'depth' => 0,
             'entityRanges' => [],
