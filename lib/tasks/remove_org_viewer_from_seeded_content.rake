@@ -9,6 +9,8 @@ end
 
 def reindex_getting_started_clones(org)
   gs = org.getting_started_collection
+  return false unless gs.present?
+
   puts "\n*** #{org.name} ***"
   all_collections = [gs] + gs.all_child_collections
   puts "> Inspecting #{all_collections.count} getting started collections"
