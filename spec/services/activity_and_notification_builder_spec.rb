@@ -59,7 +59,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
 
     it 'reindexes the activity count' do
       expect(Collection).to receive(:where).with(
-        id: [target.id, target_parent.id],
+        id: [target_parent.id, target.id],
       ).and_call_original
       expect(Collection).to receive(:reindex)
       builder.call

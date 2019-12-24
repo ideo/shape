@@ -64,9 +64,13 @@ class ActivityAndNotificationBuilder < SimpleService
   end
 
   def cache_activity_count_and_reindex
+    return unless @target.is_a?(Breadcrumbable)
+
     @target.cache_activity_count!
+    ids = @target.breadcrumb
+    ids += [@target.id] if @target.is_a?(Collection)
     # reindex for boosting search results by activity_count
-    Collection.where(id: [@target.id] + @target.breadcrumb).reindex
+    Collection.where(id: ids).reindex
   end
 
   def create_notifications_async
