@@ -1255,6 +1255,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
+
+  toggleTemplateHelper() {
+    if (this.apiStore.currentUser.show_template_helper) {
+      this.uiStore.update('showTemplateHelperForCollection', this)
+      this.uiStore.closeMoveMenu()
+    } else {
+      this.uiStore.openMoveMenu({
+        from: this,
+        cardAction: 'useTemplate',
+      })
+    }
+  }
 }
 
 Collection.refDefaults = {

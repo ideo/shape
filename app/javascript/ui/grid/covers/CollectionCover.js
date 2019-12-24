@@ -21,7 +21,6 @@ import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import { routingStore } from '~/stores'
-import { ACTION_SOURCES } from '~/enums/actionEnums'
 
 const IconHolder = styled.span`
   display: inline-block;
@@ -209,19 +208,8 @@ class CollectionCover extends React.Component {
   }
 
   openMoveMenuForTemplate = async e => {
-    const { collection, uiStore, apiStore } = this.props
-    // load additional data needed for moving template from card cover, ie. parent_collection_card
-    await apiStore.fetch('collections', collection.id)
-    if (apiStore.currentUser.show_template_helper) {
-      uiStore.update('showTemplateHelper', true)
-      uiStore.closeMoveMenu()
-    } else {
-      uiStore.openMoveMenu({
-        from: collection,
-        cardAction: 'useTemplate',
-        context: ACTION_SOURCES.COVER,
-      })
-    }
+    const { collection } = this.props
+    collection.toggleTemplateHelper()
   }
 
   get hasCollectionScore() {

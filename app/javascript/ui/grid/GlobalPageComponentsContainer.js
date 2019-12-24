@@ -12,17 +12,23 @@ class GlobalPageComponentsContainer extends React.Component {
   render() {
     const { uiStore, apiStore, pastingCards } = this.props
     if (
-      uiStore.showTemplateHelper &&
+      uiStore.showTemplateHelperForCollection &&
       apiStore.currentUser.show_template_helper
     ) {
       return <MoveHelperModal type="template" />
     }
     const children = []
-    if (uiStore.shouldOpenMoveSnackbar && uiStore.cardAction === 'move') {
-      if (apiStore.currentUser.show_move_helper) {
-        children.push(<MoveHelperModal type="move" />)
-      }
-      children.push(<MoveSnackbar pastingCards={pastingCards} />)
+    if (
+      apiStore.currentUser.show_move_helper &&
+      uiStore.cardAction === 'move'
+    ) {
+      children.push(<MoveHelperModal type="move" key="moveHelperModal" />)
+    }
+
+    if (uiStore.shouldOpenMoveSnackbar) {
+      children.push(
+        <MoveSnackbar pastingCards={pastingCards} key="moveSnackbar" />
+      )
     }
 
     return <div>{children}</div>

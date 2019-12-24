@@ -25,7 +25,6 @@ import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
-import { ACTION_SOURCES } from '~/enums/actionEnums'
 
 /* global IdeoSSO */
 
@@ -116,12 +115,8 @@ class PageHeader extends React.Component {
   }
 
   openMoveMenuForTemplate = e => {
-    const { record, uiStore } = this.props
-    uiStore.openMoveMenu({
-      from: record,
-      cardAction: 'useTemplate',
-      context: ACTION_SOURCES.HEADER,
-    })
+    const { record } = this.props
+    record.toggleTemplateHelper()
   }
 
   get collectionIcon() {

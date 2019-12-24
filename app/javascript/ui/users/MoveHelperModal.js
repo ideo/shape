@@ -102,13 +102,12 @@ class MoveHelperModal extends React.Component {
     if (this.dontShowChecked) {
       currentUser.API_hideHelper(type)
     }
-    if (uiStore.showTemplateHelper) {
-      uiStore.update('showTemplateHelper', false)
-      // FIXME: from should be the card being used as a template not uiStore.viewingCollection...
-      // uiStore.openMoveMenu({
-      //   from: uiStore.viewingCollection,
-      //   cardAction: 'useTemplate',
-      // })
+    if (uiStore.showTemplateHelperForCollection) {
+      uiStore.openMoveMenu({
+        from: uiStore.showTemplateHelperForCollection,
+        cardAction: 'useTemplate',
+      })
+      uiStore.update('showTemplateHelperForCollection', null)
     }
   }
 
