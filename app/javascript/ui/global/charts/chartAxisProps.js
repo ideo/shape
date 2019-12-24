@@ -128,7 +128,7 @@ const ChartAxisProps = ({
   }
   const axisProps = {
     dependentAxis: false,
-    domain: domain,
+    domain,
     style: chartAxisStyle(isSmallChartStyle),
     offsetY: isSmallChartStyle ? 13 : 22,
     axisComponent: <LineSegment transform="translate(10 26) scale(0.955)" />,

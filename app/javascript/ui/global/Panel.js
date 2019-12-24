@@ -86,7 +86,7 @@ class Panel extends React.Component {
 }
 
 Panel.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
 }

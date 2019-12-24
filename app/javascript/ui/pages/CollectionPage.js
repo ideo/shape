@@ -152,7 +152,7 @@ class CollectionPage extends React.Component {
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
     }
-    if (collection.collection_cards.length === 0) {
+    if (collection.isEmpty) {
       uiStore.openBlankContentTool()
     }
     if (undoStore.undoAfterRoute) {
@@ -489,7 +489,6 @@ class CollectionPage extends React.Component {
       submissionBoxSettingsOpen,
       gridSettings,
       selectedArea,
-      cardMenuOpen,
     } = uiStore
 
     // props shared by Foamcore + Normal
@@ -520,8 +519,6 @@ class CollectionPage extends React.Component {
           selectedArea={selectedArea}
           // Included so that component re-renders when area changes
           selectedAreaMinX={selectedArea.minX}
-          // Trigger re-render if card menu is opened
-          cardIdMenuOpen={cardMenuOpen.id}
         />
       )
     } else if (isTestCollection) {

@@ -24,9 +24,11 @@ RSpec.describe CollectionCardFilter, type: :service do
     let(:cards) { collection.collection_cards }
     let(:visible_card_1) { cards[0] }
     let(:visible_card_2) { cards[1] }
+    let(:visible_cards) { [visible_card_1, visible_card_2] }
     let(:hidden_card) { cards[2] }
     let(:private_card) { cards[3] }
     let!(:archived_card) { cards[4] }
+    let(:ids_only) { false }
     before do
       # And group to collection
       group.add_role(Role::VIEWER, collection)
@@ -65,6 +67,7 @@ RSpec.describe CollectionCardFilter, type: :service do
         user: user,
         filters: filters,
         application: application,
+        ids_only: ids_only,
       )
     end
 
@@ -72,9 +75,7 @@ RSpec.describe CollectionCardFilter, type: :service do
       let!(:user) { viewer }
 
       it 'returns all non-hidden cards' do
-        expect(subject).to match_array(
-          [visible_card_1, visible_card_2],
-        )
+        expect(subject).to match_array(visible_cards)
       end
 
       context 'regular collection' do
@@ -143,7 +144,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
         it 'returns all cards user has permission to see' do
           expect(subject).to match_array(
-            [visible_card_1, visible_card_2, hidden_card],
+            visible_cards + [hidden_card],
           )
         end
       end
@@ -153,7 +154,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
         before do
           visible_card_1.record.update(
-            name: 'a plant'
+            name: 'a plant',
           )
           Collection.reindex
           Collection.searchkick_index.refresh
@@ -161,8 +162,16 @@ RSpec.describe CollectionCardFilter, type: :service do
 
         it 'should only return the cards that match the filter query' do
           expect(subject).to match_array(
-            [visible_card_1,]
+            [visible_card_1],
           )
+        end
+      end
+
+      context 'with ids_only setting' do
+        let(:ids_only) { true }
+
+        it 'returns ids of all visible cards' do
+          expect(subject).to match_array(visible_cards.map(&:id))
         end
       end
     end
@@ -172,7 +181,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
       it 'returns all non-hidden cards' do
         expect(subject).to match_array(
-          [visible_card_1, visible_card_2, private_card],
+          visible_cards + [private_card],
         )
       end
     end
@@ -182,7 +191,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
       it 'returns all public or private, non-hidden cards' do
         expect(subject).to match_array(
-          [visible_card_1, visible_card_2, private_card],
+          visible_cards + [private_card],
         )
       end
 
@@ -191,7 +200,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
         it 'returns all cards' do
           expect(subject).to match_array(
-            [visible_card_1, visible_card_2, hidden_card, private_card],
+            visible_cards + [hidden_card, private_card],
           )
         end
       end
@@ -224,9 +233,7 @@ RSpec.describe CollectionCardFilter, type: :service do
       end
 
       it 'returns all cards that common resource group can view' do
-        expect(subject).to match_array(
-          [visible_card_1, visible_card_2],
-        )
+        expect(subject).to match_array(visible_cards)
       end
     end
 

@@ -150,7 +150,7 @@ class AudienceSettingsWidget extends React.Component {
     const audienceItems = orgAudiences.map(audience => {
       const { name, global } = audience
       return {
-        name: name,
+        name,
         iconLeft: global ? <GlobeIcon /> : null,
         iconRight: (
           <StyledInfoIconWrapper

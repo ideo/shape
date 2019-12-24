@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import axios from 'axios'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType, updateModelId } from 'datx'
 import pluralize from 'pluralize'
@@ -428,6 +429,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get isCreativeDifferenceChartCover() {
     return (
       this.cover_type === 'cover_type_items' &&
+      this.collection_cover_items.length > 0 &&
       this.collection_cover_items[0].isData
     )
   }
@@ -504,10 +506,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isEmpty() {
-    // use the cached card count
-    return (
-      this.collection_card_count === 0 && this.collection_cards.length === 0
-    )
+    return this.collection_cards.length === 0
   }
 
   get numPaidQuestions() {
@@ -656,13 +655,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       } else {
         this.totalPages = links.last
       }
-      this.currentPage = page
       if (
         page === 1 &&
         (searchTerm || this.storedCacheKey !== this.cache_key)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
+        this.currentPage = 1
       } else {
         // NOTE: (potential pre-optimization) if collection_cards grows in size,
         // at some point do we reset back to a reasonable number?
@@ -675,6 +674,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             'id'
           )
         )
+        if (this.currentPage < page) {
+          this.currentPage = page
+        }
         this.collection_cards.replace(newData)
       }
     })
@@ -945,9 +947,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: this.launchableTestId,
-      hasLinkSharingAudience: hasLinkSharingAudience,
-      hasPaidAudience: hasPaidAudience,
-      ideasCount: ideasCount,
+      hasLinkSharingAudience,
+      hasPaidAudience,
+      ideasCount,
     })
   }
 
@@ -1023,7 +1025,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           actionName,
           hasLinkSharingAudience: has_link_sharing,
           hasPaidAudience: gives_incentive,
-          ideasCount: ideasCount,
+          ideasCount,
         })
       }
     } catch (err) {
@@ -1041,6 +1043,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.parent && this.parent.submission_attrs) {
       this.apiStore.request(`collections/${this.parent.id}`)
     }
+  }
+
+  API_fetchAllCardIds() {
+    return axios.get(`/api/v1/collections/${this.id}/collection_cards/ids`)
   }
 
   async API_setSubmissionBoxTemplate(data) {
@@ -1165,6 +1171,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
+    // clearing placeholder will properly clear out multiMoveCardIds for the next step
+    uiStore.clearMdlPlaceholder()
     if (_.isEmpty(uiStore.multiMoveCardIds)) {
       uiStore.update('multiMoveCardIds', cardIds)
     }

@@ -7,10 +7,7 @@ import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
 import v from '~/utils/variables'
 
-const Holder = styled.div`
-  display: inline-block;
-  position: absolute;
-`
+const Holder = styled.div``
 
 const EditButton = styled(NamedActionButton)`
   color: ${v.colors.commonDark};

@@ -49,6 +49,7 @@ const captureGlobalKeypress = e => {
     activeElement.nodeName === 'INPUT' ||
     _.intersection(activeElement.classList, [
       'ql-editor',
+      'ql-container',
       'public-DraftEditor-content',
       'edit-cover-title',
       'edit-cover-subtitle',
@@ -57,58 +58,66 @@ const captureGlobalKeypress = e => {
   if (shouldNormalKeyPressBeAllowed) return false
   const { code, metaKey, ctrlKey, shiftKey } = e
   const { selectedCardIds, viewingCollection } = uiStore
+  const ctrlKeypress = metaKey || ctrlKey
+  let card
   switch (code) {
     // CTRL+X: Move
     case 'KeyX':
-      if (!viewingCollection) {
+      if (!viewingCollection || !ctrlKeypress) {
         return false
       }
-      if (metaKey || ctrlKey) {
-        if (!selectedCardIds.length) {
-          return false
-        }
-        const card = apiStore.find('collection_cards', selectedCardIds[0])
-        if (card) {
-          card.reselectOnlyEditableCards(selectedCardIds)
-        }
-        viewingCollection.confirmEdit({
-          onConfirm: () => {
-            uiStore.openMoveMenu({
-              from: viewingCollection,
-              cardAction: 'move',
-            })
-          },
-        })
+      if (!selectedCardIds.length) {
+        return false
       }
+      card = apiStore.find('collection_cards', selectedCardIds[0])
+      if (card) {
+        // TODO: investigate... shouldn't need to reselect on move, but
+        // what if you select pinned cards? API will reject the move... ?
+        card.reselectOnlyMovableCards(selectedCardIds)
+      }
+      viewingCollection.confirmEdit({
+        onConfirm: () => {
+          uiStore.openMoveMenu({
+            from: viewingCollection,
+            cardAction: 'move',
+          })
+        },
+      })
       break
     // CTRL+C: Duplicate
     case 'KeyC':
-      if (!viewingCollection) {
+      if (!viewingCollection || !ctrlKeypress) {
         return false
       }
-      if (metaKey || ctrlKey) {
-        uiStore.openMoveMenu({
-          from: viewingCollection,
-          cardAction: 'duplicate',
-        })
-      }
+      uiStore.openMoveMenu({
+        from: viewingCollection,
+        cardAction: 'duplicate',
+      })
       break
     // CTRL+V: Place (Paste)
     case 'KeyV':
-      if (metaKey || ctrlKey) {
+      if (ctrlKeypress) {
         // MoveSnackbar will listen to this value and then set it to false
         uiStore.update('pastingCards', true)
       }
       break
     case 'KeyZ':
+      if (!ctrlKeypress) {
+        return false
+      }
       // CTRL+Shift+Z: Redo
-      if (shiftKey && (metaKey || ctrlKey)) {
+      if (shiftKey) {
         undoStore.handleRedoKeyPress()
         break
       }
       // CTRL+Z: Undo
-      if (metaKey || ctrlKey) {
-        undoStore.handleUndoKeypress()
+      undoStore.handleUndoKeypress()
+      break
+    // CTRL+A: Select All
+    case 'KeyA':
+      if (ctrlKeypress && uiStore.viewingCollection) {
+        e.preventDefault()
+        uiStore.selectAll({ location: 'Global' })
       }
       break
     case 'Backspace':
@@ -116,13 +125,13 @@ const captureGlobalKeypress = e => {
       if (!selectedCardIds || !selectedCardIds.length) {
         return false
       }
-      const card = apiStore.find('collection_cards', selectedCardIds[0])
+      card = apiStore.find('collection_cards', selectedCardIds[0])
       // see note in CollectionCard model -- this could really be a static method;
       // because it's not, we just have to call it on any selected card
       card.API_archive()
       break
     case 'Escape':
-      // save on sec happens only when user clicks the title textarea
+      // save on esc happens only when user clicks the title textarea
       const { editingCardCover } = uiStore
       if (editingCardCover) {
         uiStore.update('editingCardCover', null)

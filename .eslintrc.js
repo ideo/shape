@@ -82,6 +82,7 @@ module.exports = {
     'no-undef': 2,
     'no-duplicate-imports': 2,
     'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'object-shorthand': 1,
     'prettier/prettier': 'error',
     'prefer-destructuring': [
       'error',

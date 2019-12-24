@@ -351,7 +351,8 @@ class Collection < ApplicationRecord
     parent: self.parent,
     building_template_instance: false,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    card: nil
   )
 
     # check if we are cloning a template inside a template instance;
@@ -369,6 +370,10 @@ class Collection < ApplicationRecord
     end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
+    if c.is_a?(Collection::UserProfile)
+      c = c.becomes(Collection)
+      c.type = nil
+    end
     if parent.master_template?
       # when duplicating into a master_template, this collection should be a subtemplate
       c.template_id = nil
@@ -392,6 +397,7 @@ class Collection < ApplicationRecord
 
     # save the dupe collection first so that we can reference it later
     # return if it didn't work for whatever reason
+    c.parent_collection_card = card if card
     return c unless c.save
 
     c.parent_collection_card.save if c.parent_collection_card.present?
@@ -408,7 +414,7 @@ class Collection < ApplicationRecord
     # Method from Externalizable
     duplicate_external_records(c)
 
-    c.enable_org_view_access_if_allowed(parent)
+    c.enable_org_view_access_if_allowed
 
     if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
@@ -507,14 +513,14 @@ class Collection < ApplicationRecord
     Collection
   end
 
-  def recalculate_child_breadcrumbs_async
-    BreadcrumbRecalculationWorker.perform_async(id)
+  def recalculate_child_breadcrumbs_async(cards)
+    BreadcrumbRecalculationWorker.perform_async(id, cards.pluck(:id))
   end
 
   # Cards are explicitly passed in when moving them from another collection to this one
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
-      next if card.link?
+      next unless card.primary?
 
       if card.item.present?
         # have to reload in order to pick up new parent relationship
@@ -522,6 +528,22 @@ class Collection < ApplicationRecord
       elsif card.collection_id.present?
         # this method will run the async worker if there are >50 children
         card.collection.reload.recalculate_breadcrumb_tree!
+      end
+    end
+  end
+
+  # similar to above but runs more slowly, and will correct any issues (above assumes breadcrumb tree is accurate)
+  def recursively_fix_breadcrumbs!(cards = collection_cards)
+    cards.each do |card|
+      next unless card.primary?
+
+      if card.item.present?
+        # have to reload in order to pick up new parent relationship
+        card.item.reload.recalculate_breadcrumb!
+      elsif card.collection_id.present?
+        # this will run recursively rather than using breadcrumb to find all children
+        card.collection.reload.recalculate_breadcrumb!
+        card.collection.recursively_fix_breadcrumbs!
       end
     end
   end
@@ -576,6 +598,12 @@ class Collection < ApplicationRecord
     )
   end
 
+  def increment_card_orders_at(order, amount: 1)
+    collection_cards
+      .where(CollectionCard.arel_table[:order].gteq(order))
+      .update_all(['"order" = "order" + ?', amount])
+  end
+
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
     if card_attrs_snapshot.present?
@@ -588,11 +616,13 @@ class Collection < ApplicationRecord
     queue_update_template_instances
   end
 
-  def enable_org_view_access_if_allowed(parent)
+  def enable_org_view_access_if_allowed
     # If parent is user collection, allow primary group to see it
     # As long as it isn't the 'Getting Started' collection
-    return false unless parent.is_a?(Collection::UserCollection) &&
-                        (cloned_from.blank? || !cloned_from.getting_started?)
+    return false unless parent&.is_a?(Collection::UserCollection) &&
+                        (cloned_from.blank? ||
+                         !cloned_from.getting_started? &&
+                         !cloned_from.inside_getting_started?)
 
     # collections created in My Collection always get unanchored
     unanchor_and_inherit_roles_from_anchor!
@@ -725,14 +755,11 @@ class Collection < ApplicationRecord
   end
 
   def mark_children_processing_status(status = nil)
-    # also mark self
-    update_processing_status(status)
     collections = Collection.in_collection(self)
     collections.update_all(
       processing_status: status,
       updated_at: Time.now,
     )
-
     # Broadcast that this collection is no longer being edited
     collections.each(&:processing_done) if processing_status.nil?
   end
@@ -772,14 +799,6 @@ class Collection < ApplicationRecord
       child: self,
     )
     result
-  end
-
-  def last_non_blank_row
-    collection_cards.map(&:row).compact.max.to_i
-  end
-
-  def empty_row_for_moving_cards
-    last_non_blank_row + 2
   end
 
   def default_group_id
@@ -837,6 +856,10 @@ class Collection < ApplicationRecord
 
   def parent_submission
     parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
+  end
+
+  def inside_getting_started?
+    parents.any?(&:getting_started?)
   end
 
   def parent_submission_box_template
@@ -924,6 +947,19 @@ class Collection < ApplicationRecord
 
     # Only include cover items if this collection has indicated to use them
     cover_type_default? ? [] : collection_cover_items
+  end
+
+  # convert placement of 'beginning' or 'end' into an integer order
+  def card_order_at(placement)
+    # default to 'beginning', which goes after the first pinned card
+    order = collection_cards.pinned.maximum(:order) || 0
+    if placement == 'end'
+      order = cached_last_card_order || collection_cards.maximum(:order) || -1
+      order += 1
+    elsif placement.is_a?(Integer)
+      order = placement
+    end
+    order
   end
 
   private

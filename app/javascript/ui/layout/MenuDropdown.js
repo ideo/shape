@@ -45,7 +45,7 @@ const renderDropdownItems = (item, isHome, handleScrollToContent) => {
   const props =
     label === 'Overview'
       ? { onClick: () => handleScrollToContent(isHome) }
-      : { href: href }
+      : { href }
   return (
     <SubmenuListItem key={label}>
       <FlexNavLink {...props}>{label}</FlexNavLink>

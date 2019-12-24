@@ -282,7 +282,7 @@ class TestSurveyResponder extends React.Component {
     const { id, gives_incentive } = collection
     const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
-      event: event,
+      event,
       organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: id,

@@ -111,7 +111,7 @@ class Dialog extends React.PureComponent {
       maxWidth,
     } = this.props
     const variant = {
-      backgroundColor: backgroundColor,
+      backgroundColor,
       color: this.variantColor,
     }
     return (

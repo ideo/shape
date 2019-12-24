@@ -36,7 +36,8 @@
     "is_restorable": { "type": ["boolean", "null"] },
     "default_group_id": { "type": ["string", "null"] },
     "unresolved_count": { "type": ["number"] },
-    "last_unresolved_comment_id": { "type": ["number", "null"] }
+    "last_unresolved_comment_id": { "type": ["number", "null"] },
+    "cloned_from_id": { "type": ["string", "null"] }
   },
   "required": ["class_type"]
 }

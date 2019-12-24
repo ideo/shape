@@ -23,6 +23,7 @@ class SerializableCollection < BaseJsonSerializer
     :test_show_media,
     :idea_id,
     :search_term,
+    :cloned_from_id,
   )
 
   stringified_attributes(

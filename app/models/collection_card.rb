@@ -100,6 +100,7 @@ class CollectionCard < ApplicationRecord
   scope :is_cover, -> { where(is_cover: true) }
   scope :primary, -> { where(type: 'CollectionCard::Primary') }
   scope :link, -> { where(type: 'CollectionCard::Link') }
+  scope :not_placeholder, -> { where.not(type: 'CollectionCard::Placeholder') }
   scope :ideas_collection_card, -> { where(section_type: :ideas).where.not(collection_id: nil) }
   # this scope orders by identifier because the default order(:id) is very slow when getting .first
   scope :identifier, ->(identifier) { where(identifier: identifier).order(:identifier) }
@@ -122,6 +123,7 @@ class CollectionCard < ApplicationRecord
     enable
     # propagate to STI models
     propagate
+    nullify :identifier
     nullify :templated_from_id
     # don't recognize any relations, easiest way to turn them all off
     recognize []
@@ -156,29 +158,23 @@ class CollectionCard < ApplicationRecord
     parent: self.parent,
     shallow: false,
     placement: 'end',
-    duplicate_linked_records: false,
     building_template_instance: false,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    placeholder: nil
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
       return self
     end
-    if link? && duplicate_linked_records
-      # this option will create a real duplicate of the underlying record.
-      # should only be used at the topmost level, e.g. if you duplicate a linked collection,
-      # all the links *within* that collection should remain as links
-      return record.parent_collection_card.duplicate!(
-        for_user: for_user,
-        parent: parent,
-        shallow: shallow,
-        placement: placement,
-        system_collection: system_collection,
-        synchronous: synchronous,
-      )
+    cc = placeholder || amoeba_dup
+    if placeholder
+      cc = cc.becomes(CollectionCard::Primary)
+      cc.type = 'CollectionCard::Primary'
+      # nullify these
+      cc.item_id = nil
+      cc.collection_id = nil
     end
-    cc = amoeba_dup
     if master_template_card? && parent.templated?
       # if we're cloning from template -> templated collection
       cc.templated_from = self
@@ -216,6 +212,7 @@ class CollectionCard < ApplicationRecord
         parent: parent,
         system_collection: system_collection,
         synchronous: synchronous,
+        card: cc,
       }
       coll_opts = opts.merge(
         building_template_instance: building_template_instance,
@@ -275,6 +272,10 @@ class CollectionCard < ApplicationRecord
 
   def link?
     is_a? CollectionCard::Link
+  end
+
+  def placeholder?
+    is_a? CollectionCard::Placeholder
   end
 
   def master_template_card?

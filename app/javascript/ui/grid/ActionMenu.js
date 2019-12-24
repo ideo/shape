@@ -12,6 +12,7 @@ import MoveIcon from '~/ui/icons/MoveIcon'
 import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import PrintIcon from '~/ui/icons/PrintIcon'
+import SelectAllIcon from '~/ui/icons/SelectAllIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -62,7 +63,7 @@ class ActionMenu extends React.Component {
     if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
     if (cardAction === 'move') {
-      card.reselectOnlyEditableCards()
+      card.reselectOnlyMovableCards()
     }
     uiStore.openMoveMenu({ from: viewingCollection, cardAction })
   }
@@ -98,11 +99,16 @@ class ActionMenu extends React.Component {
     if (afterArchive && result) afterArchive({ type: 'archive' })
   }
 
+  selectAll = async () => {
+    const { uiStore, location, card } = this.props
+    uiStore.selectAll({ location, card })
+  }
+
   showTags = () => {
     const { card, uiStore } = this.props
     if (card.record.can_edit) {
       // you can't select a mix of editable and non-editable for tagging
-      card.reselectOnlyEditableCards()
+      card.reselectOnlyEditableRecords()
     }
     uiStore.update('tagsModalOpenId', card.id)
   }
@@ -185,6 +191,11 @@ class ActionMenu extends React.Component {
       { name: 'Move', iconRight: <MoveIcon />, onClick: this.moveCard },
       { name: 'Link', iconRight: <LinkIcon />, onClick: this.linkCard },
       {
+        name: 'Select All',
+        iconRight: <SelectAllIcon />,
+        onClick: this.selectAll,
+      },
+      {
         name: 'Add to My Collection',
         iconRight: <AddIntoIcon />,
         onClick: this.addToMyCollection,
@@ -244,6 +255,7 @@ class ActionMenu extends React.Component {
       const viewActions = [
         'Comment',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Download',
       ]
@@ -255,6 +267,11 @@ class ActionMenu extends React.Component {
         viewActions.push('Sharing')
       }
       items = _.filter(items, a => _.includes(viewActions, a.name))
+    }
+
+    if (location === 'Search') {
+      // Select All doesn't work from the search page
+      items = _.reject(items, { name: 'Select All' })
     }
 
     if (location === 'PageMenu' && record.isCollection) {

@@ -26,6 +26,7 @@ describe('ActionMenu', () => {
         'Duplicate',
         'Move',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -35,7 +36,8 @@ describe('ActionMenu', () => {
       actions = _.without(allActions, 'Replace')
       props.card.isPinnedAndLocked = false
       props.card.record.can_edit = true
-      props.card.reselectOnlyEditableCards = jest.fn()
+      props.card.reselectOnlyMovableCards = jest.fn()
+      props.card.reselectOnlyEditableRecords = jest.fn()
       wrapper = shallow(<ActionMenu.wrappedComponent {...props} canEdit />)
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
@@ -75,8 +77,9 @@ describe('ActionMenu', () => {
     })
 
     describe('assuming confirmEdit warning disabled', () => {
-      it('calls selectCardId and openMoveMenu on move action', () => {
+      it('calls selectCardId, reselectOnlyMovableCards and openMoveMenu on move action', () => {
         component.openMoveMenu('move')
+        expect(props.card.reselectOnlyMovableCards).toHaveBeenCalled()
         expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
         expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
           from: props.uiStore.viewingCollection,
@@ -103,9 +106,9 @@ describe('ActionMenu', () => {
       })
     })
 
-    it('calls reselectOnlyEditableCards on showTags action', () => {
+    it('calls reselectOnlyEditableRecords on showTags action', () => {
       component.showTags()
-      expect(props.card.reselectOnlyEditableCards).toHaveBeenCalled()
+      expect(props.card.reselectOnlyEditableRecords).toHaveBeenCalled()
       expect(props.uiStore.update).toHaveBeenCalledWith(
         'tagsModalOpenId',
         props.card.id
@@ -133,6 +136,7 @@ describe('ActionMenu', () => {
         'Comment',
         'Duplicate',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -157,6 +161,7 @@ describe('ActionMenu', () => {
         'Comment',
         'Duplicate',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -199,7 +204,14 @@ describe('ActionMenu', () => {
 
   describe('as editor of a system required record', () => {
     beforeEach(() => {
-      actions = ['Comment', 'Move', 'Link', 'Add to My Collection', 'Sharing']
+      actions = [
+        'Comment',
+        'Move',
+        'Link',
+        'Select All',
+        'Add to My Collection',
+        'Sharing',
+      ]
       props.card.record.system_required = true
       props.card.isPinnedAndLocked = false
       wrapper = shallow(
@@ -224,6 +236,7 @@ describe('ActionMenu', () => {
         'Duplicate',
         'Move',
         'Link',
+        'Select All',
         'Add to My Collection',
         'Tags',
         'Sharing',
@@ -261,19 +274,16 @@ describe('ActionMenu', () => {
 
   describe('with an archived record', () => {
     beforeEach(() => {
+      actions = ['Comment', 'Select All', 'Download', 'Tags']
       props.canEdit = true
       props.card.record.archived = true
       wrapper = shallow(<ActionMenu.wrappedComponent {...props} />)
     })
 
-    it('should only render tags and sharing', () => {
+    it('should only render limited options', () => {
       const popout = wrapper.find('PopoutMenu').at(0)
-      expect(popout.props().menuItems.length).toEqual(3)
-      expect(_.map(popout.props().menuItems, i => i.name)).toEqual([
-        'Comment',
-        'Download',
-        'Tags',
-      ])
+      expect(popout.props().menuItems.length).toEqual(actions.length)
+      expect(_.map(popout.props().menuItems, 'name')).toEqual(actions)
     })
   })
 })
