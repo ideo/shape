@@ -28,7 +28,7 @@ module Templateable
   end
 
   # copy all the cards from this template into a new collection
-  def setup_templated_collection(for_user:, collection:)
+  def setup_templated_collection(for_user:, collection:, synchronous: :async)
     # important that this is first so that the collection knows it is "templated"
     collection.update(template: self)
     CollectionCardDuplicator.call(
@@ -36,6 +36,7 @@ module Templateable
       cards: collection_cards,
       for_user: for_user,
       building_template_instance: true,
+      synchronous: synchronous,
     )
   end
 
