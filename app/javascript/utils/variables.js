@@ -33,6 +33,12 @@ export const COLLECTION_TYPES = {
   TEST_DESIGN: 'Collection::TestDesign',
 }
 
+export const COLLECTION_CARD_TYPES = {
+  PRIMARY: 'CollectionCard::Primary',
+  LINK: 'CollectionCard::Link',
+  PLACEHOLDER: 'CollectionCard::Placeholder',
+}
+
 export const DATASET_CHART_TYPES = {
   AREA: 'area',
   LINE: 'line',
@@ -119,6 +125,13 @@ export const EVENT_SOURCE_TYPES = {
   TEXT_EDITOR: 'textEditor',
 }
 
+export const TOUCH_DEVICE_OS = {
+  WINDOWS: 'Windows Phone',
+  ANDROID: 'Android',
+  IOS: 'iOS',
+  UNKNOWN: 'Unknown',
+}
+
 // warning: don't change, modify component based offsets instead. see: clickUtils::calculatePopoutMenuOffset
 export const INITIAL_OFFSET_X = 20
 export const INITIAL_OFFSET_Y = 90
@@ -156,7 +169,7 @@ export default {
   navOpacity: 0.9,
 
   cardHoldTime: 0.4 * 1000,
-  touchDeviceHoldToDragTime: 1000,
+  touchDeviceHoldToDragTime: 1500,
 
   colors: {
     black: '#120f0e',
@@ -229,8 +242,8 @@ export default {
     popoutMenu: 201,
     scrollIndicator: 200,
     cardHovering: 160,
-    gridCard: 150,
     gridCardTop: 151,
+    gridCard: 150,
     itemClose: 10,
     floatOverContent: 2,
     gridCardBg: 1,

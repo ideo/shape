@@ -8,6 +8,20 @@ jest.useFakeTimers()
 
 let wrapper, rerender, props, filters
 
+const mockTagResponse = nameArray => {
+  return {
+    data: nameArray.map((name, i) => {
+      return {
+        id: i.toString(),
+        type: 'tags',
+        attributes: {
+          name,
+        },
+      }
+    }),
+  }
+}
+
 describe('FilterSearchModal', () => {
   filters = []
 
@@ -34,7 +48,9 @@ describe('FilterSearchModal', () => {
   describe('componentDidMount()', () => {
     beforeEach(() => {
       apiStore.requestJson.mockClear()
-      apiStore.requestJson.mockReturnValue(Promise.resolve(['taga', 'tage']))
+      apiStore.requestJson.mockReturnValue(
+        Promise.resolve(mockTagResponse(['taga', 'tage']))
+      )
       rerender()
     })
 
@@ -65,7 +81,7 @@ describe('FilterSearchModal', () => {
         props.filters = [fakeCollectionFilter]
         apiStore.requestJson.mockClear()
         apiStore.requestJson.mockReturnValue(
-          Promise.resolve(['whale', 'dolphin'])
+          Promise.resolve(mockTagResponse(['whale', 'dolphin']))
         )
         rerender()
       })

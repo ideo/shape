@@ -19,6 +19,7 @@ import PageSeparator from '~/ui/global/PageSeparator'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 import EditorPill from '~/ui/items/EditorPill'
+import SearchCollection from '~/ui/grid/SearchCollection'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
@@ -151,7 +152,7 @@ class CollectionPage extends React.Component {
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
     }
-    if (collection.collection_cards.length === 0) {
+    if (collection.isEmpty) {
       uiStore.openBlankContentTool()
     }
     if (undoStore.undoAfterRoute) {
@@ -432,8 +433,17 @@ class CollectionPage extends React.Component {
     )
   }
 
+  renderSearchCollection() {
+    return (
+      <SearchCollection
+        collection={this.props.collection}
+        trackCollectionUpdated={this.trackCollectionUpdated}
+      />
+    )
+  }
+
   renderTestDesigner() {
-    return <TestDesigner collection={this.collection} />
+    return <TestDesigner collection={this.props.collection} />
   }
 
   loader = () => (
@@ -479,7 +489,6 @@ class CollectionPage extends React.Component {
       submissionBoxSettingsOpen,
       gridSettings,
       selectedArea,
-      cardMenuOpen,
     } = uiStore
 
     // props shared by Foamcore + Normal
@@ -510,12 +519,12 @@ class CollectionPage extends React.Component {
           selectedArea={selectedArea}
           // Included so that component re-renders when area changes
           selectedAreaMinX={selectedArea.minX}
-          // Trigger re-render if card menu is opened
-          cardIdMenuOpen={cardMenuOpen.id}
         />
       )
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
+    } else if (collection.isSearchCollection) {
+      inner = this.renderSearchCollection()
     } else {
       inner = (
         <CollectionGrid

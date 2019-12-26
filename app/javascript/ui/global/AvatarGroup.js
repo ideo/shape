@@ -59,7 +59,7 @@ class AvatarGroup extends React.PureComponent {
 }
 
 AvatarGroup.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
   avatarCount: PropTypes.number.isRequired,
   placeholderTitle: PropTypes.string.isRequired,
 }

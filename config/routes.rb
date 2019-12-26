@@ -27,12 +27,17 @@ Rails.application.routes.draw do
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'
+          post 'background_update_template_instances'
         end
         collection do
           post 'create_template'
           post 'set_submission_box_template'
         end
-        resources :collection_cards, only: %i[index]
+        resources :collection_cards, only: %i[index] do
+          collection do
+            get 'ids'
+          end
+        end
         resources :roles, only: %i[index create destroy] do
           collection do
             delete '', action: 'destroy'
@@ -125,10 +130,11 @@ Rails.application.routes.draw do
           get 'check_payments'
           get 'my_collection'
           get 'admin_users'
-          get 'tags'
         end
 
         get 'search', to: 'search#search'
+        get 'search_collection_cards', to: 'search#search_collection_cards'
+        resources :tags, only: %i[index]
         resources :collections, only: %i[create]
         resources :groups, only: %i[index create update]
         resources :users, only: %i[index]

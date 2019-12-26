@@ -40,21 +40,21 @@ class CollectionCreator extends React.Component {
   createCollection = e => {
     e.preventDefault()
     if (!this.state.inputText) return
-    const { createCard } = this.props
-
-    createCard(
-      {
-        // `collection` is the collection being created within the card
-        collection_attributes: {
-          name: this.state.inputText,
-          master_template: this.shouldCreateAsSubTemplate,
-          type: this.dbType,
-        },
+    const { createCard, type } = this.props
+    const cardParams = {
+      // `collection` is the collection being created within the card
+      collection_attributes: {
+        name: this.state.inputText,
+        master_template: this.shouldCreateAsSubTemplate,
+        type: this.dbType,
       },
-      {
-        afterCreate: this.afterCreate,
-      }
-    )
+    }
+    if (type === 'search')
+      cardParams.collection_attributes.search_term = this.state.inputText
+
+    createCard(cardParams, {
+      afterCreate: this.afterCreate,
+    })
   }
 
   get shouldCreateAsSubTemplate() {
@@ -70,6 +70,7 @@ class CollectionCreator extends React.Component {
     if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
     else if (type === 'testCollection') dbType = 'Collection::TestCollection'
     else if (type === 'foamcoreBoard') dbType = 'Collection::Board'
+    else if (type === 'search') dbType = 'Collection::SearchCollection'
 
     return dbType
   }
@@ -81,13 +82,19 @@ class CollectionCreator extends React.Component {
   }
 
   render() {
+    const { type } = this.props
+    const placeholder =
+      type === 'search'
+        ? 'add search term for collection'
+        : `${this.typeName} name`
+
     return (
       <PaddedCardCover>
         <form className="form" onSubmit={this.createCollection}>
           <BctTextField
             autoFocus
             data-cy="CollectionCreatorTextField"
-            placeholder={`${this.typeName} name`}
+            placeholder={placeholder}
             value={this.state.inputText}
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
@@ -97,7 +104,7 @@ class CollectionCreator extends React.Component {
             disabled={this.props.loading}
             width={125}
           >
-            Add
+            Create
           </FormButton>
         </form>
       </PaddedCardCover>
@@ -113,6 +120,7 @@ CollectionCreator.propTypes = {
     'testCollection',
     'submissionBox',
     'foamcoreBoard',
+    'search',
   ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,

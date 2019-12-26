@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: d687696d84834a18912cb18cabdb9580563fa5d9
+  revision: 4144ff85a9191c7dc2af7deaad8719fc6b264da2
   specs:
-    network-api-ruby (0.0.17)
+    network-api-ruby (0.0.21)
       json_api_client (~> 1.5, >= 1.5.3)
 
 GIT
@@ -322,7 +322,7 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
-    loofah (2.3.1)
+    loofah (2.4.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.12)
@@ -348,7 +348,7 @@ GEM
     multipart-post (2.1.1)
     nenv (0.3.0)
     nio4r (2.3.1)
-    nokogiri (1.10.5)
+    nokogiri (1.10.7)
       mini_portile2 (~> 2.4.0)
     normalize-rails (4.1.1)
     notiffany (0.1.1)
@@ -384,8 +384,9 @@ GEM
       pry (~> 0.10)
     pry-rails (0.3.6)
       pry (>= 0.10.4)
-    puma (3.12.0)
-    rack (2.0.7)
+    puma (4.3.1)
+      nio4r (~> 2.0)
+    rack (2.0.8)
     rack-cors (1.0.6)
       rack (>= 1.6.0)
     rack-protection (2.0.7)
@@ -566,7 +567,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
-    webpacker (4.2.0)
+    webpacker (4.2.2)
       activesupport (>= 4.2)
       rack-proxy (>= 0.6.1)
       railties (>= 4.2)
@@ -635,7 +636,7 @@ DEPENDENCIES
   possessive
   pry-byebug
   pry-rails
-  puma (~> 3.12)
+  puma (~> 4.3.1)
   rack-cors (~> 1.0.1)
   rack-rewrite (~> 1.5)
   rails (~> 5.2)

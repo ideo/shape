@@ -22,6 +22,8 @@ class SerializableCollection < BaseJsonSerializer
     :last_unresolved_comment_id,
     :test_show_media,
     :idea_id,
+    :search_term,
+    :cloned_from_id,
   )
 
   stringified_attributes(
@@ -94,11 +96,11 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :can_view do
-    @current_ability.can?(:read, @object)
+    @search_collection ? true : @current_ability.can?(:read, @object)
   end
 
   attribute :can_edit do
-    @current_ability.can?(:edit, @object)
+    @search_collection ? false : @current_ability.can?(:edit, @object)
   end
 
   attribute :can_edit_content do
@@ -235,5 +237,9 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :cache_key, if: -> { @object == @current_record } do
     Digest::MD5.hexdigest(@object.cache_key(@card_order || 'order', @current_user.try(:id)))
+  end
+
+  attribute :serializer do
+    'SerializableCollection'
   end
 end

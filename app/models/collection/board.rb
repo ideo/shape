@@ -16,6 +16,7 @@
 #  master_template            :boolean          default(FALSE)
 #  name                       :string
 #  processing_status          :integer
+#  search_term                :string
 #  shared_with_organization   :boolean          default(FALSE)
 #  submission_box_type        :integer
 #  submissions_enabled        :boolean          default(TRUE)
@@ -84,6 +85,14 @@ class Collection
 
     def max_col_index
       collection_cards.maximum(:col)
+    end
+
+    def last_non_blank_row
+      collection_cards.map(&:row).compact.max.to_i
+    end
+
+    def empty_row_for_moving_cards
+      last_non_blank_row + 2
     end
   end
 end

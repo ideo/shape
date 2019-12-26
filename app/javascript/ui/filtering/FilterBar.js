@@ -6,10 +6,9 @@ import { Box, Flex } from 'reflexbox'
 import styled from 'styled-components'
 
 import PillList from '~/ui/global/PillList'
-import SearchIconRight from '~/ui/icons/SearchIconRight'
-import TagIcon from '~/ui/icons/TagIcon'
 import { SubduedText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import { filtersToTags } from '~/ui/filtering/shared'
 
 const ResponsiveFlex = styled(Flex)`
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
@@ -21,16 +20,11 @@ const ResponsiveFlex = styled(Flex)`
 @observer
 class FilterBar extends React.Component {
   get formattedPills() {
-    const { onSelect } = this.props
-    const { filters } = this.props
-    return filters.map(filter => ({
-      id: filter.id,
-      name: filter.text,
-      icon: filter.filter_type === 'tag' ? <TagIcon /> : <SearchIconRight />,
-      selectable: true,
-      selected: filter.selected,
-      onSelect: onSelect,
-    }))
+    const { onSelect, filters } = this.props
+    return filtersToTags({
+      filters,
+      onSelect,
+    })
   }
 
   get anyFiltersSelected() {
@@ -46,7 +40,9 @@ class FilterBar extends React.Component {
         {_.isNumber(totalResults) && this.anyFiltersSelected && (
           <Fragment>
             <Box mr={'25px'} ml={['8px', '8px', '8px']}>
-              <SubduedText>{totalResults} Results</SubduedText>
+              <SubduedText>
+                {totalResults} {totalResults === 1 ? 'Result' : 'Results'}
+              </SubduedText>
             </Box>
             <Box ml={['8px', '8px', 0]}>
               <button onClick={onShowAll}>

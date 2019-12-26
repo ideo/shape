@@ -15,6 +15,7 @@ class Api::V1::BaseController < ApplicationController
   # See: https://github.com/jsonapi-rb/jsonapi-rails/issues/68
   def jsonapi_class
     super.merge(
+      'ActsAsTaggableOn::Tag': SerializableTag,
       'Item::VideoItem': SerializableItem,
       'Item::TextItem': SerializableItem,
       'Item::FileItem': SerializableItem,
@@ -27,6 +28,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::UserCollection': SerializableCollection,
       'Collection::ApplicationCollection': SerializableCollection,
       'Collection::Board': SerializableCollection,
+      'Collection::SearchCollection': SerializableCollection,
       'Collection::SharedWithMeCollection': SerializableCollection,
       'Collection::Global': SerializableCollection,
       'Collection::TestCollection': SerializableCollection,
@@ -38,6 +40,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,
+      'CollectionCard::Placeholder': SerializableCollectionCard,
       'Dataset::CollectionsAndItems': SerializableDataset,
       'Dataset::Empty': SerializableDataset,
       'Dataset::External': SerializableDataset,

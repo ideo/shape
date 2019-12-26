@@ -16,6 +16,10 @@ const SortContainer = styled.div`
   top: -15px;
 `
 
+const GrowFlex = styled(Flex)`
+  flex-grow: 1;
+`
+
 @observer
 class CollectionFilter extends React.Component {
   @observable
@@ -61,6 +65,18 @@ class CollectionFilter extends React.Component {
     }
   }
 
+  filterIsDupe = filter => {
+    const {
+      collection: { collection_filters },
+    } = this.props
+    const existingFilter = collection_filters.find(
+      f =>
+        f.text.toUpperCase() === filter.text.toUpperCase() &&
+        f.filter_type === filter.filter_type
+    )
+    return !!existingFilter
+  }
+
   onCreateFilter = async tag => {
     const { collection } = this.props
     if (!this.currentFilterLookupType) return
@@ -73,7 +89,8 @@ class CollectionFilter extends React.Component {
       filter_type: backendFilterType,
       selected: false,
     }
-    return collection.API_createCollectionFilter(filter)
+    if (!this.filterIsDupe(filter))
+      return collection.API_createCollectionFilter(filter)
   }
 
   onDeleteFilter = async tag => {
@@ -118,9 +135,10 @@ class CollectionFilter extends React.Component {
       sortable,
     } = this.props
     const isFilterBarActive =
-      collection_filters && collection_filters.length > 0
+      (collection_filters && collection_filters.length > 0) ||
+      collection.isSearchCollection
     return (
-      <Flex align="flex-end">
+      <GrowFlex align="flex-end">
         {isFilterBarActive && (
           <FilterBar
             filters={collection_filters}
@@ -132,34 +150,36 @@ class CollectionFilter extends React.Component {
             onShowAll={this.onShowAll}
           />
         )}
-        {canEdit && (
-          <FilterMenu
-            alignTop={isFilterBarActive || sortable}
-            onFilterByTag={this.openSearchModal('Tags')}
-            onFilterBySearch={this.openSearchModal('Search Term')}
-          />
-        )}
-        {sortable && (
-          <SortContainer>
-            <CollectionSort collection={collection} />
-          </SortContainer>
-        )}
-        {!!this.currentFilterLookupType && (
-          <FilterSearchModal
-            filters={
-              this.currentFilterLookupType === 'Tags'
-                ? [...this.tagFilters]
-                : [...this.searchFilters]
-            }
-            onCreateTag={this.onCreateFilter}
-            onRemoveTag={this.onDeleteFilter}
-            onSelectTag={this.onSelectFilter}
-            onModalClose={this.openSearchModal(null)}
-            filterType={this.currentFilterLookupType}
-            modalOpen={!!this.currentFilterLookupType}
-          />
-        )}
-      </Flex>
+        <Flex align="flex-end" ml="auto">
+          {canEdit && (
+            <FilterMenu
+              alignTop={isFilterBarActive || sortable}
+              onFilterByTag={this.openSearchModal('Tags')}
+              onFilterBySearch={this.openSearchModal('Search Term')}
+            />
+          )}
+          {sortable && (
+            <SortContainer>
+              <CollectionSort collection={collection} />
+            </SortContainer>
+          )}
+          {!!this.currentFilterLookupType && (
+            <FilterSearchModal
+              filters={
+                this.currentFilterLookupType === 'Tags'
+                  ? [...this.tagFilters]
+                  : [...this.searchFilters]
+              }
+              onCreateTag={this.onCreateFilter}
+              onRemoveTag={this.onDeleteFilter}
+              onSelectTag={this.onSelectFilter}
+              onModalClose={this.openSearchModal(null)}
+              filterType={this.currentFilterLookupType}
+              modalOpen={!!this.currentFilterLookupType}
+            />
+          )}
+        </Flex>
+      </GrowFlex>
     )
   }
 }
