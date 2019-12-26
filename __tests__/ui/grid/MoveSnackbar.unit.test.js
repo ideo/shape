@@ -1,5 +1,4 @@
 import MoveSnackbar from '~/ui/grid/MoveSnackbar'
-import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import { fakeCollection, fakeItemCard } from '#/mocks/data'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
@@ -42,38 +41,6 @@ describe('MoveSnackbar', () => {
     it('should close the move menu in the uiStore', () => {
       component.handleClose(fakeEvent)
       expect(props.uiStore.closeMoveMenu).toHaveBeenCalled()
-    })
-  })
-
-  describe('moveHelper', () => {
-    describe('with template helper', () => {
-      beforeEach(() => {
-        props.apiStore.currentUser.show_template_helper = true
-        props.uiStore.cardAction = 'useTemplate'
-        wrapper = shallow(<MoveSnackbar.wrappedComponent {...props} />)
-      })
-      it('should display if user.show_template_helper is true', () => {
-        expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
-      })
-    })
-    describe('with move (MDL) helper', () => {
-      beforeEach(() => {
-        props.apiStore.currentUser.show_move_helper = true
-        props.uiStore.cardAction = 'move'
-        wrapper = shallow(<MoveSnackbar.wrappedComponent {...props} />)
-      })
-      it('should display if user.show_move_helper is true', () => {
-        expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
-      })
-    })
-
-    describe('with dismissedMoveHelper = true', () => {
-      beforeEach(() => {
-        props.uiStore.dismissedMoveHelper = true
-      })
-      it('should not display any helper', () => {
-        expect(wrapper.find(MoveHelperModal).exists()).toBeFalsy()
-      })
     })
   })
 
