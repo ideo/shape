@@ -70,7 +70,7 @@ def find_search_import_in_batches(with_activities: false)
   [Collection, Item].each do |klass|
     total = klass.search_import.count
     agg = 0
-    klass.search_import.limit(15_000).find_in_batches.with_index do |batch, i|
+    klass.search_import.find_in_batches.with_index do |batch, i|
       agg += batch.count
       puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
       ids = batch.pluck(:id)
