@@ -66,7 +66,7 @@ describe('LinkItemCover', () => {
     describe('with a short name', () => {
       beforeEach(() => {
         props.item.name = 'The Verge '
-        props.item.content =
+        props.item.subtitle =
           'E-sports like the Overwatch League, NBA 2K League, Mega Man II, and the League of Legends Championship Series are looking to taking on the NBA and NFL with more structure and big-name owners.'
         wrapper.setProps(props)
         rerender()
@@ -97,7 +97,7 @@ describe('LinkItemCover', () => {
       beforeEach(() => {
         props.item.name =
           'Soccer News, Live Scores, Results & Transfers | Goal.com US | The latest soccer news, live scores, results, and rumours from around the world'
-        props.item.content =
+        props.item.subtitle =
           'The latest soccer news, live scores, results, rumours, transfers'
         wrapper.setProps(props)
         rerender()

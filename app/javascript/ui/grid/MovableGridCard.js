@@ -672,10 +672,19 @@ class MovableGridCard extends React.Component {
       searchResult,
     }
 
+    const {
+      cardMenuOpen,
+      editingCardCover,
+      activeDragTarget,
+      isTouchDevice,
+      isCypress,
+      shouldOpenMoveModal,
+    } = uiStore
+
     let _zIndex = 1
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
-    if (uiStore.cardMenuOpen.id === card.id) {
+    if (_.includes([cardMenuOpen.id, editingCardCover], card.id)) {
       menuOpen = true
       // TODO: decouple context menus from GridCard so they can have their own z-index?
       _zIndex = aboveClickWrapper
@@ -686,7 +695,7 @@ class MovableGridCard extends React.Component {
     // const outerTransform = `scale(${1 / zoomLevel})`
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
-    const draggedOverBreadcrumb = !!uiStore.activeDragTarget
+    const draggedOverBreadcrumb = !!activeDragTarget
     if (dragging) {
       transform += ` translate(${xAdjust}px, ${yAdjust}px) rotate(${cardTiltDegrees}deg)`
       if (draggedOverBreadcrumb) {
@@ -704,9 +713,9 @@ class MovableGridCard extends React.Component {
       transition = cardHoverTransition
     }
 
-    const isTouchDeviceSingleColumn = uiStore.isTouchDevice && cols === 1
+    const isTouchDeviceSingleColumn = isTouchDevice && cols === 1
     const touchDeviceClass =
-      isTouchDeviceSingleColumn || uiStore.isCypress ? 'touch-device' : ''
+      isTouchDeviceSingleColumn || isCypress ? 'touch-device' : ''
 
     let shouldHide = !dragging && hidden
     const defaultPosition = {
@@ -720,7 +729,7 @@ class MovableGridCard extends React.Component {
       _zIndex = cardDragging
       cardProps.searchResult = true
       cardProps.canEditCollection = false
-      shouldHide = shouldHide || !uiStore.shouldOpenMoveModal
+      shouldHide = shouldHide || !shouldOpenMoveModal
     }
 
     const draggingMultiple =
@@ -731,7 +740,7 @@ class MovableGridCard extends React.Component {
     const dragPosition = mdlPlaceholder ? null : { x, y }
 
     const disableDragging =
-      !canEditCollection || card.isPinnedAndLocked || !!uiStore.editingCardCover
+      !canEditCollection || card.isPinnedAndLocked || !!editingCardCover
 
     const rndProps = {
       ref: c => {
