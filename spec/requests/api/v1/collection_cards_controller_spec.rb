@@ -237,6 +237,18 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'GET #ids' do
+    let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids" }
+
+    it 'returns stringified ids of collection.collection_cards' do
+      get(path)
+      expect(response.status).to eq(200)
+      expect(json.length).to eq(5)
+      expect(json).to eq(collection.collection_cards.pluck(:id).map(&:to_s))
+    end
+  end
+
   describe 'POST #create' do
     let(:path) { '/api/v1/collection_cards' }
     let(:item_attributes) do
@@ -583,9 +595,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       context 'with snapshot' do
-        let!(:unarchiving_card) { collection.collection_cards.first }
-        let!(:card2) { collection.collection_cards.second }
-        let!(:card3) { collection.collection_cards.third }
+        let(:cards) { collection.collection_cards.to_a }
+        let!(:unarchiving_card) { cards.first }
+        let!(:card2) { cards.second }
+        let!(:card3) { cards.third }
         let(:raw_params) do
           {
             card_ids: [unarchiving_card.id],
@@ -618,6 +631,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           # should be mapped to snapshot
           expect(unarchiving_card.active?).to be true
           expect(unarchiving_card.width).to eq 2
+          expect(unarchiving_card.order).to eq 0
           expect(collection.collection_cards.first).to eq unarchiving_card
         end
       end
@@ -923,6 +937,33 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           expect(combined_cards.first).to eq moving_cards.last
         end
       end
+
+      context 'with cards > bulk_operation_threshold' do
+        let(:placeholder) { create(:collection_card_placeholder) }
+        let(:moving_cards) { from_collection.collection_cards.first(3) }
+
+        before do
+          ENV['BULK_OPERATION_THRESHOLD'] = '3'
+        end
+        after do
+          ENV['BULK_OPERATION_THRESHOLD'] = nil
+        end
+
+        it 'should call perform_bulk_operation instead of CardMover' do
+          expect(CardMover).not_to receive(:new)
+          expect(BulkCardOperationProcessor).to receive(:call).with(
+            placement: 'beginning',
+            action: 'move',
+            cards: moving_cards,
+            to_collection: to_collection,
+            for_user: user,
+          ).and_return(placeholder)
+          patch(path, params: params)
+          expect(json['data']['attributes']).to match_json_schema('collection_card')
+          expect(json['data']['id']).to eq placeholder.id.to_s
+          expect(json['meta']).to eq('placeholder' => true)
+        end
+      end
     end
   end
 
@@ -1096,33 +1137,39 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'duplicates cards from one collection to the other' do
-        expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
-        post(path, params: params)
-        # newly created cards should be duplicates
-        first_cards = to_collection.collection_cards.first(2)
-        expect(first_cards.map(&:item)).not_to match_array moving_cards.map(&:item)
-        # names should match, in same order
-        expect(first_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
-        expect(to_collection.collection_cards.first.primary?).to be true
-      end
-
-      it 'calls reorder_cards! to make sure card orders are not wacky' do
-        expect_any_instance_of(Collection).to receive(:reorder_cards!)
+        expect(CollectionCardDuplicator).to receive(:call).with(
+          to_collection: to_collection,
+          cards: moving_cards,
+          placement: placement,
+          for_user: user,
+        ).and_call_original
         post(path, params: params)
       end
 
-      context 'with integer order' do
-        let(:placement) { 1 }
+      context 'with cards > bulk_operation_threshold' do
+        let(:placeholder) { create(:collection_card_placeholder) }
+        let(:moving_cards) { from_collection.collection_cards.first(3) }
 
-        it 'duplicates cards from one collection to the other, preserving order' do
-          expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
+        before do
+          ENV['BULK_OPERATION_THRESHOLD'] = '3'
+        end
+        after do
+          ENV['BULK_OPERATION_THRESHOLD'] = nil
+        end
+
+        it 'should call perform_bulk_operation instead of CollectionCardDuplicator' do
+          expect(CollectionCardDuplicator).not_to receive(:call)
+          expect(BulkCardOperationProcessor).to receive(:call).with(
+            placement: placement,
+            action: 'duplicate',
+            cards: array_including(moving_cards),
+            to_collection: instance_of(Collection),
+            for_user: user,
+          ).and_return(placeholder)
           post(path, params: params)
-          # newly created cards should be duplicates
-          dupe_cards = to_collection.collection_cards[1..2]
-          # names should match, in same order
-          expect(dupe_cards.map(&:item).map(&:name)).to eq moving_cards.map(&:item).map(&:name)
-          expect(dupe_cards.map(&:item).map(&:cloned_from)).to eq moving_cards.map(&:item)
-          expect(dupe_cards.first.primary?).to be true
+          expect(json['data']['attributes']).to match_json_schema('collection_card')
+          expect(json['data']['id']).to eq placeholder.id.to_s
+          expect(json['meta']).to eq('placeholder' => true)
         end
       end
     end

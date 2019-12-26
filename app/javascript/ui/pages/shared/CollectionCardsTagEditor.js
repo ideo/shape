@@ -11,7 +11,7 @@ class CollectionCardsTagEditor extends React.Component {
     const { cards, apiStore } = this.props
     apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
       card_ids: _.map(cards, 'id'),
-      tag: tag,
+      tag,
     })
   }
 

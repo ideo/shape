@@ -20,6 +20,8 @@ class SerializableItem < BaseJsonSerializer
     :archived,
     :unresolved_count,
     :last_unresolved_comment_id,
+    :subtitle_hidden,
+    :cloned_from_id,
   )
 
   has_many :roles do

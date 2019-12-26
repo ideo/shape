@@ -76,7 +76,8 @@ class Item < ApplicationRecord
                  :previous_thumbnail_urls,
                  :cached_inheritance,
                  :pending_transcoding_uuid,
-                 :common_viewable
+                 :common_viewable,
+                 :subtitle_hidden
 
   store_accessor :data_content,
                  :ops,
@@ -254,7 +255,8 @@ class Item < ApplicationRecord
     copy_parent_card: false,
     parent: self.parent,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    card: nil
   )
     # Clones item
     i = amoeba_dup
@@ -262,7 +264,7 @@ class Item < ApplicationRecord
     i.tag_list = tag_list
     # copy roles from parent (i.e. where it's being placed)
     i.roles_anchor_collection_id = parent.roles_anchor.id
-
+    i.parent_collection_card = card if card
     # save the dupe item first so that we can reference it later
     # return if it didn't work for whatever reason
     return i unless i.save
