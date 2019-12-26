@@ -1,6 +1,7 @@
 import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import { fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 let props, wrapper, component
 
@@ -12,6 +13,7 @@ describe('MoveHelperModal', () => {
       currentUser: fakeUser,
       type: 'move',
       uiStore,
+      apiStore: fakeApiStore(),
     }
     wrapper = shallow(<MoveHelperModal.wrappedComponent {...props} />)
     component = wrapper.instance()
@@ -44,7 +46,9 @@ describe('MoveHelperModal', () => {
       })
 
       it('should update the current user', () => {
-        expect(props.currentUser.API_hideHelper).toHaveBeenCalledWith('move')
+        expect(props.apiStore.currentUser.API_hideHelper).toHaveBeenCalledWith(
+          'move'
+        )
       })
     })
   })
