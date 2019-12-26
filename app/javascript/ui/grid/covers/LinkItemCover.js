@@ -80,9 +80,9 @@ class LinkItemCover extends React.Component {
       desiredNameLen *= 2
       desiredContentLen *= 2
     }
-    const { name, content } = item
+    const { name, subtitle } = item
     let truncatedName = name || ''
-    let truncatedContent = content || ''
+    let truncatedContent = subtitle || ''
     if (name && name.length > desiredNameLen) {
       // In this case, the title will be over 3 lines, so don't display
       // any content and truncate the title somewhat in the middle
@@ -91,9 +91,9 @@ class LinkItemCover extends React.Component {
       const first = name.slice(0, desiredLength / 2)
       const second = name.slice(name.length - desiredLength / 2, name.length)
       truncatedName = `${first}… ${second}`
-    } else if (content && content.length > desiredContentLen) {
+    } else if (subtitle && subtitle.length > desiredContentLen) {
       const desiredLength = desiredContentLen - 1 // one extra char for ellipsis
-      const first = content.slice(0, desiredLength)
+      const first = subtitle.slice(0, desiredLength)
       truncatedContent = `${first}…`
       truncatedName = name
     }

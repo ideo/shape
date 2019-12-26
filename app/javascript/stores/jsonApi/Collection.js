@@ -1226,6 +1226,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return cover.hardcoded_subtitle || cover.text || ''
   }
 
+  get subtitleForEditing() {
+    const { cover } = this
+    return cover.hardcoded_subtitle || cover.text || ''
+  }
+
   get subtitleHidden() {
     const { cover } = this
     if (cover && cover.subtitle_hidden) {

@@ -18,14 +18,14 @@ class GlobalPageComponentsContainer extends React.Component {
       return <MoveHelperModal type="template" />
     }
     const children = []
-    if (
-      apiStore.currentUser.show_move_helper &&
-      uiStore.cardAction === 'move'
-    ) {
-      children.push(<MoveHelperModal type="move" key="moveHelperModal" />)
-    }
 
     if (uiStore.shouldOpenMoveSnackbar) {
+      if (
+        apiStore.currentUser.show_move_helper &&
+        uiStore.cardAction === 'move'
+      ) {
+        children.push(<MoveHelperModal type="move" key="moveHelperModal" />)
+      }
       children.push(
         <MoveSnackbar pastingCards={pastingCards} key="moveSnackbar" />
       )

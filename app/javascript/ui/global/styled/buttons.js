@@ -113,6 +113,14 @@ export const NamedActionButton = styled.button`
   letter-spacing: 0.0625rem;
   padding: 16px 8px;
   text-transform: uppercase;
+  margin-bottom: ${props => props.marginBottom || 0}px;
+
+  ${props =>
+    props.noPadding &&
+    `
+    padding: 0;
+    display: block;
+  `}
 
   svg,
   .icon {

@@ -40,19 +40,6 @@ describe('GlobalPageComponentsContainer', () => {
       })
     })
 
-    describe('with move (MDL) helper', () => {
-      beforeEach(() => {
-        props.apiStore.currentUser.show_move_helper = true
-        props.uiStore.cardAction = 'move'
-        wrapper = shallow(
-          <GlobalPageComponentsContainer.wrappedComponent {...props} />
-        )
-      })
-      it('should display if user.show_move_helper is true', () => {
-        expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
-      })
-    })
-
     describe('with dismissedMoveHelper = true', () => {
       beforeEach(() => {
         props.uiStore.dismissedMoveHelper = true
@@ -68,6 +55,19 @@ describe('GlobalPageComponentsContainer', () => {
       })
       it('should display moveSnackbar', () => {
         expect(wrapper.find(MoveSnackbar).exists()).toBeTruthy()
+      })
+
+      describe('with move (MDL) helper', () => {
+        beforeEach(() => {
+          props.apiStore.currentUser.show_move_helper = true
+          props.uiStore.cardAction = 'move'
+          wrapper = shallow(
+            <GlobalPageComponentsContainer.wrappedComponent {...props} />
+          )
+        })
+        it('should display if user.show_move_helper is true', () => {
+          expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
+        })
       })
     })
   })

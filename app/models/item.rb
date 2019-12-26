@@ -76,7 +76,8 @@ class Item < ApplicationRecord
                  :previous_thumbnail_urls,
                  :cached_inheritance,
                  :pending_transcoding_uuid,
-                 :common_viewable
+                 :common_viewable,
+                 :subtitle_hidden
 
   store_accessor :data_content,
                  :ops,
