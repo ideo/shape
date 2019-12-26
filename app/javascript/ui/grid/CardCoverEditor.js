@@ -92,13 +92,6 @@ const StyledEditTitle = styled.div`
 
 StyledEditTitle.displayName = 'StyledEditTitle'
 
-const RestoreButton = styled(NamedActionButton)`
-  display: block;
-  margin: 0;
-  margin-bottom: 20px;
-  padding: 0;
-`
-
 export const MediumBreak = styled.div`
   display: block;
   margin-bottom: 0.75rem;
@@ -472,9 +465,13 @@ class CardCoverEditor extends React.Component {
                   ></LabelContainer>
                   <br />
                   {record.isLink && (
-                    <RestoreButton onClick={this.handleRestore}>
+                    <NamedActionButton
+                      noPadding
+                      marginBottom={20}
+                      onClick={this.handleRestore}
+                    >
                       Restore
-                    </RestoreButton>
+                    </NamedActionButton>
                   )}
                 </div>
               )}
