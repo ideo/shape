@@ -189,10 +189,12 @@ class CollectionGrid extends React.Component {
       if (blankFound && blankFound.order !== order) {
         // HACK: `num` just makes it so that BCT can get a new unique `id`
         // otherwise grid thinks the BCT has simply "moved"
-        blankFound.num += 1
-        blankFound.id = `blank-${blankFound.num}`
-        // Increments order from existing BCT order
-        blankCard = { ...blankFound, ...blankAttrs }
+        runInAction(() => {
+          blankFound.num += 1
+          blankFound.id = `blank-${blankFound.num}`
+          // Increments order from existing BCT order
+          blankCard = { ...blankFound, ...blankAttrs }
+        })
       }
       if (canEditCollection || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
