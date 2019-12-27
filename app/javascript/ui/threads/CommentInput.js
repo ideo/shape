@@ -41,21 +41,14 @@ class CommentInput extends React.Component {
       transform = `scaleY(1)`
       transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
       const { y } = uiStore.activityLogPosition
-      top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1)) + 16}px`
+      const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // max height is the height above the input and the activity box
+      const totalSuggestionsLength = 45 * (suggestions.length + 1)
+
+      top = `${maxCommentSuggestionsHeight - totalSuggestionsLength}px`
       if (uiStore.isTouchDevice) {
         if (cols == 1) {
-          top = `${window.innerHeight - (50 * suggestions.length + 1) - 35}px`
-        } else if (cols == 2) {
-          const hasEnoughSpace =
-            (window.innerHeight - decoratorRect.top) / 2 >
-            45 * (suggestions.length + 1)
-          top = `${
-            hasEnoughSpace
-              ? decoratorRect.top - y + 30 // bottom
-              : decoratorRect.top - (y + 45 * (suggestions.length + 1)) - 2 // top
-          }px`
-        } else if (cols == 4) {
-          top = `${decoratorRect.top + -(y + 30)}px`
+          // use activity log height since decoratorRect and activity log y position are static for mobile
+          top = `${uiStore.activityLogPosition.h - 24}px`
         }
       }
     } else if (isActive) {
