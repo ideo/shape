@@ -544,7 +544,7 @@ class MovableGridCard extends React.Component {
   }
 
   get hoveringOver() {
-    const { card } = this.props
+    const { card, cardType, parent } = this.props
     const { hoveringOver } = uiStore
     const isHoveringOver =
       hoveringOver && hoveringOver.card && hoveringOver.card.id === card.id
@@ -555,7 +555,10 @@ class MovableGridCard extends React.Component {
     if (isHoveringOver) {
       holdingOver = hoveringOver.holdingOver
       hoveringOverLeft = hoveringOver.direction === 'left'
-      hoveringOverRight = hoveringOver.direction === 'right'
+      hoveringOverRight =
+        hoveringOver.direction === 'right' ||
+        // in foamcore, hovering over a collection is always treated as hoveringOverRight
+        (cardType === 'collections' && parent.isBoard)
     }
 
     return {

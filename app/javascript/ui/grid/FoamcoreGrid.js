@@ -705,7 +705,7 @@ class FoamcoreGrid extends React.Component {
 
   async moveCardsIntoCollection(cardIds, hoveringRecord) {
     const afterCancelOrSuccess = () => {
-      this.hoveringOver = false
+      this.setHoveringOver(false)
       // Call so it resets moving / doesn't look like drag collision
       this.resetCardPositions()
     }
@@ -767,7 +767,7 @@ class FoamcoreGrid extends React.Component {
 
     const previousHoveringOver = { ...this.hoveringOver }
     // store whatever card (or not) that we're hovering over
-    this.hoveringOver = this.findCardOverlap(masterPosition)
+    this.setHoveringOver(this.findCardOverlap(masterPosition))
     if (
       this.hoveringOver &&
       (!previousHoveringOver.card ||
@@ -776,8 +776,11 @@ class FoamcoreGrid extends React.Component {
       // if we've changed cards we're hovering over... start a new dragTimeout
       this.clearDragTimeout()
       const dragTimeoutId = setTimeout(() => {
-        if (!this.hoveringOver) return
+        if (!this.hoveringOverCollection) {
+          return
+        }
         this.hoveringOver.holdingOver = true
+        this.setHoveringOver(this.hoveringOver)
         // kind of silly but we need to call this just to get the holdingOver "jiggle" effect
         this.calculateCardsToRender()
       }, v.cardHoldTime)
@@ -794,6 +797,12 @@ class FoamcoreGrid extends React.Component {
       return this.hoveringOver.record
     }
     return null
+  }
+
+  setHoveringOver(val) {
+    const { uiStore } = this.props
+    this.hoveringOver = val
+    uiStore.setHoveringOver(val)
   }
 
   /*
@@ -822,50 +831,6 @@ class FoamcoreGrid extends React.Component {
       }
     })
     return dragMap
-  }
-
-  /*
-   * This method takes a card and drag position and adds some extra data to
-   * the drag spot, such as the direction, which tells what action should
-   * happen when a card is being dragged on.
-   */
-  setCardDragSpot(card, dragPosition) {
-    const { record } = card
-    const { dragX } = dragPosition
-    const { gridW } = this.props
-    const leftAreaSize = gridW * 0.23
-    const position = this.positionForCoordinates(card)
-    let direction = 'left'
-    if (record && record.internalType === 'collections') {
-      // only collections have a "hover right" area
-      direction = dragX >= position.x + leftAreaSize ? 'right' : 'left'
-    }
-    runInAction(() => {
-      const { col, row, width } = card
-      this.dragGridSpot.set(getMapKey({ row, col }), {
-        col,
-        row,
-        width,
-        direction,
-        card,
-      })
-    })
-  }
-
-  /* This method will set the dragged-over spots for the other cards that
-   * maybe are being dragged along with the one that the user is actually
-   * dragging. It will only be called if multiple cards are being dragged.
-   */
-  setMultiMoveDragSpots(masterPosition, dragPosition) {
-    this.draggingMap.forEach(mapped => {
-      const relativePosition = {
-        col: mapped.col + masterPosition.col,
-        row: mapped.row + masterPosition.row,
-        width: mapped.card.width,
-        height: mapped.card.height,
-      }
-      this.setDraggedOnSpots(relativePosition, dragPosition, true)
-    })
   }
 
   setResizeSpot({ row, col, width, height }) {
@@ -931,23 +896,10 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionCard(card) {
-    const { col, row } = card
-    const beingDraggedOnSpot =
-      this.dragging && this.getDraggedOnSpot({ col, row })
-    const hoverOverLeft = !!(
-      beingDraggedOnSpot && beingDraggedOnSpot.direction === 'left'
-    )
-    const hoverOverRight = !!(
-      beingDraggedOnSpot && beingDraggedOnSpot.direction === 'right'
-    )
-
-    return this.renderMovableCard(card, `card-${card.id}`, {
-      hoverOverLeft,
-      hoverOverRight,
-    })
+    return this.renderMovableCard(card, `card-${card.id}`)
   }
 
-  renderMovableCard(card, key, opts) {
+  renderMovableCard(card, key) {
     const { canEditCollection, collection, routingStore, uiStore } = this.props
     const { cardMenuOpen } = uiStore
     const cardType = card.record ? card.record.internalType : card.cardType
@@ -964,11 +916,6 @@ class FoamcoreGrid extends React.Component {
       y: pageMargins.top,
     }
 
-    const isHoveringOverCollection =
-      this.hoveringOver &&
-      this.hoveringOver.card.id === card.id &&
-      this.hoveringOver.record.internalType === 'collections'
-
     return (
       <MovableGridCard
         key={key}
@@ -983,10 +930,6 @@ class FoamcoreGrid extends React.Component {
         record={card.record || {}}
         onDrag={this.onDrag}
         onDragStart={this.onDragStart}
-        // no need to trigger displacing the card (hoveringOverLeft) since we don't do that in foamcore
-        hoveringOverLeft={false}
-        hoveringOverRight={isHoveringOverCollection}
-        holdingOver={isHoveringOverCollection && this.hoveringOver.holdingOver}
         onDragOrResizeStop={this.onDragOrResizeStop}
         onResize={this.onResize}
         routeTo={routingStore.routeTo}
@@ -1046,7 +989,7 @@ class FoamcoreGrid extends React.Component {
       width,
       height,
     }
-    return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`, {})
+    return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`)
   }
 
   cardWithinViewPlusPage = card => {
