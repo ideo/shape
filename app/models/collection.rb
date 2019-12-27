@@ -684,7 +684,7 @@ class Collection < ApplicationRecord
   def cache_card_count!
     cache_attributes!(
       cached_last_card_order: collection_cards.maximum(:order),
-      cached_card_count: collection_cards.count,
+      cached_card_count: collection_cards.visible.count,
     )
   end
 
