@@ -179,7 +179,7 @@ class Routes extends React.Component {
 
   handleTouchMove = e => {
     const { uiStore, apiStore } = this.props
-    if (uiStore.dragging) {
+    if (uiStore.dragging || uiStore.activityLogMoving) {
       e.preventDefault()
     }
     if (!e.target.closest('.activity_log-draggable')) {
