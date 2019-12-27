@@ -18,7 +18,7 @@ const chartStyle = (style, order) => {
       stroke: (style && style.fill) || v.colors.black,
       strokeWidth: 3,
       strokeDasharray: lineChartDashWithForOrder({
-        order: order,
+        order,
         scale: 1.5,
       }),
     },

@@ -2,11 +2,13 @@ class Search
   def initialize(options = {})
     default_options = {
       fields: [
-        'handle^6',
-        'name^5',
-        'tags^3',
+        'name^50',
+        'handle^50',
+        'tags^20',
         'content',
       ],
+      # `missing` just means this field is allowed to be missing
+      boost_by: { activity_count: { factor: 0.2, missing: 0 } },
       per_page: 10,
       page: 1,
       where: {},
@@ -40,6 +42,7 @@ class Search
       Filters::TypeCollection,
       Filters::TypeItem,
       Filters::CollectionType,
+      Filters::RecordId,
     ]
   end
 end

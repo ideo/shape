@@ -24,6 +24,10 @@ namespace :searchkick do
     find_search_import_in_batches
   end
 
+  task cache_activity_counts: :environment do
+    find_search_import_in_batches(with_activities: true)
+  end
+
   task new_user_search_data: :environment do
     total = User.search_import.count
     agg = 0
@@ -31,6 +35,21 @@ namespace :searchkick do
       agg += batch.count
       puts "Reindexing User batch #{i}... #{agg}/#{total}"
       User.search_import.where(id: batch.pluck(:id)).reindex(:new_search_data)
+    end
+  end
+
+  task reindex_collections_items_last_week: :environment do
+    [Collection, Item].each do |klass|
+      scope = klass.where('updated_at > ?', 1.week.ago)
+      agg = 0
+      total = scope.count
+      scope
+        .find_in_batches
+        .with_index do |batch, i|
+          agg += batch.count
+          puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
+          klass.searchkick_index.import(batch)
+        end
     end
   end
 end
@@ -47,14 +66,20 @@ def reindex_models(klasses)
   end
 end
 
-def find_search_import_in_batches
+def find_search_import_in_batches(with_activities: false)
   [Collection, Item].each do |klass|
     total = klass.search_import.count
     agg = 0
     klass.search_import.find_in_batches.with_index do |batch, i|
       agg += batch.count
       puts "Reindexing #{klass} batch #{i}... #{agg}/#{total}"
-      klass.search_import.where(id: batch.pluck(:id)).reindex(:new_search_data)
+      ids = batch.pluck(:id)
+      klass.where(id: ids).each(&:cache_activity_count!) if with_activities
+      begin
+        klass.search_import.where(id: ids).reindex(:new_search_data)
+      rescue Searchkick::ImportError
+        puts 'error importing batch'
+      end
     end
   end
 end

@@ -125,6 +125,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
         :legend_item_id,
         :legend_search_source,
         :style,
+        :subtitle_hidden,
         filestack_file_attributes: Item.filestack_file_attributes_whitelist,
       ].concat(Item.globalize_attribute_names),
     )

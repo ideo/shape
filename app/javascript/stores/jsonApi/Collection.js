@@ -430,6 +430,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get isCreativeDifferenceChartCover() {
     return (
       this.cover_type === 'cover_type_items' &&
+      this.collection_cover_items.length > 0 &&
       this.collection_cover_items[0].isData
     )
   }
@@ -506,10 +507,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isEmpty() {
-    // use the cached card count
-    return (
-      this.collection_card_count === 0 && this.collection_cards.length === 0
-    )
+    return this.collection_cards.length === 0
   }
 
   get numPaidQuestions() {
@@ -950,9 +948,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: this.launchableTestId,
-      hasLinkSharingAudience: hasLinkSharingAudience,
-      hasPaidAudience: hasPaidAudience,
-      ideasCount: ideasCount,
+      hasLinkSharingAudience,
+      hasPaidAudience,
+      ideasCount,
     })
   }
 
@@ -1028,7 +1026,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           actionName,
           hasLinkSharingAudience: has_link_sharing,
           hasPaidAudience: gives_incentive,
-          ideasCount: ideasCount,
+          ideasCount,
         })
       }
     } catch (err) {
@@ -1237,6 +1235,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (cover.subtitle_hidden) {
       return ''
     }
+    return cover.hardcoded_subtitle || cover.text || ''
+  }
+
+  get subtitleForEditing() {
+    const { cover } = this
     return cover.hardcoded_subtitle || cover.text || ''
   }
 

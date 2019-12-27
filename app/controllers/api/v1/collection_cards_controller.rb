@@ -354,7 +354,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     # Only notify for archiving of collections (and not link cards)
     return if card.link?
 
-    # TODO: this should be async!
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: card.record,

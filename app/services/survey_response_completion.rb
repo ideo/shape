@@ -1,6 +1,7 @@
 class SurveyResponseCompletion < SimpleService
   delegate :test_collection,
            :gives_incentive?,
+           :in_progress?,
            :completed?,
            :user,
            :test_audience,
@@ -12,7 +13,10 @@ class SurveyResponseCompletion < SimpleService
   end
 
   def call
-    mark_as_completed!
+    # for an already duplicate/completed_late survey there's nothing to be done
+    return @survey_response unless in_progress? || completed?
+
+    mark_as_completed_or_duplicate!
     @survey_response.cache_test_scores!
     update_test_audience_if_complete
     mark_response_as_payment_owed
@@ -22,16 +26,20 @@ class SurveyResponseCompletion < SimpleService
 
   private
 
-  def mark_as_completed!
-    return unless @survey_response.in_progress?
+  def mark_as_completed_or_duplicate!
+    # even completed surveys can later get marked as duplicate (once they add their email)
+    if user_has_existing_survey_response?
+      @survey_response.update(status: :duplicate)
+      return
+    end
+
+    return unless in_progress?
 
     status = :completed
     # For in-collection tests the response may technically be attached to a "share via link" audience;
     # but we only care if the entire test has been closed
     test_audience_closed = (test_collection.collection_to_test.nil? && test_audience&.closed?)
-    if user_has_existing_survey_response?
-      status = :duplicate
-    elsif test_collection.closed? || test_audience_closed
+    if test_collection.closed? || test_audience_closed
       status = :completed_late
     end
     @survey_response.update(status: status)
@@ -60,6 +68,7 @@ class SurveyResponseCompletion < SimpleService
     end
     SurveyResponse
       .where(where_status)
+      .where.not(id: @survey_response.id)
       .find_by(user: user, test_collection: @survey_response.test_collection)
       .present?
   end

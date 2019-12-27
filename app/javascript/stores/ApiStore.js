@@ -96,7 +96,7 @@ class ApiStore extends jsonapi(datxCollection) {
     this.filestackToken = filestackToken
     this.currentUserOrganizationId = organizationId || null
     Sentry.configureScope(scope => {
-      scope.setUser({ id: id, currentOrganizationId: organizationId })
+      scope.setUser({ id, currentOrganizationId: organizationId })
     })
   }
 
@@ -751,7 +751,7 @@ class ApiStore extends jsonapi(datxCollection) {
         apiCall: () => {
           this.unarchiveCards({
             cardIds: res.meta.new_cards,
-            collection: collection,
+            collection,
           })
         },
         actionType: POPUP_ACTION_TYPES.SNACKBAR,

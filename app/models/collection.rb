@@ -76,6 +76,7 @@ class Collection < ApplicationRecord
   include Externalizable
   include Commentable
   include Globalizable
+  include CachedAttributes
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -99,6 +100,7 @@ class Collection < ApplicationRecord
                  :cached_owned_tag_list,
                  :cached_card_count,
                  :cached_last_card_order,
+                 :cached_activity_count,
                  :submission_attrs,
                  :getting_started_shell,
                  :loading_content,
@@ -278,6 +280,7 @@ class Collection < ApplicationRecord
       archived: archived,
       master_template: master_template,
       collection_type: collection_type,
+      activity_count: activities_and_child_activities_count
     }
   end
 
@@ -285,7 +288,7 @@ class Collection < ApplicationRecord
   # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
     {
-      master_template: master_template,
+      activity_count: activities_and_child_activities_count,
     }
   end
 
@@ -361,7 +364,8 @@ class Collection < ApplicationRecord
     parent: self.parent,
     building_template_instance: false,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    card: nil
   )
 
     # check if we are cloning a template inside a template instance;
@@ -406,6 +410,7 @@ class Collection < ApplicationRecord
 
     # save the dupe collection first so that we can reference it later
     # return if it didn't work for whatever reason
+    c.parent_collection_card = card if card
     return c unless c.save
 
     c.parent_collection_card.save if c.parent_collection_card.present?
@@ -422,7 +427,7 @@ class Collection < ApplicationRecord
     # Method from Externalizable
     duplicate_external_records(c)
 
-    c.enable_org_view_access_if_allowed(parent)
+    c.enable_org_view_access_if_allowed
 
     if collection_cards.any? && !c.getting_started_shell
       worker_opts = [
@@ -528,7 +533,7 @@ class Collection < ApplicationRecord
   # Cards are explicitly passed in when moving them from another collection to this one
   def recalculate_child_breadcrumbs(cards = collection_cards)
     cards.each do |card|
-      next if card.link?
+      next unless card.primary?
 
       if card.item.present?
         # have to reload in order to pick up new parent relationship
@@ -536,6 +541,22 @@ class Collection < ApplicationRecord
       elsif card.collection_id.present?
         # this method will run the async worker if there are >50 children
         card.collection.reload.recalculate_breadcrumb_tree!
+      end
+    end
+  end
+
+  # similar to above but runs more slowly, and will correct any issues (above assumes breadcrumb tree is accurate)
+  def recursively_fix_breadcrumbs!(cards = collection_cards)
+    cards.each do |card|
+      next unless card.primary?
+
+      if card.item.present?
+        # have to reload in order to pick up new parent relationship
+        card.item.reload.recalculate_breadcrumb!
+      elsif card.collection_id.present?
+        # this will run recursively rather than using breadcrumb to find all children
+        card.collection.reload.recalculate_breadcrumb!
+        card.collection.recursively_fix_breadcrumbs!
       end
     end
   end
@@ -608,11 +629,13 @@ class Collection < ApplicationRecord
     queue_update_template_instances
   end
 
-  def enable_org_view_access_if_allowed(parent)
+  def enable_org_view_access_if_allowed
     # If parent is user collection, allow primary group to see it
     # As long as it isn't the 'Getting Started' collection
-    return false unless parent.is_a?(Collection::UserCollection) &&
-                        (cloned_from.blank? || !cloned_from.getting_started?)
+    return false unless parent&.is_a?(Collection::UserCollection) &&
+                        (cloned_from.blank? ||
+                         !cloned_from.getting_started? &&
+                         !cloned_from.inside_getting_started?)
 
     # collections created in My Collection always get unanchored
     unanchor_and_inherit_roles_from_anchor!
@@ -669,15 +692,16 @@ class Collection < ApplicationRecord
   end
 
   def cache_card_count!
-    # not using the store_accessor directly here because of:
-    # https://github.com/rails/rails/pull/32563
-    self.cached_attributes ||= {}
-    self.cached_attributes['cached_last_card_order'] = collection_cards.maximum(:order)
-    self.cached_attributes['cached_card_count'] = collection_cards.count
-    # update without callbacks
-    return unless changes.present?
+    cache_attributes!(
+      cached_last_card_order: collection_cards.maximum(:order),
+      cached_card_count: collection_cards.visible.count,
+    )
+  end
 
-    update_columns cached_attributes: cached_attributes, updated_at: Time.current
+  def activities_and_child_activities_count
+    (cached_activity_count || 0) +
+      all_child_collections.sum("(collections.cached_attributes->>'cached_activity_count')::INT") +
+      all_child_items.sum("(items.cached_attributes->>'cached_activity_count')::INT")
   end
 
   def update_cover_text!(text_item)
@@ -846,6 +870,10 @@ class Collection < ApplicationRecord
 
   def parent_submission
     parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
+  end
+
+  def inside_getting_started?
+    parents.any?(&:getting_started?)
   end
 
   def parent_submission_box_template

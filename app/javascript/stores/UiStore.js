@@ -47,11 +47,6 @@ export default class UiStore {
   selectedTextRangeForCard = { ...this.defaultSelectedTextRange }
   // stored in case we ever need to reset the text
   quillSnapshot = {}
-  @computed
-  get cardMenuOpenAndPositioned() {
-    const { cardMenuOpen } = this
-    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
-  }
   @observable
   organizationMenuPage = null
   @observable
@@ -210,6 +205,29 @@ export default class UiStore {
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
+  hoveringOverDefaults = {
+    order: null,
+    direction: null,
+    card: null,
+    record: null,
+    holdingOver: false,
+  }
+  @observable
+  hoveringOver = {
+    ...this.hoveringOverDefaults,
+  }
+  placeholderDefaults = {
+    xPos: 0,
+    yPos: 0,
+    width: 0,
+    height: 0,
+    cardWidth: 1,
+    cardHeight: 1,
+  }
+  @observable
+  placeholderPosition = {
+    ...this.placeholderDefaults,
+  }
 
   @action
   toggleEditingCardId(cardId) {
@@ -354,6 +372,12 @@ export default class UiStore {
   @action
   closeDialog() {
     this.dialogConfig.open = null
+  }
+
+  @computed
+  get cardMenuOpenAndPositioned() {
+    const { cardMenuOpen } = this
+    return cardMenuOpen.id && !!(cardMenuOpen.x || cardMenuOpen.y)
   }
 
   @action
@@ -1138,7 +1162,7 @@ export default class UiStore {
     this.scroller.scrollTo(bottom, {
       ...v.commentScrollOpts,
       ...scrollOpts,
-      offset: offset,
+      offset,
     })
   }
 
@@ -1205,5 +1229,19 @@ export default class UiStore {
     this.multiMoveCardIds.replace(
       _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
     )
+  }
+
+  @action
+  setHoveringOver(opts) {
+    if (!opts) {
+      this.hoveringOver = { ...this.hoveringOverDefaults }
+    } else {
+      this.hoveringOver = { ...this.hoveringOverDefaults, ...opts }
+    }
+  }
+
+  @action
+  updatePlaceholderPosition(position = {}) {
+    _.assign(this.placeholderPosition, position)
   }
 }

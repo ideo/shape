@@ -161,10 +161,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
       }
     }
     hidden={false}
-    holdingOver={false}
     horizontalScroll={false}
-    hoveringOverLeft={false}
-    hoveringOverRight={false}
     isBoardCollection={false}
     isSharedCollection={false}
     isUserCollection={false}
@@ -173,7 +170,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
     loadCollectionCards={[MockFunction]}
     maxResizeCol={4}
     maxResizeRow={2}
-    menuOpen={false}
     onDrag={[Function]}
     onDragOrResizeStop={[Function]}
     onResize={[Function]}
@@ -2175,6 +2171,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
     }
     routeTo={[MockFunction]}
     scrollElement={null}
+    searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
   />
@@ -2334,10 +2331,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
       }
     }
     hidden={false}
-    holdingOver={false}
     horizontalScroll={false}
-    hoveringOverLeft={false}
-    hoveringOverRight={false}
     isBoardCollection={false}
     isSharedCollection={false}
     isUserCollection={false}
@@ -2346,7 +2340,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
     loadCollectionCards={[MockFunction]}
     maxResizeCol={4}
     maxResizeRow={2}
-    menuOpen={false}
     onDrag={[Function]}
     onDragOrResizeStop={[Function]}
     onResize={[Function]}
@@ -4348,6 +4341,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
     }
     routeTo={[MockFunction]}
     scrollElement={null}
+    searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
   />
@@ -4507,10 +4501,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
       }
     }
     hidden={false}
-    holdingOver={false}
     horizontalScroll={false}
-    hoveringOverLeft={false}
-    hoveringOverRight={false}
     isBoardCollection={false}
     isSharedCollection={false}
     isUserCollection={false}
@@ -4519,7 +4510,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
     loadCollectionCards={[MockFunction]}
     maxResizeCol={4}
     maxResizeRow={2}
-    menuOpen={false}
     onDrag={[Function]}
     onDragOrResizeStop={[Function]}
     onResize={[Function]}
@@ -6521,6 +6511,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
     }
     routeTo={[MockFunction]}
     scrollElement={null}
+    searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
   />
@@ -6553,10 +6544,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
       }
     }
     hidden={false}
-    holdingOver={false}
     horizontalScroll={false}
-    hoveringOverLeft={false}
-    hoveringOverRight={false}
     isBoardCollection={false}
     isSharedCollection={false}
     isUserCollection={false}
@@ -6565,7 +6553,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
     loadCollectionCards={[MockFunction]}
     maxResizeCol={4}
     maxResizeRow={2}
-    menuOpen={false}
     onDrag={[Function]}
     onDragOrResizeStop={[Function]}
     onResize={[Function]}
@@ -8507,6 +8494,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
     record={Object {}}
     routeTo={[MockFunction]}
     scrollElement={null}
+    searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
   />

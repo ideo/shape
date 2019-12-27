@@ -2,7 +2,8 @@
 
 const googleTagManager = {
   push: params => {
-    if (process.env.SHAPE_APP === 'localhost') {
+    if (process.env.DEBUG) {
+      // eslint-disable-next-line
       console.log('dataLayer.push', params)
     }
     window.dataLayer = window.dataLayer || []

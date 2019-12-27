@@ -20,24 +20,27 @@ module Breadcrumbable
       connection.remove_column table_name, :breadcrumb
     end
 
-    def in_collection(collection_or_id)
+    def in_collection(collection_or_id, order: :breadcrumb)
       if collection_or_id.is_a?(Collection)
         collection_id = collection_or_id.id
       else
         collection_id = collection_or_id
       end
-      scoped = active.where('breadcrumb @> ?', [collection_id].to_s)
+      scoped = active.where("#{table_name}.breadcrumb @> ?", [collection_id].to_s)
       # order from the top of the tree down
-      scoped.order(Arel.sql('jsonb_array_length(breadcrumb) ASC'))
+      if order == :breadcrumb
+        scoped = scoped.order(Arel.sql('jsonb_array_length(breadcrumb) ASC'))
+      end
+      scoped
     end
   end
 
   def all_child_collections
-    Collection.in_collection(self)
+    Collection.in_collection(self, order: nil)
   end
 
   def all_child_items
-    Item.in_collection(self)
+    Item.in_collection(self, order: nil)
   end
 
   def parents

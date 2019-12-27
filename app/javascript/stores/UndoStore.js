@@ -97,7 +97,7 @@ export default class UndoStore {
       // however TextItemCover has a unique way of undo/redo
       this.pushRedoAction({
         ...redoAction,
-        redirectPath: redirectPath,
+        redirectPath,
         actionType,
       })
     }
