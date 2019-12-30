@@ -134,7 +134,11 @@ export default class CardMoveService {
           uiStore.scrollToBottom()
         }
       }
-      if (cardAction === 'move' && !uiStore.movingIntoCollection) {
+      if (
+        (cardAction === 'move' && !uiStore.movingIntoCollection) ||
+        cardAction === 'duplicate' ||
+        cardAction === 'link'
+      ) {
         // we actually want to reselect the cards at this point
         uiStore.reselectCardIds(data.collection_card_ids)
       }
