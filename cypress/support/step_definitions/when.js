@@ -451,7 +451,7 @@ When('I close the move helper modal', () => {
 })
 
 When('I click the {word} arrow on the MDL snackbar', direction => {
-  cy.locate(`MoveModalArrow-${direction}`)
+  cy.locate(`MoveSnackbarArrow-${direction}`)
     .first()
     .click({ force: true })
   cy.wait(100)

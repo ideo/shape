@@ -97,7 +97,7 @@ const captureGlobalKeypress = e => {
     // CTRL+V: Place (Paste)
     case 'KeyV':
       if (ctrlKeypress) {
-        // MoveModal will listen to this value and then set it to false
+        // MoveSnackbar will listen to this value and then set it to false
         uiStore.update('pastingCards', true)
       }
       break
