@@ -75,7 +75,6 @@ class MoveHelperModal extends React.Component {
   }
 
   handleAddToMyCollection = async e => {
-    e.preventDefault()
     this.updateUserPreference()
 
     const { uiStore, apiStore, routingStore } = this.props
@@ -110,7 +109,6 @@ class MoveHelperModal extends React.Component {
   }
 
   letMePlaceIt = e => {
-    e.preventDefault()
     const { uiStore } = this.props
     if (this.templateCollection) {
       uiStore.openMoveMenu({
@@ -180,44 +178,43 @@ class MoveHelperModal extends React.Component {
           <CloseIcon />
         </ModalCloseButton>
         <StyledDialogContent>
-          <form>
-            <img
-              src="https://s3-us-west-2.amazonaws.com/assets.shape.space/move_helper_diagram.png"
-              alt="Diagram showing moving items between multiple collections"
-              style={{ width: '100%', maxWidth: '410px', marginBottom: '40px' }}
+          <img
+            src="https://s3-us-west-2.amazonaws.com/assets.shape.space/move_helper_diagram.png"
+            alt="Diagram showing moving items between multiple collections"
+            style={{ width: '100%', maxWidth: '410px', marginBottom: '40px' }}
+          />
+          <StyledSpecialDisplayHeading>
+            {this.helperText}
+          </StyledSpecialDisplayHeading>
+          {currentUser.show_template_helper &&
+            type == 'template' &&
+            this.renderModalButtons}
+          <FormControl component="fieldset" required>
+            <FormControlLabel
+              classes={{ label: 'form-control' }}
+              style={{ textAlign: 'left' }}
+              control={
+                <Checkbox
+                  checked={this.dontShowChecked}
+                  onChange={this.handleDontShowCheck}
+                  value="yes"
+                />
+              }
+              label="Thanks, please don't show me this message again."
             />
-            <StyledSpecialDisplayHeading>
-              {this.helperText}
-            </StyledSpecialDisplayHeading>
-            {currentUser.show_template_helper &&
-              type == 'template' &&
-              this.renderModalButtons}
-            <FormControl component="fieldset" required>
-              <FormControlLabel
-                classes={{ label: 'form-control' }}
-                style={{ textAlign: 'left' }}
-                control={
-                  <Checkbox
-                    checked={this.dontShowChecked}
-                    onChange={this.handleDontShowCheck}
-                    value="yes"
-                  />
-                }
-                label="Thanks, please don't show me this message again."
-              />
-            </FormControl>
+          </FormControl>
 
-            {!(currentUser.show_template_helper && type == 'template') && (
-              <div className="button--center">
-                <TextButton
-                  data-cy="MoveHelperModal-button"
-                  disabled={this.isLoading}
-                >
-                  Close
-                </TextButton>
-              </div>
-            )}
-          </form>
+          {!(currentUser.show_template_helper && type == 'template') && (
+            <div className="button--center">
+              <TextButton
+                onClick={this.handleClose}
+                data-cy="MoveHelperModal-button"
+                disabled={this.isLoading}
+              >
+                Close
+              </TextButton>
+            </div>
+          )}
         </StyledDialogContent>
       </StyledDialog>
     )
