@@ -3,7 +3,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[index move replace]
   skip_before_action :check_api_authentication!, only: %i[index]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
-  before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
+  before_action :load_and_authorize_parent_collection_for_update, only: %i[update pin]
 
   before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids]
   before_action :check_cache, only: %i[index ids]
@@ -194,6 +194,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render jsonapi: @to_collection.reload,
            meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
            expose: { current_record: @to_collection }
+  end
+
+  def toggle_pin
+    pinner = CardPinner.new(
+      card: @collection_card,
+      pinning: !@collection_card.pinned,
+    )
+
+    pinner.call
+    render jsonapi: @collection_card.reload
   end
 
   private

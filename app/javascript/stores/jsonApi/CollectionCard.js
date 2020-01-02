@@ -433,6 +433,16 @@ class CollectionCard extends BaseRecord {
     }
     return false
   }
+
+  async API_togglePin() {
+    const data = this.toJsonApi()
+
+    return this.apiStore.request(
+      `collection_cards/${this.id}/toggle_pin`,
+      'PATCH',
+      { data }
+    )
+  }
 }
 
 export default CollectionCard

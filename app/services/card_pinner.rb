@@ -1,7 +1,6 @@
 class CardPinner < SimpleService
-  def initialize(card:, template:, pinning:)
+  def initialize(card:, pinning:)
     @card = card
-    @template = template
     @pinning = pinning
   end
 
@@ -10,15 +9,19 @@ class CardPinner < SimpleService
   end
 
   def reorder_cards!
+    template = @card.parent
+
     if @pinning
-      # pinning inserts at the front
-      @card.update(pinned: true, order: 0)
+      # pinning inserts card at the back of pinned items
+      last_pinned_order = template.collection_cards.pinned&.last&.order || 0
+      @card.update(pinned: true, order: last_pinned_order)
     else
       # unpinning inserts at the front of unpinned items
-      unpinned_order = @template.unpinned&.first&.order || 0
-      @card.update(pinned: false, order: unpinned_order)
+      next_to_last_pinned_order = template.collection_cards.pinned&.last&.order ? template.collection_cards.pinned.last.order + 1 : 0
+      first_unpinned_order = template.collection_cards.unpinned&.first&.order || next_to_last_pinned_order
+      @card.update(pinned: false, order: first_unpinned_order)
     end
-    @template.reorder_cards!
-    @template.collection_cards.reload
+    template.reorder_cards!
+    template.queue_update_template_instances
   end
 end
