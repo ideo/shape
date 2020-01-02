@@ -71,11 +71,18 @@ const SharedRecordMixin = superclass =>
       // see collection_updater.rb for deserialization
       if (this.internalType === 'collections') {
         if (hardcodedSubtitle !== this.subtitle) {
-          data.attributes.hardcoded_subtitle = hardcodedSubtitle
           this.cover.hardcoded_subtitle = hardcodedSubtitle
         }
+        data.attributes.hardcoded_subtitle = hardcodedSubtitle
         this.cover.subtitle_hidden = subtitleHidden
         data.attributes.subtitle_hidden = subtitleHidden
+      } else if (this.isLink) {
+        if (hardcodedSubtitle !== this.content) {
+          this.content = hardcodedSubtitle
+        }
+        data.attributes.content = hardcodedSubtitle
+        data.attributes.subtitle_hidden = subtitleHidden
+        this.subtitle_hidden = subtitleHidden
       }
 
       // cancel sync so that name edits don't roundtrip and interfere with your <input>

@@ -52,6 +52,7 @@ class Item < ApplicationRecord
   include Externalizable
   include Commentable
   include Globalizable
+  include CachedAttributes
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -73,10 +74,12 @@ class Item < ApplicationRecord
 
   store_accessor :cached_attributes,
                  :cached_tag_list,
-                 :previous_thumbnail_urls,
                  :cached_inheritance,
+                 :cached_activity_count,
+                 :previous_thumbnail_urls,
                  :pending_transcoding_uuid,
-                 :common_viewable
+                 :common_viewable,
+                 :subtitle_hidden
 
   store_accessor :data_content,
                  :ops,
@@ -119,7 +122,7 @@ class Item < ApplicationRecord
 
   validates :type, presence: true
 
-  before_save :cache_attributes
+  before_save :cache_tag_list
   before_update :cache_previous_thumbnail_url, if: :will_save_change_to_thumbnail_url?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_parent_collection, unless: :destroyed?
@@ -220,12 +223,12 @@ class Item < ApplicationRecord
       name: name,
       tags: tags.map(&:name).map(&:downcase),
       content: search_content,
-      # NOTE: could change this back to defer to parent if we ever remove item roles
       user_ids: search_user_ids,
       parent_id: parent&.id,
       group_ids: search_group_ids,
       organization_id: organization_id,
       archived: archived,
+      activity_count: cached_activity_count,
     }
   end
 
@@ -233,8 +236,7 @@ class Item < ApplicationRecord
   # Item.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
     {
-      tags: tags.map(&:name).map(&:downcase),
-      archived: archived,
+      activity_count: cached_activity_count,
     }
   end
 
@@ -254,7 +256,8 @@ class Item < ApplicationRecord
     copy_parent_card: false,
     parent: self.parent,
     system_collection: false,
-    synchronous: false
+    synchronous: false,
+    card: nil
   )
     # Clones item
     i = amoeba_dup
@@ -262,7 +265,7 @@ class Item < ApplicationRecord
     i.tag_list = tag_list
     # copy roles from parent (i.e. where it's being placed)
     i.roles_anchor_collection_id = parent.roles_anchor.id
-
+    i.parent_collection_card = card if card
     # save the dupe item first so that we can reference it later
     # return if it didn't work for whatever reason
     return i unless i.save
@@ -333,7 +336,7 @@ class Item < ApplicationRecord
     collection.update_cover_text!(self)
   end
 
-  def cache_attributes
+  def cache_tag_list
     if cached_tag_list != tag_list
       self.cached_tag_list = tag_list
     end

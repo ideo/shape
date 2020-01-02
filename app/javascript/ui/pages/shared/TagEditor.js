@@ -6,7 +6,9 @@ import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
 import Pill from '~/ui/global/Pill'
-import StyledReactTags, { creativeDifferenceTagIcon } from './StyledReactTags'
+import StyledReactTags, {
+  creativeDifferenceTagIcon,
+} from '~/ui/pages/shared/StyledReactTags'
 
 export const tagsInCommon = (records, tagField) => {
   const tags = []
@@ -45,34 +47,37 @@ class TagEditor extends React.Component {
     this.initTags(tagsInCommon(records, tagField))
   }
 
-  createFormattedTag(id, label) {
+  createFormattedTag(label) {
     const tag = {
-      id,
+      id: label,
       label,
       name: label,
+      onDelete: this.handleDelete(label),
       symbol: creativeDifferenceTagIcon(label),
       symbolSize: 18,
     }
-    tag.onDelete = this.handleDelete(id)
     return tag
   }
 
   @action
   initTags = tagArray => {
     // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...tagArray], (t, i) => this.createFormattedTag(i, t))
+    this.tags = _.map([...tagArray], t => this.createFormattedTag(t))
   }
 
   @action
   handleAddition = tagData => {
     const { validateTag, records, tagField, afterAddTag } = this.props
     tagData.name = tagData.name.trim()
-    const newTag = this.createFormattedTag(tagData.id, tagData.name)
+    const newTag = this.createFormattedTag(tagData.name)
     this.error = ''
 
     // Return if tag is a duplicate
-    if (this.tags.find(t => t.name.toUpperCase() === newTag.name.toUpperCase()))
+    if (
+      _.find(this.tags, t => t.name.toUpperCase() === newTag.name.toUpperCase())
+    ) {
       return
+    }
 
     // If a validateTag function is provided, validate tag
     if (validateTag) {
@@ -92,17 +97,18 @@ class TagEditor extends React.Component {
     afterAddTag(newTag.name)
   }
 
-  @action
-  handleDelete = tagIndex => () => {
+  handleDelete = label => e => {
     const { records, tagField, afterRemoveTag } = this.props
-    const tag = this.tags[tagIndex]
-    runInAction(() => {
-      this.tags.remove(tag)
-      records.forEach(record => {
-        record[tagField].remove(tag.name)
+    const tag = _.find(this.tags, { label })
+    if (tag) {
+      runInAction(() => {
+        this.tags.remove(tag)
+        records.forEach(record => {
+          record[tagField].remove(tag.name)
+        })
+        afterRemoveTag(tag.name)
       })
-    })
-    afterRemoveTag(tag.name)
+    }
   }
 
   // This is displayed instead of the tag input if the user cannot edit the tags

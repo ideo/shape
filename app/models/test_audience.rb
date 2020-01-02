@@ -14,15 +14,6 @@
 #  network_payment_id :string
 #  test_collection_id :bigint(8)
 #
-# Indexes
-#
-#  index_test_audiences_on_audience_id         (audience_id)
-#  index_test_audiences_on_test_collection_id  (test_collection_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (audience_id => audiences.id)
-#
 
 class TestAudience < ApplicationRecord
   belongs_to :audience

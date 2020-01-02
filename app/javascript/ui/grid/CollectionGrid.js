@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { action, runInAction } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { updateModelId } from 'datx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
@@ -14,6 +14,8 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import { objectsEqual } from '~/utils/objectUtils'
 import CardMoveService from '~/ui/grid/CardMoveService'
 import v from '~/utils/variables'
+
+const cardMover = new CardMoveService()
 
 const StyledGrid = styled.div`
   min-height: ${props => props.minHeight}px;
@@ -71,16 +73,14 @@ const pageMargins = () => {
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
 class CollectionGrid extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      cards: [],
-      rows: 1,
-      hoveringOver: false,
-      dragTimeoutId: null,
-      matrix: [],
-    }
-  }
+  @observable
+  cards = []
+  @observable
+  matrix = []
+  @observable
+  rows = 1
+  dragTimeoutId = null
+  draggingId = null
 
   componentDidMount() {
     this.initialize(this.props)
@@ -184,15 +184,17 @@ class CollectionGrid extends React.Component {
         blankType,
       }
       // If we already have a BCT open, find it in our cards
-      const blankFound = _.find(this.state.cards, { cardType: 'blank' })
+      const blankFound = _.find(this.cards, { cardType: 'blank' })
       // Look for card in state...
       if (blankFound && blankFound.order !== order) {
         // HACK: `num` just makes it so that BCT can get a new unique `id`
         // otherwise grid thinks the BCT has simply "moved"
-        blankFound.num += 1
-        blankFound.id = `blank-${blankFound.num}`
-        // Increments order from existing BCT order
-        blankCard = { ...blankFound, ...blankAttrs }
+        runInAction(() => {
+          blankFound.num += 1
+          blankFound.id = `blank-${blankFound.num}`
+          // Increments order from existing BCT order
+          blankCard = { ...blankFound, ...blankAttrs }
+        })
       }
       if (canEditCollection || blankCard.blankType) {
         // Add the BCT to the array of cards to be positioned, if they can edit
@@ -224,10 +226,23 @@ class CollectionGrid extends React.Component {
   // --------------------------
   // <Drag related functions>
   // --------------------------
+  // reset the grid back to its original state
+  positionCardsFromProps = () => {
+    const { uiStore } = this.props
+    uiStore.update('multiMoveCardIds', [])
+    this.setHoveringOver(false)
+    this.initialize(this.props)
+  }
+
+  calculateOrderForMovingCard = (order, index) => {
+    return Math.ceil(order) + index
+  }
+
   onResize = (cardId, newSize) => {
-    const positionedCard = _.find(this.state.cards, { id: cardId })
+    const { uiStore } = this.props
+    const positionedCard = _.find(this.cards, { id: cardId })
     const placeholderKey = `${cardId}-placeholder`
-    const stateCards = [...this.state.cards]
+    const stateCards = [...this.cards]
     let placeholder = _.find(stateCards, { id: placeholderKey })
     let repositionCards = false
 
@@ -247,28 +262,95 @@ class CollectionGrid extends React.Component {
         dragging: positionedCard.id,
         dragType: 'resize',
       })
+      uiStore.updatePlaceholderPosition({
+        ...placeholder.position,
+        order: placeholder.order,
+        cardWidth: placeholder.width,
+        cardHeight: placeholder.height,
+      })
     }
   }
 
-  // reset the grid back to its original state
-  positionCardsFromProps = () => {
+  onDrag = (cardId, dragPosition) => {
+    if (!this.props.canEditCollection) return
     const { uiStore } = this.props
-    uiStore.update('multiMoveCardIds', [])
-    this.setState({ hoveringOver: false }, () => {
-      this.initialize(this.props)
-    })
-  }
+    const positionedCard = _.find(this.cards, { id: cardId })
+    const stateCards = [...this.cards]
+    let placeholder = _.find(stateCards, { cardType: 'placeholder' })
+    const hoveringOver = this.findOverlap(cardId, dragPosition)
+    if (hoveringOver && hoveringOver.card.isPinnedAndLocked) return
+    const previousHoveringOver = this.hoveringOver
+    let createdPlaceholder = false
+    const hoveringOverChanged =
+      _.get(hoveringOver, 'card.id', null) !==
+        _.get(previousHoveringOver, 'card.id', null) ||
+      _.get(hoveringOver, 'direction', null) !==
+        _.get(previousHoveringOver, 'direction', null)
 
-  calculateOrderForMovingCard = (order, index) => {
-    return Math.ceil(order) + index
+    if (hoveringOver) {
+      if (hoveringOver.card.cardType === 'placeholder') {
+        if (!placeholder) {
+          // the case where we created a new placeholder in findOverlap
+          placeholder = hoveringOver.card
+          stateCards.push(placeholder)
+          createdPlaceholder = true
+        }
+      }
+      // guard clause to exit if we are not hovering over a new card or card zone
+      if (!hoveringOverChanged) return
+      this.clearDragTimeout()
+      // NOTE: currently, only collections trigger this "right" hover zone
+      if (
+        hoveringOver.direction === 'right' &&
+        !this.fakeCardType(hoveringOver.card.cardType)
+      ) {
+        const dragTimeoutId = setTimeout(() => {
+          hoveringOver.holdingOver = true
+          this.setHoveringOver(hoveringOver)
+        }, v.cardHoldTime)
+        this.dragTimeoutId = dragTimeoutId
+      }
+
+      if (!placeholder) {
+        placeholder = this.createPlaceholderCard(positionedCard)
+        stateCards.push(placeholder)
+        createdPlaceholder = true
+      }
+    } else {
+      this.clearDragTimeout()
+    }
+
+    if (!hoveringOver || hoveringOver.direction !== 'left') {
+      uiStore.updatePlaceholderPosition({ order: null, card: null })
+    }
+
+    if (hoveringOverChanged) {
+      this.setHoveringOver(hoveringOver)
+    }
+
+    if (this.draggingId !== positionedCard.id || createdPlaceholder) {
+      this.draggingId = positionedCard.id
+      // only want to call positionCards if we really have to
+      this.positionCards(stateCards, {
+        dragging: positionedCard.id,
+        dragType: 'hover',
+      })
+    }
+    if (_.get(hoveringOver, 'card') && hoveringOverChanged) {
+      uiStore.updatePlaceholderPosition({
+        ...hoveringOver.card.position,
+        order: hoveringOver.card.order,
+      })
+    }
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
-    const { hoveringOver, cards } = this.state
+    const { hoveringOver, cards } = this
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
     const { original } = placeholder
-    const { uiStore, collection } = this.props
+    const { uiStore, collection, trackCollectionUpdated } = this.props
     const { cardAction, movingFromCollectionId } = uiStore
+    this.draggingId = null
     this.clearDragTimeout()
     let moved = false
 
@@ -279,10 +361,18 @@ class CollectionGrid extends React.Component {
     const movingWithinCollection =
       cardAction === 'move' && movingFromCollectionId === collection.id
 
+    const fields = ['order', 'width', 'height']
+    const placeholderPosition = {
+      order: uiStore.placeholderPosition.order,
+      // height and width should be the cardHeight/Width e.g. "1" and "2" here
+      height: uiStore.placeholderPosition.cardHeight,
+      width: uiStore.placeholderPosition.cardWidth,
+    }
+
     if (draggingFromMDL) {
       if (!_.isEmpty(placeholder) && !movingWithinCollection) {
-        const { order } = placeholder
-        CardMoveService.moveCards(Math.ceil(order))
+        const { order } = placeholderPosition
+        cardMover.moveCards(Math.ceil(order))
         this.positionCardsFromProps()
         return
       }
@@ -290,65 +380,28 @@ class CollectionGrid extends React.Component {
       movingIds = [...uiStore.movingCardIds]
     }
 
-    if (placeholder && original) {
-      const fields = ['order', 'width', 'height']
-      const placeholderPosition = _.pick(placeholder, fields)
-      placeholderPosition.order = Math.ceil(placeholderPosition.order)
+    if (placeholderPosition.order !== null && original) {
       const originalPosition = _.pick(original, fields)
       moved = !_.isEqual(placeholderPosition, originalPosition)
     }
 
-    const movingCards = _.filter(cards, card => _.includes(movingIds, card.id))
     if (moved) {
       // we want to update this card to match the placeholder
-      const { order } = placeholder
-      let { width, height } = placeholder
-      let undoMessage = 'Card move undone'
-      const updates = []
-      const { trackCollectionUpdated } = this.props
-
-      // don't resize the card for a drag, only for an actual resize
-      if (dragType === 'resize') {
-        // just some double-checking validations
-        if (height > 2) height = 2
-        if (width > 4) width = 4
-        // set up action to undo
-        if (original.height !== height || original.width !== width) {
-          undoMessage = 'Card resize undone'
-        }
-        updates.push({
-          card: original,
-          order,
-          width,
-          height,
-        })
-      }
-      if (movingIds.length > 0) {
-        // Set order for moved cards so they are between whole integers,
-        // and API_batchUpdateCards will properly set/reorder it amongst the collection
-        const sortedCards = _.sortBy(movingCards, 'order')
-        _.each(sortedCards, (card, idx) => {
-          const sortedOrder = this.calculateOrderForMovingCard(order, idx)
-          updates.push({
-            card,
-            order: sortedOrder,
-          })
-        })
-      }
-
-      const onConfirm = () => {
-        trackCollectionUpdated()
-      }
-      const onCancel = () => this.positionCardsFromProps()
-
-      // Perform batch update on all cards,
-      // and show confirmation if this is a template
-      collection.API_batchUpdateCardsWithUndo({
-        updates,
-        updateAllCards: true,
-        undoMessage,
-        onConfirm,
-        onCancel,
+      cardMover.updateCardsWithinCollection({
+        movingIds,
+        collection,
+        placeholder: {
+          ...placeholderPosition,
+          original,
+        },
+        undoable: true,
+        action: dragType,
+        onConfirm: () => {
+          trackCollectionUpdated()
+        },
+        onCancel: () => {
+          this.positionCardsFromProps()
+        },
       })
       // this should happen right away, not waiting for the API call (since locally we have the updated cards' positions)
       this.positionCardsFromProps()
@@ -357,9 +410,8 @@ class CollectionGrid extends React.Component {
       const hoveringRecord = hoveringOver.card.record
       uiStore.setMovingCards(uiStore.multiMoveCardIds)
       if (hoveringRecord.internalType === 'collections') {
-        this.setState({ hoveringOver: false }, () => {
-          this.moveCardsIntoCollection(movingIds, hoveringRecord)
-        })
+        this.setHoveringOver(false)
+        this.moveCardsIntoCollection(movingIds, hoveringRecord)
       }
     } else {
       if (uiStore.activeDragTarget) {
@@ -381,11 +433,17 @@ class CollectionGrid extends React.Component {
       toCollection: hoveringRecord,
       cardIds,
       onCancel: () => this.positionCardsFromProps(),
-      onSuccess: () =>
-        this.setState({
-          hoveringOver: false,
-        }),
+      onSuccess: () => this.setHoveringOver(false),
     })
+  }
+
+  get hoveringOver() {
+    return this.props.uiStore.hoveringOver
+  }
+
+  setHoveringOver(val) {
+    const { uiStore } = this.props
+    uiStore.setHoveringOver(val)
   }
 
   cancelDrag() {
@@ -393,66 +451,6 @@ class CollectionGrid extends React.Component {
     uiStore.setMovingCards([])
     uiStore.stopDragging()
     this.positionCardsFromProps()
-  }
-
-  onDrag = (cardId, dragPosition) => {
-    if (!this.props.canEditCollection) return
-    const positionedCard = _.find(this.state.cards, { id: cardId })
-    let stateCards = [...this.state.cards]
-    let placeholder = _.find(stateCards, { cardType: 'placeholder' })
-    const hoveringOver = this.findOverlap(cardId, dragPosition)
-    if (hoveringOver && hoveringOver.card.isPinnedAndLocked) return
-    if (hoveringOver) {
-      if (hoveringOver.card.cardType === 'placeholder') {
-        if (!placeholder) {
-          // the case where we created a new placeholder in findOverlap
-          placeholder = hoveringOver.card
-          stateCards.push(placeholder)
-        }
-      }
-      const previousHoveringOver = this.state.hoveringOver
-      const previousHoverOrder = previousHoveringOver
-        ? previousHoveringOver.order
-        : null
-      const hoveringOverChanged =
-        hoveringOver.card.order !== previousHoverOrder ||
-        hoveringOver.direction !== previousHoveringOver.direction
-      // guard clause to exit if we are not hovering over a new card or card zone
-      if (!hoveringOverChanged) return
-      this.clearDragTimeout()
-      // NOTE: currently, only collections trigger this "right" hover zone
-      if (
-        hoveringOver.direction === 'right' &&
-        !this.fakeCardType(hoveringOver.card.cardType)
-      ) {
-        const dragTimeoutId = setTimeout(() => {
-          hoveringOver.holdingOver = true
-          this.setState({ hoveringOver })
-        }, v.cardHoldTime)
-        this.setState({ dragTimeoutId })
-      }
-
-      if (!placeholder) {
-        placeholder = this.createPlaceholderCard(positionedCard)
-        stateCards.push(placeholder)
-      }
-      // NOTE: this will modify observable card attrs, for later save/update
-      placeholder.order = parseFloat(hoveringOver.card.order) - 0.5
-      placeholder.width = hoveringOver.card.width
-      placeholder.height = hoveringOver.card.height
-    } else {
-      this.clearDragTimeout()
-    }
-    if (!hoveringOver || hoveringOver.direction !== 'left') {
-      stateCards = _.reject(stateCards, { cardType: 'placeholder' })
-    }
-
-    this.setState({ hoveringOver }, () => {
-      this.positionCards(stateCards, {
-        dragging: positionedCard.id,
-        dragType: 'hover',
-      })
-    })
   }
 
   createPlaceholderCard = (
@@ -489,7 +487,7 @@ class CollectionGrid extends React.Component {
   findOverlap = (cardId, dragPosition) => {
     const { dragX, dragY } = dragPosition
     const { gutter, gridW, gridH } = this.props
-    const { cards, matrix } = this.state
+    const { cards, matrix } = this
     let placeholder = _.find(cards, { cardType: 'placeholder' })
 
     // calculate row/col that we are dragging over (with some padding to account for our desired logic)
@@ -497,6 +495,8 @@ class CollectionGrid extends React.Component {
     const col = Math.floor((dragX + gutter * 2) / (gridW + gutter))
 
     let overlapCardId = null
+    if (matrix.length <= row || (matrix[row] && matrix[row].length <= col))
+      return
     if (matrix[row] && matrix[row][col]) {
       // first case: we're directly overlapping an existing card
       if (placeholder && placeholder.skipPositioning) {
@@ -585,9 +585,9 @@ class CollectionGrid extends React.Component {
   }
 
   clearDragTimeout = () => {
-    if (this.state.dragTimeoutId) {
-      clearTimeout(this.state.dragTimeoutId)
-      this.setState({ dragTimeoutId: null })
+    if (this.dragTimeoutId) {
+      clearTimeout(this.dragTimeoutId)
+      this.dragTimeoutId = null
     }
   }
 
@@ -663,7 +663,7 @@ class CollectionGrid extends React.Component {
       0,
       pageYOffset + window.innerHeight - window.innerHeight / 2
     )
-    const { cards } = this.state
+    const { cards } = this
     const closestCard = cards.find(
       card =>
         card.position.yPos < scrollPoint &&
@@ -727,6 +727,15 @@ class CollectionGrid extends React.Component {
     return position
   }
 
+  get movingAllCards() {
+    const { collection, uiStore } = this.props
+    return (
+      uiStore.movingFromCollectionId === collection.id &&
+      uiStore.movingCardIds.length >= collection.collection_card_count &&
+      uiStore.cardAction === 'move'
+    )
+  }
+
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
@@ -741,13 +750,21 @@ class CollectionGrid extends React.Component {
       cols,
       shouldAddEmptyRow,
       canEditCollection,
+      uiStore,
     } = this.props
     const { currentOrder } = collection
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    if (collection.hasMore) this.addPaginationCard(cards)
+    if (this.movingAllCards) {
+      // show BCT when collection is emptied for moving all cards
+      uiStore.openBlankContentTool()
+    } else if (collection.hasMore) {
+      // check if we've selected all and moving all the cards,
+      // in which case there is no need to try to paginate
+      this.addPaginationCard(cards)
+    }
     let sortedCards = cards
     if (currentOrder === 'order') {
       // For most collections, we will be sorting by `order`. In that case we call
@@ -785,6 +802,7 @@ class CollectionGrid extends React.Component {
       if (opts.dragging && card.isBeingMultiMoved) {
         return
       }
+
       let filled = false
       // find an open row that can fit the current card
       // NOTE: row limit check is to catch any bad calculations with resizing/moving
@@ -947,16 +965,10 @@ class CollectionGrid extends React.Component {
     }
 
     // update cards in state
-    this.setState(
-      {
-        cards,
-        rows,
-        matrix,
-      },
-      () => {
-        if (_.isFunction(opts.onMoveComplete)) opts.onMoveComplete()
-      }
-    )
+    this.cards.replace(cards)
+    this.rows = rows
+    this.matrix = matrix
+    if (_.isFunction(opts.onMoveComplete)) opts.onMoveComplete()
   }
 
   renderMobileHotspot() {
@@ -986,15 +998,10 @@ class CollectionGrid extends React.Component {
       collection,
       canEditCollection,
       routingStore,
-      uiStore,
       loadCollectionCards,
     } = this.props
-    const { hoveringOver } = this.state
     let i = 0
-    // unnecessary? we seem to need to preserve the array order
-    // in order to not re-draw divs (make transform animation work)
-    // so that's why we do this second pass to actually create the divs in their original order
-    _.each(this.state.cards, card => {
+    _.each(this.cards, card => {
       i += 1
       let record = {}
       let { cardType } = card
@@ -1002,15 +1009,13 @@ class CollectionGrid extends React.Component {
         // TODO: some kind of error catch if no record?
         if (card.record) {
           ;({ record } = card)
-          // getRecordType gets either 'items' or 'collections'
+          // internalType gets either 'items' or 'collections'
           cardType = card.record.internalType
         }
       }
-      const isHoveringOver =
-        hoveringOver && hoveringOver.card && hoveringOver.card.id === card.id
-      const isHoldingOver = isHoveringOver && hoveringOver.holdingOver
       if (_.isEmpty(card.position)) return
       const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
+
       grid.push(
         <MovableGridCard
           key={card.id}
@@ -1024,22 +1029,15 @@ class CollectionGrid extends React.Component {
           dragOffset={pageMargins()}
           record={record}
           onDrag={this.onDrag}
-          hoveringOverLeft={isHoveringOver && hoveringOver.direction === 'left'}
-          hoveringOverRight={
-            isHoveringOver && hoveringOver.direction === 'right'
-          }
-          holdingOver={isHoldingOver}
           onDragOrResizeStop={this.onDragOrResizeStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
           routeTo={routingStore.routeTo}
           parent={collection}
-          menuOpen={uiStore.actionMenuOpenForCard(card.id)}
-          lastPinnedCard={
-            card.isPinnedAndLocked && i === this.state.cards.length - 1
-          }
+          lastPinnedCard={card.isPinnedAndLocked && i === this.cards.length - 1}
           loadCollectionCards={loadCollectionCards}
           hidden={shouldHide}
+          searchResult={collection.isSearchResultsCollection}
         />
       )
     })
@@ -1049,7 +1047,7 @@ class CollectionGrid extends React.Component {
   render() {
     const { uiStore, collection } = this.props
     const { gridSettings } = uiStore
-    const { rows } = this.state
+    const { rows } = this
     if (uiStore.isLoading || collection.reloading) return <Loader />
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)

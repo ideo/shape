@@ -11,6 +11,7 @@
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
 #  cached_test_scores         :jsonb
+#  collection_type            :integer          default(0)
 #  cover_type                 :integer          default("cover_type_default")
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
@@ -58,10 +59,6 @@
 #  index_collections_on_template_id                 (template_id)
 #  index_collections_on_test_status                 (test_status)
 #  index_collections_on_type                        (type)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (organization_id => organizations.id)
 #
 
 class Collection

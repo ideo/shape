@@ -56,7 +56,8 @@ export default class UndoStore {
     this.status = UNDO_ACTION_STATUS.UNDO
     const { redirectPath } = undoAction
     if (redirectPath) {
-      this.redirectAction(redirectPath, undoAction)
+      this.performAfterRedirect(redirectPath, undoAction)
+      return
     }
     this.performUndo(undoAction)
   }
@@ -68,13 +69,14 @@ export default class UndoStore {
     this.status = UNDO_ACTION_STATUS.REDO
     const { redirectPath } = redoAction
     if (redirectPath) {
-      this.redirectAction(redirectPath, redoAction)
+      this.performAfterRedirect(redirectPath, redoAction)
+      return
     }
     this.performRedo(redoAction)
   }
 
   @action
-  async redirectAction(redirectPath, action) {
+  async performAfterRedirect(redirectPath, action) {
     const { type, id } = redirectPath
     const { viewingRecord } = uiStore
     const { internalType, id: recordId } = viewingRecord
@@ -82,6 +84,8 @@ export default class UndoStore {
     if (!!type && !!id && (internalType !== type || recordId !== id)) {
       routingStore.routeTo(type, id)
       this.undoAfterRoute = action
+    } else {
+      this.performUndo(action)
     }
   }
 
@@ -93,7 +97,7 @@ export default class UndoStore {
       // however TextItemCover has a unique way of undo/redo
       this.pushRedoAction({
         ...redoAction,
-        redirectPath: redirectPath,
+        redirectPath,
         actionType,
       })
     }

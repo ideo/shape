@@ -45,12 +45,12 @@ class MarketingProductPage extends React.Component {
       'product',
       this.page
     )
-    this.setState({ content: content })
+    this.setState({ content })
     const footer = await marketingFirebaseClient.getCollectionField(
       'home',
       'footer'
     )
-    this.setState({ footer: footer })
+    this.setState({ footer })
   }
 
   handleRedirect = href => {

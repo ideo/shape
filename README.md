@@ -30,7 +30,7 @@ gem install bundler
 - https://github.com/ideo/network-react-components
 - https://github.com/ideo/network-api-ruby
 
-Note: You will need to [create a GitHub personal access token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) in order to install the `network-api-ruby` gem. You can  enter the token as your password when prompted for your GitHub credentials. Or, you can set an environment variable for Bundler to use: `export BUNDLE_GITHUB__COM=x-access-token:<token>`
+Note: You will need to [create a GitHub personal access token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) in order to install the `network-api-ruby` gem. You can enter the token as your password when prompted for your GitHub credentials. Or, you can set an environment variable for Bundler to use: `export BUNDLE_GITHUB__COM=x-access-token:<token>`
 
 **Clone the app and run the setup script:**
 
@@ -53,7 +53,6 @@ cp .env.example .env
 **Setup your text editor and linter:**
 
 Ensure your text editor has [eslint](https://eslint.org/) and [rubocop](https://rubocop.readthedocs.io/en/latest/) installed (e.g. for Atom you would install [linter-eslint](https://github.com/AtomLinter/linter-eslint) and [linter-rubocop](https://atom.io/packages/linter-rubocop)). For JS code we are using [prettier](https://prettier.io/), so if you have your linter running, it will automatically format properly on save.
-
 
 **Run tests:**
 
@@ -144,10 +143,11 @@ Use the post-checkout hook here to keep your branches in sync:
 https://github.com/ideo/shape/wiki/Git-post-checkout-hook
 
 Upon switching branches, this will (as necessary):
- - bundle install
- - yarn install
- - migrate or rollback any migrations relevant (or not relevant) to the branch, and checkout `db/schema.rb`
- - git submodule update
+
+- bundle install
+- yarn install
+- migrate or rollback any migrations relevant (or not relevant) to the branch, and checkout `db/schema.rb`
+- git submodule update
 
 You can also decline the updates e.g. if you are just making a quick branch update don't want to rollback migrations (and lose data).
 
@@ -158,6 +158,7 @@ Sometimes your local database environment will drift away from production. You c
 ```sh
 shapecopydb local
 ```
+
 It shouldn't take too long, although `Searchkick` will take longer to reindex records.
 
 ### (Optional) Create your own Firebase instance
@@ -167,7 +168,7 @@ It shouldn't take too long, although `Searchkick` will take longer to reindex re
 1. Click on the gear icon next to "Project Overview" in the sidebar and go to the "Project settings"
 1. Copy the "Web API Key" value and update the `GOOGLE_CLOUD_BROWSER_KEY` value in the `.env` file
 1. Copy the "Project ID" value and update the `GOOGLE_CLOUD_PROJECT` value in the `.env` file
-1. Go to the "Service accounts" tab
+1. Go to the ["Service accounts"](https://console.cloud.google.com/iam-admin/serviceaccounts) tab in the Google Cloud Platform IAM & Admin.
 1. Click the "Generate new private key" button
 1. Copy the contents of the private key JSON file and update the `GOOGLE_CLOUD_KEYFILE` value in `.env` file
 1. Click on "Authentication" in sidebar

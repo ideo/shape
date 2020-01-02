@@ -141,7 +141,8 @@ module Archivable
       related = try(relation)
       if related.is_a? ActiveRecord::Relation
         # use .map if relation is one-to-many (e.g. collection_cards)
-        related.map { |r| r.try(:archive_with_relations!, batch: batch) }
+        # and only archive currently active records
+        related.active.map { |r| r.try(:archive_with_relations!, batch: batch) }
       else
         # otherwise just archive the relation (e.g. item)
         related.try(:archive_with_relations!, batch: batch)

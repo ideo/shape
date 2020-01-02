@@ -36,7 +36,7 @@ RSpec.describe SurveyResponse, type: :model do
     end
 
     context 'with all questions answered' do
-      let(:question_answers) do
+      let(:create_question_answers) do
         SurveyResponseValidation.new(survey_response).answerable_ids.each do |item_id, idea_id|
           create(:question_answer,
                  survey_response: survey_response,
@@ -47,8 +47,22 @@ RSpec.describe SurveyResponse, type: :model do
 
       it 'calls SurveyResponseCompletion to mark response as completed' do
         expect(SurveyResponseCompletion).to receive(:call).with(survey_response)
-        # create question answers
-        question_answers
+        create_question_answers
+      end
+
+      context 'with paid audience and no user' do
+        let(:test_audience) { create(:test_audience, test_collection: test_collection) }
+        let(:survey_response) do
+          create(:survey_response, test_audience: test_audience, status: :completed, test_collection: test_collection)
+        end
+
+        it 'calls SurveyResponseCompletionWorker to await marking response completed' do
+          expect(SurveyResponseCompletionWorker).to receive(:perform_in).with(
+            1.minute,
+            survey_response.id,
+          )
+          create_question_answers
+        end
       end
     end
   end

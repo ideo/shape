@@ -3530,9 +3530,9 @@ class-utils@^0.3.5:
     static-extend "^0.1.1"
 
 classnames@^2.2.5:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
-  integrity sha1-+zgB1FNGdknvNgPH1hoCvRKb3m0=
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
+  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
 
 clean-webpack-plugin@^0.1.19:
   version "0.1.19"
@@ -12041,10 +12041,10 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-re-resizable@^4.1.0:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-4.3.2.tgz#2f3c106f0d5d3156ff1648ea3bb15b314a4f4cb8"
-  integrity sha512-b/72ODt5zz6Tz50ws2UubpXkUcgsm6+vuj/XdMahqn/25zer7Y0tZJvQa/Yn5kQhcwDP7VJy0ng4KHT52huOCA==
+re-resizable@4.5.1:
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-4.5.1.tgz#4688e8311ea4b70d558f7aebb3168a25926e62d9"
+  integrity sha512-amjlp4IuTSHs4XG1bP5WbAgBDIZitODKIsqcpZsNhEBYYEidol0dlP4S9zHiN3iu6Tff4WfYuruihLgN7RJeQw==
 
 react-autosize-textarea@^3.0.3:
   version "3.0.3"
@@ -12157,9 +12157,10 @@ react-dotdotdot@^1.2.3:
   dependencies:
     object.pick "^1.3.0"
 
-react-draggable@^3.0.3, "react-draggable@git+https://git@github.com/ideo/react-draggable.git#3.0.5-beta.1":
-  version "3.0.5-beta.1"
-  resolved "git+https://git@github.com/ideo/react-draggable.git#67015426f9c7baf0d10534ea925f18b8366260a2"
+react-draggable@^3.0.5:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-3.3.2.tgz#966ef1d90f2387af3c2d8bd3516f601ea42ca359"
+  integrity sha512-oaz8a6enjbPtx5qb0oDWxtDNuybOylvto1QLydsXgKmwT7e3GXC2eMVDwEMIUYJIFqVG72XpOv673UuuAq6LhA==
   dependencies:
     classnames "^2.2.5"
     prop-types "^15.6.0"
@@ -12240,10 +12241,15 @@ react-input-autosize@^2.2.1:
   dependencies:
     prop-types "^15.5.8"
 
-react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6, react-is@^16.9.0:
+react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.4, react-is@^16.8.6, react-is@^16.9.0:
   version "16.11.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.11.0.tgz#b85dfecd48ad1ce469ff558a882ca8e8313928fa"
   integrity sha512-gbBVYR2p8mnriqAwWx9LbuUrShnAuSCNnuPGyc7GJrMVQtPDAh8iLpv7FRuMPFb56KkaVZIYSz1PrjI9q0QPCw==
+
+react-is@^16.8.1:
+  version "16.12.0"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.12.0.tgz#2cc0fe0fba742d97fd527c42a13bec4eeb06241c"
+  integrity sha512-rPCkf/mWBtKc97aLL9/txD8DZdemK0vkA3JMLShjlJB3Pj3s+lpf1KaBzMfQrAmhMQB0n1cU/SUGgKKBCe837Q==
 
 react-jss@^8.1.0:
   version "8.6.1"
@@ -12295,12 +12301,12 @@ react-quill@^1.3.3:
     react-dom-factories "^1.0.0"
 
 react-rnd@^7.3.0:
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/react-rnd/-/react-rnd-7.3.0.tgz#b5def82c217abf5f201ccf3941aec1f5dde57749"
-  integrity sha512-bSbR6/fQGkFQek0rLNGnZe7DEg9p883yP/vJNndNZ92HDkBRBERmcul76MeX6XtMfe9EGACuel6RcfX4paOuBw==
+  version "7.4.3"
+  resolved "https://registry.yarnpkg.com/react-rnd/-/react-rnd-7.4.3.tgz#76adc591fd78f543a66cc63595d0002599d1d408"
+  integrity sha512-TLQ35nqXup7rC63qAETebbO6Znilr20CroTTeAdlYu8nvRSwB7BrmPKZhHB2GgeiSucOoeCyAA9pHPhbMpEd/Q==
   dependencies:
-    re-resizable "^4.1.0"
-    react-draggable "^3.0.3"
+    re-resizable "4.5.1"
+    react-draggable "^3.0.5"
 
 react-router-dom@^4.3.1:
   version "4.3.1"
@@ -14031,10 +14037,10 @@ styled-components@^4.3.2:
     stylis-rule-sheet "^0.0.10"
     supports-color "^5.5.0"
 
-styled-loaders-react@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/styled-loaders-react/-/styled-loaders-react-1.0.1.tgz#808f1e6036be5751395dcb6e2ea029d9b2e53154"
-  integrity sha512-wQZlYuoLTWbC4o1I2fvgHfw/B7y8vXq0kMMmA0aibEP6FBu1RwIBvjL/Xwywja2WPIq0w8pmirWN+G9ExAqXTQ==
+styled-loaders-react@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/styled-loaders-react/-/styled-loaders-react-1.1.0.tgz#446264008d80459f93d1dd003c786963058aa9fc"
+  integrity sha512-LuQA88HHvBXyysfc39MfSBIJ+vpcgqmUOw14rsRaXnJWHBvFNpr/8u6gB98WufjETLXCGoG1N/mE9e0E7T4TWQ==
 
 stylehacks@^4.0.0:
   version "4.0.3"

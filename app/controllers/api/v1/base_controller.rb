@@ -40,6 +40,7 @@ class Api::V1::BaseController < ApplicationController
       'Collection::UserProfile': SerializableCollection,
       'CollectionCard::Primary': SerializableCollectionCard,
       'CollectionCard::Link': SerializableCollectionCard,
+      'CollectionCard::Placeholder': SerializableCollectionCard,
       'Dataset::CollectionsAndItems': SerializableDataset,
       'Dataset::Empty': SerializableDataset,
       'Dataset::External': SerializableDataset,

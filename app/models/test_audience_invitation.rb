@@ -10,16 +10,6 @@
 #  test_audience_id :bigint(8)
 #  user_id          :bigint(8)
 #
-# Indexes
-#
-#  index_test_audience_invitations_on_test_audience_id  (test_audience_id)
-#  index_test_audience_invitations_on_user_id           (user_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (test_audience_id => test_audiences.id)
-#  fk_rails_...  (user_id => users.id)
-#
 
 class TestAudienceInvitation < ApplicationRecord
   belongs_to :test_audience, optional: true

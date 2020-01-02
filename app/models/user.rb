@@ -37,13 +37,6 @@
 #  current_organization_id     :integer
 #  current_user_collection_id  :integer
 #
-# Indexes
-#
-#  index_users_on_email             (email)
-#  index_users_on_handle            (handle) UNIQUE
-#  index_users_on_invitation_token  (invitation_token)
-#  index_users_on_provider_and_uid  (provider,uid) UNIQUE
-#
 
 class User < ApplicationRecord
   prepend RolifyExtensions # Prepend so it can call rolify methods using super
