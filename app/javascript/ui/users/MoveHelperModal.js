@@ -6,13 +6,16 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-
 import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
-import { TextButton } from '~/ui/global/styled/buttons'
+import { TextButton, FormButton } from '~/ui/global/styled/buttons'
 import { Checkbox } from '~/ui/global/styled/forms'
-import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
+import {
+  SpecialDisplayHeading,
+  DisplayText,
+} from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import CardMoveService from '~/ui/grid/CardMoveService'
 
 const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
@@ -53,34 +56,71 @@ const StyledDialogContent = styled(DialogContent)`
   }
 `
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class MoveHelperModal extends React.Component {
   @observable
   dontShowChecked = false
   @observable
   isLoading = false
-  @observable
-  submitted = false
+
+  get templateCollection() {
+    const { uiStore } = this.props
+    return uiStore.showTemplateHelperForCollection
+  }
 
   @action
   handleDontShowCheck = event => {
     this.dontShowChecked = event.target.checked
   }
 
+  handleAddToMyCollection = async e => {
+    this.updateUserPreference()
+
+    const { uiStore, apiStore, routingStore } = this.props
+    const { currentUser } = apiStore
+    const user_collection_id = currentUser.current_user_collection_id
+    uiStore.update('cardAction', 'useTemplate')
+    if (!apiStore.find('collections', user_collection_id)) {
+      await apiStore.fetch('collections', user_collection_id)
+    }
+    await CardMoveService.moveCards('end', {
+      to_id: user_collection_id,
+      from_id: this.templateCollection.id,
+    })
+    uiStore.closeMoveMenu()
+    routingStore.routeTo('homepage')
+  }
+
   @action
-  handleSubmit = e => {
-    e.preventDefault()
-    const { currentUser, type, uiStore } = this.props
-    this.submitted = true
-    uiStore.update('dismissedMoveHelper', true)
+  updateUserPreference = () => {
+    const { apiStore, type } = this.props
+    const { currentUser } = apiStore
     if (this.dontShowChecked) {
       currentUser.API_hideHelper(type)
     }
   }
 
+  handleClose = () => {
+    const { uiStore } = this.props
+    this.updateUserPreference()
+    uiStore.update('dismissedMoveHelper', true)
+    uiStore.update('showTemplateHelperForCollection', null)
+  }
+
+  letMePlaceIt = e => {
+    const { uiStore } = this.props
+    if (this.templateCollection) {
+      uiStore.openMoveMenu({
+        from: this.templateCollection,
+        cardAction: 'useTemplate',
+      })
+      this.handleClose()
+    }
+  }
+
   get helperText() {
-    const { type, recordName } = this.props
+    const { type } = this.props
     let text = ''
     if (type === 'move') {
       text = `
@@ -88,62 +128,93 @@ class MoveHelperModal extends React.Component {
         you can navigate to another collection to place the items there?
       `
     } else if (type === 'template') {
-      text = `
-        Did you know? You can navigate to wherever you would like to place
-        "${recordName}", and use the up or down arrows to place it at the top or
-        bottom of the collection.
-      `
+      text = 'Where would you like to place your template?'
     }
     return text
   }
 
+  get renderModalButtons() {
+    const { uiStore } = this.props
+
+    return (
+      <div>
+        <div style={{ marginBottom: '18px' }}>
+          <DisplayText>{uiStore.templateName}</DisplayText>
+        </div>
+        <FormButton
+          onClick={this.handleAddToMyCollection}
+          minWidth={250}
+          fontSize={0.75}
+        >
+          Add to my collection
+        </FormButton>
+        <div style={{ marginBottom: '12px', marginTop: '12px' }}>
+          <DisplayText>or</DisplayText>
+        </div>
+        <FormButton
+          onClick={this.letMePlaceIt}
+          fontSize={0.75}
+          color={v.colors.commonDark}
+          transparent
+        >
+          Let me place it
+        </FormButton>
+      </div>
+    )
+  }
+
   render() {
+    const { apiStore, type } = this.props
+    const { currentUser } = apiStore
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
-        open={!this.submitted}
+        open
         BackdropProps={{
           invisible: true,
         }}
       >
-        <ModalCloseButton onClick={this.handleSubmit}>
+        <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
         </ModalCloseButton>
         <StyledDialogContent>
-          <form onSubmit={this.handleSubmit}>
-            <img
-              src="https://s3-us-west-2.amazonaws.com/assets.shape.space/move_helper_diagram.png"
-              alt="Diagram showing moving items between multiple collections"
-              style={{ width: '100%', maxWidth: '410px', marginBottom: '40px' }}
+          <img
+            src="https://s3-us-west-2.amazonaws.com/assets.shape.space/move_helper_diagram.png"
+            alt="Diagram showing moving items between multiple collections"
+            style={{ width: '100%', maxWidth: '410px', marginBottom: '40px' }}
+          />
+          <StyledSpecialDisplayHeading>
+            {this.helperText}
+          </StyledSpecialDisplayHeading>
+          {currentUser.show_template_helper &&
+            type == 'template' &&
+            this.renderModalButtons}
+          <FormControl component="fieldset" required>
+            <FormControlLabel
+              classes={{ label: 'form-control' }}
+              style={{ textAlign: 'left' }}
+              control={
+                <Checkbox
+                  checked={this.dontShowChecked}
+                  onChange={this.handleDontShowCheck}
+                  value="yes"
+                />
+              }
+              label="Thanks, please don't show me this message again."
             />
-            <StyledSpecialDisplayHeading>
-              {this.helperText}
-            </StyledSpecialDisplayHeading>
-            <FormControl component="fieldset" required>
-              <FormControlLabel
-                classes={{ label: 'form-control' }}
-                style={{ textAlign: 'left' }}
-                control={
-                  <Checkbox
-                    checked={this.dontShowChecked}
-                    onChange={this.handleDontShowCheck}
-                    value="yes"
-                  />
-                }
-                label="Thanks, please don't show me this message again."
-              />
-              <div style={{ height: '54px' }} />
-            </FormControl>
+          </FormControl>
 
+          {!(currentUser.show_template_helper && type == 'template') && (
             <div className="button--center">
               <TextButton
+                onClick={this.handleClose}
                 data-cy="MoveHelperModal-button"
                 disabled={this.isLoading}
               >
                 Close
               </TextButton>
             </div>
-          </form>
+          )}
         </StyledDialogContent>
       </StyledDialog>
     )
@@ -151,18 +222,16 @@ class MoveHelperModal extends React.Component {
 }
 
 MoveHelperModal.propTypes = {
-  currentUser: MobxPropTypes.objectOrObservableObject.isRequired,
-  recordName: PropTypes.string,
-  type: PropTypes.string,
+  type: PropTypes.oneOf(['move', 'template']),
 }
 
 MoveHelperModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 MoveHelperModal.defaultProps = {
-  type: 'move', // types are 'move' or 'template'
-  recordName: null,
+  type: 'move',
 }
 
 export default MoveHelperModal
