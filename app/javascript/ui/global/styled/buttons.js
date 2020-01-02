@@ -140,13 +140,13 @@ NamedActionButton.defaultProps = {
 export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
   text-transform: uppercase;
-  font-family: ${props => props.fontFamily};
+  font-family: ${v.fonts.sans};
   font-size: ${props => props.fontSize}rem;
-  font-weight: ${props => props.fontWeight};
+  font-weight: ${v.weights.medium};
   ${props =>
     props.minWidth &&
     `
-    min-width: ${props.minWidth}px
+    min-width: ${props.minWidth}px;
   `};
   letter-spacing: 0.09375rem;
   height: 40px;
@@ -205,8 +205,6 @@ export const FormButton = styled.button`
 `
 FormButton.displayName = 'FormButton'
 FormButton.defaultProps = {
-  fontFamily: v.fonts.sans,
-  fontWeight: v.weights.medium,
   fontSize: 1,
   transparent: false,
   color: v.colors.black,

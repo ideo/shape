@@ -18,9 +18,7 @@ exports[`CollectionCreator renders snapshot 1`] = `
       color="#120f0e"
       data-cy="CollectionCreatorFormButton"
       disabled={false}
-      fontFamily="'Gotham', sans-serif"
       fontSize={1}
-      fontWeight={500}
       transparent={false}
       width={125}
     >

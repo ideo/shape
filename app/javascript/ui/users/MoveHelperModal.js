@@ -56,16 +56,6 @@ const StyledDialogContent = styled(DialogContent)`
   }
 `
 
-const LetMeButton = styled(FormButton)`
-  border: 1px solid ${v.colors.commonDark};
-  color: ${v.colors.commonDark};
-  font-family: ${v.fonts.sans};
-  font-weight: ${v.weights.medium};
-  font-size: 12px;
-  margin-top: 8px;
-`
-LetMeButton.displayName = 'LetMeButton'
-
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class MoveHelperModal extends React.Component {
@@ -73,41 +63,61 @@ class MoveHelperModal extends React.Component {
   dontShowChecked = false
   @observable
   isLoading = false
-  @observable
-  submitted = false
+
+  get templateCollection() {
+    const { uiStore } = this.props
+    return uiStore.showTemplateHelperForCollection
+  }
 
   @action
   handleDontShowCheck = event => {
     this.dontShowChecked = event.target.checked
   }
 
-  @action
   handleAddToMyCollection = async e => {
+    e.preventDefault()
+    this.updateUserPreference()
+
     const { uiStore, apiStore, routingStore } = this.props
     const { currentUser } = apiStore
-    uiStore.cardAction = 'useTemplate'
+    const user_collection_id = currentUser.current_user_collection_id
+    uiStore.update('cardAction', 'useTemplate')
+    if (!apiStore.find('collections', user_collection_id)) {
+      await apiStore.fetch('collections', user_collection_id)
+    }
     await CardMoveService.moveCards('end', {
-      to_id: currentUser.current_user_collection_id,
+      to_id: user_collection_id,
+      from_id: this.templateCollection.id,
     })
+    uiStore.closeMoveMenu()
     routingStore.routeTo('homepage')
   }
 
   @action
-  handleSubmit = e => {
-    e.preventDefault()
-    const { apiStore, type, uiStore } = this.props
+  updateUserPreference = () => {
+    const { apiStore, type } = this.props
     const { currentUser } = apiStore
-    this.submitted = true
-    uiStore.update('dismissedMoveHelper', true)
     if (this.dontShowChecked) {
       currentUser.API_hideHelper(type)
     }
-    if (uiStore.showTemplateHelperForCollection) {
+  }
+
+  handleClose = () => {
+    const { uiStore } = this.props
+    this.updateUserPreference()
+    uiStore.update('dismissedMoveHelper', true)
+    uiStore.update('showTemplateHelperForCollection', null)
+  }
+
+  letMePlaceIt = e => {
+    e.preventDefault()
+    const { uiStore } = this.props
+    if (this.templateCollection) {
       uiStore.openMoveMenu({
-        from: uiStore.showTemplateHelperForCollection,
+        from: this.templateCollection,
         cardAction: 'useTemplate',
       })
-      uiStore.update('showTemplateHelperForCollection', null)
+      this.handleClose()
     }
   }
 
@@ -126,19 +136,17 @@ class MoveHelperModal extends React.Component {
   }
 
   get renderModalButtons() {
+    const { uiStore } = this.props
+
     return (
       <div>
         <div style={{ marginBottom: '18px' }}>
-          <DisplayText>Recommended when getting started</DisplayText>
+          <DisplayText>{uiStore.templateName}</DisplayText>
         </div>
         <FormButton
           onClick={this.handleAddToMyCollection}
           minWidth={250}
-          fontFamily={v.fonts.sans}
-          fontWeight={v.weights.medium}
           fontSize={0.75}
-          minWidth={250}
-          color={v.colors.black}
         >
           Add to my collection
         </FormButton>
@@ -146,8 +154,7 @@ class MoveHelperModal extends React.Component {
           <DisplayText>or</DisplayText>
         </div>
         <FormButton
-          fontFamily={v.fonts.sans}
-          fontWeight={v.weights.medium}
+          onClick={this.letMePlaceIt}
           fontSize={0.75}
           color={v.colors.commonDark}
           transparent
@@ -164,16 +171,16 @@ class MoveHelperModal extends React.Component {
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
-        open={!this.submitted}
+        open
         BackdropProps={{
           invisible: true,
         }}
       >
-        <ModalCloseButton onClick={this.handleSubmit}>
+        <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
         </ModalCloseButton>
         <StyledDialogContent>
-          <form onSubmit={this.handleSubmit}>
+          <form>
             <img
               src="https://s3-us-west-2.amazonaws.com/assets.shape.space/move_helper_diagram.png"
               alt="Diagram showing moving items between multiple collections"
@@ -227,7 +234,7 @@ MoveHelperModal.wrappedComponent.propTypes = {
 }
 
 MoveHelperModal.defaultProps = {
-  type: 'move', // types are 'move' or 'template'
+  type: 'move',
 }
 
 export default MoveHelperModal

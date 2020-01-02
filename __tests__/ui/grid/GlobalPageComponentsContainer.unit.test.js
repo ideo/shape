@@ -7,13 +7,15 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 
 let props, wrapper
 const uiStore = fakeUiStore
+
+const rerender = () => {
+  wrapper = shallow(
+    <GlobalPageComponentsContainer.wrappedComponent {...props} />
+  )
+}
+
 describe('GlobalPageComponentsContainer', () => {
   beforeEach(() => {
-    uiStore.viewingCollection = {
-      id: 3,
-      API_fetchCards: jest.fn(),
-      movingCardIds: [10],
-    }
     props = {
       apiStore: fakeApiStore(),
       uiStore,
@@ -22,18 +24,14 @@ describe('GlobalPageComponentsContainer', () => {
     props.uiStore.alert.mockClear()
     props.uiStore.scrollToTop.mockClear()
     props.uiStore.shouldOpenMoveSnackbar = true
-    wrapper = shallow(
-      <GlobalPageComponentsContainer.wrappedComponent {...props} />
-    )
+    rerender()
   })
   describe('moveHelper', () => {
     describe('with template helper', () => {
       beforeEach(() => {
         props.apiStore.currentUser.show_template_helper = true
         props.uiStore.showTemplateHelperForCollection = true
-        wrapper = shallow(
-          <GlobalPageComponentsContainer.wrappedComponent {...props} />
-        )
+        rerender()
       })
       it('should display if user.show_template_helper is true', () => {
         expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
@@ -61,12 +59,17 @@ describe('GlobalPageComponentsContainer', () => {
         beforeEach(() => {
           props.apiStore.currentUser.show_move_helper = true
           props.uiStore.cardAction = 'move'
-          wrapper = shallow(
-            <GlobalPageComponentsContainer.wrappedComponent {...props} />
-          )
         })
         it('should display if user.show_move_helper is true', () => {
+          props.uiStore.dismissedMoveHelper = false
+          rerender()
           expect(wrapper.find(MoveHelperModal).exists()).toBeTruthy()
+        })
+
+        it('should not display if dismissedMoveHelper is true', () => {
+          props.uiStore.dismissedMoveHelper = true
+          rerender()
+          expect(wrapper.find(MoveHelperModal).exists()).toBeFalsy()
         })
       })
     })

@@ -1263,8 +1263,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   toggleTemplateHelper() {
     if (this.apiStore.currentUser.show_template_helper) {
-      this.uiStore.update('showTemplateHelperForCollection', this)
       this.uiStore.closeMoveMenu()
+      this.uiStore.update('showTemplateHelperForCollection', this)
+      this.uiStore.update('templateName', this.name)
     } else {
       this.uiStore.openMoveMenu({
         from: this,

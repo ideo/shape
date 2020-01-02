@@ -514,6 +514,7 @@ export default class UiStore {
     this.cardAction = 'move'
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
+    this.showTemplateHelperForCollection = null
     if (deselect) this.deselectCards()
   }
 

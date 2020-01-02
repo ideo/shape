@@ -153,7 +153,15 @@ class MoveSnackbar extends React.Component {
     )
   }
 
-  get moveSnackbar() {
+  get snackbarActions() {
+    return [
+      this.upArrowIconHolder,
+      this.downArrowIconHolder,
+      this.closeIconHolder,
+    ].filter(el => !null)
+  }
+
+  render() {
     const { uiStore } = this.props
     return (
       <StyledSnackbar classes={{ root: 'Snackbar' }} open>
@@ -176,18 +184,6 @@ class MoveSnackbar extends React.Component {
         )}
       </StyledSnackbar>
     )
-  }
-
-  get snackbarActions() {
-    return [
-      this.upArrowIconHolder,
-      this.downArrowIconHolder,
-      this.closeIconHolder,
-    ].filter(el => !null)
-  }
-
-  render() {
-    return this.moveSnackbar
   }
 }
 

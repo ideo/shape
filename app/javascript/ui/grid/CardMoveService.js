@@ -13,32 +13,43 @@ export default class CardMoveService {
     return new this().moveCards(placement, overrideData)
   }
 
-  static moveErrors() {
-    return new this().moveErrors()
+  static moveErrors(opts) {
+    return new this().moveErrors(opts)
   }
 
   async moveCards(placement, overrideData = {}) {
     const { apiStore, uiStore } = this
-    const { viewingCollection, cardAction } = uiStore
+    const {
+      viewingCollection,
+      movingFromCollectionId,
+      movingCardIds,
+      cardAction,
+    } = uiStore
+
+    let data = {
+      to_id: viewingCollection ? viewingCollection.id : null,
+      from_id: movingFromCollectionId,
+      collection_card_ids: [...movingCardIds],
+      placement,
+    }
+    _.assign(data, overrideData)
+
     // Viewing collection might not be set, such as on the search page
-    if (!viewingCollection) {
+    if (!data.to_id) {
       uiStore.alert("You can't move an item here")
       return
     }
 
-    const collectionId = viewingCollection.id
-    const movingFromCollection = apiStore.find(
-      'collections',
-      uiStore.movingFromCollectionId
-    )
+    const toCollection = apiStore.find('collections', data.to_id)
+    const movingFromCollection = apiStore.find('collections', data.from_id)
+
     const error = this.moveErrors({
-      viewingCollection,
-      movingFromCollection,
+      toCollection,
       cardAction,
     })
 
     if (error) {
-      if (!viewingCollection.can_edit_content) {
+      if (!toCollection.can_edit_content) {
         uiStore.confirm({
           prompt: error,
           confirmText: 'Continue',
@@ -55,18 +66,8 @@ export default class CardMoveService {
       return
     }
 
-    let data = {
-      to_id: collectionId,
-      from_id: uiStore.movingFromCollectionId,
-      collection_card_ids: [...uiStore.movingCardIds],
-      placement,
-    }
-    _.assign(data, overrideData)
-    const toCollection = apiStore.find('collections', data.to_id)
-
     const movingWithinCollection =
       movingFromCollection === toCollection && cardAction === 'move'
-
     try {
       uiStore.update('isLoadingMoveAction', true)
       let successMessage
@@ -213,12 +214,12 @@ export default class CardMoveService {
     return Math.ceil(order) + index
   }
 
-  moveErrors({ viewingCollection, movingFromCollection, cardAction }) {
-    if (!viewingCollection.can_edit_content) {
+  moveErrors({ toCollection, cardAction }) {
+    if (!toCollection.can_edit_content) {
       return 'You only have view access to this collection. Would you like to keep moving the cards?'
-    } else if (cardAction === 'useTemplate' && viewingCollection.isTemplate) {
+    } else if (cardAction === 'useTemplate' && toCollection.isTemplate) {
       return "You can't create a template instance inside another template. You may be intending to create or duplicate a master template into here instead."
-    } else if (viewingCollection.isTestCollection) {
+    } else if (toCollection.isTestCollection) {
       return "You can't move cards into a test collection"
     }
     return ''

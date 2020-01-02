@@ -8,17 +8,23 @@ const apiStore = fakeApiStore()
 const uiStore = fakeUiStore
 
 uiStore.viewingCollection = {
-  id: 3,
+  id: '3',
   API_fetchCards: jest.fn(),
-  movingCardIds: [10],
+  movingCardIds: ['10'],
 }
-apiStore.find = (type, id) => {
-  return { ...mockCollection, id }
+
+const mockFind = (type, id) => {
+  if (uiStore.viewingCollection.id === id) {
+    return uiStore.viewingCollection
+  } else {
+    return { ...mockCollection, id }
+  }
 }
 
 let service, mockCollection
 const reinitialize = ({ moveCardsResult = null } = {}) => {
   apiStore.moveCards = jest.fn().mockReturnValue(moveCardsResult || {})
+  apiStore.find = jest.fn(mockFind)
   service = new CardMoveService({ apiStore, uiStore })
 }
 describe('CardMoveService', () => {
@@ -30,7 +36,7 @@ describe('CardMoveService', () => {
     describe('without permission', () => {
       it('should return an error message', () => {
         const message = service.moveErrors({
-          viewingCollection: { can_edit_content: false },
+          toCollection: { can_edit_content: false },
           movingFromCollection: {},
           cardAction: '',
         })
@@ -43,12 +49,12 @@ describe('CardMoveService', () => {
     describe('trying to create a template inside another template', () => {
       it('should return an error message', () => {
         const message = service.moveErrors({
-          viewingCollection: {
-            id: 1,
+          toCollection: {
+            id: '1',
             can_edit_content: true,
             isTemplate: true,
           },
-          movingFromCollection: { id: 1 },
+          movingFromCollection: { id: '1' },
           cardAction: 'useTemplate',
         })
         expect(message).toContain(
@@ -60,8 +66,8 @@ describe('CardMoveService', () => {
     describe('with edit access and no issues', () => {
       it('should not return an error message', () => {
         const message = service.moveErrors({
-          viewingCollection: { id: 3, can_edit_content: true },
-          movingFromCollection: { id: 1 },
+          toCollection: { id: '3', can_edit_content: true },
+          movingFromCollection: { id: '1' },
           cardAction: 'move',
         })
         expect(message).toBeFalsy()
@@ -70,14 +76,14 @@ describe('CardMoveService', () => {
 
     describe('when moving into a test collection or design', () => {
       it('should return an error message', () => {
-        const viewingCollection = {
-          id: 1,
+        const toCollection = {
+          id: '1',
           isTestCollection: true,
           can_edit_content: true,
         }
-        const movingFromCollection = { id: 1 }
+        const movingFromCollection = { id: '1' }
         const message = service.moveErrors({
-          viewingCollection,
+          toCollection,
           movingFromCollection,
           cardAction: 'move',
         })
@@ -91,7 +97,7 @@ describe('CardMoveService', () => {
       beforeEach(() => {
         uiStore.viewingCollection.can_edit_content = false
         reinitialize()
-        service.moveCards('top')
+        service.moveCards('beginning')
       })
 
       it('should not make an API request', () => {
@@ -106,6 +112,7 @@ describe('CardMoveService', () => {
     describe('on a collection nested inside itself', () => {
       beforeEach(() => {
         uiStore.viewingCollection.can_edit_content = true
+        apiStore.find = () => uiStore.viewingCollection
         reinitialize({ moveCardsResult: Promise.reject('e') })
       })
 
@@ -121,13 +128,19 @@ describe('CardMoveService', () => {
       beforeEach(() => {
         apiStore.currentUser = fakeUser
         apiStore.request = jest.fn().mockReturnValue(Promise.resolve())
-        uiStore.movingCardIds = [21, 23]
-        uiStore.movingFromCollectionId = 3
+        uiStore.movingCardIds = ['21', '23']
+        uiStore.movingFromCollectionId = '3'
         uiStore.cardAction = 'move'
         uiStore.viewingCollection = {
           ...uiStore.viewingCollection,
-          id: 4,
+          id: '4',
           can_edit_content: true,
+        }
+        mockCollection = {
+          id: '3',
+          name: 'moving collection',
+          can_edit_content: true,
+          API_batchUpdateCardsWithUndo: jest.fn(),
         }
         reinitialize()
       })
@@ -158,12 +171,12 @@ describe('CardMoveService', () => {
       beforeEach(() => {
         apiStore.currentUser = fakeUser
         apiStore.request = jest.fn().mockReturnValue(Promise.resolve())
-        uiStore.movingCardIds = [21, 23]
-        uiStore.movingFromCollectionId = 3
+        uiStore.movingCardIds = ['21', '23']
+        uiStore.movingFromCollectionId = '3'
         uiStore.cardAction = 'link'
         uiStore.viewingCollection = {
           ...uiStore.viewingCollection,
-          id: 4,
+          id: '4',
           can_edit_content: true,
         }
         reinitialize()
@@ -194,11 +207,11 @@ describe('CardMoveService', () => {
       beforeEach(() => {
         apiStore.currentUser = fakeUser
         apiStore.request = jest.fn().mockReturnValue(Promise.resolve())
-        uiStore.movingFromCollectionId = 3
+        uiStore.movingFromCollectionId = '3'
         uiStore.cardAction = 'useTemplate'
         uiStore.viewingCollection = {
           ...uiStore.viewingCollection,
-          id: 4,
+          id: '4',
           can_edit_content: true,
         }
         reinitialize()
@@ -234,10 +247,12 @@ describe('CardMoveService', () => {
       mockCollection = {
         id: '99',
         name: 'moving collection',
+        can_edit_content: true,
         API_batchUpdateCardsWithUndo: jest.fn(),
       }
-      // return the same collection for moving to/from
-      apiStore.find = () => mockCollection
+      // same collection for moving to/from
+      uiStore.movingFromCollectionId = '99'
+      uiStore.viewingCollection = mockCollection
       reinitialize()
     })
 
