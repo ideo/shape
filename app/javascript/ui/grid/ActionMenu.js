@@ -341,6 +341,16 @@ class ActionMenu extends React.Component {
     return location === 'GridCard' || location === 'Search' ? 'card' : ''
   }
 
+  get offsetPosition() {
+    const { uiStore, offsetPosition } = this.props
+    return (
+      offsetPosition || {
+        x: uiStore.cardMenuOpen.offsetX,
+        y: uiStore.cardMenuOpen.offsetY,
+      }
+    )
+  }
+
   render() {
     const {
       className,
@@ -348,7 +358,6 @@ class ActionMenu extends React.Component {
       wrapperClassName,
       uiStore,
       location,
-      offsetPosition,
     } = this.props
 
     return (
@@ -361,7 +370,7 @@ class ActionMenu extends React.Component {
         menuOpen={menuOpen}
         buttonStyle={this.buttonStyle}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
-        offsetPosition={offsetPosition}
+        offsetPosition={this.offsetPosition}
         width={250}
         location={location}
       />
