@@ -11,11 +11,11 @@ const PinnedIconButton = ({ card, IconWrapper }) => {
   let wrappedIcon = (
     <Tooltip
       classes={{ tooltip: 'Tooltip' }}
-      title={card.isPinned ? 'Unpin' : 'Pin'}
+      title={card.isPinned ? 'Unpin from Template' : 'Pin to Template'}
       placement="top"
     >
       <div onClick={onClick}>
-        <PinnedIcon locked={card.isPinned} />
+        <PinnedIcon locked={false} pinnedFromMasterTemplate={card.isPinned} />
       </div>
     </Tooltip>
   )

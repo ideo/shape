@@ -4,13 +4,30 @@ import v from '~/utils/variables'
 import Icon from './Icon'
 
 export const PinIconHolder = styled.div`
-  background-color: ${props => (props.locked ? 'transparent' : v.colors.black)};
+  background-color: ${props => {
+    console.log('!props.locked', !props.locked)
+    console.log(
+      '!props.pinnedFromMasterTemplate',
+      !props.pinnedFromMasterTemplate
+    )
+    if (props.locked || (!props.locked && !props.pinnedFromMasterTemplate)) {
+      return 'transparent'
+    } else if (props.pinnedFromMasterTemplate) {
+      return v.colors.black
+    } else {
+      return v.colors.black
+    }
+  }};
   border-radius: 50%;
   height: 24px;
   margin-left: 10px;
   margin-top: 10px;
   text-align: center;
   width: 24px;
+  border: ${props =>
+    !props.pinnedFromMasterTemplate && !props.locked
+      ? `2px solid ${v.colors.commonMedium}`
+      : 'none'};
 
   .icon {
     height: 25px;
@@ -39,8 +56,12 @@ export const PinnedInnerIcon = () => (
   </Icon>
 )
 
-const PinnedIcon = ({ className, locked }) => (
-  <PinIconHolder className={className} locked={locked}>
+const PinnedIcon = ({ className, locked, pinnedFromMasterTemplate }) => (
+  <PinIconHolder
+    className={className}
+    locked={locked}
+    pinnedFromMasterTemplate={pinnedFromMasterTemplate}
+  >
     <PinnedInnerIcon />
   </PinIconHolder>
 )
@@ -48,10 +69,12 @@ const PinnedIcon = ({ className, locked }) => (
 PinnedIcon.propTypes = {
   className: PropTypes.string,
   locked: PropTypes.bool,
+  pinnedFromMasterTemplate: PropTypes.bool,
 }
 PinnedIcon.defaultProps = {
   className: '',
   locked: false,
+  pinnedFromMasterTemplate: false,
 }
 
 export default PinnedIcon
