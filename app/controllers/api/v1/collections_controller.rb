@@ -66,7 +66,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def background_update_template_instances
     render json: { success: false } unless @collection.master_template
 
-    @collection.queue_update_template_instances
+    @collection.queue_update_template_instances(
+      updated_card_ids: @collection.master_template.collection_cards.pluck(:id),
+      template_update_action: 'update_all',
+    )
     render json: { success: true }
   end
 

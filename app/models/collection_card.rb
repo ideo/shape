@@ -239,7 +239,10 @@ class CollectionCard < ApplicationRecord
 
     if parent.master_template?
       # we just added a template card, so update the instances
-      parent.queue_update_template_instances
+      parent.queue_update_template_instances(
+        updated_card_ids: [cc.id],
+        template_update_action: 'duplicate',
+      )
     end
 
     cc
@@ -358,10 +361,13 @@ class CollectionCard < ApplicationRecord
     parents = cards.map(&:parent).uniq.compact
     parents.each do |parent|
       parent.touch
-      if parent.master_template?
-        # we just archived a template card, so update the instances
-        parent.queue_update_template_instances
-      end
+      next unless parent.master_template?
+
+      # we just archived a template card, so update the instances
+      parent.queue_update_template_instances(
+        updated_card_ids: ids,
+        template_update_action: 'archive',
+      )
     end
     CollectionCardArchiveWorker.perform_async(
       ids,

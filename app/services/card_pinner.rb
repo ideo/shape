@@ -21,7 +21,13 @@ class CardPinner < SimpleService
       first_unpinned_order = template.collection_cards.unpinned&.first&.order || next_to_last_pinned_order
       @card.update(pinned: false, order: first_unpinned_order)
     end
+
+    # we just pinned a template card, so update the instances
+    template.queue_update_template_instances(
+      updated_card_ids: [@card.id],
+      template_update_action: 'pin',
+    )
+
     template.reorder_cards!
-    template.queue_update_template_instances
   end
 end

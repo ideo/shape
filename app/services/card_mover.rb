@@ -159,8 +159,19 @@ class CardMover < SimpleService
   end
 
   def update_template_instances
-    @from_collection.queue_update_template_instances if @from_collection.master_template?
-    @to_collection.queue_update_template_instances if @to_collection.master_template?
+    if @from_collection.master_template?
+      @from_collection.queue_update_template_instances(
+        updated_card_ids: @from_collection.collection_cards.pluck(:id),
+        template_update_action: 'update_all',
+      )
+    end
+
+    return unless @to_collection.master_template?
+
+    @to_collection.queue_update_template_instances(
+      updated_card_ids: @to_collection.collection_cards.pluck(:id),
+      template_update_action: 'update_all',
+    )
   end
 
   def duplicate_or_link_legend_items

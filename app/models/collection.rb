@@ -616,7 +616,10 @@ class Collection < ApplicationRecord
     # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
     return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
 
-    queue_update_template_instances
+    queue_update_template_instances(
+      updated_card_ids: cards.pluck(:id),
+      template_update_action: 'unarchive',
+    )
   end
 
   def enable_org_view_access_if_allowed

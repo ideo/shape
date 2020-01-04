@@ -61,7 +61,10 @@ class CollectionCardBuilder
         @parent_collection.reorder_cards!
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
-          @parent_collection.queue_update_template_instances
+          @parent_collection.queue_update_template_instances(
+            updated_card_ids: [@collection_card.id],
+            template_update_action: 'create',
+          )
         end
 
         create_datasets if @datasets_params.present?

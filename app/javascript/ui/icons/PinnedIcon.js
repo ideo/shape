@@ -5,11 +5,6 @@ import Icon from './Icon'
 
 export const PinIconHolder = styled.div`
   background-color: ${props => {
-    console.log('!props.locked', !props.locked)
-    console.log(
-      '!props.pinnedFromMasterTemplate',
-      !props.pinnedFromMasterTemplate
-    )
     if (props.locked || (!props.locked && !props.pinnedFromMasterTemplate)) {
       return 'transparent'
     } else if (props.pinnedFromMasterTemplate) {
