@@ -93,11 +93,11 @@ const scrollAmount = () => {
 @observer
 class MovableGridCard extends React.Component {
   unmounted = false
+  timeoutId = null
 
   constructor(props) {
     super(props)
     this.state = {
-      timeoutId: null,
       // this is really just used so that it will reset when you finish dragging
       dragging: false,
       resizing: false,
@@ -260,7 +260,7 @@ class MovableGridCard extends React.Component {
   }
 
   handleDrag = (e, data, dX, dY) => {
-    if (!this.shouldDragCard) return
+    if (!this.shouldDragCard || this.unmounted) return
     const { card, position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
@@ -325,6 +325,7 @@ class MovableGridCard extends React.Component {
   }
 
   handleStop = type => ev => {
+    if (this.unmounted) return
     const { horizontalScroll, onDragOrResizeStop } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
@@ -340,7 +341,8 @@ class MovableGridCard extends React.Component {
           resizeHeight: 0,
         })
         onDragOrResizeStop(this.props.card.id, type, ev)
-        const timeoutId = setTimeout(() => {
+        this.timeoutId = setTimeout(() => {
+          if (this.umounted) return
           // have this item remain "on top" while it animates back
           this.setState({
             moveComplete: true,
@@ -349,9 +351,6 @@ class MovableGridCard extends React.Component {
         }, 350)
         uiStore.stopDragging()
         this.debouncedAllowTouchDeviceDrag.cancel()
-        this.setState({
-          timeoutId,
-        })
         this.scrolling = false
       }
     )
@@ -426,8 +425,8 @@ class MovableGridCard extends React.Component {
   }
 
   clearDragTimeout = () => {
-    if (this.state.timeoutId) {
-      clearTimeout(this.state.timeoutId)
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId)
     }
     this.scrolling = false
   }
