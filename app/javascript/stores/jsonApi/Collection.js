@@ -624,12 +624,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (rows && cols) {
-      params.rows = rows
-      params.cols = cols
-    }
     if (rows) {
       params.rows = rows
+    }
+    if (cols) {
+      params.cols = cols
     }
     let apiPath = `collections/${
       this.id
@@ -657,11 +656,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
       if (
         page === 1 &&
+        !rows &&
         (searchTerm || this.storedCacheKey !== this.cache_key)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
         this.currentPage = 1
+        if (this.isBoard) {
+          // reset these to be recalculated in updateMaxLoaded
+          this.loadedRows = 0
+          this.loadedCols = 0
+        }
       } else {
         // NOTE: (potential pre-optimization) if collection_cards grows in size,
         // at some point do we reset back to a reasonable number?
@@ -679,8 +684,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         }
         this.collection_cards.replace(newData)
       }
+      if (this.isBoard) {
+        this.updateMaxLoadedColsRows()
+      }
     })
     return data
+  }
+
+  @action
+  updateMaxLoadedColsRows = () => {
+    const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
+    const maxCol = (_.maxBy(this.collection_cards, 'col') || { col: 0 }).col
+    if (maxRow > this.loadedRows) {
+      this.loadedRows = maxRow
+    }
+    if (maxCol > this.loadedCols) {
+      this.loadedCols = maxCol
+    }
   }
 
   /*
