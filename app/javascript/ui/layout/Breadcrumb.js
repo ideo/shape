@@ -49,6 +49,8 @@ const BackIconContainer = styled.span`
 class Breadcrumb extends React.Component {
   @observable
   breadcrumbWithLinks = []
+  @observable
+  breadcrumbDropDownRecords = []
 
   constructor(props) {
     super(props)
@@ -275,13 +277,19 @@ class Breadcrumb extends React.Component {
           <StyledBreadcrumbWrapper>
             {this.renderBackButton()}
             {items.map((item, index) => (
-              <span className="breadcrumb_item" key={`${item.name}-${index}`}>
+              <span
+                className="breadcrumb_item"
+                key={`${item.name}-${index}`}
+                style={{ position: 'relative' }}
+              >
                 <BreadcrumbItem
                   identifier={item.identifier}
                   item={item}
                   index={index}
                   numItems={items.length}
                   restoreBreadcrumb={() => this.restoreBreadcrumb(item)}
+                  onHoverOver={() => this.onHoverOver(item)}
+                  onHoverOut={() => this.onHoverOut(item)}
                 />
               </span>
             ))}

@@ -9,7 +9,7 @@ import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
-  position: relative;
+  position: ${props => (props.hideDotMenu ? 'absolute' : 'relative')};
   .menu-wrapper {
     display: none;
     opacity: 0;

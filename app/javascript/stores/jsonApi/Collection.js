@@ -738,6 +738,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
   }
 
+  API_fetchBreadcrumbRecords() {
+    const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
+    return this.apiStore.request(apiPath)
+  }
+
   /*
   Perform batch updates on multiple cards at once,
   and captures current cards state to undo to

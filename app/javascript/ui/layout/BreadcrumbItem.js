@@ -1,11 +1,14 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
+import axios from 'axios'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 import { routingStore } from '~/stores'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
+import PopoutMenu from '~/ui/global/PopoutMenu'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import WithDropTarget from '~/ui/global/WithDropTarget'
@@ -55,6 +58,52 @@ StyledRestoreButton.displayName = 'StyledRestoreButton'
 @observer
 // also export unwrapped component for unit test
 export class BreadcrumbItem extends React.Component {
+  @observable
+  breadcrumbDropDownRecords = []
+
+  @action
+  closeDropdown = () => {
+    this.breadcrumbDropDownRecords = []
+  }
+
+  onHoverOver = async () => {
+    const record = this.props.item
+    if (record.type === 'collections') {
+      const breadcrumbRecordsReq = await axios.get(
+        `/api/v1/collections/${record.id}/collection_cards/breadcrumb_records`
+      )
+      runInAction(() => {
+        this.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
+      })
+    }
+  }
+
+  onHoverOut = () => {
+    this.closeDropdown()
+  }
+
+  renderDropdown() {
+    const { item } = this.props
+    if (!item.ellipses) return null
+    if (this.breadcrumbDropDownRecords.length === 0) return null
+    const menuItems = this.breadcrumbDropDownRecords.map(record => ({
+      name: record.name,
+      onClick: () => console.log(record.id),
+    }))
+    return (
+      <PopoutMenu
+        onMouseLeave={this.closeDropdown}
+        menuItems={menuItems}
+        menuOpen={true}
+        width={250}
+        offsetPosition={{
+          y: -31,
+        }}
+        hideDotMenu
+      />
+    )
+  }
+
   render() {
     const { item, index, numItems, restoreBreadcrumb } = this.props
     const isLast = index === numItems - 1
@@ -75,6 +124,8 @@ export class BreadcrumbItem extends React.Component {
           ref={this.props.forwardedRef}
           currentlyDraggedOn={!!showDrag}
           isLast={isLast}
+          onMouseOver={this.onHoverOver}
+          onMouseLeave={this.onHoverOut}
         >
           {item.link && (
             <Tooltip
@@ -98,6 +149,7 @@ export class BreadcrumbItem extends React.Component {
             <Link to={path}>{item.name}</Link>
           )}
         </StyledBreadcrumbItem>
+        {this.renderDropdown()}
         {!isLast && <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>}
       </Fragment>
     )

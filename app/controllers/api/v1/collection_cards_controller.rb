@@ -5,9 +5,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
 
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids]
-  before_action :check_cache, only: %i[index ids]
-  before_action :load_collection_cards, only: %i[index ids]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records]
+  before_action :check_cache, only: %i[index ids breadcrumb_records]
+  before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
   def index
     params[:card_order] ||= @collection.default_card_order
 
@@ -18,13 +18,24 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              current_record: @collection,
              parent: @collection,
              inside_a_submission: @collection.submission? || @collection.inside_a_submission?,
-             inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?,
+             inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?
            }
   end
 
   # return all collection_card_ids for this particular collection
   def ids
     render json: @collection_card_ids.map(&:to_s)
+  end
+
+  def breadcrumb_records
+    card_data = @collection_cards.map do |card|
+      {
+        id: card.record.id,
+        type: card.record.type,
+        name: card.record.name
+      }
+    end
+    render json: card_data
   end
 
   def create
@@ -462,7 +473,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :filename,
           :size,
           :mimetype,
-          docinfo: {},
+          docinfo: {}
         ],
         data_items_datasets_attributes: %i[
           order
@@ -489,9 +500,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
             date
             percentage
             column
-          ],
-        ],
-      ].concat(Item.globalize_attribute_names),
+          ]
+        ]
+      ].concat(Item.globalize_attribute_names)
     ]
   end
 
