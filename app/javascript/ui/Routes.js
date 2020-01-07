@@ -178,9 +178,15 @@ class Routes extends React.Component {
   }
 
   handleTouchMove = e => {
-    const { uiStore } = this.props
-    if (uiStore.dragging) {
+    const { uiStore, apiStore } = this.props
+    if (uiStore.dragging || uiStore.activityLogMoving) {
       e.preventDefault()
+    }
+    if (!e.target.closest('.activity_log-draggable')) {
+      // close activity log when scroll happens outside of it
+      uiStore.setCommentingOnRecord(null)
+      uiStore.update('activityLogOpen', false)
+      apiStore.collapseReplies()
     }
   }
 

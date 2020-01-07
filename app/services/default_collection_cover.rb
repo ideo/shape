@@ -73,7 +73,6 @@ class DefaultCollectionCover < SimpleService
     return cover_card if @collection.cover_type_text_and_media?
 
     cover_card.update(is_cover: true)
-    CollectionUpdateBroadcaster.call(@collection)
     cover_card
   end
 

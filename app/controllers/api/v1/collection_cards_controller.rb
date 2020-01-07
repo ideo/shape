@@ -156,12 +156,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       placement: placement,
       card_action: @card_action,
     )
-    if mover.call
+    moved_cards = mover.call
+    if moved_cards
+      # we still create notifications on the original @cards
       @cards.map do |card|
-        create_notification(card,
-                            Activity.map_move_action(@card_action))
+        create_notification(
+          card,
+          Activity.map_move_action(@card_action),
+        )
       end
-      head :no_content
+      render_to_collection_with_cards(moved_cards)
     else
       render json: { errors: mover.errors }, status: :unprocessable_entity
     end
@@ -191,6 +195,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       placement: placement,
       for_user: current_user,
     )
+    render_to_collection_with_cards(new_cards)
+  end
+
+  private
+
+  def render_to_collection_with_cards(new_cards)
     render jsonapi: @to_collection.reload,
            meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
            expose: { current_record: @to_collection }
@@ -205,8 +215,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     pinner.call
     render jsonapi: @collection_card.reload
   end
-
-  private
 
   def perform_bulk_operation(placement:, action:)
     card = BulkCardOperationProcessor.call(

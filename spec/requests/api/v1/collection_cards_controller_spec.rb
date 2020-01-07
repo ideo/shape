@@ -716,7 +716,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       let(:to_collection) { create(:collection, add_editors: [user]) }
       it 'should be successful' do
         patch(path, params: params)
-        expect(response.status).to eq(204)
+        expect(response.status).to eq(200)
       end
 
       context 'with pinned_and_locked cards' do
@@ -758,10 +758,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       context 'but with edit access to the from_collection' do
-        it 'returns a 204' do
+        it 'returns a 200' do
           patch(path, params: params)
           expect(moving_cards.first.can_edit?(user)).to be false
-          expect(response.status).to eq(204)
+          expect(response.status).to eq(200)
         end
       end
 
@@ -801,9 +801,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         end
       end
 
-      it 'returns a 204' do
+      it 'returns a 200' do
         patch(path, params: params)
-        expect(response.status).to eq(204)
+        expect(response.status).to eq(200)
       end
 
       context 'even if from_id param is absent' do
@@ -815,9 +815,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           }
         end
 
-        it 'returns a 204' do
+        it 'returns a 200' do
           patch(path, params: params)
-          expect(response.status).to eq(204)
+          expect(response.status).to eq(200)
         end
       end
     end
@@ -840,9 +840,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         moving_cards.first.record.unanchor!
       end
 
-      it 'returns a 204' do
+      it 'returns a 200' do
         patch(path, params: params)
-        expect(response.status).to eq(204)
+        expect(response.status).to eq(200)
       end
     end
 
@@ -874,9 +874,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         create(:collection, num_cards: 3, add_editors: [user, editor], add_viewers: [viewer])
       end
 
-      it 'returns a 204' do
+      it 'returns a 200' do
         patch(path, params: params)
-        expect(response.status).to eq(204)
+        expect(response.status).to eq(200)
       end
 
       it 'moves cards from one collection to the other' do
@@ -1021,9 +1021,16 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         end
       end
 
-      it 'returns a 204' do
+      it 'returns a 200' do
         post(path, params: params)
-        expect(response.status).to eq(204)
+        expect(response.status).to eq(200)
+      end
+
+      it 'returns the new link cards as meta.new_cards' do
+        expect {
+          post(path, params: params)
+        }.to change(CollectionCard::Link, :count)
+        expect(json['meta']['new_cards'].count).to eq(moving_cards.count)
       end
 
       it 'links cards from one collection to the other' do
@@ -1051,9 +1058,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           }
         end
 
-        it 'returns a 204' do
+        it 'returns a 200' do
           post(path, params: params)
-          expect(response.status).to eq(204)
+          expect(response.status).to eq(200)
         end
       end
     end
@@ -1134,6 +1141,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       it 'returns a 200' do
         post(path, params: params)
         expect(response.status).to eq(200)
+      end
+
+      it 'returns the new duplicate cards as meta.new_cards' do
+        post(path, params: params)
+        expect(json['meta']['new_cards'].count).to eq(moving_cards.count)
       end
 
       it 'duplicates cards from one collection to the other' do

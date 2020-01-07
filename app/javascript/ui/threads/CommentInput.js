@@ -32,6 +32,7 @@ class CommentInput extends React.Component {
   positionSuggestions = ({ decoratorRect, state, props }) => {
     const { suggestions } = props
     const { isActive } = state
+    const cols = _.get(uiStore, 'gridSettings.cols')
     let transform
     let transition
     let top = '-36px'
@@ -40,7 +41,16 @@ class CommentInput extends React.Component {
       transform = `scaleY(1)`
       transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
       const { y } = uiStore.activityLogPosition
-      top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1))}px`
+      const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // max height is the height above the input and the activity box
+      const totalSuggestionsLength = 45 * (suggestions.length + 1)
+
+      top = `${maxCommentSuggestionsHeight - totalSuggestionsLength}px`
+      if (uiStore.isTouchDevice) {
+        if (cols == 1) {
+          // use activity log height since decoratorRect and activity log y position are static for mobile
+          top = `${uiStore.activityLogPosition.h - 24}px`
+        }
+      }
     } else if (isActive) {
       transform = 'scaleY(0)'
       transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'

@@ -283,7 +283,7 @@ class CollectionCard < ApplicationRecord
 
   def master_template_card?
     # does this card live in a MasterTemplate?
-    parent.master_template?
+    parent&.master_template?
   end
 
   def ideas_collection_card?
