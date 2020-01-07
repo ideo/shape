@@ -11,6 +11,9 @@ import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
+// set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
+const USE_COLLISION_DETECTION_ON_DRAG = false
+
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
 const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
@@ -136,7 +139,7 @@ class FoamcoreGrid extends React.Component {
   hasDragCollision = false
   hoveringOver = false
   dragTimeoutId = null
-  dragMatrix = []
+  openSpotMatrix = []
 
   constructor(props) {
     super(props)
@@ -618,8 +621,8 @@ class FoamcoreGrid extends React.Component {
     }
 
     const updates = []
-    // draggingMap has the relative row and column of all cards being moved
     let negativeZone = false
+    // dragGridSpot has the positions of all the dragged cards
     const draggingPlaceholders = [...this.dragGridSpot.values()]
     _.each(draggingPlaceholders, placeholder => {
       const { card, row, col } = placeholder
@@ -698,11 +701,12 @@ class FoamcoreGrid extends React.Component {
 
     // reset these
     this.dragGridSpot.clear()
-    this.dragMatrix = this.calculateDragMatrix()
     this.hasDragCollision = false
+    if (USE_COLLISION_DETECTION_ON_DRAG) {
+      this.openSpotMatrix = this.calculateOpenSpotMatrix()
+    }
 
     // Add master dragging card
-    // this.dragGridSpot.set(getMapKey(masterPosition), masterPosition)
     const unmodifiedMasterPosition = { ...masterPosition }
     this.updateDragGridSpotWithOpenPosition(masterPosition)
 
@@ -716,7 +720,6 @@ class FoamcoreGrid extends React.Component {
           height: mapped.card.height,
           card: mapped.card,
         }
-        // this.dragGridSpot.set(getMapKey(relativePosition), relativePosition)
         this.updateDragGridSpotWithOpenPosition(relativePosition)
       })
     }
@@ -744,15 +747,22 @@ class FoamcoreGrid extends React.Component {
 
   @action
   updateDragGridSpotWithOpenPosition(position) {
+    if (!USE_COLLISION_DETECTION_ON_DRAG) {
+      this.dragGridSpot.set(getMapKey(position), position)
+      this.hasDragCollision =
+        this.hasDragCollision || this.findCardOverlap(position)
+      return
+    }
     const openSpot = this.findClosestOpenSpot(position)
     if (openSpot) {
       position.row = openSpot.row
       position.col = openSpot.col
       this.dragGridSpot.set(getMapKey(position), position)
       // have to recalculate to consider this dragged spot
-      this.dragMatrix = this.calculateDragMatrix({ withDraggedSpots: true })
+      this.openSpotMatrix = this.calculateOpenSpotMatrix({
+        withDraggedSpots: true,
+      })
     } else {
-      // TODO: update meaning of this... ??
       this.hasDragCollision = true
     }
   }
@@ -829,17 +839,17 @@ class FoamcoreGrid extends React.Component {
    * [2, 1, 0, 0, 5...]
    * [10, 9, 8, 7, 6...]
    */
-  calculateDragMatrix({ withDraggedSpots = false } = {}) {
+  calculateOpenSpotMatrix({ withDraggedSpots = false } = {}) {
     const { uiStore, collection } = this.props
 
     const cardMatrix = withDraggedSpots
       ? this.matrixWithDraggedSpots
       : collection.cardMatrix
-    const dragMatrix = [[]]
+    const openSpotMatrix = [[]]
 
     _.each(cardMatrix, (row, rowIdx) => {
       let open = 0
-      dragMatrix[rowIdx] = Array(16)
+      openSpotMatrix[rowIdx] = Array(16)
       const reversed = _.reverse(row)
       _.each(reversed, (card, colIdx) => {
         if (card && !_.includes(uiStore.multiMoveCardIds, card.id)) {
@@ -847,26 +857,26 @@ class FoamcoreGrid extends React.Component {
         } else {
           open += 1
         }
-        dragMatrix[rowIdx][15 - colIdx] = open
+        openSpotMatrix[rowIdx][15 - colIdx] = open
       })
     })
 
-    return dragMatrix
+    return openSpotMatrix
   }
 
   findClosestOpenSpot(placeholder) {
-    const { dragMatrix } = this
+    const { openSpotMatrix } = this
     const { row, col, height, width } = placeholder
 
     let possibilities = []
     let exactFit = false
-    _.each(dragMatrix, (rowVals, rowIdx) => {
+    _.each(openSpotMatrix, (rowVals, rowIdx) => {
       if (rowIdx >= row && rowIdx <= row + 15) {
         _.each(rowVals, (openSpots, colIdx) => {
           let canFit = false
           if (openSpots >= width) {
             if (height > 1) {
-              const nextRow = dragMatrix[rowIdx + 1]
+              const nextRow = openSpotMatrix[rowIdx + 1]
               if (nextRow && nextRow[colIdx] && nextRow[colIdx] >= width) {
                 canFit = true
               }

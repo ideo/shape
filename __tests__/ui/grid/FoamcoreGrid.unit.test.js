@@ -10,7 +10,12 @@ let idCounter = 0
 function createCard(data) {
   idCounter += 1
   const id = idCounter.toString()
-  return { ...fakeCollectionCard, ...data, id }
+  return {
+    ...fakeCollectionCard,
+    ...data,
+    id,
+    record: { internalType: 'items' },
+  }
 }
 
 describe('FoamcoreGrid', () => {
@@ -51,6 +56,7 @@ describe('FoamcoreGrid', () => {
       },
     }
     rerender = () => {
+      props.collection.API_batchUpdateCardsWithUndo.mockClear()
       wrapper = shallow(<FoamcoreGrid.wrappedComponent {...props} />)
       instance = wrapper.instance()
     }
@@ -64,29 +70,6 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('non-rendering functions', () => {
-    beforeEach(() => {
-      // Mock these because we ran into `Maximum call stack size exceeded`
-      // errors on CI, so turning the card calculator into a mock solves that
-      instance.throttledCalculateCardsToRender = jest.fn()
-      instance.calculateCardsToRender = jest.fn()
-    })
-
-    describe('componentDidUpdate', () => {
-      it('re-renders when cardProperties have changed', () => {
-        wrapper.setProps({
-          collection: { ...fakeCollection },
-        })
-        // no changes because we did not change cardProperties
-        expect(instance.throttledCalculateCardsToRender).not.toHaveBeenCalled()
-        wrapper.setProps({
-          collection: { ...fakeCollection },
-          cardProperties: [{ id: 'new' }],
-        })
-        // it does re-render with a change to cardProperties
-        expect(instance.throttledCalculateCardsToRender).toHaveBeenCalled()
-      })
-    })
-
     describe('findCardOverlap', () => {
       it('finds filledSpot (or not) where a card is trying to be dragged', () => {
         // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
@@ -140,17 +123,13 @@ describe('FoamcoreGrid', () => {
         instance.resizeCard = jest.fn().mockReturnValue()
         instance.dragging = true
         props.uiStore.multiMoveCardIds = [cards[0].id]
-        props.uiStore.selectedCardIds = [cards[0].id]
       })
 
       it('should stop all dragging', () => {
         instance.resetCardPositions()
         expect(instance.dragGridSpot.size).toEqual(0)
         expect(instance.dragging).toEqual(false)
-        expect(props.uiStore.multiMoveCardIds.length).toBe(0)
-        expect(instance.calculateCardsToRender).toHaveBeenCalled()
-        // card should remain selected
-        expect(props.uiStore.selectedCardIds.length).toBe(1)
+        expect(props.uiStore.setMovingCards).toHaveBeenCalledWith([])
       })
     })
 
@@ -242,12 +221,12 @@ describe('FoamcoreGrid', () => {
     })
 
     describe('moveCards', () => {
+      const card = { id: '1', row: 0, col: 0, record: {} }
+      const card2 = { id: '2', row: 0, col: 0, record: {} }
       describe('when moving a single card', () => {
         beforeEach(() => {
-          instance.dragGridSpot.set('6,7', { col: 6, row: 7 })
-          // Dragging map has relatively positioned cards from master card at 0,0
-          instance.draggingMap = [{ card: cards[0], row: 0, col: 0 }]
-          instance.moveCards(cards[0])
+          instance.dragGridSpot.set('6,7', { col: 6, row: 7, card })
+          instance.moveCards(card)
         })
 
         it('calls collection.API_batchUpdateCardsWithUndo', () => {
@@ -256,7 +235,7 @@ describe('FoamcoreGrid', () => {
           ).toHaveBeenCalledWith({
             updates: [
               {
-                card: cards[0],
+                card,
                 col: 6,
                 row: 7,
               },
@@ -270,13 +249,13 @@ describe('FoamcoreGrid', () => {
 
       describe('when moving multiple cards', () => {
         beforeEach(() => {
-          props.uiStore.multiMoveCardIds = [cards[0].id, cards[1].id]
+          props.uiStore.multiMoveCardIds = [card.id, card2.id]
           rerender()
-          instance.dragGridSpot.set('6,7', { col: 6, row: 7 })
-          // Dragging map has relatively positioned cards from master card at 0,0
+          instance.dragGridSpot.set('6,7', { col: 6, row: 7, card })
+          instance.dragGridSpot.set('8,9', { col: 8, row: 9, card: card2 })
           instance.draggingMap = [
-            { card: cards[0], row: 0, col: 0 },
-            { card: cards[1], row: 2, col: 2 },
+            { card, row: 6, col: 7 },
+            { card: card2, row: 8, col: 9 },
           ]
           instance.moveCards(cards[0])
         })
@@ -287,12 +266,12 @@ describe('FoamcoreGrid', () => {
           ).toHaveBeenCalledWith({
             updates: [
               {
-                card: cards[0],
+                card,
                 col: 6,
                 row: 7,
               },
               {
-                card: cards[1],
+                card: card2,
                 col: 8,
                 row: 9,
               },
@@ -379,13 +358,8 @@ describe('FoamcoreGrid', () => {
 
       describe('scrolling in loaded bounds', () => {
         beforeEach(() => {
-          // `Object.defineProperty` is the only way I could find to stub getter methods
-          Object.defineProperty(instance, 'visibleCols', {
-            get: jest.fn().mockReturnValue({ min: 0, max: 4, num: 5 }),
-          })
-          Object.defineProperty(instance, 'visibleRows', {
-            get: jest.fn().mockReturnValue({ min: 1, max: 4, num: 4 }),
-          })
+          instance.visibleCols = { min: 0, max: 4, num: 5 }
+          instance.visibleRows = { min: 1, max: 4, num: 4 }
         })
 
         it('does not call loadCards if all in view', () => {
@@ -395,65 +369,16 @@ describe('FoamcoreGrid', () => {
       })
 
       describe('scrolling out of bounds vertically', () => {
-        beforeEach(() => {
-          Object.defineProperty(instance, 'visibleRows', {
-            get: jest.fn().mockReturnValue({ min: 4, max: 8, num: 4 }),
-          })
-          Object.defineProperty(instance, 'visibleCols', {
-            get: jest.fn().mockReturnValue({ min: 0, max: 4, num: 5 }),
-          })
-        })
-
         it('calls loadMoreRows', () => {
-          const expectedRowsCols = {
-            cols: [0, instance.visibleCols.num * 2],
-            rows: [
-              props.collection.loadedRows + 1,
-              props.collection.loadedRows + 1 + instance.visibleRows.num,
-            ],
-          }
+          instance.computeVisibleRows()
           instance.loadAfterScroll()
-          expect(instance.loadCards).toHaveBeenCalledWith(expectedRowsCols)
-        })
-      })
-
-      describe('scrolling out of bounds horizontally', () => {
-        beforeEach(() => {
-          Object.defineProperty(instance, 'visibleCols', {
-            get: jest.fn().mockReturnValue({ min: 2, max: 6, num: 5 }),
-          })
-          Object.defineProperty(instance, 'visibleRows', {
-            get: jest.fn().mockReturnValue({ min: 0, max: 3, num: 4 }),
-          })
-        })
-
-        it('calls loadMoreColumns', () => {
-          const expectedRowsCols = {
-            cols: [
-              props.collection.loadedCols + 1,
-              props.collection.loadedCols + 1 + instance.visibleCols.num,
-            ],
-            rows: [0, instance.visibleRows.num * 2],
+          const minRow = props.collection.loadedRows + 1
+          const expectedRows = {
+            // ceil needed because visibleRows.num may be fractional
+            rows: [minRow, Math.ceil(minRow + instance.visibleRows.num + 3)],
           }
-          instance.loadAfterScroll()
-          expect(instance.loadCards).toHaveBeenCalledWith(expectedRowsCols)
+          expect(props.loadCollectionCards).toHaveBeenCalledWith(expectedRows)
         })
-      })
-    })
-
-    describe('loadCards', () => {
-      beforeEach(() => {
-        props.loadCollectionCards = jest.fn()
-        rerender()
-      })
-
-      it('calls props.loadCollectionCards', () => {
-        const rowsCols = {
-          cols: [10, 15],
-          rows: [0, 8],
-        }
-        instance.loadCards(rowsCols)
-        expect(props.loadCollectionCards).toHaveBeenCalledWith(rowsCols)
       })
     })
 
