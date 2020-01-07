@@ -5,7 +5,7 @@ import { observable, action, runInAction, computed } from 'mobx'
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v, { TOUCH_DEVICE_OS, EVENT_SOURCE_TYPES } from '~/utils/variables'
-import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 
@@ -90,6 +90,8 @@ export default class UiStore {
   isLoadingMoveAction = false
   @observable
   dismissedMoveHelper = false
+  @observable
+  showTemplateHelperForCollection = null
   @observable
   movingCardIds = []
   @observable
@@ -482,7 +484,7 @@ export default class UiStore {
   }
 
   @action
-  openMoveMenu({ from = null, cardAction = 'move', context = null }) {
+  openMoveMenu({ from = null, cardAction = 'move' }) {
     const fromCollectionId = from ? from.id : null
     this.dismissedMoveHelper = false
     this.pageMenuOpen = false
@@ -492,21 +494,11 @@ export default class UiStore {
     // cardAction can be 'move', 'link', 'duplicate', 'useTemplate'
     this.cardAction = cardAction
     if (this.cardAction === 'useTemplate') {
-      const fromCover = context === ACTION_SOURCES.COVER
-      if (fromCover) {
-        const { parent_collection_card, name } = from
-        const { id } = parent_collection_card
-        // selected card is the card whose cover was selected
-        this.movingCardIds.replace([id])
-        this.templateName = name
-      } else {
-        const { name, parent_collection_card } = this.viewingCollection
-        // fake the selected card to trigger the menu open,
-        // because we aren't really moving an existing card
-        this.movingCardIds.replace([parent_collection_card.id])
-        // store the name e.g. "CoLab Prototype in transit"
-        this.templateName = name
-      }
+      const { parent_collection_card, name } = from
+      const { id } = parent_collection_card
+      // selected card is the card whose cover was selected
+      this.movingCardIds.replace([id])
+      this.templateName = name
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
       this.deselectCards()
@@ -522,6 +514,7 @@ export default class UiStore {
     this.cardAction = 'move'
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
+    this.showTemplateHelperForCollection = null
     if (deselect) this.deselectCards()
   }
 
@@ -558,7 +551,7 @@ export default class UiStore {
   }
 
   @computed
-  get shouldOpenMoveModal() {
+  get shouldOpenMoveSnackbar() {
     return this.movingCardIds.length > 0 && !this.movingIntoCollection
   }
 

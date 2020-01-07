@@ -6,7 +6,7 @@ import queryString from 'query-string'
 
 import Loader from '~/ui/layout/Loader'
 import Deactivated from '~/ui/layout/Deactivated'
-import MoveModal from '~/ui/grid/MoveModal'
+import GlobalPageComponentsContainer from '~/ui/grid/GlobalPageComponentsContainer'
 import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 import { stringifyUrlParams } from '~/utils/url'
@@ -172,7 +172,7 @@ class SearchPage extends React.Component {
       <Fragment>
         <PageContainer marginTop={40}>
           {this.renderSearchResults()}
-          <MoveModal />
+          <GlobalPageComponentsContainer />
         </PageContainer>
       </Fragment>
     )
