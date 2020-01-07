@@ -23,6 +23,7 @@ const mockFind = (type, id) => {
 
 let service, mockCollection
 const reinitialize = ({ moveCardsResult = null } = {}) => {
+  uiStore.reselectCardIds.mockClear()
   apiStore.moveCards = jest.fn().mockReturnValue(moveCardsResult || {})
   apiStore.find = jest.fn(mockFind)
   service = new CardMoveService({ apiStore, uiStore })
@@ -259,6 +260,13 @@ describe('CardMoveService', () => {
     it('should call collection.API_batchUpdateCardsWithUndo', async () => {
       await service.moveCards('beginning')
       expect(mockCollection.API_batchUpdateCardsWithUndo).toHaveBeenCalled()
+    })
+
+    it('should call uiStore.reselectCardIds with the moving cards', async () => {
+      await service.moveCards('beginning')
+      expect(uiStore.reselectCardIds).toHaveBeenCalledWith(
+        uiStore.movingCardIds
+      )
     })
   })
 
