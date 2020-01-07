@@ -112,9 +112,9 @@ export default class CardMoveService {
         default:
           return
       }
-      const { meta } = res
+      const meta = res.meta || {}
       // if we received a bulk operation placeholder, place that in the collection
-      if (meta && meta.placeholder && toCollection === viewingCollection) {
+      if (meta.placeholder && toCollection === viewingCollection) {
         runInAction(() => {
           toCollection.collection_cards.unshift(res.data)
         })
@@ -135,12 +135,17 @@ export default class CardMoveService {
         }
       }
       if (
-        (cardAction === 'move' && !uiStore.movingIntoCollection) ||
-        cardAction === 'duplicate' ||
-        cardAction === 'link'
+        !meta.placeholder &&
+        ((cardAction === 'move' && !uiStore.movingIntoCollection) ||
+          cardAction === 'duplicate' ||
+          cardAction === 'link')
       ) {
         // we actually want to reselect the cards at this point
-        uiStore.reselectCardIds(data.collection_card_ids)
+        if (movingWithinCollection) {
+          uiStore.reselectCardIds(data.collection_card_ids)
+        } else if (meta.new_cards) {
+          uiStore.reselectCardIds(meta.new_cards)
+        }
       }
       return true
     } catch (e) {
