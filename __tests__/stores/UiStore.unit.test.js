@@ -46,7 +46,10 @@ describe('UiStore', () => {
     })
     describe('with useTemplate action', () => {
       it('should set movingCardIds and templateName', () => {
-        uiStore.openMoveMenu({ from: '99', cardAction: 'useTemplate' })
+        uiStore.openMoveMenu({
+          from: collection,
+          cardAction: 'useTemplate',
+        })
         expect(uiStore.templateName).toEqual('BMC Template')
         expect(uiStore.movingCardIds).toEqual([parentId])
       })

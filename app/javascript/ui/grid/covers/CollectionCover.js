@@ -14,7 +14,6 @@ import CarouselCover from '~/ui/grid/covers/CarouselCover'
 import { FormButton } from '~/ui/global/styled/buttons'
 import { RoundPill } from '~/ui/global/styled/forms'
 import { routingStore } from '~/stores'
-import { ACTION_SOURCES } from '~/enums/actionEnums'
 import CollectionCoverTitle, {
   IconHolder,
 } from '~/ui/grid/covers/CollectionCoverTitle'
@@ -37,12 +36,6 @@ const CardButtonWrapper = styled.div`
   padding-bottom: 4px;
 `
 CardButtonWrapper.displayName = 'CardButtonWrapper'
-
-const UseTemplateButton = styled(FormButton)`
-  border-color: white;
-  color: white;
-`
-UseTemplateButton.displayName = 'UseTemplateButton'
 
 const StyledCollectionCover = styled.div`
   width: 100%;
@@ -138,14 +131,8 @@ class CollectionCover extends React.Component {
   hasEmptyCarousel = false
 
   openMoveMenuForTemplate = async e => {
-    const { collection, uiStore, apiStore } = this.props
-    // load additional data needed for moving template from card cover, ie. parent_collection_card
-    await apiStore.fetch('collections', collection.id)
-    uiStore.openMoveMenu({
-      from: collection,
-      cardAction: 'useTemplate',
-      context: ACTION_SOURCES.COVER,
-    })
+    const { collection } = this.props
+    collection.toggleTemplateHelper()
   }
 
   get hasCollectionScore() {
@@ -229,16 +216,17 @@ class CollectionCover extends React.Component {
   get useTemplateButton() {
     return (
       <CardButtonWrapper>
-        <UseTemplateButton
+        <FormButton
           width={v.buttonSizes.header.width}
           fontSize={v.buttonSizes.header.fontSize}
-          color={'transparent'}
           onClick={this.openMoveMenuForTemplate}
           data-cy="CollectionCoverFormButton"
           className="CollectionCoverFormButton"
+          color={v.colors.white}
+          transparent
         >
           Use Template
-        </UseTemplateButton>
+        </FormButton>
       </CardButtonWrapper>
     )
   }

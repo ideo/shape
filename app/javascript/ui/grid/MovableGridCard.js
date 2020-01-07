@@ -676,9 +676,9 @@ class MovableGridCard extends React.Component {
       cardMenuOpen,
       editingCardCover,
       activeDragTarget,
+      shouldOpenMoveSnackbar,
       isTouchDevice,
       isCypress,
-      shouldOpenMoveModal,
     } = uiStore
 
     let _zIndex = 1
@@ -729,7 +729,7 @@ class MovableGridCard extends React.Component {
       _zIndex = cardDragging
       cardProps.searchResult = true
       cardProps.canEditCollection = false
-      shouldHide = shouldHide || !shouldOpenMoveModal
+      shouldHide = shouldHide || !shouldOpenMoveSnackbar
     }
 
     const draggingMultiple =

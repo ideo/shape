@@ -18,7 +18,6 @@ import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
-import { ACTION_SOURCES } from '~/enums/actionEnums'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
@@ -113,12 +112,8 @@ class PageHeader extends React.Component {
   }
 
   openMoveMenuForTemplate = e => {
-    const { record, uiStore } = this.props
-    uiStore.openMoveMenu({
-      from: record,
-      cardAction: 'useTemplate',
-      context: ACTION_SOURCES.HEADER,
-    })
+    const { record } = this.props
+    record.toggleTemplateHelper()
   }
 
   get leftIcon() {
@@ -230,7 +225,6 @@ class PageHeader extends React.Component {
           <CopyToClipboard text={record.publicTestURL} onCopy={() => null}>
             <FormButton
               width={v.buttonSizes.header.width}
-              color={v.colors.transparent}
               onClick={() =>
                 uiStore.popupSnackbar({
                   message: 'Test link copied',
@@ -238,6 +232,7 @@ class PageHeader extends React.Component {
               }
               fontSize={v.buttonSizes.header.fontSize}
               data-cy="HeaderFormButton"
+              transparent
             >
               <span
                 style={{
@@ -273,11 +268,11 @@ class PageHeader extends React.Component {
     return (
       <FormButton
         onClick={record.reopenTest}
-        color={v.colors.transparent}
         width="200"
         disabled={uiStore.launchButtonLoading}
         fontSize={v.buttonSizes.header.fontSize}
         data-cy="HeaderFormButton"
+        transparent
       >
         Re-open Feedback
       </FormButton>
@@ -360,11 +355,11 @@ class PageHeader extends React.Component {
       return (
         <FormButton
           width="170"
-          color={v.colors.transparent}
           onClick={record.closeTest}
           disabled={uiStore.launchButtonLoading}
           fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
+          transparent
         >
           Stop Feedback
         </FormButton>

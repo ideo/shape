@@ -129,7 +129,7 @@ class CollectionGrid extends React.Component {
     const cards = [...collection.collection_cards]
 
     // create the mdlPlaceholder
-    // this is the draggable card that sits in the MDL MoveModal so that you can drag it onto the grid
+    // this is the draggable card that sits in the MDL MoveSnackbar so that you can drag it onto the grid
     if (movingCardIds && movingCardIds.length) {
       const movingCard = apiStore.find(
         'collection_cards',
@@ -405,6 +405,7 @@ class CollectionGrid extends React.Component {
       })
       // this should happen right away, not waiting for the API call (since locally we have the updated cards' positions)
       this.positionCardsFromProps()
+      uiStore.reselectCardIds(movingIds)
     } else if (hoveringOver && hoveringOver.direction === 'right') {
       // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
       const hoveringRecord = hoveringOver.card.record
