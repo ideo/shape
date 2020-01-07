@@ -65,7 +65,7 @@ class TemplateInstanceUpdater
   end
 
   def move_cards_deleted_from_master_template(instance)
-    cards = @master_template.collection_cards.select { |cc| @updated_cards.includes? cc.id }
+    cards = instance.collection_cards.select { |cc| @updated_card_ids.include? cc.templated_from_id }
     return unless cards.present?
 
     if instance.is_a?(Collection::TestCollection)
@@ -73,8 +73,10 @@ class TemplateInstanceUpdater
       CollectionCard.where(id: cards.pluck(:id)).destroy_all
       return
     end
-    deleted_cards_coll = instance.find_or_create_deleted_cards_collection
-    transaction do
+    deleted_cards_coll = find_or_create_deleted_cards_collection(instance)
+
+    # FIXME: How can we make this block behave like a 'transaction'?
+    # transaction do
       # TODO: do something here if the cards already exist in the deleted coll?
       # e.g. when template editor archives/unarchives cards
       card_mover = CardMover.new(
@@ -100,7 +102,7 @@ class TemplateInstanceUpdater
       moved_cards.each do |card|
         ActivityAndNotificationBuilder.call(
           # TODO: this should really be whoever initiated the action
-          actor: created_by || instance.created_by,
+          actor: @master_template.created_by || instance.created_by,
           organization: instance.organization,
           target: instance, # Assign as target so we can route to it
           action: :archived_from_template,
@@ -109,6 +111,25 @@ class TemplateInstanceUpdater
           source: card.record,
         )
       end
-    end
+    # end
+  end
+
+  private
+
+  def find_or_create_deleted_cards_collection(instance)
+    deleted_from_template_collection = instance.collections.find_by(name: 'Deleted From Template')
+    return deleted_from_template_collection if deleted_from_template_collection.present?
+
+    builder = CollectionCardBuilder.new(
+      params: {
+        order: 0,
+        collection_attributes: {
+          name: 'Deleted From Template',
+        },
+      },
+      parent_collection: instance,
+      user: instance.created_by,
+    )
+    return builder.collection_card.record if builder.create
   end
 end

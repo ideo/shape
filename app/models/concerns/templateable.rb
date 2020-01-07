@@ -65,35 +65,6 @@ module Templateable
     end
   end
 
-  def find_or_create_deleted_cards_collection
-    coll = deleted_cards_collection
-    return coll if coll.present?
-
-    builder = CollectionCardBuilder.new(
-      params: {
-        order: 0,
-        collection_attributes: {
-          name: 'Deleted From Template',
-        },
-      },
-      parent_collection: self,
-      user: created_by,
-    )
-    return builder.collection_card.record if builder.create
-  end
-
-  def deleted_cards_collection
-    collections.find_by(name: 'Deleted From Template')
-  end
-
-  def templated_cards_by_templated_from_id
-    @templated_cards_by_templated_from_id ||= collection_cards
-                                              .where.not(templated_from: nil)
-                                              .each_with_object({}) do |card, h|
-      h[card.templated_from_id] = card
-    end
-  end
-
   def pinned_cards_by_id
     @pinned_cards_by_id ||= collection_cards
                             .pinned
