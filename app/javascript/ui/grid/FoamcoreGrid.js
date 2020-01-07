@@ -582,6 +582,7 @@ class FoamcoreGrid extends React.Component {
   moveCards = masterCard => {
     if (this.dragGridSpot.size < 1) return
     const { uiStore, collection } = this.props
+    const { multiMoveCardIds } = uiStore
     const undoMessage = 'Card move undone'
 
     const movePlaceholder = [...this.dragGridSpot.values()][0]
@@ -593,7 +594,7 @@ class FoamcoreGrid extends React.Component {
       if (uiStore.activeDragTarget.item.id === 'homepage') {
         targetRecord.id = apiStore.currentUserCollectionId
       }
-      uiStore.setMovingCards(uiStore.multiMoveCardIds, {
+      uiStore.setMovingCards(multiMoveCardIds, {
         cardAction: 'moveWithinCollection',
       })
       this.moveCardsIntoCollection(uiStore.multiMoveCardIds, targetRecord)
@@ -636,13 +637,13 @@ class FoamcoreGrid extends React.Component {
       return update
     })
 
-    if (negativeZone) {
-      this.resetCardPositions()
-      return
-    }
-
     const onConfirmOrCancel = () => {
       this.resetCardPositions()
+      uiStore.reselectCardIds(multiMoveCardIds)
+    }
+
+    if (negativeZone) {
+      return onConfirmOrCancel()
     }
 
     collection.API_batchUpdateCardsWithUndo({
