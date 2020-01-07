@@ -8,7 +8,11 @@ import { Link } from 'react-router-dom'
 
 import { routingStore } from '~/stores'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
-import PopoutMenu from '~/ui/global/PopoutMenu'
+import {
+  StyledMenu,
+  StyledMenuItem,
+  StyledMenuWrapper,
+} from '~/ui/global/PopoutMenu'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import WithDropTarget from '~/ui/global/WithDropTarget'
@@ -60,20 +64,26 @@ StyledRestoreButton.displayName = 'StyledRestoreButton'
 export class BreadcrumbItem extends React.Component {
   @observable
   breadcrumbDropDownRecords = []
+  @observable
+  dropdownOpen = false
 
   @action
   closeDropdown = () => {
-    this.breadcrumbDropDownRecords = []
+    // this.breadcrumbDropDownRecords = []
+    console.log('close')
+    this.dropdownOpen = false
   }
 
   onHoverOver = async () => {
     const record = this.props.item
     if (record.type === 'collections') {
+      // TODO cache this data locally?
       const breadcrumbRecordsReq = await axios.get(
         `/api/v1/collections/${record.id}/collection_cards/breadcrumb_records`
       )
       runInAction(() => {
         this.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
+        this.dropdownOpen = true
       })
     }
   }
@@ -84,23 +94,22 @@ export class BreadcrumbItem extends React.Component {
 
   renderDropdown() {
     const { item } = this.props
-    if (!item.ellipses) return null
-    if (this.breadcrumbDropDownRecords.length === 0) return null
-    const menuItems = this.breadcrumbDropDownRecords.map(record => ({
-      name: record.name,
-      onClick: () => console.log(record.id),
-    }))
+    if (!this.dropdownOpen) return null
+    // const menuItems = this.breadcrumbDropDownRecords.map(record => ({
+    //   name: record.name,
+    //   onClick: () => console.log(record.id),
+    // }))
+    const menuItems = [item]
     return (
-      <PopoutMenu
-        onMouseLeave={this.closeDropdown}
-        menuItems={menuItems}
-        menuOpen={true}
-        width={250}
-        offsetPosition={{
-          y: -31,
-        }}
-        hideDotMenu
-      />
+      <StyledMenuWrapper style={{ marginTop: '-8px' }}>
+        <StyledMenu onMouseLeave={this.closeDropdown}>
+          {menuItems.map(menuItem => (
+            <StyledMenuItem key={menuItem.name}>
+              <button onClick={this.onItemClick}>{menuItem.name}</button>
+            </StyledMenuItem>
+          ))}
+        </StyledMenu>
+      </StyledMenuWrapper>
     )
   }
 
@@ -138,13 +147,7 @@ export class BreadcrumbItem extends React.Component {
             </Tooltip>
           )}
           {item.ellipses || item.truncatedName ? (
-            <Tooltip
-              classes={{ tooltip: 'Tooltip' }}
-              title={item.name}
-              placement="top"
-            >
-              <Link to={path}>{item.truncatedName}…</Link>
-            </Tooltip>
+            <Link to={path}>{item.truncatedName}…</Link>
           ) : (
             <Link to={path}>{item.name}</Link>
           )}
