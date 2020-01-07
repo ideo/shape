@@ -174,7 +174,13 @@ class MoveHelperModal extends React.Component {
           invisible: true,
         }}
       >
-        <ModalCloseButton onClick={this.handleClose}>
+        <ModalCloseButton
+          onClick={
+            !currentUser.show_template_helper
+              ? this.handleClose
+              : this.letMePlaceIt
+          }
+        >
           <CloseIcon />
         </ModalCloseButton>
         <StyledDialogContent>
