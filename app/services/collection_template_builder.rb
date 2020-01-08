@@ -94,6 +94,7 @@ class CollectionTemplateBuilder < SimpleService
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
+      synchronous: :first_level,
     )
   end
 
