@@ -278,7 +278,12 @@ RSpec.describe CollectionCard, type: :model do
         end
 
         it 'should call the UpdateTemplateInstancesWorker' do
-          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          # TODO: how do we get the amoeba_dup id?
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+            collection.id,
+            [anything],
+            'duplicate',
+          )
           duplicate
         end
       end
@@ -658,7 +663,11 @@ RSpec.describe CollectionCard, type: :model do
         let!(:instance) { create(:collection, template: collection) }
 
         it 'should call the UpdateTemplateInstancesWorker' do
-          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+            collection.id,
+            collection.collection_cards.pluck(:id),
+            'archive',
+          )
           collection_cards.archive_all!(user_id: user.id)
         end
       end

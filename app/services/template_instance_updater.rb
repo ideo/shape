@@ -20,8 +20,11 @@ class TemplateInstanceUpdater
       @master_template.templated_collections.active.map(&:reorder_cards!) # pinning/unpinning from master_template modifies the card order
     when 'archive'
       @master_template.templated_collections.active.map { |i| move_cards_deleted_from_master_template(i) }
-    when 'create', 'duplicate'
+    when 'create'
       @master_template.templated_collections.active.map { |i| add_cards_from_master_template(i) }
+    when 'duplicate'
+      @master_template.templated_collections.active.map { |i| add_cards_from_master_template(i) }
+      @master_template.templated_collections.active.map { |i| update_all_templated_cards_for_instance(i) }
     else
       return
     end
