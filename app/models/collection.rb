@@ -448,7 +448,7 @@ class Collection < ApplicationRecord
     cards = cards.select do |card|
       # ensures single copy, if existing copies already exist it will skip those
       existing_records = target_collection.collection_cards.map(&:record)
-      existing_records.select { |r| r.cloned_from == card.record }.blank?
+      existing_records.none? { |record| record.cloned_from == card.record }
     end
 
     duplicates = CollectionCardDuplicator.call(

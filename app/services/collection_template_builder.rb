@@ -10,7 +10,8 @@ class CollectionTemplateBuilder < SimpleService
     parent_card: nil,
     external_id: nil,
     collection_card_params: {},
-    collection_params: {}
+    collection_params: {},
+    synchronous: :async
   )
     @parent = parent
     @template = template
@@ -22,6 +23,7 @@ class CollectionTemplateBuilder < SimpleService
     @external_id = external_id
     @collection_card_params = collection_card_params.to_h.symbolize_keys
     @raw_collection_params = collection_params
+    @synchronous = synchronous
   end
 
   def call
@@ -94,7 +96,7 @@ class CollectionTemplateBuilder < SimpleService
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
-      synchronous: :first_level,
+      synchronous: @synchronous,
     )
   end
 
