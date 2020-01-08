@@ -191,7 +191,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         # cheat and move this one inside the parent anyway, to simulate bad issue
         c1.parent_collection_card.update(parent: collection, pinned: true)
         c1.recalculate_breadcrumb!
-      end
+    end
 
       after do
         Sidekiq::Testing.fake!
@@ -214,7 +214,8 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         expect(templates_created.count).to eq 1
         # should not end up creating more instances every time you call update_template_instances
         expect {
-          collection.reload.update_template_instances
+          collection.reload
+          template_instance_updater.call
         }.not_to change(Collection, :count)
         expect(templates_created.reload.count).to eq 1
       end
