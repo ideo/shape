@@ -733,7 +733,11 @@ describe Collection, type: :model do
         let!(:instance) { create(:collection, template: collection) }
 
         it 'should call the UpdateTemplateInstancesWorker' do
-          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+            collection.id,
+            cards.pluck(:id),
+            'unarchive',
+          )
           collection.unarchive_cards!(cards, snapshot)
         end
       end

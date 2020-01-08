@@ -168,6 +168,13 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
     context 'with potential recursive loop' do
       let!(:collection) { create(:collection, master_template: true, num_cards: 2, pin_cards: true) }
       let!(:other_collection) { create(:collection) }
+      let(:template_instance_updater) {
+        TemplateInstanceUpdater.new(
+          master_template: collection,
+          updated_card_ids: collection.collection_cards.pluck(:id),
+          template_update_action: 'create',
+        )
+      }
 
       before do
         Sidekiq::Testing.inline!
@@ -201,7 +208,8 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
 
       it 'does not get stuck creating multiple instances of itself' do
         # NOTE: the fix is the result of a guard clause in templateable#add_cards_from_master_template
-        collection.reload.update_template_instances
+        collection.reload
+        template_instance_updater.call
         templates_created = Collection.in_collection(other_collection).where(template: collection)
         expect(templates_created.count).to eq 1
         # should not end up creating more instances every time you call update_template_instances
