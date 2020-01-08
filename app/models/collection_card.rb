@@ -171,8 +171,8 @@ class CollectionCard < ApplicationRecord
     cc = placeholder || amoeba_dup
     if placeholder
       cc = cc.becomes(CollectionCard::Primary)
-      # Note: when explicitly duplicated on the front-end,
-      # we turn all link cards into real duplicates,
+      # Note: when a user explicitly selects a link card to be duplicated
+      # (versus it being in a sub-collection), we will duplicate the underlying record,
       # which is why placeholders are always turned into primary collection cards
       cc.type = 'CollectionCard::Primary'
       # nullify these
