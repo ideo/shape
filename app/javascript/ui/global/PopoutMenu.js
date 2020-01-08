@@ -109,22 +109,27 @@ StyledMenuToggle.defaultTypes = {
 
 StyledMenuToggle.displayName = 'StyledMenuToggle'
 
+export const StyledMenuButton = styled.button`
+  text-transform: capitalize;
+  font-family: ${v.fonts.sans};
+  font-weight: 400;
+  font-size: 1rem;
+  text-align: left;
+`
+
 export const StyledMenuItem = styled.li`
-  button {
-    width: 100%;
-    min-height: 2rem;
-    padding: 0.75rem 0 0.75rem 1rem;
-    text-transform: capitalize;
-    position: relative;
+  border-bottom: solid ${v.colors.commonMedium};
+  border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
+  border-left: 7px solid transparent;
+  color: ${v.colors.black};
+  min-height: 1rem;
+  padding: 0.75rem 0 0.75rem 1rem;
+  position: relative;
+  width: 100%;
+
+  ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};
-    border-left: 7px solid transparent;
-    font-family: ${v.fonts.sans};
-    font-weight: 400;
-    font-size: 1rem;
-    text-align: left;
-    border-bottom: solid ${v.colors.commonMedium};
-    border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
-    color: ${v.colors.black};
+
     &.with-avatar {
       padding-left: 3.75rem;
       padding-right: 1rem;
@@ -159,9 +164,7 @@ export const StyledMenuItem = styled.li`
   }
   &:hover,
   &:active {
-    button {
-      border-left: 7px solid ${v.colors.black};
-    }
+    border-left: 7px solid ${v.colors.black};
   }
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
@@ -206,7 +209,7 @@ class PopoutMenu extends React.Component {
                 loading={loading}
                 wrapperClassName={wrapperClassName}
               >
-                <button
+                <StyledMenuButton
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
@@ -216,7 +219,7 @@ class PopoutMenu extends React.Component {
                   {iconRight && (
                     <span className={rightIconClassName}>{iconRight}</span>
                   )}
-                </button>
+                </StyledMenuButton>
               </StyledMenuItem>
             )
           })}

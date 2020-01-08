@@ -28,13 +28,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def breadcrumb_records
-    card_data = @collection_cards.map do |card|
-      {
-        id: card.record.id,
-        type: card.record.type,
-        name: card.record.name
-      }
-    end
+    card_data = @collection_cards
+                  .select { |card| card.record.is_a?(Collection) }
+                  .map do |card|
+                    {
+                      id: card.record.id,
+                      type: card.record.type,
+                      name: card.record.name,
+                    }
+                  end
     render json: card_data
   end
 

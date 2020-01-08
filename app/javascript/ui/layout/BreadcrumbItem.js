@@ -10,6 +10,7 @@ import { routingStore } from '~/stores'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import {
   StyledMenu,
+  StyledMenuButton,
   StyledMenuItem,
   StyledMenuWrapper,
 } from '~/ui/global/PopoutMenu'
@@ -66,15 +67,34 @@ export class BreadcrumbItem extends React.Component {
   breadcrumbDropDownRecords = []
   @observable
   dropdownOpen = false
+  @observable
+  menuItemOpenId = null
+  hoverTimer = null
 
   @action
   closeDropdown = () => {
     // this.breadcrumbDropDownRecords = []
     console.log('close')
+    this.hoverTimer = null
     this.dropdownOpen = false
+    this.menuItemOpenId = null
   }
 
-  onHoverOver = async () => {
+  @action
+  onHoverOver = () => {
+    this.dropdownOpen = true
+    clearTimeout(this.hoverTimer)
+  }
+
+  onBreadcrumbHoverOut = async ev => {
+    this.hoverTimer = setTimeout(this.closeDropdown, 150)
+  }
+
+  onDropdownHoverOut = async ev => {
+    this.hoverTimer = setTimeout(this.closeDropdown, 150)
+  }
+
+  onNavigationClick = async ev => {
     const record = this.props.item
     if (record.type === 'collections') {
       // TODO cache this data locally?
@@ -83,13 +103,9 @@ export class BreadcrumbItem extends React.Component {
       )
       runInAction(() => {
         this.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
-        this.dropdownOpen = true
+        this.menuItemOpenId = record.id
       })
     }
-  }
-
-  onHoverOut = () => {
-    this.closeDropdown()
   }
 
   renderDropdown() {
@@ -99,16 +115,41 @@ export class BreadcrumbItem extends React.Component {
     //   name: record.name,
     //   onClick: () => console.log(record.id),
     // }))
-    const menuItems = [item]
+    let menuItems = [item.name]
+    const splitName = item.name.split('>')
+    if (item.ellipses && splitName.length > 1) {
+      menuItems = splitName
+    }
     return (
       <StyledMenuWrapper style={{ marginTop: '-8px' }}>
-        <StyledMenu onMouseLeave={this.closeDropdown}>
+        <StyledMenu
+          width={200}
+          onMouseOver={this.onHoverOver}
+          onMouseLeave={this.onDropdownHoverOut}
+        >
           {menuItems.map(menuItem => (
-            <StyledMenuItem key={menuItem.name}>
-              <button onClick={this.onItemClick}>{menuItem.name}</button>
+            <StyledMenuItem key={menuItem}>
+              <StyledMenuButton onClick={this.onItemClick}>
+                {menuItem}
+              </StyledMenuButton>
+              <button onClick={this.onNavigationClick}>></button>
             </StyledMenuItem>
           ))}
         </StyledMenu>
+        {this.menuItemOpenId && (
+          <StyledMenuWrapper offsetPosition={{ x: 200, y: 0 }}>
+            <StyledMenu width={200}>
+              {this.breadcrumbDropDownRecords.map(menuItem => (
+                <StyledMenuItem key={menuItem.name}>
+                  <StyledMenuButton onClick={this.onItemClick}>
+                    {menuItem.name}
+                  </StyledMenuButton>
+                  <button onClick={this.onNavigationClick}>></button>
+                </StyledMenuItem>
+              ))}
+            </StyledMenu>
+          </StyledMenuWrapper>
+        )}
       </StyledMenuWrapper>
     )
   }
@@ -134,7 +175,7 @@ export class BreadcrumbItem extends React.Component {
           currentlyDraggedOn={!!showDrag}
           isLast={isLast}
           onMouseOver={this.onHoverOver}
-          onMouseLeave={this.onHoverOut}
+          onMouseOut={this.onBreadcrumbHoverOut}
         >
           {item.link && (
             <Tooltip
