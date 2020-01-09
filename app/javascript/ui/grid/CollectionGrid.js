@@ -12,7 +12,8 @@ import IconAvatar from '~/ui/global/IconAvatar'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import { objectsEqual } from '~/utils/objectUtils'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
+import { groupByConsecutive } from '~/utils/CardGridCalculator'
 import v from '~/utils/variables'
 
 const cardMover = new CardMoveService()

@@ -11,7 +11,7 @@ import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 import CollectionCard from './CollectionCard'
 import CollectionFilter from './CollectionFilter'
 import Item from './Item'

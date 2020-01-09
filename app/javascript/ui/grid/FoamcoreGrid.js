@@ -5,7 +5,7 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
