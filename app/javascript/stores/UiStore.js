@@ -166,6 +166,8 @@ export default class UiStore {
   @observable
   dragging = false
   @observable
+  draggingFromMDL = false
+  @observable
   textEditingItem = null
   @observable
   overdueBannerVisible = true
@@ -248,11 +250,15 @@ export default class UiStore {
   @action
   startDragging(cardId) {
     this.dragging = true
+    this.draggingFromMDL = false
     if (
       this.selectedCardIds.length > 0 &&
       this.selectedCardIds.indexOf(cardId.toString()) > -1
     ) {
       this.multiMoveCardIds = [...this.selectedCardIds]
+    } else if (_.includes(cardId, '-mdlPlaceholder')) {
+      this.draggingFromMDL = true
+      this.multiMoveCardIds = [...this.movingCardIds]
     } else {
       this.multiMoveCardIds = [cardId]
     }
@@ -515,6 +521,7 @@ export default class UiStore {
     this.movingCardIds.replace([])
     this.movingFromCollectionId = null
     this.showTemplateHelperForCollection = null
+    this.draggingFromMDL = false
     if (deselect) this.deselectCards()
   }
 

@@ -1,9 +1,12 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { updateModelId } from 'datx'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import CardMoveService from '~/ui/grid/CardMoveService'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
@@ -13,6 +16,8 @@ import { objectsEqual } from '~/utils/objectUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
+
+const cardMover = new CardMoveService()
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -350,7 +355,7 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  findCardOverlap(card) {
+  findOverlap(card) {
     const { collection, uiStore } = this.props
     const { row, col, height, width } = card
     let h = 1
@@ -363,8 +368,12 @@ class FoamcoreGrid extends React.Component {
         const filledCol = col + w - 1
         const searchRow = cardMatrix[filledRow]
         const found = searchRow && searchRow[filledCol]
-        // don't consider overlapping itself
-        if (found && !_.includes(uiStore.multiMoveCardIds, found.id)) {
+        if (
+          found &&
+          (uiStore.cardAction !== 'move' ||
+            // don't consider overlapping itself when performing a move
+            !_.includes(uiStore.multiMoveCardIds, found.id))
+        ) {
           return {
             card: found,
             record: found.record,
@@ -494,14 +503,22 @@ class FoamcoreGrid extends React.Component {
     this.throttledLoadAfterScroll(ev)
   }
 
+  originalCard(cardId) {
+    const { apiStore } = this.props
+    let realCardId = cardId
+    if (_.includes(cardId, '-mdlPlaceholder')) {
+      realCardId = cardId.replace('-mdlPlaceholder', '')
+    }
+    // use apiStore to find this card which may exist outside this collection
+    return apiStore.find('collection_cards', realCardId)
+  }
+
   onDrag = (cardId, dragPosition) => {
     runInAction(() => {
       this.dragging = true
     })
-    const {
-      collection: { collection_cards },
-    } = this.props
-    const card = _.find(collection_cards, { id: cardId })
+    const card = this.originalCard(cardId)
+
     // TODO considering changing dragX in MoveableGridCard
     const cardPosition = {
       x: dragPosition.dragX,
@@ -518,7 +535,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   onDragStart = cardId => {
-    this.draggingMap = this.determineDragMap(cardId)
+    const card = this.originalCard(cardId)
+    this.draggingMap = this.determineDragMap(card.id)
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
@@ -569,7 +587,6 @@ class FoamcoreGrid extends React.Component {
         height,
       },
     ]
-
     const onConfirm = () => trackCollectionUpdated()
 
     // If a template, warn that any instances will be updated
@@ -585,11 +602,17 @@ class FoamcoreGrid extends React.Component {
   moveCards = masterCard => {
     if (this.dragGridSpot.size < 1) return
     const { uiStore, collection } = this.props
-    const { multiMoveCardIds } = uiStore
+    const {
+      multiMoveCardIds,
+      movingFromCollectionId,
+      cardAction,
+      draggingFromMDL,
+    } = uiStore
     const undoMessage = 'Card move undone'
 
     const movePlaceholder = [...this.dragGridSpot.values()][0]
     const masterRow = movePlaceholder.row
+
     // This is for dragging onto the breadcrumb
     if (uiStore.activeDragTarget) {
       const { apiStore } = this.props
@@ -616,6 +639,16 @@ class FoamcoreGrid extends React.Component {
       typeof masterRow === 'undefined'
     ) {
       // this means you tried to drop it over an existing card (or there was no placeholder i.e. you dragged offscreen)
+      this.resetCardPositions({ keepMDLOpen: draggingFromMDL })
+      return
+    }
+
+    const movingWithinCollection =
+      cardAction === 'move' && movingFromCollectionId === collection.id
+
+    if (draggingFromMDL && !movingWithinCollection) {
+      // TODO: allow row/col position here
+      cardMover.moveCards('end')
       this.resetCardPositions()
       return
     }
@@ -674,7 +707,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   // reset the grid back to its original state
-  resetCardPositions() {
+  resetCardPositions({ keepMDLOpen = false } = {}) {
     const { uiStore } = this.props
     runInAction(() => {
       this.dragGridSpot.clear()
@@ -682,7 +715,9 @@ class FoamcoreGrid extends React.Component {
       this.resizing = false
       this.draggingCardMasterPosition = {}
       this.setPlaceholderSpot(this.placeholderDefaults)
-      uiStore.setMovingCards([])
+      if (!keepMDLOpen) {
+        uiStore.setMovingCards([])
+      }
     })
   }
 
@@ -726,7 +761,7 @@ class FoamcoreGrid extends React.Component {
 
     const previousHoveringOver = { ...this.hoveringOver }
     // store whatever card (or not) that we're hovering over
-    this.setHoveringOver(this.findCardOverlap(unmodifiedMasterPosition))
+    this.setHoveringOver(this.findOverlap(unmodifiedMasterPosition))
     if (
       this.hoveringOver &&
       (!previousHoveringOver.card ||
@@ -750,7 +785,7 @@ class FoamcoreGrid extends React.Component {
     if (!USE_COLLISION_DETECTION_ON_DRAG) {
       this.dragGridSpot.set(getMapKey(position), position)
       this.hasDragCollision =
-        this.hasDragCollision || this.findCardOverlap(position)
+        this.hasDragCollision || this.findOverlap(position)
       return
     }
     const openSpot = this.findClosestOpenSpot(position)
@@ -792,19 +827,35 @@ class FoamcoreGrid extends React.Component {
    * Drag map: [{ col: 0, row: 0}, { col: 1, row: 0}]
    */
   determineDragMap(cardId) {
-    const { collection, uiStore } = this.props
-
+    const { apiStore, uiStore } = this.props
+    const { multiMoveCardIds, movingFromCollectionId } = uiStore
+    const movingFromCollection = apiStore.find(
+      'collections',
+      movingFromCollectionId
+    )
     // The master card is the card currently being dragged
-    const masterCard = collection.collection_cards.find(c => c.id === cardId)
-    const movingCardIds = uiStore.multiMoveCardIds.filter(id => id !== cardId)
+    const masterCard = apiStore.find('collection_cards', cardId)
+    const movingCardIds = multiMoveCardIds.filter(id => id !== cardId)
+
     // Loop through non-master cards to calculate drag map
     const dragMap = movingCardIds.map(movingCardId => {
-      const card = collection.collection_cards.find(c => c.id === movingCardId)
-      const { col, row } = card
+      const card = apiStore.find('collection_cards', movingCardId)
+      let { col, row } = card
+      let masterCol = masterCard.col
+      let masterRow = masterCard.row
+      if (!movingFromCollection.isBoard) {
+        // in this case we're moving cards from CollectionGrid to Foamcore
+        // HACK: use the calculated position... will change this to just go 4 cols wide...
+        const { position } = card
+        col = position.x
+        row = position.y
+        masterCol = masterCard.position.x
+        masterRow = masterCard.position.y
+      }
       return {
         card,
-        col: col - masterCard.col,
-        row: row - masterCard.row,
+        col: col - masterCol,
+        row: row - masterRow,
       }
     })
     return dragMap
@@ -1147,15 +1198,11 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderVisibleCards() {
-    const { uiStore, collection } = this.props
-
+    const { collection } = this.props
     let cards = _.reject(
       collection.collection_cards,
-      // hide additional cards that are being dragged along (not dragCardMaster)
-      c =>
-        ((uiStore.dragging || uiStore.movingIntoCollection) &&
-          c.isBeingMultiDragged) ||
-        c.hidden
+      // hide additional cards that are being moved/hidden
+      'shouldHideFromUI'
     )
     cards = _.map(cards, this.renderCard)
 
@@ -1172,7 +1219,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderBlanksAndBct() {
-    const { uiStore, canEditCollection } = this.props
+    const { apiStore, uiStore, canEditCollection } = this.props
+    const { movingCardIds } = uiStore
     let cards = []
 
     if (this.loadingRow) {
@@ -1203,6 +1251,28 @@ class FoamcoreGrid extends React.Component {
         id: 'resize',
         ...this.placeholderSpot,
       })
+    }
+
+    if (movingCardIds && movingCardIds.length) {
+      const movingCard = apiStore.find(
+        'collection_cards',
+        _.last(movingCardIds)
+      )
+
+      if (!uiStore.isLoadingMoveAction && movingCard) {
+        const data = {
+          cardType: 'mdlPlaceholder',
+          originalId: movingCard.id,
+          record: movingCard.record,
+          width: movingCard.width,
+          height: movingCard.height,
+          position: this.positionForCoordinates(movingCard),
+        }
+        // console.log({ mdlPlaceholderCard })
+        const placeholder = new CollectionCard(data, apiStore)
+        updateModelId(placeholder, `${movingCard.id}-mdlPlaceholder`)
+        cards.push(placeholder)
+      }
     }
 
     cards = _.map(cards, this.renderCard)

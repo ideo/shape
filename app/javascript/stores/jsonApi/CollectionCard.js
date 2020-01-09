@@ -316,6 +316,17 @@ class CollectionCard extends BaseRecord {
     return uiStore.dragCardMaster === this.id
   }
 
+  get shouldHideFromUI() {
+    const { uiStore } = this
+    return (
+      ((uiStore.dragging || uiStore.movingIntoCollection) &&
+        uiStore.cardAction === 'move' &&
+        this.isBeingMultiDragged) ||
+      this.isBeingMoved ||
+      this.hidden
+    )
+  }
+
   get introSection() {
     return this.section_type === 'intro'
   }

@@ -579,7 +579,6 @@ class MovableGridCard extends React.Component {
       isSharedCollection,
       isBoardCollection,
       lastPinnedCard,
-      hidden,
       maxResizeRow,
       maxResizeCol,
       zoomLevel,
@@ -719,7 +718,6 @@ class MovableGridCard extends React.Component {
     const touchDeviceClass =
       isTouchDeviceSingleColumn || isCypress ? 'touch-device' : ''
 
-    let shouldHide = !dragging && hidden
     const defaultPosition = {
       width: adjustedWidth,
       height: adjustedHeight,
@@ -727,11 +725,12 @@ class MovableGridCard extends React.Component {
       y: yPos,
     }
 
+    let shouldHide = false
     if (card.isMDLPlaceholder) {
       _zIndex = cardDragging
       cardProps.searchResult = true
       cardProps.canEditCollection = false
-      shouldHide = shouldHide || !shouldOpenMoveSnackbar
+      shouldHide = !shouldOpenMoveSnackbar
     }
 
     const draggingMultiple =
@@ -852,7 +851,6 @@ MovableGridCard.propTypes = {
   isBoardCollection: PropTypes.bool,
   routeTo: PropTypes.func,
   lastPinnedCard: PropTypes.bool,
-  hidden: PropTypes.bool,
   zoomLevel: PropTypes.number,
   maxResizeRow: PropTypes.number,
   maxResizeCol: PropTypes.number,
@@ -868,7 +866,6 @@ MovableGridCard.defaultProps = {
   isSharedCollection: false,
   isBoardCollection: false,
   lastPinnedCard: false,
-  hidden: false,
   zoomLevel: 1,
   maxResizeRow: 2,
   maxResizeCol: 4,
