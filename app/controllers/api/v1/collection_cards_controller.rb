@@ -198,14 +198,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render_to_collection_with_cards(new_cards)
   end
 
-  private
-
-  def render_to_collection_with_cards(new_cards)
-    render jsonapi: @to_collection.reload,
-           meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
-           expose: { current_record: @to_collection }
-  end
-
   def toggle_pin
     pinner = CardPinner.new(
       card: @collection_card,
@@ -214,6 +206,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
     pinner.call
     render jsonapi: @collection_card.reload
+  end
+
+  private
+
+  def render_to_collection_with_cards(new_cards)
+    render jsonapi: @to_collection.reload,
+           meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
+           expose: { current_record: @to_collection }
   end
 
   def perform_bulk_operation(placement:, action:)

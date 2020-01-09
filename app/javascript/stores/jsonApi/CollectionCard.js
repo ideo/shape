@@ -34,7 +34,15 @@ class CollectionCard extends BaseRecord {
     'section_type',
   ]
 
-  batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
+  batchUpdateAttributes = [
+    'id',
+    'order',
+    'width',
+    'height',
+    'row',
+    'col',
+    'pinned',
+  ]
 
   @observable
   maxWidth = this.width
