@@ -430,7 +430,7 @@ class Collection < ApplicationRecord
       if synchronous
         CollectionCardDuplicationWorker.new.perform(*worker_opts)
       else
-        CollectionCardDuplicationWorker.perform_async(*worker_opts)
+        CollectionCardDuplicationWorker.new.perform(*worker_opts)
       end
     end
 
@@ -971,6 +971,24 @@ class Collection < ApplicationRecord
       order = placement
     end
     order
+  end
+
+  def should_pin_all_moving_cards?(placement)
+    has_pinned_cards = collection_cards.pinned.any?
+
+    return false unless has_pinned_cards
+
+    return true if placement == 'beginning'
+
+    first_moving_card_index = collection_cards.find_index { |cc| cc.order == placement }
+
+    return false if first_moving_card_index == -1
+
+    return true if first_moving_card_index <= 1
+
+    left_of_first_moving_card_index = first_moving_card_index - 1
+
+    collection_cards[left_of_first_moving_card_index].pinned?
   end
 
   private

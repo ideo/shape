@@ -61,7 +61,7 @@ class CollectionCardDuplicator < SimpleService
 
     CollectionCard.import(@new_cards)
     @to_collection.update_processing_status(:duplicating)
-    CollectionCardDuplicationWorker.perform_async(
+    CollectionCardDuplicationWorker.new.perform(
       @new_cards.map(&:id),
       @to_collection.id,
       @for_user.try(:id),

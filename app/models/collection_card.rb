@@ -161,8 +161,11 @@ class CollectionCard < ApplicationRecord
     building_template_instance: false,
     system_collection: false,
     synchronous: false,
-    placeholder: nil
+    placeholder: nil,
+    should_pin_all_moving_cards: false
   )
+    binding.pry
+    # binding.pry
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
       return self
@@ -178,8 +181,8 @@ class CollectionCard < ApplicationRecord
     if master_template_card? && parent.templated?
       # if we're cloning from template -> templated collection
       cc.templated_from = self
-    elsif parent.master_template?
-      # Make it pinned if you're duplicating it into a master template
+    elsif parent.master_template? && should_pin_all_moving_cards
+      # Make it pinned if you're duplicating it into a master template and all of its cards are pinned or placed in the beginning
       cc.pinned = true
     else
       # copying into a normal (non templated) collection, it should never be pinned;
