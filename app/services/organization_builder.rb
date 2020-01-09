@@ -2,10 +2,10 @@ class OrganizationBuilder
   attr_reader :organization, :errors
 
   def initialize(params, user, full_setup: true)
-    @organization = Organization.new(name: params[:name])
-    @errors = @organization.errors
-    @user = user
     @params = params
+    @user = user
+    @organization = Organization.new(organization_params)
+    @errors = @organization.errors
     # mainly just in tests that we don't need this overhead
     @full_setup = full_setup
   end
@@ -83,5 +83,11 @@ class OrganizationBuilder
       organization: @organization,
       application: @user.application,
     )
+  end
+
+  def organization_params
+    return { name: @params[:name] } if @params[:in_app_billing].nil?
+
+    { name: @params[:name], in_app_billing: @params[:in_app_billing] }
   end
 end
