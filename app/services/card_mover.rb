@@ -55,6 +55,7 @@ class CardMover < SimpleService
   end
 
   def select_pinned_cards
+    # TODO: is this still the case?
     # for moving cards in a master template, all cards are pinned;
     # so we don't need to "lock" the existing pinned cards to the front
     return if @to_collection.master_template?
@@ -80,20 +81,24 @@ class CardMover < SimpleService
     elsif @placement == 'end'
       @to_collection_cards = (@pinned_cards + @existing_cards + @moving_cards)
     else
-      order = @placement.to_i
-      # make sure order comes after any pinned cards
-      last_pinned = @pinned_cards.last&.order || -1
-      order = [last_pinned + 1, order].max
-      # get the place in the array where we should insert our moving cards
-      idx = @existing_cards.find_index { |c| c.order >= order }
-      # default to the end of the array
-      idx ||= @existing_cards.count
-      combined = @existing_cards.insert(idx, @moving_cards).flatten
-      @to_collection_cards = (@pinned_cards + combined).compact
+      shift_moving_cards_after_pinned
     end
 
     # uniq the array because we may be moving within the same collection
     @to_collection_cards.uniq!
+  end
+
+  def shift_moving_cards_after_pinned
+    order = @placement.to_i
+    # make sure order comes after any pinned cards
+    last_pinned = @pinned_cards.last&.order || -1
+    order = [last_pinned + 1, order].max
+    # get the place in the array where we should insert our moving cards
+    idx = @existing_cards.find_index { |c| c.order >= order }
+    # default to the end of the array
+    idx ||= @existing_cards.count
+    combined = @existing_cards.insert(idx, @moving_cards).flatten
+    @to_collection_cards = (@pinned_cards + combined).compact
   end
 
   def move_cards_to_board

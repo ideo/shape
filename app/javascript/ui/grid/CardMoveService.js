@@ -231,24 +231,27 @@ export default class CardMoveService {
   }
 
   calculateToPinAllMovingCards = (collection, order) => {
-    const firstMovingCardSortedOrder = this.calculateOrderForMovingCard(
-      order,
-      0
-    )
     const hasPinnedCards = _.some(
       collection.collection_cards,
       cc => cc.isPinned
     )
     if (!hasPinnedCards) return false
-    if (firstMovingCardSortedOrder > 0) {
-      const leftOfLeftmostMovingCard = collection.collection_cards.find(
-        cc => cc.order === firstMovingCardSortedOrder - 1
-      )
-      // copy pinned state of the card to the left of the leftmost card
-      return leftOfLeftmostMovingCard.isPinned
-    }
-    // pin moving cards if moving on the beginning
-    return true
+
+    const firstMovingCardSortOrder = this.calculateOrderForMovingCard(order, 0)
+    const firstMovingCardIndex = _.findIndex(
+      collection.collection_cards,
+      cc => {
+        return cc.order === firstMovingCardSortOrder
+      }
+    )
+
+    if (firstMovingCardIndex === -1) return false // erroneous case, ordered cards should be found in the collection_cards
+    if (firstMovingCardIndex <= 1) return true // pin card if moving card in tbe beginning or next to a pinned card
+    const leftOfFirstMovingCardIndex = firstMovingCardIndex - 1
+    const leftOfFirstMovingCard =
+      collection.collection_cards[leftOfFirstMovingCardIndex]
+    // copy pinned state of the card to the left of the first moving card
+    return leftOfFirstMovingCard.isPinned
   }
 
   moveErrors({ toCollection, cardAction }) {
