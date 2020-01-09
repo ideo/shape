@@ -164,8 +164,6 @@ class CollectionCard < ApplicationRecord
     placeholder: nil,
     should_pin_all_moving_cards: false
   )
-    binding.pry
-    # binding.pry
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
       return self

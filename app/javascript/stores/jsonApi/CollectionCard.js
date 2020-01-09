@@ -445,11 +445,15 @@ class CollectionCard extends BaseRecord {
   async API_togglePin() {
     const data = this.toJsonApi()
 
-    return this.apiStore.request(
+    await this.apiStore.request(
       `collection_cards/${this.id}/toggle_pin`,
       'PATCH',
-      { data }
+      {
+        data,
+      }
     )
+    // refetch cards to get the right order in the database
+    return this.parentCollection.API_fetchCards()
   }
 }
 
