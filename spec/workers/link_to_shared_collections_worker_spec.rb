@@ -58,7 +58,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       let!(:collection_to_link) do
         create(
           :collection,
-          name: '{{CD.DASHBOARD.IDEO-CREATIVE-DIFFERENCE}}',
+          name: '{{CD.DASHBOARD.CREATIVE-DIFFERENCE}}',
           parent_collection: application_collection,
           organization: organization,
         )
@@ -74,15 +74,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       end
 
       context 'with second record matching method library' do
-        before do
-          LinkToSharedCollectionsWorker.new.perform(
-            users_to_add.map(&:id),
-            groups_to_add.map(&:id),
-            [collection_to_link&.id].compact,
-            [item_to_link&.id].compact,
-          )
-        end
-        let!(:collection_to_link) do
+        let!(:method_library_collection) do
           create(
             :collection,
             name: '{{CD.DASHBOARD.METHOD_LIBRARY}}',
@@ -90,13 +82,22 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
             organization: organization,
           )
         end
+        before do
+          LinkToSharedCollectionsWorker.new.perform(
+            users_to_add.map(&:id),
+            groups_to_add.map(&:id),
+            [method_library_collection.id],
+            [],
+          )
+        end
 
         it 'adds a link at -9 position with 1x2 size' do
-          link = user.current_shared_collection.collection_cards.second
-          expect(link.collection_id).to eq(method_library_collection.id)
-          expect(link.width).to eq(1)
-          expect(link.height).to eq(2)
-          expect(link.order).to eq(-9)
+          first, second = user.current_shared_collection.collection_cards.reorder(order: :asc).first(2)
+          expect(first.collection_id).to eq(collection_to_link.id)
+          expect(second.collection_id).to eq(method_library_collection.id)
+          expect(second.width).to eq(1)
+          expect(second.height).to eq(2)
+          expect(second.order).to eq(-9)
         end
       end
     end
@@ -105,11 +106,13 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       let!(:application_collection) { create(:application_collection, organization: organization) }
       let(:child_collection) do
         create(:collection,
+               name: '{{CD.DASHBOARD.CREATIVE-DIFFERENCE}}',
                parent_collection: application_collection,
                organization: organization)
       end
       let!(:collection_to_link) do
         create(:collection,
+               name: 'Business Unit Dashboard',
                parent_collection: child_collection,
                organization: organization)
       end
