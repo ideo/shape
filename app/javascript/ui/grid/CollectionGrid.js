@@ -13,7 +13,7 @@ import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import { objectsEqual } from '~/utils/objectUtils'
 import CardMoveService from '~/utils/CardMoveService'
-import { groupByConsecutive } from '~/utils/CardGridCalculator'
+import { groupByConsecutive } from '~/utils/CollectionGridCalculator'
 import v from '~/utils/variables'
 
 const cardMover = new CardMoveService()
@@ -39,22 +39,6 @@ const StyledGrid = styled.div`
   `}
 `
 StyledGrid.displayName = 'StyledGrid'
-
-const groupByConsecutive = (array, value) => {
-  const groups = []
-  let buffer = []
-  for (let i = 0; i < array.length; i += 1) {
-    const curItem = array[i]
-    if (curItem === value) {
-      buffer.push(i)
-    } else if (buffer.length > 0) {
-      groups.push(buffer)
-      buffer = []
-    }
-  }
-  if (buffer.length > 0) groups.push(buffer)
-  return groups
-}
 
 const pageMargins = () => {
   let xMargin
