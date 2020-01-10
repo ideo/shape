@@ -973,7 +973,7 @@ class Collection < ApplicationRecord
     order
   end
 
-  def should_pin_all_moving_cards?(placement)
+  def should_pin_cards?(placement)
     has_pinned_cards = collection_cards.pinned.any?
 
     return false unless has_pinned_cards

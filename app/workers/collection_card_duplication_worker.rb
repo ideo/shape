@@ -25,7 +25,7 @@ class CollectionCardDuplicationWorker
     @parent_collection.update_processing_status(:duplicating)
     first_moving_card_placement = @collection_cards.first.order
     # determine if all moving cards should be pinned/unpinned based on the card to the left of the first moving card
-    should_pin_all_moving_cards = @parent_collection.should_pin_all_moving_cards?(first_moving_card_placement)
+    should_pin_duplicating_cards = @parent_collection.should_pin_cards?(first_moving_card_placement)
     @collection_cards.each do |card|
       # Skip duplicating any cards this user can't view (if user provided)
       # If a system collection don't check if user can view
@@ -51,7 +51,7 @@ class CollectionCardDuplicationWorker
         system_collection: @system_collection,
         synchronous: @synchronous,
         placeholder: placeholder,
-        should_pin_all_moving_cards: should_pin_all_moving_cards,
+        should_pin_duplicating_cards: should_pin_duplicating_cards,
       )
     end
   end

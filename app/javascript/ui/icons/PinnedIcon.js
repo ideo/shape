@@ -7,8 +7,6 @@ export const PinIconHolder = styled.div`
   background-color: ${props => {
     if (props.locked || (!props.locked && !props.pinnedFromMasterTemplate)) {
       return 'transparent'
-    } else if (props.pinnedFromMasterTemplate) {
-      return v.colors.black
     } else {
       return v.colors.black
     }

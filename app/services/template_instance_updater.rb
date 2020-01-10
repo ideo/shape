@@ -32,18 +32,10 @@ class TemplateInstanceUpdater
     @master_template.update_submissions_launch_status
   end
 
+  private
+
   def update_all_templated_cards_for_instance(instance)
-    @updated_card_ids.each do |id|
-      master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
-      instance_card = instance.collection_cards.find { |instance_cards| instance_cards.templated_from.id == id }
-
-      next if master_card.blank? || instance_card.blank?
-
-      TemplateInstanceCardUpdater.call(instance_card: instance_card, master_card: master_card, master_template: @master_template)
-    end
-
-    instance.reorder_cards!
-    instance.touch
+    update_instance_cards_by_templated_from_ids(@updated_card_ids, instance)
   end
 
   def add_cards_from_master_template(instance)
@@ -62,6 +54,8 @@ class TemplateInstanceUpdater
         building_template_instance: true,
       )
     end
+    # NOTE: only the cards after the new instance card needs to be updated to improve performance
+    update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
   end
 
   def move_cards_deleted_from_master_template(instance)
@@ -114,8 +108,6 @@ class TemplateInstanceUpdater
     # end
   end
 
-  private
-
   def find_or_create_deleted_cards_collection(instance)
     deleted_from_template_collection = instance.collections.find_by(name: 'Deleted From Template')
     return deleted_from_template_collection if deleted_from_template_collection.present?
@@ -130,6 +122,21 @@ class TemplateInstanceUpdater
       parent_collection: instance,
       user: instance.created_by,
     )
+
     return builder.collection_card.record if builder.create
+  end
+
+  def update_instance_cards_by_templated_from_ids(templated_from_ids, instance)
+    templated_from_ids.each do |id|
+      master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
+      instance_card = instance.collection_cards.find { |instance_cards| instance_cards.templated_from.id == id }
+
+      next if master_card.blank? || instance_card.blank?
+
+      TemplateInstanceCardUpdater.call(instance_card: instance_card, master_card: master_card, master_template: @master_template)
+    end
+
+    instance.reorder_cards!
+    instance.touch
   end
 end

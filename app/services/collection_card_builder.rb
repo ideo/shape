@@ -48,8 +48,8 @@ class CollectionCardBuilder
   end
 
   def create_collection_card
-    # NOTE: for now you can *only* create pinned cards in a master template
-    @collection_card.pinned = true if @collection_card.master_template_card?
+    # NOTE: cards created inside a master_template are unpinned by default unless it's being created within a pinned area
+    @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
     # TODO: rollback transaction if these later actions fail; add errors, return false
     CollectionCard.transaction do
       @collection_card.save.tap do |result|
