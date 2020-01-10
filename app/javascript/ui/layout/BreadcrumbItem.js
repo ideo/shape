@@ -115,10 +115,9 @@ export class BreadcrumbItem extends React.Component {
     //   name: record.name,
     //   onClick: () => console.log(record.id),
     // }))
-    let menuItems = [item.name]
-    const splitName = item.name.split('>')
-    if (item.ellipses && splitName.length > 1) {
-      menuItems = splitName
+    const menuItems = [item]
+    if (item.subItem) {
+      menuItems.push(item.subItem)
     }
     return (
       <StyledMenuWrapper style={{ marginTop: '-8px' }}>
@@ -128,9 +127,9 @@ export class BreadcrumbItem extends React.Component {
           onMouseLeave={this.onDropdownHoverOut}
         >
           {menuItems.map(menuItem => (
-            <StyledMenuItem key={menuItem}>
+            <StyledMenuItem key={menuItem.name}>
               <StyledMenuButton onClick={this.onItemClick}>
-                {menuItem}
+                {menuItem.name}
               </StyledMenuButton>
               <button onClick={this.onNavigationClick}>></button>
             </StyledMenuItem>

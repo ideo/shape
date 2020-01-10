@@ -143,6 +143,7 @@ class Breadcrumb extends React.Component {
     })
 
     const depth = clamp && maxDepth ? maxDepth * -1 : 0
+    console.log('items', items, _.compact(items))
     return _.compact(items).slice(depth)
   }
 
@@ -222,7 +223,8 @@ class Breadcrumb extends React.Component {
       _.each(items, (item, idx) => {
         const next = items[idx + 1]
         if (item.ellipses && next && next.ellipses) {
-          next.name = `${item.name} > ${next.name}`
+          // next.name = `${item.name} > ${next.name}`
+          next.subItem = item
           item.remove = true
         }
       })
