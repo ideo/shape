@@ -6,6 +6,10 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import CardMoveService from '~/utils/CardMoveService'
+import {
+  findTopLeftCard,
+  calculateRowsCols,
+} from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
@@ -16,8 +20,6 @@ import { objectsEqual } from '~/utils/objectUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
-
-const cardMover = new CardMoveService()
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -145,6 +147,8 @@ class FoamcoreGrid extends React.Component {
   hoveringOver = false
   dragTimeoutId = null
   openSpotMatrix = []
+  movingFromNormalCollection = false
+  movingCards = []
 
   constructor(props) {
     super(props)
@@ -599,7 +603,7 @@ class FoamcoreGrid extends React.Component {
     this.resetCardPositions()
   }
 
-  moveCards = masterCard => {
+  moveCards = async masterCard => {
     if (this.dragGridSpot.size < 1) return
     const { uiStore, collection } = this.props
     const {
@@ -610,7 +614,8 @@ class FoamcoreGrid extends React.Component {
     } = uiStore
     const undoMessage = 'Card move undone'
 
-    const movePlaceholder = [...this.dragGridSpot.values()][0]
+    const dragGridSpotValues = [...this.dragGridSpot.values()]
+    const movePlaceholder = dragGridSpotValues[0]
     const masterRow = movePlaceholder.row
 
     // This is for dragging onto the breadcrumb
@@ -647,8 +652,21 @@ class FoamcoreGrid extends React.Component {
       cardAction === 'move' && movingFromCollectionId === collection.id
 
     if (draggingFromMDL && !movingWithinCollection) {
-      // TODO: allow row/col position here
-      cardMover.moveCards('end')
+      let topLeft
+      if (this.movingFromNormalCollection) {
+        // row/col should represent the first ordered card
+        topLeft = this.movingCards[0]
+      } else {
+        // row/col should represent the top-left-most card
+        topLeft = findTopLeftCard(this.movingCards)
+      }
+      // TODO: would this ever not be found?
+      const topLeftCoords = _.find(
+        dragGridSpotValues,
+        v => v.card.id === topLeft.id
+      )
+      const { row, col } = topLeftCoords
+      await CardMoveService.moveCards({ row, col })
       this.resetCardPositions()
       return
     }
@@ -656,7 +674,7 @@ class FoamcoreGrid extends React.Component {
     const updates = []
     let negativeZone = false
     // dragGridSpot has the positions of all the dragged cards
-    const draggingPlaceholders = [...this.dragGridSpot.values()]
+    const draggingPlaceholders = dragGridSpotValues
     _.each(draggingPlaceholders, placeholder => {
       const { card, row, col } = placeholder
       const update = {
@@ -837,15 +855,27 @@ class FoamcoreGrid extends React.Component {
     const masterCard = apiStore.find('collection_cards', cardId)
     const movingCardIds = multiMoveCardIds.filter(id => id !== cardId)
 
+    let movingCards = movingCardIds.map(movingCardId => {
+      return apiStore.find('collection_cards', movingCardId)
+    })
+
+    this.movingFromNormalCollection = false
+    if (!movingFromCollection.isBoard) {
+      this.movingFromNormalCollection = true
+      // make sure masterCard is factored into position calculation
+      movingCards.unshift(masterCard)
+      // this will add .position to each card
+      movingCards = calculateRowsCols(movingCards)
+    }
+    this.movingCards = movingCards
+
     // Loop through non-master cards to calculate drag map
-    const dragMap = movingCardIds.map(movingCardId => {
-      const card = apiStore.find('collection_cards', movingCardId)
+    const dragMap = movingCards.map(card => {
       let { col, row } = card
       let masterCol = masterCard.col
       let masterRow = masterCard.row
       if (!movingFromCollection.isBoard) {
         // in this case we're moving cards from CollectionGrid to Foamcore
-        // HACK: use the calculated position... will change this to just go 4 cols wide...
         const { position } = card
         col = position.x
         row = position.y
@@ -927,10 +957,12 @@ class FoamcoreGrid extends React.Component {
           let canFit = false
           if (openSpots >= width) {
             if (height > 1) {
-              const nextRow = openSpotMatrix[rowIdx + 1]
-              if (nextRow && nextRow[colIdx] && nextRow[colIdx] >= width) {
-                canFit = true
-              }
+              _.times(height - 1, i => {
+                const nextRow = openSpotMatrix[rowIdx + i + 1]
+                if (nextRow && nextRow[colIdx] && nextRow[colIdx] >= width) {
+                  canFit = true
+                }
+              })
             } else {
               canFit = true
             }

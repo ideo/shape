@@ -1,4 +1,5 @@
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
+import CardMoveService from '~/utils/CardMoveService'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -70,27 +71,28 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('non-rendering functions', () => {
-    describe('findCardOverlap', () => {
+    describe('findOverlap', () => {
       it('finds filledSpot (or not) where a card is trying to be dragged', () => {
         // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
         let fakeCard = { row: 1, col: 5, width: 1, height: 1 }
-        let overlap = instance.findCardOverlap(fakeCard)
+        let overlap = instance.findOverlap(fakeCard)
         expect(overlap.card).toEqual(cardA)
         // 2x2 should stick out and overlap cardA
         fakeCard = { row: 0, col: 4, width: 2, height: 2 }
-        overlap = instance.findCardOverlap(fakeCard)
+        overlap = instance.findOverlap(fakeCard)
         expect(overlap.card).toEqual(cardA)
       })
     })
 
     describe('onDragStart', () => {
       describe('when dragging multiple cards', () => {
-        let fakeDragMap, cardId
-
+        let fakeDragMap, cardId, card
         beforeEach(() => {
+          card = cards[0]
+          cardId = card.id
           fakeDragMap = [
             {
-              card: cards[0],
+              card,
               col: 0,
               row: 0,
             },
@@ -100,14 +102,14 @@ describe('FoamcoreGrid', () => {
               row: 0,
             },
           ]
-          cardId = cards[0].id
-
           instance.draggingMap = []
+          instance.originalCard = jest.fn().mockReturnValue(card)
           instance.determineDragMap = jest.fn().mockReturnValue(fakeDragMap)
           instance.onDragStart(cardId)
         })
 
         it('should determine the drag map with card id', () => {
+          expect(instance.originalCard).toHaveBeenCalledWith(cardId)
           expect(instance.determineDragMap).toHaveBeenCalledWith(cardId)
         })
 
@@ -279,6 +281,23 @@ describe('FoamcoreGrid', () => {
             undoMessage: 'Card move undone',
             onConfirm: expect.any(Function),
             onCancel: expect.any(Function),
+          })
+        })
+      })
+
+      describe('when dragging from MDL', () => {
+        beforeEach(() => {
+          CardMoveService.moveCards = jest.fn()
+          props.uiStore.draggingFromMDL = true
+          instance.movingCards = [card, card2]
+          instance.dragGridSpot.set('6,7', { col: 6, row: 7, card })
+          instance.moveCards(card)
+        })
+
+        it('calls CardMoveService with the drag spot row/col', () => {
+          expect(CardMoveService.moveCards).toHaveBeenCalledWith({
+            col: 6,
+            row: 7,
           })
         })
       })

@@ -1007,7 +1007,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "y": 140,
       }
     }
-    hidden={false}
     horizontalScroll={true}
     isBoardCollection={true}
     isSharedCollection={false}
@@ -11220,7 +11219,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "y": 140,
       }
     }
-    hidden={false}
     horizontalScroll={true}
     isBoardCollection={true}
     isSharedCollection={false}
@@ -21433,7 +21431,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "y": 140,
       }
     }
-    hidden={false}
     horizontalScroll={true}
     isBoardCollection={true}
     isSharedCollection={false}
