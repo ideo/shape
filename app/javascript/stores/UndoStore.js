@@ -10,7 +10,7 @@ export default class UndoStore {
   redoStack = []
 
   @observable
-  undoAfterRoute = null
+  actionAfterRoute = null
 
   @observable
   actionStatus = UNDO_ACTION_STATUS.IDLE
@@ -59,7 +59,7 @@ export default class UndoStore {
       this.performAfterRedirect(redirectPath, undoAction)
       return
     }
-    this.performUndo(undoAction)
+    this.performAction(undoAction)
   }
 
   @action
@@ -68,11 +68,12 @@ export default class UndoStore {
     if (!redoAction) return
     this.status = UNDO_ACTION_STATUS.REDO
     const { redirectPath } = redoAction
+    console.log({ redoAction })
     if (redirectPath) {
       this.performAfterRedirect(redirectPath, redoAction)
       return
     }
-    this.performRedo(redoAction)
+    this.performAction(redoAction)
   }
 
   @action
@@ -83,42 +84,40 @@ export default class UndoStore {
     // check if we don't have to redirect
     if (!!type && !!id && (internalType !== type || recordId !== id)) {
       routingStore.routeTo(type, id)
-      this.undoAfterRoute = action
+      this.actionAfterRoute = action
     } else {
-      this.performUndo(action)
+      this.performAction(action)
     }
   }
 
   @action
-  async performUndo(undoAction) {
-    const { message, redoAction, redirectPath, actionType } = undoAction
+  async performAction(action) {
+    const {
+      message,
+      redoAction,
+      redirectPath,
+      redoRedirectPath,
+      actionType,
+    } = action
     if (redoAction) {
-      // there should usually always be a redoAction...
+      // undo actions should usually have a redoAction...
       // however TextItemCover has a unique way of undo/redo
       this.pushRedoAction({
         ...redoAction,
-        redirectPath,
+        redirectPath: redoRedirectPath || redirectPath,
         actionType,
       })
     }
     uiStore.performPopupAction(message, actionType)
-    await undoAction.apiCall()
+    await action.apiCall()
     this.status = UNDO_ACTION_STATUS.IDLE
   }
 
   @action
-  async performRedo(redoAction) {
-    const { message, actionType } = redoAction
-    uiStore.performPopupAction(message, actionType)
-    await redoAction.apiCall()
-    this.status = UNDO_ACTION_STATUS.IDLE
-  }
-
-  @action
-  performUndoAfterRoute() {
-    const undoAction = this.undoAfterRoute
-    this.undoAfterRoute = null
-    return this.performUndo(undoAction)
+  performActionAfterRoute() {
+    const action = this.actionAfterRoute
+    this.actionAfterRoute = null
+    return this.performAction(action)
   }
 
   handleUndoKeypress = () => {

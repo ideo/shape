@@ -160,7 +160,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "y": 210,
       }
     }
-    hidden={false}
     horizontalScroll={false}
     isBoardCollection={false}
     isSharedCollection={false}
@@ -2326,7 +2325,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "y": 210,
       }
     }
-    hidden={false}
     horizontalScroll={false}
     isBoardCollection={false}
     isSharedCollection={false}
@@ -4492,7 +4490,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "y": 210,
       }
     }
-    hidden={false}
     horizontalScroll={false}
     isBoardCollection={false}
     isSharedCollection={false}
@@ -6531,7 +6528,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "y": 210,
       }
     }
-    hidden={false}
     horizontalScroll={false}
     isBoardCollection={false}
     isSharedCollection={false}

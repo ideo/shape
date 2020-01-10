@@ -561,6 +561,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const data = this.toJsonApi()
     // attach nested attributes of cards
     if (this.collection_cards) {
+      // make sure cards are sequential
+      this._reorderCards()
       const cardAttributes = []
       _.each(this.collection_cards, card => {
         if (
@@ -748,8 +750,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       // force the grid to immediately observe that things have changed
       card.updated_at = new Date()
     })
-
-    this._reorderCards()
 
     const data = this.toJsonApiWithCards(
       updateAllCards ? [] : _.keys(updatesByCardId)
@@ -1273,8 +1273,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // now actually make the change to the card
     _.assign(card, updates)
 
-    this._reorderCards()
-
+    // this will also reorder the cards
     const data = this.toJsonApiWithCards()
     // we don't want to receive updates which are just going to try to re-render
     data.cancel_sync = true
