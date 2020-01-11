@@ -9,7 +9,9 @@ describe('calculateRowsCols', () => {
       { order: 6, width: 1, height: 2 },
       { order: 7, width: 1, height: 1 },
       { order: 8, width: 3, height: 1 },
-      { order: 8, width: 2, height: 1 },
+      { order: 9, width: 2, height: 1 },
+      { order: 10, width: 2, height: 2 },
+      { order: 11, width: 1, height: 1 },
     ]
 
     expect(_.map(calculateRowsCols(cards), 'position')).toEqual([
@@ -19,6 +21,8 @@ describe('calculateRowsCols', () => {
       { x: 0, y: 1 },
       { x: 0, y: 2 },
       { x: 0, y: 3 },
+      { x: 2, y: 3 },
+      { x: 0, y: 4 },
     ])
   })
 })

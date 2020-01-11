@@ -67,6 +67,31 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         )
         subject
       end
+
+      context 'moving to a foamcore board' do
+        let(:to_collection) { create(:board_collection, num_cards: 1) }
+
+        context 'without row/col placement' do
+          it 'should return false for BulkCardOperationProcessor' do
+            expect(placeholder).to eq false
+          end
+        end
+
+        context 'with row/col placement' do
+          let(:placement) { Hashie::Mash.new(row: 2, col: 3) }
+
+          it 'should call CardMover with move action' do
+            expect(CardMover).to receive(:call).with(
+              to_collection: to_collection,
+              cards: cards,
+              placement: { 'row' => 2, 'col' => 3 },
+              from_collection: from_collection,
+              card_action: 'move',
+            )
+            subject
+          end
+        end
+      end
     end
 
     context 'with link action' do
@@ -83,5 +108,22 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         subject
       end
     end
+
+    context 'with failed action' do
+      let(:action) { 'move' }
+
+      it 'should rollback the placeholder destroy' do
+        expect(CardMover).to receive(:call).with(
+          to_collection: to_collection,
+          cards: cards,
+          placement: placeholder.order,
+          from_collection: from_collection,
+          card_action: 'move',
+        ).and_return(false)
+        subject
+        expect(CollectionCard.find_by_id(placeholder.id)).not_to be nil
+      end
+    end
+
   end
 end

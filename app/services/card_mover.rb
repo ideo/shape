@@ -79,7 +79,7 @@ class CardMover < SimpleService
       @to_collection_cards = (@pinned_cards + @moving_cards + @existing_cards)
     elsif @placement == 'end'
       @to_collection_cards = (@pinned_cards + @existing_cards + @moving_cards)
-    else
+    elsif @placement.is_a?(String) || @placement.is_a?(Integer)
       order = @placement.to_i
       # make sure order comes after any pinned cards
       last_pinned = @pinned_cards.last&.order || -1
@@ -90,6 +90,14 @@ class CardMover < SimpleService
       idx ||= @existing_cards.count
       combined = @existing_cards.insert(idx, @moving_cards).flatten
       @to_collection_cards = (@pinned_cards + combined).compact
+    elsif @placement.respond_to?('[]')
+      @placement_row = @placement['row']
+      @placement_col = @placement['col']
+      # error case
+      return false unless @to_collection.is_a?(Collection::Board)
+    else
+      # @placement format not found
+      return false
     end
 
     # uniq the array because we may be moving within the same collection
@@ -97,14 +105,33 @@ class CardMover < SimpleService
   end
 
   def move_cards_to_board
-    return unless @to_collection.is_a? Collection::Board
+    return unless @to_collection.is_a?(Collection::Board)
 
-    target_empty_row = @to_collection.empty_row_for_moving_cards
-    @moving_cards.each_with_index do |card, i|
+    if @from_collection.is_a?(Collection::Board)
+      top_left_card = CollectionGrid::Calculator.top_left_card(@moving_cards)
+    else
+      # cards are already ordered
+      top_left_card = @moving_cards.first
+      # calculate row/col values for each of the moving cards
+      CollectionGrid::Calculator.calculate_rows_cols(@moving_cards)
+    end
+
+    if @placement_row
+      row_move = @placement_row - top_left_card.row
+      col_move = @placement_col - top_left_card.col
+    else
+      # always "move to end"
+      row_move = @to_collection.empty_row_for_moving_cards
+      col_move = 0
+    end
+
+    # binding.pry
+
+    @moving_cards.each do |card|
       card.update(
         parent_id: @to_collection.id,
-        row: target_empty_row,
-        col: i,
+        row: card.row + row_move,
+        col: card.col + col_move,
       )
     end
   end
