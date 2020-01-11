@@ -42,13 +42,31 @@ class CommentInput extends React.Component {
       transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
       const { y } = uiStore.activityLogPosition
       const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // max height is the height above the input and the activity box
-      const totalSuggestionsLength = 45 * (suggestions.length + 1)
+      const totalSuggestionsLength = 45 * suggestions.length
 
-      top = `${maxCommentSuggestionsHeight - totalSuggestionsLength}px`
+      // TODO: We should reverse sort the list if we are placing list items on the top of the comment input
+      const shouldPlaceSuggestionsAtBottom =
+        decoratorRect.top + totalSuggestionsLength < window.innerHeight
+      top = `${
+        shouldPlaceSuggestionsAtBottom
+          ? decoratorRect.top - 48
+          : maxCommentSuggestionsHeight - (totalSuggestionsLength + 45)
+      }px`
       if (uiStore.isTouchDevice) {
         if (cols == 1) {
           // use activity log height since decoratorRect and activity log y position are static for mobile
           top = `${uiStore.activityLogPosition.h - 24}px`
+        } else {
+          // TODO:
+          // 1. Handle comment window clipping comment mentions
+          // 2. Handle touch device virtual keyboard pushing focused windows when placed in virtual keyboard area
+          const shouldPlaceSuggestionsAtBottomForTouchDevice =
+            decoratorRect.top + totalSuggestionsLength < window.innerHeight / 2
+          top = `${
+            shouldPlaceSuggestionsAtBottomForTouchDevice
+              ? decoratorRect.top - 30
+              : maxCommentSuggestionsHeight - (totalSuggestionsLength + 75)
+          }px`
         }
       }
     } else if (isActive) {
