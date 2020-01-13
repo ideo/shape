@@ -557,6 +557,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this._reorderCards()
   }
 
+  @action
+  clearCollectionCards() {
+    this.collection_cards.replace([])
+  }
+
   toJsonApiWithCards(onlyCardIds = []) {
     const data = this.toJsonApi()
     // attach nested attributes of cards

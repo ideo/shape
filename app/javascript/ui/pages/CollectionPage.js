@@ -98,7 +98,7 @@ class CollectionPage extends React.Component {
   }
 
   loadCollectionCards = async ({ page, per_page, rows, cols }) => {
-    const { collection } = this.props
+    const { collection, undoStore } = this.props
     // if the collection is still awaiting updates, there are no cards to load
     if (collection.awaiting_updates) {
       this.pollForUpdates()
@@ -110,6 +110,11 @@ class CollectionPage extends React.Component {
       params = { rows }
     } else {
       params = { page, per_page, rows, cols }
+    }
+
+    if (undoStore.actionAfterRoute) {
+      // clear this out before we fetch, so that any undo/redo actions don't flash a previous state of the cards
+      collection.clearCollectionCards()
     }
 
     return collection.API_fetchCards(params).then(() => {
@@ -152,11 +157,11 @@ class CollectionPage extends React.Component {
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
     }
-    if (collection.isEmpty) {
-      uiStore.openBlankContentTool()
-    }
     if (undoStore.actionAfterRoute) {
       undoStore.performActionAfterRoute()
+    }
+    if (collection.isEmpty) {
+      uiStore.openBlankContentTool()
     }
     if (collection.joinable_group_id) {
       apiStore.checkJoinableGroup(collection.joinable_group_id)
