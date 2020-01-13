@@ -49,8 +49,8 @@ class CommentInput extends React.Component {
         decoratorRect.top + totalSuggestionsLength < window.innerHeight
       top = `${
         shouldPlaceSuggestionsAtBottom
-          ? decoratorRect.top - 48
-          : maxCommentSuggestionsHeight - (totalSuggestionsLength + 45)
+          ? maxCommentSuggestionsHeight + 6
+          : maxCommentSuggestionsHeight - (totalSuggestionsLength + 56)
       }px`
       if (uiStore.isTouchDevice) {
         if (cols == 1) {
@@ -64,7 +64,7 @@ class CommentInput extends React.Component {
             decoratorRect.top + totalSuggestionsLength < window.innerHeight / 2
           top = `${
             shouldPlaceSuggestionsAtBottomForTouchDevice
-              ? decoratorRect.top - 30
+              ? maxCommentSuggestionsHeight + 6
               : maxCommentSuggestionsHeight - (totalSuggestionsLength + 75)
           }px`
         }

@@ -51,6 +51,7 @@ const StyledHeader = styled.div`
   &:active {
     cursor: move;
   }
+  user-select: none;
 `
 
 const Action = styled.button`
