@@ -59,6 +59,7 @@ class CollectionCardDuplicator < SimpleService
     end
 
     if moving_to_board?
+      # this will just calculate the correct row/col values onto @new_cards
       CollectionGrid::BoardPlacement.call(
         to_collection: @to_collection,
         from_collection: from_collection,
