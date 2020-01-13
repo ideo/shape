@@ -246,7 +246,8 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Replace' })
       if (
         record &&
-        (record.is_submission_box_template || record.isSearchCollection)
+        (record.is_submission_box_template ||
+          (record.parent && record.parent.isSearchCollection))
       ) {
         items = _.reject(items, { name: 'Delete' })
         items = _.reject(items, { name: 'Move' })
