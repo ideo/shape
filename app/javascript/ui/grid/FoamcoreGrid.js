@@ -7,8 +7,10 @@ import styled from 'styled-components'
 
 import CardMoveService from '~/utils/CardMoveService'
 import {
-  findTopLeftCard,
+  calculateOpenSpotMatrix,
   calculateRowsCols,
+  findClosestOpenSpot,
+  findTopLeftCard,
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -746,7 +748,7 @@ class FoamcoreGrid extends React.Component {
   @action
   setDraggedOnSpots(masterPosition, dragPosition) {
     if (!this.dragging || !masterPosition) return
-    const { uiStore } = this.props
+    const { collection, uiStore } = this.props
 
     // If master dragging position hasn't changed, don't need to do anything
     if (objectsEqual(masterPosition, this.draggingCardMasterPosition)) return
@@ -756,7 +758,10 @@ class FoamcoreGrid extends React.Component {
     this.dragGridSpot.clear()
     this.hasDragCollision = false
     if (USE_COLLISION_DETECTION_ON_DRAG) {
-      this.openSpotMatrix = this.calculateOpenSpotMatrix()
+      this.openSpotMatrix = calculateOpenSpotMatrix({
+        collection,
+        multiMoveCardIds: uiStore.multiMoveCardIds,
+      })
     }
 
     // Add master dragging card
@@ -806,13 +811,20 @@ class FoamcoreGrid extends React.Component {
         this.hasDragCollision || this.findOverlap(position)
       return
     }
-    const openSpot = this.findClosestOpenSpot(position)
+    const openSpot = findClosestOpenSpot(position, this.openSpotMatrix)
     if (openSpot) {
+      const {
+        collection,
+        uiStore: { multiMoveCardIds },
+      } = this.props
       position.row = openSpot.row
       position.col = openSpot.col
       this.dragGridSpot.set(getMapKey(position), position)
       // have to recalculate to consider this dragged spot
       this.openSpotMatrix = this.calculateOpenSpotMatrix({
+        collection,
+        multiMoveCardIds,
+        dragGridSpot: this.dragGridSpot,
         withDraggedSpots: true,
       })
     } else {
@@ -889,113 +901,6 @@ class FoamcoreGrid extends React.Component {
       }
     })
     return dragMap
-  }
-
-  get matrixWithDraggedSpots() {
-    const { collection } = this.props
-    const cardMatrix = [...collection.cardMatrix]
-
-    const draggingPlaceholders = [...this.dragGridSpot.values()]
-    _.each(draggingPlaceholders, placeholder => {
-      const maxRow = placeholder.row + placeholder.height
-      const maxCol = placeholder.col + placeholder.width
-      const rows = _.range(placeholder.row, maxRow)
-      const cols = _.range(placeholder.col, maxCol)
-
-      // Iterate over each to populate the matrix
-      _.each(rows, row => {
-        _.each(cols, col => {
-          cardMatrix[row][col] = placeholder
-        })
-      })
-    })
-
-    return cardMatrix
-  }
-
-  /*
-   * The drag matrix is an array of arrays (like the cardMatrix) that simply represents
-   * the number of open spots to the right of any particular coordinate (row/col)
-   * e.g.
-   * [2, 1, 0, 0, 5...]
-   * [10, 9, 8, 7, 6...]
-   */
-  calculateOpenSpotMatrix({ withDraggedSpots = false } = {}) {
-    const { uiStore, collection } = this.props
-
-    const cardMatrix = withDraggedSpots
-      ? this.matrixWithDraggedSpots
-      : collection.cardMatrix
-    const openSpotMatrix = [[]]
-
-    _.each(cardMatrix, (row, rowIdx) => {
-      let open = 0
-      openSpotMatrix[rowIdx] = Array(16)
-      const reversed = _.reverse(row)
-      _.each(reversed, (card, colIdx) => {
-        if (card && !_.includes(uiStore.multiMoveCardIds, card.id)) {
-          open = 0
-        } else {
-          open += 1
-        }
-        openSpotMatrix[rowIdx][15 - colIdx] = open
-      })
-    })
-
-    return openSpotMatrix
-  }
-
-  findClosestOpenSpot(placeholder) {
-    const { openSpotMatrix } = this
-    const { row, col, height, width } = placeholder
-
-    let possibilities = []
-    let exactFit = false
-    _.each(openSpotMatrix, (rowVals, rowIdx) => {
-      if (rowIdx >= row && rowIdx <= row + 15) {
-        _.each(rowVals, (openSpots, colIdx) => {
-          let canFit = false
-          if (openSpots >= width) {
-            if (height > 1) {
-              _.times(height - 1, i => {
-                const nextRow = openSpotMatrix[rowIdx + i + 1]
-                if (nextRow && nextRow[colIdx] && nextRow[colIdx] >= width) {
-                  canFit = true
-                }
-              })
-            } else {
-              canFit = true
-            }
-          }
-
-          if (canFit) {
-            const rowDiff = rowIdx - row
-            let colDiff = colIdx - col
-            // pythagorean distance + weighted towards the right
-            if (colDiff < 0) {
-              colDiff *= 1.01
-            } else {
-              colDiff *= 0.99
-            }
-            const distance = Math.sqrt(rowDiff * rowDiff + colDiff * colDiff)
-            exactFit = distance === 0
-            possibilities.push({ row: rowIdx, col: colIdx, distance })
-          }
-          if (exactFit || possibilities.length > 32) {
-            // exit loop
-            return false
-          }
-        })
-      }
-      if (exactFit || possibilities.length > 32) {
-        // exit loop
-        return false
-      }
-    })
-
-    possibilities = _.sortBy(possibilities, 'distance')
-    const closest = possibilities[0]
-    return closest || false
   }
 
   setResizeSpot({ row, col, width, height }) {

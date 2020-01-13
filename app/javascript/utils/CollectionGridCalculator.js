@@ -69,3 +69,112 @@ export const calculateRowsCols = cards => {
   })
   return sortedCards
 }
+
+export const findClosestOpenSpot = (placeholder, openSpotMatrix) => {
+  const { row, col, height, width } = placeholder
+
+  let possibilities = []
+  let exactFit = false
+
+  _.each(openSpotMatrix, (rowVals, rowIdx) => {
+    if (rowIdx >= row && rowIdx <= row + 15) {
+      _.each(rowVals, (openSpots, colIdx) => {
+        let canFit = false
+        if (openSpots >= width) {
+          if (height > 1) {
+            _.times(height - 1, i => {
+              const nextRow = openSpotMatrix[rowIdx + i + 1]
+              if (nextRow && nextRow[colIdx] && nextRow[colIdx] >= width) {
+                canFit = true
+              }
+            })
+          } else {
+            canFit = true
+          }
+        }
+
+        if (canFit) {
+          const rowDiff = rowIdx - row
+          let colDiff = colIdx - col
+          // pythagorean distance + weighted towards the right
+          if (colDiff < 0) {
+            colDiff *= 1.01
+          } else {
+            colDiff *= 0.99
+          }
+          const distance = Math.sqrt(rowDiff * rowDiff + colDiff * colDiff)
+          exactFit = distance === 0
+          possibilities.push({ row: rowIdx, col: colIdx, distance })
+        }
+        if (exactFit || possibilities.length > 32) {
+          // exit loop
+          return false
+        }
+      })
+    }
+    if (exactFit || possibilities.length > 32) {
+      // exit loop
+      return false
+    }
+  })
+
+  possibilities = _.sortBy(possibilities, 'distance')
+  const closest = possibilities[0]
+  return closest || false
+}
+
+const matrixWithDraggedSpots = (collection, dragGridSpot) => {
+  const cardMatrix = [...collection.cardMatrix]
+
+  const draggingPlaceholders = [...dragGridSpot.values()]
+  _.each(draggingPlaceholders, placeholder => {
+    const maxRow = placeholder.row + placeholder.height
+    const maxCol = placeholder.col + placeholder.width
+    const rows = _.range(placeholder.row, maxRow)
+    const cols = _.range(placeholder.col, maxCol)
+
+    // Iterate over each to populate the matrix
+    _.each(rows, row => {
+      _.each(cols, col => {
+        cardMatrix[row][col] = placeholder
+      })
+    })
+  })
+
+  return cardMatrix
+}
+
+/*
+ * The drag matrix is an array of arrays (like the cardMatrix) that simply represents
+ * the number of open spots to the right of any particular coordinate (row/col)
+ * e.g.
+ * [2, 1, 0, 0, 5...]
+ * [10, 9, 8, 7, 6...]
+ */
+export const calculateOpenSpotMatrix = ({
+  collection,
+  multiMoveCardIds,
+  dragGridSpot,
+  withDraggedSpots = false,
+} = {}) => {
+  const cardMatrix = withDraggedSpots
+    ? matrixWithDraggedSpots(collection, dragGridSpot)
+    : collection.cardMatrix
+  const openSpotMatrix = [[]]
+
+  _.each(cardMatrix, (row, rowIdx) => {
+    let open = 0
+    openSpotMatrix[rowIdx] = Array(16)
+    const reversed = _.reverse(row)
+    _.each(reversed, (card, colIdx) => {
+      if (card && !_.includes(multiMoveCardIds, card.id)) {
+        open = 0
+      } else {
+        open += 1
+      }
+      openSpotMatrix[rowIdx][15 - colIdx] = open
+    })
+  })
+
+  return openSpotMatrix
+}

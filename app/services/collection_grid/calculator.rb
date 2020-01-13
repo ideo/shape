@@ -70,5 +70,175 @@ module CollectionGrid
       end
       cards
     end
+
+    def board_matrix(
+      collection:
+    )
+      return [] if collection.collection_cards.count === 0
+      max_col = 15
+      # TODO define card.max_row
+      max_row = maximum(collection.collection_cards.map{ |card| card.max_row })
+      matrix = [0..max_row + 1].map{ |row| [0..max_col + 1] }
+
+      collection.collection_cards.each do |card|
+        rows = [card.row..card.max_row + 1]
+        cols = [card.col..card.max_col + 1]
+
+        rows.each do |row|
+          cols.each do |col|
+            matrix[row][col] = card
+          end
+        end
+      end
+      matrix
+    end
+
+    def determine_foamcore_drag_map(
+      master_card:,
+      moving_cards:,
+      from_collection:
+    )
+      if !from_collection.is_a(Collection::Board)
+        moving_cards.unshift(master_card)
+        moving_cards = calculate_rows_cols(moving_cards)
+      end
+      drag_map = moving_cards.map do |card|
+        row = card.row
+        col = card.col
+        master_col = master_card.col
+        master_row = master_card.row
+        return {
+          card: card,
+          col: col - master_col,
+          row: row - master_row,
+        }
+      end
+      drag_map
+    end
+
+    def foamcore_collision(
+      placeholder:,
+      collection:,
+      moving_cards:
+    )
+      open_spot_matrix = calculate_open_spot_matrix(
+        collection: collection,
+        moving_cards: moving_cards,
+        drag_grid_spot: placeholder,
+      )
+      open_spot = find_closest_open_spot(placeholder, open_spot_matrix)
+      if open_spot
+        placeholder.row = open_spot.row
+        placeholder.col = open_spot.col
+        drag_map = determine_foamcore_drag_map(
+          master_card: placeholder,
+          moving_cards: moving_cards
+        )
+        return drag_map
+      else
+        return false
+      end
+    end
+
+    def find_closest_open_spot(placeholder, open_spot_matrix)
+      row = placeholder.row
+      col = placeholder.col
+      width = placeholder.width
+      height = placeholder.height
+
+      possibilities = []
+      exact_fit = false
+
+      open_spot_matrix.each do |row_vals, row_idx|
+        if row_idx >= row && row_idx <= row + 15
+          row_vals.each do |open_spots, col_idx|
+            can_fit = false
+            if open_spots >= width
+              if height > 1
+                (height - 1).times do |i|
+                  next_row = open_spot_matrix[row_idx + i + 1]
+                  if next_row && next_row[col_idx] && next_row[col_idx] >= width
+                    can_fit = true
+                  end
+                end
+              else
+                can_fit = true
+              end
+            end
+
+            if can_fit
+              row_diff = row_idx - row
+              col_diff = col_idx - col
+              if col_diff.negative?
+                col_diff *= 1.01
+              else
+                col_diff *= 0.99
+              end
+              distance = Math.sqrt(row_diff * row_diff + col_diff * col_diff)
+              exact_fit = distance.zero?
+              possibilities.push(row: row_idx, col: col_idx, distance: distance)
+            end
+            if exact_fit || possibilities.size > 32
+              return false
+            end
+          end
+        end
+        if exact_fit || possibilities.size > 32
+          return false
+        end
+      end
+      possibilities = possibilities.sort_by(&:distance)
+      closest = possibilities.first
+      closest || false
+    end
+
+    def calculate_open_spot_matrix(
+      collection:,
+      moving_cards:,
+      drag_grid_spot:
+    )
+      card_matrix = matrix_with_dragged_spots(
+        collection: collection,
+        drag_grid_spot: drag_grid_spot,
+      )
+      open_spot_matrix = [[]]
+
+      card_matrix.each_with_index do |row, row_idx|
+        open = 0
+        open_spot_matrix[row_idx] = [0..16]
+        reversed = row.reverse
+
+        reversed.each_with_index do |card, col_idx|
+          if card && moving_cards.include?(card.id)
+            open = 0
+          else
+            open += 1
+          end
+          open_spot_matrix[row_idx][15 - col_idx] = open
+        end
+      end
+      open_spot_matrix
+    end
+
+    def matrix_with_dragged_spots(
+      collection:,
+      drag_grid_spot:
+    )
+      card_matrix = board_matrix(collection: collection)
+      dragging_placeholders = drag_grid_spot.values
+      dragging_placeholders.each do |placeholder|
+        max_row = placeholder.row + placeholder.height
+        max_col = placeholder.col + placeholder.width
+        rows = [placeholder.row..max_row]
+        cols = [placeholder.col..max_col]
+
+        rows.each do |row|
+          cols.each do |col|
+            card_matrix[row][col] = placeholder
+          end
+        end
+      end
+      card_matrix
+    end
   end
 end
