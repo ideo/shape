@@ -353,7 +353,21 @@ class CollectionGrid extends React.Component {
     }
 
     const placeholderOrder = placeholderPosition.order
-    if (
+    if (placeholderOrder !== null && original) {
+      const originalPosition = _.pick(original, fields)
+      moved = !_.isEqual(placeholderPosition, originalPosition)
+    }
+
+    if (hoveringOver && hoveringOver.direction === 'right') {
+      // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
+      const hoveringRecord = hoveringOver.card.record
+      uiStore.setMovingCards(uiStore.multiMoveCardIds)
+
+      if (hoveringRecord.internalType === 'collections') {
+        this.setHoveringOver(false)
+        this.moveCardsIntoCollection(movingIds, hoveringRecord)
+      }
+    } else if (
       dragType === 'drag' &&
       draggingFromMDL &&
       (placeholderOrder !== null &&
@@ -363,14 +377,7 @@ class CollectionGrid extends React.Component {
       cardMover.moveCards(Math.ceil(placeholderOrder))
       this.positionCardsFromProps()
       return
-    }
-
-    if (placeholderOrder !== null && original) {
-      const originalPosition = _.pick(original, fields)
-      moved = !_.isEqual(placeholderPosition, originalPosition)
-    }
-
-    if (moved) {
+    } else if (moved) {
       // we want to update this card to match the placeholder
       cardMover.updateCardsWithinCollection({
         movingIds,
@@ -391,14 +398,6 @@ class CollectionGrid extends React.Component {
       // this should happen right away, not waiting for the API call (since locally we have the updated cards' positions)
       this.positionCardsFromProps()
       uiStore.reselectCardIds(movingIds)
-    } else if (hoveringOver && hoveringOver.direction === 'right') {
-      // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
-      const hoveringRecord = hoveringOver.card.record
-      uiStore.setMovingCards(uiStore.multiMoveCardIds)
-      if (hoveringRecord.internalType === 'collections') {
-        this.setHoveringOver(false)
-        this.moveCardsIntoCollection(movingIds, hoveringRecord)
-      }
     } else {
       if (uiStore.activeDragTarget) {
         const { apiStore } = this.props

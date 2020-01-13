@@ -1303,7 +1303,6 @@ class FoamcoreGrid extends React.Component {
           height: movingCard.height,
           position: this.positionForCoordinates(movingCard),
         }
-        // console.log({ mdlPlaceholderCard })
         const placeholder = new CollectionCard(data, apiStore)
         updateModelId(placeholder, `${movingCard.id}-mdlPlaceholder`)
         cards.push(placeholder)

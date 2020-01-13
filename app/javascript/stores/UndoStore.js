@@ -68,7 +68,6 @@ export default class UndoStore {
     if (!redoAction) return
     this.status = UNDO_ACTION_STATUS.REDO
     const { redirectPath } = redoAction
-    console.log({ redoAction })
     if (redirectPath) {
       this.performAfterRedirect(redirectPath, redoAction)
       return
