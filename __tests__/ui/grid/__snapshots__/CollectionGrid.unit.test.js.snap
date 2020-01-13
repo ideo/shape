@@ -206,6 +206,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "cardProperties": Array [],
         "card_order": "order",
         "checkCurrentOrg": [MockFunction],
+        "clearCollectionCards": [MockFunction],
         "collection_cards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -720,6 +721,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -2371,6 +2373,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "cardProperties": Array [],
         "card_order": "order",
         "checkCurrentOrg": [MockFunction],
+        "clearCollectionCards": [MockFunction],
         "collection_cards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -2885,6 +2888,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -4536,6 +4540,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "cardProperties": Array [],
         "card_order": "order",
         "checkCurrentOrg": [MockFunction],
+        "clearCollectionCards": [MockFunction],
         "collection_cards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -5050,6 +5055,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -6574,6 +6580,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
         "cardProperties": Array [],
         "card_order": "order",
         "checkCurrentOrg": [MockFunction],
+        "clearCollectionCards": [MockFunction],
         "collection_cards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -7088,6 +7095,7 @@ exports[`CollectionGrid renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],

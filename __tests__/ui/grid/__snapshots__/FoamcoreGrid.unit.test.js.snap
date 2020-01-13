@@ -81,6 +81,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "cardProperties": Array [],
           "card_order": "order",
           "checkCurrentOrg": [MockFunction],
+          "clearCollectionCards": [MockFunction],
           "collection_cards": Array [
             Object {
               "API_archive": [MockFunction],
@@ -1103,6 +1104,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -2074,6 +2076,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -3045,6 +3048,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -4015,6 +4019,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -4983,6 +4988,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -5906,6 +5912,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "cardProperties": Array [],
         "card_order": "order",
         "checkCurrentOrg": [MockFunction],
+        "clearCollectionCards": [MockFunction],
         "collection_cards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -5957,6 +5964,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -6925,6 +6933,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -7893,6 +7902,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -8892,6 +8902,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -10293,6 +10304,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "cardProperties": Array [],
           "card_order": "order",
           "checkCurrentOrg": [MockFunction],
+          "clearCollectionCards": [MockFunction],
           "collection_cards": Array [
             Object {
               "API_archive": [MockFunction],
@@ -11315,6 +11327,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -12286,6 +12299,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -13257,6 +13271,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -14227,6 +14242,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -15195,6 +15211,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -16118,6 +16135,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "cardProperties": Array [],
         "card_order": "order",
         "checkCurrentOrg": [MockFunction],
+        "clearCollectionCards": [MockFunction],
         "collection_cards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -16169,6 +16187,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -17137,6 +17156,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -18105,6 +18125,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -19104,6 +19125,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -20505,6 +20527,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "cardProperties": Array [],
           "card_order": "order",
           "checkCurrentOrg": [MockFunction],
+          "clearCollectionCards": [MockFunction],
           "collection_cards": Array [
             Object {
               "API_archive": [MockFunction],
@@ -21527,6 +21550,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -22498,6 +22522,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -23469,6 +23494,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -24439,6 +24465,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -25407,6 +25434,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -26330,6 +26358,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "cardProperties": Array [],
         "card_order": "order",
         "checkCurrentOrg": [MockFunction],
+        "clearCollectionCards": [MockFunction],
         "collection_cards": Array [
           Object {
             "API_archive": [MockFunction],
@@ -26381,6 +26410,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -27349,6 +27379,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -28317,6 +28348,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -29316,6 +29348,7 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],
