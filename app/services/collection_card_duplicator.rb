@@ -83,10 +83,6 @@ class CollectionCardDuplicator < SimpleService
     #       to run before this duplication worker so that it
     #       can map all cards that need linking
 
-
-    # TODO: how do we handle a fully async process,
-    # because we need the mapper to run before this worker starts?
-
     result = CollectionCardDuplicationWorker.send(
       "perform_#{run_worker_sync ? 'sync' : 'async'}",
       @batch_id,
