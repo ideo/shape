@@ -1,3 +1,6 @@
+# This service will set (but not persist) appropriate row/col/parent_id of cards being placed on a Board.
+# One reason it does not persist updates is because services may be operating on new records that
+# they want to handle saving/creating themselves.
 module CollectionGrid
   class BoardPlacement < SimpleService
     def initialize(
