@@ -717,7 +717,12 @@ export default class UiStore {
   @action
   closeBlankContentTool({ force = false } = {}) {
     const { viewingCollection } = this
-    if (!force && viewingCollection && viewingCollection.isEmpty) {
+    if (
+      !force &&
+      viewingCollection &&
+      !viewingCollection.isBoard &&
+      viewingCollection.isEmpty
+    ) {
       // shouldn't be allowed to close BCT on empty collection, send back to default
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()

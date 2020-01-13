@@ -160,7 +160,7 @@ class CollectionPage extends React.Component {
     if (undoStore.actionAfterRoute) {
       undoStore.performActionAfterRoute()
     }
-    if (collection.isEmpty) {
+    if (collection.isEmpty && !collection.isBoard) {
       uiStore.openBlankContentTool()
     }
     if (collection.joinable_group_id) {
