@@ -1080,6 +1080,8 @@ class FoamcoreGrid extends React.Component {
       y: pageMargins.top,
     }
 
+    const mdlInSnackbar = card.isMDLPlaceholder && !card.isDragCardMaster
+
     return (
       <MovableGridCard
         key={key}
@@ -1098,7 +1100,8 @@ class FoamcoreGrid extends React.Component {
         onResize={this.onResize}
         routeTo={routingStore.routeTo}
         parent={collection}
-        zoomLevel={this.relativeZoomLevel}
+        // don't apply any zoom to the mdlPlaceholder
+        zoomLevel={mdlInSnackbar ? 1 : this.relativeZoomLevel}
         horizontalScroll
         showHotEdge={false}
       />

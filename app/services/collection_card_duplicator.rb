@@ -26,10 +26,14 @@ class CollectionCardDuplicator < SimpleService
   private
 
   def initialize_card_order
-    @order = @to_collection.card_order_at(@placement)
-
+    if @placement.is_a?(String) || @placement.is_a?(Integer)
+      @order = @to_collection.card_order_at(@placement)
+    elsif @placement.respond_to?('[]')
+      @row = @placement.try(:[], 'row')
+      @col = @placement.try(:[], 'col')
+    end
     # now make room for these cards (unless we're at the end)
-    return if @placement == 'end'
+    return if @placement == 'end' || @to_collection.is_a?(Collection::Board)
 
     @to_collection.increment_card_orders_at(@order, amount: @cards.count)
   end
@@ -46,17 +50,22 @@ class CollectionCardDuplicator < SimpleService
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
       dup.pinned = @to_collection.master_template?
-      dup.order = @order + i
       dup.parent_id = @to_collection.id
-
-      if @to_collection.is_a? Collection::Board
-        # TODO: this logic will get fixed/changed with Foamcore collision detection
-        target_empty_row ||= @to_collection.empty_row_for_moving_cards
-        dup.row = target_empty_row
-        dup.col = i
+      unless moving_to_board?
+        dup.order = @order + i
       end
 
       @new_cards << dup
+    end
+
+    if moving_to_board?
+      CollectionGrid::BoardPlacement.call(
+        to_collection: @to_collection,
+        from_collection: from_collection,
+        moving_cards: @new_cards,
+        row: @row,
+        col: @col,
+      )
     end
 
     CollectionCard.import(@new_cards)
@@ -83,5 +92,15 @@ class CollectionCardDuplicator < SimpleService
     return unless mover.call
 
     @new_cards += mover.legend_item_cards
+  end
+
+  def moving_to_board?
+    @to_collection.is_a? Collection::Board
+  end
+
+  def from_collection
+    # this is just inferred from what you are moving, just to figure out if you
+    # are moving cards from a normal Collection or not
+    @cards.first.parent
   end
 end
