@@ -21,7 +21,7 @@ import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
-const USE_COLLISION_DETECTION_ON_DRAG = false
+const USE_COLLISION_DETECTION_ON_DRAG = true
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -821,7 +821,7 @@ class FoamcoreGrid extends React.Component {
       position.col = openSpot.col
       this.dragGridSpot.set(getMapKey(position), position)
       // have to recalculate to consider this dragged spot
-      this.openSpotMatrix = this.calculateOpenSpotMatrix({
+      this.openSpotMatrix = calculateOpenSpotMatrix({
         collection,
         multiMoveCardIds,
         dragGridSpot: this.dragGridSpot,
