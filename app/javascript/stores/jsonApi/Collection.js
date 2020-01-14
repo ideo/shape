@@ -1168,7 +1168,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onSuccess,
   } = {}) {
     const { uiStore } = this
-    const { cardAction, movingFromCollectionId } = uiStore
+    const { cardAction } = uiStore
+    const movingFromCollectionId = uiStore.movingFromCollectionId || this.id
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
       uiStore.closeMoveMenu()
@@ -1197,11 +1198,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
-    // clearing placeholder will properly clear out multiMoveCardIds for the next step
-    uiStore.clearMdlPlaceholder()
-    if (_.isEmpty(uiStore.multiMoveCardIds)) {
-      uiStore.update('multiMoveCardIds', cardIds)
-    }
     uiStore.update('movingIntoCollection', toCollection)
 
     const success = await CardMoveService.moveCards('beginning', {
@@ -1209,8 +1205,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       from_id: movingFromCollectionId,
       collection_card_ids: cardIds,
     })
-    uiStore.update('multiMoveCardIds', [])
-    uiStore.update('movingIntoCollection', null)
     if (!success) return false
 
     // Explicitly remove cards from this collection so front-end updates

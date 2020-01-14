@@ -519,6 +519,8 @@ export default class UiStore {
     this.isLoadingMoveAction = false
     this.cardAction = 'move'
     this.movingCardIds.replace([])
+    this.multiMoveCardIds.replace([])
+    this.movingIntoCollection = null
     this.movingFromCollectionId = null
     this.showTemplateHelperForCollection = null
     this.draggingFromMDL = false
@@ -1228,13 +1230,6 @@ export default class UiStore {
   @action
   closeAdminUsersMenu() {
     this.adminUsersMenuOpen = null
-  }
-
-  @action
-  clearMdlPlaceholder() {
-    this.multiMoveCardIds.replace(
-      _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
-    )
   }
 
   @action
