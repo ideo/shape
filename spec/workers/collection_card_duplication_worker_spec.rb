@@ -164,7 +164,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: user,
           target: card.record,
-          action: :duplicate,
+          action: :duplicated,
           subject_user_ids: card.record.editors[:users].pluck(:id),
           subject_group_ids: card.record.editors[:groups].pluck(:id),
           source: collection,

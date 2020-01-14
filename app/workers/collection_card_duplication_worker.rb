@@ -81,7 +81,7 @@ class CollectionCardDuplicationWorker
       ActivityAndNotificationBuilder.call(
         actor: @for_user,
         target: card.record,
-        action: :duplicate,
+        action: :duplicated,
         subject_user_ids: card.record.editors[:users].pluck(:id),
         subject_group_ids: card.record.editors[:groups].pluck(:id),
         source: @from_collection,
