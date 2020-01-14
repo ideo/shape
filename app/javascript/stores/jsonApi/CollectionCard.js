@@ -427,6 +427,7 @@ class CollectionCard extends BaseRecord {
         uiStore.trackEvent('archive', collection)
         if (
           collection.collection_cards.length === 0 &&
+          !collection.isBoard &&
           !collection.isSubmissionsCollection
         ) {
           uiStore.openBlankContentTool()
