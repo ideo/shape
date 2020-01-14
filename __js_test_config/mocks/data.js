@@ -449,6 +449,7 @@ export const fakeCollection = {
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
+  clearCollectionCards: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   meta: {

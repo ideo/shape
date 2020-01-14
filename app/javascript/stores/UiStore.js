@@ -5,7 +5,7 @@ import { observable, action, runInAction, computed } from 'mobx'
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v, { TOUCH_DEVICE_OS, EVENT_SOURCE_TYPES } from '~/utils/variables'
-import { POPUP_ACTION_TYPES, ACTION_SOURCES } from '~/enums/actionEnums'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 
@@ -91,6 +91,8 @@ export default class UiStore {
   @observable
   dismissedMoveHelper = false
   @observable
+  showTemplateHelperForCollection = null
+  @observable
   movingCardIds = []
   @observable
   movingFromCollectionId = null
@@ -163,6 +165,8 @@ export default class UiStore {
   trackedRecords = new Map()
   @observable
   dragging = false
+  @observable
+  draggingFromMDL = false
   @observable
   textEditingItem = null
   @observable
@@ -246,11 +250,15 @@ export default class UiStore {
   @action
   startDragging(cardId) {
     this.dragging = true
+    this.draggingFromMDL = false
     if (
       this.selectedCardIds.length > 0 &&
       this.selectedCardIds.indexOf(cardId.toString()) > -1
     ) {
       this.multiMoveCardIds = [...this.selectedCardIds]
+    } else if (_.includes(cardId, '-mdlPlaceholder')) {
+      this.draggingFromMDL = true
+      this.multiMoveCardIds = [...this.movingCardIds]
     } else {
       this.multiMoveCardIds = [cardId]
     }
@@ -482,7 +490,7 @@ export default class UiStore {
   }
 
   @action
-  openMoveMenu({ from = null, cardAction = 'move', context = null }) {
+  openMoveMenu({ from = null, cardAction = 'move' }) {
     const fromCollectionId = from ? from.id : null
     this.dismissedMoveHelper = false
     this.pageMenuOpen = false
@@ -492,21 +500,11 @@ export default class UiStore {
     // cardAction can be 'move', 'link', 'duplicate', 'useTemplate'
     this.cardAction = cardAction
     if (this.cardAction === 'useTemplate') {
-      const fromCover = context === ACTION_SOURCES.COVER
-      if (fromCover) {
-        const { parent_collection_card, name } = from
-        const { id } = parent_collection_card
-        // selected card is the card whose cover was selected
-        this.movingCardIds.replace([id])
-        this.templateName = name
-      } else {
-        const { name, parent_collection_card } = this.viewingCollection
-        // fake the selected card to trigger the menu open,
-        // because we aren't really moving an existing card
-        this.movingCardIds.replace([parent_collection_card.id])
-        // store the name e.g. "CoLab Prototype in transit"
-        this.templateName = name
-      }
+      const { parent_collection_card, name } = from
+      const { id } = parent_collection_card
+      // selected card is the card whose cover was selected
+      this.movingCardIds.replace([id])
+      this.templateName = name
     } else {
       this.movingCardIds.replace([...this.selectedCardIds])
       this.deselectCards()
@@ -521,7 +519,11 @@ export default class UiStore {
     this.isLoadingMoveAction = false
     this.cardAction = 'move'
     this.movingCardIds.replace([])
+    this.multiMoveCardIds.replace([])
+    this.movingIntoCollection = null
     this.movingFromCollectionId = null
+    this.showTemplateHelperForCollection = null
+    this.draggingFromMDL = false
     if (deselect) this.deselectCards()
   }
 
@@ -558,7 +560,7 @@ export default class UiStore {
   }
 
   @computed
-  get shouldOpenMoveModal() {
+  get shouldOpenMoveSnackbar() {
     return this.movingCardIds.length > 0 && !this.movingIntoCollection
   }
 
@@ -692,6 +694,7 @@ export default class UiStore {
 
   @computed
   get blankContentToolIsOpen() {
+    // even for foamcore, order will at least == 0 when open
     return this.blankContentToolState.order !== null
   }
 
@@ -716,7 +719,12 @@ export default class UiStore {
   @action
   closeBlankContentTool({ force = false } = {}) {
     const { viewingCollection } = this
-    if (!force && viewingCollection && viewingCollection.isEmpty) {
+    if (
+      !force &&
+      viewingCollection &&
+      !viewingCollection.isBoard &&
+      viewingCollection.isEmpty
+    ) {
       // shouldn't be allowed to close BCT on empty collection, send back to default
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()
@@ -1222,13 +1230,6 @@ export default class UiStore {
   @action
   closeAdminUsersMenu() {
     this.adminUsersMenuOpen = null
-  }
-
-  @action
-  clearMdlPlaceholder() {
-    this.multiMoveCardIds.replace(
-      _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
-    )
   }
 
   @action

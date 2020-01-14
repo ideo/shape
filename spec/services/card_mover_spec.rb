@@ -259,11 +259,10 @@ RSpec.describe CardMover, type: :service do
         let(:placement) { 'end' }
 
         it 'sets row of linked cards 2 rows after the last non-blank row' do
-          card_mover.call
-
           target_empty_row = to_collection.empty_row_for_moving_cards
+          card_mover.call
           to_collection.reload
-
+          # they are all 1x1 so should fit consecutively
           to_collection.collection_cards.last(3).each_with_index do |card, index|
             expect(card.row).to eq target_empty_row
             expect(card.col).to eq index
@@ -361,6 +360,26 @@ RSpec.describe CardMover, type: :service do
           expect(
             to_collection.collection_cards.reload.map(&:item).compact,
           ).to include(legend_item)
+        end
+      end
+    end
+
+    context 'with placement as row/col values, moving to a foamcore board' do
+      let!(:to_collection) do
+        create(:board_collection,
+               num_cards: 3,
+               add_editors: [user],
+               organization: organization)
+      end
+      let(:placement) { Hashie::Mash.new(row: 2, col: 3) }
+
+      it 'moves cards to targeted area' do
+        card_mover.call
+        # they are all 1x1 so should fit consecutively
+        moving_cards.reload.each_with_index do |card, index|
+          expect(card.parent_id).to eq to_collection.id
+          expect(card.row).to eq 2
+          expect(card.col).to eq 3 + index
         end
       end
     end
