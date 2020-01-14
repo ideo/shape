@@ -80,38 +80,43 @@ class CardMover < SimpleService
       @to_collection_cards = (@pinned_cards + @moving_cards + @existing_cards)
     elsif @placement == 'end'
       @to_collection_cards = (@pinned_cards + @existing_cards + @moving_cards)
+    elsif @placement.is_a?(String) || @placement.is_a?(Integer)
+      order = @placement.to_i
+      # make sure order comes after any pinned cards
+      last_pinned = @pinned_cards.last&.order || -1
+      order = [last_pinned + 1, order].max
+      # get the place in the array where we should insert our moving cards
+      idx = @existing_cards.find_index { |c| c.order >= order }
+      # default to the end of the array
+      idx ||= @existing_cards.count
+      combined = @existing_cards.insert(idx, @moving_cards).flatten
+      @to_collection_cards = (@pinned_cards + combined).compact
+    elsif @placement.respond_to?('[]')
+      @placement_row = @placement['row']
+      @placement_col = @placement['col']
+      # error case
+      return false unless @to_collection.is_a?(Collection::Board)
     else
-      shift_moving_cards_after_pinned
+      # @placement format not found
+      return false
     end
 
     # uniq the array because we may be moving within the same collection
     @to_collection_cards.uniq!
   end
 
-  def shift_moving_cards_after_pinned
-    order = @placement.to_i
-    # make sure order comes after any pinned cards
-    last_pinned = @pinned_cards.last&.order || -1
-    order = [last_pinned + 1, order].max
-    # get the place in the array where we should insert our moving cards
-    idx = @existing_cards.find_index { |c| c.order >= order }
-    # default to the end of the array
-    idx ||= @existing_cards.count
-    combined = @existing_cards.insert(idx, @moving_cards).flatten
-    @to_collection_cards = (@pinned_cards + combined).compact
-  end
-
   def move_cards_to_board
-    return unless @to_collection.is_a? Collection::Board
+    return unless @to_collection.is_a?(Collection::Board)
 
-    target_empty_row = @to_collection.empty_row_for_moving_cards
-    @moving_cards.each_with_index do |card, i|
-      card.update(
-        parent_id: @to_collection.id,
-        row: target_empty_row,
-        col: i,
-      )
-    end
+    CollectionGrid::BoardPlacement.call(
+      to_collection: @to_collection,
+      from_collection: @from_collection,
+      moving_cards: @moving_cards,
+      row: @placement_row,
+      col: @placement_col,
+    )
+    # BoardPlacement does not save the records, just updates their attrs
+    @moving_cards.each(&:save)
   end
 
   def move_cards_to_collection

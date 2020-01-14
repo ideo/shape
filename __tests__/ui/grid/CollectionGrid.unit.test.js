@@ -117,35 +117,4 @@ describe('CollectionGrid', () => {
       })
     })
   })
-
-  describe('movingAllCards', () => {
-    beforeEach(() => {
-      props.collection.collection_card_count = 3
-      props.uiStore.movingFromCollectionId = props.collection.id
-      props.uiStore.movingCardIds = ['1', '2', '3']
-    })
-
-    describe('moving within the same collection', () => {
-      it('returns true if moving all cards in the collection', () => {
-        props.uiStore.cardAction = 'move'
-        rerender()
-        expect(component.movingAllCards).toBe(true)
-      })
-
-      it('returns false if the cardAction is not "move"', () => {
-        props.uiStore.cardAction = 'link'
-        rerender()
-        expect(component.movingAllCards).toBe(false)
-      })
-    })
-
-    describe('moving between collections', () => {
-      it('returns false', () => {
-        props.uiStore.cardAction = 'move'
-        props.uiStore.movingFromCollectionId = '9876'
-        rerender()
-        expect(component.movingAllCards).toBe(false)
-      })
-    })
-  })
 })

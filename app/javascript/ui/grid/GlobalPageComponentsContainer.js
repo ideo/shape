@@ -21,11 +21,7 @@ class GlobalPageComponentsContainer extends React.Component {
     const children = []
 
     if (uiStore.shouldOpenMoveSnackbar) {
-      if (
-        currentUser.show_move_helper &&
-        !uiStore.dismissedMoveHelper &&
-        uiStore.cardAction !== 'useTemplate'
-      ) {
+      if (currentUser.show_move_helper && !uiStore.dismissedMoveHelper) {
         children.push(<MoveHelperModal type="move" key="moveHelperModal" />)
       }
       children.push(

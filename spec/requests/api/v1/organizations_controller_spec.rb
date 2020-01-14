@@ -233,6 +233,21 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       expect(json['data']['attributes']).to match_json_schema('organization')
     end
 
+    context 'setting in app billing' do
+      it 'does not accept the in_app_billing param if you are not super admin' do
+        post(path, params: json_api_params('organizations', name: 'IDEO U', in_app_billing: false))
+        # in_app_billing defaults to true (see app/models/organization.rb)
+        expect(json['data']['attributes']['in_app_billing']).to be(true)
+      end
+
+      it 'allows setting in_app_billing param if you are a super admin' do
+        user.add_role(Role::SUPER_ADMIN)
+        post(path, params: json_api_params('organizations', name: 'IDEO U', in_app_billing: false))
+
+        expect(json['data']['attributes']['in_app_billing']).to eql(false)
+      end
+    end
+
     context 'with invalid params' do
       let(:params) do
         json_api_params(

@@ -249,14 +249,18 @@ describe('CollectionPage', () => {
           {...props}
           undoStore={{
             ...undoStore,
-            undoAfterRoute: 'do something',
+            actionAfterRoute: { do: 'something' },
           }}
         />
       )
     })
 
+    it('should clear out collection cards on loadCollectionCards', () => {
+      expect(props.collection.clearCollectionCards).toHaveBeenCalled()
+    })
+
     it('should call undoStore to perform the action', () => {
-      expect(undoStore.performUndoAfterRoute).toHaveBeenCalled()
+      expect(undoStore.performActionAfterRoute).toHaveBeenCalled()
     })
   })
 
