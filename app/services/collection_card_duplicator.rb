@@ -28,7 +28,6 @@ class CollectionCardDuplicator < SimpleService
     duplicate_cards_with_placeholders if @synchronous == :async
     register_card_mappings
     deep_duplicate_cards
-    duplicate_legend_items
     reorder_and_cache_covers
     return @new_cards if @synchronous == :async
 
@@ -78,6 +77,8 @@ class CollectionCardDuplicator < SimpleService
 
   def deep_duplicate_cards
     run_worker_sync = %i[all_levels first_level].include?(@synchronous)
+    # Use placeholders if we just created them, otherwise pass in original card ids
+    card_ids = @synchronous == :async ? @new_cards.map(&:id) : @cards.map(&:id)
 
     # Note: the CardDuplicatorMapperFindLinkedCardsWorker needs
     #       to run before this duplication worker so that it
@@ -86,7 +87,7 @@ class CollectionCardDuplicator < SimpleService
     result = CollectionCardDuplicationWorker.send(
       "perform_#{run_worker_sync ? 'sync' : 'async'}",
       @batch_id,
-      @cards.map(&:id),
+      card_ids,
       @to_collection.id,
       @for_user&.id,
       @system_collection,
@@ -128,16 +129,5 @@ class CollectionCardDuplicator < SimpleService
   def reorder_and_cache_covers
     @to_collection.reorder_cards!
     @to_collection.cache_cover!
-  end
-
-  def duplicate_legend_items
-    mover = LegendMover.new(
-      to_collection: @to_collection,
-      cards: (@to_collection.collection_cards + @new_cards).compact.uniq,
-      action: 'duplicate',
-    )
-    return unless mover.call
-
-    @new_cards += mover.legend_item_cards
   end
 end

@@ -45,16 +45,18 @@ RSpec.describe CollectionCardDuplicator, type: :service do
     end
 
     it 'calls CollectionCardDuplicationWorker to complete the duplication' do
-      expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+      allow(CollectionCardDuplicationWorker).to receive(:perform_async).and_call_original
+      new_cards = service.call
+      expect(new_cards.map(&:id)).not_to match_array(moving_cards.map(&:id))
+      expect(CollectionCardDuplicationWorker).to have_received(:perform_async).with(
         instance_of(String), # batch id
-        instance_of(Array), # new card ids
+        new_cards.map(&:id), # new card ids
         to_collection.id,
         user.id,
         false, # system collection
         false, # synchronous
         false, # building_template_instance
       )
-      service.call
     end
 
     context 'if synchronous is all levels' do
@@ -63,7 +65,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       it 'calls CollectionCardDuplicationWorker synchronously' do
         expect(CollectionCardDuplicationWorker).to receive(:perform_sync).with(
           instance_of(String), # batch id
-          instance_of(Array), # new card ids
+          moving_cards.map(&:id), # existing card ids
           to_collection.id,
           user.id,
           false, # system collection
@@ -80,7 +82,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       it 'calls CollectionCardDuplicationWorker synchronously, but async sub-processes' do
         expect(CollectionCardDuplicationWorker).to receive(:perform_sync).with(
           instance_of(String), # batch id
-          instance_of(Array), # new card ids
+          moving_cards.map(&:id), # existing card ids
           to_collection.id,
           user.id,
           false, # system collection
@@ -117,88 +119,6 @@ RSpec.describe CollectionCardDuplicator, type: :service do
           expect(card.parent_id).to eq to_collection.id
           expect(card.row).to eq target_empty_row
           expect(card.col).to eq index
-        end
-      end
-    end
-
-    context 'with data items that have legends' do
-      let!(:data_item) do
-        create(
-          :data_item,
-          :report_type_record,
-          parent_collection: from_collection,
-        )
-      end
-      let(:legend_item) { data_item.legend_item }
-      let(:duplicated_data_items) { to_collection.items.data_items }
-      let!(:moving_cards) { default_moving_cards + [data_item.parent_collection_card] }
-      before do
-        legend_item.reload # to make sure data_item_ids aren't cached
-        user.add_role(Role::EDITOR, data_item)
-        Sidekiq::Testing.inline!
-      end
-
-      after do
-        Sidekiq::Testing.fake!
-      end
-
-      it 'links legend to duplicated data item' do
-        service.call
-        to_collection.reload.collection_cards
-        expect(from_collection.items.data_items.size).to eq(1)
-        expect(duplicated_data_items.size).to eq(1)
-        expect(duplicated_data_items.first.cloned_from).to eq(data_item)
-      end
-
-      context 'if legend is not selected' do
-        it 'duplicates legend' do
-          expect(moving_cards).not_to include(legend_item.parent_collection_card)
-          expect {
-            service.call
-          }.to change(Item::LegendItem, :count).by(1)
-        end
-      end
-
-      context 'if legend is selected' do
-        let!(:moving_cards) { default_moving_cards + [legend_item.parent_collection_card] }
-
-        it 'duplicates it' do
-          expect {
-            service.call
-          }.to change(Item::LegendItem, :count).by(1)
-        end
-      end
-
-      context 'with legend linked to other data items not duplicated' do
-        let!(:data_item_two) do
-          create(
-            :data_item,
-            :report_type_record,
-            parent_collection: from_collection,
-            legend_item: legend_item,
-          )
-        end
-
-        before do
-          user.add_role(Role::EDITOR, data_item_two)
-        end
-
-        it 'duplicates legend' do
-          expect {
-            service.call
-          }.to change(Item::LegendItem, :count).by(1)
-        end
-
-        it 'leaves existing data item linked to legend item' do
-          service.call
-          to_collection_legend_items = to_collection.collection_cards.reload.select do |card|
-            card.item&.is_a?(Item::LegendItem)
-          end.map(&:item)
-          expect(
-            to_collection_legend_items.size,
-          ).to eq(1)
-          duplicated_legend_item = to_collection_legend_items.first
-          expect(data_item_two.reload.legend_item).not_to eq(duplicated_legend_item)
         end
       end
     end

@@ -21,7 +21,9 @@ class CollectionCardDuplicationWorker
     @from_collection = nil
     @building_template_instance = building_template_instance
     @new_cards = duplicate_cards
+    duplicate_legend_items
     update_parent_collection_status
+    create_notifications
     @new_cards
   end
 
@@ -83,8 +85,19 @@ class CollectionCardDuplicationWorker
         subject_user_ids: card.record.editors[:users].pluck(:id),
         subject_group_ids: card.record.editors[:groups].pluck(:id),
         source: @from_collection,
-        destination: @to_collection,
+        destination: @parent_collection,
       )
     end
+  end
+
+  def duplicate_legend_items
+    mover = LegendMover.new(
+      to_collection: @parent_collection,
+      cards: (@parent_collection.collection_cards + @new_cards).compact.uniq,
+      action: 'duplicate',
+    )
+    return unless mover.call
+
+    @new_cards += mover.legend_item_cards
   end
 end
