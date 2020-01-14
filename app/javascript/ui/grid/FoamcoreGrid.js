@@ -608,12 +608,9 @@ class FoamcoreGrid extends React.Component {
   moveCards = async masterCard => {
     if (this.dragGridSpot.size < 1) return
     const { uiStore, collection } = this.props
-    const {
-      multiMoveCardIds,
-      movingFromCollectionId,
-      cardAction,
-      draggingFromMDL,
-    } = uiStore
+    const { movingFromCollectionId, cardAction, draggingFromMDL } = uiStore
+    // capture this as a normal array before it gets changed/observed e.g. in onConfirmOrCancel
+    const multiMoveCardIds = [...uiStore.multiMoveCardIds]
     const undoMessage = 'Card move undone'
 
     const dragGridSpotValues = [...this.dragGridSpot.values()]
@@ -653,7 +650,34 @@ class FoamcoreGrid extends React.Component {
     const movingWithinCollection =
       cardAction === 'move' && movingFromCollectionId === collection.id
 
-    if (draggingFromMDL && !movingWithinCollection) {
+    const updates = []
+    let negativeZone = false
+    // dragGridSpot has the positions of all the dragged cards
+    const draggingPlaceholders = dragGridSpotValues
+    _.each(draggingPlaceholders, placeholder => {
+      const { card, row, col } = placeholder
+      const update = {
+        card,
+        row,
+        col,
+      }
+      updates.push(update)
+      if (row < 0 || col < 0) {
+        negativeZone = true
+        return false
+      }
+      return update
+    })
+
+    const onConfirmOrCancel = ({ keepMDLOpen = false } = {}) => {
+      this.resetCardPositions({ keepMDLOpen })
+      uiStore.reselectCardIds(multiMoveCardIds)
+    }
+    const onCancel = () => onConfirmOrCancel({ keepMDLOpen: true })
+
+    if (negativeZone) {
+      return onCancel()
+    } else if (draggingFromMDL && !movingWithinCollection) {
       let topLeft
       if (this.movingFromNormalCollection) {
         // row/col should represent the first ordered card
@@ -673,40 +697,11 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
-    const updates = []
-    let negativeZone = false
-    // dragGridSpot has the positions of all the dragged cards
-    const draggingPlaceholders = dragGridSpotValues
-    _.each(draggingPlaceholders, placeholder => {
-      const { card, row, col } = placeholder
-      const update = {
-        card,
-        row,
-        col,
-      }
-      updates.push(update)
-
-      if (row < 0 || col < 0) {
-        negativeZone = true
-        return false
-      }
-      return update
-    })
-
-    const onConfirmOrCancel = () => {
-      this.resetCardPositions()
-      uiStore.reselectCardIds(multiMoveCardIds)
-    }
-
-    if (negativeZone) {
-      return onConfirmOrCancel()
-    }
-
     collection.API_batchUpdateCardsWithUndo({
       updates,
       undoMessage,
       onConfirm: onConfirmOrCancel,
-      onCancel: onConfirmOrCancel,
+      onCancel,
     })
   }
 
@@ -857,12 +852,17 @@ class FoamcoreGrid extends React.Component {
    * Drag map: [{ col: 0, row: 0}, { col: 1, row: 0}]
    */
   determineDragMap(cardId) {
-    const { apiStore, uiStore } = this.props
+    const { collection, apiStore, uiStore } = this.props
     const { multiMoveCardIds, movingFromCollectionId } = uiStore
-    const movingFromCollection = apiStore.find(
-      'collections',
-      movingFromCollectionId
-    )
+
+    let movingFromCollection = collection
+    if (movingFromCollectionId) {
+      // this may not be set in uiStore if you're just dragging within the collection
+      movingFromCollection = apiStore.find(
+        'collections',
+        movingFromCollectionId
+      )
+    }
     // The master card is the card currently being dragged
     const masterCard = apiStore.find('collection_cards', cardId)
     const movingCardIds = multiMoveCardIds.filter(id => id !== cardId)
