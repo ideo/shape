@@ -233,8 +233,24 @@ class ActivityLogBox extends React.Component {
 
   get mobileProps() {
     const { uiStore } = this.props
-    if (!uiStore.activityLogForceWidth) return {}
-    const height = window.innerHeight
+    if (!uiStore.activityLogForceWidth && uiStore.isAndroid) {
+      // TODO: handle push contents above when keyboard is active for android. For now, set default size and position on top
+      return {
+        position: {
+          x: window.innerWidth / 4,
+          y: 0,
+        },
+        size: {
+          width: window.innerWidth / 2,
+          height: MIN_HEIGHT + 90,
+        },
+      }
+    } else if (!uiStore.activityLogForceWidth) {
+      return {}
+    }
+
+    // set height for Android since it does not push contents when keyboard is active
+    const height = uiStore.isIOS ? window.innerHeight : 300
     return {
       minWidth: uiStore.activityLogForceWidth,
       minHeight: height,

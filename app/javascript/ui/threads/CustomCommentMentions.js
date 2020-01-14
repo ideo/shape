@@ -49,7 +49,7 @@ export const StyledCommentInput = styled.div`
 
   .draftJsMentionPlugin__mentionSuggestionsEntry__3mSwm {
     color: #444;
-    padding: 7px 10px 3px 10px;
+    padding: 7px 10px 7px 10px;
     transition: background-color 0.4s cubic-bezier(0.27, 1.27, 0.48, 0.56);
     margin-bottom: 2px;
     border-bottom: 2px solid ${v.colors.secondaryDark};

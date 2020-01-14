@@ -32,52 +32,66 @@ class CommentInput extends React.Component {
   positionSuggestions = ({ decoratorRect, state, props }) => {
     const { suggestions } = props
     const { isActive } = state
-    const cols = _.get(uiStore, 'gridSettings.cols')
-    let transform
-    let transition
-    let top = '-36px'
 
-    if (isActive && suggestions.length > 0) {
-      transform = `scaleY(1)`
-      transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
-      const { y } = uiStore.activityLogPosition
-      const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // max height is the height above the input and the activity box
-      const totalSuggestionsLength = 45 * suggestions.length
-
-      // TODO: We should reverse sort the list if we are placing list items on the top of the comment input
-      const shouldPlaceSuggestionsAtBottom =
-        decoratorRect.top + totalSuggestionsLength < window.innerHeight
-      top = `${
-        shouldPlaceSuggestionsAtBottom
-          ? maxCommentSuggestionsHeight + 6
-          : maxCommentSuggestionsHeight - (totalSuggestionsLength + 56)
-      }px`
-      if (uiStore.isTouchDevice) {
-        if (cols == 1) {
-          // use activity log height since decoratorRect and activity log y position are static for mobile
-          top = `${uiStore.activityLogPosition.h - 24}px`
-        } else {
-          // TODO:
-          // 1. Handle comment window clipping comment mentions
-          // 2. Handle touch device virtual keyboard pushing focused windows when placed in virtual keyboard area
-          const shouldPlaceSuggestionsAtBottomForTouchDevice =
-            decoratorRect.top + totalSuggestionsLength < window.innerHeight / 2
-          top = `${
-            shouldPlaceSuggestionsAtBottomForTouchDevice
-              ? maxCommentSuggestionsHeight + 6
-              : maxCommentSuggestionsHeight - (totalSuggestionsLength + 75)
-          }px`
-        }
+    if (isActive && _.isEmpty(suggestions)) {
+      return {
+        transform: 'scaleY(0)',
+        transition: 'all 0.25s cubic-bezier(.3,1,.2,1)',
+        top: '-36px',
       }
-    } else if (isActive) {
-      transform = 'scaleY(0)'
-      transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
     }
 
-    return {
-      transform,
-      transition,
-      top,
+    const transform = `scaleY(1)`
+    const transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
+
+    const { y } = uiStore.activityLogPosition
+    const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // max height is the height above the input and the activity box
+    const totalSuggestionsLength = 45 * suggestions.length
+
+    if (!uiStore.isTouchDevice) {
+      const shouldPlaceSuggestionsAtBottom =
+        decoratorRect.top + totalSuggestionsLength < window.innerHeight
+
+      return {
+        transform,
+        transition,
+        top: `${
+          shouldPlaceSuggestionsAtBottom
+            ? maxCommentSuggestionsHeight + 6
+            : maxCommentSuggestionsHeight - (totalSuggestionsLength + 80)
+        }px`,
+      }
+    } else {
+      let top = '0px'
+      const cols = _.get(uiStore, 'gridSettings.cols')
+
+      if (cols == 1 && uiStore.isIOS) {
+        // will place at the bottom of the comment input, use activity log height since iOS phone comment box is full-screen
+        top = `${uiStore.activityLogPosition.h - 42}px`
+      } else if (cols == 1 && uiStore.isAndroid) {
+        // will place at the top of the comment input
+        top = maxCommentSuggestionsHeight - (totalSuggestionsLength + 56)
+      } else if (cols == 2 && uiStore.isAndroid) {
+        // position mentions on top by default for Android tablets with two columns
+        top = maxCommentSuggestionsHeight + 6
+      } else {
+        // TODO:
+        // 1. Handle comment window clipping comment mentions bug for safari
+        // 2. Handle touch device virtual keyboard pushing focused windows when placed where virtual keyboard will be
+        const shouldPlaceSuggestionsAtBottomForTouchDevice =
+          decoratorRect.top + totalSuggestionsLength < window.innerHeight / 2
+        top = `${
+          shouldPlaceSuggestionsAtBottomForTouchDevice
+            ? maxCommentSuggestionsHeight + 6
+            : maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+        }px`
+      }
+
+      return {
+        transform,
+        transition,
+        top,
+      }
     }
   }
 

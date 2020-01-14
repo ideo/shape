@@ -574,6 +574,10 @@ export default class UiStore {
     return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
   }
 
+  get isIOS() {
+    return getTouchDeviceOS() === TOUCH_DEVICE_OS.IOS
+  }
+
   // NOTE: because we aren't tracking a difference between "closed" and null,
   // OrgMenu will always default back to "People & Groups" while in the process of closing/fading
   @computed
