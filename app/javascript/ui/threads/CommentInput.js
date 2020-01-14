@@ -46,7 +46,7 @@ class CommentInput extends React.Component {
 
     const { y } = uiStore.activityLogPosition
     const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // max height is the height above the input and the activity box
-    const totalSuggestionsLength = 45 * suggestions.length
+    const totalSuggestionsLength = 45 * _.clamp(suggestions.length, 0, 6)
 
     if (!uiStore.isTouchDevice) {
       const shouldPlaceSuggestionsAtBottom =
@@ -58,7 +58,7 @@ class CommentInput extends React.Component {
         top: `${
           shouldPlaceSuggestionsAtBottom
             ? maxCommentSuggestionsHeight + 6
-            : maxCommentSuggestionsHeight - (totalSuggestionsLength + 80)
+            : maxCommentSuggestionsHeight - (totalSuggestionsLength + 122)
         }px`,
       }
     } else {
@@ -133,12 +133,16 @@ class CommentInput extends React.Component {
   }
 
   onSearchChange = ({ value }) => {
-    this.searchUsersAndGroups(value)
+    const params = {
+      query: value,
+      per_page: 20,
+    }
+    this.searchUsersAndGroups(params)
   }
 
-  _searchUsersAndGroups = async query => {
+  _searchUsersAndGroups = async params => {
     const { apiStore } = this.props
-    const res = await apiStore.searchUsersAndGroups(query)
+    const res = await apiStore.searchUsersAndGroups(params)
     this.updateSuggestions(res.data)
   }
 
@@ -181,7 +185,7 @@ class CommentInput extends React.Component {
         <MentionSuggestions
           onSearchChange={this.onSearchChange}
           onOpen={this.handleOpenSuggestions}
-          onClose={this.handleClose}
+          onClose={() => {}}
           suggestions={this.suggestions.toJS()}
           entryComponent={CustomMentionSuggestion}
         />

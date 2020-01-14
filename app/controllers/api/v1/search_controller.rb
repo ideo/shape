@@ -115,7 +115,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         # TODO: enable way to surface global groups e.g. Common Resource
         organization_ids: [current_organization.id],
       },
-      per_page: 6,
+      per_page: params[:per_page] || 6,
       page: @page,
     ).search(@query)
   end

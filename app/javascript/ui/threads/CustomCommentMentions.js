@@ -101,6 +101,8 @@ export const StyledCommentInput = styled.div`
     box-sizing: border-box;
     -webkit-transform: scale(0);
     transform: scale(0);
+    max-height: 360px;
+    overflow-y: scroll;
   }
 
   .mentionSuggestionsEntryContainer {
