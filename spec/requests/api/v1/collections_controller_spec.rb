@@ -337,6 +337,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
 
       it 'broadcasts collection updates' do
+        allow(CollectionUpdateBroadcaster).to receive(:call)
         expect(CollectionUpdateBroadcaster).to receive(:call).with(
           to_collection,
           user,

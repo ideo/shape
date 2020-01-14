@@ -104,6 +104,7 @@ describe Templateable, type: :concern do
         template.setup_templated_collection(
           for_user: user,
           collection: template_instance,
+          synchronous: :first_level,
         )
       end
       let!(:deleted_card) do

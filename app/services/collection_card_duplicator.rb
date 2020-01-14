@@ -93,7 +93,7 @@ class CollectionCardDuplicator < SimpleService
       @synchronous == :all_levels,
       @building_template_instance,
     )
-    @new_cards = result if run_worker_sync
+    @new_cards = Array(result) if run_worker_sync
   end
 
   def duplicate_cards_with_placeholders
@@ -133,7 +133,7 @@ class CollectionCardDuplicator < SimpleService
   def duplicate_legend_items
     mover = LegendMover.new(
       to_collection: @to_collection,
-      cards: (@to_collection.collection_cards + @new_cards).uniq,
+      cards: (@to_collection.collection_cards + @new_cards).compact.uniq,
       action: 'duplicate',
     )
     return unless mover.call
