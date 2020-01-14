@@ -142,7 +142,7 @@ class SearchCollection extends React.Component {
 
 SearchCollection.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  trackCollectionUpdate: PropTypes.func.isRequired,
+  trackCollectionUpdated: PropTypes.func.isRequired,
 }
 SearchCollection.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

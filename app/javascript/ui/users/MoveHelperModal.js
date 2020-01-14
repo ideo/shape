@@ -15,7 +15,7 @@ import {
   DisplayText,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 
 const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;

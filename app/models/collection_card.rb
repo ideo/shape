@@ -88,6 +88,7 @@ class CollectionCard < ApplicationRecord
   delegate :can_edit?,
            :can_edit_content?,
            :can_view?,
+           :name,
            to: :record,
            allow_nil: true
 

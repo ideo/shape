@@ -29,6 +29,26 @@ RSpec.describe BulkCardOperationProcessor, type: :service do
       ])
     end
 
+    context 'on a foamcore board' do
+      let(:to_collection) { create(:board_collection, num_cards: 1) }
+      let(:placement) { Hashie::Mash.new(row: 3, col: 2) }
+
+      before do
+        # assign this a fixed value
+        to_collection.collection_cards.first.update(row: 1, col: 1)
+      end
+
+      it 'should create a placeholder card with row/col' do
+        expect {
+          subject.call
+        }.to change(CollectionCard::Placeholder, :count).by(1)
+        expect(to_collection.collection_cards.pluck(:type, :row, :col)).to eq([
+          ['CollectionCard::Primary', 1, 1],
+          ['CollectionCard::Placeholder', 3, 2],
+        ])
+      end
+    end
+
     it 'should create a text item describing the bulk operation' do
       placeholder = subject.call
       expect(placeholder.persisted?).to be true

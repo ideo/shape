@@ -185,8 +185,6 @@ class GridCard extends React.Component {
           canView={record.can_view}
           canEdit={this.canEditCard}
           canReplace={record.canReplace && !card.link && !searchResult}
-          direction={uiStore.cardMenuOpen.direction}
-          offsetPosition={this.offsetPosition}
           menuOpen={menuOpen}
           onOpen={this.openActionMenu}
           onLeave={this.closeMenu}
@@ -443,13 +441,6 @@ class GridCard extends React.Component {
   get location() {
     const { searchResult } = this.props
     return searchResult ? 'Search' : 'GridCard'
-  }
-
-  get offsetPosition() {
-    return {
-      x: uiStore.cardMenuOpen.offsetX,
-      y: uiStore.cardMenuOpen.offsetY,
-    }
   }
 
   get cardsForTagging() {

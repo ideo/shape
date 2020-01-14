@@ -11,7 +11,7 @@ import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
 import BaseRecord from './BaseRecord'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 import CollectionCard from './CollectionCard'
 import CollectionFilter from './CollectionFilter'
 import Item from './Item'
@@ -149,7 +149,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.collection_cards.length === 0) return [[]]
 
     // Get maximum dimensions of our card matrix
-    const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
+    // const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
+    const maxCol = 15
     const maxRow = _.max(this.collection_cards.map(card => card.maxRow))
 
     // Create matrix of arrays, each row having an array with the 'columns'
@@ -556,10 +557,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this._reorderCards()
   }
 
+  @action
+  clearCollectionCards() {
+    this.collection_cards.replace([])
+  }
+
   toJsonApiWithCards(onlyCardIds = []) {
     const data = this.toJsonApi()
     // attach nested attributes of cards
     if (this.collection_cards) {
+      // make sure cards are sequential
+      this._reorderCards()
       const cardAttributes = []
       _.each(this.collection_cards, card => {
         if (
@@ -624,12 +632,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (rows && cols) {
-      params.rows = rows
-      params.cols = cols
-    }
     if (rows) {
       params.rows = rows
+    }
+    if (cols) {
+      params.cols = cols
     }
     let apiPath = `collections/${
       this.id
@@ -657,11 +664,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
       if (
         page === 1 &&
+        !rows &&
         (searchTerm || this.storedCacheKey !== this.cache_key)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
         this.currentPage = 1
+        if (this.isBoard) {
+          // reset these to be recalculated in updateMaxLoaded
+          this.loadedRows = 0
+          this.loadedCols = 0
+        }
       } else {
         // NOTE: (potential pre-optimization) if collection_cards grows in size,
         // at some point do we reset back to a reasonable number?
@@ -679,8 +692,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         }
         this.collection_cards.replace(newData)
       }
+      if (this.isBoard) {
+        this.updateMaxLoadedColsRows()
+      }
     })
     return data
+  }
+
+  @action
+  updateMaxLoadedColsRows = () => {
+    const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
+    const maxCol = (_.maxBy(this.collection_cards, 'col') || { col: 0 }).col
+    if (maxRow > this.loadedRows) {
+      this.loadedRows = maxRow
+    }
+    if (maxCol > this.loadedCols) {
+      this.loadedCols = maxCol
+    }
   }
 
   /*
@@ -727,8 +755,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       // force the grid to immediately observe that things have changed
       card.updated_at = new Date()
     })
-
-    this._reorderCards()
 
     const data = this.toJsonApiWithCards(
       updateAllCards ? [] : _.keys(updatesByCardId)
@@ -1143,6 +1169,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   } = {}) {
     const { uiStore } = this
     const { cardAction } = uiStore
+    const movingFromCollectionId = uiStore.movingFromCollectionId || this.id
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
       uiStore.closeMoveMenu()
@@ -1171,24 +1198,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
-    // clearing placeholder will properly clear out multiMoveCardIds for the next step
-    uiStore.clearMdlPlaceholder()
-    if (_.isEmpty(uiStore.multiMoveCardIds)) {
-      uiStore.update('multiMoveCardIds', cardIds)
-    }
     uiStore.update('movingIntoCollection', toCollection)
 
     const success = await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),
-      from_id: this.id.toString(),
+      from_id: movingFromCollectionId,
       collection_card_ids: cardIds,
     })
-    uiStore.update('multiMoveCardIds', [])
-    uiStore.update('movingIntoCollection', null)
     if (!success) return false
 
     // Explicitly remove cards from this collection so front-end updates
-    if (cardAction === 'move') {
+    if (cardAction === 'move' && movingFromCollectionId === this.id) {
       this.removeCardIds(cardIds)
     }
 
@@ -1252,8 +1272,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // now actually make the change to the card
     _.assign(card, updates)
 
-    this._reorderCards()
-
+    // this will also reorder the cards
     const data = this.toJsonApiWithCards()
     // we don't want to receive updates which are just going to try to re-render
     data.cancel_sync = true

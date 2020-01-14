@@ -29,11 +29,12 @@ export default class CardMoveService {
     let data = {
       to_id: viewingCollection ? viewingCollection.id : null,
       from_id: movingFromCollectionId,
-      collection_card_ids: [...movingCardIds],
+      collection_card_ids: movingCardIds,
       placement,
     }
     _.assign(data, overrideData)
-
+    // always ensure non-observable array, esp. when these same ids are used by UndoStore
+    data.collection_card_ids = [...data.collection_card_ids]
     // Viewing collection might not be set, such as on the search page
     if (!data.to_id) {
       uiStore.alert("You can't move an item here")

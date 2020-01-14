@@ -316,6 +316,17 @@ class CollectionCard extends BaseRecord {
     return uiStore.dragCardMaster === this.id
   }
 
+  get shouldHideFromUI() {
+    const { uiStore } = this
+    return (
+      ((uiStore.dragging || uiStore.movingIntoCollection) &&
+        uiStore.cardAction === 'move' &&
+        this.isBeingMultiDragged) ||
+      this.isBeingMoved ||
+      this.hidden
+    )
+  }
+
   get introSection() {
     return this.section_type === 'intro'
   }
@@ -416,6 +427,7 @@ class CollectionCard extends BaseRecord {
         uiStore.trackEvent('archive', collection)
         if (
           collection.collection_cards.length === 0 &&
+          !collection.isBoard &&
           !collection.isSubmissionsCollection
         ) {
           uiStore.openBlankContentTool()
