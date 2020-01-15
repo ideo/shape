@@ -45,12 +45,19 @@ class CommentInput extends React.Component {
     const transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
 
     const { y } = uiStore.activityLogPosition
-    const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // max height is the height above the input and the activity box
-    const totalSuggestionsLength = 45 * _.clamp(suggestions.length, 0, 6)
+    const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // height above the input and the activity box
+    const maxPossibleSuggestions = uiStore.isTouchDevice ? 3 : 6 // show a max of 3.5 suggestions for phones/tablets and 6.5 suggestions for desktop
+    const clampedSuggestionsLength = _.clamp(
+      suggestions.length,
+      0,
+      maxPossibleSuggestions
+    )
+    const totalSuggestionsLength = 45 * clampedSuggestionsLength
 
     if (!uiStore.isTouchDevice) {
       const shouldPlaceSuggestionsAtBottom =
         decoratorRect.top + totalSuggestionsLength < window.innerHeight
+      const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
 
       return {
         transform,
@@ -58,7 +65,9 @@ class CommentInput extends React.Component {
         top: `${
           shouldPlaceSuggestionsAtBottom
             ? maxCommentSuggestionsHeight + 6
-            : maxCommentSuggestionsHeight - (totalSuggestionsLength + 122)
+            : clampedSuggestionsLength === maxPossibleSuggestions
+            ? newTop - 6
+            : newTop + 40
         }px`,
       }
     } else {
@@ -69,23 +78,38 @@ class CommentInput extends React.Component {
         // will place at the bottom of the comment input, use activity log height since iOS phone comment box is full-screen
         top = `${uiStore.activityLogPosition.h - 42}px`
       } else if (cols == 1 && uiStore.isAndroid) {
-        // will place at the top of the comment input
-        top = maxCommentSuggestionsHeight - (totalSuggestionsLength + 56)
-      } else if (cols == 2 && uiStore.isAndroid) {
-        // position mentions on top by default for Android tablets with two columns
-        top = maxCommentSuggestionsHeight + 6
-      } else {
-        // TODO:
-        // 1. Handle comment window clipping comment mentions bug for safari
-        // 2. Handle touch device virtual keyboard pushing focused windows when placed where virtual keyboard will be
-        const shouldPlaceSuggestionsAtBottomForTouchDevice =
-          decoratorRect.top + totalSuggestionsLength < window.innerHeight / 2
+        // will place at the top of the comment input for android phones
+        const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength
         top = `${
-          shouldPlaceSuggestionsAtBottomForTouchDevice
-            ? maxCommentSuggestionsHeight + 6
-            : maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+          clampedSuggestionsLength === maxPossibleSuggestions
+            ? newTop + 90
+            : newTop + 136
+        }px`
+      } else {
+        // FIXME: Handle touch device virtual keyboard pushing focused windows when placed where virtual keyboard will be
+        // will place at the top of the comment input
+        const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
+        top = `${
+          clampedSuggestionsLength === maxPossibleSuggestions
+            ? newTop - 30
+            : newTop
         }px`
       }
+      // NOTE: The following block will make comment mentions more responsive for tablets
+      // but commented out since safari had issues with clipping mentions based on acitivity log height
+      // } else {
+      //   const shouldPlaceSuggestionsAtBottomForTouchDevice =
+      //     decoratorRect.top + totalSuggestionsLength < window.innerHeight / 2
+      //   const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+      //
+      //   top = `${
+      //     shouldPlaceSuggestionsAtBottomForTouchDevice
+      //       ? maxCommentSuggestionsHeight + 6
+      //       : clampedSuggestionsLength === maxPossibleSuggestions
+      //       ? newTop + 12
+      //       : newTop + 38
+      //   }px`
+      // }
 
       return {
         transform,
@@ -168,9 +192,14 @@ class CommentInput extends React.Component {
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
     const plugins = [this.mentionPlugin, this.linkifyPlugin]
+    const mentionsSize = uiStore.isTouchDevice ? 'small' : 'default'
 
     return (
-      <StyledCommentInput editing onClick={this.focus}>
+      <StyledCommentInput
+        editing
+        onClick={this.focus}
+        mentionsSize={mentionsSize}
+      >
         <Editor
           editorState={editorState}
           onChange={onChange}
