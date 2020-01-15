@@ -99,8 +99,6 @@ export const StyledCommentInput = styled.div`
     -webkit-box-direction: normal;
     flex-direction: column;
     box-sizing: border-box;
-    -webkit-transform: scale(0);
-    transform: scale(0);
     max-height: ${props =>
       props.mentionsSize === 'default' ? '340px' : '190px'};
     overflow-y: scroll;

@@ -34,15 +34,8 @@ class CommentInput extends React.Component {
     const { isActive } = state
 
     if (isActive && _.isEmpty(suggestions)) {
-      return {
-        transform: 'scaleY(0)',
-        transition: 'all 0.25s cubic-bezier(.3,1,.2,1)',
-        top: '-36px',
-      }
+      return
     }
-
-    const transform = `scaleY(1)`
-    const transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
 
     const { y } = uiStore.activityLogPosition
     const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // height above the input and the activity box
@@ -60,8 +53,6 @@ class CommentInput extends React.Component {
       const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
 
       return {
-        transform,
-        transition,
         top: `${
           shouldPlaceSuggestionsAtBottom
             ? maxCommentSuggestionsHeight + 6
@@ -95,25 +86,8 @@ class CommentInput extends React.Component {
             : newTop
         }px`
       }
-      // NOTE: The following block will make comment mentions more responsive for tablets
-      // but commented out since safari had issues with clipping mentions based on acitivity log height
-      // } else {
-      //   const shouldPlaceSuggestionsAtBottomForTouchDevice =
-      //     decoratorRect.top + totalSuggestionsLength < window.innerHeight / 2
-      //   const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
-      //
-      //   top = `${
-      //     shouldPlaceSuggestionsAtBottomForTouchDevice
-      //       ? maxCommentSuggestionsHeight + 6
-      //       : clampedSuggestionsLength === maxPossibleSuggestions
-      //       ? newTop + 12
-      //       : newTop + 38
-      //   }px`
-      // }
 
       return {
-        transform,
-        transition,
         top,
       }
     }
@@ -214,7 +188,7 @@ class CommentInput extends React.Component {
         <MentionSuggestions
           onSearchChange={this.onSearchChange}
           onOpen={this.handleOpenSuggestions}
-          onClose={() => {}}
+          onClose={this.handleClose}
           suggestions={this.suggestions.toJS()}
           entryComponent={CustomMentionSuggestion}
         />
