@@ -44,7 +44,7 @@ describe('CommentThread', () => {
       ]
       const thread = {
         ...fakeThread,
-        comments: comments,
+        comments,
       }
 
       props.thread = thread

@@ -12,7 +12,7 @@ import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
-import MoveModal from '~/ui/grid/MoveModal'
+import GlobalPageComponentsContainer from '~/ui/grid/GlobalPageComponentsContainer'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import PageSeparator from '~/ui/global/PageSeparator'
@@ -98,7 +98,7 @@ class CollectionPage extends React.Component {
   }
 
   loadCollectionCards = async ({ page, per_page, rows, cols }) => {
-    const { collection } = this.props
+    const { collection, undoStore } = this.props
     // if the collection is still awaiting updates, there are no cards to load
     if (collection.awaiting_updates) {
       this.pollForUpdates()
@@ -110,6 +110,11 @@ class CollectionPage extends React.Component {
       params = { rows }
     } else {
       params = { page, per_page, rows, cols }
+    }
+
+    if (undoStore.actionAfterRoute) {
+      // clear this out before we fetch, so that any undo/redo actions don't flash a previous state of the cards
+      collection.clearCollectionCards()
     }
 
     return collection.API_fetchCards(params).then(() => {
@@ -152,11 +157,11 @@ class CollectionPage extends React.Component {
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
     }
-    if (collection.isEmpty) {
-      uiStore.openBlankContentTool()
+    if (undoStore.actionAfterRoute) {
+      undoStore.performActionAfterRoute()
     }
-    if (undoStore.undoAfterRoute) {
-      undoStore.performUndoAfterRoute()
+    if (collection.isEmpty && !collection.isBoard) {
+      uiStore.openBlankContentTool()
     }
     if (collection.joinable_group_id) {
       apiStore.checkJoinableGroup(collection.joinable_group_id)
@@ -559,7 +564,9 @@ class CollectionPage extends React.Component {
                 <SubmissionBoxSettingsModal collection={collection} />
               )}
               {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-              <MoveModal pastingCards={uiStore.pastingCards} />
+              <GlobalPageComponentsContainer
+                pastingCards={uiStore.pastingCards}
+              />
               {isSubmissionBox &&
                 apiStore.currentUser &&
                 collection.submission_box_type &&

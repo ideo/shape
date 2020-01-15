@@ -75,6 +75,7 @@ class Collection < ApplicationRecord
   include Externalizable
   include Commentable
   include Globalizable
+  include CachedAttributes
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -98,6 +99,7 @@ class Collection < ApplicationRecord
                  :cached_owned_tag_list,
                  :cached_card_count,
                  :cached_last_card_order,
+                 :cached_activity_count,
                  :submission_attrs,
                  :getting_started_shell,
                  :loading_content,
@@ -268,6 +270,7 @@ class Collection < ApplicationRecord
       updated_at: updated_at,
       archived: archived,
       master_template: master_template,
+      activity_count: activities_and_child_activities_count,
     }
   end
 
@@ -275,7 +278,7 @@ class Collection < ApplicationRecord
   # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
     {
-      master_template: master_template,
+      activity_count: activities_and_child_activities_count,
     }
   end
 
@@ -682,15 +685,16 @@ class Collection < ApplicationRecord
   end
 
   def cache_card_count!
-    # not using the store_accessor directly here because of:
-    # https://github.com/rails/rails/pull/32563
-    self.cached_attributes ||= {}
-    self.cached_attributes['cached_last_card_order'] = collection_cards.maximum(:order)
-    self.cached_attributes['cached_card_count'] = collection_cards.count
-    # update without callbacks
-    return unless changes.present?
+    cache_attributes!(
+      cached_last_card_order: collection_cards.maximum(:order),
+      cached_card_count: collection_cards.visible.count,
+    )
+  end
 
-    update_columns cached_attributes: cached_attributes, updated_at: Time.current
+  def activities_and_child_activities_count
+    (cached_activity_count || 0) +
+      all_child_collections.sum("(collections.cached_attributes->>'cached_activity_count')::INT") +
+      all_child_items.sum("(items.cached_attributes->>'cached_activity_count')::INT")
   end
 
   def update_cover_text!(text_item)

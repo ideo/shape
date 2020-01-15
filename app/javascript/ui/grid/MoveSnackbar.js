@@ -6,9 +6,8 @@ import styled from 'styled-components'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
-import MoveHelperModal from '~/ui/users/MoveHelperModal'
 import Tooltip from '~/ui/global/Tooltip'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 
 import {
   StyledSnackbar,
@@ -40,7 +39,7 @@ const CloseIconHolder = styled.span`
 
 @inject('uiStore', 'apiStore')
 @observer
-class MoveModal extends React.Component {
+class MoveSnackbar extends React.Component {
   componentDidUpdate() {
     const { uiStore, pastingCards } = this.props
     if (pastingCards) {
@@ -95,29 +94,6 @@ class MoveModal extends React.Component {
     return message
   }
 
-  get moveHelper() {
-    const { uiStore, apiStore } = this.props
-    const { cardAction, templateName } = uiStore
-    const helperProps = {
-      type: 'move',
-    }
-    if (cardAction === 'useTemplate') {
-      if (!apiStore.currentUser.show_template_helper) {
-        return null
-      }
-      helperProps.recordName = templateName
-      helperProps.type = 'template'
-    } else if (
-      !apiStore.currentUser.show_move_helper ||
-      uiStore.dismissedMoveHelper
-    ) {
-      return null
-    }
-    return (
-      <MoveHelperModal currentUser={apiStore.currentUser} {...helperProps} />
-    )
-  }
-
   get upArrowIconHolder() {
     const { uiStore } = this.props
     const { viewingCollection } = uiStore
@@ -133,7 +109,7 @@ class MoveModal extends React.Component {
         >
           <button
             onClick={this.handleMoveToBeginning}
-            data-cy="MoveModalArrow-up"
+            data-cy="MoveSnackbarArrow-up"
           >
             <MoveArrowIcon direction="up" />
           </button>
@@ -150,7 +126,10 @@ class MoveModal extends React.Component {
           title="Place at bottom"
           placement="top"
         >
-          <button onClick={this.handleMoveToEnd} data-cy="MoveModalArrow-down">
+          <button
+            onClick={this.handleMoveToEnd}
+            data-cy="MoveSnackbarArrow-down"
+          >
             <MoveArrowIcon direction="down" />
           </button>
         </Tooltip>
@@ -184,43 +163,39 @@ class MoveModal extends React.Component {
 
   render() {
     const { uiStore } = this.props
-    if (!uiStore.shouldOpenMoveModal) return null
     return (
-      <div>
-        <StyledSnackbar classes={{ root: 'Snackbar' }} open>
-          {uiStore.isLoadingMoveAction ? (
-            <SnackbarBackground>
-              <InlineLoader />
-            </SnackbarBackground>
-          ) : (
-            <Fragment>
-              <StyledSnackbarContent
-                classes={{ root: 'SnackbarContent' }}
-                message={
-                  <StyledSnackbarText id="message-id">
-                    {this.moveMessage}
-                  </StyledSnackbarText>
-                }
-                action={this.snackbarActions}
-              />
-            </Fragment>
-          )}
-        </StyledSnackbar>
-        {this.moveHelper}
-      </div>
+      <StyledSnackbar classes={{ root: 'Snackbar' }} open>
+        {uiStore.isLoadingMoveAction ? (
+          <SnackbarBackground>
+            <InlineLoader />
+          </SnackbarBackground>
+        ) : (
+          <Fragment>
+            <StyledSnackbarContent
+              classes={{ root: 'SnackbarContent' }}
+              message={
+                <StyledSnackbarText id="message-id">
+                  {this.moveMessage}
+                </StyledSnackbarText>
+              }
+              action={this.snackbarActions}
+            />
+          </Fragment>
+        )}
+      </StyledSnackbar>
     )
   }
 }
 
-MoveModal.propTypes = {
+MoveSnackbar.propTypes = {
   pastingCards: PropTypes.bool.isRequired,
 }
-MoveModal.wrappedComponent.propTypes = {
+MoveSnackbar.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-MoveModal.defaultProps = {
+MoveSnackbar.defaultProps = {
   pastingCards: false,
 }
 
-export default MoveModal
+export default MoveSnackbar

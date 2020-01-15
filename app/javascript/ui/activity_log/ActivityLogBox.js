@@ -20,7 +20,6 @@ const MIN_HEIGHT = 200
 const MAX_WIDTH = 800
 const MAX_HEIGHT = 800
 const HEADER_HEIGHT = 35
-const MOBILE_Y = 300
 
 const DEFAULT = {
   x: 0,
@@ -234,13 +233,13 @@ class ActivityLogBox extends React.Component {
   get mobileProps() {
     const { uiStore } = this.props
     if (!uiStore.activityLogForceWidth) return {}
-    const height = window.innerHeight - MOBILE_Y
+    const height = window.innerHeight
     return {
       minWidth: uiStore.activityLogForceWidth,
       minHeight: height,
       position: {
         x: 0,
-        y: MOBILE_Y,
+        y: 0,
       },
       size: {
         width: uiStore.activityLogForceWidth,

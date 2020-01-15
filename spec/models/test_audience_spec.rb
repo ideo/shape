@@ -98,6 +98,11 @@ RSpec.describe TestAudience, type: :model do
       end
       let(:test_audience) { create(:test_audience, test_collection: test_collection, sample_size: 5) }
 
+      before do
+        # call this synchronously to make sure the completion checks are triggered
+        SurveyResponseCompletion.call(survey_responses.last)
+      end
+
       context 'when it has received enough completed responses' do
         let!(:survey_responses) do
           create_list(

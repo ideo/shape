@@ -188,6 +188,7 @@ class Api::V1::BaseController < ApplicationController
   def check_page_param
     @page = params[:page].try(:to_i) ||
             params[:page].try(:[], :number) ||
+            params[:filter].try(:[], :page) ||
             1
   end
 

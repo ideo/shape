@@ -114,7 +114,6 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
 
       before do
         survey_response.update(user: user)
-        survey_response2.update(user: user)
       end
 
       it 'updates survey response payment status' do
@@ -128,6 +127,7 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
         before do
           survey_response.update(status: :completed)
           test_audience.update(price_per_response: 0)
+          survey_response2.update(user: user)
         end
 
         it 'marks the survey_response as duplicate' do
@@ -149,13 +149,21 @@ describe SurveyResponseCompletion, type: :service, truncate: true do
           user.reload.incentive_owed_account_balance.to_f,
         ).to eq(survey_response.potential_incentive)
 
-        # call it with a 2nd response
+        # call it with a 2nd response, with no user yet
+        SurveyResponseCompletion.call(survey_response2)
+        expect(survey_response2.incentive_unearned?).to be true
+        # it will initially mark as completed because we don't know the user
+        expect(survey_response2.completed?).to be true
+
+        # now add the user (as if they just filled out their info)
+        survey_response2.update(user: user)
         SurveyResponseCompletion.call(survey_response2)
         expect(
           user.reload.incentive_owed_account_balance.to_f,
         ).to eq(survey_response2.potential_incentive)
         # dupe response remains unearned
         expect(survey_response2.incentive_unearned?).to be true
+        # it will initially mark as completed because we don't know the user
         expect(survey_response2.duplicate?).to be true
       end
 

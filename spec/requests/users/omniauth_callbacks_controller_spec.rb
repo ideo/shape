@@ -15,12 +15,13 @@ describe Users::OmniauthCallbacksController, type: :request do
     let(:picture) { user.picture }
     let(:first_name) { user.first_name }
     let(:path) { '/users/auth/ideo/callback' }
+    let(:omniauth_uid) { user.uid }
 
     before do
       OmniAuth.config.test_mode = true
       OmniAuth.config.mock_auth[:ideo] = OmniAuth::AuthHash.new(
         provider: 'ideo',
-        uid: user.uid,
+        uid: omniauth_uid,
         info: {
           first_name: first_name,
           last_name: user.last_name,
@@ -99,6 +100,19 @@ describe Users::OmniauthCallbacksController, type: :request do
         expect(user.email).to eq(email)
         expect(user.picture).to eq(picture)
         expect(user.first_name).to eq(first_name)
+      end
+    end
+
+    context 'with a pending user' do
+      let!(:user) do
+        create(:user, :pending, current_organization: organization)
+      end
+      let(:omniauth_uid) { '1232xyz' }
+
+      it 'should update the user to active' do
+        post(path)
+        user.reload
+        expect(user.active?).to be true
       end
     end
 

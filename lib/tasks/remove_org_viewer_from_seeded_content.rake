@@ -1,33 +1,32 @@
 namespace :seeded_content do
   desc 'Migrate TestCollection/TestDesign setup to TestResultsCollection'
-  task remove_org_viewer: :environment do
+  task reindex: :environment do
     Organization.find_each do |org|
-      remove_org_viewer(org)
+      reindex_getting_started_clones(org)
     end
   end
 end
 
-def remove_org_viewer(org)
+def reindex_getting_started_clones(org)
   gs = org.getting_started_collection
-  # inner_count = gs.all_child_collections.count
-  puts "*** #{org.name} ***"
-  gs.recursively_fix_breadcrumbs!
+  return false unless gs.present?
 
-  primary_group = org.primary_group
+  puts "\n*** #{org.name} ***"
   all_collections = [gs] + gs.all_child_collections
-  puts "inspecting #{all_collections.count} getting started collections"
+  puts "> Inspecting #{all_collections.count} getting started collections"
   all_collections.each do |c|
-    clones_with_roles = Collection.where(cloned_from: c, roles_anchor_collection_id: nil)
-    count = clones_with_roles.count
+    clones = Collection.where(cloned_from: c)
+    count = clones.count
     next unless count.positive?
 
-    puts "removing org access from clones of #{c.name} (#{count} total)"
-    clones_with_roles.find_in_batches.each_with_index do |batch, i|
-      puts "fixing batch #{i} (#{batch.count})..."
-      batch.each do |clone|
-        primary_group.remove_role(Role::VIEWER, clone)
+    puts "Reindexing clones of #{c.name} (#{count} total)"
+    agg = 0
+    Collection.search_import.where(cloned_from: c).find_in_batches.with_index do |batch, i|
+      agg += batch.count
+      puts "Reindexing batch #{i}... #{agg}/#{count}"
+      batch.each do |record|
+        Collection.searchkick_index.remove(record)
       end
-      Collection.search_import.where(id: batch.pluck(:id)).reindex
     end
   end
 end

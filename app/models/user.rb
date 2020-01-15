@@ -255,7 +255,6 @@ class User < ApplicationRecord
         user.status = User.statuses[:limited]
       else
         user = User.find_or_initialize_by(email: attrs.email)
-        user.status = User.statuses[:active]
         # Users see terms on the Network, so we can mark them as accepted
         user.terms_accepted = true
       end
@@ -271,6 +270,7 @@ class User < ApplicationRecord
     user.last_name = attrs.last_name
     user.email = attrs.email
     user.phone = attrs.phone
+    user.status = User.statuses[:active] unless user.limited?
     if attrs.try(:locale)
       user.locale = attrs.locale
     end

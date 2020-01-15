@@ -23,7 +23,7 @@ class FilterBar extends React.Component {
     const { onSelect, filters } = this.props
     return filtersToTags({
       filters,
-      onSelect: onSelect,
+      onSelect,
     })
   }
 

@@ -46,6 +46,32 @@ describe('CollectionCard', () => {
     })
   })
 
+  describe('API_linkToMyCollection', () => {
+    beforeEach(() => {
+      uiStore.viewingCollection = { id: '1' }
+      uiStore.selectedCardIds = ['1', '2']
+      collectionCard = new CollectionCard(
+        { ...collectionCardAttributes },
+        apiStore
+      )
+    })
+
+    it('calls link API request with uiStore.selectedCardIds', async () => {
+      await collectionCard.API_linkToMyCollection()
+      const data = {
+        to_id: apiStore.currentUser.current_user_collection_id,
+        from_id: uiStore.viewingCollection.id,
+        collection_card_ids: uiStore.selectedCardIds,
+        placement: 'end',
+      }
+      expect(apiStore.request).toHaveBeenCalledWith(
+        'collection_cards/link',
+        'POST',
+        data
+      )
+    })
+  })
+
   describe('API_create', () => {
     describe('when Link (with no name) or Data item', () => {
       beforeEach(() => {

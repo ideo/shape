@@ -17,9 +17,10 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import TextareaAutosize from 'react-autosize-textarea'
-import { CloseButton } from '~/ui/global/styled/buttons'
+import { CloseButton, NamedActionButton } from '~/ui/global/styled/buttons'
 import PropTypes from 'prop-types'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import parseURLMeta from '~/utils/parseURLMeta'
 
 const removeOption = {
   type: 'remove',
@@ -298,12 +299,25 @@ class CardCoverEditor extends React.Component {
     uiStore.setEditingCardCover(null)
   }
 
+  handleRestore = async ev => {
+    const { record } = this.props.card
+    const meta = await parseURLMeta(record.url)
+    runInAction(() => {
+      this.hardcodedSubtitle = meta.description
+      this.cardTitle = meta.title
+    })
+  }
+
   @action
   setObservableInputs = () => {
     const { record } = this.props.card
     const { name } = record
     this.cardTitle = name || record.url
-    this.hardcodedSubtitle = record.subtitle
+    if (record.isCollection) {
+      this.hardcodedSubtitle = record.subtitleForEditing
+    } else if (record.isLink) {
+      this.hardcodedSubtitle = record.content
+    }
     this.subtitleHidden = record.subtitleHidden
   }
 
@@ -429,7 +443,7 @@ class CardCoverEditor extends React.Component {
                 />
               )}
               <MediumBreak />
-              {record.isCollection && (
+              {(record.isCollection || record.isLink) && (
                 <div>
                   <h3>Subtitle</h3>
                   <StyledEditTitle>
@@ -449,6 +463,16 @@ class CardCoverEditor extends React.Component {
                       </div>
                     }
                   ></LabelContainer>
+                  <br />
+                  {record.isLink && (
+                    <NamedActionButton
+                      noPadding
+                      marginBottom={20}
+                      onClick={this.handleRestore}
+                    >
+                      Restore
+                    </NamedActionButton>
+                  )}
                 </div>
               )}
             </div>

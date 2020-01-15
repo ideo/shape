@@ -8,7 +8,7 @@ import FilePreview from '~/ui/grid/covers/FilePreview'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import ImageItem from '~/ui/items/ImageItem'
 import Loader from '~/ui/layout/Loader'
-import MoveModal from '~/ui/grid/MoveModal'
+import GlobalPageComponentsContainer from '~/ui/grid/GlobalPageComponentsContainer'
 import PageContainer from '~/ui/layout/PageContainer'
 import PageHeader from '~/ui/pages/shared/PageHeader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
@@ -176,7 +176,7 @@ class ItemPage extends React.Component {
               this.content
             )}
           </PageContainer>
-          <MoveModal />
+          <GlobalPageComponentsContainer />
         </ItemPageContainer>
       </Fragment>
     )

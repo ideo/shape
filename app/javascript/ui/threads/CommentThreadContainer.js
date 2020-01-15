@@ -56,7 +56,6 @@ JumpButton.displayName = 'JumpButton'
 @observer
 class CommentThreadContainer extends React.Component {
   prevScrollPosition = 0
-  // visibleThreads = observable.map({})
   @observable
   bottomOfExpandedThread = false
   @observable

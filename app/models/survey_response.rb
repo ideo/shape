@@ -109,7 +109,11 @@ class SurveyResponse < ApplicationRecord
     # service will validate that all questions have been answered
     return unless SurveyResponseValidation.call(self)
 
-    SurveyResponseCompletion.call(self)
+    if should_queue_survey_completion?
+      SurveyResponseCompletionWorker.perform_in(1.minute, id)
+    else
+      SurveyResponseCompletion.call(self)
+    end
   end
 
   def cache_test_scores!
@@ -133,6 +137,12 @@ class SurveyResponse < ApplicationRecord
   end
 
   private
+
+  def should_queue_survey_completion?
+    # we queue this up for paid tests where they may add their info at the end,
+    # so we can properly capture duplicates
+    user.nil? && gives_incentive?
+  end
 
   def set_default_incentive_status
     self.incentive_status ||= :incentive_unearned

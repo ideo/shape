@@ -5,11 +5,12 @@ RSpec.describe Search do
   let(:expected_defaults) do
     {
       fields: [
-        'handle^6',
-        'name^5',
-        'tags^3',
+        'name^50',
+        'handle^50',
+        'tags^20',
         'content',
       ],
+      boost_by: { activity_count: { factor: 0.2, missing: 0 } },
       per_page: 10,
       page: 1,
       where: {},
@@ -37,6 +38,7 @@ RSpec.describe Search do
     expect(Searchkick).to receive(:search)
       .with(search_term,
             fields: expected_defaults[:fields],
+            boost_by: expected_defaults[:boost_by],
             foo: 'bar',
             per_page: 10,
             page: 1,
@@ -66,6 +68,7 @@ RSpec.describe Search do
     expect(Searchkick).to receive(:search)
       .with('derp',
             fields: expected_defaults[:fields],
+            boost_by: expected_defaults[:boost_by],
             per_page: 10,
             page: 1,
             where: { foo: 'bar' })

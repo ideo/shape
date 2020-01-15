@@ -68,6 +68,8 @@ module PaidTests
         .group(:user_id, :id)
         .includes(:user)
         .map(&:user)
+        .uniq
+        .compact
     end
   end
 end

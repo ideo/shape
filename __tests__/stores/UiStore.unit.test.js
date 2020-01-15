@@ -1,3 +1,4 @@
+import { runInAction } from 'mobx'
 import UiStore from '~/stores/UiStore'
 
 let uiStore
@@ -44,13 +45,55 @@ describe('UiStore', () => {
     beforeEach(() => {
       uiStore.setViewingRecord(collection)
     })
+    describe('with move action (default)', () => {
+      it('should set cardAction and movingFromCollectionId', () => {
+        uiStore.openMoveMenu({
+          from: collection,
+        })
+        expect(uiStore.cardAction).toEqual('move')
+        expect(uiStore.movingFromCollectionId).toEqual(collection.id)
+      })
+    })
     describe('with useTemplate action', () => {
       it('should set movingCardIds and templateName', () => {
-        uiStore.openMoveMenu({ from: '99', cardAction: 'useTemplate' })
+        uiStore.openMoveMenu({
+          from: collection,
+          cardAction: 'useTemplate',
+        })
         expect(uiStore.templateName).toEqual('BMC Template')
         expect(uiStore.movingCardIds).toEqual([parentId])
       })
     })
-    describe('with move action', () => {})
+  })
+
+  describe('#closeMoveMenu', () => {
+    beforeEach(() => {
+      runInAction(() => {
+        uiStore.dismissedMoveHelper = true
+        uiStore.templateName = 'blah'
+        uiStore.cardAction = 'duplicate'
+        uiStore.isLoadingMoveAction = true
+        uiStore.movingCardIds.replace(['1'])
+        uiStore.multiMoveCardIds.replace(['2'])
+        uiStore.movingIntoCollection = { id: '123' }
+        uiStore.movingFromCollectionId = '123'
+        uiStore.draggingFromMDL = true
+        uiStore.selectedCardIds = ['1', '2']
+      })
+    })
+
+    it('should clear out all related values', () => {
+      uiStore.closeMoveMenu()
+
+      expect(uiStore.dismissedMoveHelper).toEqual(false)
+      expect(uiStore.templateName).toEqual('')
+      expect(uiStore.cardAction).toEqual('move')
+      expect(uiStore.isLoadingMoveAction).toEqual(false)
+      expect(uiStore.movingCardIds).toEqual([])
+      expect(uiStore.multiMoveCardIds).toEqual([])
+      expect(uiStore.movingIntoCollection).toEqual(null)
+      expect(uiStore.movingFromCollectionId).toEqual(null)
+      expect(uiStore.draggingFromMDL).toEqual(false)
+    })
   })
 })
