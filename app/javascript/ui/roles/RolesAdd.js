@@ -88,7 +88,7 @@ class RolesAdd extends React.Component {
     if (ownerType === 'shapeAdmins') {
       searchMethod = 'searchUsers'
     }
-    apiStore[searchMethod](term)
+    apiStore[searchMethod]({ query: term })
       .then(res => {
         if (!res.data) return
         uiStore.update('autocompleteValues', res.data.length)
