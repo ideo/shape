@@ -284,7 +284,10 @@ class Collection < ApplicationRecord
 
   def all_tag_names
     # We include item tags because you currently can't search for items
-    (tags.map(&:name) + items.map(&:tags).flatten.map(&:name)).map(&:downcase).uniq
+    (
+      tags.map(&:name) +
+      items.includes(:tags).map(&:tags).flatten.map(&:name)
+    ).map(&:downcase).uniq
   end
 
   def search_content
