@@ -24,8 +24,10 @@ class FilterSearchModal extends React.Component {
   }
 
   componentDidMount() {
-    runInAction(async () => {
-      this.tagNames = await this.getOrganizationTagList()
+    this.getOrganizationTagList().then(tags => {
+      runInAction(() => {
+        this.tagNames = tags
+      })
     })
   }
 
