@@ -189,7 +189,7 @@ describe Templateable, type: :concern do
       it 'notifies all editors that card has been moved' do
         expect {
           template.update_template_instances
-        }.to change(Activity, :count).by(1)
+        }.to change(Activity, :count).by(1 + added_cards.size)
         deleted_item_in_instance = deleted_from_collection.items.where(
           cloned_from_id: deleted_card.record.id,
         ).first

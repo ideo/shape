@@ -47,6 +47,7 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def initialize_card_order
+    @order = 0
     if @placement.is_a?(String) || @placement.is_a?(Integer)
       @order = @to_collection.card_order_at(@placement)
     elsif @placement.respond_to?('[]')

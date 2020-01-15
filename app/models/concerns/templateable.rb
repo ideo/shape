@@ -31,6 +31,8 @@ module Templateable
   def setup_templated_collection(for_user:, collection:, synchronous: :async)
     # important that this is first so that the collection knows it is "templated"
     collection.update(template: self)
+    return if collection_cards.blank?
+
     CollectionCardDuplicator.call(
       to_collection: collection,
       cards: collection_cards,
