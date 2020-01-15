@@ -1,7 +1,7 @@
 require 'rails_helper'
 require_relative 'shared_setup'
 
-RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
+RSpec.describe CardDuplicatorMapper::RemapLinkedCards, type: :service do
   include_context 'CardDuplicatorMapper setup'
   let(:duplicate_to_collection) do
     create(
@@ -13,15 +13,14 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
   before do
     # Note: if you try to duplicate all cards explicitly,
     # it will turn any link cards into real duplicates
-    Sidekiq::Testing.inline! do
-      CollectionCardDuplicator.call(
-        to_collection: duplicate_to_collection,
-        cards: [parent_collection.parent_collection_card],
-        placement: 'end',
-        for_user: user,
-        batch_id: batch_id,
-      )
-    end
+    CollectionCardDuplicator.call(
+      to_collection: duplicate_to_collection,
+      cards: [parent_collection.parent_collection_card],
+      placement: 'end',
+      for_user: user,
+      batch_id: batch_id,
+      synchronous: :all_levels,
+    )
     duplicate_to_collection.reload
   end
   let(:duplicated_parent_collection) do
@@ -43,6 +42,14 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
     ).first
   end
   let(:duplicate_search_collection) do
+    duplicated_parent_collection.collections.where(type: 'Collection::SearchCollection').first
+  end
+  let(:duplicate_collection_with_filter_target) do
+    duplicated_parent_collection.collections.where(
+      cloned_from_id: collection_with_filter_target.id,
+    ).first
+  end
+  let(:duplicate_collection_with_filter) do
     duplicated_parent_collection.collections.joins(:collection_filters).first
   end
 
@@ -51,24 +58,23 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
       expect(duplicate_link_text_card.item).to eq(duplicate_text_item)
     end
 
-    it 're-assigns collection filter to duplicated search collection target' do
+    it 're-assigns search collection to duplicated search collection target' do
+      expect(duplicate_search_collection.within_collection_id.present?).to be true
       expect(
-        duplicate_search_collection.collection_filters.first.within_collection_id,
+        duplicate_search_collection.within_collection_id,
       ).to eq(
         duplicate_search_collection_target.id,
       )
     end
 
-    # TODO: it appears fakeredis may not support expiration using
-    xit 'expires cached data for this duplication batch after one day' do
-      base = CardDuplicatorMapper::Base.new(batch_id: batch_id)
-      expect(base.duplicated_cards).not_to be_empty
-      expect(base.linked_cards).not_to be_empty
-
-      Timecop.travel(25.hours.from_now) do
-        expect(base.duplicated_cards).to be_empty
-        expect(base.linked_cards).to be_empty
-      end
+    it 're-assigns collection filter to duplicated collection filter target' do
+      duplicated_filter = duplicate_collection_with_filter.collection_filters.first
+      expect(duplicated_filter.within_collection_id.present?).to be true
+      expect(
+        duplicated_filter.within_collection_id,
+      ).to eq(
+        duplicate_collection_with_filter_target.id,
+      )
     end
   end
 end

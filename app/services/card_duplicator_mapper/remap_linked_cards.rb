@@ -11,12 +11,13 @@ module CardDuplicatorMapper
         data = linked_card_data(card_id: original_card_id)
         next if data['remapper'].blank?
 
-        unless Object.const_defined?(data['remapper'])
+        klass = data['remapper'].safe_constantize
+        unless klass.is_a?(Class)
           raise "Card remapper does not exist '#{data['remapper']}' "\
                 "for card: #{original_card_id} to card: #{to_card_id}"
         end
 
-        data['remapper'].safe_constantize.call(
+        klass.call(
           batch_id: @batch_id,
           original_card_id: original_card_id,
           to_card_id: to_card_id,

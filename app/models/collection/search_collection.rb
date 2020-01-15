@@ -66,5 +66,22 @@
 
 class Collection
   class SearchCollection < Collection
+
+    def reassign_search_term_within!(from_collection_id:, to_collection_id:)
+      prev_search_term = search_term.dup
+      search_term.sub!(
+        "within:#{from_collection_id}",
+        "within:#{to_collection_id}",
+      )
+      # Update collection name if it was the search term
+      self.name = search_term if name == prev_search_term
+      save
+    end
+
+    def within_collection_id
+      return if search_term.blank?
+
+      Search::Filters::WithinCollection.new(search_term).within_collection_id
+    end
   end
 end

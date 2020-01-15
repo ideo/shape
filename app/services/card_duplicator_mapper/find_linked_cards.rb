@@ -17,12 +17,16 @@ module CardDuplicatorMapper
         register_link_card(card)
       end
 
-      all_search_collection_filters_by_collection_id.each do |collection_id, collection_filters|
-        card_id = Collection.where(id: collection_id)
-                            .joins(:parent_collection_card)
-                            .first
-                            .parent_collection_card
-                            .id
+      all_search_collections.each do |search_collection|
+        register_card_with_search_collection(
+          search_collection.parent_collection_card.id,
+          search_collection,
+        )
+      end
+
+      all_collections_with_filters_by_collection_id.each do |collection_id, collection_filters|
+        card_id = parent_collection_card_id_for_collection(collection_id)
+
         collection_filters.each do |collection_filter|
           register_card_with_collection_filter(card_id, collection_filter)
         end
@@ -32,6 +36,15 @@ module CardDuplicatorMapper
     end
 
     private
+
+    def parent_collection_card_id_for_collection(collection_id)
+      Collection
+        .where(id: collection_id)
+        .joins(:parent_collection_card)
+        .first
+        &.parent_collection_card
+        &.id
+    end
 
     def all_link_cards
       return @all_link_cards if @all_link_cards.present?
@@ -45,16 +58,22 @@ module CardDuplicatorMapper
       @all_link_cards = links.uniq
     end
 
-    def all_search_collection_filters_by_collection_id
-      return @all_search_collection_filters if @all_search_collection_filters.present?
+    def all_collections_with_filters_by_collection_id
+      return @all_collections_with_filters_by_collection_id if @all_collections_with_filters_by_collection_id.present?
 
-      search_collection_filters = CollectionFilter.search.where(
+      collection_filters = CollectionFilter.search.where(
         collection_id: @all_collections.map(&:id),
       ).select { |cf| cf.within_collection_id.present? }
 
-      @all_search_collection_filters = search_collection_filters.each_with_object({}) do |cf, h|
+      @all_collections_with_filters_by_collection_id = collection_filters.each_with_object({}) do |cf, h|
         h[cf.collection_id] ||= []
         h[cf.collection_id] << cf
+      end
+    end
+
+    def all_search_collections
+      all_collections.select do |collection|
+        collection.is_a?(Collection::SearchCollection)
       end
     end
 
@@ -111,6 +130,10 @@ module CardDuplicatorMapper
       )
     end
 
+    def loaded_card_ids
+      @loaded_card_ids ||= load_cards.map(&:id)
+    end
+
     def register_link_card(card)
       # Only register if this link card points to an item that will be duplicated
       return if !all_collections.include?(card.record) && !all_items.include?(card.record)
@@ -124,11 +147,11 @@ module CardDuplicatorMapper
           record_card_id: record_parent_collection_card.id.to_s,
         },
       )
-      # Also register the linked record's card
-      # So that we wait for it to be duplicated before re-linking
+      # Register referenced card to wait for it to be duplicated before re-linking
+      # But what happens if it isn't included in the cards to be duplicated?
       register_linked_card(
         card_id: record_parent_collection_card.id,
-        data: {}, # No remapper is necessary
+        data: {},
       )
     end
 
@@ -136,9 +159,37 @@ module CardDuplicatorMapper
       register_linked_card(
         card_id: card_id,
         data: {
-          remapper: 'CardDuplicatorMapper::RemapSearchFilter',
+          remapper: 'CardDuplicatorMapper::RemapCollectionFilter',
           within_collection_id: collection_filter.within_collection_id,
         },
+      )
+      # Register referenced card to wait for it to be duplicated before re-linking
+      referenced_card_id = parent_collection_card_id_for_collection(collection_filter.within_collection_id)
+      # Return if it won't be duplicated
+      return unless loaded_card_ids.include?(referenced_card_id)
+
+      register_linked_card(
+        card_id: parent_collection_card_id_for_collection(collection_filter.within_collection_id),
+        data: {},
+      )
+    end
+
+    def register_card_with_search_collection(card_id, search_collection)
+      register_linked_card(
+        card_id: card_id,
+        data: {
+          remapper: 'CardDuplicatorMapper::RemapSearchCollection',
+          within_collection_id: search_collection.within_collection_id,
+        },
+      )
+      # Register referenced card to wait for it to be duplicated before re-linking
+      referenced_card_id = parent_collection_card_id_for_collection(search_collection.within_collection_id)
+      # Return if it won't be duplicated
+      return unless loaded_card_ids.include?(referenced_card_id)
+
+      register_linked_card(
+        card_id: parent_collection_card_id_for_collection(search_collection.within_collection_id),
+        data: {},
       )
     end
   end

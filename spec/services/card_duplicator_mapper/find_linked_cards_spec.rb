@@ -22,8 +22,12 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
       linked_card_record_card = linked_text_card.record.parent_collection_card
       expect(subject.linked_cards).to eq(
         search_collection.parent_collection_card.id.to_s => {
-          'remapper' => 'CardDuplicatorMapper::RemapSearchFilter',
+          'remapper' => 'CardDuplicatorMapper::RemapSearchCollection',
           'within_collection_id' => search_collection_target.id,
+        },
+        collection_with_filter.parent_collection_card.id.to_s => {
+          'remapper' => 'CardDuplicatorMapper::RemapCollectionFilter',
+          'within_collection_id' => collection_with_filter_target.id,
         },
         linked_text_card.id.to_s => {
           'remapper' => 'CardDuplicatorMapper::RemapLinkItem',

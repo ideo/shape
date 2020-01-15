@@ -7,12 +7,20 @@ RSpec.shared_context 'CardDuplicatorMapper setup' do
   let!(:parent_collection) { create(:collection, parent_collection: root_collection) }
   let(:text_item) { create(:text_item, parent_collection: parent_collection) }
   let!(:search_collection_target) { create(:collection, parent_collection: parent_collection) }
-  let!(:search_collection) { create(:collection, parent_collection: parent_collection) }
+  let!(:search_collection) do
+    create(
+      :search_collection,
+      parent_collection: parent_collection,
+      search_term: "planet within:#{search_collection_target.id}",
+    )
+  end
+  let!(:collection_with_filter_target) { create(:collection, parent_collection: parent_collection) }
+  let!(:collection_with_filter) { create(:collection, parent_collection: parent_collection) }
   let!(:collection_filter) do
     create(
       :collection_filter,
-      collection: search_collection,
-      text: "galactic within:#{search_collection_target.id}",
+      collection: collection_with_filter,
+      text: "galactic within:#{collection_with_filter_target.id}",
     )
   end
   let!(:linked_text_card) { create(:collection_card_link_text, parent: parent_collection, item: text_item) }
@@ -21,6 +29,8 @@ RSpec.shared_context 'CardDuplicatorMapper setup' do
       text_item.parent_collection_card,
       search_collection.parent_collection_card,
       search_collection_target.parent_collection_card,
+      collection_with_filter.parent_collection_card,
+      collection_with_filter_target.parent_collection_card,
       linked_text_card,
     ]
   end

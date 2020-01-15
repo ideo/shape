@@ -31,6 +31,7 @@ FactoryBot.define do
     factory :user_profile, class: Collection::UserProfile
     factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection
+    factory :search_collection, class: Collection::SearchCollection
 
     factory :private_collection do
       after(:create, &:mark_as_private!)

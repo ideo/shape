@@ -1,5 +1,5 @@
 module CardDuplicatorMapper
-  class RemapSearchFilter < Base
+  class RemapSearchCollection < Base
     def initialize(batch_id:, original_card_id:, to_card_id:, data:)
       @batch_id = batch_id
       @original_card_id = original_card_id
@@ -8,9 +8,9 @@ module CardDuplicatorMapper
     end
 
     def call
-      return if duplicated_filter.blank?
+      return if duplicated_search_collection.blank?
 
-      duplicated_filter.reassign_within!(
+      duplicated_search_collection.reassign_search_term_within!(
         from_collection_id: original_search_target.id,
         to_collection_id: search_target_duplicate_card.collection_id,
       )
@@ -18,10 +18,8 @@ module CardDuplicatorMapper
 
     private
 
-    def duplicated_filter
-      new_card.collection.collection_filters.find do |new_filter|
-        new_filter.within_collection_id == original_search_target.id
-      end
+    def duplicated_search_collection
+      new_card.collection
     end
 
     def original_search_target
@@ -40,7 +38,7 @@ module CardDuplicatorMapper
 
     def new_card
       @new_card ||= CollectionCard.where(id: @to_card_id)
-                                  .includes(collection: :collection_filters)
+                                  .includes(:collection)
                                   .first
     end
   end
