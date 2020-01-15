@@ -213,22 +213,22 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  searchUsersAndGroups({ query = '', per_page = null } = {}) {
+  searchUsersAndGroups(params = {}) {
+    // possible params: query, per_page, users_only, groups_only
+    const defaultParams = { query: '' }
     return this.request(
-      `search/users_and_groups?query=${query}&per_page=${per_page}`
+      `search/users_and_groups?${queryString.stringify(
+        _.merge(defaultParams, params)
+      )}`
     )
   }
 
-  searchUsers(query) {
-    return this.request(
-      `search/users_and_groups?query=${query}&users_only=true`
-    )
+  searchUsers({ query }) {
+    return this.searchUsersAndGroups({ query, users_only: true })
   }
 
-  searchGroups(query) {
-    return this.request(
-      `search/users_and_groups?query=${query}&groups_only=true`
-    )
+  searchGroups({ query }) {
+    return this.searchUsersAndGroups({ query, groups_only: true })
   }
 
   searchOrganizations(query) {
