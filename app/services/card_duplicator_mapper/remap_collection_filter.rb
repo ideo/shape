@@ -8,7 +8,7 @@ module CardDuplicatorMapper
     end
 
     def call
-      return if duplicated_filter.blank?
+      return if duplicated_filter.blank? || search_target_duplicate_card.blank?
 
       duplicated_filter.reassign_within!(
         from_collection_id: original_search_target.id,
@@ -35,7 +35,7 @@ module CardDuplicatorMapper
         original_card_id: original_search_target.parent_collection_card.id,
       )
 
-      CollectionCard.find(search_target_duplicate_card_id)
+      CollectionCard.find_by(id: search_target_duplicate_card_id)
     end
 
     def new_card
