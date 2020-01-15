@@ -48,8 +48,8 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
       cards[5].update(row: 2, col: 2, width: 2, height: 1)
       moving_cards[0].update(row: 3, col: 5)
       moving_cards[1].update(row: 3, col: 6)
-      moving_cards[1].update(row: 3, col: 7)
-      moving_cards[1].update(row: 4, col: 5)
+      moving_cards[2].update(row: 3, col: 7)
+      moving_cards[3].update(row: 4, col: 5)
     end
 
     it 'should insert cards into the layout without collision' do
@@ -61,11 +61,11 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
         from_collection: from_collection,
         moving_cards: moving_cards,
       )
-      expect(moving_cards.pluck(:col, :row)).to eq([
-        [1, 2],
-        [3, 1],
-        [5, 1],
-        [5, 2],
+      expect(moving_cards.pluck(:row, :col)).to eq([
+        [2, 1],
+        [1, 3],
+        [1, 5],
+        [2, 5],
       ])
     end
   end

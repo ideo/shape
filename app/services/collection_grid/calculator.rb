@@ -88,11 +88,12 @@ module CollectionGrid
 
       max_col = 15
       max_row = collection.collection_cards.map { |card| card_max_row(card) }.max
-      matrix = Array.new(max_row + 1){Array.new(max_col + 1)}
+      # matrix = Array.new(max_row + 1){Array.new(max_col + 1)}
+      matrix = Array.new(16){Array.new(16)}
 
       collection.collection_cards.each do |card|
-        rows = [card.row..card_max_row(card) + 1]
-        cols = [card.col..card_max_col(card) + 1]
+        rows =* (card.row..card_max_row(card) + 1)
+        cols =* (card.col..card_max_col(card) + 1)
 
         rows.each do |row|
           cols.each do |col|
@@ -103,7 +104,7 @@ module CollectionGrid
       matrix
     end
 
-    def self.determine_foamcore_drag_map(
+    def self.determine_drag_map(
       master_card:,
       moving_cards:,
       from_collection:
@@ -117,23 +118,30 @@ module CollectionGrid
         col = card.col
         master_col = master_card.col
         master_row = master_card.row
-        return {
+        Hashie::Mash.new(
           card: card,
           col: col - master_col,
           row: row - master_row,
-        }
+        )
       end
       drag_map
     end
 
     def self.update_drag_grid_spot_with_open_position(
-      placeholder:,
-      open_spot_matrix:
+      card:,
+      position:,
+      open_spot_matrix:,
+      drag_grid_spot:
     )
-      open_spot = find_closest_open_spot(placeholder, open_spot_matrix)
+      open_spot = find_closest_open_spot(position, open_spot_matrix)
       return false unless open_spot
-      card.row = open_spot.row
-      card.col = open_spot.col
+      card.row = open_spot[:row]
+      card.col = open_spot[:col]
+      drag_grid_spot[get_map_key(col: open_spot[:col], row: open_spot[:row])] = card
+    end
+
+    def self.get_map_key(col:, row:)
+      "#{col},#{row}"
     end
 
     def self.foamcore_collision(
@@ -144,6 +152,7 @@ module CollectionGrid
       from_collection:,
       moving_cards:
     )
+      drag_grid_spot = {}
       placeholder = Hashie::Mash.new(
         row: row,
         col: col,
@@ -153,29 +162,38 @@ module CollectionGrid
       open_spot_matrix = calculate_open_spot_matrix(
         collection: collection,
         moving_cards: moving_cards,
-        drag_grid_spot: placeholder,
+        drag_grid_spot: drag_grid_spot,
       )
-      master_card.row = placeholder.row
-      master_card.col = placeholder.col
-      update_drag_grid_spot_with_open_position(
-        placeholder: master_card,
-        open_spot_matrix: open_spot_matrix,
-      )
-      drag_map = determine_foamcore_drag_map(
+      drag_map = determine_drag_map(
         master_card: master_card,
         moving_cards: moving_cards,
         from_collection: from_collection,
       )
+      update_drag_grid_spot_with_open_position(
+        card: master_card,
+        position: placeholder,
+        open_spot_matrix: open_spot_matrix,
+        drag_grid_spot: drag_grid_spot,
+      )
       debugger
-      drag_map.values.each do |mapped|
+      drag_map.each do |mapped|
+        # TODO remove this position duplication
+        position = Hashie::Mash.new(
+          row: mapped.row,
+          col: mapped.col,
+          width: mapped.card.width,
+          height: mapped.card.height,
+        )
         open_spot_matrix = calculate_open_spot_matrix(
           collection: collection,
           moving_cards: moving_cards,
-          drag_grid_spot: mapped,
+          drag_grid_spot: drag_grid_spot,
         )
         update_drag_grid_spot_with_open_position(
-          placeholder: mapped,
+          card: mapped.card,
+          position: position,
           open_spot_matrix: open_spot_matrix,
+          drag_grid_spot: drag_grid_spot,
         )
       end
     end
@@ -219,15 +237,15 @@ module CollectionGrid
               possibilities.push(row: row_idx, col: col_idx, distance: distance)
             end
             if exact_fit || possibilities.size > 32
-              return false
+              break
             end
           end
         end
         if exact_fit || possibilities.size > 32
-          return false
+          break
         end
       end
-      possibilities = possibilities.sort_by(&:distance)
+      possibilities = possibilities.sort_by { |p| p[:distance] }
       closest = possibilities.first
       closest || false
     end
@@ -245,11 +263,11 @@ module CollectionGrid
 
       card_matrix.each_with_index do |row, row_idx|
         open = 0
-        open_spot_matrix[row_idx] = [0..16]
+        open_spot_matrix[row_idx] = Array.new(16)
         reversed = row.reverse
 
         reversed.each_with_index do |card, col_idx|
-          if card && moving_cards.include?(card.id)
+          if card.present? && !moving_cards.pluck(:id).include?(card.id)
             open = 0
           else
             open += 1
@@ -265,10 +283,11 @@ module CollectionGrid
       drag_grid_spot:
     )
       card_matrix = board_matrix(collection: collection)
-      dragging_placeholders = [drag_grid_spot]
+      dragging_placeholders = drag_grid_spot.values
+      debugger
       dragging_placeholders.each do |placeholder|
-        max_row = placeholder.row + placeholder.height
-        max_col = placeholder.col + placeholder.width
+        max_row = placeholder.row + placeholder.height - 1
+        max_col = placeholder.col + placeholder.width - 1
         rows = [placeholder.row..max_row]
         cols = [placeholder.col..max_col]
 
