@@ -19,16 +19,16 @@ module CardDuplicatorMapper
 
       all_search_collections.each do |search_collection|
         register_card_with_search_collection(
-          search_collection.parent_collection_card.id,
+          search_collection.parent_collection_card,
           search_collection,
         )
       end
 
       all_collections_with_filters_by_collection_id.each do |collection_id, collection_filters|
-        card_id = parent_collection_card_id_for_collection(collection_id)
+        card = parent_collection_card_for_collection(collection_id)
 
         collection_filters.each do |collection_filter|
-          register_card_with_collection_filter(card_id, collection_filter)
+          register_card_with_collection_filter(card, collection_filter)
         end
       end
 
@@ -37,13 +37,12 @@ module CardDuplicatorMapper
 
     private
 
-    def parent_collection_card_id_for_collection(collection_id)
+    def parent_collection_card_for_collection(collection_id)
       Collection
         .where(id: collection_id)
         .joins(:parent_collection_card)
         .first
         &.parent_collection_card
-        &.id
     end
 
     def all_link_cards
@@ -130,8 +129,14 @@ module CardDuplicatorMapper
       )
     end
 
-    def loaded_card_ids
-      @loaded_card_ids ||= load_cards.map(&:id)
+    def record_will_be_duplicated?(record)
+      if record.is_a?(Item)
+        all_items.include?(record)
+      elsif record.is_a?(Collection)
+        all_collections.include?(record)
+      else
+        false
+      end
     end
 
     def register_link_card(card)
@@ -148,47 +153,49 @@ module CardDuplicatorMapper
         },
       )
       # Register referenced card to wait for it to be duplicated before re-linking
-      # But what happens if it isn't included in the cards to be duplicated?
+      # If it is among the cards being duplicated
+      return unless record_will_be_duplicated?(card.record)
+
       register_linked_card(
         card_id: record_parent_collection_card.id,
         data: {},
       )
     end
 
-    def register_card_with_collection_filter(card_id, collection_filter)
+    def register_card_with_collection_filter(card, collection_filter)
       register_linked_card(
-        card_id: card_id,
+        card_id: card.id,
         data: {
           remapper: 'CardDuplicatorMapper::RemapCollectionFilter',
           within_collection_id: collection_filter.within_collection_id,
         },
       )
       # Register referenced card to wait for it to be duplicated before re-linking
-      referenced_card_id = parent_collection_card_id_for_collection(collection_filter.within_collection_id)
+      referenced_card = parent_collection_card_for_collection(collection_filter.within_collection_id)
       # Return if it won't be duplicated
-      return unless loaded_card_ids.include?(referenced_card_id)
+      return unless record_will_be_duplicated?(referenced_card.record)
 
       register_linked_card(
-        card_id: parent_collection_card_id_for_collection(collection_filter.within_collection_id),
+        card_id: referenced_card.id,
         data: {},
       )
     end
 
-    def register_card_with_search_collection(card_id, search_collection)
+    def register_card_with_search_collection(card, search_collection)
       register_linked_card(
-        card_id: card_id,
+        card_id: card.id,
         data: {
           remapper: 'CardDuplicatorMapper::RemapSearchCollection',
           within_collection_id: search_collection.within_collection_id,
         },
       )
       # Register referenced card to wait for it to be duplicated before re-linking
-      referenced_card_id = parent_collection_card_id_for_collection(search_collection.within_collection_id)
+      referenced_card = parent_collection_card_for_collection(search_collection.within_collection_id)
       # Return if it won't be duplicated
-      return unless loaded_card_ids.include?(referenced_card_id)
+      return unless record_will_be_duplicated?(referenced_card.record)
 
       register_linked_card(
-        card_id: parent_collection_card_id_for_collection(search_collection.within_collection_id),
+        card_id: referenced_card.id,
         data: {},
       )
     end

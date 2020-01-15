@@ -17,23 +17,39 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
       allow(CardDuplicatorMapper::RemapLinkedCards).to receive(:call)
     end
 
-    it 'registers all linked cards' do
+    it 'registers link card and card it references' do
       subject.call
       linked_card_record_card = linked_text_card.record.parent_collection_card
-      expect(subject.linked_cards).to eq(
-        search_collection.parent_collection_card.id.to_s => {
-          'remapper' => 'CardDuplicatorMapper::RemapSearchCollection',
-          'within_collection_id' => search_collection_target.id,
-        },
-        collection_with_filter.parent_collection_card.id.to_s => {
-          'remapper' => 'CardDuplicatorMapper::RemapCollectionFilter',
-          'within_collection_id' => collection_with_filter_target.id,
-        },
+      expect(subject.linked_cards).to include(
         linked_text_card.id.to_s => {
           'remapper' => 'CardDuplicatorMapper::RemapLinkItem',
           'record_card_id' => linked_card_record_card.id.to_s,
         },
         linked_card_record_card.id.to_s => {},
+      )
+    end
+
+    it 'registers search collection and referenced collection' do
+      subject.call
+      linked_collection_card = search_collection_target.parent_collection_card
+      expect(subject.linked_cards).to include(
+        search_collection.parent_collection_card.id.to_s => {
+          'remapper' => 'CardDuplicatorMapper::RemapSearchCollection',
+          'within_collection_id' => search_collection_target.id,
+        },
+        linked_collection_card.id.to_s => {},
+      )
+    end
+
+    it 'registers collection with filter and referenced collection card' do
+      subject.call
+      linked_collection_card = collection_with_filter_target.parent_collection_card
+      expect(subject.linked_cards).to include(
+        collection_with_filter.parent_collection_card.id.to_s => {
+          'remapper' => 'CardDuplicatorMapper::RemapCollectionFilter',
+          'within_collection_id' => collection_with_filter_target.id,
+        },
+        linked_collection_card.id.to_s => {},
       )
     end
   end
