@@ -59,15 +59,52 @@ RSpec.describe CollectionCardDuplicator, type: :service do
     end
 
     context 'when to_collection is a foamcore board' do
-      let!(:to_collection) { create(:board_collection, num_cards: 3, add_editors: [user]) }
+      let!(:to_collection) { create(:board_collection, add_editors: [user]) }
+      let(:placement) { 'end' }
       let(:new_cards) { service.call }
-      let(:target_empty_row) { to_collection.empty_row_for_moving_cards }
 
       it 'sets row of duplicated cards 2 rows after the last non-blank row' do
+        target_empty_row = to_collection.empty_row_for_moving_cards
         new_cards.each_with_index do |card, index|
           expect(card.parent_id).to eq to_collection.id
           expect(card.row).to eq target_empty_row
           expect(card.col).to eq index
+        end
+      end
+
+      context 'with placement as row/col values, moving to a foamcore board' do
+        let(:placement) { Hashie::Mash.new(row: 2, col: 3) }
+
+        it 'moves cards to targeted area' do
+          # they are all 1x1 so should fit consecutively
+          new_cards.each_with_index do |card, index|
+            expect(card.parent_id).to eq to_collection.id
+            expect(card.row).to eq 2
+            expect(card.col).to eq 3 + index
+          end
+        end
+      end
+
+      context 'when from_collection is a foamcore board' do
+        let!(:from_collection) { create(:board_collection, num_cards: 3, add_viewers: [user]) }
+        let(:placement) { Hashie::Mash.new(row: 2, col: 3) }
+
+        before do
+          moving_cards.each_with_index do |card, index|
+            card.update(
+              row: index * 2,
+              col: index * 2,
+            )
+          end
+        end
+
+        it 'moves cards to targeted area' do
+          # they are all 1x1 so should fit consecutively
+          new_cards.each_with_index do |card, index|
+            expect(card.parent_id).to eq to_collection.id
+            expect(card.row).to eq(2 + (index * 2))
+            expect(card.col).to eq(3 + (index * 2))
+          end
         end
       end
     end

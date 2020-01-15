@@ -3,9 +3,9 @@ import { fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 
-jest.mock('../../../app/javascript/ui/grid/CardMoveService')
+jest.mock('../../../app/javascript/utils/CardMoveService')
 
 let props, wrapper, component, uiStore, routingStore
 

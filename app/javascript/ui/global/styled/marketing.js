@@ -19,7 +19,11 @@ MarketingBack.displayName = 'StyledMarketingBack'
 
 /** @component */
 export const MarketingGradientTop = styled(MarketingBack)`
-  background: linear-gradient(to bottom, transparent 0%, ${v.colors.white} 100%),
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 1) 100%
+    ),
     url(${organicGridPillGray}), no-repeat, right, top;
   overflow: hidden;
   position: relative;

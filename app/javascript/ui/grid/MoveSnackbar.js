@@ -7,7 +7,7 @@ import CloseIcon from '~/ui/icons/CloseIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import MoveArrowIcon from '~/ui/icons/MoveArrowIcon'
 import Tooltip from '~/ui/global/Tooltip'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 
 import {
   StyledSnackbar,
