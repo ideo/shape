@@ -52,8 +52,7 @@ const DeleteIconHolder = styled.span`
 const SymbolHolder = styled.span`
   width: ${props => props.symbolSize || 16}px;
   height: ${props => props.symbolSize || 16}px;
-  margin-right: ${props =>
-    !props.symbolSize || props.symbolSize === 16 ? 4 : 10}px;
+  margin-right: ${props => (props.selectable ? 6 : 12)}px;
 `
 
 const Pill = props => {
@@ -79,7 +78,7 @@ const Pill = props => {
     <PillWrapper {...wrapperProps}>
       {selectable && (
         <Checkbox
-          style={{ marginRight: '6px' }}
+          style={{ marginRight: '0px', marginLeft: '-4px' }}
           color="primary"
           checked={selected}
           onChange={ev => {
@@ -88,7 +87,11 @@ const Pill = props => {
           value="yes"
         />
       )}
-      {symbol && <SymbolHolder symbolSize={symbolSize}>{symbol}</SymbolHolder>}
+      {symbol && (
+        <SymbolHolder selectable={selectable} symbolSize={symbolSize}>
+          {symbol}
+        </SymbolHolder>
+      )}
       <DisplayText>{label}</DisplayText>
       {onDelete && (
         <DeleteIconHolder>

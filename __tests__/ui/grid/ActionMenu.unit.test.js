@@ -122,7 +122,10 @@ describe('ActionMenu', () => {
     })
 
     it('should close the move menu', () => {
-      expect(props.uiStore.closeMoveMenu).toHaveBeenCalled()
+      expect(props.uiStore.selectCardId).toHaveBeenCalledWith(props.card.id)
+      expect(props.uiStore.closeMoveMenu).toHaveBeenCalledWith({
+        deselect: false,
+      })
     })
 
     it('should call the API to link to my collection', () => {
