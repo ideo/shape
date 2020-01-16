@@ -535,8 +535,8 @@ describe Collection, type: :model do
     end
 
     it 'should gather collection tags' do
-      collection.update(tag_list: %w[this that])
-      expect(collection.reload.all_tag_names).to match_array %w[this that]
+      collection.update(tag_list: ['this', 'interstellar space dust'])
+      expect(collection.reload.all_tag_names).to match_array ['this', 'interstellar space dust']
     end
 
     it 'should gather collection + item tags' do
