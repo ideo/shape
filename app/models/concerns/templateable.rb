@@ -52,7 +52,7 @@ module Templateable
     # no need to queue up the job for nonexistent instances
     return unless master_template? && templated_collections.active.present?
 
-    UpdateTemplateInstancesWorker.new.perform(id, updated_card_ids, template_update_action)
+    UpdateTemplateInstancesWorker.perform_async(id, updated_card_ids, template_update_action)
   end
 
   def update_test_template_instance_types!

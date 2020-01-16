@@ -80,7 +80,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email add_tag remove_tag]
   after_action :broadcast_collection_archive_updates, only: %i[archive unarchive unarchive_from_email]
   def archive
-    @collection_cards.archive_all!(user_id: current_user.id)
+    CollectionCard.archive_all!(ids: @collection_cards.pluck(:id), user_id: current_user.id)
     render json: { archived: true }
   end
 

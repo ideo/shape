@@ -348,15 +348,7 @@ class CollectionCard < ApplicationRecord
   end
 
   # gets called by API collection_cards_controller
-  def self.archive_all!(user_id:)
-    # should only ever be used on a subset of cards, e.g. not `all`!
-    unless scope_attributes['id'].present? || scope_attributes['parent_id'].present?
-      return false
-    end
-
-    # capture these before `self` potentially gets altered by archive scope
-    ids = pluck(:id)
-    # ensure we're now working with an unscoped AR::Relation
+  def self.archive_all!(ids:, user_id:)
     cards = CollectionCard.where(id: ids)
     cards.update_all(archived: true)
     # should generally only be the one parent collection, but an array to be safe

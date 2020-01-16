@@ -12,16 +12,19 @@ class TemplateInstanceUpdater
   def update_template_instances
     return unless @updated_card_ids.any?
 
+    templated_collections = @master_template.templated_collections.active
+
     case @template_update_action
-    when 'update_all', 'unarchive'
-      @master_template.templated_collections.active.map { |i| update_all_templated_cards_for_instance(i) }
+    when 'update_all'
+      templated_collections.map { |i| update_all_templated_cards_for_instance(i) }
     when 'pin'
-      @master_template.templated_collections.active.map { |i| update_all_templated_cards_for_instance(i) }
-      @master_template.templated_collections.active.map(&:reorder_cards!) # pinning/unpinning from master_template modifies the card order
+      templated_collections.map { |i| pin_templated_cards_for_instance(i) }
     when 'archive'
-      @master_template.templated_collections.active.map { |i| move_cards_deleted_from_master_template(i) }
+      templated_collections.map { |i| move_cards_archived_from_master_template(i) }
+    when 'unarchive'
+      templated_collections.map { |i| move_cards_unarchived_from_master_template(i) }
     when 'create', 'duplicate'
-      @master_template.templated_collections.active.map { |i| add_cards_from_master_template(i) }
+      templated_collections.map { |i| add_new_templated_cards_for_instance(i) }
     else
       return
     end
@@ -38,8 +41,42 @@ class TemplateInstanceUpdater
     update_instance_cards_by_templated_from_ids(@updated_card_ids, instance)
   end
 
-  def add_cards_from_master_template(instance)
-    @updated_card_ids.each do |id|
+  def pin_templated_cards_for_instance(instance)
+    find_and_move_or_create_instance_cards(@updated_card_ids, instance)
+    update_instance_cards_by_templated_from_ids(@updated_card_ids, instance)
+  end
+
+  def add_new_templated_cards_for_instance(instance)
+    add_cards_from_master_template(@updated_card_ids, instance)
+    update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
+  end
+
+  def move_cards_archived_from_master_template(instance)
+    move_cards_to_deleted_from_collection(@updated_card_ids, instance)
+    update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
+  end
+
+  def move_cards_unarchived_from_master_template(instance)
+    find_and_move_or_create_instance_cards(@updated_card_ids, instance)
+    update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
+  end
+
+  def update_instance_cards_by_templated_from_ids(templated_from_ids, instance)
+    templated_from_ids.each do |id|
+      master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
+      instance_card = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
+
+      next if master_card.blank? || instance_card.blank?
+
+      TemplateInstanceCardUpdater.call(instance_card: instance_card, master_card: master_card, master_template: @master_template)
+    end
+
+    instance.reorder_cards!
+    instance.touch
+  end
+
+  def add_cards_from_master_template(adding_cards, instance)
+    adding_cards.each do |id|
       master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
       if instance.is_a?(Collection::TestCollection)
         next unless master_card.card_question_type.present?
@@ -54,12 +91,10 @@ class TemplateInstanceUpdater
         building_template_instance: true,
       )
     end
-    # NOTE: only the cards after the new instance card needs to be updated to improve performance
-    update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
   end
 
-  def move_cards_deleted_from_master_template(instance)
-    cards = instance.collection_cards.select { |cc| @updated_card_ids.include? cc.templated_from_id }
+  def move_cards_to_deleted_from_collection(moving_to_deleted_ids, instance)
+    cards = instance.collection_cards.select { |cc| moving_to_deleted_ids.include? cc.templated_from_id }
     return unless cards.present?
 
     if instance.is_a?(Collection::TestCollection)
@@ -69,8 +104,7 @@ class TemplateInstanceUpdater
     end
     deleted_cards_coll = find_or_create_deleted_cards_collection(instance)
 
-    # FIXME: How can we make this block behave like a 'transaction'?
-    # transaction do
+    ActiveRecord::Base.transaction do
       # TODO: do something here if the cards already exist in the deleted coll?
       # e.g. when template editor archives/unarchives cards
       card_mover = CardMover.new(
@@ -79,9 +113,6 @@ class TemplateInstanceUpdater
         cards: cards,
         placement: 'end',
         card_action: 'move',
-        # don't need to go through the hassle of reassigning roles,
-        # the cards being moved already have the correct ones
-        # reassign_permissions: false,
       )
       moved_cards = card_mover.call
       # card_mover will return false if error
@@ -105,19 +136,23 @@ class TemplateInstanceUpdater
           source: card.record,
         )
       end
-    # end
+    end
   end
 
   def find_or_create_deleted_cards_collection(instance)
     deleted_from_template_collection = instance.collections.find_by(name: 'Deleted From Template')
     return deleted_from_template_collection if deleted_from_template_collection.present?
 
+    # add deleted_from_template_collection to the end of unpinned cards
+    order = instance.collection_cards.unpinned.last.order + 1
+
     builder = CollectionCardBuilder.new(
       params: {
-        order: 0,
+        order: order,
         collection_attributes: {
           name: 'Deleted From Template',
         },
+        pinned: false,
       },
       parent_collection: instance,
       user: instance.created_by,
@@ -126,17 +161,41 @@ class TemplateInstanceUpdater
     return builder.collection_card.record if builder.create
   end
 
-  def update_instance_cards_by_templated_from_ids(templated_from_ids, instance)
-    templated_from_ids.each do |id|
-      master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
-      instance_card = instance.collection_cards.find { |instance_cards| instance_cards.templated_from.id == id }
+  def find_and_move_or_create_instance_cards(moving_card_ids, instance)
+    all_cards_within_instance = CollectionCard
+                                .joins(:parent)
+                                .where(
+                                  Collection
+                                    .arel_table[:id]
+                                    .in([instance.id] + Collection.in_collection(instance).pluck(:id)),
+                                )
 
-      next if master_card.blank? || instance_card.blank?
+    moving_card_ids.each do |moving_card_id|
+      # TODO: filter out archived cards?
+      card_within_instance = all_cards_within_instance.where(templated_from_id: moving_card_id).first
 
-      TemplateInstanceCardUpdater.call(instance_card: instance_card, master_card: master_card, master_template: @master_template)
+      next if card_within_instance.parent == instance # skip if card is already in top-level instance
+
+      if card_within_instance.present?
+        # find and move card within instance
+        card_mover = CardMover.new(
+          from_collection: card_within_instance.parent,
+          to_collection: instance,
+          cards: [card_within_instance],
+          placement: 'end',
+          card_action: 'move',
+        )
+
+        card_mover.call
+
+        next unless card_within_instance.archived?
+
+        card_within_instance.unarchive!
+      else
+        # duplicate master card into instance if unarchived card is no longer in instance
+        add_cards_from_master_template([moving_card_id], instance)
+      end
     end
-
-    instance.reorder_cards!
-    instance.touch
+    # NOTE: may need to archive empty 'Deleted From Collection' collection
   end
 end

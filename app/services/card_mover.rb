@@ -55,7 +55,6 @@ class CardMover < SimpleService
   end
 
   def select_pinned_cards
-    # TODO: is this still the case?
     # for moving cards in a master template, all cards are pinned;
     # so we don't need to "lock" the existing pinned cards to the front
     return if @to_collection.master_template?
@@ -122,6 +121,9 @@ class CardMover < SimpleService
   def move_cards_to_collection
     return [] if @to_collection.is_a? Collection::Board
 
+    first_moving_card_placement = @to_collection_cards.find_index {|tc| tc == @moving_cards.first}
+    should_pin_moving_cards = @to_collection.should_pin_cards?(first_moving_card_placement)
+
     # Reorder all cards based on order of joined_cards
     @to_collection_cards.map.with_index do |card, i|
       card.assign_attributes(order: i)
@@ -129,16 +131,13 @@ class CardMover < SimpleService
       if @moving_cards.include?(card)
         # assign new parent
         card.assign_attributes(parent_id: @to_collection.id)
-        if @to_collection.templated? && @to_collection == @from_collection
-          # pinned cards within template instance stay pinned
-          card.assign_attributes(pinned: card.pinned)
-        elsif @to_collection.master_template?
-          # any cards created in master_templates become pinned
-          card.assign_attributes(pinned: true)
+        if @to_collection.master_template?
+          # any cards created in master_template's pinned area become pinned
+          card.assign_attributes(pinned: should_pin_moving_cards)
           if card.collection.present?
             card.collection.convert_to_template!
           end
-        else
+        elsif @to_collection != @from_collection
           card.assign_attributes(pinned: false)
         end
         if @to_collection.anyone_can_view? && card.primary? && card.collection.present?
@@ -169,18 +168,26 @@ class CardMover < SimpleService
   end
 
   def update_template_instances
-    if @from_collection.master_template?
+    if @to_collection == @from_collection && @from_collection.master_template?
       @from_collection.queue_update_template_instances(
         updated_card_ids: @from_collection.collection_cards.pluck(:id),
         template_update_action: 'update_all',
+      )
+      return
+    end
+
+    if @from_collection.master_template?
+      @from_collection.queue_update_template_instances(
+        updated_card_ids: @moving_cards.pluck(:id),
+        template_update_action: 'archive',
       )
     end
 
     return unless @to_collection.master_template?
 
     @to_collection.queue_update_template_instances(
-      updated_card_ids: @to_collection.collection_cards.pluck(:id),
-      template_update_action: 'update_all',
+      updated_card_ids: @moving_cards.pluck(:id),
+      template_update_action: 'create',
     )
   end
 

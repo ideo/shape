@@ -982,7 +982,7 @@ class Collection < ApplicationRecord
 
     first_moving_card_index = collection_cards.find_index { |cc| cc.order == placement }
 
-    return false if first_moving_card_index == -1
+    return collection_cards.last&.pinned? if first_moving_card_index.nil?
 
     return true if first_moving_card_index <= 1
 
