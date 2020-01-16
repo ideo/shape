@@ -121,14 +121,14 @@ class PageFooter extends React.PureComponent {
           <Center>
             <ResponsivePadInlineBlock>
               <InvertMarketingLink
-                fontSize={14}
+                fontSize={15}
                 target="_blank"
                 href="https://docs.google.com/forms/d/1ICmLGME17sTuHkMwSLgOE9p45mZPEYCQ1BfzL9Pzsac/edit"
               >
                 Do not Sell My Personal Information
               </InvertMarketingLink>
               <InvertMarketingLink
-                fontSize={14}
+                fontSize={15}
                 target="_blank"
                 href="https://www.ideo.com/privacy#privacy-rights"
               >
