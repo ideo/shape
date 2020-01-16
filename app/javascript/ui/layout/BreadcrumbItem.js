@@ -60,6 +60,14 @@ const StyledRestoreButton = styled.button`
 `
 StyledRestoreButton.displayName = 'StyledRestoreButton'
 
+const DiveButton = styled.button`
+  height: 40px;
+  margin-bottom: -10px;
+  margin-left: auto;
+  margin-top: -10px;
+  width: 35px;
+`
+
 @observer
 // also export unwrapped component for unit test
 export class BreadcrumbItem extends React.Component {
@@ -70,11 +78,13 @@ export class BreadcrumbItem extends React.Component {
   @observable
   menuItemOpenId = null
   hoverTimer = null
+  diveTimer = null
+  diveY = 0
+  diveX = 0
 
   @action
   closeDropdown = () => {
     // this.breadcrumbDropDownRecords = []
-    console.log('close')
     this.hoverTimer = null
     this.dropdownOpen = false
     this.menuItemOpenId = null
@@ -86,6 +96,11 @@ export class BreadcrumbItem extends React.Component {
     clearTimeout(this.hoverTimer)
   }
 
+  onItemClick = item => {
+    console.log('click item', item)
+    routingStore.routeTo('collections', item.id)
+  }
+
   onBreadcrumbHoverOut = async ev => {
     this.hoverTimer = setTimeout(this.closeDropdown, 150)
   }
@@ -94,56 +109,109 @@ export class BreadcrumbItem extends React.Component {
     this.hoverTimer = setTimeout(this.closeDropdown, 150)
   }
 
-  onNavigationClick = async ev => {
-    const record = this.props.item
-    if (record.type === 'collections') {
-      // TODO cache this data locally?
-      const breadcrumbRecordsReq = await axios.get(
-        `/api/v1/collections/${record.id}/collection_cards/breadcrumb_records`
-      )
-      runInAction(() => {
-        this.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
-        this.menuItemOpenId = record.id
-      })
+  onNavigationClick = async itemId => {
+    const breadcrumbRecordsReq = await axios.get(
+      `/api/v1/collections/${itemId}/collection_cards/breadcrumb_records`
+    )
+    runInAction(() => {
+      this.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
+      this.menuItemOpenId = itemId
+    })
+  }
+
+  onDiveClick = (item, level, ev) => {
+    this.diveX = level === 1 ? 230 : 0
+    if (!item.nested) {
+      this.diveY = 0
+    } else {
+      this.diveY = item.nested * 44
     }
+    this.onNavigationClick(item.id)
+  }
+
+  // onDiveHoverOver = (item, ev) => {
+  //   console.log('dive hover', item)
+  //   this.onNavigationClick(item.id)
+  //   if (!item.nested) {
+  //     this.diveY = 0
+  //   } else {
+  //     this.diveY = item.nested * 44
+  //   }
+  //   console.log('divey', this.diveY)
+  // }
+
+  onDiveHoverOut = ev => {
+    this.diveTimer = setTimeout(this.closeDiver, 150)
+  }
+
+  @action
+  onDiveMenuHoverOver = () => {
+    this.dropdownOpen = true
+    clearTimeout(this.hoverTimer)
+    clearTimeout(this.diveTimer)
+  }
+
+  onDiveMenuHoverOut = () => {
+    this.diveTimer = setTimeout(this.closeDiver, 150)
+    this.hoverTimer = setTimeout(this.closeDropdown, 150)
+  }
+
+  @action
+  closeDiver() {
+    this.breadcrumbDropDownRecords = []
+    this.menuItemOpenId = null
+    this.diveY = 0
   }
 
   renderDropdown() {
     const { item } = this.props
     if (!this.dropdownOpen) return null
-    // const menuItems = this.breadcrumbDropDownRecords.map(record => ({
-    //   name: record.name,
-    //   onClick: () => console.log(record.id),
-    // }))
-    const menuItems = [item]
-    if (item.subItem) {
-      menuItems.push(item.subItem)
+    let menuItems = [item]
+    if (item.subItems) {
+      menuItems = [...menuItems, ...item.subItems]
     }
     return (
-      <StyledMenuWrapper style={{ marginTop: '-8px' }}>
+      <StyledMenuWrapper style={{ marginTop: '-5px' }}>
         <StyledMenu
-          width={200}
+          width={230}
           onMouseOver={this.onHoverOver}
-          onMouseLeave={this.onDropdownHoverOut}
+          onMouseOut={this.onDropdownHoverOut}
         >
           {menuItems.map(menuItem => (
             <StyledMenuItem key={menuItem.name}>
-              <StyledMenuButton onClick={this.onItemClick}>
+              <StyledMenuButton
+                onClick={() => this.onItemClick(menuItem)}
+                nested={menuItem.nested}
+              >
                 {menuItem.name}
               </StyledMenuButton>
-              <button onClick={this.onNavigationClick}>></button>
+              <DiveButton
+                // onMouseOver={ev => {
+                //   this.onDiveHoverOver(menuItem, ev)
+                // }}
+                onMouseOut={this.onDiveHoverOut}
+                onClick={ev => this.onDiveClick(menuItem, 1, ev)}
+              >
+                <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
+              </DiveButton>
             </StyledMenuItem>
           ))}
         </StyledMenu>
         {this.menuItemOpenId && (
-          <StyledMenuWrapper offsetPosition={{ x: 200, y: 0 }}>
-            <StyledMenu width={200}>
+          <StyledMenuWrapper offsetPosition={{ x: this.diveX, y: this.diveY }}>
+            <StyledMenu
+              width={230}
+              onMouseOver={this.onDiveMenuHoverOver}
+              onMouseOut={this.onDiveMenuHoverOut}
+            >
               {this.breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.name}>
-                  <StyledMenuButton onClick={this.onItemClick}>
+                  <StyledMenuButton onClick={() => this.onItemClick(menuItem)}>
                     {menuItem.name}
                   </StyledMenuButton>
-                  <button onClick={this.onNavigationClick}>></button>
+                  <DiveButton onClick={ev => this.onDiveClick(menuItem, 2, ev)}>
+                    <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
+                  </DiveButton>
                 </StyledMenuItem>
               ))}
             </StyledMenu>

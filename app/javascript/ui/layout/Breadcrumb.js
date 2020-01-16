@@ -94,7 +94,7 @@ class Breadcrumb extends React.Component {
   items = (clamp = true) => {
     const { maxDepth, record } = this.props
     const items = []
-    let middleName = ''
+    // const middleName = ''
     const breadcrumb = this.breadcrumbWithLinks
     if (record.inMyCollection || uiStore.linkedInMyCollection) {
       items.push({
@@ -121,12 +121,13 @@ class Breadcrumb extends React.Component {
 
       if (longBreadcrumb && idx >= 2 && idx <= len - 3) {
         // if we have a really long breadcrumb we compress some options in the middle
-        if (middleName) middleName += ' > '
-        middleName += name
+        // if (middleName) middleName += ' > '
+        // middleName += name
         if (idx == len - 3) {
           return items.push({
             ...item,
-            name: middleName,
+            // name: middleName,
+            name,
             ellipses: true,
             identifier,
           })
@@ -143,7 +144,6 @@ class Breadcrumb extends React.Component {
     })
 
     const depth = clamp && maxDepth ? maxDepth * -1 : 0
-    console.log('items', items, _.compact(items))
     return _.compact(items).slice(depth)
   }
 
@@ -219,16 +219,24 @@ class Breadcrumb extends React.Component {
     }
 
     // last step! combine multiple consecutive ellipses
-    if (items.length > 4) {
-      _.each(items, (item, idx) => {
-        const next = items[idx + 1]
-        if (item.ellipses && next && next.ellipses) {
-          // next.name = `${item.name} > ${next.name}`
-          next.subItem = item
-          item.remove = true
-        }
-      })
-    }
+    // if (items.length > 4) {
+    //   _.each(items, (item, idx) => {
+    //     const next = items[idx + 1]
+    //     if (item.ellipses && next && next.ellipses) {
+    //       // next.name = `${item.name} > ${next.name}`
+    //       if (!next.subItems) next.subItems = []
+    //       next.subItems.push(item)
+    //       item.remove = true
+    //     }
+    //   })
+    // }
+    const ellipsesItems = items.filter(item => item.ellipses)
+    const firstEllipsesItem = ellipsesItems.shift()
+    ellipsesItems.forEach((item, idx) => {
+      item.remove = true
+      item.nested = idx + 1
+    })
+    firstEllipsesItem.subItems = ellipsesItems
 
     return _.reject(items, { remove: true })
   }

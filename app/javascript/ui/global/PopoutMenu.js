@@ -115,6 +115,12 @@ export const StyledMenuButton = styled.button`
   font-weight: 400;
   font-size: 1rem;
   text-align: left;
+  max-width: 160px;
+  padding-left: ${props => props.nested * 10}px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 export const StyledMenuItem = styled.li`
@@ -122,10 +128,12 @@ export const StyledMenuItem = styled.li`
   border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
   border-left: 7px solid transparent;
   color: ${v.colors.black};
+  display: flex;
   min-height: 1rem;
   padding: 0.75rem 0 0.75rem 1rem;
   position: relative;
   width: 100%;
+  width: 200px;
 
   ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};
