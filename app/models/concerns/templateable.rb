@@ -28,16 +28,18 @@ module Templateable
   end
 
   # copy all the cards from this template into a new collection
-  def setup_templated_collection(for_user:, collection:)
+  def setup_templated_collection(for_user:, collection:, synchronous: :async)
     # important that this is first so that the collection knows it is "templated"
     collection.update(template: self)
-    collection_cards.each do |cc|
-      cc.duplicate!(
-        for_user: for_user,
-        parent: collection,
-        building_template_instance: true,
-      )
-    end
+    return if collection_cards.blank?
+
+    CollectionCardDuplicator.call(
+      to_collection: collection,
+      cards: collection_cards,
+      for_user: for_user,
+      building_template_instance: true,
+      synchronous: synchronous,
+    )
   end
 
   # This gets called upon:
@@ -85,20 +87,25 @@ module Templateable
   end
 
   def add_cards_from_master_template(instance)
-    cards_added_to_master_template(instance).each do |card|
-      if instance.is_a?(Collection::TestCollection)
-        next unless card.card_question_type.present?
+    cards = cards_added_to_master_template(instance).select do |card|
+      if instance.is_a?(Collection::TestCollection) && card.card_question_type.blank?
+        false
+      elsif card.record.try(:templated?)
+        # ABORT: should not allow duplicating a template instance in this manner;
+        # this could lead to infinite loops. (similar to note above)
+        false
+      else
+        true
       end
-      # ABORT: should not allow duplicating a template instance in this manner;
-      # this could lead to infinite loops. (similar to note above)
-      next if card.record.try(:templated?)
-
-      card.duplicate!(
-        for_user: instance.created_by,
-        parent: instance,
-        building_template_instance: true,
-      )
     end
+
+    CollectionCardDuplicator.call(
+      to_collection: instance,
+      cards: cards,
+      for_user: instance.created_by,
+      building_template_instance: true,
+      synchronous: :all_levels,
+    )
   end
 
   def update_cards_on_template_instance(instance)
@@ -166,6 +173,7 @@ module Templateable
     builder = CollectionCardBuilder.new(
       params: {
         order: 0,
+        identifier: 'deleted-from-template',
         collection_attributes: {
           name: 'Deleted From Template',
         },

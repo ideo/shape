@@ -1,6 +1,22 @@
 require 'rails_helper'
 
 RSpec.describe CollectionCardDuplicationWorker, type: :worker do
+  describe '#perform_sync' do
+    let(:args) do
+      [
+        'batch-123',
+        ['456'],
+        '789',
+      ]
+    end
+
+    it 'calls new.perform' do
+      allow_any_instance_of(CollectionCardDuplicationWorker).to receive(:perform)
+      expect_any_instance_of(CollectionCardDuplicationWorker).to receive(:perform).with(*args)
+      CollectionCardDuplicationWorker.perform_sync(*args)
+    end
+  end
+
   describe '#perform' do
     let(:user) { create(:user) }
     let(:collection) { create(:collection, num_cards: 5) }
@@ -8,8 +24,10 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
     let(:cards) { collection.collection_cards }
     let(:card_ids) { cards.pluck(:id) }
     let(:system_collection) { false }
+    let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}" }
     let(:params) do
       [
+        batch_id,
         card_ids,
         to_collection.id,
         user&.id,
@@ -17,7 +35,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       ]
     end
     let(:run_worker) do
-      CollectionCardDuplicationWorker.new.perform(*params)
+      CollectionCardDuplicationWorker.perform_sync(*params)
     end
 
     before do
@@ -70,6 +88,12 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       it 'broadcasts collection as stopped editing' do
         expect_any_instance_of(Collection).to receive(:processing_done)
         run_worker
+      end
+
+      it 'returns newly-duplicated cards' do
+        result = run_worker
+        expect(result).to eq(to_collection.collection_cards)
+        expect(result.size).to eq(5)
       end
 
       context 'with placeholder cards' do
@@ -131,6 +155,97 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
 
         it 'duplicates all items' do
           expect(to_collection.items.map(&:cloned_from)).to match_array(collection.items)
+        end
+      end
+    end
+
+    it 'calls ActivityAndNotificationBuilder for each duplicated card' do
+      cards.each do |card|
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: user,
+          target: card.record,
+          action: :duplicated,
+          subject_user_ids: card.record.editors[:users].pluck(:id),
+          subject_group_ids: card.record.editors[:groups].pluck(:id),
+          source: collection,
+          destination: to_collection,
+        )
+      end
+      run_worker
+    end
+
+    context 'with data items that have legends' do
+      let!(:data_item) do
+        create(
+          :data_item,
+          :report_type_record,
+          parent_collection: collection,
+        )
+      end
+      let(:legend_item) { data_item.legend_item }
+      let(:duplicated_data_items) { to_collection.items.data_items }
+      let(:default_moving_cards) { collection.collection_cards.first(2) }
+      let!(:cards) { default_moving_cards + [data_item.parent_collection_card] }
+      before do
+        legend_item.reload # to make sure data_item_ids aren't cached
+        user.add_role(Role::EDITOR, data_item)
+      end
+
+      it 'links legend to duplicated data item' do
+        run_worker
+        to_collection.reload.collection_cards
+        expect(collection.items.data_items.size).to eq(1)
+        expect(duplicated_data_items.size).to eq(1)
+        expect(duplicated_data_items.first.cloned_from).to eq(data_item)
+      end
+
+      it 'duplicates legend' do
+        expect(cards).not_to include(legend_item.parent_collection_card)
+        expect {
+          run_worker
+        }.to change(Item::LegendItem, :count).by(1)
+      end
+
+      context 'if legend is selected' do
+        let!(:cards) { default_moving_cards + [legend_item.parent_collection_card] }
+
+        it 'duplicates it' do
+          expect {
+            run_worker
+          }.to change(Item::LegendItem, :count).by(1)
+        end
+      end
+
+      context 'with legend linked to other data items not duplicated' do
+        let!(:data_item_two) do
+          create(
+            :data_item,
+            :report_type_record,
+            parent_collection: collection,
+            legend_item: legend_item,
+          )
+        end
+
+        before do
+          user.add_role(Role::EDITOR, data_item_two)
+        end
+
+        it 'duplicates legend' do
+          expect {
+            run_worker
+          }.to change(Item::LegendItem, :count).by(1)
+        end
+
+        it 'leaves existing data item linked to legend item' do
+          run_worker
+          to_collection_legend_items = to_collection.collection_cards.reload.select do |card|
+            card.item&.is_a?(Item::LegendItem)
+          end.map(&:item)
+          expect(
+            to_collection_legend_items.size,
+          ).to eq(1)
+          duplicated_legend_item = to_collection_legend_items.first
+          expect(data_item_two.reload.legend_item).not_to eq(duplicated_legend_item)
         end
       end
     end

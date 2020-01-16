@@ -257,6 +257,7 @@ class Item < ApplicationRecord
     parent: self.parent,
     system_collection: false,
     synchronous: false,
+    batch_id: nil,
     card: nil
   )
     # Clones item
@@ -280,6 +281,7 @@ class Item < ApplicationRecord
         parent: parent,
         system_collection: system_collection,
         synchronous: synchronous,
+        batch_id: batch_id,
       )
       i.parent_collection_card.item = i
     end
