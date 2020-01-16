@@ -45,6 +45,7 @@ export const StyledMenuButtonWrapper = styled.div`
 export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
+  transition: all 150ms;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
     const { position, offsetPosition, location } = props
