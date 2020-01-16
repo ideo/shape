@@ -88,6 +88,8 @@ export class BreadcrumbItem extends React.Component {
     this.hoverTimer = null
     this.dropdownOpen = false
     this.menuItemOpenId = null
+    this.diveX = 0
+    this.diveY = 0
   }
 
   @action
@@ -170,6 +172,7 @@ export class BreadcrumbItem extends React.Component {
     if (item.subItems) {
       menuItems = [...menuItems, ...item.subItems]
     }
+    console.log('divex', this.diveX, !this.menuItemOpenId || this.diveX !== 0)
     return (
       <StyledMenuWrapper style={{ marginTop: '-5px' }}>
         <StyledMenu
@@ -177,25 +180,26 @@ export class BreadcrumbItem extends React.Component {
           onMouseOver={this.onHoverOver}
           onMouseOut={this.onDropdownHoverOut}
         >
-          {menuItems.map(menuItem => (
-            <StyledMenuItem key={menuItem.name}>
-              <StyledMenuButton
-                onClick={() => this.onItemClick(menuItem)}
-                nested={menuItem.nested}
-              >
-                {menuItem.name}
-              </StyledMenuButton>
-              <DiveButton
-                // onMouseOver={ev => {
-                //   this.onDiveHoverOver(menuItem, ev)
-                // }}
-                onMouseOut={this.onDiveHoverOut}
-                onClick={ev => this.onDiveClick(menuItem, 1, ev)}
-              >
-                <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
-              </DiveButton>
-            </StyledMenuItem>
-          ))}
+          {(!this.menuItemOpenId || this.diveX !== 0) &&
+            menuItems.map(menuItem => (
+              <StyledMenuItem key={menuItem.name}>
+                <StyledMenuButton
+                  onClick={() => this.onItemClick(menuItem)}
+                  nested={menuItem.nested}
+                >
+                  {menuItem.name}
+                </StyledMenuButton>
+                <DiveButton
+                  // onMouseOver={ev => {
+                  //   this.onDiveHoverOver(menuItem, ev)
+                  // }}
+                  onMouseOut={this.onDiveHoverOut}
+                  onClick={ev => this.onDiveClick(menuItem, 1, ev)}
+                >
+                  <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
+                </DiveButton>
+              </StyledMenuItem>
+            ))}
         </StyledMenu>
         {this.menuItemOpenId && (
           <StyledMenuWrapper offsetPosition={{ x: this.diveX, y: this.diveY }}>
