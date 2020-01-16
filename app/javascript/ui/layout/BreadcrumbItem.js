@@ -99,7 +99,6 @@ export class BreadcrumbItem extends React.Component {
   }
 
   onItemClick = item => {
-    console.log('click item', item)
     routingStore.routeTo('collections', item.id)
   }
 
@@ -172,9 +171,10 @@ export class BreadcrumbItem extends React.Component {
     if (item.subItems) {
       menuItems = [...menuItems, ...item.subItems]
     }
+    console.log('menuitems', menuItems)
     console.log('divex', this.diveX, !this.menuItemOpenId || this.diveX !== 0)
     return (
-      <StyledMenuWrapper style={{ marginTop: '-5px' }}>
+      <StyledMenuWrapper style={{ marginTop: '0px', left: '-20px' }}>
         <StyledMenu
           width={230}
           onMouseOver={this.onHoverOver}
@@ -189,15 +189,17 @@ export class BreadcrumbItem extends React.Component {
                 >
                   {menuItem.name}
                 </StyledMenuButton>
-                <DiveButton
-                  // onMouseOver={ev => {
-                  //   this.onDiveHoverOver(menuItem, ev)
-                  // }}
-                  onMouseOut={this.onDiveHoverOut}
-                  onClick={ev => this.onDiveClick(menuItem, 1, ev)}
-                >
-                  <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
-                </DiveButton>
+                {menuItem.has_children && (
+                  <DiveButton
+                    // onMouseOver={ev => {
+                    //   this.onDiveHoverOver(menuItem, ev)
+                    // }}
+                    onMouseOut={this.onDiveHoverOut}
+                    onClick={ev => this.onDiveClick(menuItem, 1, ev)}
+                  >
+                    <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
+                  </DiveButton>
+                )}
               </StyledMenuItem>
             ))}
         </StyledMenu>
@@ -213,9 +215,13 @@ export class BreadcrumbItem extends React.Component {
                   <StyledMenuButton onClick={() => this.onItemClick(menuItem)}>
                     {menuItem.name}
                   </StyledMenuButton>
-                  <DiveButton onClick={ev => this.onDiveClick(menuItem, 2, ev)}>
-                    <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
-                  </DiveButton>
+                  {menuItem.has_children && (
+                    <DiveButton
+                      onClick={ev => this.onDiveClick(menuItem, 2, ev)}
+                    >
+                      <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
+                    </DiveButton>
+                  )}
                 </StyledMenuItem>
               ))}
             </StyledMenu>

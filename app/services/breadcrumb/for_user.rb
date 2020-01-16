@@ -73,6 +73,7 @@ module Breadcrumb
         id: object.id.to_s,
         name: object.name,
         can_edit: object == @object ? object.can_edit?(@user) : editable.include?(object.id),
+        has_children: object.collections.count > 0
       }
     end
 
