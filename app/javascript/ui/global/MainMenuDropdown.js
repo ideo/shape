@@ -83,8 +83,8 @@ class MainMenuDropdown extends React.Component {
     this.props.routingStore.routeTo('/terms')
   }
 
-  handlePrivacy = ev => {
-    window.open('https://www.ideo.com/privacy', '_blank')
+  handleExternalLink = url => ev => {
+    window.open(url, '_blank')
   }
 
   handleZendesk = ev => {
@@ -154,9 +154,7 @@ class MainMenuDropdown extends React.Component {
         {
           name: 'Account Settings',
           icon: <SettingsIcon />,
-          onClick: () => {
-            window.open(IdeoSSO.profileUrl, '_blank')
-          },
+          onClick: this.handleExternalLink(IdeoSSO.profileUrl),
         },
         {
           name: 'Notification Settings',
@@ -198,7 +196,22 @@ class MainMenuDropdown extends React.Component {
         { name: 'New Organization', onClick: this.handleNewOrg },
         { name: 'Contact Support', onClick: this.handleZendesk },
         { name: 'Terms of Use', onClick: this.handleTerms },
-        { name: 'Privacy Policy', onClick: this.handlePrivacy },
+        {
+          name: 'Privacy Policy',
+          onClick: this.handleExternalLink('https://www.ideo.com/privacy'),
+        },
+        {
+          name: 'Do not Sell My Info',
+          onClick: this.handleExternalLink(
+            'https://docs.google.com/forms/d/1ICmLGME17sTuHkMwSLgOE9p45mZPEYCQ1BfzL9Pzsac/edit'
+          ),
+        },
+        {
+          name: 'CA User Rights',
+          onClick: this.handleExternalLink(
+            'https://www.ideo.com/privacy#privacy-rights'
+          ),
+        },
       ],
     }
     // splice these into the correct placement

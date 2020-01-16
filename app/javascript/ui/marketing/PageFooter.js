@@ -14,7 +14,7 @@ import {
   DesktopSpacer,
   Center,
   InvertedFixedWidth,
-} from '~/ui/global/styled/marketing.js'
+} from '~/ui/global/styled/marketing'
 
 import poweredByIdeo from '~/assets/Powered-by-IDEO-Inverted.png'
 import SubscribeEmail from '~/ui/marketing/SubscribeEmail'
@@ -98,23 +98,45 @@ class PageFooter extends React.PureComponent {
 
         <Center>
           <ResponsivePadInlineBlock>
-            <InvertMarketingLink href="https://www.ideo.com/privacy">
+            <InvertMarketingLink
+              target="_blank"
+              href="https://www.ideo.com/privacy"
+            >
               Privacy and Cookie Policy
             </InvertMarketingLink>
           </ResponsivePadInlineBlock>
-        </Center>
-        <Center>
           <ResponsivePadInlineBlock>
             <DesktopSpacer style={{ width: '80px' }} />
-            <InvertMarketingLink href="https://www.ideo.com/">
+            <span>
               {/* Added span around &copy; in order to satisfy "jsx-a11y/accessible-emoji" */}
               <span role="img" aria-label="Copyright Symbol">
                 &copy;
               </span>{' '}
               2019
-            </InvertMarketingLink>
+            </span>
           </ResponsivePadInlineBlock>
         </Center>
+
+        <div>
+          <Center>
+            <ResponsivePadInlineBlock>
+              <InvertMarketingLink
+                fontSize={14}
+                target="_blank"
+                href="https://docs.google.com/forms/d/1ICmLGME17sTuHkMwSLgOE9p45mZPEYCQ1BfzL9Pzsac/edit"
+              >
+                Do not Sell My Personal Information
+              </InvertMarketingLink>
+              <InvertMarketingLink
+                fontSize={14}
+                target="_blank"
+                href="https://www.ideo.com/privacy#privacy-rights"
+              >
+                CA User Rights
+              </InvertMarketingLink>
+            </ResponsivePadInlineBlock>
+          </Center>
+        </div>
       </MarketingFooter>
     )
   }
