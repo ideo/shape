@@ -14,7 +14,7 @@ export const PinIconHolder = styled.div`
   border-radius: 50%;
   height: 24px;
   margin-left: 10px;
-  margin-top: 10px;
+  margin-bottom: 5px;
   text-align: center;
   width: 24px;
   border: ${props =>

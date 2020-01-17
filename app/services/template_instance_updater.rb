@@ -17,14 +17,10 @@ class TemplateInstanceUpdater
     case @template_update_action
     when 'update_all'
       templated_collections.map { |i| update_all_templated_cards_for_instance(i) }
-    when 'pin'
-      templated_collections.map { |i| pin_templated_cards_for_instance(i) }
     when 'archive'
       templated_collections.map { |i| move_cards_archived_from_master_template(i) }
-    when 'unarchive'
-      templated_collections.map { |i| move_cards_unarchived_from_master_template(i) }
-    when 'create', 'duplicate'
-      templated_collections.map { |i| add_new_templated_cards_for_instance(i) }
+    when 'create', 'duplicate', 'pin', 'unarchive'
+      templated_collections.map { |i| insert_or_update_instance_cards(i) }
     else
       return
     end
@@ -41,23 +37,13 @@ class TemplateInstanceUpdater
     update_instance_cards_by_templated_from_ids(@updated_card_ids, instance)
   end
 
-  def pin_templated_cards_for_instance(instance)
+  def insert_or_update_instance_cards(instance)
     find_and_move_or_create_instance_cards(@updated_card_ids, instance)
     update_instance_cards_by_templated_from_ids(@updated_card_ids, instance)
   end
 
-  def add_new_templated_cards_for_instance(instance)
-    add_cards_from_master_template(@updated_card_ids, instance)
-    update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
-  end
-
   def move_cards_archived_from_master_template(instance)
     move_cards_to_deleted_from_collection(@updated_card_ids, instance)
-    update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
-  end
-
-  def move_cards_unarchived_from_master_template(instance)
-    find_and_move_or_create_instance_cards(@updated_card_ids, instance)
     update_instance_cards_by_templated_from_ids(@master_template.collection_cards.pluck(:id), instance)
   end
 
@@ -69,6 +55,10 @@ class TemplateInstanceUpdater
       next if master_card.blank? || instance_card.blank?
 
       TemplateInstanceCardUpdater.call(instance_card: instance_card, master_card: master_card, master_template: @master_template)
+
+      next unless instance.archived?
+
+      card_within_instance.unarchive!
     end
 
     instance.reorder_cards!
