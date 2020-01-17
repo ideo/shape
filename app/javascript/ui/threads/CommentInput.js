@@ -67,7 +67,7 @@ class CommentInput extends React.Component {
 
       if (cols == 1 && uiStore.isIOS) {
         // will place at the bottom of the comment input, use activity log height since iOS phone comment box is full-screen
-        top = `${uiStore.activityLogPosition.h - 42}px`
+        top = `${uiStore.activityLogPosition.h - 41}px`
       } else if (cols == 1 && uiStore.isAndroid) {
         // will place at the top of the comment input for android phones
         const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength
