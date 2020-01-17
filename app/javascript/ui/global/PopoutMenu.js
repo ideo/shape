@@ -118,7 +118,7 @@ export const StyledMenuButton = styled.button`
   font-weight: 400;
   font-size: 1rem;
   text-align: left;
-  max-width: 160px;
+  max-width: 190px;
   padding-left: ${props => props.nested * 10}px;
 
   white-space: nowrap;
@@ -136,7 +136,7 @@ export const StyledMenuItem = styled.li`
   padding: 0.75rem 0 0.75rem 1rem;
   position: relative;
   width: 100%;
-  width: 200px;
+  width: ${props => props.width || 200}px;
 
   ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};

@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -8,6 +9,8 @@ import { Link } from 'react-router-dom'
 
 import { routingStore } from '~/stores'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
+import NestedArrowIcon from '~/ui/icons/NestedArrowIcon'
+import NestedLineIcon from '~/ui/icons/NestedLineIcon'
 import {
   StyledMenu,
   StyledMenuButton,
@@ -68,8 +71,36 @@ const DiveButton = styled.button`
   width: 35px;
 `
 
+const NestedArrowHolder = styled.div`
+  display: inline-block;
+  margin-left: 0px;
+  margin-right: 5px;
+
+  .icon.icon {
+    transform: none;
+    position: static;
+    height: 15px;
+    vertical-align: text-bottom;
+    width: 10px;
+  }
+`
+
+const NestedLineHolder = styled.div`
+  display: inline-block;
+  margin-right: 2px;
+  width: 3px;
+
+  .icon.icon {
+    transform: none;
+    position: static;
+    width: 1px;
+    vertical-align: top;
+    height: 12px;
+  }
+`
+
 const NEST_AMOUNT_Y_PX = 44
-const MENU_WIDTH = 230
+const MENU_WIDTH = 250
 const HOVER_TIMEOUT_MS = 150
 
 @observer
@@ -166,12 +197,29 @@ export class BreadcrumbItem extends React.Component {
     this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
   }
 
+  renderNesting(menuItem) {
+    if (menuItem.nested === 0) return null
+    const nestLines = _.range(0, menuItem.nested - 1).map(nestLevel => (
+      <NestedLineHolder>
+        <NestedLineIcon />
+      </NestedLineHolder>
+    ))
+    return (
+      <Fragment>
+        {nestLines}
+        <NestedArrowHolder>
+          <NestedArrowIcon />
+        </NestedArrowHolder>
+      </Fragment>
+    )
+  }
+
   renderDropdown() {
     const { item } = this.props
     if (!this.dropdownOpen) return null
     let menuItems = [item]
     if (item.subItems) {
-      menuItems = [...menuItems, ...item.subItems]
+      menuItems = [...item.subItems]
     }
     return (
       <StyledMenuWrapper style={{ marginTop: '0px', left: '-20px' }}>
@@ -182,11 +230,15 @@ export class BreadcrumbItem extends React.Component {
         >
           {(!this.menuItemOpenId || this.nestedMenuX !== 0) &&
             menuItems.map(menuItem => (
-              <StyledMenuItem key={menuItem.name}>
+              <StyledMenuItem
+                key={menuItem.name}
+                style={{ paddingLeft: '10px', width: '230px' }}
+              >
                 <StyledMenuButton
                   onClick={() => this.onBreadcrumbClick(menuItem)}
-                  nested={menuItem.nested}
+                  // nested={menuItem.nested}
                 >
+                  {this.renderNesting(menuItem)}
                   {menuItem.name}
                 </StyledMenuButton>
                 {menuItem.has_children && (
@@ -202,13 +254,15 @@ export class BreadcrumbItem extends React.Component {
             offsetPosition={{ x: this.nestedMenuX, y: this.nestedMenuY }}
           >
             <StyledMenu
-              width={230}
+              width={MENU_WIDTH}
               onMouseOver={this.onNestedMenuHoverOver}
               onMouseOut={this.onNestedMenuHoverOut}
             >
               {this.breadcrumbDropDownRecords.map(menuItem => (
-                <StyledMenuItem key={menuItem.name}>
-                  <StyledMenuButton onClick={() => this.onItemClick(menuItem)}>
+                <StyledMenuItem key={menuItem.name} style={{ width: '230px' }}>
+                  <StyledMenuButton
+                    onClick={() => this.onBreadcrumbClick(menuItem)}
+                  >
                     {menuItem.name}
                   </StyledMenuButton>
                   {menuItem.has_children && (

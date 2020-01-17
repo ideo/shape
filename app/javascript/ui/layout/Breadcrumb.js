@@ -49,8 +49,6 @@ const BackIconContainer = styled.span`
 class Breadcrumb extends React.Component {
   @observable
   breadcrumbWithLinks = []
-  @observable
-  breadcrumbDropDownRecords = []
 
   constructor(props) {
     super(props)
@@ -216,11 +214,14 @@ class Breadcrumb extends React.Component {
 
     const ellipsesItems = items.filter(item => item.ellipses)
     const firstEllipsesItem = ellipsesItems.shift()
-    ellipsesItems.forEach((item, idx) => {
-      item.remove = true
-      item.nested = idx + 1
+    const subItems = items.map((item, idx) => {
+      const subItem = { ...item }
+      if (item.ellipses && item.id !== firstEllipsesItem.id) item.remove = true
+      subItem.nested = idx
+      return subItem
     })
-    firstEllipsesItem.subItems = ellipsesItems
+    // .filter(item => item.id !== firstEllipsesItem.id)
+    firstEllipsesItem.subItems = subItems
 
     return _.reject(items, { remove: true })
   }
