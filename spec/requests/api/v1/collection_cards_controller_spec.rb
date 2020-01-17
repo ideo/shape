@@ -20,6 +20,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
   before do
     user.reload
+    allow(ActivityAndNotificationWorker).to receive(:perform_async).and_call_original
   end
 
   describe 'GET #index' do
@@ -310,16 +311,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates an activity' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: user,
-          target: anything,
-          action: :created,
-          subject_user_ids: [user.id],
-          subject_group_ids: [],
-          source: nil,
-          destination: nil,
-        )
         post(path, params: params)
+        expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+          user.id,
+          json['data']['id'].to_i,
+          :created,
+          nil,
+          nil,
+        )
       end
 
       context 'with a link card' do
@@ -921,7 +920,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates an activity' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).twice
+        expect(ActivityAndNotificationWorker).to receive(:perform_async).twice
         patch(path, params: params)
       end
 
@@ -1229,16 +1228,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
 
     it 'creates an activity' do
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        actor: user,
-        target: anything,
-        action: :edited,
-        subject_user_ids: [user.id],
-        subject_group_ids: [],
-        source: nil,
-        destination: nil,
-      )
       patch(path, params: params)
+      expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+        user.id,
+        json['data']['id'].to_i,
+        :edited,
+        nil,
+        nil,
+      )
     end
 
     context 'when changing the is_cover property' do
@@ -1346,16 +1343,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates an activity' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: user,
-          target: anything,
-          action: :replaced,
-          subject_user_ids: [editor.id],
-          subject_group_ids: [],
-          source: nil,
-          destination: nil,
-        )
         patch(path, params: params)
+        expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+          user.id,
+          json['data']['id'].to_i,
+          :replaced,
+          nil,
+          nil,
+        )
       end
 
       it 'broadcasts collection updates' do

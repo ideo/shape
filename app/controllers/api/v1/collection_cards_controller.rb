@@ -157,7 +157,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_action: @card_action,
     )
     moved_cards = mover.call
-    if moved_cards
+    if moved_cards #&& @from_collection != @to_collection
       # we still create notifications on the original @cards
       @cards.map do |card|
         create_notification(
@@ -367,14 +367,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     # Only notify for archiving of collections (and not link cards)
     return if card.link?
 
-    ActivityAndNotificationBuilder.call(
-      actor: current_user,
-      target: card.record,
-      action: action,
-      subject_user_ids: card.record.editors[:users].pluck(:id),
-      subject_group_ids: card.record.editors[:groups].pluck(:id),
-      source: @from_collection,
-      destination: @to_collection,
+    from_id = @from_collection&.id
+    to_id = @to_collection&.id
+    return if action == :moved && from_id == to_id
+
+    ActivityAndNotificationWorker.perform_async(
+      current_user.id,
+      card.id,
+      action,
+      from_id,
+      to_id,
     )
   end
 
