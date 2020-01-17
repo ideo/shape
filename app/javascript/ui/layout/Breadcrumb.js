@@ -94,7 +94,6 @@ class Breadcrumb extends React.Component {
   items = (clamp = true) => {
     const { maxDepth, record } = this.props
     const items = []
-    // const middleName = ''
     const breadcrumb = this.breadcrumbWithLinks
     if (record.inMyCollection || uiStore.linkedInMyCollection) {
       items.push({
@@ -121,12 +120,9 @@ class Breadcrumb extends React.Component {
 
       if (longBreadcrumb && idx >= 2 && idx <= len - 3) {
         // if we have a really long breadcrumb we compress some options in the middle
-        // if (middleName) middleName += ' > '
-        // middleName += name
         if (idx == len - 3) {
           return items.push({
             ...item,
-            // name: middleName,
             name,
             ellipses: true,
             identifier,
@@ -218,18 +214,6 @@ class Breadcrumb extends React.Component {
       increment = !increment
     }
 
-    // last step! combine multiple consecutive ellipses
-    // if (items.length > 4) {
-    //   _.each(items, (item, idx) => {
-    //     const next = items[idx + 1]
-    //     if (item.ellipses && next && next.ellipses) {
-    //       // next.name = `${item.name} > ${next.name}`
-    //       if (!next.subItems) next.subItems = []
-    //       next.subItems.push(item)
-    //       item.remove = true
-    //     }
-    //   })
-    // }
     const ellipsesItems = items.filter(item => item.ellipses)
     const firstEllipsesItem = ellipsesItems.shift()
     ellipsesItems.forEach((item, idx) => {
