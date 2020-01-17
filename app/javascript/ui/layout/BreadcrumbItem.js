@@ -214,6 +214,19 @@ export class BreadcrumbItem extends React.Component {
     )
   }
 
+  renderMenuNameWithTooltip(menuItem) {
+    if (menuItem.name.length < 20) return menuItem.name
+    return (
+      <Tooltip
+        classes={{ tooltip: 'Tooltip' }}
+        title={menuItem.name}
+        placement="top"
+      >
+        <span>{menuItem.name}</span>
+      </Tooltip>
+    )
+  }
+
   renderDropdown() {
     const { item } = this.props
     if (!this.dropdownOpen) return null
@@ -239,7 +252,7 @@ export class BreadcrumbItem extends React.Component {
                   // nested={menuItem.nested}
                 >
                   {this.renderNesting(menuItem)}
-                  {menuItem.name}
+                  {this.renderMenuNameWithTooltip(menuItem)}
                 </StyledMenuButton>
                 {menuItem.has_children && (
                   <DiveButton onClick={ev => this.onDiveClick(menuItem, 1, ev)}>
@@ -263,7 +276,7 @@ export class BreadcrumbItem extends React.Component {
                   <StyledMenuButton
                     onClick={() => this.onBreadcrumbClick(menuItem)}
                   >
-                    {menuItem.name}
+                    {this.renderMenuNameWithTooltip(menuItem)}
                   </StyledMenuButton>
                   {menuItem.has_children && (
                     <DiveButton
