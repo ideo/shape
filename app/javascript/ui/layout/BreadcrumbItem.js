@@ -98,7 +98,6 @@ export class BreadcrumbItem extends React.Component {
 
   @action
   closeDropdown = () => {
-    // this.breadcrumbDropDownRecords = []
     this.hoverTimer = null
     this.dropdownOpen = false
     this.menuItemOpenId = null
@@ -140,6 +139,12 @@ export class BreadcrumbItem extends React.Component {
     this.nestedMenuX = level === 1 ? MENU_WIDTH : 0
     if (!item.nested) {
       this.nestedMenuY = 0
+      // If the menu is moving back to the left position, we have to cancel
+      // out the hover out timer on the menu so it doesn't close while it's
+      // moving over there (because your mouse technically hovers off of it)
+      setTimeout(() => {
+        clearTimeout(this.nestedMenuTimer)
+      }, HOVER_TIMEOUT_MS - 50)
     } else {
       this.nestedMenuY = item.nested * NEST_AMOUNT_Y_PX
     }
