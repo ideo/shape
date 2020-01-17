@@ -18,7 +18,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              current_record: @collection,
              parent: @collection,
              inside_a_submission: @collection.submission? || @collection.inside_a_submission?,
-             inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?
+             inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?,
            }
   end
 
@@ -476,7 +476,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           :filename,
           :size,
           :mimetype,
-          docinfo: {}
+          docinfo: {},
         ],
         data_items_datasets_attributes: %i[
           order
@@ -503,9 +503,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
             date
             percentage
             column
-          ]
-        ]
-      ].concat(Item.globalize_attribute_names)
+          ],
+        ],
+      ].concat(Item.globalize_attribute_names),
     ]
   end
 
