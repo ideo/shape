@@ -24,6 +24,7 @@ export default class CardMoveService {
       movingFromCollectionId,
       movingCardIds,
       cardAction,
+      overflowFromMDL,
     } = uiStore
 
     let data = {
@@ -68,7 +69,8 @@ export default class CardMoveService {
     }
 
     const movingWithinCollection =
-      movingFromCollection === toCollection && cardAction === 'move'
+      !overflowFromMDL &&
+      (movingFromCollection === toCollection && cardAction === 'move')
     try {
       uiStore.update('isLoadingMoveAction', true)
       let successMessage

@@ -10,6 +10,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
+import { findTopLeftCard } from '~/utils/CollectionGridCalculator'
 import BaseRecord from './BaseRecord'
 import CardMoveService from '~/utils/CardMoveService'
 import CollectionCard from './CollectionCard'
@@ -143,6 +144,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return cardIdsBetween.slice(firstIdx, lastIdx)
     }
     return cardIdsBetween.slice(lastIdx, firstIdx)
+  }
+
+  firstCardId(cardIds) {
+    const cards = this.collection_cards.filter(card =>
+      _.includes(cardIds, card.id)
+    )
+    let card = {}
+    if (this.isBoard) {
+      card = findTopLeftCard(cards)
+    } else {
+      card = _.first(_.sortBy(cards, 'order'))
+    }
+    return card.id
   }
 
   get cardMatrix() {

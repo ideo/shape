@@ -10,7 +10,6 @@ import {
   calculateOpenSpotMatrix,
   calculateRowsCols,
   findClosestOpenSpot,
-  findTopLeftCard,
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -150,6 +149,7 @@ class FoamcoreGrid extends React.Component {
   dragTimeoutId = null
   openSpotMatrix = []
   movingFromNormalCollection = false
+  masterCard = null
   movingCards = []
 
   constructor(props) {
@@ -608,7 +608,12 @@ class FoamcoreGrid extends React.Component {
   moveCards = async masterCard => {
     if (this.dragGridSpot.size < 1) return
     const { uiStore, collection } = this.props
-    const { movingFromCollectionId, cardAction, draggingFromMDL } = uiStore
+    const {
+      movingFromCollectionId,
+      cardAction,
+      draggingFromMDL,
+      overflowFromMDL,
+    } = uiStore
     // capture this as a normal array before it gets changed/observed e.g. in onConfirmOrCancel
     const multiMoveCardIds = [...uiStore.multiMoveCardIds]
     const undoMessage = 'Card move undone'
@@ -677,21 +682,12 @@ class FoamcoreGrid extends React.Component {
 
     if (negativeZone) {
       return onCancel()
-    } else if (draggingFromMDL && !movingWithinCollection) {
-      let topLeft
-      if (this.movingFromNormalCollection) {
-        // row/col should represent the first ordered card
-        topLeft = this.movingCards[0]
-      } else {
-        // row/col should represent the top-left-most card
-        topLeft = findTopLeftCard(this.movingCards)
-      }
-      // TODO: would this ever not be found?
-      const topLeftCoords = _.find(
-        dragGridSpotValues,
-        v => v.card.id === topLeft.id
-      )
-      const { row, col } = topLeftCoords
+    } else if (
+      draggingFromMDL &&
+      (overflowFromMDL || !movingWithinCollection)
+    ) {
+      // movePlaceholder will represent the MDL dragged card position
+      const { row, col } = movePlaceholder
       await CardMoveService.moveCards({ row, col })
       this.resetCardPositions()
       return
@@ -879,8 +875,9 @@ class FoamcoreGrid extends React.Component {
       // this will add .position to each card
       movingCards = calculateRowsCols(movingCards)
     }
+    this.masterCard = masterCard
     this.movingCards = movingCards
-
+    let overflow = 0
     // Loop through non-master cards to calculate drag map
     const dragMap = movingCards.map(card => {
       let { col, row } = card
@@ -894,13 +891,22 @@ class FoamcoreGrid extends React.Component {
         masterCol = masterCard.position.x
         masterRow = masterCard.position.y
       }
+      const colDiff = col - masterCol
+      const rowDiff = row - masterRow
+
+      if (uiStore.draggingFromMDL && Math.abs(rowDiff) > 6) {
+        overflow += 1
+        return
+      }
+
       return {
         card,
-        col: col - masterCol,
-        row: row - masterRow,
+        col: colDiff,
+        row: rowDiff,
       }
     })
-    return dragMap
+    uiStore.update('overflowFromMDL', overflow)
+    return _.compact(dragMap)
   }
 
   setResizeSpot({ row, col, width, height }) {
@@ -1196,7 +1202,7 @@ class FoamcoreGrid extends React.Component {
     if (movingCardIds && movingCardIds.length) {
       const movingCard = apiStore.find(
         'collection_cards',
-        _.last(movingCardIds)
+        _.first(movingCardIds)
       )
 
       if (!uiStore.isLoadingMoveAction && movingCard) {
