@@ -68,6 +68,10 @@ const DiveButton = styled.button`
   width: 35px;
 `
 
+const NEST_AMOUNT_Y_PX = 44
+const MENU_WIDTH = 230
+const HOVER_TIMEOUT_MS = 150
+
 @observer
 // also export unwrapped component for unit test
 export class BreadcrumbItem extends React.Component {
@@ -78,39 +82,11 @@ export class BreadcrumbItem extends React.Component {
   @observable
   menuItemOpenId = null
   hoverTimer = null
-  diveTimer = null
-  diveY = 0
-  diveX = 0
+  nestedMenuTimer = null
+  nestedMenuY = 0
+  nestedMenuX = 0
 
-  @action
-  closeDropdown = () => {
-    // this.breadcrumbDropDownRecords = []
-    this.hoverTimer = null
-    this.dropdownOpen = false
-    this.menuItemOpenId = null
-    this.diveX = 0
-    this.diveY = 0
-  }
-
-  @action
-  onHoverOver = () => {
-    this.dropdownOpen = true
-    clearTimeout(this.hoverTimer)
-  }
-
-  onItemClick = item => {
-    routingStore.routeTo('collections', item.id)
-  }
-
-  onBreadcrumbHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, 150)
-  }
-
-  onDropdownHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, 150)
-  }
-
-  onNavigationClick = async itemId => {
+  fetchBreadcrumbRecords = async itemId => {
     const breadcrumbRecordsReq = await axios.get(
       `/api/v1/collections/${itemId}/collection_cards/breadcrumb_records`
     )
@@ -120,48 +96,69 @@ export class BreadcrumbItem extends React.Component {
     })
   }
 
-  onDiveClick = (item, level, ev) => {
-    this.diveX = level === 1 ? 230 : 0
-    if (!item.nested) {
-      this.diveY = 0
-    } else {
-      this.diveY = item.nested * 44
-    }
-    this.onNavigationClick(item.id)
-  }
-
-  // onDiveHoverOver = (item, ev) => {
-  //   console.log('dive hover', item)
-  //   this.onNavigationClick(item.id)
-  //   if (!item.nested) {
-  //     this.diveY = 0
-  //   } else {
-  //     this.diveY = item.nested * 44
-  //   }
-  //   console.log('divey', this.diveY)
-  // }
-
-  onDiveHoverOut = ev => {
-    this.diveTimer = setTimeout(this.closeDiver, 150)
+  @action
+  closeDropdown = () => {
+    // this.breadcrumbDropDownRecords = []
+    this.hoverTimer = null
+    this.dropdownOpen = false
+    this.menuItemOpenId = null
+    this.nestedMenuX = 0
+    this.nestedMenuY = 0
   }
 
   @action
-  onDiveMenuHoverOver = () => {
-    this.dropdownOpen = true
-    clearTimeout(this.hoverTimer)
-    clearTimeout(this.diveTimer)
-  }
-
-  onDiveMenuHoverOut = () => {
-    this.diveTimer = setTimeout(this.closeDiver, 150)
-    this.hoverTimer = setTimeout(this.closeDropdown, 150)
-  }
-
-  @action
-  closeDiver() {
+  closeNestedMenu() {
     this.breadcrumbDropDownRecords = []
     this.menuItemOpenId = null
-    this.diveY = 0
+    this.nestedMenuY = 0
+  }
+
+  @action
+  onBreadcrumbHoverOver = () => {
+    this.dropdownOpen = true
+    clearTimeout(this.hoverTimer)
+  }
+
+  onBreadcrumbHoverOut = async ev => {
+    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
+  }
+
+  onDropdownHoverOver = () => {
+    // Keep the dropdown open in the same was as hovering over a breadcrumb
+    this.onBreadcrumbHoverOver()
+  }
+
+  onBreadcrumbClick = item => {
+    routingStore.routeTo('collections', item.id)
+  }
+
+  onDropdownHoverOut = async ev => {
+    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
+  }
+
+  onDiveClick = (item, level, ev) => {
+    this.nestedMenuX = level === 1 ? MENU_WIDTH : 0
+    if (!item.nested) {
+      this.nestedMenuY = 0
+    } else {
+      this.nestedMenuY = item.nested * NEST_AMOUNT_Y_PX
+    }
+    this.fetchBreadcrumbRecords(item.id)
+  }
+
+  @action
+  onNestedMenuHoverOver = () => {
+    this.dropdownOpen = true
+    clearTimeout(this.hoverTimer)
+    clearTimeout(this.nestedMenuTimer)
+  }
+
+  onNestedMenuHoverOut = () => {
+    this.nestedMenuTimer = setTimeout(
+      this.closeNestedMenu,
+      HOVER_TIMEOUT_MS + 50
+    )
+    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
   }
 
   renderDropdown() {
@@ -171,32 +168,24 @@ export class BreadcrumbItem extends React.Component {
     if (item.subItems) {
       menuItems = [...menuItems, ...item.subItems]
     }
-    console.log('menuitems', menuItems)
-    console.log('divex', this.diveX, !this.menuItemOpenId || this.diveX !== 0)
     return (
       <StyledMenuWrapper style={{ marginTop: '0px', left: '-20px' }}>
         <StyledMenu
-          width={230}
-          onMouseOver={this.onHoverOver}
+          width={MENU_WIDTH}
+          onMouseOver={this.onDropdownHoverOver}
           onMouseOut={this.onDropdownHoverOut}
         >
-          {(!this.menuItemOpenId || this.diveX !== 0) &&
+          {(!this.menuItemOpenId || this.nestedMenuX !== 0) &&
             menuItems.map(menuItem => (
               <StyledMenuItem key={menuItem.name}>
                 <StyledMenuButton
-                  onClick={() => this.onItemClick(menuItem)}
+                  onClick={() => this.onBreadcrumbClick(menuItem)}
                   nested={menuItem.nested}
                 >
                   {menuItem.name}
                 </StyledMenuButton>
                 {menuItem.has_children && (
-                  <DiveButton
-                    // onMouseOver={ev => {
-                    //   this.onDiveHoverOver(menuItem, ev)
-                    // }}
-                    onMouseOut={this.onDiveHoverOut}
-                    onClick={ev => this.onDiveClick(menuItem, 1, ev)}
-                  >
+                  <DiveButton onClick={ev => this.onDiveClick(menuItem, 1, ev)}>
                     <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
                   </DiveButton>
                 )}
@@ -204,11 +193,13 @@ export class BreadcrumbItem extends React.Component {
             ))}
         </StyledMenu>
         {this.menuItemOpenId && (
-          <StyledMenuWrapper offsetPosition={{ x: this.diveX, y: this.diveY }}>
+          <StyledMenuWrapper
+            offsetPosition={{ x: this.nestedMenuX, y: this.nestedMenuY }}
+          >
             <StyledMenu
               width={230}
-              onMouseOver={this.onDiveMenuHoverOver}
-              onMouseOut={this.onDiveMenuHoverOut}
+              onMouseOver={this.onNestedMenuHoverOver}
+              onMouseOut={this.onNestedMenuHoverOut}
             >
               {this.breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.name}>
@@ -251,7 +242,7 @@ export class BreadcrumbItem extends React.Component {
           ref={this.props.forwardedRef}
           currentlyDraggedOn={!!showDrag}
           isLast={isLast}
-          onMouseOver={this.onHoverOver}
+          onMouseOver={this.onBreadcrumbHoverOver}
           onMouseOut={this.onBreadcrumbHoverOut}
         >
           {item.link && (

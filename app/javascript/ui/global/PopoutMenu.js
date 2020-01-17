@@ -45,7 +45,7 @@ export const StyledMenuButtonWrapper = styled.div`
 export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
-  transition: all 150ms;
+  transition: left 120ms;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
     const { position, offsetPosition, location } = props
@@ -93,8 +93,10 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
   background-color: white;
-  width: ${props => props.width}px;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
+  max-height: ${window.innerWidth - 260};
+  overflow-y: scroll;
+  width: ${props => props.width}px;
 `
 
 export const StyledMenuToggle = styled.button`
