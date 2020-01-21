@@ -205,7 +205,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
 
     pinner.call
-    render jsonapi: @collection_card.reload
+
+    render jsonapi: @collection_card.reload, include: CollectionCard.default_relationships_for_api
   end
 
   private

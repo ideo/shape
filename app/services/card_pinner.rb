@@ -29,5 +29,6 @@ class CardPinner < SimpleService
     )
 
     template.reorder_cards!
+    template.reload
   end
 end

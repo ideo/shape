@@ -246,7 +246,12 @@ export default class CardMoveService {
       }
     )
 
-    if (firstMovingCardIndex === -1) return false // erroneous case, ordered cards should be found in the collection_cards
+    if (firstMovingCardIndex === -1)
+      return (
+        (_.last(collection.collection_cards) &&
+          _.last(collection.collection_cards).isPinned) ||
+        false
+      )
     if (firstMovingCardIndex <= 1) return true // pin card if moving card in tbe beginning or next to a pinned card
     const leftOfFirstMovingCardIndex = firstMovingCardIndex - 1
     const leftOfFirstMovingCard =

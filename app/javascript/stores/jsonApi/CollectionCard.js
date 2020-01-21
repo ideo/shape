@@ -465,8 +465,7 @@ class CollectionCard extends BaseRecord {
         data,
       }
     )
-    // refetch cards to get the right order in the database
-    return this.parentCollection.API_fetchCards()
+    return this.parentCollection._reorderCards()
   }
 }
 

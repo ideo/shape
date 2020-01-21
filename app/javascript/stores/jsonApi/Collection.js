@@ -882,9 +882,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // NOTE: this should work ok even if there are infinite scroll / pagination cards
     // not being displayed offscreen...
     if (this.collection_cards) {
-      _.each(this.sortedCards, (card, i) => {
-        card.order = i
-      })
+      _.orderBy(this.collection_cards, ['pinned', 'order'], ['desc', 'asc'])
     }
   }
 
