@@ -118,7 +118,7 @@ export const StyledMenuButton = styled.button`
   font-weight: 400;
   font-size: 1rem;
   text-align: left;
-  max-width: 190px;
+  // max-width: 190px;
   padding-left: ${props => props.nested * 10}px;
 
   white-space: nowrap;
@@ -192,7 +192,7 @@ class PopoutMenu extends React.Component {
   }
 
   get renderMenuItems() {
-    const { groupExtraComponent, wrapperClassName } = this.props
+    const { groupExtraComponent, wrapperClassName, width } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -219,6 +219,7 @@ class PopoutMenu extends React.Component {
                 noBorder={item.noBorder}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
+                width={width - 20}
               >
                 <StyledMenuButton
                   onClick={loading ? () => null : onClick}
