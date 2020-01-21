@@ -164,7 +164,7 @@ class CollectionCard < ApplicationRecord
     synchronous: false,
     placeholder: nil,
     batch_id: nil,
-    should_pin_duplicating_cards: false,
+    should_pin_duplicating_cards: false
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
