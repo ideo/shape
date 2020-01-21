@@ -40,6 +40,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
         template.setup_templated_collection(
           for_user: user,
           collection: template_instance,
+          synchronous: :first_level,
         )
       end
       it 'should update all pinned cards to match any height, width and order updates' do
@@ -62,14 +63,14 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
         template.collection_cards.reload
 
         # Instance cards should reflect the updates, and be in the updated order
-        expect(template_instance.collection_cards.pinned[0].height).to eq(1)
-        expect(template_instance.collection_cards.pinned[0].width).to eq(1)
-        expect(template_instance.collection_cards.pinned[0].templated_from_id).to eq(
+        expect(template_instance.collection_cards[0].height).to eq(1)
+        expect(template_instance.collection_cards[0].width).to eq(1)
+        expect(template_instance.collection_cards[0].templated_from_id).to eq(
           second_template_card.id,
         )
-        expect(template_instance.collection_cards.pinned[1].height).to eq(2)
-        expect(template_instance.collection_cards.pinned[1].width).to eq(2)
-        expect(template_instance.collection_cards.pinned[1].templated_from_id).to eq(
+        expect(template_instance.collection_cards[1].height).to eq(2)
+        expect(template_instance.collection_cards[1].width).to eq(2)
+        expect(template_instance.collection_cards[1].templated_from_id).to eq(
           first_template_card.id,
         )
       end
@@ -84,7 +85,8 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
                  add_editors: [template_admin])
         end
         let(:organization) { create(:organization) }
-        let!(:template_instance) { create(:collection, template: template, created_by: user) }
+        let(:parent_collection) { create(:collection, organization: organization) }
+        let!(:template_instance) { create(:collection, template: template, created_by: user, parent_collection: parent_collection) }
         let(:template_text_item) { template.collection_cards.first.item }
         let(:instance_text_item) { template_instance.collection_cards.first.item }
         let!(:activity) { create(:activity, actor: user, action: :edited) }
@@ -131,6 +133,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
         template.setup_templated_collection(
           for_user: user,
           collection: template_instance,
+          synchronous: :first_level,
         )
         card_to_delete.update(archived: true)
       end

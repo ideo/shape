@@ -187,6 +187,7 @@ RSpec.describe CollectionCard, type: :model do
     let(:placement) { 'end' }
     let(:system_collection) { false }
     let(:placeholder) { nil }
+    let(:should_pin_duplicating_cards) { false }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
@@ -195,6 +196,7 @@ RSpec.describe CollectionCard, type: :model do
         placement: placement,
         system_collection: system_collection,
         placeholder: placeholder,
+        should_pin_duplicating_cards: should_pin_duplicating_cards,
       )
     end
 
@@ -313,14 +315,17 @@ RSpec.describe CollectionCard, type: :model do
       let(:template) { create(:collection, master_template: true) }
       let!(:collection_card) { create(:collection_card_text, pinned: true, parent: template) }
 
-      it 'should set pinned to true on the duplicate' do
-        expect(collection_card.pinned?).to be true
-        expect(duplicate.pinned?).to be true
+      it 'should not pin duplicating card if should_pin_duplicating_cards is false' do
+        expect(duplicate.pinned?).to be false
       end
 
-      it 'should set pinned even if original was not pinned' do
-        collection_card.update(pinned: false)
-        expect(duplicate.pinned?).to be true
+      context 'with should_pin_duplicating_cards is false' do
+        let!(:should_pin_duplicating_cards) { true }
+
+        it 'should set pinned to true on the duplicate and should_pin_duplicating_cards is true' do
+          expect(collection_card.pinned?).to be true
+          expect(duplicate.pinned?).to be true
+        end
       end
     end
 
@@ -642,7 +647,7 @@ RSpec.describe CollectionCard, type: :model do
 
       it 'should archive all cards in the query' do
         expect do
-          collection_cards.archive_all!(user_id: user.id)
+          collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
           collection.reload
         end.to change(CollectionCard.active, :count)
           .by(collection_cards.count * -1)
@@ -655,7 +660,7 @@ RSpec.describe CollectionCard, type: :model do
           collection_cards.map(&:id),
           user.id,
         )
-        collection_cards.archive_all!(user_id: user.id)
+        collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
       end
 
       context 'with a master template collection with 1 or more instances' do
@@ -668,7 +673,7 @@ RSpec.describe CollectionCard, type: :model do
             collection.collection_cards.pluck(:id),
             'archive',
           )
-          collection_cards.archive_all!(user_id: user.id)
+          collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
         end
       end
     end

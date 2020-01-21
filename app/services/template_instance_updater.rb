@@ -134,7 +134,8 @@ class TemplateInstanceUpdater
     return deleted_from_template_collection if deleted_from_template_collection.present?
 
     # add deleted_from_template_collection to the end of unpinned cards
-    order = instance.collection_cards.unpinned.last.order + 1
+    last_card_order = instance.collection_cards.last.present? ? instance.collection_cards.last.order + 1 : 0
+    order = instance.collection_cards.unpinned.last.present? ? instance.collection_cards.unpinned.last.present.order + 1 : last_card_order
 
     builder = CollectionCardBuilder.new(
       params: {
@@ -164,9 +165,9 @@ class TemplateInstanceUpdater
       # TODO: filter out archived cards?
       card_within_instance = all_cards_within_instance.where(templated_from_id: moving_card_id).first
 
-      next if card_within_instance.parent == instance # skip if card is already in top-level instance
-
       if card_within_instance.present?
+        next if card_within_instance.parent == instance # skip if card is already in top-level instance
+
         # find and move card within instance
         card_mover = CardMover.new(
           from_collection: card_within_instance.parent,

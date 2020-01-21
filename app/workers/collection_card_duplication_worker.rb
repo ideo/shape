@@ -29,9 +29,10 @@ class CollectionCardDuplicationWorker
 
   def duplicate_cards
     @parent_collection.update_processing_status(:duplicating)
-    first_moving_card_placement = @collection_cards.first.order
+
+    pin_duplicating_card = should_pin_duplicating_cards?
+
     # determine if all moving cards should be pinned/unpinned based on the card to the left of the first moving card
-    should_pin_duplicating_cards = @parent_collection.should_pin_cards?(first_moving_card_placement)
     cards_to_duplicate.map do |card|
       # duplicating each card in order, each subsequent one should be placed at the end
       placement = 'end'
@@ -56,7 +57,7 @@ class CollectionCardDuplicationWorker
         placeholder: placeholder,
         batch_id: @batch_id,
         building_template_instance: @building_template_instance,
-        should_pin_duplicating_cards: should_pin_duplicating_cards,
+        should_pin_duplicating_cards: pin_duplicating_card,
       )
     end
   end
@@ -103,5 +104,13 @@ class CollectionCardDuplicationWorker
     return unless mover.call
 
     @new_cards += mover.legend_item_cards
+  end
+
+  private
+
+  def should_pin_duplicating_cards?
+    return false unless @collection_cards.first.present?
+
+    @parent_collection.should_pin_cards?(@collection_cards.first.order)
   end
 end
