@@ -81,19 +81,15 @@ class Collection
     end
 
     def max_row_index
-      collection_cards.maximum(:row)
+      collection_cards.maximum(:row) || 0
     end
 
     def max_col_index
-      collection_cards.maximum(:col)
-    end
-
-    def last_non_blank_row
-      collection_cards.map(&:row).compact.max.to_i
+      collection_cards.maximum(:col) || 0
     end
 
     def empty_row_for_moving_cards
-      last_non_blank_row + 2
+      max_row_index + 2
     end
   end
 end

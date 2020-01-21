@@ -19,7 +19,11 @@ MarketingBack.displayName = 'StyledMarketingBack'
 
 /** @component */
 export const MarketingGradientTop = styled(MarketingBack)`
-  background: linear-gradient(to bottom, transparent 0%, ${v.colors.white} 100%),
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 1) 100%
+    ),
     url(${organicGridPillGray}), no-repeat, right, top;
   overflow: hidden;
   position: relative;
@@ -317,7 +321,7 @@ InvertedFixedWidth.displayName = 'StyledInvertedFixedWidth'
 export const MarketingStyledLink = styled(Anchor)`
   color: ${v.colors.commonLightest};
   letter-spacing: -0.2px;
-  font-size: 18px;
+  font-size: ${props => props.fontSize || 18}px;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
 `

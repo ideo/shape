@@ -166,6 +166,8 @@ export default class UiStore {
   @observable
   dragging = false
   @observable
+  draggingFromMDL = false
+  @observable
   textEditingItem = null
   @observable
   overdueBannerVisible = true
@@ -248,11 +250,15 @@ export default class UiStore {
   @action
   startDragging(cardId) {
     this.dragging = true
+    this.draggingFromMDL = false
     if (
       this.selectedCardIds.length > 0 &&
       this.selectedCardIds.indexOf(cardId.toString()) > -1
     ) {
       this.multiMoveCardIds = [...this.selectedCardIds]
+    } else if (_.includes(cardId, '-mdlPlaceholder')) {
+      this.draggingFromMDL = true
+      this.multiMoveCardIds = [...this.movingCardIds]
     } else {
       this.multiMoveCardIds = [cardId]
     }
@@ -513,8 +519,11 @@ export default class UiStore {
     this.isLoadingMoveAction = false
     this.cardAction = 'move'
     this.movingCardIds.replace([])
+    this.multiMoveCardIds.replace([])
+    this.movingIntoCollection = null
     this.movingFromCollectionId = null
     this.showTemplateHelperForCollection = null
+    this.draggingFromMDL = false
     if (deselect) this.deselectCards()
   }
 
@@ -572,6 +581,10 @@ export default class UiStore {
 
   get isAndroid() {
     return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
+  }
+
+  get isIOS() {
+    return getTouchDeviceOS() === TOUCH_DEVICE_OS.IOS
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
@@ -685,6 +698,7 @@ export default class UiStore {
 
   @computed
   get blankContentToolIsOpen() {
+    // even for foamcore, order will at least == 0 when open
     return this.blankContentToolState.order !== null
   }
 
@@ -709,7 +723,12 @@ export default class UiStore {
   @action
   closeBlankContentTool({ force = false } = {}) {
     const { viewingCollection } = this
-    if (!force && viewingCollection && viewingCollection.isEmpty) {
+    if (
+      !force &&
+      viewingCollection &&
+      !viewingCollection.isBoard &&
+      viewingCollection.isEmpty
+    ) {
       // shouldn't be allowed to close BCT on empty collection, send back to default
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()
@@ -1215,13 +1234,6 @@ export default class UiStore {
   @action
   closeAdminUsersMenu() {
     this.adminUsersMenuOpen = null
-  }
-
-  @action
-  clearMdlPlaceholder() {
-    this.multiMoveCardIds.replace(
-      _.reject(this.multiMoveCardIds, id => _.includes(id, '-mdlPlaceholder'))
-    )
   }
 
   @action

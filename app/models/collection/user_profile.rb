@@ -110,6 +110,7 @@ class Collection
       organization.profile_template.setup_templated_collection(
         for_user: user,
         collection: profile,
+        synchronous: :first_level,
       )
       # create the special profile tag for the profile collection
       organization.profile_template.tag(

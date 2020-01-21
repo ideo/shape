@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CollectionCardFilter, type: :service do
+RSpec.describe CollectionCardFilter::Base, type: :service do
   describe '#call (Collection#collection_cards_viewable_by)' do
     let(:user) { nil }
     let(:editor) { create(:user) }
@@ -62,7 +62,7 @@ RSpec.describe CollectionCardFilter, type: :service do
       archived_card.archive!
     end
     subject do
-      CollectionCardFilter.call(
+      CollectionCardFilter::Base.call(
         collection: collection,
         user: user,
         filters: filters,
@@ -112,7 +112,7 @@ RSpec.describe CollectionCardFilter, type: :service do
 
         it 'filters by row/col' do
           # Must re-instantiate subject so we can cast board to right class
-          cc_filter = CollectionCardFilter.call(
+          cc_filter = CollectionCardFilter::Base.call(
             collection: collection.becomes(Collection::Board),
             user: user,
             filters: filters,

@@ -213,20 +213,22 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  searchUsersAndGroups(query) {
-    return this.request(`search/users_and_groups?query=${query}`)
-  }
-
-  searchUsers(query) {
+  searchUsersAndGroups(params = {}) {
+    // possible params: query, per_page, users_only, groups_only
+    const defaultParams = { query: '' }
     return this.request(
-      `search/users_and_groups?query=${query}&users_only=true`
+      `search/users_and_groups?${queryString.stringify(
+        _.merge(defaultParams, params)
+      )}`
     )
   }
 
-  searchGroups(query) {
-    return this.request(
-      `search/users_and_groups?query=${query}&groups_only=true`
-    )
+  searchUsers({ query }) {
+    return this.searchUsersAndGroups({ query, users_only: true })
+  }
+
+  searchGroups({ query }) {
+    return this.searchUsersAndGroups({ query, groups_only: true })
   }
 
   searchOrganizations(query) {
@@ -681,6 +683,8 @@ class ApiStore extends jsonapi(datxCollection) {
     // reverse to and from values for potential undo operation
     const reversedData = {
       ...data,
+      // override any row/col placement, card orders will get overriden by snapshot
+      placement: 'beginning',
       to_id: data.from_id,
       from_id: data.to_id,
     }
@@ -688,8 +692,8 @@ class ApiStore extends jsonapi(datxCollection) {
     // add undo operation to stack so users can undo moving cards
     this.undoStore.pushUndoAction({
       message: 'Move undone',
-      apiCall: async () => {
-        await this.moveCards(reversedData, {
+      apiCall: () => {
+        this.moveCards(reversedData, {
           undoSnapshot: originalData,
         })
       },
@@ -697,10 +701,16 @@ class ApiStore extends jsonapi(datxCollection) {
         type: 'collections',
         id: fromCollection.id,
       },
+      redoRedirectPath: {
+        type: 'collections',
+        id: toCollection.id,
+      },
       redoAction: {
         message: 'Move redone',
         apiCall: async () => {
-          await this.moveCards(data, {})
+          // redo should just replicate the initial move
+          await this.moveCards(data)
+          toCollection.API_fetchCards()
         },
         actionType: POPUP_ACTION_TYPES.SNACKBAR,
       },

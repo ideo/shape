@@ -16,20 +16,40 @@
 
 class CollectionFilter < ApplicationRecord
   belongs_to :collection
-  # TODO should we destroy the user filters in a worker? they will never
-  # show up in the UI after their collection_filter is destroyed
   has_many :user_collection_filters,
            dependent: :destroy
+
+  validates :text, presence: true
 
   enum filter_type: {
     tag: 0,
     search: 1,
   }
 
-  # TODO look up these values as I forgot what they all mean
   amoeba do
     enable
     recognize []
     propagate
+  end
+
+  def duplicate!(assign_collection: collection)
+    cf = amoeba_dup
+    cf.collection = assign_collection
+    cf.save
+    cf
+  end
+
+  def reassign_within!(from_collection_id:, to_collection_id:)
+    text.sub!(
+      "within:#{from_collection_id}",
+      "within:#{to_collection_id}",
+    )
+    save
+  end
+
+  def within_collection_id
+    return if !search? || text.blank?
+
+    Search::Filters::WithinCollection.new(text).within_collection_id
   end
 end

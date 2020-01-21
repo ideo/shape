@@ -263,6 +263,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -771,6 +772,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "cardProperties": Array [],
                     "card_order": "order",
                     "checkCurrentOrg": [MockFunction],
+                    "clearCollectionCards": [MockFunction],
                     "collection_cards": Array [
                       Object {
                         "API_archive": [MockFunction],
@@ -2298,6 +2300,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "cardProperties": Array [],
                   "card_order": "order",
                   "checkCurrentOrg": [MockFunction],
+                  "clearCollectionCards": [MockFunction],
                   "collection_cards": Array [
                     Object {
                       "API_archive": [MockFunction],
@@ -2806,6 +2809,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "cardProperties": Array [],
                       "card_order": "order",
                       "checkCurrentOrg": [MockFunction],
+                      "clearCollectionCards": [MockFunction],
                       "collection_cards": Array [
                         Object {
                           "API_archive": [MockFunction],
@@ -4224,6 +4228,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "cardProperties": Array [],
                   "card_order": "order",
                   "checkCurrentOrg": [MockFunction],
+                  "clearCollectionCards": [MockFunction],
                   "collection_cards": Array [
                     Object {
                       "API_archive": [MockFunction],
@@ -5194,6 +5199,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -5702,6 +5708,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "cardProperties": Array [],
                     "card_order": "order",
                     "checkCurrentOrg": [MockFunction],
+                    "clearCollectionCards": [MockFunction],
                     "collection_cards": Array [
                       Object {
                         "API_archive": [MockFunction],
@@ -7096,6 +7103,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "cardProperties": Array [],
                     "card_order": "order",
                     "checkCurrentOrg": [MockFunction],
+                    "clearCollectionCards": [MockFunction],
                     "collection_cards": Array [
                       Object {
                         "API_archive": [MockFunction],
@@ -8064,6 +8072,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "cardProperties": Array [],
                   "card_order": "order",
                   "checkCurrentOrg": [MockFunction],
+                  "clearCollectionCards": [MockFunction],
                   "collection_cards": Array [
                     Object {
                       "API_archive": [MockFunction],
@@ -8537,6 +8546,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "cardProperties": Array [],
                     "card_order": "order",
                     "checkCurrentOrg": [MockFunction],
+                    "clearCollectionCards": [MockFunction],
                     "collection_cards": Array [
                       Object {
                         "API_archive": [MockFunction],
@@ -9045,6 +9055,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "cardProperties": Array [],
                         "card_order": "order",
                         "checkCurrentOrg": [MockFunction],
+                        "clearCollectionCards": [MockFunction],
                         "collection_cards": Array [
                           Object {
                             "API_archive": [MockFunction],
@@ -10443,6 +10454,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "cardProperties": Array [],
                       "card_order": "order",
                       "checkCurrentOrg": [MockFunction],
+                      "clearCollectionCards": [MockFunction],
                       "collection_cards": Array [
                         Object {
                           "API_archive": [MockFunction],
@@ -11385,6 +11397,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "cardProperties": Array [],
                         "card_order": "order",
                         "checkCurrentOrg": [MockFunction],
+                        "clearCollectionCards": [MockFunction],
                         "collection_cards": Array [
                           Object {
                             "API_archive": [MockFunction],
@@ -11893,6 +11906,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                             "cardProperties": Array [],
                             "card_order": "order",
                             "checkCurrentOrg": [MockFunction],
+                            "clearCollectionCards": [MockFunction],
                             "collection_cards": Array [
                               Object {
                                 "API_archive": [MockFunction],
@@ -13275,6 +13289,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "cardProperties": Array [],
                         "card_order": "order",
                         "checkCurrentOrg": [MockFunction],
+                        "clearCollectionCards": [MockFunction],
                         "collection_cards": Array [
                           Object {
                             "API_archive": [MockFunction],
@@ -14309,6 +14324,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
             "cardProperties": Array [],
             "card_order": "order",
             "checkCurrentOrg": [MockFunction],
+            "clearCollectionCards": [MockFunction],
             "collection_cards": Array [
               Object {
                 "API_archive": [MockFunction],
@@ -14782,6 +14798,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
               "cardProperties": Array [],
               "card_order": "order",
               "checkCurrentOrg": [MockFunction],
+              "clearCollectionCards": [MockFunction],
               "collection_cards": Array [
                 Object {
                   "API_archive": [MockFunction],
@@ -15290,6 +15307,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "cardProperties": Array [],
                   "card_order": "order",
                   "checkCurrentOrg": [MockFunction],
+                  "clearCollectionCards": [MockFunction],
                   "collection_cards": Array [
                     Object {
                       "API_archive": [MockFunction],
@@ -16688,6 +16706,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "cardProperties": Array [],
                 "card_order": "order",
                 "checkCurrentOrg": [MockFunction],
+                "clearCollectionCards": [MockFunction],
                 "collection_cards": Array [
                   Object {
                     "API_archive": [MockFunction],
@@ -17630,6 +17649,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "cardProperties": Array [],
                   "card_order": "order",
                   "checkCurrentOrg": [MockFunction],
+                  "clearCollectionCards": [MockFunction],
                   "collection_cards": Array [
                     Object {
                       "API_archive": [MockFunction],
@@ -18138,6 +18158,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "cardProperties": Array [],
                       "card_order": "order",
                       "checkCurrentOrg": [MockFunction],
+                      "clearCollectionCards": [MockFunction],
                       "collection_cards": Array [
                         Object {
                           "API_archive": [MockFunction],
@@ -19520,6 +19541,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "cardProperties": Array [],
                   "card_order": "order",
                   "checkCurrentOrg": [MockFunction],
+                  "clearCollectionCards": [MockFunction],
                   "collection_cards": Array [
                     Object {
                       "API_archive": [MockFunction],

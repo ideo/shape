@@ -17,9 +17,9 @@ const StyledFlex = styled.div`
   z-index: ${v.zIndex.gridCard};
 `
 
-const InlineLoader = ({ fixed, background }) => (
+const InlineLoader = ({ fixed, background, animation }) => (
   <StyledFlex fixed={fixed} background={background}>
-    <Loader fadeIn="half" height="30px" size={30} />
+    <Loader fadeIn="half" animation={animation} height="30px" size={30} />
   </StyledFlex>
 )
 InlineLoader.displayName = 'InlineLoader'
@@ -27,10 +27,12 @@ InlineLoader.displayName = 'InlineLoader'
 InlineLoader.propTypes = {
   fixed: PropTypes.bool,
   background: PropTypes.string,
+  animation: PropTypes.string,
 }
 InlineLoader.defaultProps = {
   fixed: false,
   background: 'commonDark',
+  animation: 'cube',
 }
 
 export default InlineLoader

@@ -104,6 +104,7 @@ describe Templateable, type: :concern do
         template.setup_templated_collection(
           for_user: user,
           collection: template_instance,
+          synchronous: :first_level,
         )
       end
       let!(:deleted_card) do
@@ -188,7 +189,7 @@ describe Templateable, type: :concern do
       it 'notifies all editors that card has been moved' do
         expect {
           template.update_template_instances
-        }.to change(Activity, :count).by(1)
+        }.to change(Activity, :count).by(1 + added_cards.size)
         deleted_item_in_instance = deleted_from_collection.items.where(
           cloned_from_id: deleted_card.record.id,
         ).first
@@ -216,7 +217,8 @@ describe Templateable, type: :concern do
                add_editors: [template_admin])
       end
       let(:organization) { create(:organization) }
-      let!(:template_instance) { create(:collection, template: template, created_by: user) }
+      let(:parent_collection) { create(:collection, organization: organization) }
+      let!(:template_instance) { create(:collection, template: template, created_by: user, parent_collection: parent_collection) }
       let(:template_text_item) { template.collection_cards.last.item }
       let(:instance_text_item) { template_instance.collection_cards.last.item }
       let(:data) do

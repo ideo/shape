@@ -46,11 +46,11 @@ module TestResultsCollection
         test_results_collection.id,
         created_by&.id,
       ]
-      if ENV['CYPRESS'].present?
-        TestResultsCollection::CreateContentWorker.new.perform(*opts)
-      else
-        TestResultsCollection::CreateContentWorker.perform_async(*opts)
-      end
+      TestResultsCollection::CreateContentWorker.send(
+        "perform_#{ENV['CYPRESS'].present? ? 'sync' : 'async'}",
+        test_results_collection.id,
+        created_by&.id,
+      )
     end
 
     private

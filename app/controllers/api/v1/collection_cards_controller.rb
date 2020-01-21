@@ -214,11 +214,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       to_collection: @to_collection,
       for_user: current_user,
     )
-    # card is the newly created placeholder
-    render jsonapi: card,
-           include: CollectionCard.default_relationships_for_api,
-           meta: { placeholder: true },
-           expose: { current_record: card.record }
+
+    if card
+      # card is the newly created placeholder
+      render jsonapi: card,
+             include: CollectionCard.default_relationships_for_api,
+             meta: { placeholder: true },
+             expose: { current_record: card.record }
+    else
+      render json: { errors: 'Unable to create placeholder' }, status: :unprocessable_entity
+    end
   end
 
   def bulk_operation_threshold
@@ -244,7 +249,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     ids_only = params[:action] == 'ids'
     filter_params = params[:filter].present? ? params[:filter] : params
     filter_params.merge(q: params[:q]) if params[:q].present?
-    @collection_cards = CollectionCardFilter
+    @collection_cards = CollectionCardFilter::Base
                         .call(
                           collection: @collection,
                           user: current_user,

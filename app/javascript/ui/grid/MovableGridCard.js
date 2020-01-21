@@ -93,11 +93,11 @@ const scrollAmount = () => {
 @observer
 class MovableGridCard extends React.Component {
   unmounted = false
+  timeoutId = null
 
   constructor(props) {
     super(props)
     this.state = {
-      timeoutId: null,
       // this is really just used so that it will reset when you finish dragging
       dragging: false,
       resizing: false,
@@ -260,7 +260,7 @@ class MovableGridCard extends React.Component {
   }
 
   handleDrag = (e, data, dX, dY) => {
-    if (!this.shouldDragCard) return
+    if (!this.shouldDragCard || this.unmounted) return
     const { card, position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
@@ -325,6 +325,7 @@ class MovableGridCard extends React.Component {
   }
 
   handleStop = type => ev => {
+    if (this.unmounted) return
     const { horizontalScroll, onDragOrResizeStop } = this.props
     this.scrolling = false
     document.body.style['overflow-y'] = 'auto'
@@ -340,7 +341,8 @@ class MovableGridCard extends React.Component {
           resizeHeight: 0,
         })
         onDragOrResizeStop(this.props.card.id, type, ev)
-        const timeoutId = setTimeout(() => {
+        this.timeoutId = setTimeout(() => {
+          if (this.umounted) return
           // have this item remain "on top" while it animates back
           this.setState({
             moveComplete: true,
@@ -349,9 +351,6 @@ class MovableGridCard extends React.Component {
         }, 350)
         uiStore.stopDragging()
         this.debouncedAllowTouchDeviceDrag.cancel()
-        this.setState({
-          timeoutId,
-        })
         this.scrolling = false
       }
     )
@@ -426,8 +425,8 @@ class MovableGridCard extends React.Component {
   }
 
   clearDragTimeout = () => {
-    if (this.state.timeoutId) {
-      clearTimeout(this.state.timeoutId)
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId)
     }
     this.scrolling = false
   }
@@ -544,7 +543,7 @@ class MovableGridCard extends React.Component {
   }
 
   get hoveringOver() {
-    const { card } = this.props
+    const { card, cardType, parent } = this.props
     const { hoveringOver } = uiStore
     const isHoveringOver =
       hoveringOver && hoveringOver.card && hoveringOver.card.id === card.id
@@ -555,7 +554,10 @@ class MovableGridCard extends React.Component {
     if (isHoveringOver) {
       holdingOver = hoveringOver.holdingOver
       hoveringOverLeft = hoveringOver.direction === 'left'
-      hoveringOverRight = hoveringOver.direction === 'right'
+      hoveringOverRight =
+        hoveringOver.direction === 'right' ||
+        // in foamcore, hovering over a collection is always treated as hoveringOverRight
+        (cardType === 'collections' && parent.isBoard)
     }
 
     return {
@@ -577,7 +579,6 @@ class MovableGridCard extends React.Component {
       isSharedCollection,
       isBoardCollection,
       lastPinnedCard,
-      hidden,
       maxResizeRow,
       maxResizeCol,
       zoomLevel,
@@ -717,7 +718,6 @@ class MovableGridCard extends React.Component {
     const touchDeviceClass =
       isTouchDeviceSingleColumn || isCypress ? 'touch-device' : ''
 
-    let shouldHide = !dragging && hidden
     const defaultPosition = {
       width: adjustedWidth,
       height: adjustedHeight,
@@ -725,11 +725,12 @@ class MovableGridCard extends React.Component {
       y: yPos,
     }
 
+    let shouldHide = false
     if (card.isMDLPlaceholder) {
       _zIndex = cardDragging
       cardProps.searchResult = true
       cardProps.canEditCollection = false
-      shouldHide = shouldHide || !shouldOpenMoveSnackbar
+      shouldHide = !shouldOpenMoveSnackbar
     }
 
     const draggingMultiple =
@@ -850,7 +851,6 @@ MovableGridCard.propTypes = {
   isBoardCollection: PropTypes.bool,
   routeTo: PropTypes.func,
   lastPinnedCard: PropTypes.bool,
-  hidden: PropTypes.bool,
   zoomLevel: PropTypes.number,
   maxResizeRow: PropTypes.number,
   maxResizeCol: PropTypes.number,
@@ -866,7 +866,6 @@ MovableGridCard.defaultProps = {
   isSharedCollection: false,
   isBoardCollection: false,
   lastPinnedCard: false,
-  hidden: false,
   zoomLevel: 1,
   maxResizeRow: 2,
   maxResizeCol: 4,

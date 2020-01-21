@@ -251,12 +251,14 @@ describe Collection, type: :model do
     end
     let(:copy_parent_card) { false }
     let(:parent) { collection.parent }
+    let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}" }
     let(:card) { nil }
     let(:duplicate) do
       dupe = collection.duplicate!(
         for_user: user,
         copy_parent_card: copy_parent_card,
         parent: parent,
+        batch_id: batch_id,
         card: card,
       )
       # Necessary because AR-relationship is cached
@@ -310,6 +312,7 @@ describe Collection, type: :model do
         dupe = collection.duplicate!(
           copy_parent_card: true,
           parent: parent,
+          batch_id: batch_id,
         )
         user.roles.reload
         user.reset_cached_roles!
@@ -322,6 +325,7 @@ describe Collection, type: :model do
 
       it 'clones all the collection cards' do
         expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          batch_id,
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           nil,
@@ -375,13 +379,17 @@ describe Collection, type: :model do
 
       it 'clones all the collection cards' do
         expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          batch_id,
           collection.collection_cards.map(&:id),
           instance_of(Integer),
           user.id,
           false,
           false,
         )
-        collection.duplicate!(for_user: user)
+        collection.duplicate!(
+          for_user: user,
+          batch_id: batch_id,
+        )
       end
 
       it 'clones all roles from parent collection' do
@@ -411,13 +419,19 @@ describe Collection, type: :model do
       it 'should call synchronously' do
         expect(CollectionCardDuplicationWorker).to receive(:new)
         expect(instance_double).to receive(:perform).with(
+          batch_id,
           anything,
           anything,
           anything,
           true,
           true,
         )
-        collection.duplicate!(for_user: user, system_collection: true, synchronous: true)
+        collection.duplicate!(
+          batch_id: batch_id,
+          for_user: user,
+          system_collection: true,
+          synchronous: true,
+        )
       end
     end
 
@@ -521,8 +535,8 @@ describe Collection, type: :model do
     end
 
     it 'should gather collection tags' do
-      collection.update(tag_list: %w[this that])
-      expect(collection.reload.all_tag_names).to match_array %w[this that]
+      collection.update(tag_list: ['this', 'interstellar space dust'])
+      expect(collection.reload.all_tag_names).to match_array ['this', 'interstellar space dust']
     end
 
     it 'should gather collection + item tags' do

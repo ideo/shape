@@ -28,6 +28,10 @@ class Cache
     value
   end
 
+  def self.expire(key, seconds_from_now)
+    client.expire(key, seconds_from_now)
+  end
+
   def self.delete(key)
     client.del(key) == '1'
   end
@@ -54,5 +58,35 @@ class Cache
 
   def self.set_remove(key, value)
     client.srem(key, value) == '1'
+  end
+
+  def self.hash_set(key, field, value, raw: false)
+    value = JSON.generate(value) unless raw
+    client.hset(key, field, value)
+  end
+
+  def self.hash_values(key)
+    client.hvals(key)
+  end
+
+  def self.hash_get(key, field, raw: false)
+    value = client.hget(key, field)
+    return value if raw || value.blank?
+
+    JSON.parse(value)
+  end
+
+  def self.hash_get_all(key, raw: false)
+    client.hgetall(key).each_with_object({}) do |(k, v), h|
+      h[k] = v.present? && !raw ? JSON.parse(v) : v
+    end
+  end
+
+  def self.hash_exists?(key, field)
+    client.hexists(key, field)
+  end
+
+  def self.hash_delete(key, field)
+    client.hdel(key, field) == '1'
   end
 end
