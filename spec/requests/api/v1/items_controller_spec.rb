@@ -156,8 +156,8 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         user.add_role(Role::VIEWER, collection)
         get(path)
         expect(json['data']['attributes']['breadcrumb']).to match_array([
-          { type: 'collections', id: collection.id.to_s, name: collection.name, can_edit: false },
-          { type: 'items', id: item.id.to_s, name: item.name, can_edit: false },
+          { type: 'collections', id: collection.id.to_s, name: collection.name, can_edit: false, has_children: false },
+          { type: 'items', id: item.id.to_s, name: item.name, can_edit: false, has_children: false },
         ].as_json)
       end
     end
