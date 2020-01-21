@@ -284,7 +284,15 @@ class Collection < ApplicationRecord
 
   def all_tag_names
     # We include item tags because you currently can't search for items
-    (tags.map(&:name) + items.map(&:tags).flatten.map(&:name)).map(&:downcase).uniq
+    all_tags = (
+      tags.map(&:name) +
+      items.includes(:tags).map(&:tags).flatten.map(&:name)
+    ).map(&:downcase).uniq
+
+    # Remove all dashes, because we use dashes to indicate spaces
+    all_tags.map do |tag|
+      tag.gsub(/\-+/, ' ')
+    end
   end
 
   def search_content
@@ -355,6 +363,7 @@ class Collection < ApplicationRecord
     building_template_instance: false,
     system_collection: false,
     synchronous: false,
+    batch_id: nil,
     card: nil
   )
 
@@ -410,6 +419,7 @@ class Collection < ApplicationRecord
         for_user: for_user,
         shallow: true,
         parent: parent,
+        batch_id: batch_id,
       )
       c.parent_collection_card.collection = c
     end
@@ -419,19 +429,20 @@ class Collection < ApplicationRecord
 
     c.enable_org_view_access_if_allowed
 
+    collection_filters.each do |cf|
+      cf.duplicate!(assign_collection: c)
+    end
+
     if collection_cards.any? && !c.getting_started_shell
-      worker_opts = [
+      CollectionCardDuplicationWorker.send(
+        "perform_#{synchronous ? 'sync' : 'async'}",
+        batch_id,
         collection_cards.map(&:id),
         c.id,
         for_user.try(:id),
         system_collection,
         synchronous,
-      ]
-      if synchronous
-        CollectionCardDuplicationWorker.new.perform(*worker_opts)
-      else
-        CollectionCardDuplicationWorker.new.perform(*worker_opts)
-      end
+      )
     end
 
     # pick up newly created relationships
@@ -445,20 +456,20 @@ class Collection < ApplicationRecord
     system_collection: false
   )
     cards = placement != 'end' ? collection_cards.reverse : collection_cards
-    duplicates = []
-    cards.each do |card|
+    cards = cards.select do |card|
       # ensures single copy, if existing copies already exist it will skip those
       existing_records = target_collection.collection_cards.map(&:record)
-      next if existing_records.select { |r| r.cloned_from == card.record }.present?
-
-      duplicates << card.duplicate!(
-        parent: target_collection,
-        placement: placement,
-        synchronous: synchronous,
-        # can allow copies to continue even if the user can't view the original content
-        system_collection: system_collection,
-      )
+      existing_records.none? { |record| record.cloned_from == card.record }
     end
+
+    duplicates = CollectionCardDuplicator.call(
+      to_collection: target_collection,
+      cards: cards,
+      placement: placement,
+      system_collection: system_collection,
+      synchronous: synchronous ? :all_levels : :async,
+    )
+
     # return the set of created duplicates
     CollectionCard.where(id: duplicates.pluck(:id))
   end
@@ -574,7 +585,7 @@ class Collection < ApplicationRecord
   end
 
   def collection_cards_viewable_by(user:, filters: {})
-    CollectionCardFilter.call(
+    CollectionCardFilter::Base.call(
       collection: self,
       user: user,
       filters: filters,
@@ -958,6 +969,8 @@ class Collection < ApplicationRecord
 
   # convert placement of 'beginning' or 'end' into an integer order
   def card_order_at(placement)
+    return placement if placement.is_a?(Integer)
+
     # default to 'beginning', which goes after the first pinned card
     if master_template?
       order = 0
@@ -967,8 +980,6 @@ class Collection < ApplicationRecord
     if placement == 'end'
       order = cached_last_card_order || collection_cards.maximum(:order) || -1
       order += 1
-    elsif placement.is_a?(Integer)
-      order = placement
     end
     order
   end

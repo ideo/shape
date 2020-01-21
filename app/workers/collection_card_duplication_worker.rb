@@ -3,12 +3,15 @@ class CollectionCardDuplicationWorker
   sidekiq_options queue: 'critical'
 
   def perform(
+    batch_id,
     card_ids,
     parent_collection_id,
     for_user_id = nil,
     system_collection = false,
-    synchronous = false
+    synchronous = false,
+    building_template_instance = false
   )
+    @batch_id = batch_id
     @collection_cards = CollectionCard.active.where(id: card_ids).ordered
     @for_user = User.find(for_user_id) if for_user_id.present?
     @parent_collection = Collection.find(parent_collection_id)
@@ -16,9 +19,12 @@ class CollectionCardDuplicationWorker
     @synchronous = synchronous
     @system_collection = system_collection
     @from_collection = nil
-
-    duplicate_cards
+    @building_template_instance = building_template_instance
+    @new_cards = duplicate_cards
+    duplicate_legend_items
     update_parent_collection_status
+    create_notifications
+    @new_cards
   end
 
   def duplicate_cards
@@ -26,11 +32,7 @@ class CollectionCardDuplicationWorker
     first_moving_card_placement = @collection_cards.first.order
     # determine if all moving cards should be pinned/unpinned based on the card to the left of the first moving card
     should_pin_duplicating_cards = @parent_collection.should_pin_cards?(first_moving_card_placement)
-    @collection_cards.each do |card|
-      # Skip duplicating any cards this user can't view (if user provided)
-      # If a system collection don't check if user can view
-      next if @for_user.present? && !@system_collection && !card.record.can_view?(@for_user)
-
+    cards_to_duplicate.map do |card|
       # duplicating each card in order, each subsequent one should be placed at the end
       placement = 'end'
       source_card = card
@@ -44,6 +46,7 @@ class CollectionCardDuplicationWorker
       end
       # capture this for notification builder
       @from_collection ||= source_card.parent
+
       source_card.duplicate!(
         for_user: @for_user,
         parent: @parent_collection,
@@ -51,8 +54,24 @@ class CollectionCardDuplicationWorker
         system_collection: @system_collection,
         synchronous: @synchronous,
         placeholder: placeholder,
+        batch_id: @batch_id,
+        building_template_instance: @building_template_instance,
         should_pin_duplicating_cards: should_pin_duplicating_cards,
       )
+    end
+  end
+
+  def cards_to_duplicate
+    @collection_cards.select do |card|
+      # Skip duplicating any cards this user can't view (if user provided)
+      # If a system collection don't check if user can view
+      if @building_template_instance || @system_collection
+        true
+      elsif @for_user.present? && !card.record.can_view?(@for_user)
+        false
+      else
+        true
+      end
     end
   end
 
@@ -66,12 +85,23 @@ class CollectionCardDuplicationWorker
       ActivityAndNotificationBuilder.call(
         actor: @for_user,
         target: card.record,
-        action: :duplicate,
+        action: :duplicated,
         subject_user_ids: card.record.editors[:users].pluck(:id),
         subject_group_ids: card.record.editors[:groups].pluck(:id),
         source: @from_collection,
-        destination: @to_collection,
+        destination: @parent_collection,
       )
     end
+  end
+
+  def duplicate_legend_items
+    mover = LegendMover.new(
+      to_collection: @parent_collection,
+      cards: (@parent_collection.collection_cards + @new_cards).compact.uniq,
+      action: 'duplicate',
+    )
+    return unless mover.call
+
+    @new_cards += mover.legend_item_cards
   end
 end

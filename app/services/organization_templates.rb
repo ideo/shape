@@ -44,7 +44,7 @@ class OrganizationTemplates < SimpleService
     @org.primary_group.add_role(Role::VIEWER, template_collection)
     template_collection.update(shared_with_organization: true)
     # also make sure to share with the initial creator
-    LinkToSharedCollectionsWorker.new.perform(
+    LinkToSharedCollectionsWorker.perform_sync(
       [@org.primary_group.user_ids],
       [],
       [template_collection.id],

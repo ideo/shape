@@ -9,7 +9,7 @@
       "url": "heroku/ruby"
     }
   ],
-  "addons": ["heroku-postgresql", "rediscloud", "bonsai", "sendgrid"],
+  "addons": [],
   "env": {
     "FILESTACK_API_KEY": {
       "required": true

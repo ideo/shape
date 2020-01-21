@@ -30,7 +30,10 @@ describe('CommentInput', () => {
   })
 
   it('calls apiStore.searchUsersAndGroups', () => {
-    component._searchUsersAndGroups('ideo')
-    expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('ideo')
+    component._searchUsersAndGroups({ query: 'ideo', per_page: 6 })
+    expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith({
+      query: 'ideo',
+      per_page: 6,
+    })
   })
 })

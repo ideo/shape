@@ -589,11 +589,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     } else if (this.isSearchCollection) {
       return {}
     }
+    const spaces = /\s+/
     const activeFilters = collection_filters
       .filter(filter => filter.selected)
-      .map(filter =>
-        filter.filter_type === 'tag' ? `#${filter.text}` : filter.text
-      )
+      .map(filter => {
+        if (filter.filter_type === 'tag') {
+          return `#${filter.text.replace(spaces, '-')}`
+        } else {
+          return filter.text
+        }
+      })
     if (activeFilters.length === 0) return {}
     return { q: activeFilters.join(' ') }
   }

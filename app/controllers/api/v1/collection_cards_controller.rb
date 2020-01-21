@@ -260,7 +260,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     ids_only = params[:action] == 'ids'
     filter_params = params[:filter].present? ? params[:filter] : params
     filter_params.merge(q: params[:q]) if params[:q].present?
-    @collection_cards = CollectionCardFilter
+    @collection_cards = CollectionCardFilter::Base
                         .call(
                           collection: @collection,
                           user: current_user,

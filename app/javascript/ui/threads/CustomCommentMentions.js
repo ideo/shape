@@ -49,16 +49,18 @@ export const StyledCommentInput = styled.div`
 
   .draftJsMentionPlugin__mentionSuggestionsEntry__3mSwm {
     color: #444;
-    padding: 7px 10px 3px 10px;
+    padding: 7px 10px 7px 10px;
     transition: background-color 0.4s cubic-bezier(0.27, 1.27, 0.48, 0.56);
+    margin-bottom: 2px;
+    border-bottom: 2px solid ${v.colors.secondaryDark};
   }
 
   .draftJsMentionPlugin__mentionSuggestionsEntry__3mSwm:active {
-    background-color: #cce7ff;
+    background-color: ${v.colors.secondaryDarkest};
   }
 
   .draftJsMentionPlugin__mentionSuggestionsEntryFocused__3LcTd {
-    background-color: #e6f3ff;
+    background-color: ${v.colors.secondaryDarkest};
   }
 
   .draftJsMentionPlugin__mentionSuggestionsEntryText__3Jobq {
@@ -80,13 +82,12 @@ export const StyledCommentInput = styled.div`
   }
 
   .draftJsMentionPlugin__mentionSuggestions__2DWjA {
-    border: 1px solid #eee;
     margin-top: 0.4em;
     top: 0;
     position: fixed;
     min-width: 220px;
     max-width: 440px;
-    background: #fff;
+    background: ${v.colors.secondaryMedium};
     border-radius: 2px;
     cursor: pointer;
     padding-top: 8px;
@@ -98,8 +99,9 @@ export const StyledCommentInput = styled.div`
     -webkit-box-direction: normal;
     flex-direction: column;
     box-sizing: border-box;
-    -webkit-transform: scale(0);
-    transform: scale(0);
+    max-height: ${props =>
+      props.mentionsSize === 'default' ? '340px' : '190px'};
+    overflow-y: scroll;
   }
 
   .mentionSuggestionsEntryContainer {
@@ -127,11 +129,11 @@ export const StyledCommentInput = styled.div`
 
   .mentionSuggestionsEntryText {
     font-size: 80%;
-    color: #a7a7a7;
+    color: ${v.colors.commonMedium};
   }
 
   .mentionSuggestionsEntryTitle {
-    color: ${v.colors.black};
+    color: ${v.colors.commonLight};
     font-family: ${v.fonts.sans};
     font-weight: ${v.weights.book};
   }

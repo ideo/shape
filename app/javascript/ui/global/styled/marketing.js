@@ -321,7 +321,7 @@ InvertedFixedWidth.displayName = 'StyledInvertedFixedWidth'
 export const MarketingStyledLink = styled(Anchor)`
   color: ${v.colors.commonLightest};
   letter-spacing: -0.2px;
-  font-size: 18px;
+  font-size: ${props => props.fontSize || 18}px;
   font-family: ${v.fonts.sans};
   font-weight: ${v.weights.book};
 `

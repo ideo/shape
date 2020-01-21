@@ -154,9 +154,13 @@ class User < ApplicationRecord
   end
 
   enum status: {
+    # active = has an active (INA) login
     active: 0,
+    # pending = was invited via email but has not yet logged in
     pending: 1,
+    # archived = user was deleted from INA
     archived: 2,
+    # limited = survey respondent user, does not have access to the full app
     limited: 3,
   }
 
