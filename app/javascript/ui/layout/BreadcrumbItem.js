@@ -70,6 +70,7 @@ const DiveButton = styled.button`
   margin-top: -10px;
   width: 35px;
 `
+DiveButton.displayName = 'DiveButton'
 
 const NestedArrowHolder = styled.div`
   display: inline-block;
@@ -84,6 +85,7 @@ const NestedArrowHolder = styled.div`
     width: 10px;
   }
 `
+NestedArrowHolder.displayName = 'NestedArrowHolder'
 
 const NestedLineHolder = styled.div`
   display: inline-block;
@@ -98,6 +100,7 @@ const NestedLineHolder = styled.div`
     height: 12px;
   }
 `
+NestedLineHolder.displayName = 'NestedLineHolder'
 
 const NEST_AMOUNT_Y_PX = 44
 const MENU_WIDTH = 250
