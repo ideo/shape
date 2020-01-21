@@ -118,7 +118,7 @@ export const StyledMenuButton = styled.button`
   font-weight: 400;
   font-size: 1rem;
   text-align: left;
-  // max-width: 190px;
+  max-width: 190px;
   padding-left: ${props => props.nested * 10}px;
 
   white-space: nowrap;
