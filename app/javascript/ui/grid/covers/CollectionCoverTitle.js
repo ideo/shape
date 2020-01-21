@@ -3,10 +3,11 @@ import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 import styled from 'styled-components'
 import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
+import { some } from 'lodash'
 
 function namePartTooLong(fullName) {
   const parts = fullName.split(' ')
-  return parts.some(part => part.length > 14)
+  return some(parts, part => part.length > 14)
 }
 
 function splitName(name) {
@@ -47,7 +48,7 @@ class CollectionCoverTitle extends React.Component {
     const { collection } = this.props
 
     const leftConditions = [collection.isMasterTemplate]
-    if (leftConditions.some(bool => bool)) {
+    if (some(leftConditions, bool => bool)) {
       return <CollectionTypeIcon record={collection} />
     }
     return null
@@ -64,7 +65,7 @@ class CollectionCoverTitle extends React.Component {
       collection.isProfileTemplate,
     ]
 
-    if (rightConditions.some(bool => bool)) {
+    if (some(rightConditions, bool => bool)) {
       return <CollectionTypeIcon record={collection} />
     }
     return null
