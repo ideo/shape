@@ -344,6 +344,17 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         )
         post(path, params: params)
       end
+      it 'creates Activity item' do
+        allow(ActivityAndNotificationBuilder).to receive(:call)
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: user,
+          target: instance,
+          source: template,
+          action: :template_used,
+          content: template.collection_type,
+        )
+        post(path, params: params)
+      end
 
       context 'with collection name in params' do
         let(:params_with_name) do

@@ -971,11 +971,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     hasPaidAudience = false,
     ideasCount = 0,
   }) => {
-    const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
       event: 'formSubmission',
       formType: `${actionName} Feedback Test`,
-      organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: this.launchableTestId,
       hasLinkSharingAudience,
@@ -1231,7 +1229,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         placement: 'beginning',
       }
       uiStore.update('isLoading', true)
-      const res = await apiStore.createTemplateInstance(templateData)
+      const res = await apiStore.createTemplateInstance(templateData, template)
       uiStore.update('isLoading', false)
       routingStore.routeTo('collections', res.data.id)
     } else {

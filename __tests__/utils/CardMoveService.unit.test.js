@@ -4,6 +4,9 @@ import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeUser } from '#/mocks/data'
+import googleTagManager from '~/vendor/googleTagManager'
+
+jest.mock('../../app/javascript/vendor/googleTagManager')
 
 const apiStore = fakeApiStore()
 const uiStore = fakeUiStore
@@ -221,11 +224,14 @@ describe('CardMoveService', () => {
 
       it('should request the api to create the template', async () => {
         await service.moveCards('beginning')
-        expect(apiStore.createTemplateInstance).toHaveBeenCalledWith({
-          parent_id: uiStore.viewingCollection.id,
-          template_id: uiStore.movingFromCollectionId,
-          placement: 'beginning',
-        })
+        expect(apiStore.createTemplateInstance).toHaveBeenCalledWith(
+          {
+            parent_id: uiStore.viewingCollection.id,
+            template_id: uiStore.movingFromCollectionId,
+            placement: 'beginning',
+          },
+          uiStore.viewingCollection
+        )
         // expect the collection to reload
         expect(uiStore.viewingCollection.API_fetchCards).toHaveBeenCalled()
       })
