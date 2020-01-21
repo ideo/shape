@@ -57,6 +57,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'submission_box_type',
     'collection_to_test_id',
     'test_show_media',
+    'collection_type',
   ]
 
   constructor(...args) {
@@ -1162,6 +1163,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const apiPath = `test_collections/${this.id}/remove_comparison`
     const data = { comparison_collection_id: comparisonTest.id }
     return this.apiStore.request(apiPath, 'POST', { data })
+  }
+
+  async API_selectCollectionType(collectionType) {
+    const apiPath = `collections/${this.id}`
+    const data = {
+      type: 'collections',
+      attributes: {
+        collection_type: collectionType,
+      },
+    }
+    return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
   async API_moveCardsIntoCollection({
