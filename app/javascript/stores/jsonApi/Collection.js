@@ -163,7 +163,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.collection_cards.length === 0) return [[]]
 
     // Get maximum dimensions of our card matrix
-    // const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
     const maxCol = 15
     const maxRow = _.max(this.collection_cards.map(card => card.maxRow))
 

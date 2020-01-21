@@ -71,34 +71,55 @@ module CollectionGrid
       cards
     end
 
-    def board_matrix(
-      collection:
-    )
-      return [] if collection.collection_cards.count === 0
-      max_col = 15
-      # TODO define card.max_row
-      max_row = maximum(collection.collection_cards.map{ |card| card.max_row })
-      matrix = [0..max_row + 1].map{ |row| [0..max_col + 1] }
+    def self.card_max_row(card)
+      return 0 if card.row.blank? || card.height.blank?
 
-      collection.collection_cards.each do |card|
-        rows = [card.row..card.max_row + 1]
-        cols = [card.col..card.max_col + 1]
+      card.row + card.height - 1
+    end
 
+    def self.card_max_col(card)
+      return 0 if card.col.blank? || card.width.blank?
+
+      card.col + card.width - 1
+    end
+
+    def self.board_matrix(collection:, drag_positions: {}, debug: true)
+      return [] if collection.collection_cards.count.zero?
+
+      cards = collection.collection_cards
+      if drag_positions.present?
+        cards += drag_positions.values
+      end
+
+      max_row = cards.map { |card| card_max_row(card) }.max
+      matrix = Array.new(max_row + 1) { Array.new(16) }
+
+      cards.each do |card|
+        rows = (card.row..card_max_row(card))
+        cols = (card.col..card_max_col(card))
         rows.each do |row|
           cols.each do |col|
             matrix[row][col] = card
           end
         end
       end
+
+      if debug
+        output = matrix.map do |row|
+          row.map { |c| c.nil? ? '' : c.id }
+        end
+        pp output
+      end
+
       matrix
     end
 
-    def determine_foamcore_drag_map(
+    def self.determine_drag_map(
       master_card:,
       moving_cards:,
       from_collection:
     )
-      if !from_collection.is_a(Collection::Board)
+      unless from_collection.is_a?(Collection::Board)
         moving_cards.unshift(master_card)
         moving_cards = calculate_rows_cols(moving_cards)
       end
@@ -107,57 +128,94 @@ module CollectionGrid
         col = card.col
         master_col = master_card.col
         master_row = master_card.row
-        return {
+        Mashie.new(
           card: card,
           col: col - master_col,
           row: row - master_row,
-        }
+        )
       end
       drag_map
     end
 
-    def foamcore_collision(
-      placeholder:,
+    def self.place_foamcore_cards(
+      row:,
+      col:,
+      master_card:,
       collection:,
+      from_collection:,
       moving_cards:
     )
+      drag_positions = {}
+      master_position = Mashie.new(
+        row: row,
+        col: col,
+        height: master_card.height,
+        width: master_card.width,
+      )
+      drag_map = determine_drag_map(
+        master_card: master_card,
+        moving_cards: moving_cards,
+        from_collection: from_collection,
+      )
+
       open_spot_matrix = calculate_open_spot_matrix(
         collection: collection,
         moving_cards: moving_cards,
-        drag_grid_spot: placeholder,
       )
-      open_spot = find_closest_open_spot(placeholder, open_spot_matrix)
-      if open_spot
-        placeholder.row = open_spot.row
-        placeholder.col = open_spot.col
-        drag_map = determine_foamcore_drag_map(
-          master_card: placeholder,
-          moving_cards: moving_cards
+
+      drag_map.each do |mapped|
+        card = mapped.card
+        position = Mashie.new(
+          row: mapped.row + master_position.row,
+          col: mapped.col + master_position.col,
+          width: card.width,
+          height: card.height,
         )
-        return drag_map
-      else
-        return false
+
+        open_spot = find_closest_open_spot(
+          position,
+          open_spot_matrix,
+        )
+        # not really sure how it couldn't find a spot since it should always find an empty row at the bottom...
+        next unless open_spot.present?
+
+        position.row = open_spot.row
+        position.col = open_spot.col
+
+        # drag_positions tracks what we have "placed" so far
+        drag_positions[card.id] = position
+        card.row = position.row
+        card.col = position.col
+
+        open_spot_matrix = calculate_open_spot_matrix(
+          collection: collection,
+          moving_cards: moving_cards,
+          drag_positions: drag_positions,
+        )
       end
     end
 
-    def find_closest_open_spot(placeholder, open_spot_matrix)
-      row = placeholder.row
-      col = placeholder.col
-      width = placeholder.width
-      height = placeholder.height
+    def self.find_closest_open_spot(position, open_spot_matrix)
+      row = position.row
+      col = position.col
+      width = position.width
+      height = position.height
 
       possibilities = []
       exact_fit = false
 
-      open_spot_matrix.each do |row_vals, row_idx|
+      open_spot_matrix.each_with_index do |row_vals, row_idx|
         if row_idx >= row && row_idx <= row + 15
-          row_vals.each do |open_spots, col_idx|
+          row_vals.each_with_index do |open_spots, col_idx|
             can_fit = false
             if open_spots >= width
               if height > 1
                 (height - 1).times do |i|
                   next_row = open_spot_matrix[row_idx + i + 1]
-                  if next_row && next_row[col_idx] && next_row[col_idx] >= width
+                  # if next row is blank then that row doesn't exist yet (empty)
+                  if next_row.blank?
+                    can_fit = true
+                  elsif next_row[col_idx] && next_row[col_idx] >= width
                     can_fit = true
                   end
                 end
@@ -176,40 +234,46 @@ module CollectionGrid
               end
               distance = Math.sqrt(row_diff * row_diff + col_diff * col_diff)
               exact_fit = distance.zero?
-              possibilities.push(row: row_idx, col: col_idx, distance: distance)
+              possibilities.push(
+                Mashie.new(
+                  row: row_idx,
+                  col: col_idx,
+                  distance: distance,
+                ),
+              )
             end
             if exact_fit || possibilities.size > 32
-              return false
+              break
             end
           end
         end
         if exact_fit || possibilities.size > 32
-          return false
+          break
         end
       end
-      possibilities = possibilities.sort_by(&:distance)
+      possibilities = possibilities.sort_by { |p| p[:distance] }
       closest = possibilities.first
       closest || false
     end
 
-    def calculate_open_spot_matrix(
+    def self.calculate_open_spot_matrix(
       collection:,
       moving_cards:,
-      drag_grid_spot:
+      drag_positions: {}
     )
-      card_matrix = matrix_with_dragged_spots(
+      card_matrix = board_matrix(
         collection: collection,
-        drag_grid_spot: drag_grid_spot,
+        drag_positions: drag_positions,
       )
       open_spot_matrix = [[]]
 
       card_matrix.each_with_index do |row, row_idx|
         open = 0
-        open_spot_matrix[row_idx] = [0..16]
+        open_spot_matrix[row_idx] = Array.new(16)
         reversed = row.reverse
 
         reversed.each_with_index do |card, col_idx|
-          if card && moving_cards.include?(card.id)
+          if card.present? && !moving_cards.pluck(:id).include?(card.id)
             open = 0
           else
             open += 1
@@ -220,7 +284,7 @@ module CollectionGrid
       open_spot_matrix
     end
 
-    def matrix_with_dragged_spots(
+    def self.matrix_with_dragged_spots(
       collection:,
       drag_grid_spot:
     )
@@ -229,8 +293,8 @@ module CollectionGrid
       dragging_placeholders.each do |placeholder|
         max_row = placeholder.row + placeholder.height
         max_col = placeholder.col + placeholder.width
-        rows = [placeholder.row..max_row]
-        cols = [placeholder.col..max_col]
+        rows = (placeholder.row...max_row).to_a
+        cols = (placeholder.col...max_col).to_a
 
         rows.each do |row|
           cols.each do |col|

@@ -5,6 +5,7 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import hexToRgba from '~/utils/hexToRgba'
 import CardMoveService from '~/utils/CardMoveService'
 import {
   calculateOpenSpotMatrix,
@@ -34,14 +35,19 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
     cursor: 'pointer',
   },
 }))`
-  background-color: ${props => {
+  background: ${props => {
     if (props.blocked) {
       return v.colors.alert
     }
     if (props.type === 'unrendered') {
       return v.colors.commonLightest
-    }
-    if (_.includes(['blank', 'drag', 'resize'], props.type)) {
+    } else if (props.type === 'drag-overflow') {
+      return `linear-gradient(
+        to bottom,
+        ${hexToRgba(v.colors.primaryLight)} 0%,
+        ${hexToRgba(v.colors.primaryLight)} 25%,
+        ${hexToRgba(v.colors.primaryLight, 0)} 100%)`
+    } else if (_.includes(['blank', 'drag', 'resize'], props.type)) {
       return v.colors.primaryLight
     }
     return 'none'
@@ -50,7 +56,7 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   transform-origin: left top;
   opacity: ${props => {
     if (props.type === 'unrendered') return 0.75
-    if (props.type === 'drag') return 0.5
+    if (_.includes(['drag', 'drag-overflow'], props.type)) return 0.5
     return 1
   }};
   z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
@@ -519,6 +525,11 @@ class FoamcoreGrid extends React.Component {
     return apiStore.find('collection_cards', realCardId)
   }
 
+  onDragStart = cardId => {
+    const card = this.originalCard(cardId)
+    this.draggingMap = this.determineDragMap(card.id)
+  }
+
   onDrag = (cardId, dragPosition) => {
     runInAction(() => {
       this.dragging = true
@@ -538,11 +549,6 @@ class FoamcoreGrid extends React.Component {
       { card, ...cardCoords, ...cardDims },
       dragPosition
     )
-  }
-
-  onDragStart = cardId => {
-    const card = this.originalCard(cardId)
-    this.draggingMap = this.determineDragMap(card.id)
   }
 
   onDragOrResizeStop = (cardId, dragType) => {
@@ -812,7 +818,7 @@ class FoamcoreGrid extends React.Component {
       position.col = openSpot.col
       this.dragGridSpot.set(getMapKey(position), position)
       // have to recalculate to consider this dragged spot
-      this.openSpotMatrix = this.calculateOpenSpotMatrix({
+      this.openSpotMatrix = calculateOpenSpotMatrix({
         collection,
         multiMoveCardIds,
         dragGridSpot: this.dragGridSpot,
@@ -1026,7 +1032,6 @@ class FoamcoreGrid extends React.Component {
     let inner = ''
     if (type === 'hover') {
       inner = (
-        // TODO: better styling than this for centering PlusIcon
         <StyledPlusIcon className="plus-icon">
           <PlusIcon />
         </StyledPlusIcon>
@@ -1133,10 +1138,8 @@ class FoamcoreGrid extends React.Component {
     // the hover spot at all (which gets rendered after this loop)
     if (cardOrBlank.id === 'blank') {
       return this.positionBct(cardOrBlank)
-    } else if (cardOrBlank.id === 'unrendered') {
-      return this.positionBlank(cardOrBlank, 'unrendered')
-    } else if (cardOrBlank.id === 'resize' || !cardOrBlank.id) {
-      return this.positionBlank(cardOrBlank, cardOrBlank.id || 'drag')
+    } else if (_.includes(['unrendered', 'resize'], cardOrBlank.id)) {
+      return this.positionBlank(cardOrBlank, cardOrBlank.id)
     } else if (cardOrBlank.id) {
       return this.positionCard(cardOrBlank)
     }
@@ -1159,9 +1162,21 @@ class FoamcoreGrid extends React.Component {
     if (!this.dragGridSpot.size || this.hoveringOverCollection) {
       return
     }
+    const { overflowFromMDL } = this.props.uiStore
 
     const draggingPlaceholders = [...this.dragGridSpot.values()]
-    return _.map(draggingPlaceholders, this.renderCard)
+    const maxRowCard = _.maxBy(draggingPlaceholders, 'row')
+    const maxRow = maxRowCard && maxRowCard.row
+    return _.map(draggingPlaceholders, placeholder => {
+      placeholder.id = 'drag'
+      const atMaxRow =
+        placeholder.row === maxRow ||
+        placeholder.row + placeholder.height - 1 === maxRow
+      if (overflowFromMDL && atMaxRow) {
+        placeholder.id = 'drag-overflow'
+      }
+      return this.positionBlank(placeholder, placeholder.id)
+    })
   }
 
   renderBlanksAndBct() {
