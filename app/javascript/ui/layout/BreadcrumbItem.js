@@ -204,7 +204,7 @@ export class BreadcrumbItem extends React.Component {
   renderNesting(menuItem) {
     if (menuItem.nested === 0) return null
     const nestLines = _.range(0, menuItem.nested - 1).map(nestLevel => (
-      <NestedLineHolder>
+      <NestedLineHolder key={nestLevel}>
         <NestedLineIcon />
       </NestedLineHolder>
     ))
@@ -250,12 +250,11 @@ export class BreadcrumbItem extends React.Component {
           {(!this.menuItemOpenId || this.nestedMenuX !== 0) &&
             menuItems.map(menuItem => (
               <StyledMenuItem
-                key={menuItem.name}
+                key={menuItem.id}
                 style={{ paddingLeft: '10px', width: itemWidth }}
               >
                 <StyledMenuButton
                   onClick={() => this.onBreadcrumbClick(menuItem)}
-                  // nested={menuItem.nested}
                 >
                   {this.renderNesting(menuItem)}
                   {this.renderMenuNameWithTooltip(menuItem)}
@@ -278,10 +277,7 @@ export class BreadcrumbItem extends React.Component {
               onMouseOut={this.onNestedMenuHoverOut}
             >
               {this.breadcrumbDropDownRecords.map(menuItem => (
-                <StyledMenuItem
-                  key={menuItem.name}
-                  style={{ width: itemWidth }}
-                >
+                <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
                     onClick={() => this.onBreadcrumbClick(menuItem)}
                   >
