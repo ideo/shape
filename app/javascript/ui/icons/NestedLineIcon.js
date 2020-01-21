@@ -1,4 +1,5 @@
 import Icon from './Icon'
+import v from '~/utils/variables'
 
 const NestedLineIcon = () => (
   <Icon fill>
@@ -14,7 +15,7 @@ const NestedLineIcon = () => (
         y1="0.5"
         x2="0.5"
         y2="9.5"
-        stroke="#A89F9B"
+        stroke={v.colors.commonDark}
         strokeLinecap="round"
       />
     </svg>

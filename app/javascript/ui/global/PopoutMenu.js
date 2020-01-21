@@ -94,8 +94,9 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 export const StyledMenu = styled.ul`
   background-color: white;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
-  max-height: ${window.innerWidth - 260};
-  overflow-y: scroll;
+  max-height: ${props => window.innerHeight - 260}px;
+  overflow-y: auto;
+  overflow-x: hidden;
   width: ${props => props.width}px;
 `
 
@@ -118,7 +119,6 @@ export const StyledMenuButton = styled.button`
   font-weight: 400;
   font-size: 1rem;
   text-align: left;
-  // max-width: 190px;
   padding-left: ${props => props.nested * 10}px;
 
   white-space: nowrap;
