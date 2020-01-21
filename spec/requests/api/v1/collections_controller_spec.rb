@@ -344,6 +344,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         )
         post(path, params: params)
       end
+
       it 'creates Activity item' do
         allow(ActivityAndNotificationBuilder).to receive(:call)
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
