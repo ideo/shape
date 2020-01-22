@@ -20,22 +20,6 @@ RSpec.describe BreadcrumbRecalculationWorker, type: :worker do
       BreadcrumbRecalculationWorker.new.perform(collection.id)
     end
 
-    it 'marks subtree as processing (and then done)' do
-      expect(collection).to receive(
-        :mark_children_processing_status,
-      ).with(
-        Collection.processing_statuses[:processing_breadcrumb],
-      ).once
-
-      expect(collection).to receive(
-        :mark_children_processing_status,
-      ).with(nil).once
-
-      BreadcrumbRecalculationWorker.new.perform(
-        collection.id,
-      )
-    end
-
     context 'with card_ids' do
       let(:card_ids) { collection.collection_cards.first(2).pluck(:id) }
 
