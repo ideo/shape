@@ -220,7 +220,6 @@ class Breadcrumb extends React.Component {
       subItem.nested = idx
       return subItem
     })
-    // .filter(item => item.id !== firstEllipsesItem.id)
     firstEllipsesItem.subItems = subItems
 
     return _.reject(items, { remove: true })

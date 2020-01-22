@@ -204,7 +204,7 @@ describe('BreadcrumbItem', () => {
       breadcrumbItem.simulate('mouseout')
       expect(setTimeout).toHaveBeenLastCalledWith(
         wrapper.instance().closeDropdown,
-        150
+        300
       )
     })
   })

@@ -76,6 +76,7 @@ const NestedArrowHolder = styled.div`
   display: inline-block;
   margin-left: 0px;
   margin-right: 5px;
+  color: ${v.colors.commonDark};
 
   .icon.icon {
     transform: none;
@@ -104,7 +105,7 @@ NestedLineHolder.displayName = 'NestedLineHolder'
 
 const NEST_AMOUNT_Y_PX = 44
 const MENU_WIDTH = 250
-const HOVER_TIMEOUT_MS = 150
+const HOVER_TIMEOUT_MS = 300
 
 @observer
 // also export unwrapped component for unit test
@@ -203,7 +204,7 @@ export class BreadcrumbItem extends React.Component {
   renderNesting(menuItem) {
     if (menuItem.nested === 0) return null
     const nestLines = _.range(0, menuItem.nested - 1).map(nestLevel => (
-      <NestedLineHolder>
+      <NestedLineHolder key={nestLevel}>
         <NestedLineIcon />
       </NestedLineHolder>
     ))
@@ -237,6 +238,8 @@ export class BreadcrumbItem extends React.Component {
     if (item.subItems) {
       menuItems = [...item.subItems]
     }
+    const itemWidth = '90%'
+
     return (
       <StyledMenuWrapper style={{ marginTop: '0px', left: '-20px' }}>
         <StyledMenu
@@ -247,12 +250,11 @@ export class BreadcrumbItem extends React.Component {
           {(!this.menuItemOpenId || this.nestedMenuX !== 0) &&
             menuItems.map(menuItem => (
               <StyledMenuItem
-                key={menuItem.name}
-                style={{ paddingLeft: '10px', width: '230px' }}
+                key={menuItem.id}
+                style={{ paddingLeft: '10px', width: itemWidth }}
               >
                 <StyledMenuButton
                   onClick={() => this.onBreadcrumbClick(menuItem)}
-                  // nested={menuItem.nested}
                 >
                   {this.renderNesting(menuItem)}
                   {this.renderMenuNameWithTooltip(menuItem)}
@@ -275,7 +277,7 @@ export class BreadcrumbItem extends React.Component {
               onMouseOut={this.onNestedMenuHoverOut}
             >
               {this.breadcrumbDropDownRecords.map(menuItem => (
-                <StyledMenuItem key={menuItem.name} style={{ width: '230px' }}>
+                <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
                     onClick={() => this.onBreadcrumbClick(menuItem)}
                   >
