@@ -22,6 +22,7 @@ import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
+import { some } from 'lodash'
 
 /* global IdeoSSO */
 
@@ -120,7 +121,7 @@ class PageHeader extends React.Component {
     const { record } = this.props
     const leftConditions = [record.isProfileTemplate, record.isMasterTemplate]
 
-    if (leftConditions.some(bool => bool)) {
+    if (some(leftConditions, bool => bool)) {
       return (
         <IconHolder align="right">
           <CollectionTypeIcon record={record} />
@@ -141,7 +142,7 @@ class PageHeader extends React.Component {
       record.isBoard,
     ]
 
-    if (rightConditions.some(bool => bool)) {
+    if (some(rightConditions, bool => bool)) {
       return (
         <IconHolder align="right">
           <CollectionTypeIcon record={record} />

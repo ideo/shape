@@ -7,15 +7,18 @@ import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-import CollectionIcon from '~/ui/icons/CollectionIcon'
+import CollectionIconLg from '~/ui/icons/CollectionIconLg'
+import ProfileIconLg from '~/ui/icons/ProfileIconLg'
+import ProjectIcon from '~/ui/icons/ProjectIcon'
+import PrototypeIcon from '~/ui/icons/PrototypeIcon'
+import MethodIcon from '~/ui/icons/MethodIcon'
 
 export const collectionTypeToIcon = {
-  collection: <CollectionIcon />,
-  profile: <ProfileIcon />,
-  // Replace with proper icons
-  project: <TemplateIcon />,
-  method: <SystemIcon />,
-  prototype: <TestCollectionIcon />,
+  collection: <CollectionIconLg />,
+  profile: <ProfileIconLg />,
+  project: <ProjectIcon />,
+  method: <MethodIcon />,
+  prototype: <PrototypeIcon />,
 }
 
 const CollectionTypeIcon = ({ record }) => {
