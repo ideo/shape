@@ -485,7 +485,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get cardProperties() {
-    return this.collection_cards.map(c => _.pick(c, ['id', 'updated_at']))
+    return this.collection_cards.map(c =>
+      _.pick(c, ['id', 'updated_at', 'order'])
+    )
   }
 
   // this marks it with the "offset" special color
@@ -878,7 +880,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get sortedCards() {
-    return _.sortBy(this.collection_cards, 'order')
+    return _.orderBy(
+      this.collection_cards,
+      ['pinned', 'order'],
+      ['desc', 'asc']
+    )
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order
@@ -887,7 +893,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // NOTE: this should work ok even if there are infinite scroll / pagination cards
     // not being displayed offscreen...
     if (this.collection_cards) {
-      _.orderBy(this.collection_cards, ['pinned', 'order'], ['desc', 'asc'])
+      _.each(this.sortedCards, (card, i) => {
+        card.order = i
+      })
     }
   }
 

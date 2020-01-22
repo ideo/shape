@@ -113,7 +113,7 @@ class CollectionCardDuplicator < SimpleService
       # help us refer back to the originals when duplicating
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
-      dup.pinned = @to_collection.master_template?
+      dup.pinned = @to_collection.should_pin_cards?(@order)
       dup.parent_id = @to_collection.id
       unless moving_to_board?
         dup.order = @order + i
@@ -150,5 +150,11 @@ class CollectionCardDuplicator < SimpleService
     # this is just inferred from what you are moving, just to figure out if you
     # are moving cards from a normal Collection or not
     @cards.first.parent
+  end
+
+  def should_pin_duplicating_cards?
+    return false unless @cards.first.present?
+
+    @to_collection.should_pin_cards?(@cards.first.order)
   end
 end

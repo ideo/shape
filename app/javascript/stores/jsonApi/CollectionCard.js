@@ -455,16 +455,20 @@ class CollectionCard extends BaseRecord {
     return false
   }
 
+  @action
   async API_togglePin() {
-    const data = this.toJsonApi()
-
+    // toggle it first
+    this.pinned = !this.pinned
     await this.apiStore.request(
       `collection_cards/${this.id}/toggle_pin`,
       'PATCH',
       {
-        data,
+        pinned: this.pinned,
       }
     )
+    // make sure this card, if it moved, is the "tiebreaker" for its new order
+    this.order -= 0.5
+
     return this.parentCollection._reorderCards()
   }
 }

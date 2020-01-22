@@ -232,30 +232,20 @@ export default class CardMoveService {
   }
 
   calculateToPinAllMovingCards = (collection, order) => {
-    const hasPinnedCards = _.some(
-      collection.collection_cards,
-      cc => cc.isPinned
-    )
+    const { sortedCards } = collection
+    const hasPinnedCards = _.some(sortedCards, cc => cc.isPinned)
     if (!hasPinnedCards) return false
 
     const firstMovingCardSortOrder = this.calculateOrderForMovingCard(order, 0)
-    const firstMovingCardIndex = _.findIndex(
-      collection.collection_cards,
-      cc => {
-        return cc.order === firstMovingCardSortOrder
-      }
-    )
+    const firstMovingCardIndex = _.findIndex(sortedCards, cc => {
+      return cc.order === firstMovingCardSortOrder
+    })
 
     if (firstMovingCardIndex === -1)
-      return (
-        (_.last(collection.collection_cards) &&
-          _.last(collection.collection_cards).isPinned) ||
-        false
-      )
+      return (_.last(sortedCards) && _.last(sortedCards).isPinned) || false
     if (firstMovingCardIndex <= 1) return true // pin card if moving card in tbe beginning or next to a pinned card
     const leftOfFirstMovingCardIndex = firstMovingCardIndex - 1
-    const leftOfFirstMovingCard =
-      collection.collection_cards[leftOfFirstMovingCardIndex]
+    const leftOfFirstMovingCard = sortedCards[leftOfFirstMovingCardIndex]
     // copy pinned state of the card to the left of the first moving card
     return leftOfFirstMovingCard.isPinned
   }
