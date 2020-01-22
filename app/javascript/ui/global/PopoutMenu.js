@@ -144,7 +144,7 @@ export const StyledMenuItem = styled.li`
       top: 50%;
       transform: translateY(-50%);
       position: absolute;
-      width: 16px; // Why is this 16?
+      width: 16px;
       height: 16px;
       line-height: 1.4rem;
     }
