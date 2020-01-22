@@ -133,6 +133,8 @@ class CollectionFilter extends React.Component {
       collection: { collection_filters },
       canEdit,
       sortable,
+      alignTop,
+      showFilterIconLeft,
     } = this.props
     const isFilterBarActive =
       (collection_filters && collection_filters.length > 0) ||
@@ -148,12 +150,13 @@ class CollectionFilter extends React.Component {
             onDelete={this.onDeleteFilter}
             onSelect={this.onSelectFilter}
             onShowAll={this.onShowAll}
+            showIcon={showFilterIconLeft}
           />
         )}
         <Flex align="flex-end" ml="auto">
           {canEdit && (
             <FilterMenu
-              alignTop={isFilterBarActive || sortable}
+              alignTop={alignTop || isFilterBarActive || sortable}
               onFilterByTag={this.openSearchModal('Tags')}
               onFilterBySearch={this.openSearchModal('Search Term')}
             />
@@ -188,11 +191,15 @@ CollectionFilter.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
   sortable: PropTypes.bool,
+  alignTop: PropTypes.bool,
+  showFilterIconLeft: PropTypes.bool,
 }
 
 CollectionFilter.defaultProps = {
   canEdit: false,
   sortable: false,
+  alignTop: false,
+  showFilterIconLeft: false,
 }
 
 export default CollectionFilter

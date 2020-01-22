@@ -3,14 +3,22 @@ import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
 import { observable, computed, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 import _ from 'lodash'
 
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
-import { DisplayText } from '~/ui/global/styled/typography'
-import EditableSearchInput from '~/ui/global/EditableSearchInput'
+import { DisplayText, DisplayTextCss } from '~/ui/global/styled/typography'
+import EditableName from '~/ui/pages/shared/EditableName'
 import PageSeparator from '~/ui/global/PageSeparator'
+import SearchIconRight from '~/ui/icons/SearchIconRight'
 import Loader from '~/ui/layout/Loader'
+
+const SearchIconWrapper = styled.div`
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+`
 
 @inject('uiStore')
 @observer
@@ -102,16 +110,27 @@ class SearchCollection extends React.Component {
           movingCardIds={[]}
         />
         <PageSeparator title={<h3>Search Results</h3>} />
-        <Flex justify="space-between" align="center" mb="12px">
-          <EditableSearchInput
-            value={collection.search_term || ''}
-            onChange={this.onSearchChange}
+        <Flex align="center" mb="4px" mt="18px">
+          <SearchIconWrapper>
+            <SearchIconRight />
+          </SearchIconWrapper>
+          <EditableName
+            name={collection.search_term || ''}
+            updateNameHandler={this.onSearchChange}
             canEdit={collection.can_edit}
+            TypographyComponent={DisplayText}
+            typographyCss={DisplayTextCss}
             dataCy="SearchCollectionInput"
+            fieldName="searchTerm"
+            editingMarginTop="0"
           />
+        </Flex>
+        <Flex mb="12px" ml="2px">
           <CollectionFilter
+            alignTop={false}
             collection={collection}
             canEdit={collection.can_edit_content}
+            showFilterIconLeft={true}
           />
         </Flex>
         {this.loading ? (
