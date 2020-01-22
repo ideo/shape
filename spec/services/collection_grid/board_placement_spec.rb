@@ -50,6 +50,17 @@ RSpec.describe CollectionGrid::BoardPlacement, type: :service do
           expect(card.col).to eq 3 + index
         end
       end
+
+      it 'should call CollectionGrid::Calculator.place_cards_on_board' do
+        expect(CollectionGrid::Calculator).to receive(:place_cards_on_board).with(
+          row: row,
+          col: col,
+          collection: to_collection,
+          from_collection: from_collection,
+          moving_cards: moving_cards,
+        )
+        service.call
+      end
     end
 
     context 'moving within the same board collection' do

@@ -83,7 +83,7 @@ module CollectionGrid
       card.col + card.width - 1
     end
 
-    def self.board_matrix(collection:, drag_positions: {}, debug: true)
+    def self.board_matrix(collection:, drag_positions: {}, debug: false)
       return [] if collection.collection_cards.count.zero?
 
       cards = collection.collection_cards
@@ -116,13 +116,8 @@ module CollectionGrid
 
     def self.determine_drag_map(
       master_card:,
-      moving_cards:,
-      from_collection:
+      moving_cards:
     )
-      unless from_collection.is_a?(Collection::Board)
-        moving_cards.unshift(master_card)
-        moving_cards = calculate_rows_cols(moving_cards)
-      end
       drag_map = moving_cards.map do |card|
         row = card.row
         col = card.col
@@ -137,15 +132,22 @@ module CollectionGrid
       drag_map
     end
 
-    def self.place_foamcore_cards(
+    def self.place_cards_on_board(
       row:,
       col:,
-      master_card:,
       collection:,
       from_collection:,
       moving_cards:
     )
-      drag_positions = {}
+      if from_collection.is_a?(Collection::Board)
+        master_card = top_left_card(moving_cards)
+      else
+        # important to do this first to assign row/col onto the cards
+        moving_cards = calculate_rows_cols(moving_cards)
+        # cards are already ordered
+        master_card = moving_cards.first
+      end
+
       master_position = Mashie.new(
         row: row,
         col: col,
@@ -155,14 +157,13 @@ module CollectionGrid
       drag_map = determine_drag_map(
         master_card: master_card,
         moving_cards: moving_cards,
-        from_collection: from_collection,
       )
-
       open_spot_matrix = calculate_open_spot_matrix(
         collection: collection,
         moving_cards: moving_cards,
       )
 
+      drag_positions = {}
       drag_map.each do |mapped|
         card = mapped.card
         position = Mashie.new(
@@ -182,8 +183,13 @@ module CollectionGrid
         position.row = open_spot.row
         position.col = open_spot.col
 
+        # object_id for unpersisted cards
+        card_id = card.id || card.object_id
         # drag_positions tracks what we have "placed" so far
-        drag_positions[card.id] = position
+        drag_positions[card_id] = position
+
+        # now actually move the card (to be persisted in wrapping services)
+        card.parent_id = collection.id
         card.row = position.row
         card.col = position.col
 
@@ -193,6 +199,8 @@ module CollectionGrid
           drag_positions: drag_positions,
         )
       end
+
+      moving_cards
     end
 
     def self.find_closest_open_spot(position, open_spot_matrix)
@@ -204,47 +212,55 @@ module CollectionGrid
       possibilities = []
       exact_fit = false
 
-      open_spot_matrix.each_with_index do |row_vals, row_idx|
-        if row_idx >= row && row_idx <= row + 15
-          row_vals.each_with_index do |open_spots, col_idx|
-            can_fit = false
-            if open_spots >= width
-              if height > 1
-                (height - 1).times do |i|
-                  next_row = open_spot_matrix[row_idx + i + 1]
-                  # if next row is blank then that row doesn't exist yet (empty)
-                  if next_row.blank?
-                    can_fit = true
-                  elsif next_row[col_idx] && next_row[col_idx] >= width
-                    can_fit = true
-                  end
-                end
-              else
-                can_fit = true
-              end
-            end
+      if open_spot_matrix[row].blank?
+        # if this entire row is empty we know it fits
+        return Mashie.new(
+          row: row,
+          col: col,
+        )
+      end
 
-            if can_fit
-              row_diff = row_idx - row
-              col_diff = col_idx - col
-              if col_diff.negative?
-                col_diff *= 1.01
-              else
-                col_diff *= 0.99
+      open_spot_matrix.each_with_index do |row_vals, row_idx|
+        next unless row_idx >= row && row_idx <= row + 15
+
+        row_vals.each_with_index do |open_spots, col_idx|
+          can_fit = false
+          if open_spots >= width
+            if height > 1
+              (height - 1).times do |i|
+                next_row = open_spot_matrix[row_idx + i + 1]
+                # if next row is blank then that row doesn't exist yet (empty)
+                if next_row.blank?
+                  can_fit = true
+                elsif next_row[col_idx] && next_row[col_idx] >= width
+                  can_fit = true
+                end
               end
-              distance = Math.sqrt(row_diff * row_diff + col_diff * col_diff)
-              exact_fit = distance.zero?
-              possibilities.push(
-                Mashie.new(
-                  row: row_idx,
-                  col: col_idx,
-                  distance: distance,
-                ),
-              )
+            else
+              can_fit = true
             end
-            if exact_fit || possibilities.size > 32
-              break
+          end
+
+          if can_fit
+            row_diff = row_idx - row
+            col_diff = col_idx - col
+            if col_diff.negative?
+              col_diff *= 1.01
+            else
+              col_diff *= 0.99
             end
+            distance = Math.sqrt(row_diff * row_diff + col_diff * col_diff)
+            exact_fit = distance.zero?
+            possibilities.push(
+              Mashie.new(
+                row: row_idx,
+                col: col_idx,
+                distance: distance,
+              ),
+            )
+          end
+          if exact_fit || possibilities.size > 32
+            break
           end
         end
         if exact_fit || possibilities.size > 32
@@ -266,6 +282,7 @@ module CollectionGrid
         drag_positions: drag_positions,
       )
       open_spot_matrix = [[]]
+      moving_card_ids = moving_cards.pluck(:id).compact
 
       card_matrix.each_with_index do |row, row_idx|
         open = 0
@@ -273,7 +290,7 @@ module CollectionGrid
         reversed = row.reverse
 
         reversed.each_with_index do |card, col_idx|
-          if card.present? && !moving_cards.pluck(:id).include?(card.id)
+          if card.present? && !moving_card_ids.include?(card.id)
             open = 0
           else
             open += 1

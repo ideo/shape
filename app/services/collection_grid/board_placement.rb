@@ -13,36 +13,21 @@ module CollectionGrid
       @to_collection = to_collection
       @from_collection = from_collection
       @moving_cards = moving_cards
-      @row = row
-      @col = col
+      @row = row || @to_collection.empty_row_for_moving_cards
+      @col = col || 0
     end
 
     def call
       return false unless @to_collection.is_a?(Collection::Board)
 
-      if @from_collection.is_a?(Collection::Board)
-        top_left_card = CollectionGrid::Calculator.top_left_card(@moving_cards)
-      else
-        # calculate row/col values for each of the moving cards
-        CollectionGrid::Calculator.calculate_rows_cols(@moving_cards)
-        # cards are already ordered
-        top_left_card = @moving_cards.first
-      end
-
-      if @row && @col
-        row_move = @row - top_left_card.row
-        col_move = @col - top_left_card.col
-      else
-        # always "move to end"
-        row_move = @to_collection.empty_row_for_moving_cards
-        col_move = 0
-      end
-
-      @moving_cards.each do |card|
-        card.parent_id = @to_collection.id
-        card.row += row_move
-        card.col += col_move
-      end
+      CollectionGrid::Calculator.place_cards_on_board(
+        row: @row,
+        col: @col,
+        collection: @to_collection,
+        # non-foamcore collections will get converted to rows/cols inside this method
+        from_collection: @from_collection,
+        moving_cards: @moving_cards,
+      )
     end
   end
 end

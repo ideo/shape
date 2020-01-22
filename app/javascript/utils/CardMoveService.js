@@ -124,7 +124,11 @@ export default class CardMoveService {
         })
       } else if (!movingWithinCollection) {
         // always refresh the current collection
-        await viewingCollection.API_fetchCards()
+        const fetchData = {}
+        if (data.placement && data.placement.row) {
+          fetchData.rows = [data.placement.row, data.placement.row + 20]
+        }
+        await viewingCollection.API_fetchCards(fetchData)
       }
 
       uiStore.update('isLoadingMoveAction', false)

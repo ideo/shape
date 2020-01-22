@@ -33,16 +33,15 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
     end
   end
 
-  describe '#place_foamcore_cards' do
+  describe '#place_cards_on_board' do
     let(:collection) { create(:board_collection, num_cards: 8) }
     let(:from_collection) { create(:board_collection) }
     let(:cards) { collection.collection_cards }
     let(:moving_cards) { create_list(:collection_card, 4) }
     let(:calculate) do
-      CollectionGrid::Calculator.place_foamcore_cards(
+      CollectionGrid::Calculator.place_cards_on_board(
         row: placement[:row],
         col: placement[:col],
-        master_card: moving_cards[0],
         collection: collection,
         from_collection: from_collection,
         moving_cards: moving_cards,
@@ -78,11 +77,11 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
 
       it 'should insert cards into the layout and calculate collisions' do
         calculate
-        expect(moving_cards.pluck(:row, :col)).to eq([
-          [1, 3],
-          [1, 5],
-          [1, 7],
-          [2, 5],
+        expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+          [1, 3, collection.id],
+          [1, 5, collection.id],
+          [1, 7, collection.id],
+          [2, 5, collection.id],
         ])
       end
     end
@@ -94,11 +93,11 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
 
       it 'should insert cards into the layout and calculate collisions' do
         calculate
-        expect(moving_cards.pluck(:row, :col)).to eq([
-          [2, 1],
-          [2, 4],
-          [1, 5],
-          [3, 0],
+        expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+          [2, 1, collection.id],
+          [2, 4, collection.id],
+          [1, 5, collection.id],
+          [3, 0, collection.id],
         ])
       end
     end
