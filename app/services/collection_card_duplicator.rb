@@ -103,6 +103,8 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def duplicate_cards_with_placeholders
+    pin_duplicating_cards = should_pin_duplicating_cards?
+
     @cards.each_with_index do |card, i|
       # Skip if legend item - they will be moved over in `CollectionCardDuplicationWorker#duplicate_legend_items`
       next if card.item&.is_a?(Item::LegendItem)
@@ -113,7 +115,7 @@ class CollectionCardDuplicator < SimpleService
       # help us refer back to the originals when duplicating
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
-      dup.pinned = @to_collection.should_pin_cards?(@order)
+      dup.pinned = pin_duplicating_cards
       dup.parent_id = @to_collection.id
       unless moving_to_board?
         dup.order = @order + i
@@ -155,6 +157,6 @@ class CollectionCardDuplicator < SimpleService
   def should_pin_duplicating_cards?
     return false unless @cards.first.present?
 
-    @to_collection.should_pin_cards?(@cards.first.order)
+    @to_collection.should_pin_cards?(@placement)
   end
 end

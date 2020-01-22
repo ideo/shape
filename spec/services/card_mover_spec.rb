@@ -186,6 +186,23 @@ RSpec.describe CardMover, type: :service do
             original_cards[1].id,
           ])
         end
+
+        it 'should pin the all the moving cards' do
+          card_mover.call
+          expect(to_collection.reload.collection_cards.pinned.all?(&:id)).to eq(true)
+        end
+
+        context 'moving cards right next to unpinned cards' do
+          before do
+            # update second card to be pinned
+            to_collection.reload.collection_cards[1].update(pinned: false)
+          end
+          it 'should keep all the moving cards unpinned' do
+            card_mover.call
+            cards_moved = to_collection.reload.collection_cards.select {|cc| moving_cards.pluck(:id).include? cc.id}
+            expect(cards_moved.pluck(:pinned)).to all(be_falsy)
+          end
+        end
       end
 
       context 'with pinned cards in the from_collection' do
