@@ -58,6 +58,7 @@ Cypress.Commands.add('locateDataOrClassWith', (selector, text) => {
 Cypress.Commands.add(
   'createCollection',
   ({ name, collectionType = 'normal', empty = false }) => {
+    let _empty = empty
     let type = 'collection'
     // these types correspond to the BctButtonBox types in GridCardBlank
     switch (collectionType) {
@@ -67,20 +68,25 @@ Cypress.Commands.add(
       case 'test':
         type = 'testCollection'
         break
+      case 'emptyCollection':
+        type = 'collection'
+        _empty = true
       default:
         // e.g. "normal"
         type = 'collection'
         break
     }
-    if (collectionType === 'searchCollection') {
+
+    if (collectionType === 'templateCollection') {
       cy.selectPopoutTemplateBctType({
-        type: 'searchCollection',
+        type: 'collection',
         order: 'first',
-        empty: false,
+        empty: true,
       })
     } else {
-      cy.selectBctType({ type, empty })
+      cy.selectBctType({ type, empty: _empty })
     }
+
     // force == don't care if it's "covered by tooltip"
     cy.locate('CollectionCreatorTextField').type(name, {
       force: true,
@@ -248,7 +254,6 @@ Cypress.Commands.add(
         cy.locate('PopoutMenu_createSearchCollection')
           .first()
           .click({ force: true })
-        return
         return
       case 'submissionBox':
         cy.locate('PopoutMenu_createSubmissionBox')

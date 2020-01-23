@@ -8,13 +8,14 @@ const PinnedIconButton = ({ card, IconWrapper }) => {
   const onClick = () => {
     card.API_togglePin()
   }
+  const tooltipText = card.isPinned ? 'Unpin from Template' : 'Pin to Template'
   let wrappedIcon = (
     <Tooltip
       classes={{ tooltip: 'Tooltip' }}
-      title={card.isPinned ? 'Unpin from Template' : 'Pin to Template'}
+      title={tooltipText}
       placement="top"
     >
-      <div onClick={onClick}>
+      <div onClick={onClick} data-cy={`CardAction-${tooltipText}`}>
         <PinnedIcon locked={false} pinnedFromMasterTemplate={card.isPinned} />
       </div>
     </Tooltip>

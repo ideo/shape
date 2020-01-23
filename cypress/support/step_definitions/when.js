@@ -436,6 +436,13 @@ When('I click the {word} action for the index {int} card', (action, pos) => {
   cy.wait(100)
 })
 
+When('I click the {string} on the index {int} card', (action, pos) => {
+  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="${action}"]`)
+    .first()
+    .click({ force: true })
+  cy.wait(100)
+})
+
 When(
   'I select {string} on the {string} select on the report item',
   (option, select) => {
