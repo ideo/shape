@@ -8,3 +8,10 @@ module Sidekiq
     end
   end
 end
+
+if ENV['CYPRESS'].present?
+  require 'sidekiq/testing'
+
+  # in Cypress, run all worker processes inline
+  Sidekiq::Testing.inline!
+end
