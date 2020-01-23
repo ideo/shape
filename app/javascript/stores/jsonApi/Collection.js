@@ -124,6 +124,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.reloading = value
   }
 
+  get methodLibraryCollection() {
+    return false
+  }
+
   cardIdsBetween(firstCardId, lastCardId) {
     if (this.isBoard) {
       return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
