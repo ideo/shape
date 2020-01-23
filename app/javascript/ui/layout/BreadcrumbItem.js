@@ -9,6 +9,10 @@ import { Link } from 'react-router-dom'
 
 import { routingStore } from '~/stores'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
+import BreadcrumbCaretIcon from '~/ui/icons/BreadcrumbCaretIcon'
+import CollectionIconSm from '~/ui/icons/CollectionIconSm'
+import FoamcoreBoardIconSm from '~/ui/icons/FoamcoreBoardIconSm'
+import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import NestedArrowIcon from '~/ui/icons/NestedArrowIcon'
 import NestedLineIcon from '~/ui/icons/NestedLineIcon'
 import {
@@ -67,16 +71,27 @@ const DiveButton = styled.button`
   height: 40px;
   margin-bottom: -10px;
   margin-left: auto;
+  margin-right: -5px;
   margin-top: -10px;
   width: 35px;
+  transform: translate(0, 1px);
+
+  position: absolute;
+  right: 0;
+
+  .icon {
+    height: 16px;
+    width: 16px;
+  }
 `
 DiveButton.displayName = 'DiveButton'
 
 const NestedArrowHolder = styled.div`
+  color: ${v.colors.commonDark};
   display: inline-block;
   margin-left: 0px;
   margin-right: 5px;
-  color: ${v.colors.commonDark};
+  transform: translate(0, -3px);
 
   .icon.icon {
     transform: none;
@@ -91,6 +106,7 @@ NestedArrowHolder.displayName = 'NestedArrowHolder'
 const NestedLineHolder = styled.div`
   display: inline-block;
   margin-right: 2px;
+  transform: translate(0, -2px);
   width: 3px;
 
   .icon.icon {
@@ -102,6 +118,19 @@ const NestedLineHolder = styled.div`
   }
 `
 NestedLineHolder.displayName = 'NestedLineHolder'
+
+const IconHolder = styled.div`
+  color: ${v.colors.commonMedium};
+  display: inline-block;
+  margin-right: 6px;
+  transform: translate(0, -1px);
+
+  .icon.icon {
+    transform: none;
+    position: static;
+    vertical-align: bottom;
+  }
+`
 
 const NEST_AMOUNT_Y_PX = 45
 const MENU_WIDTH = 250
@@ -135,6 +164,7 @@ export class BreadcrumbItem extends React.Component {
 
   @action
   closeDropdown = () => {
+    return
     this.hoverTimer = null
     this.dropdownOpen = false
     this.menuItemOpenId = null
@@ -239,6 +269,22 @@ export class BreadcrumbItem extends React.Component {
     this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
   }
 
+  renderIcon(menuItem) {
+    let icon
+    switch (menuItem.collection_type) {
+      case 'Collection':
+        icon = <CollectionIconSm />
+        break
+      case 'Collection::Board':
+        icon = <FoamcoreBoardIconSm />
+        break
+      case 'Collection::SubmissionBox':
+        icon = <SubmissionBoxIconSm />
+        break
+    }
+    return <IconHolder>{icon}</IconHolder>
+  }
+
   renderNesting(menuItem) {
     if (menuItem.nested === 0) return null
     const nestLines = _.range(0, menuItem.nested - 1).map(nestLevel => (
@@ -288,13 +334,15 @@ export class BreadcrumbItem extends React.Component {
               >
                 <StyledMenuButton
                   onClick={() => this.onBreadcrumbClick(menuItem)}
+                  style={{ maxWidth: '200px' }}
                 >
                   {this.renderNesting(menuItem)}
+                  {this.renderIcon(menuItem)}
                   {this.renderMenuNameWithTooltip(menuItem)}
                 </StyledMenuButton>
                 {menuItem.has_children && (
                   <DiveButton onClick={ev => this.onDiveClick(menuItem, 1, ev)}>
-                    <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
+                    <BreadcrumbCaretIcon />
                   </DiveButton>
                 )}
               </StyledMenuItem>
@@ -314,13 +362,14 @@ export class BreadcrumbItem extends React.Component {
                   <StyledMenuButton
                     onClick={() => this.onBreadcrumbClick(menuItem)}
                   >
+                    {this.renderIcon(menuItem)}
                     {this.renderMenuNameWithTooltip(menuItem)}
                   </StyledMenuButton>
                   {menuItem.has_children && (
                     <DiveButton
                       onClick={ev => this.onDiveClick(menuItem, 2, ev)}
                     >
-                      <StyledBreadcrumbCaret>&#62;</StyledBreadcrumbCaret>
+                      <BreadcrumbCaretIcon />
                     </DiveButton>
                   )}
                 </StyledMenuItem>

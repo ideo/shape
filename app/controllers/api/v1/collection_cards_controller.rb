@@ -33,7 +33,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                   .map do |card|
                     {
                       id: card.record.id,
-                      type: card.record.type,
+                      type: card.class.base_class.name.downcase.pluralize,
+                      collection_type: object.class.name,
                       name: card.record.name,
                       has_children: card.record.collections.count > 0
                     }
