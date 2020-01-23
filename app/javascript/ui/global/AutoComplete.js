@@ -276,6 +276,7 @@ class AutoComplete extends React.Component {
           fullWidth
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
+            autoFocus: true,
             classes,
             menuStyles,
             numOptionsToShow,
