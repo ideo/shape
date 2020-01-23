@@ -45,7 +45,7 @@ class FilterBar extends React.Component {
     const { onDelete, onShowAll, totalResults, showIcon } = this.props
     return (
       <ResponsiveFlex align="center">
-        {showIcon && this.anyFiltersSelected && (
+        {showIcon && this.formattedPills.length > 0 && (
           <FilterIconHolder>
             <FilterIcon />
           </FilterIconHolder>

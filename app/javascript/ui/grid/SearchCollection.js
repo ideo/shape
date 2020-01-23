@@ -127,10 +127,9 @@ class SearchCollection extends React.Component {
         </Flex>
         <Flex mb="12px" ml="2px">
           <CollectionFilter
-            alignTop={false}
+            inSearchCollection={true}
             collection={collection}
             canEdit={collection.can_edit_content}
-            showFilterIconLeft={true}
           />
         </Flex>
         {this.loading ? (
