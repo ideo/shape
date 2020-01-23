@@ -134,6 +134,7 @@ class Breadcrumb extends React.Component {
         truncatedName: null,
         ellipses: false,
         identifier,
+        nested: 0,
       })
     })
 

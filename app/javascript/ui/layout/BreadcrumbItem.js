@@ -103,7 +103,7 @@ const NestedLineHolder = styled.div`
 `
 NestedLineHolder.displayName = 'NestedLineHolder'
 
-const NEST_AMOUNT_Y_PX = 44
+const NEST_AMOUNT_Y_PX = 45
 const MENU_WIDTH = 250
 const HOVER_TIMEOUT_MS = 300
 
@@ -112,6 +112,8 @@ const HOVER_TIMEOUT_MS = 300
 export class BreadcrumbItem extends React.Component {
   @observable
   breadcrumbDropDownRecords = []
+  @observable
+  baseDropDownRecords = []
   @observable
   dropdownOpen = false
   @observable
@@ -138,28 +140,43 @@ export class BreadcrumbItem extends React.Component {
     this.menuItemOpenId = null
     this.nestedMenuX = 0
     this.nestedMenuY = 0
+    this.baseDropDownRecords = []
   }
 
   @action
   closeNestedMenu() {
     this.breadcrumbDropDownRecords = []
+    // this.baseDropDownRecords = []
     this.menuItemOpenId = null
     this.nestedMenuY = 0
   }
 
   @action
+  setInitialBaseRecords() {
+    const { item } = this.props
+    let menuItems = [item]
+    if (item.subItems) {
+      menuItems = [...item.subItems]
+    }
+    this.baseDropDownRecords = menuItems
+  }
+
+  @action
   onBreadcrumbHoverOver = () => {
+    this.setInitialBaseRecords()
     this.dropdownOpen = true
     clearTimeout(this.hoverTimer)
   }
 
   onBreadcrumbHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
+    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 150)
   }
 
+  @action
   onDropdownHoverOver = () => {
     // Keep the dropdown open in the same was as hovering over a breadcrumb
-    this.onBreadcrumbHoverOver()
+    this.dropdownOpen = true
+    clearTimeout(this.hoverTimer)
   }
 
   onBreadcrumbClick = item => {
@@ -170,10 +187,32 @@ export class BreadcrumbItem extends React.Component {
     this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
   }
 
+  setNestedBaseRecords(item) {
+    const idx = _.findIndex(
+      this.baseDropDownRecords,
+      menuItem => menuItem.id === this.menuItemOpenId
+    )
+    let cutRecords = [...this.baseDropDownRecords]
+    let lastNestedLevel = -1
+    if (idx > -1) {
+      cutRecords = this.baseDropDownRecords.splice(0, idx + 1)
+      const lastItem = cutRecords[cutRecords.length - 1]
+      lastNestedLevel = lastItem.nested
+    }
+
+    cutRecords.push(item)
+    item.nested = lastNestedLevel + 1
+
+    this.baseDropDownRecords = [...cutRecords]
+    this.nestedMenuY = (this.baseDropDownRecords.length - 1) * NEST_AMOUNT_Y_PX
+  }
+
+  @action
   onDiveClick = (item, level, ev) => {
-    this.nestedMenuX = level === 1 ? MENU_WIDTH : 0
-    if (!item.nested) {
-      this.nestedMenuY = 0
+    this.nestedMenuX = MENU_WIDTH
+    this.fetchBreadcrumbRecords(item.id)
+    if (!item.nested && this.menuItemOpenId) {
+      this.setNestedBaseRecords(item)
       // If the menu is moving back to the left position, we have to cancel
       // out the hover out timer on the menu so it doesn't close while it's
       // moving over there (because your mouse technically hovers off of it)
@@ -181,9 +220,8 @@ export class BreadcrumbItem extends React.Component {
         clearTimeout(this.nestedMenuTimer)
       }, HOVER_TIMEOUT_MS - 50)
     } else {
-      this.nestedMenuY = item.nested * NEST_AMOUNT_Y_PX
+      this.nestedMenuY = (item.nested || 0) * NEST_AMOUNT_Y_PX
     }
-    this.fetchBreadcrumbRecords(item.id)
   }
 
   @action
@@ -232,12 +270,7 @@ export class BreadcrumbItem extends React.Component {
   }
 
   renderDropdown() {
-    const { item } = this.props
     if (!this.dropdownOpen) return null
-    let menuItems = [item]
-    if (item.subItems) {
-      menuItems = [...item.subItems]
-    }
     const itemWidth = '90%'
 
     return (
@@ -248,7 +281,7 @@ export class BreadcrumbItem extends React.Component {
           onMouseOut={this.onDropdownHoverOut}
         >
           {(!this.menuItemOpenId || this.nestedMenuX !== 0) &&
-            menuItems.map(menuItem => (
+            this.baseDropDownRecords.map(menuItem => (
               <StyledMenuItem
                 key={menuItem.id}
                 style={{ paddingLeft: '10px', width: itemWidth }}

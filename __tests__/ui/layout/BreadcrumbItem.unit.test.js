@@ -12,7 +12,7 @@ jest.mock('../../../app/javascript/stores')
 jest.useFakeTimers()
 
 const props = {
-  item: fakeTextItem,
+  item: { ...fakeTextItem, nested: 0 },
   identifier: 'item_1',
   index: 1,
   numItems: 1,
@@ -41,6 +41,7 @@ describe('BreadcrumbItem', () => {
     describe('with dropdown open', () => {
       beforeEach(() => {
         wrapper.instance().dropdownOpen = true
+        wrapper.instance().setInitialBaseRecords()
         wrapper.update()
       })
 
@@ -54,10 +55,12 @@ describe('BreadcrumbItem', () => {
 
       describe('if breadcrumb has children', () => {
         beforeEach(() => {
-          const props = {
-            item: { ...fakeTextItem, has_children: true },
+          const newProps = {
+            item: { ...props.item, has_children: true },
           }
-          wrapper.setProps(props)
+          wrapper.setProps(newProps)
+          wrapper.instance().setInitialBaseRecords()
+          wrapper.update()
         })
 
         it('should render a Dive Button', () => {
@@ -88,6 +91,8 @@ describe('BreadcrumbItem', () => {
               name: 'This is a really long name longer than 20',
             },
           })
+          wrapper.instance().setInitialBaseRecords()
+          wrapper.update()
         })
 
         it('should render a tooltip on the breadcrumb name', () => {
@@ -115,6 +120,7 @@ describe('BreadcrumbItem', () => {
             ],
           }
           wrapper.setProps(props)
+          wrapper.instance().setInitialBaseRecords()
         })
 
         it('should render a menu item for each sub item', () => {
@@ -135,6 +141,7 @@ describe('BreadcrumbItem', () => {
 
       beforeEach(() => {
         wrapper.instance().dropdownOpen = true
+        wrapper.instance().setInitialBaseRecords()
         wrapper.instance().menuItemOpenId = 1
         wrapper.instance().breadcrumbDropDownRecords = [
           { name: 'nested item 1', id: '10', has_children: true },
@@ -204,7 +211,7 @@ describe('BreadcrumbItem', () => {
       breadcrumbItem.simulate('mouseout')
       expect(setTimeout).toHaveBeenLastCalledWith(
         wrapper.instance().closeDropdown,
-        300
+        150
       )
     })
   })
