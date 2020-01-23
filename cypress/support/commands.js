@@ -77,11 +77,11 @@ Cypress.Commands.add(
         break
     }
 
-    if (collectionType === 'templateCollection') {
+    if (collectionType === 'searchCollection') {
       cy.selectPopoutTemplateBctType({
-        type: 'collection',
+        type: 'searchCollection',
         order: 'first',
-        empty: true,
+        empty: false,
       })
     } else {
       cy.selectBctType({ type, empty: _empty })

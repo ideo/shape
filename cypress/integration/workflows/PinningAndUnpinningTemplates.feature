@@ -33,6 +33,6 @@ Feature: Pinning and Unpinning
     And I place a card to the bottom using the snackbar
     And I wait for '@apiCreateTemplate' to finish
     And I navigate to the collection named "My Test Template" via the "CollectionCover"
-    And I wait for 3 seconds
+    And I wait for 1 seconds
     And I reorder the first two cards
     Then I should see a "CollectionCover" in the first card
