@@ -131,6 +131,16 @@ When('I close the snackbar', () => {
   cy.wait(300)
 })
 
+When('I place a card to the bottom using the snackbar', () => {
+  // NOTE: snackbar tests have proven fickle, so instead we just wait a bit for it
+  cy.locateDataOrClass('.MuiSnackbarContent-action')
+    .find('button')
+    .first()
+    .click({ force: true })
+  // allow it to disappear
+  cy.wait(300)
+})
+
 // ----------------------
 // Test Collection setup
 // ----------------------
@@ -444,11 +454,31 @@ When(
 // Modals
 // ----------------------
 When('I close the move helper modal', () => {
-  cy.locate('MoveHelperModal-button')
+  cy.locate('MoveHelperModal-closeBtn')
     .first()
     .click({ force: true })
   cy.wait(100)
 })
+
+When(
+  'I choose to place the template instance elsewhere from the template helper modal',
+  () => {
+    cy.locate('MoveHelperModal-letMePlaceItBtn')
+      .first()
+      .click({ force: true })
+    cy.wait(100)
+  }
+)
+
+When(
+  'I choose to add the template instance into my collection from the template helper modal',
+  () => {
+    cy.locate('MoveHelperModal-addToMyCollectionBtn')
+      .first()
+      .click({ force: true })
+    cy.wait(100)
+  }
+)
 
 When('I click the {word} arrow on the MDL snackbar', direction => {
   cy.locate(`MoveSnackbarArrow-${direction}`)
