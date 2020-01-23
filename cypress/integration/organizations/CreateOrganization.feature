@@ -11,5 +11,7 @@ Feature: Creating an Organization
     And I wait for "@apiCreateOrganization" to finish
     # NOTE: sidekiq runs inline so it won't even see "wait while we build..."
     # URL might be "our-test-org-1" etc, this will match as RegExp
+    And I wait for "@apiGetCollectionCards" to finish
+    And I wait for "@apiGetCurrentUser" to finish
     Then I should see "our-test-org" in the URL
     Then I should see a collection card named "Our Test Org Templates"

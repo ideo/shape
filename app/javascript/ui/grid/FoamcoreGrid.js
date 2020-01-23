@@ -36,17 +36,17 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   },
 }))`
   background: ${props => {
-    if (props.blocked) {
-      return v.colors.alert
-    }
     if (props.type === 'unrendered') {
       return v.colors.commonLightest
     } else if (props.type === 'drag-overflow') {
+      const color = props.blocked ? v.colors.alert : v.colors.primaryLight
       return `linear-gradient(
         to bottom,
-        ${hexToRgba(v.colors.primaryLight)} 0%,
-        ${hexToRgba(v.colors.primaryLight)} 25%,
-        ${hexToRgba(v.colors.primaryLight, 0)} 100%)`
+        ${hexToRgba(color)} 0%,
+        ${hexToRgba(color)} 25%,
+        ${hexToRgba(color, 0)} 100%)`
+    } else if (props.blocked) {
+      return v.colors.alert
     } else if (_.includes(['blank', 'drag', 'resize'], props.type)) {
       return v.colors.primaryLight
     }
@@ -56,10 +56,11 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   transform-origin: left top;
   opacity: ${props => {
     if (props.type === 'unrendered') return 0.75
-    if (_.includes(['drag', 'drag-overflow'], props.type)) return 0.5
+    if (_.includes(props.type, 'drag')) return 0.5
     return 1
   }};
-  z-index: ${props => (props.type === 'drag' ? v.zIndex.cardHovering : 0)};
+  z-index: ${props =>
+    _.includes(props.type, 'drag') ? v.zIndex.cardHovering : 0};
   ${props =>
     props.type === 'unrendered'
       ? ''
@@ -1040,6 +1041,9 @@ class FoamcoreGrid extends React.Component {
       inner = <InlineLoader background={v.colors.commonLightest} />
     }
 
+    // could be drag or drag-overflow
+    const isDrag = _.includes(type, 'drag')
+
     return (
       <BlankCard
         onClick={this.handleBlankCardClick({ col, row })}
@@ -1048,8 +1052,7 @@ class FoamcoreGrid extends React.Component {
         zoomLevel={relativeZoomLevel}
         key={`blank-${type}-${row}:${col}`}
         /* Why is this rendering on top of a collection? */
-
-        blocked={this.hasDragCollision && type === 'drag'}
+        blocked={this.hasDragCollision && isDrag}
         data-blank-type={type}
         data-empty-space-click
         draggedOn
