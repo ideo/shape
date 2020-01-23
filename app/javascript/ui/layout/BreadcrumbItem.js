@@ -257,7 +257,11 @@ export class BreadcrumbItem extends React.Component {
   onDiveClick = (item, level, ev) => {
     this.nestedMenuX = MENU_WIDTH
     this.fetchBreadcrumbRecords(item.id)
-    if (!item.nested && this.menuItemOpenId) {
+    if (
+      !item.nested &&
+      this.menuItemOpenId &&
+      this.menuItemOpenId !== item.id
+    ) {
       this.setNestedBaseRecords(item)
       // If the menu is moving back to the left position, we have to cancel
       // out the hover out timer on the menu so it doesn't close while it's
