@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import Icon from './Icon'
 
-const FoamcoreBoardIconSm = ({ large }) => (
+const FoamcoreBoardIconXs = ({ large }) => (
   <Icon fill>
     <svg
       version="1.1"
@@ -33,12 +33,12 @@ const FoamcoreBoardIconSm = ({ large }) => (
   </Icon>
 )
 
-FoamcoreBoardIconSm.propTypes = {
+FoamcoreBoardIconXs.propTypes = {
   large: PropTypes.bool,
 }
 
-FoamcoreBoardIconSm.defaultProps = {
+FoamcoreBoardIconXs.defaultProps = {
   large: false,
 }
 
-export default FoamcoreBoardIconSm
+export default FoamcoreBoardIconXs

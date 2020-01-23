@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import Icon from './Icon'
 
-const CollectionIconSm = props => (
+const CollectionIconXs = props => (
   <Icon fill>
     <svg
       version="1.1"
@@ -39,11 +39,11 @@ const CollectionIconSm = props => (
     </svg>
   </Icon>
 )
-CollectionIconSm.propTypes = {
+CollectionIconXs.propTypes = {
   viewBox: PropTypes.string,
 }
-CollectionIconSm.defaultProps = {
+CollectionIconXs.defaultProps = {
   viewBox: '0 0 200 200',
 }
 
-export default CollectionIconSm
+export default CollectionIconXs

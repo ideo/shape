@@ -10,9 +10,9 @@ import { Link } from 'react-router-dom'
 import { routingStore } from '~/stores'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BreadcrumbCaretIcon from '~/ui/icons/BreadcrumbCaretIcon'
-import CollectionIconSm from '~/ui/icons/CollectionIconSm'
-import FoamcoreBoardIconSm from '~/ui/icons/FoamcoreBoardIconSm'
-import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
+import CollectionIconXs from '~/ui/icons/CollectionIconXs'
+import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
+import SubmissionBoxIconXs from '~/ui/icons/SubmissionBoxIconXs'
 import NestedArrowIcon from '~/ui/icons/NestedArrowIcon'
 import NestedLineIcon from '~/ui/icons/NestedLineIcon'
 import {
@@ -164,7 +164,6 @@ export class BreadcrumbItem extends React.Component {
 
   @action
   closeDropdown = () => {
-    return
     this.hoverTimer = null
     this.dropdownOpen = false
     this.menuItemOpenId = null
@@ -176,7 +175,6 @@ export class BreadcrumbItem extends React.Component {
   @action
   closeNestedMenu() {
     this.breadcrumbDropDownRecords = []
-    // this.baseDropDownRecords = []
     this.menuItemOpenId = null
     this.nestedMenuY = 0
   }
@@ -273,13 +271,13 @@ export class BreadcrumbItem extends React.Component {
     let icon
     switch (menuItem.collection_type) {
       case 'Collection':
-        icon = <CollectionIconSm />
+        icon = <CollectionIconXs />
         break
       case 'Collection::Board':
-        icon = <FoamcoreBoardIconSm />
+        icon = <FoamcoreBoardIconXs />
         break
       case 'Collection::SubmissionBox':
-        icon = <SubmissionBoxIconSm />
+        icon = <SubmissionBoxIconXs />
         break
     }
     return <IconHolder>{icon}</IconHolder>
