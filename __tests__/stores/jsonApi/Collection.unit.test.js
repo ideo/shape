@@ -9,6 +9,7 @@ import Collection from '~/stores/jsonApi/Collection'
 import Organization from '~/stores/jsonApi/Organization'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import googleTagManager from '~/vendor/googleTagManager'
+import v from '~/utils/variables'
 
 import { fakeRole } from '#/mocks/data'
 jest.mock('../../../app/javascript/vendor/googleTagManager')
@@ -22,6 +23,7 @@ describe('Collection', () => {
         name: 'fakeCollection',
         roles: [fakeRole],
         organization_id: '1',
+        style: {},
       },
       apiStore
     )
@@ -437,6 +439,61 @@ describe('Collection', () => {
           // should just replace collection_cards with [2]
           expect(_.map(collection.collection_cards, 'id')).toEqual(['3'])
         })
+      })
+    })
+  })
+
+  describe('coverColor', () => {
+    let expectedColor
+    beforeEach(() => {
+      expectedColor = v.colors.collectionCover
+    })
+
+    it('returns default color', () => {
+      expect(collection.coverColor).toEqual(expectedColor)
+    })
+
+    describe('with custom color', () => {
+      beforeEach(() => {
+        expectedColor = '#7E10AB'
+        collection.style.cover_color = expectedColor
+      })
+
+      it('returns custom color', () => {
+        expect(collection.coverColor).toEqual(expectedColor)
+      })
+    })
+
+    describe('if special collection', () => {
+      beforeEach(() => {
+        collection.is_profile_template = true
+        expectedColor = v.colors.offset
+      })
+
+      it('returns custom color', () => {
+        expect(collection.coverColor).toEqual(expectedColor)
+      })
+    })
+  })
+
+  describe('coverOverlayOpacity', () => {
+    let expectedOpacity
+    beforeEach(() => {
+      expectedOpacity = v.collectionCoverOpacity
+    })
+
+    it('returns default opacity', () => {
+      expect(collection.coverOverlayOpacity).toEqual(expectedOpacity)
+    })
+
+    describe('with custom opacity', () => {
+      beforeEach(() => {
+        collection.style.cover_opacity = 0.7
+        expectedOpacity = 0.7
+      })
+
+      it('returns custom opacity', () => {
+        expect(collection.coverOverlayOpacity).toEqual(expectedOpacity)
       })
     })
   })

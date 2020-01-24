@@ -500,7 +500,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get coverColor() {
-    if (this.style.cover_color) {
+    if (this.style && this.style.cover_color) {
       return this.style.cover_color
     } else if (this.isSpecialCollection) {
       return v.colors.offset
@@ -510,7 +510,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get coverOverlayOpacity() {
-    return this.style.cover_opacity
+    return this.style && this.style.cover_opacity
       ? this.style.cover_opacity
       : v.collectionCoverOpacity
   }
