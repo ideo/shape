@@ -80,7 +80,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email add_tag remove_tag]
   after_action :broadcast_collection_archive_updates, only: %i[archive unarchive unarchive_from_email]
   def archive
-    @collection_cards.archive_all!(user_id: current_user.id)
+    CollectionCard.archive_all!(ids: @collection_cards.pluck(:id), user_id: current_user.id)
     render json: { archived: true }
   end
 
@@ -196,6 +196,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       for_user: current_user,
     )
     render_to_collection_with_cards(new_cards)
+  end
+
+  def toggle_pin
+    pinner = CardPinner.new(
+      card: @collection_card,
+      pinning: json_api_params[:pinned],
+    )
+
+    pinner.call
+
+    render jsonapi: @collection_card.reload, include: CollectionCard.default_relationships_for_api
   end
 
   private

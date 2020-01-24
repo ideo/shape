@@ -627,7 +627,10 @@ class Collection < ApplicationRecord
     # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
     return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
 
-    queue_update_template_instances
+    queue_update_template_instances(
+      updated_card_ids: cards.pluck(:id),
+      template_update_action: 'unarchive',
+    )
   end
 
   def enable_org_view_access_if_allowed
@@ -959,12 +962,34 @@ class Collection < ApplicationRecord
     return placement if placement.is_a?(Integer)
 
     # default to 'beginning', which goes after the first pinned card
-    order = collection_cards.pinned.maximum(:order) || 0
+    if master_template?
+      order = 0
+    else
+      order = collection_cards.pinned.maximum(:order) || 0
+    end
     if placement == 'end'
       order = cached_last_card_order || collection_cards.maximum(:order) || -1
       order += 1
     end
     order
+  end
+
+  def should_pin_cards?(placement)
+    has_pinned_cards = collection_cards.pinned.any?
+
+    return false unless has_pinned_cards
+
+    return true if placement == 'beginning'
+
+    first_moving_card_index = collection_cards.find_index { |cc| cc.order == placement }
+
+    return collection_cards.last&.pinned? if first_moving_card_index.nil?
+
+    return true if first_moving_card_index <= 1
+
+    left_of_first_moving_card_index = first_moving_card_index - 1
+
+    collection_cards[left_of_first_moving_card_index].pinned?
   end
 
   private
