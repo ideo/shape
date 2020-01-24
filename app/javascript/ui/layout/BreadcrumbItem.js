@@ -7,7 +7,7 @@ import { action, observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-import { routingStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BreadcrumbCaretIcon from '~/ui/icons/BreadcrumbCaretIcon'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
@@ -190,14 +190,32 @@ export class BreadcrumbItem extends React.Component {
   }
 
   @action
-  onBreadcrumbHoverOver = () => {
+  openBreadcrumb() {
     this.setInitialBaseRecords()
     this.dropdownOpen = true
     clearTimeout(this.hoverTimer)
   }
 
+  @action
+  onBreadcrumbHoverOver = () => {
+    this.openBreadcrumb()
+  }
+
   onBreadcrumbHoverOut = async ev => {
     this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 150)
+  }
+
+  onBreadcrumbClick = ev => {
+    if (uiStore.isTouchDevice) {
+      ev.stopPropagation()
+      this.openBreadcrumb()
+    }
+  }
+
+  onClick = async ev => {
+    if (uiStore.isMobile) {
+      this.openBreadcrumb()
+    }
   }
 
   @action
@@ -207,7 +225,7 @@ export class BreadcrumbItem extends React.Component {
     clearTimeout(this.hoverTimer)
   }
 
-  onBreadcrumbClick = item => {
+  onDropdownBreadcrumbClick = item => {
     routingStore.routeTo('collections', item.id)
   }
 
@@ -216,6 +234,14 @@ export class BreadcrumbItem extends React.Component {
   }
 
   setNestedBaseRecords(item) {
+    const existingIdx = _.findIndex(
+      this.baseDropDownRecords,
+      menuItem => menuItem.id === item.id
+    )
+    if (existingIdx > -1) {
+      this.nestedMenuY = existingIdx * NEST_AMOUNT_Y_PX
+      return
+    }
     const idx = _.findIndex(
       this.baseDropDownRecords,
       menuItem => menuItem.id === this.menuItemOpenId
@@ -239,7 +265,11 @@ export class BreadcrumbItem extends React.Component {
   onDiveClick = (item, level, ev) => {
     this.nestedMenuX = MENU_WIDTH
     this.fetchBreadcrumbRecords(item.id)
-    if (!item.nested && this.menuItemOpenId) {
+    if (
+      !item.nested &&
+      this.menuItemOpenId &&
+      this.menuItemOpenId !== item.id
+    ) {
       this.setNestedBaseRecords(item)
       // If the menu is moving back to the left position, we have to cancel
       // out the hover out timer on the menu so it doesn't close while it's
@@ -331,7 +361,7 @@ export class BreadcrumbItem extends React.Component {
                 style={{ paddingLeft: '10px', width: itemWidth }}
               >
                 <StyledMenuButton
-                  onClick={() => this.onBreadcrumbClick(menuItem)}
+                  onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
                   style={{ maxWidth: '200px' }}
                 >
                   {this.renderNesting(menuItem)}
@@ -358,7 +388,7 @@ export class BreadcrumbItem extends React.Component {
               {this.breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
-                    onClick={() => this.onBreadcrumbClick(menuItem)}
+                    onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
                   >
                     {this.renderIcon(menuItem)}
                     {this.renderMenuNameWithTooltip(menuItem)}
@@ -401,6 +431,7 @@ export class BreadcrumbItem extends React.Component {
           isLast={isLast}
           onMouseOver={this.onBreadcrumbHoverOver}
           onMouseOut={this.onBreadcrumbHoverOut}
+          onClick={this.onBreadcrumbClick}
         >
           {item.link && (
             <Tooltip

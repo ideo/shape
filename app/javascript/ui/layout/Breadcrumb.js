@@ -163,8 +163,27 @@ class Breadcrumb extends React.Component {
     return this.truncateItems(this.items())
   }
 
+  transformToSubItems(items, firstItem) {
+    const subItems = items.map((item, idx) => {
+      const subItem = { ...item }
+      if (item.ellipses && item.id !== firstItem.id) item.remove = true
+      subItem.nested = idx
+      return subItem
+    })
+    return subItems
+  }
+
   truncateItems = items => {
     let charsLeftToTruncate = this.charsToTruncateForItems(items)
+
+    // The mobile menu should have the full breadcrumb trail in it's one item
+    const { maxDepth } = this.props
+    if (maxDepth === 1) {
+      const allItems = this.items(false)
+      const subItems = this.transformToSubItems(allItems, items[0])
+      if (items[0]) items[0].subItems = subItems
+    }
+
     // If we are within allowable number of chars, return items
     if (charsLeftToTruncate <= 0) return items
 
@@ -176,8 +195,6 @@ class Breadcrumb extends React.Component {
     })
 
     charsLeftToTruncate = this.charsToTruncateForItems(items)
-
-    if (charsLeftToTruncate <= 0) return items
 
     if (items.length === 1) {
       const [item] = items
@@ -215,12 +232,7 @@ class Breadcrumb extends React.Component {
 
     const ellipsesItems = items.filter(item => item.ellipses)
     const firstEllipsesItem = ellipsesItems.shift()
-    const subItems = items.map((item, idx) => {
-      const subItem = { ...item }
-      if (item.ellipses && item.id !== firstEllipsesItem.id) item.remove = true
-      subItem.nested = idx
-      return subItem
-    })
+    const subItems = this.transformToSubItems(items, firstEllipsesItem)
     firstEllipsesItem.subItems = subItems
 
     return _.reject(items, { remove: true })
