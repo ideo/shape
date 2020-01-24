@@ -12,16 +12,24 @@ const parseURLMeta = async urlStr => {
   if (!parsed || typeof parsed !== 'object') return false
 
   const { hostname, pathname } = parsed
-  if (
+  const shapeLink =
     hostname.match(/shape\.space/i) ||
     (process.env.SHAPE_APP === 'localhost' && hostname.match(/localhost/i))
-  ) {
-    const match = pathname.match(/\/(collections|items)\/(\d+)/)
-    if (match) {
+  if (shapeLink) {
+    const itemOrCollection = pathname.match(/\/(collections|items)\/(\d+)/)
+    if (itemOrCollection) {
       return {
         shapeLink: true,
-        recordType: match[1].slice(0, -1), // cut off the 's'
-        recordId: match[2],
+        recordType: itemOrCollection[1].slice(0, -1), // cut off the 's'
+        recordId: itemOrCollection[2],
+      }
+    } else if (pathname.length > 1) {
+      // always just return the url for an internal Shape link
+      // even if not an item/collection (e.g. /tests/xyz)
+      return {
+        url,
+        icon:
+          'https://dgqn8hswhczqn.cloudfront.net/assets/favicons/apple-touch-icon-4c8dfc8a98d38e7c012c7d80528e0cf6f06e687794931cb389c7c9f919497744.png',
       }
     }
   }
