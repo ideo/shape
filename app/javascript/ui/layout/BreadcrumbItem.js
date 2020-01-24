@@ -8,10 +8,11 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 import { routingStore, uiStore } from '~/stores'
-import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BreadcrumbCaretIcon from '~/ui/icons/BreadcrumbCaretIcon'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
+import LinkIconSm from '~/ui/icons/LinkIconSm'
 import SubmissionBoxIconXs from '~/ui/icons/SubmissionBoxIconXs'
 import NestedArrowIcon from '~/ui/icons/NestedArrowIcon'
 import NestedLineIcon from '~/ui/icons/NestedLineIcon'
@@ -147,6 +148,8 @@ export class BreadcrumbItem extends React.Component {
   dropdownOpen = false
   @observable
   menuItemOpenId = null
+  @observable
+  nestedMenuLoading = false
   hoverTimer = null
   nestedMenuTimer = null
   nestedMenuY = 0
@@ -159,6 +162,7 @@ export class BreadcrumbItem extends React.Component {
     runInAction(() => {
       this.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
       this.menuItemOpenId = itemId
+      this.nestedMenuLoading = false
     })
   }
 
@@ -267,12 +271,14 @@ export class BreadcrumbItem extends React.Component {
       this.menuItemOpenId &&
       this.menuItemOpenId !== item.id
     ) {
+      this.nestedMenuLoading = true
       this.setNestedBaseRecords(item)
       // If the menu is moving back to the left position, we have to cancel
       // out the hover out timer on the menu so it doesn't close while it's
       // moving over there (because your mouse technically hovers off of it)
       setTimeout(() => {
         clearTimeout(this.nestedMenuTimer)
+        clearTimeout(this.hoverTimer)
       }, HOVER_TIMEOUT_MS - 50)
     } else {
       this.nestedMenuY = (item.nested || 0) * NEST_AMOUNT_Y_PX
@@ -382,6 +388,7 @@ export class BreadcrumbItem extends React.Component {
               onMouseOver={this.onNestedMenuHoverOver}
               onMouseOut={this.onNestedMenuHoverOut}
             >
+              {this.nestedMenuLoading && <InlineLoader />}
               {this.breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
