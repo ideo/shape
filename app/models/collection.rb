@@ -769,16 +769,6 @@ class Collection < ApplicationRecord
     processing_done if processing_status.nil?
   end
 
-  def mark_children_processing_status(status = nil)
-    collections = Collection.in_collection(self)
-    collections.update_all(
-      processing_status: status,
-      updated_at: Time.now,
-    )
-    # Broadcast that this collection is no longer being edited
-    collections.each(&:processing_done) if processing_status.nil?
-  end
-
   def clear_collection_cover
     cover = primary_collection_cards.where(is_cover: true).first
     return if cover.nil?

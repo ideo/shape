@@ -168,6 +168,8 @@ export default class UiStore {
   @observable
   draggingFromMDL = false
   @observable
+  overflowFromMDL = 0
+  @observable
   textEditingItem = null
   @observable
   overdueBannerVisible = true
@@ -497,7 +499,12 @@ export default class UiStore {
       this.movingCardIds.replace([id])
       this.templateName = name
     } else {
-      this.movingCardIds.replace([...this.selectedCardIds])
+      let firstCardId = _.first(this.selectedCardIds)
+      if (from) {
+        // always put the topLeft card first
+        firstCardId = from.firstCardId(this.selectedCardIds)
+      }
+      this.movingCardIds.replace(_.uniq([firstCardId, ...this.selectedCardIds]))
       this.deselectCards()
       this.templateName = ''
     }
