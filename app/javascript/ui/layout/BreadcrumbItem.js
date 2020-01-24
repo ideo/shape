@@ -198,6 +198,8 @@ export class BreadcrumbItem extends React.Component {
 
   @action
   onBreadcrumbHoverOver = () => {
+    // The hover even fires on mobile after a click
+    if (uiStore.isTouchDevice && uiStore.isMobileXs) return
     this.openBreadcrumb()
   }
 
@@ -206,14 +208,9 @@ export class BreadcrumbItem extends React.Component {
   }
 
   onBreadcrumbClick = ev => {
-    if (uiStore.isTouchDevice) {
+    // The dropdown should only show up on touch devices large enough to handle it
+    if (uiStore.isTouchDevice && !uiStore.isMobileXs) {
       ev.stopPropagation()
-      this.openBreadcrumb()
-    }
-  }
-
-  onClick = async ev => {
-    if (uiStore.isMobile) {
       this.openBreadcrumb()
     }
   }
