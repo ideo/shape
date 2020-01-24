@@ -168,11 +168,13 @@ export default class UiStore {
   @observable
   draggingFromMDL = false
   @observable
+  overflowFromMDL = 0
+  @observable
   textEditingItem = null
   @observable
   overdueBannerVisible = true
   @observable
-  editingCardId = null
+  editingCardCover = null
   @observable
   collectionCardSortOrder = 'updated_at'
   @observable
@@ -231,15 +233,6 @@ export default class UiStore {
   @observable
   placeholderPosition = {
     ...this.placeholderDefaults,
-  }
-
-  @action
-  toggleEditingCardId(cardId) {
-    if (this.editingCardId === cardId) {
-      this.editingCardId = null
-    } else {
-      this.editingCardId = cardId
-    }
   }
 
   @action
@@ -506,7 +499,12 @@ export default class UiStore {
       this.movingCardIds.replace([id])
       this.templateName = name
     } else {
-      this.movingCardIds.replace([...this.selectedCardIds])
+      let firstCardId = _.first(this.selectedCardIds)
+      if (from) {
+        // always put the topLeft card first
+        firstCardId = from.firstCardId(this.selectedCardIds)
+      }
+      this.movingCardIds.replace(_.uniq([firstCardId, ...this.selectedCardIds]))
       this.deselectCards()
       this.templateName = ''
     }

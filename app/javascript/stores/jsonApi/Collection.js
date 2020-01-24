@@ -10,6 +10,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 
+import { findTopLeftCard } from '~/utils/CollectionGridCalculator'
 import BaseRecord from './BaseRecord'
 import CardMoveService from '~/utils/CardMoveService'
 import CollectionCard from './CollectionCard'
@@ -146,12 +147,30 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return cardIdsBetween.slice(lastIdx, firstIdx)
   }
 
+  firstCardId(cardIds) {
+    const cards = this.collection_cards.filter(card =>
+      _.includes(cardIds, card.id)
+    )
+    let card = {}
+    if (this.isBoard) {
+      card = findTopLeftCard(cards)
+    } else {
+      card = _.first(_.sortBy(cards, 'order'))
+    }
+    return card.id
+  }
+
+  get maxColumnIndex() {
+    // NOTE: this may be replaced by an API attribute in the future
+    // (16 columns - 1)
+    return 15
+  }
+
   get cardMatrix() {
     if (this.collection_cards.length === 0) return [[]]
 
     // Get maximum dimensions of our card matrix
-    // const maxCol = _.max(this.collection_cards.map(card => card.maxCol))
-    const maxCol = 15
+    const maxCol = this.maxColumnIndex
     const maxRow = _.max(this.collection_cards.map(card => card.maxRow))
 
     // Create matrix of arrays, each row having an array with the 'columns'

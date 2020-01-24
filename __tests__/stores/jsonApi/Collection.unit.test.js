@@ -158,6 +158,14 @@ describe('Collection', () => {
         firstThreeCardIds
       )
     })
+
+    describe('firstCardId', () => {
+      it('should always get the first ordered card out of the given ids', () => {
+        expect(collection.firstCardId(_.reverse(firstThreeCardIds))).toEqual(
+          cardIds[0]
+        )
+      })
+    })
   })
 
   describe('board collection', () => {

@@ -284,7 +284,7 @@ class GridCard extends React.Component {
   editCard = ev => {
     ev.preventDefault()
     const { card } = this.props
-    uiStore.toggleEditingCardId(card.id)
+    uiStore.setEditingCardCover(card.id)
   }
 
   onCollectionCoverChange = () => {
