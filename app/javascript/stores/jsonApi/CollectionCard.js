@@ -175,6 +175,7 @@ class CollectionCard extends BaseRecord {
       uiStore.trackEvent('create', this.parentCollection)
       return res.data
     } catch (e) {
+      uiStore.closeBlankContentTool({ force: true })
       uiStore.defaultAlertError()
       return false
     }
@@ -204,6 +205,7 @@ class CollectionCard extends BaseRecord {
       return res.data
     } catch (e) {
       console.warn(e)
+      uiStore.closeBlankContentTool({ force: true })
       uiStore.defaultAlertError()
       return false
     }

@@ -78,6 +78,8 @@ class CollectionCard < ApplicationRecord
   validates :row,
             numericality: { greater_than_or_equal_to: 0 },
             if: :parent_board_collection?
+  validate :board_placement_is_valid?, if: :parent_board_collection?
+
   validates :section_type, presence: true, if: :parent_test_collection?
 
   delegate :board_collection?, :test_collection?,
@@ -537,5 +539,13 @@ class CollectionCard < ApplicationRecord
     return unless collection.present?
 
     collection.touch
+  end
+
+  def board_placement_is_valid?
+    matrix = CollectionGrid::Calculator.board_matrix(collection: parent)
+    # if this spot is filled...
+    return unless matrix[row].present? && matrix[row][col].present?
+
+    errors.add(:base, 'Board position is already taken')
   end
 end

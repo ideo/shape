@@ -120,6 +120,28 @@ RSpec.describe CollectionCard, type: :model do
         end
       end
     end
+
+    describe '#board_placement_is_valid?' do
+      let!(:parent) { create(:board_collection, num_cards: 1) }
+      let(:existing_card) { parent.collection_cards.first }
+      let(:card) { build(:collection_card_text, parent: parent) }
+
+      it 'should be valid if the spot is not taken' do
+        existing_card.update(row: 0, col: 0)
+        parent.reload
+        card.row = 2
+        card.col = 2
+        expect(card.valid?).to be true
+      end
+
+      it 'should be invalid if the spot is taken' do
+        existing_card.update(row: 2, col: 2, width: 2)
+        parent.reload
+        card.row = 2
+        card.col = 3
+        expect(card.valid?).to be false
+      end
+    end
   end
 
   describe 'callbacks' do
