@@ -500,8 +500,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get coverColor() {
-    if (this.cover_color) {
-      return this.cover_color
+    if (this.style.cover_color) {
+      return this.style.cover_color
     } else if (this.isSpecialCollection) {
       return v.colors.offset
     } else {
@@ -510,7 +510,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get coverOverlayOpacity() {
-    return this.cover_opacity ? this.cover_opacity : v.collectionCoverOpacity
+    return this.style.cover_opacity
+      ? this.style.cover_opacity
+      : v.collectionCoverOpacity
   }
 
   get isNormalCollection() {

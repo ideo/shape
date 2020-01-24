@@ -450,7 +450,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         test_show_media
         tag_list
         search_term
-      ].concat(Collection.globalize_attribute_names),
+      ].concat(Collection.globalize_attribute_names).concat([style: {}]),
       item_attributes: [
         :id,
         :type,

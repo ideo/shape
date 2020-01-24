@@ -24,6 +24,7 @@ class SerializableCollection < BaseJsonSerializer
     :idea_id,
     :search_term,
     :cloned_from_id,
+    :style,
   )
 
   stringified_attributes(
