@@ -58,7 +58,6 @@ Cypress.Commands.add('locateDataOrClassWith', (selector, text) => {
 Cypress.Commands.add(
   'createCollection',
   ({ name, collectionType = 'normal', empty = false }) => {
-    let _empty = empty
     let type = 'collection'
     // these types correspond to the BctButtonBox types in GridCardBlank
     switch (collectionType) {
@@ -68,9 +67,6 @@ Cypress.Commands.add(
       case 'test':
         type = 'testCollection'
         break
-      case 'emptyCollection':
-        type = 'collection'
-        _empty = true
       default:
         // e.g. "normal"
         type = 'collection'
@@ -84,7 +80,7 @@ Cypress.Commands.add(
         empty: false,
       })
     } else {
-      cy.selectBctType({ type, empty: _empty })
+      cy.selectBctType({ type, empty })
     }
 
     // force == don't care if it's "covered by tooltip"

@@ -162,7 +162,6 @@ class TemplateInstanceUpdater
                                 )
 
     moving_card_ids.each do |moving_card_id|
-      # TODO: filter out archived cards?
       card_within_instance = all_cards_within_instance.where(templated_from_id: moving_card_id).first
 
       if card_within_instance.present?

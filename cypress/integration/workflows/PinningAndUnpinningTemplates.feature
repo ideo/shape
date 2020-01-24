@@ -3,7 +3,7 @@ Feature: Pinning and Unpinning
     Given I login and visit the Test Area
     When I create a template card
     And I navigate to the collection named "Test Template" via the "CollectionCover"
-    And I create a emptyCollection collection named "Unpinned Collection 1"
+    And I create a normal collection named "Unpinned Collection 1" in my empty collection
     And I create a normal collection named "To Pin then Unpin"
     And I create a normal collection named "Pinned Collection 1"
     And I create a normal collection named "Pinned Collection 2"
@@ -25,7 +25,7 @@ Feature: Pinning and Unpinning
     Given I login and visit the Test Area
     When I create a template card
     And I navigate to the collection named "Test Template" via the "CollectionCover"
-    And I create a emptyCollection collection named "Test Collection 1"
+    And I create a normal collection named "Test Collection 1" in my empty collection
     And I create a textItem card
     And I navigate to the collection named "Cypress Test Area" via the breadcrumb
     And I click the 'CollectionCoverFormButton'

@@ -19,8 +19,9 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
              created_by: template_admin,
              add_editors: [template_admin])
     }
+    let(:organization) { template.organization }
     let!(:updated_card_ids) { template.collection_cards.pluck(:id) }
-    let!(:template_instance) { create(:collection, template: template, created_by: user) }
+    let!(:template_instance) { create(:collection, template: template, created_by: user, organization: organization) }
     let!(:template_update_action) { 'create' }
 
     context 'calling template_instance_updater with \'create\' template_update_action' do
@@ -135,7 +136,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
           collection: template_instance,
           synchronous: :first_level,
         )
-        card_to_delete.update(archived: true)
+        card_to_delete.archive!
       end
 
       it 'should move deleted cards into Deleted From Template collection' do
@@ -165,6 +166,36 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
             source_type: 'Item',
           ).count,
         ).to eq(1)
+      end
+    end
+
+    context 'unarchiving a template card' do
+      let(:card_to_unarchive) do
+        template.collection_cards.first
+      end
+      let(:updated_card_ids) do
+        [card_to_unarchive.id]
+      end
+      let(:deleted_from_template) do
+        create(:collection, name: 'Deleted From Template', parent_collection: template_instance, organization: organization)
+      end
+      let!(:template_update_action) { 'unarchive' }
+
+      before do
+        template.setup_templated_collection(
+          for_user: user,
+          collection: template_instance,
+          synchronous: :first_level,
+        )
+        # move this into Deleted From Template, so that we can see that it comes back out
+        template_instance.collection_cards.find_by(templated_from_id: card_to_unarchive.id).update(parent: deleted_from_template)
+        deleted_from_template.reload
+      end
+
+      it 'should move deleted cards from Deleted From Template back into the instance' do
+        expect(deleted_from_template.children.size).to eq(1)
+        template_instance_updater.call
+        expect(deleted_from_template.reload.children.size).to eq(0)
       end
     end
   end
