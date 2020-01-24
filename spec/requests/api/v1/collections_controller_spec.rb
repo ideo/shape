@@ -563,7 +563,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let!(:instance) { create(:collection, template: template) }
 
     it 'should call the UpdateTemplateInstancesWorker' do
-      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(template.id)
+      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(template.id, template.collection_cards.pluck(:id), 'update_all')
       post(path)
     end
   end

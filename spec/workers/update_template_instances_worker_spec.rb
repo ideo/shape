@@ -5,9 +5,8 @@ RSpec.describe UpdateTemplateInstancesWorker, type: :worker do
     let(:master_template) { create(:collection, master_template: true, num_cards: 3) }
 
     it 'calls #update_template_instances' do
-      allow_any_instance_of(Collection).to receive(:update_template_instances)
-      expect_any_instance_of(Collection).to receive(:update_template_instances)
-      UpdateTemplateInstancesWorker.new.perform(master_template.id)
+      expect_any_instance_of(TemplateInstanceUpdater).to receive(:call)
+      UpdateTemplateInstancesWorker.new.perform(master_template.id, master_template.collection_cards.pluck(:id), 'update_all')
     end
   end
 end

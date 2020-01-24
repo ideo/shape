@@ -63,7 +63,7 @@ class CollectionCardDuplicator < SimpleService
   def register_card_mappings
     run_worker_sync = %i[all_levels first_level].include?(@synchronous)
 
-    if @building_template_instance && @cards.size == 1
+    if @building_template_instance && @cards.size == 1 && @to_collection.parent_collection_card.present?
       # Append the template instance card,
       # so that the mapper will include the entire template in its mapping
       card_ids = @cards.map(&:id) + [@to_collection.parent_collection_card.id]
@@ -103,6 +103,8 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def duplicate_cards_with_placeholders
+    pin_duplicating_cards = should_pin_duplicating_cards?
+
     @cards.each_with_index do |card, i|
       # Skip if legend item - they will be moved over in `CollectionCardDuplicationWorker#duplicate_legend_items`
       next if card.item&.is_a?(Item::LegendItem)
@@ -113,7 +115,7 @@ class CollectionCardDuplicator < SimpleService
       # help us refer back to the originals when duplicating
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
-      dup.pinned = @to_collection.master_template?
+      dup.pinned = pin_duplicating_cards
       dup.parent_id = @to_collection.id
       unless moving_to_board?
         dup.order = @order + i
@@ -150,5 +152,11 @@ class CollectionCardDuplicator < SimpleService
     # this is just inferred from what you are moving, just to figure out if you
     # are moving cards from a normal Collection or not
     @cards.first.parent
+  end
+
+  def should_pin_duplicating_cards?
+    return false unless @cards.first.present?
+
+    @to_collection.should_pin_cards?(@placement)
   end
 end

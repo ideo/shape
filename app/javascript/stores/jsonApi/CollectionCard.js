@@ -34,7 +34,15 @@ class CollectionCard extends BaseRecord {
     'section_type',
   ]
 
-  batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
+  batchUpdateAttributes = [
+    'id',
+    'order',
+    'width',
+    'height',
+    'row',
+    'col',
+    'pinned',
+  ]
 
   @observable
   maxWidth = this.width
@@ -445,6 +453,23 @@ class CollectionCard extends BaseRecord {
       uiStore.defaultAlertError()
     }
     return false
+  }
+
+  @action
+  async API_togglePin() {
+    // toggle it first
+    this.pinned = !this.pinned
+    await this.apiStore.request(
+      `collection_cards/${this.id}/toggle_pin`,
+      'PATCH',
+      {
+        pinned: this.pinned,
+      }
+    )
+    // make sure this card, if it moved, is the "tiebreaker" for its new order
+    this.order -= 0.5
+
+    return this.parentCollection._reorderCards()
   }
 }
 

@@ -1406,4 +1406,53 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
   end
+
+  describe '#POST toggle_pin' do
+    let(:master) {
+      create(:collection,
+             master_template: true,
+             num_cards: 1,
+             pin_cards: true,
+             created_by: user,
+             add_editors: [user])
+    }
+    let(:collection_card) { create(:collection_card_collection, parent: master) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/toggle_pin" }
+    let(:params) { json_api_params('collection_cards', pinned: true) }
+
+    context 'with pinned true' do
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'with pinned false' do
+      let!(:params) { json_api_params('collection_cards', pinned: false) }
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'with toggle_pin using template instance' do
+      let(:instance) { create(:collection, template: master, created_by: user) }
+      let!(:collection_card) { create(:collection_card_collection, parent: instance) }
+      let!(:path) { "/api/v1/collection_cards/#{collection_card.id}/toggle_pin" }
+
+      before do
+        master.setup_templated_collection(
+          for_user: user,
+          collection: instance,
+          synchronous: :first_level,
+        )
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
 end

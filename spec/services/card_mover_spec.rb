@@ -186,6 +186,23 @@ RSpec.describe CardMover, type: :service do
             original_cards[1].id,
           ])
         end
+
+        it 'should pin the all the moving cards' do
+          card_mover.call
+          expect(to_collection.reload.collection_cards.pinned.all?(&:id)).to eq(true)
+        end
+
+        context 'moving cards right next to unpinned cards' do
+          before do
+            # update second card to be pinned
+            to_collection.reload.collection_cards[1].update(pinned: false)
+          end
+          it 'should keep all the moving cards unpinned' do
+            card_mover.call
+            cards_moved = to_collection.reload.collection_cards.select {|cc| moving_cards.pluck(:id).include? cc.id}
+            expect(cards_moved.pluck(:pinned)).to all(be_falsy)
+          end
+        end
       end
 
       context 'with pinned cards in the from_collection' do
@@ -214,18 +231,23 @@ RSpec.describe CardMover, type: :service do
             to_collection.update(master_template: true)
           end
 
-          it 'should pin all cards if moving from a normal collection' do
-            card_mover.call
-            to_collection.reload
-            expect(to_collection.collection_cards.count).to eq 7
-            expect(to_collection.collection_cards.all?(&:pinned?)).to be true
-            subcollection = to_collection.collections.first
-            expect(subcollection.collection_cards.all?(&:pinned)).to be true
-            # subcollection should now be a subtemplate
-            expect(subcollection.master_template?).to be true
-            expect(subcollection.collections.first.master_template?).to be true
+
+          context 'moving to the beginning of master template with pinned cards' do
+            let!(:placement) {'beginning'}
+
+            it 'should pin all cards if moving to the beginning of collection with pinned cards' do
+              card_mover.call
+              to_collection.reload
+              expect(to_collection.collection_cards.count).to eq 7
+              expect(to_collection.collection_cards.any?(&:pinned?)).to be true
+              subcollection = to_collection.collections.first
+              expect(subcollection.collection_cards.all?(&:pinned)).to be true
+              # subcollection should now be a subtemplate
+              expect(subcollection.master_template?).to be true
+              expect(subcollection.collections.first.master_template?).to be true
+            end
           end
-        end
+          end
       end
     end
 

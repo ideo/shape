@@ -48,8 +48,8 @@ class CollectionCardBuilder
   end
 
   def create_collection_card
-    # NOTE: for now you can *only* create pinned cards in a master template
-    @collection_card.pinned = true if @collection_card.master_template_card?
+    # NOTE: cards created inside a master_template are unpinned by default unless it's being created within a pinned area
+    @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
     # TODO: rollback transaction if these later actions fail; add errors, return false
     CollectionCard.transaction do
       @collection_card.save.tap do |result|
@@ -61,7 +61,10 @@ class CollectionCardBuilder
         @parent_collection.reorder_cards!
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
-          @parent_collection.queue_update_template_instances
+          @parent_collection.queue_update_template_instances(
+            updated_card_ids: [@collection_card.id],
+            template_update_action: 'create',
+          )
         end
 
         create_datasets if @datasets_params.present?
