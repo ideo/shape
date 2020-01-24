@@ -88,8 +88,6 @@ const fakeUiStore = {
   addNewCard: jest.fn(),
   removeNewCard: jest.fn(),
   isNewCard: jest.fn(),
-  editingCardId: 0,
-  toggleEditingCardId: jest.fn(),
   autocompleteMenuClosed: jest.fn(),
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),

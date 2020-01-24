@@ -123,6 +123,16 @@ describe('MovableGridCard', () => {
       ).toBeTruthy()
       expect(wrapper.find('Rnd').props().disableDragging).toBeFalsy()
     })
+
+    describe('when editing the card cover', () => {
+      beforeEach(() => {
+        uiStore.editingCardCover = props.card.id
+        wrapper = shallow(<MovableGridCard {...props} />)
+      })
+      it('disables dragging', () => {
+        expect(wrapper.find('Rnd').props().disableDragging).toBeTruthy()
+      })
+    })
   })
 
   describe('when hoveringOverRight', () => {

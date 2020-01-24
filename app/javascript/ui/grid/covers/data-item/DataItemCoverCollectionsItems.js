@@ -63,12 +63,16 @@ class DataItemCoverCollectionsItems extends React.Component {
   @computed
   get editing() {
     const { card, uiStore } = this.props
-    return uiStore.editingCardId === card.id
+    return uiStore.editingCardCover === card.id
   }
 
   toggleEditing() {
     const { card, uiStore } = this.props
-    uiStore.toggleEditingCardId(card.id)
+    if (this.editing) {
+      uiStore.setEditingCardCover(null)
+    } else {
+      uiStore.setEditingCardCover(card.id)
+    }
   }
 
   onSelectTimeframe = value => {
@@ -131,7 +135,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       this.toggleEditing()
-      uiStore.toggleEditingCardId(card.id)
+      uiStore.setEditingCardCover(card.id)
       this.loading = false
     })
   }
@@ -139,7 +143,7 @@ class DataItemCoverCollectionsItems extends React.Component {
   handleEditClick = ev => {
     const { card, item, uiStore } = this.props
     if (!item.can_edit_content) return
-    uiStore.toggleEditingCardId(card.id)
+    uiStore.setEditingCardCover(card.id)
   }
 
   get timeframeControl() {

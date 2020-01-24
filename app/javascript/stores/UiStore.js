@@ -172,7 +172,7 @@ export default class UiStore {
   @observable
   overdueBannerVisible = true
   @observable
-  editingCardId = null
+  editingCardCover = null
   @observable
   collectionCardSortOrder = 'updated_at'
   @observable
@@ -231,15 +231,6 @@ export default class UiStore {
   @observable
   placeholderPosition = {
     ...this.placeholderDefaults,
-  }
-
-  @action
-  toggleEditingCardId(cardId) {
-    if (this.editingCardId === cardId) {
-      this.editingCardId = null
-    } else {
-      this.editingCardId = cardId
-    }
   }
 
   @action
