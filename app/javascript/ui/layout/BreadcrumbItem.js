@@ -234,6 +234,14 @@ export class BreadcrumbItem extends React.Component {
   }
 
   setNestedBaseRecords(item) {
+    const existingIdx = _.findIndex(
+      this.baseDropDownRecords,
+      menuItem => menuItem.id === item.id
+    )
+    if (existingIdx > -1) {
+      this.nestedMenuY = existingIdx * NEST_AMOUNT_Y_PX
+      return
+    }
     const idx = _.findIndex(
       this.baseDropDownRecords,
       menuItem => menuItem.id === this.menuItemOpenId
