@@ -36,7 +36,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                       type: card.class.base_class.name.downcase.pluralize,
                       collection_type: card.class.name,
                       name: card.record.name,
-                      has_children: card.record.collections.count > 0
+                      has_children: card.record.has_child_collections?,
                     }
                   end
     render json: card_data

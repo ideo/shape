@@ -966,6 +966,10 @@ class Collection < ApplicationRecord
     order
   end
 
+  def has_child_collections?
+    collections.count.positive?
+  end
+
   private
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)

@@ -452,6 +452,10 @@ class Item < ApplicationRecord
     "Please add #{missing_value_by_question_type} to #{incomplete_question_noun} #{question_number}"
   end
 
+  def has_child_collections?
+    false
+  end
+
   private
 
   def missing_value_by_question_type
