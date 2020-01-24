@@ -19,6 +19,7 @@ import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import v from '~/utils/variables'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
@@ -496,6 +497,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.isProfileTemplate ||
       this.isProfileCollection
     )
+  }
+
+  get coverColor() {
+    if (this.cover_color) {
+      return this.cover_color
+    } else if (this.isSpecialCollection) {
+      return v.colors.offset
+    } else {
+      return v.colors.collectionCover
+    }
+  }
+
+  get coverOverlayOpacity() {
+    return this.cover_opacity ? this.cover_opacity : v.collectionCoverOpacity
   }
 
   get isNormalCollection() {

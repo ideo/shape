@@ -50,8 +50,7 @@ CardButtonWrapper.displayName = 'CardButtonWrapper'
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
-  background: ${props =>
-    props.isSpecialCollection ? v.colors.offset : v.colors.collectionCover};
+  background: ${props => props.color};
   color: white;
   position: relative;
   overflow: hidden;
@@ -367,14 +366,14 @@ class CollectionCover extends React.Component {
       textItem,
       cardId,
     } = this.props
-    const { subtitle } = collection
+    const { subtitle, coverColor } = collection
     const { gridW, gutter } = uiStore.gridSettings
-
     return (
       <StyledCollectionCover
         data-cy="CollectionCover"
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
+        color={coverColor}
       >
         {collection.isCarousel && !this.hasEmptyCarousel ? (
           <CarouselCover
