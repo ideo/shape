@@ -40,11 +40,16 @@ class DataItemCoverCollectionsItems extends React.Component {
   loading = false
 
   componentDidMount() {
+    const { item, uiStore } = this.props
     const {
       primaryDataset: { data_source_id },
     } = this.props.item
     if (data_source_id) {
       this.loadTargetCollection(data_source_id)
+    }
+    if (uiStore.isNewCard(item.id)) {
+      uiStore.removeNewCard(item.id)
+      this.toggleEditing()
     }
   }
 
@@ -119,7 +124,7 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 
   async saveSettings(settings) {
-    const { card, item, uiStore } = this.props
+    const { card, item } = this.props
     runInAction(() => {
       Object.assign(item.primaryDataset, settings)
       this.loading = true
@@ -135,15 +140,14 @@ class DataItemCoverCollectionsItems extends React.Component {
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       this.toggleEditing()
-      uiStore.setEditingCardCover(card.id)
       this.loading = false
     })
   }
 
   handleEditClick = ev => {
-    const { card, item, uiStore } = this.props
+    const { item } = this.props
     if (!item.can_edit_content) return
-    uiStore.setEditingCardCover(card.id)
+    this.toggleEditing()
   }
 
   get timeframeControl() {
@@ -292,13 +296,9 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 
   render() {
-    const { item, uiStore } = this.props
+    const { item } = this.props
     const { timeframe } = item.primaryDataset
 
-    if (uiStore.isNewCard(item.id)) {
-      uiStore.removeNewCard(item.id)
-      this.toggleEditing()
-    }
     return (
       <StyledDataItemCover
         className="cancelGridClick"
