@@ -484,6 +484,14 @@ class CollectionCard < ApplicationRecord
     identifier(CardIdentifier.call(*args)).first&.record
   end
 
+  def board_placement_is_valid?
+    return true unless parent&.is_a?(Collection::Board)
+    return true if CollectionGrid::Calculator.exact_open_spot?(card: self, collection: parent)
+
+    errors.add(:base, 'Board position is already taken')
+    false
+  end
+
   private
 
   def assign_default_height_and_width
@@ -539,13 +547,5 @@ class CollectionCard < ApplicationRecord
     return unless collection.present?
 
     collection.touch
-  end
-
-  def board_placement_is_valid?
-    matrix = CollectionGrid::Calculator.board_matrix(collection: parent)
-    # if this spot is filled...
-    return unless matrix[row].present? && matrix[row][col].present?
-
-    errors.add(:base, 'Board position is already taken')
   end
 end

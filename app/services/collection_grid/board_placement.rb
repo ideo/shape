@@ -4,14 +4,15 @@
 module CollectionGrid
   class BoardPlacement < SimpleService
     def initialize(
-      to_collection:,
-      from_collection:,
       moving_cards:,
+      to_collection:,
+      from_collection: nil,
       row: nil,
       col: nil
     )
       @to_collection = to_collection
-      @from_collection = from_collection
+      # e.g. in the case where we're creating a card, from_collection can just equal to_collection
+      @from_collection = from_collection || to_collection
       @moving_cards = moving_cards
       @row = row || @to_collection.empty_row_for_moving_cards
       @col = col || 0

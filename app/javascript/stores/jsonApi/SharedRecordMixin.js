@@ -90,30 +90,32 @@ const SharedRecordMixin = superclass =>
       return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
     }
 
-    API_revertTo({ snapshot } = {}) {
-      let data
+    async API_revertTo({ snapshot } = {}) {
+      let data, currentSnapshot
       // special case if you're undoing a card resize/move
       if (snapshot.collection_cards_attributes) {
-        snapshot.collection_cards_attributes.forEach(cardData => {
-          const card = this.collection_cards.find(cc => cc.id === cardData.id)
-          if (card) {
-            _.assign(
-              card,
-              _.pick(cardData, ['order', 'width', 'height', 'row', 'col']),
-              {
-                updated_at: new Date(),
-              }
-            )
-          }
-        })
-        this._reorderCards()
+        currentSnapshot = this.toJsonApiWithCards().attributes
+        this.revertToSnapshot(snapshot)
         data = this.toJsonApiWithCards()
       } else {
         _.assign(this, snapshot)
         data = this.toJsonApi()
       }
 
-      return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
+      try {
+        const res = await this.apiStore.request(this.baseApiPath, 'PATCH', {
+          data,
+        })
+        return res
+      } catch {
+        if (snapshot && this.internalType === 'collections') {
+          this.uiStore.popupSnackbar({
+            message: 'Undo cancelled due to overlap',
+          })
+          // revert it to its original state because the undo didn't work
+          this.revertToSnapshot(currentSnapshot)
+        }
+      }
     }
 
     API_restorePermissions() {

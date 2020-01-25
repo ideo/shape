@@ -588,7 +588,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // attach nested attributes of cards
     if (this.collection_cards) {
       // make sure cards are sequential
-      this._reorderCards()
+      if (!this.isBoard) this._reorderCards()
       const cardAttributes = []
       _.each(this.collection_cards, card => {
         if (
@@ -738,59 +738,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   /*
-  Perform batch updates on multiple cards at once
-
-  updates (array)
-    An array of objects with a card reference and the updated attributes, e.g.
-    [
-      { card: card instance, order: 2  },
-      { card: card instance, order: 4  },
-    ]
-
-  updateAllCards (bool)
-    If true, it will send data to the API for all collection cards
-    (useful for regular collections where order needs to be updated on all cards).
-
-    If false, will only send data about updated cards.
-  */
-
-  API_batchUpdateCards({ updates, updateAllCards }) {
-    const updatesByCardId = {}
-    _.each(updates, update => {
-      updatesByCardId[update.card.id] = update
-    })
-    const orders = _.map(updates, update => update.order)
-    const minOrder = _.min(orders)
-    const maxOrder = _.max(orders)
-    // min...max is range of cards you are moving
-
-    // Apply all updates to in-memory cards
-    _.each(this.collection_cards, card => {
-      // Apply updates to each card
-      const cardUpdates = updatesByCardId[card.id]
-      if (cardUpdates) {
-        // Pick out allowed values and assign them
-        const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
-        _.forEach(allowedAttrs, (value, key) => {
-          card[key] = value
-        })
-      } else if (card.order >= minOrder) {
-        // make sure this card gets bumped out of the way of our moving ones
-        card.order += maxOrder + 1
-      }
-      // force the grid to immediately observe that things have changed
-      card.updated_at = new Date()
-    })
-
-    const data = this.toJsonApiWithCards(
-      updateAllCards ? [] : _.keys(updatesByCardId)
-    )
-
-    // Persist updates to API
-    return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
-  }
-
-  /*
   Perform batch updates on multiple cards at once,
   and captures current cards state to undo to
 
@@ -820,47 +767,111 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onCancel,
   }) {
     const cardIds = []
-    const updatesByCardId = {}
-    _.each(updates, update => {
-      cardIds.push(update.card.id)
-      updatesByCardId[update.card.id] = update
-    })
 
-    const performUpdate = () => {
+    const performUpdate = async () => {
       // close MoveMenu e.g. if you were dragging from MDL
       this.uiStore.closeMoveMenu()
       // Store snapshot of existing cards so changes can be un-done
-      const cardsData = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
-
-      this.pushUndo({
-        snapshot: cardsData.attributes,
-        message: undoMessage,
-        redoAction: {
-          message: 'Move redone',
-          apiCall: () =>
-            // re-call the same function
-            this.API_batchUpdateCardsWithUndo({
-              updates,
-              updateAllCards,
-              undoMessage,
-              onConfirm,
-              onCancel,
-            }),
-        },
-        actionType: POPUP_ACTION_TYPES.SNACKBAR,
+      const dataBeforeMove = this.toJsonApiWithCards(
+        updateAllCards ? [] : cardIds
+      )
+      const snapshot = dataBeforeMove.attributes
+      const updatesByCardId = {}
+      _.each(updates, update => {
+        updatesByCardId[update.card.id] = update
       })
 
-      return this.API_batchUpdateCards({ updates, updateAllCards }).then(
-        res => {
+      this.applyLocalCardUpdates(updates)
+
+      const data = this.toJsonApiWithCards(
+        updateAllCards ? [] : _.keys(updatesByCardId)
+      )
+
+      try {
+        // Persist updates to API
+        const res = await this.apiStore.request(
+          `collections/${this.id}`,
+          'PATCH',
+          { data }
+        )
+
+        if (res) {
+          // only push undo once we've successfully updated the cards
+          this.pushUndo({
+            snapshot,
+            message: undoMessage,
+            redoAction: {
+              message: 'Move redone',
+              apiCall: () =>
+                // re-call the same function
+                this.API_batchUpdateCardsWithUndo({
+                  updates,
+                  updateAllCards,
+                  undoMessage,
+                  onConfirm,
+                  onCancel,
+                }),
+            },
+            actionType: POPUP_ACTION_TYPES.SNACKBAR,
+          })
           if (onConfirm) onConfirm()
         }
-      )
+      } catch {
+        this.uiStore.popupSnackbar({ message: 'Move cancelled due to overlap' })
+        this.revertToSnapshot(snapshot)
+        if (onCancel) onCancel()
+      }
     }
 
     // Show a dialog if in a template
     return this.confirmEdit({
       onCancel,
       onConfirm: performUpdate,
+    })
+  }
+
+  revertToSnapshot(snapshot) {
+    const updates = []
+    snapshot.collection_cards_attributes.forEach(cardData => {
+      const update = _.pick(cardData, [
+        'order',
+        'width',
+        'height',
+        'row',
+        'col',
+      ])
+      update.card = { id: cardData.id }
+      updates.push(update)
+    })
+    this.applyLocalCardUpdates(updates)
+  }
+
+  @action
+  applyLocalCardUpdates(updates) {
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      updatesByCardId[update.card.id] = update
+    })
+    const orders = _.map(updates, update => update.order)
+    const minOrder = _.min(orders)
+    const maxOrder = _.max(orders)
+    // min...max is range of cards you are moving
+    // Apply all updates to in-memory cards
+    _.each(this.collection_cards, card => {
+      // Apply updates to each card
+      const cardUpdates = updatesByCardId[card.id]
+      if (cardUpdates) {
+        // Pick out allowed values and assign them
+        const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
+        _.forEach(allowedAttrs, (value, key) => {
+          card[key] = value
+        })
+      } else if (card.order >= minOrder) {
+        // make sure this card gets bumped out of the way of our moving ones
+        card.order += maxOrder + 1
+      }
+      // force the grid to immediately observe that things have changed
+      card.updated_at = new Date()
     })
   }
 

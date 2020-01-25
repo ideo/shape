@@ -132,6 +132,22 @@ module CollectionGrid
       drag_map
     end
 
+    def self.exact_open_spot?(
+      card:,
+      collection:
+    )
+      open_spot_matrix = calculate_open_spot_matrix(
+        collection: collection,
+        # ignore the card we're trying to place
+        moving_cards: [card],
+      )
+      open_spot = find_closest_open_spot(
+        card,
+        open_spot_matrix,
+      )
+      open_spot && open_spot.row == card.row && open_spot.col == card.col
+    end
+
     def self.place_cards_on_board(
       row:,
       col:,
@@ -274,7 +290,7 @@ module CollectionGrid
 
     def self.calculate_open_spot_matrix(
       collection:,
-      moving_cards:,
+      moving_cards: [],
       drag_positions: {}
     )
       card_matrix = board_matrix(

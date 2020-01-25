@@ -52,6 +52,16 @@ class CollectionCardBuilder
     @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
     # TODO: rollback transaction if these later actions fail; add errors, return false
     CollectionCard.transaction do
+      if @parent_collection.is_a?(Collection::Board) && !@collection_card.board_placement_is_valid?
+        # valid row/col will get applied to the card here for later saving
+        CollectionGrid::BoardPlacement.call(
+          row: @collection_card.row,
+          col: @collection_card.col,
+          to_collection: @parent_collection,
+          moving_cards: [@collection_card],
+        )
+      end
+
       @collection_card.save.tap do |result|
         return false unless result
 

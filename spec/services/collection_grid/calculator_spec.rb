@@ -33,20 +33,10 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
     end
   end
 
-  describe '#place_cards_on_board' do
+  context 'with existing cards on board' do
     let(:collection) { create(:board_collection, num_cards: 8) }
     let(:from_collection) { create(:board_collection) }
     let(:cards) { collection.collection_cards }
-    let(:moving_cards) { create_list(:collection_card, 4) }
-    let(:calculate) do
-      CollectionGrid::Calculator.place_cards_on_board(
-        row: placement[:row],
-        col: placement[:col],
-        collection: collection,
-        from_collection: from_collection,
-        moving_cards: moving_cards,
-      )
-    end
 
     before do
       cards[0].update(row: 0, col: 0, width: 4, height: 1)
@@ -62,43 +52,82 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
       #  [2, 3, 4, _, 5, _, _, _, _, _, _, _, _, _, _, _],
       #  [2, _, 6, 6, _, _, _, _, _, _, _, _, _, _, _, _],
       #  [_, 7, 8, 8, 8, _, _, _, _, _, _, _, _, _, _, _],
-
-      moving_cards[0].update(row: 3, col: 5)
-      moving_cards[1].update(row: 3, col: 6, width: 2)
-      moving_cards[2].update(row: 3, col: 8)
-      moving_cards[3].update(row: 4, col: 5, height: 2)
-      # drag_map = [[0, 0], [0, 1], [0, 3], [1, 0]]
     end
 
-    context 'at placement row: 1, col: 3' do
-      let(:placement) do
-        { row: 1, col: 3 }
+    describe '#place_cards_on_board' do
+      let(:moving_cards) { create_list(:collection_card, 4) }
+      let(:calculate) do
+        CollectionGrid::Calculator.place_cards_on_board(
+          row: placement[:row],
+          col: placement[:col],
+          collection: collection,
+          from_collection: from_collection,
+          moving_cards: moving_cards,
+        )
       end
 
-      it 'should insert cards into the layout and calculate collisions' do
-        calculate
-        expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
-          [1, 3, collection.id],
-          [1, 5, collection.id],
-          [1, 7, collection.id],
-          [2, 5, collection.id],
-        ])
+      before do
+        moving_cards[0].update(row: 3, col: 5)
+        moving_cards[1].update(row: 3, col: 6, width: 2)
+        moving_cards[2].update(row: 3, col: 8)
+        moving_cards[3].update(row: 4, col: 5, height: 2)
+        # drag_map = [[0, 0], [0, 1], [0, 3], [1, 0]]
+      end
+
+      context 'at placement row: 1, col: 3' do
+        let(:placement) do
+          { row: 1, col: 3 }
+        end
+
+        it 'should insert cards into the layout and calculate collisions' do
+          calculate
+          expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+            [1, 3, collection.id],
+            [1, 5, collection.id],
+            [1, 7, collection.id],
+            [2, 5, collection.id],
+          ])
+        end
+      end
+
+      context 'at placement row: 1, col: 1' do
+        let(:placement) do
+          { row: 1, col: 1 }
+        end
+
+        it 'should insert cards into the layout and calculate collisions' do
+          calculate
+          expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+            [2, 1, collection.id],
+            [2, 4, collection.id],
+            [1, 5, collection.id],
+            [3, 0, collection.id],
+          ])
+        end
       end
     end
 
-    context 'at placement row: 1, col: 1' do
-      let(:placement) do
-        { row: 1, col: 1 }
+    describe '#exact_open_spot?' do
+      let!(:card) { create(:collection_card_text) }
+
+      it 'should return true if the exact spot is open' do
+        card.row = 7
+        card.col = 7
+        result = CollectionGrid::Calculator.exact_open_spot?(card: card, collection: collection)
+        expect(result).to be true
       end
 
-      it 'should insert cards into the layout and calculate collisions' do
-        calculate
-        expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
-          [2, 1, collection.id],
-          [2, 4, collection.id],
-          [1, 5, collection.id],
-          [3, 0, collection.id],
-        ])
+      it 'should return false if the exact spot is not open' do
+        card.row = 0
+        card.col = 0
+        result = CollectionGrid::Calculator.exact_open_spot?(card: card, collection: collection)
+        expect(result).to be false
+
+        card.row = 0
+        # not valid column
+        card.col = 20
+        result = CollectionGrid::Calculator.exact_open_spot?(card: card, collection: collection)
+        expect(result).to be false
       end
     end
   end
