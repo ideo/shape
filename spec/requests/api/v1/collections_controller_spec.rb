@@ -308,13 +308,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
     let(:params) { raw_params.to_json }
     let(:instance_double) { double('builder') }
+    let(:builder_double_collection) { create(:collection) }
 
     context 'success' do
       before do
         user.add_role(Role::EDITOR, to_collection)
         user.add_role(Role::VIEWER, template)
         allow(instance_double).to receive(:call).and_return(true)
-        allow(instance_double).to receive(:collection).and_return(create(:collection))
+        allow(instance_double).to receive(:collection).and_return(builder_double_collection)
       end
 
       it 'calls the CollectionTemplateBuilder' do
@@ -349,7 +350,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         allow(ActivityAndNotificationBuilder).to receive(:call)
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: user,
-          target: instance,
+          target: builder_double_collection,
           source: template,
           action: :template_used,
           content: template.collection_type,

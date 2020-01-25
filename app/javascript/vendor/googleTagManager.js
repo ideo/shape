@@ -2,7 +2,7 @@ import { apiStore, uiStore } from '~/stores'
 
 // just a simple wrapper for GTM dataLayer
 const googleTagManager = {
-  push: params => {
+  push(params) {
     // always inject organization (slug), currentUserId, objectIdentifier into params
     const allParams = Object.assign(params, this.defaultParams())
     if (process.env.DEBUG) {
@@ -12,7 +12,7 @@ const googleTagManager = {
     window.dataLayer = window.dataLayer || []
     return window.dataLayer.push(allParams)
   },
-  defaultParams: () => {
+  defaultParams() {
     const params = {
       organization: apiStore.currentOrgSlug,
       currentUserId: apiStore.currentUserId,

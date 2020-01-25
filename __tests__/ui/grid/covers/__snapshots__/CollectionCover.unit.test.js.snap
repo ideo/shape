@@ -68,6 +68,7 @@ exports[`CollectionCover renders snapshot 1`] = `
                     "cardProperties": Array [],
                     "card_order": "order",
                     "checkCurrentOrg": [MockFunction],
+                    "clearCollectionCards": [MockFunction],
                     "collection_cards": Array [
                       Object {
                         "API_archive": [MockFunction],
@@ -561,6 +562,7 @@ exports[`CollectionCover renders snapshot 1`] = `
                         "cardProperties": Array [],
                         "card_order": "order",
                         "checkCurrentOrg": [MockFunction],
+                        "clearCollectionCards": [MockFunction],
                         "collection_cards": Array [
                           Object {
                             "API_archive": [MockFunction],
@@ -1902,6 +1904,7 @@ exports[`CollectionCover renders snapshot 1`] = `
                   "cardProperties": Array [],
                   "card_order": "order",
                   "checkCurrentOrg": [MockFunction],
+                  "clearCollectionCards": [MockFunction],
                   "collection_cards": Array [
                     Object {
                       "API_archive": [MockFunction],
@@ -2395,6 +2398,7 @@ exports[`CollectionCover renders snapshot 1`] = `
                       "cardProperties": Array [],
                       "card_order": "order",
                       "checkCurrentOrg": [MockFunction],
+                      "clearCollectionCards": [MockFunction],
                       "collection_cards": Array [
                         Object {
                           "API_archive": [MockFunction],
@@ -3701,7 +3705,7 @@ exports[`CollectionCover renders snapshot 1`] = `
               location="CollectionCover"
             >
               <styled.span>
-                <SystemIcon />
+                <MethodIcon />
               </styled.span>
             </CollectionTypeSelector>
           </Dotdotdot>

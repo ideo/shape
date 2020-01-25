@@ -578,18 +578,11 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async createTemplateInstance(data, template) {
-    console.log('create template')
     const result = await this.request(
       'collections/create_template',
       'POST',
       data
     )
-    console.log('about to push tag manager', {
-      event: 'templateUsed',
-      formType: 'Template Used',
-      templateName: template.name,
-      collectionType: template.collection_type,
-    })
     googleTagManager.push({
       event: 'templateUsed',
       formType: 'Template Used',
