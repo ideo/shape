@@ -2,7 +2,7 @@ class OrganizationAssigner < SimpleService
   def initialize(params, user, full_setup)
     @params = params
     @user = user
-    @organization = Organization.where(blank: true).first
+    @organization = Organization.where(shell: true).first
     @full_setup = full_setup
   end
 
@@ -11,6 +11,7 @@ class OrganizationAssigner < SimpleService
       update_organization_information
       update_primary_group!
       add_role
+      assign_user_collection
       setup_user_membership_and_collections
       create_application_organization if @user.application_bot?
 
@@ -57,6 +58,16 @@ class OrganizationAssigner < SimpleService
 
   def add_role
     @user.add_role(Role::ADMIN, @organization.primary_group)
+  end
+
+  def assign_user_collection
+    collection = Collection::UserCollection.find_by(organization: @organization)
+                                           .first
+
+    @user.add_role(Role::EDITOR, collection.becomes(Collection))
+    Collection::SharedWithMeCollection.find_or_create_for_collection(
+      collection, @user
+    )
   end
 
   def setup_user_membership_and_collections

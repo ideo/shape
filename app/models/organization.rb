@@ -5,7 +5,6 @@
 #  id                                    :bigint(8)        not null, primary key
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
-#  blank                                 :boolean          default(FALSE)
 #  deactivated                           :boolean          default(FALSE), not null
 #  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
@@ -16,6 +15,7 @@
 #  sent_high_charges_high_email          :boolean          default(FALSE), not null
 #  sent_high_charges_low_email           :boolean          default(FALSE), not null
 #  sent_high_charges_middle_email        :boolean          default(FALSE), not null
+#  shell                                 :boolean          default(FALSE)
 #  slug                                  :string
 #  terms_version                         :integer
 #  trial_ends_at                         :datetime
