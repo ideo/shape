@@ -18,7 +18,6 @@
 #  processing_status          :integer
 #  search_term                :string
 #  shared_with_organization   :boolean          default(FALSE)
-#  style                      :jsonb
 #  submission_box_type        :integer
 #  submissions_enabled        :boolean          default(TRUE)
 #  test_closed_at             :datetime

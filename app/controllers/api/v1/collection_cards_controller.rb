@@ -426,6 +426,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :order,
       :hidden,
       :section_type,
+      :font_color
     )
   end
 
@@ -450,7 +451,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         test_show_media
         tag_list
         search_term
-      ].concat(Collection.globalize_attribute_names).concat([style: {}]),
+      ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
         :type,
@@ -526,6 +527,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       show_replace
       card_type
       section_type
+      font_color
     ]
     # Allow pinning, replacing if this is an application/bot user
     attrs << :pinned if current_application.present?
