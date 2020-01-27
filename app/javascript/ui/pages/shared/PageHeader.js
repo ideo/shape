@@ -9,7 +9,6 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
-import MethodLibraryFilters from '~/ui/filtering/MethodLibraryFilters'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
@@ -442,12 +441,10 @@ class PageHeader extends React.Component {
               )}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (
-              <CollectionFilter collection={record} canEdit={this.canEdit} />
-            )}
-            {record.methodLibraryCollection && (
-              <MethodLibraryFilters
+              <CollectionFilter
                 collection={record}
                 canEdit={this.canEdit}
+                isMethodLibrary={record.methodLibraryCollection}
               />
             )}
           </div>

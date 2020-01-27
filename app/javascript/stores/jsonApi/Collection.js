@@ -125,7 +125,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get methodLibraryCollection() {
-    return false
+    return true
   }
 
   cardIdsBetween(firstCardId, lastCardId) {

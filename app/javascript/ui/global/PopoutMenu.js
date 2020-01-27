@@ -125,6 +125,7 @@ export const StyledMenuItem = styled.li`
     border-bottom: solid ${v.colors.commonMedium};
     border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
+    ${props => props.bgColor && `background-color: ${props.bgColor};`}
     &.with-avatar {
       padding-left: 3.75rem;
       padding-right: 1rem;
@@ -194,6 +195,8 @@ class PopoutMenu extends React.Component {
               onClick,
               loading,
               withAvatar,
+              bgColor,
+              noBorder,
             } = item
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
@@ -202,9 +205,10 @@ class PopoutMenu extends React.Component {
             return (
               <StyledMenuItem
                 key={`${name}-${id || i}`}
-                noBorder={item.noBorder}
+                noBorder={noBorder}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
+                bgColor={bgColor}
               >
                 <button
                   onClick={loading ? () => null : onClick}
@@ -313,6 +317,7 @@ const propTypeMenuItem = PropTypes.arrayOf(
     noBorder: PropTypes.bool,
     loading: PropTypes.bool,
     withAvatar: PropTypes.bool,
+    bgColor: PropTypes.string,
   })
 )
 

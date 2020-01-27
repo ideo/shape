@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
+import { Fragment } from 'react'
 import { computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
@@ -10,6 +11,12 @@ import CollectionSort from '~/ui/grid/CollectionSort'
 import FilterBar from './FilterBar'
 import FilterMenu from './FilterMenu'
 import FilterSearchModal from './FilterSearchModal'
+import MethodLibraryFilterBar from './MethodLibraryFilterBar'
+import {
+  subqualities,
+  methodLibraryTypes,
+  methodLibraryCategories,
+} from '~/utils/creativeDifferenceVariables'
 
 const SortContainer = styled.div`
   position: relative;
@@ -30,7 +37,11 @@ class CollectionFilter extends React.Component {
     const {
       collection: { collection_filters },
     } = this.props
-    return collection_filters.filter(filter => filter.filter_type === 'tag')
+    return collection_filters.filter(
+      filter =>
+        filter.filter_type === 'tag' &&
+        !this.isMethodLibraryFixedTag(filter.text)
+    )
   }
 
   @computed
@@ -39,6 +50,52 @@ class CollectionFilter extends React.Component {
       collection: { collection_filters },
     } = this.props
     return collection_filters.filter(filter => filter.filter_type === 'search')
+  }
+
+  @computed
+  get filterBarFilters() {
+    const {
+      isMethodLibrary,
+      collection: { collection_filters },
+    } = this.props
+    if (!isMethodLibrary) return collection_filters
+    // If it is method library, return all filters except the fixed tags
+    return collection_filters.filter(
+      filter =>
+        filter.filter_type !== 'tag' ||
+        (filter.filter_type === 'tag' &&
+          !this.isMethodLibraryFixedTag(filter.text))
+    )
+  }
+
+  @computed
+  get methodLibraryFilters() {
+    const {
+      collection: { collection_filters },
+    } = this.props
+    return collection_filters.filter(
+      filter => !this.filterBarFilters.includes(filter)
+    )
+  }
+
+  get methodLibraryFixedTagCategories() {
+    return {
+      subquality: Object.keys(subqualities),
+      category: methodLibraryCategories,
+      type: methodLibraryTypes,
+    }
+  }
+
+  get methodLibraryFixedTags() {
+    return [
+      ...this.methodLibraryFixedTagCategories.subquality,
+      ...this.methodLibraryFixedTagCategories.category,
+      ...this.methodLibraryFixedTagCategories.type,
+    ]
+  }
+
+  isMethodLibraryFixedTag(tag) {
+    return this.methodLibraryFixedTags.includes(tag.toLowerCase())
   }
 
   /*
@@ -128,58 +185,63 @@ class CollectionFilter extends React.Component {
   }
 
   render() {
-    const {
-      collection,
-      collection: { collection_filters },
-      canEdit,
-      sortable,
-    } = this.props
+    const { collection, canEdit, sortable, isMethodLibrary } = this.props
     const isFilterBarActive =
-      (collection_filters && collection_filters.length > 0) ||
+      (this.filterBarFilters && this.filterBarFilters.length > 0) ||
       collection.isSearchCollection
     return (
-      <GrowFlex align="flex-end">
-        {isFilterBarActive && (
-          <FilterBar
-            filters={collection_filters}
-            totalResults={
-              !uiStore.isLoading && collection.collection_cards.length
-            }
+      <Fragment>
+        <GrowFlex align="flex-end">
+          {isFilterBarActive && (
+            <FilterBar
+              filters={this.filterBarFilters}
+              totalResults={
+                !uiStore.isLoading && collection.collection_cards.length
+              }
+              onDelete={this.onDeleteFilter}
+              onSelect={this.onSelectFilter}
+              onShowAll={this.onShowAll}
+            />
+          )}
+          <Flex align="flex-end" ml="auto">
+            {canEdit && (
+              <FilterMenu
+                alignTop={isFilterBarActive || sortable}
+                onFilterByTag={this.openSearchModal('Tags')}
+                onFilterBySearch={this.openSearchModal('Search Term')}
+              />
+            )}
+            {sortable && (
+              <SortContainer>
+                <CollectionSort collection={collection} />
+              </SortContainer>
+            )}
+            {!!this.currentFilterLookupType && (
+              <FilterSearchModal
+                filters={
+                  this.currentFilterLookupType === 'Tags'
+                    ? [...this.tagFilters]
+                    : [...this.searchFilters]
+                }
+                onCreateTag={this.onCreateFilter}
+                onRemoveTag={this.onDeleteFilter}
+                onSelectTag={this.onSelectFilter}
+                onModalClose={this.openSearchModal(null)}
+                filterType={this.currentFilterLookupType}
+                modalOpen={!!this.currentFilterLookupType}
+              />
+            )}
+          </Flex>
+        </GrowFlex>
+        {isMethodLibrary && (
+          <MethodLibraryFilterBar
+            methodLibraryTags={this.methodLibraryFixedTagCategories}
+            filters={this.methodLibraryFilters}
             onDelete={this.onDeleteFilter}
             onSelect={this.onSelectFilter}
-            onShowAll={this.onShowAll}
           />
         )}
-        <Flex align="flex-end" ml="auto">
-          {canEdit && (
-            <FilterMenu
-              alignTop={isFilterBarActive || sortable}
-              onFilterByTag={this.openSearchModal('Tags')}
-              onFilterBySearch={this.openSearchModal('Search Term')}
-            />
-          )}
-          {sortable && (
-            <SortContainer>
-              <CollectionSort collection={collection} />
-            </SortContainer>
-          )}
-          {!!this.currentFilterLookupType && (
-            <FilterSearchModal
-              filters={
-                this.currentFilterLookupType === 'Tags'
-                  ? [...this.tagFilters]
-                  : [...this.searchFilters]
-              }
-              onCreateTag={this.onCreateFilter}
-              onRemoveTag={this.onDeleteFilter}
-              onSelectTag={this.onSelectFilter}
-              onModalClose={this.openSearchModal(null)}
-              filterType={this.currentFilterLookupType}
-              modalOpen={!!this.currentFilterLookupType}
-            />
-          )}
-        </Flex>
-      </GrowFlex>
+      </Fragment>
     )
   }
 }
@@ -188,11 +250,13 @@ CollectionFilter.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
   sortable: PropTypes.bool,
+  isMethodLibrary: PropTypes.bool,
 }
 
 CollectionFilter.defaultProps = {
   canEdit: false,
   sortable: false,
+  isMethodLibrary: false,
 }
 
 export default CollectionFilter

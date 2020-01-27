@@ -48,3 +48,29 @@ export const creativeQualities = {
   ...primaryQualities,
   ...subqualities,
 }
+
+export const methodLibraryTypes = [
+  'challenge',
+  'worksheet',
+  'ritual',
+  'process',
+  'article',
+  'case study',
+]
+
+export const methodLibraryCategories = [
+  'systematizing design process',
+  'developing and nurturing talent',
+  'design process',
+  'experience design',
+  'building and running labs',
+  'developing creative problem solving capabilities',
+  'building ventures',
+  'research',
+  'business models',
+  'strategy',
+  'marketing',
+  'org design',
+  'business design',
+  'creative work',
+]
