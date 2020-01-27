@@ -32,15 +32,10 @@ class ActionMenu extends React.Component {
 
   callCardAction = async (name, methodName) => {
     const { uiStore, card } = this.props
-    let onCancel
-    if (methodName === 'API_archive') {
-      uiStore.selectCardId(card.id)
-      onCancel = () => {
-        uiStore.toggleSelectedCardId(card.id)
-      }
-      uiStore.closeMoveMenu({ deselect: false })
-    } else {
-      uiStore.closeMoveMenu({ deselect: true })
+    uiStore.selectCardId(card.id)
+    uiStore.closeMoveMenu({ deselect: false })
+    const onCancel = () => {
+      uiStore.toggleSelectedCardId(card.id)
     }
     this.setLoading(name)
     const result = await card[methodName]({ onCancel })
@@ -246,7 +241,8 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Replace' })
       if (
         record &&
-        (record.is_submission_box_template || record.isSearchCollection)
+        (record.is_submission_box_template ||
+          (record.parent && record.parent.isSearchCollection))
       ) {
         items = _.reject(items, { name: 'Delete' })
         items = _.reject(items, { name: 'Move' })
@@ -341,6 +337,16 @@ class ActionMenu extends React.Component {
     return location === 'GridCard' || location === 'Search' ? 'card' : ''
   }
 
+  get offsetPosition() {
+    const { uiStore, offsetPosition } = this.props
+    return (
+      offsetPosition || {
+        x: uiStore.cardMenuOpen.offsetX,
+        y: uiStore.cardMenuOpen.offsetY,
+      }
+    )
+  }
+
   render() {
     const {
       className,
@@ -348,7 +354,6 @@ class ActionMenu extends React.Component {
       wrapperClassName,
       uiStore,
       location,
-      offsetPosition,
     } = this.props
 
     return (
@@ -361,7 +366,7 @@ class ActionMenu extends React.Component {
         menuOpen={menuOpen}
         buttonStyle={this.buttonStyle}
         position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
-        offsetPosition={offsetPosition}
+        offsetPosition={this.offsetPosition}
         width={250}
         location={location}
       />

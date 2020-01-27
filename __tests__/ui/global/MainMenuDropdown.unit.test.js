@@ -7,6 +7,8 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
+window.IdeoSSO = { profileUrl: 'https://profile.url' }
+
 describe('MainMenuDropdown', () => {
   let component, wrapper, props, otherFakeOrg, itemNames
 
@@ -37,6 +39,8 @@ describe('MainMenuDropdown', () => {
       'Billing',
       'Terms of Use',
       'Privacy Policy',
+      'Do not Sell My Info',
+      'CA User Rights',
     ]
     props.uiStore.alert.mockClear()
     props.uiStore.confirm.mockClear()
@@ -224,6 +228,19 @@ describe('MainMenuDropdown', () => {
 
     it('should route to the terms page', () => {
       expect(props.routingStore.routeTo).toHaveBeenCalledWith('/terms')
+    })
+  })
+
+  describe('handleExternalLink', () => {
+    const url = 'https://www.ideo.com/privacy'
+    beforeEach(() => {
+      window.open = jest.fn()
+      const handler = component.handleExternalLink(url)
+      handler()
+    })
+
+    it('should route to the external page', () => {
+      expect(window.open).toHaveBeenCalledWith(url, '_blank')
     })
   })
 

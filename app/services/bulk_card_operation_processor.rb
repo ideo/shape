@@ -9,7 +9,8 @@ class BulkCardOperationProcessor < SimpleService
   end
 
   def call
-    create_placeholder
+    return false unless create_placeholder
+
     queue_bulk_action
     @placeholder
   end
@@ -17,16 +18,27 @@ class BulkCardOperationProcessor < SimpleService
   private
 
   def create_placeholder
-    order = @to_collection.card_order_at(@placement)
+    if @placement.is_a?(String) || @placement.is_a?(Integer)
+      order = @to_collection.card_order_at(@placement)
+    elsif @placement.respond_to?('[]')
+      row = @placement.try(:[], 'row')
+      col = @placement.try(:[], 'col')
+    else
+      return false
+    end
     @placeholder = CollectionCard::Placeholder.create(
       parent: @to_collection,
       order: order,
+      row: row,
+      col: col,
       item_attributes: {
         type: 'Item::TextItem',
         content: placeholder_message,
         roles_anchor_collection_id: @to_collection.roles_anchor.id,
       },
     )
+    return false unless @placeholder.persisted?
+
     # bump cards out of the way as needed
     @placeholder.move_to_order(order)
   end

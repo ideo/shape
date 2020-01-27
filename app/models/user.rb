@@ -154,9 +154,13 @@ class User < ApplicationRecord
   end
 
   enum status: {
+    # active = has an active (INA) login
     active: 0,
+    # pending = was invited via email but has not yet logged in
     pending: 1,
+    # archived = user was deleted from INA
     archived: 2,
+    # limited = survey respondent user, does not have access to the full app
     limited: 3,
   }
 
@@ -255,7 +259,6 @@ class User < ApplicationRecord
         user.status = User.statuses[:limited]
       else
         user = User.find_or_initialize_by(email: attrs.email)
-        user.status = User.statuses[:active]
         # Users see terms on the Network, so we can mark them as accepted
         user.terms_accepted = true
       end
@@ -271,6 +274,7 @@ class User < ApplicationRecord
     user.last_name = attrs.last_name
     user.email = attrs.email
     user.phone = attrs.phone
+    user.status = User.statuses[:active] unless user.limited?
     if attrs.try(:locale)
       user.locale = attrs.locale
     end

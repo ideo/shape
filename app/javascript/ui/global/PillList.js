@@ -38,7 +38,7 @@ class PillList extends React.Component {
       <ChipHolder>
         {itemList.map(item => {
           let avatar = null
-          let symbolSize = 16
+          const symbolSize = 16
           if (item.pic_url_square) {
             avatar = (
               <StyledAvatar
@@ -48,7 +48,6 @@ class PillList extends React.Component {
                 url={item.pic_url_square}
               />
             )
-            symbolSize = 26
           }
           if (item.icon) {
             avatar = <PillIconHolder>{item.icon}</PillIconHolder>

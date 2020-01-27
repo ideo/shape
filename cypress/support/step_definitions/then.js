@@ -51,6 +51,16 @@ Then('I should see a {string} in the index {int} card', (el, pos) => {
     .should('be.visible')
 })
 
+Then(
+  'I should see a collection card named {string} in the index {int}',
+  (name, pos) => {
+    cy.get(`[data-cy="GridCard"][data-order="${pos}"]`)
+      .locateWith('CollectionCover', name)
+      .first()
+      .should('be.visible')
+  }
+)
+
 Then('I should see the element {string}', el => {
   cy.locate(el).should('be.visible')
 })

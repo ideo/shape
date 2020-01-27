@@ -11,7 +11,7 @@ RSpec.describe Search::Filters::WithinCollection do
 
     context 'when there is a within match in the query' do
       it 'returns a where for the parent ids' do
-        result = Search::Filters::WithinCollection.new('foo within(bar/123) baz').options
+        result = Search::Filters::WithinCollection.new('foo within:123 baz').options
         expect(result).to eq(
           where: {
             parent_ids: {
@@ -20,6 +20,21 @@ RSpec.describe Search::Filters::WithinCollection do
           },
         )
       end
+    end
+  end
+
+  describe '#within_collection_id' do
+    it 'returns parent collection id' do
+      within_collection_id = Search::Filters::WithinCollection.new('foo within:123 baz').within_collection_id
+      expect(within_collection_id).to eq(123)
+
+      within_collection_id = Search::Filters::WithinCollection.new('foo within:123 baz').within_collection_id
+      expect(within_collection_id).to eq(123)
+    end
+
+    it 'returns nil if no parent collection id' do
+      within_collection_id = Search::Filters::WithinCollection.new('foo baz').within_collection_id
+      expect(within_collection_id).to be_nil
     end
   end
 
@@ -33,7 +48,7 @@ RSpec.describe Search::Filters::WithinCollection do
 
     context 'when there is a within match in the query' do
       it 'returns the query without the within match in it' do
-        result = Search::Filters::WithinCollection.new('foo within(bar/123) qux').modify_query
+        result = Search::Filters::WithinCollection.new('foo within:123 qux').modify_query
         expect(result).to eq('foo qux')
       end
     end

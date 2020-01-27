@@ -20,6 +20,17 @@ RSpec.describe Search::Filters::Tag do
           },
         )
       end
+
+      it 'turns dashes into spaces and downcases' do
+        result = Search::Filters::Tag.new('foo #bar baz #Interstellar-Space-Dust').options
+        expect(result).to eq(
+          where: {
+            tags: {
+              all: ['bar', 'interstellar space dust'],
+            },
+          },
+        )
+      end
     end
   end
 

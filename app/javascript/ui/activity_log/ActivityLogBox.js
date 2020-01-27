@@ -20,7 +20,6 @@ const MIN_HEIGHT = 200
 const MAX_WIDTH = 800
 const MAX_HEIGHT = 800
 const HEADER_HEIGHT = 35
-const MOBILE_Y = 300
 
 const DEFAULT = {
   x: 0,
@@ -52,6 +51,7 @@ const StyledHeader = styled.div`
   &:active {
     cursor: move;
   }
+  user-select: none;
 `
 
 const Action = styled.button`
@@ -233,14 +233,19 @@ class ActivityLogBox extends React.Component {
 
   get mobileProps() {
     const { uiStore } = this.props
-    if (!uiStore.activityLogForceWidth) return {}
-    const height = window.innerHeight - MOBILE_Y
+    // TODO: handle push contents above when keyboard is active for android and iOS safari clipping
+    if (!uiStore.activityLogForceWidth) {
+      return {}
+    }
+
+    // set height for Android since it does not push contents when keyboard is active
+    const height = uiStore.isIOS ? window.innerHeight : 300
     return {
       minWidth: uiStore.activityLogForceWidth,
       minHeight: height,
       position: {
         x: 0,
-        y: MOBILE_Y,
+        y: 0,
       },
       size: {
         width: uiStore.activityLogForceWidth,

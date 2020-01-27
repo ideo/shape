@@ -95,7 +95,7 @@ class Api::V1::SearchController < Api::V1::BaseController
       # NOTE: This index may get replaced based on filters e.g. "type:item"
       index_name: index_name,
       where: where_clause,
-      per_page: params[:per_page] || 10,
+      per_page: per_page(10),
       page: @page,
       order: order_opts,
       model_includes: {
@@ -115,7 +115,7 @@ class Api::V1::SearchController < Api::V1::BaseController
         # TODO: enable way to surface global groups e.g. Common Resource
         organization_ids: [current_organization.id],
       },
-      per_page: 6,
+      per_page: per_page(6),
       page: @page,
     ).search(@query)
   end
@@ -226,6 +226,17 @@ class Api::V1::SearchController < Api::V1::BaseController
         include: CollectionCard.default_relationships_for_api,
         jsonapi: results.results.map(&:parent_collection_card).compact,
       )
+    end
+  end
+
+  def per_page(default)
+    per_page = params[:per_page].to_i
+    if per_page <= 0
+      default
+    elsif per_page > 100
+      100
+    else
+      per_page
     end
   end
 end

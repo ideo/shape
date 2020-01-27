@@ -112,7 +112,7 @@ class PublicSharingOptions extends React.Component {
       return
     }
     apiStore
-      .searchGroups(term)
+      .searchGroups({ query: term })
       .then(res => {
         uiStore.update('autocompleteValues', res.data.length)
         callback(this.mapGroups(res.data))

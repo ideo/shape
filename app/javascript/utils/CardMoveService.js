@@ -24,16 +24,18 @@ export default class CardMoveService {
       movingFromCollectionId,
       movingCardIds,
       cardAction,
+      overflowFromMDL,
     } = uiStore
 
     let data = {
       to_id: viewingCollection ? viewingCollection.id : null,
       from_id: movingFromCollectionId,
-      collection_card_ids: [...movingCardIds],
+      collection_card_ids: movingCardIds,
       placement,
     }
     _.assign(data, overrideData)
-
+    // always ensure non-observable array, esp. when these same ids are used by UndoStore
+    data.collection_card_ids = [...data.collection_card_ids]
     // Viewing collection might not be set, such as on the search page
     if (!data.to_id) {
       uiStore.alert("You can't move an item here")
@@ -67,7 +69,8 @@ export default class CardMoveService {
     }
 
     const movingWithinCollection =
-      movingFromCollection === toCollection && cardAction === 'move'
+      !overflowFromMDL &&
+      (movingFromCollection === toCollection && cardAction === 'move')
     try {
       uiStore.update('isLoadingMoveAction', true)
       let successMessage
@@ -113,15 +116,19 @@ export default class CardMoveService {
         default:
           return
       }
-      const { meta } = res
+      const meta = res.meta || {}
       // if we received a bulk operation placeholder, place that in the collection
-      if (meta && meta.placeholder && toCollection === viewingCollection) {
+      if (meta.placeholder && toCollection === viewingCollection) {
         runInAction(() => {
           toCollection.collection_cards.unshift(res.data)
         })
       } else if (!movingWithinCollection) {
         // always refresh the current collection
-        await viewingCollection.API_fetchCards()
+        const fetchData = {}
+        if (data.placement && data.placement.row) {
+          fetchData.rows = [data.placement.row, data.placement.row + 20]
+        }
+        await viewingCollection.API_fetchCards(fetchData)
       }
 
       uiStore.update('isLoadingMoveAction', false)
@@ -135,9 +142,18 @@ export default class CardMoveService {
           uiStore.scrollToBottom()
         }
       }
-      if (cardAction === 'move' && !uiStore.movingIntoCollection) {
+      if (
+        !meta.placeholder &&
+        ((cardAction === 'move' && !uiStore.movingIntoCollection) ||
+          cardAction === 'duplicate' ||
+          cardAction === 'link')
+      ) {
         // we actually want to reselect the cards at this point
-        uiStore.reselectCardIds(data.collection_card_ids)
+        if (movingWithinCollection) {
+          uiStore.reselectCardIds(data.collection_card_ids)
+        } else if (meta.new_cards) {
+          uiStore.reselectCardIds(meta.new_cards)
+        }
       }
       return true
     } catch (e) {
@@ -190,12 +206,19 @@ export default class CardMoveService {
       // Set order for moved cards so they are between whole integers,
       // and API_batchUpdateCards will properly set/reorder it amongst the collection
       const sortedCards = _.sortBy(movingCards, 'order')
+      const toPinAllMovingCards = this.calculateToPinAllMovingCards(
+        collection,
+        order
+      )
+
       _.each(sortedCards, (card, idx) => {
         const sortedOrder = this.calculateOrderForMovingCard(order, idx)
-        updates.push({
+        const update = {
           card,
           order: sortedOrder,
-        })
+          pinned: toPinAllMovingCards,
+        }
+        updates.push(update)
       })
     }
 
@@ -212,6 +235,25 @@ export default class CardMoveService {
 
   calculateOrderForMovingCard = (order, index) => {
     return Math.ceil(order) + index
+  }
+
+  calculateToPinAllMovingCards = (collection, order) => {
+    const { sortedCards } = collection
+    const hasPinnedCards = _.some(sortedCards, cc => cc.isPinned)
+    if (!hasPinnedCards) return false
+
+    const firstMovingCardSortOrder = this.calculateOrderForMovingCard(order, 0)
+    const firstMovingCardIndex = _.findIndex(sortedCards, cc => {
+      return cc.order === firstMovingCardSortOrder
+    })
+
+    if (firstMovingCardIndex === -1)
+      return (_.last(sortedCards) && _.last(sortedCards).isPinned) || false
+    if (firstMovingCardIndex <= 1) return true // pin card if moving card in tbe beginning or next to a pinned card
+    const leftOfFirstMovingCardIndex = firstMovingCardIndex - 1
+    const leftOfFirstMovingCard = sortedCards[leftOfFirstMovingCardIndex]
+    // copy pinned state of the card to the left of the first moving card
+    return leftOfFirstMovingCard.isPinned
   }
 
   moveErrors({ toCollection, cardAction }) {

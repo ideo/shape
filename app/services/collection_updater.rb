@@ -14,7 +14,10 @@ class CollectionUpdater < SimpleService
         # TODO: could ignore this part unless collection_card attrs have changed...
         if @attributes[:collection_cards_attributes].present?
           # we just added a template card, so update the instances
-          @collection.queue_update_template_instances
+          @collection.queue_update_template_instances(
+            updated_card_ids: @collection.collection_cards.pluck(:id),
+            template_update_action: 'update_all',
+          )
         end
         if @collection.saved_change_to_collection_to_test_id
           @collection.update_test_template_instance_types!

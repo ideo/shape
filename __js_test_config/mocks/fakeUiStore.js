@@ -88,8 +88,6 @@ const fakeUiStore = {
   addNewCard: jest.fn(),
   removeNewCard: jest.fn(),
   isNewCard: jest.fn(),
-  editingCardId: 0,
-  toggleEditingCardId: jest.fn(),
   autocompleteMenuClosed: jest.fn(),
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),
@@ -117,7 +115,8 @@ const fakeUiStore = {
   setReplyingToComment: jest.fn(),
   setCommentingOnRecord: jest.fn(),
   selectedTextRangeForCard: jest.fn(),
-  reselectCardIds: jest.fn()
+  reselectCardIds: jest.fn(),
+  setMovingCards: jest.fn(),
 }
 
 export default fakeUiStore
