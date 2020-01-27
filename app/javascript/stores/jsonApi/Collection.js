@@ -658,11 +658,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (rows) {
-      params.rows = rows
-    }
-    if (cols) {
-      params.cols = cols
+    if (this.isBoard) {
+      if (rows) {
+        params.rows = rows
+      }
+      if (cols) {
+        params.cols = cols
+      }
     }
     let apiPath = `collections/${
       this.id
@@ -688,10 +690,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       } else {
         this.totalPages = links.last
       }
+      const firstPage = page === 1 && (!rows || rows[0] == 0)
       if (
-        page === 1 &&
-        !rows &&
-        (searchTerm || this.storedCacheKey !== this.cache_key)
+        firstPage &&
+        (this.storedCacheKey !== this.cache_key ||
+          data.length === 0 ||
+          searchTerm)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
