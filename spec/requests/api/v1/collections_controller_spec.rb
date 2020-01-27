@@ -347,6 +347,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
 
       it 'creates Activity item' do
+        allow(CollectionTemplateBuilder).to receive(:new).and_return(instance_double)
         allow(ActivityAndNotificationBuilder).to receive(:call)
         expect(ActivityAndNotificationBuilder).to receive(:call).with(
           actor: user,
