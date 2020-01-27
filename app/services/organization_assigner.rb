@@ -3,7 +3,7 @@ class OrganizationAssigner < SimpleService
     @params = params
     @user = user
     @organization = Organization.where(blank: true).first
-    @full_setup
+    @full_setup = full_setup
   end
 
   def call
