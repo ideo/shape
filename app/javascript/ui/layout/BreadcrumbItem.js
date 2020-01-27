@@ -168,6 +168,7 @@ export class BreadcrumbItem extends React.Component {
 
   @action
   closeDropdown = () => {
+    return
     this.hoverTimer = null
     this.dropdownOpen = false
     this.menuItemOpenId = null
@@ -365,7 +366,7 @@ export class BreadcrumbItem extends React.Component {
               >
                 <StyledMenuButton
                   onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
-                  style={{ maxWidth: '200px' }}
+                  style={{ maxWidth: '200px', width: '100%' }}
                 >
                   {this.renderNesting(menuItem)}
                   {this.renderIcon(menuItem)}
