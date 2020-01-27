@@ -107,7 +107,10 @@ export default class CardMoveService {
             template_id: data.from_id,
             placement,
           }
-          res = await apiStore.createTemplateInstance(data, toCollection)
+          res = await apiStore.createTemplateInstance({
+            data,
+            template: toCollection,
+          })
           successMessage = 'Your template instance has been created!'
           break
         }

@@ -1241,7 +1241,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         placement: 'beginning',
       }
       uiStore.update('isLoading', true)
-      const res = await apiStore.createTemplateInstance(templateData, template)
+      const res = await apiStore.createTemplateInstance({
+        data: templateData,
+        template,
+        inSubmissionBox: true,
+      })
       uiStore.update('isLoading', false)
       routingStore.routeTo('collections', res.data.id)
     } else {

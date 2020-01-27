@@ -577,7 +577,7 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`organizations/${orgId}/admin_users`, 'GET')
   }
 
-  async createTemplateInstance(data, template) {
+  async createTemplateInstance({ data, template, inSubmissionBox = false }) {
     const result = await this.request(
       'collections/create_template',
       'POST',
@@ -588,6 +588,7 @@ class ApiStore extends jsonapi(datxCollection) {
       formType: 'Template Used',
       templateName: template.name,
       collectionType: template.collection_type,
+      submissionContent: inSubmissionBox,
     })
     return result
   }
