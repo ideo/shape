@@ -97,6 +97,7 @@ export const StyledMenu = styled.ul`
   max-height: ${props => window.innerHeight - 260}px;
   overflow-y: auto;
   overflow-x: hidden;
+  position: relative;
   width: ${props => props.width}px;
 `
 
