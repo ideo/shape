@@ -161,6 +161,7 @@ describe('OrganizationMenu', () => {
         event: 'formSubmission',
         // because we have an existing org in apiStore in this case
         formType: 'Additional Org',
+        organization: 'sluggity',
       })
     })
   })
