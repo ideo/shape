@@ -11,7 +11,7 @@ class OrganizationTemplatesWorker
     create_profile_template
     create_profile_collection
     create_org_getting_started_collection
-    create_user_getting_started_collection unless @user.application_bot?
+    create_user_getting_started_collection unless @user&.application_bot?
   rescue ActiveRecord::RecordNotFound
     # org was already deleted, e.g. in a test
     false
@@ -131,8 +131,11 @@ class OrganizationTemplatesWorker
   end
 
   def create_user_getting_started_collection
+    user_collection = @user.present? ?
+      @user.current_user_collection(@organization.id) :
+      Collection::UserCollection.find_by(organization_id: @organization.id)
     @organization.create_user_getting_started_content(
-      @user,
+      user_collection,
       synchronous: true,
     )
   end

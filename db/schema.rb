@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_23_191847) do
+ActiveRecord::Schema.define(version: 2020_01_25_010741) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -516,6 +516,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_191847) do
     t.bigint "terms_text_item_id"
     t.integer "terms_version"
     t.string "default_locale", default: "en"
+    t.boolean "blank", default: false
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end
@@ -538,6 +539,13 @@ ActiveRecord::Schema.define(version: 2020_01_23_191847) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
+  create_table "question_answer_choices", force: :cascade do |t|
+    t.integer "question_choice_id"
+    t.integer "question_answer_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "question_answers", force: :cascade do |t|
     t.bigint "survey_response_id"
     t.bigint "question_id"
@@ -546,8 +554,8 @@ ActiveRecord::Schema.define(version: 2020_01_23_191847) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.jsonb "selected_choice_ids", default: [], null: false
     t.bigint "idea_id"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
     t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"

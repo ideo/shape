@@ -5,6 +5,7 @@
 #  id                                    :bigint(8)        not null, primary key
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
+#  blank                                 :boolean          default(FALSE)
 #  deactivated                           :boolean          default(FALSE), not null
 #  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
@@ -156,7 +157,7 @@ class Organization < ApplicationRecord
     # Create the getting started content for new users
     if user_collection.is_a?(Collection::UserCollection) &&
        user_collection.newly_created
-      create_user_getting_started_content(user, synchronous: synchronous)
+      create_user_getting_started_content(user_collection, synchronous: synchronous)
     end
     add_shared_with_org_collections(user) if primary_group.can_view?(user)
   end
@@ -315,10 +316,10 @@ class Organization < ApplicationRecord
     )
   end
 
-  def create_user_getting_started_content(user, synchronous: false)
+  def create_user_getting_started_content(user_collection, synchronous: false)
     return if getting_started_collection.blank?
 
-    user_collection = user.current_user_collection(id)
+    # user_collection = user.current_user_collection(id)
 
     # this will copy them to the beginning
     getting_started_collection.copy_all_cards_into!(
