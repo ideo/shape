@@ -417,7 +417,7 @@ export class BreadcrumbItem extends React.Component {
     const { item, index, numItems, restoreBreadcrumb } = this.props
     const isLast = index === numItems - 1
     let path
-    if (item.id === 'homepage') {
+    if (item.identifier === 'homepage') {
       path = routingStore.pathTo('homepage')
     } else {
       path = routingStore.pathTo(item.type, item.id)

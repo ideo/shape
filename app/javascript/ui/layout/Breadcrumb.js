@@ -96,12 +96,13 @@ class Breadcrumb extends React.Component {
     if (record.inMyCollection || uiStore.linkedInMyCollection) {
       items.push({
         type: 'collections',
-        id: 'homepage',
+        id: apiStore.currentUserCollectionId,
         identifier: 'homepage',
         name: 'My Collection',
         can_edit_content: true,
         truncatedName: null,
         ellipses: false,
+        has_children: true,
       })
     }
     if (!breadcrumb) return items
@@ -234,6 +235,8 @@ class Breadcrumb extends React.Component {
     const firstEllipsesItem = ellipsesItems.shift()
     const subItems = this.transformToSubItems(items, firstEllipsesItem)
     firstEllipsesItem.subItems = subItems
+    // My Collection breadcrumb should always have the full trail
+    if (items[0].name === 'My Collection') items[0].subItems = subItems
 
     return _.reject(items, { remove: true })
   }
@@ -249,7 +252,7 @@ class Breadcrumb extends React.Component {
     const item = this.previousItem
     if (!backButton || !item) return null
     let path
-    if (item.id === 'homepage') {
+    if (item.identifier === 'homepage') {
       path = routingStore.pathTo('homepage')
     } else {
       path = routingStore.pathTo(item.type, item.id)
