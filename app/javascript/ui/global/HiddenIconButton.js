@@ -9,8 +9,10 @@ import HiddenIconSm from '~/ui/icons/HiddenIconSm'
 
 const StyledHiddenIconButton = styled.button`
   position: relative;
-  bottom: 10%;
+  bottom: 3px;
   right: 2px;
+  margin-left: 9px;
+  margin-right: 6px;
 `
 
 StyledHiddenIconButton.displayName = 'StyledHiddenIconButton'

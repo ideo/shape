@@ -34,7 +34,15 @@ class CollectionCard extends BaseRecord {
     'section_type',
   ]
 
-  batchUpdateAttributes = ['id', 'order', 'width', 'height', 'row', 'col']
+  batchUpdateAttributes = [
+    'id',
+    'order',
+    'width',
+    'height',
+    'row',
+    'col',
+    'pinned',
+  ]
 
   @observable
   maxWidth = this.width
@@ -214,13 +222,14 @@ class CollectionCard extends BaseRecord {
 
   async API_linkToMyCollection() {
     const { uiStore } = this
+    const { selectedCardIds } = uiStore
     const viewingCollectionId = uiStore.viewingCollection
       ? uiStore.viewingCollection.id
       : this.parent_id
     const data = {
       to_id: this.apiStore.currentUser.current_user_collection_id,
       from_id: viewingCollectionId,
-      collection_card_ids: [this.id],
+      collection_card_ids: selectedCardIds.length ? selectedCardIds : [this.id],
       placement: 'end',
     }
     try {
@@ -314,6 +323,17 @@ class CollectionCard extends BaseRecord {
   get isDragCardMaster() {
     const { uiStore } = this
     return uiStore.dragCardMaster === this.id
+  }
+
+  get shouldHideFromUI() {
+    const { uiStore } = this
+    return (
+      ((uiStore.dragging || uiStore.movingIntoCollection) &&
+        uiStore.cardAction === 'move' &&
+        this.isBeingMultiDragged) ||
+      this.isBeingMoved ||
+      this.hidden
+    )
   }
 
   get introSection() {
@@ -416,6 +436,7 @@ class CollectionCard extends BaseRecord {
         uiStore.trackEvent('archive', collection)
         if (
           collection.collection_cards.length === 0 &&
+          !collection.isBoard &&
           !collection.isSubmissionsCollection
         ) {
           uiStore.openBlankContentTool()
@@ -432,6 +453,23 @@ class CollectionCard extends BaseRecord {
       uiStore.defaultAlertError()
     }
     return false
+  }
+
+  @action
+  async API_togglePin() {
+    // toggle it first
+    this.pinned = !this.pinned
+    await this.apiStore.request(
+      `collection_cards/${this.id}/toggle_pin`,
+      'PATCH',
+      {
+        pinned: this.pinned,
+      }
+    )
+    // make sure this card, if it moved, is the "tiebreaker" for its new order
+    this.order -= 0.5
+
+    return this.parentCollection._reorderCards()
   }
 }
 

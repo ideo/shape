@@ -32,24 +32,71 @@ class CommentInput extends React.Component {
   positionSuggestions = ({ decoratorRect, state, props }) => {
     const { suggestions } = props
     const { isActive } = state
-    let transform
-    let transition
-    let top = '-36px'
 
-    if (isActive && suggestions.length > 0) {
-      transform = `scaleY(1)`
-      transition = 'all 0.25s cubic-bezier(.3,1.2,.2,1)'
-      const { y } = uiStore.activityLogPosition
-      top = `${decoratorRect.top - (y + 45 * (suggestions.length + 1))}px`
-    } else if (isActive) {
-      transform = 'scaleY(0)'
-      transition = 'all 0.25s cubic-bezier(.3,1,.2,1)'
+    if (isActive && _.isEmpty(suggestions)) {
+      return
     }
 
-    return {
-      transform,
-      transition,
-      top,
+    const { y } = uiStore.activityLogPosition
+    const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // height above the input and the activity box
+    const maxPossibleSuggestions = uiStore.isTouchDevice ? 3 : 6 // show a max of 3.5 suggestions for phones/tablets and 6.5 suggestions for desktop
+    const clampedSuggestionsLength = _.clamp(
+      suggestions.length,
+      0,
+      maxPossibleSuggestions
+    )
+    const totalSuggestionsLength = 45 * clampedSuggestionsLength
+
+    if (!uiStore.isTouchDevice) {
+      const shouldPlaceSuggestionsAtBottom =
+        decoratorRect.top + totalSuggestionsLength < window.innerHeight
+      const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+
+      return {
+        top: `${
+          shouldPlaceSuggestionsAtBottom
+            ? maxCommentSuggestionsHeight + 6
+            : clampedSuggestionsLength === maxPossibleSuggestions
+            ? newTop - 6
+            : newTop + 40
+        }px`,
+      }
+    } else {
+      let top = '0px'
+      const cols = _.get(uiStore, 'gridSettings.cols')
+
+      if (cols == 1 && uiStore.isIOS) {
+        // will place at the top of the comment input, use activity log height since iOS phone comment box is full-screen
+        const _maxCommentSuggestionsHeight = uiStore.activityLogPosition.h - y
+        const newTop =
+          _maxCommentSuggestionsHeight - totalSuggestionsLength + 50
+        top = `${
+          clampedSuggestionsLength === maxPossibleSuggestions
+            ? newTop
+            : newTop + 38
+        }px`
+      } else if (cols == 1 && uiStore.isAndroid) {
+        // will place at the top of the comment input for android phones
+        const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength
+        top = `${
+          clampedSuggestionsLength === maxPossibleSuggestions
+            ? newTop + 90
+            : newTop + 136
+        }px`
+      } else {
+        // FIXME: Handle touch device virtual keyboard pushing focused windows when placed where virtual keyboard will be
+        // will place at the top of the comment input
+        const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
+        top = `${
+          clampedSuggestionsLength === maxPossibleSuggestions
+            ? newTop - 30
+            : newTop
+        }px`
+      }
+
+      return {
+        top,
+      }
     }
   }
 
@@ -91,12 +138,16 @@ class CommentInput extends React.Component {
   }
 
   onSearchChange = ({ value }) => {
-    this.searchUsersAndGroups(value)
+    const params = {
+      query: value,
+      per_page: 20,
+    }
+    this.searchUsersAndGroups(params)
   }
 
-  _searchUsersAndGroups = async query => {
+  _searchUsersAndGroups = async params => {
     const { apiStore } = this.props
-    const res = await apiStore.searchUsersAndGroups(query)
+    const res = await apiStore.searchUsersAndGroups(params)
     this.updateSuggestions(res.data)
   }
 
@@ -122,9 +173,14 @@ class CommentInput extends React.Component {
     const { MentionSuggestions } = this.mentionPlugin
     MentionSuggestions.displayName = 'MentionSuggestions'
     const plugins = [this.mentionPlugin, this.linkifyPlugin]
+    const mentionsSize = uiStore.isTouchDevice ? 'small' : 'default'
 
     return (
-      <StyledCommentInput editing onClick={this.focus}>
+      <StyledCommentInput
+        editing
+        onClick={this.focus}
+        mentionsSize={mentionsSize}
+      >
         <Editor
           editorState={editorState}
           onChange={onChange}

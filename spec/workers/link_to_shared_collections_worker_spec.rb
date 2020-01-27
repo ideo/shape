@@ -52,13 +52,53 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     end
 
     context 'when the link is a child of an application collection' do
-      let!(:application_collection) { create(:application_collection, organization: organization) }
-      let!(:collection_to_link) { create(:collection, parent_collection: application_collection, organization: organization) }
+      let!(:application_collection) do
+        create(:application_collection, organization: organization)
+      end
+      let!(:collection_to_link) do
+        create(
+          :collection,
+          name: '{{CD.DASHBOARD.CREATIVE-DIFFERENCE}}',
+          parent_collection: application_collection,
+          organization: organization,
+        )
+      end
 
-      it 'should add the link at the first position' do
+      it 'adds the link at the -10 position with 3x2 size' do
         link = user.current_shared_collection.collection_cards.first
         # link to the org collection within the root application collection
-        expect(link.collection_id).to eq application_collection.collections.first.id
+        expect(link.collection_id).to eq(collection_to_link.id)
+        expect(link.width).to eq(3)
+        expect(link.height).to eq(2)
+        expect(link.order).to eq(-10)
+      end
+
+      context 'with second record matching method library' do
+        let!(:method_library_collection) do
+          create(
+            :collection,
+            name: '{{CD.DASHBOARD.METHOD_LIBRARY}}',
+            parent_collection: application_collection,
+            organization: organization,
+          )
+        end
+        before do
+          LinkToSharedCollectionsWorker.new.perform(
+            users_to_add.map(&:id),
+            groups_to_add.map(&:id),
+            [method_library_collection.id],
+            [],
+          )
+        end
+
+        it 'adds a link at -9 position with 1x2 size' do
+          first, second = user.current_shared_collection.collection_cards.reorder(order: :asc).first(2)
+          expect(first.collection_id).to eq(collection_to_link.id)
+          expect(second.collection_id).to eq(method_library_collection.id)
+          expect(second.width).to eq(1)
+          expect(second.height).to eq(2)
+          expect(second.order).to eq(-9)
+        end
       end
     end
 
@@ -66,19 +106,24 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       let!(:application_collection) { create(:application_collection, organization: organization) }
       let(:child_collection) do
         create(:collection,
+               name: '{{CD.DASHBOARD.CREATIVE-DIFFERENCE}}',
                parent_collection: application_collection,
                organization: organization)
       end
       let!(:collection_to_link) do
         create(:collection,
+               name: 'Business Unit Dashboard',
                parent_collection: child_collection,
                organization: organization)
       end
 
-      it 'should add the link at the first position' do
+      it 'adds the link at the -10 position with 3x2 size' do
         link = user.current_shared_collection.collection_cards.first
         # link to the org collection within the root application collection
-        expect(link.collection_id).to eq application_collection.collections.first.id
+        expect(link.collection_id).to eq(child_collection.id)
+        expect(link.width).to eq(3)
+        expect(link.height).to eq(2)
+        expect(link.order).to eq(-10)
       end
     end
 

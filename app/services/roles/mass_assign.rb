@@ -115,7 +115,8 @@ module Roles
       return unless @object.respond_to?(:children)
       return if @object.children.blank?
 
-      params = [
+      ModifyChildrenRolesWorker.send(
+        "perform_#{@synchronous ? 'sync' : 'async'}",
         @invited_by.try(:id),
         @added_users.map(&:id),
         @added_groups.map(&:id),
@@ -124,12 +125,7 @@ module Roles
         @object.class.name,
         @previous_anchor_id,
         'add',
-      ]
-      if @synchronous
-        ModifyChildrenRolesWorker.new.perform(*params)
-      else
-        ModifyChildrenRolesWorker.perform_async(*params)
-      end
+      )
     end
 
     def create_activities_and_notifications

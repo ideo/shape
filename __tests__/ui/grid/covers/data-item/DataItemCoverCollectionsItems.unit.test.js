@@ -18,7 +18,7 @@ describe('DataItemCover', () => {
     props.item = fakeDataItemCollectionsItemsAttrs
     props.item.primaryDataset = fakeDataset
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
-    props.uiStore.editingCardId = 0
+    props.uiStore.editingCardCover = 0
     render = () =>
       (wrapper = shallow(
         <DataItemCoverCollectionsItems.wrappedComponent {...props} />
@@ -43,7 +43,7 @@ describe('DataItemCover', () => {
         .at(0)
         .simulate('click', fakeEv)
 
-      expect(uiStore.toggleEditingCardId).not.toHaveBeenCalled()
+      expect(uiStore.setEditingCardCover).not.toHaveBeenCalled()
     })
   })
 
@@ -74,7 +74,7 @@ describe('DataItemCover', () => {
         .find('EditableButton')
         .simulate('click', fakeEv)
 
-      expect(uiStore.toggleEditingCardId).toHaveBeenCalledWith(props.card.id)
+      expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(props.card.id)
     })
 
     it('renders the within text explaining the data', () => {
@@ -83,7 +83,7 @@ describe('DataItemCover', () => {
 
     describe('when editing', () => {
       beforeEach(() => {
-        props.uiStore.editingCardId = props.card.id
+        props.uiStore.editingCardCover = props.card.id
         render()
       })
 
@@ -131,7 +131,7 @@ describe('DataItemCover', () => {
 
     describe('when editing', () => {
       beforeEach(() => {
-        props.uiStore.editingCardId = props.card.id
+        props.uiStore.editingCardCover = props.card.id
         render()
       })
 

@@ -95,7 +95,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email add_tag remove_tag]
   after_action :broadcast_collection_archive_updates, only: %i[archive unarchive unarchive_from_email]
   def archive
-    @collection_cards.archive_all!(user_id: current_user.id)
+    CollectionCard.archive_all!(ids: @collection_cards.pluck(:id), user_id: current_user.id)
     render json: { archived: true }
   end
 
@@ -171,12 +171,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       placement: placement,
       card_action: @card_action,
     )
-    if mover.call
+    moved_cards = mover.call
+    if moved_cards #&& @from_collection != @to_collection
+      # we still create notifications on the original @cards
       @cards.map do |card|
-        create_notification(card,
-                            Activity.map_move_action(@card_action))
+        create_notification(
+          card,
+          Activity.map_move_action(@card_action),
+        )
       end
-      head :no_content
+      render_to_collection_with_cards(moved_cards)
     else
       render json: { errors: mover.errors }, status: :unprocessable_entity
     end
@@ -206,12 +210,27 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       placement: placement,
       for_user: current_user,
     )
+    render_to_collection_with_cards(new_cards)
+  end
+
+  def toggle_pin
+    pinner = CardPinner.new(
+      card: @collection_card,
+      pinning: json_api_params[:pinned],
+    )
+
+    pinner.call
+
+    render jsonapi: @collection_card.reload, include: CollectionCard.default_relationships_for_api
+  end
+
+  private
+
+  def render_to_collection_with_cards(new_cards)
     render jsonapi: @to_collection.reload,
            meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
            expose: { current_record: @to_collection }
   end
-
-  private
 
   def perform_bulk_operation(placement:, action:)
     card = BulkCardOperationProcessor.call(
@@ -221,11 +240,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       to_collection: @to_collection,
       for_user: current_user,
     )
-    # card is the newly created placeholder
-    render jsonapi: card,
-           include: CollectionCard.default_relationships_for_api,
-           meta: { placeholder: true },
-           expose: { current_record: card.record }
+
+    if card
+      # card is the newly created placeholder
+      render jsonapi: card,
+             include: CollectionCard.default_relationships_for_api,
+             meta: { placeholder: true },
+             expose: { current_record: card.record }
+    else
+      render json: { errors: 'Unable to create placeholder' }, status: :unprocessable_entity
+    end
   end
 
   def bulk_operation_threshold
@@ -251,7 +275,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     ids_only = params[:action] == 'ids'
     filter_params = params[:filter].present? ? params[:filter] : params
     filter_params.merge(q: params[:q]) if params[:q].present?
-    @collection_cards = CollectionCardFilter
+    @collection_cards = CollectionCardFilter::Base
                         .call(
                           collection: @collection,
                           user: current_user,
@@ -369,14 +393,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     # Only notify for archiving of collections (and not link cards)
     return if card.link?
 
-    ActivityAndNotificationBuilder.call(
-      actor: current_user,
-      target: card.record,
-      action: action,
-      subject_user_ids: card.record.editors[:users].pluck(:id),
-      subject_group_ids: card.record.editors[:groups].pluck(:id),
-      source: @from_collection,
-      destination: @to_collection,
+    from_id = @from_collection&.id
+    to_id = @to_collection&.id
+    return if action == :moved && from_id == to_id
+
+    ActivityAndNotificationWorker.perform_async(
+      current_user.id,
+      card.id,
+      action,
+      from_id,
+      to_id,
     )
   end
 

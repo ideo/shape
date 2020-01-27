@@ -88,6 +88,7 @@ class CollectionCard < ApplicationRecord
   delegate :can_edit?,
            :can_edit_content?,
            :can_view?,
+           :name,
            to: :record,
            allow_nil: true
 
@@ -161,7 +162,9 @@ class CollectionCard < ApplicationRecord
     building_template_instance: false,
     system_collection: false,
     synchronous: false,
-    placeholder: nil
+    placeholder: nil,
+    batch_id: nil,
+    should_pin_duplicating_cards: false
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -170,6 +173,9 @@ class CollectionCard < ApplicationRecord
     cc = placeholder || amoeba_dup
     if placeholder
       cc = cc.becomes(CollectionCard::Primary)
+      # Note: when a user explicitly selects a link card to be duplicated
+      # (versus it being in a sub-collection), we will duplicate the underlying record,
+      # which is why placeholders are always turned into primary collection cards
       cc.type = 'CollectionCard::Primary'
       # nullify these
       cc.item_id = nil
@@ -178,8 +184,8 @@ class CollectionCard < ApplicationRecord
     if master_template_card? && parent.templated?
       # if we're cloning from template -> templated collection
       cc.templated_from = self
-    elsif parent.master_template?
-      # Make it pinned if you're duplicating it into a master template
+    elsif parent.master_template? && should_pin_duplicating_cards
+      # Make it pinned if you're duplicating it into a master template and all of its cards are pinned or placed in the beginning
       cc.pinned = true
     else
       # copying into a normal (non templated) collection, it should never be pinned;
@@ -212,6 +218,7 @@ class CollectionCard < ApplicationRecord
         parent: parent,
         system_collection: system_collection,
         synchronous: synchronous,
+        batch_id: batch_id,
         card: cc,
       }
       coll_opts = opts.merge(
@@ -239,7 +246,21 @@ class CollectionCard < ApplicationRecord
 
     if parent.master_template?
       # we just added a template card, so update the instances
-      parent.queue_update_template_instances
+      parent.queue_update_template_instances(
+        updated_card_ids: [cc.id],
+        template_update_action: 'duplicate',
+      )
+    end
+
+    if batch_id.present?
+      # Map what card this was duplicated to so we can later re-map
+      # things like link cards and search filters
+      CardDuplicatorMapper::Base.new(
+        batch_id: batch_id,
+      ).register_duplicated_card(
+        original_card_id: id,
+        to_card_id: cc.id,
+      )
     end
 
     cc
@@ -343,25 +364,20 @@ class CollectionCard < ApplicationRecord
   end
 
   # gets called by API collection_cards_controller
-  def self.archive_all!(user_id:)
-    # should only ever be used on a subset of cards, e.g. not `all`!
-    unless scope_attributes['id'].present? || scope_attributes['parent_id'].present?
-      return false
-    end
-
-    # capture these before `self` potentially gets altered by archive scope
-    ids = pluck(:id)
-    # ensure we're now working with an unscoped AR::Relation
+  def self.archive_all!(ids:, user_id:)
     cards = CollectionCard.where(id: ids)
     cards.update_all(archived: true)
     # should generally only be the one parent collection, but an array to be safe
     parents = cards.map(&:parent).uniq.compact
     parents.each do |parent|
       parent.touch
-      if parent.master_template?
-        # we just archived a template card, so update the instances
-        parent.queue_update_template_instances
-      end
+      next unless parent.master_template?
+
+      # we just archived a template card, so update the instances
+      parent.queue_update_template_instances(
+        updated_card_ids: ids,
+        template_update_action: 'archive',
+      )
     end
     CollectionCardArchiveWorker.perform_async(
       ids,

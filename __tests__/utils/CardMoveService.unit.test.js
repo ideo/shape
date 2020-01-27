@@ -1,4 +1,5 @@
-import CardMoveService from '~/ui/grid/CardMoveService'
+import { observable } from 'mobx'
+import CardMoveService from '~/utils/CardMoveService'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -10,7 +11,6 @@ const uiStore = fakeUiStore
 uiStore.viewingCollection = {
   id: '3',
   API_fetchCards: jest.fn(),
-  movingCardIds: ['10'],
 }
 
 const mockFind = (type, id) => {
@@ -23,6 +23,7 @@ const mockFind = (type, id) => {
 
 let service, mockCollection
 const reinitialize = ({ moveCardsResult = null } = {}) => {
+  uiStore.reselectCardIds.mockClear()
   apiStore.moveCards = jest.fn().mockReturnValue(moveCardsResult || {})
   apiStore.find = jest.fn(mockFind)
   service = new CardMoveService({ apiStore, uiStore })
@@ -128,7 +129,8 @@ describe('CardMoveService', () => {
       beforeEach(() => {
         apiStore.currentUser = fakeUser
         apiStore.request = jest.fn().mockReturnValue(Promise.resolve())
-        uiStore.movingCardIds = ['21', '23']
+        // this should get converted into a normal array
+        uiStore.movingCardIds = observable.array(['21', '23'])
         uiStore.movingFromCollectionId = '3'
         uiStore.cardAction = 'move'
         uiStore.viewingCollection = {
@@ -150,7 +152,7 @@ describe('CardMoveService', () => {
         expect(apiStore.moveCards).toHaveBeenCalledWith({
           to_id: uiStore.viewingCollection.id,
           from_id: uiStore.movingFromCollectionId,
-          collection_card_ids: uiStore.movingCardIds,
+          collection_card_ids: ['21', '23'],
           placement: 'beginning',
         })
       })
@@ -259,6 +261,13 @@ describe('CardMoveService', () => {
     it('should call collection.API_batchUpdateCardsWithUndo', async () => {
       await service.moveCards('beginning')
       expect(mockCollection.API_batchUpdateCardsWithUndo).toHaveBeenCalled()
+    })
+
+    it('should call uiStore.reselectCardIds with the moving cards', async () => {
+      await service.moveCards('beginning')
+      expect(uiStore.reselectCardIds).toHaveBeenCalledWith(
+        uiStore.movingCardIds
+      )
     })
   })
 

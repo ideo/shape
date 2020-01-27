@@ -14,8 +14,9 @@ class LinkToSharedCollectionsWorker
         # Don't create any links if object was created by user
         next if object.try(:created_by_id) == entity.id
 
-        if within_application_collection?(object)
-          # If linking a C∆ collection, only share the org collection
+        # If linking to any collection in C∆ Dashboard,
+        # add top-level card (unless linking method library)
+        if within_application_collection?(object) && !method_library_collection?(object)
           object = object.parent_application_collection.collections.first
         end
 
@@ -41,18 +42,25 @@ class LinkToSharedCollectionsWorker
 
   private
 
+  def org_dashboard_collection?(object)
+    return false unless within_application_collection?(object)
+
+    object.name.match?(/creative[\s\_\-]+difference/i)
+  end
+
+  def method_library_collection?(object)
+    return false unless within_application_collection?(object)
+
+    object.name.match?(/method[\s\_\-]+library/i)
+  end
+
   def within_application_collection?(object)
     object.respond_to?(:parent_application_collection) &&
       object.parent_application_collection.present?
   end
 
   def create_link(object, collection)
-    width = 1
-    height = 1
-    if within_application_collection?(object)
-      width = 3
-      height = 2
-    end
+    width, height = card_width_height(object)
     CollectionCard::Link.create(
       parent: collection,
       item_id: (object.is_a?(Item) ? object.id : nil),
@@ -63,9 +71,25 @@ class LinkToSharedCollectionsWorker
     )
   end
 
+  def card_width_height(object)
+    width = 1
+    height = 1
+
+    if org_dashboard_collection?(object)
+      width = 3
+      height = 2
+    elsif method_library_collection?(object)
+      height = 2
+    end
+
+    [width, height]
+  end
+
   def card_order(object, collection)
     # If sharing C∆/App collection, always put it at the beginning of your 'My Collection'
     if within_application_collection?(object)
+      return -9 if method_library_collection?(object)
+
       # Use -10 because 'getting started' content is often beforehand
       -10
     else

@@ -15,7 +15,7 @@ import {
   DisplayText,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
 
 const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
@@ -145,6 +145,7 @@ class MoveHelperModal extends React.Component {
           onClick={this.handleAddToMyCollection}
           minWidth={250}
           fontSize={0.75}
+          data-cy="MoveHelperModal-addToMyCollectionBtn"
         >
           Add to my collection
         </FormButton>
@@ -156,6 +157,7 @@ class MoveHelperModal extends React.Component {
           fontSize={0.75}
           color={v.colors.commonDark}
           transparent
+          data-cy="MoveHelperModal-letMePlaceItBtn"
         >
           Let me place it
         </FormButton>
@@ -173,6 +175,7 @@ class MoveHelperModal extends React.Component {
         BackdropProps={{
           invisible: true,
         }}
+        data-cy={`${type}HelperModal`}
       >
         <ModalCloseButton onClick={this.handleClose}>
           <CloseIcon />
@@ -208,7 +211,7 @@ class MoveHelperModal extends React.Component {
             <div className="button--center">
               <TextButton
                 onClick={this.handleClose}
-                data-cy="MoveHelperModal-button"
+                data-cy="MoveHelperModal-closeBtn"
                 disabled={this.isLoading}
               >
                 Close

@@ -12,7 +12,8 @@ import IconAvatar from '~/ui/global/IconAvatar'
 import Loader from '~/ui/layout/Loader'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import { objectsEqual } from '~/utils/objectUtils'
-import CardMoveService from '~/ui/grid/CardMoveService'
+import CardMoveService from '~/utils/CardMoveService'
+import { groupByConsecutive } from '~/utils/CollectionGridCalculator'
 import v from '~/utils/variables'
 
 const cardMover = new CardMoveService()
@@ -38,22 +39,6 @@ const StyledGrid = styled.div`
   `}
 `
 StyledGrid.displayName = 'StyledGrid'
-
-const groupByConsecutive = (array, value) => {
-  const groups = []
-  let buffer = []
-  for (let i = 0; i < array.length; i += 1) {
-    const curItem = array[i]
-    if (curItem === value) {
-      buffer.push(i)
-    } else if (buffer.length > 0) {
-      groups.push(buffer)
-      buffer = []
-    }
-  }
-  if (buffer.length > 0) groups.push(buffer)
-  return groups
-}
 
 const pageMargins = () => {
   let xMargin
@@ -128,15 +113,15 @@ class CollectionGrid extends React.Component {
     // for the sake of later calculations/manipulations
     const cards = [...collection.collection_cards]
 
-    // create the mdlPlaceholder
-    // this is the draggable card that sits in the MDL MoveSnackbar so that you can drag it onto the grid
     if (movingCardIds && movingCardIds.length) {
       const movingCard = apiStore.find(
         'collection_cards',
-        _.last(movingCardIds)
+        _.first(movingCardIds)
       )
 
       if (!uiStore.isLoadingMoveAction && movingCard) {
+        // create the mdlPlaceholder
+        // this is the draggable card that sits in the MDL MoveSnackbar so that you can drag it onto the grid
         const mdlPlaceholderCard = this.createPlaceholderCard(movingCard, {
           cardType: 'mdlPlaceholder',
         })
@@ -349,15 +334,13 @@ class CollectionGrid extends React.Component {
     const placeholder = _.find(cards, { cardType: 'placeholder' }) || {}
     const { original } = placeholder
     const { uiStore, collection, trackCollectionUpdated } = this.props
-    const { cardAction, movingFromCollectionId } = uiStore
+    const { cardAction, movingFromCollectionId, draggingFromMDL } = uiStore
     this.draggingId = null
     this.clearDragTimeout()
     let moved = false
 
     // multiMoveCardIds = all cards being dragged
-    let movingIds = [...uiStore.multiMoveCardIds]
-    // check if we're dragging the MDL placeholder
-    const draggingFromMDL = _.includes(_.first(movingIds), 'mdlPlaceholder')
+    const movingIds = [...uiStore.multiMoveCardIds]
     const movingWithinCollection =
       cardAction === 'move' && movingFromCollectionId === collection.id
 
@@ -369,23 +352,32 @@ class CollectionGrid extends React.Component {
       width: uiStore.placeholderPosition.cardWidth,
     }
 
-    if (draggingFromMDL) {
-      if (!_.isEmpty(placeholder) && !movingWithinCollection) {
-        const { order } = placeholderPosition
-        cardMover.moveCards(Math.ceil(order))
-        this.positionCardsFromProps()
-        return
-      }
-      // update these for later calls to moveCardsIntoCollection
-      movingIds = [...uiStore.movingCardIds]
-    }
-
-    if (placeholderPosition.order !== null && original) {
+    const placeholderOrder = placeholderPosition.order
+    if (placeholderOrder !== null && original) {
       const originalPosition = _.pick(original, fields)
       moved = !_.isEqual(placeholderPosition, originalPosition)
     }
 
-    if (moved) {
+    if (hoveringOver && hoveringOver.direction === 'right') {
+      // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
+      const hoveringRecord = hoveringOver.card.record
+      uiStore.setMovingCards(uiStore.multiMoveCardIds)
+
+      if (hoveringRecord.internalType === 'collections') {
+        this.setHoveringOver(false)
+        this.moveCardsIntoCollection(movingIds, hoveringRecord)
+      }
+    } else if (
+      dragType === 'drag' &&
+      draggingFromMDL &&
+      (placeholderOrder !== null &&
+        !_.isEmpty(placeholder) &&
+        !movingWithinCollection)
+    ) {
+      cardMover.moveCards(Math.ceil(placeholderOrder))
+      this.positionCardsFromProps()
+      return
+    } else if (moved) {
       // we want to update this card to match the placeholder
       cardMover.updateCardsWithinCollection({
         movingIds,
@@ -405,14 +397,7 @@ class CollectionGrid extends React.Component {
       })
       // this should happen right away, not waiting for the API call (since locally we have the updated cards' positions)
       this.positionCardsFromProps()
-    } else if (hoveringOver && hoveringOver.direction === 'right') {
-      // the case where we hovered in the drop zone of a collection and now want to move cards + reroute
-      const hoveringRecord = hoveringOver.card.record
-      uiStore.setMovingCards(uiStore.multiMoveCardIds)
-      if (hoveringRecord.internalType === 'collections') {
-        this.setHoveringOver(false)
-        this.moveCardsIntoCollection(movingIds, hoveringRecord)
-      }
+      uiStore.reselectCardIds(movingIds)
     } else {
       if (uiStore.activeDragTarget) {
         const { apiStore } = this.props
@@ -507,7 +492,6 @@ class CollectionGrid extends React.Component {
       overlapCardId = matrix[row][col]
       const overlapped = _.find(cards, { id: overlapCardId })
       const { record, position } = overlapped
-      if (overlapped.isBeingMultiMoved) return null
       const isPlaceholder =
         overlapped.cardType === 'placeholder' || overlapped.cardType === 'blank'
       if (overlapped.id === cardId || isPlaceholder) return null
@@ -612,6 +596,7 @@ class CollectionGrid extends React.Component {
     const { apiStore, uiStore, canEditCollection } = this.props
     const { currentUser } = apiStore
     let previousCell = null
+    let previousOrder = -1
     const encountered = []
     matrix.forEach((row, rowIdx) => {
       row.forEach((cell, colIdx) => {
@@ -620,8 +605,12 @@ class CollectionGrid extends React.Component {
           encountered.push(cell)
         } else if (cell === null) {
           const previousCard = cards.find(c => c.id === previousCell)
-          if (!previousCard) return
-          const order = previousCard.order + 1
+          if (previousCard) {
+            previousOrder = previousCard.order + 1
+          } else {
+            previousOrder += 1
+          }
+          const order = previousOrder
           const id = `empty-${order}-${colIdx}-${rowIdx}`
           const emptyCard = this.createEmptyCard(order, id)
           emptyCard.position = this.calculateGridPosition({
@@ -727,21 +716,12 @@ class CollectionGrid extends React.Component {
     return position
   }
 
-  get movingAllCards() {
-    const { collection, uiStore } = this.props
-    return (
-      uiStore.movingFromCollectionId === collection.id &&
-      uiStore.movingCardIds.length >= collection.collection_card_count &&
-      uiStore.cardAction === 'move'
-    )
-  }
-
   // Sorts cards and sets state.cards after doing so
   @action
   positionCards = (collectionCards = [], opts = {}) => {
     // even though hidden cards are not loaded by default in the API, we still filter here because
     // it's possible that some hidden cards were loaded in memory via the CardCoverEditor
-    const cards = [...collectionCards].filter(c => !c.hidden)
+    const cards = _.reject(collectionCards, 'shouldHideFromUI')
     const {
       collection,
       gridW,
@@ -750,17 +730,13 @@ class CollectionGrid extends React.Component {
       cols,
       shouldAddEmptyRow,
       canEditCollection,
-      uiStore,
     } = this.props
     const { currentOrder } = collection
     let row = 0
     const matrix = []
     // create an empty row
     matrix.push(_.fill(Array(cols), null))
-    if (this.movingAllCards) {
-      // show BCT when collection is emptied for moving all cards
-      uiStore.openBlankContentTool()
-    } else if (collection.hasMore) {
+    if (collection.hasMore) {
       // check if we've selected all and moving all the cards,
       // in which case there is no need to try to paginate
       this.addPaginationCard(cards)
@@ -781,7 +757,7 @@ class CollectionGrid extends React.Component {
         return
       }
 
-      if (card.isBeingMoved || card.tempHidden || card.skipPositioning) {
+      if (card.tempHidden || card.skipPositioning) {
         return
       }
 
@@ -795,11 +771,6 @@ class CollectionGrid extends React.Component {
         })
         card.calculateMaxSize(cols)
 
-        return
-      }
-
-      // if we're dragging multiple cards, also don't show them
-      if (opts.dragging && card.isBeingMultiMoved) {
         return
       }
 
@@ -1014,7 +985,6 @@ class CollectionGrid extends React.Component {
         }
       }
       if (_.isEmpty(card.position)) return
-      const shouldHide = card.isBeingMultiMoved || card.isBeingMoved
 
       grid.push(
         <MovableGridCard
@@ -1036,7 +1006,6 @@ class CollectionGrid extends React.Component {
           parent={collection}
           lastPinnedCard={card.isPinnedAndLocked && i === this.cards.length - 1}
           loadCollectionCards={loadCollectionCards}
-          hidden={shouldHide}
           searchResult={collection.isSearchResultsCollection}
         />
       )

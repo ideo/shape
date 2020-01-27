@@ -11,6 +11,7 @@ export const StyledPdfCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${v.colors.commonMedium};
+  overflow: hidden;
 
   .fileInfo {
     align-items: center;
@@ -39,12 +40,17 @@ export const StyledPdfCover = styled.div`
 `
 StyledPdfCover.displayName = 'StyledPdfCover'
 
+const clipPath = orientation => {
+  const { gridSettings } = uiStore
+  const { gridW, gridH } = gridSettings
+  return orientation === 'landscape'
+    ? `polygon(0 0,0 100%,100% 100%,100% ${gridW / 6.08}px,${gridH / 1.02}px 0)`
+    : `polygon(0 0,0 100%,100% 100%,100% ${gridW / 5.96}px,${gridH / 1.17}px 0)`
+}
+
 export const ImageContainer = styled.div`
   border-radius: 12px;
-  clip-path: ${props =>
-    props.orientation === 'landscape'
-      ? 'polygon(0 0,0 100%,100% 100%,100% 52px,245px 0)'
-      : 'polygon(0 0,0 100%,100% 100%,100% 53px,214px 0)'};
+  clip-path: ${props => clipPath(props.orientation)};
   overflow: hidden;
   position: relative;
   transform: rotate(-8deg) translateX(${props => props.x})
@@ -61,9 +67,20 @@ const CornerContainer = styled.div`
   color: gray;
   height: 54px;
   position: absolute;
-  right: 0;
-  top: -3px;
-  width: 54px;
+  ${props => {
+    if (uiStore.gridSettings.layoutSize === 3) {
+      return `
+        right: -3px;
+        top: -6px;
+        width: 48px;
+      `
+    }
+    return `
+      right: 0;
+      top: -3px;
+      width: 54px;
+    `
+  }}
 `
 
 @observer

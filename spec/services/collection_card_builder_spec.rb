@@ -161,7 +161,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
         it 'should create a pinned card by default' do
           expect(builder.create).to be true
-          expect(builder.collection_card.pinned?).to be true
+          expect(builder.collection_card.pinned?).to be false
         end
       end
 

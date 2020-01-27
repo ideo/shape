@@ -10,13 +10,15 @@ class BulkCardOperationWorker
     # what if the placeholder was destroyed in a failed job?
     @placeholder = CollectionCard.find(placeholder_id)
     @to_collection = @placeholder.parent
-    @order = @placeholder.order
     @for_user = for_user_id ? User.find(for_user_id) : nil
 
-    @placeholder.destroy
+    ActiveRecord::Base.transaction do
+      @placeholder.destroy
+      success = perform_action
+      raise ActiveRecord::Rollback unless success
 
-    perform_action
-    broadcast
+      broadcast
+    end
   end
 
   private
@@ -30,10 +32,15 @@ class BulkCardOperationWorker
   end
 
   def common_params
+    if @to_collection.is_a?(Collection::Board)
+      placement = { 'row' => @placeholder.row, 'col' => @placeholder.col }
+    else
+      placement = @placeholder.order
+    end
     {
       to_collection: @to_collection,
       cards: @cards,
-      placement: @order,
+      placement: placement,
     }
   end
 

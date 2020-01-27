@@ -16,7 +16,7 @@ const StyledButton = styled.button`
 `
 
 const EditableButton = ({ onClick, children }) => (
-  <StyledButton onClick={onClick} className="editable">
+  <StyledButton data-cy="EditableButton" onClick={onClick} className="editable">
     {children}
   </StyledButton>
 )

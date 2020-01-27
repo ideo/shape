@@ -81,7 +81,9 @@ describe('RolesAdd', () => {
         const instance = wrapper.instance()
         // instance.mapItems = jest.fn()
         await instance._autocompleteSearch('person', callback)
-        expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('person')
+        expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith({
+          query: 'person',
+        })
         // expect(instance.mapItems)
         expect(callback).toHaveBeenCalledWith(
           instance.mapItems([
@@ -100,7 +102,9 @@ describe('RolesAdd', () => {
 
       it('should call apiStore to search users and groups', () => {
         wrapper.instance()._autocompleteSearch('person', jest.fn())
-        expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith('person')
+        expect(apiStore.searchUsersAndGroups).toHaveBeenCalledWith({
+          query: 'person',
+        })
       })
     })
   })

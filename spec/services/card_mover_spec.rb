@@ -186,6 +186,23 @@ RSpec.describe CardMover, type: :service do
             original_cards[1].id,
           ])
         end
+
+        it 'should pin the all the moving cards' do
+          card_mover.call
+          expect(to_collection.reload.collection_cards.pinned.all?(&:id)).to eq(true)
+        end
+
+        context 'moving cards right next to unpinned cards' do
+          before do
+            # update second card to be pinned
+            to_collection.reload.collection_cards[1].update(pinned: false)
+          end
+          it 'should keep all the moving cards unpinned' do
+            card_mover.call
+            cards_moved = to_collection.reload.collection_cards.select {|cc| moving_cards.pluck(:id).include? cc.id}
+            expect(cards_moved.pluck(:pinned)).to all(be_falsy)
+          end
+        end
       end
 
       context 'with pinned cards in the from_collection' do
@@ -214,18 +231,23 @@ RSpec.describe CardMover, type: :service do
             to_collection.update(master_template: true)
           end
 
-          it 'should pin all cards if moving from a normal collection' do
-            card_mover.call
-            to_collection.reload
-            expect(to_collection.collection_cards.count).to eq 7
-            expect(to_collection.collection_cards.all?(&:pinned?)).to be true
-            subcollection = to_collection.collections.first
-            expect(subcollection.collection_cards.all?(&:pinned)).to be true
-            # subcollection should now be a subtemplate
-            expect(subcollection.master_template?).to be true
-            expect(subcollection.collections.first.master_template?).to be true
+
+          context 'moving to the beginning of master template with pinned cards' do
+            let!(:placement) {'beginning'}
+
+            it 'should pin all cards if moving to the beginning of collection with pinned cards' do
+              card_mover.call
+              to_collection.reload
+              expect(to_collection.collection_cards.count).to eq 7
+              expect(to_collection.collection_cards.any?(&:pinned?)).to be true
+              subcollection = to_collection.collections.first
+              expect(subcollection.collection_cards.all?(&:pinned)).to be true
+              # subcollection should now be a subtemplate
+              expect(subcollection.master_template?).to be true
+              expect(subcollection.collections.first.master_template?).to be true
+            end
           end
-        end
+          end
       end
     end
 
@@ -259,11 +281,10 @@ RSpec.describe CardMover, type: :service do
         let(:placement) { 'end' }
 
         it 'sets row of linked cards 2 rows after the last non-blank row' do
-          card_mover.call
-
           target_empty_row = to_collection.empty_row_for_moving_cards
+          card_mover.call
           to_collection.reload
-
+          # they are all 1x1 so should fit consecutively
           to_collection.collection_cards.last(3).each_with_index do |card, index|
             expect(card.row).to eq target_empty_row
             expect(card.col).to eq index
@@ -361,6 +382,26 @@ RSpec.describe CardMover, type: :service do
           expect(
             to_collection.collection_cards.reload.map(&:item).compact,
           ).to include(legend_item)
+        end
+      end
+    end
+
+    context 'with placement as row/col values, moving to a foamcore board' do
+      let!(:to_collection) do
+        create(:board_collection,
+               num_cards: 3,
+               add_editors: [user],
+               organization: organization)
+      end
+      let(:placement) { Hashie::Mash.new(row: 2, col: 3) }
+
+      it 'moves cards to targeted area' do
+        card_mover.call
+        # they are all 1x1 so should fit consecutively
+        moving_cards.reload.each_with_index do |card, index|
+          expect(card.parent_id).to eq to_collection.id
+          expect(card.row).to eq 2
+          expect(card.col).to eq 3 + index
         end
       end
     end
