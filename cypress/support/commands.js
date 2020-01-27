@@ -72,6 +72,7 @@ Cypress.Commands.add(
         type = 'collection'
         break
     }
+
     if (collectionType === 'searchCollection') {
       cy.selectPopoutTemplateBctType({
         type: 'searchCollection',
@@ -81,6 +82,7 @@ Cypress.Commands.add(
     } else {
       cy.selectBctType({ type, empty })
     }
+
     // force == don't care if it's "covered by tooltip"
     cy.locate('CollectionCreatorTextField').type(name, {
       force: true,
@@ -248,7 +250,6 @@ Cypress.Commands.add(
         cy.locate('PopoutMenu_createSearchCollection')
           .first()
           .click({ force: true })
-        return
         return
       case 'submissionBox':
         cy.locate('PopoutMenu_createSubmissionBox')

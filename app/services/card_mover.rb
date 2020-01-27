@@ -121,6 +121,8 @@ class CardMover < SimpleService
   def move_cards_to_collection
     return [] if @to_collection.is_a? Collection::Board
 
+    pin_moving_cards = should_pin_moving_cards?
+
     # Reorder all cards based on order of joined_cards
     @to_collection_cards.map.with_index do |card, i|
       card.assign_attributes(order: i)
@@ -128,16 +130,13 @@ class CardMover < SimpleService
       if @moving_cards.include?(card)
         # assign new parent
         card.assign_attributes(parent_id: @to_collection.id)
-        if @to_collection.templated? && @to_collection == @from_collection
-          # pinned cards within template instance stay pinned
-          card.assign_attributes(pinned: card.pinned)
-        elsif @to_collection.master_template?
-          # any cards created in master_templates become pinned
-          card.assign_attributes(pinned: true)
+        if @to_collection.master_template?
+          # any cards created in master_template's pinned area become pinned
+          card.assign_attributes(pinned: pin_moving_cards)
           if card.collection.present?
             card.collection.convert_to_template!
           end
-        else
+        elsif @to_collection != @from_collection
           card.assign_attributes(pinned: false)
         end
         if @to_collection.anyone_can_view? && card.primary? && card.collection.present?
@@ -168,8 +167,27 @@ class CardMover < SimpleService
   end
 
   def update_template_instances
-    @from_collection.queue_update_template_instances if @from_collection.master_template?
-    @to_collection.queue_update_template_instances if @to_collection.master_template?
+    if @to_collection == @from_collection && @from_collection.master_template?
+      @from_collection.queue_update_template_instances(
+        updated_card_ids: @from_collection.collection_cards.pluck(:id),
+        template_update_action: 'update_all',
+      )
+      return
+    end
+
+    if @from_collection.master_template?
+      @from_collection.queue_update_template_instances(
+        updated_card_ids: @moving_cards.pluck(:id),
+        template_update_action: 'archive',
+      )
+    end
+
+    return unless @to_collection.master_template?
+
+    @to_collection.queue_update_template_instances(
+      updated_card_ids: @moving_cards.pluck(:id),
+      template_update_action: 'create',
+    )
   end
 
   def duplicate_or_link_legend_items
@@ -223,5 +241,12 @@ class CardMover < SimpleService
 
       Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
+  end
+
+  def should_pin_moving_cards?
+    return false unless @moving_cards.first.present?
+
+    first_moving_card_placement = @to_collection_cards.find_index { |tc| tc == @moving_cards.first }
+    @to_collection.should_pin_cards?(first_moving_card_placement)
   end
 end

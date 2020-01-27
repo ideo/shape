@@ -206,12 +206,19 @@ export default class CardMoveService {
       // Set order for moved cards so they are between whole integers,
       // and API_batchUpdateCards will properly set/reorder it amongst the collection
       const sortedCards = _.sortBy(movingCards, 'order')
+      const toPinAllMovingCards = this.calculateToPinAllMovingCards(
+        collection,
+        order
+      )
+
       _.each(sortedCards, (card, idx) => {
         const sortedOrder = this.calculateOrderForMovingCard(order, idx)
-        updates.push({
+        const update = {
           card,
           order: sortedOrder,
-        })
+          pinned: toPinAllMovingCards,
+        }
+        updates.push(update)
       })
     }
 
@@ -228,6 +235,25 @@ export default class CardMoveService {
 
   calculateOrderForMovingCard = (order, index) => {
     return Math.ceil(order) + index
+  }
+
+  calculateToPinAllMovingCards = (collection, order) => {
+    const { sortedCards } = collection
+    const hasPinnedCards = _.some(sortedCards, cc => cc.isPinned)
+    if (!hasPinnedCards) return false
+
+    const firstMovingCardSortOrder = this.calculateOrderForMovingCard(order, 0)
+    const firstMovingCardIndex = _.findIndex(sortedCards, cc => {
+      return cc.order === firstMovingCardSortOrder
+    })
+
+    if (firstMovingCardIndex === -1)
+      return (_.last(sortedCards) && _.last(sortedCards).isPinned) || false
+    if (firstMovingCardIndex <= 1) return true // pin card if moving card in tbe beginning or next to a pinned card
+    const leftOfFirstMovingCardIndex = firstMovingCardIndex - 1
+    const leftOfFirstMovingCard = sortedCards[leftOfFirstMovingCardIndex]
+    // copy pinned state of the card to the left of the first moving card
+    return leftOfFirstMovingCard.isPinned
   }
 
   moveErrors({ toCollection, cardAction }) {

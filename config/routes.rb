@@ -96,6 +96,7 @@ Rails.application.routes.draw do
         member do
           patch 'replace'
           patch 'update'
+          patch 'toggle_pin'
           delete 'destroy'
         end
         collection do

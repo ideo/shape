@@ -103,6 +103,7 @@ class DataTargetSelect extends React.Component {
             }}
           >
             <AutoComplete
+              autoFocus
               options={[]}
               optionSearch={this.onSearch}
               onOptionSelect={option => this.props.onSelect(option)}

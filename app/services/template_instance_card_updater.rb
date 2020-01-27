@@ -25,6 +25,7 @@ class TemplateInstanceCardUpdater < SimpleService
       height: @master_card.height,
       width: @master_card.width,
       order: @master_card.order,
+      pinned: @master_card.pinned,
     )
   end
 
