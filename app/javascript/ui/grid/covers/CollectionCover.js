@@ -28,6 +28,7 @@ const IconHolder = styled.span`
   margin-right: 5px;
   vertical-align: middle;
   width: 27px;
+  height: 27px;
 `
 
 const LaunchButton = styled(FormButton)`
