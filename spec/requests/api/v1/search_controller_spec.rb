@@ -39,6 +39,14 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
     end
     let(:path) { "/api/v1/organizations/#{organization.slug}/search" }
     let(:find_collection) { collections.first }
+    let!(:number_collection) do
+      create(
+        :collection,
+        organization: organization,
+        name: '3rd Place Results',
+        add_viewers: [current_user],
+      )
+    end
 
     before do
       Collection.reindex
@@ -97,6 +105,25 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         get(path, params: { query: '#Innovation-Metrics' })
         expect(json['data'].size).to eq(1)
         expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+      end
+
+      context 'searching by ID' do
+        it 'should find records by ID' do
+          get(path, params: { query: find_collection.id })
+          expect(json['data'].size).to eq(1)
+          expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+        end
+
+        it 'should find records by ID and slug' do
+          get(path, params: { query: "#{find_collection.id}-any-slug" })
+          expect(json['data'].size).to eq(1)
+          expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+        end
+
+        it 'should find records named with a number (not ID)' do
+          get(path, params: { query: '3rd' })
+          expect(json['data'].first['id'].to_i).to eq(number_collection.id)
+        end
       end
 
       context 'with a per_page param set' do
