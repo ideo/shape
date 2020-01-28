@@ -59,3 +59,6 @@ production:
     charges_limit:
       cron: '30 18 * * * America/Los_Angeles'
       class: ChargesLimitWorker
+    organization_shell_refresh:
+      cron: '0 23 */2 * * America/Los_Angeles'
+      class: OrganizationShellRefreshWorker

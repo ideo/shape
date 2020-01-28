@@ -258,6 +258,8 @@ class Organization < ApplicationRecord
   end
 
   def network_organization
+    return nil if shell
+
     @network_organization ||= NetworkApi::Organization.find_by_external_id(id)
   end
 

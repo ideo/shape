@@ -1,21 +1,18 @@
 class OrganizationShellBuilder
   attr_reader :organization, :errors
 
-  def initialize(full_setup = false)
+  def initialize
     name = next_shell_name
     @organization = Organization.new(name: name, shell: true)
     @errors = @organization.errors
     # mainly just in tests that we don't need this overhead
-    @full_setup = full_setup
   end
 
   def save
     result = @organization.transaction do
       @organization.save!
-      if @full_setup
-        create_user_collection
-        create_templates
-      end
+      create_user_collection
+      create_templates
       true
     end
     !result.nil?

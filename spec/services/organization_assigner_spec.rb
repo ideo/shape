@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe OrganizationShellBuilder, type: :service do
-  describe '#call', :vcr do
+  describe '#call' do
     let(:user) { create(:user) }
     let(:params) do
       {
@@ -10,19 +10,19 @@ RSpec.describe OrganizationShellBuilder, type: :service do
       }
     end
     let(:builder) do
-      OrganizationAssigner.new(params, user, true)
+      OrganizationAssigner.new(params, user, false)
     end
-    let(:network_organization) { spy('network organization') }
-    let(:shell_organization) do
+    let!(:shell_organization) do
       # Create a shell we can assign with
-      shell_builder = OrganizationShellBuilder.new(true)
+      shell_builder = OrganizationShellBuilder.new
       shell_builder.save
+      shell_builder.organization.update(name: 'poop')
       shell_builder.organization
     end
+    let(:network_organization) { double('network_organization') }
+    let(:subscription) { double('subscription') }
 
     before do
-      allow(shell_organization).to receive(:create_network_organization)
-      allow(shell_organization).to receive(:create_network_subscription)
       builder.call
     end
 
@@ -44,18 +44,6 @@ RSpec.describe OrganizationShellBuilder, type: :service do
       user_collection = Collection::UserCollection.find_by(organization:
                                                            builder.organization)
       expect(user.has_role?(Role::EDITOR, user_collection)).to be true
-    end
-
-    it 'should call setup user membership with the first admin' do
-      expect(shell_organization).to receive(:setup_user_membership).with(user).twice
-    end
-
-    it 'should create the network organization' do
-      expect(shell_organization).to have_received(:create_network_organization).with(user)
-    end
-
-    it 'should create the network organization' do
-      expect(shell_organization).to have_received(:create_network_subscription)
     end
   end
 end
