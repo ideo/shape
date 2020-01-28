@@ -29,8 +29,31 @@ RSpec.describe NotificationMailer, type: :mailer do
 
       it 'renders the body' do
         expect(mail.body.encoded).to match(
-          'Your collaborators and teammates have updates for you.'
+          'Your collaborators and teammates have updates for you.',
         )
+      end
+
+      describe 'with added editor activity' do
+        let(:collection) { create(:collection) }
+        let(:activity) { create(:activity, subject_users: [user], action: :added_editor, target: collection) }
+        let!(:notifications) { [create(:notification, user: user, activity: activity)] }
+
+        it 'renders added editor user' do
+          expect(mail.body.encoded).to include(
+            "#{notifications.first.activity.actor.name} has made #{notifications.first.activity.subject_users.first.name} a(n) editor of #{notifications.first.activity.target.name}",
+          )
+        end
+
+        context 'with group' do
+          let(:group) {create(:group)}
+          let!(:activity) { create(:activity, subject_groups: [group], action: :added_editor, target: collection) }
+
+          it 'renders added editor group' do
+            expect(mail.body.encoded).to include(
+              "#{notifications.first.activity.actor.name} has made #{notifications.first.activity.subject_groups.first.name} a(n) editor of #{notifications.first.activity.target.name}",
+            )
+          end
+        end
       end
 
       it 'should update the last_notification_mail_sent timestamp' do

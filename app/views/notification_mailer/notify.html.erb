@@ -106,7 +106,13 @@
                 <% when "added_editor", "added_member", "added_admin" %>
                   <span class="bold"><%= notification.activity.actor.name %></span>
                   has made
-                  <span class="bold"><%= notification.activity.subject_users.map(&:name).join(', ') %></span>
+                  <span class="bold">
+                    <% if notification.activity.subject_users.any? %>
+                      <%= notification.activity.subject_users.map(&:name).join(', ') %>
+                    <% else %>
+                      <%= notification.activity.subject_groups.map(&:name).join(', ') %>
+                    <% end %>
+                  </span>
                   a(n) <%= notification.activity.action.to_s.split('_')[1] %> of <%= notification.activity.target.name %>
                 <% when "archived" %>
                   <div class="Activity__ActivityText">
