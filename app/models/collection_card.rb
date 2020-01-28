@@ -78,8 +78,6 @@ class CollectionCard < ApplicationRecord
   validates :row,
             numericality: { greater_than_or_equal_to: 0 },
             if: :parent_board_collection?
-  validate :board_placement_is_valid?, if: :parent_board_collection?
-
   validates :section_type, presence: true, if: :parent_test_collection?
 
   delegate :board_collection?, :test_collection?,

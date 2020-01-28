@@ -131,7 +131,7 @@ RSpec.describe CollectionCard, type: :model do
         parent.reload
         card.row = 2
         card.col = 2
-        expect(card.valid?).to be true
+        expect(card.board_placement_is_valid?).to be true
       end
 
       it 'should be invalid if the spot is taken' do
@@ -139,7 +139,7 @@ RSpec.describe CollectionCard, type: :model do
         parent.reload
         card.row = 2
         card.col = 3
-        expect(card.valid?).to be false
+        expect(card.board_placement_is_valid?).to be false
       end
     end
   end
