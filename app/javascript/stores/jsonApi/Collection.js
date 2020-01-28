@@ -770,26 +770,24 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onConfirm,
     onCancel,
   }) {
-    const cardIds = []
-
     const performUpdate = async () => {
       // close MoveMenu e.g. if you were dragging from MDL
       this.uiStore.closeMoveMenu()
+
+      const updatesByCardId = {}
+      _.each(updates, update => {
+        updatesByCardId[update.card.id] = update
+      })
+      const cardIds = _.keys(updatesByCardId)
+
       // Store snapshot of existing cards so changes can be un-done
       const dataBeforeMove = this.toJsonApiWithCards(
         updateAllCards ? [] : cardIds
       )
       const snapshot = dataBeforeMove.attributes
-      const updatesByCardId = {}
-      _.each(updates, update => {
-        updatesByCardId[update.card.id] = update
-      })
-
       this.applyLocalCardUpdates(updates)
-
-      const data = this.toJsonApiWithCards(
-        updateAllCards ? [] : _.keys(updatesByCardId)
-      )
+      // now get current data after making the updates
+      const data = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
 
       try {
         // Persist updates to API
@@ -798,6 +796,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           'PATCH',
           { data }
         )
+        // do this again... this is because you may have received a RT update in between;
+        // but your update is now "the latest"
+        this.applyLocalCardUpdates(updates)
 
         if (res) {
           // only push undo once we've successfully updated the cards

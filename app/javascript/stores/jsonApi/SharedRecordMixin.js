@@ -94,9 +94,10 @@ const SharedRecordMixin = superclass =>
       let data, currentSnapshot
       // special case if you're undoing a card resize/move
       if (snapshot.collection_cards_attributes) {
-        currentSnapshot = this.toJsonApiWithCards().attributes
+        const cardIds = _.map(snapshot.collection_cards_attributes, 'id')
+        currentSnapshot = this.toJsonApiWithCards(cardIds).attributes
         this.revertToSnapshot(snapshot)
-        data = this.toJsonApiWithCards()
+        data = this.toJsonApiWithCards(cardIds)
       } else {
         _.assign(this, snapshot)
         data = this.toJsonApi()
