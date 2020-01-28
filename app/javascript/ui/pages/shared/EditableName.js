@@ -155,6 +155,7 @@ class EditableName extends React.Component {
             value={this.name}
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
+            data-cy={`EditableNameInput-${fieldName}`}
           />
           <ClickWrapper clickHandlers={clickHandlers} />
         </StyledEditableName>
@@ -164,7 +165,7 @@ class EditableName extends React.Component {
       <StyledName className="styled-name">
         <TypographyComponent
           className="editable-name-heading"
-          data-cy="EditableNameHeading"
+          data-cy={`EditableNameHeading-${fieldName}`}
           ref={ref => {
             this.textRef = ref
           }}
