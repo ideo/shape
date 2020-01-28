@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe OrganizationShellBuilder, type: :service do
   describe '#save' do
     let(:builder) do
-      OrganizationShellBuilder.new(true)
+      OrganizationShellBuilder.new()
     end
 
     it 'should assign an incremented shell name' do
@@ -15,13 +15,30 @@ RSpec.describe OrganizationShellBuilder, type: :service do
       expect(builder.organization.name).to eq 'shell-1'
     end
 
-    it 'should create a blank org' do
+    it 'should create a shell org' do
       builder.save
-      expect(builder.organization.blank).to be true
+      expect(builder.organization.shell).to be true
     end
 
-    it 'should set the active users count to 1' do
-      expect(builder.organization.active_users_count).to eq 1
+    context 'with full setup' do
+      let(:builder) do
+        OrganizationShellBuilder.new(true)
+      end
+
+      it 'should create an unassigned user collection' do
+        builder.save
+        user_collection = Collection::UserCollection.find_by(
+          organization: builder.organization,
+        )
+        expect(user_collection.present?).to be true
+      end
+
+      it 'should call organization templates' do
+        expect(OrganizationTemplates).to receive(:call).with(
+          instance_of(Organization), nil
+        )
+        builder.save
+      end
     end
   end
 end

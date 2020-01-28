@@ -49,6 +49,7 @@ class OrganizationAssigner < SimpleService
 
   def update_organization_information
     @organization.update(organization_params)
+    @organization.update(active_users_count: 1)
   end
 
   def update_primary_group!

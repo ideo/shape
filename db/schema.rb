@@ -516,7 +516,7 @@ ActiveRecord::Schema.define(version: 2020_01_25_010741) do
     t.bigint "terms_text_item_id"
     t.integer "terms_version"
     t.string "default_locale", default: "en"
-    t.boolean "blank", default: false
+    t.boolean "shell", default: false
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end

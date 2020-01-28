@@ -1,7 +1,7 @@
 class OrganizationShellBuilder
   attr_reader :organization, :errors
 
-  def initialize(full_setup)
+  def initialize(full_setup = false)
     name = next_shell_name
     @organization = Organization.new(name: name, shell: true)
     @errors = @organization.errors
@@ -11,8 +11,6 @@ class OrganizationShellBuilder
 
   def save
     result = @organization.transaction do
-      # set it to 1 so that it doesn't start off at 0
-      @organization.active_users_count = 1
       @organization.save!
       if @full_setup
         create_user_collection
@@ -29,8 +27,8 @@ class OrganizationShellBuilder
 
   def next_shell_name
     last_shell = Organization.where(shell: true).last
-    debugger
     return 'shell-0' if last_shell.blank?
+
     last_number = last_shell.name.split('-').last.to_i
     "shell-#{last_number + 1}"
   end
@@ -47,6 +45,6 @@ class OrganizationShellBuilder
 
   def create_templates
     # Create templates after membership has been setup correctly
-    OrganizationTemplates.call(@organization, @user)
+    OrganizationTemplates.call(@organization, nil)
   end
 end
