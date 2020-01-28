@@ -115,7 +115,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         end
 
         it 'should find records by ID and slug' do
-          get(path, params: { query: "#{find_collection.id}-any-slug" })
+          get(path, params: { query: "#{find_collection.id}-any-slug-could-have-123-numbers" })
           expect(json['data'].size).to eq(1)
           expect(json['data'].first['id'].to_i).to eq(find_collection.id)
         end
