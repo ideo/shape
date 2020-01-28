@@ -51,7 +51,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -1024,7 +1023,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -1074,7 +1072,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -2046,7 +2043,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -3018,7 +3014,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -3989,7 +3984,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -4958,7 +4952,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -5934,7 +5927,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -6903,7 +6895,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -7872,7 +7863,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -8872,7 +8862,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -10274,7 +10263,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -11247,7 +11235,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -11297,7 +11284,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -12269,7 +12255,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -13241,7 +13226,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -14212,7 +14196,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -15181,7 +15164,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -16157,7 +16139,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -17126,7 +17107,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -18095,7 +18075,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -19095,7 +19074,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -20497,7 +20475,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -21470,7 +21447,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -21520,7 +21496,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -22492,7 +22467,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -23464,7 +23438,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -24435,7 +24408,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -25404,7 +25376,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -26380,7 +26351,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -27349,7 +27319,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -28318,7 +28287,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -29318,7 +29286,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],

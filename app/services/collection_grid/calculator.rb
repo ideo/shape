@@ -83,15 +83,21 @@ module CollectionGrid
       card.col + card.width - 1
     end
 
-    def self.board_matrix(collection:, drag_positions: {}, debug: false)
-      return [] if collection.collection_cards.count.zero?
+    def self.board_matrix(
+      collection:,
+      drag_positions: {},
+      moving_cards: [],
+      debug: false
+    )
+      return [] if collection.collection_cards.none?
 
-      cards = collection.collection_cards
+      # omit moving cards from our matrix
+      cards = collection.collection_cards.where.not(id: moving_cards.pluck(:id))
       if drag_positions.present?
         cards += drag_positions.values
       end
 
-      max_row = cards.map { |card| card_max_row(card) }.max
+      max_row = cards.map { |card| card_max_row(card) }.max || 0
       matrix = Array.new(max_row + 1) { Array.new(16) }
 
       cards.each do |card|
@@ -130,6 +136,22 @@ module CollectionGrid
         )
       end
       drag_map
+    end
+
+    def self.exact_open_spot?(
+      card:,
+      collection:
+    )
+      open_spot_matrix = calculate_open_spot_matrix(
+        collection: collection,
+        # ignore the card we're trying to place
+        moving_cards: [card],
+      )
+      open_spot = find_closest_open_spot(
+        card,
+        open_spot_matrix,
+      )
+      open_spot && open_spot.row == card.row && open_spot.col == card.col
     end
 
     def self.place_cards_on_board(
@@ -274,15 +296,15 @@ module CollectionGrid
 
     def self.calculate_open_spot_matrix(
       collection:,
-      moving_cards:,
+      moving_cards: [],
       drag_positions: {}
     )
       card_matrix = board_matrix(
         collection: collection,
         drag_positions: drag_positions,
+        moving_cards: moving_cards,
       )
       open_spot_matrix = [[]]
-      moving_card_ids = moving_cards.pluck(:id).compact
 
       card_matrix.each_with_index do |row, row_idx|
         open = 0
@@ -290,7 +312,7 @@ module CollectionGrid
         reversed = row.reverse
 
         reversed.each_with_index do |card, col_idx|
-          if card.present? && !moving_card_ids.include?(card.id)
+          if card.present?
             open = 0
           else
             open += 1
