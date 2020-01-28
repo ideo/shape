@@ -14,7 +14,7 @@ import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
-import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
+import TestCollectionIconSm from '~/ui/icons/TestCollectionIconSm'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
@@ -567,7 +567,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('testCollection')}
-        Icon={() => <TestCollectionIcon size="small" />}
+        Icon={() => <TestCollectionIconSm />}
       />
     )
     const submissionBctBox = (
