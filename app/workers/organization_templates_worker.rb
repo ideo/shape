@@ -5,7 +5,7 @@ class OrganizationTemplatesWorker
     @organization = Organization.find(organization_id)
     @original_getting_started_collection = Collection.find(ENV['GETTING_STARTED_TEMPLATE_ID'])
     @original_templates_collection = Collection.find(ENV['ORG_MASTER_TEMPLATES_ID'])
-    @user = User.find(user_id)
+    @user = User.find(user_id) if user_id.present?
 
     copy_templates_from_master
     create_profile_template
