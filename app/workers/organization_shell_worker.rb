@@ -1,7 +1,7 @@
-class OrganizationCloningWorker
+class OrganizationShellWorker
   include Sidekiq::Worker
 
   def perform
-    OrganizationBuilder
+    OrganizationShellBuilder.new(true).save
   end
 end

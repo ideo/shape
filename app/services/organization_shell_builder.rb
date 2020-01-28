@@ -38,7 +38,7 @@ class OrganizationShellBuilder
   end
 
   def create_user_collection
-    Collection::UserCollection.create(
+    col = Collection::UserCollection.create(
       organization: @organization,
     )
   end

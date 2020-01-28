@@ -1,4 +1,6 @@
 class OrganizationAssigner < SimpleService
+  attr_reader :organization, :errors
+
   def initialize(params, user, full_setup)
     @params = params
     @user = user
@@ -16,8 +18,6 @@ class OrganizationAssigner < SimpleService
       create_application_organization if @user.application_bot?
 
       if @full_setup
-        create_templates
-        # this check is for running Cypress, don't create real Network orgs for every test org
         return true if @user.email == 'cypress-test@ideo.com'
 
         create_network_organization
@@ -63,7 +63,6 @@ class OrganizationAssigner < SimpleService
 
   def assign_user_collection
     collection = Collection::UserCollection.find_by(organization: @organization)
-                                           .first
 
     @user.add_role(Role::EDITOR, collection.becomes(Collection))
     Collection::SharedWithMeCollection.find_or_create_for_collection(

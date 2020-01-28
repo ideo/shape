@@ -1,0 +1,348 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations
+    body:
+      encoding: UTF-8
+      string: '{"data":{"type":"organizations","attributes":{"external_id":"5","name":"shell-0","admin_user_uid":"6ab88793590bcc1732e2b7ea48be92","enterprise":false}}}'
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 28 Jan 2020 00:55:41 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=N0FQT3F4TE5FMmJGS2gxaklzZWt2UnRoY2Urd1RNdEFHbytJN0FFNlFEYkplcng4VlJyamhtbTZxZkh3YXFVTjJqK3E1T1NRQklzOFU5ZGFvYXFNS3JVNGo0c1haNXlpNzJ2NzVQK0E3S0dvbUwyd3lWeTk5cysvYU4yejg1ZW8tLWpyVUhvbkRyaG1vQXZoVUVjeUZua0E9PQ%3D%3D--680cbace09233de3bf4af742b6f5a45bd8a57026;
+        path=/; expires=Tue, 28 Jan 2020 04:55:42 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTM1YzgwYzBmNDEzOGZjOGQ1YTk1%0AZjkyNGM2YjFiZjNiNzFkMTU3OWJlYWYyODBlMzRiZjYwZmQ3ZGEwMmU4NTgG%0AOwBG%0A--526a3732e84af59d69e9203dc3faddca6dcc8972;
+        path=/; expires=Tue, 28 Jan 2020 04:55:42 -0000; HttpOnly; secure
+      Etag:
+      - W/"a737b987b3e3c51b72dbf5875fcfb70c"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 7236d1c8-3a95-4ae0-8bad-3da3a75cee5c
+      X-Runtime:
+      - '0.022149'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":{"id":"188","type":"organizations","attributes":{"id":188,"name":"Mae
+        Funk Organization","enterprise":false,"external_id":null},"relationships":{"applications":{"meta":{"included":false}},"application_organizations":{"meta":{"included":false}}}},"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Tue, 28 Jan 2020 00:55:42 GMT
+- request:
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/plans?page%5Bnumber%5D=1&page%5Bsize%5D=1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 28 Jan 2020 00:55:42 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=UHE1ODUrcG9yTGoxeEhDeXZDTjdVaWF4Y3J5ZXA0K1J4dmhpWXlQVTNnMDlRNkRIalpSdjR4d3g4Ym5TSXB1VHBuak1DeU15Wm1zeTM3VVJIUkR0L0R0UDg4U3phOUg2b29oTUlLWVFYOTBIQXJ6bmdKcXZ5UTBob3U0ak1mdHUtLUdSL01EbW5yZkFIZktBSFl3a3N3aVE9PQ%3D%3D--d783cdfe4f74f187f97369fc8c7bc950f8862a21;
+        path=/; expires=Tue, 28 Jan 2020 04:55:42 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRWQyZjg2YTU0YWM5ZTg0MDc3ZGNj%0AOTkzMDE1YmNkZTU4ZmNkNzgzYzMxNTkxZmVkZmY1ZWRmYmIzY2U2ZWMzNjAG%0AOwBG%0A--f7cfcc8bb814522de4bd2ee0f32b74046eb0aafc;
+        path=/; expires=Tue, 28 Jan 2020 04:55:42 -0000; HttpOnly; secure
+      Etag:
+      - W/"2952759970425a14c9c44c1c10571c9a"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 30991ecc-e5fa-45be-a474-0aeadb90eee5
+      X-Runtime:
+      - '0.016150'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":[{"id":"18","type":"plans","attributes":{"id":18,"name":"User","stripe_id":"plan_DcjhjFf1GikIut","amount":4.5,"interval":"month","usage_type":"metered","currency":"usd","updated_at":"2018-09-17T21:25:54.655Z"}}],"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Tue, 28 Jan 2020 00:55:43 GMT
+- request:
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/organizations?filter%5Bclient_id%5D=3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5&filter%5Bexternal_id%5D=5&page%5Bnumber%5D=1&page%5Bsize%5D=1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 28 Jan 2020 00:55:42 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=N2xKb2JGRnJmWEZxc0d1ZTQ1Wk9sdmRwbUJYblFNdlFvVFJuRU5LNlliakYwNVRUZGl2T29iZkNEMTBkZFF0ZnFBYU5UVUE5b1hzVFNlZDF2T2ZjeG51WG40MzhyZTFMV3lNMnJIVjNLTGlEeitLeFk1WHM2dGhMdVVnSXFmd2MtLVdwVUdsU3grWGN2ZW5zNkt3eFE1WUE9PQ%3D%3D--cb45de9bca9c9ce78329084ee9af3c8375751747;
+        path=/; expires=Tue, 28 Jan 2020 04:55:43 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTAyNjZiMTVjMmRiNzdlYWFkYTBl%0ANDc2NzQyMTE1MmNiZDg0NzcyN2FiNWRiYWM1N2I2NGE4NTZjNGYzNjYwNGMG%0AOwBG%0A--d9bf71868b132201db05752d2e9a47e1111674bb;
+        path=/; expires=Tue, 28 Jan 2020 04:55:43 -0000; HttpOnly; secure
+      Etag:
+      - W/"0c2c19d0f6387ca8df5d2a79bc60b54b"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - 9df56782-230e-4b86-847c-f4bbfe2f20a3
+      X-Runtime:
+      - '0.022715'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":[{"id":"188","type":"organizations","attributes":{"id":188,"name":"Mae
+        Funk Organization","enterprise":false,"external_id":null},"relationships":{"applications":{"data":[{"type":"applications","id":"17"}]},"application_organizations":{"meta":{"included":false}}}}],"included":[{"id":"17","type":"applications","attributes":{"name":"Shape
+        - local development","client_id":"3695c5fe55ab3db6f9ee25f18c0ef2fe7025eb4717f1a031fd7824a5d8cddbb5","redirect_uri":"http://localhost:3000/users/auth/ideo/callback","header_image_url":"","additional_fields_message":"","welcome_markdown":null,"terms_markdown":null,"support_email":null,"supplementary_logo_url":null}}],"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Tue, 28 Jan 2020 00:55:43 GMT
+- request:
+    method: get
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/payment_methods?filter%5Bdefault%5D=true&filter%5Borganization_id%5D=188
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 28 Jan 2020 00:55:43 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/vnd.api+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=UC82N0NSVm5xdVdwS2VNZzZDbUExY0hLTlFFRWREcjV2SGFjbWNGcVJQZGJWUGh4ZXZVQTJEamhlRms2TUZtQjhGUlZUY21JY2JKY1J5WVcrL1JLQ1EwNUhvUzF6Sm1DRVJPclpwcGJseUhoay9lbmRvZnFnTVVkZXhibldEMUMtLUVBQ0orYTRZeloycW5jSC9ZWWhEWXc9PQ%3D%3D--988e2c0f1365dd7129baf4212f081120e87cd575;
+        path=/; expires=Tue, 28 Jan 2020 04:55:43 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTIwODkxYTI0ODczODUwOThiMWEy%0AMjUwZTQxODUyOTViM2U5YTUyNjdjNzc5NzNkMzRhYWM0MDcxNjcxMTI5OTIG%0AOwBG%0A--4b56b7f960d69a44d59d59d68165a68b0fa93839;
+        path=/; expires=Tue, 28 Jan 2020 04:55:43 -0000; HttpOnly; secure
+      Etag:
+      - W/"9cb0f11ceff0010d135e52d64db2d726"
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      X-Request-Id:
+      - aa0e2d5c-ca9b-47f3-9595-8850882a674f
+      X-Runtime:
+      - '0.020056'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"data":[],"meta":{},"jsonapi":{"version":"1.0"}}'
+    http_version: 
+  recorded_at: Tue, 28 Jan 2020 00:55:43 GMT
+- request:
+    method: post
+    uri: https://ideo-sso-profile-staging.herokuapp.com/api/v1/subscriptions
+    body:
+      encoding: UTF-8
+      string: '{"data":{"type":"subscriptions","attributes":{"organization_id":188,"plan_id":18}}}'
+    headers:
+      User-Agent:
+      - Faraday v0.12.2
+      Content-Type:
+      - application/vnd.api+json
+      Accept:
+      - application/vnd.api+json
+      Authorization:
+      - Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ0eXBlIjoiYXBwbGljYXRpb24iLCJjbGllbnRfaWQiOiIzNjk1YzVmZTU1YWIzZGI2ZjllZTI1ZjE4YzBlZjJmZTcwMjVlYjQ3MTdmMWEwMzFmZDc4MjRhNWQ4Y2RkYmI1IiwidWlkIjoiMDB1ZXFieGc5ZUFpODBTWjQwaDciLCJleHBpcmVzIjoxNTUzNjMyMjI3fQ.FxfLmkVWB70FBcm9rZ3odahqNjTephdbNhtAWAZ2F6Wk34aZVhdxc8yCXgijIq49p5LTx-6pG09hQARvC7jJLNVPo3N2Ht8QgVurrfStCu3LOEMbOrzgJH7wDp62q1UG8A0JCqooSWlZhWmO_vh9J99Q5nrALmafTej1jL2WYnjpPk6K16PlDrOf14nLjhWx9NWn0hm1BAAHjWTC11H1AXhMrvxiLgHuAqupMOBZZUBKBw6MWBRwfWBCyKaB-dbvbLKj0pHFGuScouzOSDzzr4JJq0l2JgSWbxrcsvevH0UTA3XPrQA5ciDAwNdf0PzhcSOIgN14xv-fcGwE8B2HXQ
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      Server:
+      - Cowboy
+      Date:
+      - Tue, 28 Jan 2020 00:55:43 GMT
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      X-Download-Options:
+      - noopen
+      X-Permitted-Cross-Domain-Policies:
+      - none
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Content-Type:
+      - application/scim+json; charset=utf-8
+      Set-Cookie:
+      - _sso_profile_session=MzJvTTZEeHhBN2d1MFMwZDZhbkxzYm05dmJpWHN0bUxObHYrbFRhVFRSY01ieURKcXZNd3Y3QmhMR2VrZWE5L0ZjZkZPRlQ0VDhyeGVNZGtjcUZISFdpQkZRUlVRaFFTMUUwU01DeFRoTGtoUkpGTzJoVDZZckF6ZkN5L1I2WmgtLVc5bnpZREdpSWZRd0prSnlRdk14Tnc9PQ%3D%3D--699590ac8863ac7fd4d01cedac9f1fa29149a5f7;
+        path=/; expires=Tue, 28 Jan 2020 04:55:43 -0000; HttpOnly; secure
+      - rack.session=BAh7BkkiD3Nlc3Npb25faWQGOgZFVEkiRTYwNjkyOGNjZjA2YWU5NzVmZGQ0%0AOTQxM2I0MTUyOGIwMjZjYmNkMzQyNmRlYWFlZmEyMTY3MDIwMTY2MDg0MWIG%0AOwBG%0A--841ad41033fdc8c715c5b3a586fca985da22806b;
+        path=/; expires=Tue, 28 Jan 2020 04:55:43 -0000; HttpOnly; secure
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - fb83e159-6447-4db3-b23e-07c3c040bca9
+      X-Runtime:
+      - '0.019222'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Vary:
+      - Origin
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"errors":[{"code":"unprocessable_entity","status":"422","title":"Validation
+        Error","detail":"Payment method already has an active subscription on this
+        same organization and plan","source":{"pointer":"/data/relationships/payment_method"},"meta":{"attribute":"payment_method","message":"already
+        has an active subscription on this same organization and plan","code":"already
+        has an active subscription on this same organization and plan"}}]}'
+    http_version: 
+  recorded_at: Tue, 28 Jan 2020 00:55:44 GMT
+recorded_with: VCR 4.0.0
