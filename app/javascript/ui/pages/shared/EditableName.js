@@ -85,6 +85,7 @@ class EditableName extends React.Component {
   startEditingName = e => {
     e.stopPropagation()
     const { fieldName, uiStore } = this.props
+    if (uiStore.editingName.includes(fieldName)) return
     uiStore.editingName.push(fieldName)
   }
 
@@ -183,7 +184,7 @@ EditableName.propTypes = {
   fontSize: PropTypes.number,
   extraWidth: PropTypes.number,
   TypographyComponent: PropTypes.object,
-  typographyCss: PropTypes.object,
+  typographyCss: PropTypes.array,
   fieldName: PropTypes.string,
   editingMarginTop: PropTypes.string,
 }

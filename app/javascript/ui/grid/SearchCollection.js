@@ -95,7 +95,6 @@ class SearchCollection extends React.Component {
     const { uiStore, collection, trackCollectionUpdated } = this.props
     const { blankContentToolState, gridSettings } = uiStore
     if (uiStore.isLoading || collection.reloading) return <Loader />
-
     return (
       <div style={{ position: 'relative' }}>
         <CollectionGrid
