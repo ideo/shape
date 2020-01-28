@@ -14,7 +14,7 @@ export const PillWrapper = styled.div`
   text-decoration: none;
   padding: 2px 7px;
   outline: none;
-  margin: 4px;
+  margin: 4px 8px 4px 0;
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
