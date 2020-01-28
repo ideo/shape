@@ -78,7 +78,7 @@ class CollectionTypeSelector extends React.Component {
       <Fragment>
         <button
           style={{
-            position: position,
+            position,
           }}
           onClick={this.openPopoutMenu}
           data-cy="CollectionTypeSelector"
@@ -91,7 +91,7 @@ class CollectionTypeSelector extends React.Component {
             {children}
           </Tooltip>
         </button>
-        <div style={{ position: position }}>
+        <div style={{ position }}>
           <PopoutMenu
             offsetPosition={positionOffset}
             // y = top, x = left
