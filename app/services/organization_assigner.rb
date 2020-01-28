@@ -51,6 +51,7 @@ class OrganizationAssigner < SimpleService
     @organization.update(organization_params)
     @organization.update(active_users_count: 1)
     @organization.update(shell: false)
+    @organization.update(created_at: DateTime.now)
   end
 
   def update_primary_group!

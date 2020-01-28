@@ -19,9 +19,8 @@ class OrganizationTemplates < SimpleService
     end
 
     # create Getting Started collection for the org and the first admin user
-    OrganizationTemplatesWorker.perform_in(
+    OrganizationTemplatesWorker.new.perform(
       # for some reason the org sometimes wasn't being found right away
-      3.seconds,
       @org.id,
       @user&.id,
     )
