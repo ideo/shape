@@ -740,6 +740,35 @@ describe Collection, type: :model do
       expect(card.order).to eq 0
     end
 
+    context 'with a board collection' do
+      let(:collection) { create(:board_collection, num_cards: 3) }
+      let(:cards) { collection.all_collection_cards.first(3) }
+      let(:first_card) { cards.first }
+      let(:overlap_card) { create(:collection_card_text, parent: collection, row: 1, col: 1) }
+
+      before do
+        first_card.update(row: 1, col: 1)
+      end
+
+      it 'calls the BoardPlacement service to place cards with collision detection' do
+        allow(CollectionGrid::BoardPlacement).to receive(:call).and_call_original
+        expect(CollectionGrid::BoardPlacement).to receive(:call).with(
+          moving_cards: cards,
+          to_collection: collection,
+          row: cards.first.row,
+          col: cards.first.col,
+        )
+        # create overlap card
+        overlap_card
+        collection.unarchive_cards!(cards, snapshot)
+        # pick up new attrs
+        first_card.reload
+        expect(first_card.active?).to be true
+        # should have bumped it out of the way by 1
+        expect(first_card.col).to eq 2
+      end
+    end
+
     context 'with a master_template' do
       let(:collection) { create(:collection, master_template: true, num_cards: 3) }
 

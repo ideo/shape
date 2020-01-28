@@ -623,7 +623,24 @@ class Collection < ApplicationRecord
     if card_attrs_snapshot.present?
       CollectionUpdater.call(self, card_attrs_snapshot)
     end
-    reorder_cards!
+    if board_collection?
+      # re-place any unarchived cards to do collision detection on their original position(s)
+      top_left_card = CollectionGrid::Calculator.top_left_card(cards)
+      CollectionGrid::BoardPlacement.call(
+        moving_cards: cards,
+        to_collection: self,
+        row: top_left_card.row,
+        col: top_left_card.col,
+      )
+      CollectionCard.import(
+        cards.to_a,
+        validate: false,
+        on_duplicate_key_update: %i[row col],
+      )
+    else
+      reorder_cards!
+    end
+
     # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
     return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
 

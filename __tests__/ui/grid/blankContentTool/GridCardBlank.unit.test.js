@@ -169,18 +169,8 @@ describe('GridCardBlank', () => {
         {
           ...attrs,
           row: 1,
-          // col should get bumped -4 since it was going over max of 15
-          col: 12,
-        },
-        { afterCreate }
-      )
-      component.createCardWith(file, 7)
-      expect(component.createCard).toHaveBeenCalledWith(
-        {
-          ...attrs,
-          row: 2,
-          // col should get bumped -4 since it was going over max of 15
-          col: 13,
+          // even though it is over max of 15, the API will place this card appropriately
+          col: 16,
         },
         { afterCreate }
       )
