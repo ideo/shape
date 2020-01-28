@@ -13,6 +13,7 @@ import FilterMenu from './FilterMenu'
 import FilterSearchModal from './FilterSearchModal'
 import MethodLibraryFilterBar from './MethodLibraryFilterBar'
 import {
+  primaryQualities,
   subqualities,
   methodLibraryTypes,
   methodLibraryCategories,
@@ -32,7 +33,6 @@ class CollectionFilter extends React.Component {
   @observable
   currentFilterLookupType = null
 
-  @computed
   get tagFilters() {
     const {
       collection: { collection_filters },
@@ -41,6 +41,13 @@ class CollectionFilter extends React.Component {
       filter =>
         filter.filter_type === 'tag' &&
         !this.isMethodLibraryFixedTag(filter.text)
+    )
+  }
+
+  @computed
+  get tagFiltersWithoutCreativeQualities() {
+    return this.tagFilters.filter(
+      tagFilter => !this.isCreativeQualityTag(tagFilter.text)
     )
   }
 
@@ -56,16 +63,29 @@ class CollectionFilter extends React.Component {
   get filterBarFilters() {
     const {
       isMethodLibrary,
+      canEdit,
       collection: { collection_filters },
     } = this.props
     if (!isMethodLibrary) return collection_filters
     // If it is method library, return all filters except the fixed tags
-    return collection_filters.filter(
+    const nonMethodLibraryFilters = collection_filters.filter(
       filter =>
         filter.filter_type !== 'tag' ||
         (filter.filter_type === 'tag' &&
           !this.isMethodLibraryFixedTag(filter.text))
     )
+    // Mark all creative quality tags as not deletable
+    return nonMethodLibraryFilters.map(filter => {
+      if (
+        filter.filter_type === 'tag' &&
+        this.isCreativeQualityTag(filter.text)
+      ) {
+        filter.deletable = false
+      } else {
+        filter.deletable = canEdit
+      }
+      return filter
+    })
   }
 
   @computed
@@ -96,6 +116,10 @@ class CollectionFilter extends React.Component {
 
   isMethodLibraryFixedTag(tag) {
     return this.methodLibraryFixedTags.includes(tag.toLowerCase())
+  }
+
+  isCreativeQualityTag(tag) {
+    return !!primaryQualities[tag.toLowerCase()]
   }
 
   /*
@@ -220,7 +244,7 @@ class CollectionFilter extends React.Component {
               <FilterSearchModal
                 filters={
                   this.currentFilterLookupType === 'Tags'
-                    ? [...this.tagFilters]
+                    ? [...this.tagFiltersWithoutCreativeQualities]
                     : [...this.searchFilters]
                 }
                 onCreateTag={this.onCreateFilter}

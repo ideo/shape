@@ -57,7 +57,7 @@ class PillList extends React.Component {
             selectable: item.selectable,
             selected: item.selected,
             onSelect: item.onSelect,
-            onDelete: ev => this.handleDelete(item),
+            onDelete: item.deletable ? ev => this.handleDelete(item) : null,
           }
 
           const identifier = item.name || item.id || item.email

@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
+import { Checkbox } from '~/ui/global/styled/forms'
 import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
@@ -93,7 +94,7 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 export const StyledMenu = styled.ul`
   background-color: white;
   width: ${props => props.width}px;
-  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
+  ${props => !props.noShadow && 'box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);'}
 `
 
 export const StyledMenuToggle = styled.button`
@@ -132,12 +133,29 @@ export const StyledMenuItem = styled.li`
     }
 
     .icon-left {
-      margin-right: ${props =>
-        props.wrapperClassName === 'card-menu' ? 16 : 0}px;
+      margin-right: ${props => {
+        if (props.checkboxMenu) {
+          return 30
+        } else if (props.wrapperClassName === 'card-menu') {
+          return 16
+        } else {
+          return 0
+        }
+      }}px;
     }
 
     .icon-left .icon {
-      left: ${props => (props.wrapperClassName === 'card-menu' ? 8 : 0)}px;
+      left: ${props => {
+        if (props.checkboxMenu) {
+          return 35
+        } else if (props.wrapperClassName === 'card-menu') {
+          return 8
+        } else {
+          return 0
+        }
+      }}px;
+    }
+    .checkBox {
     }
 
     .icon {
@@ -161,7 +179,8 @@ export const StyledMenuItem = styled.li`
   &:hover,
   &:active {
     button {
-      border-left: 7px solid ${v.colors.black};
+      ${props =>
+        !props.checkboxMenu && `border-left: 7px solid ${v.colors.black};`}
     }
   }
 `
@@ -179,7 +198,7 @@ class PopoutMenu extends React.Component {
   }
 
   get renderMenuItems() {
-    const { groupExtraComponent, wrapperClassName } = this.props
+    const { groupExtraComponent, wrapperClassName, checkboxMenu } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -197,6 +216,7 @@ class PopoutMenu extends React.Component {
               withAvatar,
               bgColor,
               noBorder,
+              isChecked,
             } = item
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
@@ -206,6 +226,7 @@ class PopoutMenu extends React.Component {
               <StyledMenuItem
                 key={`${name}-${id || i}`}
                 noBorder={noBorder}
+                checkboxMenu={checkboxMenu}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
                 bgColor={bgColor}
@@ -215,6 +236,22 @@ class PopoutMenu extends React.Component {
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
                 >
+                  {checkboxMenu && (
+                    <Checkbox
+                      style={{
+                        marginRight: '0px',
+                        marginLeft: '-14px',
+                        width: 'auto',
+                        height: 'auto',
+                      }}
+                      color="primary"
+                      checked={isChecked}
+                      onChange={loading ? () => null : onClick}
+                      value="yes"
+                      size="small"
+                      className="checkBox"
+                    />
+                  )}
                   {iconLeft && <span className="icon-left">{iconLeft}</span>}
                   <span>{name}</span>
                   {iconRight && (
@@ -268,6 +305,7 @@ class PopoutMenu extends React.Component {
       offsetPosition,
       hideDotMenu,
       location,
+      checkboxMenu,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -301,7 +339,9 @@ class PopoutMenu extends React.Component {
           location={location}
           menuClass={className}
         >
-          <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
+          <StyledMenu width={width} noShadow={checkboxMenu}>
+            {this.renderMenuItems}
+          </StyledMenu>
         </StyledMenuWrapper>
       </StyledMenuButtonWrapper>
     )
@@ -318,6 +358,7 @@ const propTypeMenuItem = PropTypes.arrayOf(
     loading: PropTypes.bool,
     withAvatar: PropTypes.bool,
     bgColor: PropTypes.string,
+    isChecked: PropTypes.bool,
   })
 )
 
@@ -349,6 +390,7 @@ PopoutMenu.propTypes = {
     component: PropTypes.node,
   }),
   location: PropTypes.string,
+  checkboxMenu: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -368,6 +410,7 @@ PopoutMenu.defaultProps = {
   groupExtraComponent: {},
   hideDotMenu: false,
   location: null,
+  checkboxMenu: false,
 }
 
 export default PopoutMenu
