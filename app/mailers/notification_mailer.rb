@@ -13,6 +13,7 @@ class NotificationMailer < ApplicationMailer
     @comment_threads = CommentThread
                        .where(id: comment_thread_ids)
                        .joins(:comments)
+                       .distinct
                        .where(
                          Comment.arel_table[:created_at].gt(
                            @last_notification_mail_sent,

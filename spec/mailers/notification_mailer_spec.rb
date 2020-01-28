@@ -40,7 +40,7 @@ RSpec.describe NotificationMailer, type: :mailer do
 
         it 'renders added editor user' do
           expect(mail.body.encoded).to include(
-            "#{notifications.first.activity.actor.name} has made #{notifications.first.activity.subject_users.first.name} a(n) editor of #{notifications.first.activity.target.name}",
+            "#{notifications.first.activity.actor.name} has made #{notifications.first.activity.subject_users.first.name} a(n) editor of",
           )
         end
 
@@ -50,7 +50,7 @@ RSpec.describe NotificationMailer, type: :mailer do
 
           it 'renders added editor group' do
             expect(mail.body.encoded).to include(
-              "#{notifications.first.activity.actor.name} has made #{notifications.first.activity.subject_groups.first.name} a(n) editor of #{notifications.first.activity.target.name}",
+              "#{notifications.first.activity.actor.name} has made #{notifications.first.activity.subject_groups.first.name} a(n) editor of",
             )
           end
         end
@@ -93,16 +93,14 @@ RSpec.describe NotificationMailer, type: :mailer do
         end
       end
 
-      describe 'when there are notifications and ss' do
+      describe 'when there are notifications and comments' do
         it 'renders the headers' do
           expect(mail.subject).to match("#{comments.count} new comments and #{notifications.count} new notifications on Shape")
           expect(mail.to).to eq([user.email])
         end
       end
 
-      describe 'when there are only notifications' do
-        let!(:comments) { [] }
-
+      describe 'when there are only notifications and no new comments' do
         it 'renders the headers' do
           expect(mail.subject).to match("#{notifications.count} new notifications on Shape")
           expect(mail.to).to eq([user.email])
