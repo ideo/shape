@@ -335,8 +335,7 @@ class FoamcoreGrid extends React.Component {
     const col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
     const row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
 
-    if (row === -1 || col === -1) return null
-
+    // could return negative, but setDraggedOnSpots will deal with this appropriately
     return { col, row }
   }
 
@@ -659,7 +658,7 @@ class FoamcoreGrid extends React.Component {
       cardAction === 'move' && movingFromCollectionId === collection.id
 
     const updates = []
-    let negativeZone = false
+    let outsideDraggableArea = false
     // dragGridSpot has the positions of all the dragged cards
     const draggingPlaceholders = dragGridSpotValues
     _.each(draggingPlaceholders, placeholder => {
@@ -670,8 +669,8 @@ class FoamcoreGrid extends React.Component {
         col,
       }
       updates.push(update)
-      if (row < 0 || col < 0) {
-        negativeZone = true
+      if (row < 0 || col < 0 || col > collection.maxColumnIndex) {
+        outsideDraggableArea = true
         return false
       }
       return update
@@ -683,7 +682,7 @@ class FoamcoreGrid extends React.Component {
     }
     const onCancel = () => onConfirmOrCancel({ keepMDLOpen: true })
 
-    if (negativeZone) {
+    if (outsideDraggableArea) {
       return onCancel()
     } else if (
       draggingFromMDL &&
@@ -799,7 +798,13 @@ class FoamcoreGrid extends React.Component {
 
   @action
   updateDragGridSpotWithOpenPosition(position) {
+    const { collection } = this.props
     if (!USE_COLLISION_DETECTION_ON_DRAG) {
+      const { row, col } = position
+      if (row < 0 || col < 0 || col > collection.maxColumnIndex) {
+        this.hasDragCollision = true
+        return
+      }
       this.dragGridSpot.set(getMapKey(position), position)
       this.hasDragCollision =
         this.hasDragCollision || this.findOverlap(position)
