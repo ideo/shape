@@ -50,7 +50,7 @@ class OrganizationAssigner < SimpleService
   def update_organization_information
     @organization.update(organization_params)
     @organization.update(active_users_count: 1)
-    # @organization.update(shell: false)
+    @organization.update(shell: false)
   end
 
   def update_primary_group!

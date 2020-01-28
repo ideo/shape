@@ -29,6 +29,7 @@ RSpec.describe OrganizationShellBuilder, type: :service do
     it 'should update the org information with the params' do
       expect(builder.organization.name).to eq 'An org'
       expect(builder.organization.handle).to eq 'an-org'
+      expect(builder.organization.shell).to be false
     end
 
     it 'should update the primary group with params' do
