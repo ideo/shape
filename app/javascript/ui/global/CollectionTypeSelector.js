@@ -52,7 +52,7 @@ class CollectionTypeSelector extends React.Component {
     return collectionTypes.map(collectionType => {
       return {
         name: collectionType,
-        iconRight: collectionTypeToIcon[collectionType],
+        iconRight: collectionTypeToIcon({ type: collectionType, size: 'sm' }),
         onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
         withAvatar: false,
@@ -78,7 +78,7 @@ class CollectionTypeSelector extends React.Component {
       <Fragment>
         <button
           style={{
-            position,
+            position: position,
           }}
           onClick={this.openPopoutMenu}
           data-cy="CollectionTypeSelector"
@@ -91,7 +91,7 @@ class CollectionTypeSelector extends React.Component {
             {children}
           </Tooltip>
         </button>
-        <div style={{ position }}>
+        <div style={{ position: position }}>
           <PopoutMenu
             offsetPosition={positionOffset}
             // y = top, x = left

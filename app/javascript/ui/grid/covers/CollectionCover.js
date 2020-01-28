@@ -350,7 +350,10 @@ class CollectionCover extends React.Component {
                         collection={collection}
                       >
                         <IconHolder>
-                          {collectionTypeToIcon[collection.collection_type]}
+                          {collectionTypeToIcon({
+                            type: collection.collection_type,
+                            size: 'lg',
+                          })}
                         </IconHolder>
                       </CollectionTypeSelector>
                     </Dotdotdot>

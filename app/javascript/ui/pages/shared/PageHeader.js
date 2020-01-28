@@ -163,7 +163,10 @@ class PageHeader extends React.Component {
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
         <IconHolder align="right">
-          {collectionTypeToIcon[record.collection_type]}
+          {collectionTypeToIcon({
+            type: record.collection_type,
+            size: 'lg',
+          })}
         </IconHolder>
       </CollectionTypeSelector>
     )
