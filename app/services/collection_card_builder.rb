@@ -50,9 +50,13 @@ class CollectionCardBuilder
   def create_collection_card
     # NOTE: cards created inside a master_template are unpinned by default unless it's being created within a pinned area
     @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
-    # TODO: rollback transaction if these later actions fail; add errors, return false
-    CollectionCard.transaction do
-      if @parent_collection.is_a?(Collection::Board) && !@collection_card.board_placement_is_valid?
+    @parent_collection.transaction do
+      # NOTE: Have to lock board collections for collision detection race conditions.
+      #  This means that uploading 6 files at once for example will be threadsafe,
+      #  but it will slow down each concurrent API request while it waits for the lock
+      @parent_collection.lock! if @parent_collection.board_collection?
+
+      if @parent_collection.board_collection? && !@collection_card.board_placement_is_valid?
         # valid row/col will get applied to the card here for later saving
         CollectionGrid::BoardPlacement.call(
           row: @collection_card.row,
@@ -69,6 +73,7 @@ class CollectionCardBuilder
 
         @collection_card.increment_card_orders!
         @parent_collection.reorder_cards!
+
         if @parent_collection.master_template?
           # we just added a template card, so update the instances
           @parent_collection.queue_update_template_instances(
