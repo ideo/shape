@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe CollectionGrid::Calculator, type: :service do
   # this is intentionally written similar to CollectionGridCalculator frontend test
-  describe '#calculate_rows_cols' do
+  context 'normal collection' do
     let(:collection) { create(:collection, num_cards: 8) }
     let(:cards) { collection.collection_cards }
 
@@ -16,24 +16,25 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
       cards[6].update(width: 2, height: 2)
       cards[7].update(width: 1, height: 1)
     end
-
-    it 'should calculate the 4 column layout of the given cards' do
-      CollectionGrid::Calculator.calculate_rows_cols(cards)
-      # col, row to match x, y on frontend
-      expect(cards.pluck(:col, :row)).to eq([
-        [0, 0],
-        [1, 0],
-        [3, 0],
-        [0, 1],
-        [0, 2],
-        [0, 3],
-        [2, 3],
-        [0, 4],
-      ])
+    describe '#calculate_rows_cols' do
+      it 'should calculate the 4 column layout of the given cards' do
+        CollectionGrid::Calculator.calculate_rows_cols(cards)
+        # col, row to match x, y on frontend
+        expect(cards.pluck(:col, :row)).to eq([
+          [0, 0],
+          [1, 0],
+          [3, 0],
+          [0, 1],
+          [0, 2],
+          [0, 3],
+          [2, 3],
+          [0, 4],
+        ])
+      end
     end
   end
 
-  context 'with existing cards on board' do
+  context 'foamcore collection with existing cards on the board' do
     let(:collection) { create(:board_collection, num_cards: 8) }
     let(:from_collection) { create(:board_collection) }
     let(:cards) { collection.collection_cards }
@@ -52,6 +53,28 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
       #  [2, 3, 4, _, 5, _, _, _, _, _, _, _, _, _, _, _],
       #  [2, _, 6, 6, _, _, _, _, _, _, _, _, _, _, _, _],
       #  [_, 7, 8, 8, 8, _, _, _, _, _, _, _, _, _, _, _],
+    end
+
+    describe '#board_matrix' do
+      it 'should generate the array of cards and blank spaces' do
+        matrix = CollectionGrid::Calculator.board_matrix(collection: collection)
+        expect(matrix[0]).to eq(
+          [cards[0]] * 4 + [nil] * 12,
+        )
+        expect(matrix[1]).to eq(
+          [cards[1], cards[2], cards[3], nil, cards[4]] + [nil] * 11,
+        )
+      end
+
+      it 'should omit moving_cards if indicated' do
+        matrix = CollectionGrid::Calculator.board_matrix(
+          collection: collection,
+          moving_cards: [cards[1], cards[2]],
+        )
+        expect(matrix[1]).to eq(
+          [nil, nil, cards[3], nil, cards[4]] + [nil] * 11,
+        )
+      end
     end
 
     describe '#place_cards_on_board' do

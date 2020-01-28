@@ -83,15 +83,21 @@ module CollectionGrid
       card.col + card.width - 1
     end
 
-    def self.board_matrix(collection:, drag_positions: {}, debug: false)
-      return [] if collection.collection_cards.count.zero?
+    def self.board_matrix(
+      collection:,
+      drag_positions: {},
+      moving_cards: [],
+      debug: false
+    )
+      return [] if collection.collection_cards.none?
 
-      cards = collection.collection_cards
+      # omit moving cards from our matrix
+      cards = collection.collection_cards.where.not(id: moving_cards.pluck(:id))
       if drag_positions.present?
         cards += drag_positions.values
       end
 
-      max_row = cards.map { |card| card_max_row(card) }.max
+      max_row = cards.map { |card| card_max_row(card) }.max || 0
       matrix = Array.new(max_row + 1) { Array.new(16) }
 
       cards.each do |card|
@@ -296,9 +302,9 @@ module CollectionGrid
       card_matrix = board_matrix(
         collection: collection,
         drag_positions: drag_positions,
+        moving_cards: moving_cards,
       )
       open_spot_matrix = [[]]
-      moving_card_ids = moving_cards.pluck(:id).compact
 
       card_matrix.each_with_index do |row, row_idx|
         open = 0
@@ -306,7 +312,7 @@ module CollectionGrid
         reversed = row.reverse
 
         reversed.each_with_index do |card, col_idx|
-          if card.present? && !moving_card_ids.include?(card.id)
+          if card.present?
             open = 0
           else
             open += 1
