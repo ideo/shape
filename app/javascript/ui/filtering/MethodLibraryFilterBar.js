@@ -1,5 +1,6 @@
 import { startCase } from 'lodash'
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
@@ -21,6 +22,11 @@ const ResponsiveFlex = styled(Flex)`
   }
 `
 
+const MethodCategoryWrapper = styled.div`
+  flex-basis: auto;
+  margin: 3px 0;
+`
+
 const MethodCategorySelect = styled.div`
   padding: 0 10px 0 10px;
   cursor: pointer;
@@ -35,7 +41,7 @@ const MethodCategorySelect = styled.div`
 const MethodTagsWrapper = styled.div`
   display: inline-block;
   vertical-align: middle;
-  min-height: 50px;
+  min-height: 41px;
 `
 
 @observer
@@ -62,7 +68,7 @@ class MethodLibraryFilterBar extends React.Component {
     return matchingFilters.filter(filter => filter.selected)
   }
 
-  selectFilter(filter) {
+  selectFilter = filter => {
     const { onSelect } = this.props
     onSelect(filter)
   }
@@ -80,39 +86,49 @@ class MethodLibraryFilterBar extends React.Component {
   }
 
   render() {
-    const { onDelete } = this.props
-    const categories = ['subquality', 'category', 'type']
+    const { methodLibraryTags } = this.props
+    const categories = Object.keys(methodLibraryTags).filter(
+      category => category !== 'creativeQualities'
+    )
     return (
-      <ResponsiveFlex>
-        {categories.map(category => (
-          <div style={{ flexBasis: 'auto', margin: '3px 0' }}>
-            <PopoutMenu
-              hideDotMenu
-              checkboxMenu
-              menuOpen={this.state.menuOpen === category}
-              onMouseLeave={() => this.closeMenu(category)}
-              menuItems={this.formattedPills(category).map(tag => ({
-                name: tag.name,
-                bgColor: tag.color || v.colors.commonLight,
-                isChecked: tag.selected,
-                iconLeft: <TagIcon />,
-                onClick: () => this.selectFilter(tag),
-              }))}
-              width={category === 'type' ? 200 : 300}
-              offsetPosition={{ x: 0, y: 15 }}
-            />
-            <MethodCategorySelect onMouseEnter={() => this.openMenu(category)}>
-              <DisplayText>{startCase(category)}</DisplayText> <DropdownIcon />
-            </MethodCategorySelect>
-            <MethodTagsWrapper>
-              <PillList
-                itemList={this.formattedPills(category, true)}
-                onItemDelete={onDelete}
+      <Fragment>
+        <div style={{ marginTop: '6px' }}>
+          <PillList itemList={this.formattedPills('creativeQualities')} />
+        </div>
+        <ResponsiveFlex>
+          {categories.map(category => (
+            <MethodCategoryWrapper key={category}>
+              <PopoutMenu
+                hideDotMenu
+                checkboxMenu
+                menuOpen={this.state.menuOpen === category}
+                onMouseLeave={() => this.closeMenu(category)}
+                menuItems={this.formattedPills(category).map(tag => ({
+                  name: tag.name,
+                  bgColor: tag.color || v.colors.commonLight,
+                  isChecked: tag.selected,
+                  iconLeft: <TagIcon />,
+                  onClick: () => this.selectFilter(tag),
+                }))}
+                width={category === 'type' ? 200 : 300}
+                offsetPosition={{ x: -5, y: 1 }}
               />
-            </MethodTagsWrapper>
-          </div>
-        ))}
-      </ResponsiveFlex>
+              <MethodCategorySelect
+                onMouseEnter={() => this.openMenu(category)}
+              >
+                <DisplayText>{startCase(category)}</DisplayText>{' '}
+                <DropdownIcon />
+              </MethodCategorySelect>
+              <MethodTagsWrapper>
+                <PillList
+                  itemList={this.formattedPills(category, true)}
+                  onItemDelete={this.selectFilter}
+                />
+              </MethodTagsWrapper>
+            </MethodCategoryWrapper>
+          ))}
+        </ResponsiveFlex>
+      </Fragment>
     )
   }
 }
@@ -120,7 +136,6 @@ class MethodLibraryFilterBar extends React.Component {
 MethodLibraryFilterBar.propTypes = {
   filters: MobxPropTypes.arrayOrObservableArray.isRequired,
   methodLibraryTags: PropTypes.object.isRequired,
-  onDelete: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
 }
 

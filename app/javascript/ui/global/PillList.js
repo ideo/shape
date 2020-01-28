@@ -28,12 +28,8 @@ const StyledAvatar = styled(Avatar)`
 
 @observer
 class PillList extends React.Component {
-  handleDelete = item => {
-    this.props.onItemDelete(item)
-  }
-
   render() {
-    const { itemList } = this.props
+    const { itemList, onItemDelete } = this.props
     return (
       <ChipHolder>
         {itemList.map(item => {
@@ -57,7 +53,7 @@ class PillList extends React.Component {
             selectable: item.selectable,
             selected: item.selected,
             onSelect: item.onSelect,
-            onDelete: item.deletable ? ev => this.handleDelete(item) : null,
+            onDelete: onItemDelete ? () => onItemDelete(item) : null,
           }
 
           const identifier = item.name || item.id || item.email
@@ -90,7 +86,11 @@ class PillList extends React.Component {
 
 PillList.propTypes = {
   itemList: MobxPropTypes.arrayOrObservableArray.isRequired,
-  onItemDelete: PropTypes.func.isRequired,
+  onItemDelete: PropTypes.func,
+}
+
+PillList.defaultProps = {
+  onItemDelete: null,
 }
 
 export default PillList

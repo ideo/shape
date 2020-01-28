@@ -26,7 +26,6 @@ export const filtersToTags = ({ filters, onSelect, onDelete } = {}) => {
       color: color(filter.text),
       selectable: true,
       selected: filter.selected,
-      deletable: filter.deletable || !!onDelete,
     }
     tag.onDelete = () => onDelete && onDelete(tag)
     tag.onSelect = () => onSelect && onSelect(tag)

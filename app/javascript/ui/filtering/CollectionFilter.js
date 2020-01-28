@@ -33,22 +33,9 @@ class CollectionFilter extends React.Component {
   @observable
   currentFilterLookupType = null
 
-  get tagFilters() {
-    const {
-      collection: { collection_filters },
-    } = this.props
-    return collection_filters.filter(
-      filter =>
-        filter.filter_type === 'tag' &&
-        !this.isMethodLibraryFixedTag(filter.text)
-    )
-  }
-
   @computed
-  get tagFiltersWithoutCreativeQualities() {
-    return this.tagFilters.filter(
-      tagFilter => !this.isCreativeQualityTag(tagFilter.text)
-    )
+  get tagFilters() {
+    return this.filterBarFilters.filter(filter => filter.filter_type === 'tag')
   }
 
   @computed
@@ -63,29 +50,16 @@ class CollectionFilter extends React.Component {
   get filterBarFilters() {
     const {
       isMethodLibrary,
-      canEdit,
       collection: { collection_filters },
     } = this.props
     if (!isMethodLibrary) return collection_filters
     // If it is method library, return all filters except the fixed tags
-    const nonMethodLibraryFilters = collection_filters.filter(
+    return collection_filters.filter(
       filter =>
         filter.filter_type !== 'tag' ||
         (filter.filter_type === 'tag' &&
           !this.isMethodLibraryFixedTag(filter.text))
     )
-    // Mark all creative quality tags as not deletable
-    return nonMethodLibraryFilters.map(filter => {
-      if (
-        filter.filter_type === 'tag' &&
-        this.isCreativeQualityTag(filter.text)
-      ) {
-        filter.deletable = false
-      } else {
-        filter.deletable = canEdit
-      }
-      return filter
-    })
   }
 
   @computed
@@ -100,17 +74,19 @@ class CollectionFilter extends React.Component {
 
   get methodLibraryFixedTagCategories() {
     return {
-      subquality: Object.keys(subqualities),
-      category: methodLibraryCategories,
-      type: methodLibraryTypes,
+      creativeQualities: Object.keys(primaryQualities),
+      subqualities: Object.keys(subqualities),
+      categories: methodLibraryCategories,
+      types: methodLibraryTypes,
     }
   }
 
   get methodLibraryFixedTags() {
     return [
-      ...this.methodLibraryFixedTagCategories.subquality,
-      ...this.methodLibraryFixedTagCategories.category,
-      ...this.methodLibraryFixedTagCategories.type,
+      ...this.methodLibraryFixedTagCategories.creativeQualities,
+      ...this.methodLibraryFixedTagCategories.subqualities,
+      ...this.methodLibraryFixedTagCategories.categories,
+      ...this.methodLibraryFixedTagCategories.types,
     ]
   }
 
@@ -215,6 +191,13 @@ class CollectionFilter extends React.Component {
       collection.isSearchCollection
     return (
       <Fragment>
+        {isMethodLibrary && (
+          <MethodLibraryFilterBar
+            methodLibraryTags={this.methodLibraryFixedTagCategories}
+            filters={this.methodLibraryFilters}
+            onSelect={this.onSelectFilter}
+          />
+        )}
         <GrowFlex align="flex-end">
           {isFilterBarActive && (
             <FilterBar
@@ -244,7 +227,7 @@ class CollectionFilter extends React.Component {
               <FilterSearchModal
                 filters={
                   this.currentFilterLookupType === 'Tags'
-                    ? [...this.tagFiltersWithoutCreativeQualities]
+                    ? [...this.tagFilters]
                     : [...this.searchFilters]
                 }
                 onCreateTag={this.onCreateFilter}
@@ -257,14 +240,6 @@ class CollectionFilter extends React.Component {
             )}
           </Flex>
         </GrowFlex>
-        {isMethodLibrary && (
-          <MethodLibraryFilterBar
-            methodLibraryTags={this.methodLibraryFixedTagCategories}
-            filters={this.methodLibraryFilters}
-            onDelete={this.onDeleteFilter}
-            onSelect={this.onSelectFilter}
-          />
-        )}
       </Fragment>
     )
   }
