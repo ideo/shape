@@ -111,7 +111,7 @@ class ExpandableSearchInput extends React.Component {
     }
     this.props.onToggle(val)
     if (val) {
-      this.searchInput.focus()
+      this.searchInput && this.searchInput.focus()
     }
   }
 
