@@ -12,6 +12,12 @@ class NotificationMailer < ApplicationMailer
                      .first(10)
     @comment_threads = CommentThread
                        .where(id: comment_thread_ids)
+                       .joins(:comments)
+                       .where(
+                         Comment.arel_table[:created_at].gt(
+                           @last_notification_mail_sent,
+                         ),
+                       )
                        .order(updated_at: :desc)
                        .first(5)
 
