@@ -12,8 +12,10 @@ export const PillWrapper = styled.div`
   transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
     box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   text-decoration: none;
-  padding: 2px ${props => (props.paddingRight ? props.paddingRight : '7px')} 2px
-    7px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: ${props => (props.paddingRight ? props.paddingRight : '7px')};
+  padding-left: ${props => (props.paddingLeft ? props.paddingLeft : '7px')};
   outline: none;
   margin: 4px 8px 4px 0;
   font-weight: ${v.weights.medium};
@@ -69,6 +71,7 @@ const Pill = props => {
     wrapperProps.tagName = props.tag.name
   }
   if (!onDelete) wrapperProps.paddingRight = '14px'
+  if (selectable) wrapperProps.paddingLeft = '4px'
 
   return (
     <PillWrapper {...wrapperProps}>

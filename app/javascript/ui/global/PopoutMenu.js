@@ -94,7 +94,7 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 export const StyledMenu = styled.ul`
   background-color: white;
   width: ${props => props.width}px;
-  ${props => !props.noShadow && 'box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);'}
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
 `
 
 export const StyledMenuToggle = styled.button`
@@ -123,8 +123,10 @@ export const StyledMenuItem = styled.li`
     font-weight: 400;
     font-size: 1rem;
     text-align: left;
-    border-bottom: solid ${v.colors.commonMedium};
-    border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
+    border-top: solid
+      ${props =>
+        props.borderColor ? props.borderColor : v.colors.commonMedium};
+    border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
     ${props => props.bgColor && `background-color: ${props.bgColor};`}
     &.with-avatar {
@@ -218,6 +220,7 @@ class PopoutMenu extends React.Component {
               withAvatar,
               bgColor,
               noBorder,
+              borderColor,
               hasCheckbox,
               isChecked,
               TextComponent,
@@ -230,6 +233,7 @@ class PopoutMenu extends React.Component {
             return (
               <StyledMenuItem
                 key={`${name}-${id || i}`}
+                borderColor={borderColor}
                 noBorder={noBorder}
                 noHover={noHover}
                 hasCheckbox={hasCheckbox}
@@ -316,7 +320,6 @@ class PopoutMenu extends React.Component {
       offsetPosition,
       hideDotMenu,
       location,
-      noShadow,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -350,9 +353,7 @@ class PopoutMenu extends React.Component {
           location={location}
           menuClass={className}
         >
-          <StyledMenu width={width} noShadow={noShadow}>
-            {this.renderMenuItems}
-          </StyledMenu>
+          <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
         </StyledMenuWrapper>
       </StyledMenuButtonWrapper>
     )
@@ -366,6 +367,7 @@ const propTypeMenuItem = PropTypes.arrayOf(
     iconRight: PropTypes.element,
     onClick: PropTypes.func,
     noBorder: PropTypes.bool,
+    borderColor: PropTypes.string,
     noHover: PropTypes.bool,
     loading: PropTypes.bool,
     withAvatar: PropTypes.bool,
@@ -404,7 +406,6 @@ PopoutMenu.propTypes = {
     component: PropTypes.node,
   }),
   location: PropTypes.string,
-  noShadow: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -424,7 +425,6 @@ PopoutMenu.defaultProps = {
   groupExtraComponent: {},
   hideDotMenu: false,
   location: null,
-  noShadow: false,
 }
 
 export default PopoutMenu

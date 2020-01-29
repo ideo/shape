@@ -105,6 +105,7 @@ class MethodLibraryFilterBar extends React.Component {
           name: quality,
           bgColor: data.color,
           noHover: true,
+          borderColor: v.colors.black,
           TextComponent: CreativeQualityTypography,
           onClick: () => null,
         })
@@ -152,7 +153,6 @@ class MethodLibraryFilterBar extends React.Component {
             <MethodCategoryWrapper key={category}>
               <PopoutMenu
                 hideDotMenu
-                noShadow
                 menuOpen={this.state.menuOpen === category}
                 onMouseLeave={() => this.closeMenu(category)}
                 menuItems={this.popoutMenuItems(category)}
