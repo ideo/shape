@@ -174,9 +174,6 @@ export const StyledMenuItem = styled.li`
       right: ${props =>
         props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
     }
-    span {
-      line-height: 1.4rem;
-    }
   }
   &:hover,
   &:active {
@@ -189,6 +186,10 @@ export const StyledMenuItem = styled.li`
   }
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
+
+const StyledMenuItemText = styled.span`
+  line-height: 1.4rem;
+`
 
 class PopoutMenu extends React.Component {
   get groupedMenuItems() {
@@ -263,11 +264,13 @@ class PopoutMenu extends React.Component {
                     />
                   )}
                   {iconLeft && <span className="icon-left">{iconLeft}</span>}
-                  {TextComponent ? (
-                    <TextComponent>{name}</TextComponent>
-                  ) : (
-                    <span>{name}</span>
-                  )}
+                  <StyledMenuItemText>
+                    {TextComponent ? (
+                      <TextComponent>{name}</TextComponent>
+                    ) : (
+                      name
+                    )}
+                  </StyledMenuItemText>
 
                   {iconRight && (
                     <span className={rightIconClassName}>{iconRight}</span>

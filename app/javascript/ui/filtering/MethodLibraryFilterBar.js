@@ -24,7 +24,9 @@ const ResponsiveFlex = styled(Flex)`
 
 const MethodCategoryWrapper = styled.div`
   flex-basis: auto;
-  margin: 3px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `
 
 const MethodCategorySelect = styled.div`
@@ -39,9 +41,7 @@ const MethodCategorySelect = styled.div`
 `
 
 const MethodTagsWrapper = styled.div`
-  display: inline-block;
-  vertical-align: middle;
-  min-height: 47px;
+  flex: 1;
 `
 
 const CreativeQualityTypography = styled(Heading3)`
@@ -157,7 +157,7 @@ class MethodLibraryFilterBar extends React.Component {
                 onMouseLeave={() => this.closeMenu(category)}
                 menuItems={this.popoutMenuItems(category)}
                 width={category === 'type' ? 200 : 300}
-                offsetPosition={{ x: -10, y: 1 }}
+                offsetPosition={{ x: -10, y: -19 }}
               />
               <MethodCategorySelect
                 onMouseEnter={() => this.openMenu(category)}
