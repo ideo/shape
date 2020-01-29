@@ -11,6 +11,7 @@ import PillList from '~/ui/global/PillList'
 import v from '~/utils/variables'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import { filtersToTags } from '~/ui/filtering/shared'
+import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
 
 const ResponsiveFlex = styled(Flex)`
@@ -27,6 +28,10 @@ const MethodCategoryWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 `
 
 const MethodCategorySelect = styled.div`
@@ -37,6 +42,10 @@ const MethodCategorySelect = styled.div`
     vertical-align: middle;
     width: 25px;
     height: 25px;
+  }
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
 `
 
@@ -141,6 +150,36 @@ class MethodLibraryFilterBar extends React.Component {
     })
   }
 
+  toggleMenu(category) {
+    const { menuOpen } = this.state
+    if (menuOpen === category) {
+      this.closeMenu(category)
+    } else {
+      this.openMenu(category)
+    }
+  }
+
+  popoutMenuCoords(category) {
+    console.log('isMobile', uiStore.isMobile)
+    if (uiStore.isMobile) {
+      return {
+        width: screen.width - 40,
+        offsetPosition: {
+          x: -10,
+          y: 0,
+        },
+      }
+    } else {
+      return {
+        width: category === 'type' ? 200 : 300,
+        offsetPosition: {
+          x: -10,
+          y: -19,
+        },
+      }
+    }
+  }
+
   render() {
     const categories = ['subqualities', 'categories', 'types']
     return (
@@ -156,11 +195,12 @@ class MethodLibraryFilterBar extends React.Component {
                 menuOpen={this.state.menuOpen === category}
                 onMouseLeave={() => this.closeMenu(category)}
                 menuItems={this.popoutMenuItems(category)}
-                width={category === 'type' ? 200 : 300}
-                offsetPosition={{ x: -10, y: -19 }}
+                width={this.popoutMenuCoords(category).width}
+                offsetPosition={this.popoutMenuCoords(category).offsetPosition}
               />
               <MethodCategorySelect
                 onMouseEnter={() => this.openMenu(category)}
+                onClick={() => this.toggleMenu(category)}
               >
                 <DisplayText>{startCase(category)}</DisplayText>{' '}
                 <DropdownIcon />

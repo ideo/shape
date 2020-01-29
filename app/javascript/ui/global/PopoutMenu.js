@@ -157,8 +157,6 @@ export const StyledMenuItem = styled.li`
         }
       }}px;
     }
-    .checkBox {
-    }
 
     .icon {
       left: 0;
