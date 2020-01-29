@@ -41,7 +41,7 @@ const MethodCategorySelect = styled.div`
 const MethodTagsWrapper = styled.div`
   display: inline-block;
   vertical-align: middle;
-  min-height: 41px;
+  min-height: 47px;
 `
 
 const CreativeQualityTypography = styled(Heading3)`
@@ -157,7 +157,7 @@ class MethodLibraryFilterBar extends React.Component {
                 onMouseLeave={() => this.closeMenu(category)}
                 menuItems={this.popoutMenuItems(category)}
                 width={category === 'type' ? 200 : 300}
-                offsetPosition={{ x: -5, y: 1 }}
+                offsetPosition={{ x: -10, y: 1 }}
               />
               <MethodCategorySelect
                 onMouseEnter={() => this.openMenu(category)}
