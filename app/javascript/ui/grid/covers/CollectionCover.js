@@ -17,7 +17,6 @@ import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
   IconHolder,
 } from '~/ui/grid/covers/CollectionCoverTitle'
-import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 
 const LaunchButton = styled(FormButton)`
@@ -345,17 +344,13 @@ class CollectionCover extends React.Component {
                       >
                         <CollectionCoverTitle collection={collection} />
                       </PlainLink>
-                      <CollectionTypeSelector
-                        location={'CollectionCover'}
-                        collection={collection}
-                      >
-                        <IconHolder>
-                          {collectionTypeToIcon({
+                      <IconHolder>
+                        {!collection.collection_type === 'collection' &&
+                          collectionTypeToIcon({
                             type: collection.collection_type,
                             size: 'lg',
                           })}
-                        </IconHolder>
-                      </CollectionTypeSelector>
+                      </IconHolder>
                     </Dotdotdot>
                     {this.button}
                   </PositionedCardHeading>
