@@ -131,11 +131,10 @@ class RealtimeTextItem extends React.Component {
 
     if (!this.reactQuillRef) return
     this.initQuillRefsAndData({ initSnapshot: true })
+    this.clearQuillHistory()
     setTimeout(() => {
       this.quillEditor.focus()
-      // fix for undo clearing out all text
-      // https://github.com/zenoamaro/react-quill/issues/511
-      this.quillEditor.history.clear()
+      this.clearQuillHistory()
     }, 100)
   }
 
@@ -163,6 +162,12 @@ class RealtimeTextItem extends React.Component {
     ChannelManager.unsubscribeAllFromChannel(this.channelName, {
       keepOpen: routingToSameItem,
     })
+  }
+
+  clearQuillHistory() {
+    // fix for undo clearing out all text
+    // https://github.com/zenoamaro/react-quill/issues/511
+    this.quillEditor.history.clear()
   }
 
   reapplyActiveHighlight() {
@@ -205,7 +210,9 @@ class RealtimeTextItem extends React.Component {
 
   channelConnected = () => {
     if (this.unmounted) return
-    this.setState({ disconnected: false })
+    this.setState({ disconnected: false }, () => {
+      this.clearQuillHistory()
+    })
   }
 
   channelDisconnected = (message = 'Disconnected from channel') => {
