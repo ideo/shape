@@ -13,6 +13,8 @@ import DropdownIcon from '~/ui/icons/DropdownIcon'
 import { filtersToTags } from '~/ui/filtering/shared'
 import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
+import FilterIcon from '~/ui/icons/FilterIcon'
+import { FilterIconHolder } from './FilterBar'
 
 const ResponsiveFlex = styled(Flex)`
   flex-direction: row;
@@ -37,9 +39,9 @@ const MethodCategoryWrapper = styled.div`
 const MethodCategorySelect = styled.div`
   padding: 0 10px 0 10px;
   cursor: pointer;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   .icon {
-    vertical-align: middle;
     width: 25px;
     height: 25px;
   }
@@ -55,6 +57,11 @@ const MethodTagsWrapper = styled.div`
 
 const CreativeQualityTypography = styled(Heading3)`
   margin-bottom: 0;
+`
+
+const CreativeQualityTagsWrapper = styled.div`
+  margin-top: 6px;
+  display: flex;
 `
 
 @observer
@@ -92,6 +99,11 @@ class MethodLibraryFilterBar extends React.Component {
     )
     if (!onlySelected) return matchingFilters
     return matchingFilters.filter(filter => filter.selected)
+  }
+
+  selectFilter = filter => {
+    const { onSelect } = this.props
+    onSelect(filter)
   }
 
   tagToMenuItem(tag) {
@@ -133,9 +145,24 @@ class MethodLibraryFilterBar extends React.Component {
     }
   }
 
-  selectFilter = filter => {
-    const { onSelect } = this.props
-    onSelect(filter)
+  popoutMenuCoords(category) {
+    if (uiStore.isMobile) {
+      return {
+        width: screen.width - 40,
+        offsetPosition: {
+          x: -10,
+          y: -4,
+        },
+      }
+    } else {
+      return {
+        width: category === 'type' ? 200 : 300,
+        offsetPosition: {
+          x: -10,
+          y: -19,
+        },
+      }
+    }
   }
 
   openMenu(category) {
@@ -159,34 +186,16 @@ class MethodLibraryFilterBar extends React.Component {
     }
   }
 
-  popoutMenuCoords(category) {
-    console.log('isMobile', uiStore.isMobile)
-    if (uiStore.isMobile) {
-      return {
-        width: screen.width - 40,
-        offsetPosition: {
-          x: -10,
-          y: 0,
-        },
-      }
-    } else {
-      return {
-        width: category === 'type' ? 200 : 300,
-        offsetPosition: {
-          x: -10,
-          y: -19,
-        },
-      }
-    }
-  }
-
   render() {
     const categories = ['subqualities', 'categories', 'types']
     return (
       <Fragment>
-        <div style={{ marginTop: '6px' }}>
+        <CreativeQualityTagsWrapper>
+          <FilterIconHolder>
+            <FilterIcon />
+          </FilterIconHolder>
           <PillList itemList={this.formattedPills('creativeQualities')} />
-        </div>
+        </CreativeQualityTagsWrapper>
         <ResponsiveFlex>
           {categories.map(category => (
             <MethodCategoryWrapper key={category}>

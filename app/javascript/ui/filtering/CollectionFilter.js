@@ -219,7 +219,7 @@ class CollectionFilter extends React.Component {
               onDelete={this.onDeleteFilter}
               onSelect={this.onSelectFilter}
               onShowAll={this.onShowAll}
-              showIcon={inSearchCollection}
+              showIcon={inSearchCollection || isMethodLibrary}
             />
           )}
           <Flex align="flex-end" ml="auto">
