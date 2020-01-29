@@ -14,7 +14,7 @@ const StyledName = styled.div`
   margin-top: 0;
   vertical-align: top;
 
-  h1 {
+  .editable-name-heading {
     margin-bottom: 0;
     padding: 0;
   }
@@ -24,9 +24,9 @@ StyledName.displayName = 'StyledName'
 const StyledEditableName = styled.div`
   display: block;
   .input__name {
-    margin-top: 0.6rem;
+    margin-top: ${props => props.editingMarginTop};
     input {
-      ${Heading1TypographyCss};
+      ${props => props.typographyCss};
       z-index: ${v.zIndex.aboveClickWrapper};
       position: relative;
       background-color: transparent;
@@ -61,8 +61,8 @@ class EditableName extends React.Component {
   }
 
   componentWillUnmount() {
-    const { uiStore } = this.props
-    uiStore.update('editingName', false)
+    const { uiStore, fieldName } = this.props
+    uiStore.editingName.remove(fieldName)
   }
 
   onNameFieldKeypress = e => {
@@ -84,16 +84,17 @@ class EditableName extends React.Component {
   @action
   startEditingName = e => {
     e.stopPropagation()
-    const { uiStore } = this.props
-    uiStore.update('editingName', true)
+    const { fieldName, uiStore } = this.props
+    if (uiStore.editingName.includes(fieldName)) return
+    uiStore.editingName.push(fieldName)
   }
 
   @action
   stopEditingName = () => {
     // Ensure that save is called if user presses enter
     this.saveName.flush()
-    const { uiStore } = this.props
-    uiStore.update('editingName', false)
+    const { fieldName, uiStore } = this.props
+    uiStore.editingName.remove(fieldName)
   }
 
   _saveName = () => {
@@ -129,13 +130,24 @@ class EditableName extends React.Component {
   }
 
   render() {
-    const { canEdit, fontSize, uiStore } = this.props
-    const { editingName } = uiStore
-
-    if (canEdit && editingName) {
+    const {
+      canEdit,
+      fontSize,
+      uiStore,
+      TypographyComponent,
+      typographyCss,
+      fieldName,
+      editingMarginTop,
+    } = this.props
+    if (canEdit && uiStore.editingName.includes(fieldName)) {
       const clickHandlers = [() => this.stopEditingName()]
       return (
-        <StyledEditableName className="styled-name" fontSize={fontSize}>
+        <StyledEditableName
+          typographyCss={typographyCss}
+          className="styled-name"
+          fontSize={fontSize}
+          editingMarginTop={editingMarginTop}
+        >
           <AutosizeInput
             maxLength={v.maxTitleLength}
             className="input__name"
@@ -143,6 +155,7 @@ class EditableName extends React.Component {
             value={this.name}
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
+            data-cy={`EditableNameInput-${fieldName}`}
           />
           <ClickWrapper clickHandlers={clickHandlers} />
         </StyledEditableName>
@@ -150,15 +163,16 @@ class EditableName extends React.Component {
     }
     return (
       <StyledName className="styled-name">
-        <Heading1
-          data-cy="EditableNameHeading"
+        <TypographyComponent
+          className="editable-name-heading"
+          data-cy={`EditableNameHeading-${fieldName}`}
           ref={ref => {
             this.textRef = ref
           }}
           onClick={canEdit ? this.startEditingName : null}
         >
           {this.truncateName()}
-        </Heading1>
+        </TypographyComponent>
       </StyledName>
     )
   }
@@ -170,6 +184,10 @@ EditableName.propTypes = {
   canEdit: PropTypes.bool,
   fontSize: PropTypes.number,
   extraWidth: PropTypes.number,
+  TypographyComponent: PropTypes.object,
+  typographyCss: PropTypes.array,
+  fieldName: PropTypes.string,
+  editingMarginTop: PropTypes.string,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -180,6 +198,10 @@ EditableName.defaultProps = {
   canEdit: false,
   fontSize: 2.25,
   extraWidth: 0,
+  editingMarginTop: '0.5rem',
+  TypographyComponent: Heading1,
+  typographyCss: Heading1TypographyCss,
+  fieldName: 'name',
 }
 
 EditableName.displayName = 'EditableName'

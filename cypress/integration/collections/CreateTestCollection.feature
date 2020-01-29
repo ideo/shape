@@ -8,7 +8,7 @@ Feature: Creating a Test Collection
     # the extra cards load for ideas collection
     And I wait for "@apiGetCollectionCards" to finish
     And I wait for "@apiGetOrganizationAudiences" to finish
-    Then I should see "Test Prototype" in a "EditableNameHeading"
+    Then I should see "Test Prototype" in a "EditableNameHeading-recordName"
     # verify existence of all three sections
     Then I should see "intro" in a "section-title"
     Then I should see "Idea(s)" in a "section-title"
