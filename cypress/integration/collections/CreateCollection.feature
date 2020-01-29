@@ -5,7 +5,7 @@ Feature: Creating a Collection
     When I create a normal collection named "Hello World"
     Then I should see a collection card named "Hello World"
     When I navigate to the collection named "Hello World" via the "CollectionCover"
-    Then I should see "Hello World" in a "EditableNameHeading"
+    Then I should see "Hello World" in a "EditableNameHeading-recordName"
 
     # Test navigating back to the parent collection via the breadcrumb
     When I capture the current URL

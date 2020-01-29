@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import PillList from '~/ui/global/PillList'
 import { SubduedText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import FilterIcon from '~/ui/icons/FilterIcon'
 import { filtersToTags } from '~/ui/filtering/shared'
 
 const ResponsiveFlex = styled(Flex)`
@@ -16,6 +17,14 @@ const ResponsiveFlex = styled(Flex)`
     flex-direction: column;
   }
 `
+
+export const FilterIconHolder = styled.div`
+  margin-top: 3px;
+  height: 40px;
+  width: 35px;
+  color: ${v.colors.commonDark};
+`
+FilterIconHolder.displayName = 'FilterIconHolder'
 
 @observer
 class FilterBar extends React.Component {
@@ -33,9 +42,14 @@ class FilterBar extends React.Component {
   }
 
   render() {
-    const { onDelete, onShowAll, totalResults } = this.props
+    const { onDelete, onShowAll, totalResults, showIcon } = this.props
     return (
       <ResponsiveFlex align="center">
+        {showIcon && this.formattedPills.length > 0 && (
+          <FilterIconHolder>
+            <FilterIcon />
+          </FilterIconHolder>
+        )}
         <PillList itemList={this.formattedPills} onItemDelete={onDelete} />
         {_.isNumber(totalResults) && this.anyFiltersSelected && (
           <Fragment>
@@ -63,6 +77,11 @@ FilterBar.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onShowAll: PropTypes.func.isRequired,
+  showIcon: PropTypes.bool,
+}
+
+FilterBar.defaultProps = {
+  showIcon: false,
 }
 
 export default FilterBar
