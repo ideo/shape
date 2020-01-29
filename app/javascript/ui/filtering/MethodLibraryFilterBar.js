@@ -5,7 +5,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
-import { DisplayText } from '~/ui/global/styled/typography'
+import { DisplayText, Heading3 } from '~/ui/global/styled/typography'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import PillList from '~/ui/global/PillList'
 import v from '~/utils/variables'
@@ -42,6 +42,10 @@ const MethodTagsWrapper = styled.div`
   display: inline-block;
   vertical-align: middle;
   min-height: 41px;
+`
+
+const CreativeQualityTypography = styled(Heading3)`
+  margin-bottom: 0;
 `
 
 @observer
@@ -100,6 +104,8 @@ class MethodLibraryFilterBar extends React.Component {
         tags.push({
           name: quality,
           bgColor: data.color,
+          noHover: true,
+          TextComponent: CreativeQualityTypography,
           onClick: () => null,
         })
         const subqualityFilters = filters.filter(filter =>

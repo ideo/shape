@@ -180,7 +180,9 @@ export const StyledMenuItem = styled.li`
   &:active {
     button {
       ${props =>
-        !props.hasCheckbox && `border-left: 7px solid ${v.colors.black};`}
+        !props.hasCheckbox &&
+        !props.noHover &&
+        `border-left: 7px solid ${v.colors.black};`}
     }
   }
 `
@@ -218,6 +220,8 @@ class PopoutMenu extends React.Component {
               noBorder,
               hasCheckbox,
               isChecked,
+              TextComponent,
+              noHover,
             } = item
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
@@ -227,6 +231,7 @@ class PopoutMenu extends React.Component {
               <StyledMenuItem
                 key={`${name}-${id || i}`}
                 noBorder={noBorder}
+                noHover={noHover}
                 hasCheckbox={hasCheckbox}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
@@ -254,7 +259,12 @@ class PopoutMenu extends React.Component {
                     />
                   )}
                   {iconLeft && <span className="icon-left">{iconLeft}</span>}
-                  <span>{name}</span>
+                  {TextComponent ? (
+                    <TextComponent>{name}</TextComponent>
+                  ) : (
+                    <span>{name}</span>
+                  )}
+
                   {iconRight && (
                     <span className={rightIconClassName}>{iconRight}</span>
                   )}
@@ -356,9 +366,11 @@ const propTypeMenuItem = PropTypes.arrayOf(
     iconRight: PropTypes.element,
     onClick: PropTypes.func,
     noBorder: PropTypes.bool,
+    noHover: PropTypes.bool,
     loading: PropTypes.bool,
     withAvatar: PropTypes.bool,
     bgColor: PropTypes.string,
+    TextComponent: PropTypes.object,
     hasCheckbox: PropTypes.bool,
     isChecked: PropTypes.bool,
   })
