@@ -156,7 +156,16 @@ class PageHeader extends React.Component {
     const { record } = this.props
 
     // Not allowed to update label/use case for Foamcore or Submission Boxes
-    if (record.isBoard || record.isSubmissionBox || record.isUserProfile) {
+    const hideSelector = some(
+      [
+        record.isBoard,
+        record.isSubmissionBox,
+        record.isUserProfile,
+        record.isProfileCollection, // isProfileCollection == "system collection"
+      ],
+      true
+    )
+    if (hideSelector) {
       return null
     }
 
