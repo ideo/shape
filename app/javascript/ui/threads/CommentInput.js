@@ -89,8 +89,8 @@ class CommentInput extends React.Component {
           // handle landscape and portrait differently
           const isPortrait = cols == 2
           const willBePushedByVirtualKeyboard = isPortrait
-            ? y > window.innerHeight / 2
-            : y > window.innerHeight / 2 - 200
+            ? decoratorRect.top > window.innerHeight / 2
+            : decoratorRect.top > window.innerHeight / 2 - 260
 
           // check if comment mentions are placed where virtual keyboard will be
           if (willBePushedByVirtualKeyboard) {
