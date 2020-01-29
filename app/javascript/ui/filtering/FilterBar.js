@@ -11,13 +11,6 @@ import v from '~/utils/variables'
 import FilterIcon from '~/ui/icons/FilterIcon'
 import { filtersToTags } from '~/ui/filtering/shared'
 
-const ResponsiveFlex = styled(Flex)`
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-`
-
 export const FilterIconHolder = styled.div`
   margin-top: 3px;
   height: 40px;
@@ -50,7 +43,7 @@ class FilterBar extends React.Component {
       showIcon,
     } = this.props
     return (
-      <ResponsiveFlex align="center">
+      <Flex align="center">
         {showIcon && this.formattedPills.length > 0 && (
           <FilterIconHolder>
             <FilterIcon />
@@ -73,7 +66,7 @@ class FilterBar extends React.Component {
               </Box>
             </Fragment>
           )}
-      </ResponsiveFlex>
+      </Flex>
     )
   }
 }

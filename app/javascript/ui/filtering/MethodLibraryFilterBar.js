@@ -13,8 +13,6 @@ import DropdownIcon from '~/ui/icons/DropdownIcon'
 import { filtersToTags } from '~/ui/filtering/shared'
 import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
-import FilterIcon from '~/ui/icons/FilterIcon'
-import { FilterIconHolder } from './FilterBar'
 
 const ResponsiveFlex = styled(Flex)`
   flex-direction: row;
@@ -191,9 +189,6 @@ class MethodLibraryFilterBar extends React.Component {
     return (
       <Fragment>
         <CreativeQualityTagsWrapper>
-          <FilterIconHolder>
-            <FilterIcon />
-          </FilterIconHolder>
           <PillList itemList={this.formattedPills('creativeQualities')} />
         </CreativeQualityTagsWrapper>
         <ResponsiveFlex>
