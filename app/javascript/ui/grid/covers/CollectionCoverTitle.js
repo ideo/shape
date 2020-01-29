@@ -83,12 +83,12 @@ class CollectionCoverTitle extends React.Component {
 
       return (
         <span style={{ hyphens }}>
-          <IconHolder>{this.leftIcon}</IconHolder>
+          {this.leftIcon && <IconHolder>{this.leftIcon}</IconHolder>}
           {nameParts.join(' ')}{' '}
           <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
             {hyphenate(lastName)}
             &nbsp;
-            <IconHolder>{this.rightIcon}</IconHolder>
+            {this.rightIcon && <IconHolder>{this.rightIcon}</IconHolder>}
           </span>
         </span>
       )
