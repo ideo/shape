@@ -452,7 +452,7 @@ class Organization < ApplicationRecord
       cancel_network_subscription
     end
 
-    network_organization.update_attributes(
+    network_organization&.update_attributes(
       enterprise: !in_app_billing,
     )
   end

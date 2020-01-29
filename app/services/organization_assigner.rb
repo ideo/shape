@@ -5,6 +5,7 @@ class OrganizationAssigner < SimpleService
     @params = params
     @user = user
     @organization = Organization.where(shell: true).first
+    @errors = []
     @full_setup = full_setup
   end
 
@@ -49,9 +50,12 @@ class OrganizationAssigner < SimpleService
 
   def update_organization_information
     @organization.update(organization_params)
-    @organization.update(active_users_count: 1)
-    @organization.update(shell: false)
-    @organization.update(created_at: DateTime.now)
+    @organization.update_attributes(
+      active_users_count: 1,
+      shell: false,
+      created_at: DateTime.now,
+    )
+    @errors = @organization.errors
   end
 
   def update_primary_group!

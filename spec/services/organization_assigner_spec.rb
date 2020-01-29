@@ -19,8 +19,6 @@ RSpec.describe OrganizationShellBuilder, type: :service do
       shell_builder.organization.update(name: 'poop')
       shell_builder.organization
     end
-    let(:network_organization) { double('network_organization') }
-    let(:subscription) { double('subscription') }
 
     before do
       builder.call
