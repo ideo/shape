@@ -1,7 +1,7 @@
 import TagIcon from '~/ui/icons/TagIcon'
 import SearchIconRight from '~/ui/icons/SearchIconRight'
 import { creativeDifferenceTagIcon } from '~/ui/pages/shared/StyledReactTags'
-import { creativeQualities } from '~/utils/creativeDifferenceVariables'
+import { allQualityColors } from '~/utils/creativeDifferenceVariables'
 
 const filterSymbol = filter => {
   if (filter.filter_type === 'tag') {
@@ -11,8 +11,7 @@ const filterSymbol = filter => {
 }
 
 const color = tagName => {
-  const creativeQuality = creativeQualities[tagName.toLowerCase()]
-  return creativeQuality ? creativeQuality.color : null
+  return allQualityColors[tagName.toLowerCase()]
 }
 
 export const filtersToTags = ({ filters, onSelect, onDelete } = {}) => {

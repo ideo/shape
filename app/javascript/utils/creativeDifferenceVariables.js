@@ -1,53 +1,58 @@
-export const primaryQualities = {
-  purpose: {
-    color: '#9874AB',
-  },
-  'looking out': {
-    color: '#9A4F7A',
-  },
-  experimentation: {
-    color: '#D26A3B',
-  },
-  collaboration: {
-    color: '#EED950',
-  },
-  empowerment: {
-    color: '#83CCB1',
-  },
-  refinement: {
-    color: '#8A929D',
-  },
-}
+// Use a map so we can preserve the order of the qualities
+export const creativeQualities = new Map()
+creativeQualities.set('purpose', {
+  color: '#9874AB',
+  subqualities: ['usefulness', 'passion', 'clarity'],
+})
+creativeQualities.set('looking out', {
+  color: '#9A4F7A',
+  subqualities: [
+    'market insightfulness',
+    'tech insightfulness',
+    'customer insightfulness',
+  ],
+})
+creativeQualities.set('experimentation', {
+  color: '#D26A3B',
+  subqualities: [
+    'user testing',
+    'high-fidelity prototyping',
+    'low-fidelity prototyping',
+    'modeling',
+  ],
+})
+creativeQualities.set('collaboration', {
+  color: '#EED950',
+  subqualities: [
+    'network informality',
+    'team collaboration',
+    'collaboration characteristics',
+  ],
+})
+creativeQualities.set('empowerment', {
+  color: '#83CCB1',
+  subqualities: [
+    'opposability',
+    'fairness',
+    'autonomy',
+    'risk tolerance',
+    'visionary in implementation',
+  ],
+})
+creativeQualities.set('refinement', {
+  color: '#8A929D',
+  subqualities: ['expert', 'technical creativity', 'detail orientation'],
+})
 
-export const subqualities = {
-  usefulness: primaryQualities.purpose,
-  passion: primaryQualities.purpose,
-  clarity: primaryQualities.purpose,
-  'market insightfulness': primaryQualities['looking out'],
-  'tech insightfulness': primaryQualities['looking out'],
-  'customer insightfulness': primaryQualities['looking out'],
-  'user testing': primaryQualities.experimentation,
-  'high-fidelity prototyping': primaryQualities.experimentation,
-  'low-fidelity prototyping': primaryQualities.experimentation,
-  modeling: primaryQualities.experimentation,
-  'network informality': primaryQualities.collaboration,
-  'team collaboraiton': primaryQualities.collaboration,
-  'collaboration characteristics': primaryQualities.collaboration,
-  'process clarity': primaryQualities.empowerment,
-  opposability: primaryQualities.empowerment,
-  fairness: primaryQualities.empowerment,
-  autonomy: primaryQualities.empowerment,
-  'risk tolerance': primaryQualities.empowerment,
-  'visionary in implementation': primaryQualities.refinement,
-  expert: primaryQualities.refinement,
-  'technical creativity': primaryQualities.refinement,
-  'detail orientation': primaryQualities.refinement,
-}
-
-export const creativeQualities = {
-  ...primaryQualities,
-  ...subqualities,
-}
+export const allQualityColors = {}
+// Iterate over all qualities and subqualities
+// and populate object with quality as key and color as value
+creativeQualities.forEach((value, key) => {
+  allQualityColors[key] = value.color
+  value.subqualities.forEach(subquality => {
+    allQualityColors[subquality] = value.color
+  })
+})
 
 export const methodLibraryTypes = [
   'challenge',

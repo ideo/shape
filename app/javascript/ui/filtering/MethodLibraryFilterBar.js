@@ -59,13 +59,62 @@ class MethodLibraryFilterBar extends React.Component {
   }
 
   filtersForType(type, onlySelected = false) {
-    const { methodLibraryTags, filters } = this.props
-    const tagNames = methodLibraryTags[type]
+    const {
+      filters,
+      methodLibraryTagCategories,
+      methodLibraryTagCategories: { creativeQualities },
+    } = this.props
+    let tagNames
+    if (type === 'creativeQualities') {
+      tagNames = [...creativeQualities.keys()]
+    } else if (type === 'subqualities') {
+      tagNames = [...creativeQualities.values()]
+        .map(val => val.subqualities)
+        .flat()
+    } else {
+      tagNames = methodLibraryTagCategories[type]
+    }
     const matchingFilters = filters.filter(filter =>
       tagNames.includes(filter.text.toLowerCase())
     )
     if (!onlySelected) return matchingFilters
     return matchingFilters.filter(filter => filter.selected)
+  }
+
+  tagToMenuItem(tag) {
+    return {
+      name: tag.name,
+      bgColor: tag.color || v.colors.commonLight,
+      hasCheckbox: true,
+      isChecked: tag.selected,
+      iconLeft: <TagIcon />,
+      onClick: () => this.selectFilter(tag),
+    }
+  }
+
+  popoutMenuItems(category) {
+    if (category === 'subqualities') {
+      const { methodLibraryTagCategories, filters, onSelect } = this.props
+      let tags = []
+      methodLibraryTagCategories.creativeQualities.forEach((data, quality) => {
+        tags.push({
+          name: quality,
+          bgColor: data.color,
+          onClick: () => null,
+        })
+        const subqualityFilters = filters.filter(filter =>
+          data.subqualities.includes(filter.text.toLowerCase())
+        )
+        const subqualityTags = filtersToTags({
+          filters: subqualityFilters,
+          onSelect,
+        })
+        tags = [...tags, ...subqualityTags.map(tag => this.tagToMenuItem(tag))]
+      })
+      return tags
+    } else {
+      return this.formattedPills(category).map(tag => this.tagToMenuItem(tag))
+    }
   }
 
   selectFilter = filter => {
@@ -86,10 +135,7 @@ class MethodLibraryFilterBar extends React.Component {
   }
 
   render() {
-    const { methodLibraryTags } = this.props
-    const categories = Object.keys(methodLibraryTags).filter(
-      category => category !== 'creativeQualities'
-    )
+    const categories = ['subqualities', 'categories', 'types']
     return (
       <Fragment>
         <div style={{ marginTop: '6px' }}>
@@ -100,16 +146,10 @@ class MethodLibraryFilterBar extends React.Component {
             <MethodCategoryWrapper key={category}>
               <PopoutMenu
                 hideDotMenu
-                checkboxMenu
+                noShadow
                 menuOpen={this.state.menuOpen === category}
                 onMouseLeave={() => this.closeMenu(category)}
-                menuItems={this.formattedPills(category).map(tag => ({
-                  name: tag.name,
-                  bgColor: tag.color || v.colors.commonLight,
-                  isChecked: tag.selected,
-                  iconLeft: <TagIcon />,
-                  onClick: () => this.selectFilter(tag),
-                }))}
+                menuItems={this.popoutMenuItems(category)}
                 width={category === 'type' ? 200 : 300}
                 offsetPosition={{ x: -5, y: 1 }}
               />
@@ -135,7 +175,7 @@ class MethodLibraryFilterBar extends React.Component {
 
 MethodLibraryFilterBar.propTypes = {
   filters: MobxPropTypes.arrayOrObservableArray.isRequired,
-  methodLibraryTags: PropTypes.object.isRequired,
+  methodLibraryTagCategories: PropTypes.object.isRequired,
   onSelect: PropTypes.func.isRequired,
 }
 

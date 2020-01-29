@@ -134,7 +134,7 @@ export const StyledMenuItem = styled.li`
 
     .icon-left {
       margin-right: ${props => {
-        if (props.checkboxMenu) {
+        if (props.hasCheckbox) {
           return 30
         } else if (props.wrapperClassName === 'card-menu') {
           return 16
@@ -146,7 +146,7 @@ export const StyledMenuItem = styled.li`
 
     .icon-left .icon {
       left: ${props => {
-        if (props.checkboxMenu) {
+        if (props.hasCheckbox) {
           return 35
         } else if (props.wrapperClassName === 'card-menu') {
           return 8
@@ -180,7 +180,7 @@ export const StyledMenuItem = styled.li`
   &:active {
     button {
       ${props =>
-        !props.checkboxMenu && `border-left: 7px solid ${v.colors.black};`}
+        !props.hasCheckbox && `border-left: 7px solid ${v.colors.black};`}
     }
   }
 `
@@ -198,7 +198,7 @@ class PopoutMenu extends React.Component {
   }
 
   get renderMenuItems() {
-    const { groupExtraComponent, wrapperClassName, checkboxMenu } = this.props
+    const { groupExtraComponent, wrapperClassName } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -216,6 +216,7 @@ class PopoutMenu extends React.Component {
               withAvatar,
               bgColor,
               noBorder,
+              hasCheckbox,
               isChecked,
             } = item
             let className = `menu-${_.kebabCase(name)}`
@@ -226,7 +227,7 @@ class PopoutMenu extends React.Component {
               <StyledMenuItem
                 key={`${name}-${id || i}`}
                 noBorder={noBorder}
-                checkboxMenu={checkboxMenu}
+                hasCheckbox={hasCheckbox}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
                 bgColor={bgColor}
@@ -236,7 +237,7 @@ class PopoutMenu extends React.Component {
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
                 >
-                  {checkboxMenu && (
+                  {hasCheckbox && (
                     <Checkbox
                       style={{
                         marginRight: '0px',
@@ -305,7 +306,7 @@ class PopoutMenu extends React.Component {
       offsetPosition,
       hideDotMenu,
       location,
-      checkboxMenu,
+      noShadow,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -339,7 +340,7 @@ class PopoutMenu extends React.Component {
           location={location}
           menuClass={className}
         >
-          <StyledMenu width={width} noShadow={checkboxMenu}>
+          <StyledMenu width={width} noShadow={noShadow}>
             {this.renderMenuItems}
           </StyledMenu>
         </StyledMenuWrapper>
@@ -358,6 +359,7 @@ const propTypeMenuItem = PropTypes.arrayOf(
     loading: PropTypes.bool,
     withAvatar: PropTypes.bool,
     bgColor: PropTypes.string,
+    hasCheckbox: PropTypes.bool,
     isChecked: PropTypes.bool,
   })
 )
@@ -390,7 +392,7 @@ PopoutMenu.propTypes = {
     component: PropTypes.node,
   }),
   location: PropTypes.string,
-  checkboxMenu: PropTypes.bool,
+  noShadow: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -410,7 +412,7 @@ PopoutMenu.defaultProps = {
   groupExtraComponent: {},
   hideDotMenu: false,
   location: null,
-  checkboxMenu: false,
+  noShadow: false,
 }
 
 export default PopoutMenu

@@ -13,8 +13,8 @@ import FilterMenu from './FilterMenu'
 import FilterSearchModal from './FilterSearchModal'
 import MethodLibraryFilterBar from './MethodLibraryFilterBar'
 import {
-  primaryQualities,
-  subqualities,
+  creativeQualities,
+  allQualityColors,
   methodLibraryTypes,
   methodLibraryCategories,
 } from '~/utils/creativeDifferenceVariables'
@@ -53,12 +53,11 @@ class CollectionFilter extends React.Component {
       collection: { collection_filters },
     } = this.props
     if (!isMethodLibrary) return collection_filters
-    // If it is method library, return all filters except the fixed tags
+    // If it is method library, return all filters except the fixed method library tags
     return collection_filters.filter(
       filter =>
         filter.filter_type !== 'tag' ||
-        (filter.filter_type === 'tag' &&
-          !this.isMethodLibraryFixedTag(filter.text))
+        (filter.filter_type === 'tag' && !this.isMethodLibraryTag(filter.text))
     )
   }
 
@@ -72,30 +71,28 @@ class CollectionFilter extends React.Component {
     )
   }
 
-  get methodLibraryFixedTagCategories() {
+  get methodLibraryTagCategories() {
     return {
-      creativeQualities: Object.keys(primaryQualities),
-      subqualities: Object.keys(subqualities),
+      creativeQualities,
       categories: methodLibraryCategories,
       types: methodLibraryTypes,
     }
   }
 
-  get methodLibraryFixedTags() {
+  get methodLibraryTags() {
     return [
-      ...this.methodLibraryFixedTagCategories.creativeQualities,
-      ...this.methodLibraryFixedTagCategories.subqualities,
-      ...this.methodLibraryFixedTagCategories.categories,
-      ...this.methodLibraryFixedTagCategories.types,
+      ...Object.keys(allQualityColors),
+      ...this.methodLibraryTagCategories.categories,
+      ...this.methodLibraryTagCategories.types,
     ]
   }
 
-  isMethodLibraryFixedTag(tag) {
-    return this.methodLibraryFixedTags.includes(tag.toLowerCase())
+  isMethodLibraryTag(tag) {
+    return this.methodLibraryTags.includes(tag.toLowerCase())
   }
 
   isCreativeQualityTag(tag) {
-    return !!primaryQualities[tag.toLowerCase()]
+    return !!creativeQualities[tag.toLowerCase()]
   }
 
   /*
@@ -193,7 +190,7 @@ class CollectionFilter extends React.Component {
       <Fragment>
         {isMethodLibrary && (
           <MethodLibraryFilterBar
-            methodLibraryTags={this.methodLibraryFixedTagCategories}
+            methodLibraryTagCategories={this.methodLibraryTagCategories}
             filters={this.methodLibraryFilters}
             onSelect={this.onSelectFilter}
           />
