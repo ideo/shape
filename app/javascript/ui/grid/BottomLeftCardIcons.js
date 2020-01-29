@@ -15,6 +15,7 @@ import { Tooltip } from '@material-ui/core'
 import v from '~/utils/variables'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import UnresolvedButton from '~/ui/global/UnresolvedButton'
+import PinnedIconButton from '~/ui/global/PinnedIconButton'
 import { apiStore } from '~/stores/'
 
 export const StyledIconsWrapper = styled.div`
@@ -51,12 +52,6 @@ const LockedPinnedCardIcon = () => (
   </Tooltip>
 )
 
-const PinnedCardIcon = () => (
-  <Tooltip title="pinned" placement="top">
-    <PinnedIcon />
-  </Tooltip>
-)
-
 class BottomLeftCardIcons extends React.Component {
   handleUnreadIconClick = e => {
     e.preventDefault()
@@ -70,11 +65,14 @@ class BottomLeftCardIcons extends React.Component {
     const { card, cardType, record } = this.props
     const icons = []
 
-    if (card.isPinnedInTemplate) {
+    if (card.is_master_template_card) {
       icons.push(
-        <StyledIconWrapper>
-          <PinnedCardIcon />
-        </StyledIconWrapper>
+        <PinnedIconButton
+          card={card}
+          IconWrapper={({ children }) => (
+            <StyledIconWrapper>{children}</StyledIconWrapper>
+          )}
+        />
       )
     }
 

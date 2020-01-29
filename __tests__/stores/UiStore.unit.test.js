@@ -40,7 +40,11 @@ describe('UiStore', () => {
 
   describe('#openMoveMenu', () => {
     const parentId = '111'
-    const collection = { ...fakeCollection, name: 'BMC Template' }
+    const collection = {
+      ...fakeCollection,
+      firstCardId: jest.fn().mockReturnValue('99'),
+      name: 'BMC Template',
+    }
     collection.parent_collection_card.id = parentId
     beforeEach(() => {
       uiStore.setViewingRecord(collection)
@@ -52,6 +56,14 @@ describe('UiStore', () => {
         })
         expect(uiStore.cardAction).toEqual('move')
         expect(uiStore.movingFromCollectionId).toEqual(collection.id)
+      })
+      it('should move the first selected card to the beginning of the array', () => {
+        uiStore.selectedCardIds = ['1', '99', '2']
+        uiStore.openMoveMenu({
+          from: collection,
+        })
+        expect(collection.firstCardId).toHaveBeenCalled()
+        expect(uiStore.movingCardIds).toEqual(['99', '1', '2'])
       })
     })
     describe('with useTemplate action', () => {

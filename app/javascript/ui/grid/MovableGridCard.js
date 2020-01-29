@@ -685,8 +685,10 @@ class MovableGridCard extends React.Component {
     let _zIndex = 1
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
+    let disableDragging = !canEditCollection || card.isPinnedAndLocked
     if (_.includes([cardMenuOpen.id, editingCardCover], card.id)) {
       menuOpen = true
+      disableDragging = true
       // TODO: decouple context menus from GridCard so they can have their own z-index?
       _zIndex = aboveClickWrapper
     }
@@ -739,9 +741,6 @@ class MovableGridCard extends React.Component {
     const mdlPlaceholder = !dragging && card.isMDLPlaceholder
 
     const dragPosition = mdlPlaceholder ? null : { x, y }
-
-    const disableDragging =
-      !canEditCollection || card.isPinnedAndLocked || !!editingCardCover
 
     const rndProps = {
       ref: c => {

@@ -13,6 +13,13 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { fakeRole } from '#/mocks/data'
 jest.mock('../../../app/javascript/vendor/googleTagManager')
 
+const collectionCard_1 = new CollectionCard()
+updateModelId(collectionCard_1, '1')
+const collectionCard_2 = new CollectionCard()
+updateModelId(collectionCard_2, '2')
+const collectionCard_3 = new CollectionCard()
+updateModelId(collectionCard_3, '3')
+
 describe('Collection', () => {
   let collection, organization
 
@@ -157,6 +164,14 @@ describe('Collection', () => {
       expect(collection.cardIdsBetweenByOrder(cardIds[2], cardIds[0])).toEqual(
         firstThreeCardIds
       )
+    })
+
+    describe('firstCardId', () => {
+      it('should always get the first ordered card out of the given ids', () => {
+        expect(collection.firstCardId(_.reverse(firstThreeCardIds))).toEqual(
+          cardIds[0]
+        )
+      })
     })
   })
 
@@ -337,13 +352,6 @@ describe('Collection', () => {
   })
 
   describe('API_fetchCards', () => {
-    const collectionCard_1 = new CollectionCard()
-    updateModelId(collectionCard_1, '1')
-    const collectionCard_2 = new CollectionCard()
-    updateModelId(collectionCard_2, '2')
-    const collectionCard_3 = new CollectionCard()
-    updateModelId(collectionCard_3, '3')
-
     const fakeCollectionCardData = {
       type: 'collection_cards',
       attributes: {
@@ -438,6 +446,34 @@ describe('Collection', () => {
           expect(_.map(collection.collection_cards, 'id')).toEqual(['3'])
         })
       })
+    })
+  })
+
+  describe('API_batchUpdateCardsWithUndo', () => {
+    beforeEach(() => {
+      runInAction(() => {
+        collectionCard_1.row = 0
+        collection.class_type = 'Collection::Board'
+        collection.collection_cards = [collectionCard_1, collectionCard_2]
+      })
+    })
+    it('should call apiStore and apply local updates', () => {
+      expect(collectionCard_1.row).toEqual(0)
+      const updates = [{ card: collectionCard_1, row: 2, col: 3 }]
+      collection.API_batchUpdateCardsWithUndo({
+        updates,
+        undoMessage: 'Undoing action',
+      })
+      // local update should be applied and then sent through to apiStore
+      const data = collection.toJsonApiWithCards([collectionCard_1.id])
+      expect(data.attributes.collection_cards_attributes).toEqual([
+        { id: collectionCard_1.id, order: 0, row: 2, col: 3 },
+      ])
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}`,
+        'PATCH',
+        { data }
+      )
     })
   })
 })

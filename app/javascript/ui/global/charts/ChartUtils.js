@@ -156,10 +156,7 @@ export const advancedTooltipText = ({
 
   let dayTimeframe = '7 days'
   if (timeframe === 'month') {
-    timeRange = `in ${momentDate
-      .clone()
-      .subtract(1, 'month')
-      .format('MMMM')}`
+    timeRange = `in ${momentDate.clone().format('MMMM')}`
     dayTimeframe = '30 days'
   }
   if (timeframe === 'day') {

@@ -1,5 +1,6 @@
 import EditableName from '~/ui/pages/shared/EditableName'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import { Heading2 } from '~/ui/global/styled/typography'
 
 let wrapper, props
 
@@ -11,25 +12,32 @@ describe('EditableName', () => {
         updateNameHandler: jest.fn(),
         canEdit: true,
         uiStore: fakeUiStore,
+        fieldName: 'name',
+        TypographyComponent: Heading2,
       }
       wrapper = shallow(<EditableName.wrappedComponent {...props} />)
     })
 
-    it('renders name', () => {
-      expect(wrapper.render().text()).toMatch(/Amazing Collection/)
+    it('renders name in given TypographyComponent', () => {
+      expect(wrapper.find('Heading2').text()).toMatch(/Amazing Collection/)
     })
   })
 
   describe('when editing', () => {
     beforeEach(() => {
-      props.uiStore.editingName = true
+      props.fieldName = 'name'
+      props.TypographyComponent = Heading2
       wrapper = shallow(<EditableName.wrappedComponent {...props} canEdit />)
+      const fakeEvent = {
+        stopPropagation: jest.fn(),
+      }
+      wrapper.instance().startEditingName(fakeEvent)
     })
 
     it('shows editable field', () => {
       expect(wrapper.find('AutosizeInput').exists()).toEqual(true)
       expect(wrapper.find('AutosizeInput').props().value).toEqual(props.name)
-      expect(wrapper.find('Heading1').exists()).toEqual(false)
+      expect(wrapper.find('Heading2').exists()).toEqual(false)
     })
 
     it('calls updateNameHandler with name after user edits name', () => {
@@ -46,13 +54,17 @@ describe('EditableName', () => {
       wrapper.find('AutosizeInput').simulate('keyPress', {
         key: 'Enter',
       })
-      expect(props.uiStore.update).toHaveBeenCalledWith('editingName', false)
+      expect(props.uiStore.editingName).toEqual([])
     })
   })
 
   describe('if canEdit is false', () => {
     beforeEach(() => {
-      wrapper.setProps({ ...props, canEdit: false })
+      wrapper.setProps({
+        ...props,
+        canEdit: false,
+        TypographyComponent: Heading2,
+      })
     })
 
     it('renders name', () => {
@@ -60,7 +72,7 @@ describe('EditableName', () => {
     })
 
     it('does not show editable field when clicked', () => {
-      wrapper.find('Heading1').simulate('click', { stopPropagation: jest.fn() })
+      wrapper.find('Heading2').simulate('click', { stopPropagation: jest.fn() })
       expect(wrapper.find('AutosizeInput').exists()).toEqual(false)
     })
   })

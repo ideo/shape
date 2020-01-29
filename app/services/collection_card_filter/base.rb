@@ -58,6 +58,9 @@ module CollectionCardFilter
       elsif @collection.is_a?(Collection::Board)
         # Defaults to 16x16 since we default to a fully zoomed-out view
         rows = @filters[:rows].is_a?(Array) ? @filters[:rows] : [0, 16]
+        # make sure it's getting at least 10 rows
+        rows[0] = rows[0].to_i
+        rows[1] = [rows[1].to_i, (rows[0] + 10)].max
         cols = @filters[:cols].is_a?(Array) ? @filters[:cols] : [0, 16]
         @cards = @collection.collection_cards_by_row_and_col(
           rows: rows,

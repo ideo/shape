@@ -40,11 +40,16 @@ class DataItemCoverCollectionsItems extends React.Component {
   loading = false
 
   componentDidMount() {
+    const { item, uiStore } = this.props
     const {
       primaryDataset: { data_source_id },
     } = this.props.item
     if (data_source_id) {
       this.loadTargetCollection(data_source_id)
+    }
+    if (uiStore.isNewCard(item.id)) {
+      uiStore.removeNewCard(item.id)
+      this.toggleEditing()
     }
   }
 
@@ -63,12 +68,16 @@ class DataItemCoverCollectionsItems extends React.Component {
   @computed
   get editing() {
     const { card, uiStore } = this.props
-    return uiStore.editingCardId === card.id
+    return uiStore.editingCardCover === card.id
   }
 
   toggleEditing() {
     const { card, uiStore } = this.props
-    uiStore.toggleEditingCardId(card.id)
+    if (this.editing) {
+      uiStore.setEditingCardCover(null)
+    } else {
+      uiStore.setEditingCardCover(card.id)
+    }
   }
 
   onSelectTimeframe = value => {
@@ -115,7 +124,7 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 
   async saveSettings(settings) {
-    const { card, item, uiStore } = this.props
+    const { card, item } = this.props
     runInAction(() => {
       Object.assign(item.primaryDataset, settings)
       this.loading = true
@@ -131,15 +140,14 @@ class DataItemCoverCollectionsItems extends React.Component {
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       this.toggleEditing()
-      uiStore.toggleEditingCardId(card.id)
       this.loading = false
     })
   }
 
   handleEditClick = ev => {
-    const { card, item, uiStore } = this.props
+    const { item } = this.props
     if (!item.can_edit_content) return
-    uiStore.toggleEditingCardId(card.id)
+    this.toggleEditing()
   }
 
   get timeframeControl() {
@@ -288,13 +296,9 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 
   render() {
-    const { item, uiStore } = this.props
+    const { item } = this.props
     const { timeframe } = item.primaryDataset
 
-    if (uiStore.isNewCard(item.id)) {
-      uiStore.removeNewCard(item.id)
-      this.toggleEditing()
-    }
     return (
       <StyledDataItemCover
         className="cancelGridClick"

@@ -182,10 +182,24 @@ class CollectionFilter extends React.Component {
   }
 
   render() {
-    const { collection, canEdit, sortable, isMethodLibrary } = this.props
+    const {
+      collection,
+      collection: { collection_filters },
+      canEdit,
+      sortable,
+      inSearchCollection,
+      isMethodLibrary,
+    } = this.props
     const isFilterBarActive =
       (this.filterBarFilters && this.filterBarFilters.length > 0) ||
       collection.isSearchCollection
+
+    let filterMenuMarginTop
+    if (inSearchCollection) {
+      filterMenuMarginTop = collection_filters.length > 0 ? -90 : -40
+    } else {
+      filterMenuMarginTop = isFilterBarActive || sortable ? 5 : -24
+    }
     return (
       <Fragment>
         {isMethodLibrary && (
@@ -205,12 +219,13 @@ class CollectionFilter extends React.Component {
               onDelete={this.onDeleteFilter}
               onSelect={this.onSelectFilter}
               onShowAll={this.onShowAll}
+              showIcon={inSearchCollection}
             />
           )}
           <Flex align="flex-end" ml="auto">
             {canEdit && (
               <FilterMenu
-                alignTop={isFilterBarActive || sortable}
+                marginTop={filterMenuMarginTop}
                 onFilterByTag={this.openSearchModal('Tags')}
                 onFilterBySearch={this.openSearchModal('Search Term')}
               />
@@ -247,12 +262,14 @@ CollectionFilter.propTypes = {
   canEdit: PropTypes.bool,
   sortable: PropTypes.bool,
   isMethodLibrary: PropTypes.bool,
+  inSearchCollection: PropTypes.bool,
 }
 
 CollectionFilter.defaultProps = {
   canEdit: false,
   sortable: false,
   isMethodLibrary: false,
+  inSearchCollection: false,
 }
 
 export default CollectionFilter

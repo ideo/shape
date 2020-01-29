@@ -64,9 +64,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   load_and_authorize_resource only: %i[background_update_template_instances]
   def background_update_template_instances
-    render json: { success: false } unless @collection.master_template
+    unless @collection.master_template?
+      render json: { success: false }
+      return
+    end
 
-    @collection.queue_update_template_instances
+    @collection.queue_update_template_instances(
+      updated_card_ids: @collection.collection_cards.pluck(:id),
+      template_update_action: 'update_all',
+    )
     render json: { success: true }
   end
 
@@ -255,7 +261,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :subtitle_hidden,
       :test_show_media,
       :search_term,
-      collection_cards_attributes: %i[id order width height row col],
+      collection_cards_attributes: %i[id order width height row col pinned],
     ].concat(Collection.globalize_attribute_names)
   end
 

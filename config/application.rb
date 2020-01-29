@@ -46,5 +46,7 @@ module Shape
 
     # https://github.com/globalize/globalize#i18n-fallbacks-for-empty-translations
     config.i18n.fallbacks = [I18n.default_locale]
+
+    config.log_level = ENV.fetch('LOG_LEVEL') { :debug }
   end
 end

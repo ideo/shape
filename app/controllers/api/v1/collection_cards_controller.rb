@@ -80,7 +80,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_cards, only: %i[archive unarchive unarchive_from_email add_tag remove_tag]
   after_action :broadcast_collection_archive_updates, only: %i[archive unarchive unarchive_from_email]
   def archive
-    @collection_cards.archive_all!(user_id: current_user.id)
+    CollectionCard.archive_all!(ids: @collection_cards.pluck(:id), user_id: current_user.id)
     render json: { archived: true }
   end
 
@@ -157,7 +157,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_action: @card_action,
     )
     moved_cards = mover.call
-    if moved_cards
+    if moved_cards #&& @from_collection != @to_collection
       # we still create notifications on the original @cards
       @cards.map do |card|
         create_notification(
@@ -196,6 +196,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       for_user: current_user,
     )
     render_to_collection_with_cards(new_cards)
+  end
+
+  def toggle_pin
+    pinner = CardPinner.new(
+      card: @collection_card,
+      pinning: json_api_params[:pinned],
+    )
+
+    pinner.call
+
+    render jsonapi: @collection_card.reload, include: CollectionCard.default_relationships_for_api
   end
 
   private
@@ -367,14 +378,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     # Only notify for archiving of collections (and not link cards)
     return if card.link?
 
-    ActivityAndNotificationBuilder.call(
-      actor: current_user,
-      target: card.record,
-      action: action,
-      subject_user_ids: card.record.editors[:users].pluck(:id),
-      subject_group_ids: card.record.editors[:groups].pluck(:id),
-      source: @from_collection,
-      destination: @to_collection,
+    from_id = @from_collection&.id
+    to_id = @to_collection&.id
+    return if action == :moved && from_id == to_id
+
+    ActivityAndNotificationWorker.perform_async(
+      current_user.id,
+      card.id,
+      action,
+      from_id,
+      to_id,
     )
   end
 

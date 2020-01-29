@@ -434,7 +434,6 @@ export const fakeCollection = {
   API_getNextAvailableTest: jest.fn(),
   API_clearCollectionCover: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
-  API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   API_createCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
   API_destroyCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
