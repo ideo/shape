@@ -86,11 +86,16 @@ class CommentInput extends React.Component {
       } else {
         let newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
         if (uiStore.isIOS) {
-          // check if comment mentions are placed where virtual keyboard will be
-          const willBePushedByVirtualKeyboard = y > window.innerHeight / 2
+          // handle landscape and portrait differently
+          const isPortrait = cols == 2
+          const willBePushedByVirtualKeyboard = isPortrait
+            ? y > window.innerHeight / 2
+            : y > window.innerHeight / 2 - 200
 
+          // check if comment mentions are placed where virtual keyboard will be
           if (willBePushedByVirtualKeyboard) {
-            newTop = newTop + 400
+            const pushedTopOffset = isPortrait ? 400 : 500
+            newTop = newTop + pushedTopOffset
           }
           top = `${
             clampedSuggestionsLength === maxPossibleSuggestions
