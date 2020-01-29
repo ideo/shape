@@ -28,7 +28,7 @@ export const IconHolder = styled.span`
   line-height: 31px;
   margin-right: 5px;
   vertical-align: middle;
-  width: 30px;
+  width: 27px;
 `
 
 @observer
