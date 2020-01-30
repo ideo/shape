@@ -172,6 +172,9 @@ describe('Collection', () => {
           cardIds[0]
         )
       })
+      it('should always return an id even if none found in collection_cards', () => {
+        expect(collection.firstCardId(['123321'])).toEqual('123321')
+      })
     })
   })
 

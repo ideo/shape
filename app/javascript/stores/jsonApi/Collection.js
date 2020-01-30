@@ -150,11 +150,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const cards = this.collection_cards.filter(card =>
       _.includes(cardIds, card.id)
     )
-    let card = {}
+    let card
     if (this.isBoard) {
       card = findTopLeftCard(cards)
     } else {
       card = _.first(_.sortBy(cards, 'order'))
+    }
+    if (_.isEmpty(card)) {
+      // catch
+      return _.first(cardIds)
     }
     return card.id
   }
