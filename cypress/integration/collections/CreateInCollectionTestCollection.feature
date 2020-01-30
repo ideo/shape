@@ -8,7 +8,7 @@ Feature: Creating an "in-collection" Test Collection
     # the extra cards load for ideas collection
     And I wait for "@apiGetCollectionCards" to finish
     And I wait for "@apiGetOrganizationAudiences" to finish
-    Then I should see "Cypress Test" in a "EditableNameHeading"
+    Then I should see "Cypress Test" in a "EditableNameHeading-recordName"
     When I click the "Radio-collection"
     And I wait for "@apiUpdateCollection" to finish
     And I wait for "@apiGetCollectionCards" to finish

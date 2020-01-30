@@ -59,6 +59,32 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       )
     end
 
+    context 'duplicating from a template' do
+      before do
+        from_collection.update(master_template: true)
+        moving_cards.each { |c| c.update(pinned: true) }
+      end
+
+      it 'creates Placeholder cards that are pinned like the originals' do
+        new_cards = service.call
+        expect(new_cards.all?(&:placeholder?)).to be true
+        expect(new_cards.all?(&:pinned?)).to be true
+      end
+    end
+
+    context 'duplicating into a template' do
+      let!(:to_collection) do
+        create(:collection, master_template: true, pin_cards: true, num_cards: 3, add_editors: [user])
+      end
+
+      it 'creates pinned Placeholder cards' do
+        new_cards = service.call
+        # newly created cards should be duplicates
+        expect(new_cards.all?(&:placeholder?)).to be true
+        expect(new_cards.all?(&:pinned?)).to be true
+      end
+    end
+
     context 'if synchronous is all levels' do
       let!(:synchronous) { :all_levels }
 

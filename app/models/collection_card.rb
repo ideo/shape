@@ -482,6 +482,14 @@ class CollectionCard < ApplicationRecord
     identifier(CardIdentifier.call(*args)).first&.record
   end
 
+  def board_placement_is_valid?
+    return true unless parent&.is_a?(Collection::Board)
+    return true if CollectionGrid::Calculator.exact_open_spot?(card: self, collection: parent)
+
+    errors.add(:base, 'Board position is already taken')
+    false
+  end
+
   private
 
   def assign_default_height_and_width

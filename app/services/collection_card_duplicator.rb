@@ -63,6 +63,7 @@ class CollectionCardDuplicator < SimpleService
   def register_card_mappings
     run_worker_sync = %i[all_levels first_level].include?(@synchronous)
 
+    # ensure parent_collection_card exists
     if @building_template_instance && @cards.size == 1 && @to_collection.parent_collection_card.present?
       # Append the template instance card,
       # so that the mapper will include the entire template in its mapping
@@ -115,7 +116,7 @@ class CollectionCardDuplicator < SimpleService
       # help us refer back to the originals when duplicating
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
-      dup.pinned = pin_duplicating_cards
+      dup.pinned ||= pin_duplicating_cards
       dup.parent_id = @to_collection.id
       unless moving_to_board?
         dup.order = @order + i

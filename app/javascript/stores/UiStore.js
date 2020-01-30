@@ -160,7 +160,7 @@ export default class UiStore {
   @observable
   commentingOnRecord = null
   @observable
-  editingName = false
+  editingName = []
   @observable
   trackedRecords = new Map()
   @observable
