@@ -39,9 +39,10 @@ Feature: Undo actions
     When I click the "CardAction-edit cover"
     And I wait for "@apiGetCollectionCards" to finish
     Then I should see a 'EditCoverOptions'
-
+    # This is testing native browser text editing undo
     When I type "Undo" in the title textarea
     And I undo with CTRL+Z
+    # This is testing our Shape undo that undoes a saved title edit
     And I type "New Title" in the title textarea
     And I click the 'EditCoverCloseBtn'
     And I wait for "@apiUpdateCollection" to finish
