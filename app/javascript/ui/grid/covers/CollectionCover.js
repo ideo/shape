@@ -425,7 +425,7 @@ CollectionCover.defaultProps = {
   dragging: false,
   searchResult: false,
   textItem: null,
-  fontColor: v.colors.collectionCover,
+  fontColor: v.colors.white,
 }
 
 CollectionCover.displayName = 'CollectionCover'

@@ -268,10 +268,6 @@ class CollectionCard < ApplicationRecord
     cc
   end
 
-  def font_color
-    '#000'
-  end
-
   def record
     return item if item.present?
     return collection if collection.present?
