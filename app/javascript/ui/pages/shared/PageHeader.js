@@ -25,6 +25,7 @@ import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
+import { rightClamp } from '~/utils/textUtils'
 
 /* global IdeoSSO */
 
@@ -68,7 +69,7 @@ const HeaderButtonContainer = styled.span`
 `
 HeaderButtonContainer.displayName = 'HeaderButtonContainer'
 
-@inject('uiStore', 'apiStore')
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class PageHeader extends React.Component {
   @observable
@@ -125,12 +126,6 @@ class PageHeader extends React.Component {
       return (
         <IconHolder align="left">
           <FilledProfileIcon />
-        </IconHolder>
-      )
-    } else if (record.isMasterTemplate) {
-      return (
-        <IconHolder align="left">
-          <TemplateIcon circled filled />
         </IconHolder>
       )
     }
@@ -322,18 +317,66 @@ class PageHeader extends React.Component {
 
   get renderTemplateButton() {
     const { record } = this.props
-    if (!record.isUsableTemplate) return null
-    return (
-      <FormButton
-        width="160"
-        color={v.colors.primaryDark}
-        onClick={this.openMoveMenuForTemplate}
-        fontSize={v.buttonSizes.header.fontSize}
-        data-cy="HeaderFormButton"
-      >
-        Use Template
-      </FormButton>
-    )
+    if (record.isUsableTemplate && record.isMasterTemplate) {
+      return (
+        <FormButton
+          width={v.buttonSizes.header.width}
+          color={v.colors.primaryDark}
+          onClick={this.openMoveMenuForTemplate}
+          fontSize={v.buttonSizes.header.fontSize}
+          data-cy="HeaderFormButton"
+        >
+          Use Template
+        </FormButton>
+      )
+    } else if (
+      !record.isMasterTemplate &&
+      !record.isSubTemplate &&
+      !record.isTestCollection &&
+      record.isTemplated
+    ) {
+      const { template } = record
+      const { maxButtonTextLength } = v
+      const templateName = template ? template.name : 'Template'
+      const truncatedName =
+        templateName.length > maxButtonTextLength
+          ? rightClamp(templateName, maxButtonTextLength)
+          : templateName
+
+      return (
+        <FormButton
+          onClick={() => {
+            this.props.routingStore.routeTo('collections', record.template_id)
+          }}
+          fontSize={v.buttonSizes.header.fontSize}
+          data-cy="HeaderFormButton"
+          color={v.colors.commonMedium}
+          transparent
+          disabled={!template.can_view}
+        >
+          <span
+            style={{
+              display: 'inline-block',
+              height: 24,
+              width: 27,
+              verticalAlign: 'middle',
+            }}
+          >
+            <TemplateIcon />
+          </span>
+          <span
+            style={{
+              display: 'inline-block',
+              verticalAlign: 'middle',
+            }}
+          >
+            {truncatedName}
+          </span>
+        </FormButton>
+      )
+    }
+
+    return null
   }
 
   get renderStopFeebackButton() {
@@ -463,6 +506,7 @@ PageHeader.propTypes = {
 PageHeader.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default PageHeader

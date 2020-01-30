@@ -52,6 +52,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :collection_to_test
   belongs_to :organization
   belongs_to :created_by
+  belongs_to :template
   has_many :test_audiences
   has_one :test_results_collection
   has_many :collection_filters

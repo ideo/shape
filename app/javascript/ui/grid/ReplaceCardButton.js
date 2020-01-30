@@ -45,7 +45,6 @@ class ReplaceCardButton extends React.PureComponent {
 
   render() {
     const { card, canEditCollection } = this.props
-
     return (
       <CenteredContainer removeBackground={card.is_master_template_card}>
         <FormButton

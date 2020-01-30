@@ -321,6 +321,7 @@ class Collection < ApplicationRecord
       :parent,
       :submissions_collection,
       :submission_template,
+      :template,
       :collection_to_test,
       :live_test_collection,
       :collection_cover_items,
