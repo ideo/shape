@@ -268,7 +268,6 @@ describe('Collection', () => {
           hasLinkSharingAudience: false,
           hasPaidAudience: false,
           ideasCount: 0,
-          organization: 'MyOrg',
           testId: collection.id,
           timestamp: expect.any(String),
         })
