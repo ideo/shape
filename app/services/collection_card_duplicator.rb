@@ -29,6 +29,7 @@ class CollectionCardDuplicator < SimpleService
     register_card_mappings
     deep_duplicate_cards
     reorder_and_cache_covers
+    create_notifications
     return @new_cards if @synchronous == :async
 
     # If synchronous, re-assign @new_cards to actual cards, overriding placeholders
@@ -159,5 +160,19 @@ class CollectionCardDuplicator < SimpleService
     return false unless @cards.first.present?
 
     @to_collection.should_pin_cards?(@placement)
+  end
+
+  def create_notifications
+    return if @for_user.blank? || @building_template_instance || @system_collection
+
+    @cards.each do |card|
+      ActivityAndNotificationWorker.perform_async(
+        @for_user&.id,
+        card.id,
+        :duplicated,
+        from_collection.id,
+        @to_collection.id,
+      )
+    end
   end
 end
