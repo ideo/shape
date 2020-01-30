@@ -164,7 +164,7 @@ class Breadcrumb extends React.Component {
     return this.truncateItems(this.items())
   }
 
-  transformToSubItems(items, firstItem) {
+  transformToSubItems(items, firstItem = {}) {
     const subItems = items.map((item, idx) => {
       const subItem = { ...item }
       if (item.ellipses && item.id !== firstItem.id) item.remove = true
@@ -232,11 +232,18 @@ class Breadcrumb extends React.Component {
     }
 
     const ellipsesItems = items.filter(item => item.ellipses)
-    const firstEllipsesItem = ellipsesItems.shift()
-    const subItems = this.transformToSubItems(items, firstEllipsesItem)
-    firstEllipsesItem.subItems = subItems
+    let subItems
+    if (ellipsesItems.length) {
+      const firstEllipsesItem = ellipsesItems.shift()
+      subItems = this.transformToSubItems(items, firstEllipsesItem)
+      firstEllipsesItem.subItems = subItems
+    } else {
+      subItems = this.transformToSubItems(items)
+    }
     // My Collection breadcrumb should always have the full trail
-    if (items[0].name === 'My Collection') items[0].subItems = subItems
+    if (items[0] && items[0].name === 'My Collection') {
+      items[0].subItems = subItems
+    }
 
     return _.reject(items, { remove: true })
   }
