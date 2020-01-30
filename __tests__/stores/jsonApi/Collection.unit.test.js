@@ -29,6 +29,7 @@ describe('Collection', () => {
         name: 'fakeCollection',
         roles: [fakeRole],
         organization_id: '1',
+        style: {},
       },
       apiStore
     )

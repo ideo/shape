@@ -108,6 +108,7 @@ class CoverRenderer extends React.Component {
           cardId={card.id}
           width={card.maxWidth}
           height={card.maxHeight}
+          fontColor={card.font_color}
           collection={record}
           subtitle={record.subtitle}
           dragging={dragging}

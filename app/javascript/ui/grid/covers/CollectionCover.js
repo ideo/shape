@@ -50,8 +50,7 @@ CardButtonWrapper.displayName = 'CardButtonWrapper'
 const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
-  background: ${props =>
-    props.isSpecialCollection ? v.colors.offset : v.colors.collectionCover};
+  background: ${props => props.backgroundColor};
   color: white;
   position: relative;
   overflow: hidden;
@@ -90,7 +89,7 @@ const calcSectionHeight = props => {
 const StyledCardContent = styled.div`
   .top,
   .bottom {
-    color: white;
+    color: ${props => (props.color ? props.color : 'white')};
     font-family: ${v.fonts.sans};
     font-size: 1rem;
     letter-spacing: 0;
@@ -103,7 +102,7 @@ const StyledCardContent = styled.div`
 
     // Text style for the text and media covers
     h1 {
-      color: white;
+      color: ${props => (props.color ? props.color : 'white')};
     }
 
     &.text-item {
@@ -120,6 +119,7 @@ const StyledCardContent = styled.div`
   .bottom {
     bottom: ${props => (props.height === 1 ? 4 : pad)}px;
   }
+
   ${props =>
     props.width > 1 &&
     `
@@ -133,6 +133,14 @@ StyledCardContent.displayName = 'StyledCardContent'
 const PositionedCardHeading = styled(CardHeading)`
   bottom: 0;
   position: absolute;
+`
+
+const TextWithBackground = styled.span`
+  display: inline;
+  background-color: ${v.colors.white};
+  box-decoration-break: clone; /* This makes it so the left and right padding is equal when the lines break */
+  padding: 0.3rem 0.3rem 0.2rem 0.3rem;
+  line-height: inherit;
 `
 
 function splitName(name) {
@@ -205,6 +213,12 @@ class CollectionCover extends React.Component {
       )
     }
     return <span style={{ hyphens }}>{collection.name}</span>
+  }
+
+  get backgroundColor() {
+    const { collection } = this.props
+    if (collection.isSpecialCollection) return v.colors.offset
+    return v.colors.collectionCover
   }
 
   openMoveMenuForTemplate = async e => {
@@ -357,6 +371,18 @@ class CollectionCover extends React.Component {
     return !!(cover && cover.image_url)
   }
 
+  get useTextBackground() {
+    const {
+      collection: { tag_list },
+    } = this.props
+    return tag_list && tag_list.includes('case study')
+  }
+
+  textWithBackground(text) {
+    if (!this.useTextBackground) return text
+    return <TextWithBackground>{text}</TextWithBackground>
+  }
+
   render() {
     const {
       height,
@@ -366,15 +392,16 @@ class CollectionCover extends React.Component {
       uiStore,
       textItem,
       cardId,
+      fontColor,
     } = this.props
     const { subtitle } = collection
     const { gridW, gutter } = uiStore.gridSettings
-
     return (
       <StyledCollectionCover
         data-cy="CollectionCover"
         url={this.coverImageUrl}
         isSpecialCollection={collection.isSpecialCollection}
+        backgroundColor={this.backgroundColor}
       >
         {collection.isCarousel && !this.hasEmptyCarousel ? (
           <CarouselCover
@@ -392,6 +419,7 @@ class CollectionCover extends React.Component {
             gutter={gutter}
             gridW={gridW}
             isTextItem={!!textItem}
+            color={fontColor}
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
             {textItem ? (
@@ -419,8 +447,9 @@ class CollectionCover extends React.Component {
                         onClick={this.handleClick}
                         to={routingStore.pathTo('collections', collection.id)}
                         data-cy="collection-cover-link"
+                        color={fontColor}
                       >
-                        {this.name}
+                        {this.textWithBackground(this.name)}
                       </PlainLink>
                     </Dotdotdot>
                     {this.button}
@@ -430,9 +459,9 @@ class CollectionCover extends React.Component {
                   {this.launchTestButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
-                  {!this.hasLaunchTestButton && (
+                  {!this.hasLaunchTestButton && subtitle && (
                     <Dotdotdot clamp={this.numberOfLinesForDescription}>
-                      {subtitle}
+                      {this.textWithBackground(subtitle)}
                     </Dotdotdot>
                   )}
                 </div>
@@ -454,6 +483,7 @@ CollectionCover.propTypes = {
   dragging: PropTypes.bool,
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
+  fontColor: PropTypes.string,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -465,6 +495,7 @@ CollectionCover.defaultProps = {
   dragging: false,
   searchResult: false,
   textItem: null,
+  fontColor: v.colors.collectionCover,
 }
 
 CollectionCover.displayName = 'CollectionCover'

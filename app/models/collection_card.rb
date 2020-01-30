@@ -8,6 +8,8 @@
 #  archived_at       :datetime
 #  col               :integer
 #  filter            :integer          default("transparent_gray")
+#  font_background   :boolean          default(FALSE)
+#  font_color        :string
 #  height            :integer
 #  hidden            :boolean          default(FALSE)
 #  identifier        :string
@@ -264,6 +266,10 @@ class CollectionCard < ApplicationRecord
     end
 
     cc
+  end
+
+  def font_color
+    '#000'
   end
 
   def record

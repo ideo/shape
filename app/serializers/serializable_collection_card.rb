@@ -19,6 +19,8 @@ class SerializableCollectionCard < BaseJsonSerializer
     :col,
     :row,
     :section_type,
+    :font_color,
+    :font_background
   )
 
   stringified_attributes(
