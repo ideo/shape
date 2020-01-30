@@ -306,7 +306,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isRegularCollection() {
-    return this.type === 'Collection' && !this.isBoard
+    return this.type === 'Collection'
   }
 
   get isUserCollection() {
@@ -507,6 +507,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get cardProperties() {
     return this.collection_cards.map(c =>
       _.pick(c, ['id', 'updated_at', 'order'])
+    )
+  }
+
+  get allowsCollectionTypeSelector() {
+    return _.every(
+      [
+        this.isRegularCollection,
+        !this.isSpecialCollection,
+        !this.system_required,
+      ],
+      bool => bool
     )
   }
 
