@@ -58,6 +58,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'submission_box_type',
     'collection_to_test_id',
     'test_show_media',
+    'collection_type',
   ]
 
   constructor(...args) {
@@ -309,7 +310,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isRegularCollection() {
-    return this.type === 'Collection' && !this.isBoard
+    return this.type === 'Collection'
   }
 
   get isUserCollection() {
@@ -510,6 +511,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get cardProperties() {
     return this.collection_cards.map(c =>
       _.pick(c, ['id', 'updated_at', 'order'])
+    )
+  }
+
+  get allowsCollectionTypeSelector() {
+    return _.every(
+      [
+        this.isRegularCollection,
+        !this.isSpecialCollection,
+        !this.system_required,
+      ],
+      bool => bool
     )
   }
 
@@ -1073,11 +1085,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     hasPaidAudience = false,
     ideasCount = 0,
   }) => {
-    const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
       event: 'formSubmission',
       formType: `${actionName} Feedback Test`,
-      organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: this.launchableTestId,
       hasLinkSharingAudience,
@@ -1268,6 +1278,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'POST', { data })
   }
 
+  async API_selectCollectionType(collectionType) {
+    const apiPath = `collections/${this.id}`
+    const data = {
+      type: 'collections',
+      attributes: {
+        collection_type: collectionType,
+      },
+    }
+    return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,
@@ -1333,7 +1354,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         placement: 'beginning',
       }
       uiStore.update('isLoading', true)
-      const res = await apiStore.createTemplateInstance(templateData)
+      const res = await apiStore.createTemplateInstance({
+        data: templateData,
+        template,
+        inSubmissionBox: true,
+      })
       uiStore.update('isLoading', false)
       routingStore.routeTo('collections', res.data.id)
     } else {

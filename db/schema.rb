@@ -195,6 +195,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_191847) do
     t.integer "idea_id"
     t.integer "survey_response_id"
     t.string "search_term"
+    t.integer "collection_type", default: 0
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin

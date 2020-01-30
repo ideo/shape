@@ -4,31 +4,20 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { action, observable } from 'mobx'
 import styled from 'styled-components'
 import Dotdotdot from 'react-dotdotdot'
-import Hypher from 'hypher'
-import english from 'hyphenation.en-us'
 
 import FilestackUpload from '~/utils/FilestackUpload'
 import v from '~/utils/variables'
 import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
-import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import CarouselCover from '~/ui/grid/covers/CarouselCover'
-import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
 import { FormButton } from '~/ui/global/styled/buttons'
 import { RoundPill } from '~/ui/global/styled/forms'
-import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
-import TemplateIcon from '~/ui/icons/TemplateIcon'
-import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import { routingStore } from '~/stores'
-
-const IconHolder = styled.span`
-  display: inline-block;
-  line-height: 31px;
-  margin-right: 5px;
-  vertical-align: middle;
-  width: 27px;
-`
+import CollectionCoverTitle, {
+  IconHolder,
+} from '~/ui/grid/covers/CollectionCoverTitle'
+import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 
 const LaunchButton = styled(FormButton)`
   font-size: 0.9rem;
@@ -54,7 +43,6 @@ const StyledCollectionCover = styled.div`
     props.isSpecialCollection ? v.colors.offset : v.colors.collectionCover};
   color: white;
   position: relative;
-  overflow: hidden;
   ${props =>
     props.url &&
     `
@@ -135,77 +123,11 @@ const PositionedCardHeading = styled(CardHeading)`
   position: absolute;
 `
 
-function splitName(name) {
-  return name.split(' ')
-}
-
-const Hyphy = new Hypher(english)
-function hyphenate(namePart) {
-  const hyphenated = Hyphy.hyphenateText(namePart, 14)
-  // u00AD is the "soft" hyphenation character Hypher uses
-  if (!hyphenated.includes('\u00AD')) return namePart
-  const parts = hyphenated.split('\u00AD')
-  return `${parts.slice(0, -1).join('')}\u00AD${parts.slice(-1)}`
-}
-
-function namePartTooLong(fullName) {
-  const parts = fullName.split(' ')
-  return parts.some(part => part.length > 14)
-}
-
 @inject('uiStore', 'apiStore')
 @observer
 class CollectionCover extends React.Component {
   @observable
   hasEmptyCarousel = false
-
-  get hasIcon() {
-    const { collection } = this.props
-    return (
-      collection.isTemplated ||
-      collection.isMasterTemplate ||
-      collection.isSubmissionBox ||
-      collection.isTestCollectionOrResults
-    )
-  }
-
-  get name() {
-    const { collection } = this.props
-    const tooLong = namePartTooLong(collection.name)
-    const hyphens = tooLong ? 'auto' : 'initial'
-    if (this.hasIcon) {
-      const nameParts = splitName(collection.name)
-      if (!nameParts) return collection.name
-      const lastName = nameParts.pop()
-      let leftIcon
-      let rightIcon
-      if (collection.isProfileTemplate) {
-        rightIcon = <FilledProfileIcon />
-      } else if (collection.isMasterTemplate) {
-        leftIcon = <TemplateIcon circled filled />
-      } else if (collection.isUserProfile) {
-        rightIcon = <ProfileIcon />
-      } else if (collection.isTestCollectionOrResults) {
-        rightIcon = <TestCollectionIcon />
-      } else if (collection.isTemplated) {
-        rightIcon = <TemplateIcon circled />
-      } else if (collection.isSubmissionBox) {
-        rightIcon = <SubmissionBoxIconLg />
-      }
-      return (
-        <span style={{ hyphens }}>
-          {leftIcon && <IconHolder>{leftIcon}</IconHolder>}
-          {nameParts.join(' ')}{' '}
-          <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
-            {hyphenate(lastName)}
-            &nbsp;
-            {rightIcon && <IconHolder>{rightIcon}</IconHolder>}
-          </span>
-        </span>
-      )
-    }
-    return <span style={{ hyphens }}>{collection.name}</span>
-  }
 
   openMoveMenuForTemplate = async e => {
     const { collection } = this.props
@@ -415,13 +337,21 @@ class CollectionCover extends React.Component {
                   <PositionedCardHeading>
                     <Dotdotdot clamp={height > 1 ? 6 : 3}>
                       <PlainLink
+                        style={{ marginRight: '5px' }}
                         className="no-select cancelGridClick"
                         onClick={this.handleClick}
                         to={routingStore.pathTo('collections', collection.id)}
                         data-cy="collection-cover-link"
                       >
-                        {this.name}
+                        <CollectionCoverTitle collection={collection} />
                       </PlainLink>
+                      <IconHolder>
+                        {collection.collection_type !== 'collection' &&
+                          collectionTypeToIcon({
+                            type: collection.collection_type,
+                            size: 'lg',
+                          })}
+                      </IconHolder>
                     </Dotdotdot>
                     {this.button}
                   </PositionedCardHeading>
