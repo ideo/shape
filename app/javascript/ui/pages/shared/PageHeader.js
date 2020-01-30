@@ -14,6 +14,7 @@ import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
+import BackIcon from '~/ui/icons/BackIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
@@ -26,6 +27,7 @@ import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
 import routeToLogin from '~/utils/routeToLogin'
 import { rightClamp } from '~/utils/textUtils'
+import Tooltip from '~/ui/global/Tooltip'
 
 /* global IdeoSSO */
 
@@ -68,6 +70,22 @@ const HeaderButtonContainer = styled.span`
   }
 `
 HeaderButtonContainer.displayName = 'HeaderButtonContainer'
+
+const StyledButtonIconWrapper = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+  height: ${props => (props.height ? props.height : 24)}px;
+  width: ${props => (props.width ? props.width : 27)}px;
+`
+
+StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
+
+const StyledButtonNameWrapper = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+`
+
+StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
 
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
@@ -220,24 +238,10 @@ class PageHeader extends React.Component {
               data-cy="HeaderFormButton"
               transparent
             >
-              <span
-                style={{
-                  display: 'inline-block',
-                  height: 24,
-                  width: 27,
-                  verticalAlign: 'middle',
-                }}
-              >
+              <StyledButtonIconWrapper>
                 <LinkIconSm />
-              </span>
-              <span
-                style={{
-                  display: 'inline-block',
-                  verticalAlign: 'middle',
-                }}
-              >
-                Get Link
-              </span>
+              </StyledButtonIconWrapper>
+              <StyledButtonNameWrapper>Get Link</StyledButtonNameWrapper>
             </FormButton>
           </CopyToClipboard>
           {this.renderStopFeebackButton}
@@ -315,6 +319,35 @@ class PageHeader extends React.Component {
     )
   }
 
+  get renderTemplateName() {
+    const { record } = this.props
+    const { template } = record
+    const { maxButtonTextLength } = v
+    const templateName = template ? template.name : 'Template'
+    const truncatedName =
+      templateName.length > maxButtonTextLength
+        ? rightClamp(templateName, maxButtonTextLength)
+        : templateName
+    const shouldTruncate = templateName.length > maxButtonTextLength
+    const buttonNameWrapper = (
+      <StyledButtonNameWrapper>{truncatedName}</StyledButtonNameWrapper>
+    )
+
+    if (!shouldTruncate) {
+      return buttonNameWrapper
+    }
+
+    return (
+      <Tooltip
+        classes={{ tooltip: 'Tooltip' }}
+        title={template.name}
+        placement="top"
+      >
+        {buttonNameWrapper}
+      </Tooltip>
+    )
+  }
+
   get renderTemplateButton() {
     const { record } = this.props
     if (record.isUsableTemplate && record.isMasterTemplate) {
@@ -336,13 +369,6 @@ class PageHeader extends React.Component {
       record.isTemplated
     ) {
       const { template } = record
-      const { maxButtonTextLength } = v
-      const templateName = template ? template.name : 'Template'
-      const truncatedName =
-        templateName.length > maxButtonTextLength
-          ? rightClamp(templateName, maxButtonTextLength)
-          : templateName
-
       return (
         <FormButton
           onClick={() => {
@@ -351,27 +377,22 @@ class PageHeader extends React.Component {
           fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
           color={v.colors.commonMedium}
+          disabled={!template.can_view && !template.anyone_can_view}
           transparent
-          disabled={!template.can_view}
         >
-          <span
-            style={{
-              display: 'inline-block',
-              height: 24,
-              width: 27,
-              verticalAlign: 'middle',
-            }}
-          >
+          <StyledButtonIconWrapper>
             <TemplateIcon />
-          </span>
-          <span
-            style={{
-              display: 'inline-block',
-              verticalAlign: 'middle',
-            }}
+          </StyledButtonIconWrapper>
+          {this.renderTemplateName}
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title={'Go to Master Template'}
+            placement="top"
           >
-            {truncatedName}
-          </span>
+            <StyledButtonIconWrapper width={14}>
+              <BackIcon />
+            </StyledButtonIconWrapper>
+          </Tooltip>
         </FormButton>
       )
     }
