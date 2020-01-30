@@ -65,7 +65,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   load_and_authorize_resource only: %i[background_update_template_instances]
   def background_update_template_instances
-    render json: { success: false } unless @collection.master_template
+    unless @collection.master_template?
+      render json: { success: false }
+      return
+    end
 
     @collection.queue_update_template_instances(
       updated_card_ids: @collection.collection_cards.pluck(:id),

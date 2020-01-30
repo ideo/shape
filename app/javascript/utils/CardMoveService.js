@@ -229,7 +229,8 @@ export default class CardMoveService {
     // and show confirmation if this is a template
     return collection.API_batchUpdateCardsWithUndo({
       updates,
-      updateAllCards: true,
+      // on a board collection we can just update the moving cards
+      updateAllCards: !collection.isBoard,
       undoMessage,
       onConfirm,
       onCancel,

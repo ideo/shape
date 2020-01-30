@@ -4,7 +4,7 @@ Feature: Sharing a Collection
     Given I login and visit the Test Area
     When I create a normal collection named "Anyone Can See"
     When I navigate to the collection named "Anyone Can See" via the "CollectionCover"
-    Then I should see "Anyone Can See" in a "EditableNameHeading"
+    Then I should see "Anyone Can See" in a "EditableNameHeading-recordName"
 
     When I click ... in the nav and select "sharing"
     Then I should see the "Sharing: Anyone Can See" modal

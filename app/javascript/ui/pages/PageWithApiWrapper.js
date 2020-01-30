@@ -114,7 +114,7 @@ class PageWithApiWrapper extends React.Component {
     })
   }
 
-  fetchData = async () => {
+  fetchData = () => {
     const { apiStore, uiStore, match } = this.props
     uiStore.update('pageError', null)
 

@@ -414,6 +414,7 @@ class PageHeader extends React.Component {
                   updateNameHandler={this.updateRecordName}
                   canEdit={this.canEdit}
                   extraWidth={this.iconAndTagsWidth}
+                  fieldName="recordName"
                 />
                 {/* Can't use <Flex> if we want to attach refs... */}
                 <div

@@ -288,9 +288,6 @@ class GridCardBlank extends React.Component {
     order += idx
     if (row !== null && col !== null) {
       col += idx % 4
-      if (col > uiStore.viewingCollection.maxColumnIndex) {
-        col -= 4
-      }
       row += Math.floor(idx / 4)
     }
 

@@ -43,7 +43,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -763,7 +762,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -1483,7 +1481,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -2182,7 +2179,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -2329,7 +2325,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -2540,7 +2535,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -2751,7 +2745,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -2903,7 +2896,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -3715,7 +3707,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -3926,7 +3917,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -4137,7 +4127,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -4274,7 +4263,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -4981,7 +4969,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
         Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -5128,7 +5115,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -5339,7 +5325,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -5550,7 +5535,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -5702,7 +5686,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -6514,7 +6497,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -6725,7 +6707,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -6936,7 +6917,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -7075,7 +7055,6 @@ exports[`GridCard when hoveringOver renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -7818,7 +7797,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -8538,7 +8516,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -9258,7 +9235,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -9957,7 +9933,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -10104,7 +10079,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -10315,7 +10289,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -10526,7 +10499,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -10678,7 +10650,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -11490,7 +11461,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -11701,7 +11671,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -11912,7 +11881,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -12049,7 +12017,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -12756,7 +12723,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
         Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -12903,7 +12869,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -13114,7 +13079,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -13325,7 +13289,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -13477,7 +13440,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -14289,7 +14251,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -14500,7 +14461,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -14711,7 +14671,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -14850,7 +14809,6 @@ exports[`GridCard when selected renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -15592,7 +15550,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -16311,7 +16268,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -17050,7 +17006,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -17779,7 +17734,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -18478,7 +18432,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -18623,7 +18576,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -18833,7 +18785,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -19043,7 +18994,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -19193,7 +19143,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -20004,7 +19953,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -20214,7 +20162,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -20424,7 +20371,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -20560,7 +20506,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -21266,7 +21211,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
         Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -21411,7 +21355,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -21621,7 +21564,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -21831,7 +21773,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -21981,7 +21922,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -22792,7 +22732,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -23002,7 +22941,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -23212,7 +23150,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -23350,7 +23287,6 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -24092,7 +24028,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -24831,7 +24766,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -25560,7 +25494,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -26259,7 +26192,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -26404,7 +26336,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -26614,7 +26545,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -26824,7 +26754,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -26974,7 +26903,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -27785,7 +27713,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -27995,7 +27922,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -28205,7 +28131,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -28341,7 +28266,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -29047,7 +28971,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
         Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -29192,7 +29115,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -29402,7 +29324,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -29612,7 +29533,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -29762,7 +29682,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -30573,7 +30492,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -30783,7 +30701,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -30993,7 +30910,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -31131,7 +31047,6 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -31873,7 +31788,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -32592,7 +32506,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -33311,7 +33224,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -34010,7 +33922,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -34156,7 +34067,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -34366,7 +34276,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -34576,7 +34485,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -34727,7 +34635,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -35538,7 +35445,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -35748,7 +35654,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -35958,7 +35863,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -36094,7 +35998,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -36800,7 +36703,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
         Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -36946,7 +36848,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -37156,7 +37057,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -37366,7 +37266,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -37517,7 +37416,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -38328,7 +38226,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -38538,7 +38435,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -38748,7 +38644,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -38886,7 +38781,6 @@ exports[`GridCard with collection with SharedCollection card (menuDisabled = tru
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -39628,7 +39522,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -40367,7 +40260,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -41096,7 +40988,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -41795,7 +41686,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -41941,7 +41831,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -42151,7 +42040,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -42361,7 +42249,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -42511,7 +42398,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -43322,7 +43208,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -43532,7 +43417,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -43742,7 +43626,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -43878,7 +43761,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -44584,7 +44466,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
         Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -44730,7 +44611,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -44940,7 +44820,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -45150,7 +45029,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -45300,7 +45178,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -46111,7 +45988,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -46321,7 +46197,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -46531,7 +46406,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -46669,7 +46543,6 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -48950,7 +48823,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -49670,7 +49542,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -50410,7 +50281,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -51140,7 +51010,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         "parentCollection": Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -51839,7 +51708,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
       Object {
         "API_addComparison": [MockFunction],
         "API_archive": [MockFunction],
-        "API_batchUpdateCards": [MockFunction],
         "API_batchUpdateCardsWithUndo": [MockFunction],
         "API_clearCollectionCover": [MockFunction],
         "API_createCollectionFilter": [MockFunction],
@@ -51986,7 +51854,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -52197,7 +52064,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -52408,7 +52274,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -52560,7 +52425,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -53372,7 +53236,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -53583,7 +53446,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -53794,7 +53656,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -53931,7 +53792,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -54638,7 +54498,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
         Object {
           "API_addComparison": [MockFunction],
           "API_archive": [MockFunction],
-          "API_batchUpdateCards": [MockFunction],
           "API_batchUpdateCardsWithUndo": [MockFunction],
           "API_clearCollectionCover": [MockFunction],
           "API_createCollectionFilter": [MockFunction],
@@ -54785,7 +54644,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -54996,7 +54854,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -55207,7 +55064,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -55359,7 +55215,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
             "parentCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -56171,7 +56026,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -56382,7 +56236,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -56593,7 +56446,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -56732,7 +56584,6 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
           "parentCollection": Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],

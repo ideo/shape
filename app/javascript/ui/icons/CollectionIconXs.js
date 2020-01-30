@@ -1,7 +1,6 @@
-// import PropTypes from 'prop-types'
 import Icon from './Icon'
 // https://drive.google.com/file/d/1nefh_dY_APYLxyfqVBboWS2AMdnFb7Pp/view
-const CollectionIconXs = props => (
+const CollectionIconXs = () => (
   <Icon fill>
     <svg
       x="0px"
