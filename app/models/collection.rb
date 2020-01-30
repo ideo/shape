@@ -377,6 +377,7 @@ class Collection < ApplicationRecord
         created_by: for_user,
         # in this case the card has already been created
         parent_card: parent_collection_card,
+        synchronous: synchronous ? :all_levels : :async,
       )
       return builder.call
     end
