@@ -119,6 +119,7 @@ const StyledCardContent = styled.div`
   .bottom {
     bottom: ${props => (props.height === 1 ? 4 : pad)}px;
   }
+
   ${props =>
     props.width > 1 &&
     `
@@ -134,12 +135,12 @@ const PositionedCardHeading = styled(CardHeading)`
   position: absolute;
 `
 
-const TextBackground = styled.span`
+const TextWithBackground = styled.span`
   display: inline;
-  background-color: #fff;
+  background-color: ${v.colors.white};
   box-decoration-break: clone; /* This makes it so the left and right padding is equal when the lines break */
   padding: 0.3rem 0.3rem 0.2rem 0.3rem;
-  line-height: 1rem;
+  line-height: inherit;
 `
 
 function splitName(name) {
@@ -370,6 +371,18 @@ class CollectionCover extends React.Component {
     return !!(cover && cover.image_url)
   }
 
+  get useTextBackground() {
+    const {
+      collection: { tag_list },
+    } = this.props
+    return tag_list && tag_list.includes('case study')
+  }
+
+  textWithBackground(text) {
+    if (!this.useTextBackground) return text
+    return <TextWithBackground>{text}</TextWithBackground>
+  }
+
   render() {
     const {
       height,
@@ -436,7 +449,7 @@ class CollectionCover extends React.Component {
                         data-cy="collection-cover-link"
                         color={fontColor}
                       >
-                        <TextBackground>{this.name}</TextBackground>
+                        {this.textWithBackground(this.name)}
                       </PlainLink>
                     </Dotdotdot>
                     {this.button}
@@ -448,7 +461,7 @@ class CollectionCover extends React.Component {
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (
                     <Dotdotdot clamp={this.numberOfLinesForDescription}>
-                      <TextBackground>{subtitle}</TextBackground>
+                      {this.textWithBackground(subtitle)}
                     </Dotdotdot>
                   )}
                 </div>
