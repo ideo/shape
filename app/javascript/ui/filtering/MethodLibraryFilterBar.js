@@ -13,6 +13,10 @@ import DropdownIcon from '~/ui/icons/DropdownIcon'
 import { filtersToTags } from '~/ui/filtering/shared'
 import { uiStore } from '~/stores'
 import TagIcon from '~/ui/icons/TagIcon'
+import {
+  methodLibraryTagsByType,
+  creativeQualities,
+} from '~/utils/creativeDifferenceVariables'
 
 const ResponsiveFlex = styled(Flex)`
   flex-direction: row;
@@ -77,11 +81,7 @@ class MethodLibraryFilterBar extends React.Component {
   }
 
   filtersForType(type, onlySelected = false) {
-    const {
-      filters,
-      methodLibraryTagCategories,
-      methodLibraryTagCategories: { creativeQualities },
-    } = this.props
+    const { filters } = this.props
     let tagNames
     if (type === 'creativeQualities') {
       tagNames = [...creativeQualities.keys()]
@@ -90,7 +90,7 @@ class MethodLibraryFilterBar extends React.Component {
         .map(val => val.subqualities)
         .flat()
     } else {
-      tagNames = methodLibraryTagCategories[type]
+      tagNames = methodLibraryTagsByType[type]
     }
     const matchingFilters = filters.filter(filter =>
       tagNames.includes(filter.text.toLowerCase())
@@ -117,9 +117,9 @@ class MethodLibraryFilterBar extends React.Component {
 
   popoutMenuItems(category) {
     if (category === 'subqualities') {
-      const { methodLibraryTagCategories, filters, onSelect } = this.props
+      const { filters, onSelect } = this.props
       let tags = []
-      methodLibraryTagCategories.creativeQualities.forEach((data, quality) => {
+      creativeQualities.forEach((data, quality) => {
         tags.push({
           name: quality,
           bgColor: data.color,
@@ -225,7 +225,6 @@ class MethodLibraryFilterBar extends React.Component {
 
 MethodLibraryFilterBar.propTypes = {
   filters: MobxPropTypes.arrayOrObservableArray.isRequired,
-  methodLibraryTagCategories: PropTypes.object.isRequired,
   onSelect: PropTypes.func.isRequired,
 }
 

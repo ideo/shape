@@ -442,11 +442,7 @@ class PageHeader extends React.Component {
               )}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (
-              <CollectionFilter
-                collection={record}
-                canEdit={this.canEdit}
-                isMethodLibrary={record.methodLibraryCollection}
-              />
+              <CollectionFilter collection={record} canEdit={this.canEdit} />
             )}
           </div>
         </MaxWidthContainer>

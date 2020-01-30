@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
 import { Fragment } from 'react'
-import { computed, observable, runInAction } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
@@ -12,13 +12,6 @@ import FilterBar from './FilterBar'
 import FilterMenu from './FilterMenu'
 import FilterSearchModal from './FilterSearchModal'
 import MethodLibraryFilterBar from './MethodLibraryFilterBar'
-import {
-  creativeQualities,
-  allQualityColors,
-  methodLibraryTypes,
-  methodLibraryCategories,
-} from '~/utils/creativeDifferenceVariables'
-
 const SortContainer = styled.div`
   position: relative;
   top: -15px;
@@ -33,66 +26,14 @@ class CollectionFilter extends React.Component {
   @observable
   currentFilterLookupType = null
 
-  @computed
   get tagFilters() {
-    return this.filterBarFilters.filter(filter => filter.filter_type === 'tag')
+    const { filterBarFilters } = this.props.collection
+    return filterBarFilters.filter(filter => filter.filter_type === 'tag')
   }
 
-  @computed
   get searchFilters() {
-    const {
-      collection: { collection_filters },
-    } = this.props
-    return collection_filters.filter(filter => filter.filter_type === 'search')
-  }
-
-  @computed
-  get filterBarFilters() {
-    const {
-      isMethodLibrary,
-      collection: { collection_filters },
-    } = this.props
-    if (!isMethodLibrary) return collection_filters
-    // If it is method library, return all filters except the fixed method library tags
-    return collection_filters.filter(
-      filter =>
-        filter.filter_type !== 'tag' ||
-        (filter.filter_type === 'tag' && !this.isMethodLibraryTag(filter.text))
-    )
-  }
-
-  @computed
-  get methodLibraryFilters() {
-    const {
-      collection: { collection_filters },
-    } = this.props
-    return collection_filters.filter(
-      filter => !this.filterBarFilters.includes(filter)
-    )
-  }
-
-  get methodLibraryTagCategories() {
-    return {
-      creativeQualities,
-      categories: methodLibraryCategories,
-      types: methodLibraryTypes,
-    }
-  }
-
-  get methodLibraryTags() {
-    return [
-      ...Object.keys(allQualityColors),
-      ...this.methodLibraryTagCategories.categories,
-      ...this.methodLibraryTagCategories.types,
-    ]
-  }
-
-  isMethodLibraryTag(tag) {
-    return this.methodLibraryTags.includes(tag.toLowerCase())
-  }
-
-  isCreativeQualityTag(tag) {
-    return !!creativeQualities[tag.toLowerCase()]
+    const { filterBarFilters } = this.props.collection
+    return filterBarFilters.filter(filter => filter.filter_type === 'search')
   }
 
   /*
@@ -184,14 +125,18 @@ class CollectionFilter extends React.Component {
   render() {
     const {
       collection,
-      collection: { collection_filters },
+      collection: {
+        collection_filters,
+        isMethodLibraryCollection,
+        filterBarFilters,
+        methodLibraryFilters,
+      },
       canEdit,
       sortable,
       inSearchCollection,
-      isMethodLibrary,
     } = this.props
     const isFilterBarActive =
-      (this.filterBarFilters && this.filterBarFilters.length > 0) ||
+      (filterBarFilters && filterBarFilters.length > 0) ||
       collection.isSearchCollection
 
     let filterMenuMarginTop
@@ -202,24 +147,23 @@ class CollectionFilter extends React.Component {
     }
     return (
       <Fragment>
-        {isMethodLibrary && (
+        {isMethodLibraryCollection && (
           <MethodLibraryFilterBar
-            methodLibraryTagCategories={this.methodLibraryTagCategories}
-            filters={this.methodLibraryFilters}
+            filters={methodLibraryFilters}
             onSelect={this.onSelectFilter}
           />
         )}
         <GrowFlex align="flex-end">
           {isFilterBarActive && (
             <FilterBar
-              filters={this.filterBarFilters}
+              filters={filterBarFilters}
               totalResults={
                 !uiStore.isLoading && collection.collection_cards.length
               }
               onDelete={this.onDeleteFilter}
               onSelect={this.onSelectFilter}
               onShowAll={this.onShowAll}
-              showIcon={inSearchCollection || isMethodLibrary}
+              showIcon={inSearchCollection || isMethodLibraryCollection}
             />
           )}
           <Flex align="flex-end" ml="auto">
@@ -261,14 +205,12 @@ CollectionFilter.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
   sortable: PropTypes.bool,
-  isMethodLibrary: PropTypes.bool,
   inSearchCollection: PropTypes.bool,
 }
 
 CollectionFilter.defaultProps = {
   canEdit: false,
   sortable: false,
-  isMethodLibrary: false,
   inSearchCollection: false,
 }
 

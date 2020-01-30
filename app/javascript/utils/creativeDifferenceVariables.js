@@ -54,28 +54,36 @@ creativeQualities.forEach((value, key) => {
   })
 })
 
-export const methodLibraryTypes = [
-  'challenge',
-  'worksheet',
-  'ritual',
-  'process',
-  'article',
-  'case study',
-]
+export const methodLibraryTagsByType = {
+  creativeQualities,
+  categories: [
+    'systematizing design process',
+    'developing and nurturing talent',
+    'design process',
+    'experience design',
+    'building and running labs',
+    'developing creative problem solving capabilities',
+    'building ventures',
+    'research',
+    'business models',
+    'strategy',
+    'marketing',
+    'org design',
+    'business design',
+    'creative work',
+  ],
+  types: [
+    'challenge',
+    'worksheet',
+    'ritual',
+    'process',
+    'article',
+    'case study',
+  ],
+}
 
-export const methodLibraryCategories = [
-  'systematizing design process',
-  'developing and nurturing talent',
-  'design process',
-  'experience design',
-  'building and running labs',
-  'developing creative problem solving capabilities',
-  'building ventures',
-  'research',
-  'business models',
-  'strategy',
-  'marketing',
-  'org design',
-  'business design',
-  'creative work',
+export const methodLibraryTags = [
+  ...Object.keys(allQualityColors),
+  ...methodLibraryTagsByType.categories,
+  ...methodLibraryTagsByType.types,
 ]
