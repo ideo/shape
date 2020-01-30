@@ -160,11 +160,13 @@ class PageHeader extends React.Component {
       [
         record.isBoard,
         record.isSubmissionBox,
-        record.isUserProfile,
-        record.isProfileCollection, // isProfileCollection == "system collection"
+        record.isTestCollectionOrResults,
+        record.isProfileCollection,
+        record.system_required, //  "system collection"
       ],
-      true
+      bool => bool
     )
+
     if (hideSelector) {
       return null
     }
