@@ -86,6 +86,7 @@ class Activity < ApplicationRecord
     added_viewer: 22,
     removed_editor: 23,
     removed_viewer: 24,
+    template_used: 25,
   }
 
   def self.participant_actions

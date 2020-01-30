@@ -23,7 +23,6 @@ class CollectionCardDuplicationWorker
     @new_cards = duplicate_cards
     duplicate_legend_items
     update_parent_collection_status
-    create_notifications
     @new_cards
   end
 
@@ -57,7 +56,7 @@ class CollectionCardDuplicationWorker
         placeholder: placeholder,
         batch_id: @batch_id,
         building_template_instance: @building_template_instance,
-        should_pin_duplicating_cards: pin_duplicating_card,
+        should_pin_duplicating_cards: source_card.pinned? || pin_duplicating_card,
       )
     end
   end
@@ -79,20 +78,6 @@ class CollectionCardDuplicationWorker
   def update_parent_collection_status
     @parent_collection.update_processing_status(nil)
     CollectionUpdateBroadcaster.call(@parent_collection)
-  end
-
-  def create_notifications
-    @collection_cards.each do |card|
-      ActivityAndNotificationBuilder.call(
-        actor: @for_user,
-        target: card.record,
-        action: :duplicated,
-        subject_user_ids: card.record.editors[:users].pluck(:id),
-        subject_group_ids: card.record.editors[:groups].pluck(:id),
-        source: @from_collection,
-        destination: @parent_collection,
-      )
-    end
   end
 
   def duplicate_legend_items

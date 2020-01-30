@@ -39,14 +39,7 @@ describe('CollectionCover', () => {
     )
   })
 
-  it('renders the collection name and cover text', () => {
-    expect(
-      wrapper
-        .find('PlainLink')
-        .at(0)
-        .children()
-        .text()
-    ).toContain(fakeCollection.name)
+  it('renders cover text', () => {
     expect(
       wrapper
         .find('Dotdotdot')
