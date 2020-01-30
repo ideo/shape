@@ -40,7 +40,7 @@ TemplateIcon.propTypes = {
 TemplateIcon.defaultProps = {
   circled: false,
   filled: false,
-  viewBox: '0 0 50 50',
+  viewBox: '0 0 48 48',
 }
 
 export default TemplateIcon

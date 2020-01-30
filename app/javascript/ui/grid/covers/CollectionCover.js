@@ -337,6 +337,7 @@ class CollectionCover extends React.Component {
                   <PositionedCardHeading>
                     <Dotdotdot clamp={height > 1 ? 6 : 3}>
                       <PlainLink
+                        style={{ marginRight: '5px' }}
                         className="no-select cancelGridClick"
                         onClick={this.handleClick}
                         to={routingStore.pathTo('collections', collection.id)}
@@ -345,7 +346,7 @@ class CollectionCover extends React.Component {
                         <CollectionCoverTitle collection={collection} />
                       </PlainLink>
                       <IconHolder>
-                        {!collection.collection_type === 'collection' &&
+                        {collection.collection_type !== 'collection' &&
                           collectionTypeToIcon({
                             type: collection.collection_type,
                             size: 'lg',
