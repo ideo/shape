@@ -577,8 +577,20 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`organizations/${orgId}/admin_users`, 'GET')
   }
 
-  createTemplateInstance(data) {
-    return this.request('collections/create_template', 'POST', data)
+  async createTemplateInstance({ data, template, inSubmissionBox = false }) {
+    const result = await this.request(
+      'collections/create_template',
+      'POST',
+      data
+    )
+    googleTagManager.push({
+      event: 'templateUsed',
+      formType: 'Template Used',
+      templateName: template.name,
+      collectionType: template.collection_type,
+      submissionContent: inSubmissionBox,
+    })
+    return result
   }
 
   async fetchAllPages(url, page = 1, acc = []) {

@@ -84,14 +84,31 @@ class CommentInput extends React.Component {
             : newTop + 136
         }px`
       } else {
-        // FIXME: Handle touch device virtual keyboard pushing focused windows when placed where virtual keyboard will be
-        // will place at the top of the comment input
-        const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
-        top = `${
-          clampedSuggestionsLength === maxPossibleSuggestions
-            ? newTop - 30
-            : newTop
-        }px`
+        let newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
+        if (uiStore.isIOS) {
+          // handle landscape and portrait differently
+          const isPortrait = cols == 2
+          const willBePushedByVirtualKeyboard = isPortrait
+            ? decoratorRect.top > window.innerHeight / 2
+            : decoratorRect.top > window.innerHeight / 2 - 260
+
+          // check if comment mentions are placed where virtual keyboard will be
+          if (willBePushedByVirtualKeyboard) {
+            const pushedTopOffset = isPortrait ? 400 : 500
+            newTop = newTop + pushedTopOffset
+          }
+          top = `${
+            clampedSuggestionsLength === maxPossibleSuggestions
+              ? newTop - 30
+              : newTop
+          }px`
+        } else {
+          top = `${
+            clampedSuggestionsLength === maxPossibleSuggestions
+              ? newTop - 30
+              : newTop
+          }px`
+        }
       }
 
       return {

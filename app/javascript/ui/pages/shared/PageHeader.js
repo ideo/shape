@@ -7,27 +7,25 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
-import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import Tooltip from '~/ui/global/Tooltip'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
-import ProfileIcon from '~/ui/icons/ProfileIcon'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
-import TemplateIcon from '~/ui/icons/TemplateIcon'
-import SystemIcon from '~/ui/icons/SystemIcon'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BackIcon from '~/ui/icons/BackIcon'
-import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
-import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { FormButton } from '~/ui/global/styled/buttons'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
-import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
-import routeToLogin from '~/utils/routeToLogin'
 import { rightClamp } from '~/utils/textUtils'
-import Tooltip from '~/ui/global/Tooltip'
+import routeToLogin from '~/utils/routeToLogin'
+import CollectionTypeIcon, {
+  collectionTypeToIcon,
+} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
+import { some } from 'lodash'
 
 /* global IdeoSSO */
 
@@ -138,16 +136,58 @@ class PageHeader extends React.Component {
     record.toggleTemplateHelper()
   }
 
-  get collectionIcon() {
+  get leftIcon() {
     const { record } = this.props
-    if (record.isProfileTemplate) {
+    const leftConditions = [record.isProfileTemplate, record.isMasterTemplate]
+
+    if (some(leftConditions, bool => bool)) {
       return (
-        <IconHolder align="left">
-          <FilledProfileIcon />
+        <IconHolder align="right">
+          <CollectionTypeIcon record={record} />
         </IconHolder>
       )
     }
     return null
+  }
+
+  get rightIcon() {
+    const { record } = this.props
+    const rightConditions = [
+      record.isUserProfile,
+      record.isProfileCollection,
+      record.isTemplated && !record.isSubTemplate,
+      record.isSubmissionBox,
+      record.launchableTestId,
+      record.isBoard,
+    ]
+
+    if (some(rightConditions, bool => bool)) {
+      return (
+        <IconHolder align="right">
+          <CollectionTypeIcon record={record} />
+        </IconHolder>
+      )
+    }
+    return null
+  }
+
+  get collectionLabelSelector() {
+    const { record } = this.props
+
+    if (!record.allowsCollectionTypeSelector) {
+      return null
+    }
+
+    return (
+      <CollectionTypeSelector collection={record} location={'PageHeader'}>
+        <IconHolder align="right">
+          {collectionTypeToIcon({
+            type: record.collection_type,
+            size: 'lg',
+          })}
+        </IconHolder>
+      </CollectionTypeSelector>
+    )
   }
 
   get hiddenIcon() {
@@ -184,28 +224,6 @@ class PageHeader extends React.Component {
         )
       }
       return <SubduedHeading1>{tagList}</SubduedHeading1>
-    }
-    return null
-  }
-
-  get collectionTypeIcon() {
-    const { record } = this.props
-    let icon = ''
-    if (record.isUserProfile) {
-      icon = <ProfileIcon />
-    } else if (record.isProfileCollection) {
-      icon = <SystemIcon />
-    } else if (record.isTemplated && !record.isSubTemplate) {
-      icon = <TemplateIcon circled />
-    } else if (record.isSubmissionBox) {
-      icon = <SubmissionBoxIconLg />
-    } else if (record.launchableTestId) {
-      icon = <TestCollectionIcon />
-    } else if (record.isBoard) {
-      icon = <FoamcoreBoardIcon large />
-    }
-    if (icon) {
-      return <IconHolder align="right">{icon}</IconHolder>
     }
     return null
   }
@@ -381,7 +399,7 @@ class PageHeader extends React.Component {
           transparent
         >
           <StyledButtonIconWrapper>
-            <TemplateIcon />
+            <CollectionTypeIcon record={record} />
           </StyledButtonIconWrapper>
           {this.renderTemplateName}
           <Tooltip
@@ -460,7 +478,7 @@ class PageHeader extends React.Component {
                 className="title"
                 onClick={this.handleTitleClick}
               >
-                {this.collectionIcon}
+                {this.leftIcon}
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
@@ -475,7 +493,8 @@ class PageHeader extends React.Component {
                     this.updateIconAndTagsWidth(ref)
                   }}
                 >
-                  {this.collectionTypeIcon}
+                  {this.rightIcon}
+                  {this.collectionLabelSelector}
                   {this.hiddenIcon}
                   {record.isLiveTest && (
                     <LiveTestIndicator>Live</LiveTestIndicator>

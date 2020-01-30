@@ -35,6 +35,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
 
     if builder.call
+      log_template_used(template: @template_collection, instance: builder.collection)
       render jsonapi: builder.collection, expose: { current_record: builder.collection }
     else
       render_api_errors builder.errors
@@ -261,6 +262,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :subtitle_hidden,
       :test_show_media,
       :search_term,
+      :collection_type,
       collection_cards_attributes: %i[id order width height row col pinned],
     ].concat(Collection.globalize_attribute_names)
   end
@@ -275,6 +277,16 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       actor: current_user,
       target: organization.primary_group,
       action: :joined,
+    )
+  end
+
+  def log_template_used(template:, instance:)
+    ActivityAndNotificationBuilder.call(
+      actor: current_user,
+      target: instance,
+      source: template,
+      action: :template_used,
+      content: template.collection_type,
     )
   end
 
