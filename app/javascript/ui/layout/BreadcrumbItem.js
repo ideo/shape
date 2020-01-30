@@ -168,7 +168,6 @@ export class BreadcrumbItem extends React.Component {
 
   @action
   closeDropdown = () => {
-    return
     this.hoverTimer = null
     this.dropdownOpen = false
     this.menuItemOpenId = null
