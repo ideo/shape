@@ -155,19 +155,7 @@ class PageHeader extends React.Component {
   get collectionLabelSelector() {
     const { record } = this.props
 
-    // Not allowed to update label/use case for Foamcore or Submission Boxes
-    const hideSelector = some(
-      [
-        record.isBoard,
-        record.isSubmissionBox,
-        record.isTestCollectionOrResults,
-        record.isProfileCollection,
-        record.system_required, //  "system collection"
-      ],
-      bool => bool
-    )
-
-    if (hideSelector) {
+    if (!record.allowsCollectionTypeSelector) {
       return null
     }
 
