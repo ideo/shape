@@ -30,6 +30,11 @@ exports[`CollectionCover renders snapshot 1`] = `
               className="no-select cancelGridClick"
               data-cy="collection-cover-link"
               onClick={[Function]}
+              style={
+                Object {
+                  "marginRight": "5px",
+                }
+              }
               to="//collections/1"
             >
               <CollectionCoverTitle
@@ -1868,7 +1873,9 @@ exports[`CollectionCover renders snapshot 1`] = `
                 }
               />
             </PlainLink>
-            <styled.span />
+            <styled.span>
+              <MethodIcon />
+            </styled.span>
           </Dotdotdot>
         </Styled(CardHeading)>
       </div>
