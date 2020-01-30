@@ -11,13 +11,6 @@ import v from '~/utils/variables'
 import FilterIcon from '~/ui/icons/FilterIcon'
 import { filtersToTags } from '~/ui/filtering/shared'
 
-const ResponsiveFlex = styled(Flex)`
-  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-`
-
 export const FilterIconHolder = styled.div`
   margin-top: 3px;
   height: 40px;
@@ -42,30 +35,38 @@ class FilterBar extends React.Component {
   }
 
   render() {
-    const { onDelete, onShowAll, totalResults, showIcon } = this.props
+    const {
+      onDelete,
+      onShowAll,
+      totalResults,
+      hideTotalResults,
+      showIcon,
+    } = this.props
     return (
-      <ResponsiveFlex align="center">
+      <Flex align="center">
         {showIcon && this.formattedPills.length > 0 && (
           <FilterIconHolder>
             <FilterIcon />
           </FilterIconHolder>
         )}
         <PillList itemList={this.formattedPills} onItemDelete={onDelete} />
-        {_.isNumber(totalResults) && this.anyFiltersSelected && (
-          <Fragment>
-            <Box mr={'25px'} ml={['8px', '8px', '8px']}>
-              <SubduedText>
-                {totalResults} {totalResults === 1 ? 'Result' : 'Results'}
-              </SubduedText>
-            </Box>
-            <Box ml={['8px', '8px', 0]}>
-              <button onClick={onShowAll}>
-                <SubduedText>Show all</SubduedText>
-              </button>
-            </Box>
-          </Fragment>
-        )}
-      </ResponsiveFlex>
+        {_.isNumber(totalResults) &&
+          !hideTotalResults &&
+          this.anyFiltersSelected && (
+            <Fragment>
+              <Box mr={'25px'} ml={['8px', '8px', '8px']}>
+                <SubduedText>
+                  {totalResults} {totalResults === 1 ? 'Result' : 'Results'}
+                </SubduedText>
+              </Box>
+              <Box ml={['8px', '8px', 0]}>
+                <button onClick={onShowAll}>
+                  <SubduedText>Show all</SubduedText>
+                </button>
+              </Box>
+            </Fragment>
+          )}
+      </Flex>
     )
   }
 }
@@ -77,11 +78,13 @@ FilterBar.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onShowAll: PropTypes.func.isRequired,
+  hideTotalResults: PropTypes.bool,
   showIcon: PropTypes.bool,
 }
 
 FilterBar.defaultProps = {
-  showIcon: false,
+  hideTotalResults: false,
+  showIcon: PropTypes.bool,
 }
 
 export default FilterBar

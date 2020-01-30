@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
+import { Checkbox } from '~/ui/global/styled/forms'
 import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
@@ -122,21 +123,39 @@ export const StyledMenuItem = styled.li`
     font-weight: 400;
     font-size: 1rem;
     text-align: left;
-    border-bottom: solid ${v.colors.commonMedium};
-    border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
+    border-top: solid
+      ${props =>
+        props.borderColor ? props.borderColor : v.colors.commonMedium};
+    border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
+    ${props => props.bgColor && `background-color: ${props.bgColor};`}
     &.with-avatar {
       padding-left: 3.75rem;
       padding-right: 1rem;
     }
 
     .icon-left {
-      margin-right: ${props =>
-        props.wrapperClassName === 'card-menu' ? 16 : 0}px;
+      margin-right: ${props => {
+        if (props.hasCheckbox) {
+          return 30
+        } else if (props.wrapperClassName === 'card-menu') {
+          return 16
+        } else {
+          return 0
+        }
+      }}px;
     }
 
     .icon-left .icon {
-      left: ${props => (props.wrapperClassName === 'card-menu' ? 8 : 0)}px;
+      left: ${props => {
+        if (props.hasCheckbox) {
+          return 35
+        } else if (props.wrapperClassName === 'card-menu') {
+          return 8
+        } else {
+          return 0
+        }
+      }}px;
     }
 
     .icon {
@@ -153,18 +172,22 @@ export const StyledMenuItem = styled.li`
       right: ${props =>
         props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
     }
-    span {
-      line-height: 1.4rem;
-    }
   }
   &:hover,
   &:active {
     button {
-      border-left: 7px solid ${v.colors.black};
+      ${props =>
+        !props.hasCheckbox &&
+        !props.noHover &&
+        `border-left: 7px solid ${v.colors.black};`}
     }
   }
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
+
+const StyledMenuItemText = styled.span`
+  line-height: 1.4rem;
+`
 
 class PopoutMenu extends React.Component {
   get groupedMenuItems() {
@@ -194,6 +217,13 @@ class PopoutMenu extends React.Component {
               onClick,
               loading,
               withAvatar,
+              bgColor,
+              noBorder,
+              borderColor,
+              hasCheckbox,
+              isChecked,
+              TextComponent,
+              noHover,
             } = item
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
@@ -202,17 +232,44 @@ class PopoutMenu extends React.Component {
             return (
               <StyledMenuItem
                 key={`${name}-${id || i}`}
-                noBorder={item.noBorder}
+                borderColor={borderColor}
+                noBorder={noBorder}
+                noHover={noHover}
+                hasCheckbox={hasCheckbox}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
+                bgColor={bgColor}
               >
                 <button
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
                 >
+                  {hasCheckbox && (
+                    <Checkbox
+                      style={{
+                        marginRight: '0px',
+                        marginLeft: '-14px',
+                        width: 'auto',
+                        height: 'auto',
+                      }}
+                      color="primary"
+                      checked={isChecked}
+                      onChange={loading ? () => null : onClick}
+                      value="yes"
+                      size="small"
+                      className="checkBox"
+                    />
+                  )}
                   {iconLeft && <span className="icon-left">{iconLeft}</span>}
-                  <span>{name}</span>
+                  <StyledMenuItemText>
+                    {TextComponent ? (
+                      <TextComponent>{name}</TextComponent>
+                    ) : (
+                      name
+                    )}
+                  </StyledMenuItemText>
+
                   {iconRight && (
                     <span className={rightIconClassName}>{iconRight}</span>
                   )}
@@ -311,8 +368,14 @@ const propTypeMenuItem = PropTypes.arrayOf(
     iconRight: PropTypes.element,
     onClick: PropTypes.func,
     noBorder: PropTypes.bool,
+    borderColor: PropTypes.string,
+    noHover: PropTypes.bool,
     loading: PropTypes.bool,
     withAvatar: PropTypes.bool,
+    bgColor: PropTypes.string,
+    TextComponent: PropTypes.object,
+    hasCheckbox: PropTypes.bool,
+    isChecked: PropTypes.bool,
   })
 )
 
