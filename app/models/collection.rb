@@ -992,6 +992,10 @@ class Collection < ApplicationRecord
     order
   end
 
+  def has_child_collections?
+    collections.count.positive?
+  end
+
   def should_pin_cards?(placement)
     has_pinned_cards = collection_cards.pinned.any?
 

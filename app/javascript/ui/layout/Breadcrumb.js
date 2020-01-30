@@ -92,17 +92,17 @@ class Breadcrumb extends React.Component {
   items = (clamp = true) => {
     const { maxDepth, record } = this.props
     const items = []
-    let middleName = ''
     const breadcrumb = this.breadcrumbWithLinks
     if (record.inMyCollection || uiStore.linkedInMyCollection) {
       items.push({
         type: 'collections',
-        id: 'homepage',
+        id: apiStore.currentUserCollectionId,
         identifier: 'homepage',
         name: 'My Collection',
         can_edit_content: true,
         truncatedName: null,
         ellipses: false,
+        has_children: true,
       })
     }
     if (!breadcrumb) return items
@@ -119,12 +119,10 @@ class Breadcrumb extends React.Component {
 
       if (longBreadcrumb && idx >= 2 && idx <= len - 3) {
         // if we have a really long breadcrumb we compress some options in the middle
-        if (middleName) middleName += ' > '
-        middleName += name
         if (idx == len - 3) {
           return items.push({
             ...item,
-            name: middleName,
+            name,
             ellipses: true,
             identifier,
           })
@@ -137,6 +135,7 @@ class Breadcrumb extends React.Component {
         truncatedName: null,
         ellipses: false,
         identifier,
+        nested: 0,
       })
     })
 
@@ -165,8 +164,27 @@ class Breadcrumb extends React.Component {
     return this.truncateItems(this.items())
   }
 
+  transformToSubItems(items, firstItem) {
+    const subItems = items.map((item, idx) => {
+      const subItem = { ...item }
+      if (item.ellipses && item.id !== firstItem.id) item.remove = true
+      subItem.nested = idx
+      return subItem
+    })
+    return subItems
+  }
+
   truncateItems = items => {
     let charsLeftToTruncate = this.charsToTruncateForItems(items)
+
+    // The mobile menu should have the full breadcrumb trail in it's one item
+    const { maxDepth } = this.props
+    if (maxDepth === 1) {
+      const allItems = this.items(false)
+      const subItems = this.transformToSubItems(allItems, items[0])
+      if (items[0]) items[0].subItems = subItems
+    }
+
     // If we are within allowable number of chars, return items
     if (charsLeftToTruncate <= 0) return items
 
@@ -178,8 +196,6 @@ class Breadcrumb extends React.Component {
     })
 
     charsLeftToTruncate = this.charsToTruncateForItems(items)
-
-    if (charsLeftToTruncate <= 0) return items
 
     if (items.length === 1) {
       const [item] = items
@@ -215,16 +231,12 @@ class Breadcrumb extends React.Component {
       increment = !increment
     }
 
-    // last step! combine multiple consecutive ellipses
-    if (items.length > 4) {
-      _.each(items, (item, idx) => {
-        const next = items[idx + 1]
-        if (item.ellipses && next && next.ellipses) {
-          next.name = `${item.name} > ${next.name}`
-          item.remove = true
-        }
-      })
-    }
+    const ellipsesItems = items.filter(item => item.ellipses)
+    const firstEllipsesItem = ellipsesItems.shift()
+    const subItems = this.transformToSubItems(items, firstEllipsesItem)
+    firstEllipsesItem.subItems = subItems
+    // My Collection breadcrumb should always have the full trail
+    if (items[0].name === 'My Collection') items[0].subItems = subItems
 
     return _.reject(items, { remove: true })
   }
@@ -240,7 +252,7 @@ class Breadcrumb extends React.Component {
     const item = this.previousItem
     if (!backButton || !item) return null
     let path
-    if (item.id === 'homepage') {
+    if (item.identifier === 'homepage') {
       path = routingStore.pathTo('homepage')
     } else {
       path = routingStore.pathTo(item.type, item.id)
@@ -275,13 +287,19 @@ class Breadcrumb extends React.Component {
           <StyledBreadcrumbWrapper>
             {this.renderBackButton()}
             {items.map((item, index) => (
-              <span className="breadcrumb_item" key={`${item.name}-${index}`}>
+              <span
+                className="breadcrumb_item"
+                key={`${item.name}-${index}`}
+                style={{ position: 'relative' }}
+              >
                 <BreadcrumbItem
                   identifier={item.identifier}
                   item={item}
                   index={index}
                   numItems={items.length}
                   restoreBreadcrumb={() => this.restoreBreadcrumb(item)}
+                  onHoverOver={() => this.onHoverOver(item)}
+                  onHoverOut={() => this.onHoverOut(item)}
                 />
               </span>
             ))}
