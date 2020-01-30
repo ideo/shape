@@ -8,6 +8,7 @@ describe('FilterMenu', () => {
       onFilterByTag: jest.fn(),
       onFilterBySearch: jest.fn(),
       alignTop: true,
+      marginTop: 5,
     }
     rerender = function() {
       wrapper = shallow(<FilterMenu {...props} />)
@@ -23,20 +24,18 @@ describe('FilterMenu', () => {
       expect(getPopoutMenu().props().menuOpen).toBe(false)
     })
 
-    describe('when the filterBar is active', () => {
-      it('should set the FilterIconHolder to have 5px top margin', () => {
-        const iconHolder = wrapper.find('FilterIconHolder').dive()
-        expect(iconHolder).toHaveStyleRule('margin-top', '5px')
-      })
+    it('should set the FilterIconHolder to have 5px top margin', () => {
+      const iconHolder = wrapper.find('FilterIconHolder').dive()
+      expect(iconHolder).toHaveStyleRule('margin-top', '5px')
     })
 
-    describe('when the filterBar is inactive', () => {
+    describe('when margin top is not specified', () => {
       beforeEach(() => {
-        props.alignTop = false
+        props.marginTop = undefined
         rerender()
       })
 
-      it('should set the FilterIconHolder to negative top margin', () => {
+      it('should set the FilterIconHolder to default margin', () => {
         const iconHolder = wrapper.find('FilterIconHolder').dive()
         expect(iconHolder).toHaveStyleRule('margin-top', '-24px')
       })

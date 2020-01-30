@@ -8,15 +8,8 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 export const FilterIconButton = styled.button`
   height: 40px;
   margin-right: 10px;
-  ${props =>
-    props.alignTop
-      ? `
-    margin-top: 5px;
-  `
-      : `
-    margin-bottom: 12px;
-    margin-top: -24px;
-    `}
+  margin-top: ${props => props.marginTop};
+  margin-bottom: ${props => props.marginBottom};
   width: 35px;
 `
 FilterIconButton.displayName = 'FilterIconButton'
@@ -50,11 +43,15 @@ class FilterMenu extends React.Component {
   }
 
   render() {
-    const { alignTop } = this.props
+    const { marginTop } = this.props
 
     return (
       <Box ml={'auto'}>
-        <FilterIconButton alignTop={alignTop} onClick={this.handleFilterClick}>
+        <FilterIconButton
+          marginTop={`${marginTop}px`}
+          marginBottom={marginTop > 0 ? 'inherit' : '12px'}
+          onClick={this.handleFilterClick}
+        >
           <FilterIcon />
         </FilterIconButton>
         <PopoutMenu
@@ -80,11 +77,11 @@ class FilterMenu extends React.Component {
 FilterMenu.propTypes = {
   onFilterByTag: PropTypes.func.isRequired,
   onFilterBySearch: PropTypes.func.isRequired,
-  alignTop: PropTypes.bool,
+  marginTop: PropTypes.number,
 }
 
 FilterMenu.defaultProps = {
-  alignTop: false,
+  marginTop: -24,
 }
 
 export default FilterMenu

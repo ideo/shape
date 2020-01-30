@@ -5,9 +5,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
 
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids]
-  before_action :check_cache, only: %i[index ids]
-  before_action :load_collection_cards, only: %i[index ids]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records]
+  before_action :check_cache, only: %i[index ids breadcrumb_records]
+  before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
   def index
     params[:card_order] ||= @collection.default_card_order
 
@@ -25,6 +25,21 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   # return all collection_card_ids for this particular collection
   def ids
     render json: @collection_card_ids.map(&:to_s)
+  end
+
+  def breadcrumb_records
+    card_data = @collection_cards
+                  .select { |card| card.record.is_a?(Collection) }
+                  .map do |card|
+                    {
+                      id: card.record.id,
+                      type: card.record.class.base_class.name.downcase.pluralize,
+                      collection_type: card.record.class.name,
+                      name: card.record.name,
+                      has_children: card.record.has_child_collections?,
+                    }
+                  end
+    render json: card_data
   end
 
   def create
