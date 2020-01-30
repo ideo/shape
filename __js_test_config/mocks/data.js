@@ -419,7 +419,6 @@ export const fakeCollection = {
   links: {
     self: 'https://www.shape.space/ideo/collections/1',
   },
-  style: {},
   collection_filters: [],
   card_order: 'order',
   collection_cards: fakeCards,

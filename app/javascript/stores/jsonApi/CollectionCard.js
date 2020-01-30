@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 
-import {
+import v, {
   ITEM_TYPES,
   COLLECTION_TYPES,
   COLLECTION_CARD_TYPES,

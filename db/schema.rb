@@ -126,6 +126,7 @@ ActiveRecord::Schema.define(version: 2020_01_24_010234) do
     t.integer "section_type"
     t.string "identifier"
     t.string "font_color"
+    t.boolean "font_background", default: false
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
