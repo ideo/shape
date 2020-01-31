@@ -44,7 +44,7 @@ export const StyledMenuButtonWrapper = styled.div`
 `
 
 export const StyledMenuWrapper = styled.div`
-  position: absolute;
+  position: ${props => (props.positionRelative ? 'relative' : 'absolute')};
   padding: 10px;
   transition: left 120ms;
   z-index: ${v.zIndex.aboveClickWrapper};
@@ -95,7 +95,7 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 export const StyledMenu = styled.ul`
   background-color: white;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
-  max-height: ${props => window.innerHeight - 260}px;
+  max-height: ${window.innerHeight - 260}px;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
@@ -349,6 +349,7 @@ class PopoutMenu extends React.Component {
       offsetPosition,
       hideDotMenu,
       location,
+      positionRelative,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -375,6 +376,7 @@ class PopoutMenu extends React.Component {
           </MenuToggle>
         )}
         <StyledMenuWrapper
+          positionRelative={positionRelative}
           position={position}
           offsetPosition={offsetPosition}
           height={200}
@@ -435,6 +437,7 @@ PopoutMenu.propTypes = {
     component: PropTypes.node,
   }),
   location: PropTypes.string,
+  positionRelative: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -454,6 +457,7 @@ PopoutMenu.defaultProps = {
   groupExtraComponent: {},
   hideDotMenu: false,
   location: null,
+  positionRelative: true,
 }
 
 export default PopoutMenu

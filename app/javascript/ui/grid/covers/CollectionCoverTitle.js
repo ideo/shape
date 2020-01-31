@@ -1,9 +1,12 @@
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { PropTypes as MobxPropTypes, observer } from 'mobx-react'
 import styled from 'styled-components'
 import Hypher from 'hypher'
 import english from 'hyphenation.en-us'
 import { some } from 'lodash'
+import { TextWithBackground } from './CollectionCover'
 
 function namePartTooLong(fullName) {
   const parts = fullName.split(' ')
@@ -72,34 +75,58 @@ class CollectionCoverTitle extends React.Component {
     return null
   }
 
-  render() {
-    const { collection } = this.props
-    const tooLong = namePartTooLong(collection.name)
-    const hyphens = tooLong ? 'auto' : 'initial'
+  get nameTooLong() {
+    const {
+      collection: { name },
+    } = this.props
+    return namePartTooLong(name)
+  }
 
-    if (this.hasIcon) {
-      const nameParts = splitName(collection.name)
-      if (!nameParts) return collection.name
-      const lastName = nameParts.pop()
+  get renderName() {
+    const {
+      collection: { name },
+    } = this.props
+    if (!this.hasIcon) return name
 
-      return (
-        <span style={{ hyphens }}>
-          {this.leftIcon && <IconHolder>{this.leftIcon}</IconHolder>}
-          {nameParts.join(' ')}{' '}
-          <span style={{ hyphens: tooLong ? 'auto' : 'initial' }}>
-            {hyphenate(lastName)}
-            &nbsp;
-            {this.rightIcon && <IconHolder>{this.rightIcon}</IconHolder>}
-          </span>
+    const nameParts = splitName(name)
+    if (!nameParts) return name
+
+    const lastName = nameParts.pop()
+    return (
+      <Fragment>
+        {this.leftIcon && <IconHolder>{this.leftIcon}</IconHolder>}
+        {nameParts.join(' ')}{' '}
+        <span style={{ hyphens: this.tooLong ? 'auto' : 'initial' }}>
+          {hyphenate(lastName)}
+          &nbsp;
+          {this.rightIcon && <IconHolder>{this.rightIcon}</IconHolder>}
         </span>
-      )
-    }
-    return <span style={{ hyphens }}>{collection.name}</span>
+      </Fragment>
+    )
+  }
+
+  render() {
+    const { useTextBackground } = this.props
+    const hyphens = this.tooLong ? 'auto' : 'initial'
+    return (
+      <span style={{ hyphens }}>
+        {useTextBackground ? (
+          <TextWithBackground>{this.renderName}</TextWithBackground>
+        ) : (
+          this.renderName
+        )}
+      </span>
+    )
   }
 }
 
 CollectionCoverTitle.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  useTextBackground: PropTypes.bool,
+}
+
+CollectionCoverTitle.defaultProps = {
+  useTextBackground: false,
 }
 
 export default CollectionCoverTitle

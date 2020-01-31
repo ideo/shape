@@ -126,6 +126,8 @@ class CollectionCardBuilder
     return unless @parent_collection.is_a? Collection::SubmissionsCollection
 
     @parent_collection.follow_submission_box(@user)
+    record.unanchor_and_inherit_roles_from_anchor!
+    @user.add_role(Role::EDITOR, record)
   end
 
   def add_external_record
