@@ -57,7 +57,7 @@ const middleClamp = (text, desiredTextLen) => {
   // any content and truncate the title somewhat in the middle
   const desiredLength = desiredTextLen - 2 // two extra chars for ellipsis and space
   const first = text.slice(0, desiredLength / 2)
-  const second = text.slice(name.length - desiredLength / 2, name.length)
+  const second = text.slice(text.length - desiredLength / 2, text.length)
   return `${first}… ${second}`
 }
 

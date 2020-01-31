@@ -3,6 +3,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { fakeTextItem, fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import { rightClamp } from '~/utils/textUtils'
 
 describe('PageHeader', () => {
   let wrapper, component, props
@@ -135,6 +136,36 @@ describe('PageHeader', () => {
     })
   })
 
+  describe('with a template instance collection', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.isUsableTemplate = false
+      props.record.isMasterTemplate = false
+      props.record.isTestCollection = false
+      props.record.isTemplated = true
+      props.record.template = fakeCollection
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+    })
+
+    it('should show the template instance icon', () => {
+      expect(wrapper.find('CollectionTypeIcon').exists()).toBeTruthy()
+    })
+
+    it('should show master template navigate back button', () => {
+      expect(wrapper.find('BackIcon').exists()).toBeTruthy()
+    })
+
+    it('should show a clamped collection name', () => {
+      expect(
+        wrapper
+          .find('StyledButtonNameWrapper')
+          .children()
+          .first()
+          .text()
+      ).toEqual(rightClamp(fakeCollection.name, 12))
+    })
+  })
+
   describe('with template whose a child of a master template', () => {
     beforeEach(() => {
       props.record = fakeCollection
@@ -173,6 +204,7 @@ describe('PageHeader', () => {
       props.record.archived = true
       props.record.is_restorable = true
       props.record.can_edit = true
+      props.record.isTemplated = false
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
 
