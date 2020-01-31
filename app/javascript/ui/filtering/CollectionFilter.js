@@ -13,7 +13,7 @@ import FilterSearchModal from './FilterSearchModal'
 
 const SortContainer = styled.div`
   position: relative;
-  top: -15px;
+  top: ${props => (props.top ? props.top : 0)}px;
 `
 
 const GrowFlex = styled(Flex)`
@@ -168,7 +168,10 @@ class CollectionFilter extends React.Component {
             />
           )}
           {sortable && (
-            <SortContainer>
+            <SortContainer
+              // if FilterMenu is shown then CollectionSort needs to bump up
+              top={canEdit ? -15 : 0}
+            >
               <CollectionSort collection={collection} />
             </SortContainer>
           )}
