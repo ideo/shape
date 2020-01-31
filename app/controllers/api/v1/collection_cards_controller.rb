@@ -156,7 +156,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_moving_collections, only: %i[move]
   after_action :broadcast_moving_collection_updates, only: %i[move link]
   def move
-    placement = json_api_params[:placement]
+    placement = json_api_params[:placement].presence || 'beginning'
     @card_action ||= 'move'
     if @cards.count >= bulk_operation_threshold
       return perform_bulk_operation(
