@@ -1,4 +1,4 @@
-import { startCase } from 'lodash'
+import { startCase, flatten } from 'lodash'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -86,9 +86,9 @@ class MethodLibraryFilterBar extends React.Component {
     if (type === 'creativeQualities') {
       tagNames = [...creativeQualities.keys()]
     } else if (type === 'subqualities') {
-      tagNames = [...creativeQualities.values()]
-        .map(val => val.subqualities)
-        .flat()
+      tagNames = flatten(
+        [...creativeQualities.values()].map(val => val.subqualities)
+      )
     } else {
       tagNames = methodLibraryTagsByType[type]
     }
@@ -120,6 +120,7 @@ class MethodLibraryFilterBar extends React.Component {
       const { filters, onSelect } = this.props
       let tags = []
       creativeQualities.forEach((data, quality) => {
+        // Add quality as header
         tags.push({
           name: quality,
           bgColor: data.color,
@@ -128,6 +129,7 @@ class MethodLibraryFilterBar extends React.Component {
           TextComponent: CreativeQualityTypography,
           onClick: () => null,
         })
+        // Add subqualities for this quality from filters
         const subqualityFilters = filters.filter(filter =>
           data.subqualities.includes(filter.text.toLowerCase())
         )
@@ -189,7 +191,10 @@ class MethodLibraryFilterBar extends React.Component {
     return (
       <Fragment>
         <CreativeQualityTagsWrapper>
-          <PillList itemList={this.formattedPills('creativeQualities')} />
+          <PillList
+            itemList={this.formattedPills('creativeQualities')}
+            className="creativeQualityTags"
+          />
         </CreativeQualityTagsWrapper>
         <ResponsiveFlex>
           {categories.map(category => (
@@ -201,6 +206,7 @@ class MethodLibraryFilterBar extends React.Component {
                 menuItems={this.popoutMenuItems(category)}
                 width={this.popoutMenuCoords(category).width}
                 offsetPosition={this.popoutMenuCoords(category).offsetPosition}
+                className={`PopoutMenu-${category}`}
               />
               <MethodCategorySelect
                 onMouseEnter={() => this.openMenu(category)}
