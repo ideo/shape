@@ -110,8 +110,12 @@ SubduedHeading1.displayName = 'SubduedHeading1'
 /** @component */
 export const SubduedText = styled(DisplayText)`
   color: ${v.colors.commonDark};
+  font-size: ${props => props.fontSize};
 `
 SubduedText.displayName = 'SubduedText'
+SubduedText.defaultProps = {
+  fontSize: '1rem',
+}
 
 /** @component */
 export const DisplayLink = styled.a`

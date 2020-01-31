@@ -137,7 +137,9 @@ class OrganizationMenu extends React.Component {
         <GroupModify
           group={{}}
           onSave={this.createOrganization}
+          onCancel={this.handleClose}
           groupType="Organization"
+          creatingOrg
         />
       </div>
     )
@@ -154,6 +156,7 @@ class OrganizationMenu extends React.Component {
           this.saveOrganization(group)
           this.afterGroupSave(group)
         }}
+        onCancel={this.handleClose}
         groupType="Organization"
       />
     )
