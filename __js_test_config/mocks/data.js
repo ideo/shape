@@ -69,8 +69,8 @@ export const fakeAreaChartDataset = {
   data: areaChartData,
   dataWithDates: areaChartData.map(d => ({
     date: new Date(d.date),
-    value: d.value
-  }))
+    value: d.value,
+  })),
 }
 
 const fakeBarChartData = [
@@ -142,7 +142,7 @@ export const creativeDifferenceQualityDataset = {
     { value: 40, name: 'Expert' },
   ],
   data: creativeDifferenceData,
-  dataWithDates: creativeDifferenceData
+  dataWithDates: creativeDifferenceData,
 }
 
 export const fakeDatasetAttrs = {
@@ -420,6 +420,9 @@ export const fakeCollection = {
     self: 'https://www.shape.space/ideo/collections/1',
   },
   collection_filters: [],
+  filterBarFilters: [],
+  methodLibraryFilters: [],
+  isMethodLibraryCollection: false,
   card_order: 'order',
   collection_cards: fakeCards,
   sortedCards: fakeCards,
@@ -434,7 +437,6 @@ export const fakeCollection = {
   API_getNextAvailableTest: jest.fn(),
   API_clearCollectionCover: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
-  API_batchUpdateCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   API_createCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
   API_destroyCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
@@ -446,12 +448,14 @@ export const fakeCollection = {
     .mockReturnValue(Promise.resolve({})),
   API_removeComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_selectCollectionType: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
   clearCollectionCards: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
+  collection_type: 'method',
   meta: {
     snapshot: {
       can_edit: false,
@@ -628,7 +632,7 @@ export const fakeTestAudience = {
   sample_size: 12,
   num_completed_responses: 6,
   price_per_response: 4.24,
-  incentive_per_response: 1.95
+  incentive_per_response: 1.95,
 }
 export const fakeTestCollection = {
   id: '1',

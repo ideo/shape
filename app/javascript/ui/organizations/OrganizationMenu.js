@@ -77,6 +77,7 @@ class OrganizationMenu extends React.Component {
       googleTagManager.push({
         event: 'formSubmission',
         formType: hasOrg ? 'Additional Org' : 'New Org',
+        organization: newOrg.slug,
       })
       routingStore.routeTo(`/${newOrg.slug}`)
       onClose()

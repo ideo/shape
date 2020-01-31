@@ -245,7 +245,7 @@ export const StyledGridCardInner = styled.div`
     ${props =>
       (props.filter === 'transparent_gray' || props.forceFilter) &&
       `
-      background: ${hexToRgba(v.colors.black, 0.4)};
+      background: ${hexToRgba(v.colors.black, v.collectionCoverOpacity)};
     `} width: 100%;
     height: 100%;
   }

@@ -577,8 +577,20 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`organizations/${orgId}/admin_users`, 'GET')
   }
 
-  createTemplateInstance(data) {
-    return this.request('collections/create_template', 'POST', data)
+  async createTemplateInstance({ data, template, inSubmissionBox = false }) {
+    const result = await this.request(
+      'collections/create_template',
+      'POST',
+      data
+    )
+    googleTagManager.push({
+      event: 'templateUsed',
+      formType: 'Template Used',
+      templateName: template.name,
+      collectionType: template.collection_type,
+      submissionContent: inSubmissionBox,
+    })
+    return result
   }
 
   async fetchAllPages(url, page = 1, acc = []) {
@@ -599,7 +611,8 @@ class ApiStore extends jsonapi(datxCollection) {
       }
     )
     if (undoable) {
-      const snapshot = collection.toJsonApiWithCards()
+      const onlyCardIds = collection.isBoard ? cardIds : []
+      const snapshot = collection.toJsonApiWithCards(onlyCardIds)
       this.undoStore.pushUndoAction({
         message: 'Delete undone',
         apiCall: () => this.unarchiveCards({ cardIds, collection, snapshot }),
@@ -622,7 +635,9 @@ class ApiStore extends jsonapi(datxCollection) {
     snapshot = null,
     undoable = true,
   }) {
-    const collection_snapshot = snapshot || collection.toJsonApiWithCards()
+    const onlyCardIds = collection.isBoard ? cardIds : []
+    const collection_snapshot =
+      snapshot || collection.toJsonApiWithCards(onlyCardIds)
     const res = await this.request('collection_cards/unarchive', 'PATCH', {
       card_ids: cardIds,
       collection_snapshot,
@@ -634,7 +649,7 @@ class ApiStore extends jsonapi(datxCollection) {
         apiCall: () => {
           this.archiveCards({ cardIds, collection, undoable: false })
         },
-        redirectPath: { type: 'collections', id: snapshot.id },
+        redirectPath: { type: 'collections', id: collection.id },
         redoAction: {
           message: 'Redoing Duplicate',
           apiCall: () => this.unarchiveCards({ cardIds, collection }),
@@ -670,7 +685,8 @@ class ApiStore extends jsonapi(datxCollection) {
     // find origin collection
     const fromCollection = this.find('collections', data.from_id)
     // make snapshot of fromCollection data with cards for potential undo
-    const originalData = fromCollection.toJsonApiWithCards()
+    const onlyCardIds = toCollection.isBoard ? data.collection_card_ids : []
+    const originalData = fromCollection.toJsonApiWithCards(onlyCardIds)
     if (!fromCollection.can_view) {
       this.undoStore.pushUndoAction({
         message:

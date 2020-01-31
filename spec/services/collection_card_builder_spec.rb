@@ -325,9 +325,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       context 'when item is a submission' do
+        let(:editor) { create(:user) }
         let(:submission_box) do
           create(:submission_box,
                  organization: organization,
+                 add_editors: [editor],
                  add_viewers: [user])
         end
         let(:parent) { create(:submissions_collection, submission_box: submission_box) }
@@ -340,6 +342,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
         it 'should subscribe the submitter to the submission box' do
           users_thread = comment_thread.users_thread_for(user)
           expect(users_thread.subscribed).to be true
+        end
+
+        it 'should add the submitter as an editor' do
+          record = builder.collection_card.record
+          expect(record.can_edit?(editor)).to be true
+          expect(record.can_edit?(user)).to be true
         end
       end
 
@@ -497,6 +505,39 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       it 'should display errors' do
         expect(builder.errors.full_messages.first).to eq 'Only one of Item or Collection can be assigned'
+      end
+    end
+
+    context 'creating an overlapping card on foamcore' do
+      let(:parent) do
+        create(:board_collection,
+               organization: organization,
+               add_editors: [user])
+      end
+      let!(:overlapping_card) { create(:collection_card_text, row: 1, col: 1, parent: parent) }
+      let(:builder) do
+        CollectionCardBuilder.new(
+          params: params.merge(
+            item_attributes: {
+              name: 'My item name',
+              content: 'My Text Content goes here',
+              data_content: { ops: [] },
+              type: 'Item::TextItem',
+            },
+            row: 1,
+            col: 1,
+          ),
+          parent_collection: parent,
+          user: user,
+        )
+      end
+
+      it 'should create the card in an open spot' do
+        expect(builder.create).to be true
+        card = builder.collection_card
+        expect(card.row).to eq 1
+        # should put it in the next column over
+        expect(card.col).to eq 2
       end
     end
   end

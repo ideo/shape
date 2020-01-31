@@ -178,6 +178,11 @@ class FoamcoreGrid extends React.Component {
 
   componentDidUpdate(prevProps) {
     this.updateSelectedArea()
+    if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
+      // e.g. if API_fetchCards has reset the loaded cards, we may want to
+      // trigger this in case we are viewing further down the page
+      this.throttledLoadAfterScroll()
+    }
   }
 
   componentWillUnmount() {
@@ -187,16 +192,6 @@ class FoamcoreGrid extends React.Component {
       uiStore.selectedAreaEnabled = false
     })
     window.removeEventListener('scroll', this.handleScroll)
-  }
-
-  propsHaveChangedFrom(prevProps) {
-    const fields = [
-      'cardProperties',
-      'blankContentToolState',
-      'cardIdMenuOpen',
-      'movingCardIds',
-    ]
-    return !objectsEqual(_.pick(prevProps, fields), _.pick(this.props, fields))
   }
 
   // Load more cards if we are approaching a boundary of what we have loaded
@@ -226,14 +221,15 @@ class FoamcoreGrid extends React.Component {
     const { collection, loadCollectionCards } = this.props
     const visRows = this.visibleRows
     const collectionMaxRow = collection.max_row_index
+    // min row should start with the next row after what's loaded
     const loadMinRow = collection.loadedRows + 1
-    // add a buffer of 3 more rows
-    let loadMaxRow = Math.ceil(loadMinRow + visRows.num + 3)
-
-    // Constrain max row to maximum on collection
-    if (loadMaxRow > collectionMaxRow) loadMaxRow = collectionMaxRow
-
-    if (loadMinRow < loadMaxRow) {
+    // add a buffer of 3 more rows (constrained by max row on collection)
+    const loadMaxRow = _.min([
+      collectionMaxRow,
+      Math.ceil(loadMinRow + visRows.num + 3),
+    ])
+    // min and max could be equal if there is one more row to load
+    if (loadMinRow <= loadMaxRow) {
       return loadCollectionCards({
         // just load by row # downward, and always load all 16 cols
         rows: [loadMinRow, loadMaxRow],
@@ -339,8 +335,7 @@ class FoamcoreGrid extends React.Component {
     const col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
     const row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
 
-    if (row === -1 || col === -1) return null
-
+    // could return negative, but setDraggedOnSpots will deal with this appropriately
     return { col, row }
   }
 
@@ -513,7 +508,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleScroll = ev => {
-    this.throttledLoadAfterScroll(ev)
+    this.throttledLoadAfterScroll()
   }
 
   originalCard(cardId) {
@@ -663,7 +658,7 @@ class FoamcoreGrid extends React.Component {
       cardAction === 'move' && movingFromCollectionId === collection.id
 
     const updates = []
-    let negativeZone = false
+    let outsideDraggableArea = false
     // dragGridSpot has the positions of all the dragged cards
     const draggingPlaceholders = dragGridSpotValues
     _.each(draggingPlaceholders, placeholder => {
@@ -674,8 +669,8 @@ class FoamcoreGrid extends React.Component {
         col,
       }
       updates.push(update)
-      if (row < 0 || col < 0) {
-        negativeZone = true
+      if (row < 0 || col < 0 || col > collection.maxColumnIndex) {
+        outsideDraggableArea = true
         return false
       }
       return update
@@ -687,7 +682,7 @@ class FoamcoreGrid extends React.Component {
     }
     const onCancel = () => onConfirmOrCancel({ keepMDLOpen: true })
 
-    if (negativeZone) {
+    if (outsideDraggableArea) {
       return onCancel()
     } else if (
       draggingFromMDL &&
@@ -803,7 +798,13 @@ class FoamcoreGrid extends React.Component {
 
   @action
   updateDragGridSpotWithOpenPosition(position) {
+    const { collection } = this.props
     if (!USE_COLLISION_DETECTION_ON_DRAG) {
+      const { row, col } = position
+      if (row < 0 || col < 0 || col > collection.maxColumnIndex) {
+        this.hasDragCollision = true
+        return
+      }
       this.dragGridSpot.set(getMapKey(position), position)
       this.hasDragCollision =
         this.hasDragCollision || this.findOverlap(position)

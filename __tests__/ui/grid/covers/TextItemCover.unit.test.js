@@ -128,6 +128,8 @@ describe('TextItemCover', () => {
       })
       const result = await component.handleClick(e)
       expect(result).toBe(null)
+      // simulate this next part which happens via timeout
+      component.pushTextUndo()
       expect(item.pushUndo).toHaveBeenCalledWith({
         message: 'Text undone!',
         redirectTo: null,
@@ -142,6 +144,57 @@ describe('TextItemCover', () => {
       })
       component.handleClick(e)
       expect(uiStore.showPermissionsAlert).toHaveBeenCalled()
+    })
+  })
+
+  describe('cancel', () => {
+    beforeEach(() => {
+      item.content = '<p>'
+      item.API_updateWithoutSync = jest.fn()
+    })
+
+    it('calls item.API_updateWithoutSync', async () => {
+      component.cancel({ item, ev: e })
+      expect(props.item.API_updateWithoutSync).toHaveBeenCalledWith({
+        cancel_sync: true,
+      })
+    })
+
+    describe('with no content', () => {
+      const card = { API_archiveSelf: jest.fn() }
+      beforeEach(() => {
+        item.content = ''
+        item.version = null
+        item.API_updateWithoutSync = jest.fn()
+        apiStore.find = jest.fn().mockReturnValue(card)
+        card.API_archiveSelf.mockClear()
+      })
+      describe('and no version', () => {
+        beforeEach(() => {
+          item.version = null
+          wrapper = shallow(<TextItemCover {...props} />)
+          component = wrapper.instance()
+        })
+        it('calls card.API_archiveSelf', async () => {
+          component.cancel({ item, ev: e })
+          expect(apiStore.find).toHaveBeenCalledWith(
+            'collection_cards',
+            props.cardId
+          )
+          expect(card.API_archiveSelf).toHaveBeenCalled()
+        })
+      })
+      describe('and a version', () => {
+        beforeEach(() => {
+          item.version = 1
+          wrapper = shallow(<TextItemCover {...props} />)
+          component = wrapper.instance()
+        })
+        it('does not call card.API_archiveSelf', async () => {
+          component.cancel({ item, ev: e })
+          expect(card.API_archiveSelf).not.toHaveBeenCalled()
+        })
+      })
     })
   })
 })

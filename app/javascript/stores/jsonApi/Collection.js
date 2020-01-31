@@ -20,6 +20,7 @@ import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
@@ -58,6 +59,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'submission_box_type',
     'collection_to_test_id',
     'test_show_media',
+    'collection_type',
   ]
 
   constructor(...args) {
@@ -150,11 +152,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const cards = this.collection_cards.filter(card =>
       _.includes(cardIds, card.id)
     )
-    let card = {}
+    let card
     if (this.isBoard) {
       card = findTopLeftCard(cards)
     } else {
       card = _.first(_.sortBy(cards, 'order'))
+    }
+    if (_.isEmpty(card)) {
+      // catch
+      return _.first(cardIds)
     }
     return card.id
   }
@@ -305,7 +311,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isRegularCollection() {
-    return this.type === 'Collection' && !this.isBoard
+    return this.type === 'Collection'
   }
 
   get isUserCollection() {
@@ -509,6 +515,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get allowsCollectionTypeSelector() {
+    return _.every(
+      [
+        this.isRegularCollection,
+        !this.isSpecialCollection,
+        !this.system_required,
+      ],
+      bool => bool
+    )
+  }
+
   // this marks it with the "offset" special color
   // NOTE: could also use Collection::Global -- except OrgTemplates is not "special"?
   get isSpecialCollection() {
@@ -588,7 +605,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     // attach nested attributes of cards
     if (this.collection_cards) {
       // make sure cards are sequential
-      this._reorderCards()
+      if (!this.isBoard) this._reorderCards()
       const cardAttributes = []
       _.each(this.collection_cards, card => {
         if (
@@ -622,6 +639,29 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     if (activeFilters.length === 0) return {}
     return { q: activeFilters.join(' ') }
+  }
+
+  get isMethodLibraryCollection() {
+    return this.name.match(/method\s+library/i)
+  }
+
+  @computed
+  get filterBarFilters() {
+    if (!this.isMethodLibraryCollection) return this.collection_filters
+    // If it is method library, return all filters except the fixed method library tags
+    return this.collection_filters.filter(
+      filter =>
+        filter.filter_type !== 'tag' ||
+        (filter.filter_type === 'tag' &&
+          !methodLibraryTags.includes(filter.text.toLowerCase()))
+    )
+  }
+
+  @computed
+  get methodLibraryFilters() {
+    return this.collection_filters.filter(
+      filter => !this.filterBarFilters.includes(filter)
+    )
   }
 
   get ideasCollection() {
@@ -658,11 +698,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (rows) {
-      params.rows = rows
-    }
-    if (cols) {
-      params.cols = cols
+    if (this.isBoard) {
+      if (rows) {
+        params.rows = rows
+      }
+      if (cols) {
+        params.cols = cols
+      }
     }
     let apiPath = `collections/${
       this.id
@@ -688,10 +730,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       } else {
         this.totalPages = links.last
       }
+      const firstPage = page === 1 && (!rows || rows[0] == 0)
       if (
-        page === 1 &&
-        !rows &&
-        (searchTerm || this.storedCacheKey !== this.cache_key)
+        firstPage &&
+        (this.storedCacheKey !== this.cache_key ||
+          data.length === 0 ||
+          searchTerm)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
@@ -790,6 +834,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
   }
 
+  API_fetchBreadcrumbRecords() {
+    const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
+    return this.apiStore.request(apiPath)
+  }
   /*
   Perform batch updates on multiple cards at once,
   and captures current cards state to undo to
@@ -819,48 +867,113 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onConfirm,
     onCancel,
   }) {
-    const cardIds = []
-    const updatesByCardId = {}
-    _.each(updates, update => {
-      cardIds.push(update.card.id)
-      updatesByCardId[update.card.id] = update
-    })
-
-    const performUpdate = () => {
+    const performUpdate = async () => {
       // close MoveMenu e.g. if you were dragging from MDL
       this.uiStore.closeMoveMenu()
-      // Store snapshot of existing cards so changes can be un-done
-      const cardsData = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
 
-      this.pushUndo({
-        snapshot: cardsData.attributes,
-        message: undoMessage,
-        redoAction: {
-          message: 'Move redone',
-          apiCall: () =>
-            // re-call the same function
-            this.API_batchUpdateCardsWithUndo({
-              updates,
-              updateAllCards,
-              undoMessage,
-              onConfirm,
-              onCancel,
-            }),
-        },
-        actionType: POPUP_ACTION_TYPES.SNACKBAR,
+      const updatesByCardId = {}
+      _.each(updates, update => {
+        updatesByCardId[update.card.id] = update
       })
+      const cardIds = _.keys(updatesByCardId)
 
-      return this.API_batchUpdateCards({ updates, updateAllCards }).then(
-        res => {
+      // Store snapshot of existing cards so changes can be un-done
+      const dataBeforeMove = this.toJsonApiWithCards(
+        updateAllCards ? [] : cardIds
+      )
+      const snapshot = dataBeforeMove.attributes
+      this.applyLocalCardUpdates(updates)
+      // now get current data after making the updates
+      const data = this.toJsonApiWithCards(updateAllCards ? [] : cardIds)
+
+      try {
+        // Persist updates to API
+        const res = await this.apiStore.request(
+          `collections/${this.id}`,
+          'PATCH',
+          { data }
+        )
+        // do this again... this is because you may have received a RT update in between;
+        // but your update is now "the latest"
+        this.applyLocalCardUpdates(updates)
+
+        if (res) {
+          // only push undo once we've successfully updated the cards
+          this.pushUndo({
+            snapshot,
+            message: undoMessage,
+            redoAction: {
+              message: 'Move redone',
+              apiCall: () =>
+                // re-call the same function
+                this.API_batchUpdateCardsWithUndo({
+                  updates,
+                  updateAllCards,
+                  undoMessage,
+                  onConfirm,
+                  onCancel,
+                }),
+            },
+            actionType: POPUP_ACTION_TYPES.SNACKBAR,
+          })
           if (onConfirm) onConfirm()
         }
-      )
+      } catch {
+        this.uiStore.popupSnackbar({ message: 'Move cancelled due to overlap' })
+        this.revertToSnapshot(snapshot)
+        if (onCancel) onCancel()
+      }
     }
 
     // Show a dialog if in a template
     return this.confirmEdit({
       onCancel,
       onConfirm: performUpdate,
+    })
+  }
+
+  revertToSnapshot(snapshot) {
+    const updates = []
+    snapshot.collection_cards_attributes.forEach(cardData => {
+      const update = _.pick(cardData, [
+        'order',
+        'width',
+        'height',
+        'row',
+        'col',
+      ])
+      update.card = { id: cardData.id }
+      updates.push(update)
+    })
+    this.applyLocalCardUpdates(updates)
+  }
+
+  @action
+  applyLocalCardUpdates(updates) {
+    const updatesByCardId = {}
+    _.each(updates, update => {
+      updatesByCardId[update.card.id] = update
+    })
+    const orders = _.map(updates, update => update.order)
+    const minOrder = _.min(orders)
+    const maxOrder = _.max(orders)
+    // min...max is range of cards you are moving
+    // Apply all updates to in-memory cards
+    _.each(this.collection_cards, card => {
+      // Apply updates to each card
+      const cardUpdates = updatesByCardId[card.id]
+      if (cardUpdates) {
+        // Pick out allowed values and assign them
+        const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
+        _.forEach(allowedAttrs, (value, key) => {
+          card[key] = value
+        })
+      } else if (card.order >= minOrder) {
+        // make sure this card gets bumped out of the way of our moving ones
+        card.order += maxOrder + 1
+      }
+      // force the grid to immediately observe that things have changed
+      card.updated_at = new Date()
     })
   }
 
@@ -996,11 +1109,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     hasPaidAudience = false,
     ideasCount = 0,
   }) => {
-    const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
       event: 'formSubmission',
       formType: `${actionName} Feedback Test`,
-      organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: this.launchableTestId,
       hasLinkSharingAudience,
@@ -1191,6 +1302,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'POST', { data })
   }
 
+  async API_selectCollectionType(collectionType) {
+    const apiPath = `collections/${this.id}`
+    const data = {
+      type: 'collections',
+      attributes: {
+        collection_type: collectionType,
+      },
+    }
+    return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,
@@ -1256,7 +1378,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         placement: 'beginning',
       }
       uiStore.update('isLoading', true)
-      const res = await apiStore.createTemplateInstance(templateData)
+      const res = await apiStore.createTemplateInstance({
+        data: templateData,
+        template,
+        inSubmissionBox: true,
+      })
       uiStore.update('isLoading', false)
       routingStore.routeTo('collections', res.data.id)
     } else {

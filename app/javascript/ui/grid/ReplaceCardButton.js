@@ -44,7 +44,7 @@ class ReplaceCardButton extends React.PureComponent {
   }
 
   render() {
-    const { card, canEditCollection } = this.props
+    const { card, showControls } = this.props
 
     return (
       <CenteredContainer removeBackground={card.is_master_template_card}>
@@ -54,16 +54,10 @@ class ReplaceCardButton extends React.PureComponent {
           disabledHover={card.is_master_template_card}
           overrideOutlineColor={v.colors.commonDarkest}
           onClick={this.handleReplace}
-          style={{
-            display:
-              card.is_master_template_card || card.show_replace
-                ? 'block'
-                : 'none',
-          }}
         >
           Replace
         </FormButton>
-        {card.is_master_template_card && canEditCollection && (
+        {card.is_master_template_card && showControls && (
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
             title={`${
@@ -95,7 +89,11 @@ class ReplaceCardButton extends React.PureComponent {
 
 ReplaceCardButton.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  canEditCollection: PropTypes.bool.isRequired,
+  showControls: PropTypes.bool,
+}
+
+ReplaceCardButton.defaultProps = {
+  showControls: false,
 }
 
 export default ReplaceCardButton

@@ -109,7 +109,10 @@ export default class CardMoveService {
             template_id: data.from_id,
             placement,
           }
-          res = await apiStore.createTemplateInstance(data)
+          res = await apiStore.createTemplateInstance({
+            data,
+            template: toCollection,
+          })
           successMessage = 'Your template instance has been created!'
           break
         }
@@ -226,7 +229,8 @@ export default class CardMoveService {
     // and show confirmation if this is a template
     return collection.API_batchUpdateCardsWithUndo({
       updates,
-      updateAllCards: true,
+      // on a board collection we can just update the moving cards
+      updateAllCards: !collection.isBoard,
       undoMessage,
       onConfirm,
       onCancel,

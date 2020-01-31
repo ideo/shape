@@ -11,13 +11,9 @@ describe('tagColor', () => {
     expect(tagColor('Cats', 'white')).toEqual('white')
   })
 
-  it('returns color if it matches a Creative Quality', () => {
+  it('returns color if it matches a Creative Quality or subquality', () => {
     expect(tagColor('purpose', 'white')).toEqual('#9874AB')
-    // It should be case-insensitive
     expect(tagColor('Purpose', 'white')).toEqual('#9874AB')
-  })
-
-  it('returns color if it matches a Creative Subquality', () => {
     expect(tagColor('Process Clarity', 'white')).toEqual('#83CCB1')
     expect(tagColor('process clarity', 'white')).toEqual('#83CCB1')
   })

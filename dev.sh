@@ -37,5 +37,7 @@ else
   ttab "$EDITOR . && open http://localhost:3000"
 fi
 
+# make sure you're up to date
+git fetch
 # add network-react-components
 git submodule update --init
