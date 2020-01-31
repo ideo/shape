@@ -55,7 +55,9 @@ class OrganizationAssigner < SimpleService
       shell: false,
       created_at: DateTime.now,
     )
-    @organization.template_collection.update(name: @organization.name)
+    @organization.template_collection.update(
+      name: "#{@organization.name} Templates",
+    )
     @errors = @organization.errors
   end
 
