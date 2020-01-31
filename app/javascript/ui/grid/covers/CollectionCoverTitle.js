@@ -106,10 +106,11 @@ class CollectionCoverTitle extends React.Component {
   }
 
   render() {
+    const { useTextBackground } = this.props
     const hyphens = this.tooLong ? 'auto' : 'initial'
     return (
       <span style={{ hyphens }}>
-        {this.useTextBackground ? (
+        {useTextBackground ? (
           <TextWithBackground>{this.renderName}</TextWithBackground>
         ) : (
           this.renderName

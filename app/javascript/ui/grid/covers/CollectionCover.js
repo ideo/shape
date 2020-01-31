@@ -67,11 +67,39 @@ const calcSectionWidth = props => {
 }
 
 const calcSectionHeight = props => {
-  if (props.isTextItem) return 'auto;'
-  if (props.height > 1) {
-    return `calc(50% - ${pad + props.gutter / 2}px)`
+  const { isTextItem, height, useTextBackground, gutter } = props
+  if (isTextItem) return 'auto'
+  if (useTextBackground) return '50%'
+  let reduceBy
+  if (height > 1) {
+    reduceBy = `${pad + gutter / 2}px`
+  } else {
+    reduceBy = `${pad}px`
   }
-  return `calc(50% - ${pad}px)`
+  return `calc(50% - ${reduceBy})`
+}
+
+const calcTopAndBottom = props => {
+  if (props.useTextBackground) {
+    return {
+      top: {
+        top: 0,
+        bottom: 'auto',
+      },
+      bottom: {
+        bottom: 0,
+      },
+    }
+  }
+  return {
+    top: {
+      top: `${props.isTextItem ? 'auto' : props.gutter / 2 + pad}px`,
+      bottom: props.isTextItem ? '13px' : 'auto',
+    },
+    bottom: {
+      bottom: `${props.height === 1 ? 4 : pad}px`,
+    },
+  }
 }
 
 const StyledCardContent = styled.div`
@@ -91,6 +119,7 @@ const StyledCardContent = styled.div`
     // Text style for the text and media covers
     h1 {
       color: ${props => (props.color ? props.color : 'white')};
+      ${props => props.useTextBackground && 'padding: 0; margin-bottom: 0;'}
     }
 
     &.text-item {
@@ -101,11 +130,11 @@ const StyledCardContent = styled.div`
     }
   }
   .top {
-    top: ${props => (props.isTextItem ? 'auto' : props.gutter / 2 + pad)}px;
-    bottom: ${props => (props.isTextItem ? '13px' : 'auto')};
+    top: ${props => calcTopAndBottom(props).top.top};
+    bottom: ${props => calcTopAndBottom(props).top.bottom};
   }
   .bottom {
-    bottom: ${props => (props.height === 1 ? 4 : pad)}px;
+    bottom: ${props => calcTopAndBottom(props).bottom.bottom};
   }
 
   ${props =>
@@ -140,6 +169,9 @@ class CollectionCover extends React.Component {
   get backgroundColor() {
     const { collection } = this.props
     if (collection.isSpecialCollection) return v.colors.offset
+    // If image is present, have white background (for transparent images)
+    if (this.coverImageUrl) return v.colors.white
+    // Otherwise default color
     return v.colors.collectionCover
   }
 
@@ -313,6 +345,12 @@ class CollectionCover extends React.Component {
     } = this.props
     const { subtitle } = collection
     const { gridW, gutter } = uiStore.gridSettings
+    const collectionIcon =
+      collection.collection_type !== 'collection' &&
+      collectionTypeToIcon({
+        type: collection.collection_type,
+        size: 'lg',
+      })
     return (
       <StyledCollectionCover
         data-cy="CollectionCover"
@@ -337,6 +375,7 @@ class CollectionCover extends React.Component {
             gridW={gridW}
             isTextItem={!!textItem}
             color={fontColor}
+            useTextBackground={this.useTextBackground}
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
             {textItem ? (
@@ -372,13 +411,9 @@ class CollectionCover extends React.Component {
                           useTextBackground={this.useTextBackground}
                         />
                       </PlainLink>
-                      <IconHolder>
-                        {collection.collection_type !== 'collection' &&
-                          collectionTypeToIcon({
-                            type: collection.collection_type,
-                            size: 'lg',
-                          })}
-                      </IconHolder>
+                      {collectionIcon && (
+                        <IconHolder>{collectionIcon}</IconHolder>
+                      )}
                     </Dotdotdot>
                     {this.button}
                   </PositionedCardHeading>
