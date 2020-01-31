@@ -2,12 +2,12 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import CreativeDifferenceLogoSmall from '~/ui/icons/CreativeDifferenceLogoSmall'
-import { creativeQualities } from '~/utils/creativeDifferenceVariables'
+import { allQualityColors } from '~/utils/creativeDifferenceVariables'
 
 export const tagColor = (tagName = null, defaultColor = null) => {
   const lowerTagName = tagName ? tagName.toLowerCase() : null
-  if (creativeQualities[lowerTagName]) {
-    return creativeQualities[lowerTagName].color
+  if (allQualityColors[lowerTagName]) {
+    return allQualityColors[lowerTagName]
   } else if (defaultColor) {
     return defaultColor
   }
@@ -15,7 +15,7 @@ export const tagColor = (tagName = null, defaultColor = null) => {
 }
 
 export const creativeDifferenceTagIcon = tagName => {
-  if (creativeQualities[tagName.toLowerCase()]) {
+  if (allQualityColors[tagName.toLowerCase()]) {
     return <CreativeDifferenceLogoSmall />
   }
   return null

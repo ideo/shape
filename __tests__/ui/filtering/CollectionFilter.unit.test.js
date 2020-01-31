@@ -25,7 +25,7 @@ describe('CollectionFilter', () => {
   describe('render()', () => {
     describe('with some collection filters', () => {
       beforeEach(() => {
-        props.collection.collection_filters = [fakeCollectionFilter]
+        props.collection.filterBarFilters = [fakeCollectionFilter]
         rerender()
       })
 
@@ -51,7 +51,7 @@ describe('CollectionFilter', () => {
           id: '2',
           filter_type: 'search',
         })
-        props.collection.collection_filters = [
+        props.collection.filterBarFilters = [
           tagFilterA,
           tagFilterB,
           searchFilter,
@@ -94,6 +94,22 @@ describe('CollectionFilter', () => {
 
       it('should not render the Filter Menu', () => {
         expect(wrapper.find('FilterMenu').exists()).toBe(false)
+      })
+    })
+
+    it('does not render method library filters', () => {
+      expect(wrapper.find('MethodLibraryFilterBar').exists()).toBe(false)
+    })
+
+    describe('if collection is method library', () => {
+      beforeEach(() => {
+        props.collection.isMethodLibraryCollection = true
+        props.collection.methodLibraryFilters = [fakeCollectionFilter]
+        rerender()
+      })
+
+      it('does render method library filters', () => {
+        expect(wrapper.find('MethodLibraryFilterBar').exists()).toBe(true)
       })
     })
   })
@@ -141,6 +157,7 @@ describe('CollectionFilter', () => {
     describe('adding duplicate tag', () => {
       beforeEach(() => {
         props.collection.API_createCollectionFilter.mockClear()
+        props.collection.collection_filters = [fakeCollectionFilter]
         fireEvent('Tags', fakeCollectionFilter.text)
       })
 
