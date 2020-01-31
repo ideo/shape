@@ -55,10 +55,13 @@ class OrganizationAssigner < SimpleService
       shell: false,
       created_at: DateTime.now,
     )
+    @organization.template_collection.update(name: @organization.name)
     @errors = @organization.errors
   end
 
   def update_primary_group!
+    @organization.slug = nil
+    @organization.primary_group.handle = nil
     @organization.primary_group.attributes = group_params
     @organization.primary_group.save!
   end
