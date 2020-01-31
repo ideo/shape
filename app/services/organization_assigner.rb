@@ -5,6 +5,7 @@ class OrganizationAssigner < SimpleService
     @params = params
     @user = user
     @organization = Organization.where(shell: true).first
+    create_shell_organization if @organization.blank?
     @errors = []
     @full_setup = full_setup
   end
@@ -37,6 +38,13 @@ class OrganizationAssigner < SimpleService
   end
 
   private
+
+  def create_shell_organization
+    # This is a backup case for if a org shell isn't available for some
+    # reason. In this case, we still have to show the users the loading
+    # content as it might take a while to make the org
+    OrganizationShellBuilder.new(true).save
+  end
 
   def group_params
     @params.except(:in_app_billing)
