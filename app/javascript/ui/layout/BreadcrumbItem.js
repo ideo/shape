@@ -393,6 +393,7 @@ export class BreadcrumbItem extends React.Component {
                 <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
                     onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
+                    style={{ maxWidth: '200px', width: '86%' }}
                   >
                     {this.renderIcon(menuItem)}
                     {this.renderMenuNameWithTooltip(menuItem)}
