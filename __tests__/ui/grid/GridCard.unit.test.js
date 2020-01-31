@@ -349,4 +349,21 @@ describe('GridCard', () => {
       expect(wrapper.find('ActionMenu').props().canEdit).toBe(false)
     })
   })
+
+  describe('renderReplaceControl', () => {
+    beforeEach(() => {
+      props.card.show_replace = true
+      props.card.record.isMedia = true
+      props.card.record.has_replaced_media = false
+      props.card.parentCollection = { isTemplated: true }
+      props.canEditCollection = true
+      rerender()
+    })
+
+    it('renders the the replace control', () => {
+      const replaceButton = wrapper.find('ReplaceCardButton')
+      expect(replaceButton.props().card).toEqual(props.card)
+      expect(replaceButton.props().showControls).toEqual(false)
+    })
+  })
 })
