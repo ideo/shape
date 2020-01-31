@@ -201,6 +201,7 @@ class MethodLibraryFilterBar extends React.Component {
             <MethodCategoryWrapper key={category}>
               <PopoutMenu
                 hideDotMenu
+                wrapText
                 menuOpen={this.state.menuOpen === category}
                 onMouseLeave={() => this.closeMenu(category)}
                 menuItems={this.popoutMenuItems(category)}
