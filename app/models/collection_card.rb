@@ -184,6 +184,8 @@ class CollectionCard < ApplicationRecord
     if master_template_card? && parent.templated?
       # if we're cloning from template -> templated collection
       cc.templated_from = self
+      # any user initiated duplicate should not pin cards into their instance
+      cc.pinned = false unless building_template_instance
     elsif parent.master_template? && should_pin_duplicating_cards
       # Make it pinned if you're duplicating it into a master template and all of its cards are pinned or placed in the beginning
       cc.pinned = true

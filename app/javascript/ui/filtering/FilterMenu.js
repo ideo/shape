@@ -5,14 +5,14 @@ import styled from 'styled-components'
 import FilterIcon from '~/ui/icons/FilterIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 
-export const FilterIconHolder = styled.div`
+export const FilterIconButton = styled.button`
   height: 40px;
   margin-right: 10px;
   margin-top: ${props => props.marginTop};
   margin-bottom: ${props => props.marginBottom};
   width: 35px;
 `
-FilterIconHolder.displayName = 'FilterIconHolder'
+FilterIconButton.displayName = 'FilterIconButton'
 
 class FilterMenu extends React.Component {
   constructor(props) {
@@ -47,14 +47,13 @@ class FilterMenu extends React.Component {
 
     return (
       <Box ml={'auto'}>
-        <FilterIconHolder
+        <FilterIconButton
           marginTop={`${marginTop}px`}
           marginBottom={marginTop > 0 ? 'inherit' : '12px'}
+          onClick={this.handleFilterClick}
         >
-          <button onClick={this.handleFilterClick}>
-            <FilterIcon />
-          </button>
-        </FilterIconHolder>
+          <FilterIcon />
+        </FilterIconButton>
         <PopoutMenu
           hideDotMenu
           menuOpen={this.state.filterDropdownOpen}

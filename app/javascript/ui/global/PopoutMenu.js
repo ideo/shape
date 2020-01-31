@@ -10,7 +10,7 @@ import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
-  position: relative;
+  position: ${props => (props.hideDotMenu ? 'absolute' : 'relative')};
   .menu-wrapper {
     display: none;
     opacity: 0;
@@ -46,6 +46,7 @@ export const StyledMenuButtonWrapper = styled.div`
 export const StyledMenuWrapper = styled.div`
   position: absolute;
   padding: 10px;
+  transition: left 120ms;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
     const { position, offsetPosition, location } = props
@@ -93,8 +94,12 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
   background-color: white;
-  width: ${props => props.width}px;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
+  max-height: ${props => window.innerHeight - 260}px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  width: ${props => props.width}px;
 `
 
 export const StyledMenuToggle = styled.button`
@@ -110,13 +115,33 @@ StyledMenuToggle.defaultTypes = {
 
 StyledMenuToggle.displayName = 'StyledMenuToggle'
 
+export const StyledMenuButton = styled.button`
+  text-transform: capitalize;
+  font-family: ${v.fonts.sans};
+  font-weight: 400;
+  font-size: 1rem;
+  text-align: left;
+  max-width: 200px;
+  padding-left: ${props => props.nested * 10}px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+
 export const StyledMenuItem = styled.li`
-  button {
-    width: 100%;
-    min-height: 2rem;
-    padding: 0.75rem 0 0.75rem 1rem;
-    text-transform: capitalize;
-    position: relative;
+  border-bottom: solid ${v.colors.commonMedium};
+  border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
+  border-left: 7px solid transparent;
+  color: ${v.colors.black};
+  display: flex;
+  min-height: 1rem;
+  padding: 0.75rem 0 0.75rem 1rem;
+  position: relative;
+  width: 100%;
+  width: ${props => props.width || 200}px;
+
+  ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};
     border-left: 7px solid transparent;
     font-family: ${v.fonts.sans};
@@ -129,6 +154,7 @@ export const StyledMenuItem = styled.li`
     border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
     ${props => props.bgColor && `background-color: ${props.bgColor};`}
+
     &.with-avatar {
       padding-left: 3.75rem;
       padding-right: 1rem;
@@ -175,11 +201,11 @@ export const StyledMenuItem = styled.li`
   }
   &:hover,
   &:active {
-    button {
+    ${StyledMenuButton} {
       ${props =>
         !props.hasCheckbox &&
         !props.noHover &&
-        `border-left: 7px solid ${v.colors.black};`}
+        `border-left-color: ${v.colors.black};`}
     }
   }
 `
@@ -201,7 +227,7 @@ class PopoutMenu extends React.Component {
   }
 
   get renderMenuItems() {
-    const { groupExtraComponent, wrapperClassName } = this.props
+    const { groupExtraComponent, wrapperClassName, width } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -239,8 +265,9 @@ class PopoutMenu extends React.Component {
                 loading={loading}
                 wrapperClassName={wrapperClassName}
                 bgColor={bgColor}
+                width={width - 20}
               >
-                <button
+                <StyledMenuButton
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
@@ -273,7 +300,7 @@ class PopoutMenu extends React.Component {
                   {iconRight && (
                     <span className={rightIconClassName}>{iconRight}</span>
                   )}
-                </button>
+                </StyledMenuButton>
               </StyledMenuItem>
             )
           })}

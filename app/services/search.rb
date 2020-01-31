@@ -41,6 +41,7 @@ class Search
       Filters::ActivityDateRange,
       Filters::TypeCollection,
       Filters::TypeItem,
+      Filters::CollectionType,
       Filters::RecordId,
     ]
   end
