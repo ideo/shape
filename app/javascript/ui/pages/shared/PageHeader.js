@@ -389,6 +389,7 @@ class PageHeader extends React.Component {
       record.isTemplated
     ) {
       const { template } = record
+      const active = template.can_view || template.anyone_can_view
       return (
         <FormButton
           onClick={() => {
@@ -397,14 +398,14 @@ class PageHeader extends React.Component {
           fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
           color={v.colors.commonMedium}
-          disabled={!template.can_view && !template.anyone_can_view}
+          disabled={!active}
           transparent
         >
           <StyledButtonIconWrapper>
             <CollectionTypeIcon record={record} />
           </StyledButtonIconWrapper>
           {this.renderTemplateName}
-          {(template.can_view || template.anyone_can_view) && (
+          {active && (
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}
               title={'Go to Master Template'}
