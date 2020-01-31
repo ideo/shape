@@ -44,7 +44,7 @@ export const StyledMenuButtonWrapper = styled.div`
 `
 
 export const StyledMenuWrapper = styled.div`
-  position: absolute;
+  position: ${props => (props.positionRelative ? 'relative' : 'absolute')};
   padding: 10px;
   transition: left 120ms;
   z-index: ${v.zIndex.aboveClickWrapper};
@@ -95,19 +95,12 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 export const StyledMenu = styled.ul`
   background-color: white;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
-  ${props =>
-    props.limitMaxHeight &&
-    `
-    max-height: ${window.innerHeight - 260}px;
-  `}
+  max-height: ${window.innerHeight - 260}px;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   width: ${props => props.width}px;
 `
-StyledMenu.defaultProps = {
-  limitMaxHeight: true,
-}
 
 export const StyledMenuToggle = styled.button`
   padding: 2px 7px;
@@ -358,7 +351,7 @@ class PopoutMenu extends React.Component {
       offsetPosition,
       hideDotMenu,
       location,
-      limitMaxHeight,
+      positionRelative,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -385,6 +378,7 @@ class PopoutMenu extends React.Component {
           </MenuToggle>
         )}
         <StyledMenuWrapper
+          positionRelative={positionRelative}
           position={position}
           offsetPosition={offsetPosition}
           height={200}
@@ -392,9 +386,7 @@ class PopoutMenu extends React.Component {
           location={location}
           menuClass={className}
         >
-          <StyledMenu limitMaxHeight={limitMaxHeight} width={width}>
-            {this.renderMenuItems}
-          </StyledMenu>
+          <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
         </StyledMenuWrapper>
       </StyledMenuButtonWrapper>
     )
@@ -447,7 +439,7 @@ PopoutMenu.propTypes = {
     component: PropTypes.node,
   }),
   location: PropTypes.string,
-  limitMaxHeight: PropTypes.bool,
+  positionRelative: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -467,7 +459,7 @@ PopoutMenu.defaultProps = {
   groupExtraComponent: {},
   hideDotMenu: false,
   location: null,
-  limitMaxHeight: true,
+  positionRelative: true,
 }
 
 export default PopoutMenu
