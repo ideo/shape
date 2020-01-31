@@ -20,6 +20,7 @@ import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
@@ -638,6 +639,29 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     if (activeFilters.length === 0) return {}
     return { q: activeFilters.join(' ') }
+  }
+
+  get isMethodLibraryCollection() {
+    return this.name.match(/method\s+library/i)
+  }
+
+  @computed
+  get filterBarFilters() {
+    if (!this.isMethodLibraryCollection) return this.collection_filters
+    // If it is method library, return all filters except the fixed method library tags
+    return this.collection_filters.filter(
+      filter =>
+        filter.filter_type !== 'tag' ||
+        (filter.filter_type === 'tag' &&
+          !methodLibraryTags.includes(filter.text.toLowerCase()))
+    )
+  }
+
+  @computed
+  get methodLibraryFilters() {
+    return this.collection_filters.filter(
+      filter => !this.filterBarFilters.includes(filter)
+    )
   }
 
   get ideasCollection() {
