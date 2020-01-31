@@ -259,6 +259,8 @@ class AudienceSettingsWidget extends React.Component {
               menuItems={this.addAudienceMenuItems()}
               offsetPosition={popoutMenuOffsetPosition}
               hideDotMenu
+              // HACK: until we make this list properly scrollable
+              limitMaxHeight={false}
             />
           </AddAudienceMenu>
         </StyledRowFlexItem>
