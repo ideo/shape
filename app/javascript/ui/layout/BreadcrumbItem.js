@@ -72,7 +72,7 @@ const DiveButton = styled.button`
   height: 40px;
   margin-bottom: -10px;
   margin-left: auto;
-  margin-right: -5px;
+  margin-right: 0;
   margin-top: -10px;
   width: 35px;
   transform: translate(0, 1px);
@@ -365,7 +365,7 @@ export class BreadcrumbItem extends React.Component {
               >
                 <StyledMenuButton
                   onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
-                  style={{ maxWidth: '200px', width: '100%' }}
+                  style={{ maxWidth: '200px', width: '86%' }}
                 >
                   {this.renderNesting(menuItem)}
                   {this.renderIcon(menuItem)}
