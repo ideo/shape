@@ -207,6 +207,7 @@ class MethodLibraryFilterBar extends React.Component {
                 width={this.popoutMenuCoords(category).width}
                 offsetPosition={this.popoutMenuCoords(category).offsetPosition}
                 className={`PopoutMenu-${category}`}
+                positionRelative={false}
               />
               <MethodCategorySelect
                 onMouseEnter={() => this.openMenu(category)}

@@ -133,8 +133,6 @@ export const StyledMenuButton = styled.button`
 `
 
 export const StyledMenuItem = styled.li`
-  border-bottom: solid ${v.colors.commonMedium};
-  border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
   border-left: 7px solid transparent;
   color: ${v.colors.black};
   display: flex;
@@ -143,6 +141,10 @@ export const StyledMenuItem = styled.li`
   position: relative;
   width: 100%;
   width: ${props => props.width || 200}px;
+  ${props => props.bgColor && `background-color: ${props.bgColor};`}
+  border-top: solid
+    ${props => (props.borderColor ? props.borderColor : v.colors.commonMedium)};
+  border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
 
   ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};
@@ -151,12 +153,8 @@ export const StyledMenuItem = styled.li`
     font-weight: 400;
     font-size: 1rem;
     text-align: left;
-    border-top: solid
-      ${props =>
-        props.borderColor ? props.borderColor : v.colors.commonMedium};
-    border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
+
     color: ${v.colors.black};
-    ${props => props.bgColor && `background-color: ${props.bgColor};`}
 
     &.with-avatar {
       padding-left: 3.75rem;
@@ -268,27 +266,27 @@ class PopoutMenu extends React.Component {
                 bgColor={bgColor}
                 width={width - 20}
               >
+                {hasCheckbox && (
+                  <Checkbox
+                    style={{
+                      marginRight: '0px',
+                      marginLeft: '-14px',
+                      width: 'auto',
+                      height: 'auto',
+                    }}
+                    color="primary"
+                    checked={isChecked}
+                    onChange={loading ? () => null : onClick}
+                    value="yes"
+                    size="small"
+                    className="checkBox"
+                  />
+                )}
                 <StyledMenuButton
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
                 >
-                  {hasCheckbox && (
-                    <Checkbox
-                      style={{
-                        marginRight: '0px',
-                        marginLeft: '-14px',
-                        width: 'auto',
-                        height: 'auto',
-                      }}
-                      color="primary"
-                      checked={isChecked}
-                      onChange={loading ? () => null : onClick}
-                      value="yes"
-                      size="small"
-                      className="checkBox"
-                    />
-                  )}
                   {iconLeft && <span className="icon-left">{iconLeft}</span>}
                   <StyledMenuItemText>
                     {TextComponent ? (
