@@ -544,6 +544,20 @@ describe Collection::TestCollection, type: :model do
     end
     let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
     let(:submission_test) { create(:test_collection, :completed, template: test_collection, parent_collection: submission) }
+    let(:test_collection_template_updater) {
+      TemplateInstanceUpdater.new(
+        master_template: test_collection,
+        updated_card_ids: test_collection.collection_cards.pluck(:id),
+        template_update_action: 'create',
+      )
+    }
+    let(:submission_template_updater) {
+      TemplateInstanceUpdater.new(
+        master_template: submission_template,
+        updated_card_ids: submission_template.collection_cards.pluck(:id),
+        template_update_action: 'create',
+      )
+    }
 
     before do
       submission_box.setup_submissions_collection!
@@ -551,7 +565,7 @@ describe Collection::TestCollection, type: :model do
       # persist this now that submissions_collection exists
       submission_test
       # copy cards into the template the way it actually would happen
-      test_collection.update_template_instances
+      test_collection_template_updater.call
     end
 
     it 'should create the templated questions in the submission_test' do
@@ -568,13 +582,17 @@ describe Collection::TestCollection, type: :model do
 
         it 'should call the UpdateTemplateInstancesWorker if there are any instances' do
           expect(test_collection.templated_collections.count).to eq 1
-          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(test_collection.id)
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+            test_collection.id,
+            test_collection.collection_cards.pluck(:id),
+            'update_all',
+          )
           test_collection.launch!(initiated_by: user)
         end
 
         it 'should preserve all of the instance cards' do
           test_collection.launch!(initiated_by: user)
-          test_collection.update_template_instances
+          submission_template_updater.call
           # testing a bug case where it was accidentally deleting cards because they weren't pinned
           expect(submission_test.question_items.count).to eq test_collection.question_items.count
         end

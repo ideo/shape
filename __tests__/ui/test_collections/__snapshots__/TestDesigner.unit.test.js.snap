@@ -222,7 +222,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
               Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -240,6 +239,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 },
                 "API_getNextAvailableTest": [MockFunction],
                 "API_removeComparison": [MockFunction],
+                "API_selectCollectionType": [MockFunction],
                 "API_selectDatasetsWithIdentifier": [MockFunction],
                 "API_unselectDatasetsWithIdentifier": [MockFunction],
                 "API_updateCard": [MockFunction],
@@ -680,6 +680,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                 ],
                 "collection_filters": Array [],
+                "collection_type": "method",
                 "confirmEdit": [MockFunction],
                 "cover": Object {
                   "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -729,7 +730,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -747,6 +747,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                     "API_getNextAvailableTest": [MockFunction],
                     "API_removeComparison": [MockFunction],
+                    "API_selectCollectionType": [MockFunction],
                     "API_selectDatasetsWithIdentifier": [MockFunction],
                     "API_unselectDatasetsWithIdentifier": [MockFunction],
                     "API_updateCard": [MockFunction],
@@ -1187,6 +1188,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       },
                     ],
                     "collection_filters": Array [],
+                    "collection_type": "method",
                     "confirmEdit": [MockFunction],
                     "cover": Object {
                       "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -2255,7 +2257,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -2273,6 +2274,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                   "API_getNextAvailableTest": [MockFunction],
                   "API_removeComparison": [MockFunction],
+                  "API_selectCollectionType": [MockFunction],
                   "API_selectDatasetsWithIdentifier": [MockFunction],
                   "API_unselectDatasetsWithIdentifier": [MockFunction],
                   "API_updateCard": [MockFunction],
@@ -2713,6 +2715,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                   ],
                   "collection_filters": Array [],
+                  "collection_type": "method",
                   "confirmEdit": [MockFunction],
                   "cover": Object {
                     "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -2762,7 +2765,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "parentCollection": Object {
                       "API_addComparison": [MockFunction],
                       "API_archive": [MockFunction],
-                      "API_batchUpdateCards": [MockFunction],
                       "API_batchUpdateCardsWithUndo": [MockFunction],
                       "API_clearCollectionCover": [MockFunction],
                       "API_createCollectionFilter": [MockFunction],
@@ -2780,6 +2782,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       },
                       "API_getNextAvailableTest": [MockFunction],
                       "API_removeComparison": [MockFunction],
+                      "API_selectCollectionType": [MockFunction],
                       "API_selectDatasetsWithIdentifier": [MockFunction],
                       "API_unselectDatasetsWithIdentifier": [MockFunction],
                       "API_updateCard": [MockFunction],
@@ -3220,6 +3223,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         },
                       ],
                       "collection_filters": Array [],
+                      "collection_type": "method",
                       "confirmEdit": [MockFunction],
                       "cover": Object {
                         "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -4179,7 +4183,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -4197,6 +4200,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                   "API_getNextAvailableTest": [MockFunction],
                   "API_removeComparison": [MockFunction],
+                  "API_selectCollectionType": [MockFunction],
                   "API_selectDatasetsWithIdentifier": [MockFunction],
                   "API_unselectDatasetsWithIdentifier": [MockFunction],
                   "API_updateCard": [MockFunction],
@@ -4637,6 +4641,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                   ],
                   "collection_filters": Array [],
+                  "collection_type": "method",
                   "confirmEdit": [MockFunction],
                   "cover": Object {
                     "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -5148,7 +5153,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
               Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -5166,6 +5170,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 },
                 "API_getNextAvailableTest": [MockFunction],
                 "API_removeComparison": [MockFunction],
+                "API_selectCollectionType": [MockFunction],
                 "API_selectDatasetsWithIdentifier": [MockFunction],
                 "API_unselectDatasetsWithIdentifier": [MockFunction],
                 "API_updateCard": [MockFunction],
@@ -5606,6 +5611,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                 ],
                 "collection_filters": Array [],
+                "collection_type": "method",
                 "confirmEdit": [MockFunction],
                 "cover": Object {
                   "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -5655,7 +5661,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -5673,6 +5678,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                     "API_getNextAvailableTest": [MockFunction],
                     "API_removeComparison": [MockFunction],
+                    "API_selectCollectionType": [MockFunction],
                     "API_selectDatasetsWithIdentifier": [MockFunction],
                     "API_unselectDatasetsWithIdentifier": [MockFunction],
                     "API_updateCard": [MockFunction],
@@ -6113,6 +6119,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       },
                     ],
                     "collection_filters": Array [],
+                    "collection_type": "method",
                     "confirmEdit": [MockFunction],
                     "cover": Object {
                       "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -7048,7 +7055,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "parentCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -7066,6 +7072,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                     "API_getNextAvailableTest": [MockFunction],
                     "API_removeComparison": [MockFunction],
+                    "API_selectCollectionType": [MockFunction],
                     "API_selectDatasetsWithIdentifier": [MockFunction],
                     "API_unselectDatasetsWithIdentifier": [MockFunction],
                     "API_updateCard": [MockFunction],
@@ -7506,6 +7513,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       },
                     ],
                     "collection_filters": Array [],
+                    "collection_type": "method",
                     "confirmEdit": [MockFunction],
                     "cover": Object {
                       "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -8015,7 +8023,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -8033,6 +8040,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                   "API_getNextAvailableTest": [MockFunction],
                   "API_removeComparison": [MockFunction],
+                  "API_selectCollectionType": [MockFunction],
                   "API_selectDatasetsWithIdentifier": [MockFunction],
                   "API_unselectDatasetsWithIdentifier": [MockFunction],
                   "API_updateCard": [MockFunction],
@@ -8473,6 +8481,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                   ],
                   "collection_filters": Array [],
+                  "collection_type": "method",
                   "confirmEdit": [MockFunction],
                   "cover": Object {
                     "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -8487,7 +8496,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "ideasCollection": Object {
                     "API_addComparison": [MockFunction],
                     "API_archive": [MockFunction],
-                    "API_batchUpdateCards": [MockFunction],
                     "API_batchUpdateCardsWithUndo": [MockFunction],
                     "API_clearCollectionCover": [MockFunction],
                     "API_createCollectionFilter": [MockFunction],
@@ -8505,6 +8513,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                     "API_getNextAvailableTest": [MockFunction],
                     "API_removeComparison": [MockFunction],
+                    "API_selectCollectionType": [MockFunction],
                     "API_selectDatasetsWithIdentifier": [MockFunction],
                     "API_unselectDatasetsWithIdentifier": [MockFunction],
                     "API_updateCard": [MockFunction],
@@ -8945,6 +8954,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       },
                     ],
                     "collection_filters": Array [],
+                    "collection_type": "method",
                     "confirmEdit": [MockFunction],
                     "cover": Object {
                       "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -8994,7 +9004,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "parentCollection": Object {
                         "API_addComparison": [MockFunction],
                         "API_archive": [MockFunction],
-                        "API_batchUpdateCards": [MockFunction],
                         "API_batchUpdateCardsWithUndo": [MockFunction],
                         "API_clearCollectionCover": [MockFunction],
                         "API_createCollectionFilter": [MockFunction],
@@ -9012,6 +9021,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         },
                         "API_getNextAvailableTest": [MockFunction],
                         "API_removeComparison": [MockFunction],
+                        "API_selectCollectionType": [MockFunction],
                         "API_selectDatasetsWithIdentifier": [MockFunction],
                         "API_unselectDatasetsWithIdentifier": [MockFunction],
                         "API_updateCard": [MockFunction],
@@ -9452,6 +9462,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                           },
                         ],
                         "collection_filters": Array [],
+                        "collection_type": "method",
                         "confirmEdit": [MockFunction],
                         "cover": Object {
                           "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -10391,7 +10402,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "parentCollection": Object {
                       "API_addComparison": [MockFunction],
                       "API_archive": [MockFunction],
-                      "API_batchUpdateCards": [MockFunction],
                       "API_batchUpdateCardsWithUndo": [MockFunction],
                       "API_clearCollectionCover": [MockFunction],
                       "API_createCollectionFilter": [MockFunction],
@@ -10409,6 +10419,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       },
                       "API_getNextAvailableTest": [MockFunction],
                       "API_removeComparison": [MockFunction],
+                      "API_selectCollectionType": [MockFunction],
                       "API_selectDatasetsWithIdentifier": [MockFunction],
                       "API_unselectDatasetsWithIdentifier": [MockFunction],
                       "API_updateCard": [MockFunction],
@@ -10849,6 +10860,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         },
                       ],
                       "collection_filters": Array [],
+                      "collection_type": "method",
                       "confirmEdit": [MockFunction],
                       "cover": Object {
                         "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -11332,7 +11344,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "record": Object {
                         "API_addComparison": [MockFunction],
                         "API_archive": [MockFunction],
-                        "API_batchUpdateCards": [MockFunction],
                         "API_batchUpdateCardsWithUndo": [MockFunction],
                         "API_clearCollectionCover": [MockFunction],
                         "API_createCollectionFilter": [MockFunction],
@@ -11350,6 +11361,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         },
                         "API_getNextAvailableTest": [MockFunction],
                         "API_removeComparison": [MockFunction],
+                        "API_selectCollectionType": [MockFunction],
                         "API_selectDatasetsWithIdentifier": [MockFunction],
                         "API_unselectDatasetsWithIdentifier": [MockFunction],
                         "API_updateCard": [MockFunction],
@@ -11790,6 +11802,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                           },
                         ],
                         "collection_filters": Array [],
+                        "collection_type": "method",
                         "confirmEdit": [MockFunction],
                         "cover": Object {
                           "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -11839,7 +11852,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                           "parentCollection": Object {
                             "API_addComparison": [MockFunction],
                             "API_archive": [MockFunction],
-                            "API_batchUpdateCards": [MockFunction],
                             "API_batchUpdateCardsWithUndo": [MockFunction],
                             "API_clearCollectionCover": [MockFunction],
                             "API_createCollectionFilter": [MockFunction],
@@ -11857,6 +11869,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                             },
                             "API_getNextAvailableTest": [MockFunction],
                             "API_removeComparison": [MockFunction],
+                            "API_selectCollectionType": [MockFunction],
                             "API_selectDatasetsWithIdentifier": [MockFunction],
                             "API_unselectDatasetsWithIdentifier": [MockFunction],
                             "API_updateCard": [MockFunction],
@@ -12297,6 +12310,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                               },
                             ],
                             "collection_filters": Array [],
+                            "collection_type": "method",
                             "confirmEdit": [MockFunction],
                             "cover": Object {
                               "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -13220,7 +13234,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "parentCollection": Object {
                         "API_addComparison": [MockFunction],
                         "API_archive": [MockFunction],
-                        "API_batchUpdateCards": [MockFunction],
                         "API_batchUpdateCardsWithUndo": [MockFunction],
                         "API_clearCollectionCover": [MockFunction],
                         "API_createCollectionFilter": [MockFunction],
@@ -13238,6 +13251,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         },
                         "API_getNextAvailableTest": [MockFunction],
                         "API_removeComparison": [MockFunction],
+                        "API_selectCollectionType": [MockFunction],
                         "API_selectDatasetsWithIdentifier": [MockFunction],
                         "API_unselectDatasetsWithIdentifier": [MockFunction],
                         "API_updateCard": [MockFunction],
@@ -13678,6 +13692,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                           },
                         ],
                         "collection_filters": Array [],
+                        "collection_type": "method",
                         "confirmEdit": [MockFunction],
                         "cover": Object {
                           "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -14253,7 +14268,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
           Object {
             "API_addComparison": [MockFunction],
             "API_archive": [MockFunction],
-            "API_batchUpdateCards": [MockFunction],
             "API_batchUpdateCardsWithUndo": [MockFunction],
             "API_clearCollectionCover": [MockFunction],
             "API_createCollectionFilter": [MockFunction],
@@ -14271,6 +14285,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
             },
             "API_getNextAvailableTest": [MockFunction],
             "API_removeComparison": [MockFunction],
+            "API_selectCollectionType": [MockFunction],
             "API_selectDatasetsWithIdentifier": [MockFunction],
             "API_unselectDatasetsWithIdentifier": [MockFunction],
             "API_updateCard": [MockFunction],
@@ -14711,6 +14726,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
               },
             ],
             "collection_filters": Array [],
+            "collection_type": "method",
             "confirmEdit": [MockFunction],
             "cover": Object {
               "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -14725,7 +14741,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
             "ideasCollection": Object {
               "API_addComparison": [MockFunction],
               "API_archive": [MockFunction],
-              "API_batchUpdateCards": [MockFunction],
               "API_batchUpdateCardsWithUndo": [MockFunction],
               "API_clearCollectionCover": [MockFunction],
               "API_createCollectionFilter": [MockFunction],
@@ -14743,6 +14758,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
               },
               "API_getNextAvailableTest": [MockFunction],
               "API_removeComparison": [MockFunction],
+              "API_selectCollectionType": [MockFunction],
               "API_selectDatasetsWithIdentifier": [MockFunction],
               "API_unselectDatasetsWithIdentifier": [MockFunction],
               "API_updateCard": [MockFunction],
@@ -15183,6 +15199,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 },
               ],
               "collection_filters": Array [],
+              "collection_type": "method",
               "confirmEdit": [MockFunction],
               "cover": Object {
                 "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -15232,7 +15249,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -15250,6 +15266,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                   "API_getNextAvailableTest": [MockFunction],
                   "API_removeComparison": [MockFunction],
+                  "API_selectCollectionType": [MockFunction],
                   "API_selectDatasetsWithIdentifier": [MockFunction],
                   "API_unselectDatasetsWithIdentifier": [MockFunction],
                   "API_updateCard": [MockFunction],
@@ -15690,6 +15707,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                   ],
                   "collection_filters": Array [],
+                  "collection_type": "method",
                   "confirmEdit": [MockFunction],
                   "cover": Object {
                     "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -16629,7 +16647,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
               "parentCollection": Object {
                 "API_addComparison": [MockFunction],
                 "API_archive": [MockFunction],
-                "API_batchUpdateCards": [MockFunction],
                 "API_batchUpdateCardsWithUndo": [MockFunction],
                 "API_clearCollectionCover": [MockFunction],
                 "API_createCollectionFilter": [MockFunction],
@@ -16647,6 +16664,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 },
                 "API_getNextAvailableTest": [MockFunction],
                 "API_removeComparison": [MockFunction],
+                "API_selectCollectionType": [MockFunction],
                 "API_selectDatasetsWithIdentifier": [MockFunction],
                 "API_unselectDatasetsWithIdentifier": [MockFunction],
                 "API_updateCard": [MockFunction],
@@ -17087,6 +17105,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                 ],
                 "collection_filters": Array [],
+                "collection_type": "method",
                 "confirmEdit": [MockFunction],
                 "cover": Object {
                   "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -17570,7 +17589,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "record": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -17588,6 +17606,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                   "API_getNextAvailableTest": [MockFunction],
                   "API_removeComparison": [MockFunction],
+                  "API_selectCollectionType": [MockFunction],
                   "API_selectDatasetsWithIdentifier": [MockFunction],
                   "API_unselectDatasetsWithIdentifier": [MockFunction],
                   "API_updateCard": [MockFunction],
@@ -18028,6 +18047,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                   ],
                   "collection_filters": Array [],
+                  "collection_type": "method",
                   "confirmEdit": [MockFunction],
                   "cover": Object {
                     "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -18077,7 +18097,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "parentCollection": Object {
                       "API_addComparison": [MockFunction],
                       "API_archive": [MockFunction],
-                      "API_batchUpdateCards": [MockFunction],
                       "API_batchUpdateCardsWithUndo": [MockFunction],
                       "API_clearCollectionCover": [MockFunction],
                       "API_createCollectionFilter": [MockFunction],
@@ -18095,6 +18114,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       },
                       "API_getNextAvailableTest": [MockFunction],
                       "API_removeComparison": [MockFunction],
+                      "API_selectCollectionType": [MockFunction],
                       "API_selectDatasetsWithIdentifier": [MockFunction],
                       "API_unselectDatasetsWithIdentifier": [MockFunction],
                       "API_updateCard": [MockFunction],
@@ -18535,6 +18555,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         },
                       ],
                       "collection_filters": Array [],
+                      "collection_type": "method",
                       "confirmEdit": [MockFunction],
                       "cover": Object {
                         "hardcoded_subtitle": "Lorem ipsum hardcoded",
@@ -19458,7 +19479,6 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "parentCollection": Object {
                   "API_addComparison": [MockFunction],
                   "API_archive": [MockFunction],
-                  "API_batchUpdateCards": [MockFunction],
                   "API_batchUpdateCardsWithUndo": [MockFunction],
                   "API_clearCollectionCover": [MockFunction],
                   "API_createCollectionFilter": [MockFunction],
@@ -19476,6 +19496,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   },
                   "API_getNextAvailableTest": [MockFunction],
                   "API_removeComparison": [MockFunction],
+                  "API_selectCollectionType": [MockFunction],
                   "API_selectDatasetsWithIdentifier": [MockFunction],
                   "API_unselectDatasetsWithIdentifier": [MockFunction],
                   "API_updateCard": [MockFunction],
@@ -19916,6 +19937,7 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     },
                   ],
                   "collection_filters": Array [],
+                  "collection_type": "method",
                   "confirmEdit": [MockFunction],
                   "cover": Object {
                     "hardcoded_subtitle": "Lorem ipsum hardcoded",

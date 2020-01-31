@@ -103,7 +103,18 @@ class TextItemCover extends React.Component {
       return false
     }
     await apiStore.fetch('items', item.id, true)
+    // entering edit mode should deselect all cards
+    uiStore.deselectCards()
+    uiStore.update('textEditingItem', this.state.item)
     // store item content for later undo action
+    // TODO: only push the undo *after* you're done editing, at which point
+    // it could also push the redo action; otherwise timeout is kind of a temp hack
+    setTimeout(this.pushTextUndo, 1000)
+    return null
+  }
+
+  pushTextUndo = () => {
+    const { item } = this.props
     item.pushUndo({
       snapshot: {
         quill_data: this.state.item.quill_data,
@@ -111,13 +122,7 @@ class TextItemCover extends React.Component {
       message: 'Text undone!',
       redirectTo: uiStore.viewingCollection,
       actionType: POPUP_ACTION_TYPES.SNACKBAR,
-      // TODO: there is no way to push a redoAction because the edit hasn't happened yet!
-      // so we'd have to figure out a different way to capture the redo after you undo
     })
-    // entering edit mode should deselect all cards
-    uiStore.deselectCards()
-    uiStore.update('textEditingItem', this.state.item)
-    return null
   }
 
   expand = () => {
@@ -133,14 +138,14 @@ class TextItemCover extends React.Component {
   }
 
   // cancel should only ever be called for editors, since it is canceling out of edit view
-  cancel = async ({ item, ev } = {}) => {
+  cancel = ({ item, ev } = {}) => {
     if (this.unmounted) {
       return
     }
     if (ev && ev.stopPropagation) ev.stopPropagation()
     this.clearTextEditingItem()
     const hasContent = stripTags(item.content).length
-    if (!hasContent) {
+    if (!hasContent && !item.version) {
       // archive empty text item when you hit "X"
       const card = apiStore.find('collection_cards', this.props.cardId)
       card.API_archiveSelf({ undoable: false })
@@ -151,8 +156,12 @@ class TextItemCover extends React.Component {
 
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
-    const node = ReactDOM.findDOMNode(this)
-    node.scrollTop = 0
+    try {
+      const node = ReactDOM.findDOMNode(this)
+      node.scrollTop = 0
+    } catch {
+      // console.warn('probably in jest test')
+    }
   }
 
   checkTextAreaHeight = height => {

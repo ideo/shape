@@ -116,7 +116,7 @@ class CollectionGrid extends React.Component {
     if (movingCardIds && movingCardIds.length) {
       const movingCard = apiStore.find(
         'collection_cards',
-        _.last(movingCardIds)
+        _.first(movingCardIds)
       )
 
       if (!uiStore.isLoadingMoveAction && movingCard) {

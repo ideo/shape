@@ -133,6 +133,50 @@ describe('GridCardBlank', () => {
     })
   })
 
+  describe('createCardWith to create multiple files', () => {
+    const file = { url: 'x', handle: 'z' }
+    const attrs = {
+      order: expect.any(Number),
+      item_attributes: expect.any(Object),
+    }
+    const afterCreate = expect.any(Function)
+    beforeEach(() => {
+      props.uiStore.blankContentToolState = {
+        row: 1,
+        col: 14,
+      }
+      props.uiStore.viewingCollection = {
+        maxColumnIndex: 15,
+      }
+      wrapper = shallow(<GridCardBlank.wrappedComponent {...props} />)
+      component = wrapper.instance()
+      // mock this to test how it is called
+      component.createCard = jest.fn()
+    })
+
+    it('should create multiple files in stacked rows 4 across', () => {
+      component.createCardWith(file, 0)
+      expect(component.createCard).toHaveBeenCalledWith(
+        {
+          ...attrs,
+          row: 1,
+          col: 14,
+        },
+        { afterCreate }
+      )
+      component.createCardWith(file, 2)
+      expect(component.createCard).toHaveBeenCalledWith(
+        {
+          ...attrs,
+          row: 1,
+          // even though it is over max of 15, the API will place this card appropriately
+          col: 16,
+        },
+        { afterCreate }
+      )
+    })
+  })
+
   describe('afterCreate', () => {
     describe('when creating a TextItem', () => {
       it('pushes an event to google tag manager', () => {

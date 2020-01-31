@@ -11,6 +11,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
     end
     let(:placement) { 'beginning' }
     let(:synchronous) { :async }
+    let(:building_template_instance) { false }
     let(:service) do
       CollectionCardDuplicator.new(
         to_collection: to_collection,
@@ -18,6 +19,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         placement: placement,
         for_user: user,
         synchronous: synchronous,
+        building_template_instance: building_template_instance,
       )
     end
 
@@ -57,6 +59,61 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         false, # synchronous
         false, # building_template_instance
       )
+    end
+
+    it 'calls ActivityAndNotificationWorker for each duplicated card' do
+      moving_cards.each do |card|
+        expect(ActivityAndNotificationWorker).to receive(:perform_async).with(
+          user.id,
+          card.id,
+          :duplicated,
+          from_collection.id,
+          to_collection.id,
+        )
+      end
+      service.call
+    end
+
+    context 'duplicating from a template' do
+      before do
+        from_collection.update(master_template: true)
+        moving_cards.each { |c| c.update(pinned: true) }
+      end
+
+      it 'creates Placeholder cards that are pinned like the originals' do
+        new_cards = service.call
+        expect(new_cards.all?(&:placeholder?)).to be true
+        expect(new_cards.all?(&:pinned?)).to be true
+      end
+
+      it 'calls ActivityAndNotificationWorker if you are duplicating a template' do
+        moving_cards.each do
+          expect(ActivityAndNotificationWorker).to receive(:perform_async)
+        end
+        service.call
+      end
+
+      context 'building template instance' do
+        let(:building_template_instance) { true }
+
+        it 'does not call ActivityAndNotificationWorker' do
+          expect(ActivityAndNotificationWorker).not_to receive(:perform_async)
+          service.call
+        end
+      end
+    end
+
+    context 'duplicating into a template' do
+      let!(:to_collection) do
+        create(:collection, master_template: true, pin_cards: true, num_cards: 3, add_editors: [user])
+      end
+
+      it 'creates pinned Placeholder cards' do
+        new_cards = service.call
+        # newly created cards should be duplicates
+        expect(new_cards.all?(&:placeholder?)).to be true
+        expect(new_cards.all?(&:pinned?)).to be true
+      end
     end
 
     context 'if synchronous is all levels' do

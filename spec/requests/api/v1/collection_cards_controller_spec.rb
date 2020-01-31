@@ -20,6 +20,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
   before do
     user.reload
+    allow(ActivityAndNotificationWorker).to receive(:perform_async).and_call_original
   end
 
   describe 'GET #index' do
@@ -249,6 +250,18 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'GET #breadcrumb_records' do
+    let!(:collection) { create(:collection, record_type: :collection, num_cards: 5, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/breadcrumb_records" }
+
+    it 'returns stringified ids of collection.collection_cards' do
+      get(path)
+      expect(response.status).to eq(200)
+      expect(json.length).to eq(5)
+      expect(json.pluck("id")).to eq(collection.collection_cards.map(&:record).pluck(:id))
+    end
+  end
+
   describe 'POST #create' do
     let(:path) { '/api/v1/collection_cards' }
     let(:item_attributes) do
@@ -310,16 +323,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates an activity' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: user,
-          target: anything,
-          action: :created,
-          subject_user_ids: [user.id],
-          subject_group_ids: [],
-          source: nil,
-          destination: nil,
-        )
         post(path, params: params)
+        expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+          user.id,
+          json['data']['id'].to_i,
+          :created,
+          nil,
+          nil,
+        )
       end
 
       context 'with a link card' do
@@ -921,7 +932,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates an activity' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).twice
+        expect(ActivityAndNotificationWorker).to receive(:perform_async).twice
         patch(path, params: params)
       end
 
@@ -1229,16 +1240,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
 
     it 'creates an activity' do
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        actor: user,
-        target: anything,
-        action: :edited,
-        subject_user_ids: [user.id],
-        subject_group_ids: [],
-        source: nil,
-        destination: nil,
-      )
       patch(path, params: params)
+      expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+        user.id,
+        json['data']['id'].to_i,
+        :edited,
+        nil,
+        nil,
+      )
     end
 
     context 'when changing the is_cover property' do
@@ -1346,16 +1355,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates an activity' do
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: user,
-          target: anything,
-          action: :replaced,
-          subject_user_ids: [editor.id],
-          subject_group_ids: [],
-          source: nil,
-          destination: nil,
-        )
         patch(path, params: params)
+        expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+          user.id,
+          json['data']['id'].to_i,
+          :replaced,
+          nil,
+          nil,
+        )
       end
 
       it 'broadcasts collection updates' do
@@ -1403,6 +1410,55 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     context 'without record edit access' do
       before do
         remove_access([collection_card], user)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
+
+  describe '#POST toggle_pin' do
+    let(:master) {
+      create(:collection,
+             master_template: true,
+             num_cards: 1,
+             pin_cards: true,
+             created_by: user,
+             add_editors: [user])
+    }
+    let(:collection_card) { create(:collection_card_collection, parent: master) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/toggle_pin" }
+    let(:params) { json_api_params('collection_cards', pinned: true) }
+
+    context 'with pinned true' do
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'with pinned false' do
+      let!(:params) { json_api_params('collection_cards', pinned: false) }
+
+      it 'returns a 200' do
+        patch(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'with toggle_pin using template instance' do
+      let(:instance) { create(:collection, template: master, created_by: user) }
+      let!(:collection_card) { create(:collection_card_collection, parent: instance) }
+      let!(:path) { "/api/v1/collection_cards/#{collection_card.id}/toggle_pin" }
+
+      before do
+        master.setup_templated_collection(
+          for_user: user,
+          collection: instance,
+          synchronous: :first_level,
+        )
       end
 
       it 'returns a 401' do

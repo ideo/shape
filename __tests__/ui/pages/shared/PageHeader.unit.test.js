@@ -122,7 +122,6 @@ describe('PageHeader', () => {
           .children()
           .text()
       ).toEqual('#template')
-      expect(wrapper.find('TemplateIcon').exists()).toBeTruthy()
     })
 
     it('should show the Use Template button', () => {
@@ -165,7 +164,6 @@ describe('PageHeader', () => {
           .children()
           .text()
       ).toEqual('#test')
-      expect(wrapper.find('TestCollectionIcon').exists()).toBeTruthy()
     })
   })
 

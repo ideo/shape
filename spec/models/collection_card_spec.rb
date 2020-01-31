@@ -120,6 +120,28 @@ RSpec.describe CollectionCard, type: :model do
         end
       end
     end
+
+    describe '#board_placement_is_valid?' do
+      let!(:parent) { create(:board_collection, num_cards: 1) }
+      let(:existing_card) { parent.collection_cards.first }
+      let(:card) { build(:collection_card_text, parent: parent) }
+
+      it 'should be valid if the spot is not taken' do
+        existing_card.update(row: 0, col: 0)
+        parent.reload
+        card.row = 2
+        card.col = 2
+        expect(card.board_placement_is_valid?).to be true
+      end
+
+      it 'should be invalid if the spot is taken' do
+        existing_card.update(row: 2, col: 2, width: 2)
+        parent.reload
+        card.row = 2
+        card.col = 3
+        expect(card.board_placement_is_valid?).to be false
+      end
+    end
   end
 
   describe 'callbacks' do
@@ -187,6 +209,7 @@ RSpec.describe CollectionCard, type: :model do
     let(:placement) { 'end' }
     let(:system_collection) { false }
     let(:placeholder) { nil }
+    let(:should_pin_duplicating_cards) { false }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
@@ -195,6 +218,7 @@ RSpec.describe CollectionCard, type: :model do
         placement: placement,
         system_collection: system_collection,
         placeholder: placeholder,
+        should_pin_duplicating_cards: should_pin_duplicating_cards,
       )
     end
 
@@ -278,7 +302,12 @@ RSpec.describe CollectionCard, type: :model do
         end
 
         it 'should call the UpdateTemplateInstancesWorker' do
-          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
+          # TODO: how do we get the amoeba_dup id?
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+            collection.id,
+            [anything],
+            'duplicate',
+          )
           duplicate
         end
       end
@@ -308,14 +337,17 @@ RSpec.describe CollectionCard, type: :model do
       let(:template) { create(:collection, master_template: true) }
       let!(:collection_card) { create(:collection_card_text, pinned: true, parent: template) }
 
-      it 'should set pinned to true on the duplicate' do
-        expect(collection_card.pinned?).to be true
-        expect(duplicate.pinned?).to be true
+      it 'should not pin duplicating card if should_pin_duplicating_cards is false' do
+        expect(duplicate.pinned?).to be false
       end
 
-      it 'should set pinned even if original was not pinned' do
-        collection_card.update(pinned: false)
-        expect(duplicate.pinned?).to be true
+      context 'with should_pin_duplicating_cards is false' do
+        let!(:should_pin_duplicating_cards) { true }
+
+        it 'should set pinned to true on the duplicate and should_pin_duplicating_cards is true' do
+          expect(collection_card.pinned?).to be true
+          expect(duplicate.pinned?).to be true
+        end
       end
     end
 
@@ -357,7 +389,7 @@ RSpec.describe CollectionCard, type: :model do
           expect(duplicate.collection.master_template?).to be true
         end
 
-        context 'inside a template instance' do
+        context 'building a template instance' do
           let(:duplicate) do
             collection_card_collection.duplicate!(
               for_user: user,
@@ -368,6 +400,22 @@ RSpec.describe CollectionCard, type: :model do
           it 'calls the TemplateBuilder to create an instance of the template' do
             expect(duplicate.collection.master_template?).to be false
             expect(duplicate.collection.template).to eq collection
+          end
+        end
+
+        context 'copying pinned card into a template instance' do
+          let(:collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
+          let(:card) { collection.collection_cards.first }
+          let(:duplicate) do
+            card.duplicate!(
+              for_user: user,
+              building_template_instance: false,
+            )
+          end
+
+          it 'should unpin the card that you duplicated' do
+            expect(card.pinned?).to be true
+            expect(duplicate.pinned?).to be false
           end
         end
       end
@@ -637,7 +685,7 @@ RSpec.describe CollectionCard, type: :model do
 
       it 'should archive all cards in the query' do
         expect do
-          collection_cards.archive_all!(user_id: user.id)
+          collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
           collection.reload
         end.to change(CollectionCard.active, :count)
           .by(collection_cards.count * -1)
@@ -650,7 +698,7 @@ RSpec.describe CollectionCard, type: :model do
           collection_cards.map(&:id),
           user.id,
         )
-        collection_cards.archive_all!(user_id: user.id)
+        collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
       end
 
       context 'with a master template collection with 1 or more instances' do
@@ -658,8 +706,12 @@ RSpec.describe CollectionCard, type: :model do
         let!(:instance) { create(:collection, template: collection) }
 
         it 'should call the UpdateTemplateInstancesWorker' do
-          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(collection.id)
-          collection_cards.archive_all!(user_id: user.id)
+          expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+            collection.id,
+            collection.collection_cards.pluck(:id),
+            'archive',
+          )
+          collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
         end
       end
     end

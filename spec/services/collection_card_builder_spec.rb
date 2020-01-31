@@ -161,7 +161,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
         it 'should create a pinned card by default' do
           expect(builder.create).to be true
-          expect(builder.collection_card.pinned?).to be true
+          expect(builder.collection_card.pinned?).to be false
         end
       end
 
@@ -497,6 +497,39 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       it 'should display errors' do
         expect(builder.errors.full_messages.first).to eq 'Only one of Item or Collection can be assigned'
+      end
+    end
+
+    context 'creating an overlapping card on foamcore' do
+      let(:parent) do
+        create(:board_collection,
+               organization: organization,
+               add_editors: [user])
+      end
+      let!(:overlapping_card) { create(:collection_card_text, row: 1, col: 1, parent: parent) }
+      let(:builder) do
+        CollectionCardBuilder.new(
+          params: params.merge(
+            item_attributes: {
+              name: 'My item name',
+              content: 'My Text Content goes here',
+              data_content: { ops: [] },
+              type: 'Item::TextItem',
+            },
+            row: 1,
+            col: 1,
+          ),
+          parent_collection: parent,
+          user: user,
+        )
+      end
+
+      it 'should create the card in an open spot' do
+        expect(builder.create).to be true
+        card = builder.collection_card
+        expect(card.row).to eq 1
+        # should put it in the next column over
+        expect(card.col).to eq 2
       end
     end
   end

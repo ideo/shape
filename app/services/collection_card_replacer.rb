@@ -69,6 +69,9 @@ class CollectionCardReplacer
   def update_template_instances
     return unless @replacing_card.parent.submission_box_template_test?
 
-    @replacing_card.parent.queue_update_template_instances
+    @replacing_card.parent.queue_update_template_instances(
+      updated_card_ids: @replacing_card.parent.collection_cards.pluck(:id),
+      template_update_action: 'update_all',
+    )
   end
 end

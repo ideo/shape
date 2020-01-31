@@ -165,7 +165,8 @@ class CollectionCard < ApplicationRecord
     system_collection: false,
     synchronous: false,
     placeholder: nil,
-    batch_id: nil
+    batch_id: nil,
+    should_pin_duplicating_cards: false
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -185,8 +186,10 @@ class CollectionCard < ApplicationRecord
     if master_template_card? && parent.templated?
       # if we're cloning from template -> templated collection
       cc.templated_from = self
-    elsif parent.master_template?
-      # Make it pinned if you're duplicating it into a master template
+      # any user initiated duplicate should not pin cards into their instance
+      cc.pinned = false unless building_template_instance
+    elsif parent.master_template? && should_pin_duplicating_cards
+      # Make it pinned if you're duplicating it into a master template and all of its cards are pinned or placed in the beginning
       cc.pinned = true
     else
       # copying into a normal (non templated) collection, it should never be pinned;
@@ -247,7 +250,10 @@ class CollectionCard < ApplicationRecord
 
     if parent.master_template?
       # we just added a template card, so update the instances
-      parent.queue_update_template_instances
+      parent.queue_update_template_instances(
+        updated_card_ids: [cc.id],
+        template_update_action: 'duplicate',
+      )
     end
 
     if batch_id.present?
@@ -366,25 +372,20 @@ class CollectionCard < ApplicationRecord
   end
 
   # gets called by API collection_cards_controller
-  def self.archive_all!(user_id:)
-    # should only ever be used on a subset of cards, e.g. not `all`!
-    unless scope_attributes['id'].present? || scope_attributes['parent_id'].present?
-      return false
-    end
-
-    # capture these before `self` potentially gets altered by archive scope
-    ids = pluck(:id)
-    # ensure we're now working with an unscoped AR::Relation
+  def self.archive_all!(ids:, user_id:)
     cards = CollectionCard.where(id: ids)
     cards.update_all(archived: true)
     # should generally only be the one parent collection, but an array to be safe
     parents = cards.map(&:parent).uniq.compact
     parents.each do |parent|
       parent.touch
-      if parent.master_template?
-        # we just archived a template card, so update the instances
-        parent.queue_update_template_instances
-      end
+      next unless parent.master_template?
+
+      # we just archived a template card, so update the instances
+      parent.queue_update_template_instances(
+        updated_card_ids: ids,
+        template_update_action: 'archive',
+      )
     end
     CollectionCardArchiveWorker.perform_async(
       ids,
@@ -487,6 +488,14 @@ class CollectionCard < ApplicationRecord
 
   def self.find_record_by_identifier(*args)
     identifier(CardIdentifier.call(*args)).first&.record
+  end
+
+  def board_placement_is_valid?
+    return true unless parent&.is_a?(Collection::Board)
+    return true if CollectionGrid::Calculator.exact_open_spot?(card: self, collection: parent)
+
+    errors.add(:base, 'Board position is already taken')
+    false
   end
 
   private

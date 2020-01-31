@@ -200,17 +200,23 @@ class GridCard extends React.Component {
     if (!canEditCollection) return null
     const { record } = card
     if (!record.isMedia) return
-    if (!card.is_master_template_card && !card.isPinned) return null
-    if (!card.is_master_template_card && card.record.has_replaced_media)
-      return null
-    return (
-      <ReplaceCardButton
-        card={card}
-        canEditCollection={canEditCollection}
-        // observe button update
-        showReplace={card.show_replace}
-      />
-    )
+    if (card.is_master_template_card) {
+      return (
+        <ReplaceCardButton
+          card={card}
+          showControls={canEditCollection}
+          // observe button update
+          showReplace={card.show_replace}
+        />
+      )
+    }
+    if (
+      card.parentCollection.isTemplated &&
+      card.show_replace &&
+      !card.record.has_replaced_media
+    ) {
+      return <ReplaceCardButton card={card} />
+    }
   }
 
   @action
@@ -284,7 +290,7 @@ class GridCard extends React.Component {
   editCard = ev => {
     ev.preventDefault()
     const { card } = this.props
-    uiStore.toggleEditingCardId(card.id)
+    uiStore.setEditingCardCover(card.id)
   }
 
   onCollectionCoverChange = () => {

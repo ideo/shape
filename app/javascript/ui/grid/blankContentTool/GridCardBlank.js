@@ -14,7 +14,7 @@ import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
-import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
+import TestCollectionIconSm from '~/ui/icons/TestCollectionIconSm'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
 import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
@@ -264,7 +264,9 @@ class GridCardBlank extends React.Component {
       onSuccess: async res => {
         if (res.length > 0) {
           const files = await FilestackUpload.processFiles(res)
-          files.forEach(file => this.createCardWith(file))
+          _.each(files, (file, idx) => {
+            this.createCardWith(file, idx)
+          })
         }
       },
     }
@@ -280,8 +282,19 @@ class GridCardBlank extends React.Component {
     this.setState({ creating: type, bctMenuOpen: false })
   }
 
-  createCardWith = file => {
+  createCardWith = (file, idx = 0) => {
+    const { uiStore } = this.props
+    let { row, col, order } = uiStore.blankContentToolState
+    order += idx
+    if (row !== null && col !== null) {
+      col += idx % 4
+      row += Math.floor(idx / 4)
+    }
+
     const attrs = {
+      row,
+      col,
+      order,
       item_attributes: {
         type: ITEM_TYPES.FILE,
         filestack_file_attributes: {
@@ -337,10 +350,12 @@ class GridCardBlank extends React.Component {
       ? FilestackUpload.pickImages
       : FilestackUpload.pickImage
     filestackMethod({
-      onSuccess: files =>
-        !replacingId
-          ? files.forEach(file => this.createCardWith(file))
-          : this.createCardWith(files),
+      onSuccess: fileData => {
+        const files = _.isArray(fileData) ? fileData : [fileData]
+        _.each(files, (file, idx) => {
+          this.createCardWith(file, idx)
+        })
+      },
     })
   }
 
@@ -549,7 +564,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('testCollection')}
-        Icon={() => <TestCollectionIcon size="small" />}
+        Icon={() => <TestCollectionIconSm />}
       />
     )
     const submissionBctBox = (

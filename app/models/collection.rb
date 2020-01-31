@@ -11,6 +11,7 @@
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
 #  cached_test_scores         :jsonb
+#  collection_type            :integer          default("collection")
 #  cover_type                 :integer          default("cover_type_default")
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
@@ -218,6 +219,14 @@ class Collection < ApplicationRecord
     cover_type_carousel: 3,
   }
 
+  enum collection_type: {
+    collection: 0,
+    project: 1,
+    method: 2,
+    prototype: 3,
+    profile: 4, # Different from UserProfile
+  }, _prefix: true
+
   # Searchkick Config
   # Use queue to bulk reindex every 1m (with Sidekiq Scheduled Job/ActiveJob)
   searchkick callbacks: :queue
@@ -270,7 +279,8 @@ class Collection < ApplicationRecord
       updated_at: updated_at,
       archived: archived,
       master_template: master_template,
-      activity_count: activities_and_child_activities_count,
+      collection_type: collection_type,
+      activity_count: activities_and_child_activities_count
     }
   end
 
@@ -377,6 +387,7 @@ class Collection < ApplicationRecord
         created_by: for_user,
         # in this case the card has already been created
         parent_card: parent_collection_card,
+        synchronous: synchronous ? :all_levels : :async,
       )
       return builder.call
     end
@@ -623,11 +634,31 @@ class Collection < ApplicationRecord
     if card_attrs_snapshot.present?
       CollectionUpdater.call(self, card_attrs_snapshot)
     end
-    reorder_cards!
+    if board_collection?
+      # re-place any unarchived cards to do collision detection on their original position(s)
+      top_left_card = CollectionGrid::Calculator.top_left_card(cards)
+      CollectionGrid::BoardPlacement.call(
+        moving_cards: cards,
+        to_collection: self,
+        row: top_left_card.row,
+        col: top_left_card.col,
+      )
+      CollectionCard.import(
+        cards.to_a,
+        validate: false,
+        on_duplicate_key_update: %i[row col],
+      )
+    else
+      reorder_cards!
+    end
+
     # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
     return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
 
-    queue_update_template_instances
+    queue_update_template_instances(
+      updated_card_ids: cards.pluck(:id),
+      template_update_action: 'unarchive',
+    )
   end
 
   def enable_org_view_access_if_allowed
@@ -767,16 +798,6 @@ class Collection < ApplicationRecord
     )
 
     processing_done if processing_status.nil?
-  end
-
-  def mark_children_processing_status(status = nil)
-    collections = Collection.in_collection(self)
-    collections.update_all(
-      processing_status: status,
-      updated_at: Time.now,
-    )
-    # Broadcast that this collection is no longer being edited
-    collections.each(&:processing_done) if processing_status.nil?
   end
 
   def clear_collection_cover
@@ -969,12 +990,38 @@ class Collection < ApplicationRecord
     return placement if placement.is_a?(Integer)
 
     # default to 'beginning', which goes after the first pinned card
-    order = collection_cards.pinned.maximum(:order) || 0
+    if master_template?
+      order = 0
+    else
+      order = collection_cards.pinned.maximum(:order) || 0
+    end
     if placement == 'end'
       order = cached_last_card_order || collection_cards.maximum(:order) || -1
       order += 1
     end
     order
+  end
+
+  def has_child_collections?
+    collections.count.positive?
+  end
+
+  def should_pin_cards?(placement)
+    has_pinned_cards = collection_cards.pinned.any?
+
+    return false unless has_pinned_cards
+
+    return true if placement == 'beginning'
+
+    first_moving_card_index = collection_cards.find_index { |cc| cc.order == placement }
+
+    return collection_cards.last&.pinned? if first_moving_card_index.nil?
+
+    return true if first_moving_card_index <= 1
+
+    left_of_first_moving_card_index = first_moving_card_index - 1
+
+    collection_cards[left_of_first_moving_card_index].pinned?
   end
 
   private

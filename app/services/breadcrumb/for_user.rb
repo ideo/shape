@@ -70,9 +70,11 @@ module Breadcrumb
       type = object.class.base_class.name.downcase.pluralize
       {
         type: type,
+        collection_type: object.class.name,
         id: object.id.to_s,
         name: object.name,
         can_edit: object == @object ? object.can_edit?(@user) : editable.include?(object.id),
+        has_children: object.has_child_collections?,
       }
     end
 

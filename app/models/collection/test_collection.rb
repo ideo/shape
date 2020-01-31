@@ -11,6 +11,7 @@
 #  breadcrumb                 :jsonb
 #  cached_attributes          :jsonb
 #  cached_test_scores         :jsonb
+#  collection_type            :integer          default("collection")
 #  cover_type                 :integer          default("cover_type_default")
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
@@ -717,7 +718,10 @@ class Collection
           },
         )
         # make sure all templates get the latest question setup
-        queue_update_template_instances
+        queue_update_template_instances(
+          updated_card_ids: collection_cards.pluck(:id),
+          template_update_action: 'update_all',
+        )
         # submission box master template test doesn't create a test_design, move cards, etc.
         return true
       end

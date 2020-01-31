@@ -256,6 +256,7 @@ class AutoComplete extends React.Component {
 
   render() {
     const {
+      autoFocus,
       classes,
       keepSelectedOptions,
       defaultOptions,
@@ -276,6 +277,7 @@ class AutoComplete extends React.Component {
           fullWidth
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
+            autoFocus,
             classes,
             menuStyles,
             numOptionsToShow,
@@ -306,6 +308,7 @@ class AutoComplete extends React.Component {
 }
 
 AutoComplete.propTypes = {
+  autoFocus: PropTypes.bool,
   classes: PropTypes.shape({
     root: PropTypes.string,
     chip: PropTypes.string,
@@ -340,6 +343,7 @@ AutoComplete.propTypes = {
 }
 
 AutoComplete.defaultProps = {
+  autoFocus: false,
   onSelect: () => {},
   keepSelectedOptions: false,
   creatable: false,

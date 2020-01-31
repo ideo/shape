@@ -39,6 +39,7 @@
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
 #  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
+#  index_items_on_transcoding_uuid                     (((cached_attributes ->> 'pending_transcoding_uuid'::text)))
 #  index_items_on_type                                 (type)
 #
 
@@ -452,6 +453,10 @@ class Item < ApplicationRecord
     end
 
     "Please add #{missing_value_by_question_type} to #{incomplete_question_noun} #{question_number}"
+  end
+
+  def has_child_collections?
+    false
   end
 
   private

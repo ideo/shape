@@ -197,6 +197,7 @@ ActiveRecord::Schema.define(version: 2020_01_24_010234) do
     t.integer "idea_id"
     t.integer "survey_response_id"
     t.string "search_term"
+    t.integer "collection_type", default: 0
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
@@ -465,6 +466,7 @@ ActiveRecord::Schema.define(version: 2020_01_24_010234) do
     t.integer "legend_item_id"
     t.integer "legend_search_source"
     t.jsonb "style"
+    t.index "((cached_attributes ->> 'pending_transcoding_uuid'::text))", name: "index_items_on_transcoding_uuid"
     t.index ["archive_batch"], name: "index_items_on_archive_batch"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
     t.index ["cloned_from_id"], name: "index_items_on_cloned_from_id"

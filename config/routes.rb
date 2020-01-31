@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     sessions: 'users/login_redirect',
-    registrations: 'users/login_redirect',
+    registrations: 'users/login_redirect'
   }
 
   unauthenticated do
@@ -36,6 +36,7 @@ Rails.application.routes.draw do
         resources :collection_cards, only: %i[index] do
           collection do
             get 'ids'
+            get 'breadcrumb_records'
           end
         end
         resources :roles, only: %i[index create destroy] do
@@ -96,6 +97,7 @@ Rails.application.routes.draw do
         member do
           patch 'replace'
           patch 'update'
+          patch 'toggle_pin'
           delete 'destroy'
         end
         collection do

@@ -6,7 +6,7 @@ class SerializableSimpleCollection < BaseJsonSerializer
   type 'collections'
 
   attributes :created_at, :updated_at, :name, :organization_id,
-             :master_template, :archived
+             :master_template, :archived, :collection_type
   attribute :cover do
     @object.cached_cover || {}
   end

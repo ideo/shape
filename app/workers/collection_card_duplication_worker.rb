@@ -23,12 +23,15 @@ class CollectionCardDuplicationWorker
     @new_cards = duplicate_cards
     duplicate_legend_items
     update_parent_collection_status
-    create_notifications
     @new_cards
   end
 
   def duplicate_cards
     @parent_collection.update_processing_status(:duplicating)
+
+    # determine if all moving cards should be pinned/unpinned based on the card to the left of the first moving card
+    pin_duplicating_card = should_pin_duplicating_cards?
+
     cards_to_duplicate.map do |card|
       # duplicating each card in order, each subsequent one should be placed at the end
       placement = 'end'
@@ -53,6 +56,7 @@ class CollectionCardDuplicationWorker
         placeholder: placeholder,
         batch_id: @batch_id,
         building_template_instance: @building_template_instance,
+        should_pin_duplicating_cards: source_card.pinned? || pin_duplicating_card,
       )
     end
   end
@@ -76,20 +80,6 @@ class CollectionCardDuplicationWorker
     CollectionUpdateBroadcaster.call(@parent_collection)
   end
 
-  def create_notifications
-    @collection_cards.each do |card|
-      ActivityAndNotificationBuilder.call(
-        actor: @for_user,
-        target: card.record,
-        action: :duplicated,
-        subject_user_ids: card.record.editors[:users].pluck(:id),
-        subject_group_ids: card.record.editors[:groups].pluck(:id),
-        source: @from_collection,
-        destination: @parent_collection,
-      )
-    end
-  end
-
   def duplicate_legend_items
     mover = LegendMover.new(
       to_collection: @parent_collection,
@@ -99,5 +89,13 @@ class CollectionCardDuplicationWorker
     return unless mover.call
 
     @new_cards += mover.legend_item_cards
+  end
+
+  private
+
+  def should_pin_duplicating_cards?
+    return false unless @collection_cards.first.present?
+
+    @parent_collection.should_pin_cards?(@collection_cards.first.order)
   end
 end

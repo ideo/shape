@@ -1,3 +1,5 @@
+import { observable } from "mobx"
+
 const fakeUiStore = {
   gridSettings: {
     cols: 4,
@@ -80,7 +82,7 @@ const fakeUiStore = {
   openOptionalMenus: jest.fn(),
   trackEvent: jest.fn(),
   trackedRecords: {},
-  editingName: false,
+  editingName: observable([]),
   activityLogPage: 'comments',
   pageMenuOpen: false,
   searchText: '',
@@ -88,8 +90,6 @@ const fakeUiStore = {
   addNewCard: jest.fn(),
   removeNewCard: jest.fn(),
   isNewCard: jest.fn(),
-  editingCardId: 0,
-  toggleEditingCardId: jest.fn(),
   autocompleteMenuClosed: jest.fn(),
   captureKeyboardGridClick: jest.fn(),
   popupAlert: jest.fn(),

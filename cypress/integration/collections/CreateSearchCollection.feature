@@ -6,9 +6,9 @@ Feature: Creating a Search Collection
 
     Then I should see a collection card named "cypress"
     When I navigate to the collection named "cypress" via the "CollectionCover"
-    Then I should see "cypress" in a "EditableNameHeading"
+    Then I should see "cypress" in a "EditableNameHeading-recordName"
     Then I should see a collection card named "Cypress Test Area"
-    Then I should see the value "cypress" in a "SearchCollectionInput"
-    When I click the "SearchCollectionEditTerm"
-    When I type " plants" in "SearchCollectionInput"
+    Then I should see "cypress" in a "EditableNameHeading-searchTerm"
+    When I click the "EditableNameHeading-searchTerm"
+    When I type " plants" in "EditableNameInput-searchTerm"
     Then I should see a "SearchCollectionEmptyMessage"

@@ -57,7 +57,7 @@ const fakeApiStore = ({
       .mockReturnValue(Promise.resolve({ key: 'x' })),
     findThreadForRecord: jest.fn(),
     loadNextThreadPage: jest.fn(),
-    createTemplateInstance: jest.fn().mockReturnValue({}),
+    createTemplateInstance: jest.fn().mockReturnValue(Promise.resolve({})),
     moveCards: jest.fn().mockReturnValue({}),
     linkCards: jest.fn().mockReturnValue({}),
     duplicateCards: jest.fn().mockReturnValue({}),

@@ -104,20 +104,17 @@ class PageWithApiWrapper extends React.Component {
   }
 
   trackPageView(record) {
-    const { apiStore } = this.props
     const { type, isCollection, isMasterTemplate } = record
-    const { currentUserOrganizationName } = apiStore
 
     googleTagManager.push({
       event: 'pageView',
-      organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       objectType: type,
       isMasterTemplate: (isCollection && isMasterTemplate) || false,
     })
   }
 
-  fetchData = async () => {
+  fetchData = () => {
     const { apiStore, uiStore, match } = this.props
     uiStore.update('pageError', null)
 
