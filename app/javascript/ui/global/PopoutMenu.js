@@ -146,7 +146,7 @@ export const StyledMenuItem = styled.li`
 
   ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};
-    border-left: 7px solid transparent;
+    border-left: 0;
     font-family: ${v.fonts.sans};
     font-weight: 400;
     font-size: 1rem;
@@ -204,12 +204,10 @@ export const StyledMenuItem = styled.li`
   }
   &:hover,
   &:active {
-    ${StyledMenuButton} {
-      ${props =>
-        !props.hasCheckbox &&
-        !props.noHover &&
-        `border-left-color: ${v.colors.black};`}
-    }
+    ${props =>
+      !props.hasCheckbox &&
+      !props.noHover &&
+      `border-left-color: ${v.colors.black};`}
   }
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
