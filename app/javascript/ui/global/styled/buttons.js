@@ -168,15 +168,20 @@ export const FormButton = styled.button`
   &:hover,
   &:focus {
     background-color: ${props => {
+      if (props.transparent && props.filledHover) return v.colors.commonDark
+      if (props.disabledHover) return props.color
       if (props.transparent) return v.colors.transparent
-      return props.color
+      if (props.color === v.colors.primaryDark) return v.colors.primaryDarkest
+      return v.colors.commonDark
     }};
     border: ${props => {
+      if (props.transparent && props.filledHover)
+        return `1px solid ${v.colors.commonDark}`
       if (!props.transparent) return 'none'
-      const color = invertColor(props.color)
-      return `1px solid ${color}`
+      return `1px solid ${invertColor(props.color)}`
     }};
     color: ${props => {
+      if (props.transparent && props.filledHover) return v.colors.white
       if (!props.transparent) return v.colors.white
       return invertColor(props.color)
     }};

@@ -255,6 +255,7 @@ class PageHeader extends React.Component {
               fontSize={v.buttonSizes.header.fontSize}
               data-cy="HeaderFormButton"
               transparent
+              filledHover
             >
               <StyledButtonIconWrapper>
                 <LinkIconSm />
@@ -281,6 +282,7 @@ class PageHeader extends React.Component {
         fontSize={v.buttonSizes.header.fontSize}
         data-cy="HeaderFormButton"
         transparent
+        filledHover
       >
         Re-open Feedback
       </FormButton>
@@ -402,15 +404,17 @@ class PageHeader extends React.Component {
             <CollectionTypeIcon record={record} />
           </StyledButtonIconWrapper>
           {this.renderTemplateName}
-          <Tooltip
-            classes={{ tooltip: 'Tooltip' }}
-            title={'Go to Master Template'}
-            placement="top"
-          >
-            <StyledButtonIconWrapper width={14}>
-              <BackIcon />
-            </StyledButtonIconWrapper>
-          </Tooltip>
+          {(template.can_view || template.anyone_can_view) && (
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title={'Go to Master Template'}
+              placement="top"
+            >
+              <StyledButtonIconWrapper width={14}>
+                <BackIcon />
+              </StyledButtonIconWrapper>
+            </Tooltip>
+          )}
         </FormButton>
       )
     }
@@ -433,6 +437,7 @@ class PageHeader extends React.Component {
           fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
           transparent
+          filledHover
         >
           Stop Feedback
         </FormButton>
