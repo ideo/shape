@@ -2,46 +2,52 @@
 export const creativeQualities = new Map()
 creativeQualities.set('purpose', {
   color: '#9874AB',
-  subqualities: ['usefulness', 'passion', 'clarity'],
+  subqualities: ['clarity', 'usefulness', 'passion'],
 })
 creativeQualities.set('looking out', {
   color: '#9A4F7A',
   subqualities: [
     'market insightfulness',
-    'tech insightfulness',
     'customer insightfulness',
+    'tech insightfulness',
   ],
 })
 creativeQualities.set('experimentation', {
   color: '#D26A3B',
   subqualities: [
-    'user testing',
-    'high-fidelity prototyping',
     'low-fidelity prototyping',
+    'high-fidelity prototyping',
+    'user testing',
     'modeling',
   ],
 })
 creativeQualities.set('collaboration', {
   color: '#EED950',
   subqualities: [
-    'network informality',
     'team collaboration',
+    'network informality',
+    'diversity of perspective',
     'collaboration characteristics',
   ],
 })
 creativeQualities.set('empowerment', {
   color: '#83CCB1',
   subqualities: [
-    'opposability',
     'fairness',
+    'opposability',
     'autonomy',
     'risk tolerance',
-    'visionary in implementation',
+    'process clarity',
   ],
 })
 creativeQualities.set('refinement', {
   color: '#8A929D',
-  subqualities: ['expert', 'technical creativity', 'detail orientation'],
+  subqualities: [
+    'visionary in implementation',
+    'technical creativity',
+    'detail orientation',
+    'expert',
+  ],
 })
 
 export const allQualityColors = {}
