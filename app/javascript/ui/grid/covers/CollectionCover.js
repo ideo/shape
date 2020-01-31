@@ -80,7 +80,8 @@ const calcSectionHeight = props => {
 }
 
 const calcTopAndBottom = props => {
-  if (props.useTextBackground) {
+  const { useTextBackground, isTextItem, height, gutter } = props
+  if (useTextBackground) {
     return {
       top: {
         top: 0,
@@ -93,11 +94,11 @@ const calcTopAndBottom = props => {
   }
   return {
     top: {
-      top: `${props.isTextItem ? 'auto' : props.gutter / 2 + pad}px`,
-      bottom: props.isTextItem ? '13px' : 'auto',
+      top: `${isTextItem ? 'auto' : gutter / 2 + pad}px`,
+      bottom: isTextItem ? '13px' : 'auto',
     },
     bottom: {
-      bottom: `${props.height === 1 ? 4 : pad}px`,
+      bottom: `${height === 1 ? 4 : pad}px`,
     },
   }
 }
