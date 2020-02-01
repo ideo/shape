@@ -100,6 +100,9 @@ export const StyledMenu = styled.ul`
   overflow-x: hidden;
   position: relative;
   width: ${props => props.width}px;
+  .organizations {
+    border-top: 1px solid ${v.colors.commonMedium};
+  }
 `
 
 export const StyledMenuToggle = styled.button`
@@ -126,10 +129,15 @@ export const StyledMenuButton = styled.button`
   margin-top: -13px;
   margin-bottom: -13px;
   width: 100%;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  ${props =>
+    props.wrapText
+      ? `display: flex;
+        align-items: center;`
+      : `
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  `}
 `
 
 export const StyledMenuItem = styled.li`
@@ -154,18 +162,17 @@ export const StyledMenuItem = styled.li`
     font-weight: 400;
     font-size: 1rem;
     text-align: left;
-
     color: ${v.colors.black};
 
     &.with-avatar {
-      padding-left: 3.75rem;
+      padding-left: 1rem;
       padding-right: 1rem;
     }
 
     .icon-left {
       margin-right: ${props => {
         if (props.hasCheckbox) {
-          return 30
+          return 10
         } else if (props.wrapperClassName === 'card-menu') {
           return 16
         } else {
@@ -174,31 +181,30 @@ export const StyledMenuItem = styled.li`
       }}px;
     }
 
+    .icon {
+      width: 16px;
+      height: 16px;
+      line-height: 1.4rem;
+    }
+    .icon-right .icon {
+      top: 50%;
+      transform: translateY(-50%);
+      position: absolute;
+      left: auto;
+      right: ${props =>
+        props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
+    }
     .icon-left .icon {
-      left: ${props => {
+      display: block;
+      margin-left: ${props => {
         if (props.hasCheckbox) {
-          return 35
+          return 10
         } else if (props.wrapperClassName === 'card-menu') {
           return 8
         } else {
           return 0
         }
       }}px;
-    }
-
-    .icon {
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      line-height: 1.4rem;
-    }
-    .icon-right .icon {
-      left: auto;
-      right: ${props =>
-        props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
     }
   }
   &:hover,
@@ -226,8 +232,26 @@ class PopoutMenu extends React.Component {
     return groupedMenuItems
   }
 
+  renderName(item) {
+    const { wrapText } = this.props
+    const { name, TextComponent } = item
+    const menuItem = (
+      <StyledMenuItemText>
+        {TextComponent ? <TextComponent>{name}</TextComponent> : name}
+      </StyledMenuItemText>
+    )
+    if (!wrapText) return menuItem
+
+    return <div style={{ display: 'inline-block' }}>{menuItem}</div>
+  }
+
   get renderMenuItems() {
-    const { groupExtraComponent, wrapperClassName, width } = this.props
+    const {
+      groupExtraComponent,
+      wrapperClassName,
+      width,
+      wrapText,
+    } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -248,7 +272,6 @@ class PopoutMenu extends React.Component {
               borderColor,
               hasCheckbox,
               isChecked,
-              TextComponent,
               noHover,
             } = item
             let className = `menu-${_.kebabCase(name)}`
@@ -287,16 +310,10 @@ class PopoutMenu extends React.Component {
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
+                  wrapText={wrapText}
                 >
                   {iconLeft && <span className="icon-left">{iconLeft}</span>}
-                  <StyledMenuItemText>
-                    {TextComponent ? (
-                      <TextComponent>{name}</TextComponent>
-                    ) : (
-                      name
-                    )}
-                  </StyledMenuItemText>
-
+                  {this.renderName(item)}
                   {iconRight && (
                     <span className={rightIconClassName}>{iconRight}</span>
                   )}
@@ -437,6 +454,7 @@ PopoutMenu.propTypes = {
   }),
   location: PropTypes.string,
   positionRelative: PropTypes.bool,
+  wrapText: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -457,6 +475,7 @@ PopoutMenu.defaultProps = {
   hideDotMenu: false,
   location: null,
   positionRelative: true,
+  wrapText: false,
 }
 
 export default PopoutMenu
