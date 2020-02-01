@@ -9,7 +9,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       master_template: true,
       num_cards: 2,
       pin_cards: true,
-      collection_type: :project
+      collection_type: :project,
     )
   end
   let(:viewer) { create(:user) }
