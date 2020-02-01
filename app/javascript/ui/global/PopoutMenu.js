@@ -137,6 +137,7 @@ export const StyledMenuItem = styled.li`
   color: ${v.colors.black};
   display: flex;
   min-height: 1rem;
+  overflow-y: hidden;
   padding: 0.75rem 0 0.75rem 1rem;
   position: relative;
   width: 100%;
