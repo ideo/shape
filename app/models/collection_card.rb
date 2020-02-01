@@ -213,7 +213,6 @@ class CollectionCard < ApplicationRecord
 
     # Nullify is_cover if the collection going into already has a cover or
     # should specifically not have a cover.
-    # Don't reset for template instances, as none of the cached attributes are copied over
     cc.is_cover = false if parent.cached_cover.try(:[], 'no_cover') == true
 
     # If there is already a collection card is the cover,
