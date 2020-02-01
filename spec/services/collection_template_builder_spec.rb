@@ -3,7 +3,14 @@ require 'rails_helper'
 RSpec.describe CollectionTemplateBuilder, type: :service do
   let(:organization) { create(:organization) }
   let(:template) do
-    create(:collection, organization: organization, master_template: true, num_cards: 2, pin_cards: true)
+    create(
+      :collection,
+      organization: organization,
+      master_template: true,
+      num_cards: 2,
+      pin_cards: true,
+      collection_type: :project
+    )
   end
   let(:viewer) { create(:user) }
   let(:parent) { create(:collection, num_cards: 2, organization: organization, add_viewers: [viewer]) }
@@ -28,6 +35,10 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
 
     it 'should copy the tags over to the instance' do
       expect(instance.tag_list).to eq template.tag_list
+    end
+
+    it 'copies the collection_type' do
+      expect(instance.collection_type).to eq('project')
     end
 
     it 'should give parent collection users the same access to collection and its items' do
@@ -163,6 +174,17 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         expect(test_instance.is_a?(Collection::TestCollection)).to be true
         # test should point to the new instance parent
         expect(test_instance.collection_to_test).to eq(instance)
+      end
+    end
+
+    context 'with collection filters' do
+      let!(:collection_filter) { create(:collection_filter, collection: template) }
+
+      it 'copies all filters' do
+        expect do
+          instance
+        end.to change(CollectionFilter, :count).by(1)
+        expect(instance.collection_filters.first.text).to eq(collection_filter.text)
       end
     end
 
