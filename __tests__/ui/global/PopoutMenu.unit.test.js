@@ -59,9 +59,7 @@ describe('PopoutMenu', () => {
     })
 
     it('will render a border when noBorder set to true', () => {
-      expect(menuItem.at(0)).toHaveStyleRule('border-bottom-width', '1px', {
-        modifier: 'button',
-      })
+      expect(menuItem.at(0)).toHaveStyleRule('border-top-width', '1px')
     })
 
     it('has "open" CSS class if menu is open', () => {
@@ -79,9 +77,7 @@ describe('PopoutMenu', () => {
 
     describe('on a menu item with no border', () => {
       it('will not render a border', () => {
-        expect(menuItem.at(1)).toHaveStyleRule('border-bottom-width', '0px', {
-          modifier: 'button',
-        })
+        expect(menuItem.at(1)).toHaveStyleRule('border-top-width', '0px')
       })
     })
   })
@@ -108,7 +104,7 @@ describe('PopoutMenu', () => {
     it('makes the menu items clickable', () => {
       menuItem
         .at(0)
-        .find('button')
+        .find('.menu-do-stuff')
         .simulate('click')
       expect(props.groupedMenuItems.top[0].onClick).toHaveBeenCalled()
     })

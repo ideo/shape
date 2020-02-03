@@ -33,9 +33,11 @@ module CollectionCardFilter
       end
 
       # API should always have user (e.g. application_bot) present
-      if @filters[:external_id].present? && @application.present?
-        filter_external_id
+      if @application.present?
+        filter_external_id if @filters[:external_id].present?
+        filter_identifier if @filters[:identifier].present?
       end
+
       return @cards.pluck(:id) if @ids_only
 
       @cards
@@ -158,6 +160,10 @@ module CollectionCardFilter
                    ExternalRecord.arel_table[:application_id].eq(@application.id),
                  ),
                )
+    end
+
+    def filter_identifier
+      @cards = @cards.where(identifier: @filters[:identifier])
     end
 
     def fields

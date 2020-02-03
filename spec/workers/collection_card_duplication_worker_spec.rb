@@ -96,6 +96,25 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect(result.size).to eq(5)
       end
 
+      context 'with pinned cards' do
+        let(:collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
+
+        it 'calls duplicate with should_pin_duplicating_cards' do
+          expect_any_instance_of(CollectionCard).to receive(:duplicate!).with(
+            for_user: user,
+            parent: to_collection,
+            placement: 'end',
+            system_collection: false,
+            synchronous: false,
+            placeholder: nil,
+            batch_id: batch_id,
+            building_template_instance: false,
+            should_pin_duplicating_cards: true,
+          )
+          run_worker
+        end
+      end
+
       context 'with placeholder cards' do
         let!(:placeholders) do
           cards.map do |card|
@@ -157,21 +176,6 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
           expect(to_collection.items.map(&:cloned_from)).to match_array(collection.items)
         end
       end
-    end
-
-    it 'calls ActivityAndNotificationBuilder for each duplicated card' do
-      cards.each do |card|
-        expect(ActivityAndNotificationBuilder).to receive(:call).with(
-          actor: user,
-          target: card.record,
-          action: :duplicated,
-          subject_user_ids: card.record.editors[:users].pluck(:id),
-          subject_group_ids: card.record.editors[:groups].pluck(:id),
-          source: collection,
-          destination: to_collection,
-        )
-      end
-      run_worker
     end
 
     context 'with data items that have legends' do

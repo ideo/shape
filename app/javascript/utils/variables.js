@@ -167,6 +167,7 @@ export default {
   transitionWithDelay: 'all 0.3s 0.2s',
 
   navOpacity: 0.9,
+  collectionCoverOpacity: 0.4,
 
   cardHoldTime: 0.4 * 1000,
   touchDeviceHoldToDragTime: 1500,

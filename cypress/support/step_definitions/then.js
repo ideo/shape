@@ -23,7 +23,6 @@ Then(
 Then('I should not see a collection card with subtitle {string}', subtitle => {
   cy.locateDataOrClass('CollectionCover')
     .find('.bottom')
-    .children()
     .last()
     .invoke('text')
     .should('not.eq', subtitle)

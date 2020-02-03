@@ -95,8 +95,7 @@ exports[`GridCardBlank renders snapshot 1`] = `
                 "iconLeft": <TemplateIcon
                   circled={false}
                   filled={false}
-                  size="normal"
-                  viewBox="0 0 50 50"
+                  viewBox="0 0 48 48"
                 />,
                 "name": "Create Template",
                 "onClick": [Function],
@@ -120,7 +119,9 @@ exports[`GridCardBlank renders snapshot 1`] = `
           onClick={[Function]}
           onMouseLeave={[Function]}
           position={null}
+          positionRelative={true}
           width={240}
+          wrapText={false}
           wrapperClassName="card-menu"
         />
       </Flex>

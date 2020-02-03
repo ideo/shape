@@ -250,6 +250,18 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'GET #breadcrumb_records' do
+    let!(:collection) { create(:collection, record_type: :collection, num_cards: 5, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/breadcrumb_records" }
+
+    it 'returns stringified ids of collection.collection_cards' do
+      get(path)
+      expect(response.status).to eq(200)
+      expect(json.length).to eq(5)
+      expect(json.pluck("id")).to eq(collection.collection_cards.map(&:record).pluck(:id))
+    end
+  end
+
   describe 'POST #create' do
     let(:path) { '/api/v1/collection_cards' }
     let(:item_attributes) do

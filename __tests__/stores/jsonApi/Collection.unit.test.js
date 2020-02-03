@@ -8,6 +8,7 @@ import { apiStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
 import Organization from '~/stores/jsonApi/Organization'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
 import googleTagManager from '~/vendor/googleTagManager'
 
 import { fakeRole } from '#/mocks/data'
@@ -172,6 +173,9 @@ describe('Collection', () => {
           cardIds[0]
         )
       })
+      it('should always return an id even if none found in collection_cards', () => {
+        expect(collection.firstCardId(['123321'])).toEqual('123321')
+      })
     })
   })
 
@@ -267,7 +271,6 @@ describe('Collection', () => {
           hasLinkSharingAudience: false,
           hasPaidAudience: false,
           ideasCount: 0,
-          organization: 'MyOrg',
           testId: collection.id,
           timestamp: expect.any(String),
         })
@@ -474,6 +477,56 @@ describe('Collection', () => {
         'PATCH',
         { data }
       )
+    })
+  })
+
+  describe('filter bar methods', () => {
+    beforeEach(() => {
+      collection.addReference(
+        'collection_filters',
+        [
+          {
+            filter_type: 'tag',
+            text: 'plant',
+          },
+          {
+            filter_type: 'tag',
+            text: 'purpose',
+          },
+        ],
+        {
+          model: CollectionFilter,
+          type: ReferenceType.TO_MANY,
+        }
+      )
+      collection.name = 'Some Purposeful Plants'
+    })
+
+    it('filterBarFilters returns all collection filters', () => {
+      expect(collection.filterBarFilters.map(f => f.text)).toEqual([
+        'plant',
+        'purpose',
+      ])
+    })
+
+    it('methodLibraryFilters returns no filters', () => {
+      expect(collection.methodLibraryFilters.map(f => f.text)).toEqual([])
+    })
+
+    describe('if method library collection', () => {
+      beforeEach(() => {
+        collection.name = "Plant Organization's Method Library"
+      })
+
+      it('filterBarFilters returns non-method-library filters', () => {
+        expect(collection.filterBarFilters.map(f => f.text)).toEqual(['plant'])
+      })
+
+      it('methodLibraryFilters returns method library filters', () => {
+        expect(collection.methodLibraryFilters.map(f => f.text)).toEqual([
+          'purpose',
+        ])
+      })
     })
   })
 })

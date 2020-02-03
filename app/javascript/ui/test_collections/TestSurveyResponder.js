@@ -278,12 +278,10 @@ class TestSurveyResponder extends React.Component {
   }
 
   trackResponseEvent(event) {
-    const { apiStore, collection } = this.props
+    const { collection } = this.props
     const { id, gives_incentive } = collection
-    const { currentUserOrganizationName } = apiStore
     googleTagManager.push({
       event,
-      organization: currentUserOrganizationName,
       timestamp: new Date().toUTCString(),
       testId: id,
       hasPaidAudience: gives_incentive,

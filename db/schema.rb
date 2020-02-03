@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_23_191847) do
+ActiveRecord::Schema.define(version: 2020_01_24_010234) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -125,6 +125,8 @@ ActiveRecord::Schema.define(version: 2020_01_23_191847) do
     t.integer "col"
     t.integer "section_type"
     t.string "identifier"
+    t.string "font_color"
+    t.boolean "font_background", default: false
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
@@ -195,6 +197,7 @@ ActiveRecord::Schema.define(version: 2020_01_23_191847) do
     t.integer "idea_id"
     t.integer "survey_response_id"
     t.string "search_term"
+    t.integer "collection_type", default: 0
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
@@ -546,8 +549,8 @@ ActiveRecord::Schema.define(version: 2020_01_23_191847) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.jsonb "selected_choice_ids", default: [], null: false
     t.bigint "idea_id"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
     t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"

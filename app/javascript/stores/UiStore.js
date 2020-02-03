@@ -500,7 +500,7 @@ export default class UiStore {
       this.templateName = name
     } else {
       let firstCardId = _.first(this.selectedCardIds)
-      if (from) {
+      if (from && this.selectedCardIds.length > 1) {
         // always put the topLeft card first
         firstCardId = from.firstCardId(this.selectedCardIds)
       }

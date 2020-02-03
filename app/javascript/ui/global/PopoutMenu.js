@@ -5,11 +5,12 @@ import styled from 'styled-components'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import MenuIcon from '~/ui/icons/MenuIcon'
+import { Checkbox } from '~/ui/global/styled/forms'
 import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
-  position: relative;
+  position: ${props => (props.hideDotMenu ? 'absolute' : 'relative')};
   .menu-wrapper {
     display: none;
     opacity: 0;
@@ -43,8 +44,9 @@ export const StyledMenuButtonWrapper = styled.div`
 `
 
 export const StyledMenuWrapper = styled.div`
-  position: absolute;
+  position: ${props => (props.positionRelative ? 'relative' : 'absolute')};
   padding: 10px;
+  transition: left 120ms;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
     const { position, offsetPosition, location } = props
@@ -92,8 +94,15 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
   background-color: white;
-  width: ${props => props.width}px;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
+  max-height: ${window.innerHeight - 260}px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  width: ${props => props.width}px;
+  .organizations {
+    border-top: 1px solid ${v.colors.commonMedium};
+  }
 `
 
 export const StyledMenuToggle = styled.button`
@@ -109,62 +118,108 @@ StyledMenuToggle.defaultTypes = {
 
 StyledMenuToggle.displayName = 'StyledMenuToggle'
 
+export const StyledMenuButton = styled.button`
+  text-transform: capitalize;
+  font-family: ${v.fonts.sans};
+  font-weight: 400;
+  font-size: 1rem;
+  text-align: left;
+  max-width: 240px;
+  padding-left: ${props => props.nested * 10}px;
+  margin-top: -13px;
+  margin-bottom: -13px;
+  width: 100%;
+  ${props =>
+    props.wrapText
+      ? `display: flex;
+        align-items: center;`
+      : `
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  `}
+`
+
 export const StyledMenuItem = styled.li`
-  button {
-    width: 100%;
-    min-height: 2rem;
-    padding: 0.75rem 0 0.75rem 1rem;
-    text-transform: capitalize;
-    position: relative;
+  border-left: 7px solid transparent;
+  color: ${v.colors.black};
+  display: flex;
+  min-height: 1rem;
+  overflow-y: hidden;
+  padding: 0.75rem 0 0.75rem 1rem;
+  position: relative;
+  width: 100%;
+  width: ${props => props.width || 200}px;
+  ${props => props.bgColor && `background-color: ${props.bgColor};`}
+  border-top: solid
+    ${props => (props.borderColor ? props.borderColor : v.colors.commonMedium)};
+  border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
+
+  ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};
-    border-left: 7px solid transparent;
+    border-left: 0;
     font-family: ${v.fonts.sans};
     font-weight: 400;
     font-size: 1rem;
     text-align: left;
-    border-bottom: solid ${v.colors.commonMedium};
-    border-bottom-width: ${props => (props.noBorder ? 0 : 1)}px;
     color: ${v.colors.black};
+
     &.with-avatar {
-      padding-left: 3.75rem;
+      padding-left: 1rem;
       padding-right: 1rem;
     }
 
     .icon-left {
-      margin-right: ${props =>
-        props.wrapperClassName === 'card-menu' ? 16 : 0}px;
-    }
-
-    .icon-left .icon {
-      left: ${props => (props.wrapperClassName === 'card-menu' ? 8 : 0)}px;
+      margin-right: ${props => {
+        if (props.hasCheckbox) {
+          return 10
+        } else if (props.wrapperClassName === 'card-menu') {
+          return 16
+        } else {
+          return 0
+        }
+      }}px;
     }
 
     .icon {
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      position: absolute;
       width: 16px;
       height: 16px;
       line-height: 1.4rem;
     }
     .icon-right .icon {
+      top: 50%;
+      transform: translateY(-50%);
+      position: absolute;
       left: auto;
       right: ${props =>
         props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
     }
-    span {
-      line-height: 1.4rem;
+    .icon-left .icon {
+      display: block;
+      margin-left: ${props => {
+        if (props.hasCheckbox) {
+          return 10
+        } else if (props.wrapperClassName === 'card-menu') {
+          return 8
+        } else {
+          return 0
+        }
+      }}px;
     }
   }
   &:hover,
   &:active {
-    button {
-      border-left: 7px solid ${v.colors.black};
-    }
+    ${props =>
+      !props.hasCheckbox &&
+      !props.noHover &&
+      `border-left-color: ${v.colors.black};`}
   }
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
+
+const StyledMenuItemText = styled.span`
+  line-height: 1.4rem;
+`
 
 class PopoutMenu extends React.Component {
   get groupedMenuItems() {
@@ -177,8 +232,26 @@ class PopoutMenu extends React.Component {
     return groupedMenuItems
   }
 
+  renderName(item) {
+    const { wrapText } = this.props
+    const { name, TextComponent } = item
+    const menuItem = (
+      <StyledMenuItemText>
+        {TextComponent ? <TextComponent>{name}</TextComponent> : name}
+      </StyledMenuItemText>
+    )
+    if (!wrapText) return menuItem
+
+    return <div style={{ display: 'inline-block' }}>{menuItem}</div>
+  }
+
   get renderMenuItems() {
-    const { groupExtraComponent, wrapperClassName } = this.props
+    const {
+      groupExtraComponent,
+      wrapperClassName,
+      width,
+      wrapText,
+    } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
@@ -194,6 +267,12 @@ class PopoutMenu extends React.Component {
               onClick,
               loading,
               withAvatar,
+              bgColor,
+              noBorder,
+              borderColor,
+              hasCheckbox,
+              isChecked,
+              noHover,
             } = item
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
@@ -202,21 +281,43 @@ class PopoutMenu extends React.Component {
             return (
               <StyledMenuItem
                 key={`${name}-${id || i}`}
-                noBorder={item.noBorder}
+                borderColor={borderColor}
+                noBorder={noBorder}
+                noHover={noHover}
+                hasCheckbox={hasCheckbox}
                 loading={loading}
                 wrapperClassName={wrapperClassName}
+                bgColor={bgColor}
+                width={width - 20}
               >
-                <button
+                {hasCheckbox && (
+                  <Checkbox
+                    style={{
+                      marginRight: '0px',
+                      marginLeft: '-14px',
+                      width: 'auto',
+                      height: 'auto',
+                    }}
+                    color="primary"
+                    checked={isChecked}
+                    onChange={loading ? () => null : onClick}
+                    value="yes"
+                    size="small"
+                    className="checkBox"
+                  />
+                )}
+                <StyledMenuButton
                   onClick={loading ? () => null : onClick}
                   data-cy={`PopoutMenu_${_.camelCase(name)}`}
                   className={className}
+                  wrapText={wrapText}
                 >
                   {iconLeft && <span className="icon-left">{iconLeft}</span>}
-                  <span>{name}</span>
+                  {this.renderName(item)}
                   {iconRight && (
                     <span className={rightIconClassName}>{iconRight}</span>
                   )}
-                </button>
+                </StyledMenuButton>
               </StyledMenuItem>
             )
           })}
@@ -264,6 +365,7 @@ class PopoutMenu extends React.Component {
       offsetPosition,
       hideDotMenu,
       location,
+      positionRelative,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -290,6 +392,7 @@ class PopoutMenu extends React.Component {
           </MenuToggle>
         )}
         <StyledMenuWrapper
+          positionRelative={positionRelative}
           position={position}
           offsetPosition={offsetPosition}
           height={200}
@@ -311,8 +414,14 @@ const propTypeMenuItem = PropTypes.arrayOf(
     iconRight: PropTypes.element,
     onClick: PropTypes.func,
     noBorder: PropTypes.bool,
+    borderColor: PropTypes.string,
+    noHover: PropTypes.bool,
     loading: PropTypes.bool,
     withAvatar: PropTypes.bool,
+    bgColor: PropTypes.string,
+    TextComponent: PropTypes.object,
+    hasCheckbox: PropTypes.bool,
+    isChecked: PropTypes.bool,
   })
 )
 
@@ -344,6 +453,8 @@ PopoutMenu.propTypes = {
     component: PropTypes.node,
   }),
   location: PropTypes.string,
+  positionRelative: PropTypes.bool,
+  wrapText: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
@@ -363,6 +474,8 @@ PopoutMenu.defaultProps = {
   groupExtraComponent: {},
   hideDotMenu: false,
   location: null,
+  positionRelative: true,
+  wrapText: false,
 }
 
 export default PopoutMenu

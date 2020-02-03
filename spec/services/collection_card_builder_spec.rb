@@ -325,9 +325,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       context 'when item is a submission' do
+        let(:editor) { create(:user) }
         let(:submission_box) do
           create(:submission_box,
                  organization: organization,
+                 add_editors: [editor],
                  add_viewers: [user])
         end
         let(:parent) { create(:submissions_collection, submission_box: submission_box) }
@@ -340,6 +342,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
         it 'should subscribe the submitter to the submission box' do
           users_thread = comment_thread.users_thread_for(user)
           expect(users_thread.subscribed).to be true
+        end
+
+        it 'should add the submitter as an editor' do
+          record = builder.collection_card.record
+          expect(record.can_edit?(editor)).to be true
+          expect(record.can_edit?(user)).to be true
         end
       end
 

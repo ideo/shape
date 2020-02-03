@@ -369,6 +369,7 @@ class ActionMenu extends React.Component {
         offsetPosition={this.offsetPosition}
         width={250}
         location={location}
+        positionRelative={false}
       />
     )
   }

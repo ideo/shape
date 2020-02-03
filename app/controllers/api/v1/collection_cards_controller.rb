@@ -5,9 +5,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
 
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids]
-  before_action :check_cache, only: %i[index ids]
-  before_action :load_collection_cards, only: %i[index ids]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records]
+  before_action :check_cache, only: %i[index ids breadcrumb_records]
+  before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
   def index
     params[:card_order] ||= @collection.default_card_order
 
@@ -25,6 +25,21 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   # return all collection_card_ids for this particular collection
   def ids
     render json: @collection_card_ids.map(&:to_s)
+  end
+
+  def breadcrumb_records
+    card_data = @collection_cards
+                  .select { |card| card.record.is_a?(Collection) }
+                  .map do |card|
+                    {
+                      id: card.record.id,
+                      type: card.record.class.base_class.name.downcase.pluralize,
+                      collection_type: card.record.class.name,
+                      name: card.record.name,
+                      has_children: card.record.has_child_collections?,
+                    }
+                  end
+    render json: card_data
   end
 
   def create
@@ -141,7 +156,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_moving_collections, only: %i[move]
   after_action :broadcast_moving_collection_updates, only: %i[move link]
   def move
-    placement = json_api_params[:placement]
+    placement = json_api_params[:placement].presence || 'beginning'
     @card_action ||= 'move'
     if @cards.count >= bulk_operation_threshold
       return perform_bulk_operation(
@@ -439,6 +454,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :order,
       :hidden,
       :section_type,
+      :font_color,
+      :font_background,
     )
   end
 
@@ -539,6 +556,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       show_replace
       card_type
       section_type
+      font_color
+      font_background
     ]
     # Allow pinning, replacing if this is an application/bot user
     attrs << :pinned if current_application.present?
