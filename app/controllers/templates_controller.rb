@@ -8,6 +8,7 @@ class TemplatesController < ApplicationController
     if current_user.current_organization.blank?
       # TODO: do something if the user is logged in BUT does not have an org...
       # and remember the template they were trying to create
+      session[:use_template_id] = params[:id]
       redirect_to root_path
       return
     end
