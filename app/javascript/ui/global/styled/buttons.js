@@ -178,7 +178,6 @@ FormButton.defaultProps = {
   color: v.colors.black,
 }
 
-/** @component */
 export const TextButton = styled.button`
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
@@ -188,7 +187,6 @@ export const TextButton = styled.button`
   cursor: pointer;
   max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 `
-TextButton.displayName = 'StyledTextButton'
 
 export const CollectionCoverTextButton = styled(TextButton)`
   font-size: 0.75rem;

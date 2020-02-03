@@ -2,7 +2,8 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
-import { FormButton, TextButton } from '~/ui/global/styled/buttons'
+import { FormButton } from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
 import { SmallHelperText } from '~/ui/global/styled/typography'
 import {
   FieldContainer,
