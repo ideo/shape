@@ -123,6 +123,12 @@ class OrganizationMenu extends React.Component {
     this.editGroup = {}
   }
 
+  handleLogout = ev => {
+    ev.preventDefault()
+    const { apiStore } = this.props
+    apiStore.currentUser.logout()
+  }
+
   removeGroup = group => async () => {
     group.API_archive()
   }
@@ -138,7 +144,9 @@ class OrganizationMenu extends React.Component {
         <GroupModify
           group={{}}
           onSave={this.createOrganization}
+          onCancel={this.handleLogout}
           groupType="Organization"
+          creatingOrg
         />
       </div>
     )
@@ -155,6 +163,7 @@ class OrganizationMenu extends React.Component {
           this.saveOrganization(group)
           this.afterGroupSave(group)
         }}
+        onCancel={this.handleClose}
         groupType="Organization"
       />
     )
