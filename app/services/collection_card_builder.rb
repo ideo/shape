@@ -48,14 +48,13 @@ class CollectionCardBuilder
   end
 
   def build_collection_card(type)
-    attrs = @params.symbolize_keys
-    if type == 'link'
-      # Copy style attributes from existing card
-      linked_record_attrs = card.record&.parent_collection_card&.link_card_copy_attributes || {}
-      attrs.merge!(linked_record_attrs)
-    end
+    card = @parent_collection.send("#{type}_collection_cards").build(@params)
 
-    @parent_collection.send("#{type}_collection_cards").build(attrs)
+    return card unless type == 'link' && card.record&.parent_collection_card.present?
+
+    # Copy style attributes from existing card
+    card.attributes = card.record.parent_collection_card.link_card_copy_attributes
+    card
   end
 
   def create_collection_card
