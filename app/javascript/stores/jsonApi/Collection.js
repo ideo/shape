@@ -643,9 +643,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isMethodLibraryCollection() {
     return (
-      this.name.match(/all\s+methods/i) &&
+      this.name.match(/all\s+methods/i) !== null &&
       this.parent &&
-      this.parent.name.match(/method\s+library/i)
+      this.parent.name &&
+      this.parent.name.match(/method\s+library/i) !== null
     )
   }
 
