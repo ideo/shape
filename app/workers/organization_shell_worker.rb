@@ -2,6 +2,6 @@ class OrganizationShellWorker
   include Sidekiq::Worker
 
   def perform
-    OrganizationShellBuilder.new(true).save
+    OrganizationShellBuilder.new.save
   end
 end
