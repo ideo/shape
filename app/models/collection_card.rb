@@ -126,7 +126,6 @@ class CollectionCard < ApplicationRecord
     enable
     # propagate to STI models
     propagate
-    nullify :identifier
     nullify :templated_from_id
     # don't recognize any relations, easiest way to turn them all off
     recognize []
