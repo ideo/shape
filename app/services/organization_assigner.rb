@@ -43,7 +43,9 @@ class OrganizationAssigner < SimpleService
     # This is a backup case for if a org shell isn't available for some
     # reason. In this case, we still have to show the users the loading
     # content as it might take a while to make the org
-    OrganizationShellBuilder.new(true).save
+    builder = OrganizationShellBuilder.new
+    builder.save
+    @organization = builder.organization
   end
 
   def group_params

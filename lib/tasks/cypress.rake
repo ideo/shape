@@ -30,7 +30,7 @@ namespace :cypress do
   end
 
   def create_shell_orgs
-    [0..3].each do
+    3.times do
       OrganizationShellBuilder.new.save
     end
   end

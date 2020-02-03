@@ -3,9 +3,9 @@ class OrganizationShellRefreshWorker
 
   def perform
     old_organizations = Organization.where(shell: true)
-    [0.10].each do
+    10.times do
       OrganizationShellBuilder.new.save
     end
-    older_organizations.destroy_all
+    old_organizations.destroy_all
   end
 end
