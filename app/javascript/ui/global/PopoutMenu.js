@@ -103,7 +103,9 @@ export const StyledMenu = styled.ul`
   .organizations {
     border-top: 1px solid ${v.colors.commonMedium};
     li {
-      padding-top: 20px;
+      ${StyledMenuItem} {
+        padding-top: 20px;
+      }
     }
   }
 `
