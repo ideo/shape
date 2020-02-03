@@ -60,8 +60,15 @@ class LinkToSharedCollectionsWorker
   end
 
   def create_link(object, collection)
-    width, height = card_width_height(object)
     CollectionCard::Link.create(
+      card_attrs(object, collection),
+    )
+  end
+
+  def card_attrs(object, collection)
+    width, height = card_width_height(object)
+    existing_parent_card = object.parent_collection_card
+    existing_parent_card.link_card_copy_attributes.merge(
       parent: collection,
       item_id: (object.is_a?(Item) ? object.id : nil),
       collection_id: (object.is_a?(Collection) ? object.id : nil),
