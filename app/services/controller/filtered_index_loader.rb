@@ -53,6 +53,7 @@ module Controller
       filter_id
       filter_uid
       filter_external_id
+      filter_identifier
       filter_collection_id
       # if results is an empty array it won't be pagination-friendly
       @results.present? ? @results.page(@page) : @results
@@ -90,6 +91,14 @@ module Controller
       @results = @results.where_external_id(
         @filter[:external_id],
         application_id: @application.id,
+      )
+    end
+
+    def filter_identifier
+      return if @filter[:identifier].blank?
+
+      @results = @results.where(
+        identifier: @filter[:identifier],
       )
     end
 

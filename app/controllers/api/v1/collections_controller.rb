@@ -241,6 +241,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :is_cover,
       :hidden,
       :pinned,
+      :filter,
+      :font_color,
+      :font_background
     )
   end
 

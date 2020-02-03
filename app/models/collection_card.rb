@@ -126,7 +126,6 @@ class CollectionCard < ApplicationRecord
     enable
     # propagate to STI models
     propagate
-    nullify :identifier
     nullify :templated_from_id
     # don't recognize any relations, easiest way to turn them all off
     recognize []
@@ -214,7 +213,12 @@ class CollectionCard < ApplicationRecord
     # Nullify is_cover if the collection going into already has a cover or
     # should specifically not have a cover.
     cc.is_cover = false if parent.cached_cover.try(:[], 'no_cover') == true
-    cc.is_cover = false if parent.collection_cards.is_cover.count.positive?
+
+    # If there is already a collection card is the cover,
+    # don't set this duplicated card as the cover
+    if parent.collection_cards.is_cover.where.not(id: cc.id).count.positive?
+      cc.is_cover = false
+    end
 
     unless shallow || link?
       opts = {

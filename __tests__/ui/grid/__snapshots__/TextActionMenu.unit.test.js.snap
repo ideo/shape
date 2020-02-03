@@ -35,6 +35,7 @@ exports[`TextActionMenu as viewer render snapshot 1`] = `
   }
   positionRelative={true}
   width={250}
+  wrapText={false}
   wrapperClassName="card-menu"
 />
 `;
