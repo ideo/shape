@@ -2,7 +2,7 @@ class OrganizationShellRefreshWorker
   include Sidekiq::Worker
 
   def perform
-    old_organization_ids = Organization.where(shell: true).pluck(:id)
+    old_organization_ids = Organization.shell.pluck(:id)
     10.times do
       OrganizationShellBuilder.new.save
     end

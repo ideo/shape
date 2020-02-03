@@ -4,7 +4,7 @@ class OrganizationAssigner < SimpleService
   def initialize(params, user, full_setup)
     @params = params
     @user = user
-    @organization = Organization.where(shell: true).first
+    @organization = Organization.shell.first
     create_shell_organization if @organization.blank?
     @errors = []
     @full_setup = full_setup

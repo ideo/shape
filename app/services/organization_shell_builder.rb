@@ -23,7 +23,7 @@ class OrganizationShellBuilder
   private
 
   def next_shell_name
-    last_shell = Organization.where(shell: true).last
+    last_shell = Organization.shell.last
     return 'shell-0' if last_shell.blank?
 
     last_number = last_shell.name.split('-').last.to_i
@@ -35,7 +35,7 @@ class OrganizationShellBuilder
   end
 
   def create_user_collection
-    col = Collection::UserCollection.create(
+    Collection::UserCollection.create(
       organization: @organization,
     )
   end

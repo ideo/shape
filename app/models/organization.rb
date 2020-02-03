@@ -121,6 +121,7 @@ class Organization < ApplicationRecord
             format: { with: SLUG_FORMAT, allow_blank: true }
 
   scope :active, -> { where(deactivated: false) }
+  scope :shell, -> { where(shell: true) }
   scope :billable, -> do
     active
       .where(in_app_billing: true)
