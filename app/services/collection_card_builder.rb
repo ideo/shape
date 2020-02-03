@@ -11,7 +11,7 @@ class CollectionCardBuilder
       @params.delete :row
       @params.delete :col
     end
-    @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
+    @collection_card = build_collection_card(type.to_s)
     @errors = @collection_card.errors
     @user = user
   end
@@ -45,6 +45,17 @@ class CollectionCardBuilder
     return unless @user.try(:show_helper)
 
     @user.update(show_helper: false)
+  end
+
+  def build_collection_card(type)
+    attrs = @params.symbolize_keys
+    if type == 'link'
+      # Copy style attributes from existing card
+      linked_record_attrs = card.record&.parent_collection_card&.link_card_copy_attributes || {}
+      attrs.merge!(linked_record_attrs)
+    end
+
+    @parent_collection.send("#{type}_collection_cards").build(attrs)
   end
 
   def create_collection_card
