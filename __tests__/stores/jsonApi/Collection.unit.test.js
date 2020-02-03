@@ -30,6 +30,7 @@ describe('Collection', () => {
         name: 'fakeCollection',
         roles: [fakeRole],
         organization_id: '1',
+        parent: { name: 'Some Collection' },
       },
       apiStore
     )
@@ -515,7 +516,9 @@ describe('Collection', () => {
 
     describe('if method library collection', () => {
       beforeEach(() => {
-        collection.name = "Plant Organization's Method Library"
+        collection.parent.name = "Plant Organization's Method Library"
+        collection.name = 'All Methods'
+        expect(collection.isMethodLibraryCollection).toEqual(true)
       })
 
       it('filterBarFilters returns non-method-library filters', () => {
