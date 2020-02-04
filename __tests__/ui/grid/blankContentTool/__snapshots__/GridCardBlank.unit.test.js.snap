@@ -121,7 +121,7 @@ exports[`GridCardBlank renders snapshot 1`] = `
           position={null}
           positionRelative={true}
           width={240}
-          wrapText={false}
+          wrapText={true}
           wrapperClassName="card-menu"
         />
       </Flex>
