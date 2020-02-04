@@ -28,10 +28,12 @@ describe TemplatesController, type: :request, auth: true do
       end
     end
 
-    xcontext 'without an organization' do
+    context 'without an organization' do
       let(:collection) { create(:collection, master_template: true, add_viewers: [user]) }
 
-      it 'should redirect to root path AND DO SOMETHING ELSE' do
+      it 'should redirect to root path' do
+        # technically session variable should also be set which you can't inspect here
+        # - this gets tested in organizations_controller_spec
         expect(get(path)).to redirect_to(root_url)
       end
     end

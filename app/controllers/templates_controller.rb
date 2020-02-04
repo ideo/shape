@@ -6,8 +6,6 @@ class TemplatesController < ApplicationController
 
   def use_in_my_collection
     if current_user.current_organization.blank?
-      # TODO: do something if the user is logged in BUT does not have an org...
-      # and remember the template they were trying to create
       session[:use_template_id] = params[:id]
       redirect_to root_path
       return
@@ -31,6 +29,8 @@ class TemplatesController < ApplicationController
   private
 
   def load_and_authorize_collection_template
+    # clear this out
+    session[:use_template_id] = nil
     @template_collection = Collection.find(params[:id])
     unless @template_collection.master_template?
       redirect_to root_path

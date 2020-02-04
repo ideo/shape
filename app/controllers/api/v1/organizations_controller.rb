@@ -33,7 +33,13 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
       true,
     )
     if assigner.call
-      render jsonapi: assigner.organization.reload, include: [:primary_group]
+      meta = {}
+      if session[:use_template_id]
+        meta[:use_template_id] = session[:use_template_id]
+      end
+      render jsonapi: assigner.organization.reload,
+             include: [:primary_group],
+             meta: meta
     else
       render_api_errors assigner.errors
     end
