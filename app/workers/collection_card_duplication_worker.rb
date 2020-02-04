@@ -39,11 +39,13 @@ class CollectionCardDuplicationWorker
       if card.is_a?(CollectionCard::Placeholder)
         # placeholder has a reference to the record, we want to copy *its* parent card
         source_card = card.record.parent_collection_card
-        # we already know the order
+        # we already know the order (and card.pinned will also be set)
         placement = card.order
         placeholder = card
       elsif @parent_collection.master_template?
         source_card.pinned = pin_duplicating_card
+      else
+        source_card.pinned = false unless @building_template_instance
       end
 
       source_card.duplicate!(
