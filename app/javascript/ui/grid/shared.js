@@ -200,9 +200,9 @@ export const StyledCardWrapper = styled.div`
   ${props => props.moving && mdlPillPlaceholderCss}
   /* NOTE: for react draggable to scroll when dragging on a touch device, may not work for IE */
   /* See: https://github.com/mzabriskie/react-draggable/issues/227 */
-  .react-draggable {
+  /* .react-draggable {
     touch-action: auto !important;
-  }
+  } */
 `
 StyledCardWrapper.defaultProps = {
   zIndex: 1,
