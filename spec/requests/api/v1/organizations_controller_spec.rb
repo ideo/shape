@@ -292,7 +292,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       json_api_params(
         'organizations',
         name: 'Acme Inc 2.0',
-        domain_whitelist: 'acme.com,subsidiary.acme.com',
+        domain_whitelist: %w[acme.com subsidiary.acme.com],
       )
     end
 

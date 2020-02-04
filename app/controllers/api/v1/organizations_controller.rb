@@ -19,6 +19,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
 
   def update
     @organization.attributes = organization_params
+
     if @organization.save
       render jsonapi: @organization
     else
@@ -96,11 +97,11 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   def organization_params
     params_allowed = [
       :name,
-      :domain_whitelist,
       :deactivated,
       :terms_text_item_id,
       :default_locale,
       :handle,
+      domain_whitelist: [],
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     ]
     # If super admin or application (bot) user, we allow toggling billing
