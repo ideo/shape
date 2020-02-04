@@ -563,6 +563,18 @@ RSpec.describe CollectionCard, type: :model do
         expect(collection.cached_cover['image_url']).to be nil
       end
     end
+
+    context 'setting is_cover to false from nil' do
+      before do
+        current_cover.update(is_cover: nil)
+      end
+
+      it 'should not affect no_cover setting' do
+        expect(collection.cached_cover['no_cover']).to be false
+        current_cover.update(is_cover: false)
+        expect(collection.cached_cover['no_cover']).to be false
+      end
+    end
   end
 
   describe 'update_parent_card_count!' do
