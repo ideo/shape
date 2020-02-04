@@ -12,13 +12,12 @@ class CollectionCardDuplicationWorker
     building_template_instance = false
   )
     @batch_id = batch_id
-    @collection_cards = CollectionCard.active.where(id: card_ids).ordered
+    @duplicating_cards = CollectionCard.active.where(id: card_ids).ordered
     @for_user = User.find(for_user_id) if for_user_id.present?
     @parent_collection = Collection.find(parent_collection_id)
     @system_collection = system_collection
     @synchronous = synchronous
     @system_collection = system_collection
-    @from_collection = nil
     @building_template_instance = building_template_instance
     @new_cards = duplicate_cards
     duplicate_legend_items
@@ -43,9 +42,9 @@ class CollectionCardDuplicationWorker
         # we already know the order
         placement = card.order
         placeholder = card
+      elsif @parent_collection.master_template?
+        source_card.pinned = pin_duplicating_card
       end
-      # capture this for notification builder
-      @from_collection ||= source_card.parent
 
       source_card.duplicate!(
         for_user: @for_user,
@@ -56,13 +55,12 @@ class CollectionCardDuplicationWorker
         placeholder: placeholder,
         batch_id: @batch_id,
         building_template_instance: @building_template_instance,
-        should_pin_duplicating_cards: source_card.pinned? || pin_duplicating_card,
       )
     end
   end
 
   def cards_to_duplicate
-    @collection_cards.select do |card|
+    @duplicating_cards.select do |card|
       # Skip duplicating any cards this user can't view (if user provided)
       # If a system collection don't check if user can view
       if @building_template_instance || @system_collection
@@ -94,8 +92,12 @@ class CollectionCardDuplicationWorker
   private
 
   def should_pin_duplicating_cards?
-    return false unless @collection_cards.first.present?
+    # NOTE: could DRY / remove this method here and defer to CollectionCardDuplicator
+    #  however some processes call this worker directly and bypass the duplicator,
+    #  or when running the duplicator synchronously
+    first_card = @duplicating_cards.first
+    return false unless first_card.present?
 
-    @parent_collection.should_pin_cards?(@collection_cards.first.order)
+    @parent_collection.should_pin_cards?(first_card.order)
   end
 end

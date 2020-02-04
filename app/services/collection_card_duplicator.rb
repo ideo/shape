@@ -28,7 +28,7 @@ class CollectionCardDuplicator < SimpleService
     duplicate_cards_with_placeholders if @synchronous == :async
     register_card_mappings
     deep_duplicate_cards
-    reorder_and_cache_covers
+    reorder_and_update_cached_values
     create_notifications
     return @new_cards if @synchronous == :async
 
@@ -117,7 +117,13 @@ class CollectionCardDuplicator < SimpleService
       # help us refer back to the originals when duplicating
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
-      dup.pinned ||= pin_duplicating_cards
+      if @building_template_instance
+        dup.pinned = card.pinned
+      elsif @to_collection.master_template?
+        dup.pinned = pin_duplicating_cards
+      else
+        dup.pinned = false
+      end
       dup.parent_id = @to_collection.id
       unless moving_to_board?
         dup.order = @order + i
@@ -141,10 +147,28 @@ class CollectionCardDuplicator < SimpleService
     @to_collection.update_processing_status(:duplicating)
   end
 
-  def reorder_and_cache_covers
+  def reorder_and_update_cached_values
     @to_collection.reorder_cards!
+    @to_collection.cache_card_count!
     @to_collection.cache_cover!
   end
+
+  def create_notifications
+    # only notify when a user initiates this action
+    return if @for_user.blank? || @building_template_instance || @system_collection
+
+    @cards.each do |card|
+      ActivityAndNotificationWorker.perform_async(
+        @for_user&.id,
+        card.id,
+        :duplicated,
+        from_collection.id,
+        @to_collection.id,
+      )
+    end
+  end
+
+  # helpers
 
   def moving_to_board?
     @to_collection.is_a? Collection::Board
@@ -159,20 +183,7 @@ class CollectionCardDuplicator < SimpleService
   def should_pin_duplicating_cards?
     return false unless @cards.first.present?
 
+    # NOTE: this will always treat an empty to_collection as "unpinned", which may incorrectly unpin cards
     @to_collection.should_pin_cards?(@placement)
-  end
-
-  def create_notifications
-    return if @for_user.blank? || @building_template_instance || @system_collection
-
-    @cards.each do |card|
-      ActivityAndNotificationWorker.perform_async(
-        @for_user&.id,
-        card.id,
-        :duplicated,
-        from_collection.id,
-        @to_collection.id,
-      )
-    end
   end
 end

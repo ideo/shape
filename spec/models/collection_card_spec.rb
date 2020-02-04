@@ -209,7 +209,6 @@ RSpec.describe CollectionCard, type: :model do
     let(:placement) { 'end' }
     let(:system_collection) { false }
     let(:placeholder) { nil }
-    let(:should_pin_duplicating_cards) { false }
     let(:duplicate) do
       collection_card.duplicate!(
         for_user: user,
@@ -218,7 +217,6 @@ RSpec.describe CollectionCard, type: :model do
         placement: placement,
         system_collection: system_collection,
         placeholder: placeholder,
-        should_pin_duplicating_cards: should_pin_duplicating_cards,
       )
     end
 
@@ -324,33 +322,6 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    context 'with pinned card from regular collection' do
-      let!(:collection_card) { create(:collection_card_text, pinned: true) }
-
-      it 'should set pinned to false on the duplicate' do
-        expect(collection_card.pinned?).to be true
-        expect(duplicate.pinned?).to be false
-      end
-    end
-
-    context 'with pinned card from master template' do
-      let(:template) { create(:collection, master_template: true) }
-      let!(:collection_card) { create(:collection_card_text, pinned: true, parent: template) }
-
-      it 'should not pin duplicating card if should_pin_duplicating_cards is false' do
-        expect(duplicate.pinned?).to be false
-      end
-
-      context 'with should_pin_duplicating_cards is false' do
-        let!(:should_pin_duplicating_cards) { true }
-
-        it 'should set pinned to true on the duplicate and should_pin_duplicating_cards is true' do
-          expect(collection_card.pinned?).to be true
-          expect(duplicate.pinned?).to be true
-        end
-      end
-    end
-
     context 'with linked card' do
       let(:parent_collection_card) { create(:collection_card_collection) }
       let(:collection) { parent_collection_card.collection }
@@ -389,6 +360,23 @@ RSpec.describe CollectionCard, type: :model do
           expect(duplicate.collection.master_template?).to be true
         end
 
+        context 'with master template card duplicating into a template' do
+          let(:template) { create(:collection, master_template: true) }
+          let!(:collection_card) { create(:collection_card_text, pinned: true, parent: template) }
+          let(:templated) { create(:collection, template: template) }
+          let(:duplicate) do
+            collection_card.duplicate!(
+              for_user: user,
+              parent: templated,
+              building_template_instance: true,
+            )
+          end
+
+          it 'should set templated_from' do
+            expect(duplicate.templated_from).to eq collection_card
+          end
+        end
+
         context 'building a template instance' do
           let(:duplicate) do
             collection_card_collection.duplicate!(
@@ -400,22 +388,6 @@ RSpec.describe CollectionCard, type: :model do
           it 'calls the TemplateBuilder to create an instance of the template' do
             expect(duplicate.collection.master_template?).to be false
             expect(duplicate.collection.template).to eq collection
-          end
-        end
-
-        context 'copying pinned card into a template instance' do
-          let(:collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
-          let(:card) { collection.collection_cards.first }
-          let(:duplicate) do
-            card.duplicate!(
-              for_user: user,
-              building_template_instance: false,
-            )
-          end
-
-          it 'should unpin the card that you duplicated' do
-            expect(card.pinned?).to be true
-            expect(duplicate.pinned?).to be false
           end
         end
       end

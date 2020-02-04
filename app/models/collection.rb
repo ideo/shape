@@ -1018,6 +1018,10 @@ class Collection < ApplicationRecord
 
     return true if placement == 'beginning'
 
+    if placement == 'end'
+      return collection_cards.unpinned.none?
+    end
+
     first_moving_card_index = collection_cards.find_index { |cc| cc.order == placement }
 
     return collection_cards.last&.pinned? if first_moving_card_index.nil?

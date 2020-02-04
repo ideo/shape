@@ -80,12 +80,6 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         moving_cards.each { |c| c.update(pinned: true) }
       end
 
-      it 'creates Placeholder cards that are pinned like the originals' do
-        new_cards = service.call
-        expect(new_cards.all?(&:placeholder?)).to be true
-        expect(new_cards.all?(&:pinned?)).to be true
-      end
-
       it 'calls ActivityAndNotificationWorker if you are duplicating a template' do
         moving_cards.each do
           expect(ActivityAndNotificationWorker).to receive(:perform_async)
@@ -93,11 +87,50 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         service.call
       end
 
+      context 'moving into an unpinned area' do
+        it 'creates Placeholder cards that are not pinned' do
+          new_cards = service.call
+          expect(new_cards.all?(&:placeholder?)).to be true
+          expect(new_cards.any?(&:pinned?)).to be false
+        end
+      end
+
+      context 'moving into a pinned area' do
+        before do
+          to_collection.update(master_template: true)
+          to_collection.collection_cards.each { |c| c.update(pinned: true) }
+        end
+        it 'creates Placeholder cards that are pinned' do
+          new_cards = service.call
+          expect(new_cards.all?(&:placeholder?)).to be true
+          expect(new_cards.all?(&:pinned?)).to be true
+        end
+      end
+
       context 'building template instance' do
         let(:building_template_instance) { true }
 
         it 'does not call ActivityAndNotificationWorker' do
           expect(ActivityAndNotificationWorker).not_to receive(:perform_async)
+          service.call
+        end
+
+        it 'creates Placeholder cards that are pinned like the originals' do
+          new_cards = service.call
+          expect(new_cards.all?(&:placeholder?)).to be true
+          expect(new_cards.all?(&:pinned?)).to be true
+        end
+
+        it 'passes building_template_instance to CollectionCardDuplicationWorker' do
+          expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+            instance_of(String), # batch id
+            instance_of(Array), # new card ids
+            to_collection.id,
+            user.id,
+            false, # system collection
+            false, # synchronous
+            true, # building_template_instance
+          )
           service.call
         end
       end
