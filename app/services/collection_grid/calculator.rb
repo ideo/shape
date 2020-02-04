@@ -92,7 +92,10 @@ module CollectionGrid
       return [] if collection.collection_cards.none?
 
       # omit moving cards from our matrix
-      cards = collection.collection_cards.where.not(id: moving_cards.pluck(:id))
+      cards = collection
+              .collection_cards
+              .visible
+              .where.not(id: moving_cards.pluck(:id))
       if drag_positions.present?
         cards += drag_positions.values
       end

@@ -57,74 +57,22 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    describe '#col' do
-      let(:card) { build(:collection_card_text, row: 5) }
-
-      it 'does not apply to regular collection' do
-        card.col = 500
-        expect(card.valid?).to be true
-      end
-
-      context 'parent is Collection::Board' do
-        before do
-          card.parent.update(type: 'Collection::Board')
-        end
-
-        it 'validates column is in 0..Collection::Board::COLS' do
-          expect(Collection::Board::COLS).to eq(16)
-
-          card.col = 0
-          expect(card.valid?).to be true
-
-          card.col = 15
-          expect(card.valid?).to be true
-
-          card.col = 16
-          expect(card.valid?).to be false
-          expect(card.errors[:col]).not_to be_empty
-
-          card.col = 500
-          expect(card.valid?).to be false
-          expect(card.errors[:col]).not_to be_empty
-        end
-      end
-    end
-
-    describe '#row' do
-      let(:card) { build(:collection_card_text, col: 5) }
-
-      it 'does not apply to regular collection' do
-        card.row = -20
-        expect(card.valid?).to be true
-      end
-
-      context 'parent is Collection::Board' do
-        before do
-          card.parent.update(type: 'Collection::Board')
-        end
-
-        it 'validates row >= 0' do
-          card.row = 0
-          expect(card.valid?).to be true
-
-          card.row = 1500
-          expect(card.valid?).to be true
-
-          card.row = -10
-          expect(card.valid?).to be false
-          expect(card.errors[:row]).not_to be_empty
-
-          card.row = 'this'
-          expect(card.valid?).to be false
-          expect(card.errors[:row]).not_to be_empty
-        end
-      end
-    end
-
     describe '#board_placement_is_valid?' do
       let!(:parent) { create(:board_collection, num_cards: 1) }
       let(:existing_card) { parent.collection_cards.first }
       let(:card) { build(:collection_card_text, parent: parent) }
+
+      it 'should be invalid if the spot is out of the valid range' do
+        card.row = -1
+        card.col = -1
+        expect(card.board_placement_is_valid?).to be false
+        card.row = nil
+        card.col = nil
+        expect(card.board_placement_is_valid?).to be false
+        card.row = 2
+        card.col = Collection::Board::COLS + 20
+        expect(card.board_placement_is_valid?).to be false
+      end
 
       it 'should be valid if the spot is not taken' do
         existing_card.update(row: 0, col: 0)
@@ -140,6 +88,20 @@ RSpec.describe CollectionCard, type: :model do
         card.row = 2
         card.col = 3
         expect(card.board_placement_is_valid?).to be false
+      end
+
+      it 'should ignore hidden cards' do
+        # ignore existing hidden card
+        existing_card.update(row: 0, col: 0, hidden: true)
+        parent.reload
+        card.row = 0
+        card.col = 0
+        expect(card.board_placement_is_valid?).to be true
+        card.hidden = true
+        # does not validate hidden cards
+        card.row = nil
+        card.col = nil
+        expect(card.board_placement_is_valid?).to be true
       end
     end
   end

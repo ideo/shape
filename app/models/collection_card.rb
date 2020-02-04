@@ -74,12 +74,6 @@ class CollectionCard < ApplicationRecord
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
   validate :parent_is_not_readonly, on: :create
-  validates :col,
-            inclusion: { in: Collection::Board.allowed_col_range.to_a },
-            if: :parent_board_collection?
-  validates :row,
-            numericality: { greater_than_or_equal_to: 0 },
-            if: :parent_board_collection?
   validates :section_type, presence: true, if: :parent_test_collection?
 
   delegate :board_collection?, :test_collection?,
@@ -481,7 +475,13 @@ class CollectionCard < ApplicationRecord
   end
 
   def board_placement_is_valid?
-    return true unless parent&.is_a?(Collection::Board)
+    return true if hidden?
+    return true unless parent&.board_collection?
+
+    if col.nil? || row.nil? || col.negative? || row.negative? || col > Collection::Board.allowed_col_range.last
+      errors.add(:base, 'Board position is invalid')
+      return false
+    end
     return true if CollectionGrid::Calculator.exact_open_spot?(card: self, collection: parent)
 
     errors.add(:base, 'Board position is already taken')

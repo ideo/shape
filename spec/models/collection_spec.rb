@@ -751,6 +751,18 @@ describe Collection, type: :model do
       expect(card.order).to eq 0
     end
 
+    context 'with a master template and existing instances' do
+      let!(:instance) { create(:collection, template: collection) }
+      before do
+        collection.update(master_template: true)
+      end
+
+      it 'calls queue_update_template_instances' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async)
+        collection.unarchive_cards!(cards, snapshot)
+      end
+    end
+
     context 'with a board collection' do
       let(:collection) { create(:board_collection, num_cards: 3) }
       let(:cards) { collection.all_collection_cards.first(3) }
