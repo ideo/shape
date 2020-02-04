@@ -9,8 +9,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     let!(:collection_to_link) { create(:collection, organization: organization) }
     let(:item_to_link) { nil }
     let(:existing_link) { nil }
-
-    before do
+    let(:perform) do
       allow(CollectionCard::Link).to receive(:create).and_call_original
       # TODO: why is this needed?
       if existing_link
@@ -25,6 +24,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     end
 
     it 'should create a link to shared/my collections' do
+      perform
       # each one should have been added 1 link card
       expect(user.current_shared_collection.link_collection_cards.count).to eq 1
       expect(user.current_user_collection.link_collection_cards.count).to eq 1
@@ -33,6 +33,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
     end
 
     it 'should create links to groups shared collections' do
+      perform
       expect(
         groups_to_add.first.current_shared_collection.collection_cards.count,
       ).to eq(1)
@@ -47,6 +48,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       end
 
       it 'should not create a duplicate link in my collection' do
+        perform
         expect(user.current_shared_collection.link_collection_cards.count).to eq(1)
       end
     end
@@ -65,6 +67,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       end
 
       it 'adds the link at the -10 position with 3x2 size' do
+        perform
         link = user.current_shared_collection.collection_cards.first
         # link to the org collection within the root application collection
         expect(link.collection_id).to eq(collection_to_link.id)
@@ -83,6 +86,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
           )
         end
         before do
+          perform
           LinkToSharedCollectionsWorker.new.perform(
             users_to_add.map(&:id),
             groups_to_add.map(&:id),
@@ -118,6 +122,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       end
 
       it 'adds the link at the -10 position with 3x2 size' do
+        perform
         link = user.current_shared_collection.collection_cards.first
         # link to the org collection within the root application collection
         expect(link.collection_id).to eq(child_collection.id)
@@ -133,13 +138,16 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       let!(:item_to_link) { create(:text_item, parent_collection: parent_collection) }
 
       it 'calls CollectionCard::Link with item id' do
+        perform
         expect(CollectionCard::Link).to have_received(:create).with(
-          parent: anything,
-          item_id: item_to_link.id,
-          collection_id: nil,
-          width: 1,
-          height: 1,
-          order: instance_of(Integer),
+          hash_including(
+            parent: anything,
+            item_id: item_to_link.id,
+            collection_id: nil,
+            width: 1,
+            height: 1,
+            order: instance_of(Integer),
+          ),
         ).exactly(3).times
       end
     end
@@ -148,6 +156,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       let(:users_to_add) { create_list(:user, 4, add_to_org: organization) }
 
       it 'should create two links for every user' do
+        perform
         # NOTE: thoughts on looping in tests, I usually don't do it
         users_to_add.each do |user|
           expect(user.current_shared_collection.link_collection_cards.count).to eq(1)
@@ -161,6 +170,7 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       let!(:collection_to_link) { collection_created_by }
 
       it 'should not create any links for that user' do
+        perform
         expect(user.current_user_collection.link_collection_cards.count).to eq(0)
         expect(user.current_shared_collection.link_collection_cards.count).to eq(0)
       end
@@ -171,8 +181,38 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
       let(:user) { application.user }
 
       it 'should not create any links for that user' do
+        perform
         expect(user.current_user_collection.link_collection_cards.count).to eq(0)
         expect(user.current_shared_collection).to be nil
+      end
+    end
+
+    context 'if collection to link has custom card attributes' do
+      let(:card_style_attrs) do
+        {
+          image_contain: true,
+          font_background: true,
+          font_color: '#CC0000',
+          filter: 'nothing',
+          show_replace: false,
+        }
+      end
+      let!(:collection_to_link) do
+        create(:collection,
+               parent_collection: create(:collection, organization: organization),
+               organization: organization)
+      end
+      before do
+        collection_to_link.parent_collection_card.update(
+          card_style_attrs,
+        )
+      end
+
+      it 'copies the styles to the link card' do
+        perform
+        link = user.current_shared_collection.collection_cards.first
+        link_style_attrs = link.attributes.symbolize_keys.slice(*card_style_attrs.keys)
+        expect(link_style_attrs).to eq(card_style_attrs)
       end
     end
   end
