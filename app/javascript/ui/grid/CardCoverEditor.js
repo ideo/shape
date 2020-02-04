@@ -185,13 +185,11 @@ class CardCoverEditor extends React.Component {
     const collection = record
     await collection.API_fetchCards({ hidden: true })
     return _.take(
-      collection.collection_cards
-        .filter(ccard => ccard.record.isImage)
-        .map(ccard => ({
-          cardId: ccard.id,
-          title: ccard.record.name,
-          imageUrl: ccard.record.imageUrl({ resize: { width: 128 } }),
-        })),
+      collection.sortedCoverCards.map(card => ({
+        cardId: card.id,
+        title: card.record.name,
+        imageUrl: card.record.imageUrl({ resize: { width: 128 } }),
+      })),
       9
     )
   }

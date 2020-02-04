@@ -199,7 +199,7 @@ class CollectionCard < ApplicationRecord
     cc.parent = parent
     # place card at beginning or end
     if placement == 'beginning'
-      if parent.template.present?
+      if parent.templated?
         cc.order = parent.collection_cards.pinned.count
       else
         cc.order = 0
@@ -244,7 +244,7 @@ class CollectionCard < ApplicationRecord
 
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
-    cc.increment_card_orders! if placement != 'end'
+    cc.increment_card_orders! if placement != 'end' && placeholder.nil?
 
     # if we are duplicating a submission box template,
     # the cloned template should be marked as the clone's submission_template

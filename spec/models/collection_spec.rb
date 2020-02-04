@@ -934,6 +934,38 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#reorder_cards!' do
+    let!(:collection) { create(:collection, num_cards: 5) }
+    let(:cards) { collection.collection_cards }
+
+    it 'reorders with pinned and hidden in consideration' do
+      expect(collection.all_collection_cards.order(order: :asc).pluck(:id, :order)).to eq([
+        [cards[0].id, 0],
+        [cards[1].id, 1],
+        [cards[2].id, 2],
+        [cards[3].id, 3],
+        [cards[4].id, 4],
+      ])
+
+      cards[0].update(archived: true)
+      cards[1].update(hidden: true)
+      cards[2].update(order: 999)
+      cards[3].update(pinned: true)
+      collection.reorder_cards!
+      expect(collection.reload.collection_cards.pluck(:id, :order)).to eq([
+        # pinned
+        [cards[3].id, 0],
+        # normal order
+        [cards[4].id, 1],
+        # high order
+        [cards[2].id, 2],
+        # low order, hidden
+        [cards[1].id, 3],
+        # archived card not included
+      ])
+    end
+  end
+
   # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do

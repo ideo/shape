@@ -896,6 +896,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         // do this again... this is because you may have received a RT update in between;
         // but your update is now "the latest"
         this.applyLocalCardUpdates(updates)
+        this._reorderCards()
 
         if (res) {
           // only push undo once we've successfully updated the cards
@@ -1015,6 +1016,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return _.orderBy(
       this.collection_cards,
       ['pinned', 'order'],
+      ['desc', 'asc']
+    )
+  }
+
+  @computed
+  // hidden is actually shown first for these to better surface uploaded covers
+  get sortedCoverCards() {
+    return _.orderBy(
+      _.filter(this.collection_cards, card => card.record.isImage),
+      ['hidden', 'order'],
       ['desc', 'asc']
     )
   }
