@@ -103,6 +103,15 @@ class CollectionCardBuilder
       end
       record.update(update_params)
     end
+
+    if @parent_collection.id == ENV['SHAPE_ALL_METHODS_COLLECTION_ID'].to_i
+      # set font color to #120F0E
+      # set overlay to transparent or none -- Not dark
+      @collection_card.update(font_color: '#120F0E')
+      record.cached_cover = { 'no_cover' => true }
+      record.save
+    end
+
     @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
     @collection_card.update_collection_cover if @collection_card.is_cover
     add_external_record
