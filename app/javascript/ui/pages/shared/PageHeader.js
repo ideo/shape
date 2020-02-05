@@ -74,6 +74,12 @@ const StyledButtonIconWrapper = styled.span`
   vertical-align: middle;
   height: ${props => (props.height ? props.height : 24)}px;
   width: ${props => (props.width ? props.width : 27)}px;
+  padding: 4px;
+  ${props =>
+    props.float &&
+    `
+      float: ${props.float}
+    `}
 `
 
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
@@ -81,6 +87,14 @@ StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
 const StyledButtonNameWrapper = styled.span`
   display: inline-block;
   vertical-align: middle;
+  ${props =>
+    props.large &&
+    `
+      text-transform: none;
+      font-weight: normal;
+      font-size: 24px;
+      float: left;
+    `}
 `
 
 StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
@@ -155,7 +169,6 @@ class PageHeader extends React.Component {
     const rightConditions = [
       record.isUserProfile,
       record.isProfileCollection,
-      record.isTemplated && !record.isSubTemplate,
       record.isSubmissionBox,
       record.launchableTestId,
       record.isBoard,
@@ -213,6 +226,7 @@ class PageHeader extends React.Component {
     // not enough room to show in the header of a live Test
     if (record.isLiveTest) return null
     if (uiStore.windowWidth < v.responsive.medBreakpoint) return null
+    if (record.isTemplated && !record.isSubTemplate) return null
     if (record.inherited_tag_list && record.inherited_tag_list.length) {
       let tagList = record.inherited_tag_list.map(tag => `#${tag}`).join(',')
       if (tagList.length > 22) {
@@ -350,7 +364,7 @@ class PageHeader extends React.Component {
         : templateName
     const shouldTruncate = templateName.length > maxButtonTextLength
     const buttonNameWrapper = (
-      <StyledButtonNameWrapper>{truncatedName}</StyledButtonNameWrapper>
+      <StyledButtonNameWrapper large>{truncatedName}</StyledButtonNameWrapper>
     )
 
     if (!shouldTruncate) {
@@ -401,7 +415,7 @@ class PageHeader extends React.Component {
           disabled={!active}
           transparent
         >
-          <StyledButtonIconWrapper>
+          <StyledButtonIconWrapper float={'left'}>
             <CollectionTypeIcon record={record} />
           </StyledButtonIconWrapper>
           {this.renderTemplateName}
@@ -411,7 +425,7 @@ class PageHeader extends React.Component {
               title={'Go to Master Template'}
               placement="top"
             >
-              <StyledButtonIconWrapper width={14}>
+              <StyledButtonIconWrapper width={24} float={'right'}>
                 <BackIcon />
               </StyledButtonIconWrapper>
             </Tooltip>
