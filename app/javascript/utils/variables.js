@@ -147,7 +147,7 @@ export default {
   },
   topScrollTrigger: 210,
   maxTitleLength: 144,
-  maxButtonTextLength: 12,
+  maxButtonTextLength: 8,
   actionMenuWidth: 250,
   actionMenuHeight: 26,
 

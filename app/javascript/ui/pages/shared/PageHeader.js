@@ -87,6 +87,7 @@ StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
 const StyledButtonNameWrapper = styled.span`
   display: inline-block;
   vertical-align: middle;
+  max-width: ${props => (props.smallWidth ? 110 : 125)}px;
   ${props =>
     props.large &&
     `
@@ -363,8 +364,11 @@ class PageHeader extends React.Component {
         ? rightClamp(templateName, maxButtonTextLength)
         : templateName
     const shouldTruncate = templateName.length > maxButtonTextLength
+    const active = template.can_view || template.anyone_can_view
     const buttonNameWrapper = (
-      <StyledButtonNameWrapper large>{truncatedName}</StyledButtonNameWrapper>
+      <StyledButtonNameWrapper smallWidth={active} large>
+        {truncatedName}
+      </StyledButtonNameWrapper>
     )
 
     if (!shouldTruncate) {
@@ -422,7 +426,7 @@ class PageHeader extends React.Component {
           {active && (
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}
-              title={'Go to Master Template'}
+              title={'go to master template'}
               placement="top"
             >
               <StyledButtonIconWrapper width={24} float={'right'}>

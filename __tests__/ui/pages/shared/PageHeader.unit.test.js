@@ -4,6 +4,7 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { fakeTextItem, fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import { rightClamp } from '~/utils/textUtils'
+import v from '~/utils/variables'
 
 describe('PageHeader', () => {
   let wrapper, component, props
@@ -151,18 +152,43 @@ describe('PageHeader', () => {
       expect(wrapper.find('CollectionTypeIcon').exists()).toBeTruthy()
     })
 
-    it('should show master template navigate back button', () => {
-      expect(wrapper.find('BackIcon').exists()).toBeTruthy()
-    })
-
-    it('should show a clamped collection name', () => {
+    it('should show a clamped collection name with a Tooltip', () => {
       expect(
         wrapper
           .find('StyledButtonNameWrapper')
           .children()
           .first()
           .text()
-      ).toEqual(rightClamp(fakeCollection.name, 12))
+      ).toEqual(rightClamp(fakeCollection.name, v.maxButtonTextLength))
+
+      expect(
+        wrapper
+          .find('Tooltip')
+          .first()
+          .props().title
+      ).toMatch(`${fakeCollection.name}`)
+    })
+
+    it('should show master template navigate back button with a Tooltip', () => {
+      expect(wrapper.find('BackIcon').exists()).toBeTruthy()
+      expect(
+        wrapper
+          .find('Tooltip')
+          .last()
+          .props().title
+      ).toMatch('go to master template')
+    })
+
+    describe('when the instance has no access to the master template', () => {
+      beforeEach(() => {
+        props.record.template.can_view = false
+        props.record.template.anyone_can_view = false
+        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      })
+
+      it('should not show master template navigate back button', () => {
+        expect(wrapper.find('BackIcon').exists()).toBeFalsy()
+      })
     })
   })
 
