@@ -187,6 +187,7 @@ export const FormButton = styled.button`
         case v.colors.commonDark:
           return v.colors.commonLight
         case v.colors.black:
+          return v.colors.black
         default:
           return v.colors.white
       }
