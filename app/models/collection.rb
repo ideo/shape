@@ -974,9 +974,14 @@ class Collection < ApplicationRecord
   end
 
   def inside_a_creative_difference_collection?
-    breadcrumb.include?(
-      ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID'].to_i
-    ) || inside_an_application_collection?
+    creative_difference_root_collection_id = ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID']
+
+    logger.debug(
+      'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.'
+    ) if !creative_difference_root_collection_id
+
+    inside_an_application_collection? ||
+    within_collection_or_self?(Collection.find(creative_difference_root_collection_id))
   end
 
   # =================================
