@@ -15,7 +15,9 @@ namespace :cypress do
     user.save
     create_shell_orgs
     assigner = OrganizationAssigner.new(
-      { name: 'CypressTest' }, user, false
+      { name: 'CypressTest' },
+      user,
+      full_setup: false,
     )
     assigner.call
     organization = assigner.organization

@@ -31,7 +31,6 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
     assigner = OrganizationAssigner.new(
       organization_params,
       current_user,
-      true,
     )
     if assigner.call
       meta = {}
