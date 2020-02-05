@@ -223,6 +223,11 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       )
     end
 
+    before do
+      shell_builder = OrganizationShellBuilder.new
+      shell_builder.save
+    end
+
     it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq(200)

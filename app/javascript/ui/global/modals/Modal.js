@@ -160,7 +160,11 @@ class Modal extends React.Component {
     } = this.props
     let wrappedTitle = title
     if (typeof title === 'string') {
-      wrappedTitle = <Heading2 mb="0.35rem">{title}</Heading2>
+      wrappedTitle = (
+        <Heading2 mb="15px" ml="15px">
+          {title}
+        </Heading2>
+      )
     }
     const scrollVisibleClass = scrollVisible ? 'modal__scroll-visible' : ''
     // TODO progamatically set disableAutoFocus

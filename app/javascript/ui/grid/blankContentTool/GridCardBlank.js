@@ -693,6 +693,7 @@ class GridCardBlank extends React.Component {
               buttonStyle="bct"
               menuOpen={this.state.bctMenuOpen}
               onClick={this.toggleBctMenu}
+              wrapText
               direction="right"
               menuItems={[
                 {

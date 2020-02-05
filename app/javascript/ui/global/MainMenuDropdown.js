@@ -28,14 +28,6 @@ const IconHolder = styled.span`
 `
 IconHolder.displayName = 'StyledIconHolder'
 
-const TruncatedPopoutMenu = styled(PopoutMenu)`
-  .organizations {
-    max-height: 60vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
-  }
-`
-
 const StyledSearchHolder = styled.div`
   padding: 10px;
 `
@@ -361,13 +353,14 @@ class MainMenuDropdown extends React.Component {
     const { context, open } = this.props
     const className = `${context}-menu`.toLowerCase()
     return (
-      <TruncatedPopoutMenu
+      <PopoutMenu
         className={className}
         width={220}
         groupedMenuItems={this.menuItems}
         menuOpen={open}
         hideDotMenu
         groupExtraComponent={this.groupExtras}
+        offsetPosition={{ x: -198, y: 0 }}
       />
     )
   }

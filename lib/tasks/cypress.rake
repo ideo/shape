@@ -13,11 +13,12 @@ namespace :cypress do
     user = FactoryBot.create(:user, email: email).becomes(User)
     user.add_role(Role::SHAPE_ADMIN)
     user.save
-    builder = OrganizationBuilder.new(
-      { name: 'CypressTest' }, user, full_setup: false
+    create_shell_orgs
+    assigner = OrganizationAssigner.new(
+      { name: 'CypressTest' }, user, false
     )
-    builder.save
-    organization = builder.organization
+    assigner.call
+    organization = assigner.organization
     user.switch_to_organization(organization)
     # add an additional test user into the org
     FactoryBot.create(:user, email: 'cypress-test-1@ideo.com')
@@ -26,6 +27,12 @@ namespace :cypress do
     create_cards(user.current_user_collection, user)
     create_events(organization)
     create_test_collection(organization)
+  end
+
+  def create_shell_orgs
+    3.times do
+      OrganizationShellBuilder.new.save
+    end
   end
 
   def create_cards(collection, user)

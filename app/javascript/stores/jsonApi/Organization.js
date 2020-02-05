@@ -32,6 +32,7 @@ class Organization extends BaseRecord {
   attributesForAPI = [
     'in_app_billing',
     'name',
+    'handle',
     'domain_whitelist',
     'filestack_file_attributes',
     'deactivated',

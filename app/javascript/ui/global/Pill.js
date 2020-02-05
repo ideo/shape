@@ -12,9 +12,12 @@ export const PillWrapper = styled.div`
   transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
     box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   text-decoration: none;
-  padding: 2px 7px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-right: ${props => (props.paddingRight ? props.paddingRight : '7px')};
+  padding-left: ${props => (props.paddingLeft ? props.paddingLeft : '7px')};
   outline: none;
-  margin: 8px;
+  margin: 4px 8px 4px 0;
   font-weight: ${v.weights.medium};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -27,12 +30,6 @@ export const PillWrapper = styled.div`
   border: none;
   background-color: ${props => tagColor(props.tagName)};
   align-items: center;
-
-  @media only screen and (min-width: ${v.responsive.medBreakpoint}px) {
-    &:first-of-type {
-      margin-left: 0;
-    }
-  }
 
   &.avatar {
     height: 28px;
@@ -73,6 +70,8 @@ const Pill = props => {
   if (props.tag) {
     wrapperProps.tagName = props.tag.name
   }
+  if (!onDelete) wrapperProps.paddingRight = '14px'
+  if (selectable) wrapperProps.paddingLeft = '4px'
 
   return (
     <PillWrapper {...wrapperProps}>

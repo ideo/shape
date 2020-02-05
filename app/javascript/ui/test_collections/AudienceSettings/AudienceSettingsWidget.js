@@ -104,7 +104,7 @@ class AudienceSettingsWidget extends React.Component {
   toggleAddAudienceMenu = e => {
     const menuItems = this.addAudienceMenuItems()
     const menuItemCount = menuItems && menuItems.length ? menuItems.length : 1
-    const { offsetX, offsetY } = calculatePopoutMenuOffset(
+    const { offsetX } = calculatePopoutMenuOffset(
       e,
       EVENT_SOURCE_TYPES.AUDIENCE_SETTINGS,
       menuItemCount
@@ -112,7 +112,7 @@ class AudienceSettingsWidget extends React.Component {
 
     this.setState({
       addAudienceMenuOpen: !this.state.addAudienceMenuOpen,
-      popoutMenuOffsetPosition: { x: offsetX, y: offsetY },
+      popoutMenuOffsetPosition: { x: offsetX, y: -20 },
     })
   }
 
@@ -259,6 +259,7 @@ class AudienceSettingsWidget extends React.Component {
               menuItems={this.addAudienceMenuItems()}
               offsetPosition={popoutMenuOffsetPosition}
               hideDotMenu
+              positionRelative
             />
           </AddAudienceMenu>
         </StyledRowFlexItem>

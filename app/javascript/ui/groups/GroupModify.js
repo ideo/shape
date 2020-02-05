@@ -3,7 +3,7 @@ import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
 import { FormButton, TextButton } from '~/ui/global/styled/buttons'
-import { SmallHelperText } from '~/ui/global/styled/typography'
+import { SmallHelperText, SubduedText } from '~/ui/global/styled/typography'
 import {
   FieldContainer,
   FormActionsContainer,
@@ -128,7 +128,7 @@ class GroupModify extends React.Component {
   }
 
   render() {
-    const { group, groupType } = this.props
+    const { creatingOrg, group, groupType, onCancel } = this.props
     return (
       <form>
         <FloatRight>
@@ -180,6 +180,17 @@ class GroupModify extends React.Component {
             {groupType === 'Group' ? 'Add Members' : 'Save'}
           </FormButton>
         </FormActionsContainer>
+        {creatingOrg && (
+          <div style={{ textAlign: 'center' }}>
+            <SubduedText fontSize="12px">
+              Are you looking for your team? You may need to ask for an
+              invitation.
+            </SubduedText>
+            <br />
+            <br />
+            <TextButton onClick={onCancel}>Come back later</TextButton>
+          </div>
+        )}
       </form>
     )
   }
@@ -188,12 +199,16 @@ class GroupModify extends React.Component {
 GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func,
   onGroupRoles: PropTypes.func,
   groupType: PropTypes.oneOf(['Group', 'Organization']),
+  creatingOrg: PropTypes.bool,
 }
 GroupModify.defaultProps = {
   onGroupRoles: null,
+  onCancel: () => {},
   groupType: 'Group',
+  creatingOrg: false,
 }
 
 export default GroupModify

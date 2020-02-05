@@ -119,7 +119,9 @@ exports[`GridCardBlank renders snapshot 1`] = `
           onClick={[Function]}
           onMouseLeave={[Function]}
           position={null}
+          positionRelative={true}
           width={240}
+          wrapText={true}
           wrapperClassName="card-menu"
         />
       </Flex>

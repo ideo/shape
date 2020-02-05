@@ -182,7 +182,7 @@ export const FormButton = styled.button`
     }};
     color: ${props => {
       if (props.transparent && props.filledHover) return v.colors.white
-      if (!props.transparent) return v.colors.white
+      if (!props.transparent) return v.colors.commonMedium
       return invertColor(props.color)
     }};
   }

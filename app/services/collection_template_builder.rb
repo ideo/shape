@@ -66,6 +66,7 @@ class CollectionTemplateBuilder < SimpleService
       @created_by.upgrade_to_edit_role(@collection)
     end
     add_external_record
+    add_collection_filters
     # capture newly added roles
     @collection.reload
     @collection
@@ -78,6 +79,7 @@ class CollectionTemplateBuilder < SimpleService
       created_by_id: @created_by&.id,
       type: @template.type,
       tag_list: @template.tag_list,
+      collection_type: @template.collection_type,
     }.merge(@raw_collection_params)
   end
 
@@ -167,5 +169,14 @@ class CollectionTemplateBuilder < SimpleService
       @external_id,
       @created_by.application.id,
     )
+  end
+
+  # Manually add any filters - since this doesn't use the duplicate! method
+  def add_collection_filters
+    @template.collection_filters.each do |collection_filter|
+      collection_filter.duplicate!(
+        assign_collection: @collection,
+      )
+    end
   end
 end

@@ -5,13 +5,13 @@ class OrganizationTemplatesWorker
     @organization = Organization.find(organization_id)
     @original_getting_started_collection = Collection.find(ENV['GETTING_STARTED_TEMPLATE_ID'])
     @original_templates_collection = Collection.find(ENV['ORG_MASTER_TEMPLATES_ID'])
-    @user = User.find(user_id)
+    @user = User.find(user_id) if user_id.present?
 
     copy_templates_from_master
     create_profile_template
     create_profile_collection
     create_org_getting_started_collection
-    create_user_getting_started_collection unless @user.application_bot?
+    create_user_getting_started_collection unless @user&.application_bot?
   rescue ActiveRecord::RecordNotFound
     # org was already deleted, e.g. in a test
     false
@@ -131,8 +131,11 @@ class OrganizationTemplatesWorker
   end
 
   def create_user_getting_started_collection
+    user_collection = @user.present? ?
+      @user.current_user_collection(@organization.id) :
+      Collection::UserCollection.find_by(organization_id: @organization.id)
     @organization.create_user_getting_started_content(
-      @user,
+      user_collection,
       synchronous: true,
     )
   end

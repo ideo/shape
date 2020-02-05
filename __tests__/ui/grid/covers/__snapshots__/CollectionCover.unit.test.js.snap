@@ -2,6 +2,7 @@
 
 exports[`CollectionCover renders snapshot 1`] = `
 <StyledCollectionCover
+  backgroundColor="#ffffff"
   data-cy="CollectionCover"
   url="http://fake.url.net"
 >
@@ -10,6 +11,7 @@ exports[`CollectionCover renders snapshot 1`] = `
     gutter={20}
     height={1}
     isTextItem={false}
+    useTextBackground={false}
     width={2}
   >
     <div
@@ -495,10 +497,12 @@ exports[`CollectionCover renders snapshot 1`] = `
                     },
                     "create": [MockFunction],
                     "disableMenu": [MockFunction],
+                    "filterBarFilters": Array [],
                     "id": "1",
                     "inherited_tag_list": Array [],
                     "internalType": "collections",
                     "isCollection": true,
+                    "isMethodLibraryCollection": false,
                     "isNormalCollection": true,
                     "isSharedCollection": false,
                     "isUserCollection": false,
@@ -512,6 +516,7 @@ exports[`CollectionCover renders snapshot 1`] = `
                         "can_edit": false,
                       },
                     },
+                    "methodLibraryFilters": Array [],
                     "name": "My Workspace X",
                     "num_survey_responses": 0,
                     "pageTitle": "My Workspace X | Shape",
@@ -988,10 +993,12 @@ exports[`CollectionCover renders snapshot 1`] = `
                         },
                         "create": [MockFunction],
                         "disableMenu": [MockFunction],
+                        "filterBarFilters": Array [],
                         "id": "1",
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
                         "isCollection": true,
+                        "isMethodLibraryCollection": false,
                         "isNormalCollection": true,
                         "isSharedCollection": false,
                         "isUserCollection": false,
@@ -1004,6 +1011,7 @@ exports[`CollectionCover renders snapshot 1`] = `
                             "can_edit": false,
                           },
                         },
+                        "methodLibraryFilters": Array [],
                         "name": "My Workspace X",
                         "num_survey_responses": 0,
                         "pageTitle": "My Workspace X | Shape",
@@ -1869,6 +1877,7 @@ exports[`CollectionCover renders snapshot 1`] = `
                     "updated_at": "2019-11-22T18:57:12.863Z",
                   }
                 }
+                useTextBackground={false}
               />
             </PlainLink>
             <styled.span>

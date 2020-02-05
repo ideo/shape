@@ -11,7 +11,7 @@ class CollectionCardBuilder
       @params.delete :row
       @params.delete :col
     end
-    @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
+    @collection_card = build_collection_card(type.to_s)
     @errors = @collection_card.errors
     @user = user
   end
@@ -45,6 +45,16 @@ class CollectionCardBuilder
     return unless @user.try(:show_helper)
 
     @user.update(show_helper: false)
+  end
+
+  def build_collection_card(type)
+    card = @parent_collection.send("#{type}_collection_cards").build(@params)
+
+    return card unless type == 'link' && card.record&.parent_collection_card.present?
+
+    # Copy style attributes from existing card
+    card.attributes = card.record.parent_collection_card.link_card_copy_attributes
+    card
   end
 
   def create_collection_card
@@ -126,6 +136,8 @@ class CollectionCardBuilder
     return unless @parent_collection.is_a? Collection::SubmissionsCollection
 
     @parent_collection.follow_submission_box(@user)
+    record.unanchor_and_inherit_roles_from_anchor!
+    @user.add_role(Role::EDITOR, record)
   end
 
   def add_external_record

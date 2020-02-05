@@ -8,6 +8,7 @@ import { apiStore } from '~/stores'
 import Collection from '~/stores/jsonApi/Collection'
 import Organization from '~/stores/jsonApi/Organization'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
 import googleTagManager from '~/vendor/googleTagManager'
 
 import { fakeRole } from '#/mocks/data'
@@ -29,6 +30,7 @@ describe('Collection', () => {
         name: 'fakeCollection',
         roles: [fakeRole],
         organization_id: '1',
+        parent: { name: 'Some Collection' },
       },
       apiStore
     )
@@ -476,6 +478,58 @@ describe('Collection', () => {
         'PATCH',
         { data }
       )
+    })
+  })
+
+  describe('filter bar methods', () => {
+    beforeEach(() => {
+      collection.addReference(
+        'collection_filters',
+        [
+          {
+            filter_type: 'tag',
+            text: 'plant',
+          },
+          {
+            filter_type: 'tag',
+            text: 'purpose',
+          },
+        ],
+        {
+          model: CollectionFilter,
+          type: ReferenceType.TO_MANY,
+        }
+      )
+      collection.name = 'Some Purposeful Plants'
+    })
+
+    it('filterBarFilters returns all collection filters', () => {
+      expect(collection.filterBarFilters.map(f => f.text)).toEqual([
+        'plant',
+        'purpose',
+      ])
+    })
+
+    it('methodLibraryFilters returns no filters', () => {
+      expect(collection.methodLibraryFilters.map(f => f.text)).toEqual([])
+    })
+
+    describe('if method library collection', () => {
+      beforeEach(() => {
+        collection.parent.name = "Plant Organization's Method Library"
+        collection.name = 'All Methods'
+        expect(collection.isMethodLibraryCollection).toEqual(true)
+      })
+
+      it('filterBarFilters returns non-method-library filters', () => {
+        expect(collection.filterBarFilters.map(f => f.text)).toEqual(['plant'])
+      })
+
+      it('methodLibraryFilters returns method library filters', () => {
+        expect(collection.methodLibraryFilters.map(f => f.text)).toEqual([
+          'purpose',
+        ])
+      })
     })
   })
 })

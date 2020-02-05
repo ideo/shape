@@ -107,9 +107,22 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       context 'with card_type == "link"' do
         let(:card_type) { 'link' }
-        let!(:collection) { create(:collection, organization: organization) }
+        let(:parent_collection) { create(:collection, organization: organization) }
+        let!(:collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
         let(:full_params) do
           params.merge(collection_id: collection.id)
+        end
+        let(:card_style_attrs) do
+          {
+            image_contain: true,
+            font_background: true,
+            font_color: '#CC0000',
+            filter: 'nothing',
+            show_replace: false,
+          }
+        end
+        before do
+          collection.parent_collection_card.update(card_style_attrs)
         end
 
         it 'should create a link card' do
@@ -117,6 +130,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(builder.create).to be true
           expect(builder.collection_card.link?).to be true
           expect(builder.collection_card.collection).to eq collection
+        end
+
+        it 'should copy style attrs from original card' do
+          builder_card_attrs = builder.collection_card.attributes.symbolize_keys.slice(*card_style_attrs.keys)
+          expect(builder_card_attrs).to eq(card_style_attrs)
         end
 
         context 'with multiple ordered cards' do
@@ -325,9 +343,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       context 'when item is a submission' do
+        let(:editor) { create(:user) }
         let(:submission_box) do
           create(:submission_box,
                  organization: organization,
+                 add_editors: [editor],
                  add_viewers: [user])
         end
         let(:parent) { create(:submissions_collection, submission_box: submission_box) }
@@ -340,6 +360,12 @@ RSpec.describe CollectionCardBuilder, type: :service do
         it 'should subscribe the submitter to the submission box' do
           users_thread = comment_thread.users_thread_for(user)
           expect(users_thread.subscribed).to be true
+        end
+
+        it 'should add the submitter as an editor' do
+          record = builder.collection_card.record
+          expect(record.can_edit?(editor)).to be true
+          expect(record.can_edit?(user)).to be true
         end
       end
 

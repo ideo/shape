@@ -501,6 +501,17 @@ describe Collection, type: :model do
         expect(duplicate.parent_collection_card).to eq card
       end
     end
+
+    context 'with collection filters' do
+      let!(:collection_filter) { create(:collection_filter, collection: collection) }
+
+      it 'copies all filters' do
+        expect do
+          duplicate
+        end.to change(CollectionFilter, :count).by(1)
+        expect(duplicate.collection_filters.first.text).to eq(collection_filter.text)
+      end
+    end
   end
 
   describe '#copy_all_cards_into!' do
