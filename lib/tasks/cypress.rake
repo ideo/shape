@@ -18,7 +18,7 @@ namespace :cypress do
       { name: 'CypressTest' }, user, false
     )
     assigner.call
-    organization = builder.organization
+    organization = assigner.organization
     user.switch_to_organization(organization)
     # add an additional test user into the org
     FactoryBot.create(:user, email: 'cypress-test-1@ideo.com')
