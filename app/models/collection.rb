@@ -973,6 +973,12 @@ class Collection < ApplicationRecord
     broadcasting.present?
   end
 
+  def inside_a_creative_difference_collection?
+    breadcrumb.include?(
+      ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID'].to_i
+    ) || inside_an_application_collection?
+  end
+
   # =================================
   # <--- end boolean checks
   #

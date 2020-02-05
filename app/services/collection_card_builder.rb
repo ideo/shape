@@ -104,12 +104,9 @@ class CollectionCardBuilder
       record.update(update_params)
     end
 
-    if @parent_collection.id == ENV['SHAPE_ALL_METHODS_COLLECTION_ID'].to_i
-      # set font color to #120F0E
-      # set overlay to transparent or none -- Not dark
-      @collection_card.update(font_color: '#120F0E')
-      record.cached_cover = { 'no_cover' => true }
-      record.save
+    # Need to trickle down for all C∆ "app" subcollections
+    if @parent_collection.inside_a_creative_difference_collection?
+      @collection_card.update(filter: 'nothing', font_color: '#120F0E')
     end
 
     @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?

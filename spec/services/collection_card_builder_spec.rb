@@ -200,6 +200,21 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(builder.collection_card.record.external_records.last.external_id).to eq '99'
         end
       end
+
+      context "when inside a Creative Difference collection" do
+        let(:parent) do
+          create(:application_collection, # does this need to be a C∆ Collection?
+          organization: organization,
+          add_editors: [user])
+        end
+
+        before { builder.create }
+
+        it 'updates the font color of the card and sets the cover filter to nothing' do
+          expect(builder.collection_card.filter).to eq('nothing')
+          expect(builder.collection_card.font_color).to eq('#120F0E')
+        end
+      end
     end
 
     context 'success creating card with item' do
