@@ -49,20 +49,25 @@ export const StyledMenuWrapper = styled.div`
   transition: left 120ms;
   z-index: ${v.zIndex.aboveClickWrapper};
   ${props => {
-    const { position, offsetPosition, location } = props
-    // dynamic positioning based on component dimensions, click position relative to the screen
+    const { position, offsetPosition } = props
     if (position && offsetPosition) {
       const { x, y } = position
-      const clickedOnGridCardDotMenu =
-        location && (location === 'GridCard' || location === 'Search')
-      if (x === 0 && y === 0 && clickedOnGridCardDotMenu) {
-        // any transformation that's based on click must be calculated via `clickUtils::calculatePopoutMenuOffset`
-        // this is a manual override for popout menu to appear in the lower left during GridCard dot menu click
+      if (x === 0 && y === 0 && !props.positionRelative) {
+        const { x: offsetX, y: offsetY } = offsetPosition
+
+        // positioning was overriden see: actionMenu::offsetPosition
+        if (offsetX === 0) {
+          return `
+            top: 22px;
+          `
+        }
+
         return `
-          top: 22px;
-          right: -10px;
-        `
+            top: 22px;
+            right: -10px;
+          `
       }
+      // dynamic positioning based on component dimensions, click position relative to the screen, see: clickUtils::calculatePopoutMenuOffset
       const { x: offsetX, y: offsetY } = offsetPosition
       const transformX = x - offsetX
       const transformY = y + offsetY
@@ -73,7 +78,7 @@ export const StyledMenuWrapper = styled.div`
       `
     }
 
-    // dynamic positioning based on component dimensions, click position relative to the parent component
+    // dynamic positioning based on component dimensions, click position relative to the parent component, see: clickUtils::calculatePopoutMenuOffset
     if (offsetPosition) {
       const { x: offsetX, y: offsetY } = offsetPosition
       return `
@@ -86,7 +91,7 @@ export const StyledMenuWrapper = styled.div`
       right: -10px;
     `
     // fallback default position for all other menus that don't use dynamic positioning
-    // ie: org menu, and bctmenu
+    // ie: org menu, breadcrum, bctmenu
     return defaultFixedPosition
   }}}
 `
@@ -364,7 +369,6 @@ class PopoutMenu extends React.Component {
       position,
       offsetPosition,
       hideDotMenu,
-      location,
       positionRelative,
     } = this.props
 
@@ -397,7 +401,6 @@ class PopoutMenu extends React.Component {
           offsetPosition={offsetPosition}
           height={200}
           className="menu-wrapper"
-          location={location}
           menuClass={className}
         >
           <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
@@ -452,7 +455,6 @@ PopoutMenu.propTypes = {
   groupExtraComponent: PropTypes.shape({
     component: PropTypes.node,
   }),
-  location: PropTypes.string,
   positionRelative: PropTypes.bool,
   wrapText: PropTypes.bool,
 }
@@ -473,7 +475,6 @@ PopoutMenu.defaultProps = {
   width: 200,
   groupExtraComponent: {},
   hideDotMenu: false,
-  location: null,
   positionRelative: true,
   wrapText: false,
 }

@@ -338,7 +338,18 @@ class ActionMenu extends React.Component {
   }
 
   get offsetPosition() {
-    const { uiStore, offsetPosition } = this.props
+    const { uiStore, offsetPosition, card, location, zoomLevel } = this.props
+    const clickedOnGridCardDotMenu =
+      location && (location === 'GridCard' || location === 'Search')
+    const shouldOverrideFixedPosition = card && card.col === 0 && zoomLevel >= 2
+
+    if (clickedOnGridCardDotMenu && shouldOverrideFixedPosition) {
+      return {
+        x: 0,
+        y: 22,
+      }
+    }
+
     return (
       offsetPosition || {
         x: uiStore.cardMenuOpen.offsetX,
@@ -354,6 +365,7 @@ class ActionMenu extends React.Component {
       wrapperClassName,
       uiStore,
       location,
+      card,
     } = this.props
 
     return (
@@ -370,6 +382,7 @@ class ActionMenu extends React.Component {
         width={250}
         location={location}
         positionRelative={false}
+        shouldOverrideFixedPosition
       />
     )
   }
@@ -395,6 +408,7 @@ ActionMenu.propTypes = {
     x: PropTypes.number,
     y: PropTypes.number,
   }),
+  zoomLevel: PropTypes.number,
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -413,6 +427,7 @@ ActionMenu.defaultProps = {
   testCollectionCard: false,
   menuItemsCount: null,
   offsetPosition: null,
+  zoomLevel: null,
 }
 
 export default ActionMenu
