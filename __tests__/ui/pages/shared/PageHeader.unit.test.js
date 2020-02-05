@@ -187,15 +187,6 @@ describe('PageHeader', () => {
       props.record.inherited_tag_list = ['test']
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
-
-    it('should show the template tag and icon', () => {
-      expect(
-        wrapper
-          .find('SubduedHeading1')
-          .children()
-          .text()
-      ).toEqual('#test')
-    })
   })
 
   describe('with an archived collection', () => {
