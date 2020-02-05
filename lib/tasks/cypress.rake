@@ -14,11 +14,11 @@ namespace :cypress do
     user.add_role(Role::SHAPE_ADMIN)
     user.save
     create_shell_orgs
-    builder = OrganizationBuilder.new(
-      { name: 'CypressTest' }, user, full_setup: false
+    assigner = OrganizationAssigner.new(
+      { name: 'CypressTest' }, user, false
     )
-    builder.save
-    organization = builder.organization
+    assigner.call
+    organization = assigner.organization
     user.switch_to_organization(organization)
     # add an additional test user into the org
     FactoryBot.create(:user, email: 'cypress-test-1@ideo.com')

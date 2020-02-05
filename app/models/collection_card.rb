@@ -258,6 +258,17 @@ class CollectionCard < ApplicationRecord
     cc
   end
 
+  # The attributes to copy when making a link card
+  def link_card_copy_attributes
+    {
+      image_contain: image_contain,
+      font_background: font_background,
+      font_color: font_color,
+      filter: filter,
+      show_replace: show_replace,
+    }
+  end
+
   def record
     return item if item.present?
     return collection if collection.present?
