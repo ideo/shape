@@ -810,6 +810,7 @@ class MovableGridCard extends React.Component {
         width={card.maxWidth * v.defaultGridSettings.gridW}
         height={card.maxHeight * v.defaultGridSettings.gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
+        allowTouchAction={uiStore.isAndroid && !uiStore.isBoardCollection}
         // <-----
       >
         <Rnd {...rndProps}>
