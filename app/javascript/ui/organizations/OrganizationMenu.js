@@ -73,12 +73,18 @@ class OrganizationMenu extends React.Component {
         this.isLoading = true
       })
       const hasOrg = !!apiStore.currentUserOrganization
-      await newOrg.create()
+      const res = await newOrg.create()
       googleTagManager.push({
         event: 'formSubmission',
         formType: hasOrg ? 'Additional Org' : 'New Org',
         organization: newOrg.slug,
       })
+      if (res.meta && res.meta.use_template_id) {
+        // route to use this template
+        const route = `/templates/${res.meta.use_template_id}/use_in_my_collection`
+        // can't use router in this case, have to full redirect
+        window.location.href = route
+      }
       routingStore.routeTo(`/${newOrg.slug}`)
       onClose()
     } catch (err) {

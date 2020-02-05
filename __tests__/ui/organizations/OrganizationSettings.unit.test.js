@@ -8,19 +8,26 @@ import TextEditor from '~/ui/global/TextEditor'
 
 let wrapper, apiStore, routingStore, uiStore, props, organization, component
 
+const rerender = () => {
+  wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
+  component = wrapper.instance()
+}
+
 beforeEach(() => {
   apiStore = fakeApiStore()
   uiStore = fakeUiStore
   routingStore = { routeTo: jest.fn() }
   organization = apiStore.currentUserOrganization
+  organization.patch = jest.fn()
   props = { apiStore, routingStore, uiStore }
+  rerender()
 })
 
 describe('OrganizationSettings', () => {
   describe('without edit capabilities', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = false
-      wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('kicks you out back to the homepage', () => {
@@ -31,7 +38,7 @@ describe('OrganizationSettings', () => {
   describe('with edit capabilities', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = true
-      wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
@@ -45,13 +52,19 @@ describe('OrganizationSettings', () => {
     })
   })
 
+  describe('afterAddRemoveDomainTag', () => {
+    it('calls organization.patch', () => {
+      component.afterAddRemoveDomainTag()
+      expect(props.apiStore.currentUserOrganization.patch).toHaveBeenCalled()
+    })
+  })
+
   describe('with custom terms checkbox checked', () => {
     beforeEach(() => {
       organization.terms_text_item = { id: 3, save: jest.fn() }
       organization.terms_version = null
       organization.API_bumpTermsVersion = jest.fn()
-      wrapper = shallow(<OrganizationSettings.wrappedComponent {...props} />)
-      component = wrapper.instance()
+      rerender()
     })
 
     it('should render a text editor to enter the terms', () => {

@@ -26,7 +26,8 @@ class BulkCardOperationProcessor < SimpleService
     else
       return false
     end
-    @placeholder = CollectionCard::Placeholder.create(
+
+    @placeholder = CollectionCard::Placeholder.new(
       parent: @to_collection,
       order: order,
       row: row,
@@ -37,6 +38,11 @@ class BulkCardOperationProcessor < SimpleService
         roles_anchor_collection_id: @to_collection.roles_anchor.id,
       },
     )
+    if @to_collection.board_collection?
+      return false unless @placeholder.board_placement_is_valid?
+    end
+
+    @placeholder.save
     return false unless @placeholder.persisted?
 
     # bump cards out of the way as needed

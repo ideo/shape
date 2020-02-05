@@ -7,7 +7,14 @@ RSpec.describe CollectionUpdater, type: :service do
     let(:first_card) { cards.first }
     let(:last_card) { cards.last }
     let(:attributes) { {} }
-    let(:service) { CollectionUpdater.new(collection, attributes) }
+    let(:unarchiving) { false }
+    let(:service) do
+      CollectionUpdater.new(
+        collection,
+        attributes,
+        unarchiving: unarchiving,
+      )
+    end
 
     context 'with valid attributes' do
       let(:attributes) do
@@ -153,6 +160,15 @@ RSpec.describe CollectionUpdater, type: :service do
       it 'calls update_test_template_instance_types if collection_to_test setting has changed' do
         expect(collection).to receive(:update_test_template_instance_types!)
         service.call
+      end
+
+      context 'when unarchiving' do
+        let(:unarchiving) { true }
+
+        it 'does not call queue_update_template_instances' do
+          expect(collection).not_to receive(:queue_update_template_instances)
+          service.call
+        end
       end
     end
 

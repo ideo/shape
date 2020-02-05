@@ -1,7 +1,7 @@
 class OrganizationAssigner < SimpleService
   attr_reader :organization, :errors
 
-  def initialize(params, user, full_setup)
+  def initialize(params, user, full_setup: true)
     @params = params
     @user = user
     @organization = Organization.shell.first

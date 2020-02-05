@@ -12,13 +12,12 @@ class CollectionCardDuplicationWorker
     building_template_instance = false
   )
     @batch_id = batch_id
-    @collection_cards = CollectionCard.active.where(id: card_ids).ordered
+    @duplicating_cards = CollectionCard.active.where(id: card_ids).ordered
     @for_user = User.find(for_user_id) if for_user_id.present?
     @parent_collection = Collection.find(parent_collection_id)
     @system_collection = system_collection
     @synchronous = synchronous
     @system_collection = system_collection
-    @from_collection = nil
     @building_template_instance = building_template_instance
     @new_cards = duplicate_cards
     duplicate_legend_items
@@ -27,10 +26,7 @@ class CollectionCardDuplicationWorker
   end
 
   def duplicate_cards
-    @parent_collection.update_processing_status(:duplicating)
-
-    # determine if all moving cards should be pinned/unpinned based on the card to the left of the first moving card
-    pin_duplicating_card = should_pin_duplicating_cards?
+    @parent_collection.update(processing_status: :duplicating)
 
     cards_to_duplicate.map do |card|
       # duplicating each card in order, each subsequent one should be placed at the end
@@ -40,12 +36,12 @@ class CollectionCardDuplicationWorker
       if card.is_a?(CollectionCard::Placeholder)
         # placeholder has a reference to the record, we want to copy *its* parent card
         source_card = card.record.parent_collection_card
-        # we already know the order
+        # we already know the order (and card.pinned will also be set)
         placement = card.order
         placeholder = card
+      else
+        source_card.pinned = false unless @building_template_instance
       end
-      # capture this for notification builder
-      @from_collection ||= source_card.parent
 
       source_card.duplicate!(
         for_user: @for_user,
@@ -56,13 +52,14 @@ class CollectionCardDuplicationWorker
         placeholder: placeholder,
         batch_id: @batch_id,
         building_template_instance: @building_template_instance,
-        should_pin_duplicating_cards: source_card.pinned? || pin_duplicating_card,
       )
     end
   end
 
+  private
+
   def cards_to_duplicate
-    @collection_cards.select do |card|
+    @duplicating_cards.select do |card|
       # Skip duplicating any cards this user can't view (if user provided)
       # If a system collection don't check if user can view
       if @building_template_instance || @system_collection
@@ -76,7 +73,7 @@ class CollectionCardDuplicationWorker
   end
 
   def update_parent_collection_status
-    @parent_collection.update_processing_status(nil)
+    @parent_collection.update(processing_status: nil)
     CollectionUpdateBroadcaster.call(@parent_collection)
   end
 
@@ -89,13 +86,5 @@ class CollectionCardDuplicationWorker
     return unless mover.call
 
     @new_cards += mover.legend_item_cards
-  end
-
-  private
-
-  def should_pin_duplicating_cards?
-    return false unless @collection_cards.first.present?
-
-    @parent_collection.should_pin_cards?(@collection_cards.first.order)
   end
 end

@@ -248,6 +248,7 @@ Rails.application.routes.draw do
   get 'passthru', to: 'urls#passthru'
   post 'webhooks/filestack', to: 'webhooks#filestack'
   get 'invitations/:token', to: 'invitations#accept', as: :accept_invitation
+  get 'templates/:id/use_in_my_collection', to: 'templates#use_in_my_collection'
 
   get :login, to: 'home#login', as: :login
   get :login_as, to: 'home#login_as', as: :login_as

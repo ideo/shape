@@ -405,8 +405,14 @@ class Organization < ApplicationRecord
   end
 
   def check_guests_for_domain_match
-    guest_group.members[:users].each do |user|
-      setup_user_membership(user)
+    return unless domain_whitelist.present?
+
+    new_member_guests = User
+                        .where(id: guest_group.user_ids)
+                        .where(%(email SIMILAR TO  '%(#{domain_whitelist.join('|')})'))
+    # TODO: this should be a worker!
+    new_member_guests.each do |user|
+      check_email_domains_and_join_org_group(user)
     end
   end
 
