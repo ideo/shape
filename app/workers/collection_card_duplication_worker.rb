@@ -28,9 +28,6 @@ class CollectionCardDuplicationWorker
   def duplicate_cards
     @parent_collection.update_processing_status(:duplicating)
 
-    # determine if all moving cards should be pinned/unpinned based on the card to the left of the first moving card
-    pin_duplicating_card = should_pin_duplicating_cards?
-
     cards_to_duplicate.map do |card|
       # duplicating each card in order, each subsequent one should be placed at the end
       placement = 'end'
@@ -42,8 +39,6 @@ class CollectionCardDuplicationWorker
         # we already know the order (and card.pinned will also be set)
         placement = card.order
         placeholder = card
-      elsif @parent_collection.master_template?
-        source_card.pinned = pin_duplicating_card
       else
         source_card.pinned = false unless @building_template_instance
       end
@@ -60,6 +55,8 @@ class CollectionCardDuplicationWorker
       )
     end
   end
+
+  private
 
   def cards_to_duplicate
     @duplicating_cards.select do |card|
@@ -89,17 +86,5 @@ class CollectionCardDuplicationWorker
     return unless mover.call
 
     @new_cards += mover.legend_item_cards
-  end
-
-  private
-
-  def should_pin_duplicating_cards?
-    # NOTE: could DRY / remove this method here and defer to CollectionCardDuplicator
-    #  however some processes call this worker directly and bypass the duplicator,
-    #  or when running the duplicator synchronously
-    first_card = @duplicating_cards.first
-    return false unless first_card.present?
-
-    @parent_collection.should_pin_cards?(first_card.order)
   end
 end

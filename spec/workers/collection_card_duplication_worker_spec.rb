@@ -96,16 +96,6 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect(result.size).to eq(5)
       end
 
-      context 'with pinned cards duplicating into a master template' do
-        let(:collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
-        let(:to_collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
-
-        it 'should pin the cards if the template placement is pinned' do
-          result = run_worker
-          expect(result.all?(&:pinned)).to be true
-        end
-      end
-
       context 'with pinned cards duplicating into a normal collection' do
         let(:collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
 

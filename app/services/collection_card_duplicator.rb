@@ -25,7 +25,7 @@ class CollectionCardDuplicator < SimpleService
 
   def call
     initialize_card_order
-    duplicate_cards_with_placeholders if @synchronous == :async
+    duplicate_cards_with_placeholders
     register_card_mappings
     deep_duplicate_cards
     reorder_and_update_cached_values
@@ -39,6 +39,12 @@ class CollectionCardDuplicator < SimpleService
   private
 
   def validate_synchronous_value(value)
+    if value == true
+      value = :all_levels
+    elsif value == false
+      value = :async
+    end
+
     value = value.to_sym
     valid_options = %i[all_levels first_level async]
     return value if valid_options.include?(value)
@@ -84,24 +90,19 @@ class CollectionCardDuplicator < SimpleService
 
   def deep_duplicate_cards
     run_worker_sync = %i[all_levels first_level].include?(@synchronous)
-    # Use placeholders if we just created them, otherwise pass in original card ids
-    card_ids = @synchronous == :async ? @new_cards.map(&:id) : @cards.map(&:id)
-
-    # Note: the CardDuplicatorMapperFindLinkedCardsWorker needs
+    # NOTE: the CardDuplicatorMapperFindLinkedCardsWorker needs
     #       to run before this duplication worker so that it
     #       can map all cards that need linking
-
-    result = CollectionCardDuplicationWorker.send(
+    CollectionCardDuplicationWorker.send(
       "perform_#{run_worker_sync ? 'sync' : 'async'}",
       @batch_id,
-      card_ids,
+      @new_cards.pluck(:id),
       @to_collection.id,
       @for_user&.id,
       @system_collection,
       @synchronous == :all_levels,
       @building_template_instance,
     )
-    @new_cards = Array(result) if run_worker_sync
   end
 
   def duplicate_cards_with_placeholders
@@ -120,7 +121,8 @@ class CollectionCardDuplicator < SimpleService
       if @building_template_instance
         dup.pinned = card.pinned
       elsif @to_collection.master_template?
-        dup.pinned = pin_duplicating_cards
+        # only override the source card pinned value if pin_duplicating_cards is true or false
+        dup.pinned = pin_duplicating_cards unless pin_duplicating_cards.nil?
       else
         dup.pinned = false
       end
@@ -181,6 +183,8 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def should_pin_duplicating_cards?
+    # in the event of moving into an empty collection (e.g. new template) retain the pinned value of the source card
+    return nil if @to_collection.collection_cards.empty?
     return false unless @cards.first.present?
 
     # NOTE: this will always treat an empty to_collection as "unpinned", which may incorrectly unpin cards

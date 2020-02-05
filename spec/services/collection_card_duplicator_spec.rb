@@ -149,37 +149,43 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       end
     end
 
-    context 'if synchronous is all levels' do
-      let!(:synchronous) { :all_levels }
-
-      it 'calls CollectionCardDuplicationWorker synchronously' do
-        expect(CollectionCardDuplicationWorker).to receive(:perform_sync).with(
-          instance_of(String), # batch id
-          moving_cards.map(&:id), # existing card ids
-          to_collection.id,
-          user.id,
-          false, # system collection
-          true, # synchronous
-          false, # building_template_instance
-        )
-        service.call
+    context 'with synchronous settings' do
+      before do
+        allow(CollectionCardDuplicationWorker).to receive(:perform_sync).and_call_original
       end
-    end
 
-    context 'if synchronous is first level' do
-      let!(:synchronous) { :first_level }
+      context 'if synchronous is all levels' do
+        let(:synchronous) { :all_levels }
 
-      it 'calls CollectionCardDuplicationWorker synchronously, but async sub-processes' do
-        expect(CollectionCardDuplicationWorker).to receive(:perform_sync).with(
-          instance_of(String), # batch id
-          moving_cards.map(&:id), # existing card ids
-          to_collection.id,
-          user.id,
-          false, # system collection
-          false, # synchronous
-          false, # building_template_instance
-        )
-        service.call
+        it 'calls CollectionCardDuplicationWorker synchronously' do
+          new_cards = service.call
+          expect(CollectionCardDuplicationWorker).to have_received(:perform_sync).with(
+            instance_of(String), # batch id
+            new_cards.pluck(:id), # existing card ids
+            to_collection.id,
+            user.id,
+            false, # system collection
+            true, # synchronous
+            false, # building_template_instance
+          )
+        end
+      end
+
+      context 'if synchronous is first level' do
+        let(:synchronous) { :first_level }
+
+        it 'calls CollectionCardDuplicationWorker synchronously, but async sub-processes' do
+          new_cards = service.call
+          expect(CollectionCardDuplicationWorker).to have_received(:perform_sync).with(
+            instance_of(String), # batch id
+            new_cards.pluck(:id), # existing card ids
+            to_collection.id,
+            user.id,
+            false, # system collection
+            false, # synchronous
+            false, # building_template_instance
+          )
+        end
       end
     end
 

@@ -445,14 +445,13 @@ class Collection < ApplicationRecord
     end
 
     if collection_cards.any? && !c.getting_started_shell
-      CollectionCardDuplicationWorker.send(
-        "perform_#{synchronous ? 'sync' : 'async'}",
-        batch_id,
-        collection_cards.map(&:id),
-        c.id,
-        for_user.try(:id),
-        system_collection,
-        synchronous,
+      CollectionCardDuplicator.call(
+        to_collection: c,
+        batch_id: batch_id,
+        cards: collection_cards,
+        for_user: for_user,
+        system_collection: system_collection,
+        synchronous: synchronous,
       )
     end
 
@@ -466,8 +465,7 @@ class Collection < ApplicationRecord
     synchronous: false,
     system_collection: false
   )
-    cards = placement != 'end' ? collection_cards.reverse : collection_cards
-    cards = cards.select do |card|
+    cards = collection_cards.select do |card|
       # ensures single copy, if existing copies already exist it will skip those
       existing_records = target_collection.collection_cards.map(&:record)
       existing_records.none? { |record| record.cloned_from == card.record }
@@ -478,7 +476,7 @@ class Collection < ApplicationRecord
       cards: cards,
       placement: placement,
       system_collection: system_collection,
-      synchronous: synchronous ? :all_levels : :async,
+      synchronous: synchronous,
     )
 
     # return the set of created duplicates
