@@ -17845,6 +17845,7 @@ exports[`GridCard with collection as editor renders snapshot 1`] = `
       submissionBox={false}
       testCollectionCard={false}
       wrapperClassName="card-menu"
+      zoomLevel={1}
     />
   </StyledTopRightActions>
   <BottomLeftCardIcons
@@ -25668,6 +25669,7 @@ exports[`GridCard with collection as viewer renders snapshot 1`] = `
       submissionBox={false}
       testCollectionCard={false}
       wrapperClassName="card-menu"
+      zoomLevel={1}
     />
   </StyledTopRightActions>
   <BottomLeftCardIcons
@@ -41288,6 +41290,7 @@ exports[`GridCard with collection with SharedCollection renders snapshot 1`] = `
       submissionBox={false}
       testCollectionCard={false}
       wrapperClassName="card-menu"
+      zoomLevel={1}
     />
   </StyledTopRightActions>
   <BottomLeftCardIcons
@@ -48097,6 +48100,7 @@ exports[`GridCard with item as editor renders snapshot 1`] = `
       submissionBox={false}
       testCollectionCard={false}
       wrapperClassName="card-menu"
+      zoomLevel={1}
     />
   </StyledTopRightActions>
   <StyledGridCardInner
@@ -48795,6 +48799,7 @@ exports[`GridCard with item as viewer renders snapshot 1`] = `
       submissionBox={false}
       testCollectionCard={false}
       wrapperClassName="card-menu"
+      zoomLevel={1}
     />
   </StyledTopRightActions>
   <StyledGridCardInner
@@ -51375,6 +51380,7 @@ exports[`GridCard with searchResult renders snapshot 1`] = `
       submissionBox={false}
       testCollectionCard={false}
       wrapperClassName="card-menu"
+      zoomLevel={1}
     />
   </StyledTopRightActions>
   <BottomLeftCardIcons

@@ -83,7 +83,6 @@ exports[`GridCardBlank renders snapshot 1`] = `
           groupExtraComponent={Object {}}
           groupedMenuItems={Object {}}
           hideDotMenu={false}
-          location={null}
           menuItems={
             Array [
               Object {

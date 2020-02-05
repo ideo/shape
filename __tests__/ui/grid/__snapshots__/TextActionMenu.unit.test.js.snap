@@ -8,7 +8,6 @@ exports[`TextActionMenu as viewer render snapshot 1`] = `
   groupExtraComponent={Object {}}
   groupedMenuItems={Object {}}
   hideDotMenu={true}
-  location={null}
   menuItems={
     Array [
       Object {
