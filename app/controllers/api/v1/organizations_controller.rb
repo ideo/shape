@@ -27,11 +27,15 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   def create
-    builder = OrganizationBuilder.new(organization_params, current_user)
-    if builder.save
-      render jsonapi: builder.organization, include: [:primary_group]
+    assigner = OrganizationAssigner.new(
+      organization_params,
+      current_user,
+      true,
+    )
+    if assigner.call
+      render jsonapi: assigner.organization.reload, include: [:primary_group]
     else
-      render_api_errors builder.errors
+      render_api_errors assigner.errors
     end
   end
 
@@ -90,6 +94,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
       :deactivated,
       :terms_text_item_id,
       :default_locale,
+      :handle,
       filestack_file_attributes: Group.filestack_file_attributes_whitelist,
     ]
     # If super admin or application (bot) user, we allow toggling billing

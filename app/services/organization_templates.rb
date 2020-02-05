@@ -19,11 +19,10 @@ class OrganizationTemplates < SimpleService
     end
 
     # create Getting Started collection for the org and the first admin user
-    OrganizationTemplatesWorker.perform_in(
+    OrganizationTemplatesWorker.new.perform(
       # for some reason the org sometimes wasn't being found right away
-      3.seconds,
       @org.id,
-      @user.id,
+      @user&.id,
     )
   end
 
@@ -50,6 +49,17 @@ class OrganizationTemplates < SimpleService
       [template_collection.id],
       [],
     )
+    if @org.shell
+      # Manually link the template collection to the org clone my collection
+      # collection that doesn't have a user yet
+      org_user_collection = Collection::UserCollection.find_by(
+        organization_id: @org.id,
+      )
+      CollectionCard::Link.create(
+        parent: org_user_collection,
+        collection_id: template_collection.id,
+      )
+    end
   end
 
   def getting_started_template
