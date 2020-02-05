@@ -70,13 +70,12 @@ class CollectionCardDuplicator < SimpleService
   def register_card_mappings
     run_worker_sync = %i[all_levels first_level].include?(@synchronous)
 
+    card_ids = @cards.map(&:id)
     # ensure parent_collection_card exists
     if @building_template_instance && @cards.size == 1 && @to_collection.parent_collection_card.present?
       # Append the template instance card,
       # so that the mapper will include the entire template in its mapping
-      card_ids = @cards.map(&:id) + [@to_collection.parent_collection_card.id]
-    else
-      card_ids = @cards.map(&:id)
+      card_ids += [@to_collection.parent_collection_card.id]
     end
 
     CardDuplicatorMapperFindLinkedCardsWorker.send(

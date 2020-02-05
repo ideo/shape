@@ -99,7 +99,6 @@ class Collection < ApplicationRecord
                  :cached_tag_list,
                  :cached_owned_tag_list,
                  :cached_card_count,
-                 :cached_last_card_order,
                  :cached_activity_count,
                  :submission_attrs,
                  :getting_started_shell,
@@ -445,13 +444,17 @@ class Collection < ApplicationRecord
     end
 
     if collection_cards.any? && !c.getting_started_shell
-      CollectionCardDuplicator.call(
-        to_collection: c,
-        batch_id: batch_id,
-        cards: collection_cards,
-        for_user: for_user,
-        system_collection: system_collection,
-        synchronous: synchronous,
+      # NOTE: this is the one other place where we call the DuplicationWorker directly,
+      # because we don't want to convert links -> placeholders -> primary cards,
+      # and we also don't want to remap links again as this is already part of a batch.
+      CollectionCardDuplicationWorker.send(
+        "perform_#{synchronous ? 'sync' : 'async'}",
+        batch_id,
+        collection_cards.map(&:id),
+        c.id,
+        for_user.try(:id),
+        system_collection,
+        synchronous,
       )
     end
 
@@ -726,7 +729,6 @@ class Collection < ApplicationRecord
 
   def cache_card_count!
     cache_attributes!(
-      cached_last_card_order: collection_cards.maximum(:order),
       cached_card_count: collection_cards.visible.count,
     )
   end
@@ -989,7 +991,7 @@ class Collection < ApplicationRecord
       order = collection_cards.pinned.maximum(:order) || 0
     end
     if placement == 'end'
-      order = cached_last_card_order || collection_cards.maximum(:order) || -1
+      order = collection_cards.maximum(:order) || -1
       order += 1
     end
     order

@@ -324,13 +324,13 @@ describe Collection, type: :model do
       end
 
       it 'clones all the collection cards' do
-        expect(CollectionCardDuplicator).to receive(:call).with(
-          to_collection: instance_of(Collection),
-          batch_id: batch_id,
-          cards: collection.collection_cards,
-          for_user: nil,
-          system_collection: false,
-          synchronous: false,
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          batch_id,
+          collection.collection_cards.map(&:id),
+          instance_of(Integer),
+          nil,
+          false,
+          false,
         )
         duplicate_without_user
       end
@@ -378,13 +378,13 @@ describe Collection, type: :model do
       end
 
       it 'clones all the collection cards' do
-        expect(CollectionCardDuplicator).to receive(:call).with(
-          to_collection: instance_of(Collection),
-          batch_id: batch_id,
-          cards: collection.collection_cards,
-          for_user: user,
-          system_collection: false,
-          synchronous: false,
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          batch_id,
+          collection.collection_cards.map(&:id),
+          instance_of(Integer),
+          user.id,
+          false,
+          false,
         )
         collection.duplicate!(
           for_user: user,
@@ -407,14 +407,24 @@ describe Collection, type: :model do
     end
 
     context 'with system_collection and synchronous settings' do
+      let(:instance_double) do
+        double('CollectionCardDuplicationWorker')
+      end
+
+      before do
+        allow(CollectionCardDuplicationWorker).to receive(:new).and_return(instance_double)
+        allow(instance_double).to receive(:perform).and_return true
+      end
+
       it 'should call synchronously' do
-        expect(CollectionCardDuplicator).to receive(:call).with(
-          to_collection: instance_of(Collection),
-          batch_id: batch_id,
-          cards: collection.collection_cards,
-          for_user: user,
-          system_collection: true,
-          synchronous: true,
+        expect(CollectionCardDuplicationWorker).to receive(:new)
+        expect(instance_double).to receive(:perform).with(
+          batch_id,
+          anything,
+          anything,
+          anything,
+          true,
+          true,
         )
         collection.duplicate!(
           batch_id: batch_id,
