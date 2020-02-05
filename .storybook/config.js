@@ -1,7 +1,9 @@
 import React from 'react'
 import { configure, addDecorator, load, addParameters } from '@storybook/react'
 
+
 import defaultNotes from './instructions.md'
+import '!style-loader!css-loader!sass-loader!../app/assets/stylesheets/global.scss'
 addParameters({ notes: defaultNotes })
 
 // https://storybook.js.org/docs/basics/writing-stories/#decorators

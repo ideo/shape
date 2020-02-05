@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+import React from 'react'
 import { StyledRowFlexParent, StyledRowFlexHeader } from './styled'
 import { SmallHelperText } from '~/ui/global/styled/typography'
 

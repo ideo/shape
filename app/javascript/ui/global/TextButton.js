@@ -3,6 +3,9 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 
+/**
+ * Button that's just text with no background styling.
+ */
 const TextButton = styled.button`
   text-transform: uppercase;
   max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
@@ -16,7 +19,9 @@ const TextButton = styled.button`
   background: none;
 `
 TextButton.propTypes = {
+  /** Color for the button text */
   color: PropTypes.oneOf(Object.values(v.colors)),
+  /** Font size in ems for the button text */
   fontSizeEm: PropTypes.number,
   maxWidth: PropTypes.number,
 }
@@ -25,5 +30,6 @@ TextButton.defaultProps = {
   fontSizeEm: 0.9375,
   maxWidth: null,
 }
-TextButton.displayName = 'StyledTextButton'
+TextButton.displayName = 'TextButton'
+/** @component */
 export default TextButton

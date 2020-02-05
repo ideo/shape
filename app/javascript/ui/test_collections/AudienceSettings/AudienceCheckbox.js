@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
