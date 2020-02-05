@@ -146,7 +146,7 @@ class CollectionCardDuplicator < SimpleService
     end
 
     CollectionCard.import(@new_cards)
-    @to_collection.update_processing_status(:duplicating)
+    @to_collection.update(processing_status: :duplicating)
   end
 
   def reorder_and_update_cached_values

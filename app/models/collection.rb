@@ -793,14 +793,6 @@ class Collection < ApplicationRecord
     'order'
   end
 
-  def update_processing_status(status = nil)
-    update(
-      processing_status: status,
-    )
-
-    processing_done if processing_status.nil?
-  end
-
   def clear_collection_cover
     cover = primary_collection_cards.where(is_cover: true).first
     return if cover.nil?

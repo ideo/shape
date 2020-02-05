@@ -26,7 +26,7 @@ class CollectionCardDuplicationWorker
   end
 
   def duplicate_cards
-    @parent_collection.update_processing_status(:duplicating)
+    @parent_collection.update(processing_status: :duplicating)
 
     cards_to_duplicate.map do |card|
       # duplicating each card in order, each subsequent one should be placed at the end
@@ -73,7 +73,7 @@ class CollectionCardDuplicationWorker
   end
 
   def update_parent_collection_status
-    @parent_collection.update_processing_status(nil)
+    @parent_collection.update(processing_status: nil)
     CollectionUpdateBroadcaster.call(@parent_collection)
   end
 

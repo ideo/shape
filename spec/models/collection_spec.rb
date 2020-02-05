@@ -807,41 +807,6 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#update_processing_status' do
-    let(:collection) { create(:collection) }
-
-    context 'processing = :duplicating' do
-      let(:processing) { true }
-
-      it 'marks collections as duplicating' do
-        expect(collection.duplicating?).to be false
-        collection.update_processing_status(Collection.processing_statuses[:duplicating])
-        expect(collection.duplicating?).to be true
-      end
-    end
-
-    context 'processing = nil' do
-      let(:processing) { false }
-
-      before do
-        collection.update_attributes(
-          processing_status: Collection.processing_statuses[:duplicating],
-        )
-      end
-
-      it 'marks collection as not processing' do
-        expect(collection.duplicating?).to be true
-        collection.update_processing_status(nil)
-        expect(collection.duplicating?).to be false
-      end
-
-      it 'broadcasts processing has stopped' do
-        expect(collection).to receive(:processing_done).once
-        collection.update_processing_status(nil)
-      end
-    end
-  end
-
   describe '#reset_permissions!' do
     let(:user) { create(:user) }
     let(:collection) { create(:collection, num_cards: 1, add_editors: [user]) }

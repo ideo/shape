@@ -75,18 +75,18 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
 
       it 'marks collection as processing' do
         expect_any_instance_of(Collection).to receive(
-          :update_processing_status,
-        ).with(:duplicating).once
+          :update,
+        ).with(processing_status: :duplicating).once
 
         expect_any_instance_of(Collection).to receive(
-          :update_processing_status,
-        ).with(nil).once
+          :update,
+        ).with(processing_status: nil).once
 
         run_worker
       end
 
       it 'broadcasts collection as stopped editing' do
-        expect_any_instance_of(Collection).to receive(:processing_done)
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(to_collection).once
         run_worker
       end
 
@@ -134,7 +134,8 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       let(:user) { nil }
 
       it 'clones all items' do
-        expect_any_instance_of(Collection).to receive(:processing_done)
+        expect_any_instance_of(Collection).to receive(:update).with(processing_status: :duplicating)
+        expect_any_instance_of(Collection).to receive(:update).with(processing_status: nil)
         run_worker
         to_collection.reload
         expect(to_collection.items.size).to eq(5)
