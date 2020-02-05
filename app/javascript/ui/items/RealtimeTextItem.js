@@ -107,6 +107,7 @@ class RealtimeTextItem extends React.Component {
   canceled = false
   currentlySending = false
   currentlySendingCheck = null
+  quillData = {}
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
@@ -121,6 +122,7 @@ class RealtimeTextItem extends React.Component {
       30000
     )
     this.sendCursor = _.throttle(this._sendCursor, 100)
+    this.quillData = this.initialQuillData()
   }
 
   componentDidMount() {
@@ -131,10 +133,10 @@ class RealtimeTextItem extends React.Component {
 
     if (!this.reactQuillRef) return
     this.initQuillRefsAndData({ initSnapshot: true })
-    this.clearQuillHistory()
+    this.clearQuillClipboardHistory()
     setTimeout(() => {
       this.quillEditor.focus()
-      this.clearQuillHistory()
+      this.clearQuillClipboardHistory()
     }, 100)
   }
 
@@ -164,7 +166,7 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
-  clearQuillHistory() {
+  clearQuillClipboardHistory() {
     // fix for undo clearing out all text
     // https://github.com/zenoamaro/react-quill/issues/511
     this.quillEditor.history.clear()
@@ -211,7 +213,7 @@ class RealtimeTextItem extends React.Component {
   channelConnected = () => {
     if (this.unmounted) return
     this.setState({ disconnected: false }, () => {
-      this.clearQuillHistory()
+      this.clearQuillClipboardHistory()
     })
   }
 
@@ -315,7 +317,7 @@ class RealtimeTextItem extends React.Component {
     return item.can_edit_content && fullyLoaded && !disconnected
   }
 
-  get quillData() {
+  initialQuillData() {
     const { item } = this.props
     const quillData = toJS(item.quill_data) || {}
     if (!quillData.ops) quillData.ops = []
@@ -556,52 +558,45 @@ class RealtimeTextItem extends React.Component {
     apiStore.openCurrentThreadToCommentOn(item)
   }
 
-  get keyBindings() {
-    const endOfHighlight = (range, context) => {
-      if (!context.format || !context.format.commentHighlight) {
-        return false
-      }
-      const nextFormat = this.quillEditor.getFormat(range.index + 1)
-      if (nextFormat && nextFormat.commentHighlight) {
-        return false
-      }
+  endOfHighlight = (range, context) => {
+    if (!context.format || !context.format.commentHighlight) {
+      return false
+    }
+    const nextFormat = this.quillEditor.getFormat(range.index + 1)
+    if (nextFormat && nextFormat.commentHighlight) {
+      return false
+    }
+    return true
+  }
+
+  insertText = (index, char) => {
+    this.quillEditor.insertText(
+      index,
+      char,
+      {
+        commentHighlight: false,
+        'data-comment-id': null,
+      },
+      'user'
+    )
+    this.quillEditor.setSelection(index + 1)
+  }
+
+  keyHandler_enter = (range, context) => {
+    if (this.endOfHighlight(range, context)) {
+      this.insertText(range.index, '\n')
+    } else {
+      // propagate to quill default newline behavior
       return true
     }
-    const insertText = (index, char) => {
-      this.quillEditor.insertText(
-        index,
-        char,
-        {
-          commentHighlight: false,
-          'data-comment-id': null,
-        },
-        'user'
-      )
-      this.quillEditor.setSelection(index + 1)
-    }
-    return {
-      enter: {
-        key: Keyboard.keys.ENTER,
-        handler: (range, context) => {
-          if (endOfHighlight(range, context)) {
-            insertText(range.index, '\n')
-          } else {
-            // propagate to quill default newline behavior
-            return true
-          }
-        },
-      },
-      space: {
-        key: 32,
-        handler: (range, context) => {
-          if (endOfHighlight(range, context)) {
-            insertText(range.index, ' ')
-          } else {
-            // propagate to quill default newline behavior
-            return true
-          }
-        },
-      },
+  }
+
+  keyHandler_space = (range, context) => {
+    if (this.endOfHighlight(range, context)) {
+      this.insertText(range.index, ' ')
+    } else {
+      // propagate to quill default newline behavior
+      return true
     }
   }
 
@@ -633,7 +628,16 @@ class RealtimeTextItem extends React.Component {
           hideDelayMs: 3000,
         },
         keyboard: {
-          bindings: this.keyBindings,
+          bindings: {
+            enter: {
+              key: Keyboard.keys.ENTER,
+              handler: this.keyHandler_enter,
+            },
+            space: {
+              key: 32,
+              handler: this.keyHandler_space,
+            },
+          },
         },
       },
     }
