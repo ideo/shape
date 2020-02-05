@@ -87,7 +87,6 @@ StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
 const StyledButtonNameWrapper = styled.span`
   display: inline-block;
   vertical-align: middle;
-  max-width: ${props => (props.smallWidth ? 110 : 125)}px;
   ${props =>
     props.large &&
     `
@@ -96,6 +95,12 @@ const StyledButtonNameWrapper = styled.span`
       font-size: 24px;
       float: left;
     `}
+
+  ${props =>
+    props.smallWidth &&
+    `
+      max-width: 110px;
+    `}px;
 `
 
 StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
