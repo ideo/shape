@@ -53,7 +53,7 @@ export const StyledMenuWrapper = styled.div`
     if (position && offsetPosition) {
       const { x, y } = position
       if (x === 0 && y === 0 && !props.positionRelative) {
-        const { x: offsetX, y: offsetY } = offsetPosition
+        const { x: offsetX } = offsetPosition
 
         // positioning was overriden see: actionMenu::offsetPosition
         if (offsetX === 0) {

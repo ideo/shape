@@ -365,7 +365,6 @@ class ActionMenu extends React.Component {
       wrapperClassName,
       uiStore,
       location,
-      card,
     } = this.props
 
     return (
