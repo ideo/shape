@@ -3,23 +3,17 @@ class LinkToSharedCollectionsWorker
   sidekiq_options queue: 'critical'
 
   def perform(user_ids, group_ids, collection_ids, item_ids)
-    users_to_add = User.where(id: user_ids)
-    groups_to_add = Group.where(id: group_ids)
-    objects = Collection.where(id: collection_ids) + Item.where(id: item_ids)
-    (users_to_add + groups_to_add).each do |entity|
-      # bot users don't get anything shared in their ApplicationCollection
-      next if entity.try(:bot_user?)
+    @users_to_add = User.where(id: user_ids)
+    @groups_to_add = Group.where(id: group_ids)
+    @objects = Collection.where(id: collection_ids) + Item.where(id: item_ids)
+    create_links
+  end
 
-      objects.each do |object|
-        # Don't create any links if object was created by user
-        next if object.try(:created_by_id) == entity.id
+  private
 
-        # If linking to any collection in C∆ Dashboard,
-        # add top-level card (unless linking method library)
-        if within_application_collection?(object) && !method_library_collection?(object)
-          object = object.parent_application_collection.collections.first
-        end
-
+  def create_links
+    entities.each do |entity|
+      objects_to_add.each do |object|
         org_id = object.organization_id
         if entity.is_a?(User)
           shared = entity.current_shared_collection(org_id)
@@ -40,7 +34,25 @@ class LinkToSharedCollectionsWorker
     end
   end
 
-  private
+  def entities
+    (@users_to_add + @groups_to_add).reject do |entity|
+      # bot users don't get anything shared in their ApplicationCollection
+      entity.try(:bot_user?)
+    end
+  end
+
+  # Makes sure we have a unique list of objects
+  def objects_to_add
+    @objects.map do |object|
+      # If linking to any collection in C∆ Dashboard,
+      # add top-level card (unless linking method library)
+      if within_application_collection?(object) && !method_library_collection?(object)
+        object.parent_application_collection.collections.first
+      else
+        object
+      end
+    end.uniq
+  end
 
   def org_dashboard_collection?(object)
     return false unless within_application_collection?(object)
