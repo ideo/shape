@@ -83,6 +83,10 @@ RSpec.describe DefaultCollectionCover, type: :service do
       it 'should not have any text on the cover' do
         expect(collection_cover['text']).to be_nil
       end
+
+      it 'has text item in collection_cover_text_items relationship' do
+        expect(collection.collection_cover_text_items).to eq([text_item.record])
+      end
     end
 
     context 'with an image manually set' do
