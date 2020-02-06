@@ -1,3 +1,4 @@
+import { shuffle } from 'lodash'
 import MethodLibraryFilterBar from '~/ui/filtering/MethodLibraryFilterBar'
 import { fakeCollectionFilter } from '#/mocks/data'
 import {
@@ -37,22 +38,22 @@ describe('MethodLibraryFilterBar', () => {
         .find('.PopoutMenu-subqualities')
         .props()
         .menuItems.map(tag => tag.name)
-        .sort()
-    ).toEqual(allQualities.sort())
+    ).toEqual(allQualities) // Expected array order
 
     expect(
       wrapper
         .find('.PopoutMenu-categories')
         .props()
         .menuItems.map(tag => tag.name)
-    ).toEqual(methodLibraryTagsByType.categories)
+        .sort()
+    ).toEqual(methodLibraryTagsByType.categories.sort()) // Expected alphabetical order
 
     expect(
       wrapper
         .find('.PopoutMenu-types')
         .props()
         .menuItems.map(tag => tag.name)
-    ).toEqual(methodLibraryTagsByType.types)
+    ).toEqual(methodLibraryTagsByType.types.sort()) // Expected alphabetical order
   })
 
   it('renders creative qualities as pills', () => {
@@ -60,7 +61,29 @@ describe('MethodLibraryFilterBar', () => {
       wrapper
         .find('.creativeQualityTags')
         .props()
-        .itemList.map(tag => tag.name)
+        .itemList.map(tag => tag.name) // Expected array order
     ).toEqual([...creativeQualities.keys()])
+  })
+
+  describe('with collection filters in random order', () => {
+    beforeEach(() => {
+      props = {
+        filters: shuffle(methodLibraryTags).map(tag => ({
+          ...fakeCollectionFilter,
+          text: tag,
+        })),
+        onSelect: jest.fn(),
+      }
+      rerender()
+    })
+
+    it('renders creative qualities in correct order', () => {
+      expect(
+        wrapper
+          .find('.creativeQualityTags')
+          .props()
+          .itemList.map(tag => tag.name)
+      ).toEqual([...creativeQualities.keys()])
+    })
   })
 })
