@@ -135,7 +135,7 @@ export const NamedActionButton = styled.button`
 NamedActionButton.defaultProps = {
   svgSize: { width: '30px', height: '30px' },
 }
-/* eslint-disable no-nested-ternary */
+
 /** @component */
 export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
@@ -223,9 +223,10 @@ const invertColor = color => {
     case v.colors.commonDark:
       return v.colors.commonLight
     case v.colors.white:
+      return v.colors.black
     case v.colors.commonMedium:
     case v.colors.black:
-      return v.colors.black
+      return v.colors.white
     default:
       return v.colors.white
   }
