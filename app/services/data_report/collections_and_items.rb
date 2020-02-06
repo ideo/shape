@@ -195,8 +195,8 @@ module DataReport
         return
       end
 
-      # Doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
-      # we are actually finding all activities/collections created before January 2 00:00
+      # Doing the BETWEEN upper limit finds all activities created BEFORE the upper limit, for example:
+      # i.date of "01-01-2020" will return "between 12-01-2019 and 01-01-2020" aka "all of December 2019"
       columns = %i[id created_at]
       columns.push(:actor_id) if measure_queries_activities?
       beginning_of_timeframe = min.send("beginning_of_#{timeframe}")
@@ -221,7 +221,7 @@ module DataReport
               created_at BETWEEN
                 i.date - INTERVAL '1 #{timeframe}'
                 AND
-                i.date + INTERVAL '1 #{timeframe}'
+                i.date
             GROUP BY i.date
             ORDER BY i.date
       }
