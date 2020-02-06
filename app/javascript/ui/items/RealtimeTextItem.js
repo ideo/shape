@@ -11,6 +11,7 @@ import styled from 'styled-components'
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
+import QuillClipboard from '~/ui/global/QuillClipboard'
 import {
   QuillHighlighter,
   QuillHighlightResolver,
@@ -19,7 +20,7 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
 import { routingStore } from '~/stores'
 import v from '~/utils/variables'
-import QuillClipboard from '~/ui/global/QuillClipboard'
+import { objectsEqual } from '~/utils/objectUtils'
 
 Quill.debug('error')
 Quill.register('modules/cursors', QuillCursors)
@@ -101,7 +102,10 @@ const StyledContainer = styled.div`
 @observer
 class RealtimeTextItem extends React.Component {
   channelName = 'ItemRealtimeChannel'
-  state = { disconnected: false }
+  state = {
+    disconnected: false,
+    canEdit: false,
+  }
   saveTimer = null
   focused = false
   canceled = false
@@ -132,6 +136,7 @@ class RealtimeTextItem extends React.Component {
     }, 1250)
 
     if (!this.reactQuillRef) return
+    this.calculateCanEdit()
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
     setTimeout(() => {
@@ -140,7 +145,7 @@ class RealtimeTextItem extends React.Component {
     }, 100)
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     setTimeout(() => {
       // note: didUpdate seems to clear the transient highlight, manually re-add it again
       // will cause a subtle flickering effect when clicking into a text-item's highlight
@@ -149,6 +154,9 @@ class RealtimeTextItem extends React.Component {
     const initSnapshot = !prevProps.fullyLoaded && this.props.fullyLoaded
     // if we just "fully loaded" then make sure to update this.contentSnapshot and version
     this.initQuillRefsAndData({ initSnapshot })
+    if (initSnapshot || prevState.disconnected !== this.state.disconnected) {
+      this.calculateCanEdit()
+    }
   }
 
   componentWillUnmount() {
@@ -311,10 +319,16 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
-  get canEdit() {
+  calculateCanEdit() {
     const { item, fullyLoaded } = this.props
     const { disconnected } = this.state
-    return item.can_edit_content && fullyLoaded && !disconnected
+    const canEdit = item.can_edit_content && fullyLoaded && !disconnected
+    if (canEdit !== this.state.canEdit) {
+      this.setState({ canEdit }, () => {
+        // one additional case to clear this, going from canEdit false -> true
+        if (canEdit) this.clearQuillClipboardHistory()
+      })
+    }
   }
 
   initialQuillData() {
@@ -336,15 +350,30 @@ class RealtimeTextItem extends React.Component {
   cancel = (ev, { route = true } = {}) => {
     if (this.canceled) return
     const { onCancel } = this.props
+    const { canEdit } = this.state
     // mark this as it may get called again from unmount, only want to cancel once
     this.canceled = true
     this.sendCombinedDelta.flush()
     this.instanceDataContentUpdate.flush()
     // NOTE: cancel also means "save current text"!
     // event is passed through because TextItemCover uses it
-    if (!this.canEdit) return onCancel({ item: this.props.item, ev, route })
+    if (!canEdit) return onCancel({ item: this.props.item, ev, route })
+
     const item = this.setItemQuillData()
+    this.pushTextUndo()
     return onCancel({ item, ev, route })
+  }
+
+  pushTextUndo() {
+    const { item, uiStore } = this.props
+    const collection = uiStore.viewingCollection || item.parent
+    const redirectTo = collection
+    const previousData = this.quillData
+    const currentData = item.quill_data
+    if (objectsEqual(previousData, currentData)) {
+      return
+    }
+    item.pushTextUndo({ previousData, currentData, redirectTo })
   }
 
   @action
@@ -602,12 +631,15 @@ class RealtimeTextItem extends React.Component {
 
   render() {
     const { item, onExpand, fullPageView, containerRef } = this.props
+    const { canEdit } = this.state
     // item is not fully loaded yet, e.g. from a CommentThread
     if (!item.quill_data) {
       return null
     }
 
-    const { canEdit } = this
+    // NOTE: if anything changes these props e.g. state.canEdit
+    // then ReactQuill will regenerate the underlying component
+    // and we have to make sure to call clearQuillClipboardHistory()
     const quillProps = {
       ...v.quillDefaults,
       ref: c => {
