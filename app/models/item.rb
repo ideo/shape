@@ -131,6 +131,7 @@ class Item < ApplicationRecord
 
   scope :questions, -> { where(type: 'Item::QuestionItem') }
   scope :data_items, -> { where(type: 'Item::DataItem') }
+  scope :text_items, -> { where(type: 'Item::TextItem') }
   scope :legend_items, -> { where(type: 'Item::LegendItem') }
   scope :answerable, -> {
     where.not(

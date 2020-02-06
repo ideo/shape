@@ -150,6 +150,12 @@ class Collection < ApplicationRecord
            foreign_key: :parent_id,
            inverse_of: :parent
 
+  has_many :hidden_collection_cards,
+           -> { active.hidden },
+           class_name: 'CollectionCard::Primary',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
   # cards that live outside this collection, linking to this collection
   has_many :cards_linked_to_this_collection,
            class_name: 'CollectionCard::Link',
@@ -167,6 +173,11 @@ class Collection < ApplicationRecord
            class_name: 'CollectionCard::Primary',
            foreign_key: :parent_id,
            inverse_of: :parent
+
+  has_many :collection_cover_text_items,
+           -> { text_items },
+           through: :hidden_collection_cards,
+           source: :item
 
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
@@ -337,6 +348,7 @@ class Collection < ApplicationRecord
       :test_audiences,
       :restorable_parent,
       :collection_filters,
+      :collection_cover_text_items,
       roles: %i[pending_users users groups resource],
     ]
   end

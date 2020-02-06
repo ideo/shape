@@ -134,6 +134,7 @@ class CollectionCard < ApplicationRecord
         :translations,
         :parent_collection_card,
         :question_choices,
+        :collection_cover_text_items,
         collection_cover_items: :datasets,
       ],
     ]
