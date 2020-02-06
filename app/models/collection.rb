@@ -99,7 +99,6 @@ class Collection < ApplicationRecord
                  :cached_tag_list,
                  :cached_owned_tag_list,
                  :cached_card_count,
-                 :cached_last_card_order,
                  :cached_activity_count,
                  :submission_attrs,
                  :getting_started_shell,
@@ -446,6 +445,9 @@ class Collection < ApplicationRecord
     end
 
     if collection_cards.any? && !c.getting_started_shell
+      # NOTE: this is the one other place where we call the DuplicationWorker directly,
+      # because we don't want to convert links -> placeholders -> primary cards,
+      # and we also don't want to remap links again as this is already part of a batch.
       CollectionCardDuplicationWorker.send(
         "perform_#{synchronous ? 'sync' : 'async'}",
         batch_id,
@@ -467,8 +469,7 @@ class Collection < ApplicationRecord
     synchronous: false,
     system_collection: false
   )
-    cards = placement != 'end' ? collection_cards.reverse : collection_cards
-    cards = cards.select do |card|
+    cards = collection_cards.select do |card|
       # ensures single copy, if existing copies already exist it will skip those
       existing_records = target_collection.collection_cards.map(&:record)
       existing_records.none? { |record| record.cloned_from == card.record }
@@ -479,7 +480,7 @@ class Collection < ApplicationRecord
       cards: cards,
       placement: placement,
       system_collection: system_collection,
-      synchronous: synchronous ? :all_levels : :async,
+      synchronous: synchronous,
     )
 
     # return the set of created duplicates
@@ -617,7 +618,7 @@ class Collection < ApplicationRecord
     CollectionCard.import(
       calculate_reordered_cards(
         joins: :collection,
-        order: 'LOWER(collections.name) ASC',
+        order: Arel.sql('LOWER(collections.name) ASC'),
       ),
       validate: false,
       on_duplicate_key_update: %i[order],
@@ -633,7 +634,11 @@ class Collection < ApplicationRecord
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
     if card_attrs_snapshot.present?
-      CollectionUpdater.call(self, card_attrs_snapshot)
+      CollectionUpdater.call(
+        self,
+        card_attrs_snapshot,
+        unarchiving: true,
+      )
     end
     if board_collection?
       # re-place any unarchived cards to do collision detection on their original position(s)
@@ -653,8 +658,7 @@ class Collection < ApplicationRecord
       reorder_cards!
     end
 
-    # if snapshot includes card attrs then CollectionUpdater will trigger the same thing
-    return unless master_template? && card_attrs_snapshot && card_attrs_snapshot[:collection_cards_attributes].blank?
+    return unless master_template?
 
     queue_update_template_instances(
       updated_card_ids: cards.pluck(:id),
@@ -726,7 +730,6 @@ class Collection < ApplicationRecord
 
   def cache_card_count!
     cache_attributes!(
-      cached_last_card_order: collection_cards.maximum(:order),
       cached_card_count: collection_cards.visible.count,
     )
   end
@@ -791,14 +794,6 @@ class Collection < ApplicationRecord
     end
 
     'order'
-  end
-
-  def update_processing_status(status = nil)
-    update(
-      processing_status: status,
-    )
-
-    processing_done if processing_status.nil?
   end
 
   def clear_collection_cover
@@ -974,6 +969,17 @@ class Collection < ApplicationRecord
     broadcasting.present?
   end
 
+  def inside_a_creative_difference_collection?
+    creative_difference_root_collection_id = ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID']
+
+    logger.debug(
+      'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.'
+    ) if !creative_difference_root_collection_id
+
+    inside_an_application_collection? ||
+    within_collection_or_self?(creative_difference_root_collection_id.to_i)
+  end
+
   # =================================
   # <--- end boolean checks
   #
@@ -997,7 +1003,7 @@ class Collection < ApplicationRecord
       order = collection_cards.pinned.maximum(:order) || 0
     end
     if placement == 'end'
-      order = cached_last_card_order || collection_cards.maximum(:order) || -1
+      order = collection_cards.maximum(:order) || -1
       order += 1
     end
     order
@@ -1008,11 +1014,17 @@ class Collection < ApplicationRecord
   end
 
   def should_pin_cards?(placement)
+    return false unless master_template?
+
     has_pinned_cards = collection_cards.pinned.any?
 
     return false unless has_pinned_cards
 
     return true if placement == 'beginning'
+
+    if placement == 'end'
+      return collection_cards.unpinned.none?
+    end
 
     first_moving_card_index = collection_cards.find_index { |cc| cc.order == placement }
 
@@ -1029,12 +1041,17 @@ class Collection < ApplicationRecord
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)
     cards_to_update = []
-    cards = all_collection_cards.active.joins(joins).order(order)
-    cards.each_with_index do |card, i|
-      next if card.order == i
+    visible_cards = all_collection_cards.visible.active.joins(joins).order(order)
+    hidden_cards = all_collection_cards.hidden.active.joins(joins).order(order)
+    index = -1
+    [visible_cards, hidden_cards].each do |card_set|
+      card_set.each do |card|
+        index += 1
+        next if card.order == index
 
-      card.order = i
-      cards_to_update << card
+        card.order = index
+        cards_to_update << card
+      end
     end
     cards_to_update
   end

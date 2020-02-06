@@ -249,6 +249,7 @@ export const fakeTextItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   pushUndo: jest.fn(),
+  pushTextUndo: jest.fn(),
   version: 1,
   ...fakeJsonApiAttrs,
 }

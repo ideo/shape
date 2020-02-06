@@ -13,7 +13,7 @@ module SessionHelper
   # This used to be a method on Organization -- no longer used outside of tests
   def create_org_for_user(user)
     name = [user.first_name, user.last_name, 'Organization'].compact.join(' ')
-    assigner = OrganizationAssigner.new({ name: name}, user, false)
+    assigner = OrganizationAssigner.new({ name: name }, user, full_setup: false)
     assigner.call
     assigner.organization
   end

@@ -454,16 +454,21 @@ describe('Collection', () => {
   })
 
   describe('API_batchUpdateCardsWithUndo', () => {
+    const updates = [{ card: collectionCard_1, row: 2, col: 3 }]
     beforeEach(() => {
       runInAction(() => {
         collectionCard_1.row = 0
         collection.class_type = 'Collection::Board'
-        collection.collection_cards = [collectionCard_1, collectionCard_2]
+        collectionCard_3.order = 99
+        collection.collection_cards = [
+          collectionCard_1,
+          collectionCard_2,
+          collectionCard_3,
+        ]
       })
     })
     it('should call apiStore and apply local updates', () => {
       expect(collectionCard_1.row).toEqual(0)
-      const updates = [{ card: collectionCard_1, row: 2, col: 3 }]
       collection.API_batchUpdateCardsWithUndo({
         updates,
         undoMessage: 'Undoing action',
@@ -478,6 +483,18 @@ describe('Collection', () => {
         'PATCH',
         { data }
       )
+    })
+
+    it('should reorder cards sequentially', async () => {
+      await collection.API_batchUpdateCardsWithUndo({
+        updates,
+        undoMessage: 'Undoing action',
+      })
+      expect(_.map(collection.sortedCards, c => [c.id, c.order])).toEqual([
+        [collectionCard_1.id, 0],
+        [collectionCard_2.id, 1],
+        [collectionCard_3.id, 2],
+      ])
     })
   })
 

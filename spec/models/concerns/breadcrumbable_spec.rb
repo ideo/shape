@@ -100,12 +100,12 @@ describe Breadcrumbable, type: :concern do
     end
 
     it 'returns true if object is in the breadcrumb' do
-      expect(collection.within_collection_or_self?(collection)).to be true
-      expect(subcollection.within_collection_or_self?(collection)).to be true
+      expect(collection.within_collection_or_self?(collection.id)).to be true
+      expect(subcollection.within_collection_or_self?(collection.id)).to be true
     end
 
     it 'returns false if object is not in the breadcrumb' do
-      expect(other_subcollection.within_collection_or_self?(collection)).to be false
+      expect(other_subcollection.within_collection_or_self?(collection.id)).to be false
     end
   end
 end

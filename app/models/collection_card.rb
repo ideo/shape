@@ -74,12 +74,6 @@ class CollectionCard < ApplicationRecord
   validates :parent, :order, presence: true
   validate :single_item_or_collection_is_present
   validate :parent_is_not_readonly, on: :create
-  validates :col,
-            inclusion: { in: Collection::Board.allowed_col_range.to_a },
-            if: :parent_board_collection?
-  validates :row,
-            numericality: { greater_than_or_equal_to: 0 },
-            if: :parent_board_collection?
   validates :section_type, presence: true, if: :parent_test_collection?
 
   delegate :board_collection?, :test_collection?,
@@ -164,8 +158,7 @@ class CollectionCard < ApplicationRecord
     system_collection: false,
     synchronous: false,
     placeholder: nil,
-    batch_id: nil,
-    should_pin_duplicating_cards: false
+    batch_id: nil
   )
     if record.is_a? Collection::SharedWithMeCollection
       errors.add(:collection, 'cannot be a SharedWithMeCollection for duplication')
@@ -182,24 +175,15 @@ class CollectionCard < ApplicationRecord
       cc.item_id = nil
       cc.collection_id = nil
     end
-    if master_template_card? && parent.templated?
+    if master_template_card? && parent.templated? && building_template_instance
       # if we're cloning from template -> templated collection
       cc.templated_from = self
-      # any user initiated duplicate should not pin cards into their instance
-      cc.pinned = false unless building_template_instance
-    elsif parent.master_template? && should_pin_duplicating_cards
-      # Make it pinned if you're duplicating it into a master template and all of its cards are pinned or placed in the beginning
-      cc.pinned = true
-    else
-      # copying into a normal (non templated) collection, it should never be pinned;
-      # likewise even if you duplicate a pinned card in your own instance
-      cc.pinned = false
     end
     # defaults to self.parent, unless one is passed in
     cc.parent = parent
     # place card at beginning or end
     if placement == 'beginning'
-      if parent.template.present?
+      if parent.templated?
         cc.order = parent.collection_cards.pinned.count
       else
         cc.order = 0
@@ -244,7 +228,7 @@ class CollectionCard < ApplicationRecord
 
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb!
-    cc.increment_card_orders! if placement != 'end'
+    cc.increment_card_orders! if placement != 'end' && placeholder.nil?
 
     # if we are duplicating a submission box template,
     # the cloned template should be marked as the clone's submission_template
@@ -479,12 +463,15 @@ class CollectionCard < ApplicationRecord
   end
 
   def update_collection_cover
+    # don't makes any updates if going from nil to false
+    return if is_cover_previous_change == [nil, false]
+
     parent.cached_cover ||= {}
     if is_cover
       # A new cover was selected so turn off other covers
       parent.collection_cards.where.not(id: id).update_all(is_cover: false)
       parent.cached_cover['no_cover'] = false
-    else
+    elsif is_cover == false
       # The cover was de-selected so turn off the cover on the collection
       parent.cached_cover['no_cover'] = true
     end
@@ -502,7 +489,13 @@ class CollectionCard < ApplicationRecord
   end
 
   def board_placement_is_valid?
-    return true unless parent&.is_a?(Collection::Board)
+    return true if hidden?
+    return true unless parent&.board_collection?
+
+    if col.nil? || row.nil? || col.negative? || row.negative? || col > Collection::Board.allowed_col_range.last
+      errors.add(:base, 'Board position is invalid')
+      return false
+    end
     return true if CollectionGrid::Calculator.exact_open_spot?(card: self, collection: parent)
 
     errors.add(:base, 'Board position is already taken')

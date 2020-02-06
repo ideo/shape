@@ -751,6 +751,18 @@ describe Collection, type: :model do
       expect(card.order).to eq 0
     end
 
+    context 'with a master template and existing instances' do
+      let!(:instance) { create(:collection, template: collection) }
+      before do
+        collection.update(master_template: true)
+      end
+
+      it 'calls queue_update_template_instances' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async)
+        collection.unarchive_cards!(cards, snapshot)
+      end
+    end
+
     context 'with a board collection' do
       let(:collection) { create(:board_collection, num_cards: 3) }
       let(:cards) { collection.all_collection_cards.first(3) }
@@ -801,41 +813,6 @@ describe Collection, type: :model do
           expect(UpdateTemplateInstancesWorker).not_to receive(:perform_async)
           collection.unarchive_cards!(cards, snapshot)
         end
-      end
-    end
-  end
-
-  describe '#update_processing_status' do
-    let(:collection) { create(:collection) }
-
-    context 'processing = :duplicating' do
-      let(:processing) { true }
-
-      it 'marks collections as duplicating' do
-        expect(collection.duplicating?).to be false
-        collection.update_processing_status(Collection.processing_statuses[:duplicating])
-        expect(collection.duplicating?).to be true
-      end
-    end
-
-    context 'processing = nil' do
-      let(:processing) { false }
-
-      before do
-        collection.update_attributes(
-          processing_status: Collection.processing_statuses[:duplicating],
-        )
-      end
-
-      it 'marks collection as not processing' do
-        expect(collection.duplicating?).to be true
-        collection.update_processing_status(nil)
-        expect(collection.duplicating?).to be false
-      end
-
-      it 'broadcasts processing has stopped' do
-        expect(collection).to receive(:processing_done).once
-        collection.update_processing_status(nil)
       end
     end
   end
@@ -931,6 +908,38 @@ describe Collection, type: :model do
 
     it 'should return the order if it\'s an integer' do
       expect(collection.card_order_at(2)).to eq 2
+    end
+  end
+
+  describe '#reorder_cards!' do
+    let!(:collection) { create(:collection, num_cards: 5) }
+    let(:cards) { collection.collection_cards }
+
+    it 'reorders with pinned and hidden in consideration' do
+      expect(collection.all_collection_cards.order(order: :asc).pluck(:id, :order)).to eq([
+        [cards[0].id, 0],
+        [cards[1].id, 1],
+        [cards[2].id, 2],
+        [cards[3].id, 3],
+        [cards[4].id, 4],
+      ])
+
+      cards[0].update(archived: true)
+      cards[1].update(hidden: true)
+      cards[2].update(order: 999)
+      cards[3].update(pinned: true)
+      collection.reorder_cards!
+      expect(collection.reload.collection_cards.pluck(:id, :order)).to eq([
+        # pinned
+        [cards[3].id, 0],
+        # normal order
+        [cards[4].id, 1],
+        # high order
+        [cards[2].id, 2],
+        # low order, hidden
+        [cards[1].id, 3],
+        # archived card not included
+      ])
     end
   end
 

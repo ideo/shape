@@ -224,6 +224,7 @@ const invertColor = color => {
       return v.colors.commonLight
     case v.colors.white:
     case v.colors.commonMedium:
+    case v.colors.black:
       return v.colors.black
     default:
       return v.colors.white

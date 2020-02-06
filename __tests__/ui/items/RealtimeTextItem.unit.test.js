@@ -18,10 +18,13 @@ const props = {
 }
 
 let wrapper, component
+const rerender = () => {
+  wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+  component = wrapper.instance()
+}
 describe('TextItem', () => {
   beforeEach(() => {
-    wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
-    component = wrapper.instance()
+    rerender()
   })
 
   it('passes the text content to Quill', () => {
@@ -33,7 +36,7 @@ describe('TextItem', () => {
   describe('can view', () => {
     beforeEach(() => {
       props.item.can_edit = false
-      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('does not render the TextItemToolbar', () => {
@@ -74,7 +77,7 @@ describe('TextItem', () => {
     beforeEach(() => {
       props.item.can_edit_content = true
       props.item.parentPath = '/collections/99'
-      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('renders the Quill editor', () => {
@@ -94,8 +97,7 @@ describe('TextItem', () => {
   describe('initialFontTag', () => {
     beforeEach(() => {
       props.item.quill_data = { ops: null }
-      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
-      component = wrapper.instance()
+      rerender()
     })
 
     describe('with P (default)', () => {
@@ -108,8 +110,7 @@ describe('TextItem', () => {
       beforeEach(() => {
         props.item.quill_data = { ops: null }
         props.initialFontTag = 'H1'
-        wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
-        component = wrapper.instance()
+        rerender()
       })
 
       it('should insert a newline with H1', () => {
@@ -117,6 +118,37 @@ describe('TextItem', () => {
           ops: [{ insert: '\n', attributes: { header: '1' } }],
         }
         expect(component.quillData).toEqual(quillData)
+      })
+    })
+  })
+
+  describe('cancel', () => {
+    beforeEach(() => {
+      props.uiStore.viewingCollection = { id: '1' }
+      rerender()
+    })
+
+    it('should flush debounced methods', () => {
+      component.sendCombinedDelta.flush = jest.fn()
+      component.instanceDataContentUpdate.flush = jest.fn()
+      component.cancel()
+      expect(component.sendCombinedDelta.flush).toHaveBeenCalled()
+      expect(component.instanceDataContentUpdate.flush).toHaveBeenCalled()
+    })
+
+    it('should not call item pushTextUndo unless text has changed', () => {
+      component.cancel()
+      expect(props.item.pushTextUndo).not.toHaveBeenCalled()
+    })
+
+    it('should call item pushTextUndo if text has changed', () => {
+      // fake that the starting data was different
+      component.quillData = { ops: [{ insert: 'xyz old data' }] }
+      component.cancel()
+      expect(props.item.pushTextUndo).toHaveBeenCalledWith({
+        previousData: component.quillData,
+        currentData: props.item.quill_data,
+        redirectTo: props.uiStore.viewingCollection,
       })
     })
   })
@@ -143,7 +175,7 @@ describe('TextItem', () => {
 
     beforeEach(() => {
       props.item = { ...fakeTextItem, version: 1 }
-      wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('combines and buffers input text changes', () => {

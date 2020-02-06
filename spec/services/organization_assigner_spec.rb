@@ -10,7 +10,7 @@ RSpec.describe OrganizationAssigner, type: :service do
       }
     end
     let(:builder) do
-      OrganizationAssigner.new(params, user, false)
+      OrganizationAssigner.new(params, user, full_setup: false)
     end
 
     context 'with a shell organization' do

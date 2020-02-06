@@ -54,8 +54,11 @@ class TemplateInstanceUpdater
 
       next if master_card.blank? || instance_card.blank?
 
-      TemplateInstanceCardUpdater.call(instance_card: instance_card, master_card: master_card, master_template: @master_template)
-
+      TemplateInstanceCardUpdater.call(
+        instance_card: instance_card,
+        master_card: master_card,
+        master_template: @master_template,
+      )
       next unless instance.archived?
 
       card_within_instance.unarchive!
@@ -66,6 +69,7 @@ class TemplateInstanceUpdater
   end
 
   def add_cards_from_master_template(adding_cards, instance)
+    cards_to_add = []
     adding_cards.each do |id|
       master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
       if instance.is_a?(Collection::TestCollection)
@@ -75,12 +79,18 @@ class TemplateInstanceUpdater
       # this could lead to infinite loops. (similar to note above)
       next if master_card.record.try(:templated?)
 
-      master_card.duplicate!(
-        for_user: instance.created_by,
-        parent: instance,
-        building_template_instance: true,
-      )
+      cards_to_add.push(master_card)
     end
+    return if cards_to_add.empty?
+
+    CollectionCardDuplicator.call(
+      for_user: instance.created_by,
+      to_collection: instance,
+      building_template_instance: true,
+      cards: cards_to_add,
+      synchronous: :first_level,
+      placement: 'end',
+    )
   end
 
   def move_cards_to_deleted_from_collection(moving_to_deleted_ids, instance)
@@ -134,8 +144,10 @@ class TemplateInstanceUpdater
     return deleted_from_template_collection if deleted_from_template_collection.present?
 
     # add deleted_from_template_collection to the end of unpinned cards
-    last_card_order = instance.collection_cards.last.present? ? instance.collection_cards.last.order + 1 : 0
-    order = instance.collection_cards.unpinned.last.present? ? instance.collection_cards.unpinned.last.present.order + 1 : last_card_order
+    last_card = instance.collection_cards.last
+    last_unpinned_card = instance.collection_cards.unpinned.last
+    last_card_order = last_card.present? ? last_card.order + 1 : 0
+    order = last_unpinned_card.present? ? last_unpinned_card.order + 1 : last_card_order
 
     builder = CollectionCardBuilder.new(
       params: {
@@ -161,6 +173,7 @@ class TemplateInstanceUpdater
                                     .in([instance.id] + Collection.in_collection(instance).pluck(:id)),
                                 )
 
+    add_card_ids = []
     moving_card_ids.each do |moving_card_id|
       card_within_instance = all_cards_within_instance.where(templated_from_id: moving_card_id).first
 
@@ -183,9 +196,10 @@ class TemplateInstanceUpdater
         card_within_instance.unarchive!
       else
         # duplicate master card into instance if unarchived card is no longer in instance
-        add_cards_from_master_template([moving_card_id], instance)
+        add_card_ids.push(moving_card_id)
       end
     end
+    add_cards_from_master_template(add_card_ids, instance) if add_card_ids.present?
     # NOTE: may need to archive empty 'Deleted From Collection' collection
   end
 end

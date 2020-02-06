@@ -12,7 +12,6 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
-import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import styled from 'styled-components'
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
@@ -106,23 +105,7 @@ class TextItemCover extends React.Component {
     // entering edit mode should deselect all cards
     uiStore.deselectCards()
     uiStore.update('textEditingItem', this.state.item)
-    // store item content for later undo action
-    // TODO: only push the undo *after* you're done editing, at which point
-    // it could also push the redo action; otherwise timeout is kind of a temp hack
-    setTimeout(this.pushTextUndo, 1000)
     return null
-  }
-
-  pushTextUndo = () => {
-    const { item } = this.props
-    item.pushUndo({
-      snapshot: {
-        quill_data: this.state.item.quill_data,
-      },
-      message: 'Text undone!',
-      redirectTo: uiStore.viewingCollection,
-      actionType: POPUP_ACTION_TYPES.SNACKBAR,
-    })
   }
 
   expand = () => {

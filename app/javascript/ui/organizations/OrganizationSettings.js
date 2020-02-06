@@ -143,7 +143,7 @@ class OrganizationSettings extends React.Component {
   }
 
   afterAddRemoveDomainTag = () => {
-    this.organization.save()
+    this.organization.patch()
   }
 
   render() {

@@ -47,6 +47,7 @@ const captureGlobalKeypress = e => {
   // allow normal keypress on input element, quill, and draftjs
   const shouldNormalKeyPressBeAllowed =
     activeElement.nodeName === 'INPUT' ||
+    (uiStore.viewingItem && uiStore.viewingItem.isText) ||
     _.intersection(activeElement.classList, [
       'ql-editor',
       'ql-container',

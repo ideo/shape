@@ -75,18 +75,18 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
 
       it 'marks collection as processing' do
         expect_any_instance_of(Collection).to receive(
-          :update_processing_status,
-        ).with(:duplicating).once
+          :update,
+        ).with(processing_status: :duplicating).once
 
         expect_any_instance_of(Collection).to receive(
-          :update_processing_status,
-        ).with(nil).once
+          :update,
+        ).with(processing_status: nil).once
 
         run_worker
       end
 
       it 'broadcasts collection as stopped editing' do
-        expect_any_instance_of(Collection).to receive(:processing_done)
+        expect(CollectionUpdateBroadcaster).to receive(:call).with(to_collection).once
         run_worker
       end
 
@@ -96,22 +96,12 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect(result.size).to eq(5)
       end
 
-      context 'with pinned cards' do
+      context 'with pinned cards duplicating into a normal collection' do
         let(:collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
 
-        it 'calls duplicate with should_pin_duplicating_cards' do
-          expect_any_instance_of(CollectionCard).to receive(:duplicate!).with(
-            for_user: user,
-            parent: to_collection,
-            placement: 'end',
-            system_collection: false,
-            synchronous: false,
-            placeholder: nil,
-            batch_id: batch_id,
-            building_template_instance: false,
-            should_pin_duplicating_cards: true,
-          )
-          run_worker
+        it 'should not pin the cards' do
+          result = run_worker
+          expect(result.any?(&:pinned)).to be false
         end
       end
 
@@ -144,7 +134,8 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       let(:user) { nil }
 
       it 'clones all items' do
-        expect_any_instance_of(Collection).to receive(:processing_done)
+        expect_any_instance_of(Collection).to receive(:update).with(processing_status: :duplicating)
+        expect_any_instance_of(Collection).to receive(:update).with(processing_status: nil)
         run_worker
         to_collection.reload
         expect(to_collection.items.size).to eq(5)
