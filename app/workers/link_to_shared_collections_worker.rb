@@ -44,31 +44,32 @@ class LinkToSharedCollectionsWorker
   # Makes sure we have a unique list of objects
   def objects_to_add
     @objects_to_add ||= @objects.map do |object|
-      # If linking to any collection in C∆ Dashboard,
-      # add top-level card (unless linking method library)
-      if within_application_collection?(object) && !method_library_collection?(object)
-        object.parent_application_collection.collections.first
+      application_collection = object.try(:parent_application_collection)
+      if application_collection.present?
+        # If linking to any collection in C∆ Dashboard,
+        # link to the top-level C∆ Org collection and Method Library collection
+        org_dashboard_and_method_library_collections(application_collection)
       else
         object
       end
-    end.uniq
+    end.flatten.uniq
   end
 
-  def org_dashboard_collection?(object)
-    return false unless within_application_collection?(object)
-
-    object.name.match?(/creative[\s\_\-]+difference/i)
+  def org_dashboard_and_method_library_collections(application_collection)
+    application_collection
+      .collections
+      .select do |collection|
+        org_dashboard_collection?(collection) ||
+          method_library_collection?(collection)
+      end
   end
 
-  def method_library_collection?(object)
-    return false unless within_application_collection?(object)
-
-    object.name.match?(/method[\s\_\-]+library/i)
+  def org_dashboard_collection?(collection)
+    collection.name.match?(/creative[\s\_\-]+difference/i)
   end
 
-  def within_application_collection?(object)
-    object.respond_to?(:parent_application_collection) &&
-      object.parent_application_collection.present?
+  def method_library_collection?(collection)
+    collection.name.match?(/method[\s\_\-]+library/i)
   end
 
   def create_link(object, collection)
@@ -108,13 +109,12 @@ class LinkToSharedCollectionsWorker
 
   def card_order(object, collection)
     # If sharing C∆/App collection, always put it at the beginning of your 'My Collection'
-    if within_application_collection?(object)
+    if object.try(:parent_application_collection).present?
       return -9 if method_library_collection?(object)
-
       # Use -10 because 'getting started' content is often beforehand
-      -10
-    else
-      collection.collection_cards.count
+      return -10 if org_dashboard_collection?(object)
     end
+
+    collection.collection_cards.count
   end
 end
