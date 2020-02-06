@@ -64,6 +64,10 @@ class LinkToSharedCollectionsWorker
       end
   end
 
+  def within_creative_difference_application?(object)
+    object.try(:parent_application_collection).present?
+  end
+
   def org_dashboard_collection?(collection)
     collection.name.match?(/creative[\s\_\-]+difference/i)
   end
@@ -109,7 +113,7 @@ class LinkToSharedCollectionsWorker
 
   def card_order(object, collection)
     # If sharing C∆/App collection, always put it at the beginning of your 'My Collection'
-    if object.try(:parent_application_collection).present?
+    if within_creative_difference_application?(object)
       return -9 if method_library_collection?(object)
       # Use -10 because 'getting started' content is often beforehand
       return -10 if org_dashboard_collection?(object)
