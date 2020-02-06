@@ -3,6 +3,8 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { fakeTextItem, fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import { rightClamp } from '~/utils/textUtils'
+import v from '~/utils/variables'
 
 describe('PageHeader', () => {
   let wrapper, component, props
@@ -135,6 +137,61 @@ describe('PageHeader', () => {
     })
   })
 
+  describe('with a template instance collection', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.isUsableTemplate = false
+      props.record.isMasterTemplate = false
+      props.record.isTestCollection = false
+      props.record.isTemplated = true
+      props.record.template = fakeCollection
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+    })
+
+    it('should show the template instance icon', () => {
+      expect(wrapper.find('CollectionTypeIcon').exists()).toBeTruthy()
+    })
+
+    it('should show a clamped collection name with a Tooltip', () => {
+      expect(
+        wrapper
+          .find('StyledButtonNameWrapper')
+          .children()
+          .first()
+          .text()
+      ).toEqual(rightClamp(fakeCollection.name, v.maxButtonTextLength))
+
+      expect(
+        wrapper
+          .find('Tooltip')
+          .first()
+          .props().title
+      ).toMatch(`${fakeCollection.name}`)
+    })
+
+    it('should show master template navigate back button with a Tooltip', () => {
+      expect(wrapper.find('BackIcon').exists()).toBeTruthy()
+      expect(
+        wrapper
+          .find('Tooltip')
+          .last()
+          .props().title
+      ).toMatch('go to master template')
+    })
+
+    describe('when the instance has no access to the master template', () => {
+      beforeEach(() => {
+        props.record.template.can_view = false
+        props.record.template.anyone_can_view = false
+        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      })
+
+      it('should not show master template navigate back button', () => {
+        expect(wrapper.find('BackIcon').exists()).toBeFalsy()
+      })
+    })
+  })
+
   describe('with template whose a child of a master template', () => {
     beforeEach(() => {
       props.record = fakeCollection
@@ -156,15 +213,6 @@ describe('PageHeader', () => {
       props.record.inherited_tag_list = ['test']
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
-
-    it('should show the template tag and icon', () => {
-      expect(
-        wrapper
-          .find('SubduedHeading1')
-          .children()
-          .text()
-      ).toEqual('#test')
-    })
   })
 
   describe('with an archived collection', () => {
@@ -173,6 +221,7 @@ describe('PageHeader', () => {
       props.record.archived = true
       props.record.is_restorable = true
       props.record.can_edit = true
+      props.record.isTemplated = false
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
 

@@ -7,9 +7,11 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
+import Tooltip from '~/ui/global/Tooltip'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
+import BackIcon from '~/ui/icons/BackIcon'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { FormButton } from '~/ui/global/styled/buttons'
@@ -17,6 +19,7 @@ import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import v from '~/utils/variables'
+import { rightClamp } from '~/utils/textUtils'
 import routeToLogin from '~/utils/routeToLogin'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
@@ -66,11 +69,48 @@ const HeaderButtonContainer = styled.span`
 `
 HeaderButtonContainer.displayName = 'HeaderButtonContainer'
 
-@inject('uiStore', 'apiStore')
+const StyledButtonIconWrapper = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+  height: ${props => (props.height ? props.height : 24)}px;
+  width: ${props => (props.width ? props.width : 27)}px;
+  padding: 4px;
+  ${props =>
+    props.float &&
+    `
+      float: ${props.float}
+    `}
+`
+
+StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
+
+const StyledButtonNameWrapper = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+  ${props =>
+    props.large &&
+    `
+      text-transform: none;
+      font-weight: normal;
+      font-size: 24px;
+      float: left;
+    `}
+
+  ${props =>
+    props.fixedWidth &&
+    `
+      max-width: 130px;
+    `};
+`
+
+StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
+
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class PageHeader extends React.Component {
   @observable
   iconAndTagsWidth = 0
+  templateButtonRef = null
 
   get canEdit() {
     const { record } = this.props
@@ -136,7 +176,6 @@ class PageHeader extends React.Component {
     const rightConditions = [
       record.isUserProfile,
       record.isProfileCollection,
-      record.isTemplated && !record.isSubTemplate,
       record.isSubmissionBox,
       record.launchableTestId,
       record.isBoard,
@@ -194,6 +233,7 @@ class PageHeader extends React.Component {
     // not enough room to show in the header of a live Test
     if (record.isLiveTest) return null
     if (uiStore.windowWidth < v.responsive.medBreakpoint) return null
+    if (record.isTemplated && !record.isSubTemplate) return null
     if (record.inherited_tag_list && record.inherited_tag_list.length) {
       let tagList = record.inherited_tag_list.map(tag => `#${tag}`).join(',')
       if (tagList.length > 22) {
@@ -236,25 +276,12 @@ class PageHeader extends React.Component {
               fontSize={v.buttonSizes.header.fontSize}
               data-cy="HeaderFormButton"
               transparent
+              filledHover
             >
-              <span
-                style={{
-                  display: 'inline-block',
-                  height: 24,
-                  width: 27,
-                  verticalAlign: 'middle',
-                }}
-              >
+              <StyledButtonIconWrapper>
                 <LinkIconSm />
-              </span>
-              <span
-                style={{
-                  display: 'inline-block',
-                  verticalAlign: 'middle',
-                }}
-              >
-                Get Link
-              </span>
+              </StyledButtonIconWrapper>
+              <StyledButtonNameWrapper>Get Link</StyledButtonNameWrapper>
             </FormButton>
           </CopyToClipboard>
           {this.renderStopFeebackButton}
@@ -276,6 +303,7 @@ class PageHeader extends React.Component {
         fontSize={v.buttonSizes.header.fontSize}
         data-cy="HeaderFormButton"
         transparent
+        filledHover
       >
         Re-open Feedback
       </FormButton>
@@ -332,20 +360,97 @@ class PageHeader extends React.Component {
     )
   }
 
+  get renderTemplateName() {
+    const { record } = this.props
+    const { template } = record
+    const { maxButtonTextLength } = v
+    const templateName = template ? template.name : 'Template'
+    const truncatedName =
+      templateName.length > maxButtonTextLength
+        ? rightClamp(templateName, maxButtonTextLength)
+        : templateName
+    const shouldTruncate = templateName.length > maxButtonTextLength
+    const active = template.can_view || template.anyone_can_view
+    const buttonNameWrapper = (
+      <StyledButtonNameWrapper fixedWidth={active} large>
+        {truncatedName}
+      </StyledButtonNameWrapper>
+    )
+
+    if (!shouldTruncate) {
+      return buttonNameWrapper
+    }
+
+    return (
+      <Tooltip
+        classes={{ tooltip: 'Tooltip' }}
+        title={template.name}
+        placement="top"
+      >
+        {buttonNameWrapper}
+      </Tooltip>
+    )
+  }
+
   get renderTemplateButton() {
     const { record } = this.props
-    if (!record.isUsableTemplate) return null
-    return (
-      <FormButton
-        width="160"
-        color={v.colors.primaryDark}
-        onClick={this.openMoveMenuForTemplate}
-        fontSize={v.buttonSizes.header.fontSize}
-        data-cy="HeaderFormButton"
-      >
-        Use Template
-      </FormButton>
-    )
+    if (record.isUsableTemplate && record.isMasterTemplate) {
+      return (
+        <FormButton
+          width={v.buttonSizes.header.width}
+          color={v.colors.primaryDark}
+          onClick={this.openMoveMenuForTemplate}
+          fontSize={v.buttonSizes.header.fontSize}
+          data-cy="HeaderFormButton"
+        >
+          Use Template
+        </FormButton>
+      )
+    } else if (
+      !record.isMasterTemplate &&
+      !record.isSubTemplate &&
+      !record.isTestCollection &&
+      record.isTemplated
+    ) {
+      const { template } = record
+      const active = template.can_view || template.anyone_can_view
+      return (
+        <FormButton
+          ref={ref => {
+            this.templateButtonRef = ref
+          }}
+          onClick={e => {
+            this.props.routingStore.routeTo('collections', record.template_id)
+            // this same button remains mounted after the route, blur to remove focus
+            if (this.templateButtonRef) this.templateButtonRef.blur()
+          }}
+          width={v.buttonSizes.header.width + 40}
+          fontSize={v.buttonSizes.header.fontSize}
+          data-cy="HeaderFormButton"
+          color={v.colors.commonMedium}
+          disabled={!active}
+          transparent
+        >
+          <StyledButtonIconWrapper float={'left'}>
+            <CollectionTypeIcon record={record} />
+          </StyledButtonIconWrapper>
+          {this.renderTemplateName}
+          {active && (
+            <Tooltip
+              classes={{ tooltip: 'Tooltip' }}
+              title={'go to master template'}
+              placement="top"
+            >
+              <StyledButtonIconWrapper width={24} float={'right'}>
+                <BackIcon />
+              </StyledButtonIconWrapper>
+            </Tooltip>
+          )}
+        </FormButton>
+      )
+    }
+
+    return null
   }
 
   get renderStopFeebackButton() {
@@ -363,6 +468,7 @@ class PageHeader extends React.Component {
           fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
           transparent
+          filledHover
         >
           Stop Feedback
         </FormButton>
@@ -476,6 +582,7 @@ PageHeader.propTypes = {
 PageHeader.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default PageHeader

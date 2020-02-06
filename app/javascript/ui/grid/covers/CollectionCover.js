@@ -272,6 +272,7 @@ class CollectionCover extends React.Component {
           className="CollectionCoverFormButton"
           color={fontColor || v.colors.white}
           transparent
+          filledHover
         >
           Use Template
         </FormButton>

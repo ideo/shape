@@ -18,3 +18,10 @@ Feature: Template Instance
     When I place a card to the bottom using the snackbar
     And I wait for '@apiCreateTemplate' to finish
     Then I should see a collection card named "My Test Template"
+
+    # navigating back to the master template
+    When I navigate to the collection named "My Test Template" via the "CollectionCover"
+    Then I should see a 'HeaderFormButton'
+
+    When I click the 'HeaderFormButton'
+    Then I should see "#template" in a ".SubduedHeading1"
