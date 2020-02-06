@@ -134,9 +134,9 @@ class RealtimeTextItem extends React.Component {
     setTimeout(() => {
       this.subscribeToItemRealtimeChannel()
     }, 1250)
-
-    if (!this.reactQuillRef) return
     this.calculateCanEdit()
+    if (!this.reactQuillRef) return
+
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
     setTimeout(() => {
@@ -175,6 +175,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   clearQuillClipboardHistory() {
+    // guard for jest
+    if (!this.quillEditor) return
     // fix for undo clearing out all text
     // https://github.com/zenoamaro/react-quill/issues/511
     this.quillEditor.history.clear()
