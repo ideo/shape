@@ -59,6 +59,6 @@ module.exports = {
   require: [
     '!style-loader!css-loader!sass-loader!./app/assets/stylesheets/global.scss',
   ],
-  serverPort: 8080,
+  serverPort: 8000,
   webpackConfig,
 }

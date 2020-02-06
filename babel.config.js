@@ -1,7 +1,7 @@
-// This file is currently being used by styleguidist but should be merged with
-// .babelrc at some point.
-
 module.exports = function(api) {
+  // Cache the returned value forever and don't call this function again.
+  api.cache(true)
+
   return {
     sourceType: 'unambiguous',
     exclude: /node_modules/,

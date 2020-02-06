@@ -13,10 +13,8 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 
 import EditButton from '~/ui/reporting/EditButton'
-import {
-  NamedActionButton,
-  CollectionCoverTextButton,
-} from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
+import { NamedActionButton } from '~/ui/global/styled/buttons'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import Loader from '~/ui/layout/Loader'
 import Download from '~/ui/grid/Download'
@@ -543,7 +541,7 @@ class GridCard extends React.Component {
         </StyledGridCardInner>
         {record.isCreativeDifferenceChartCover && (
           <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
-            <CollectionCoverTextButton>More…</CollectionCoverTextButton>
+            <TextButton fontSizeEm={0.75}>More…</TextButton>
           </BottomRightActionHolder>
         )}
         <CollectionCardsTagEditorModal

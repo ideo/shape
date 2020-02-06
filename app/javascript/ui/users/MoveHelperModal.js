@@ -8,7 +8,8 @@ import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
-import { TextButton, FormButton } from '~/ui/global/styled/buttons'
+import { FormButton } from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
 import { Checkbox } from '~/ui/global/styled/forms'
 import {
   SpecialDisplayHeading,

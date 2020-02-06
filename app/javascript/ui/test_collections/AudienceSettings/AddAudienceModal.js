@@ -19,7 +19,8 @@ import {
   getCriterionByName,
   criteriaLimitByGroup,
 } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
-import { FormButton, TextButton } from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
+import { FormButton } from '~/ui/global/styled/buttons'
 import {
   Checkbox,
   CheckboxSelectOption,
