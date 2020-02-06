@@ -110,6 +110,7 @@ StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
 class PageHeader extends React.Component {
   @observable
   iconAndTagsWidth = 0
+  templateButtonRef = null
 
   get canEdit() {
     const { record } = this.props
@@ -415,8 +416,13 @@ class PageHeader extends React.Component {
       const active = template.can_view || template.anyone_can_view
       return (
         <FormButton
-          onClick={() => {
+          ref={ref => {
+            this.templateButtonRef = ref
+          }}
+          onClick={e => {
             this.props.routingStore.routeTo('collections', record.template_id)
+            // this same button remains mounted after the route, blur to remove focus
+            if (this.templateButtonRef) this.templateButtonRef.blur()
           }}
           width={v.buttonSizes.header.width + 40}
           fontSize={v.buttonSizes.header.fontSize}
