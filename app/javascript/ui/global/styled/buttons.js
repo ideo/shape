@@ -181,12 +181,13 @@ export const FormButton = styled.button`
         ? v.colors.primaryDarkest
         : v.colors.commonDark};
     color: ${props => {
-      if (!props.transparent) return v.colors.white
+      if (!props.transparent) return v.colors.commonMedium
       switch (props.color) {
         // invert text color for transparent buttons, add colors as you go
         case v.colors.commonDark:
           return v.colors.commonLight
         case v.colors.black:
+          return v.colors.black
         default:
           return v.colors.white
       }

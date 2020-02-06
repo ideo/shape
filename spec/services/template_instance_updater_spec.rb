@@ -120,7 +120,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
       end
     end
 
-    context 'calling template_instance_updater with \'archive\' update_all template_update_action' do
+    context 'calling template_instance_updater with \'archive\' template_update_action' do
       let(:card_to_delete) do
         template.collection_cards.first
       end

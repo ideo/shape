@@ -37,10 +37,6 @@ module RealtimeEditorsViewers
     publish_to_channel unless dont_notify
   end
 
-  def processing_done
-    publish_to_channel(processing_done: true)
-  end
-
   def stream_name
     editing_cache_key
   end

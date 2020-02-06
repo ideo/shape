@@ -1,7 +1,6 @@
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import { apiStore, uiStore } from '~/stores'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
-import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 import { fakeTextItem } from '#/mocks/data'
 
@@ -119,23 +118,6 @@ describe('TextItemCover', () => {
       const result = await component.handleClick(e)
       expect(result).toBe(null)
       expect(apiStore.fetch).toHaveBeenCalledWith('items', item.id, true)
-    })
-
-    it('calls item.pushUndo if can_edit_content', async () => {
-      wrapper.setProps({
-        dragging: false,
-        item: { ...item, can_edit_content: true },
-      })
-      const result = await component.handleClick(e)
-      expect(result).toBe(null)
-      // simulate this next part which happens via timeout
-      component.pushTextUndo()
-      expect(item.pushUndo).toHaveBeenCalledWith({
-        message: 'Text undone!',
-        redirectTo: null,
-        snapshot: { quill_data: item.quill_data },
-        actionType: POPUP_ACTION_TYPES.SNACKBAR,
-      })
     })
 
     it('calls uiStore.showPermissionsAlert if cannot view', () => {

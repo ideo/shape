@@ -172,9 +172,12 @@ describe('CardMoveService', () => {
     })
 
     describe('using link action on an editable collection', () => {
+      const data = {
+        meta: { new_cards: ['10', '11'] },
+      }
       beforeEach(() => {
         apiStore.currentUser = fakeUser
-        apiStore.request = jest.fn().mockReturnValue(Promise.resolve())
+        apiStore.linkCards = jest.fn().mockReturnValue(Promise.resolve(data))
         uiStore.movingCardIds = ['21', '23']
         uiStore.movingFromCollectionId = '3'
         uiStore.cardAction = 'link'
@@ -204,6 +207,18 @@ describe('CardMoveService', () => {
       it('should deselect the cards', async () => {
         await service.moveCards('beginning')
         expect(uiStore.resetSelectionAndBCT).toHaveBeenCalled()
+      })
+
+      it('should reselect newly created cards', async () => {
+        await service.moveCards('beginning')
+        expect(uiStore.reselectCardIds).toHaveBeenCalledWith(
+          data.meta.new_cards
+        )
+      })
+
+      it('should not reselect cards unless moving into viewingCollection', async () => {
+        await service.moveCards('beginning', { to_id: '999' })
+        expect(uiStore.reselectCardIds).not.toHaveBeenCalled()
       })
     })
 

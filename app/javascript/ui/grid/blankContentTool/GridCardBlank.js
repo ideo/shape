@@ -73,6 +73,10 @@ const StyledBlankCreationTool = styled.div`
       margin: 0 auto;
     }
   }
+  .card-menu.open {
+    /* because the BCTBoxes flex, we have to restrict the CardMenu when the PopoutMenu is open */
+    max-width: 47px;
+  }
   transition: ${v.transitionWithDelay};
 
   /* handle "small 4-col" layout i.e. layoutSize == 3, except on Foamcore */
@@ -693,6 +697,7 @@ class GridCardBlank extends React.Component {
               buttonStyle="bct"
               menuOpen={this.state.bctMenuOpen}
               onClick={this.toggleBctMenu}
+              wrapText
               direction="right"
               menuItems={[
                 {

@@ -260,6 +260,8 @@ class CollectionCover extends React.Component {
   }
 
   get useTemplateButton() {
+    const { fontColor } = this.props
+
     return (
       <CardButtonWrapper>
         <FormButton
@@ -268,7 +270,7 @@ class CollectionCover extends React.Component {
           onClick={this.openMoveMenuForTemplate}
           data-cy="CollectionCoverFormButton"
           className="CollectionCoverFormButton"
-          color={v.colors.white}
+          color={fontColor || v.colors.white}
           transparent
         >
           Use Template

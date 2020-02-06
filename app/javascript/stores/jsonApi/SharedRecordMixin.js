@@ -166,10 +166,14 @@ const SharedRecordMixin = superclass =>
       if (!apiCall) {
         undoApiCall = () => this.API_revertTo({ snapshot })
       }
+      let redirectPath = null
+      if (redirectTo) {
+        redirectPath = { type: redirectTo.internalType, id: redirectTo.id }
+      }
       this.undoStore.pushUndoAction({
         message,
         apiCall: undoApiCall,
-        redirectPath: { type: redirectTo.internalType, id: redirectTo.id },
+        redirectPath,
         redoAction,
         actionType,
       })

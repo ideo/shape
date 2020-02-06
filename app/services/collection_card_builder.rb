@@ -11,7 +11,7 @@ class CollectionCardBuilder
       @params.delete :row
       @params.delete :col
     end
-    @collection_card = parent_collection.send("#{type}_collection_cards").build(@params)
+    @collection_card = build_collection_card(type.to_s)
     @errors = @collection_card.errors
     @user = user
   end
@@ -45,6 +45,16 @@ class CollectionCardBuilder
     return unless @user.try(:show_helper)
 
     @user.update(show_helper: false)
+  end
+
+  def build_collection_card(type)
+    card = @parent_collection.send("#{type}_collection_cards").build(@params)
+
+    return card unless type == 'link' && card.record&.parent_collection_card.present?
+
+    # Copy style attributes from existing card
+    card.attributes = card.record.parent_collection_card.link_card_copy_attributes
+    card
   end
 
   def create_collection_card
@@ -103,6 +113,12 @@ class CollectionCardBuilder
       end
       record.update(update_params)
     end
+
+    # Need to trickle down for all C∆ "app" subcollections
+    if @parent_collection.inside_a_creative_difference_collection?
+      @collection_card.update(filter: 'nothing', font_color: '#120F0E')
+    end
+
     @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
     @collection_card.update_collection_cover if @collection_card.is_cover
     add_external_record

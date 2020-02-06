@@ -642,7 +642,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isMethodLibraryCollection() {
-    return this.name.match(/method\s+library/i)
+    return (
+      this.name.match(/all\s+methods/i) !== null &&
+      this.parent &&
+      this.parent.name &&
+      this.parent.name.match(/method\s+library/i) !== null
+    )
   }
 
   @computed
@@ -781,59 +786,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  /*
-  Perform batch updates on multiple cards at once
-
-  updates (array)
-    An array of objects with a card reference and the updated attributes, e.g.
-    [
-      { card: card instance, order: 2  },
-      { card: card instance, order: 4  },
-    ]
-
-  updateAllCards (bool)
-    If true, it will send data to the API for all collection cards
-    (useful for regular collections where order needs to be updated on all cards).
-
-    If false, will only send data about updated cards.
-  */
-
-  API_batchUpdateCards({ updates, updateAllCards }) {
-    const updatesByCardId = {}
-    _.each(updates, update => {
-      updatesByCardId[update.card.id] = update
-    })
-    const orders = _.map(updates, update => update.order)
-    const minOrder = _.min(orders)
-    const maxOrder = _.max(orders)
-    // min...max is range of cards you are moving
-
-    // Apply all updates to in-memory cards
-    _.each(this.collection_cards, card => {
-      // Apply updates to each card
-      const cardUpdates = updatesByCardId[card.id]
-      if (cardUpdates) {
-        // Pick out allowed values and assign them
-        const allowedAttrs = _.pick(cardUpdates, card.batchUpdateAttributes)
-        _.forEach(allowedAttrs, (value, key) => {
-          card[key] = value
-        })
-      } else if (card.order >= minOrder) {
-        // make sure this card gets bumped out of the way of our moving ones
-        card.order += maxOrder + 1
-      }
-      // force the grid to immediately observe that things have changed
-      card.updated_at = new Date()
-    })
-
-    const data = this.toJsonApiWithCards(
-      updateAllCards ? [] : _.keys(updatesByCardId)
-    )
-
-    // Persist updates to API
-    return this.apiStore.request(`collections/${this.id}`, 'PATCH', { data })
-  }
-
   API_fetchBreadcrumbRecords() {
     const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
     return this.apiStore.request(apiPath)
@@ -896,6 +848,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         // do this again... this is because you may have received a RT update in between;
         // but your update is now "the latest"
         this.applyLocalCardUpdates(updates)
+        this._reorderCards()
 
         if (res) {
           // only push undo once we've successfully updated the cards
@@ -1015,6 +968,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return _.orderBy(
       this.collection_cards,
       ['pinned', 'order'],
+      ['desc', 'asc']
+    )
+  }
+
+  @computed
+  // hidden is actually shown first for these to better surface uploaded covers
+  get sortedCoverCards() {
+    return _.orderBy(
+      _.filter(this.collection_cards, card => card.record.isImage),
+      ['hidden', 'order'],
       ['desc', 'asc']
     )
   }

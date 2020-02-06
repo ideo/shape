@@ -1,7 +1,8 @@
 class CollectionUpdater < SimpleService
-  def initialize(collection, attributes)
+  def initialize(collection, attributes, unarchiving: false)
     @collection = collection
     @attributes = attributes
+    @unarchiving = unarchiving
     @card_ids = []
   end
 
@@ -21,8 +22,8 @@ class CollectionUpdater < SimpleService
         end
         if @collection.master_template?
           # TODO: could ignore this part unless collection_card attrs have changed...
-          if @attributes[:collection_cards_attributes].present?
-            # we just added a template card, so update the instances
+          if @attributes[:collection_cards_attributes].present? && !@unarchiving
+            # we just moved the template cards, so update the instances
             @collection.queue_update_template_instances(
               updated_card_ids: @collection.collection_cards.pluck(:id),
               template_update_action: 'update_all',

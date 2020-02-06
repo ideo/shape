@@ -42,6 +42,7 @@ export const Heading2 = styled.h2`
   letter-spacing: 0.14375rem;
   color: ${v.colors.black};
   ${props => props.mb && `margin-bottom: ${props.mb};`}
+  ${props => props.ml && `margin-left: ${props.ml};`}
 `
 Heading2.displayName = 'Heading2'
 
@@ -109,8 +110,12 @@ SubduedHeading1.displayName = 'SubduedHeading1'
 /** @component */
 export const SubduedText = styled(DisplayText)`
   color: ${v.colors.commonDark};
+  font-size: ${props => props.fontSize};
 `
 SubduedText.displayName = 'SubduedText'
+SubduedText.defaultProps = {
+  fontSize: '1rem',
+}
 
 /** @component */
 export const DisplayLink = styled.a`

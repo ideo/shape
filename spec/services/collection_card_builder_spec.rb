@@ -107,9 +107,22 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       context 'with card_type == "link"' do
         let(:card_type) { 'link' }
-        let!(:collection) { create(:collection, organization: organization) }
+        let(:parent_collection) { create(:collection, organization: organization) }
+        let!(:collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
         let(:full_params) do
           params.merge(collection_id: collection.id)
+        end
+        let(:card_style_attrs) do
+          {
+            image_contain: true,
+            font_background: true,
+            font_color: '#CC0000',
+            filter: 'nothing',
+            show_replace: false,
+          }
+        end
+        before do
+          collection.parent_collection_card.update(card_style_attrs)
         end
 
         it 'should create a link card' do
@@ -117,6 +130,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
           expect(builder.create).to be true
           expect(builder.collection_card.link?).to be true
           expect(builder.collection_card.collection).to eq collection
+        end
+
+        it 'should copy style attrs from original card' do
+          builder_card_attrs = builder.collection_card.attributes.symbolize_keys.slice(*card_style_attrs.keys)
+          expect(builder_card_attrs).to eq(card_style_attrs)
         end
 
         context 'with multiple ordered cards' do
@@ -198,6 +216,39 @@ RSpec.describe CollectionCardBuilder, type: :service do
             builder.create
           end.to change(ExternalRecord, :count).by(1)
           expect(builder.collection_card.record.external_records.last.external_id).to eq '99'
+        end
+      end
+
+      context "when inside a Creative Difference collection" do
+        let!(:parent) do
+          create(:collection,
+          organization: organization,
+          add_editors: [user])
+        end
+
+        before do
+          ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID'] = parent.id.to_s
+          builder.create
+        end
+
+        it 'updates the font color of the card and sets the cover filter to nothing' do
+          expect(builder.collection_card.filter).to eq('nothing')
+          expect(builder.collection_card.font_color).to eq('#120F0E')
+        end
+      end
+
+      context "when inside an application collection" do
+        let(:parent) do
+          create(:application_collection,
+          organization: organization,
+          add_editors: [user])
+        end
+
+        before { builder.create }
+
+        it 'updates the font color of the card and sets the cover filter to nothing' do
+          expect(builder.collection_card.filter).to eq('nothing')
+          expect(builder.collection_card.font_color).to eq('#120F0E')
         end
       end
     end

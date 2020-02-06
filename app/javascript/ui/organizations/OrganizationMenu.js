@@ -73,12 +73,18 @@ class OrganizationMenu extends React.Component {
         this.isLoading = true
       })
       const hasOrg = !!apiStore.currentUserOrganization
-      await newOrg.create()
+      const res = await newOrg.create()
       googleTagManager.push({
         event: 'formSubmission',
         formType: hasOrg ? 'Additional Org' : 'New Org',
         organization: newOrg.slug,
       })
+      if (res.meta && res.meta.use_template_id) {
+        // route to use this template
+        const route = `/templates/${res.meta.use_template_id}/use_in_my_collection`
+        // can't use router in this case, have to full redirect
+        window.location.href = route
+      }
       routingStore.routeTo(`/${newOrg.slug}`)
       onClose()
     } catch (err) {
@@ -123,6 +129,12 @@ class OrganizationMenu extends React.Component {
     this.editGroup = {}
   }
 
+  handleLogout = ev => {
+    ev.preventDefault()
+    const { apiStore } = this.props
+    apiStore.currentUser.logout()
+  }
+
   removeGroup = group => async () => {
     group.API_archive()
   }
@@ -138,7 +150,9 @@ class OrganizationMenu extends React.Component {
         <GroupModify
           group={{}}
           onSave={this.createOrganization}
+          onCancel={this.handleLogout}
           groupType="Organization"
+          creatingOrg
         />
       </div>
     )
@@ -155,6 +169,7 @@ class OrganizationMenu extends React.Component {
           this.saveOrganization(group)
           this.afterGroupSave(group)
         }}
+        onCancel={this.handleClose}
         groupType="Organization"
       />
     )

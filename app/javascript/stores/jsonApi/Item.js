@@ -6,6 +6,7 @@ import { apiUrl } from '~/utils/url'
 import trackError from '~/utils/trackError'
 import FilestackUpload from '~/utils/FilestackUpload'
 import { ITEM_TYPES, DATA_MEASURES } from '~/utils/variables'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import BaseRecord from './BaseRecord'
 import Role from './Role'
 import SharedRecordMixin from './SharedRecordMixin'
@@ -236,6 +237,27 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get collectionFilter() {
     if (!this.primaryDataset) return null
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
+  }
+
+  pushTextUndo({ previousData, currentData, redirectTo }) {
+    this.pushUndo({
+      snapshot: {
+        // this should represent the original data we initialized with
+        quill_data: previousData,
+      },
+      redoAction: {
+        message: 'Text redone!',
+        apiCall: () => {
+          // redo will apply the current quill_data
+          this.API_revertTo({ snapshot: { quill_data: currentData } })
+          // we have to push this back on the stack
+          this.pushTextUndo({ previousData, currentData, redirectTo })
+        },
+      },
+      message: 'Text undone!',
+      redirectTo,
+      actionType: POPUP_ACTION_TYPES.SNACKBAR,
+    })
   }
 
   API_updateWithoutSync({ cancel_sync = false, highlight = false } = {}) {

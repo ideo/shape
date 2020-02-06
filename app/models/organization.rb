@@ -15,6 +15,7 @@
 #  sent_high_charges_high_email          :boolean          default(FALSE), not null
 #  sent_high_charges_low_email           :boolean          default(FALSE), not null
 #  sent_high_charges_middle_email        :boolean          default(FALSE), not null
+#  shell                                 :boolean          default(FALSE)
 #  slug                                  :string
 #  terms_version                         :integer
 #  trial_ends_at                         :datetime
@@ -120,6 +121,7 @@ class Organization < ApplicationRecord
             format: { with: SLUG_FORMAT, allow_blank: true }
 
   scope :active, -> { where(deactivated: false) }
+  scope :shell, -> { where(shell: true) }
   scope :billable, -> do
     active
       .where(in_app_billing: true)
@@ -156,7 +158,7 @@ class Organization < ApplicationRecord
     # Create the getting started content for new users
     if user_collection.is_a?(Collection::UserCollection) &&
        user_collection.newly_created
-      create_user_getting_started_content(user, synchronous: synchronous)
+      create_user_getting_started_content(user_collection, synchronous: synchronous)
     end
     add_shared_with_org_collections(user) if primary_group.can_view?(user)
   end
@@ -257,6 +259,8 @@ class Organization < ApplicationRecord
   end
 
   def network_organization
+    return nil if shell
+
     @network_organization ||= NetworkApi::Organization.find_by_external_id(id)
   end
 
@@ -315,10 +319,10 @@ class Organization < ApplicationRecord
     )
   end
 
-  def create_user_getting_started_content(user, synchronous: false)
+  def create_user_getting_started_content(user_collection, synchronous: false)
     return if getting_started_collection.blank?
 
-    user_collection = user.current_user_collection(id)
+    # user_collection = user.current_user_collection(id)
 
     # this will copy them to the beginning
     getting_started_collection.copy_all_cards_into!(
@@ -401,8 +405,14 @@ class Organization < ApplicationRecord
   end
 
   def check_guests_for_domain_match
-    guest_group.members[:users].each do |user|
-      setup_user_membership(user)
+    return unless domain_whitelist.present?
+
+    new_member_guests = User
+                        .where(id: guest_group.user_ids)
+                        .where(%(email SIMILAR TO  '%(#{domain_whitelist.join('|')})'))
+    # TODO: this should be a worker!
+    new_member_guests.each do |user|
+      check_email_domains_and_join_org_group(user)
     end
   end
 
@@ -449,7 +459,7 @@ class Organization < ApplicationRecord
       cancel_network_subscription
     end
 
-    network_organization.update_attributes(
+    network_organization&.update_attributes(
       enterprise: !in_app_billing,
     )
   end

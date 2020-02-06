@@ -34,6 +34,9 @@ describe('CardCoverEditor', () => {
       collection_cards: [
         { id: 1, record: { id: 1, name: '', filestack_file_url: '' } },
       ],
+      sortedCoverCards: [
+        { id: 1, record: { id: 1, name: 'CoverImg', imageUrl: jest.fn() } },
+      ],
       cover: {
         hardcoded_subtitle: 'Lorem ipsum hardcoded',
         subtitle_hidden: false,
@@ -115,8 +118,15 @@ describe('CardCoverEditor', () => {
       expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(card.id)
     })
 
-    it('should set the list of options from the api', () => {
-      expect(component.imageOptions.length).toEqual(3)
+    it('should set the list of options from the api', async () => {
+      await component.populateAllImageOptions()
+      expect(component.imageOptions.length).toEqual(4)
+      expect(component.imageOptions.map(i => i.title)).toEqual([
+        'remove image',
+        'CoverImg',
+        'gray',
+        'upload new image',
+      ])
     })
   })
 

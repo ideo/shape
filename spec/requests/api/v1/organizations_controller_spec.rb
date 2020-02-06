@@ -223,6 +223,11 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       )
     end
 
+    before do
+      shell_builder = OrganizationShellBuilder.new
+      shell_builder.save
+    end
+
     it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq(200)
@@ -245,6 +250,22 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
         post(path, params: json_api_params('organizations', name: 'IDEO U', in_app_billing: false))
 
         expect(json['data']['attributes']['in_app_billing']).to eql(false)
+      end
+    end
+
+    context 'after calling templates/use_in_my_collection' do
+      let(:template) { create(:collection, common_viewable: true, master_template: true) }
+      let(:template_path) { "/templates/#{template.id}/use_in_my_collection" }
+
+      it 'stores template_id in session and returns it in meta' do
+        # call this path to store the template_id in the session
+        get(template_path)
+        expect(response.status).to eq(302)
+        # now after org create, meta should include use_template_id
+        post(path, params: params)
+        expect(json['meta']).to eq(
+          'use_template_id' => template.id.to_s,
+        )
       end
     end
 
@@ -271,7 +292,7 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
       json_api_params(
         'organizations',
         name: 'Acme Inc 2.0',
-        domain_whitelist: 'acme.com,subsidiary.acme.com',
+        domain_whitelist: %w[acme.com subsidiary.acme.com],
       )
     end
 

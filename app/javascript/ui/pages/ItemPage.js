@@ -23,7 +23,7 @@ const ItemPageContainer = styled.div`
 `
 ItemPageContainer.displayName = 'ItemPageContainer'
 
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
 class ItemPage extends React.Component {
   state = {
@@ -38,7 +38,7 @@ class ItemPage extends React.Component {
   }
 
   onAPILoad = () => {
-    const { item, apiStore, uiStore, routingStore } = this.props
+    const { item, apiStore, uiStore, routingStore, undoStore } = this.props
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
     }
@@ -53,6 +53,10 @@ class ItemPage extends React.Component {
         if (routingStore.query) {
           uiStore.openOptionalMenus(routingStore.query)
         }
+      }
+      if (undoStore.actionAfterRoute) {
+        // the only relevant one is a text item undo
+        undoStore.performActionAfterRoute()
       }
     })
   }
@@ -190,6 +194,7 @@ ItemPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  undoStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default ItemPage

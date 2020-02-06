@@ -104,7 +104,8 @@ class BaseRecord extends jsonapi(Model) {
       data: this.toJsonApi(),
     })
     setModelMetaKey(this, DATX_PERSISTED_KEY, true)
-    return res.replaceData(this).data
+    res.replaceData(this)
+    return res
   }
 
   // not called `update` because that's already a thing

@@ -102,6 +102,11 @@ export const StyledMenu = styled.ul`
   width: ${props => props.width}px;
   .organizations {
     border-top: 1px solid ${v.colors.commonMedium};
+    li {
+      ${StyledMenuItem} {
+        padding-top: 20px;
+      }
+    }
   }
 `
 
@@ -124,7 +129,7 @@ export const StyledMenuButton = styled.button`
   font-weight: 400;
   font-size: 1rem;
   text-align: left;
-  max-width: 240px;
+  max-width: 200px;
   padding-left: ${props => props.nested * 10}px;
   margin-top: -13px;
   margin-bottom: -13px;
@@ -146,9 +151,8 @@ export const StyledMenuItem = styled.li`
   display: flex;
   min-height: 1rem;
   overflow-y: hidden;
-  padding: 0.75rem 0 0.75rem 1rem;
+  padding: 18px 0 18px 16px;
   position: relative;
-  width: 100%;
   width: ${props => props.width || 200}px;
   ${props => props.bgColor && `background-color: ${props.bgColor};`}
   border-top: solid
@@ -165,7 +169,7 @@ export const StyledMenuItem = styled.li`
     color: ${v.colors.black};
 
     &.with-avatar {
-      padding-left: 1rem;
+      padding-left: 1.4rem;
       padding-right: 1rem;
     }
 
@@ -177,6 +181,13 @@ export const StyledMenuItem = styled.li`
           return 16
         } else {
           return 0
+        }
+      }}px;
+      margin-left: ${props => {
+        if (props.hasCheckbox) {
+          return 0
+        } else {
+          return -10
         }
       }}px;
     }
@@ -217,10 +228,6 @@ export const StyledMenuItem = styled.li`
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
 
-const StyledMenuItemText = styled.span`
-  line-height: 1.4rem;
-`
-
 class PopoutMenu extends React.Component {
   get groupedMenuItems() {
     const { menuItems } = this.props
@@ -236,9 +243,9 @@ class PopoutMenu extends React.Component {
     const { wrapText } = this.props
     const { name, TextComponent } = item
     const menuItem = (
-      <StyledMenuItemText>
+      <span>
         {TextComponent ? <TextComponent>{name}</TextComponent> : name}
-      </StyledMenuItemText>
+      </span>
     )
     if (!wrapText) return menuItem
 

@@ -145,16 +145,18 @@ export default class CardMoveService {
           uiStore.scrollToBottom()
         }
       }
+
       if (
         !meta.placeholder &&
         ((cardAction === 'move' && !uiStore.movingIntoCollection) ||
           cardAction === 'duplicate' ||
           cardAction === 'link')
       ) {
-        // we actually want to reselect the cards at this point
         if (movingWithinCollection) {
+          // reselect moved cards
           uiStore.reselectCardIds(data.collection_card_ids)
-        } else if (meta.new_cards) {
+        } else if (viewingCollection === toCollection && meta.new_cards) {
+          // select newly created cards
           uiStore.reselectCardIds(meta.new_cards)
         }
       }
