@@ -97,10 +97,10 @@ const StyledButtonNameWrapper = styled.span`
     `}
 
   ${props =>
-    props.smallWidth &&
+    props.fixedWidth &&
     `
-      max-width: 110px;
-    `}px;
+      max-width: 130px;
+    `};
 `
 
 StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
@@ -371,7 +371,7 @@ class PageHeader extends React.Component {
     const shouldTruncate = templateName.length > maxButtonTextLength
     const active = template.can_view || template.anyone_can_view
     const buttonNameWrapper = (
-      <StyledButtonNameWrapper smallWidth={active} large>
+      <StyledButtonNameWrapper fixedWidth={active} large>
         {truncatedName}
       </StyledButtonNameWrapper>
     )
@@ -418,6 +418,7 @@ class PageHeader extends React.Component {
           onClick={() => {
             this.props.routingStore.routeTo('collections', record.template_id)
           }}
+          width={v.buttonSizes.header.width + 40}
           fontSize={v.buttonSizes.header.fontSize}
           data-cy="HeaderFormButton"
           color={v.colors.commonMedium}
