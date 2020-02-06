@@ -43,7 +43,7 @@ class LinkToSharedCollectionsWorker
 
   # Makes sure we have a unique list of objects
   def objects_to_add
-    @objects.map do |object|
+    @objects_to_add ||= @objects.map do |object|
       # If linking to any collection in C∆ Dashboard,
       # add top-level card (unless linking method library)
       if within_application_collection?(object) && !method_library_collection?(object)
