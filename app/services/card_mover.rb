@@ -218,7 +218,7 @@ class CardMover < SimpleService
       collection = card.collection
       next unless collection.present?
 
-      if @to_collection.within_collection_or_self?(collection)
+      if @to_collection.within_collection_or_self?(collection.id)
         @errors << 'You can\'t move a collection inside of itself.'
         return true
       end

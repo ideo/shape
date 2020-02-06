@@ -97,10 +97,10 @@ module Breadcrumbable
     true
   end
 
-  def within_collection_or_self?(collection)
-    return true if collection == self
+  def within_collection_or_self?(collection_id)
+    return true if collection_id == id
 
-    breadcrumb.include?(collection.id)
+    breadcrumb.include?(collection_id)
   end
 
   def any_parent_unsubscribed?(user)

@@ -968,6 +968,17 @@ class Collection < ApplicationRecord
     broadcasting.present?
   end
 
+  def inside_a_creative_difference_collection?
+    creative_difference_root_collection_id = ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID']
+
+    logger.debug(
+      'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.'
+    ) if !creative_difference_root_collection_id
+
+    inside_an_application_collection? ||
+    within_collection_or_self?(creative_difference_root_collection_id.to_i)
+  end
+
   # =================================
   # <--- end boolean checks
   #
