@@ -8,7 +8,6 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
   groupExtraComponent={Object {}}
   groupedMenuItems={Object {}}
   hideDotMenu={false}
-  location={null}
   menuItems={
     Array [
       Object {
@@ -78,6 +77,7 @@ exports[`ActionMenu as editor renders snapshot 1`] = `
     }
   }
   positionRelative={false}
+  shouldOverrideFixedPosition={true}
   width={250}
   wrapText={false}
   wrapperClassName="card-menu"

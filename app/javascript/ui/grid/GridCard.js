@@ -190,6 +190,7 @@ class GridCard extends React.Component {
           onLeave={this.closeMenu}
           testCollectionCard={testCollectionCard}
           menuItemsCount={this.getMenuItemsCount}
+          zoomLevel={zoomLevel}
         />
       </StyledTopRightActions>
     )
