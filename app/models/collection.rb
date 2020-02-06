@@ -981,7 +981,7 @@ class Collection < ApplicationRecord
     ) if !creative_difference_root_collection_id
 
     inside_an_application_collection? ||
-    within_collection_or_self?(Collection.find(creative_difference_root_collection_id))
+    within_collection_or_self?(creative_difference_root_collection_id.to_i)
   end
 
   # =================================

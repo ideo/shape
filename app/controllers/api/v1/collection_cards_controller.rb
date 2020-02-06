@@ -373,7 +373,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       collection = card.collection
       next unless collection.present?
 
-      if @to_collection.within_collection_or_self?(collection)
+      if @to_collection.within_collection_or_self?(collection.id)
         @errors << 'You can\'t duplicate a collection inside of itself.'
         break
       end

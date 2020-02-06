@@ -202,8 +202,26 @@ RSpec.describe CollectionCardBuilder, type: :service do
       end
 
       context "when inside a Creative Difference collection" do
+        let!(:parent) do
+          create(:collection,
+          organization: organization,
+          add_editors: [user])
+        end
+
+        before do
+          ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID'] = parent.id.to_s
+          builder.create
+        end
+
+        it 'updates the font color of the card and sets the cover filter to nothing' do
+          expect(builder.collection_card.filter).to eq('nothing')
+          expect(builder.collection_card.font_color).to eq('#120F0E')
+        end
+      end
+
+      context "when inside an application collection" do
         let(:parent) do
-          create(:application_collection, # does this need to be a C∆ Collection?
+          create(:application_collection,
           organization: organization,
           add_editors: [user])
         end
