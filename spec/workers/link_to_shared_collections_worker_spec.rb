@@ -130,6 +130,27 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
         expect(link.height).to eq(2)
         expect(link.order).to eq(-10)
       end
+
+      context 'when both objects are shared' do
+        before do
+          LinkToSharedCollectionsWorker.new.perform(
+            users_to_add.map(&:id),
+            groups_to_add.map(&:id),
+            [collection_to_link.id, child_collection.id],
+            [],
+          )
+        end
+
+        it 'does not create duplicate link' do
+          expect(
+            user.current_shared_collection
+                .collection_cards
+                .link
+                .where(collection_id: child_collection.id)
+                .count,
+          ).to eq(1)
+        end
+      end
     end
 
     context 'when the link is an item' do
