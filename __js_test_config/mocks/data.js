@@ -423,7 +423,7 @@ export const fakeCollection = {
   collection_filters: [],
   filterBarFilters: [],
   methodLibraryFilters: [],
-  isMethodLibraryCollection: false,
+  isParentMethodLibrary: false,
   card_order: 'order',
   collection_cards: fakeCards,
   sortedCards: fakeCards,
