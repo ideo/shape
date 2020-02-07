@@ -15,6 +15,10 @@ uiStore.viewingCollection = {
 
 const e = { preventDefault: jest.fn() }
 let wrapper, props, component
+const rerender = () => {
+  wrapper = shallow(<CollectionCreator {...props} />)
+  component = wrapper.instance()
+}
 describe('CollectionCreator', () => {
   beforeEach(() => {
     props = {
@@ -25,8 +29,7 @@ describe('CollectionCreator', () => {
       uiStore: fakeUiStore,
     }
     props.createCard.mockClear()
-    wrapper = shallow(<CollectionCreator {...props} />)
-    component = wrapper.instance()
+    rerender()
   })
 
   it('renders snapshot', () => {
@@ -52,6 +55,7 @@ describe('CollectionCreator', () => {
             name: component.state.inputText,
             master_template: false,
             type: null,
+            num_columns: null,
           },
         },
         {
@@ -64,8 +68,7 @@ describe('CollectionCreator', () => {
       beforeEach(() => {
         props.type = 'submissionBox'
         props.createCard.mockClear()
-        wrapper = shallow(<CollectionCreator {...props} />)
-        component = wrapper.instance()
+        rerender()
       })
 
       it('creates a card with submission box type and input text name', () => {
@@ -79,6 +82,35 @@ describe('CollectionCreator', () => {
               name: component.state.inputText,
               master_template: false,
               type: 'Collection::SubmissionBox',
+              num_columns: null,
+            },
+          },
+          {
+            afterCreate: component.afterCreate,
+          }
+        )
+      })
+    })
+
+    describe('when collection is a SubmissionBox', () => {
+      beforeEach(() => {
+        props.type = 'foamcoreBoard'
+        props.createCard.mockClear()
+        rerender()
+      })
+
+      it('creates a card with submission box type and input text name', () => {
+        component.state = {
+          inputText: 'Ideas Board',
+        }
+        component.createCollection(e)
+        expect(props.createCard).toHaveBeenCalledWith(
+          {
+            collection_attributes: {
+              name: component.state.inputText,
+              master_template: false,
+              type: 'Collection::Board',
+              num_columns: 16,
             },
           },
           {
@@ -92,8 +124,7 @@ describe('CollectionCreator', () => {
       beforeEach(() => {
         props.type = 'search'
         props.createCard.mockClear()
-        wrapper = shallow(<CollectionCreator {...props} />)
-        component = wrapper.instance()
+        rerender()
       })
 
       it('adds the search term to create card', () => {
@@ -108,6 +139,7 @@ describe('CollectionCreator', () => {
               master_template: false,
               type: 'Collection::SearchCollection',
               search_term: 'plants',
+              num_columns: null,
             },
           },
           {
@@ -121,8 +153,7 @@ describe('CollectionCreator', () => {
       beforeEach(() => {
         props.type = 'testCollection'
         props.createCard.mockClear()
-        wrapper = shallow(<CollectionCreator {...props} />)
-        component = wrapper.instance()
+        rerender()
       })
 
       it('creates a card with test collection type and input text name', () => {
@@ -136,6 +167,7 @@ describe('CollectionCreator', () => {
               name: component.state.inputText,
               master_template: false,
               type: 'Collection::TestCollection',
+              num_columns: null,
             },
           },
           {
@@ -149,8 +181,7 @@ describe('CollectionCreator', () => {
       beforeEach(() => {
         props.type = 'template'
         props.createCard.mockClear()
-        wrapper = shallow(<CollectionCreator {...props} />)
-        component = wrapper.instance()
+        rerender()
       })
 
       it('creates a template collection', () => {
@@ -163,8 +194,7 @@ describe('CollectionCreator', () => {
       beforeEach(() => {
         props.uiStore.viewingCollection.isTemplate = true
         props.createCard.mockClear()
-        wrapper = shallow(<CollectionCreator {...props} />)
-        component = wrapper.instance()
+        rerender()
       })
 
       it('creates a template collection', () => {

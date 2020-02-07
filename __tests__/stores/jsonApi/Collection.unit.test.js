@@ -193,6 +193,7 @@ describe('Collection', () => {
         - - - 3
         - - - 3
       */
+      collection.num_columns = 16
       collection.type = 'Collection::Board'
       const collCardAttrs = [
         { col: 0, row: 0, height: 1, width: 2 },

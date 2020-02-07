@@ -333,6 +333,31 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
       end
 
+      context 'with a collection' do
+        let(:raw_params) do
+          {
+            order: 1,
+            width: 1,
+            height: 1,
+            parent_id: collection.id,
+            # create with a nested item
+            collection_attributes: {
+              name: 'My Board',
+              type: 'Collection::Board',
+              num_columns: 4,
+            },
+          }
+        end
+
+        it 'creates record' do
+          expect do
+            post(path, params: params)
+          end.to change(Collection::Board, :count).by(1)
+          card = CollectionCard.find(json['data']['id'])
+          expect(card.record.num_columns).to eq 4
+        end
+      end
+
       context 'with a link card' do
         let!(:linked_collection) { create(:collection) }
         let(:raw_params) do

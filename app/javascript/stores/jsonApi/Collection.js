@@ -166,8 +166,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get maxColumnIndex() {
-    // NOTE: this may be replaced by an API attribute in the future
-    // (16 columns - 1)
     return this.num_columns - 1
   }
 
