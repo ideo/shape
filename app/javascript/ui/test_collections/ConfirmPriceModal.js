@@ -5,7 +5,7 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import TextButton from '~/ui/global/TextButton'
 import {
   DisplayText,
@@ -80,7 +80,7 @@ class ConfirmPriceModal extends React.Component {
     const { onSubmit, testName, totalPrice } = this.props
     const buttonProps = {
       disabled: !this.hasPaymentMethod,
-      width: 200,
+      minWidth: 200,
     }
 
     return (
@@ -102,7 +102,7 @@ class ConfirmPriceModal extends React.Component {
           {this.renderPaymentMethodToCharge()}
         </StyledDiv>
         <StyledDiv style={{ textAlign: 'center' }}>
-          <FormButton {...buttonProps}>Get Feedback</FormButton>
+          <Button {...buttonProps}>Get Feedback</Button>
         </StyledDiv>
       </form>
     )

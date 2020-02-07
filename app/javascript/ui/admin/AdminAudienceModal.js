@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 import { map, capitalize } from 'lodash'
 import Modal from '~/ui/global/modals/Modal'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { FieldContainer, Label } from '~/ui/global/styled/forms'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import v from '~/utils/variables'
@@ -99,14 +99,14 @@ class AdminAudienceModal extends React.Component {
           {this.renderCriteria()}
           {showModalButton && (
             <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
-              <FormButton
+              <Button
                 data-cy="CloseModalButton"
                 onClick={this.handleClose}
-                width={200}
+                minWidth={200}
                 className="adminAudienceModalButton"
               >
                 {feedbackAudienceMenuOpen ? 'Add Audience' : 'Close'}
-              </FormButton>
+              </Button>
             </div>
           )}
         </React.Fragment>

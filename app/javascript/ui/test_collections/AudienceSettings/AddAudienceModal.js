@@ -7,7 +7,7 @@ import { Grid } from '@material-ui/core'
 import googleTagManager from '~/vendor/googleTagManager'
 
 import Audience from '~/stores/jsonApi/Audience'
-import Button from '~shared/components/atoms/Button'
+import SharedButton from '~shared/components/atoms/Button'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import Modal from '~/ui/global/modals/Modal'
@@ -20,7 +20,7 @@ import {
   criteriaLimitByGroup,
 } from '~/ui/test_collections/AudienceSettings/AudienceCriteria'
 import TextButton from '~/ui/global/TextButton'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import {
   Checkbox,
   CheckboxSelectOption,
@@ -448,12 +448,12 @@ class AddAudienceModal extends React.Component {
           {this.renderSelectedCriteria()}
           <Box mb={3}>
             <div ref={ref => (this.criteriaTriggers[ROOT_MENU] = ref)}>
-              <Button href="#" onClick={() => this.openMenu(ROOT_MENU)}>
+              <SharedButton href="#" onClick={() => this.openMenu(ROOT_MENU)}>
                 <StyledPlusIcon>
                   <PlusIcon />
                 </StyledPlusIcon>
                 Add Audience Criteria
-              </Button>
+              </SharedButton>
             </div>
             <HorizontalDivider
               color={v.colors.commonMedium}
@@ -491,9 +491,9 @@ class AddAudienceModal extends React.Component {
             </Grid>
             <Grid item xs={6}>
               <Grid container justify="center">
-                <FormButton
+                <Button
                   onClick={this.handleSave}
-                  width={190}
+                  minWidth={190}
                   type="submit"
                   disabled={
                     !this.state.valid ||
@@ -502,7 +502,7 @@ class AddAudienceModal extends React.Component {
                   }
                 >
                   Save
-                </FormButton>
+                </Button>
               </Grid>
             </Grid>
           </Grid>

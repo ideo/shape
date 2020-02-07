@@ -11,7 +11,7 @@ import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import CarouselCover from '~/ui/grid/covers/CarouselCover'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { RoundPill } from '~/ui/global/styled/forms'
 import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
@@ -19,7 +19,7 @@ import CollectionCoverTitle, {
 } from '~/ui/grid/covers/CollectionCoverTitle'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 
-const LaunchButton = styled(FormButton)`
+const LaunchButton = styled(Button)`
   font-size: 0.9rem;
   padding: 0 1rem;
   width: auto;
@@ -260,22 +260,18 @@ class CollectionCover extends React.Component {
   }
 
   get useTemplateButton() {
-    const { fontColor } = this.props
-
     return (
       <CardButtonWrapper>
-        <FormButton
-          width={v.buttonSizes.header.width}
-          fontSize={v.buttonSizes.header.fontSize}
+        <Button
+          minWidth={v.buttonSizes.header.width}
+          size="sm"
           onClick={this.openMoveMenuForTemplate}
           data-cy="CollectionCoverFormButton"
           className="CollectionCoverFormButton"
-          color={fontColor || v.colors.white}
-          transparent
-          filledHover
+          colorScheme="transparent"
         >
           Use Template
-        </FormButton>
+        </Button>
       </CardButtonWrapper>
     )
   }

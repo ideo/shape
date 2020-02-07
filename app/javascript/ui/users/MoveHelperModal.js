@@ -8,7 +8,7 @@ import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import TextButton from '~/ui/global/TextButton'
 import { Checkbox } from '~/ui/global/styled/forms'
 import {
@@ -142,26 +142,25 @@ class MoveHelperModal extends React.Component {
         <div style={{ marginBottom: '18px' }}>
           <DisplayText>{uiStore.templateName}</DisplayText>
         </div>
-        <FormButton
+        <Button
           onClick={this.handleAddToMyCollection}
           minWidth={250}
-          fontSize={0.75}
+          size="sm"
           data-cy="MoveHelperModal-addToMyCollectionBtn"
         >
           Add to my collection
-        </FormButton>
+        </Button>
         <div style={{ marginBottom: '12px', marginTop: '12px' }}>
           <DisplayText>or</DisplayText>
         </div>
-        <FormButton
+        <Button
           onClick={this.letMePlaceIt}
-          fontSize={0.75}
-          color={v.colors.commonDark}
-          transparent
+          size="sm"
+          colorScheme="transparent"
           data-cy="MoveHelperModal-letMePlaceItBtn"
         >
           Let me place it
-        </FormButton>
+        </Button>
       </div>
     )
   }
