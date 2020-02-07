@@ -151,7 +151,10 @@ export const advancedTooltipText = ({
   const momentDate = utcMoment(datum.date)
   let timeRange = `${momentDate
     .clone()
+    // for example when we say May 10, for a week the period is:
+    // May 4 - May 10 (begins - 1 week + 1 day)
     .subtract(1, timeframe)
+    .add(1, 'day')
     .format('MMM D')} - ${momentDate.format('MMM D')}`
 
   let dayTimeframe = '7 days'
