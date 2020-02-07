@@ -1002,7 +1002,11 @@ class FoamcoreGrid extends React.Component {
     const position = this.positionForCoordinates(card)
 
     // TODO reorganize
-    if (card.id === 'blank' && this.zoomLevel !== 1) {
+    if (
+      card.id === 'blank' &&
+      this.zoomLevel !== 1 &&
+      !collection.isFourWideBoard
+    ) {
       position.xPos = position.x - this.zoomLevel * 38
       position.yPos = position.y - this.zoomLevel * 30
     }
