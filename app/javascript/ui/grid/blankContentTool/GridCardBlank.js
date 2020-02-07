@@ -488,8 +488,9 @@ class GridCardBlank extends React.Component {
 
   renderInner = () => {
     let inner
+    const { parent } = this.props
+    const { isBoard, isFourWideBoard } = parent
     const { creating, loading, droppingFile } = this.state
-    const { isBoard } = this.props.parent
     const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
 
@@ -506,6 +507,7 @@ class GridCardBlank extends React.Component {
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}
+            parentIsFourWide={isFourWideBoard}
           />
         )
         break
