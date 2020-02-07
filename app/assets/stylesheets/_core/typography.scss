@@ -14,42 +14,42 @@ html {
 
 @font-face {
   font-family: 'Sentinel';
-  src: '../../fonts/Sentinel-Medium.otf';
+  src: asset-url('Sentinel-Medium.otf');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Sentinel';
-  src: '../../fonts/Sentinel-MediumItal.otf';
+  src: asset-url('Sentinel-MediumItal.otf');
   font-weight: 500;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'Sentinel';
-  src: '../../fonts/Sentinel-Book.otf';
+  src: asset-url('Sentinel-Book.otf');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Gotham';
-  src: '../../fonts/Gotham-Bold.otf';
+  src: asset-url('Gotham-Bold.otf');
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Gotham';
-  src: '../../fonts/Gotham-Medium.otf';
+  src: asset-url('Gotham-Medium.otf');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Gotham';
-  src: '../../fonts/Gotham-Book.otf';
+  src: asset-url('Gotham-Book.otf');
   font-weight: 400;
   font-style: normal;
 }
