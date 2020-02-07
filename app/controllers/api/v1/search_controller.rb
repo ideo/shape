@@ -82,7 +82,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     unless current_user.has_cached_role?(Role::SUPER_ADMIN)
       where_clause[:_or] = [
         { user_ids: [current_user.id] },
-        { group_ids: current_user_current_group_ids },
+        { group_ids: current_user.all_current_org_group_ids },
       ]
     end
 
@@ -176,12 +176,6 @@ class Api::V1::SearchController < Api::V1::BaseController
         user_ids: users.pluck(:id),
         group_ids: groups.pluck(:id),
       },
-    )
-  end
-
-  def current_user_current_group_ids
-    current_user.organization_group_ids(
-      current_user.current_organization,
     )
   end
 
