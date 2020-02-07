@@ -1,12 +1,14 @@
 
-Form button is the main button
+The button element is the main button style on the site; a rounded corner
+different colored background button with a white text style. There are ways
+to configure the color style, width and text size.
 
 ```jsx
 import Button from '../../ui/global/Button'
 ;<Button>Action</Button>
 ```
 
-Organization / group modify modal
+### Organization / group modify modal
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -18,7 +20,7 @@ import Button from '../../ui/global/Button'
 </Button>
 ```
 
-Add to my collection button
+### Add to my collection button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -31,7 +33,7 @@ import Button from '../../ui/global/Button'
 </Button>
 ```
 
-Add template button
+### Add template button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -45,7 +47,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Replace card button
+### Replace card button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -58,7 +60,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Get test link button
+### Get test link button
 
 ```jsx
 import styled from 'styled-components'
@@ -113,7 +115,7 @@ StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
 </Button>
 ```
 
-Repoen test button
+### Repoen test button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -129,7 +131,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Submission submit button
+### Submission submit button
 
 
 ```jsx
@@ -144,7 +146,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Join collection button
+### Join collection button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -159,7 +161,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Restore button
+### Restore button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -174,7 +176,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Template button
+### Template button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -189,7 +191,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Stop feedback button
+### Stop feedback button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -204,7 +206,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Admin audience modal
+### Admin audience modal
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -218,7 +220,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Restore Activity button
+### Restore Activity button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -231,7 +233,7 @@ import v from '../../utils/variables'
 </Button>
 ```
 
-Organization settings save button
+### Organization settings save button
 
 ```jsx
 import Button from '../../ui/global/Button'
@@ -243,39 +245,10 @@ import Button from '../../ui/global/Button'
 </Button>
 ```
 
-Get feedback button
+### Disabled button
 
-```jsx
-import Button from '../../ui/global/Button'
-
-;<Button>
-  Get Feedback
-</Button>
-```
-
-Create collection button
-
-```jsx
-import Button from '../../ui/global/Button'
-
-;<Button
-  minWidth={125}
->
-  Create
-</Button>
-```
-
-Group save button
-
-```jsx
-import Button from '../../ui/global/Button'
-
-;<Button minWidth={130} type="submit">
-  Save
-</Button>
-```
-
-Disabled button
+The disabled button has its own style and shouldn't allow any sort of hover
+or clicking interaction.
 
 ```jsx
 import Button from '../../ui/global/Button'

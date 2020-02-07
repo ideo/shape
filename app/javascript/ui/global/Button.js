@@ -58,4 +58,5 @@ Button.defaultProps = {
   minWidth: null,
   disabled: false,
 }
+/** @component */
 export default Button

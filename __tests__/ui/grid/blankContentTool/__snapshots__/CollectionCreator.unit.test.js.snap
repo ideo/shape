@@ -14,16 +14,15 @@ exports[`CollectionCreator renders snapshot 1`] = `
       placeholder="Collection name"
       value=""
     />
-    <FormButton
-      color="#120f0e"
+    <Button
+      colorScheme="#120f0e"
       data-cy="CollectionCreatorFormButton"
       disabled={false}
-      fontSize={1}
-      transparent={false}
-      width={125}
+      minWidth={125}
+      size="md"
     >
       Create
-    </FormButton>
+    </Button>
   </form>
 </styled.div>
 `;
