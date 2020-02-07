@@ -4,12 +4,13 @@ RSpec.describe CollectionFilter, type: :model do
   describe '#duplicate!' do
     let!(:collection_filter) { create(:collection_filter) }
     let(:collection) { collection_filter.collection }
+    let(:new_collection) { create(:collection) }
     before do
       collection.organization.update(slug: 'org-1')
     end
 
     it 'creates a copy' do
-      expect { collection_filter.duplicate! }.to change(CollectionFilter, :count).by(1)
+      expect { collection_filter.duplicate!(assign_collection: new_collection) }.to change(CollectionFilter, :count).by(1)
     end
   end
 
