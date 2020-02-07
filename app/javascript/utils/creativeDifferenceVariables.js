@@ -63,7 +63,7 @@ creativeQualities.forEach((value, key) => {
 export const methodLibraryTagsByType = {
   creativeQualities,
   categories: [
-    'systematizing design process',
+    'systemizing design process',
     'developing and nurturing talent',
     'design process',
     'experience design',
