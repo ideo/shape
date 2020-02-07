@@ -683,7 +683,7 @@ class FoamcoreGrid extends React.Component {
         col,
       }
       updates.push(update)
-      if (row < 0 || col < 0 || col > collection.maxColumnIndex) {
+      if (row < 0 || col < 0 || col + card.width > collection.num_columns) {
         outsideDraggableArea = true
         return false
       }
@@ -814,10 +814,9 @@ class FoamcoreGrid extends React.Component {
   updateDragGridSpotWithOpenPosition(position) {
     const { collection } = this.props
     if (!USE_COLLISION_DETECTION_ON_DRAG) {
-      const { row, col } = position
-      if (row < 0 || col < 0 || col > collection.maxColumnIndex) {
+      const { row, col, width } = position
+      if (row < 0 || col < 0 || col + width > collection.num_columns) {
         this.hasDragCollision = true
-        return
       }
       this.dragGridSpot.set(getMapKey(position), position)
       this.hasDragCollision =
