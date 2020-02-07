@@ -238,7 +238,9 @@ class FoamcoreGrid extends React.Component {
   }
 
   get maxCols() {
-    const { uiStore } = this.props
+    const { collection, uiStore } = this.props
+    if (collection.num_columns === 4) return 4
+
     return uiStore.isTouchDevice && uiStore.isMobile
       ? MAX_COLS_MOBILE
       : MAX_COLS
@@ -247,10 +249,20 @@ class FoamcoreGrid extends React.Component {
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
     if (this.zoomLevel !== 3) return this.zoomLevel
+    // TODO: at some browser sizes + maxCols, there should really only be 2 zoom levels....
+
     const { gridW, gutter } = this.gridSettings
     const gridWidth =
       (gridW + gutter) * this.maxCols + pageMargins.left * 2 * this.zoomLevel
-    return gridWidth / window.innerWidth
+    const relative = gridWidth / window.innerWidth
+    return _.max([relative, 1])
+  }
+
+  get showZoomControls() {
+    const { gridW, gutter } = this.gridSettings
+    const gridWidth = (gridW + gutter) * this.maxCols + pageMargins.left * 2
+    // only show zoom if the grid is wider than our window
+    return gridWidth > window.innerWidth
   }
 
   get gridSettings() {
@@ -259,6 +271,8 @@ class FoamcoreGrid extends React.Component {
     return v.defaultGridSettings
   }
 
+  // TODO: figure out why we need to calculate the max width and height of the grid, what does this do?
+  // one theory -- for mobile touch scrolling?
   get totalGridSize() {
     const { gridW, gridH, gutter } = this.gridSettings
     const { collection } = this.props
@@ -1261,10 +1275,12 @@ class FoamcoreGrid extends React.Component {
         width={gridSize.width}
         height={gridSize.height}
       >
-        <FoamcoreZoomControls
-          onZoomIn={this.handleZoomIn}
-          onZoomOut={this.handleZoomOut}
-        />
+        {this.showZoomControls && (
+          <FoamcoreZoomControls
+            onZoomIn={this.handleZoomIn}
+            onZoomOut={this.handleZoomOut}
+          />
+        )}
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}
         {this.renderVisibleCards()}

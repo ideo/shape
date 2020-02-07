@@ -168,7 +168,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get maxColumnIndex() {
     // NOTE: this may be replaced by an API attribute in the future
     // (16 columns - 1)
-    return 15
+    return this.num_columns - 1
   }
 
   get cardMatrix() {
@@ -376,6 +376,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isBoard() {
     return this.type === 'Collection::Board'
+  }
+
+  get isFourWideBoard() {
+    return this.isBoard && this.num_columns === 4
   }
 
   get isPublicJoinable() {
