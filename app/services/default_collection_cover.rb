@@ -65,12 +65,11 @@ class DefaultCollectionCover < SimpleService
     return nil if @no_cover
 
     cover_card = find_manually_set_cover
-    return cover_card if cover_card.present? && !@collection.cover_type_text_and_media?
+    return cover_card if cover_card.present?
 
     # this is the case where the system looks for the first/best image for the cover
     cover_card = first_media_item_card
     return nil unless cover_card.present?
-    return cover_card if @collection.cover_type_text_and_media?
 
     cover_card.update(is_cover: true)
     cover_card

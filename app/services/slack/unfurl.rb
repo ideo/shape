@@ -30,6 +30,14 @@ module Slack
       unfurls
     end
 
+    def translate_string(string = nil)
+      return string if string.blank?
+
+      IdeoTranslation::TranslateString.call(
+        string: string,
+      )
+    end
+
     def message_data(record, url)
       cover = record.try(:cached_cover) || {}
       image_url = ''
@@ -50,8 +58,8 @@ module Slack
         author_name: 'Shape',
         author_icon: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo-no-text_2x-sq.png',
         color: '#5698ae',
-        title: record.name,
-        text: cover_text,
+        title: translate_string(record.name),
+        text: translate_string(cover_text),
         title_link: url,
         image_url: image_url,
       }

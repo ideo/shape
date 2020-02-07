@@ -509,8 +509,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "inherited_tag_list": Array [],
           "internalType": "collections",
           "isCollection": true,
-          "isMethodLibraryCollection": false,
           "isNormalCollection": true,
+          "isParentMethodLibrary": false,
           "isSharedCollection": false,
           "isUserCollection": false,
           "links": Object {
@@ -1536,8 +1536,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -2512,8 +2512,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -3488,8 +3488,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -4463,8 +4463,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -5436,8 +5436,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -6416,8 +6416,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -7389,8 +7389,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -8362,8 +8362,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -8875,8 +8875,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "inherited_tag_list": Array [],
         "internalType": "collections",
         "isCollection": true,
-        "isMethodLibraryCollection": false,
         "isNormalCollection": true,
+        "isParentMethodLibrary": false,
         "isSharedCollection": false,
         "isUserCollection": false,
         "links": Object {
@@ -9370,8 +9370,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "inherited_tag_list": Array [],
             "internalType": "collections",
             "isCollection": true,
-            "isMethodLibraryCollection": false,
             "isNormalCollection": true,
+            "isParentMethodLibrary": false,
             "isSharedCollection": false,
             "isUserCollection": false,
             "links": Object {
@@ -10776,8 +10776,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "inherited_tag_list": Array [],
           "internalType": "collections",
           "isCollection": true,
-          "isMethodLibraryCollection": false,
           "isNormalCollection": true,
+          "isParentMethodLibrary": false,
           "isSharedCollection": false,
           "isUserCollection": false,
           "links": Object {
@@ -11803,8 +11803,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -12779,8 +12779,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -13755,8 +13755,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -14730,8 +14730,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -15703,8 +15703,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -16683,8 +16683,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -17656,8 +17656,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -18629,8 +18629,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -19142,8 +19142,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "inherited_tag_list": Array [],
         "internalType": "collections",
         "isCollection": true,
-        "isMethodLibraryCollection": false,
         "isNormalCollection": true,
+        "isParentMethodLibrary": false,
         "isSharedCollection": false,
         "isUserCollection": false,
         "links": Object {
@@ -19637,8 +19637,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "inherited_tag_list": Array [],
             "internalType": "collections",
             "isCollection": true,
-            "isMethodLibraryCollection": false,
             "isNormalCollection": true,
+            "isParentMethodLibrary": false,
             "isSharedCollection": false,
             "isUserCollection": false,
             "links": Object {
@@ -21043,8 +21043,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
           "inherited_tag_list": Array [],
           "internalType": "collections",
           "isCollection": true,
-          "isMethodLibraryCollection": false,
           "isNormalCollection": true,
+          "isParentMethodLibrary": false,
           "isSharedCollection": false,
           "isUserCollection": false,
           "links": Object {
@@ -22070,8 +22070,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -23046,8 +23046,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -24022,8 +24022,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -24997,8 +24997,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -25970,8 +25970,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -26950,8 +26950,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -27923,8 +27923,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -28896,8 +28896,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -29409,8 +29409,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
         "inherited_tag_list": Array [],
         "internalType": "collections",
         "isCollection": true,
-        "isMethodLibraryCollection": false,
         "isNormalCollection": true,
+        "isParentMethodLibrary": false,
         "isSharedCollection": false,
         "isUserCollection": false,
         "links": Object {
@@ -29904,8 +29904,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
             "inherited_tag_list": Array [],
             "internalType": "collections",
             "isCollection": true,
-            "isMethodLibraryCollection": false,
             "isNormalCollection": true,
+            "isParentMethodLibrary": false,
             "isSharedCollection": false,
             "isUserCollection": false,
             "links": Object {

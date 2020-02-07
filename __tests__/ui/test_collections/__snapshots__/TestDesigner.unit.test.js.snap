@@ -696,8 +696,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -1207,8 +1207,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "inherited_tag_list": Array [],
                     "internalType": "collections",
                     "isCollection": true,
-                    "isMethodLibraryCollection": false,
                     "isNormalCollection": true,
+                    "isParentMethodLibrary": false,
                     "isSharedCollection": false,
                     "isUserCollection": false,
                     "links": Object {
@@ -2737,8 +2737,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
                   "isCollection": true,
-                  "isMethodLibraryCollection": false,
                   "isNormalCollection": true,
+                  "isParentMethodLibrary": false,
                   "isSharedCollection": false,
                   "isUserCollection": false,
                   "links": Object {
@@ -3248,8 +3248,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
                       "isCollection": true,
-                      "isMethodLibraryCollection": false,
                       "isNormalCollection": true,
+                      "isParentMethodLibrary": false,
                       "isSharedCollection": false,
                       "isUserCollection": false,
                       "links": Object {
@@ -4669,8 +4669,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
                   "isCollection": true,
-                  "isMethodLibraryCollection": false,
                   "isNormalCollection": true,
+                  "isParentMethodLibrary": false,
                   "isSharedCollection": false,
                   "isUserCollection": false,
                   "links": Object {
@@ -5642,8 +5642,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -6153,8 +6153,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "inherited_tag_list": Array [],
                     "internalType": "collections",
                     "isCollection": true,
-                    "isMethodLibraryCollection": false,
                     "isNormalCollection": true,
+                    "isParentMethodLibrary": false,
                     "isSharedCollection": false,
                     "isUserCollection": false,
                     "links": Object {
@@ -7550,8 +7550,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "inherited_tag_list": Array [],
                     "internalType": "collections",
                     "isCollection": true,
-                    "isMethodLibraryCollection": false,
                     "isNormalCollection": true,
+                    "isParentMethodLibrary": false,
                     "isSharedCollection": false,
                     "isUserCollection": false,
                     "links": Object {
@@ -8995,8 +8995,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                     "inherited_tag_list": Array [],
                     "internalType": "collections",
                     "isCollection": true,
-                    "isMethodLibraryCollection": false,
                     "isNormalCollection": true,
+                    "isParentMethodLibrary": false,
                     "isSharedCollection": false,
                     "isUserCollection": false,
                     "links": Object {
@@ -9506,8 +9506,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
                         "isCollection": true,
-                        "isMethodLibraryCollection": false,
                         "isNormalCollection": true,
+                        "isParentMethodLibrary": false,
                         "isSharedCollection": false,
                         "isUserCollection": false,
                         "links": Object {
@@ -10398,8 +10398,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
                   "isCollection": true,
-                  "isMethodLibraryCollection": false,
                   "isNormalCollection": true,
+                  "isParentMethodLibrary": false,
                   "isSharedCollection": false,
                   "isUserCollection": false,
                   "links": Object {
@@ -10909,8 +10909,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
                       "isCollection": true,
-                      "isMethodLibraryCollection": false,
                       "isNormalCollection": true,
+                      "isParentMethodLibrary": false,
                       "isSharedCollection": false,
                       "isUserCollection": false,
                       "links": Object {
@@ -11854,8 +11854,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
                         "isCollection": true,
-                        "isMethodLibraryCollection": false,
                         "isNormalCollection": true,
+                        "isParentMethodLibrary": false,
                         "isSharedCollection": false,
                         "isUserCollection": false,
                         "links": Object {
@@ -12365,8 +12365,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                             "inherited_tag_list": Array [],
                             "internalType": "collections",
                             "isCollection": true,
-                            "isMethodLibraryCollection": false,
                             "isNormalCollection": true,
+                            "isParentMethodLibrary": false,
                             "isSharedCollection": false,
                             "isUserCollection": false,
                             "links": Object {
@@ -13750,8 +13750,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                         "inherited_tag_list": Array [],
                         "internalType": "collections",
                         "isCollection": true,
-                        "isMethodLibraryCollection": false,
                         "isNormalCollection": true,
+                        "isParentMethodLibrary": false,
                         "isSharedCollection": false,
                         "isUserCollection": false,
                         "links": Object {
@@ -15261,8 +15261,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
               "inherited_tag_list": Array [],
               "internalType": "collections",
               "isCollection": true,
-              "isMethodLibraryCollection": false,
               "isNormalCollection": true,
+              "isParentMethodLibrary": false,
               "isSharedCollection": false,
               "isUserCollection": false,
               "links": Object {
@@ -15772,8 +15772,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
                   "isCollection": true,
-                  "isMethodLibraryCollection": false,
                   "isNormalCollection": true,
+                  "isParentMethodLibrary": false,
                   "isSharedCollection": false,
                   "isUserCollection": false,
                   "links": Object {
@@ -16664,8 +16664,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
             "inherited_tag_list": Array [],
             "internalType": "collections",
             "isCollection": true,
-            "isMethodLibraryCollection": false,
             "isNormalCollection": true,
+            "isParentMethodLibrary": false,
             "isSharedCollection": false,
             "isUserCollection": false,
             "links": Object {
@@ -17175,8 +17175,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                 "inherited_tag_list": Array [],
                 "internalType": "collections",
                 "isCollection": true,
-                "isMethodLibraryCollection": false,
                 "isNormalCollection": true,
+                "isParentMethodLibrary": false,
                 "isSharedCollection": false,
                 "isUserCollection": false,
                 "links": Object {
@@ -18120,8 +18120,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
                   "isCollection": true,
-                  "isMethodLibraryCollection": false,
                   "isNormalCollection": true,
+                  "isParentMethodLibrary": false,
                   "isSharedCollection": false,
                   "isUserCollection": false,
                   "links": Object {
@@ -18631,8 +18631,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                       "inherited_tag_list": Array [],
                       "internalType": "collections",
                       "isCollection": true,
-                      "isMethodLibraryCollection": false,
                       "isNormalCollection": true,
+                      "isParentMethodLibrary": false,
                       "isSharedCollection": false,
                       "isUserCollection": false,
                       "links": Object {
@@ -20016,8 +20016,8 @@ exports[`TestDesigner with default params renders snapshot 1`] = `
                   "inherited_tag_list": Array [],
                   "internalType": "collections",
                   "isCollection": true,
-                  "isMethodLibraryCollection": false,
                   "isNormalCollection": true,
+                  "isParentMethodLibrary": false,
                   "isSharedCollection": false,
                   "isUserCollection": false,
                   "links": Object {

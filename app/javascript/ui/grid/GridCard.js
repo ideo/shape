@@ -394,16 +394,21 @@ class GridCard extends React.Component {
       testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
+    const { collection_cover_text_items } = record
 
     let nestedTextItem = null
     // Carousels have their own renderer in CollectionCover,
     // so don't behave the same as the other cover item types
     const isCoverItem =
       this.coverItem && record.cover_type !== 'cover_type_carousel'
-    if (this.coverItem && record.cover_type === 'cover_type_text_and_media') {
+    if (
+      collection_cover_text_items &&
+      collection_cover_text_items.length > 0 &&
+      record.cover_type === 'cover_type_text_and_media'
+    ) {
       // If this is a special cover with both image and text, pass the text
       // item through
-      nestedTextItem = this.coverItem
+      nestedTextItem = collection_cover_text_items[0]
     } else if (this.coverItem && record.cover_type !== 'cover_type_carousel') {
       // Instead use the item for the cover rather than the collection
       record = this.coverItem
