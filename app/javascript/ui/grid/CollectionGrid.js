@@ -15,6 +15,7 @@ import { objectsEqual } from '~/utils/objectUtils'
 import CardMoveService from '~/utils/CardMoveService'
 import { groupByConsecutive } from '~/utils/CollectionGridCalculator'
 import v from '~/utils/variables'
+import { calculateFullWidthPageMargins } from '~/utils/pageUtils'
 
 const cardMover = new CardMoveService()
 
@@ -39,20 +40,6 @@ const StyledGrid = styled.div`
   `}
 `
 StyledGrid.displayName = 'StyledGrid'
-
-const pageMargins = () => {
-  let xMargin
-  if (window.innerWidth >= v.maxWidth) {
-    xMargin = (window.innerWidth - v.maxWidth) / 2
-  } else {
-    // Otherwise use container padding, multiplied to transform to px
-    xMargin = v.containerPadding.horizontal * 16
-  }
-  return {
-    x: xMargin,
-    y: v.topScrollTrigger,
-  }
-}
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -996,7 +983,7 @@ class CollectionGrid extends React.Component {
           isSharedCollection={collection.isSharedCollection}
           isBoardCollection={false}
           position={card.position}
-          dragOffset={pageMargins()}
+          dragOffset={calculateFullWidthPageMargins()}
           record={record}
           onDrag={this.onDrag}
           onDragOrResizeStop={this.onDragOrResizeStop}

@@ -19,6 +19,7 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
+import { calculateFullWidthPageMargins } from '~/utils/pageUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
@@ -1020,10 +1021,14 @@ class FoamcoreGrid extends React.Component {
       position.yPos = position.y - this.zoomLevel * 30
     }
 
-    const dragOffset = {
+    const defaultPageMargins = {
       x: pageMargins.left,
       y: pageMargins.top,
     }
+
+    const dragOffset = collection.isFourWideBoard
+      ? calculateFullWidthPageMargins()
+      : defaultPageMargins
 
     const mdlInSnackbar = card.isMDLPlaceholder && !card.isDragCardMaster
 
