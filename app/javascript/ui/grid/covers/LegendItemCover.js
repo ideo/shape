@@ -411,7 +411,7 @@ class LegendItemCover extends React.Component {
         <br />
         <StyledAddComparison>
           {comparisonMenuOpen && this.renderComparisonMenu}
-          {item.can_edit_content && !comparisonMenuOpen && (
+          {!comparisonMenuOpen && (
             <Heading3
               onClick={this.toggleComparisonSearch}
               role="button"
