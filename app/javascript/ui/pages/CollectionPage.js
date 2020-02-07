@@ -556,7 +556,9 @@ class CollectionPage extends React.Component {
           <Fragment>
             <ArchivedBanner />
             <OverdueBanner />
-            <PageContainer fullWidth={collection.isBoard}>
+            <PageContainer
+              fullWidth={collection.isBoard && !collection.isFourWideBoard}
+            >
               {this.renderEditorPill}
               {inner}
               {(collection.requiresSubmissionBoxSettings ||

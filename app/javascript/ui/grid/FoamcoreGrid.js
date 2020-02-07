@@ -106,6 +106,8 @@ const MAX_CARD_W = 4
 const MAX_CARD_H = 2
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
+const FOAMCORE_MAX_ZOOM = 3
+const FOUR_WIDE_MAX_ZOOM = 2
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -115,7 +117,7 @@ class FoamcoreGrid extends React.Component {
   @observable
   cardsToRender = []
   @observable
-  zoomLevel = 3
+  zoomLevel = FOAMCORE_MAX_ZOOM
   dragGridSpot = observable.map({})
   @observable
   dragging = false
@@ -167,9 +169,12 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
-    const { uiStore } = this.props
+    const { uiStore, collection } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = true
+      if (collection.isFourWideBoard && this.showZoomControls) {
+        this.zoomLevel = FOUR_WIDE_MAX_ZOOM
+      }
     })
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
@@ -246,9 +251,13 @@ class FoamcoreGrid extends React.Component {
       : MAX_COLS
   }
 
+  get maxZoom() {
+    return this.showZoomControls ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
+  }
+
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
-    if (this.zoomLevel !== 3) return this.zoomLevel
+    if (this.zoomLevel !== this.maxZoom) return this.zoomLevel
     // TODO: at some browser sizes + maxCols, there should really only be 2 zoom levels....
 
     const { gridW, gutter } = this.gridSettings
@@ -498,7 +507,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleZoomOut = ev => {
-    if (this.zoomLevel === 3) return
+    if (this.zoomLevel === this.maxZoom) return
     runInAction(() => {
       this.zoomLevel = this.zoomLevel + 1
     })
