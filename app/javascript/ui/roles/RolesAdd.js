@@ -484,6 +484,7 @@ class RolesAdd extends React.Component {
         </Row>
         <FormActionsContainer style={{ paddingBottom: '0' }}>
           <Button
+            data-cy="Button"
             onClick={this.confirmSave}
             disabled={this.selectedUsers.length === 0}
           >

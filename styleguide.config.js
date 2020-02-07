@@ -62,10 +62,10 @@ module.exports = {
         {
           rel: 'stylesheet',
           href:
-            'https://d2yp1lwhqo78df.cloudfront.net/assets/application-e76695f8303afddec6a82969f396f1657d3d42393f6c36d3bbf5f16c3d054ddf.css'
-        }
-      ]
-    }
+            'https://d2yp1lwhqo78df.cloudfront.net/assets/application-e76695f8303afddec6a82969f396f1657d3d42393f6c36d3bbf5f16c3d054ddf.css',
+        },
+      ],
+    },
   },
   serverPort: 8000,
   webpackConfig,
