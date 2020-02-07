@@ -101,7 +101,7 @@ module CollectionGrid
       end
 
       max_row = cards.map { |card| card_max_row(card) }.max || 0
-      matrix = Array.new(max_row + 1) { Array.new(16) }
+      matrix = Array.new(max_row + 1) { Array.new(collection.num_columns) }
 
       cards.each do |card|
         rows = (card.row..card_max_row(card))
@@ -246,7 +246,9 @@ module CollectionGrid
       end
 
       open_spot_matrix.each_with_index do |row_vals, row_idx|
-        next unless row_idx >= row && row_idx <= row + 15
+        # only find a valid open spot if it's within 20 rows of where we're looking
+        # (the 20 is just an arbitrary amount)
+        next unless row_idx >= row && row_idx <= row + 20
 
         row_vals.each_with_index do |open_spots, col_idx|
           can_fit = false
@@ -311,7 +313,7 @@ module CollectionGrid
 
       card_matrix.each_with_index do |row, row_idx|
         open = 0
-        open_spot_matrix[row_idx] = Array.new(16)
+        open_spot_matrix[row_idx] = Array.new(collection.num_columns)
         reversed = row.reverse
 
         reversed.each_with_index do |card, col_idx|
@@ -320,7 +322,7 @@ module CollectionGrid
           else
             open += 1
           end
-          open_spot_matrix[row_idx][15 - col_idx] = open
+          open_spot_matrix[row_idx][collection.max_col_limit - col_idx] = open
         end
       end
       open_spot_matrix

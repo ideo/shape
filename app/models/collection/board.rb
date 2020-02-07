@@ -16,6 +16,7 @@
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
 #  name                       :string
+#  num_columns                :integer
 #  processing_status          :integer
 #  search_term                :string
 #  shared_with_organization   :boolean          default(FALSE)
@@ -67,7 +68,6 @@
 
 class Collection
   class Board < Collection
-    COLS = 16
     # Re-define association to use `ordered_row_col` scope,
     # so cards are in correct order according to row and col
     has_many :collection_cards,
@@ -76,8 +76,8 @@ class Collection
              foreign_key: :parent_id,
              inverse_of: :parent
 
-    def self.allowed_col_range
-      0..(COLS - 1)
+    def max_col_limit
+      num_columns - 1
     end
 
     def max_row_index

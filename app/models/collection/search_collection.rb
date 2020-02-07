@@ -16,6 +16,7 @@
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
 #  name                       :string
+#  num_columns                :integer
 #  processing_status          :integer
 #  search_term                :string
 #  shared_with_organization   :boolean          default(FALSE)
