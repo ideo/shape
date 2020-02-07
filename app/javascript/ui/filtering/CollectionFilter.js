@@ -127,7 +127,7 @@ class CollectionFilter extends React.Component {
       collection,
       collection: {
         collection_filters,
-        isMethodLibraryCollection,
+        isParentMethodLibrary,
         filterBarFilters,
         methodLibraryFilters,
       },
@@ -147,7 +147,7 @@ class CollectionFilter extends React.Component {
     }
     return (
       <Fragment>
-        {isMethodLibraryCollection && (
+        {isParentMethodLibrary && (
           <MethodLibraryFilterBar
             filters={methodLibraryFilters}
             onSelect={this.onSelectFilter}
@@ -163,7 +163,7 @@ class CollectionFilter extends React.Component {
               onDelete={this.onDeleteFilter}
               onSelect={this.onSelectFilter}
               onShowAll={this.onShowAll}
-              showIcon={inSearchCollection || isMethodLibraryCollection}
+              showIcon={inSearchCollection || isParentMethodLibrary}
             />
           )}
           <Flex align="flex-end" ml="auto">
