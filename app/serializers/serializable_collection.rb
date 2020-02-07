@@ -45,6 +45,7 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
+  has_many :collection_cover_text_items
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection

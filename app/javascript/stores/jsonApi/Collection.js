@@ -1438,6 +1438,11 @@ Collection.refDefaults = {
     type: ReferenceType.TO_MANY,
     defaultValue: [],
   },
+  collection_cover_text_items: {
+    model: Item,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
 }
 
 export default Collection
