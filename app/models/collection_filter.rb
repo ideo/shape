@@ -19,7 +19,12 @@ class CollectionFilter < ApplicationRecord
   has_many :user_collection_filters,
            dependent: :destroy
 
-  validates :text, presence: true
+  validates :text,
+            presence: true,
+            uniqueness: {
+              scope: :collection_id,
+              message: 'should not have duplicate filters in a collection',
+            }
 
   enum filter_type: {
     tag: 0,

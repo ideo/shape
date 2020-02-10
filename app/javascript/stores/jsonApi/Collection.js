@@ -643,9 +643,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return { q: activeFilters.join(' ') }
   }
 
-  get isMethodLibraryCollection() {
+  get isParentMethodLibrary() {
     return (
-      this.name.match(/all\s+methods/i) !== null &&
       this.parent &&
       this.parent.name &&
       this.parent.name.match(/method\s+library/i) !== null
@@ -654,7 +653,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get filterBarFilters() {
-    if (!this.isMethodLibraryCollection) return this.collection_filters
+    if (!this.isParentMethodLibrary) return this.collection_filters
     // If it is method library, return all filters except the fixed method library tags
     return this.collection_filters.filter(
       filter =>
@@ -1437,6 +1436,11 @@ Collection.refDefaults = {
     defaultValue: [],
   },
   collection_cover_items: {
+    model: Item,
+    type: ReferenceType.TO_MANY,
+    defaultValue: [],
+  },
+  collection_cover_text_items: {
     model: Item,
     type: ReferenceType.TO_MANY,
     defaultValue: [],

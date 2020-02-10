@@ -110,6 +110,13 @@ class GridCard extends React.Component {
     return uiStore.editingCardCover === id
   }
 
+  get isHoveringOverDataItem() {
+    const { card } = this.props
+    // when you're hovering over a data item hide StyledTopRightActions
+    // so that you can still see the tooltips
+    return card.record && card.record.isData && uiStore.hoveringOverDataItem
+  }
+
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
@@ -135,12 +142,17 @@ class GridCard extends React.Component {
       return null
     }
 
+    let className = 'show-on-hover'
+    if (this.isEditingCardCover) {
+      className = 'hide-on-cover-edit'
+    } else if (this.isHoveringOverDataItem) {
+      className = 'hide-for-data-item'
+    }
+
     return (
       <StyledTopRightActions
         color={this.actionsColor}
-        className={
-          this.isEditingCardCover ? 'hide-on-cover-edit' : 'show-on-hover'
-        }
+        className={className}
         zoomLevel={zoomLevel}
       >
         {record.isDownloadable && <Download record={record} />}
@@ -396,16 +408,21 @@ class GridCard extends React.Component {
       testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
+    const { collection_cover_text_items } = record
 
     let nestedTextItem = null
     // Carousels have their own renderer in CollectionCover,
     // so don't behave the same as the other cover item types
     const isCoverItem =
       this.coverItem && record.cover_type !== 'cover_type_carousel'
-    if (this.coverItem && record.cover_type === 'cover_type_text_and_media') {
+    if (
+      collection_cover_text_items &&
+      collection_cover_text_items.length > 0 &&
+      record.cover_type === 'cover_type_text_and_media'
+    ) {
       // If this is a special cover with both image and text, pass the text
       // item through
-      nestedTextItem = this.coverItem
+      nestedTextItem = collection_cover_text_items[0]
     } else if (this.coverItem && record.cover_type !== 'cover_type_carousel') {
       // Instead use the item for the cover rather than the collection
       record = this.coverItem

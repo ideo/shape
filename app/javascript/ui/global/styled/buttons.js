@@ -220,13 +220,14 @@ export const CollectionCoverTextButton = styled(TextButton)`
 /* invert text color for transparent buttons, add colors as you go */
 const invertColor = color => {
   switch (color) {
-    case v.colors.commonDark:
-      return v.colors.commonLight
-    case v.colors.white:
-      return v.colors.black
-    case v.colors.commonMedium:
     case v.colors.black:
       return v.colors.white
+    case v.colors.commonDark:
+      return v.colors.commonLight
+    case v.colors.commonMedium:
+      return v.colors.black
+    case v.colors.white:
+      return v.colors.black
     default:
       return v.colors.white
   }

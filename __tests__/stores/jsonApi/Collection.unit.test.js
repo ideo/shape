@@ -536,7 +536,7 @@ describe('Collection', () => {
       beforeEach(() => {
         collection.parent.name = "Plant Organization's Method Library"
         collection.name = 'All Methods'
-        expect(collection.isMethodLibraryCollection).toEqual(true)
+        expect(collection.isParentMethodLibrary).toEqual(true)
       })
 
       it('filterBarFilters returns non-method-library filters', () => {

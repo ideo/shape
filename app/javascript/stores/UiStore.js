@@ -234,6 +234,8 @@ export default class UiStore {
   placeholderPosition = {
     ...this.placeholderDefaults,
   }
+  @observable
+  hoveringOverDataItem = false
 
   @action
   setEditingCardCover(editingCardCoverId) {

@@ -5,6 +5,8 @@ exports[`DataItemCover renders snapshot 1`] = `
   className="cancelGridClick"
   data-cy="DataItemCover"
   editing={false}
+  onMouseOut={[Function]}
+  onMouseOver={[Function]}
 >
   <StyledHeading3>
     <span>

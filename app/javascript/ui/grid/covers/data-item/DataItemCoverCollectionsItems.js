@@ -261,6 +261,15 @@ class DataItemCoverCollectionsItems extends React.Component {
     return name
   }
 
+  handleMouseOver = () => {
+    const { uiStore } = this.props
+    uiStore.update('hoveringOverDataItem', true)
+  }
+  handleMouseOut = () => {
+    const { uiStore } = this.props
+    uiStore.update('hoveringOverDataItem', false)
+  }
+
   renderSingleValue() {
     const { primaryDataset } = this.props.item
     const { single_value } = primaryDataset
@@ -305,6 +314,8 @@ class DataItemCoverCollectionsItems extends React.Component {
         editable={item.can_edit_content}
         editing={this.editing}
         data-cy="DataItemCover"
+        onMouseOver={this.handleMouseOver}
+        onMouseOut={this.handleMouseOut}
       >
         {this.loading && <InlineLoader />}
         {item.isReportTypeCollectionsItems && timeframe === 'ever'
