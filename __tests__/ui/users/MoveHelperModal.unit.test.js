@@ -3,9 +3,9 @@ import { fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import CardMoveService from '~/utils/CardMoveService'
+import { useTemplateInMyCollection } from '~/utils/url'
 
-jest.mock('../../../app/javascript/utils/CardMoveService')
+jest.mock('../../../app/javascript/utils/url')
 
 let props, wrapper, component, uiStore, routingStore
 
@@ -74,15 +74,10 @@ describe('MoveHelperModal', () => {
       component.handleAddToMyCollection(fakeEvent)
     })
 
-    it('should call CardMoveService.moveCards', () => {
-      expect(CardMoveService.moveCards).toHaveBeenCalledWith('end', {
-        to_id: props.apiStore.currentUser.current_user_collection_id,
-        from_id: component.templateCollection.id,
-      })
-    })
-
-    it('should set cardAction to "useTemplate"', () => {
-      expect(uiStore.update).toHaveBeenCalledWith('cardAction', 'useTemplate')
+    it('should call useTemplateInMyCollection', () => {
+      expect(useTemplateInMyCollection).toHaveBeenCalledWith(
+        component.templateCollection.id
+      )
     })
 
     describe('after checking the dont show again box', () => {
