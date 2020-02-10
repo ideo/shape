@@ -143,6 +143,8 @@ class FoamcoreGrid extends React.Component {
     max: 0,
     num: 0,
   }
+  @observable
+  disableHorizontalScroll = false
 
   placeholderDefaults = {
     row: null,
@@ -208,6 +210,10 @@ class FoamcoreGrid extends React.Component {
     this.computeVisibleRows()
     this.computeVisibleCols()
 
+    if (!this.showZoomControls && this.zoomLevel > 1) {
+      this.handleZoomIn()
+    }
+
     const visRows = this.visibleRows
 
     // Load more rows if currently loaded rows is less than
@@ -253,7 +259,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   get maxZoom() {
-    return this.showZoomControls ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
+    const { collection } = this.props
+    return collection.isFourWideBoard ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
   }
 
   // Default zoom level is that which fits all columns in the browser viewport
@@ -507,19 +514,20 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
-  handleZoomOut = ev => {
-    if (this.zoomLevel === this.maxZoom) return
-    runInAction(() => {
-      this.zoomLevel = this.zoomLevel + 1
-    })
+  @action
+  handleZoomOut = () => {
+    if (this.zoomLevel >= this.maxZoom) {
+      this.zoomLevel = this.maxZoom
+      return
+    }
+    this.zoomLevel = this.zoomLevel + 1
     this.updateCollectionScrollBottom()
   }
 
-  handleZoomIn = ev => {
+  @action
+  handleZoomIn = () => {
     if (this.zoomLevel === 1) return
-    runInAction(() => {
-      this.zoomLevel = this.zoomLevel - 1
-    })
+    this.zoomLevel = this.zoomLevel - 1
     this.updateCollectionScrollBottom()
   }
 
@@ -550,10 +558,11 @@ class FoamcoreGrid extends React.Component {
     this.draggingMap = this.determineDragMap(card.id)
   }
 
+  @action
   onDrag = (cardId, dragPosition) => {
-    runInAction(() => {
-      this.dragging = true
-    })
+    this.dragging = true
+
+    const { collection } = this.props
     const card = this.originalCard(cardId)
 
     // TODO considering changing dragX in MoveableGridCard
@@ -565,6 +574,11 @@ class FoamcoreGrid extends React.Component {
     }
     const cardDims = { width: card.width, height: card.height }
     const cardCoords = this.coordinatesForPosition(cardPosition)
+    if (cardCoords.col > collection.num_columns) {
+      this.disableHorizontalScroll = true
+    } else {
+      this.disableHorizontalScroll = false
+    }
     this.debouncedSetDraggedOnSpots(
       { card, ...cardCoords, ...cardDims },
       dragPosition
@@ -827,6 +841,7 @@ class FoamcoreGrid extends React.Component {
       const { row, col, width } = position
       if (row < 0 || col < 0 || col + width > collection.num_columns) {
         this.hasDragCollision = true
+        return
       }
       this.dragGridSpot.set(getMapKey(position), position)
       this.hasDragCollision =
@@ -1052,7 +1067,10 @@ class FoamcoreGrid extends React.Component {
         parent={collection}
         // don't apply any zoom to the mdlPlaceholder
         zoomLevel={mdlInSnackbar ? 1 : this.relativeZoomLevel}
-        horizontalScroll
+        // don't allow horizontal scroll unless we are in a zoomable view
+        horizontalScroll={
+          this.showZoomControls && !this.disableHorizontalScroll
+        }
         showHotEdge={false}
       />
     )
@@ -1285,6 +1303,7 @@ class FoamcoreGrid extends React.Component {
     const gridSize = this.totalGridSize
     return (
       <Grid
+        className="foamcoreGridBoundary"
         data-empty-space-click
         ref={ref => {
           this.gridRef = ref

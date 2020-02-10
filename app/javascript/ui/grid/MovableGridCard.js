@@ -80,9 +80,9 @@ const scrollAmount = () => {
   //
   let amount
   if (window.devicePixelRatio >= 2) {
-    amount = window.devicePixelRatio
+    amount = window.devicePixelRatio * 0.75
   } else if (window.devicePixelRatio >= 1) {
-    amount = 2
+    amount = 1.5
   } else {
     // After testing out multiple values, this seemed to be the right balance
     amount = 1.5 / window.devicePixelRatio
@@ -259,7 +259,7 @@ class MovableGridCard extends React.Component {
     return window.requestAnimationFrame(this.scrollRight)
   }
 
-  handleDrag = (e, data, dX, dY) => {
+  handleDrag = (e, data) => {
     if (!this.shouldDragCard || this.unmounted) return
     const { card, position, dragOffset, zoomLevel } = this.props
     // Global dragging should use screen coordinates
@@ -746,7 +746,7 @@ class MovableGridCard extends React.Component {
       ref: c => {
         this.rnd = c
       },
-      bounds: null,
+      bounds: isBoardCollection ? '.foamcoreGridBoundary' : null,
       onDragStart: this.handleStart,
       onDrag: this.handleDrag,
       onDragStop: this.handleStop('drag'),
@@ -810,7 +810,7 @@ class MovableGridCard extends React.Component {
         width={card.maxWidth * v.defaultGridSettings.gridW}
         height={card.maxHeight * v.defaultGridSettings.gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
-        allowTouchAction={uiStore.isAndroid && !uiStore.isBoardCollection}
+        allowTouchAction={uiStore.isAndroid && !isBoardCollection}
         // <-----
       >
         <Rnd {...rndProps}>
