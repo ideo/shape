@@ -244,6 +244,7 @@ export default {
     pageHeader: 220,
     popoutMenu: 201,
     scrollIndicator: 200,
+    zoomControls: 199,
     cardHovering: 160,
     gridCardTop: 151,
     gridCard: 150,
