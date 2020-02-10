@@ -199,11 +199,20 @@ class MovableGridCard extends React.Component {
     const leftMargin = v.containerPadding.horizontal * 16
 
     // At right of viewport
-    if (e.clientX > window.innerWidth - cardWidth + leftMargin) {
+    if (
+      e.clientX > window.innerWidth - cardWidth + leftMargin ||
+      (uiStore.isTouchDevice &&
+        e.changedTouches[0].clientX >
+          window.innerWidth - cardWidth + leftMargin)
+    ) {
       this.scrolling = true
       this.scrollRight()
       // At left of viewport
-    } else if (e.clientX - cardWidth - leftMargin < 0) {
+    } else if (
+      e.clientX - cardWidth - leftMargin < 0 ||
+      (uiStore.isTouchDevice &&
+        e.changedTouches[0].clientX - cardWidth - leftMargin < 0)
+    ) {
       this.scrolling = true
       this.scrollLeft()
     } else {
