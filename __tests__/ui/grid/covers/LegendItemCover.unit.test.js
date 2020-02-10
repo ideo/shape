@@ -234,8 +234,8 @@ describe('LegendItemCover', () => {
       wrapper = shallow(<LegendItemCover.wrappedComponent {...props} />)
     })
 
-    it('should not show the comparison button', () => {
-      expect(wrapper.find('.test-add-comparison-button').exists()).toBe(false)
+    it('should show the comparison button', () => {
+      expect(wrapper.find('.test-add-comparison-button').exists()).toBe(true)
     })
   })
 })
