@@ -144,12 +144,15 @@ class Routes extends React.Component {
     e.stopPropagation()
     e.preventDefault()
 
-    this.throttledSetSelectedArea({
-      minX: _.min([e.pageX, this.mouseDownAt.x]),
-      maxX: _.max([e.pageX, this.mouseDownAt.x]),
-      minY: _.min([e.pageY, this.mouseDownAt.y]),
-      maxY: _.max([e.pageY, this.mouseDownAt.y]),
-    })
+    this.throttledSetSelectedArea(
+      {
+        minX: _.min([e.pageX, this.mouseDownAt.x]),
+        maxX: _.max([e.pageX, this.mouseDownAt.x]),
+        minY: _.min([e.pageY, this.mouseDownAt.y]),
+        maxY: _.max([e.pageY, this.mouseDownAt.y]),
+      },
+      e.shiftKey
+    )
   }
 
   handleMouseUpSelection = e => {
@@ -190,11 +193,11 @@ class Routes extends React.Component {
     }
   }
 
-  _setSelectedArea = coords => {
+  _setSelectedArea = (coords, shifted = false) => {
     const {
       apiStore: { uiStore },
     } = this.props
-    uiStore.setSelectedArea(coords)
+    uiStore.setSelectedArea(coords, { shifted })
   }
 
   // Props for the div that shows area selected

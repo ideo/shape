@@ -457,10 +457,13 @@ class FoamcoreGrid extends React.Component {
     // Return if it couldn't find cards in both positions
     if (!topLeftCoords || !bottomRightCoords) return
 
-    const selectedCardIds = collection.cardIdsWithinRectangle(
+    let selectedCardIds = collection.cardIdsWithinRectangle(
       topLeftCoords,
       bottomRightCoords
     )
+    if (uiStore.selectedAreaShifted) {
+      selectedCardIds = _.union(selectedCardIds, uiStore.selectedCardIds)
+    }
 
     // TODO: if shift is also selected, add to any existing selection
     runInAction(() => {
