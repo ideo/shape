@@ -220,4 +220,19 @@ describe('DataItemCover', () => {
       })
     })
   })
+
+  describe('handleMouseOver', () => {
+    it('sets uiStore.hoveringOverDataItem', () => {
+      const cover = wrapper.find('StyledDataItemCover')
+      cover.simulate('mouseOver')
+      expect(uiStore.update).toHaveBeenCalledWith('hoveringOverDataItem', true)
+    })
+  })
+  describe('handleMouseOut', () => {
+    it('unsets uiStore.hoveringOverDataItem', () => {
+      const cover = wrapper.find('StyledDataItemCover')
+      cover.simulate('mouseOut')
+      expect(uiStore.update).toHaveBeenCalledWith('hoveringOverDataItem', false)
+    })
+  })
 })

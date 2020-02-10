@@ -29,8 +29,18 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       d
     end
   end
+  # to make test more predictable, fix the dates to end of current month
+  let(:end_date) { Time.current.end_of_month }
+  let(:before_end_date) { end_date - 2.days }
+  # will be in last month and also not "within last 30 days"
+  let(:over_31_days_ago) { end_date - 33.days }
 
-  let(:report) { DataReport::CollectionsAndItems.new(dataset: dataset) }
+  let(:report) do
+    DataReport::CollectionsAndItems.new(
+      dataset: dataset,
+      end_date: end_date,
+    )
+  end
 
   describe '#call' do
     context 'filtering by organization' do
@@ -123,27 +133,31 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       # Parent collection -> child collection -> child_child_collection -> 1 item
 
       let(:other_collection) { create(:collection, organization: organization) }
-      let(:parent_collection) { create(:collection, organization: organization) }
+      # parent collection is older
+      let(:parent_collection) { create(:collection, organization: organization, created_at: over_31_days_ago) }
       let(:child_collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
       let(:child_child_collection) { create(:collection, organization: organization, parent_collection: child_collection) }
       let(:item) { create(:text_item, parent_collection: child_child_collection) }
       let(:actor) { create(:user) }
 
       before do
-        create_list(:activity, 1, target: parent_collection, action: :created, created_at: 2.months.ago, organization: organization)
-        create_list(:activity, 5, target: parent_collection, action: :viewed, created_at: 2.months.ago, organization: organization)
+        date = over_31_days_ago
+        create_list(:activity, 1, target: parent_collection, action: :created, created_at: date, organization: organization)
+        create_list(:activity, 5, target: parent_collection, action: :viewed, created_at: date, organization: organization)
+
+        date = before_end_date
         # same actor edited twice
-        create_list(:activity, 2, target: child_collection, action: :edited, actor: actor, organization: organization)
+        create_list(:activity, 2, target: child_collection, action: :edited, created_at: date, actor: actor, organization: organization)
         # same actor viewed three times
-        create_list(:activity, 3, target: child_collection, action: :viewed, actor: actor, organization: organization)
-        create_list(:activity, 4, target: child_collection, action: :viewed, organization: organization)
-        create_list(:activity, 3, target: child_child_collection, action: :edited, organization: organization)
-        create_list(:activity, 3, target: child_child_collection, action: :viewed, organization: organization)
-        create_list(:activity, 4, target: item, action: :replaced, organization: organization)
-        create_list(:activity, 2, target: item, action: :viewed, organization: organization)
+        create_list(:activity, 3, target: child_collection, action: :viewed, created_at: date, actor: actor, organization: organization)
+        create_list(:activity, 4, target: child_collection, action: :viewed, created_at: date, organization: organization)
+        create_list(:activity, 3, target: child_child_collection, action: :edited, created_at: date, organization: organization)
+        create_list(:activity, 3, target: child_child_collection, action: :viewed, created_at: date, organization: organization)
+        create_list(:activity, 4, target: item, action: :replaced, created_at: date, organization: organization)
+        create_list(:activity, 2, target: item, action: :viewed, created_at: date, organization: organization)
         # other collection exists in the same org but outside the parent tree
-        create_list(:activity, 5, target: other_collection, action: :created, organization: organization)
-        create_list(:activity, 1, target: other_collection, action: :viewed, organization: organization)
+        create_list(:activity, 5, target: other_collection, action: :created, created_at: date, organization: organization)
+        create_list(:activity, 1, target: other_collection, action: :viewed, created_at: date, organization: organization)
       end
 
       context 'with a participant measure' do
@@ -289,6 +303,34 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           expect(values.first[:value]).to eq 1
           # the rest are more recent
           expect(values.last[:value]).to eq 8
+
+          # do a different query to double check our math
+          actors = Activity
+                   .where_participated
+                   .where.not(target: other_collection)
+                   .where('created_at >= ?', end_date - 30.days)
+                   .group(:actor_id).count.count
+          expect(actors).to eq 8
+        end
+
+        context 'with even older data, repeated actors' do
+          before do
+            date = over_31_days_ago - 1.month
+            target = parent_collection
+            create_list(:activity, 2, target: target, action: :created, actor: actor, created_at: date, organization: organization)
+            create_list(:activity, 1, target: target, action: :created, created_at: date, organization: organization)
+            date = before_end_date
+            # same actor we've already counted for the current date
+            create_list(:activity, 3, target: target, action: :created, actor: actor, created_at: date, organization: organization)
+          end
+
+          it 'calculates the number of participants in the collection, child collections, and items in those collections' do
+            values = report.call
+            # we have two unique actors in the oldest month
+            expect(values[0][:value]).to eq 2
+            expect(values[1][:value]).to eq 1
+            expect(values[2][:value]).to eq 8
+          end
         end
 
         context 'with a group filter' do
@@ -344,8 +386,8 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       end
 
       context 'with a collections measure' do
-        let!(:other_child_collection) do
-          create(:collection, organization: organization, parent_collection: parent_collection, created_at: 2.months.ago)
+        let!(:older_child_collections) do
+          create_list(:collection, 2, organization: organization, parent_collection: parent_collection, created_at: over_31_days_ago)
         end
         let(:dataset_params) do
           {
@@ -357,18 +399,24 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
 
         it 'should calculate collection counts on a timeline' do
           values = report.call
-          expect(values.first[:value]).to eq 1
-          # the rest are more recent
-          expect(values.last[:value]).to eq 3
+          # created some old ones, plus the parent itself is older
+          expect(values.first[:value]).to eq 3
+          # the rest (including parent collection itself) are more recent
+          expect(values.last[:value]).to eq 2
+
+          # just some math checking, we have 4 child collections + parent = 5 total
+          expect(Collection.in_collection(parent_collection).count).to eq(4)
+          # these should be the 2 recent ones
+          expect(Collection.in_collection(parent_collection).where('created_at > ?', end_date - 30.days).count).to eq(2)
         end
       end
 
       context 'with an collections & items measure' do
         let!(:old_child_collection) do
-          create(:collection, organization: organization, parent_collection: parent_collection, created_at: 2.months.ago)
+          create(:collection, organization: organization, parent_collection: parent_collection, created_at: over_31_days_ago)
         end
-        let!(:new_items) { create_list(:text_item, 3, parent_collection: old_child_collection) }
-        let!(:old_items) { create_list(:text_item, 5, parent_collection: old_child_collection, created_at: 2.months.ago) }
+        let!(:new_items) { create_list(:text_item, 4, parent_collection: old_child_collection) }
+        let!(:old_items) { create_list(:text_item, 5, parent_collection: old_child_collection, created_at: over_31_days_ago) }
         let(:dataset_params) do
           {
             data_source: parent_collection,
@@ -378,14 +426,15 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         end
 
         it 'should calculate collection & item counts on a timeline' do
+          # parent collection (parent context) 1
           # Old collection: 1
           # Old items: 5
-          # OLD = 6 total
-          # Recent collections: 3, Parent, Child, ChildChild (parent context)
-          # Recent Items: 1 (data item, top context) + 1 (parent context) + 3 new items
+          # OLD = 7 total
+          # Recent collections: 2, Child, ChildChild (parent context)
+          # Recent Items: 1 (data item, top context) + 1 (parent context) + 4 new items
           # RECENT = 8 total
           values = report.call
-          expect(values.first[:value]).to eq 6
+          expect(values.first[:value]).to eq 7
           expect(values.last[:value]).to eq 8
         end
       end
@@ -411,14 +460,14 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
 
     describe '#call' do
       let(:call) do
-        DataReport::CollectionsAndItems.call(dataset: dataset)
+        DataReport::CollectionsAndItems.call(dataset: dataset, end_date: end_date)
       end
 
       it 'returns time series' do
         expect(call).to eq(
           [
             {
-              date: Time.now.utc.strftime('%Y-%m-%d'),
+              date: end_date.utc.strftime('%Y-%m-%d'),
               value: 2,
             },
           ],
