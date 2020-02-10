@@ -2,6 +2,7 @@
 
 exports[`FoamcoreGrid renders snapshot 1`] = `
 <styled.div
+  className="foamcoreGridBoundary"
   data-empty-space-click={true}
   height={NaN}
   width={988.0701754385965}
