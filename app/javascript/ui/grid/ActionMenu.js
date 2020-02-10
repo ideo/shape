@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
@@ -141,6 +141,14 @@ class ActionMenu extends React.Component {
     window.print()
   }
 
+  selectCards = async () => {
+    const { uiStore, card } = this.props
+    const cardIds = await card.API_selectCardIds()
+    runInAction(() => {
+      uiStore.selectedCardIds = cardIds
+    })
+  }
+
   get movingFromCollectionId() {
     const { card, uiStore, location } = this.props
     // For PageMenu we're moving "from" the parent collection
@@ -215,6 +223,11 @@ class ActionMenu extends React.Component {
         name: 'Delete',
         iconRight: <TrashIconXl />,
         onClick: this.archiveCard,
+      },
+      {
+        name: 'Select Cards Below',
+        iconRight: <SelectAllIcon />,
+        onClick: this.selectCards,
       },
     ]
     actions.forEach(actionItem => {
