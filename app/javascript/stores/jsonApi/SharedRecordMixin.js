@@ -107,6 +107,8 @@ const SharedRecordMixin = superclass =>
         const res = await this.apiStore.request(this.baseApiPath, 'PATCH', {
           data,
         })
+        // much like API_batchUpdateCardsWithUndo, we have to reapply the local state
+        this.revertToSnapshot(snapshot)
         return res
       } catch {
         if (snapshot && this.internalType === 'collections') {
