@@ -70,6 +70,7 @@ gem 'acts-as-taggable-on', '~> 6.0.0'
 gem 'rack-rewrite', '~> 1.5'
 # for CORS requests (specifically for CDN handling)
 gem 'rack-cors', '~> 1.0.1'
+gem 'rack', '2.0.8'
 
 # Filestack API Wrapper
 gem 'filestack', '~> 2.6.1'
