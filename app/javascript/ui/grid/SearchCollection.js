@@ -124,13 +124,13 @@ class SearchCollection extends React.Component {
             editingMarginTop="0"
           />
         </Flex>
-        <Flex mb="12px" ml="2px">
+        <div style={{ marginBottom: '12px', marginLeft: '2px' }}>
           <CollectionFilter
             inSearchCollection={true}
             collection={collection}
             canEdit={collection.can_edit_content}
           />
-        </Flex>
+        </div>
         {this.loading ? (
           <Loader />
         ) : (
