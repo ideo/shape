@@ -1,5 +1,7 @@
 import _ from 'lodash'
-import MovableGridCard from '~/ui/grid/MovableGridCard'
+import MovableGridCard, {
+  SCROLL_ANIMATION_SPEED,
+} from '~/ui/grid/MovableGridCard'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { uiStore } from '~/stores'
 
@@ -160,14 +162,20 @@ describe('MovableGridCard', () => {
     describe('scrollRight', () => {
       it('calls scrollBy on scrollElement', () => {
         instance.scrollRight()
-        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(2, 0)
+        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(
+          SCROLL_ANIMATION_SPEED,
+          0
+        )
       })
     })
 
     describe('scrollLeft', () => {
       it('calls scrollBy on scrollElement', () => {
         instance.scrollLeft()
-        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(-2, 0)
+        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(
+          -1 * SCROLL_ANIMATION_SPEED,
+          0
+        )
       })
     })
   })

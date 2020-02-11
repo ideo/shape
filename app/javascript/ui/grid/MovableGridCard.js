@@ -67,6 +67,8 @@ const InnerCardWrapper = styled.div.attrs(
 const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
 const cardHoverTransition = 'transform 0.2s'
 
+export const SCROLL_ANIMATION_SPEED = 1.5
+
 const scrollAmount = () => {
   // When zooming browser in or out, it doesn't work to use `1` as the unit,
   // There aren't any reliable ways to get the zoom level from all browsers.
@@ -80,12 +82,12 @@ const scrollAmount = () => {
   //
   let amount
   if (window.devicePixelRatio >= 2) {
-    amount = window.devicePixelRatio * 0.75
+    amount = window.devicePixelRatio * (SCROLL_ANIMATION_SPEED / 2)
   } else if (window.devicePixelRatio >= 1) {
-    amount = 1.5
+    amount = SCROLL_ANIMATION_SPEED
   } else {
     // After testing out multiple values, this seemed to be the right balance
-    amount = 1.5 / window.devicePixelRatio
+    amount = SCROLL_ANIMATION_SPEED / window.devicePixelRatio
   }
   return amount
 }
