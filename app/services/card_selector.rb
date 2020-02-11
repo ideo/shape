@@ -28,9 +28,11 @@ class CardSelector < SimpleService
     # select cards that are only editable by the user and is not hidden?
     # pinned/unpinned?
 
-    # TODO: select everything for now
-    cards = @parent_collection.collection_cards
-    cards = cards.unpinned unless @parent_collection.master_template?
+    cards = CollectionGrid::Calculator.uninterupted_cards_below(
+      selected_card: @card,
+      collection: @parent_collection,
+    )
+    cards.reject(&:pinned)
     @selecting_cards = cards.to_a
   end
 end

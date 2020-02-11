@@ -346,5 +346,40 @@ module CollectionGrid
       end
       card_matrix
     end
+
+    def self.uninterupted_cards_below(
+      selected_card:,
+      collection:
+    )
+      card_matrix = board_matrix(
+        collection: collection,
+        drag_positions: [],
+        moving_cards: [],
+      )
+
+      min_col = selected_card.col
+      max_col = selected_card.col + selected_card.width - 1
+      selected_card_cols = *(min_col..max_col)
+
+      uninterupted_cards = [selected_card]
+
+      start_row = selected_card.row + 1
+      selected_card_cols.each do |current_col|
+        current_row = start_row
+        while card_matrix.size - 1 >= current_row
+          spot = card_matrix[current_row][current_col]
+          # if there is a card at the spot it should be one of the cards
+          if spot.present?
+            uninterupted_cards << spot
+          else
+            # This is a blank row break out of while loop
+            break
+          end
+          current_row += 1
+        end
+      end
+
+      uninterupted_cards.flatten.uniq
+    end
   end
 end

@@ -503,6 +503,10 @@ class CollectionCard < ApplicationRecord
     false
   end
 
+  def cols_occupying
+    [col, col + width]
+  end
+
   private
 
   def assign_default_height_and_width
