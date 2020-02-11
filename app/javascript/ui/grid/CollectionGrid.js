@@ -15,7 +15,7 @@ import { objectsEqual } from '~/utils/objectUtils'
 import CardMoveService from '~/utils/CardMoveService'
 import { groupByConsecutive } from '~/utils/CollectionGridCalculator'
 import v from '~/utils/variables'
-import { calculateFullWidthPageMargins } from '~/utils/pageUtils'
+import { calculatePageMargins } from '~/utils/pageUtils'
 
 const cardMover = new CardMoveService()
 
@@ -983,7 +983,7 @@ class CollectionGrid extends React.Component {
           isSharedCollection={collection.isSharedCollection}
           isBoardCollection={false}
           position={card.position}
-          dragOffset={calculateFullWidthPageMargins()}
+          dragOffset={calculatePageMargins()}
           record={record}
           onDrag={this.onDrag}
           onDragOrResizeStop={this.onDragOrResizeStop}

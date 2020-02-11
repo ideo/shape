@@ -1,17 +1,20 @@
 import v from '~/utils/variables'
 
-const calculateFullWidthPageMargins = () => {
-  let xMargin
-  if (window.innerWidth >= v.maxWidth) {
-    xMargin = (window.innerWidth - v.maxWidth) / 2
+const calculatePageMargins = ({ fullWidth = true } = {}) => {
+  let x
+  if (fullWidth && window.innerWidth >= v.maxWidth) {
+    x = (window.innerWidth - v.maxWidth) / 2
   } else {
     // Otherwise use container padding, multiplied to transform to px
-    xMargin = v.containerPadding.horizontal * 16
+    x = v.containerPadding.horizontal * 16
   }
+  const y = v.topScrollTrigger
   return {
-    x: xMargin,
-    y: v.topScrollTrigger,
+    x,
+    y,
+    left: x,
+    top: y,
   }
 }
 
-export { calculateFullWidthPageMargins }
+export { calculatePageMargins }

@@ -19,7 +19,7 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
-import { calculateFullWidthPageMargins } from '~/utils/pageUtils'
+import { calculatePageMargins } from '~/utils/pageUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
@@ -94,13 +94,6 @@ export const StyledPlusIcon = styled.div`
 
 function getMapKey({ col, row }) {
   return `${col},${row}`
-}
-
-const pageMargins = {
-  // v.containerPadding is in `em` units, so we multiply by 16
-  left: v.containerPadding.horizontal * 16,
-  // TODO: is this right? This is 60px but we also have collection title up top
-  top: v.headerHeight + 90,
 }
 
 const MAX_CARD_W = 4
@@ -249,6 +242,14 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
+  get pageMargins() {
+    const { collection } = this.props
+    return {
+      ...calculatePageMargins({ fullWidth: collection.isFourWideBoard }),
+      top: v.headerHeight + 90,
+    }
+  }
+
   get maxCols() {
     const { collection, uiStore } = this.props
     if (collection.num_columns === 4) return 4
@@ -265,6 +266,7 @@ class FoamcoreGrid extends React.Component {
 
   // Default zoom level is that which fits all columns in the browser viewport
   get relativeZoomLevel() {
+    const { pageMargins } = this
     if (this.zoomLevel !== this.maxZoom) return this.zoomLevel
     // TODO: at some browser sizes + maxCols, there should really only be 2 zoom levels....
 
@@ -276,6 +278,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   get showZoomControls() {
+    const { pageMargins } = this
     const { gridW, gutter } = this.gridSettings
     const gridWidth = (gridW + gutter) * this.maxCols + pageMargins.left * 2
     // only show zoom if the grid is wider than our window
@@ -319,6 +322,7 @@ class FoamcoreGrid extends React.Component {
 
   @action
   computeVisibleRows() {
+    const { pageMargins } = this
     if (!this.gridRef) return { min: null, max: null }
 
     const top = window.scrollY || window.pageYOffset
@@ -339,6 +343,7 @@ class FoamcoreGrid extends React.Component {
 
   @action
   computeVisibleCols() {
+    const { pageMargins } = this
     if (!this.gridRef) return { min: null, max: null }
 
     const left = window.scrollX || window.pageXOffset
@@ -438,6 +443,7 @@ class FoamcoreGrid extends React.Component {
 
   // Adjusts global x,y coords to foamcore grid coords
   get selectedAreaAdjustedForGrid() {
+    const { pageMargins } = this
     const { selectedArea } = this.props
     let { minX, minY, maxX, maxY } = selectedArea
 
@@ -496,12 +502,13 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleBlankCardClick = ({ row, col }) => e => {
-    const {
-      selectedArea: { minX },
-    } = this.props
+    const { selectedAreaMinX } = this.props
 
     // If user is selecting an area, don't trigger blank card click
-    if (minX) return
+    if (selectedAreaMinX) {
+      console.log({ selectedAreaMinX }, 'returning...')
+      return
+    }
 
     const { uiStore } = this.props
     uiStore.openBlankContentTool({
@@ -570,7 +577,7 @@ class FoamcoreGrid extends React.Component {
     }
     const cardDims = { width: card.width, height: card.height }
     const cardCoords = this.coordinatesForPosition(cardPosition)
-    if (cardCoords.col > collection.num_columns) {
+    if (cardCoords.col >= collection.num_columns) {
       this.disableHorizontalScroll = true
     } else {
       this.disableHorizontalScroll = false
@@ -1032,14 +1039,7 @@ class FoamcoreGrid extends React.Component {
       position.yPos = position.y - this.zoomLevel * 30
     }
 
-    const defaultPageMargins = {
-      x: pageMargins.left,
-      y: pageMargins.top,
-    }
-
-    const dragOffset = collection.isFourWideBoard
-      ? calculateFullWidthPageMargins()
-      : defaultPageMargins
+    const dragOffset = this.pageMargins
 
     const mdlInSnackbar = card.isMDLPlaceholder && !card.isDragCardMaster
 
@@ -1229,17 +1229,20 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderBlanksAndBct() {
-    const { apiStore, uiStore, canEditCollection } = this.props
-    const { movingCardIds } = uiStore
+    const { collection, apiStore, uiStore, canEditCollection } = this.props
+    const { num_columns } = collection
+    const { movingCardIds, blankContentToolState } = uiStore
     let cards = []
 
+    const leftPad = num_columns > 4 ? 3 : 0
+    const across = _.min([10, num_columns])
     if (this.loadingRow) {
-      _.times(10, i => {
+      _.times(across, i => {
         _.times(4, j => {
           cards.push({
             id: 'unrendered',
             // loading squares are centered, 3 from the left
-            col: i + 3,
+            col: i + leftPad,
             // 3 down from the beginning of loadingRow
             row: this.loadingRow + j + 3,
             width: 1,
@@ -1253,7 +1256,7 @@ class FoamcoreGrid extends React.Component {
       cards.push({
         id: 'blank',
         blankType: 'bct',
-        ...uiStore.blankContentToolState,
+        ...blankContentToolState,
       })
     }
     if (this.placeholderSpot) {
