@@ -167,17 +167,13 @@ class Routes extends React.Component {
 
     // Cancel any currently throttled calls
     this.throttledSetSelectedArea.cancel()
-
-    // Wait to clear mouse down area,
-    // So that BCT does not immediately trigger
-    setTimeout(() => {
-      this._setSelectedArea({
-        minX: null,
-        maxX: null,
-        minY: null,
-        maxY: null,
-      })
-    }, 500)
+    // clear selected area (enabling BCT to open)
+    this._setSelectedArea({
+      minX: null,
+      maxX: null,
+      minY: null,
+      maxY: null,
+    })
   }
 
   handleTouchMove = e => {
