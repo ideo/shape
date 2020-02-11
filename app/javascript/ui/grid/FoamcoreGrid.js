@@ -405,11 +405,6 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
-  get isSelectingArea() {
-    // Check if there is a selected area
-    return !!this.selectedAreaAdjustedForGrid.minX
-  }
-
   // Adjusts global x,y coords to foamcore grid coords
   get selectedAreaAdjustedForGrid() {
     const { selectedArea } = this.props
@@ -464,8 +459,6 @@ class FoamcoreGrid extends React.Component {
     if (uiStore.selectedAreaShifted) {
       selectedCardIds = _.union(selectedCardIds, uiStore.selectedCardIds)
     }
-
-    // TODO: if shift is also selected, add to any existing selection
     runInAction(() => {
       uiStore.selectedCardIds = selectedCardIds
     })
