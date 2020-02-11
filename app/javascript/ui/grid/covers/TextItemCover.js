@@ -235,7 +235,8 @@ class TextItemCover extends React.Component {
       <StyledPaddedCover
         data-cy="TextItemCover"
         style={{
-          height: 'calc(100% - 30px)',
+          // account for padding: 1rem on both sides
+          height: 'calc(100% - 2rem)',
         }}
         className="cancelGridClick"
         onClick={this.handleClick}

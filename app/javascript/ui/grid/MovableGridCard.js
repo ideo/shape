@@ -171,11 +171,11 @@ class MovableGridCard extends React.Component {
       document.body.style['overflow-y'] = 'hidden'
     }
 
+    const changedTouch = e.changedTouches ? e.changedTouches[0] : {}
     // Vertical Scroll
     if (
       e.clientY < v.topScrollTrigger ||
-      (uiStore.isTouchDevice &&
-        e.changedTouches[0].clientY < v.topScrollTrigger)
+      (uiStore.isTouchDevice && changedTouch.clientY < v.topScrollTrigger)
     ) {
       // At top of viewport
       this.scrolling = true
@@ -184,7 +184,7 @@ class MovableGridCard extends React.Component {
     } else if (
       e.clientY > window.innerHeight - v.topScrollTrigger ||
       (uiStore.isTouchDevice &&
-        e.changedTouches[0].clientY > window.innerHeight - v.topScrollTrigger)
+        changedTouch.clientY > window.innerHeight - v.topScrollTrigger)
     ) {
       // At bottom of viewport
       this.scrolling = true
@@ -199,13 +199,11 @@ class MovableGridCard extends React.Component {
     }
     const cardWidth = (card.width * gridW) / 2
     const leftMargin = v.containerPadding.horizontal * 16
-
     // At right of viewport
     if (
       e.clientX > window.innerWidth - cardWidth + leftMargin ||
       (uiStore.isTouchDevice &&
-        e.changedTouches[0].clientX >
-          window.innerWidth - cardWidth + leftMargin)
+        changedTouch.clientX > window.innerWidth - cardWidth + leftMargin)
     ) {
       this.scrolling = true
       this.scrollRight()
@@ -213,7 +211,7 @@ class MovableGridCard extends React.Component {
     } else if (
       e.clientX - cardWidth - leftMargin < 0 ||
       (uiStore.isTouchDevice &&
-        e.changedTouches[0].clientX - cardWidth - leftMargin < 0)
+        changedTouch.clientX - cardWidth - leftMargin < 0)
     ) {
       this.scrolling = true
       this.scrollLeft()

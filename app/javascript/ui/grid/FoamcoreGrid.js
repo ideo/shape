@@ -168,8 +168,12 @@ class FoamcoreGrid extends React.Component {
     const { uiStore, collection } = this.props
     runInAction(() => {
       uiStore.selectedAreaEnabled = true
-      if (collection.isFourWideBoard && this.showZoomControls) {
-        this.zoomLevel = FOUR_WIDE_MAX_ZOOM
+      if (collection.isFourWideBoard) {
+        if (this.showZoomControls) {
+          this.zoomLevel = FOUR_WIDE_MAX_ZOOM
+        } else {
+          this.zoomLevel = 1
+        }
       }
     })
     this.updateCollectionScrollBottom()
@@ -252,11 +256,11 @@ class FoamcoreGrid extends React.Component {
 
   get maxCols() {
     const { collection, uiStore } = this.props
-    if (collection.num_columns === 4) return 4
 
-    return uiStore.isTouchDevice && uiStore.isMobile
-      ? MAX_COLS_MOBILE
-      : MAX_COLS
+    // NOTE: if we ever allow >16, this still limits max zoom level to show only 16
+    const max =
+      uiStore.isTouchDevice && uiStore.isMobile ? MAX_COLS_MOBILE : MAX_COLS
+    return _.min([collection.num_columns, max])
   }
 
   get maxZoom() {
@@ -264,25 +268,31 @@ class FoamcoreGrid extends React.Component {
     return collection.isFourWideBoard ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
   }
 
-  // Default zoom level is that which fits all columns in the browser viewport
+  // relativeZoomLevel is either the actual zoom level (if not all the way zoomed out),
+  // or else returns the precise zoom ratio that will fit all cards on the screen
   get relativeZoomLevel() {
-    const { pageMargins } = this
-    if (this.zoomLevel !== this.maxZoom) return this.zoomLevel
-    // TODO: at some browser sizes + maxCols, there should really only be 2 zoom levels....
-
-    const { gridW, gutter } = this.gridSettings
-    const gridWidth =
-      (gridW + gutter) * this.maxCols + pageMargins.left * 2 * this.zoomLevel
+    // this method only applies for the maxZoom level, return otherwise
+    const { zoomLevel } = this
+    if (zoomLevel !== this.maxZoom) return zoomLevel
+    const gridWidth = this.maxGridWidth({ zoomLevel })
     const relative = gridWidth / window.innerWidth
     return _.max([relative, 1])
   }
 
   get showZoomControls() {
-    const { pageMargins } = this
+    // always calculate the maxGridWidth of zoomLevel = 1
+    return this.maxGridWidth({ zoomLevel: 1 }) > window.innerWidth
+  }
+
+  // This returns the grid with (in pixels) for showing the full width of cards;
+  // for mobile this gets bumped down and may not include all 16 columns (only 8 for large board)
+  maxGridWidth({ zoomLevel = 1 } = {}) {
+    const { maxCols, pageMargins } = this
     const { gridW, gutter } = this.gridSettings
-    const gridWidth = (gridW + gutter) * this.maxCols + pageMargins.left * 2
+    const gridWidth =
+      (gridW + gutter) * maxCols + pageMargins.left * 2 * zoomLevel
     // only show zoom if the grid is wider than our window
-    return gridWidth > window.innerWidth
+    return gridWidth
   }
 
   get gridSettings() {
@@ -1029,14 +1039,12 @@ class FoamcoreGrid extends React.Component {
     const cardType = card.record ? card.record.internalType : card.cardType
     const position = this.positionForCoordinates(card)
 
-    // TODO reorganize
-    if (
-      card.id === 'blank' &&
-      this.zoomLevel !== 1 &&
-      !collection.isFourWideBoard
-    ) {
-      position.xPos = position.x - this.zoomLevel * 38
-      position.yPos = position.y - this.zoomLevel * 30
+    if (card.id === 'blank' && this.zoomLevel !== 1) {
+      // TODO: on fourWide these numbers are not perfect... figure out better calculation?
+      const xShift = collection.isFourWideBoard ? 20 : 38
+      const yShift = collection.isFourWideBoard ? 16 : 30
+      position.xPos = position.x - this.zoomLevel * xShift
+      position.yPos = position.y - this.zoomLevel * yShift
     }
 
     const dragOffset = this.pageMargins
@@ -1161,7 +1169,7 @@ class FoamcoreGrid extends React.Component {
     _.each(
       _.range(0, collection.max_row_index + this.visibleRows.num * 2),
       row => {
-        _.each(_.range(0, this.maxCols), col => {
+        _.each(_.range(0, collection.num_columns), col => {
           // If there's no row, or nothing in this column, add a blank card for this spot
           const blankCard = { row, col, width: 1, height: 1 }
           if (!cardMatrix[row] || !cardMatrix[row][col]) {
