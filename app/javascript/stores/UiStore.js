@@ -200,6 +200,8 @@ export default class UiStore {
   @observable
   selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
   @observable
+  selectedAreaShifted = false
+  @observable
   selectedAreaEnabled = false
   @observable
   linkedBreadcrumbTrail = []
@@ -303,8 +305,9 @@ export default class UiStore {
   }
 
   @action
-  setSelectedArea(selectedArea) {
+  setSelectedArea(selectedArea, { shifted = false } = {}) {
     this.selectedArea = selectedArea
+    this.selectedAreaShifted = shifted
   }
 
   @action

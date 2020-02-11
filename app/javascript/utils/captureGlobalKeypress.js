@@ -27,7 +27,11 @@ export const handleMouseDownSelection = e => {
       })
     }
     // if we clicked an empty space...
-    uiStore.deselectCards()
+    if (!e.shiftKey) {
+      // Shift click should not deselect cards in case you want to drag select
+      // more.
+      uiStore.deselectCards()
+    }
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
     uiStore.closeCardMenu()
