@@ -5,7 +5,8 @@
     "cypress": "./node_modules/.bin/cypress open",
     "cypress-ci": "./node_modules/.bin/cypress run",
     "lint": "./node_modules/.bin/eslint",
-    "styleguide": "yarn styleguidist server",
+    "styleguide:build": "yarn styleguidist build",
+    "styleguide:server": "http-server styleguide",
     "test": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --watch"
   },
@@ -198,6 +199,7 @@
     "eslint-plugin-promise": "~3.5.0",
     "eslint-plugin-react": "~7.11.0",
     "eslint-plugin-standard": "~3.0.1",
+    "http-server": "^0.12.1",
     "jest": "^24.8.0",
     "jest-css-modules": "^1.1.0",
     "jest-enzyme": "^7.0.0",
