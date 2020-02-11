@@ -34,6 +34,7 @@ import BctButtonRotation from './BctButtonRotation'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const StyledGridCardBlank = styled(StyledGridCard)`
+  user-select: none;
   background-color: transparent;
   cursor: auto;
   position: relative;
