@@ -208,7 +208,7 @@ export class BreadcrumbItem extends React.Component {
   }
 
   onBreadcrumbHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 150)
+    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 250)
   }
 
   onBreadcrumbClick = ev => {
