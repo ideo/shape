@@ -92,14 +92,14 @@ describe('CollectionCreator', () => {
       })
     })
 
-    describe('when collection is a SubmissionBox', () => {
+    describe('when collection is a FoamcoreBoard', () => {
       beforeEach(() => {
         props.type = 'foamcoreBoard'
         props.createCard.mockClear()
         rerender()
       })
 
-      it('creates a card with submission box type and input text name', () => {
+      it('creates a Collection::Board with 16 columns', () => {
         component.state = {
           inputText: 'Ideas Board',
         }
@@ -111,6 +111,36 @@ describe('CollectionCreator', () => {
               master_template: false,
               type: 'Collection::Board',
               num_columns: 16,
+            },
+          },
+          {
+            afterCreate: component.afterCreate,
+          }
+        )
+      })
+    })
+
+    describe('when parent is a fourWide FoamcoreBoard', () => {
+      beforeEach(() => {
+        // parentIsFourWide overrides normal "collection" type as 4WFC
+        props.type = 'collection'
+        props.parentIsFourWide = true
+        props.createCard.mockClear()
+        rerender()
+      })
+
+      it('creates a Collection::Board with 4 columns', () => {
+        component.state = {
+          inputText: 'Ideas Board',
+        }
+        component.createCollection(e)
+        expect(props.createCard).toHaveBeenCalledWith(
+          {
+            collection_attributes: {
+              name: component.state.inputText,
+              master_template: false,
+              type: 'Collection::Board',
+              num_columns: 4,
             },
           },
           {

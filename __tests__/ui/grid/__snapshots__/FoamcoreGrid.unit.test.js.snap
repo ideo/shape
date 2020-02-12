@@ -1009,8 +1009,10 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
+        "left": 32,
+        "top": 140,
         "x": 32,
-        "y": 140,
+        "y": 210,
       }
     }
     horizontalScroll={true}
@@ -11276,8 +11278,10 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
+        "left": 32,
+        "top": 140,
         "x": 32,
-        "y": 140,
+        "y": 210,
       }
     }
     horizontalScroll={true}
@@ -21543,8 +21547,10 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
+        "left": 32,
+        "top": 140,
         "x": 32,
-        "y": 140,
+        "y": 210,
       }
     }
     horizontalScroll={true}
