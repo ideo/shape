@@ -1009,10 +1009,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
-        "left": 32,
-        "top": 140,
         "x": 32,
-        "y": 210,
+        "y": 140,
       }
     }
     horizontalScroll={true}
@@ -10293,7 +10291,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
       }
     }
     routeTo={[MockFunction]}
-    scrollElement={null}
     searchResult={false}
     showHotEdge={false}
     zoomLevel={5.34375}
@@ -11278,10 +11275,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
-        "left": 32,
-        "top": 140,
         "x": 32,
-        "y": 210,
+        "y": 140,
       }
     }
     horizontalScroll={true}
@@ -20562,7 +20557,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
       }
     }
     routeTo={[MockFunction]}
-    scrollElement={null}
     searchResult={false}
     showHotEdge={false}
     zoomLevel={5.34375}
@@ -21547,10 +21541,8 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
-        "left": 32,
-        "top": 140,
         "x": 32,
-        "y": 210,
+        "y": 140,
       }
     }
     horizontalScroll={true}
@@ -30831,7 +30823,6 @@ exports[`FoamcoreGrid renders snapshot 1`] = `
       }
     }
     routeTo={[MockFunction]}
-    scrollElement={null}
     searchResult={false}
     showHotEdge={false}
     zoomLevel={5.34375}

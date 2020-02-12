@@ -2177,7 +2177,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
       }
     }
     routeTo={[MockFunction]}
-    scrollElement={null}
     searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
@@ -4354,7 +4353,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
       }
     }
     routeTo={[MockFunction]}
-    scrollElement={null}
     searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
@@ -6531,7 +6529,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
       }
     }
     routeTo={[MockFunction]}
-    scrollElement={null}
     searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
@@ -8521,7 +8518,6 @@ exports[`CollectionGrid renders snapshot 1`] = `
     }
     record={Object {}}
     routeTo={[MockFunction]}
-    scrollElement={null}
     searchResult={false}
     showHotEdge={true}
     zoomLevel={1}
