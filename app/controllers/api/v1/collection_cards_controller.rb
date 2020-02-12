@@ -31,7 +31,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     direction = params[:direction].presence || 'bottom'
     card_id = params[:collection_card_id]
     card = CollectionCard.find(card_id)
-    # TODO: throw error if card_id is nil, not found, or archived
     selected_cards = CardSelector.new(card: card, direction: direction).call
 
     render json: selected_cards.pluck(:id).map(&:to_s)
