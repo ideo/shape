@@ -53,7 +53,7 @@ describe('ChartUtils', () => {
   })
 
   describe('chartDomainForDatasetValues', () => {
-    it('returns max of values if no max specified', () => {
+    it('returns max of values if no max domain is specified', () => {
       const values = [{ value: 10 }, { value: 20 }]
       expect(chartDomainForDatasetValues({ values })).toEqual({
         x: [1, 2],
@@ -61,7 +61,15 @@ describe('ChartUtils', () => {
       })
     })
 
-    it('returns max given', () => {
+    it('returns max value if provided max is lower than highest value', () => {
+      const values = [{ value: 60 }, { value: 40 }]
+      expect(chartDomainForDatasetValues({ values, maxYDomain: 50 })).toEqual({
+        x: [1, 2],
+        y: [0, 60],
+      })
+    })
+
+    it('returns provided max domain if it is higher than highest value', () => {
       const values = [{ value: 10 }, { value: 20 }]
       expect(chartDomainForDatasetValues({ values, maxYDomain: 100 })).toEqual({
         x: [1, 2],
