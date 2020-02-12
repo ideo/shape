@@ -305,6 +305,7 @@ class FoamcoreGrid extends React.Component {
   // one theory -- for mobile touch scrolling?
   get totalGridSize() {
     const { gridW, gridH, gutter } = this.gridSettings
+    const { relativeZoomLevel, maxCols } = this
     const { collection } = this.props
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
@@ -312,8 +313,8 @@ class FoamcoreGrid extends React.Component {
     // for padding to allow scrolling beyond the current cards
     const visRows = this.visibleRows.num || 1
     const maxRows = collection.max_row_index + 1 + visRows * 2
-    const height = ((gridH + gutter) * maxRows) / this.relativeZoomLevel
-    const width = ((gridW + gutter) * this.maxCols) / this.relativeZoomLevel
+    const height = ((gridH + gutter) * maxRows) / relativeZoomLevel
+    const width = ((gridW + gutter) * maxCols) / relativeZoomLevel
     return {
       width,
       height,
@@ -1036,6 +1037,7 @@ class FoamcoreGrid extends React.Component {
 
   renderMovableCard(card, key) {
     const { canEditCollection, collection, routingStore } = this.props
+    const { pageMargins, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
     const position = this.positionForCoordinates(card)
 
@@ -1047,7 +1049,10 @@ class FoamcoreGrid extends React.Component {
       position.yPos = position.y - this.zoomLevel * yShift
     }
 
-    const dragOffset = this.pageMargins
+    const dragOffset = {
+      x: pageMargins.left,
+      y: pageMargins.top,
+    }
 
     const mdlInSnackbar = card.isMDLPlaceholder && !card.isDragCardMaster
 
@@ -1070,7 +1075,7 @@ class FoamcoreGrid extends React.Component {
         routeTo={routingStore.routeTo}
         parent={collection}
         // don't apply any zoom to the mdlPlaceholder
-        zoomLevel={mdlInSnackbar ? 1 : this.relativeZoomLevel}
+        zoomLevel={mdlInSnackbar ? 1 : relativeZoomLevel}
         // don't allow horizontal scroll unless we are in a zoomable view
         horizontalScroll={
           this.showZoomControls && !this.disableHorizontalScroll

@@ -1,10 +1,7 @@
 import _ from 'lodash'
-import MovableGridCard, {
-  SCROLL_ANIMATION_SPEED,
-} from '~/ui/grid/MovableGridCard'
+import MovableGridCard from '~/ui/grid/MovableGridCard'
 import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { uiStore } from '~/stores'
-
 import {
   fakeItemCard,
   fakeTextItem,
@@ -35,7 +32,7 @@ const fakeEvent = {
   target: { className: '', closest: jest.fn() },
 }
 
-let wrapper, instance
+let wrapper, component
 describe('MovableGridCard', () => {
   it('renders snapshot', () => {
     expectTreeToMatchSnapshot(wrapper)
@@ -151,32 +148,18 @@ describe('MovableGridCard', () => {
     })
   })
 
-  describe('when scrollElement is provided', () => {
+  describe('handleDrag', () => {
     beforeEach(() => {
-      props.scrollElement = { scrollBy: jest.fn() }
       wrapper = shallow(<MovableGridCard {...props} />)
-      instance = wrapper.instance()
-      instance.scrolling = true
+      component = wrapper.instance()
     })
-
-    describe('scrollRight', () => {
-      it('calls scrollBy on scrollElement', () => {
-        instance.scrollRight()
-        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(
-          SCROLL_ANIMATION_SPEED,
-          0
-        )
-      })
-    })
-
-    describe('scrollLeft', () => {
-      it('calls scrollBy on scrollElement', () => {
-        instance.scrollLeft()
-        expect(props.scrollElement.scrollBy).toHaveBeenCalledWith(
-          -1 * SCROLL_ANIMATION_SPEED,
-          0
-        )
-      })
+    it('should drag', () => {
+      const pageX = 0
+      const pageY = 10
+      const e = { pageX, pageY }
+      const data = { x: 0, y: 0 }
+      component.handleDrag(e, data)
+      expect(uiStore.drag).toHaveBeenCalledWith({ x: pageX, y: pageY })
     })
   })
 

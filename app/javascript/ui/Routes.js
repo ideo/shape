@@ -31,7 +31,9 @@ import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress, {
   handleMouseDownSelection,
 } from '~/utils/captureGlobalKeypress'
+import ScrollNearPageBoundsService from '~/utils/ScrollNearPageBoundsService'
 
+const pageBoundsScroller = new ScrollNearPageBoundsService()
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
   ${props =>
@@ -151,7 +153,7 @@ class Routes extends React.Component {
         minY: _.min([e.pageY, this.mouseDownAt.y]),
         maxY: _.max([e.pageY, this.mouseDownAt.y]),
       },
-      e.shiftKey
+      e
     )
   }
 
@@ -174,6 +176,7 @@ class Routes extends React.Component {
       minY: null,
       maxY: null,
     })
+    pageBoundsScroller.setScrolling(false)
   }
 
   handleTouchMove = e => {
@@ -189,10 +192,12 @@ class Routes extends React.Component {
     }
   }
 
-  _setSelectedArea = (coords, shifted = false) => {
-    const {
-      apiStore: { uiStore },
-    } = this.props
+  _setSelectedArea = (coords, e = {}) => {
+    const { uiStore } = this.props
+    const shifted = e.shiftKey
+    if (!_.isEmpty(e)) {
+      pageBoundsScroller.scrollIfNearPageBounds(e, { speed: 1.5 })
+    }
     uiStore.setSelectedArea(coords, { shifted })
   }
 
