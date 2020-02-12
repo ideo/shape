@@ -71,7 +71,8 @@ export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
   let minXDomain
   let maxXDomain
   let calculatedMaxYDomain
-  if (maxYDomain) {
+
+  if (maxYDomain && maxYDomain > maxBy(values, 'value').value) {
     calculatedMaxYDomain = maxYDomain
   } else {
     calculatedMaxYDomain = maxBy(values, 'value').value
