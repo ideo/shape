@@ -74,4 +74,23 @@ RSpec.describe CardSelector, type: :service do
       expect(selected_cards.pluck(:id)).to eq expected_selected.pluck(:id)
     end
   end
+
+  context 'with wide cards that poke out' do
+    let(:collection) { create(:collection, num_cards: 6) }
+
+    before do
+      cards[0].update(width: 2, height: 1, row: 1, col: 2)
+      cards[1].update(width: 2, height: 1, row: 2, col: 1)
+      cards[2].update(width: 3, height: 1, row: 2, col: 3)
+      cards[3].update(width: 1, height: 2, row: 3, col: 1)
+      cards[4].update(width: 1, height: 1, row: 3, col: 5)
+      cards[5].update(width: 1, height: 1, row: 4, col: 2)
+    end
+
+    it 'select the correct cards below the main one' do
+      selected_cards = selector.call
+      expected_selected = [cards[0], cards[1], cards[2], cards[3], cards[4]]
+      expect(selected_cards.pluck(:id).sort).to eq expected_selected.pluck(:id).sort
+    end
+  end
 end
