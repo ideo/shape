@@ -156,6 +156,8 @@ exports[`CollectionGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
+        "left": 32,
+        "top": 210,
         "x": 32,
         "y": 210,
       }
@@ -2331,6 +2333,8 @@ exports[`CollectionGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
+        "left": 32,
+        "top": 210,
         "x": 32,
         "y": 210,
       }
@@ -4506,6 +4510,8 @@ exports[`CollectionGrid renders snapshot 1`] = `
     cardType="items"
     dragOffset={
       Object {
+        "left": 32,
+        "top": 210,
         "x": 32,
         "y": 210,
       }
@@ -6554,6 +6560,8 @@ exports[`CollectionGrid renders snapshot 1`] = `
     cardType="empty"
     dragOffset={
       Object {
+        "left": 32,
+        "top": 210,
         "x": 32,
         "y": 210,
       }

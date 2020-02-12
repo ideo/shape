@@ -9,7 +9,7 @@ exports[`TextItemCover renders snapshot 1`] = `
   onClick={[Function]}
   style={
     Object {
-      "height": "calc(100% - 30px)",
+      "height": "calc(100% - 2rem)",
     }
   }
   uneditable={false}
