@@ -1,16 +1,18 @@
 import PropTypes from 'prop-types'
 import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Loader from '~/ui/layout/Loader'
-import Group from '~/stores/jsonApi/Group'
-import Organization from '~/stores/jsonApi/Organization'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
 import GroupTitle from '~/ui/groups/GroupTitle'
+import Group from '~/stores/jsonApi/Group'
+import Organization from '~/stores/jsonApi/Organization'
 import googleTagManager from '~/vendor/googleTagManager'
+import { useTemplateInMyCollection } from '~/utils/url'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
@@ -80,10 +82,7 @@ class OrganizationMenu extends React.Component {
         organization: newOrg.slug,
       })
       if (res.meta && res.meta.use_template_id) {
-        // route to use this template
-        const route = `/templates/${res.meta.use_template_id}/use_in_my_collection`
-        // can't use router in this case, have to full redirect
-        window.location.href = route
+        return useTemplateInMyCollection(res.meta.use_template_id)
       }
       routingStore.routeTo(`/${newOrg.slug}`)
       onClose()

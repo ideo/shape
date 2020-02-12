@@ -6,6 +6,7 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
+
 import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
 import { TextButton, FormButton } from '~/ui/global/styled/buttons'
@@ -15,7 +16,7 @@ import {
   DisplayText,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
-import CardMoveService from '~/utils/CardMoveService'
+import { useTemplateInMyCollection } from '~/utils/url'
 
 const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
@@ -75,21 +76,8 @@ class MoveHelperModal extends React.Component {
   }
 
   handleAddToMyCollection = async e => {
-    this.updateUserPreference()
-
-    const { uiStore, apiStore, routingStore } = this.props
-    const { currentUser } = apiStore
-    const user_collection_id = currentUser.current_user_collection_id
-    uiStore.update('cardAction', 'useTemplate')
-    if (!apiStore.find('collections', user_collection_id)) {
-      await apiStore.fetch('collections', user_collection_id)
-    }
-    await CardMoveService.moveCards('end', {
-      to_id: user_collection_id,
-      from_id: this.templateCollection.id,
-    })
-    uiStore.closeMoveMenu()
-    routingStore.routeTo('homepage')
+    await this.updateUserPreference()
+    return useTemplateInMyCollection(this.templateCollection.id)
   }
 
   @action
@@ -97,7 +85,7 @@ class MoveHelperModal extends React.Component {
     const { apiStore, type } = this.props
     const { currentUser } = apiStore
     if (this.dontShowChecked) {
-      currentUser.API_hideHelper(type)
+      return currentUser.API_hideHelper(type)
     }
   }
 
