@@ -440,7 +440,10 @@ describe('FoamcoreGrid', () => {
       })
 
       it('sets uiStore.selectedCardIds', () => {
-        expect(props.uiStore.selectedCardIds).toEqual([cardA.id, cardB.id])
+        expect(props.uiStore.reselectCardIds).toHaveBeenCalledWith([
+          cardA.id,
+          cardB.id,
+        ])
       })
     })
   })

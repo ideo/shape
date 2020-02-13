@@ -165,17 +165,9 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
-    const { uiStore, collection } = this.props
-    runInAction(() => {
-      uiStore.selectedAreaEnabled = true
-      if (collection.isFourWideBoard) {
-        if (this.showZoomControls) {
-          this.zoomLevel = FOUR_WIDE_MAX_ZOOM
-        } else {
-          this.zoomLevel = 1
-        }
-      }
-    })
+    const { uiStore } = this.props
+    uiStore.update('selectedAreaEnabled', true)
+    this.updateZoomLevel()
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
     window.addEventListener('scroll', this.handleScroll)
@@ -183,6 +175,9 @@ class FoamcoreGrid extends React.Component {
 
   componentDidUpdate(prevProps) {
     this.updateSelectedArea()
+    if (this.props.collection.id !== prevProps.collection.id) {
+      this.updateZoomLevel()
+    }
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
       // e.g. if API_fetchCards has reset the loaded cards, we may want to
       // trigger this in case we are viewing further down the page
@@ -197,6 +192,21 @@ class FoamcoreGrid extends React.Component {
       uiStore.selectedAreaEnabled = false
     })
     window.removeEventListener('scroll', this.handleScroll)
+  }
+
+  @action
+  updateZoomLevel = () => {
+    let maxZoom = FOAMCORE_MAX_ZOOM
+    const { collection } = this.props
+    if (this.showZoomControls) {
+      maxZoom = collection.isFourWideBoard
+        ? FOUR_WIDE_MAX_ZOOM
+        : FOAMCORE_MAX_ZOOM
+    } else {
+      maxZoom = 1
+    }
+    // NOTE: we may eventually want to store your zoomLevel more globally in uiStore
+    this.zoomLevel = _.min([maxZoom, this.zoomLevel])
   }
 
   // Load more cards if we are approaching a boundary of what we have loaded
@@ -507,9 +517,7 @@ class FoamcoreGrid extends React.Component {
     if (uiStore.selectedAreaShifted) {
       selectedCardIds = _.union(selectedCardIds, uiStore.selectedCardIds)
     }
-    runInAction(() => {
-      uiStore.selectedCardIds = selectedCardIds
-    })
+    uiStore.reselectCardIds(selectedCardIds)
   }
 
   handleBlankCardClick = ({ row, col }) => e => {
@@ -517,7 +525,6 @@ class FoamcoreGrid extends React.Component {
 
     // If user is selecting an area, don't trigger blank card click
     if (selectedAreaMinX) {
-      console.log({ selectedAreaMinX }, 'returning...')
       return
     }
 
