@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe CardSelector, type: :service do
   let(:num_cards) { 4 }
-  let(:collection) { create(:collection, num_cards: num_cards, add_viewers: [user]) }
+  let(:collection) { create(:board_collection, num_cards: num_cards, add_viewers: [user]) }
   let(:cards) { collection.collection_cards }
   let(:user) { create(:user) }
   let(:selected_card) { cards.first }

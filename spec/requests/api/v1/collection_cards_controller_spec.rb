@@ -251,7 +251,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   describe 'GET #ids_in_direction' do
-    let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
+    let!(:collection) { create(:board_collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids_in_direction" }
     let(:direction) { 'bottom' }
     let(:card_id) { collection.collection_cards.first.id }
