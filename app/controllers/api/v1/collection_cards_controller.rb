@@ -5,7 +5,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
 
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction]
   before_action :check_cache, only: %i[index ids breadcrumb_records]
   before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
   def index
@@ -27,18 +27,31 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render json: @collection_card_ids.map(&:to_s)
   end
 
+  def ids_in_direction
+    direction = params[:direction].presence || 'bottom'
+    card_id = params[:collection_card_id]
+    card = CollectionCard.find(card_id)
+    selected_cards = CardSelector.call(
+      card: card,
+      direction: direction,
+      user: current_user,
+    )
+
+    render json: selected_cards.pluck(:id).map(&:to_s)
+  end
+
   def breadcrumb_records
     card_data = @collection_cards
-                  .select { |card| card.record.is_a?(Collection) }
-                  .map do |card|
-                    {
-                      id: card.record.id,
-                      type: card.record.class.base_class.name.downcase.pluralize,
-                      collection_type: card.record.class.name,
-                      name: card.record.name,
-                      has_children: card.record.has_child_collections?,
-                    }
-                  end
+                .select { |card| card.record.is_a?(Collection) }
+                .map do |card|
+      {
+        id: card.record.id,
+        type: card.record.class.base_class.name.downcase.pluralize,
+        collection_type: card.record.class.name,
+        name: card.record.name,
+        has_children: card.record.has_child_collections?,
+      }
+    end
     render json: card_data
   end
 
@@ -172,7 +185,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_action: @card_action,
     )
     moved_cards = mover.call
-    if moved_cards #&& @from_collection != @to_collection
+    if moved_cards && @from_collection != @to_collection
       # we still create notifications on the original @cards
       @cards.map do |card|
         create_notification(

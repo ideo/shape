@@ -250,6 +250,27 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'GET #ids_in_direction' do
+    let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids_in_direction" }
+    let(:direction) { 'bottom' }
+    let(:card_id) { collection.collection_cards.first.id }
+    let(:params) do
+      {
+        direction: direction,
+        collection_card_id: card_id,
+      }
+    end
+
+    it 'returns stringified ids of selected cards at the bottom' do
+      get(path, params: params)
+      expect(response.status).to eq(200)
+      expect(json.length).to eq(5)
+      # FIXME: should be the cards at the bottom
+      expect(json).to eq(collection.collection_cards.pluck(:id).map(&:to_s))
+    end
+  end
+
   describe 'GET #breadcrumb_records' do
     let!(:collection) { create(:collection, record_type: :collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/breadcrumb_records" }
@@ -258,7 +279,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       get(path)
       expect(response.status).to eq(200)
       expect(json.length).to eq(5)
-      expect(json.pluck("id")).to eq(collection.collection_cards.map(&:record).pluck(:id))
+      expect(json.pluck('id')).to eq(collection.collection_cards.map(&:record).pluck(:id))
     end
   end
 
