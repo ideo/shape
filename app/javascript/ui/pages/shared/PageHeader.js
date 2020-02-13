@@ -78,8 +78,14 @@ const StyledButtonIconWrapper = styled.span`
   ${props =>
     props.float &&
     `
-      float: ${props.float}
+      float: ${props.float};
     `}
+  ${props =>
+    props.float === 'right' &&
+    `
+    position: relative;
+    right: 6px;
+  `}
 `
 
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
