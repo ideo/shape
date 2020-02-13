@@ -145,6 +145,8 @@ class Routes extends React.Component {
     // Stop propagation if dragging so it doesn't trigger other events
     e.stopPropagation()
     e.preventDefault()
+    // persist to be used in throttled function below
+    e.persist()
 
     this.throttledSetSelectedArea(
       {
