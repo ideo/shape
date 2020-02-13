@@ -214,7 +214,9 @@ export const StyleguideHolder = styled.div`
   margin-left: auto;
   margin-right: auto;
   width: 500px;
+  background-color: ${({ backgroundColor }) => backgroundColor};
 `
 StyleguideHolder.defaultProps = {
   height: 200,
+  backgroundColor: 'white',
 }

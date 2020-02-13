@@ -425,7 +425,8 @@ class PageHeader extends React.Component {
           minWidth={v.buttonSizes.header.width + 40}
           size="sm"
           data-cy="HeaderFormButton"
-          colorScheme="transparent"
+          colorScheme={v.colors.commonDark}
+          outline
           disabled={!active}
         >
           <StyledButtonIconWrapper float={'left'}>

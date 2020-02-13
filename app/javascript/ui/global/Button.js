@@ -4,13 +4,20 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const Button = styled.button`
-  background-color: ${({ colorScheme }) =>
-    colorScheme === 'transparent' ? v.colors.transparent : colorScheme};
-  border: ${({ colorScheme }) =>
-    colorScheme === 'transparent' ? `1px solid ${v.colors.black}` : 'none'};
+  background-color: ${({ colorScheme, outline }) => {
+    let color = outline ? v.colors.transparent : colorScheme
+    if (colorScheme === v.colors.white) {
+      // Note: add background color for white colorScheme to be visible
+      color = `rgba(0, 0, 0, 0.15)`
+    }
+    return color
+  }};
+  border-color: ${({ colorScheme }) => `${colorScheme}`};
+  border-style: solid;
+  border-width: 1px;
   border-radius: 20px;
-  color: ${({ colorScheme }) =>
-    colorScheme === 'transparent' ? v.colors.black : v.colors.white};
+  color: ${({ colorScheme, outline }) =>
+    outline ? colorScheme : v.colors.white};
   cursor: pointer;
   font-family: ${v.fonts.sans};
   font-size: ${({ size }) => (size === 'sm' ? 0.75 : 1)}rem;
@@ -26,10 +33,7 @@ const Button = styled.button`
   &:focus {
     background-color: ${v.colors.commonDark};
     color: ${v.colors.white};
-    border: ${({ colorScheme }) =>
-      colorScheme === 'transparent'
-        ? `1px solid ${v.colors.commonDark}`
-        : 'none'};
+    border-color: ${v.colors.commonDark};
   }
   ${props =>
     props.disabled &&
@@ -51,12 +55,15 @@ Button.propTypes = {
   minWidth: PropTypes.number,
   /** Disable the button from being clicked, also rendering a disabled style */
   disabled: PropTypes.bool,
+  /** Outline */
+  outline: PropTypes.bool,
 }
 Button.defaultProps = {
   colorScheme: v.colors.black,
   size: 'md',
   minWidth: null,
   disabled: false,
+  outline: false,
 }
 /** @component */
 export default Button

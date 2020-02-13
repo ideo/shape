@@ -1,4 +1,3 @@
-
 The button element is the main button style on the site; a rounded corner
 different colored background button with a white text style. There are ways
 to configure the color style, width and text size.
@@ -12,10 +11,7 @@ import Button from '../../ui/global/Button'
 
 ```jsx
 import Button from '../../ui/global/Button'
-;<Button
-  minWidth={190}
-  type="submit"
->
+;<Button minWidth={190} type="submit">
   Add
 </Button>
 ```
@@ -24,11 +20,7 @@ import Button from '../../ui/global/Button'
 
 ```jsx
 import Button from '../../ui/global/Button'
-
-;<Button
-  minWidth={250}
-  size="sm"
->
+;<Button minWidth={250} size="sm">
   Add to my collection
 </Button>
 ```
@@ -38,11 +30,7 @@ import Button from '../../ui/global/Button'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
-;<Button
-  size="sm"
-  colorScheme="transparent"
->
+;<Button size="sm" colorScheme={v.colors.black} outline>
   Let me place it
 </Button>
 ```
@@ -52,12 +40,7 @@ import v from '../../utils/variables'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
-;<Button
-  colorScheme={v.colors.alert}
->
-  Replace
-</Button>
+;<Button colorScheme={v.colors.alert}>Replace</Button>
 ```
 
 ### Get test link button
@@ -102,11 +85,11 @@ const StyledButtonNameWrapper = styled.span`
 `
 
 StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
-
 ;<Button
   minWidth={v.buttonSizes.header.width}
   size="sm"
-  colorScheme="transparent"
+  colorScheme={v.colors.black}
+  outline
 >
   <StyledButtonIconWrapper>
     <LinkIconSm />
@@ -120,28 +103,17 @@ StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
-
-;<Button
-  minWidth={200}
-  size="sm"
-  colorScheme="transparent"
->
+;<Button minWidth={200} size="sm" colorScheme={v.colors.black} outline>
   Re-open Feedback
 </Button>
 ```
 
 ### Submission submit button
 
-
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
-;<Button
-  colorScheme={v.colors.alert}
-  size="sm"
->
+;<Button colorScheme={v.colors.alert} size="sm">
   Submit
 </Button>
 ```
@@ -151,7 +123,6 @@ import v from '../../utils/variables'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
 ;<Button
   style={{ marginLeft: '1rem' }}
   colorScheme={v.colors.primaryDarkest}
@@ -166,7 +137,6 @@ import v from '../../utils/variables'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
 ;<Button
   style={{ marginLeft: '1rem' }}
   colorScheme={v.colors.primaryDarkest}
@@ -181,7 +151,6 @@ import v from '../../utils/variables'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
 ;<Button
   minWidth={v.buttonSizes.header.width}
   colorScheme={v.colors.primaryDark}
@@ -196,12 +165,7 @@ import v from '../../utils/variables'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
-;<Button
-  minWidth="170"
-  size="sm"
-  colorScheme="transparent"
->
+;<Button minWidth="170" size="sm" colorScheme={v.colors.black} outline>
   Stop Feedback
 </Button>
 ```
@@ -211,11 +175,7 @@ import v from '../../utils/variables'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
-;<Button
-  minWidth={200}
-  className="adminAudienceModalButton"
->
+;<Button minWidth={200} className="adminAudienceModalButton">
   Add Audience
 </Button>
 ```
@@ -225,23 +185,36 @@ import v from '../../utils/variables'
 ```jsx
 import Button from '../../ui/global/Button'
 import v from '../../utils/variables'
-
-;<Button
-  colorScheme={v.colors.secondaryDark}
->
-  Restore
-</Button>
+;<Button colorScheme={v.colors.secondaryDark}>Restore</Button>
 ```
 
 ### Organization settings save button
 
 ```jsx
 import Button from '../../ui/global/Button'
+;<Button style={{ marginTop: '24px' }}>Save</Button>
+```
 
-;<Button
-  style={{ marginTop: '24px' }}
->
-  Save
+### Use Template button
+
+```jsx
+import Button from '../../ui/global/Button'
+import v from '../../utils/variables'
+import { StyleguideHolder } from '../../ui/global/styled/layout'
+;<StyleguideHolder height={'auto'} backgroundColor={v.colors.black}>
+  <Button colorScheme={v.colors.white} outline>
+    Use Template
+  </Button>
+</StyleguideHolder>
+```
+
+### Go To Master Template button
+
+```jsx
+import Button from '../../ui/global/Button'
+import v from '../../utils/variables'
+;<Button colorScheme={v.colors.commonDark} outline>
+  Go to Master Template
 </Button>
 ```
 
@@ -252,8 +225,5 @@ or clicking interaction.
 
 ```jsx
 import Button from '../../ui/global/Button'
-
-;<Button disabled>
-  Not working
-</Button>
+;<Button disabled>Not working</Button>
 ```
