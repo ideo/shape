@@ -123,4 +123,34 @@ RSpec.describe Item::DataItem, type: :model do
       expect(data_items_dataset.selected).to be false
     end
   end
+
+  describe 'csv_data' do
+    let(:organization) { create(:organization) }
+    let(:collection) { create(:collection, organization: organization) }
+
+    context 'for a collections and item data item' do
+      let(:item) { create(:data_item, :report_type_collections_and_items, parent_collection: collection) }
+      let(:csv_data) { item.csv_data }
+
+      it 'should have dates in the first column' do
+        expect(csv_data[0][1]).to eq (item.datasets.first.data.first[:date])
+      end
+
+      it 'should have the organization data in the second column' do
+        expect(csv_data).to eq ('Organization')
+      end
+    end
+  end
+
+  describe 'csv_filename' do
+    let(:organization) { create(:organization) }
+    let(:collection) { create(:collection, organization: organization) }
+    let(:item) { create(:data_item, :report_type_collections_and_items, parent_collection: collection) }
+
+    it 'should print out a filename with org, measure, timeframe, etc' do
+      expect(item.csv_filename).to eq(
+        "#{organization.name}-#{item.datasets.first.measure}-#{item.datasets.first.timeframe}-#{item.datasets.first.data_source.name}.csv",
+      )
+    end
+  end
 end

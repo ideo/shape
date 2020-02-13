@@ -97,6 +97,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
     render jsonapi: @item.reload
   end
 
+  def csv_report
+    csv_data = @item.csv_data
+    send_data csv_data, filename: @item.csv_filename
+  end
+
   private
 
   def load_and_authorize_item_update

@@ -150,6 +150,25 @@ class Item
       ).dataset
     end
 
+    def csv_data
+      if report_type_record?
+        DataReport::RecordCSVReport.call(data_item: self)
+      elsif report_type_collections_and_items?
+        DataReport::CollectionsAndItems.new(
+          dataset: datasets.first,
+        ).csv
+      end
+      []
+    end
+
+    def csv_filename
+      dataset = datasets.first
+      measure = dataset.measure
+      timeframe = dataset.timeframe
+      source = dataset.data_source.present? ? dataset.data_source.name : 'organization'
+      "#{organization.name}-#{measure}-#{timeframe}-#{source}.csv"
+    end
+
     private
 
     def dataset_type

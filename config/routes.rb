@@ -58,6 +58,7 @@ Rails.application.routes.draw do
           post 'duplicate'
           patch 'archive'
           get 'in_my_collection'
+          get 'csv_report'
           patch 'restore_permissions'
           patch 'highlight'
         end

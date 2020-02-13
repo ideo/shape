@@ -110,7 +110,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isDownloadable() {
-    return this.isGenericFile || this.isPdfFile
+    return this.isGenericFile || this.isPdfFile || this.isReportTypeCollectionsItems
   }
 
   get isImage() {
@@ -163,6 +163,9 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   fileUrl() {
+    if (this.isReportTypeCollectionsItems) {
+      return `/api/v1/items/${this.id}/csv_report`
+    }
     const { filestack_handle } = this
     if (!filestack_handle) return ''
     return FilestackUpload.fileUrl({
