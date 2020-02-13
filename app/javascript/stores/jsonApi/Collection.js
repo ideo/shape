@@ -60,6 +60,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'collection_to_test_id',
     'test_show_media',
     'collection_type',
+    'search_term',
   ]
 
   constructor(...args) {
@@ -691,7 +692,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       page,
       per_page,
     }
-    Object.assign(params, this.collectionFilterQuery)
     if (!params.per_page) {
       // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
       params.per_page = this.recordsPerPage
@@ -710,27 +710,35 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         params.cols = cols
       }
     }
-    let apiPath = `collections/${
-      this.id
-    }/collection_cards?${queryString.stringify(params, {
-      arrayFormat: 'bracket',
-    })}`
+    let apiPath
     if (searchTerm) {
-      const query = `${searchTerm} ${queryString.stringify(
-        this.collectionFilterQuery
-      )}`
-      params.query = query
+      params.query = searchTerm
+      if (this.collectionFilterQuery.q) {
+        params.query += ` ${this.collectionFilterQuery.q}`
+      }
       params.current_collection_id = this.baseId
       const stringifiedParams = queryString.stringify(params, {
         arrayFormat: 'bracket',
       })
       apiPath = `organizations/${this.organization_id}/search_collection_cards?${stringifiedParams}`
+    } else {
+      if (params.card_order === 'relevance') {
+        // disable "relevance" if there is no search term
+        params.card_order = null
+      }
+      Object.assign(params, this.collectionFilterQuery)
+      apiPath = `collections/${
+        this.id
+      }/collection_cards?${queryString.stringify(params, {
+        arrayFormat: 'bracket',
+      })}`
     }
+
     const res = await this.apiStore.request(apiPath)
     const { data, links, meta } = res
     runInAction(() => {
       if (searchTerm) {
-        this.totalPages = meta.total_pages
+        this.totalPages = (meta && meta.total_pages) || 1
       } else {
         this.totalPages = links.last
       }
