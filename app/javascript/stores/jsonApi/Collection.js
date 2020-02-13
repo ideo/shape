@@ -60,6 +60,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'collection_to_test_id',
     'test_show_media',
     'collection_type',
+    'search_term',
   ]
 
   constructor(...args) {
@@ -721,6 +722,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
       apiPath = `organizations/${this.organization_id}/search_collection_cards?${stringifiedParams}`
     } else {
+      if (params.card_order === 'relevance') {
+        // disable "relevance" if there is no search term
+        params.card_order = null
+      }
       Object.assign(params, this.collectionFilterQuery)
       apiPath = `collections/${
         this.id
@@ -728,6 +733,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         arrayFormat: 'bracket',
       })}`
     }
+
     const res = await this.apiStore.request(apiPath)
     const { data, links, meta } = res
     runInAction(() => {

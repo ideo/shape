@@ -63,7 +63,7 @@ const SharedRecordMixin = superclass =>
             message: `${this.className} name edit redone`,
             apiCall: () =>
               // re-call the same function
-              this.API_updateName(name),
+              this.API_updateNameAndCover(name),
           },
         })
       }
@@ -87,7 +87,7 @@ const SharedRecordMixin = superclass =>
 
       // cancel sync so that name edits don't roundtrip and interfere with your <input>
       data.cancel_sync = true
-      return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
+      return this.patch(data)
     }
 
     async API_revertTo({ snapshot } = {}) {
