@@ -156,7 +156,8 @@ class MoveHelperModal extends React.Component {
         <Button
           onClick={this.letMePlaceIt}
           size="sm"
-          colorScheme="transparent"
+          colorScheme={v.colors.black}
+          outline
           data-cy="MoveHelperModal-letMePlaceItBtn"
         >
           Let me place it

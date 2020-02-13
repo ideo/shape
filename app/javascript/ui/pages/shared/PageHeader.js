@@ -275,7 +275,8 @@ class PageHeader extends React.Component {
               }
               size="sm"
               data-cy="HeaderFormButton"
-              colorScheme="transparent"
+              colorScheme={v.colors.black}
+              outline
             >
               <StyledButtonIconWrapper>
                 <LinkIconSm />
@@ -301,7 +302,8 @@ class PageHeader extends React.Component {
         disabled={uiStore.launchButtonLoading}
         size="sm"
         data-cy="HeaderFormButton"
-        colorScheme="transparent"
+        colorScheme={v.colors.black}
+        outline
       >
         Re-open Feedback
       </Button>
@@ -465,7 +467,8 @@ class PageHeader extends React.Component {
           disabled={uiStore.launchButtonLoading}
           size="sm"
           data-cy="HeaderFormButton"
-          colorScheme="transparent"
+          colorScheme={v.colors.black}
+          outline
         >
           Stop Feedback
         </Button>
