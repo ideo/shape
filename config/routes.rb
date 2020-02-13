@@ -36,7 +36,7 @@ Rails.application.routes.draw do
         resources :collection_cards, only: %i[index] do
           collection do
             get 'ids'
-            get 'select_card_ids'
+            get 'ids_in_direction'
             get 'breadcrumb_records'
           end
         end

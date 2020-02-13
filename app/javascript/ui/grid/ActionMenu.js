@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { action, runInAction, observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
@@ -49,12 +49,14 @@ class ActionMenu extends React.Component {
     card.beginReplacing()
   }
 
+  get viewingCollection() {
+    const { card, uiStore } = this.props
+    return uiStore.viewingCollection || card.parentCollection
+  }
+
   openMoveMenu = cardAction => {
     const { card, onMoveMenu, uiStore } = this.props
-    let { viewingCollection } = uiStore
-    if (!viewingCollection) {
-      viewingCollection = card.record.parent ? card.record.parent.id : null
-    }
+    const { viewingCollection } = this
     if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
     if (cardAction === 'move') {
@@ -141,12 +143,10 @@ class ActionMenu extends React.Component {
     window.print()
   }
 
-  selectCards = async () => {
+  selectCardsBelow = async () => {
     const { uiStore, card } = this.props
-    const cardIds = await card.API_selectCardIds()
-    runInAction(() => {
-      uiStore.selectedCardIds = cardIds
-    })
+    const cardIds = await card.API_selectCardIdsBelow()
+    uiStore.reselectCardIds(cardIds)
   }
 
   get movingFromCollectionId() {
@@ -176,9 +176,9 @@ class ActionMenu extends React.Component {
       submissionBox,
       location,
       testCollectionCard,
-      uiStore,
     } = this.props
     const { record } = card
+    const { viewingCollection } = this
 
     const actions = [
       {
@@ -223,11 +223,6 @@ class ActionMenu extends React.Component {
         name: 'Delete',
         iconRight: <TrashIconXl />,
         onClick: this.archiveCard,
-      },
-      {
-        name: 'Select Cards Below',
-        iconRight: <SelectAllIcon />,
-        onClick: this.selectCards,
       },
     ]
     actions.forEach(actionItem => {
@@ -300,11 +295,20 @@ class ActionMenu extends React.Component {
       }
     }
 
-    if (uiStore.viewingCollection) {
-      const coll = uiStore.viewingCollection
+    if (viewingCollection) {
       // Remove Add To My Collection menu item for special collections
-      if (coll.isUserCollection) {
+      if (viewingCollection.isUserCollection) {
         items = _.reject(items, { name: 'Add to My Collection' })
+      }
+      if (viewingCollection.isSearchCollection) {
+        items = _.reject(items, { name: 'Move' })
+      }
+      if (viewingCollection.isBoard && location === 'GridCard') {
+        items.push({
+          name: 'Select Cards Below',
+          iconRight: <SelectAllIcon />,
+          onClick: this.selectCardsBelow,
+        })
       }
     }
 
@@ -324,10 +328,6 @@ class ActionMenu extends React.Component {
     const { menuItemsCount } = this.props
     if (menuItemsCount) {
       menuItemsCount(items.length)
-    }
-
-    if (card.parentCollection && card.parentCollection.isSearchCollection) {
-      items = _.reject(items, { name: 'Move' })
     }
 
     if (record && record.archived) {

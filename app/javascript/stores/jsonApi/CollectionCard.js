@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 import queryString from 'query-string'
-import axios from 'axios'
 
 import {
   ITEM_TYPES,
@@ -247,8 +246,8 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  async API_selectCardIds() {
-    const { uiStore } = this
+  async API_selectCardIdsBelow() {
+    const { apiStore, uiStore } = this
 
     let selectedCardIds = []
 
@@ -258,18 +257,16 @@ class CollectionCard extends BaseRecord {
     }
 
     try {
-      const apiPath = `/api/v1/collections/${
-        this.parent.id
-      }/collection_cards/select_card_ids?${queryString.stringify(params)}`
-      selectedCardIds = await axios.get(apiPath)
+      selectedCardIds = await apiStore.requestJson(
+        `collections/${
+          this.parent.id
+        }/collection_cards/ids_in_direction?${queryString.stringify(params)}`
+      )
     } catch (e) {
       // TODO: when cards are unselectable?
       uiStore.defaultAlertError()
     }
-
-    if (!selectedCardIds || _.isEmpty(selectedCardIds.data)) return
-
-    return selectedCardIds.data
+    return selectedCardIds
   }
 
   reselectOnlyEditableRecords(cardIds = this.uiStore.selectedCardIds) {

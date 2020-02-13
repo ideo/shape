@@ -357,21 +357,21 @@ module CollectionGrid
       card_inhabited_cols - above_card_inhabited_cols
     end
 
-    def self.find_uninterupted_cards_in_col(start_row, current_col, card_matrix)
-      uninterupted_cards = []
+    def self.find_uninterrupted_cards_in_col(start_row, current_col, card_matrix)
+      uninterrupted_cards = []
       current_row = start_row
       while card_matrix.size - 1 >= current_row
         spot = card_matrix[current_row][current_col]
         # if there is a card at the spot it should be one of the cards
         if spot.present?
-          uninterupted_cards << spot
+          uninterrupted_cards << spot
           # Check for wide cards sticking off to the right or left
           if spot.width > 1
             card_above = card_matrix[current_row - 1][current_col]
             add_columns = columns_sticking_out_of(spot, card_above)
             if add_columns.size.positive?
               add_columns.each do |added_column|
-                uninterupted_cards += find_uninterupted_cards_in_col(
+                uninterrupted_cards += find_uninterrupted_cards_in_col(
                   current_row + 1,
                   added_column,
                   card_matrix,
@@ -385,35 +385,33 @@ module CollectionGrid
         end
         current_row += 1
       end
-      uninterupted_cards
+      uninterrupted_cards
     end
 
-    def self.uninterupted_cards_below(
+    def self.uninterrupted_cards_below(
       selected_card:,
       collection:
     )
       card_matrix = board_matrix(
         collection: collection,
-        drag_positions: [],
-        moving_cards: [],
       )
 
       min_col = selected_card.col
       max_col = selected_card.col + selected_card.width - 1
       selected_card_cols = *(min_col..max_col)
 
-      uninterupted_cards = [selected_card]
+      uninterrupted_cards = [selected_card]
 
       start_row = selected_card.row + 1
       selected_card_cols.each do |current_col|
-        uninterupted_cards += find_uninterupted_cards_in_col(
+        uninterrupted_cards += find_uninterrupted_cards_in_col(
           start_row,
           current_col,
           card_matrix,
         )
       end
 
-      uninterupted_cards.flatten.uniq
+      uninterrupted_cards.flatten.uniq
     end
   end
 end
