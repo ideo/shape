@@ -56,6 +56,24 @@ describe('EditableName', () => {
       })
       expect(props.uiStore.editingName).toEqual([])
     })
+
+    describe('with placeholder prop and empty name string', () => {
+      beforeEach(() => {
+        wrapper.setProps({
+          ...props,
+          name: '',
+          placeholder: 'edit your name',
+          TypographyComponent: Heading2,
+        })
+      })
+
+      it('renders the placeholder', () => {
+        expect(wrapper.find('AutosizeInput').props().placeholder).toEqual(
+          'edit your name'
+        )
+        expect(wrapper.render().text()).toMatch(/edit your name/)
+      })
+    })
   })
 
   describe('if canEdit is false', () => {
