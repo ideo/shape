@@ -19,6 +19,7 @@ exports[`CollectionCreator renders snapshot 1`] = `
       data-cy="CollectionCreatorFormButton"
       disabled={false}
       minWidth={125}
+      outline={false}
       size="md"
     >
       Create

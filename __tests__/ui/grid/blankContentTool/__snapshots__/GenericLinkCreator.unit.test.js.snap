@@ -19,6 +19,7 @@ exports[`GenericLinkCreator renders snapshot 1`] = `
       data-cy="LinkCreatorFormButton"
       disabled={false}
       minWidth={null}
+      outline={false}
       size="md"
     >
       Add
