@@ -15,11 +15,14 @@ import BackIcon from '~/ui/icons/BackIcon'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
 import { FormButton } from '~/ui/global/styled/buttons'
-import { SubduedHeading1 } from '~/ui/global/styled/typography'
+import {
+  SubduedHeading1,
+  HeaderButtonText,
+} from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
+import TruncatableText from '~/ui/global/TruncatableText'
 import v from '~/utils/variables'
-import { rightClamp } from '~/utils/textUtils'
 import routeToLogin from '~/utils/routeToLogin'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
@@ -83,27 +86,6 @@ const StyledButtonIconWrapper = styled.span`
 `
 
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
-
-const StyledButtonNameWrapper = styled.span`
-  display: inline-block;
-  vertical-align: middle;
-  ${props =>
-    props.large &&
-    `
-      text-transform: none;
-      font-weight: normal;
-      font-size: 24px;
-      float: left;
-    `}
-
-  ${props =>
-    props.fixedWidth &&
-    `
-      max-width: 130px;
-    `};
-`
-
-StyledButtonNameWrapper.displayName = 'StyledButtonNameWrapper'
 
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
@@ -281,7 +263,7 @@ class PageHeader extends React.Component {
               <StyledButtonIconWrapper>
                 <LinkIconSm />
               </StyledButtonIconWrapper>
-              <StyledButtonNameWrapper>Get Link</StyledButtonNameWrapper>
+              <HeaderButtonText>Get Link</HeaderButtonText>
             </FormButton>
           </CopyToClipboard>
           {this.renderStopFeebackButton}
@@ -360,38 +342,6 @@ class PageHeader extends React.Component {
     )
   }
 
-  get renderTemplateName() {
-    const { record } = this.props
-    const { template } = record
-    const { maxButtonTextLength } = v
-    const templateName = template ? template.name : 'Template'
-    const truncatedName =
-      templateName.length > maxButtonTextLength
-        ? rightClamp(templateName, maxButtonTextLength)
-        : templateName
-    const shouldTruncate = templateName.length > maxButtonTextLength
-    const active = template.can_view || template.anyone_can_view
-    const buttonNameWrapper = (
-      <StyledButtonNameWrapper fixedWidth={active} large>
-        {truncatedName}
-      </StyledButtonNameWrapper>
-    )
-
-    if (!shouldTruncate) {
-      return buttonNameWrapper
-    }
-
-    return (
-      <Tooltip
-        classes={{ tooltip: 'Tooltip' }}
-        title={template.name}
-        placement="top"
-      >
-        {buttonNameWrapper}
-      </Tooltip>
-    )
-  }
-
   get renderTemplateButton() {
     const { record } = this.props
     if (record.isUsableTemplate && record.isMasterTemplate) {
@@ -434,7 +384,12 @@ class PageHeader extends React.Component {
           <StyledButtonIconWrapper float={'left'}>
             <CollectionTypeIcon record={record} />
           </StyledButtonIconWrapper>
-          {this.renderTemplateName}
+          <HeaderButtonText fixedWidth={active} large>
+            <TruncatableText
+              text={template.name}
+              maxLength={v.maxButtonTextLength}
+            />
+          </HeaderButtonText>
           {active && (
             <Tooltip
               classes={{ tooltip: 'Tooltip' }}

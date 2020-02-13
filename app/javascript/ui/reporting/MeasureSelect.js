@@ -5,7 +5,10 @@ import styled from 'styled-components'
 
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
-import { DATA_MEASURES } from '~/utils/variables'
+import v, { DATA_MEASURES } from '~/utils/variables'
+import InfoIcon from '~/ui/icons/InfoIcon'
+import Tooltip from '~/ui/global/Tooltip'
+import TruncatableText from '~/ui/global/TruncatableText'
 
 const contentMeasureValues = ['collections', 'items', 'records']
 
@@ -23,15 +26,27 @@ const timeframeMeasures = [
   { name: 'ever', value: 'ever' },
 ]
 
+const StyledInlineSelectItem = styled.span`
+  display: flex;
+  justify-content: space-between;
+`
+
 const IconHolder = styled.span`
   display: inline-block;
+  width: 10px;
+`
+
+const ToggleIconHolder = styled(IconHolder)`
   height: 15px;
   position: absolute;
   right: 15px;
   transform: rotate(${props => (props.open ? '270deg' : '180deg')});
   transition: transform 0.35s;
   top: calc(50% - 6px);
-  width: 10px;
+`
+
+const StyledMeasureName = styled.span`
+  flex-grow: 1;
 `
 
 @observer
@@ -94,6 +109,31 @@ class MeasureSelect extends React.Component {
     return []
   }
 
+  renderMeasureNameAndInfo = (measureName, description) => {
+    const { maxPopoutMenuTextLength } = v
+    return (
+      <StyledInlineSelectItem>
+        <StyledMeasureName>
+          <TruncatableText
+            text={measureName}
+            maxLength={maxPopoutMenuTextLength}
+          />
+        </StyledMeasureName>
+        {description && (
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title={description}
+            placement="bottom"
+          >
+            <IconHolder>
+              <InfoIcon />
+            </IconHolder>
+          </Tooltip>
+        )}
+      </StyledInlineSelectItem>
+    )
+  }
+
   render() {
     const { dataSettingsName } = this.props
     return (
@@ -119,13 +159,13 @@ class MeasureSelect extends React.Component {
               disabled={opt.value === 'contentMenu' && this.contentSelected}
               data-cy={`DataReportOption-${opt.value}`}
             >
-              {opt.name}
+              {this.renderMeasureNameAndInfo(opt.name, opt.description)}
               {opt.value === 'contentMenu' && (
-                <IconHolder
+                <ToggleIconHolder
                   open={this.contentSectionOpen || this.contentSelected}
                 >
                   <ArrowIcon />
-                </IconHolder>
+                </ToggleIconHolder>
               )}
             </SelectOption>
           ))}

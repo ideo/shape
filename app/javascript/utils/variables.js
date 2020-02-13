@@ -46,13 +46,48 @@ export const DATASET_CHART_TYPES = {
 }
 
 export const DATA_MEASURES = [
-  { name: 'Participants', value: 'participants' },
-  { name: 'Viewers', value: 'viewers' },
-  { name: 'Activity', value: 'activity' },
-  { name: 'Content Use', value: 'content', tooltip: 'content activities' },
-  { name: 'Collections', value: 'collections' },
-  { name: 'Items', value: 'items' },
-  { name: 'Collections & Items', value: 'records' },
+  {
+    name: 'Participants',
+    value: 'participants',
+    description:
+      'Total number of collections that exist (regular collections, foamcore collections, and submission box collections)',
+  },
+  {
+    name: 'Viewers',
+    value: 'viewers',
+    description:
+      'Total number of items that exist (text boxes, pictures and other media, files, links, and reports)',
+  },
+  {
+    name: 'Activity',
+    value: 'activity',
+    description:
+      'Total number of collections and items that exist (regular collections, foamcore collections, and submission box collections, text boxes, pictures and other media, files, links, and reports) ',
+  },
+  {
+    name: 'Content Use',
+    value: 'content',
+    tooltip: 'content activities',
+    description:
+      'Unique visitors that have commented or interacted with content',
+  },
+  {
+    name: 'Collections',
+    value: 'collections',
+    description: 'Unique visitors that have viewed content',
+  },
+  {
+    name: 'Items',
+    value: 'items',
+    description:
+      'Total actions including adding items, editing content, commenting, downloading, and duplicating, moving, or linking content',
+  },
+  {
+    name: 'Collections & Items',
+    value: 'records',
+    description:
+      'Total actions indicating content use: file downloads, PDF views, full-screen views, and link clicks',
+  },
 ]
 
 export const TEST_COLLECTION_SELECT_OPTIONS = [
@@ -148,6 +183,7 @@ export default {
   topScrollTrigger: 210,
   maxTitleLength: 144,
   maxButtonTextLength: 8,
+  maxPopoutMenuTextLength: 13,
   actionMenuWidth: 250,
   actionMenuHeight: 26,
 

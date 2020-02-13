@@ -3,8 +3,6 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { fakeTextItem, fakeCollection, fakeCollectionCard } from '#/mocks/data'
-import { rightClamp } from '~/utils/textUtils'
-import v from '~/utils/variables'
 
 describe('PageHeader', () => {
   let wrapper, component, props
@@ -152,21 +150,8 @@ describe('PageHeader', () => {
       expect(wrapper.find('CollectionTypeIcon').exists()).toBeTruthy()
     })
 
-    it('should show a clamped collection name with a Tooltip', () => {
-      expect(
-        wrapper
-          .find('StyledButtonNameWrapper')
-          .children()
-          .first()
-          .text()
-      ).toEqual(rightClamp(fakeCollection.name, v.maxButtonTextLength))
-
-      expect(
-        wrapper
-          .find('Tooltip')
-          .first()
-          .props().title
-      ).toMatch(`${fakeCollection.name}`)
+    it('should show a clamped collection name with a TruncatableText', () => {
+      expect(wrapper.find('TruncatableText').exists()).toBeTruthy()
     })
 
     it('should show master template navigate back button with a Tooltip', () => {
