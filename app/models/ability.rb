@@ -52,7 +52,7 @@ class Ability
       can :manage, Collection do |collection|
         collection.can_edit?(user) &&
           !collection.system_required? &&
-          !collection.pinned_and_locked?
+          (user.application_bot? || !collection.pinned_and_locked?)
       end
 
       can :create, CollectionCard
