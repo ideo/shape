@@ -151,14 +151,9 @@ class Item
     end
 
     def csv_data
-      if report_type_record?
-        DataReport::RecordCSVReport.call(data_item: self)
-      elsif report_type_collections_and_items?
-        DataReport::CollectionsAndItems.new(
-          dataset: datasets.first,
-        ).csv
-      end
-      []
+      return [] unless report_type_record? || report_type_collections_and_items?
+
+      DataReport::DatasetsCSVReport.call(datasets: datasets)
     end
 
     def csv_filename

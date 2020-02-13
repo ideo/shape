@@ -127,18 +127,11 @@ RSpec.describe Item::DataItem, type: :model do
   describe 'csv_data' do
     let(:organization) { create(:organization) }
     let(:collection) { create(:collection, organization: organization) }
+    let(:item) { create(:data_item, :report_type_collections_and_items, parent_collection: collection) }
 
-    context 'for a collections and item data item' do
-      let(:item) { create(:data_item, :report_type_collections_and_items, parent_collection: collection) }
-      let(:csv_data) { item.csv_data }
-
-      it 'should have dates in the first column' do
-        expect(csv_data[0][1]).to eq (item.datasets.first.data.first[:date])
-      end
-
-      it 'should have the organization data in the second column' do
-        expect(csv_data).to eq ('Organization')
-      end
+    it 'should call the datasets csv report' do
+      expect(DataReport::DatasetsCSVReport). to receive(:call).once
+      item.csv_data
     end
   end
 

@@ -23,17 +23,6 @@ module DataReport
       @data
     end
 
-    def csv
-      call
-      CSV.generate do |csv|
-        dates = @data.map { |d| d[:date] }
-        csv << [' '] + dates
-        values = @data.map { |d| d[:value] }
-        source = @record.present? ? 'Collection' : 'Organization'
-        csv << [source] + values
-      end
-    end
-
     def single_value
       @is_single_value = true
       if measure == 'records'
