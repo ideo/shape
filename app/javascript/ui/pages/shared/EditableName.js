@@ -51,15 +51,22 @@ class EditableName extends React.Component {
   constructor(props) {
     super(props)
     this.saveName = _.debounce(this._saveName, 1000)
-    const { name } = props
+  }
+
+  componentDidMount() {
+    const { name } = this.props
     this.setName(name)
   }
 
   // navigating between collections may trigger this instead of didMount
-  componentWillReceiveProps({ name }) {
-    this.setName(name)
+  componentDidUpdate(prevProps) {
+    const { name } = this.props
+    if (name !== prevProps.name) {
+      this.setName(name)
+    }
   }
 
+  @action
   componentWillUnmount() {
     const { uiStore, fieldName } = this.props
     uiStore.editingName.remove(fieldName)
@@ -87,6 +94,11 @@ class EditableName extends React.Component {
     const { fieldName, uiStore } = this.props
     if (uiStore.editingName.includes(fieldName)) return
     uiStore.editingName.push(fieldName)
+    setTimeout(() => {
+      if (this.inputRef) {
+        this.inputRef.focus()
+      }
+    }, 10)
   }
 
   @action
@@ -138,6 +150,7 @@ class EditableName extends React.Component {
       typographyCss,
       fieldName,
       editingMarginTop,
+      placeholder,
     } = this.props
     if (canEdit && uiStore.editingName.includes(fieldName)) {
       const clickHandlers = [() => this.stopEditingName()]
@@ -149,6 +162,10 @@ class EditableName extends React.Component {
           editingMarginTop={editingMarginTop}
         >
           <AutosizeInput
+            inputRef={ref => {
+              this.inputRef = ref
+            }}
+            placeholder={placeholder}
             maxLength={v.maxTitleLength}
             className="input__name"
             style={{ fontSize }}
@@ -172,6 +189,9 @@ class EditableName extends React.Component {
           onClick={canEdit ? this.startEditingName : null}
         >
           {this.truncateName()}
+          {!this.name && placeholder && (
+            <span style={{ color: v.colors.commonDark }}>{placeholder}</span>
+          )}
         </TypographyComponent>
       </StyledName>
     )
@@ -188,6 +208,7 @@ EditableName.propTypes = {
   typographyCss: PropTypes.array,
   fieldName: PropTypes.string,
   editingMarginTop: PropTypes.string,
+  placeholder: PropTypes.string,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -202,6 +223,7 @@ EditableName.defaultProps = {
   TypographyComponent: Heading1,
   typographyCss: Heading1TypographyCss,
   fieldName: 'name',
+  placeholder: '',
 }
 
 EditableName.displayName = 'EditableName'

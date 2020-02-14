@@ -10,6 +10,7 @@ import Organization from '~/stores/jsonApi/Organization'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
 import googleTagManager from '~/vendor/googleTagManager'
+import queryString from 'query-string'
 
 import { fakeRole } from '#/mocks/data'
 jest.mock('../../../app/javascript/vendor/googleTagManager')
@@ -408,6 +409,93 @@ describe('Collection', () => {
       expect(collection.cache_key).toEqual('new-cache-key')
       expect(collection.storedCacheKey).toEqual('new-cache-key')
       expect(collection.collection_cards.length).toEqual(2)
+    })
+
+    describe('as search collection with no filters', () => {
+      let searchResultsCollection
+      beforeEach(() => {
+        searchResultsCollection = new Collection(
+          {
+            name: 'fakeSearchResultsCollection',
+            class_type: 'SearchResultsCollection',
+            search_term: '#building-ventures within:123456',
+            organization_id: 1,
+          },
+          apiStore
+        )
+        searchResultsCollection.collection = collection
+        updateModelId(searchResultsCollection, '102')
+      })
+
+      it('uses search_collection_cards endpoint', async () => {
+        await searchResultsCollection.API_fetchCards({
+          searchTerm: searchResultsCollection.search_term,
+          page: 1,
+          per_page: searchResultsCollection.searchRecordsPerPage,
+        })
+        const urlParams = queryString.stringify({
+          current_collection_id: searchResultsCollection.id,
+          page: 1,
+          per_page: searchResultsCollection.searchRecordsPerPage,
+          query: '#building-ventures within:123456',
+        })
+        expect(apiStore.request).toHaveBeenCalledWith(
+          `organizations/1/search_collection_cards?${urlParams}`
+        )
+      })
+    })
+
+    describe('as search collection with filters', () => {
+      let searchResultsCollection
+      beforeEach(() => {
+        searchResultsCollection = new Collection(
+          {
+            name: 'fakeSearchResultsCollection',
+            class_type: 'SearchResultsCollection',
+            search_term: '#building-ventures within:123456',
+            organization_id: 1,
+          },
+          apiStore
+        )
+        searchResultsCollection.collection = collection
+        updateModelId(searchResultsCollection, '102')
+        collection.addReference(
+          'collection_filters',
+          [
+            {
+              filter_type: 'tag',
+              text: 'plant',
+              selected: true,
+            },
+            {
+              filter_type: 'tag',
+              text: 'purpose',
+              selected: true,
+            },
+          ],
+          {
+            model: CollectionFilter,
+            type: ReferenceType.TO_MANY,
+          }
+        )
+      })
+
+      it('combines search_term and collection filters', async () => {
+        await searchResultsCollection.API_fetchCards({
+          searchTerm: searchResultsCollection.search_term,
+          page: 1,
+          per_page: searchResultsCollection.searchRecordsPerPage,
+        })
+        const urlParams = queryString.stringify({
+          current_collection_id: searchResultsCollection.id,
+          page: 1,
+          per_page: searchResultsCollection.searchRecordsPerPage,
+          query: '#building-ventures within:123456 #plant #purpose',
+        })
+        expect(apiStore.request).toHaveBeenCalledWith(
+          `organizations/1/search_collection_cards?${urlParams}`
+        )
+      })
     })
 
     describe('with cache keys', () => {
