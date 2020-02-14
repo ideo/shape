@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe DataReport::DatasetsCSVReport, type: :service do
   let(:csv_data) { DataReport::DatasetsCSVReport.call(datasets: [dataset]) }
-  let(:first_line) { csv_data.split("\n").first.split(",") }
-  let(:second_line) { csv_data.split("\n").second.split(",") }
+  let(:first_line) { csv_data.split("\n").first.split(',') }
+  let(:second_line) { csv_data.split("\n").second.split(',') }
 
   context 'shape report' do
     let(:dataset) { create(:collections_and_items_dataset) }
@@ -13,9 +13,10 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
         Dataset::CollectionsAndItems,
       ).to receive(:data).and_return(
         [
-          { "date" => '2019-10-10', "value" => 12 },
-          { "date" => '2019-11-10', "value" => 15 },
-          { "date" => '2019-12-10', "value" => 19 }, ]
+          { 'date' => '2019-10-10', 'value' => 12 },
+          { 'date' => '2019-11-10', 'value' => 15 },
+          { 'date' => '2019-12-10', 'value' => 19 },
+        ],
       )
     end
 
@@ -40,7 +41,7 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
       end
 
       it 'should have "Organization" in the second row' do
-        second_line = csv_data.split("\n").second.split(",")
+        second_line = csv_data.split("\n").second.split(',')
         expect(second_line[0]).to eq 'Organization'
       end
     end
@@ -49,7 +50,7 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
   context 'creative difference report' do
     let(:dataset) { create(:dataset, :with_cached_data, name: 'Purpose') }
     let(:dataset_a) { create(:dataset, :with_cached_data, name: 'Innovation') }
-    let(:third_line) { csv_data.split("\n").third.split(",") }
+    let(:third_line) { csv_data.split("\n").third.split(',') }
     let(:csv_data) { DataReport::DatasetsCSVReport.call(datasets: [dataset, dataset_a]) }
 
     before do
