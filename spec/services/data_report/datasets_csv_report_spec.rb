@@ -48,14 +48,24 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
 
   context 'creative difference report' do
     let(:dataset) { create(:dataset, :with_cached_data, name: 'Purpose') }
+    let(:dataset_a) { create(:dataset, :with_cached_data, name: 'Innovation') }
+    let(:third_line) { csv_data.split("\n").third.split(",") }
+    let(:csv_data) { DataReport::DatasetsCSVReport.call(datasets: [dataset, dataset_a]) }
 
     before do
       dataset.cached_data = [
         { date: '2020-01-02', value: 80 },
         { date: '2020-02-02', value: 120 },
       ]
+      dataset_a.cached_data = [
+        { date: '2019-12-02', value: 15 },
+        { date: '2020-01-02', value: 25 },
+        { date: '2020-02-02', value: 30 },
+      ]
       dataset.save
       dataset.reload
+      dataset_a.save
+      dataset_a.reload
     end
 
     it 'should add each date in the top row' do
@@ -70,6 +80,12 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
     it 'should put the values after the source field on 2nd row' do
       expect(second_line[1]).to eq '80'
       expect(second_line[2]).to eq '120'
+    end
+
+    it 'should put the second dataset on the next line' do
+      expect(third_line[1]).to eq '15'
+      expect(third_line[2]).to eq '25'
+      expect(third_line[3]).to eq '30'
     end
   end
 end
