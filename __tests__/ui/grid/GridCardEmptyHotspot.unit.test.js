@@ -1,5 +1,4 @@
 import GridCardEmptyHotspot from '~/ui/grid/GridCardEmptyHotspot'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 let wrapper, component, props, uiStore, shallowRender
@@ -28,10 +27,6 @@ describe('GridCardEmptyHotspot', () => {
       )
       component = wrapper.instance()
     }
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders a PlusIcon', () => {
