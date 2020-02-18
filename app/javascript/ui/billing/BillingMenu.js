@@ -68,6 +68,7 @@ class BillingMenu extends React.Component {
           onClick={this.toggleOpen}
           menuOpen={this.open}
           menuItems={this.menuItems()}
+          positionRelative={false}
         />
       </Fragment>
     )

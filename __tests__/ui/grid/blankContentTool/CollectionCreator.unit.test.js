@@ -1,5 +1,4 @@
 import CollectionCreator from '~/ui/grid/blankContentTool/CollectionCreator'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import googleTagManager from '~/vendor/googleTagManager'
 import { routingStore } from '~/stores'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -30,10 +29,6 @@ describe('CollectionCreator', () => {
     }
     props.createCard.mockClear()
     rerender()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders a BctTextField', () => {

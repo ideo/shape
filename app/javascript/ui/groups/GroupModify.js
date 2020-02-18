@@ -2,7 +2,8 @@ import PropTypes from 'prop-types'
 import { action, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
-import { FormButton, TextButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
+import TextButton from '~/ui/global/TextButton'
 import { SmallHelperText, SubduedText } from '~/ui/global/styled/typography'
 import {
   FieldContainer,
@@ -170,15 +171,15 @@ class GroupModify extends React.Component {
           </button>
         </FieldContainer>
         <FormActionsContainer>
-          <FormButton
+          <Button
             data-cy="FormButton_submitGroup"
             disabled={this.formDisabled}
             onClick={this.handleSave}
-            width={190}
+            minWidth={190}
             type="submit"
           >
             {groupType === 'Group' ? 'Add Members' : 'Save'}
-          </FormButton>
+          </Button>
         </FormActionsContainer>
         {creatingOrg && (
           <div style={{ textAlign: 'center' }}>

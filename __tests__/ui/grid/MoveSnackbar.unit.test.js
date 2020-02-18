@@ -1,6 +1,5 @@
 import MoveSnackbar from '~/ui/grid/MoveSnackbar'
 import { fakeCollection, fakeItemCard } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -27,10 +26,6 @@ describe('MoveSnackbar', () => {
     props.uiStore.shouldOpenMoveSnackbar = true
     wrapper = shallow(<MoveSnackbar.wrappedComponent {...props} />)
     component = wrapper.instance()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('handleClose', () => {

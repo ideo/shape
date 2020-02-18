@@ -1,4 +1,3 @@
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import DataItemCoverDisplayOnly from '~/ui/grid/covers/data-item/DataItemCoverDisplayOnly'
 import { fakeDataItemRecordAttrs } from '#/mocks/data'
 
@@ -11,10 +10,6 @@ describe('DataItemCoverDisplayOnly', () => {
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     render = () => (wrapper = shallow(<DataItemCoverDisplayOnly {...props} />))
     render()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('should render item name', () => {

@@ -34,6 +34,7 @@ const ZoomIconWrapper = styled.div`
     }
   }
 `
+ZoomIconWrapper.displayName = 'ZoomIconWrapper'
 
 class FoamcoreZoomControls extends React.Component {
   render() {

@@ -91,11 +91,12 @@ describe('SearchCollection', () => {
 
   describe('updateSearchTerm', () => {
     beforeEach(() => {
-      component._updateSearchTerm()
+      component.updateSearchTerm('broccoli')
     })
 
     it('should save the collection', () => {
-      expect(collection.save).toHaveBeenCalled()
+      expect(collection.search_term).toEqual('broccoli')
+      expect(collection.patch).toHaveBeenCalled()
     })
 
     it('should load the cards again', () => {

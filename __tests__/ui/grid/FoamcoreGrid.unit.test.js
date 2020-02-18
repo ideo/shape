@@ -1,6 +1,5 @@
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import CardMoveService from '~/utils/CardMoveService'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
@@ -69,10 +68,6 @@ describe('FoamcoreGrid', () => {
     rerender()
     cards = props.collection.collection_cards
     component.gridRef = { scrollLeft: 0, scrollTop: 0 }
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('findOverlap', () => {
