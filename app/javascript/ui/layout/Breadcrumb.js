@@ -237,7 +237,11 @@ class Breadcrumb extends React.Component {
     if (ellipsesItems.length) {
       const firstEllipsesItem = ellipsesItems.shift()
       const lastEllipsesItem = ellipsesItems.pop()
-      subItems = this.transformToSubItems(items, firstEllipsesItem, lastEllipsesItem)
+      subItems = this.transformToSubItems(
+        items,
+        firstEllipsesItem,
+        lastEllipsesItem
+      )
       firstEllipsesItem.subItems = subItems
     } else {
       subItems = this.transformToSubItems(items)
