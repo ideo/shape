@@ -206,3 +206,17 @@ export const FooterArea = styled.div`
   padding-top: 24px;
   padding-bottom: 30px;
 `
+
+export const StyleguideHolder = styled.div`
+  height: ${props => props.height}px;
+  padding-top: 20px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 500px;
+  background-color: ${({ backgroundColor }) => backgroundColor};
+`
+StyleguideHolder.defaultProps = {
+  height: 200,
+  backgroundColor: 'white',
+}

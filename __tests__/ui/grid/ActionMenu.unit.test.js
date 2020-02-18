@@ -3,7 +3,6 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const card = fakeCollectionCard
 const uiStore = { ...fakeUiStore, viewingCollection: fakeCollection }
@@ -42,10 +41,6 @@ describe('ActionMenu', () => {
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
       props.uiStore.openMoveMenu.mockClear()
-    })
-
-    it('renders snapshot', () => {
-      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('creates a PopoutMenu with all editable actions', () => {

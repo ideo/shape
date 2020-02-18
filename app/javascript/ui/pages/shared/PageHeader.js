@@ -14,7 +14,7 @@ import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BackIcon from '~/ui/icons/BackIcon'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { SubduedHeading1 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
@@ -272,23 +272,23 @@ class PageHeader extends React.Component {
       return (
         <Fragment>
           <CopyToClipboard text={record.publicTestURL} onCopy={() => null}>
-            <FormButton
-              width={v.buttonSizes.header.width}
+            <Button
+              minWidth={v.buttonSizes.header.width}
               onClick={() =>
                 uiStore.popupSnackbar({
                   message: 'Test link copied',
                 })
               }
-              fontSize={v.buttonSizes.header.fontSize}
+              size="sm"
               data-cy="HeaderFormButton"
-              transparent
-              filledHover
+              colorScheme={v.colors.black}
+              outline
             >
               <StyledButtonIconWrapper>
                 <LinkIconSm />
               </StyledButtonIconWrapper>
               <StyledButtonNameWrapper>Get Link</StyledButtonNameWrapper>
-            </FormButton>
+            </Button>
           </CopyToClipboard>
           {this.renderStopFeebackButton}
         </Fragment>
@@ -302,17 +302,17 @@ class PageHeader extends React.Component {
     // NOTE: this button is just for re-open, since "launch feedback"
     // appears inside of AudienceSettings
     return (
-      <FormButton
+      <Button
         onClick={record.reopenTest}
-        width="200"
+        minWidth={200}
         disabled={uiStore.launchButtonLoading}
-        fontSize={v.buttonSizes.header.fontSize}
+        size="sm"
         data-cy="HeaderFormButton"
-        transparent
-        filledHover
+        colorScheme={v.colors.black}
+        outline
       >
         Re-open Feedback
-      </FormButton>
+      </Button>
     )
   }
 
@@ -321,15 +321,15 @@ class PageHeader extends React.Component {
     if (!this.isCurrentlyHiddenSubmission) return null
 
     return (
-      <FormButton
-        color={v.colors.alert}
+      <Button
+        colorScheme={v.colors.alert}
         onClick={record.API_submitSubmission}
         disabled={uiStore.launchButtonLoading}
-        fontSize={v.buttonSizes.header.fontSize}
+        size="sm"
         data-cy="HeaderFormButton"
       >
         Submit
-      </FormButton>
+      </Button>
     )
   }
 
@@ -337,15 +337,15 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (!record.isPublicJoinable) return null
     return (
-      <FormButton
+      <Button
         style={{ marginLeft: '1rem' }}
-        color={v.colors.primaryDarkest}
+        colorScheme={v.colors.primaryDarkest}
         onClick={() => routeToLogin({ redirect: record.frontend_url })}
-        fontSize={v.buttonSizes.header.fontSize}
+        size="sm"
         data-cy="HeaderFormButton"
       >
         Join
-      </FormButton>
+      </Button>
     )
   }
 
@@ -354,15 +354,15 @@ class PageHeader extends React.Component {
     if (!record.can_edit) return null
     if (!record.is_restorable) return null
     return (
-      <FormButton
+      <Button
         style={{ marginLeft: '1rem' }}
-        color={v.colors.primaryDarkest}
+        colorScheme={v.colors.primaryDarkest}
         onClick={this.handleRestore}
-        fontSize={v.buttonSizes.header.fontSize}
+        size="sm"
         data-cy="HeaderFormButton"
       >
         Restore
-      </FormButton>
+      </Button>
     )
   }
 
@@ -402,15 +402,15 @@ class PageHeader extends React.Component {
     const { record } = this.props
     if (record.isUsableTemplate && record.isMasterTemplate) {
       return (
-        <FormButton
-          width={v.buttonSizes.header.width}
-          color={v.colors.primaryDark}
+        <Button
+          minWidth={v.buttonSizes.header.width}
+          colorScheme={v.colors.primaryDark}
           onClick={this.openMoveMenuForTemplate}
-          fontSize={v.buttonSizes.header.fontSize}
+          size="sm"
           data-cy="HeaderFormButton"
         >
           Use Template
-        </FormButton>
+        </Button>
       )
     } else if (
       !record.isMasterTemplate &&
@@ -421,7 +421,7 @@ class PageHeader extends React.Component {
       const { template } = record
       const active = template.can_view || template.anyone_can_view
       return (
-        <FormButton
+        <Button
           ref={ref => {
             this.templateButtonRef = ref
           }}
@@ -430,12 +430,12 @@ class PageHeader extends React.Component {
             // this same button remains mounted after the route, blur to remove focus
             if (this.templateButtonRef) this.templateButtonRef.blur()
           }}
-          width={v.buttonSizes.header.width + 40}
-          fontSize={v.buttonSizes.header.fontSize}
+          minWidth={v.buttonSizes.header.width + 40}
+          size="sm"
           data-cy="HeaderFormButton"
-          color={v.colors.commonMedium}
+          colorScheme={v.colors.commonDark}
+          outline
           disabled={!active}
-          transparent
         >
           <StyledButtonIconWrapper float={'left'}>
             <CollectionTypeIcon record={record} />
@@ -452,7 +452,7 @@ class PageHeader extends React.Component {
               </StyledButtonIconWrapper>
             </Tooltip>
           )}
-        </FormButton>
+        </Button>
       )
     }
 
@@ -467,17 +467,17 @@ class PageHeader extends React.Component {
       record.isLiveTest
     ) {
       return (
-        <FormButton
-          width="170"
+        <Button
+          minWidth={170}
           onClick={record.closeTest}
           disabled={uiStore.launchButtonLoading}
-          fontSize={v.buttonSizes.header.fontSize}
+          size="sm"
           data-cy="HeaderFormButton"
-          transparent
-          filledHover
+          colorScheme={v.colors.black}
+          outline
         >
           Stop Feedback
-        </FormButton>
+        </Button>
       )
     }
     return null

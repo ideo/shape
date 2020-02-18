@@ -69,7 +69,7 @@ describe('PageHeader', () => {
         wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
       })
       it('should render the JoinCollectionButton', () => {
-        expect(wrapper.find('FormButton').html()).toContain('Join')
+        expect(wrapper.find('Button').html()).toContain('Join')
       })
     })
 
@@ -129,7 +129,7 @@ describe('PageHeader', () => {
     it('should show the Use Template button', () => {
       expect(
         wrapper
-          .find('FormButton')
+          .find('Button')
           .children()
           .first()
           .text()
@@ -228,7 +228,7 @@ describe('PageHeader', () => {
     it('should render the restore button', () => {
       expect(
         wrapper
-          .find('FormButton')
+          .find('Button')
           .children()
           .first()
           .text()
