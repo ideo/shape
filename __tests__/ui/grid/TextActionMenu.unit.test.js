@@ -3,7 +3,6 @@ import TextActionMenu from '~/ui/grid/TextActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollectionCard } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const props = {
   card: fakeCollectionCard,
@@ -19,10 +18,6 @@ describe('TextActionMenu', () => {
       actions = ['Comment']
       wrapper = shallow(<TextActionMenu.wrappedComponent {...props} canEdit />)
       component = wrapper.instance()
-    })
-
-    it('render snapshot', () => {
-      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('creates a PopoutMenu with a comment action', () => {

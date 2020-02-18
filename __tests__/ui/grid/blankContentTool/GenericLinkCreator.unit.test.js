@@ -1,5 +1,4 @@
 import GenericLinkCreator from '~/ui/grid/blankContentTool/GenericLinkCreator'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let wrapper, props
 describe('GenericLinkCreator', () => {
@@ -17,10 +16,6 @@ describe('GenericLinkCreator', () => {
       onPasswordChange: jest.fn(),
     }
     wrapper = shallow(<GenericLinkCreator {...props} />)
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders a form with a BctTextField', () => {

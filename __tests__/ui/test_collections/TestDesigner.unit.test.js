@@ -2,7 +2,6 @@ import TestDesigner from '~/ui/test_collections/TestDesigner'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import v from '~/utils/variables'
 import googleTagManager from '~/vendor/googleTagManager'
@@ -51,9 +50,6 @@ describe('TestDesigner', () => {
   describe('with default params', () => {
     beforeEach(() => {
       rerender()
-    })
-    it('renders snapshot', () => {
-      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('renders TestQuestions for each card', () => {
