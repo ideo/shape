@@ -37,7 +37,6 @@ describe('DataItemCover', () => {
         .find(Heading3)
         .at(0)
         .simulate('click', fakeEv)
-
       expect(uiStore.setEditingCardCover).not.toHaveBeenCalled()
     })
   })
