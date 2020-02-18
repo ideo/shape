@@ -4,7 +4,6 @@ module DataReport
   class DatasetsCSVReport < SimpleService
     def initialize(datasets:)
       @datasets = datasets
-      @primary_dataset = @datasets.first
     end
 
     def call
