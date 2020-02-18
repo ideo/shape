@@ -70,8 +70,9 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
     end
 
     it 'should add each date in the top row' do
-      expect(first_line[1]).to eq '2020-01-02'
-      expect(first_line[2]).to eq '2020-02-02'
+      expect(first_line[1]).to eq '2019-12-02'
+      expect(first_line[2]).to eq '2020-01-02'
+      expect(first_line[3]).to eq '2020-02-02'
     end
 
     it 'should include the dataset name in the first column 2nd row' do
@@ -79,8 +80,8 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
     end
 
     it 'should put the values after the source field on 2nd row' do
-      expect(second_line[1]).to eq '80'
-      expect(second_line[2]).to eq '120'
+      expect(second_line[2]).to eq '80'
+      expect(second_line[3]).to eq '120'
     end
 
     it 'should put the second dataset on the next line' do

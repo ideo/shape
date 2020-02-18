@@ -9,16 +9,22 @@ module DataReport
 
     def call
       CSV.generate do |csv|
-        dates = @primary_dataset.data.map { |d| d['date'] }
+        dates = @datasets.map(&:data).flatten.map { |d| d['date'] }.uniq.sort
         csv << [' '] + dates
 
         @datasets.each do |ds|
-          values = ds.data.map { |d| d['value'] }
           source = ds.name
           if ds.type == 'Dataset::CollectionsAndItems'
             source = ds.data_source.present? ? 'Collection' : 'Organization'
           end
-          csv << [source] + values
+          row = Array.new(dates.size + 1, ' ')
+
+          ds.data.each do |d|
+            idx = dates.index(d['date']) + 1
+            row[idx] = d['value']
+          end
+          row[0] = source
+          csv << row
         end
       end
     end
