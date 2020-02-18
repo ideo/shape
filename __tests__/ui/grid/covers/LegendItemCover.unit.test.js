@@ -1,5 +1,4 @@
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -28,10 +27,6 @@ describe('LegendItemCover', () => {
       instance = wrapper.instance()
     }
     render()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('shows selected dataset', () => {

@@ -1,5 +1,4 @@
 import CoverRenderer from '~/ui/grid/CoverRenderer'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { uiStore } from '~/stores'
 import {
   fakeCollectionCard,
@@ -29,10 +28,6 @@ describe('CoverRenderer', () => {
       wrapper = shallow(<CoverRenderer {...props} />)
       return wrapper
     }
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('with collection', () => {
