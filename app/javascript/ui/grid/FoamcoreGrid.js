@@ -385,15 +385,23 @@ class FoamcoreGrid extends React.Component {
 
   // Finds row and column from an x,y coordinate
   coordinatesForPosition(position) {
+    const { collection } = this.props
     const { x, y } = position
+    const width = position.width || 1
     const { gridW, gridH, gutter } = this.gridSettings
     const { relativeZoomLevel } = this
 
-    const col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
-    const row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
+    let col = Math.floor((x / (gridW + gutter)) * relativeZoomLevel)
+    let row = Math.floor((y / (gridH + gutter)) * relativeZoomLevel)
+    if (row < 0) {
+      row = 0
+    }
+    // even though we restrict coordinates to being within the grid,
+    // we want to know if horizontalScroll should be disabled based on unmodified col
+    const outsideDraggableArea = col >= collection.num_columns || col < 0
 
-    // could return negative, but setDraggedOnSpots will deal with this appropriately
-    return { col, row }
+    col = _.clamp(col, 0, collection.num_columns - width)
+    return { col, row, outsideDraggableArea }
   }
 
   positionForCoordinates({ col, row, width = 1, height = 1 }) {
@@ -582,8 +590,6 @@ class FoamcoreGrid extends React.Component {
   @action
   onDrag = (cardId, dragPosition) => {
     this.dragging = true
-
-    const { collection } = this.props
     const card = this.originalCard(cardId)
 
     // TODO considering changing dragX in MoveableGridCard
@@ -595,7 +601,7 @@ class FoamcoreGrid extends React.Component {
     }
     const cardDims = { width: card.width, height: card.height }
     const cardCoords = this.coordinatesForPosition(cardPosition)
-    if (cardCoords.col >= collection.num_columns) {
+    if (cardCoords.outsideDraggableArea) {
       this.disableHorizontalScroll = true
     } else {
       this.disableHorizontalScroll = false
@@ -803,7 +809,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
 
     // If master dragging position hasn't changed, don't need to do anything
-    if (objectsEqual(masterPosition, this.draggingCardMasterPosition)) return
+    // if (objectsEqual(masterPosition, this.draggingCardMasterPosition)) return
     this.draggingCardMasterPosition = masterPosition
 
     // reset these
@@ -816,12 +822,13 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
-    // Add master dragging card
+    // track this before any collision modifications
     const unmodifiedMasterPosition = { ...masterPosition }
     this.updateDragGridSpotWithOpenPosition(masterPosition)
 
     // Loop through any additional cards and add drag spots for them
     if (uiStore.multiMoveCardIds.length > 1) {
+      const bump = { col: 0, row: 0 }
       this.draggingMap.forEach(mapped => {
         const relativePosition = {
           col: mapped.col + masterPosition.col,
@@ -830,8 +837,31 @@ class FoamcoreGrid extends React.Component {
           height: mapped.card.height,
           card: mapped.card,
         }
-        this.updateDragGridSpotWithOpenPosition(relativePosition)
+        const bumped = this.updateDragGridSpotWithOpenPosition(relativePosition)
+        _.each(['row', 'col'], i => {
+          if (bumped[i] && Math.abs(bumped[i]) > Math.abs(bump[i])) {
+            bump[i] = bumped[i]
+          }
+        })
       })
+      if (bump.col !== 0 || bump.row !== 0) {
+        // reset these
+        this.dragGridSpot.clear()
+        // one more pass if we needed to bump things
+        masterPosition.col += bump.col
+        masterPosition.row += bump.row
+        this.updateDragGridSpotWithOpenPosition(masterPosition)
+        this.draggingMap.forEach(mapped => {
+          const relativePosition = {
+            col: mapped.col + masterPosition.col,
+            row: mapped.row + masterPosition.row,
+            width: mapped.card.width,
+            height: mapped.card.height,
+            card: mapped.card,
+          }
+          this.updateDragGridSpotWithOpenPosition(relativePosition)
+        })
+      }
     }
 
     const previousHoveringOver = { ...this.hoveringOver }
@@ -858,16 +888,24 @@ class FoamcoreGrid extends React.Component {
   @action
   updateDragGridSpotWithOpenPosition(position) {
     const { collection } = this.props
+    // track number of spaces (row/col) we may need to bump things to
+    // have them stay "in bounds"
+    const bump = {}
     if (!USE_COLLISION_DETECTION_ON_DRAG) {
-      const { row, col, width } = position
-      if (row < 0 || col < 0 || col + width > collection.num_columns) {
-        this.hasDragCollision = true
-        return
+      const { col, row, width } = position
+      if (col < 0) {
+        bump.col = 0 - col
+      } else if (col + width > collection.num_columns) {
+        bump.col = collection.num_columns - (col + width)
       }
+      if (row < 0) {
+        bump.row = 0 - row
+      }
+      if (!_.isEmpty(bump)) return bump
       this.dragGridSpot.set(getMapKey(position), position)
       this.hasDragCollision =
         this.hasDragCollision || this.findOverlap(position)
-      return
+      return {}
     }
     const openSpot = findClosestOpenSpot(position, this.openSpotMatrix)
     if (openSpot) {

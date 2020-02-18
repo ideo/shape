@@ -4,6 +4,7 @@ import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
+import v from '~/utils/variables'
 
 let props, wrapper, component, rerender, cards, cardA, cardB, cardC
 let idCounter = 0
@@ -29,6 +30,7 @@ describe('FoamcoreGrid', () => {
     cardC = createCard({ row: 2, col: 0, width: 2 })
     const collection = fakeCollection
 
+    collection.num_columns = 16
     collection.cardMatrix = [[], [], []]
     collection.cardMatrix[1][5] = cardA
     collection.cardMatrix[0][1] = cardB
@@ -134,6 +136,29 @@ describe('FoamcoreGrid', () => {
       expect(component.dragGridSpot.size).toEqual(0)
       expect(component.dragging).toEqual(false)
       expect(props.uiStore.setMovingCards).toHaveBeenCalledWith([])
+    })
+  })
+
+  describe('coordinatesForPosition', () => {
+    it('should calculate the appropriate coordinates', () => {
+      const { gridW, gutter } = v.defaultGridSettings
+      const zoom = component.relativeZoomLevel
+      let x = (gridW + gutter) / zoom
+      const y = 0
+      let width = 1
+      expect(component.coordinatesForPosition({ x, y, width })).toEqual({
+        col: 1,
+        outsideDraggableArea: false,
+        row: 0,
+      })
+      x = (16 * (gridW + gutter)) / zoom
+      width = 4
+      expect(component.coordinatesForPosition({ x, y, width })).toEqual({
+        // this will get bumped back to 12 (where it fits)
+        col: 12,
+        outsideDraggableArea: true,
+        row: 0,
+      })
     })
   })
 
