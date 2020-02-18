@@ -60,6 +60,7 @@ Rails.application.routes.draw do
           get 'in_my_collection'
           patch 'restore_permissions'
           patch 'highlight'
+          get 'datasets'
         end
         resources :roles, only: %i[index create destroy] do
           collection do

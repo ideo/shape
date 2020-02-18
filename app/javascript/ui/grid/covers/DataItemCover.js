@@ -8,6 +8,18 @@ import DataItemCoverDisplayOnly from '~/ui/grid/covers/data-item/DataItemCoverDi
 @inject('apiStore')
 @observer
 class DataItemCover extends React.Component {
+  componentDidMount() {
+    const { item } = this.props
+    item.API_fetchDatasets()
+  }
+
+  componentDidUpdate() {
+    const { item } = this.props
+    if (!item.primaryDataset) {
+      item.API_fetchDatasets()
+    }
+  }
+
   render() {
     const { item, card } = this.props
     if (item.isReportTypeCollectionsItems) {

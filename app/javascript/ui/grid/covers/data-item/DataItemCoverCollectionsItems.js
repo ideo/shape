@@ -41,6 +41,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   componentDidMount() {
     const { item, uiStore } = this.props
+    if (!item.primaryDataset) return
     const {
       primaryDataset: { data_source_id },
     } = this.props.item
@@ -133,9 +134,11 @@ class DataItemCoverCollectionsItems extends React.Component {
     // If the timeframe changed we have to resize the card
     if (settings.timeframe) {
       const { height, width } = this.correctGridSize
-      card.height = height
-      card.width = width
-      await card.save()
+      if (card.height !== height || card.width !== width) {
+        card.height = height
+        card.width = width
+        await card.save()
+      }
     }
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
@@ -306,8 +309,9 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   render() {
     const { item } = this.props
-    const { timeframe } = item.primaryDataset
+    const { primaryDataset } = item
 
+    // TODO add loading
     return (
       <StyledDataItemCover
         className="cancelGridClick"
@@ -317,10 +321,15 @@ class DataItemCoverCollectionsItems extends React.Component {
         onMouseOver={this.handleMouseOver}
         onMouseOut={this.handleMouseOut}
       >
-        {this.loading && <InlineLoader />}
-        {item.isReportTypeCollectionsItems && timeframe === 'ever'
-          ? this.renderSingleValue()
-          : this.renderTimeframeValues()}
+        {!primaryDataset ? <InlineLoader />  : (
+          <Fragment>
+            {this.loading && <InlineLoader />}
+            {primaryDataset && item.isReportTypeCollectionsItems && primaryDataset.timeframe === 'ever'
+              ? this.renderSingleValue()
+                : this.renderTimeframeValues()
+            }
+          </Fragment>
+        )}
       </StyledDataItemCover>
     )
   }

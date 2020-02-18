@@ -1,7 +1,7 @@
 class Api::V1::ItemsController < Api::V1::BaseController
   deserializable_resource :item, class: DeserializableItem, only: %i[create update highlight]
   load_and_authorize_resource :collection_card, only: :create
-  load_and_authorize_resource except: %i[update highlight in_my_collection]
+  load_and_authorize_resource except: %i[update highlight in_my_collection datasets]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -83,7 +83,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     end
   end
 
-  load_resource only: %i[in_my_collection]
+  load_resource only: %i[in_my_collection datasets]
   def in_my_collection
     render json: current_user.in_my_collection?(@item)
   end
@@ -95,6 +95,17 @@ class Api::V1::ItemsController < Api::V1::BaseController
       restored_by: current_user,
     )
     render jsonapi: @item.reload
+  end
+
+  def datasets
+    datasets = @item.data_items_datasets.selected.map do |data_items_datasets|
+      dataset = data_items_datasets.dataset
+      next if dataset.blank?
+
+      dataset.cached_data_items_datasets = data_items_datasets
+      dataset
+    end.compact
+    render jsonapi: datasets
   end
 
   private
