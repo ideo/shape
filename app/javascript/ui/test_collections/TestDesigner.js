@@ -494,7 +494,8 @@ class TestDesigner extends React.Component {
       questionCard = card
     }
     // Return if it tries to render idea card before they have been loaded
-    if (!questionCard) return
+    // or if the card has no question_type assigned and is within a template instance
+    if (!questionCard || (!this.canEdit && !card.card_question_type)) return
     const { record } = questionCard
     // Record is not present momentarily when turning an idea into a media item
     if (!record) return

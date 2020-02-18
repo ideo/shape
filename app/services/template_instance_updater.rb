@@ -50,16 +50,17 @@ class TemplateInstanceUpdater
   def update_instance_cards_by_templated_from_ids(templated_from_ids, instance)
     templated_from_ids.each do |id|
       master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
-      instance_card = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
+      card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
 
-      next if master_card.blank? || instance_card.blank?
+      next if master_card.blank? || card_within_instance.blank?
 
       TemplateInstanceCardUpdater.call(
-        instance_card: instance_card,
+        instance_card: card_within_instance,
         master_card: master_card,
         master_template: @master_template,
       )
-      next unless instance.archived?
+
+      next unless card_within_instance.archived?
 
       card_within_instance.unarchive!
     end
@@ -72,15 +73,13 @@ class TemplateInstanceUpdater
     cards_to_add = []
     adding_cards.each do |id|
       master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
-      if instance.is_a?(Collection::TestCollection)
-        next unless master_card.card_question_type.present?
-      end
       # ABORT: should not allow duplicating a template instance in this manner;
       # this could lead to infinite loops. (similar to note above)
       next if master_card.record.try(:templated?)
 
       cards_to_add.push(master_card)
     end
+
     return if cards_to_add.empty?
 
     CollectionCardDuplicator.call(
