@@ -1287,11 +1287,22 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderBlanksAndBct() {
-    const { collection, apiStore, uiStore, canEditCollection } = this.props
+    const {
+      collection,
+      apiStore,
+      uiStore,
+      canEditCollection,
+      selectedAreaMinX,
+    } = this.props
     const { num_columns } = collection
     const { movingCardIds, blankContentToolState } = uiStore
-    let cards = []
 
+    // if we're dragging the selection square, don't bother rendering blanks
+    if (selectedAreaMinX || this.dragging) {
+      return null
+    }
+
+    let cards = []
     const leftPad = num_columns > 4 ? 3 : 0
     const across = _.min([10, num_columns])
     if (this.loadingRow) {
