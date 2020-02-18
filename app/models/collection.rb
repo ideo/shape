@@ -290,7 +290,7 @@ class Collection < ApplicationRecord
       archived: archived,
       master_template: master_template,
       collection_type: collection_type,
-      activity_count: activities_and_child_activities_count
+      activity_count: activities_and_child_activities_count,
     }
   end
 
@@ -984,12 +984,14 @@ class Collection < ApplicationRecord
   def inside_a_creative_difference_collection?
     creative_difference_root_collection_id = ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID']
 
-    logger.debug(
-      'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.'
-    ) if !creative_difference_root_collection_id
+    unless creative_difference_root_collection_id
+      logger.debug(
+        'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.',
+      )
+    end
 
     inside_an_application_collection? ||
-    within_collection_or_self?(creative_difference_root_collection_id.to_i)
+      within_collection_or_self?(creative_difference_root_collection_id.to_i)
   end
 
   # =================================
@@ -1026,6 +1028,8 @@ class Collection < ApplicationRecord
   end
 
   def should_pin_cards?(placement)
+    return true if test_collection?
+
     return false unless master_template?
 
     has_pinned_cards = collection_cards.pinned.any?
