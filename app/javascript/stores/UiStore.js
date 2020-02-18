@@ -257,6 +257,8 @@ export default class UiStore {
       this.draggingFromMDL = true
       this.multiMoveCardIds = [...this.movingCardIds]
     } else {
+      // just select the one dragging card
+      this.reselectCardIds([cardId])
       this.multiMoveCardIds = [cardId]
     }
     this.dragCardMaster = cardId
