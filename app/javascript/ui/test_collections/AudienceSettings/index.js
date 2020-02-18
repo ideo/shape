@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
@@ -270,7 +270,7 @@ class AudienceSettings extends React.Component {
           />
         )}
         <FormButtonWrapper>
-          <FormButton
+          <Button
             data-cy="LaunchFormButton"
             disabled={uiStore.launchButtonLoading || this.locked}
             onClick={this.submitSettings}
@@ -278,7 +278,7 @@ class AudienceSettings extends React.Component {
             {testCollection.is_submission_box_template_test
               ? 'Launch Tests'
               : 'Get Feedback'}
-          </FormButton>
+          </Button>
         </FormButtonWrapper>
       </React.Fragment>
     )

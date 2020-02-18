@@ -3,7 +3,7 @@ import { observable, action, runInAction } from 'mobx'
 import FormControl from '@material-ui/core/FormControl'
 import _ from 'lodash'
 
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import {
   Checkbox,
   LabelContainer,
@@ -94,12 +94,9 @@ class OrganizationSettings extends React.Component {
           item={organization.terms_text_item}
           onExpand={() => routingStore.routeTo(`terms/${organization.slug}`)}
         />
-        <FormButton
-          style={{ marginTop: '24px' }}
-          onClick={this.handleSaveTerms}
-        >
+        <Button style={{ marginTop: '24px' }} onClick={this.handleSaveTerms}>
           Save
-        </FormButton>
+        </Button>
 
         <FormControl
           style={{ marginLeft: '12px' }}

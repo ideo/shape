@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { BctTextField } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import v, { KEYS } from '~/utils/variables'
@@ -99,13 +99,13 @@ class CollectionCreator extends React.Component {
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
           />
-          <FormButton
+          <Button
             data-cy="CollectionCreatorFormButton"
             disabled={this.props.loading}
-            width={125}
+            minWidth={125}
           >
             Create
-          </FormButton>
+          </Button>
         </form>
       </PaddedCardCover>
     )

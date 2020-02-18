@@ -208,7 +208,7 @@ export const StyledMenuItem = styled.li`
       position: absolute;
       left: auto;
       right: ${props =>
-        props.wrapperClassName === 'add-audience-menu' ? -0.5 : 1.5}rem;
+        props.wrapperClassName === 'add-audience-menu' ? 0.5 : 1.5}rem;
     }
     .icon-left .icon {
       display: block;
@@ -439,26 +439,45 @@ PopoutMenu.propTypes = {
   onMouseLeave: PropTypes.func,
   onClick: PropTypes.func,
   className: PropTypes.string,
+  /** If the value is 'card-menu' it applies extra right margin. If the value
+   * is 'add-audience-menu' it will apply special positioning to the right
+   * icon. Any value will also be passed to the element's `class` attribute on
+   * the menu button wrapper, which could be used for styling or targeting in
+   * tests. */
   wrapperClassName: PropTypes.string,
   width: PropTypes.number,
+  /** Use this prop to control yourself when the menu should be open, required
+   * if you are not rendering the dot dot dot menu */
   menuOpen: PropTypes.bool,
+  /** Disables the dot menu, meaning it won't open the menu on click */
   disabled: PropTypes.bool,
+  /** Controls the size of the dotdot menu and generally how it renders */
   buttonStyle: PropTypes.string,
+  /** Need one or the other between menuItems / groupedMenuItems */
   menuItems: propTypeMenuItem,
+  /** The dot menu is used for the action menu and opens the popout menu */
   hideDotMenu: PropTypes.bool,
+  /** Used to completely reposition the whole menu */
   position: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
   }),
+  /** Controls where to position the menu compared to where it currently is. Use
+   * this to push the menu to the left or right of where it should open from */
   offsetPosition: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
   }),
+  /** Allows you to group the menu items over different sections for top, bottom
+   * and the special organizations use case.
+   * Need one or the other between menuItems / groupedMenuItems */
   groupedMenuItems: PropTypes.shape({
     top: propTypeMenuItem,
     organizations: propTypeMenuItem,
     bottom: propTypeMenuItem,
   }),
+  /** The component passed in will be rendered before the grouped items. Use this
+   * if you need to render something special before all the grouped items. */
   groupExtraComponent: PropTypes.shape({
     component: PropTypes.node,
   }),
