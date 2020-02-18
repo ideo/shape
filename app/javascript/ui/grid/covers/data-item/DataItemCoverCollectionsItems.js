@@ -40,21 +40,17 @@ class DataItemCoverCollectionsItems extends React.Component {
   loading = false
 
   componentDidMount() {
-    const { item } = this.props
+    const { item, uiStore } = this.props
+    if (uiStore.isNewCard(item.id)) {
+      uiStore.removeNewCard(item.id)
+      this.toggleEditing()
+    }
     if (!item.primaryDataset) return
     const {
       primaryDataset: { data_source_id },
     } = this.props.item
     if (data_source_id) {
       this.loadTargetCollection(data_source_id)
-    }
-  }
-
-  componentDidUpdate() {
-    const { item, uiStore } = this.props
-    if (uiStore.isNewCard(item.id)) {
-      uiStore.removeNewCard(item.id)
-      this.toggleEditing()
     }
   }
 
