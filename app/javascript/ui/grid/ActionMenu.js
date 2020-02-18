@@ -304,11 +304,17 @@ class ActionMenu extends React.Component {
         items = _.reject(items, { name: 'Move' })
       }
       if (viewingCollection.isBoard && location === 'GridCard') {
-        items.push({
+        const selectAllIndex = _.findIndex(items, { name: 'Select All' })
+        const selectCardsBelow = {
           name: 'Select Cards Below',
           iconRight: <SelectAllIcon />,
           onClick: this.selectCardsBelow,
-        })
+        }
+        items = [
+          ...items.slice(0, selectAllIndex + 1),
+          selectCardsBelow,
+          ...items.slice(selectAllIndex + 1),
+        ]
       }
     }
 
