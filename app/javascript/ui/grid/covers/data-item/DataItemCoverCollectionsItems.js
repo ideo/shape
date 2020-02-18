@@ -280,7 +280,7 @@ class DataItemCoverCollectionsItems extends React.Component {
       <Fragment>
         <Heading3>{this.measureControl}</Heading3>
         <HugeNumber className="count" data-cy="DataReport-count">
-          {single_value}
+          {single_value.toLocaleString()}
         </HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.titleAndControls}
@@ -321,13 +321,16 @@ class DataItemCoverCollectionsItems extends React.Component {
         onMouseOver={this.handleMouseOver}
         onMouseOut={this.handleMouseOut}
       >
-        {!primaryDataset ? <InlineLoader />  : (
+        {!primaryDataset ? (
+          <InlineLoader />
+        ) : (
           <Fragment>
             {this.loading && <InlineLoader />}
-            {primaryDataset && item.isReportTypeCollectionsItems && primaryDataset.timeframe === 'ever'
+            {primaryDataset &&
+            item.isReportTypeCollectionsItems &&
+            primaryDataset.timeframe === 'ever'
               ? this.renderSingleValue()
-                : this.renderTimeframeValues()
-            }
+              : this.renderTimeframeValues()}
           </Fragment>
         )}
       </StyledDataItemCover>
