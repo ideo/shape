@@ -146,7 +146,6 @@ class MovableGridCard extends React.Component {
       horizontalScroll,
       zoomLevel,
     } = this.props
-    const { gridW } = uiStore.gridSettings
     // Global dragging should use screen coordinates
     // TODO this could also be a HOC that publishes to the UI store
     let { pageX, pageY } = e
@@ -167,10 +166,8 @@ class MovableGridCard extends React.Component {
       return
     }
 
-    const cardWidth = (card.width * gridW) / 2
     pageBoundsScroller.scrollIfNearPageBounds(e, {
       horizontalScroll,
-      cardWidth,
     })
 
     const cardX = pageX - dragOffset.x

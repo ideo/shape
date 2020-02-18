@@ -11,13 +11,11 @@ export default class ScrollNearPageBoundsService {
     this.speed = 1
   }
 
-  scrollIfNearPageBounds = (
-    e,
-    { horizontalScroll = true, cardWidth = 140, speed = 1 } = {}
-  ) => {
+  scrollIfNearPageBounds = (e, { horizontalScroll = true, speed = 1 } = {}) => {
     const { uiStore } = this
+    const { gridW } = uiStore.gridSettings
     this.speed = speed
-    this.scrolling = false
+    this.setScrolling(false)
 
     // NOTE: these hide so that we can fully control the page scroll
     // otherwise the browser will *also* try to scroll when you hit the edges;
@@ -48,10 +46,11 @@ export default class ScrollNearPageBoundsService {
 
     // Horizontal Scroll
     if (!horizontalScroll) {
-      this.scrolling = false
       return
     }
     const leftMargin = v.containerPadding.horizontal * 16
+    const cardWidth = gridW / 2
+
     // At right of viewport
     if (
       e.clientX > window.innerWidth - cardWidth + leftMargin ||
