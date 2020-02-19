@@ -25,4 +25,11 @@ class QuestionChoice < ApplicationRecord
            to: :question
 
   scope :viewable_in_ui, -> { where(archived: nil) }
+
+  def duplicate!(assign_question: question)
+    qc = amoeba_dup
+    qc.question = question
+    qc.save
+    qc
+  end
 end

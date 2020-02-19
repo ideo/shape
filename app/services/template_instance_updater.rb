@@ -63,6 +63,13 @@ class TemplateInstanceUpdater
       next unless card_within_instance.archived?
 
       card_within_instance.unarchive!
+
+      # duplicate question choices when instances are duplicated
+      next unless master_card.record.is_a?(Item::QuestionItem) &&
+                  (master_card.record.question_multiple_choice? || master_card.record.question_single_choice?) &&
+                  master_card.record.question_choices.present?
+
+      duplicate_instance_question_choices(master_card, instance_card)
     end
 
     instance.reorder_cards!
@@ -200,5 +207,13 @@ class TemplateInstanceUpdater
     end
     add_cards_from_master_template(add_card_ids, instance) if add_card_ids.present?
     # NOTE: may need to archive empty 'Deleted From Collection' collection
+  end
+
+  def duplicate_instance_question_choices(master_card, instance_card)
+    master_card.record.question_choices.each do |question_choices|
+      question_choices.duplicate!(
+        assign_question: instance_card.record,
+      )
+    end
   end
 end

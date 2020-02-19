@@ -48,11 +48,10 @@ class QuestionContentEditor extends React.Component {
   }
 
   _instanceDataContentUpdate = () => {
-    const { item, uiStore } = this.props
-    const parent =
-      _.get('parent_collection_card.parent', item) || uiStore.viewingCollection
-    if (parent && parent.isTemplate) {
-      parent.API_backgroundUpdateTemplateInstances()
+    const { handleInstanceDataContentUpdate } = this.props
+
+    if (handleInstanceDataContentUpdate) {
+      handleInstanceDataContentUpdate()
     }
   }
 
@@ -137,6 +136,7 @@ QuestionContentEditor.propTypes = {
   optional: PropTypes.bool,
   singleLine: PropTypes.bool,
   handleFocus: PropTypes.func,
+  handleInstanceDataContentUpdate: PropTypes.func,
 }
 QuestionContentEditor.defaultProps = {
   itemAttribute: 'content',
@@ -145,6 +145,7 @@ QuestionContentEditor.defaultProps = {
   optional: false,
   singleLine: false,
   handleFocus: () => true,
+  handleInstanceDataContentUpdate: () => true,
 }
 
 QuestionContentEditor.wrappedComponent.propTypes = {
