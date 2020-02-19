@@ -1,5 +1,4 @@
 import ChartGroup from '~/ui/global/charts/ChartGroup'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { emojiSeriesForQuestionType } from '~/ui/global/charts/ChartUtils'
 import {
@@ -32,10 +31,6 @@ describe('ChartGroup', () => {
     render = () =>
       (wrapper = shallow(<ChartGroup.wrappedComponent {...props} />))
     render()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders charts', () => {

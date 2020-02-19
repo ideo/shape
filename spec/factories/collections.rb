@@ -16,7 +16,9 @@ FactoryBot.define do
     organization factory: :organization_without_groups
     created_by factory: :user
 
-    factory :board_collection, class: Collection::Board
+    factory :board_collection, class: Collection::Board do
+      num_columns 16
+    end
     factory :user_collection, class: Collection::UserCollection
     factory :application_collection, class: Collection::ApplicationCollection
     factory :shared_with_me_collection, class: Collection::SharedWithMeCollection

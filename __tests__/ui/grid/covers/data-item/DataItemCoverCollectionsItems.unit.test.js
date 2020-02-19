@@ -1,4 +1,3 @@
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import DataItemCoverCollectionsItems from '~/ui/grid/covers/data-item/DataItemCoverCollectionsItems'
 import { fakeDataset, fakeDataItemCollectionsItemsAttrs } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -25,10 +24,6 @@ describe('DataItemCover', () => {
       ))
 
     render()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('without edit access', () => {

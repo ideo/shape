@@ -1,5 +1,4 @@
 import BarChart from '~/ui/global/charts/BarChart'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { fakeAreaChartDataset } from '#/mocks/data'
 
 const props = {}
@@ -11,10 +10,6 @@ describe('BarChart', () => {
     props.routeToSearch = jest.fn()
     render = () => (wrapper = shallow(<BarChart {...props} />))
     render()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders VictoryBar', () => {
