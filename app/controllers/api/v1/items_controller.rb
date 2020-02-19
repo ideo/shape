@@ -98,14 +98,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def datasets
-    datasets = @item.data_items_datasets.selected.map do |data_items_datasets|
-      dataset = data_items_datasets.dataset
-      next if dataset.blank?
-
-      dataset.cached_data_items_datasets = data_items_datasets
-      dataset
-    end.compact
-    render jsonapi: datasets
+    render jsonapi: @item.selected_datasets
   end
 
   def csv_report
