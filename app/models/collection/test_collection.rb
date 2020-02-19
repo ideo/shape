@@ -519,8 +519,14 @@ class Collection
     end
 
     def remove_empty_question_items
+      incomplete_card_ids = incomplete_question_items.map(&:parent_collection_card).pluck(:id)
+
+      queue_update_template_instances(
+        updated_card_ids: incomplete_card_ids,
+        template_update_action: 'archive',
+      )
       incomplete_question_items.select do |item|
-        item.question_item.blank?
+        item.question_type.blank?
       end.each(&:destroy)
     end
 
@@ -723,6 +729,7 @@ class Collection
           template_update_action: 'update_all',
         )
         # submission box master template test doesn't create a test_design, move cards, etc.
+        remove_empty_question_items
         return true
       end
       # remove the "blanks"
