@@ -13,9 +13,9 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
         Dataset::CollectionsAndItems,
       ).to receive(:data).and_return(
         [
-          { 'date' => '2019-10-10', 'value' => 12 },
-          { 'date' => '2019-11-10', 'value' => 15 },
-          { 'date' => '2019-12-10', 'value' => 19 },
+          { date: '2019-10-10', value: 12 },
+          { date: '2019-11-10', value: 15 },
+          { date: '2019-12-10', value: 19 },
         ],
       )
     end

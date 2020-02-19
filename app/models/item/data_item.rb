@@ -159,9 +159,10 @@ class Item
     def csv_filename
       dataset = datasets.first
       measure = dataset.measure || 'report'
-      timeframe = dataset.timeframe || Date.now.strftime("%b%Y")
+      timeframe = dataset.timeframe
       source = dataset.data_source.present? ? dataset.data_source.name : 'organization'
-      "#{organization.name}-#{measure}-#{timeframe}-#{source}.csv"
+      timestamp = Time.current.strftime('%b-%d-%Y')
+      "#{organization.name}-#{measure}-#{timeframe}-#{source}-#{timestamp}.csv"
     end
 
     private
