@@ -5,6 +5,7 @@ import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const onFoamcoreBoard = () => {
+  // Disable responsive CSS on foamcore because cards will already zoom + scale
   const collection = uiStore.viewingCollection
   return collection && collection.isBoard
 }
@@ -251,8 +252,12 @@ export const HugeNumber = styled(Heading1)`
   line-height: 3.75rem;
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
-    font-size: 4rem;
-    line-height: 3rem;
+    ${props =>
+      !onFoamcoreBoard() &&
+      `
+        font-size: 4rem;
+        line-height: 3rem;
+      `}
   }
 `
 
