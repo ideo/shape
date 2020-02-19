@@ -141,8 +141,10 @@ RSpec.describe Item::DataItem, type: :model do
     let(:item) { create(:data_item, :report_type_collections_and_items, parent_collection: collection) }
 
     it 'should print out a filename with org, measure, timeframe, etc' do
+      timestamp = Time.current.strftime('%b-%d-%Y')
+      ds = item.datasets.first
       expect(item.csv_filename).to eq(
-        "#{organization.name}-#{item.datasets.first.measure}-#{item.datasets.first.timeframe}-#{item.datasets.first.data_source.name}.csv",
+        "#{organization.name}-#{ds.measure}-#{ds.timeframe}-#{ds.data_source.name}-#{timestamp}.csv",
       )
     end
   end
