@@ -426,6 +426,8 @@ class PageHeader extends React.Component {
             this.templateButtonRef = ref
           }}
           onClick={e => {
+            // prevent other header clicks like handleTitleClick
+            e.stopPropagation()
             this.props.routingStore.routeTo('collections', record.template_id)
             // this same button remains mounted after the route, blur to remove focus
             if (this.templateButtonRef) this.templateButtonRef.blur()
