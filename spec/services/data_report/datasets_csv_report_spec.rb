@@ -89,5 +89,26 @@ RSpec.describe DataReport::DatasetsCSVReport, type: :service do
       expect(third_line[2]).to eq '25'
       expect(third_line[3]).to eq '30'
     end
+
+    context 'with some data that has no dates' do
+      before do
+        dataset_a.cached_data = [
+          { value: 15 },
+          { value: 25 },
+        ]
+      end
+
+      it 'should only generate the datasets with dates' do
+        expect(first_line).to eq([
+          ' ', '2020-01-02', '2020-02-02'
+        ])
+        expect(second_line).to eq(%w[
+          Purpose 80 120
+        ])
+        expect(third_line).to eq([
+          'Innovation', ' ', ' '
+        ])
+      end
+    end
   end
 end

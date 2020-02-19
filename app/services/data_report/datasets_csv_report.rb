@@ -8,7 +8,7 @@ module DataReport
 
     def call
       CSV.generate do |csv|
-        dates = @datasets.map(&:mashie_data).flatten.map(&:date).uniq.sort
+        dates = @datasets.map(&:mashie_data).flatten.map(&:date).compact.uniq.sort
         csv << [' '] + dates
 
         @datasets.each do |ds|
@@ -19,6 +19,8 @@ module DataReport
           row = Array.new(dates.size + 1, ' ')
 
           ds.mashie_data.each do |d|
+            next unless d[:date].present?
+
             idx = dates.index(d[:date]) + 1
             row[idx] = d[:value]
           end

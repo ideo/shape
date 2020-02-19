@@ -83,7 +83,7 @@ class VideoItemCover extends React.Component {
   get videoUrl() {
     const { item } = this.props
     if (item.filestack_file) {
-      return item.fileUrl()
+      return item.fileUrl
     }
     return item.url
   }

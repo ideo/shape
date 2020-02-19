@@ -1,7 +1,8 @@
 class Api::V1::ItemsController < Api::V1::BaseController
   deserializable_resource :item, class: DeserializableItem, only: %i[create update highlight]
   load_and_authorize_resource :collection_card, only: :create
-  load_and_authorize_resource except: %i[update highlight in_my_collection]
+  load_and_authorize_resource except: %i[update highlight in_my_collection csv_report]
+  before_action :load_and_authorize_item_read, only: %i[highlight csv_report]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -45,7 +46,6 @@ class Api::V1::ItemsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_item_highlight, only: %i[highlight]
   def highlight
     @item.attributes = item_params
     if TextItemHighlighter.call(item: @item, user: current_user)
@@ -109,7 +109,7 @@ class Api::V1::ItemsController < Api::V1::BaseController
     authorize! :edit_content, @item
   end
 
-  def load_and_authorize_item_highlight
+  def load_and_authorize_item_read
     @item = Item.find(params[:id])
     authorize! :read, @item
   end

@@ -153,7 +153,10 @@ class Item
     def csv_data
       return [] unless report_type_record? || report_type_collections_and_items?
 
-      DataReport::DatasetsCSVReport.call(datasets: datasets)
+      DataReport::DatasetsCSVReport.call(
+        # filter only the selected datasets
+        datasets: data_items_datasets.selected.map(&:dataset),
+      )
     end
 
     def csv_filename
