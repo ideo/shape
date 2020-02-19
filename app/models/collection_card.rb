@@ -228,7 +228,7 @@ class CollectionCard < ApplicationRecord
     return cc unless cc.save
 
     # now that the card exists, we can recalculate the breadcrumb
-    cc.record.recalculate_breadcrumb!
+    cc.record.recalculate_breadcrumb! unless shallow || link?
     cc.increment_card_orders! if placement != 'end' && placeholder.nil?
 
     # if we are duplicating a submission box template,

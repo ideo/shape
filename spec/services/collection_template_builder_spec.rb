@@ -214,7 +214,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         # cheat and move this one inside the parent anyway, to simulate bad issue
         c1.parent_collection_card.update(parent: collection, pinned: true)
         c1.recalculate_breadcrumb!
-    end
+      end
 
       after do
         Sidekiq::Testing.fake!
