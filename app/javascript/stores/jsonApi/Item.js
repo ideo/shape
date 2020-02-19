@@ -75,6 +75,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.report_type === 'report_type_question_item'
   }
 
+  get isReportDownloadable() {
+    return this.isReportTypeCollectionsItems || this.isReportTypeRecord
+  }
+
   get isCustomizableQuestionType() {
     return (
       this.question_type === 'question_single_choice' ||
@@ -110,7 +114,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isDownloadable() {
-    return this.isGenericFile || this.isPdfFile
+    return this.isGenericFile || this.isPdfFile || this.isReportDownloadable
   }
 
   get isImage() {
@@ -162,7 +166,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.subtitle_hidden
   }
 
-  fileUrl() {
+  get fileUrl() {
+    if (this.isReportDownloadable) {
+      return `/api/v1/items/${this.id}/csv_report`
+    }
     const { filestack_handle } = this
     if (!filestack_handle) return ''
     return FilestackUpload.fileUrl({

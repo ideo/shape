@@ -249,6 +249,11 @@ export const HugeNumber = styled(Heading1)`
   font-size: 4.5rem;
   font-weight: ${v.weights.book};
   line-height: 3.75rem;
+
+  @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
+    font-size: 4rem;
+    line-height: 3rem;
+  }
 `
 
 export const QuillStyleWrapper = styled.div`
