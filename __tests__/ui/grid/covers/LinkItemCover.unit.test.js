@@ -1,5 +1,4 @@
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeLinkItem } from '#/mocks/data'
@@ -19,10 +18,6 @@ describe('LinkItemCover', () => {
       wrapper = shallow(<LinkItemCover.wrappedComponent {...props} />)
     }
     rerender()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders the StyledLinkCover', () => {

@@ -1,5 +1,4 @@
 import DataItemCover from '~/ui/grid/covers/DataItemCover'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import {
   fakeDataset,
   fakeDataItemCollectionsItemsAttrs,
@@ -19,10 +18,6 @@ describe('DataItemCover', () => {
     render = () =>
       (wrapper = shallow(<DataItemCover.wrappedComponent {...props} />))
     render()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('item with "report_type_collections_and_items"', () => {

@@ -1,5 +1,6 @@
 import fakeApiStore from '#/mocks/fakeApiStore'
 import AddAudienceModal from '~/ui/test_collections/AudienceSettings/AddAudienceModal'
+import SharedButton from '~shared/components/atoms/Button'
 import googleTagManager from '~/vendor/googleTagManager'
 
 jest.mock('../../../../app/javascript/vendor/googleTagManager')
@@ -21,7 +22,7 @@ describe('AddAudienceModal', () => {
   })
 
   it('validates form when inputting name', () => {
-    let submitButton = wrapper.find('FormButton')
+    let submitButton = wrapper.find('Button').last()
     expect(submitButton.exists()).toBeTruthy()
     expect(submitButton.props()['disabled']).toBeTruthy()
 
@@ -36,7 +37,7 @@ describe('AddAudienceModal', () => {
     expect(state.valid).toEqual(true)
 
     // Add a criteria interest so button is not disabled
-    const addCriteriaButton = wrapper.find('Button')
+    const addCriteriaButton = wrapper.find(SharedButton)
     addCriteriaButton.simulate('click')
     const criteriaMenu = wrapper.find('StyledSelect')
     criteriaMenu.simulate('change', { target: { value: ['Age'] } })
@@ -44,12 +45,12 @@ describe('AddAudienceModal', () => {
     const genX = 'Age Gen X (born 1965-1980)'
     wrapper.find(`StyledCheckboxSelectOption[value="${genX}"]`)
     ageMenu.simulate('change', { target: { value: [genX] } })
-    submitButton = wrapper.find('FormButton')
+    submitButton = wrapper.find(SharedButton)
     expect(submitButton.props()['disabled']).toBeFalsy()
   })
 
   it('adds and removes criteria', () => {
-    const addCriteriaButton = wrapper.find('Button')
+    const addCriteriaButton = wrapper.find(SharedButton)
     expect(addCriteriaButton.exists()).toBeTruthy()
     addCriteriaButton.simulate('click')
 
@@ -86,7 +87,7 @@ describe('AddAudienceModal', () => {
   })
 
   it('runs a post-save callback', async () => {
-    const submitButton = wrapper.find('FormButton')
+    const submitButton = wrapper.find('Button').last()
     const nameField = wrapper.find('#audienceName')
 
     nameField.simulate('change', { target: { value: 'Test Audience' } })

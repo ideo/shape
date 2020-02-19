@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { BctTextField } from '~/ui/global/styled/forms'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
 import v, { KEYS } from '~/utils/variables'
@@ -47,6 +47,7 @@ class CollectionCreator extends React.Component {
         name: this.state.inputText,
         master_template: this.shouldCreateAsSubTemplate,
         type: this.dbType,
+        num_columns: this.numColumns,
       },
     }
     if (type === 'search')
@@ -64,15 +65,36 @@ class CollectionCreator extends React.Component {
   }
 
   get dbType() {
-    const { type } = this.props
-    let dbType = null
+    const { type, parentIsFourWide } = this.props
 
-    if (type === 'submissionBox') dbType = 'Collection::SubmissionBox'
-    else if (type === 'testCollection') dbType = 'Collection::TestCollection'
-    else if (type === 'foamcoreBoard') dbType = 'Collection::Board'
-    else if (type === 'search') dbType = 'Collection::SearchCollection'
+    switch (type) {
+      case 'submissionBox':
+        return 'Collection::SubmissionBox'
+        break
+      case 'testCollection':
+        return 'Collection::TestCollection'
+        break
+      case 'foamcoreBoard':
+        return 'Collection::Board'
+        break
+      case 'search':
+        return 'Collection::SearchCollection'
+        break
+      case 'collection':
+        if (parentIsFourWide) return 'Collection::Board'
+        return null
+    }
+    return null
+  }
 
-    return dbType
+  get numColumns() {
+    const { type, parentIsFourWide } = this.props
+    if (type === 'foamcoreBoard') {
+      return 16
+    } else if (parentIsFourWide && type === 'collection') {
+      return 4
+    }
+    return null
   }
 
   get typeName() {
@@ -99,13 +121,13 @@ class CollectionCreator extends React.Component {
             onChange={this.onInputChange}
             onKeyDown={this.handleKeyDown}
           />
-          <FormButton
+          <Button
             data-cy="CollectionCreatorFormButton"
             disabled={this.props.loading}
-            width={125}
+            minWidth={125}
           >
             Create
-          </FormButton>
+          </Button>
         </form>
       </PaddedCardCover>
     )
@@ -124,9 +146,11 @@ CollectionCreator.propTypes = {
   ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
+  parentIsFourWide: PropTypes.bool,
 }
 CollectionCreator.defaultProps = {
   type: 'collection',
+  parentIsFourWide: false,
 }
 
 export default CollectionCreator

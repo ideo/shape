@@ -1,8 +1,10 @@
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import { fakeCollection } from '#/mocks/data'
+import { apiStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
+apiStore.currentUserCollectionId = '123'
 const props = {
   record: fakeCollection,
   isHomepage: false,
@@ -33,21 +35,39 @@ describe('Breadcrumb', () => {
   })
 })
 
-describe('With Narrow Window', () => {
+describe('With narrow window and more breadcrumb items', () => {
   beforeEach(() => {
-    props.record.inMyCollection = true
     props.breadcrumbWrapper = {
       current: {
         offsetWidth: 400,
       },
     }
-    wrapper = shallow(<Breadcrumb {...props} />)
+    wrapper = shallow(
+      <Breadcrumb
+        {...props}
+        record={{
+          ...props.record,
+          inMyCollection: true,
+          breadcrumb: [
+            { type: 'collections', id: 1, name: 'My Workspace' },
+            { type: 'collections', id: 12, name: 'One more Level' },
+            { type: 'collections', id: 99, name: 'Use Cases' },
+          ],
+        }}
+      />
+    )
     component = wrapper.instance()
     titles = component.truncatedItems
   })
 
   it('truncates to …', () => {
     expect(titles[1].ellipses).toBe(true)
+  })
+
+  it('sets the last subItem as isEllipsesLink', () => {
+    const subItem = titles[1].subItems[2]
+    expect(subItem.isEllipsesLink).toBe(true)
+    expect(subItem.name).toEqual('One more Level')
   })
 })
 

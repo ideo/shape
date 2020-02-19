@@ -101,8 +101,8 @@ describe('MoveHelperModal', () => {
         wrapper.update()
       })
 
-      it('should not render the FormButtons', () => {
-        const modal = wrapper.find('FormButton')
+      it('should not render the Buttons', () => {
+        const modal = wrapper.find('Button')
         expect(modal.length).toBe(0)
       })
     })

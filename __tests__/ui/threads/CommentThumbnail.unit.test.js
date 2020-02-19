@@ -2,7 +2,6 @@ import CommentThumbnail from '~/ui/threads/CommentThumbnail'
 import { ITEM_TYPES } from '~/utils/variables'
 import { routingStore } from '~/stores'
 import { fakeCollection, fakeThread } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 const props = {
   threadRecord: fakeThread.record,
   subjectRecord: fakeCollection,
@@ -19,10 +18,6 @@ describe('CommentThumbnail', () => {
       wrapper = shallow(<CommentThumbnail {...props} />)
       return wrapper
     }
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('with a collection record', () => {

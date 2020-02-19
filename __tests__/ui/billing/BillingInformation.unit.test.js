@@ -1,6 +1,5 @@
 import BillingInformation from '~/ui/billing/BillingInformation'
 import Loader from '~/ui/layout/Loader'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let wrapper
 const render = async (apiStore, networkStore) => {
@@ -22,7 +21,6 @@ const render = async (apiStore, networkStore) => {
   expect(networkStore.loadPlans).toHaveBeenCalledWith(
     apiStore.currentUserOrganizationId
   )
-  expectTreeToMatchSnapshot(wrapper)
 }
 
 describe('BillingInformation', () => {

@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe Search::Filters::WithinCollection do
   describe '#options' do
     context 'when there is not a within match in the query' do
-      it 'returns empty where criteria' do
+      it 'returns empty criteria' do
         result = Search::Filters::WithinCollection.new('foo bar baz').options
-        expect(result).to eq(where: {})
+        expect(result).to eq({})
       end
     end
 
@@ -17,6 +17,23 @@ RSpec.describe Search::Filters::WithinCollection do
             parent_ids: {
               all: [123],
             },
+          },
+        )
+      end
+    end
+
+    context 'with a Submission Box' do
+      let!(:submission_box) { create(:submission_box) }
+      let(:submissions_collection) { submission_box.submissions_collection }
+      before do
+        submission_box.setup_submissions_collection!
+      end
+
+      it 'translates submission_box id into submissions_collection id' do
+        result = Search::Filters::WithinCollection.new("within:#{submission_box.id}").options
+        expect(result).to eq(
+          where: {
+            parent_id: submissions_collection.id,
           },
         )
       end

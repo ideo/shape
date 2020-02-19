@@ -109,14 +109,20 @@ class BaseRecord extends jsonapi(Model) {
   }
 
   // not called `update` because that's already a thing
-  patch() {
-    this.apiStore.request(`${this.internalType}/${this.id}`, 'PATCH', {
-      data: this.toJsonApi(),
+  patch(additionalData = {}) {
+    const data = {
+      // the model attributes will get nested in { attributes: ... }
+      ...this.toJsonApi(),
+      // additionalData could include { cancel_sync: true }
+      ...additionalData,
+    }
+    return this.apiStore.request(this.baseApiPath, 'PATCH', {
+      data,
     })
   }
 
   async destroy() {
-    await this.apiStore.request(`${this.internalType}/${this.id}`, 'DELETE')
+    await this.apiStore.request(this.baseApiPath, 'DELETE')
     this.apiStore.remove(this.internalType, this.id)
     runInAction(() => {
       setModelMetaKey(this, DATX_PERSISTED_KEY, false)

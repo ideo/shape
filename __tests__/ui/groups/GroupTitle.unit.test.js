@@ -80,7 +80,7 @@ describe('GroupTitle', () => {
         props.canEdit = false
         wrapper.setProps(props)
         expect(wrapper.find('EditIconHolder').exists()).toBeFalsy()
-        expect(wrapper.find('FormButton').exists()).toBeFalsy()
+        expect(wrapper.find('Button').exists()).toBeFalsy()
       })
     })
 
@@ -88,7 +88,7 @@ describe('GroupTitle', () => {
       it('should render the form button and not the edit icon', () => {
         component.editing = true
         wrapper.update()
-        expect(wrapper.find('FormButton').exists()).toBeTruthy()
+        expect(wrapper.find('Button').exists()).toBeTruthy()
         expect(wrapper.find('EditIconHolder').exists()).toBeFalsy()
       })
     })
