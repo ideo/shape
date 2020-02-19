@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     sessions: 'users/login_redirect',
-    registrations: 'users/login_redirect'
+    registrations: 'users/login_redirect',
   }
 
   unauthenticated do
@@ -36,6 +36,7 @@ Rails.application.routes.draw do
         resources :collection_cards, only: %i[index] do
           collection do
             get 'ids'
+            get 'ids_in_direction'
             get 'breadcrumb_records'
           end
         end
@@ -58,6 +59,7 @@ Rails.application.routes.draw do
           post 'duplicate'
           patch 'archive'
           get 'in_my_collection'
+          get 'csv_report'
           patch 'restore_permissions'
           patch 'highlight'
           get 'datasets'

@@ -7,8 +7,7 @@ import DownloadIcon from '~/ui/icons/DownloadIcon'
 class Download extends React.Component {
   trackDownload = ev => {
     const { record } = this.props
-    const file = record.filestack_file
-    if (file.url) {
+    if (record.fileUrl) {
       Activity.trackActivity('downloaded', record)
     }
   }
@@ -18,7 +17,7 @@ class Download extends React.Component {
     return (
       <a
         className="show-on-hover"
-        href={record.fileUrl()}
+        href={record.fileUrl}
         target="_blank"
         rel="noopener noreferrer"
         onClick={this.trackDownload}

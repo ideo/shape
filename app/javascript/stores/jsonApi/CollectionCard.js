@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
+import queryString from 'query-string'
 
 import {
   ITEM_TYPES,
@@ -243,6 +244,29 @@ class CollectionCard extends BaseRecord {
     } catch (e) {
       uiStore.defaultAlertError()
     }
+  }
+
+  async API_selectCardIdsBelow() {
+    const { apiStore, uiStore } = this
+
+    let selectedCardIds = []
+
+    const params = {
+      collection_card_id: this.id,
+      direction: 'bottom',
+    }
+
+    try {
+      selectedCardIds = await apiStore.requestJson(
+        `collections/${
+          this.parent.id
+        }/collection_cards/ids_in_direction?${queryString.stringify(params)}`
+      )
+    } catch (e) {
+      // TODO: when cards are unselectable?
+      uiStore.defaultAlertError()
+    }
+    return selectedCardIds
   }
 
   reselectOnlyEditableRecords(cardIds = this.uiStore.selectedCardIds) {

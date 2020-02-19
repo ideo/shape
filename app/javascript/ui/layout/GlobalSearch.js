@@ -65,8 +65,10 @@ class GlobalSearch extends React.Component {
 
   updateSearchText = text => {
     this.props.uiStore.update('searchText', text)
-    // perform a debounced search
-    this.search(this.searchText)
+    if (text.length > 3) {
+      // perform a debounced search
+      this.search(this.searchText)
+    }
   }
 
   onToggle = val => {

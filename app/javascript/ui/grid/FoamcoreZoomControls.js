@@ -14,7 +14,7 @@ const ZoomIconWrapper = styled.div`
   top: ${v.headerHeight + 18}px;
   right: 62px;
   background-color: ${hexToRgba(v.colors.commonLight, v.navOpacity)};
-  z-index: ${v.zIndex.clickWrapper};
+  z-index: ${v.zIndex.zoomControls};
   .zoom-icon {
     outline: none;
     display: inline-block;
