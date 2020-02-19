@@ -25,6 +25,9 @@ describe('UiStore', () => {
     it('should store dragging cardId in dragCardMaster', () => {
       expect(uiStore.dragCardMaster).toEqual(cardId)
     })
+    it('should reselectCardIds', () => {
+      expect(uiStore.selectedCardIds).toEqual([cardId])
+    })
 
     describe('with cardId part of a larger selection', () => {
       const selectedCardIds = [cardId, '1', '2', '3']

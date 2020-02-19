@@ -493,7 +493,7 @@ class CollectionCard < ApplicationRecord
     return true if hidden?
     return true unless parent&.board_collection?
 
-    if col.nil? || row.nil? || col.negative? || row.negative? || col > Collection::Board.allowed_col_range.last
+    if col.nil? || row.nil? || col.negative? || row.negative? || col >= parent.num_columns
       errors.add(:base, 'Board position is invalid')
       return false
     end
