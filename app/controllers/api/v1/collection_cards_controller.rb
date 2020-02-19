@@ -19,6 +19,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
              parent: @collection,
              inside_a_submission: @collection.submission? || @collection.inside_a_submission?,
              inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?,
+             include: params[:include],
            }
   end
 
