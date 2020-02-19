@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import {
   QuestionHelperText,
@@ -22,6 +22,7 @@ const QuestionHelperWrapper = styled.div`
   left: 10px;
 `
 
+@inject('uiStore')
 @observer
 class QuestionContentEditor extends React.Component {
   constructor(props) {
@@ -30,6 +31,10 @@ class QuestionContentEditor extends React.Component {
     const len = value ? value.length : 0
     this.inputRef = React.createRef()
     this.save = _.debounce(this._save, 1000)
+    this.instanceDataContentUpdate = _.debounce(
+      this._instanceDataContentUpdate,
+      30000
+    )
     this.state = {
       countLeft: props.maxLength - len,
       focused: false,
@@ -40,6 +45,15 @@ class QuestionContentEditor extends React.Component {
   _save = () => {
     const { item } = this.props
     item.save()
+  }
+
+  _instanceDataContentUpdate = () => {
+    const { item, uiStore } = this.props
+    const parent =
+      _.get('parent_collection_card.parent', item) || uiStore.viewingCollection
+    if (parent && parent.isTemplate) {
+      parent.API_backgroundUpdateTemplateInstances()
+    }
   }
 
   get value() {
@@ -53,10 +67,12 @@ class QuestionContentEditor extends React.Component {
     item[itemAttribute] = value
     this.setState({ countLeft: maxLength - value.length })
     this.save()
+    this.instanceDataContentUpdate()
   }
 
   handleBlur = () => {
     this.save.flush()
+    this.instanceDataContentUpdate.flush()
     this.setState({ focused: false })
   }
 
@@ -129,6 +145,10 @@ QuestionContentEditor.defaultProps = {
   optional: false,
   singleLine: false,
   handleFocus: () => true,
+}
+
+QuestionContentEditor.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default QuestionContentEditor
