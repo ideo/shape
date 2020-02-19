@@ -422,6 +422,10 @@ export class BreadcrumbItem extends React.Component {
       path = routingStore.pathTo('homepage')
     } else {
       path = routingStore.pathTo(item.type, item.id)
+      if (item.subItems) {
+        const linkItem = _.find(item.subItems, { isEllipsesLink: true })
+        if (linkItem) path = routingStore.pathTo(linkItem.type, linkItem.id)
+      }
     }
     const { currentlyDraggedOn } = this.props
     const showDrag =
