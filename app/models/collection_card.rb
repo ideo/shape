@@ -503,6 +503,11 @@ class CollectionCard < ApplicationRecord
     false
   end
 
+  def cloned_from_id
+    # if the underlying record was cloned, get the parent card of the cloned_from record
+    record.cloned_from&.parent_collection_card&.id
+  end
+
   private
 
   def assign_default_height_and_width
