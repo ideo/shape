@@ -31,4 +31,23 @@ RSpec.describe Dataset, type: :model do
       )
     end
   end
+
+  describe '#mashie_data' do
+    let!(:dataset) do
+      create(:dataset, :with_cached_data)
+    end
+    before do
+      dataset.cached_data = [
+        { date: '2020-01-02', value: 80 },
+        { date: '2020-02-02', value: 120 },
+      ]
+    end
+
+    it 'returns a mashie (with indifferent access) of the data' do
+      datum = dataset.mashie_data.first
+      expect(datum.date).to eq '2020-01-02'
+      expect(datum[:date]).to eq '2020-01-02'
+      expect(datum['date']).to eq '2020-01-02'
+    end
+  end
 end

@@ -1,44 +1,9 @@
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import v from '~/utils/variables'
 import CornerIcon from '~/ui/icons/CornerIcon'
-import { GridCardIconWithName } from '~/ui/grid/shared'
+import { GridCardIconWithName, StyledFileCover } from '~/ui/grid/shared'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import { uiStore } from '~/stores'
-
-export const StyledPdfCover = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: ${v.colors.commonMedium};
-  overflow: hidden;
-
-  .fileInfo {
-    align-items: center;
-    bottom: 0;
-    color: ${v.colors.commonMedium};
-    display: flex;
-    font-family: ${v.fonts.sans};
-    font-size: 1rem;
-    font-weight: 500;
-    left: 0;
-    max-height: 32px;
-    position: absolute;
-    width: 95%;
-  }
-
-  .fileName {
-    display: inline-block;
-    width: 75%;
-    white-space: nowrap;
-  }
-
-  .card-menu {
-    border-color: ${v.colors.black};
-    color: ${v.colors.black};
-  }
-`
-StyledPdfCover.displayName = 'StyledPdfCover'
 
 const clipPath = orientation => {
   const { gridSettings } = uiStore
@@ -116,7 +81,7 @@ class PdfFileItemCover extends React.Component {
     const { filestack_file, pdfCoverUrl } = item
     const { coverX, coverY, orientation } = this.calculateCoverTranslation()
     return (
-      <StyledPdfCover onClick={this.handleClick}>
+      <StyledFileCover onClick={this.handleClick}>
         <ImageContainer
           x={`${coverX}px`}
           y={`${coverY}px`}
@@ -133,7 +98,7 @@ class PdfFileItemCover extends React.Component {
             icon={<FileIcon mimeType={item.filestack_file.mimetype} />}
           />
         </div>
-      </StyledPdfCover>
+      </StyledFileCover>
     )
   }
 }

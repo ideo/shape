@@ -1,6 +1,5 @@
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import FilestackUpload from '~/utils/FilestackUpload'
@@ -38,10 +37,6 @@ beforeEach(() => {
 })
 
 describe('GridCardBlank', () => {
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
-  })
-
   describe('when starting to create a new card (choosing an option)', () => {
     it('renders the content creation buttons', () => {
       expect(wrapper.find('BctButtonBox').length).toBe(7)

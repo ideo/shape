@@ -3,7 +3,6 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 const card = fakeCollectionCard
 const uiStore = { ...fakeUiStore, viewingCollection: fakeCollection }
@@ -17,22 +16,24 @@ const props = {
   apiStore: fakeApiStore(),
 }
 
-let wrapper, allActions, actions, component
+let wrapper, allActions, allBoardActions, actions, component
 describe('ActionMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
-      allActions = [
+      allBoardActions = [
         'Comment',
         'Duplicate',
         'Move',
         'Link',
         'Select All',
+        'Select Cards Below',
         'Add to My Collection',
         'Tags',
         'Sharing',
         'Delete',
         'Replace',
       ]
+      allActions = _.without(allBoardActions, 'Select Cards Below')
       actions = _.without(allActions, 'Replace')
       props.card.isPinnedAndLocked = false
       props.card.record.can_edit = true
@@ -42,10 +43,6 @@ describe('ActionMenu', () => {
       component = wrapper.instance()
       props.uiStore.selectCardId.mockClear()
       props.uiStore.openMoveMenu.mockClear()
-    })
-
-    it('renders snapshot', () => {
-      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('creates a PopoutMenu with all editable actions', () => {
@@ -113,6 +110,27 @@ describe('ActionMenu', () => {
         'tagsModalOpenId',
         props.card.id
       )
+    })
+
+    describe('on board collection', () => {
+      it('adds selectCardsBelow action', () => {
+        wrapper = shallow(
+          <ActionMenu.wrappedComponent
+            {...props}
+            uiStore={{
+              ...props.uiStore,
+              viewingCollection: { isBoard: true },
+            }}
+            location="GridCard"
+            canReplace
+            canEdit
+          />
+        )
+        const popout = wrapper.find('PopoutMenu').at(0)
+        expect(_.map(popout.props().menuItems, i => i.name)).toEqual(
+          allBoardActions
+        )
+      })
     })
   })
 

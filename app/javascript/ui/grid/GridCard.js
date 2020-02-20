@@ -13,10 +13,8 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 
 import EditButton from '~/ui/reporting/EditButton'
-import {
-  NamedActionButton,
-  CollectionCoverTextButton,
-} from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
+import { NamedActionButton } from '~/ui/global/styled/buttons'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import Loader from '~/ui/layout/Loader'
 import Download from '~/ui/grid/Download'
@@ -155,7 +153,9 @@ class GridCard extends React.Component {
         className={className}
         zoomLevel={zoomLevel}
       >
-        {record.isDownloadable && <Download record={record} />}
+        {this.downloadableRecord && (
+          <Download record={this.downloadableRecord} />
+        )}
         {record.canSetACover && this.canEditCard && (
           <CardCoverEditor
             card={card}
@@ -351,7 +351,7 @@ class GridCard extends React.Component {
       return
     } else if (record.isGenericFile) {
       // TODO: could replace with preview
-      this.linkOffsite(record.fileUrl())
+      this.linkOffsite(record.fileUrl)
       return
     }
     // capture breadcrumb trail when navigating via Link cards, but not from My Collection
@@ -395,6 +395,18 @@ class GridCard extends React.Component {
     if (!collection_cover_items || collection_cover_items.length === 0)
       return null
     return collection_cover_items[0]
+  }
+
+  get downloadableRecord() {
+    const { record } = this.props
+    const { coverItem } = this
+    if (record.isDownloadable) {
+      return record
+    }
+    if (coverItem && coverItem.isDownloadable) {
+      return coverItem
+    }
+    return null
   }
 
   get renderCover() {
@@ -560,7 +572,7 @@ class GridCard extends React.Component {
         </StyledGridCardInner>
         {record.isCreativeDifferenceChartCover && (
           <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
-            <CollectionCoverTextButton>More…</CollectionCoverTextButton>
+            <TextButton fontSizeEm={0.75}>More…</TextButton>
           </BottomRightActionHolder>
         )}
         <CollectionCardsTagEditorModal

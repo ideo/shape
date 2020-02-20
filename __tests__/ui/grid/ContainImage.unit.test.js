@@ -1,6 +1,5 @@
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import ContainImage from '~/ui/grid/ContainImage'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { fakeCollectionCard } from '#/mocks/data'
 
 const card = fakeCollectionCard
@@ -16,10 +15,6 @@ describe('ContainImage', () => {
     props.image_contain = false
     wrapper = shallow(<ContainImage {...props} />)
     component = wrapper.instance()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('render()', () => {

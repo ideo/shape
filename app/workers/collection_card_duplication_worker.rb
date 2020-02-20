@@ -20,7 +20,10 @@ class CollectionCardDuplicationWorker
     @system_collection = system_collection
     @building_template_instance = building_template_instance
     @new_cards = duplicate_cards
+    return false if infinite_loop_detected?
+
     duplicate_legend_items
+    update_parent_cover
     update_parent_collection_status
     @new_cards
   end
@@ -58,6 +61,30 @@ class CollectionCardDuplicationWorker
 
   private
 
+  def infinite_loop_detected?
+    return unless @parent_collection.cloned_from_id.present?
+
+    error = nil
+    # first just a simple blocker if breadcrumb gets way out of hand
+    if @parent_collection.breadcrumb.count > 50
+      error = "#{self.class.name}: breadcrumb > 50"
+    else
+      parent_names = @parent_collection.parents.pluck(:name)
+      if (parent_names.count - parent_names.uniq.count) > 5
+        # we have 5 repeated parent names, seems like a problem
+        error = "#{self.class.name}: parent names are repeating"
+      end
+    end
+    return unless error.present?
+
+    logger.warn error unless Rails.env.test?
+    Appsignal.set_error(
+      StandardError.new(error),
+      parent_collection_id: @parent_collection.id,
+    )
+    true
+  end
+
   def cards_to_duplicate
     @duplicating_cards.select do |card|
       # Skip duplicating any cards this user can't view (if user provided)
@@ -75,6 +102,18 @@ class CollectionCardDuplicationWorker
   def update_parent_collection_status
     @parent_collection.update(processing_status: nil)
     CollectionUpdateBroadcaster.call(@parent_collection)
+  end
+
+  def update_parent_cover
+    cover_card_ids = @parent_collection.cached_cover.try(:[], 'card_ids')
+    return unless cover_card_ids.present?
+
+    cover_cards = @parent_collection.collection_cards.where(id: cover_card_ids)
+    # continue if these marked cover_cards don't exist in the new collection
+    return unless cover_cards.none?
+
+    # at this point we know the copied cover ids are referencing old ones, so we re-cache
+    @parent_collection.cache_cover!
   end
 
   def duplicate_legend_items

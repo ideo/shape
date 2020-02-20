@@ -35,6 +35,10 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
   # will be in last month and also not "within last 30 days"
   let(:over_31_days_ago) { end_date - 33.days }
 
+  let(:report_values) do
+    report.call.map { |v| v[:value] }
+  end
+
   let(:report) do
     DataReport::CollectionsAndItems.new(
       dataset: dataset,
@@ -298,11 +302,9 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         end
 
         it 'calculates the number of participants in the collection, child collections, and items in those collections' do
-          values = report.call
-          # we created one activity in the first month
-          expect(values.first[:value]).to eq 1
-          # the rest are more recent
-          expect(values.last[:value]).to eq 8
+          # will generate a 0 for the minimum (2 months back)
+          # 1 activity in the first month, 8 more recent
+          expect(report_values).to eq([0, 1, 8])
 
           # do a different query to double check our math
           actors = Activity
@@ -346,10 +348,8 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
               )
             end
             it 'should count the activities by the group participants' do
-              values = report.call
-              # should just be the record of our one actor
-              expect(values.count).to eq 1
-              expect(values.first[:value]).to eq 1
+              # should always have at least back 3 dates, with just the 1 activity
+              expect(report_values).to eq([0, 0, 1])
             end
           end
 
@@ -360,8 +360,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
               )
             end
             it 'should not return any activities' do
-              values = report.call
-              expect(values.count).to eq 0
+              expect(report_values).to eq [0, 0, 0]
             end
           end
         end
@@ -377,11 +376,8 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         end
 
         it 'calculates the number of viewers in the collection, child collections, and items in those collections' do
-          values = report.call
-          # we created one activity in the first month
-          expect(values.first[:value]).to eq 5
-          # the rest are more recent
-          expect(values.last[:value]).to eq 10
+          # 5 older activities, 10 more recent
+          expect(report_values).to eq [0, 5, 10]
         end
       end
 
@@ -398,13 +394,10 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         end
 
         it 'should calculate collection counts on a timeline' do
-          values = report.call
-          # created some old ones, plus the parent itself is older
-          expect(values.first[:value]).to eq 3
-          # the rest (including parent collection itself) are more recent
-          expect(values.last[:value]).to eq 2
+          # 2 old collections (+ parent itself = 3), 2 new
+          expect(report_values).to eq [0, 3, 2]
 
-          # just some math checking, we have 4 child collections + parent = 5 total
+          # just some math checking, we have 4 child collections (+ parent to total the 5 activities)
           expect(Collection.in_collection(parent_collection).count).to eq(4)
           # these should be the 2 recent ones
           expect(Collection.in_collection(parent_collection).where('created_at > ?', end_date - 30.days).count).to eq(2)
@@ -412,6 +405,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       end
 
       context 'with an collections & items measure' do
+        let!(:very_old_item) { create(:text_item, parent_collection: parent_collection, created_at: end_date - 10.weeks) }
         let!(:old_child_collection) do
           create(:collection, organization: organization, parent_collection: parent_collection, created_at: over_31_days_ago)
         end
@@ -426,16 +420,17 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
         end
 
         it 'should calculate collection & item counts on a timeline' do
+          # 1 very old item (+2 months)
+          # --
           # parent collection (parent context) 1
           # Old collection: 1
           # Old items: 5
-          # OLD = 7 total
+          # PREV MONTH = 7 total
+          # --
           # Recent collections: 2, Child, ChildChild (parent context)
           # Recent Items: 1 (data item, top context) + 1 (parent context) + 4 new items
           # RECENT = 8 total
-          values = report.call
-          expect(values.first[:value]).to eq 7
-          expect(values.last[:value]).to eq 8
+          expect(report_values).to eq [1, 7, 8]
         end
       end
     end
@@ -464,14 +459,12 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
       end
 
       it 'returns time series' do
-        expect(call).to eq(
-          [
-            {
-              date: end_date.utc.strftime('%Y-%m-%d'),
-              value: 2,
-            },
-          ],
+        values = call
+        expect(values.last).to eq(
+          date: end_date.utc.strftime('%Y-%m-%d'),
+          value: 2,
         )
+        expect(report_values).to eq([0, 0, 2])
       end
     end
 

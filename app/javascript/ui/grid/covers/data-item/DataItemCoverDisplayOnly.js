@@ -5,6 +5,7 @@ import { Fragment } from 'react'
 
 import { Heading1, Heading3 } from '~/ui/global/styled/typography'
 import InfoIcon from '~/ui/icons/InfoIcon'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import ChartGroup from '~/ui/global/charts/ChartGroup'
 import {
   primaryFillColorFromDataset,
@@ -97,6 +98,7 @@ class DataItemCoverDisplayOnly extends React.Component {
 
   render() {
     const { card, item } = this.props
+    const { primaryDataset } = item
     const tooltip = this.primaryDatasetDescription
     return (
       <StyledCover item={item}>
@@ -120,12 +122,16 @@ class DataItemCoverDisplayOnly extends React.Component {
             )}
           </StyledTitleAndDescription>
         </AboveChartContainer>
-        <ChartGroup
-          dataItem={item}
-          width={card.width}
-          height={card.height}
-          simpleDateTooltip
-        />
+        {!primaryDataset ? (
+          <InlineLoader />
+        ) : (
+          <ChartGroup
+            dataItem={item}
+            width={card.width}
+            height={card.height}
+            simpleDateTooltip
+          />
+        )}
       </StyledCover>
     )
   }

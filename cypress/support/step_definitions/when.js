@@ -61,7 +61,7 @@ When('I choose a link item from the submission box', () => {
 // Sharing collections
 // ----------------------
 When('I click the form add button in the collection sharing modal', () => {
-  cy.locateDataOrClass('.FormButton').click({ force: true })
+  cy.locate('Button').click({ force: true })
   cy.wait('@apiInviteUserToCollection')
   cy.wait('@apiSearchUsersAndGroups')
   cy.wait('@apiSearchUsersAndGroups')
@@ -86,7 +86,7 @@ When('I click a sample group', () => {
 })
 
 When('I click the form add button in the group sharing modal', () => {
-  cy.locateDataOrClass('.FormButton').click({ force: true })
+  cy.locate('Button').click({ force: true })
   cy.wait('@apiInviteUserToGroup')
   cy.wait('@apiSearchUsersAndGroups')
   cy.wait('@apiSearchUsersAndGroups')

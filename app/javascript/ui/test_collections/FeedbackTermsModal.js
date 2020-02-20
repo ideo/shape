@@ -5,7 +5,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 
 import { ModalCloseButton } from '~/ui/global/modals/Modal'
 import PaperAirplane from '~/ui/test_collections/PaperAirplane'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import {
   DisplayText,
   SpecialDisplayHeading,
@@ -119,7 +119,7 @@ const FeedbackTermsModal = ({ onSubmit, open, close }) => (
           </StyledDisplayText>
         </div>
         <div style={{ textAlign: 'center', marginBottom: '4px' }}>
-          <FormButton width={300}>I agree to these terms</FormButton>
+          <Button minWidth={300}>I agree to these terms</Button>
         </div>
       </form>
     </DialogContent>

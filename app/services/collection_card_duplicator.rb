@@ -25,7 +25,10 @@ class CollectionCardDuplicator < SimpleService
 
   def call
     initialize_card_order
-    duplicate_cards_with_placeholders
+    unless @building_template_instance
+      # this is the only case where we always skip this
+      duplicate_cards_with_placeholders
+    end
     register_card_mappings
     deep_duplicate_cards
     reorder_and_update_cached_values
@@ -92,10 +95,15 @@ class CollectionCardDuplicator < SimpleService
     # NOTE: the CardDuplicatorMapperFindLinkedCardsWorker needs
     #       to run before this duplication worker so that it
     #       can map all cards that need linking
+    if @building_template_instance
+      card_ids = @cards.pluck(:id)
+    else
+      card_ids = @new_cards.pluck(:id)
+    end
     CollectionCardDuplicationWorker.send(
       "perform_#{run_worker_sync ? 'sync' : 'async'}",
       @batch_id,
-      @new_cards.pluck(:id),
+      card_ids,
       @to_collection.id,
       @for_user&.id,
       @system_collection,
@@ -117,9 +125,7 @@ class CollectionCardDuplicator < SimpleService
       # help us refer back to the originals when duplicating
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
-      if @building_template_instance
-        dup.pinned = card.pinned
-      elsif @to_collection.master_template?
+      if @to_collection.master_template?
         # only override the source card pinned value if pin_duplicating_cards is true or false
         dup.pinned = pin_duplicating_cards unless pin_duplicating_cards.nil?
       else

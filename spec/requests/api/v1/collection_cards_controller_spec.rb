@@ -207,35 +207,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         ).to match_array(cards_included.map(&:id))
       end
     end
-
-    context 'with data items and datasets' do
-      let!(:data_item) { create(:data_item, :report_type_question_item) }
-      let(:data_items_datasets) { data_item.data_items_datasets.first }
-      before do
-        user.add_role(Role::VIEWER, data_item)
-        collection.collection_cards.first.update(
-          item: data_item,
-        )
-      end
-
-      it 'includes datasets' do
-        get(path)
-        datasets = json_included_objects_of_type('datasets')
-        expect(datasets.size).to eq(1)
-        expect(
-          datasets.map { |d| d['id'].to_i },
-        ).to eq(data_item.datasets.map(&:id))
-      end
-
-      it 'includes data_items_datasets_id' do
-        get(path)
-        dataset = json_included_objects_of_type('datasets').first
-        attrs = dataset['attributes']
-        expect(attrs['data_items_datasets_id'].to_i).to eq(data_items_datasets.id)
-        expect(attrs['order']).to eq(data_items_datasets.order)
-        expect(attrs['selected']).to eq(data_items_datasets.selected)
-      end
-    end
   end
 
   describe 'GET #ids' do
@@ -250,6 +221,27 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'GET #ids_in_direction' do
+    let!(:collection) { create(:board_collection, num_cards: 5, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids_in_direction" }
+    let(:direction) { 'bottom' }
+    let(:card_id) { collection.collection_cards.first.id }
+    let(:params) do
+      {
+        direction: direction,
+        collection_card_id: card_id,
+      }
+    end
+
+    it 'returns stringified ids of selected cards at the bottom' do
+      get(path, params: params)
+      expect(response.status).to eq(200)
+      expect(json.length).to eq(5)
+      # FIXME: should be the cards at the bottom
+      expect(json).to eq(collection.collection_cards.pluck(:id).map(&:to_s))
+    end
+  end
+
   describe 'GET #breadcrumb_records' do
     let!(:collection) { create(:collection, record_type: :collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/breadcrumb_records" }
@@ -258,7 +250,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       get(path)
       expect(response.status).to eq(200)
       expect(json.length).to eq(5)
-      expect(json.pluck("id")).to eq(collection.collection_cards.map(&:record).pluck(:id))
+      expect(json.pluck('id')).to eq(collection.collection_cards.map(&:record).pluck(:id))
     end
   end
 
@@ -331,6 +323,31 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           nil,
           nil,
         )
+      end
+
+      context 'with a collection' do
+        let(:raw_params) do
+          {
+            order: 1,
+            width: 1,
+            height: 1,
+            parent_id: collection.id,
+            # create with a nested item
+            collection_attributes: {
+              name: 'My Board',
+              type: 'Collection::Board',
+              num_columns: 4,
+            },
+          }
+        end
+
+        it 'creates record' do
+          expect do
+            post(path, params: params)
+          end.to change(Collection::Board, :count).by(1)
+          card = CollectionCard.find(json['data']['id'])
+          expect(card.record.num_columns).to eq 4
+        end
       end
 
       context 'with a link card' do

@@ -150,6 +150,34 @@ class Item
       ).dataset
     end
 
+    def csv_data
+      return [] unless report_type_record? || report_type_collections_and_items?
+
+      DataReport::DatasetsCSVReport.call(
+        # filter only the selected datasets
+        datasets: data_items_datasets.selected.map(&:dataset),
+      )
+    end
+
+    def csv_filename
+      dataset = datasets.first
+      measure = dataset.measure || 'report'
+      timeframe = dataset.timeframe
+      source = dataset.data_source.present? ? dataset.data_source.name : 'organization'
+      timestamp = Time.current.strftime('%b-%d-%Y')
+      "#{organization.name}-#{measure}-#{timeframe}-#{source}-#{timestamp}.csv"
+    end
+
+    def selected_datasets
+      data_items_datasets.selected.map do |data_items_datasets|
+        dataset = data_items_datasets.dataset
+        next if dataset.blank?
+
+        dataset.cached_data_items_datasets = data_items_datasets
+        dataset
+      end.compact
+    end
+
     private
 
     def dataset_type

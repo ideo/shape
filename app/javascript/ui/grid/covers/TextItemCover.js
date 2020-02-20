@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import { computed } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
+import styled from 'styled-components'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
@@ -12,7 +13,6 @@ import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import PaddedCardCover from '~/ui/grid/covers/PaddedCardCover'
-import styled from 'styled-components'
 const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
 const StyledPaddedCover = styled(PaddedCardCover)`
@@ -235,7 +235,8 @@ class TextItemCover extends React.Component {
       <StyledPaddedCover
         data-cy="TextItemCover"
         style={{
-          height: 'calc(100% - 30px)',
+          // account for padding: 1rem on both sides
+          height: 'calc(100% - 2rem)',
         }}
         className="cancelGridClick"
         onClick={this.handleClick}

@@ -47,15 +47,43 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
       cards[4].update(row: 1, col: 4, width: 1, height: 1)
       cards[5].update(row: 2, col: 2, width: 2, height: 1)
       cards[6].update(row: 3, col: 1, width: 1, height: 1)
-      cards[7].update(row: 3, col: 2, width: 3, height: 1)
+      if cards.count > 7
+        cards[7].update(row: 3, col: 2, width: 3, height: 1)
+      end
       # board matrix
-      # [[1, 1, 1, 1, _, _, _, _, _, _, _, _, _, _, _, _],
-      #  [2, 3, 4, _, 5, _, _, _, _, _, _, _, _, _, _, _],
-      #  [2, _, 6, 6, _, _, _, _, _, _, _, _, _, _, _, _],
-      #  [_, 7, 8, 8, 8, _, _, _, _, _, _, _, _, _, _, _],
+      # [[0, 0, 0, 0, _, _, _, _, _, _, _, _, _, _, _, _],
+      #  [1, 2, 3, _, 4, _, _, _, _, _, _, _, _, _, _, _],
+      #  [1, _, 5, 5, _, _, _, _, _, _, _, _, _, _, _, _],
+      #  [_, 6, 7, 7, 7, _, _, _, _, _, _, _, _, _, _, _],
     end
 
     describe '#board_matrix' do
+      context 'with 4-wide board' do
+        let(:collection) { create(:board_collection, num_cards: 7, num_columns: 4) }
+
+        before do
+          cards[4].update(row: 3, col: 2, width: 2, height: 1)
+          # board matrix
+          # [[0, 0, 0, 0],
+          #  [1, 2, 3, _,],
+          #  [1, _, 5, 5],
+          #  [_, 4, 6, 6],
+        end
+
+        it 'should generate the array of cards and blank spaces' do
+          matrix = CollectionGrid::Calculator.board_matrix(collection: collection)
+          expect(matrix[0]).to eq(
+            [cards[0]] * 4,
+          )
+          expect(matrix[1]).to eq(
+            [cards[1], cards[2], cards[3], nil],
+          )
+          expect(matrix[2]).to eq(
+            [cards[1], nil, cards[5], cards[5]],
+          )
+        end
+      end
+
       it 'should generate the array of cards and blank spaces' do
         matrix = CollectionGrid::Calculator.board_matrix(collection: collection)
         expect(matrix[0]).to eq(

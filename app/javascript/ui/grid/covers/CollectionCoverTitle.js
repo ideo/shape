@@ -66,7 +66,6 @@ class CollectionCoverTitle extends React.Component {
       collection.isTemplated,
       collection.isTestCollectionOrResults,
       collection.isUserProfile,
-      collection.isProfileTemplate,
     ]
 
     if (some(rightConditions, bool => bool)) {

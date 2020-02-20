@@ -119,6 +119,7 @@ const fakeUiStore = {
   selectedTextRangeForCard: jest.fn(),
   reselectCardIds: jest.fn(),
   setMovingCards: jest.fn(),
+  drag: jest.fn(),
 }
 
 export default fakeUiStore
