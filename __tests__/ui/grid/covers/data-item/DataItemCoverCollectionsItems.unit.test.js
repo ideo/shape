@@ -18,6 +18,7 @@ describe('DataItemCover', () => {
     props.item.primaryDataset = fakeDataset
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     props.uiStore.editingCardCover = 0
+    props.loadTargetCollection = jest.fn()
     render = () =>
       (wrapper = shallow(
         <DataItemCoverCollectionsItems.wrappedComponent {...props} />
@@ -137,12 +138,15 @@ describe('DataItemCover', () => {
 
   describe('with a target collection', () => {
     beforeEach(() => {
-      props.item.primaryDataset.data_source_id = 123
+      props.targetCollection = { id: 123 }
       render()
     })
 
-    it('should call apiStore.fetch with target id', () => {
-      expect(apiStore.fetch).toHaveBeenCalledWith('collections', 123)
+    it('should pass targetCollection to targetControl', () => {
+      const targetButton = wrapper.find('DataTargetButton')
+      expect(targetButton.props().targetCollection).toEqual(
+        props.targetCollection
+      )
     })
 
     describe('onSelectTarget', () => {
@@ -150,11 +154,11 @@ describe('DataItemCover', () => {
         wrapper
           .instance()
           .onSelectTarget({ id: 1, internalType: 'collections' })
-        expect(apiStore.fetch).toHaveBeenCalledWith('collections', 1)
+        expect(props.loadTargetCollection).toHaveBeenCalled()
       })
       it('should work with a custom object', () => {
         wrapper.instance().onSelectTarget({ custom: 1 })
-        expect(apiStore.fetch).toHaveBeenCalledWith('collections', 1)
+        expect(props.loadTargetCollection).toHaveBeenCalled()
       })
     })
   })

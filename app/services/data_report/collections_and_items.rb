@@ -10,7 +10,7 @@ module DataReport
       @is_single_value = false
       @query = nil
       @group = dataset.group
-      @end_date = (end_date || Date.today).to_s
+      @end_date = (end_date || Date.tomorrow).to_s
     end
 
     def call
@@ -41,19 +41,19 @@ module DataReport
 
     def sql_query
       sql_table = query_table.table_name
-      earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
+      if @record
+        earliest = @record.created_at
+      else
+        earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
+      end
       return unless earliest.present?
 
-      min = [earliest, start_date_limit].max
+      min = earliest.clamp(start_date_limit, start_date_minimum)
       case measure
       when 'participants', 'viewers'
         count = 'count(distinct(actor_id))'
-      when 'views'
-        count = 'count(distinct(id))'
-      when 'activity', 'content', 'collections', 'items'
-        count = 'count(*)'
       else
-        return
+        count = 'count(distinct(id))'
       end
 
       # Doing the BETWEEN upper limit finds all activities created BEFORE the upper limit, for example:
@@ -226,6 +226,11 @@ module DataReport
 
     def start_date_limit
       @dataset.start_date_limit || 12.months.ago
+    end
+
+    def start_date_minimum
+      # the graph looks odd with only one or two data points so we ensure a minimum
+      2.send(timeframe).ago
     end
 
     def calculate_timeframe_values
