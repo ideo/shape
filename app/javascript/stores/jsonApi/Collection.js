@@ -686,6 +686,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     rows,
     cols,
     searchTerm,
+    include = [],
   } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
@@ -693,6 +694,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const params = {
       page,
       per_page,
+      include,
     }
     if (!params.per_page) {
       // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols

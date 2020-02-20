@@ -62,6 +62,7 @@ Rails.application.routes.draw do
           get 'csv_report'
           patch 'restore_permissions'
           patch 'highlight'
+          get 'datasets'
         end
         resources :roles, only: %i[index create destroy] do
           collection do

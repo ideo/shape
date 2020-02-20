@@ -197,7 +197,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get primaryDataset() {
     const { datasets } = this
     if (!datasets) return null
-    if (datasets.length <= 1) return datasets[0]
+    if (datasets.length === 1) return datasets[0]
     const primary = datasets.find(dataset => dataset.order === 0)
     return primary
   }
@@ -308,6 +308,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
       `items/${this.id}/question_choices/${choice.id}/archive`,
       'POST'
     )
+  }
+
+  async API_fetchDatasets() {
+    const datasets = await this.apiStore.request(`items/${this.id}/datasets`)
+    this.datasets = datasets.data
+    return datasets
   }
 
   async API_persistHighlight({ commentId, delta } = {}) {
