@@ -108,27 +108,37 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       end
 
       context 'building template instance' do
+        let(:template) { create(:collection, master_template: true) }
         let(:building_template_instance) { true }
+        let(:synchronous) { :all_levels }
+        before do
+          to_collection.update(template: template)
+        end
 
         it 'does not call ActivityAndNotificationWorker' do
           expect(ActivityAndNotificationWorker).not_to receive(:perform_async)
           service.call
         end
 
-        it 'creates Placeholder cards that are pinned like the originals' do
-          new_cards = service.call
-          expect(new_cards.all?(&:placeholder?)).to be true
-          expect(new_cards.all?(&:pinned?)).to be true
+        it 'creates cards that are pinned like the originals' do
+          service.call
+          expect(to_collection.collection_cards.pluck(:templated_from_id, :order, :pinned)).to eq([
+            [moving_cards[0].id, 0, true],
+            [moving_cards[1].id, 1, true],
+            [nil, 2, false],
+            [nil, 3, false],
+            [nil, 4, false],
+          ])
         end
 
         it 'passes building_template_instance to CollectionCardDuplicationWorker' do
-          expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          expect(CollectionCardDuplicationWorker).to receive(:perform_sync).with(
             instance_of(String), # batch id
             instance_of(Array), # new card ids
             to_collection.id,
             user.id,
             false, # system collection
-            false, # synchronous
+            true, # synchronous
             true, # building_template_instance
           )
           service.call

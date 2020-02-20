@@ -164,10 +164,11 @@ class Breadcrumb extends React.Component {
     return this.truncateItems(this.items())
   }
 
-  transformToSubItems(items, firstItem = {}) {
+  transformToSubItems(items, firstItem = {}, lastItem = {}) {
     const subItems = items.map((item, idx) => {
       const subItem = { ...item }
       if (item.ellipses && item.id !== firstItem.id) item.remove = true
+      if (lastItem && item.id === lastItem.id) subItem.isEllipsesLink = true
       subItem.nested = idx
       return subItem
     })
@@ -235,7 +236,12 @@ class Breadcrumb extends React.Component {
     let subItems
     if (ellipsesItems.length) {
       const firstEllipsesItem = ellipsesItems.shift()
-      subItems = this.transformToSubItems(items, firstEllipsesItem)
+      const lastEllipsesItem = ellipsesItems.pop()
+      subItems = this.transformToSubItems(
+        items,
+        firstEllipsesItem,
+        lastEllipsesItem
+      )
       firstEllipsesItem.subItems = subItems
     } else {
       subItems = this.transformToSubItems(items)

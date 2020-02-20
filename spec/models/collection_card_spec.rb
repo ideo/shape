@@ -70,7 +70,7 @@ RSpec.describe CollectionCard, type: :model do
         card.col = nil
         expect(card.board_placement_is_valid?).to be false
         card.row = 2
-        card.col = Collection::Board::COLS + 20
+        card.col = parent.num_columns + 1
         expect(card.board_placement_is_valid?).to be false
       end
 

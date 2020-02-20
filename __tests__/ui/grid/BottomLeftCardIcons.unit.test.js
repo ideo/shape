@@ -1,6 +1,5 @@
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
 import { fakeCollectionCard, fakeCollection, fakeTextItem } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 const props = {
   card: fakeCollectionCard,
   record: fakeCollection,
@@ -14,10 +13,6 @@ describe('BottomLeftCardIcons', () => {
       wrapper = shallow(<BottomLeftCardIcons {...props} />)
       return wrapper
     }
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   describe('as link card', () => {

@@ -2,7 +2,7 @@ import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import TagEditor from '~/ui/pages/shared/TagEditor.js'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { LabelContainer } from '~/ui/global/styled/forms'
 import TextEditor from '~/ui/global/TextEditor'
 
@@ -72,7 +72,7 @@ describe('OrganizationSettings', () => {
     })
 
     it('should render the save button', () => {
-      expect(wrapper.find(FormButton).exists()).toBe(true)
+      expect(wrapper.find(Button).exists()).toBe(true)
     })
 
     it('should track bumpTermsVersion', () => {

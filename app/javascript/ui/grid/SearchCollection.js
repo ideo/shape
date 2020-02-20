@@ -26,11 +26,6 @@ class SearchCollection extends React.Component {
   @observable
   loading = false
 
-  constructor(props) {
-    super(props)
-    this.debouncedUpdateSearchTerm = _.debounce(this._updateSearchTerm, 1000)
-  }
-
   componentDidMount() {
     this.loadSearchedCards()
   }
@@ -48,11 +43,15 @@ class SearchCollection extends React.Component {
     return this.searchCollectionCards.map(c => _.pick(c, ['id', 'updated_at']))
   }
 
-  _updateSearchTerm() {
+  // NOTE: this function is already debounced by EditableName
+  updateSearchTerm = async term => {
     const { collection } = this.props
-    collection.save().then(() => {
-      this.loadSearchedCards()
+    collection.search_term = term
+    await collection.patch({
+      // cancel sync so that API call doesn't interfere with your <input>
+      cancel_sync: true,
     })
+    this.loadSearchedCards()
   }
 
   loadCollectionCards = async ({ page, per_page, rows, cols } = {}) => {
@@ -67,8 +66,11 @@ class SearchCollection extends React.Component {
 
   loadSearchedCards = async ({ page = 1, per_page, rows, cols } = {}) => {
     const { collection } = this.props
-    const { searchResultsCollection } = collection
-    const { search_term } = collection
+    const { searchResultsCollection, search_term } = collection
+    if (!search_term) {
+      searchResultsCollection.clearCollectionCards()
+      return
+    }
     if (page === 1) {
       runInAction(() => {
         this.loading = true
@@ -83,12 +85,6 @@ class SearchCollection extends React.Component {
       this.loading = false
     })
     return
-  }
-
-  onSearchChange = term => {
-    const { collection } = this.props
-    collection.search_term = term
-    this.debouncedUpdateSearchTerm()
   }
 
   render() {
@@ -115,7 +111,8 @@ class SearchCollection extends React.Component {
           </SearchIconWrapper>
           <EditableName
             name={collection.search_term || ''}
-            updateNameHandler={this.onSearchChange}
+            placeholder={'enter search term'}
+            updateNameHandler={this.updateSearchTerm}
             canEdit={collection.can_edit}
             TypographyComponent={DisplayText}
             typographyCss={DisplayTextCss}
@@ -124,13 +121,13 @@ class SearchCollection extends React.Component {
             editingMarginTop="0"
           />
         </Flex>
-        <Flex mb="12px" ml="2px">
+        <div style={{ marginBottom: '12px', marginLeft: '2px' }}>
           <CollectionFilter
             inSearchCollection={true}
             collection={collection}
             canEdit={collection.can_edit_content}
           />
-        </Flex>
+        </div>
         {this.loading ? (
           <Loader />
         ) : (

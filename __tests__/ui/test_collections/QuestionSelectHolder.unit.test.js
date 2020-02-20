@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import QuestionSelector from '~/ui/test_collections/QuestionSelector'
 import { fakeCollectionCard } from '#/mocks/data'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let wrapper, props
 describe('QuestionSelector', () => {
@@ -15,10 +14,6 @@ describe('QuestionSelector', () => {
     props.card.card_question_type = 'question_useful'
     props.card.section_type = 'ideas'
     wrapper = shallow(<QuestionSelector {...props} />)
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders Select form with card_question_type selected', () => {

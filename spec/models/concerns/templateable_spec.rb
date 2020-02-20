@@ -34,21 +34,32 @@ describe Templateable, type: :concern do
     let(:organization) { create(:organization) }
     let(:user) { create(:user, current_organization: organization) }
     let(:template) { create(:collection, master_template: true, num_cards: 3, add_editors: [user]) }
+    let(:other_collection) { create(:collection) }
+    let!(:other_template) { create(:collection, parent_collection: other_collection, master_template: true, num_cards: 1) }
+    let!(:link_card) { create(:collection_card_link_collection, collection: other_template, parent: template, order: 4) }
+    let!(:link_card_2) { create(:collection_card_link_text, parent: template, order: 5) }
     let(:collection) { create(:collection) }
 
     before do
       template.setup_templated_collection(
         for_user: user,
         collection: collection,
+        synchronous: true,
       )
     end
 
     it 'should copy the templated cards into the new collection' do
-      expect(collection.collection_cards.count).to eq 3
+      expect(collection.collection_cards.primary.count).to eq 3
     end
 
     it 'should set itself as the collection\'s template' do
       expect(collection.template).to eq template
+    end
+
+    it 'should preserve links as links' do
+      # the collection links should not get converted into actual collections
+      expect(collection.collections).to be_empty
+      expect(collection.link_collection_cards.count).to eq(2)
     end
   end
 

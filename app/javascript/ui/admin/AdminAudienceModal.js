@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { Flex, Box } from 'reflexbox'
 import { map, capitalize } from 'lodash'
 import Modal from '~/ui/global/modals/Modal'
-import { TextButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { FieldContainer, Label } from '~/ui/global/styled/forms'
 import HorizontalDivider from '~shared/components/atoms/HorizontalDivider'
 import v from '~/utils/variables'
@@ -22,14 +22,6 @@ const SelectedOption = styled.span`
   padding: 8px 12px;
 `
 SelectedOption.displayName = 'SelectedOption'
-
-const CloseModalButton = styled(TextButton)`
-  background: ${v.colors.black};
-  border-radius: 20px;
-  width: 183px;
-  height: 40px;
-  color: ${v.colors.white};
-`
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -107,14 +99,14 @@ class AdminAudienceModal extends React.Component {
           {this.renderCriteria()}
           {showModalButton && (
             <div style={{ textAlign: 'center', paddingBottom: '2rem' }}>
-              <CloseModalButton
+              <Button
                 data-cy="CloseModalButton"
                 onClick={this.handleClose}
-                width={200}
+                minWidth={200}
                 className="adminAudienceModalButton"
               >
                 {feedbackAudienceMenuOpen ? 'Add Audience' : 'Close'}
-              </CloseModalButton>
+              </Button>
             </div>
           )}
         </React.Fragment>

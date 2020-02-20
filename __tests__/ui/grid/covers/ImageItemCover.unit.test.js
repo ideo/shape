@@ -1,5 +1,4 @@
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 import { fakeImageItem } from '#/mocks/data'
 
 const props = {
@@ -10,10 +9,6 @@ let wrapper
 describe('ImageItemCover', () => {
   beforeEach(() => {
     wrapper = shallow(<ImageItemCover {...props} />)
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders the StyledImageItem', () => {
