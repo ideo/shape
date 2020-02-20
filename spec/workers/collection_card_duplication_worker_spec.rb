@@ -96,6 +96,26 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect(result.size).to eq(5)
       end
 
+      context 'with a collection' do
+        let(:collection) { create(:collection, num_cards: 3, record_type: :image) }
+        before do
+          collection.cache_cover!
+          # simulate the scenario where this collection has been copied with its cover settings
+          to_collection.update(cached_cover: collection.cached_cover)
+        end
+
+        it 'updates the parent collection cover if the cover cards were copied over' do
+          expect {
+            run_worker
+            to_collection.reload
+          }.to change(to_collection, :cached_cover)
+          # should have copied the "is_cover" card and updated the cached value to the new card
+          duplicated_cover = to_collection.collection_cards.is_cover.first
+          expect(to_collection.cached_cover['card_ids'].first).to eq duplicated_cover.id
+          expect(duplicated_cover.cloned_from_id).to eq collection.cached_cover['card_ids'].first
+        end
+      end
+
       context 'with pinned cards duplicating into a normal collection' do
         let(:collection) { create(:collection, master_template: true, pin_cards: true, num_cards: 1) }
 
@@ -241,6 +261,54 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
           ).to eq(1)
           duplicated_legend_item = to_collection_legend_items.first
           expect(data_item_two.reload.legend_item).not_to eq(duplicated_legend_item)
+        end
+      end
+
+      context 'with potential infinite loop' do
+        # needs cloned_from_id as a pre-condition, to know we're in a nested copy
+        let!(:to_collection) { create(:collection, cloned_from_id: 99) }
+
+        context 'with breadcrumb.count > 50' do
+          before do
+            # have to fake this because the model callbacks will override the actual breadcrumb
+            allow_any_instance_of(Collection).to receive(:breadcrumb).and_return(
+              (1..60).to_a,
+            )
+          end
+
+          it 'will stop the loop and signal an error' do
+            expect(Appsignal).to receive(:set_error).with(
+              an_instance_of(StandardError),
+              parent_collection_id: to_collection.id,
+            )
+            expect(run_worker).to be false
+          end
+        end
+
+        context 'with repeating parent names' do
+          let(:parents) do
+            [
+              Mashie.new(name: 'prototype collection'),
+              Mashie.new(name: 'Inner contents'),
+              Mashie.new(name: 'Working agreements'),
+            ]
+          end
+
+          before do
+            allow_any_instance_of(Collection).to receive(:parents).and_return(
+              # repeat the same names several times
+              # there are only 3 unique vs 9 total, which will cause an error
+              parents * 3,
+            )
+          end
+
+          it 'will stop the loop and signal an error' do
+            expect(Appsignal).to receive(:set_error).with(
+              an_instance_of(StandardError),
+              parent_collection_id: to_collection.id,
+            )
+            expect(run_worker).to be false
+          end
         end
       end
     end

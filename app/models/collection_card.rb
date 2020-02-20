@@ -228,7 +228,7 @@ class CollectionCard < ApplicationRecord
     return cc unless cc.save
 
     # now that the card exists, we can recalculate the breadcrumb
-    cc.record.recalculate_breadcrumb!
+    cc.record.recalculate_breadcrumb! unless shallow || link?
     cc.increment_card_orders! if placement != 'end' && placeholder.nil?
 
     # if we are duplicating a submission box template,
@@ -501,6 +501,11 @@ class CollectionCard < ApplicationRecord
 
     errors.add(:base, 'Board position is already taken')
     false
+  end
+
+  def cloned_from_id
+    # if the underlying record was cloned, get the parent card of the cloned_from record
+    record.cloned_from&.parent_collection_card&.id
   end
 
   private
