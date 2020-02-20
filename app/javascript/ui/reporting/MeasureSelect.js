@@ -6,9 +6,8 @@ import styled from 'styled-components'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { DATA_MEASURES } from '~/utils/variables'
-import InfoIcon from '~/ui/icons/InfoIcon'
-import Tooltip from '~/ui/global/Tooltip'
 import TruncatableText from '~/ui/global/TruncatableText'
+import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
 const contentMeasureValues = ['collections', 'items', 'records']
 
@@ -119,17 +118,7 @@ class MeasureSelect extends React.Component {
             maxLength={maxPopoutMenuTextLength}
           />
         </StyledMeasureName>
-        {description && (
-          <Tooltip
-            classes={{ tooltip: 'Tooltip' }}
-            title={description}
-            placement="bottom"
-          >
-            <IconHolder>
-              <InfoIcon />
-            </IconHolder>
-          </Tooltip>
-        )}
+        <HoverableDescriptionIcon description={description} />
       </StyledInlineSelectItem>
     )
   }

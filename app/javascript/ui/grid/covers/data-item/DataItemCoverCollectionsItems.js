@@ -1,4 +1,4 @@
-import { startCase } from 'lodash'
+import { startCase, find } from 'lodash'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable, computed } from 'mobx'
@@ -16,10 +16,11 @@ import EditableButton from '~/ui/reporting/EditableButton'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import DataTargetButton from '~/ui/reporting/DataTargetButton'
 import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
-import v from '~/utils/variables'
-import trackError from '~/utils/trackError'
+import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
 import { StyledDataItemCover } from '~/ui/grid/covers/data-item/StyledDataItemCover'
+import v, { DATA_MEASURES } from '~/utils/variables'
+import trackError from '~/utils/trackError'
 
 const GraphKey = styled.span`
   background: url(${OrganicGridPng});
@@ -174,6 +175,15 @@ class DataItemCoverCollectionsItems extends React.Component {
     return <span>{timeframe}</span>
   }
 
+  renderInfoIconTooltip = metric => {
+    const measure = find(DATA_MEASURES, measure => measure.value === metric)
+    return (
+      <span style={{ paddingLeft: '2px' }}>
+        <HoverableDescriptionIcon description={measure.description} />
+      </span>
+    )
+  }
+
   get measureControl() {
     const { item } = this.props
     const { primaryDataset } = item
@@ -194,6 +204,7 @@ class DataItemCoverCollectionsItems extends React.Component {
       return (
         <EditableButton editable={editable} onClick={this.handleEditClick}>
           <span className="editableMetric">{measure}</span>
+          {this.renderInfoIconTooltip(measure)}
         </EditableButton>
       )
     }

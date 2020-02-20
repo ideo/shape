@@ -50,43 +50,43 @@ export const DATA_MEASURES = [
     name: 'Participants',
     value: 'participants',
     description:
-      'Total number of collections that exist (regular collections, foamcore collections, and submission box collections)',
+      'Unique visitors that have commented or interacted with content',
   },
   {
     name: 'Viewers',
     value: 'viewers',
-    description:
-      'Total number of items that exist (text boxes, pictures and other media, files, links, and reports)',
+    description: 'Unique visitors that have viewed content',
   },
   {
     name: 'Activity',
     value: 'activity',
     description:
-      'Total number of collections and items that exist (regular collections, foamcore collections, and submission box collections, text boxes, pictures and other media, files, links, and reports) ',
+      'Total actions including adding items, editing content, commenting, downloading, and duplicating, moving, or linking content',
   },
   {
     name: 'Content Use',
     value: 'content',
     tooltip: 'content activities',
     description:
-      'Unique visitors that have commented or interacted with content',
+      'Total actions indicating content use: file downloads, PDF views, full-screen views, and link clicks',
   },
   {
     name: 'Collections',
     value: 'collections',
-    description: 'Unique visitors that have viewed content',
+    description:
+      'Total number of collections that exist (regular collections, foamcore collections, and submission box collections)',
   },
   {
     name: 'Items',
     value: 'items',
     description:
-      'Total actions including adding items, editing content, commenting, downloading, and duplicating, moving, or linking content',
+      'Total number of items that exist (text boxes, pictures and other media, files, links, and reports) ',
   },
   {
     name: 'Collections & Items',
     value: 'records',
     description:
-      'Total actions indicating content use: file downloads, PDF views, full-screen views, and link clicks',
+      'Total number of collections and items that exist (regular collections, foamcore collections, and submission box collections, text boxes, pictures and other media, files, links, and reports) ',
   },
 ]
 
