@@ -1,8 +1,8 @@
 class Api::V1::ItemsController < Api::V1::BaseController
   deserializable_resource :item, class: DeserializableItem, only: %i[create update highlight]
   load_and_authorize_resource :collection_card, only: :create
-  load_and_authorize_resource except: %i[update highlight in_my_collection csv_report]
-  before_action :load_and_authorize_item_read, only: %i[highlight csv_report]
+  load_and_authorize_resource except: %i[update highlight in_my_collection datasets csv_report]
+  before_action :load_and_authorize_item_read, only: %i[highlight csv_report datasets]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -95,6 +95,10 @@ class Api::V1::ItemsController < Api::V1::BaseController
       restored_by: current_user,
     )
     render jsonapi: @item.reload
+  end
+
+  def datasets
+    render jsonapi: @item.selected_datasets
   end
 
   def csv_report

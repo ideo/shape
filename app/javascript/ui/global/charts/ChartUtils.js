@@ -165,7 +165,7 @@ export const advancedTooltipText = ({
   if (timeframe === 'day') {
     timeRange = `on ${timeframeBegin.format('MMM D')}`
   }
-  let text = `${datum.value} `
+  let text = `${datum.value.toLocaleString()} `
   if (measure) {
     text += `${pluralize(measure)}\n`
   }

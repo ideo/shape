@@ -179,7 +179,7 @@ class LegendItemCover extends React.Component {
     } else {
       await parent.API_unselectDatasetsWithIdentifier({ identifier })
     }
-    parent.API_fetchCards()
+    parent.API_fetchCards({ include: ['datasets'] })
   }
 
   toggleComparisonSearch = () => {
