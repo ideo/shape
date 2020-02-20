@@ -185,7 +185,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       card_action: @card_action,
     )
     moved_cards = mover.call
-    if moved_cards && @from_collection != @to_collection
+    if moved_cards
       # we still create notifications on the original @cards
       @cards.map do |card|
         create_notification(
