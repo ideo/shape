@@ -92,11 +92,23 @@ class ScaleQuestion extends React.Component {
       this.updateQuestionContent,
       1000
     )
+    this.instanceDataContentUpdate = debounce(
+      this._instanceDataContentUpdate,
+      30000
+    )
   }
 
   vote = number => ev => {
     ev.preventDefault()
     this.props.onAnswer({ number })
+  }
+
+  _instanceDataContentUpdate = () => {
+    const { handleInstanceDataContentUpdate } = this.props
+
+    if (handleInstanceDataContentUpdate) {
+      handleInstanceDataContentUpdate()
+    }
   }
 
   get hasEditableCategory() {
@@ -109,6 +121,16 @@ class ScaleQuestion extends React.Component {
   handleInputChange = event => {
     this.setState({ questionContent: event.target.value })
     this.debouncedUpdateQuestionContent()
+    this.instanceDataContentUpdate()
+  }
+
+  handleBlur = () => {
+    const { questionContent } = this.state
+    this.debouncedUpdateQuestionContent.flush()
+    this.instanceDataContentUpdate.flush()
+
+    if (!questionContent) return
+    this.setState({ editing: false })
   }
 
   handleKeyPress = event => {
@@ -117,12 +139,6 @@ class ScaleQuestion extends React.Component {
 
   startEditing = () => {
     this.setState({ editing: true })
-  }
-
-  stopEditingIfContent = () => {
-    const { questionContent } = this.state
-    if (!questionContent) return
-    this.setState({ editing: false })
   }
 
   updateQuestionContent = () => {
@@ -154,7 +170,7 @@ class ScaleQuestion extends React.Component {
           value={questionContent}
           onChange={this.handleInputChange}
           onKeyPress={this.handleKeyPress}
-          onBlur={this.stopEditingIfContent}
+          onBlur={this.handleBlur}
           data-cy="category-satisfaction-input"
         />
         ?
@@ -233,10 +249,12 @@ ScaleQuestion.propTypes = {
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
+  handleInstanceDataContentUpdate: PropTypes.func,
 }
 ScaleQuestion.defaultProps = {
   questionAnswer: null,
   editing: false,
   onAnswer: () => null,
+  handleInstanceDataContentUpdate: () => true,
 }
 export default ScaleQuestion

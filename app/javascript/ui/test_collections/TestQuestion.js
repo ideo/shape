@@ -130,6 +130,9 @@ class TestQuestion extends React.Component {
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
+            handleInstanceDataContentUpdate={
+              this.handleInstanceDataContentUpdate
+            }
           />
         )
       case 'question_single_choice':
