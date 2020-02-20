@@ -199,7 +199,7 @@ RSpec.describe CardMover, type: :service do
           end
           it 'should keep all the moving cards unpinned' do
             card_mover.call
-            cards_moved = to_collection.reload.collection_cards.select {|cc| moving_cards.pluck(:id).include? cc.id}
+            cards_moved = to_collection.reload.collection_cards.select { |cc| moving_cards.pluck(:id).include? cc.id }
             expect(cards_moved.pluck(:pinned)).to all(be_falsy)
           end
         end
@@ -231,10 +231,7 @@ RSpec.describe CardMover, type: :service do
             to_collection.update(master_template: true)
           end
 
-
           context 'moving to the beginning of master template with pinned cards' do
-            let!(:placement) {'beginning'}
-
             it 'should pin all cards if moving to the beginning of collection with pinned cards' do
               card_mover.call
               to_collection.reload
@@ -247,7 +244,17 @@ RSpec.describe CardMover, type: :service do
               expect(subcollection.collections.first.master_template?).to be true
             end
           end
+
+          context 'when linking' do
+            let(:card_action) { 'link' }
+
+            it 'should not convert to template' do
+              links = card_mover.call
+              expect(links.last.collection).to eq(child_collection)
+              expect(links.last.collection.master_template?).to be false
+            end
           end
+        end
       end
     end
 
