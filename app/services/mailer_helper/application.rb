@@ -26,7 +26,7 @@ module MailerHelper
     end
 
     def invite_url
-      "#{application.invite_url}?redirect=#{CGI.escape(shape_invite_url)}"
+      shape_invite_url
     end
 
     private

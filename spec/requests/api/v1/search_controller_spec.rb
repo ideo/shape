@@ -505,13 +505,13 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
 
     it 'should find similar named users' do
       get(path, params: { query: @user.first_name })
-      expect(json['data'].select { |d| d['type'] == 'users' }.count).to be 2
+      expect(json['data'].select { |d| d['type'] == 'users' }.count).to eq 2
     end
 
     it 'should find org groups' do
       # the org is named "first_name last_name organization"
       get(path, params: { query: @user.first_name })
-      expect(json['data'].select { |d| d['type'] == 'groups' }.count).to be 3
+      expect(json['data'].select { |d| d['type'] == 'groups' }.count).to eq 3
     end
 
     context 'with application bot user' do
