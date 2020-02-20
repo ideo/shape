@@ -49,13 +49,13 @@ const chartAxisStyle = isSmallChartStyle => {
 const calculateTickLabelEdges = labelText => {
   if (!labelText) return 0
 
-  return labelText.length * 5.5
+  return labelText.length * 4
 }
 
 const TickLabel = props => {
   let dx
 
-  if (props.x === 0) dx = calculateTickLabelEdges(props.text)
+  if (props.index === 0) dx = calculateTickLabelEdges(props.text)
   if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
