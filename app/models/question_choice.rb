@@ -28,7 +28,7 @@ class QuestionChoice < ApplicationRecord
 
   def duplicate!(assign_question: question)
     qc = amoeba_dup
-    qc.question = question
+    qc.question = assign_question
     qc.save
     qc
   end

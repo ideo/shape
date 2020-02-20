@@ -67,6 +67,10 @@ class CustomizableQuestion extends React.Component {
       this.updateQuestionContent,
       250
     )
+    this.instanceDataContentUpdate = debounce(
+      this._instanceDataContentUpdate,
+      30000
+    )
   }
 
   submitAnswer = () => {
@@ -145,22 +149,24 @@ class CustomizableQuestion extends React.Component {
     return false
   }
 
-  handleInputChange = event => {
+  _instanceDataContentUpdate = () => {
     const { handleInstanceDataContentUpdate } = this.props
-    this.setState({ questionContent: event.target.value })
-    this.debouncedUpdateQuestionContent()
+
     if (handleInstanceDataContentUpdate) {
       handleInstanceDataContentUpdate()
     }
   }
 
+  handleInputChange = event => {
+    this.setState({ questionContent: event.target.value })
+    this.debouncedUpdateQuestionContent()
+    this.instanceDataContentUpdate()
+  }
+
   handleBlur = () => {
     const { questionContent } = this.state
-    const { handleInstanceDataContentUpdate } = this.props
     this.debouncedUpdateQuestionContent.flush()
-    if (handleInstanceDataContentUpdate) {
-      this.instanceDataContentUpdate.flush()
-    }
+    this.instanceDataContentUpdate.flush()
 
     if (!questionContent) return
 
@@ -228,7 +234,13 @@ class CustomizableQuestion extends React.Component {
   }
 
   render() {
-    const { question, questionAnswer, editing, question_choices } = this.props
+    const {
+      question,
+      questionAnswer,
+      editing,
+      question_choices,
+      handleInstanceDataContentUpdate,
+    } = this.props
 
     return (
       <div style={{ width: '100%' }}>
@@ -248,6 +260,9 @@ class CustomizableQuestion extends React.Component {
                 editing={editing}
                 onCreate={this.onNewChoice}
                 onDelete={this.onDeleteChoice}
+                handleInstanceDataContentUpdate={
+                  handleInstanceDataContentUpdate
+                }
               />
             ))}
         </ChoicesHolder>
@@ -269,10 +284,10 @@ CustomizableQuestion.propTypes = {
   question: MobxPropTypes.objectOrObservableObject.isRequired,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
-  onAnswer: PropTypes.func,
-  handleFocus: PropTypes.func,
   question_choices: MobxPropTypes.arrayOrObservableArray,
   isTestDraft: PropTypes.bool,
+  onAnswer: PropTypes.func,
+  handleFocus: PropTypes.func,
   handleInstanceDataContentUpdate: PropTypes.func,
 }
 CustomizableQuestion.defaultProps = {
@@ -282,6 +297,8 @@ CustomizableQuestion.defaultProps = {
   handleFocus: () => true,
   question_choices: [],
   isTestDraft: false,
+  onAnswer: PropTypes.func,
+  handleFocus: PropTypes.func,
   handleInstanceDataContentUpdate: () => true,
 }
 export default CustomizableQuestion

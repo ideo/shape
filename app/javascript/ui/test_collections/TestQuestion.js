@@ -88,8 +88,7 @@ class TestQuestion extends React.Component {
   handleInstanceDataContentUpdate = () => {
     const { parent } = this.props
     if (parent && parent.isTemplate) {
-      console.log(parent.name)
-      // parent.API_backgroundUpdateTemplateInstances()
+      parent.API_backgroundUpdateTemplateInstances()
     }
   }
 
