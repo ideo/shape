@@ -8,6 +8,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 import { LargerH3 } from '~/ui/global/styled/typography'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import InlineLoader from '~/ui/layout/InlineLoader'
 import QuestionLeftSide, {
   LeftSideContainer,
 } from '~/ui/test_collections/QuestionLeftSide'
@@ -291,7 +292,7 @@ class TestDesigner extends React.Component {
     const { collectionToTest } = this.state
     const { value } = e.target
     this.confirmEdit(async () => {
-      this.setState({ testType: value })
+      this.setState({ testType: null }) // show inline loader
       if (value === 'media') {
         collection.collection_to_test_id = null
       } else if (collectionToTest) {
@@ -301,6 +302,7 @@ class TestDesigner extends React.Component {
       }
       await collection.save()
       collection.API_fetchCards()
+      this.setState({ testType: value })
     })
   }
 
@@ -591,17 +593,26 @@ class TestDesigner extends React.Component {
     return this.renderCards(collection.sortedCards)
   }
 
-  render() {
+  renderTestType() {
     const { testType } = this.state
+
+    if (testType === 'media') {
+      return this.renderSections()
+    } else if (testType === 'collection') {
+      return this.renderQuestions()
+    }
+
+    return <InlineLoader />
+  }
+
+  render() {
     const { collection, apiStore } = this.props
     return (
       <ThemeProvider theme={this.styledTheme}>
         <OuterContainer>
           <div className={'design-column'}>
             <LargerH3>Feedback Design</LargerH3>
-            {testType === 'media'
-              ? this.renderSections()
-              : this.renderQuestions()}
+            {this.renderTestType()}
           </div>
           <div className={'settings-column'}>
             <LargerH3>Feedback Settings</LargerH3>
