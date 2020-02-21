@@ -625,6 +625,7 @@ class ApiStore extends jsonapi(datxCollection) {
         actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
     }
+    this.uiStore.deselectCards()
     collection.removeCardIds(cardIds)
     return archiveResult
   }
