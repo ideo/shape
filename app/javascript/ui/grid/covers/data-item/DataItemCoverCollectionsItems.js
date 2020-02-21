@@ -162,11 +162,7 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   renderInfoIconTooltip = metric => {
     const measure = find(DATA_MEASURES, measure => measure.value === metric)
-    return (
-      <span style={{ paddingLeft: '2px' }}>
-        <HoverableDescriptionIcon description={measure.description} />
-      </span>
-    )
+    return <HoverableDescriptionIcon description={measure.description} />
   }
 
   get measureControl() {

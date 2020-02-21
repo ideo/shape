@@ -109,16 +109,15 @@ class MeasureSelect extends React.Component {
   }
 
   renderMeasureNameAndInfo = (measureName, description) => {
-    const { maxPopoutMenuTextLength } = v
     return (
       <StyledInlineSelectItem>
         <StyledMeasureName>
           <TruncatableText
             text={measureName}
-            maxLength={maxPopoutMenuTextLength}
+            maxLength={v.maxSelectMeasureTextLength}
           />
         </StyledMeasureName>
-        <HoverableDescriptionIcon description={description} />
+        {description && <HoverableDescriptionIcon description={description} />}
       </StyledInlineSelectItem>
     )
   }
@@ -142,7 +141,7 @@ class MeasureSelect extends React.Component {
         >
           {this.measures.map(opt => (
             <SelectOption
-              classes={{ root: 'selectOption', selected: 'selected' }}
+              classes={{ root: 'selectOption wide', selected: 'selected' }}
               key={opt.value}
               value={opt.value}
               disabled={opt.value === 'contentMenu' && this.contentSelected}

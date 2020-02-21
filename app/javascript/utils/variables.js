@@ -184,6 +184,7 @@ export default {
   maxTitleLength: 144,
   maxButtonTextLength: 8,
   maxPopoutMenuTextLength: 13,
+  maxSelectMeasureTextLength: 20,
   actionMenuWidth: 250,
   actionMenuHeight: 26,
 

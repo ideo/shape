@@ -4,13 +4,12 @@ import Tooltip from '~/ui/global/Tooltip'
 import styled from 'styled-components'
 
 const StyledIconWrapper = styled.span`
+  margin-left: 3px;
   display: inline-block;
   width: 10px;
 `
 
 const HoverableDescriptionIcon = ({ description }) => {
-  if (!description) return null
-
   return (
     <Tooltip
       classes={{ tooltip: 'Tooltip' }}
@@ -26,10 +25,6 @@ const HoverableDescriptionIcon = ({ description }) => {
 
 HoverableDescriptionIcon.propTypes = {
   description: PropTypes.string.isRequired,
-}
-
-HoverableDescriptionIcon.defaultProps = {
-  description: null,
 }
 
 export default HoverableDescriptionIcon

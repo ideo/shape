@@ -283,6 +283,10 @@ export const SelectOption = styled(MenuItem)`
     }
   }
 
+  &.wide {
+    width: 200px;
+  }
+
   &.selected {
     background-color: inherit !important;
     border-left-color: ${v.colors.black};
