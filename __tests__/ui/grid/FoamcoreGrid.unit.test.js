@@ -1,9 +1,17 @@
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
 import v from '~/utils/variables'
+
+// because of mdlPlaceholder... without this mock it blows up
+jest.mock('../../../app/javascript/stores/jsonApi/CollectionCard')
+// also allows us to mock + test that the model constructor was called
+CollectionCard.mockImplementation((data, apiStore) => {
+  return data
+})
 
 let props, wrapper, component, rerender, cards, cardA, cardB, cardC
 let idCounter = 0
@@ -68,6 +76,10 @@ describe('FoamcoreGrid', () => {
     rerender()
     cards = props.collection.collection_cards
     component.gridRef = { scrollLeft: 0, scrollTop: 0 }
+  })
+
+  it('renders MovableGridCards', () => {
+    expect(wrapper.find('MovableGridCard').length).toEqual(3)
   })
 
   describe('findOverlap', () => {
@@ -245,8 +257,8 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('moveCards', () => {
-    const card = { id: '1', row: 0, col: 0, record: {} }
-    const card2 = { id: '2', row: 0, col: 0, record: {} }
+    const card = { id: '1', row: 0, col: 0, record: { internalType: 'items' } }
+    const card2 = { ...card, id: '2' }
     describe('when moving a single card', () => {
       beforeEach(() => {
         component.dragGridSpot.set('6,7', { col: 6, row: 7, card })
@@ -321,6 +333,35 @@ describe('FoamcoreGrid', () => {
           col: 6,
           row: 7,
         })
+      })
+    })
+
+    describe('when the MoveSnackbar is open', () => {
+      beforeEach(() => {
+        props.uiStore.movingCardIds = [card.id, card2.id]
+        props.apiStore = fakeApiStore({ findResult: card })
+        rerender()
+      })
+
+      afterEach(() => {
+        props.uiStore.movingCardIds = []
+        props.apiStore.find.mockClear()
+        CollectionCard.mockClear()
+      })
+
+      it('renders the MDL placeholder', () => {
+        // 3 collection_cards + 1 MDL
+        expect(wrapper.find('MovableGridCard').length).toEqual(4)
+        // it creates a new CollectionCard
+        expect(CollectionCard).toHaveBeenCalledTimes(1)
+        const placeholderId = `${card.id}-mdlPlaceholder`
+        expect(props.apiStore.updateModelId).toHaveBeenCalledWith(
+          expect.any(Object),
+          placeholderId
+        )
+        expect(wrapper.find('MovableGridCard').get(0).props.card.id).toEqual(
+          placeholderId
+        )
       })
     })
   })

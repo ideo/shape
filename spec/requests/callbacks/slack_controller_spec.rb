@@ -32,6 +32,7 @@ describe 'Slack API Requests' do
             links: [
               { domain: 'shape.space', url: collection_url },
               { domain: 'shape.space', url: item_url },
+              { domain: 'shape.space', url: 'https://shape.space/unsupported/url' },
             ],
           },
           type: 'event_callback',

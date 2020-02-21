@@ -62,6 +62,7 @@ Feature: Creating a Test Collection
     And I wait for "@apiValidateLaunch" to finish
     And I wait for "@apiLaunchTest" to finish
     And I wait for "@apiGetCollectionCards" to finish
+    And I wait for 3 calls to "@apiGetItemDataset" to finish
 
     Then I should see "Usefulness" in a "DataItemCover"
     # assuming the collection cover is not truncated...
