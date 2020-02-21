@@ -1,8 +1,10 @@
+import PropTypes from 'prop-types'
 import { startCase } from 'lodash'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable, computed } from 'mobx'
 import styled from 'styled-components'
+
 import {
   DisplayText,
   SmallHelperText,
@@ -17,7 +19,6 @@ import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import DataTargetButton from '~/ui/reporting/DataTargetButton'
 import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
 import v from '~/utils/variables'
-import trackError from '~/utils/trackError'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
 import { StyledDataItemCover } from '~/ui/grid/covers/data-item/StyledDataItemCover'
 
@@ -35,33 +36,15 @@ const GraphKey = styled.span`
 @observer
 class DataItemCoverCollectionsItems extends React.Component {
   @observable
-  targetCollection = null
-  @observable
   loading = false
+  @observable
+  changingTimeframe = false
 
   componentDidMount() {
     const { item, uiStore } = this.props
-    const {
-      primaryDataset: { data_source_id },
-    } = this.props.item
-    if (data_source_id) {
-      this.loadTargetCollection(data_source_id)
-    }
     if (uiStore.isNewCard(item.id)) {
       uiStore.removeNewCard(item.id)
       this.toggleEditing()
-    }
-  }
-
-  async loadTargetCollection(id) {
-    const { apiStore } = this.props
-    try {
-      const res = await apiStore.fetch('collections', id)
-      runInAction(() => {
-        this.targetCollection = res.data
-      })
-    } catch (e) {
-      trackError(e)
     }
   }
 
@@ -87,6 +70,7 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 
   onSelectTarget = value => {
+    const { loadTargetCollection } = this.props
     let collectionId = null
     if (value && value.internalType && value.internalType === 'collections') {
       collectionId = value.id
@@ -98,13 +82,8 @@ class DataItemCoverCollectionsItems extends React.Component {
       data_source_id: collectionId,
       data_source_type: 'Collection',
     })
-    if (collectionId) {
-      this.loadTargetCollection(collectionId)
-    } else {
-      runInAction(() => {
-        this.targetCollection = null
-      })
-    }
+    // if collectionId is null it will unset targetCollection
+    loadTargetCollection(collectionId)
     this.toggleEditing()
   }
 
@@ -128,19 +107,25 @@ class DataItemCoverCollectionsItems extends React.Component {
     runInAction(() => {
       Object.assign(item.primaryDataset, settings)
       this.loading = true
+      if (settings.timeframe) {
+        this.changingTimeframe = true
+      }
     })
     await item.primaryDataset.save()
     // If the timeframe changed we have to resize the card
     if (settings.timeframe) {
       const { height, width } = this.correctGridSize
-      card.height = height
-      card.width = width
-      await card.save()
+      if (card.height !== height || card.width !== width) {
+        card.height = height
+        card.width = width
+        await card.save()
+      }
     }
     // TODO: investigate why data isn't being updated with just `save()`
     runInAction(() => {
       this.toggleEditing()
       this.loading = false
+      this.changingTimeframe = false
     })
   }
 
@@ -201,7 +186,7 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 
   get targetControl() {
-    const { item } = this.props
+    const { item, targetCollection } = this.props
     const editable = item.can_edit_content
 
     if (this.editing) {
@@ -209,7 +194,7 @@ class DataItemCoverCollectionsItems extends React.Component {
         <span className="editableMetric">
           <DataTargetSelect
             item={item}
-            targetCollection={this.targetCollection}
+            targetCollection={targetCollection}
             onSelect={this.onSelectTarget}
           />
         </span>
@@ -218,7 +203,7 @@ class DataItemCoverCollectionsItems extends React.Component {
     return (
       <span className="editableMetric">
         <DataTargetButton
-          targetCollection={this.targetCollection}
+          targetCollection={targetCollection}
           editable={editable}
           onClick={this.handleEditClick}
         />
@@ -277,7 +262,7 @@ class DataItemCoverCollectionsItems extends React.Component {
       <Fragment>
         <Heading3>{this.measureControl}</Heading3>
         <HugeNumber className="count" data-cy="DataReport-count">
-          {single_value}
+          {single_value ? single_value.toLocaleString() : ''}
         </HugeNumber>
         <SmallHelperText color={v.colors.black}>
           {this.titleAndControls}
@@ -306,7 +291,22 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   render() {
     const { item } = this.props
-    const { timeframe } = item.primaryDataset
+    const { primaryDataset } = item
+
+    let contents
+    if (!this.changingTimeframe && primaryDataset) {
+      // during load the primaryDataset may be changing types so we don't want to render the wrong type
+      if (
+        item.isReportTypeCollectionsItems &&
+        primaryDataset.timeframe === 'ever'
+      ) {
+        contents = this.renderSingleValue()
+      } else {
+        contents = this.renderTimeframeValues()
+      }
+    } else {
+      contents = <InlineLoader />
+    }
 
     return (
       <StyledDataItemCover
@@ -317,10 +317,8 @@ class DataItemCoverCollectionsItems extends React.Component {
         onMouseOver={this.handleMouseOver}
         onMouseOut={this.handleMouseOut}
       >
-        {this.loading && <InlineLoader />}
-        {item.isReportTypeCollectionsItems && timeframe === 'ever'
-          ? this.renderSingleValue()
-          : this.renderTimeframeValues()}
+        {this.loading && primaryDataset && <InlineLoader />}
+        {contents}
       </StyledDataItemCover>
     )
   }
@@ -331,6 +329,12 @@ DataItemCoverCollectionsItems.displayName = 'DataItemCoverCollectionsItems'
 DataItemCoverCollectionsItems.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  targetCollection: MobxPropTypes.objectOrObservableObject,
+  loadTargetCollection: PropTypes.func.isRequired,
+}
+
+DataItemCoverCollectionsItems.defaultProps = {
+  targetCollection: null,
 }
 
 DataItemCoverCollectionsItems.wrappedComponent.propTypes = {

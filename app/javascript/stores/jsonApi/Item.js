@@ -75,6 +75,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.report_type === 'report_type_question_item'
   }
 
+  get isReportDownloadable() {
+    return this.isReportTypeCollectionsItems || this.isReportTypeRecord
+  }
+
   get isCustomizableQuestionType() {
     return (
       this.question_type === 'question_single_choice' ||
@@ -110,7 +114,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isDownloadable() {
-    return this.isGenericFile || this.isPdfFile
+    return this.isGenericFile || this.isPdfFile || this.isReportDownloadable
   }
 
   get isImage() {
@@ -162,7 +166,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return this.subtitle_hidden
   }
 
-  fileUrl() {
+  get fileUrl() {
+    if (this.isReportDownloadable) {
+      return `/api/v1/items/${this.id}/csv_report`
+    }
     const { filestack_handle } = this
     if (!filestack_handle) return ''
     return FilestackUpload.fileUrl({
@@ -190,7 +197,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get primaryDataset() {
     const { datasets } = this
     if (!datasets) return null
-    if (datasets.length <= 1) return datasets[0]
+    if (datasets.length === 1) return datasets[0]
     const primary = datasets.find(dataset => dataset.order === 0)
     return primary
   }
@@ -301,6 +308,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
       `items/${this.id}/question_choices/${choice.id}/archive`,
       'POST'
     )
+  }
+
+  async API_fetchDatasets() {
+    const datasets = await this.apiStore.request(`items/${this.id}/datasets`)
+    this.datasets = datasets.data
+    return datasets
   }
 
   async API_persistHighlight({ commentId, delta } = {}) {

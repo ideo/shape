@@ -130,9 +130,9 @@
             </div>
           </div>
           </a>
-          <% if notification.activity.action == 'archived' %>
+          <% if notification.activity.action == 'archived' && notification.activity.target.present? %>
             <div class="center">
-              <a class="standard-button" href="<%=frontend_url_for_type(notification.activity.target) %>/unarchive_from_email?card_ids=[<%= notification.activity.target.parent_collection_card.id%>]">Restore</a>
+              <a class="standard-button" href="<%=frontend_url_for(notification.activity.target, with_id: false) %>/unarchive_from_email?card_ids=[<%= notification.activity.target.parent_collection_card.id%>]">Restore</a>
             </div>
           <% end %>
         </div>

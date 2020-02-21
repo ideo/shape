@@ -123,4 +123,29 @@ RSpec.describe Item::DataItem, type: :model do
       expect(data_items_dataset.selected).to be false
     end
   end
+
+  describe 'csv_data' do
+    let(:organization) { create(:organization) }
+    let(:collection) { create(:collection, organization: organization) }
+    let(:item) { create(:data_item, :report_type_collections_and_items, parent_collection: collection) }
+
+    it 'should call the datasets csv report' do
+      expect(DataReport::DatasetsCSVReport). to receive(:call).once
+      item.csv_data
+    end
+  end
+
+  describe 'csv_filename' do
+    let(:organization) { create(:organization) }
+    let(:collection) { create(:collection, organization: organization) }
+    let(:item) { create(:data_item, :report_type_collections_and_items, parent_collection: collection) }
+
+    it 'should print out a filename with org, measure, timeframe, etc' do
+      timestamp = Time.current.strftime('%b-%d-%Y')
+      ds = item.datasets.first
+      expect(item.csv_filename).to eq(
+        "#{organization.name}-#{ds.measure}-#{ds.timeframe}-#{ds.data_source.name}-#{timestamp}.csv",
+      )
+    end
+  end
 end

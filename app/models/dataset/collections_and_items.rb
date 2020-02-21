@@ -48,19 +48,25 @@ class Dataset
     validates :measure, inclusion: { in: Dataset::CollectionsAndItems::VALID_MEASURES }
 
     def data
-      return if ever?
+      if ever?
+        return [{ date: 'ever', value: single_value }]
+      end
 
-      DataReport::CollectionsAndItems.call(
-        dataset: self,
-      )
+      data_report.call
     end
 
     def single_value
       return unless ever?
 
+      data_report.single_value
+    end
+
+    private
+
+    def data_report
       DataReport::CollectionsAndItems.new(
         dataset: self,
-      ).single_value
+      )
     end
   end
 end

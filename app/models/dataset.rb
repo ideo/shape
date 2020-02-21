@@ -158,6 +158,10 @@ class Dataset < ApplicationRecord
 
   # End of methods to (potentially) implement in each sub-class
 
+  def mashie_data
+    data.map { |d| Mashie.new(d) }
+  end
+
   def data_items_datasets_id
     cached_data_items_datasets&.id
   end

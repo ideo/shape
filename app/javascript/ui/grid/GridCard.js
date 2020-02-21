@@ -153,7 +153,9 @@ class GridCard extends React.Component {
         className={className}
         zoomLevel={zoomLevel}
       >
-        {record.isDownloadable && <Download record={record} />}
+        {this.downloadableRecord && (
+          <Download record={this.downloadableRecord} />
+        )}
         {record.canSetACover && this.canEditCard && (
           <CardCoverEditor
             card={card}
@@ -349,7 +351,7 @@ class GridCard extends React.Component {
       return
     } else if (record.isGenericFile) {
       // TODO: could replace with preview
-      this.linkOffsite(record.fileUrl())
+      this.linkOffsite(record.fileUrl)
       return
     }
     // capture breadcrumb trail when navigating via Link cards, but not from My Collection
@@ -393,6 +395,18 @@ class GridCard extends React.Component {
     if (!collection_cover_items || collection_cover_items.length === 0)
       return null
     return collection_cover_items[0]
+  }
+
+  get downloadableRecord() {
+    const { record } = this.props
+    const { coverItem } = this
+    if (record.isDownloadable) {
+      return record
+    }
+    if (coverItem && coverItem.isDownloadable) {
+      return coverItem
+    }
+    return null
   }
 
   get renderCover() {

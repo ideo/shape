@@ -61,7 +61,9 @@ gem 'sidekiq', '~> 6'
 gem 'sidekiq-scheduler'
 
 # ElasticSearch wrapper
-gem 'searchkick', '~> 3.0.0'
+gem 'searchkick', '~> 4.1.0'
+# see https://github.com/elastic/elasticsearch-ruby/issues/669
+gem 'elasticsearch', '~> 6'
 
 # For taggable collections/items
 gem 'acts-as-taggable-on', '~> 6.0.0'

@@ -39,7 +39,35 @@ RSpec.describe NotificationMailer, type: :mailer do
         )
       end
 
-      describe 'with added editor activity' do
+      context 'with archived action' do
+        let(:collection) { create(:collection, parent_collection_card: create(:collection_card_collection)) }
+        let(:activity) { create(:activity, subject_users: [user], action: :archived, target: collection) }
+        let!(:notifications) { [create(:notification, user: user, activity: activity)] }
+
+        it 'renders the body with a "Restore" button' do
+          expect(mail.body.encoded).to match(
+            'Restore',
+          )
+        end
+      end
+
+      context 'with missing target' do
+        let(:activity) { create(:activity, subject_users: [user], action: :added_editor) }
+        let!(:notifications) { [create(:notification, user: user, activity: activity)] }
+
+        before do
+          # not sure why some emails were getting into this case, but this would simulate it
+          activity.target.destroy
+        end
+
+        it 'renders the body' do
+          expect(mail.body.encoded).to match(
+            'Your collaborators and teammates have updates for you.',
+          )
+        end
+      end
+
+      context 'with added editor activity' do
         let(:collection) { create(:collection) }
         let(:activity) { create(:activity, subject_users: [user], action: :added_editor, target: collection) }
         let!(:notifications) { [create(:notification, user: user, activity: activity)] }
@@ -104,7 +132,7 @@ RSpec.describe NotificationMailer, type: :mailer do
       describe 'when there are notifications and comments' do
         it 'renders the headers' do
           expect(mail.subject).to match(
-            "#{comments.count} new comments and #{notifications.count} new notifications on Shape"
+            "#{comments.count} new comments and #{notifications.count} new notifications on Shape",
           )
           expect(mail.to).to eq([user.email])
         end

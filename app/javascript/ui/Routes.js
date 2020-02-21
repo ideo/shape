@@ -31,7 +31,9 @@ import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress, {
   handleMouseDownSelection,
 } from '~/utils/captureGlobalKeypress'
+import ScrollNearPageBoundsService from '~/utils/ScrollNearPageBoundsService'
 
+const pageBoundsScroller = new ScrollNearPageBoundsService()
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
   ${props =>
@@ -143,6 +145,8 @@ class Routes extends React.Component {
     // Stop propagation if dragging so it doesn't trigger other events
     e.stopPropagation()
     e.preventDefault()
+    // persist to be used in throttled function below
+    e.persist()
 
     this.throttledSetSelectedArea(
       {
@@ -151,7 +155,7 @@ class Routes extends React.Component {
         minY: _.min([e.pageY, this.mouseDownAt.y]),
         maxY: _.max([e.pageY, this.mouseDownAt.y]),
       },
-      e.shiftKey
+      e
     )
   }
 
@@ -167,17 +171,14 @@ class Routes extends React.Component {
 
     // Cancel any currently throttled calls
     this.throttledSetSelectedArea.cancel()
-
-    // Wait to clear mouse down area,
-    // So that BCT does not immediately trigger
-    setTimeout(() => {
-      this._setSelectedArea({
-        minX: null,
-        maxX: null,
-        minY: null,
-        maxY: null,
-      })
-    }, 500)
+    // clear selected area (enabling BCT to open)
+    this._setSelectedArea({
+      minX: null,
+      maxX: null,
+      minY: null,
+      maxY: null,
+    })
+    pageBoundsScroller.setScrolling(false)
   }
 
   handleTouchMove = e => {
@@ -193,10 +194,12 @@ class Routes extends React.Component {
     }
   }
 
-  _setSelectedArea = (coords, shifted = false) => {
-    const {
-      apiStore: { uiStore },
-    } = this.props
+  _setSelectedArea = (coords, e = {}) => {
+    const { uiStore } = this.props
+    const shifted = e.shiftKey
+    if (!_.isEmpty(e)) {
+      pageBoundsScroller.scrollIfNearPageBounds(e, { speed: 1.5 })
+    }
     uiStore.setSelectedArea(coords, { shifted })
   }
 

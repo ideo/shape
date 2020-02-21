@@ -18,9 +18,9 @@
 #
 # Indexes
 #
-#  index_activities_action_target_org                       (action,target_type,organization_id)
+#  activities_action_date                                   (action,organization_id,created_at,target_type)
+#  activities_action_target                                 (action,organization_id,target_type,target_id)
 #  index_activities_on_actor_id                             (actor_id)
-#  index_activities_on_created_at                           (created_at)
 #  index_activities_on_destination_type_and_destination_id  (destination_type,destination_id)
 #  index_activities_on_organization_id                      (organization_id)
 #  index_activities_on_source_type_and_source_id            (source_type,source_id)

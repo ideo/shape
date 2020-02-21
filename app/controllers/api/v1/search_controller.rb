@@ -138,6 +138,8 @@ class Api::V1::SearchController < Api::V1::BaseController
     search_opts[:where] = {
       _or: [
         {
+          # NOTE: in ES 7+ this `_type` will no longer work! could use _index
+          # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html
           _type: 'user',
           _id: @resource.search_user_ids,
           status: status,

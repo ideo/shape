@@ -16,22 +16,24 @@ const props = {
   apiStore: fakeApiStore(),
 }
 
-let wrapper, allActions, actions, component
+let wrapper, allActions, allBoardActions, actions, component
 describe('ActionMenu', () => {
   describe('as editor', () => {
     beforeEach(() => {
-      allActions = [
+      allBoardActions = [
         'Comment',
         'Duplicate',
         'Move',
         'Link',
         'Select All',
+        'Select Cards Below',
         'Add to My Collection',
         'Tags',
         'Sharing',
         'Delete',
         'Replace',
       ]
+      allActions = _.without(allBoardActions, 'Select Cards Below')
       actions = _.without(allActions, 'Replace')
       props.card.isPinnedAndLocked = false
       props.card.record.can_edit = true
@@ -108,6 +110,27 @@ describe('ActionMenu', () => {
         'tagsModalOpenId',
         props.card.id
       )
+    })
+
+    describe('on board collection', () => {
+      it('adds selectCardsBelow action', () => {
+        wrapper = shallow(
+          <ActionMenu.wrappedComponent
+            {...props}
+            uiStore={{
+              ...props.uiStore,
+              viewingCollection: { isBoard: true },
+            }}
+            location="GridCard"
+            canReplace
+            canEdit
+          />
+        )
+        const popout = wrapper.find('PopoutMenu').at(0)
+        expect(_.map(popout.props().menuItems, i => i.name)).toEqual(
+          allBoardActions
+        )
+      })
     })
   })
 
