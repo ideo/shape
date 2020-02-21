@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { updateModelId } from 'datx'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -1084,6 +1083,7 @@ class FoamcoreGrid extends React.Component {
     const { canEditCollection, collection, routingStore } = this.props
     const { pageMargins, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
+
     const position = this.positionForCoordinates(card)
 
     if (card.id === 'blank' && this.zoomLevel !== 1) {
@@ -1289,13 +1289,12 @@ class FoamcoreGrid extends React.Component {
   renderBlanksAndBct() {
     const {
       collection,
-      apiStore,
       uiStore,
       canEditCollection,
       selectedAreaMinX,
     } = this.props
     const { num_columns } = collection
-    const { movingCardIds, blankContentToolState } = uiStore
+    const { blankContentToolState } = uiStore
 
     // if we're dragging the selection square, don't bother rendering blanks
     if (selectedAreaMinX || this.dragging) {
@@ -1335,27 +1334,6 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
-    if (movingCardIds && movingCardIds.length) {
-      const movingCard = apiStore.find(
-        'collection_cards',
-        _.first(movingCardIds)
-      )
-
-      if (!uiStore.isLoadingMoveAction && movingCard) {
-        const data = {
-          cardType: 'mdlPlaceholder',
-          originalId: movingCard.id,
-          record: movingCard.record,
-          width: movingCard.width,
-          height: movingCard.height,
-          position: this.positionForCoordinates(movingCard),
-        }
-        const placeholder = new CollectionCard(data, apiStore)
-        updateModelId(placeholder, `${movingCard.id}-mdlPlaceholder`)
-        cards.push(placeholder)
-      }
-    }
-
     cards = _.map(cards, this.renderCard)
 
     if (canEditCollection && !this.dragging) {
@@ -1365,6 +1343,32 @@ class FoamcoreGrid extends React.Component {
     }
 
     return cards
+  }
+
+  // render the MDL placeholder to be draggable from the MoveSnackbar
+  renderMdlPlaceholder() {
+    const { apiStore, uiStore } = this.props
+    const { movingCardIds } = uiStore
+
+    if (!movingCardIds.length) {
+      return
+    }
+    const movingCard = apiStore.find('collection_cards', _.first(movingCardIds))
+    if (!movingCard || uiStore.isLoadingMoveAction) {
+      return
+    }
+    const data = {
+      cardType: 'mdlPlaceholder',
+      originalId: movingCard.id,
+      record: movingCard.record,
+      width: movingCard.width,
+      height: movingCard.height,
+      position: this.positionForCoordinates(movingCard),
+    }
+    const placeholder = new CollectionCard(data, apiStore)
+    apiStore.updateModelId(placeholder, `${movingCard.id}-mdlPlaceholder`)
+
+    return this.renderCard(placeholder)
   }
 
   render() {
@@ -1387,6 +1391,7 @@ class FoamcoreGrid extends React.Component {
         )}
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}
+        {this.renderMdlPlaceholder()}
         {this.renderVisibleCards()}
       </Grid>
     )

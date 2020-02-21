@@ -147,6 +147,7 @@ class PageWithApiWrapper extends React.Component {
           if (!apiStore.currentUser && err.status === 401) {
             // always redirect logged-out users to login
             routeToLogin({ redirect: match.url })
+            return
           }
           uiStore.update('pageError', err)
           trackError(err, { name: 'PageApiFetch' })

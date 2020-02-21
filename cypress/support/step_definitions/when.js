@@ -288,6 +288,12 @@ When('I wait for {string} to finish', apiCall => {
   cy.wait(apiCall)
 })
 
+When('I wait for {int} calls to {string} to finish', (num, apiCall) => {
+  _.times(num, () => {
+    cy.wait(apiCall)
+  })
+})
+
 When('I wait for the collection to finish loading', () => {
   cy.wait('@apiGetCollection')
   cy.wait('@apiGetCollectionCards')

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { action, observable } from 'mobx'
 
 import DataItemCoverCollectionsItems from '~/ui/grid/covers/data-item/DataItemCoverCollectionsItems'
 import DataItemCoverDisplayOnly from '~/ui/grid/covers/data-item/DataItemCoverDisplayOnly'
@@ -27,27 +27,31 @@ class DataItemCover extends React.Component {
   async loadDatasets() {
     const { item } = this.props
     await item.API_fetchDatasets()
-    const {
-      primaryDataset: { data_source_id },
-    } = item
-    if (data_source_id) {
+    const { data_source_id, data_source_type } = item.primaryDataset
+    if (data_source_id && data_source_type === 'Collection') {
       this.loadTargetCollection(data_source_id)
     }
+  }
+
+  @action
+  setTargetCollection(collection) {
+    this.targetCollection = collection
   }
 
   loadTargetCollection = async (id = null) => {
     const { apiStore } = this.props
     if (!id) {
-      runInAction(() => {
-        this.targetCollection = null
-      })
+      this.setTargetCollection(null)
+      return
+    }
+    const found = apiStore.find('collections', id)
+    if (found) {
+      this.setTargetCollection(found)
       return
     }
     try {
       const res = await apiStore.fetch('collections', id)
-      runInAction(() => {
-        this.targetCollection = res.data
-      })
+      this.setTargetCollection(res.data)
     } catch (e) {
       trackError(e)
     }

@@ -1,5 +1,10 @@
 import { action, runInAction, observable, computed } from 'mobx'
-import { Collection as datxCollection, assignModel, ReferenceType } from 'datx'
+import {
+  Collection as datxCollection,
+  assignModel,
+  updateModelId,
+  ReferenceType,
+} from 'datx'
 import { jsonapi } from 'datx-jsonapi'
 import _ from 'lodash'
 import moment from 'moment-mini'
@@ -625,6 +630,7 @@ class ApiStore extends jsonapi(datxCollection) {
         actionType: POPUP_ACTION_TYPES.SNACKBAR,
       })
     }
+    this.uiStore.deselectCards()
     collection.removeCardIds(cardIds)
     return archiveResult
   }
@@ -855,6 +861,13 @@ class ApiStore extends jsonapi(datxCollection) {
   @action
   update(name, value) {
     this[name] = value
+  }
+
+  // having this datx wrapper allows us to avoid unit test blowups with mock data
+  @action
+  updateModelId(record, id) {
+    // pass through to datx function
+    updateModelId(record, id)
   }
 
   // NOTE: had to override datx PureCollection, it looks like it is meant to do

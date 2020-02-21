@@ -94,8 +94,8 @@ RSpec.describe InvitationMailer, type: :mailer do
           expect(mail.from).to eq(['help@ideocreativedifference.com'])
         end
 
-        it 'sets the invite url to creative difference' do
-          expect(mail.text_part.body).to match('https://creativedifference.ideo.com/shape')
+        it 'sets the invite url to Shape' do
+          expect(mail.text_part.body).to match("http://test.shape.com/invitations/#{user.invitation_token}")
         end
 
         it 'adds support message' do

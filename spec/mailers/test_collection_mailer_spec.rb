@@ -31,8 +31,8 @@ RSpec.describe TestCollectionMailer, type: :mailer do
       expect(body).to include("Test URL: http://test.shape.com//tests/#{collection.id}")
       expect(body).to include("Test ID: #{collection.id}")
       expect(body).to include('Test launched: 5/20/2019 08:57AM')
-      expect(body).to include("Feedback collection URL: http://test.shape.com//collections/#{collection_to_test.id}")
-      expect(body).to include("Feedback design collection URL: http://test.shape.com//collections/#{collection.id}")
+      expect(body).to include("Feedback collection URL: http://test.shape.com/collections/#{collection_to_test.id}")
+      expect(body).to include("Feedback design collection URL: http://test.shape.com/collections/#{collection.id}")
       expect(body).to include("#{audience.name}: #{test_audience.sample_size}")
     end
   end
