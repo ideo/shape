@@ -84,9 +84,9 @@ class PageWithApiWrapper extends React.Component {
   get requestPath() {
     const { fetchType, match } = this.props
     if (this.isMyCollectionPath) {
-      return `organizations/${match.params.org}/my_collection`
+      return `organizations/${match.params.org}/my_collection?page_view=true`
     }
-    return `${fetchType}/${this.fetchId}`
+    return `${fetchType}/${this.fetchId}?page_view=true`
   }
 
   requiresFetch = ({ location: prevLocation, match: prevMatch }) => {
