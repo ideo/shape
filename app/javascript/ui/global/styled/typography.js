@@ -212,6 +212,28 @@ export const Anchor = styled.a`
 `
 Anchor.displayName = 'StyledAnchor'
 
+/** @component */
+export const HeaderButtonText = styled.span`
+  display: inline-block;
+  vertical-align: middle;
+  ${props =>
+    props.large &&
+    `
+      text-transform: none;
+      font-weight: normal;
+      font-size: 24px;
+      float: left;
+    `}
+
+  ${props =>
+    props.fixedWidth &&
+    `
+      max-width: 130px;
+    `};
+`
+
+HeaderButtonText.displayName = 'HeaderButtonText'
+
 export const CardHeadingCss = css`
   ${Heading1Css};
   color: ${props => props.color || v.colors.commonLight};

@@ -39,19 +39,39 @@ describe('DataItemCover', () => {
     })
 
     describe('with data_source_id', () => {
-      beforeEach(() => {
-        props.item.primaryDataset = {
-          ...fakeDataset,
-          data_source_id: 123,
-        }
-        render()
+      describe('with item', () => {
+        beforeEach(() => {
+          props.item.primaryDataset = {
+            ...fakeDataset,
+            data_source_id: 123,
+            data_source_type: 'Item',
+          }
+          render()
+        })
+        it('does not load datasource unless data_source_type is Collection', () => {
+          expect(apiStore.fetch).not.toHaveBeenCalled()
+          expect(component.targetCollection).toEqual(null)
+        })
       })
 
-      it('loads the datasource into targetCollection', () => {
-        expect(apiStore.fetch).toHaveBeenCalledWith('collections', 123)
-        expect(component.targetCollection).toEqual(fakeCollection)
-        const dataItem = wrapper.find('DataItemCoverCollectionsItems')
-        expect(dataItem.props().targetCollection).toEqual(fakeCollection)
+      describe('with item', () => {
+        beforeEach(() => {
+          props.item.primaryDataset = {
+            ...fakeDataset,
+            data_source_id: 123,
+            data_source_type: 'Collection',
+          }
+          render()
+        })
+        it('loads the datasource into targetCollection', () => {
+          // first it tries to find
+          expect(apiStore.find).toHaveBeenCalledWith('collections', 123)
+          // then fetch
+          expect(apiStore.fetch).toHaveBeenCalledWith('collections', 123)
+          expect(component.targetCollection).toEqual(fakeCollection)
+          const dataItem = wrapper.find('DataItemCoverCollectionsItems')
+          expect(dataItem.props().targetCollection).toEqual(fakeCollection)
+        })
       })
     })
   })

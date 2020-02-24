@@ -55,12 +55,9 @@ class CollectionUpdater < SimpleService
   attr_reader :organization, :parent_card, :created_by
 
   def assign_attributes
-    cover_hash = @collection.cache_cover.to_h
-    cover_hash[:hardcoded_subtitle] = @attributes[:hardcoded_subtitle]
-    cover_hash[:subtitle_hidden] = @attributes[:subtitle_hidden]
+    update_cached_cover
     clean_collection_card_attributes
     @collection.attributes = @attributes.except(:hardcoded_subtitle, :subtitle_hidden)
-    @collection.cached_cover = cover_hash
     @collection.update_cached_tag_lists
     # always touch the updated timestamp even though we may just be updating the related cards
     @collection.updated_at = Time.now
@@ -74,6 +71,17 @@ class CollectionUpdater < SimpleService
     return unless @collection.anyone_can_view_in_database && @collection.parent.anyone_can_view && !@collection.private?
 
     @collection.mark_as_private!
+  end
+
+  def update_cached_cover
+    cover_hash = @collection.cache_cover.to_h
+    cover_attrs = @attributes.slice(:hardcoded_subtitle, :subtitle_hidden).to_h.symbolize_keys
+    return unless cover_attrs.present?
+
+    cover_attrs.each do |k, v|
+      cover_hash[k] = v
+    end
+    @collection.cached_cover = cover_hash
   end
 
   def clean_collection_card_attributes

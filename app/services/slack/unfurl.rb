@@ -22,7 +22,9 @@ module Slack
         url = link[:url]
         unpacked = url.split('/')
         id = unpacked.last.to_i
-        record_type = unpacked.second_to_last
+        record_type = (unpacked & %w[items collections]).first
+        next if record_type.nil?
+
         klass = record_type.classify.safe_constantize
         record = klass.find(id)
         unfurls[url] = message_data(record, url)

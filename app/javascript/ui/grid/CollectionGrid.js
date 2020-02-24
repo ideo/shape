@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
-import { updateModelId } from 'datx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
@@ -440,6 +439,7 @@ class CollectionGrid extends React.Component {
       original = originalCard.original
     }
 
+    const { apiStore } = this.props
     const placeholderKey = `${original.id}-${cardType}`
     const data = {
       position: original.position,
@@ -451,8 +451,8 @@ class CollectionGrid extends React.Component {
       record: original.record,
     }
     // NOTE: important to always initialize models supplying apiStore as the collection
-    const placeholder = new CollectionCard(data, this.props.apiStore)
-    updateModelId(placeholder, placeholderKey)
+    const placeholder = new CollectionCard(data, apiStore)
+    apiStore.updateModelId(placeholder, placeholderKey)
     return placeholder
   }
 

@@ -117,9 +117,9 @@ const StyledCardContent = styled.div`
     width: ${props => calcSectionWidth(props)};
     height: ${props => calcSectionHeight(props)};
 
-    // Text style for the text and media covers
+    /* Text style for the text and media covers */
     h1 {
-      color: ${props => (props.color ? props.color : 'white')};
+      color: ${props => props.color || v.colors.white};
       ${props => props.useTextBackground && 'padding: 0; margin-bottom: 0;'}
     }
 
@@ -466,7 +466,7 @@ CollectionCover.defaultProps = {
   dragging: false,
   searchResult: false,
   textItem: null,
-  fontColor: v.colors.collectionCover,
+  fontColor: v.colors.white,
 }
 
 CollectionCover.displayName = 'CollectionCover'

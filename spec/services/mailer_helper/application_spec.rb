@@ -64,9 +64,7 @@ RSpec.describe MailerHelper::Application, type: :service do
 
   describe '#invite_url' do
     it 'returns app invite_url' do
-      expect(subject.invite_url).to eq(
-        "https://creativedifference.ideo.com/shape?redirect=#{CGI.escape(url_helpers.root_url + 'company/')}",
-      )
+      expect(subject.invite_url).to eq(url_helpers.root_url.to_s + 'company/')
     end
 
     context 'with pending user' do
@@ -76,9 +74,7 @@ RSpec.describe MailerHelper::Application, type: :service do
         accept_invite_url = url_helpers.accept_invitation_url(
           token: user.invitation_token,
         )
-        expect(subject.invite_url).to eq(
-          "https://creativedifference.ideo.com/shape?redirect=#{CGI.escape(accept_invite_url)}",
-        )
+        expect(subject.invite_url).to eq(accept_invite_url)
       end
     end
   end

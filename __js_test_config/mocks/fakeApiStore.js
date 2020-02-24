@@ -66,6 +66,7 @@ const fakeApiStore = ({
     openCurrentThreadToCommentOn: jest.fn(),
     expandAndOpenThreadForRecord: jest.fn(),
     alwaysShowCurrentThread: jest.fn(),
+    updateModelId: jest.fn().mockImplementation((obj, id) => (obj.id = id)),
     unreadActivityCount: 0,
 
     usersThreadPagesToLoad: 1,
