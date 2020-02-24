@@ -1,11 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observable, action } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
-import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 import Tooltip from '~/ui/global/Tooltip'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
@@ -45,30 +41,23 @@ const BackIconContainer = styled.span`
   vertical-align: middle;
 `
 
-@observer
 class Breadcrumb extends React.Component {
-  @observable
-  breadcrumbWithLinks = []
-
   constructor(props) {
     super(props)
     this.breadcrumbWrapper = props.breadcrumbWrapper
   }
 
-  componentDidMount() {
-    const { record, isHomepage } = this.props
-    if (isHomepage) return
-    this.initBreadcrumb(record)
+  get previousItem() {
+    const { items } = this.props
+    if (items.length > 1) {
+      return items[items.length - 2]
+    }
+    return null
   }
 
-  @action
-  initBreadcrumb(record) {
-    this.breadcrumbWithLinks.replace(
-      // this may also have the effect of marking uiStore.linkedInMyCollection
-      uiStore.linkedBreadcrumbTrailForRecord(record)
-    )
-    // this will set record.inMyCollection = true/false
-    apiStore.checkInMyCollection(record)
+  get truncatedItems() {
+    const { items } = this.props
+    return this.truncateItems(items)
   }
 
   calculateMaxChars = () => {
@@ -79,68 +68,6 @@ class Breadcrumb extends React.Component {
     }
     // roughly .075 characters per pixel
     return _.round(width * 0.08)
-  }
-
-  get previousItem() {
-    const items = this.items(false)
-    if (items.length > 1) {
-      return items[items.length - 2]
-    }
-    return null
-  }
-
-  items = (clamp = true) => {
-    const { maxDepth, record } = this.props
-    const items = []
-    const breadcrumb = this.breadcrumbWithLinks
-    if (record.inMyCollection || uiStore.linkedInMyCollection) {
-      items.push({
-        type: 'collections',
-        id: apiStore.currentUserCollectionId,
-        identifier: 'homepage',
-        name: 'My Collection',
-        can_edit_content: true,
-        truncatedName: null,
-        ellipses: false,
-        has_children: true,
-      })
-    }
-    if (!breadcrumb) return items
-
-    const len = breadcrumb.length
-    const longBreadcrumb = maxDepth && len >= maxDepth
-
-    _.each(breadcrumb, (item, idx) => {
-      const { type, id } = item
-      // use apiStore to observe record changes e.g. when editing current collection name
-      const itemRecord = apiStore.find(type, id)
-      const name = itemRecord ? itemRecord.name : item.name
-      const identifier = `${type}_${id}`
-
-      if (longBreadcrumb && idx >= 2 && idx <= len - 3) {
-        // if we have a really long breadcrumb we compress some options in the middle
-        if (idx == len - 3) {
-          return items.push({
-            ...item,
-            name,
-            ellipses: true,
-            identifier,
-          })
-        }
-        return
-      }
-      return items.push({
-        ...item,
-        name,
-        truncatedName: null,
-        ellipses: false,
-        identifier,
-        nested: 0,
-      })
-    })
-
-    const depth = clamp && maxDepth ? maxDepth * -1 : 0
-    return _.compact(items).slice(depth)
   }
 
   // totalNameLength keeps getting called, with items potentially truncated
@@ -160,10 +87,6 @@ class Breadcrumb extends React.Component {
     return this.totalNameLength(items) - this.calculateMaxChars()
   }
 
-  get truncatedItems() {
-    return this.truncateItems(this.items())
-  }
-
   transformToSubItems(items, firstItem = {}, lastItem = {}) {
     const subItems = items.map((item, idx) => {
       const subItem = { ...item }
@@ -181,7 +104,8 @@ class Breadcrumb extends React.Component {
     // The mobile menu should have the full breadcrumb trail in it's one item
     const { maxDepth } = this.props
     if (maxDepth === 1) {
-      const allItems = this.items(false)
+      // TODO how to get all items here?
+      const allItems = this.props.items
       const subItems = this.transformToSubItems(allItems, items[0])
       if (items[0]) items[0].subItems = subItems
     }
@@ -255,42 +179,29 @@ class Breadcrumb extends React.Component {
   }
 
   restoreBreadcrumb = item => {
-    // this will clear out any links in the breadcrumb and revert it back to normal
-    uiStore.restoreBreadcrumb(item)
-    this.initBreadcrumb(this.props.record, true)
+    this.props.onRestore(item)
   }
 
+  // TODO refactor out routing store
   renderBackButton() {
-    const { backButton } = this.props
+    const { showBackButton } = this.props
     const item = this.previousItem
-    if (!backButton || !item) return null
-    let path
-    if (item.identifier === 'homepage') {
-      path = routingStore.pathTo('homepage')
-    } else {
-      path = routingStore.pathTo(item.type, item.id)
-    }
+    if (!showBackButton || !item) return null
     return (
-      <Link to={path}>
+      <button onClick={this.props.onBack}>
         <Tooltip title={item.name}>
           <BackIconContainer>
             <ArrowIcon />
           </BackIconContainer>
         </Tooltip>
-      </Link>
+      </button>
     )
   }
 
   render() {
-    const { record, isHomepage } = this.props
-    const { inMyCollection, breadcrumb } = record
-    const renderItems =
-      !isHomepage &&
-      // wait until we load this value before rendering
-      inMyCollection !== null &&
-      breadcrumb &&
-      breadcrumb.length > 0
-    const items = this.truncatedItems
+    const { items } = this.props
+    const renderItems = items.length > 0
+    const { truncatedItems } = this
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
     return (
@@ -299,7 +210,7 @@ class Breadcrumb extends React.Component {
         {renderItems && (
           <StyledBreadcrumbWrapper>
             {this.renderBackButton()}
-            {items.map((item, index) => (
+            {truncatedItems.map((item, index) => (
               <span
                 className="breadcrumb_item"
                 key={`${item.name}-${index}`}
@@ -323,21 +234,35 @@ class Breadcrumb extends React.Component {
   }
 }
 
+const breadcrumbItemPropType = {
+  name: PropTypes.string.isRequired,
+  truncatedName: PropTypes.string,
+  id: PropTypes.string,
+  identifier: PropTypes.string,
+  type: PropTypes.string,
+  can_edit_content: PropTypes.bool,
+  ellipses: PropTypes.bool,
+  has_children: PropTypes.bool,
+}
+
 Breadcrumb.propTypes = {
-  record: MobxPropTypes.objectOrObservableObject.isRequired,
-  isHomepage: PropTypes.bool,
+  items: PropTypes.arrayOf(breadcrumbItemPropType).isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  onBack: PropTypes.func.isRequired,
+  onRestore: PropTypes.func,
   containerWidth: PropTypes.number,
   maxDepth: PropTypes.number,
-  backButton: PropTypes.bool,
+  showBackButton: PropTypes.bool,
+  visiblyHidden: PropTypes.bool,
 }
 
 Breadcrumb.defaultProps = {
-  isHomepage: false,
   breadcrumbWrapper: React.createRef(),
+  onRestore: () => {},
   containerWidth: null,
   maxDepth: 6,
-  backButton: false,
+  showBackButton: false,
+  visiblyHidden: false,
 }
 
 export default Breadcrumb
