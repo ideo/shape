@@ -84,9 +84,10 @@ describe('CollectionCover', () => {
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
     })
 
-    it('renders the launch test button', () => {
-      expect(wrapper.find('LaunchButton').exists()).toBeTruthy()
-    })
+    // Note: we temporarily disabled launching from collection cover, see: CollectionCover::hasLaunchTestButton()
+    // it('renders the launch test button', () => {
+    //   expect(wrapper.find('LaunchButton').exists()).toBeTruthy()
+    // })
   })
 
   describe('with collection user cannot view', () => {

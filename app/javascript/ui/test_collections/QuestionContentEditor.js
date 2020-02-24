@@ -152,4 +152,6 @@ QuestionContentEditor.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+QuestionContentEditor.displayName = 'QuestionContentEditor'
+
 export default QuestionContentEditor
