@@ -19,6 +19,7 @@ import Item from './Item'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
+import { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 
@@ -379,6 +380,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isFourWideBoard() {
     return this.isBoard && this.num_columns === 4
+  }
+
+  get maxZoom() {
+    return this.isFourWideBoard ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
   }
 
   get isPublicJoinable() {

@@ -99,8 +99,6 @@ const MAX_CARD_W = 4
 const MAX_CARD_H = 2
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
-const FOAMCORE_MAX_ZOOM = 3
-const FOUR_WIDE_MAX_ZOOM = 2
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -109,8 +107,6 @@ class FoamcoreGrid extends React.Component {
   gridRef = null
   @observable
   cardsToRender = []
-  @observable
-  zoomLevel = FOAMCORE_MAX_ZOOM
   dragGridSpot = observable.map({})
   @observable
   dragging = false
@@ -164,18 +160,19 @@ class FoamcoreGrid extends React.Component {
   }
 
   componentDidMount() {
-    const { uiStore } = this.props
+    const { collection, uiStore } = this.props
     uiStore.update('selectedAreaEnabled', true)
-    this.updateZoomLevel()
+    uiStore.adjustZoomLevel({ collection })
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
     window.addEventListener('scroll', this.handleScroll)
   }
 
   componentDidUpdate(prevProps) {
+    const { collection, uiStore } = this.props
     this.updateSelectedArea()
-    if (this.props.collection.id !== prevProps.collection.id) {
-      this.updateZoomLevel()
+    if (collection.id !== prevProps.collection.id) {
+      uiStore.adjustZoomLevel({ collection })
     }
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
       // e.g. if API_fetchCards has reset the loaded cards, we may want to
@@ -193,19 +190,12 @@ class FoamcoreGrid extends React.Component {
     window.removeEventListener('scroll', this.handleScroll)
   }
 
-  @action
-  updateZoomLevel = () => {
-    let maxZoom = FOAMCORE_MAX_ZOOM
-    const { collection } = this.props
-    if (this.showZoomControls) {
-      maxZoom = collection.isFourWideBoard
-        ? FOUR_WIDE_MAX_ZOOM
-        : FOAMCORE_MAX_ZOOM
-    } else {
-      maxZoom = 1
+  get zoomLevel() {
+    if (!this.showZoomControls) {
+      // force this at 1
+      return 1
     }
-    // NOTE: we may eventually want to store your zoomLevel more globally in uiStore
-    this.zoomLevel = _.min([maxZoom, this.zoomLevel])
+    return this.props.uiStore.zoomLevel
   }
 
   // Load more cards if we are approaching a boundary of what we have loaded
@@ -213,10 +203,11 @@ class FoamcoreGrid extends React.Component {
     if (this.loadingRow) return
 
     const { collection } = this.props
+    const { zoomLevel } = this
     this.computeVisibleRows()
     this.computeVisibleCols()
 
-    if (!this.showZoomControls && this.zoomLevel > 1) {
+    if (!this.showZoomControls && zoomLevel > 1) {
       this.handleZoomIn()
     }
 
@@ -272,17 +263,13 @@ class FoamcoreGrid extends React.Component {
     return _.min([collection.num_columns, max])
   }
 
-  get maxZoom() {
-    const { collection } = this.props
-    return collection.isFourWideBoard ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
-  }
-
   // relativeZoomLevel is either the actual zoom level (if not all the way zoomed out),
   // or else returns the precise zoom ratio that will fit all cards on the screen
   get relativeZoomLevel() {
-    // this method only applies for the maxZoom level, return otherwise
+    const { collection } = this.props
     const { zoomLevel } = this
-    if (zoomLevel !== this.maxZoom) return zoomLevel
+    // this method only applies for the maxZoom level, return otherwise
+    if (zoomLevel !== collection.maxZoom) return zoomLevel
     const gridWidth = this.maxGridWidth({ zoomLevel })
     const relative = gridWidth / window.innerWidth
     return _.max([relative, 1])
@@ -544,18 +531,15 @@ class FoamcoreGrid extends React.Component {
 
   @action
   handleZoomOut = () => {
-    if (this.zoomLevel >= this.maxZoom) {
-      this.zoomLevel = this.maxZoom
-      return
-    }
-    this.zoomLevel = this.zoomLevel + 1
+    const { uiStore } = this.props
+    uiStore.zoomOut()
     this.updateCollectionScrollBottom()
   }
 
   @action
   handleZoomIn = () => {
-    if (this.zoomLevel === 1) return
-    this.zoomLevel = this.zoomLevel - 1
+    const { uiStore } = this.props
+    uiStore.zoomIn()
     this.updateCollectionScrollBottom()
   }
 
@@ -1081,17 +1065,17 @@ class FoamcoreGrid extends React.Component {
 
   renderMovableCard(card, key) {
     const { canEditCollection, collection, routingStore } = this.props
-    const { pageMargins, relativeZoomLevel } = this
+    const { pageMargins, zoomLevel, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
 
     const position = this.positionForCoordinates(card)
 
-    if (card.id === 'blank' && this.zoomLevel !== 1) {
+    if (card.id === 'blank' && zoomLevel !== 1) {
       // TODO: on fourWide these numbers are not perfect... figure out better calculation?
       const xShift = collection.isFourWideBoard ? 20 : 38
       const yShift = collection.isFourWideBoard ? 16 : 30
-      position.xPos = position.x - this.zoomLevel * xShift
-      position.yPos = position.y - this.zoomLevel * yShift
+      position.xPos = position.x - zoomLevel * xShift
+      position.yPos = position.y - zoomLevel * yShift
     }
 
     const dragOffset = {

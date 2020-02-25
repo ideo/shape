@@ -67,6 +67,7 @@ const captureGlobalKeypress = e => {
   let card
   const noCardsSelected =
     !viewingCollection || !ctrlKeypress || !selectedCardIds.length
+
   switch (code) {
     // CTRL+X: Move
     case 'KeyX':
@@ -119,7 +120,7 @@ const captureGlobalKeypress = e => {
       break
     // CTRL+A: Select All
     case 'KeyA':
-      if (ctrlKeypress && uiStore.viewingCollection) {
+      if (ctrlKeypress && viewingCollection) {
         e.preventDefault()
         uiStore.selectAll({ location: 'Global' })
       }
@@ -142,6 +143,19 @@ const captureGlobalKeypress = e => {
       const { editingCardCover } = uiStore
       if (editingCardCover) {
         uiStore.update('editingCardCover', null)
+      }
+      break
+    case 'Equal':
+    case 'Minus':
+      if (!ctrlKeypress || !viewingCollection || !viewingCollection.isBoard) {
+        return false
+      }
+      // prevent browser default zoom
+      e.preventDefault()
+      if (code === 'Equal') {
+        uiStore.zoomIn()
+      } else {
+        uiStore.zoomOut()
       }
       break
     default:

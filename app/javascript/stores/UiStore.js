@@ -4,7 +4,11 @@ import { observable, action, runInAction, computed } from 'mobx'
 
 import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
-import v, { TOUCH_DEVICE_OS, EVENT_SOURCE_TYPES } from '~/utils/variables'
+import v, {
+  TOUCH_DEVICE_OS,
+  EVENT_SOURCE_TYPES,
+  FOAMCORE_MAX_ZOOM,
+} from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
@@ -238,6 +242,8 @@ export default class UiStore {
   }
   @observable
   hoveringOverDataItem = false
+  @observable
+  zoomLevel = FOAMCORE_MAX_ZOOM
 
   @action
   setEditingCardCover(editingCardCoverId) {
@@ -1253,5 +1259,34 @@ export default class UiStore {
   @action
   updatePlaceholderPosition(position = {}) {
     _.assign(this.placeholderPosition, position)
+  }
+
+  // -----------------------
+  // Foamcore zoom functions
+  @action
+  adjustZoomLevel = ({ collection } = {}) => {
+    if (!collection.isBoard) {
+      return
+    }
+    if (this.zoomLevel > 1) {
+      // when switching collections readjust what "zoomed out" means
+      this.zoomLevel = collection.maxZoom
+    }
+  }
+
+  @action
+  zoomOut() {
+    const collection = this.viewingCollection
+    if (this.zoomLevel >= collection.maxZoom) {
+      this.zoomLevel = collection.maxZoom
+      return
+    }
+    this.zoomLevel = this.zoomLevel + 1
+  }
+
+  @action
+  zoomIn() {
+    if (this.zoomLevel === 1) return
+    this.zoomLevel = this.zoomLevel - 1
   }
 }

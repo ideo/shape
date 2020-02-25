@@ -432,10 +432,12 @@ describe('FoamcoreGrid', () => {
 
   describe('loadAfterScroll', () => {
     beforeEach(() => {
-      const { collection } = props
+      const { collection, uiStore } = props
       collection.loadedRows = 9
       collection.loadedCols = 9
       component.loadCards = jest.fn()
+      // zoomed out one level (this affects visibleRows)
+      uiStore.zoomLevel = 2
     })
 
     describe('scrolling in loaded bounds', () => {
@@ -537,12 +539,13 @@ describe('FoamcoreGrid', () => {
   describe('relativeZoomLevel', () => {
     beforeEach(() => {
       props.collection.num_columns = 16
+      props.collection.maxZoom = 3
+      props.uiStore.zoomLevel = 3
       rerender()
     })
     describe('when zoomed all the way out', () => {
       it('should return the ratio that shows the entire grid by default', () => {
         const maxGridWidth = 5472
-        expect(component.zoomLevel).toEqual(3)
         expect(component.maxGridWidth({ zoomLevel: 3 })).toEqual(maxGridWidth)
         expect(component.relativeZoomLevel).toEqual(
           maxGridWidth / jestInnerWidth
@@ -551,11 +554,19 @@ describe('FoamcoreGrid', () => {
     })
     describe('when zoomed in', () => {
       it('should return the zoomLevel', () => {
-        expect(component.zoomLevel).toEqual(3)
-        component.handleZoomIn()
-        expect(component.zoomLevel).toEqual(2)
+        props.uiStore.zoomLevel = 2
         expect(component.relativeZoomLevel).toEqual(2)
       })
+    })
+  })
+
+  describe('handleZoomIn/Out', () => {
+    it('should call the respective uiStore function', () => {
+      const { uiStore } = props
+      component.handleZoomIn()
+      expect(uiStore.zoomIn).toHaveBeenCalled()
+      component.handleZoomOut()
+      expect(uiStore.zoomOut).toHaveBeenCalled()
     })
   })
 
@@ -574,14 +585,16 @@ describe('FoamcoreGrid', () => {
     })
   })
 
-  describe('with a fourWide board', () => {
+  describe('with different board sizes', () => {
     beforeEach(() => {
       props.collection.num_columns = 4
       props.collection.isFourWideBoard = true
       rerender()
     })
-    it('should default to zoomLevel of 2', () => {
-      expect(component.zoomLevel).toEqual(2)
+    it('should call uiStore.adjustZoomLevel to ensure zoom is correct', () => {
+      expect(props.uiStore.adjustZoomLevel).toHaveBeenCalledWith({
+        collection: props.collection,
+      })
     })
   })
 })
