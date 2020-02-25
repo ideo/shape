@@ -22,12 +22,22 @@ module Slack
         url = link[:url]
         unpacked = url.split('/')
         id = unpacked.last.to_i
-        record_type = unpacked.second_to_last
+        record_type = (unpacked & %w[items collections]).first
+        next if record_type.nil?
+
         klass = record_type.classify.safe_constantize
         record = klass.find(id)
         unfurls[url] = message_data(record, url)
       end
       unfurls
+    end
+
+    def translate_string(string = nil)
+      return string if string.blank?
+
+      IdeoTranslation::TranslateString.call(
+        string: string,
+      )
     end
 
     def message_data(record, url)
@@ -50,8 +60,8 @@ module Slack
         author_name: 'Shape',
         author_icon: 'https://s3-us-west-2.amazonaws.com/assets.shape.space/logo-no-text_2x-sq.png',
         color: '#5698ae',
-        title: record.name,
-        text: cover_text,
+        title: translate_string(record.name),
+        text: translate_string(cover_text),
         title_link: url,
         image_url: image_url,
       }

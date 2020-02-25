@@ -49,12 +49,14 @@ class ActionMenu extends React.Component {
     card.beginReplacing()
   }
 
+  get viewingCollection() {
+    const { card, uiStore } = this.props
+    return uiStore.viewingCollection || card.parentCollection
+  }
+
   openMoveMenu = cardAction => {
     const { card, onMoveMenu, uiStore } = this.props
-    let { viewingCollection } = uiStore
-    if (!viewingCollection) {
-      viewingCollection = card.record.parent ? card.record.parent.id : null
-    }
+    const { viewingCollection } = this
     if (onMoveMenu) onMoveMenu({ type: cardAction })
     uiStore.selectCardId(card.id)
     if (cardAction === 'move') {
@@ -141,6 +143,12 @@ class ActionMenu extends React.Component {
     window.print()
   }
 
+  selectCardsBelow = async () => {
+    const { uiStore, card } = this.props
+    const cardIds = await card.API_selectCardIdsBelow()
+    uiStore.reselectCardIds(cardIds)
+  }
+
   get movingFromCollectionId() {
     const { card, uiStore, location } = this.props
     // For PageMenu we're moving "from" the parent collection
@@ -168,9 +176,9 @@ class ActionMenu extends React.Component {
       submissionBox,
       location,
       testCollectionCard,
-      uiStore,
     } = this.props
     const { record } = card
+    const { viewingCollection } = this
 
     const actions = [
       {
@@ -287,11 +295,26 @@ class ActionMenu extends React.Component {
       }
     }
 
-    if (uiStore.viewingCollection) {
-      const coll = uiStore.viewingCollection
+    if (viewingCollection) {
       // Remove Add To My Collection menu item for special collections
-      if (coll.isUserCollection) {
+      if (viewingCollection.isUserCollection) {
         items = _.reject(items, { name: 'Add to My Collection' })
+      }
+      if (viewingCollection.isSearchCollection) {
+        items = _.reject(items, { name: 'Move' })
+      }
+      if (viewingCollection.isBoard && location === 'GridCard') {
+        const selectAllIndex = _.findIndex(items, { name: 'Select All' })
+        const selectCardsBelow = {
+          name: 'Select Cards Below',
+          iconRight: <SelectAllIcon />,
+          onClick: this.selectCardsBelow,
+        }
+        items = [
+          ...items.slice(0, selectAllIndex + 1),
+          selectCardsBelow,
+          ...items.slice(selectAllIndex + 1),
+        ]
       }
     }
 
@@ -311,10 +334,6 @@ class ActionMenu extends React.Component {
     const { menuItemsCount } = this.props
     if (menuItemsCount) {
       menuItemsCount(items.length)
-    }
-
-    if (card.parentCollection && card.parentCollection.isSearchCollection) {
-      items = _.reject(items, { name: 'Move' })
     }
 
     if (record && record.archived) {
@@ -338,7 +357,18 @@ class ActionMenu extends React.Component {
   }
 
   get offsetPosition() {
-    const { uiStore, offsetPosition } = this.props
+    const { uiStore, offsetPosition, card, location, zoomLevel } = this.props
+    const clickedOnGridCardDotMenu =
+      location && (location === 'GridCard' || location === 'Search')
+    const shouldOverrideFixedPosition = card && card.col === 0 && zoomLevel >= 2
+
+    if (clickedOnGridCardDotMenu && shouldOverrideFixedPosition) {
+      return {
+        x: 0,
+        y: 22,
+      }
+    }
+
     return (
       offsetPosition || {
         x: uiStore.cardMenuOpen.offsetX,
@@ -370,6 +400,7 @@ class ActionMenu extends React.Component {
         width={250}
         location={location}
         positionRelative={false}
+        shouldOverrideFixedPosition
       />
     )
   }
@@ -395,6 +426,7 @@ ActionMenu.propTypes = {
     x: PropTypes.number,
     y: PropTypes.number,
   }),
+  zoomLevel: PropTypes.number,
 }
 ActionMenu.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -413,6 +445,7 @@ ActionMenu.defaultProps = {
   testCollectionCard: false,
   menuItemsCount: null,
   offsetPosition: null,
+  zoomLevel: null,
 }
 
 export default ActionMenu

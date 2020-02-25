@@ -2,6 +2,7 @@ import ItemPage from '~/ui/pages/ItemPage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
+import fakeUndoStore from '#/mocks/fakeUndoStore'
 import { fakeTextItem } from '#/mocks/data'
 
 let wrapper, apiStore, component
@@ -9,6 +10,7 @@ let props
 const item = fakeTextItem
 const uiStore = fakeUiStore
 const routingStore = fakeRoutingStore
+const undoStore = fakeUndoStore
 
 beforeEach(() => {
   apiStore = fakeApiStore({
@@ -19,6 +21,7 @@ beforeEach(() => {
     apiStore,
     uiStore,
     routingStore,
+    undoStore,
     item,
   }
 

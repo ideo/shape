@@ -13,10 +13,8 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 
 import EditButton from '~/ui/reporting/EditButton'
-import {
-  NamedActionButton,
-  CollectionCoverTextButton,
-} from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
+import { NamedActionButton } from '~/ui/global/styled/buttons'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import Loader from '~/ui/layout/Loader'
 import Download from '~/ui/grid/Download'
@@ -110,6 +108,13 @@ class GridCard extends React.Component {
     return uiStore.editingCardCover === id
   }
 
+  get isHoveringOverDataItem() {
+    const { card } = this.props
+    // when you're hovering over a data item hide StyledTopRightActions
+    // so that you can still see the tooltips
+    return card.record && card.record.isData && uiStore.hoveringOverDataItem
+  }
+
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
@@ -135,15 +140,22 @@ class GridCard extends React.Component {
       return null
     }
 
+    let className = 'show-on-hover'
+    if (this.isEditingCardCover) {
+      className = 'hide-on-cover-edit'
+    } else if (this.isHoveringOverDataItem) {
+      className = 'hide-for-data-item'
+    }
+
     return (
       <StyledTopRightActions
         color={this.actionsColor}
-        className={
-          this.isEditingCardCover ? 'hide-on-cover-edit' : 'show-on-hover'
-        }
+        className={className}
         zoomLevel={zoomLevel}
       >
-        {record.isDownloadable && <Download record={record} />}
+        {this.downloadableRecord && (
+          <Download record={this.downloadableRecord} />
+        )}
         {record.canSetACover && this.canEditCard && (
           <CardCoverEditor
             card={card}
@@ -190,6 +202,7 @@ class GridCard extends React.Component {
           onLeave={this.closeMenu}
           testCollectionCard={testCollectionCard}
           menuItemsCount={this.getMenuItemsCount}
+          zoomLevel={zoomLevel}
         />
       </StyledTopRightActions>
     )
@@ -338,7 +351,7 @@ class GridCard extends React.Component {
       return
     } else if (record.isGenericFile) {
       // TODO: could replace with preview
-      this.linkOffsite(record.fileUrl())
+      this.linkOffsite(record.fileUrl)
       return
     }
     // capture breadcrumb trail when navigating via Link cards, but not from My Collection
@@ -384,6 +397,18 @@ class GridCard extends React.Component {
     return collection_cover_items[0]
   }
 
+  get downloadableRecord() {
+    const { record } = this.props
+    const { coverItem } = this
+    if (record.isDownloadable) {
+      return record
+    }
+    if (coverItem && coverItem.isDownloadable) {
+      return coverItem
+    }
+    return null
+  }
+
   get renderCover() {
     const {
       card,
@@ -395,16 +420,21 @@ class GridCard extends React.Component {
       testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
+    const { collection_cover_text_items } = record
 
     let nestedTextItem = null
     // Carousels have their own renderer in CollectionCover,
     // so don't behave the same as the other cover item types
     const isCoverItem =
       this.coverItem && record.cover_type !== 'cover_type_carousel'
-    if (this.coverItem && record.cover_type === 'cover_type_text_and_media') {
+    if (
+      collection_cover_text_items &&
+      collection_cover_text_items.length > 0 &&
+      record.cover_type === 'cover_type_text_and_media'
+    ) {
       // If this is a special cover with both image and text, pass the text
       // item through
-      nestedTextItem = this.coverItem
+      nestedTextItem = collection_cover_text_items[0]
     } else if (this.coverItem && record.cover_type !== 'cover_type_carousel') {
       // Instead use the item for the cover rather than the collection
       record = this.coverItem
@@ -542,7 +572,7 @@ class GridCard extends React.Component {
         </StyledGridCardInner>
         {record.isCreativeDifferenceChartCover && (
           <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
-            <CollectionCoverTextButton>More…</CollectionCoverTextButton>
+            <TextButton fontSizeEm={0.75}>More…</TextButton>
           </BottomRightActionHolder>
         )}
         <CollectionCardsTagEditorModal

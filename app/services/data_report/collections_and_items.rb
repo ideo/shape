@@ -2,7 +2,7 @@ module DataReport
   class CollectionsAndItems < SimpleService
     delegate :measure, :timeframe, to: :@dataset
 
-    def initialize(dataset:)
+    def initialize(dataset:, end_date: nil)
       @dataset = dataset
       @record = dataset.data_source
       @data = []
@@ -10,6 +10,7 @@ module DataReport
       @is_single_value = false
       @query = nil
       @group = dataset.group
+      @end_date = (end_date || Date.tomorrow).to_s
     end
 
     def call
@@ -38,6 +39,55 @@ module DataReport
       query_actor_ids
     end
 
+    def sql_query
+      sql_table = query_table.table_name
+      if @record
+        earliest = @record.created_at
+      else
+        earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
+      end
+      return unless earliest.present?
+
+      min = earliest.clamp(start_date_limit, start_date_minimum)
+      case measure
+      when 'participants', 'viewers'
+        count = 'count(distinct(actor_id))'
+      else
+        count = 'count(distinct(id))'
+      end
+
+      # Doing the BETWEEN upper limit finds all activities created BEFORE the upper limit, for example:
+      # i.date of "01-01-2020" will return "between 12-01-2019 and 01-01-2020" aka "all of December 2019"
+      columns = %i[id created_at]
+      columns.push(:actor_id) if measure_queries_activities?
+      beginning_of_timeframe = min.send("beginning_of_#{timeframe}")
+
+      intervals = %{
+        SELECT
+          DISTINCT LEAST(series.date, '#{@end_date}'::DATE) date
+        FROM
+          GENERATE_SERIES(
+            ('#{beginning_of_timeframe}'::DATE + INTERVAL '1 #{timeframe}'),
+            '#{@end_date}'::DATE + INTERVAL '1 #{timeframe}',
+            INTERVAL '1 #{timeframe}'
+          ) AS series
+      }
+
+      %{
+        WITH intervals AS (#{intervals})
+          SELECT i.date, #{count}
+            FROM (#{@query.select(*columns).to_sql}) inner_query
+            RIGHT JOIN intervals i
+            ON
+              created_at BETWEEN
+                i.date - INTERVAL '1 #{timeframe}'
+                AND
+                i.date
+            GROUP BY i.date
+            ORDER BY i.date
+      }
+    end
+
     private
 
     def single_value?
@@ -63,7 +113,7 @@ module DataReport
           measure: 'items',
           timeframe: timeframe,
           organization_id: organization_id,
-        ))
+        ), end_date: @end_date)
 
       collection_data = DataReport::CollectionsAndItems.new(dataset:
         Dataset.new(
@@ -71,7 +121,7 @@ module DataReport
           measure: 'collections',
           timeframe: timeframe,
           organization_id: organization_id,
-        ))
+        ), end_date: @end_date)
 
       if single_value?
         # Combine the two reports
@@ -178,57 +228,18 @@ module DataReport
       @dataset.start_date_limit || 12.months.ago
     end
 
+    def start_date_minimum
+      # the graph looks odd with only one or two data points so we ensure a minimum
+      2.send(timeframe).ago
+    end
+
     def calculate_timeframe_values
-      sql_table = query_table.table_name
-      earliest = @query.select("min(#{sql_table}.created_at)").to_a.first.min
-      return unless earliest.present?
-
-      min = [earliest, start_date_limit].max
-      case measure
-      when 'participants', 'viewers'
-        count = 'count(distinct(actor_id))'
-      when 'views'
-        count = 'count(distinct(id))'
-      when 'activity', 'content', 'collections', 'items'
-        count = 'count(*)'
-      else
-        return
-      end
-
-      # Doing the BETWEEN upper limit we actually query "date + 1", meaning for January 1
-      # we are actually finding all activities/collections created before January 2 00:00
-      columns = %i[id created_at]
-      columns.push(:actor_id) if measure_queries_activities?
-      beginning_of_timeframe = min.send("beginning_of_#{timeframe}")
-
-      intervals = %{
-        SELECT
-          DISTINCT LEAST(series.date, 'now()'::DATE) date
-        FROM
-          GENERATE_SERIES(
-            ('#{beginning_of_timeframe}'::DATE + INTERVAL '1 #{timeframe}'),
-            'now()'::DATE + INTERVAL '1 #{timeframe}',
-            INTERVAL '1 #{timeframe}'
-          ) AS series
-      }
-
-      sql = %{
-        WITH intervals AS (#{intervals})
-          SELECT i.date, #{count}
-            FROM (#{@query.select(*columns).to_sql}) inner_query
-            RIGHT JOIN intervals i
-            ON
-              created_at BETWEEN
-                i.date - INTERVAL '1 #{timeframe}'
-                AND
-                i.date + INTERVAL '1 #{timeframe}'
-            GROUP BY i.date
-            ORDER BY i.date
-      }
-
       timeframe_cache_key = "#{cache_key_base}::Time-#{timeframe}"
+      query = sql_query
+      return unless query.present?
+
       values = Rails.cache.fetch timeframe_cache_key do
-        query_table.connection.execute(sql)
+        query_table.connection.execute(query)
                    .map { |val| { date: val['date'], value: val['count'] } }
       end
       @data = values

@@ -135,7 +135,7 @@ export const NamedActionButton = styled.button`
 NamedActionButton.defaultProps = {
   svgSize: { width: '30px', height: '30px' },
 }
-/* eslint-disable no-nested-ternary */
+
 /** @component */
 export const FormButton = styled.button`
   width: ${props => (props.width ? props.width : 183)}px;
@@ -154,14 +154,7 @@ export const FormButton = styled.button`
   border-radius: 20px;
   color: ${props => {
     if (props.transparent) return props.color
-    // invert text color for non-transparent buttons, add colors as you go
-    switch (props.color) {
-      case v.colors.commonDark:
-        return v.colors.commonLight
-      case v.colors.black:
-      default:
-        return v.colors.white
-    }
+    return invertColor(props.color)
   }};
   background-color: ${props => {
     if (props.transparent) return v.colors.transparent
@@ -174,33 +167,31 @@ export const FormButton = styled.button`
   transition: all 0.3s;
   &:hover,
   &:focus {
-    background-color: ${props =>
-      props.disabledHover
-        ? props.color
-        : props.color === v.colors.primaryDark
-        ? v.colors.primaryDarkest
-        : v.colors.commonDark};
+    background-color: ${props => {
+      if (props.transparent && props.filledHover) return v.colors.commonDark
+      if (props.disabledHover) return props.color
+      if (props.transparent) return v.colors.transparent
+      if (props.color === v.colors.primaryDark) return v.colors.primaryDarkest
+      return v.colors.commonDark
+    }};
+    border: ${props => {
+      if (props.transparent && props.filledHover)
+        return `1px solid ${v.colors.commonDark}`
+      if (!props.transparent) return 'none'
+      return `1px solid ${invertColor(props.color)}`
+    }};
     color: ${props => {
+      if (props.transparent && props.filledHover) return v.colors.white
       if (!props.transparent) return v.colors.commonMedium
-      switch (props.color) {
-        // invert text color for transparent buttons, add colors as you go
-        case v.colors.commonDark:
-          return v.colors.commonLight
-        case v.colors.black:
-        default:
-          return v.colors.white
-      }
+      return invertColor(props.color)
     }};
   }
   ${props =>
     props.disabled &&
     `background-color: transparent;
+      pointer-events: none;
       border: 1px solid ${props.overrideOutlineColor || v.colors.commonMedium};
       color:  ${props.overrideOutlineColor || v.colors.commonMedium};
-      cursor: initial;
-      &:hover, &:focus {
-        background-color: transparent;
-      }
     `};
 `
 FormButton.displayName = 'FormButton'
@@ -225,3 +216,20 @@ TextButton.displayName = 'StyledTextButton'
 export const CollectionCoverTextButton = styled(TextButton)`
   font-size: 0.75rem;
 `
+
+/* invert text color for transparent buttons, add colors as you go */
+const invertColor = color => {
+  switch (color) {
+    case v.colors.black:
+      return v.colors.white
+    case v.colors.commonDark:
+      return v.colors.commonLight
+    case v.colors.commonMedium:
+      return v.colors.black
+    case v.colors.white:
+      return v.colors.black
+    default:
+      return v.colors.white
+  }
+  return v.colors.white
+}

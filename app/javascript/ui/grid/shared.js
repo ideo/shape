@@ -115,6 +115,9 @@ export const showOnHoverCss = css`
     opacity: 0;
     z-index: 1;
   }
+  .hide-for-data-item {
+    opacity: 0;
+  }
   .show-on-hover {
     opacity: 0;
     transition: opacity 0.25s;
@@ -200,9 +203,13 @@ export const StyledCardWrapper = styled.div`
   ${props => props.moving && mdlPillPlaceholderCss}
   /* NOTE: for react draggable to scroll when dragging on a touch device, may not work for IE */
   /* See: https://github.com/mzabriskie/react-draggable/issues/227 */
-  .react-draggable {
-    touch-action: auto !important;
-  }
+  ${props =>
+    props.allowTouchAction &&
+    `
+    .react-draggable {
+      touch-action: auto !important;
+    }
+    `}
 `
 StyledCardWrapper.defaultProps = {
   zIndex: 1,
@@ -303,6 +310,38 @@ export const BottomRightActionHolder = styled.div`
   position: absolute;
   z-index: ${v.zIndex.gridCardTop};
 `
+
+export const StyledFileCover = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: ${v.colors.commonMedium};
+
+  .fileInfo {
+    align-items: center;
+    bottom: 0;
+    color: ${v.colors.commonMedium};
+    display: flex;
+    font-family: ${v.fonts.sans};
+    font-size: 1rem;
+    font-weight: 500;
+    left: 0;
+    max-height: 32px;
+    position: absolute;
+    width: 95%;
+  }
+  .fileName {
+    display: inline-block;
+    width: 75%;
+    white-space: nowrap;
+  }
+  .card-menu {
+    border-color: ${v.colors.black};
+    color: ${v.colors.black};
+  }
+`
+StyledFileCover.displayName = 'StyledFileCover'
 
 export class GridCardIconWithName extends React.PureComponent {
   render() {

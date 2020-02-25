@@ -67,13 +67,13 @@ RSpec.describe DefaultCollectionCover, type: :service do
 
       before do
         collection.update(cover_type: :cover_type_text_and_media)
-        text_item.update(is_cover: true)
+        text_item.update(hidden: true)
         DefaultCollectionCover.call(collection)
       end
 
-      it 'should keep the text item as the cover' do
-        expect(text_item.is_cover).to be true
-        expect(image_item.is_cover).to be false
+      it 'should keep the image item as the cover' do
+        expect(text_item.reload.is_cover).to be false
+        expect(image_item.reload.is_cover).to be true
       end
 
       it 'should set the first media item as the image url' do
@@ -82,6 +82,10 @@ RSpec.describe DefaultCollectionCover, type: :service do
 
       it 'should not have any text on the cover' do
         expect(collection_cover['text']).to be_nil
+      end
+
+      it 'has text item in collection_cover_text_items relationship' do
+        expect(collection.collection_cover_text_items).to eq([text_item.record])
       end
     end
 

@@ -63,7 +63,7 @@ const SharedRecordMixin = superclass =>
             message: `${this.className} name edit redone`,
             apiCall: () =>
               // re-call the same function
-              this.API_updateName(name),
+              this.API_updateNameAndCover(name),
           },
         })
       }
@@ -87,7 +87,7 @@ const SharedRecordMixin = superclass =>
 
       // cancel sync so that name edits don't roundtrip and interfere with your <input>
       data.cancel_sync = true
-      return this.apiStore.request(this.baseApiPath, 'PATCH', { data })
+      return this.patch(data)
     }
 
     async API_revertTo({ snapshot } = {}) {
@@ -107,6 +107,8 @@ const SharedRecordMixin = superclass =>
         const res = await this.apiStore.request(this.baseApiPath, 'PATCH', {
           data,
         })
+        // much like API_batchUpdateCardsWithUndo, we have to reapply the local state
+        this.revertToSnapshot(snapshot)
         return res
       } catch {
         if (snapshot && this.internalType === 'collections') {
@@ -166,10 +168,14 @@ const SharedRecordMixin = superclass =>
       if (!apiCall) {
         undoApiCall = () => this.API_revertTo({ snapshot })
       }
+      let redirectPath = null
+      if (redirectTo) {
+        redirectPath = { type: redirectTo.internalType, id: redirectTo.id }
+      }
       this.undoStore.pushUndoAction({
         message,
         apiCall: undoApiCall,
-        redirectPath: { type: redirectTo.internalType, id: redirectTo.id },
+        redirectPath,
         redoAction,
         actionType,
       })

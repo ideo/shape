@@ -25,6 +25,7 @@ class SerializableCollection < BaseJsonSerializer
     :search_term,
     :collection_type,
     :cloned_from_id,
+    :num_columns,
   )
 
   stringified_attributes(
@@ -45,6 +46,7 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
+  has_many :collection_cover_text_items
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
@@ -53,6 +55,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :collection_to_test
   belongs_to :organization
   belongs_to :created_by
+  belongs_to :template
   has_many :test_audiences
   has_one :test_results_collection
   has_many :collection_filters

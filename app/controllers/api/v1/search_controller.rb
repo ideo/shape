@@ -82,7 +82,7 @@ class Api::V1::SearchController < Api::V1::BaseController
     unless current_user.has_cached_role?(Role::SUPER_ADMIN)
       where_clause[:_or] = [
         { user_ids: [current_user.id] },
-        { group_ids: current_user_current_group_ids },
+        { group_ids: current_user.all_current_org_group_ids },
       ]
     end
 
@@ -138,6 +138,8 @@ class Api::V1::SearchController < Api::V1::BaseController
     search_opts[:where] = {
       _or: [
         {
+          # NOTE: in ES 7+ this `_type` will no longer work! could use _index
+          # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-index-field.html
           _type: 'user',
           _id: @resource.search_user_ids,
           status: status,
@@ -176,12 +178,6 @@ class Api::V1::SearchController < Api::V1::BaseController
         user_ids: users.pluck(:id),
         group_ids: groups.pluck(:id),
       },
-    )
-  end
-
-  def current_user_current_group_ids
-    current_user.organization_group_ids(
-      current_user.current_organization,
     )
   end
 

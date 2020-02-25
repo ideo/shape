@@ -1,5 +1,4 @@
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
@@ -11,6 +10,7 @@ import {
 } from '#/mocks/data'
 
 let wrapper, instance, props
+const parentCollection = fakeCollection
 describe('LegendItemCover', () => {
   beforeEach(() => {
     render = () => {
@@ -18,7 +18,7 @@ describe('LegendItemCover', () => {
         item: fakeLegendItem,
         card: {
           ...fakeLegendItemCard,
-          parent: fakeCollection,
+          parentCollection,
         },
         apiStore: fakeApiStore(),
         uiStore: fakeUiStore,
@@ -28,10 +28,6 @@ describe('LegendItemCover', () => {
       instance = wrapper.instance()
     }
     render()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('shows selected dataset', () => {
@@ -83,7 +79,7 @@ describe('LegendItemCover', () => {
 
       it('should unselect the dataset by identifier', () => {
         expect(
-          props.card.parent.API_unselectDatasetsWithIdentifier
+          parentCollection.API_unselectDatasetsWithIdentifier
         ).toHaveBeenCalled()
       })
     })
@@ -107,7 +103,7 @@ describe('LegendItemCover', () => {
 
       it('should unselect the dataset by identifier', () => {
         expect(
-          props.card.parent.API_unselectDatasetsWithIdentifier
+          parentCollection.API_unselectDatasetsWithIdentifier
         ).toHaveBeenCalled()
       })
     })
@@ -124,7 +120,7 @@ describe('LegendItemCover', () => {
             selected: true,
             name: 'something-else',
             identifier: 'Something Else',
-            test_collection_id: fakeCollection.id,
+            test_collection_id: parentCollection.id,
           },
         ]
         render()
@@ -132,7 +128,7 @@ describe('LegendItemCover', () => {
       })
 
       it('should remove the comparison', () => {
-        expect(props.card.parent.API_removeComparison).toHaveBeenCalled()
+        expect(parentCollection.API_removeComparison).toHaveBeenCalled()
       })
     })
   })
@@ -205,7 +201,7 @@ describe('LegendItemCover', () => {
         identifier: 'org-wide-question',
         name: 'Organization stuff',
         internalType: 'datasets',
-        test_collection_id: fakeCollection.id,
+        test_collection_id: parentCollection.id,
       }
       props.item.datasets = [groupedDataset]
       render()
@@ -214,7 +210,7 @@ describe('LegendItemCover', () => {
     describe('with a test collection', () => {
       it('should add the test comparison with the test', () => {
         instance.onSelectComparison(fakeCollection)
-        expect(props.card.parent.API_addComparison).toHaveBeenCalled()
+        expect(parentCollection.API_addComparison).toHaveBeenCalled()
       })
     })
 
@@ -222,7 +218,7 @@ describe('LegendItemCover', () => {
       it('should toggle the dataset with name', () => {
         instance.onSelectComparison(groupedDataset)
         expect(
-          props.card.parent.API_selectDatasetsWithIdentifier
+          parentCollection.API_selectDatasetsWithIdentifier
         ).toHaveBeenCalled()
       })
     })
@@ -234,8 +230,8 @@ describe('LegendItemCover', () => {
       wrapper = shallow(<LegendItemCover.wrappedComponent {...props} />)
     })
 
-    it('should not show the comparison button', () => {
-      expect(wrapper.find('.test-add-comparison-button').exists()).toBe(false)
+    it('should show the comparison button', () => {
+      expect(wrapper.find('.test-add-comparison-button').exists()).toBe(true)
     })
   })
 })

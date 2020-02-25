@@ -200,6 +200,8 @@ export default class UiStore {
   @observable
   selectedArea = { minX: null, maxX: null, minY: null, maxY: null }
   @observable
+  selectedAreaShifted = false
+  @observable
   selectedAreaEnabled = false
   @observable
   linkedBreadcrumbTrail = []
@@ -234,6 +236,8 @@ export default class UiStore {
   placeholderPosition = {
     ...this.placeholderDefaults,
   }
+  @observable
+  hoveringOverDataItem = false
 
   @action
   setEditingCardCover(editingCardCoverId) {
@@ -253,6 +257,8 @@ export default class UiStore {
       this.draggingFromMDL = true
       this.multiMoveCardIds = [...this.movingCardIds]
     } else {
+      // just select the one dragging card
+      this.reselectCardIds([cardId])
       this.multiMoveCardIds = [cardId]
     }
     this.dragCardMaster = cardId
@@ -301,8 +307,9 @@ export default class UiStore {
   }
 
   @action
-  setSelectedArea(selectedArea) {
+  setSelectedArea(selectedArea, { shifted = false } = {}) {
     this.selectedArea = selectedArea
+    this.selectedAreaShifted = shifted
   }
 
   @action

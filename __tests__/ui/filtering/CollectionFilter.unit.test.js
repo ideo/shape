@@ -103,7 +103,7 @@ describe('CollectionFilter', () => {
 
     describe('if collection is method library', () => {
       beforeEach(() => {
-        props.collection.isMethodLibraryCollection = true
+        props.collection.isParentMethodLibrary = true
         props.collection.methodLibraryFilters = [fakeCollectionFilter]
         rerender()
       })

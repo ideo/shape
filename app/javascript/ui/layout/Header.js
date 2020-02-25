@@ -113,6 +113,18 @@ class Header extends React.Component {
     )
   }
 
+  get backgroundColor() {
+    const { record } = this
+    if (this.onArchivedPage) {
+      return v.colors.commonMediumTint
+    } else if (record && record.isFourWideBoard) {
+      // NOTE: temporary to indicate prototype feature
+      return v.colors.prototype
+    } else {
+      return v.colors.commonLight
+    }
+  }
+
   routeBack = ({ type } = {}) => {
     const { record } = this
     const { routingStore } = this.props
@@ -278,11 +290,7 @@ class Header extends React.Component {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-          body { background-color:  ${
-            this.onArchivedPage
-              ? v.colors.commonMediumTint
-              : v.colors.commonLight
-          };
+          body { background-color:  ${this.backgroundColor};
           transition: background-color 0.5s ease;
           }
         `,

@@ -11,7 +11,7 @@ import PlainLink from '~/ui/global/PlainLink'
 import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import CarouselCover from '~/ui/grid/covers/CarouselCover'
-import { FormButton } from '~/ui/global/styled/buttons'
+import Button from '~/ui/global/Button'
 import { RoundPill } from '~/ui/global/styled/forms'
 import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
@@ -19,7 +19,7 @@ import CollectionCoverTitle, {
 } from '~/ui/grid/covers/CollectionCoverTitle'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 
-const LaunchButton = styled(FormButton)`
+const LaunchButton = styled(Button)`
   font-size: 0.9rem;
   padding: 0 1rem;
   width: auto;
@@ -117,9 +117,9 @@ const StyledCardContent = styled.div`
     width: ${props => calcSectionWidth(props)};
     height: ${props => calcSectionHeight(props)};
 
-    // Text style for the text and media covers
+    /* Text style for the text and media covers */
     h1 {
-      color: ${props => (props.color ? props.color : 'white')};
+      color: ${props => props.color || v.colors.white};
       ${props => props.useTextBackground && 'padding: 0; margin-bottom: 0;'}
     }
 
@@ -262,17 +262,17 @@ class CollectionCover extends React.Component {
   get useTemplateButton() {
     return (
       <CardButtonWrapper>
-        <FormButton
-          width={v.buttonSizes.header.width}
-          fontSize={v.buttonSizes.header.fontSize}
+        <Button
+          minWidth={v.buttonSizes.header.width}
+          size="sm"
           onClick={this.openMoveMenuForTemplate}
           data-cy="CollectionCoverFormButton"
           className="CollectionCoverFormButton"
-          color={v.colors.white}
-          transparent
+          colorScheme={v.colors.white}
+          outline
         >
           Use Template
-        </FormButton>
+        </Button>
       </CardButtonWrapper>
     )
   }
@@ -463,7 +463,7 @@ CollectionCover.defaultProps = {
   dragging: false,
   searchResult: false,
   textItem: null,
-  fontColor: v.colors.collectionCover,
+  fontColor: v.colors.white,
 }
 
 CollectionCover.displayName = 'CollectionCover'

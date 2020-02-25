@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
-import { updateModelId } from 'datx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 import styled from 'styled-components'
@@ -15,6 +14,7 @@ import { objectsEqual } from '~/utils/objectUtils'
 import CardMoveService from '~/utils/CardMoveService'
 import { groupByConsecutive } from '~/utils/CollectionGridCalculator'
 import v from '~/utils/variables'
+import { calculatePageMargins } from '~/utils/pageUtils'
 
 const cardMover = new CardMoveService()
 
@@ -39,20 +39,6 @@ const StyledGrid = styled.div`
   `}
 `
 StyledGrid.displayName = 'StyledGrid'
-
-const pageMargins = () => {
-  let xMargin
-  if (window.innerWidth >= v.maxWidth) {
-    xMargin = (window.innerWidth - v.maxWidth) / 2
-  } else {
-    // Otherwise use container padding, multiplied to transform to px
-    xMargin = v.containerPadding.horizontal * 16
-  }
-  return {
-    x: xMargin,
-    y: v.topScrollTrigger,
-  }
-}
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'routingStore', 'uiStore')
@@ -453,6 +439,7 @@ class CollectionGrid extends React.Component {
       original = originalCard.original
     }
 
+    const { apiStore } = this.props
     const placeholderKey = `${original.id}-${cardType}`
     const data = {
       position: original.position,
@@ -464,8 +451,8 @@ class CollectionGrid extends React.Component {
       record: original.record,
     }
     // NOTE: important to always initialize models supplying apiStore as the collection
-    const placeholder = new CollectionCard(data, this.props.apiStore)
-    updateModelId(placeholder, placeholderKey)
+    const placeholder = new CollectionCard(data, apiStore)
+    apiStore.updateModelId(placeholder, placeholderKey)
     return placeholder
   }
 
@@ -996,7 +983,7 @@ class CollectionGrid extends React.Component {
           isSharedCollection={collection.isSharedCollection}
           isBoardCollection={false}
           position={card.position}
-          dragOffset={pageMargins()}
+          dragOffset={calculatePageMargins()}
           record={record}
           onDrag={this.onDrag}
           onDragOrResizeStop={this.onDragOrResizeStop}

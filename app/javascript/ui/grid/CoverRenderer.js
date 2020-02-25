@@ -38,6 +38,12 @@ class CoverRenderer extends React.Component {
       textItemHideReadMore,
       textItemUneditable,
     } = this.props
+
+    const isLargeBoard =
+      isBoardCollection &&
+      uiStore.viewingCollection &&
+      !uiStore.viewingCollection.isFourWideBoard
+
     if (this.isItem) {
       switch (record.type) {
         case ITEM_TYPES.TEXT:
@@ -49,7 +55,7 @@ class CoverRenderer extends React.Component {
               cardId={card.id}
               handleClick={handleClick}
               searchResult={searchResult}
-              initialFontTag={isBoardCollection ? 'H1' : 'P'}
+              initialFontTag={isLargeBoard ? 'H1' : 'P'}
               hideReadMore={textItemHideReadMore}
               uneditable={textItemUneditable}
             />

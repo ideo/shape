@@ -9,40 +9,51 @@ import {
 
 describe('ChartUtils', () => {
   describe('advancedTooltipText', () => {
-    it('renders text for the label with month and year', () => {
-      // NOTE: code pulls the actual month back by 1
-      const datum = { date: '2018-10-01', value: 34, month: 'Sep' }
+    it('renders text for the label with month', () => {
+      // Oct 1 means "all of September"
+      const datum = { date: '2018-10-01', value: 34 }
       const tooltip = advancedTooltipText({
         datum,
         isLastDataPoint: false,
-        timefame: 'month',
+        timeframe: 'month',
         measure: 'Participants',
       })
-      expect(tooltip).toEqual('34 Participants\nSep 30 - Oct 1')
+      expect(tooltip).toEqual('34 Participants\nin September')
+    })
+
+    it('renders text for the label with the week span', () => {
+      const datum = { date: '2018-10-01', value: 34 }
+      const tooltip = advancedTooltipText({
+        datum,
+        isLastDataPoint: false,
+        timeframe: 'week',
+        measure: 'viewers',
+      })
+      expect(tooltip).toEqual('34 viewers\nSep 24 - Sep 30')
     })
 
     it('renders in last 30 days for label for last data item', () => {
       // NOTE: code pulls the actual month back by 1
-      const datum = { date: '2018-10-01', value: 34, month: 'Sep' }
+      const datum = { date: '2018-10-01', value: 34 }
       const tooltip = advancedTooltipText({
         datum,
         isLastDataPoint: true,
-        timefame: 'month',
+        timeframe: 'month',
         measure: 'Participants',
       })
-      expect(tooltip).toEqual('34 Participants\nin last 7 days')
+      expect(tooltip).toEqual('34 Participants\nin last 30 days')
     })
   })
 
   describe('dateTooltipText', () => {
     it('renders {value} on {date}', () => {
-      const datum = { date: '2018-10-01', value: 34, month: 'Sep' }
+      const datum = { date: '2018-10-01', value: 34 }
       expect(dateTooltipText(datum)).toEqual('34 on 10/1/2018')
     })
   })
 
   describe('chartDomainForDatasetValues', () => {
-    it('returns max of values if no max specified', () => {
+    it('returns max of values if no max domain is specified', () => {
       const values = [{ value: 10 }, { value: 20 }]
       expect(chartDomainForDatasetValues({ values })).toEqual({
         x: [1, 2],
@@ -50,7 +61,15 @@ describe('ChartUtils', () => {
       })
     })
 
-    it('returns max given', () => {
+    it('returns max value if provided max is lower than highest value', () => {
+      const values = [{ value: 60 }, { value: 40 }]
+      expect(chartDomainForDatasetValues({ values, maxYDomain: 50 })).toEqual({
+        x: [1, 2],
+        y: [0, 60],
+      })
+    })
+
+    it('returns provided max domain if it is higher than highest value', () => {
       const values = [{ value: 10 }, { value: 20 }]
       expect(chartDomainForDatasetValues({ values, maxYDomain: 100 })).toEqual({
         x: [1, 2],
@@ -77,7 +96,7 @@ describe('ChartUtils', () => {
       data = [{ value: 25 }]
     })
 
-    xit('duplicates value n times for use in VictoryLine', () => {
+    it('duplicates value n times for use in VictoryLine', () => {
       expect(formatValuesForVictory({ values: data })).toEqual([
         { value: 25 },
         { value: 25, isDuplicate: true },

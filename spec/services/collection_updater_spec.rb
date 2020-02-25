@@ -55,6 +55,19 @@ RSpec.describe CollectionUpdater, type: :service do
           service.call
         }.not_to change(collection, :cached_cover)
       end
+
+      it 'does not update hardcoded collection cover values unless cover attributes are present' do
+        collection.update(
+          cached_cover: {
+            subtitle_hidden: true,
+            hardcoded_subtitle: 'Lorem ipsum.',
+          },
+        )
+        service.call
+        collection.reload
+        expect(collection.cached_cover['subtitle_hidden']).to be true
+        expect(collection.cached_cover['hardcoded_subtitle']).to eq 'Lorem ipsum.'
+      end
     end
 
     context 'with valid board placement' do
@@ -87,6 +100,7 @@ RSpec.describe CollectionUpdater, type: :service do
         expect(collection.cached_cover).to be nil
         service.call
         expect(collection.cached_cover['hardcoded_subtitle']).to eq attributes[:hardcoded_subtitle]
+        expect(collection.cached_cover['subtitle_hidden']).to be false
       end
     end
 

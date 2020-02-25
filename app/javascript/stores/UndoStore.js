@@ -99,8 +99,7 @@ export default class UndoStore {
       actionType,
     } = action
     if (redoAction) {
-      // undo actions should usually have a redoAction...
-      // however TextItemCover has a unique way of undo/redo
+      // undo actions should usually have a redoAction
       this.pushRedoAction({
         ...redoAction,
         redirectPath: redoRedirectPath || redirectPath,

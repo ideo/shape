@@ -29,9 +29,7 @@ export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
 
 export const utcMoment = date => {
   if (typeof date === 'object') {
-    return moment(date)
-      .startOf('day')
-      .utc()
+    return moment(date.toUTCString()).utc()
   } else {
     return moment(`${date} 00+0000`).utc()
   }
@@ -73,7 +71,8 @@ export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
   let minXDomain
   let maxXDomain
   let calculatedMaxYDomain
-  if (maxYDomain) {
+
+  if (maxYDomain && maxYDomain > maxBy(values, 'value').value) {
     calculatedMaxYDomain = maxYDomain
   } else {
     calculatedMaxYDomain = maxBy(values, 'value').value
@@ -149,20 +148,24 @@ export const advancedTooltipText = ({
   measure,
 }) => {
   const momentDate = utcMoment(datum.date)
-  let timeRange = `${momentDate
-    .clone()
-    .subtract(1, timeframe)
-    .format('MMM D')} - ${momentDate.format('MMM D')}`
+  // for example when we say May 1:
+  // timeframe 'week' = 'Apr 24 - Apr 30' (the week leading up to May 1)
+  // timerame 'month' = 'in April' (all of April leading up to May 1)
+  const timeframeBegin = momentDate.clone().subtract(1, timeframe)
+  const timeframeEnd = momentDate.clone().subtract(1, 'day')
+  let timeRange = `${timeframeBegin.format('MMM D')} - ${timeframeEnd.format(
+    'MMM D'
+  )}`
 
   let dayTimeframe = '7 days'
   if (timeframe === 'month') {
-    timeRange = `in ${momentDate.clone().format('MMMM')}`
+    timeRange = `in ${timeframeBegin.clone().format('MMMM')}`
     dayTimeframe = '30 days'
   }
   if (timeframe === 'day') {
-    timeRange = `on ${momentDate.format('MMM D')}`
+    timeRange = `on ${timeframeBegin.format('MMM D')}`
   }
-  let text = `${datum.value} `
+  let text = `${datum.value.toLocaleString()} `
   if (measure) {
     text += `${pluralize(measure)}\n`
   }

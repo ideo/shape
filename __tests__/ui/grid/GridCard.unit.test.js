@@ -1,6 +1,5 @@
 import GridCard from '~/ui/grid/GridCard'
 import { uiStore } from '~/stores'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 import {
   fakeItemCard,
@@ -37,10 +36,6 @@ describe('GridCard', () => {
       beforeEach(() => {
         props.record.can_edit = false
         rerender()
-      })
-
-      it('renders snapshot', () => {
-        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('renders a StyledGridCard with passed in dragging prop', () => {
@@ -80,10 +75,6 @@ describe('GridCard', () => {
         props.canEditCollection = true
         wrapper.setProps(props)
         rerender()
-      })
-
-      it('renders snapshot', () => {
-        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('passes canEdit to menu', () => {
@@ -183,10 +174,6 @@ describe('GridCard', () => {
         rerender()
       })
 
-      it('renders snapshot', () => {
-        expectTreeToMatchSnapshot(wrapper)
-      })
-
       it('renders the bottom left card icons', () => {
         expect(
           wrapper
@@ -217,10 +204,6 @@ describe('GridCard', () => {
         rerender()
       })
 
-      it('renders snapshot', () => {
-        expectTreeToMatchSnapshot(wrapper)
-      })
-
       it('passes canEdit to menu', () => {
         expect(wrapper.find('ActionMenu').props().canEdit).toBe(true)
       })
@@ -249,10 +232,6 @@ describe('GridCard', () => {
         rerender()
       })
 
-      it('renders snapshot', () => {
-        expectTreeToMatchSnapshot(wrapper)
-      })
-
       it('renders selection circle and card menu, but no hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('ActionMenu').exists()).toBe(true)
@@ -266,10 +245,6 @@ describe('GridCard', () => {
         props.canEditCollection = true
         props.record.menuDisabled = true
         rerender()
-      })
-
-      it('renders snapshot', () => {
-        expectTreeToMatchSnapshot(wrapper)
       })
 
       it('does not render ActionMenu', () => {
@@ -304,10 +279,6 @@ describe('GridCard', () => {
       rerender()
     })
 
-    it('renders snapshot', () => {
-      expectTreeToMatchSnapshot(wrapper)
-    })
-
     it('renders the colored circle to indicate selection', () => {
       expect(wrapper.find('StyledGridCard').props().selected).toBe(true)
     })
@@ -318,10 +289,6 @@ describe('GridCard', () => {
       props.hoveringOver = false
       uiStore.selectCardId(props.card.id)
       rerender()
-    })
-
-    it('renders snapshot', () => {
-      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('renders the colored circle to indicate selection', () => {
@@ -339,10 +306,6 @@ describe('GridCard', () => {
       props.record.can_edit = true
       props.record.menuDisabled = false
       rerender()
-    })
-
-    it('renders snapshot', () => {
-      expectTreeToMatchSnapshot(wrapper)
     })
 
     it('disables canEdit functionality', () => {
@@ -364,6 +327,43 @@ describe('GridCard', () => {
       const replaceButton = wrapper.find('ReplaceCardButton')
       expect(replaceButton.props().card).toEqual(props.card)
       expect(replaceButton.props().showControls).toEqual(false)
+    })
+  })
+
+  describe('renderTopRightActions', () => {
+    afterEach(() => {
+      // clean up values that were changed
+      uiStore.editingCardCover = null
+      uiStore.hoveringOverDataItem = false
+      props.card.record.isData = false
+    })
+
+    it('uses show-on-hover class by default', () => {
+      const topRight = wrapper.find('StyledTopRightActions').last()
+      expect(topRight.props().className).toEqual('show-on-hover')
+    })
+
+    describe('isEditingCardCover', () => {
+      beforeEach(() => {
+        uiStore.editingCardCover = props.card.id
+        rerender()
+      })
+      it('uses hide-on-cover-edit class', () => {
+        const topRight = wrapper.find('StyledTopRightActions').last()
+        expect(topRight.props().className).toEqual('hide-on-cover-edit')
+      })
+    })
+
+    describe('isHoveringOverDataItem and record.isData', () => {
+      beforeEach(() => {
+        uiStore.hoveringOverDataItem = true
+        props.card.record.isData = true
+        rerender()
+      })
+      it('uses hide-for-data-item class', () => {
+        const topRight = wrapper.find('StyledTopRightActions').last()
+        expect(topRight.props().className).toEqual('hide-for-data-item')
+      })
     })
   })
 })

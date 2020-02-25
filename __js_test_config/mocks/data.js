@@ -50,6 +50,8 @@ export const fakeTextItemAttrs = {
   internalType: 'items',
   fullyLoaded: true,
   parent_collection_card: { ...fakeCollectionCard },
+  API_fetchDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
+
 }
 
 const areaChartData = [
@@ -155,6 +157,7 @@ export const fakeDatasetAttrs = {
   order: 0,
   question_type: null,
   selected: true,
+  single_value: 32,
   test_collection_id: null,
   timeframe: 'ever',
   total: 1,
@@ -249,6 +252,7 @@ export const fakeTextItem = {
   getRecordType: jest.fn().mockReturnValue('items'),
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   pushUndo: jest.fn(),
+  pushTextUndo: jest.fn(),
   version: 1,
   ...fakeJsonApiAttrs,
 }
@@ -422,7 +426,7 @@ export const fakeCollection = {
   collection_filters: [],
   filterBarFilters: [],
   methodLibraryFilters: [],
-  isMethodLibraryCollection: false,
+  isParentMethodLibrary: false,
   card_order: 'order',
   collection_cards: fakeCards,
   sortedCards: fakeCards,

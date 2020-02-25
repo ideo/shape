@@ -34,6 +34,7 @@ import BctButtonRotation from './BctButtonRotation'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const StyledGridCardBlank = styled(StyledGridCard)`
+  user-select: none;
   background-color: transparent;
   cursor: auto;
   position: relative;
@@ -72,6 +73,10 @@ const StyledBlankCreationTool = styled.div`
       top: 120px;
       margin: 0 auto;
     }
+  }
+  .card-menu.open {
+    /* because the BCTBoxes flex, we have to restrict the CardMenu when the PopoutMenu is open */
+    max-width: 47px;
   }
   transition: ${v.transitionWithDelay};
 
@@ -484,8 +489,9 @@ class GridCardBlank extends React.Component {
 
   renderInner = () => {
     let inner
+    const { parent } = this.props
+    const { isBoard, isFourWideBoard } = parent
     const { creating, loading, droppingFile } = this.state
-    const { isBoard } = this.props.parent
     const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
 
@@ -502,6 +508,7 @@ class GridCardBlank extends React.Component {
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}
+            parentIsFourWide={isFourWideBoard}
           />
         )
         break

@@ -1,5 +1,4 @@
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
 let props, wrapper
 
@@ -13,6 +12,6 @@ describe('FoamcoreZoomControls', () => {
   })
 
   it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
+    expect(wrapper.find('ZoomIconWrapper').exists()).toBe(true)
   })
 })

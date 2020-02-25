@@ -61,13 +61,13 @@ class Comment < ApplicationRecord
     }
     entity_map = draftjs_data.try(:[], 'entityMap') || {}
     entity_map.each_pair do |_k, v|
-      entity = Hashie::Mash.new(v)
+      entity = Mashie.new(v)
       next unless entity.type == 'mention'
 
       id, type = entity.data.mention.id.split('__')
       mentions[type.to_sym] << id.to_i
     end
-    Hashie::Mash.new(
+    Mashie.new(
       user_ids: mentions[:users].uniq,
       group_ids: mentions[:groups].uniq,
     )
@@ -77,7 +77,7 @@ class Comment < ApplicationRecord
     return unless subject.present? && subject.is_a?(Item::TextItem)
 
     highlight = ''
-    Hashie::Mash.new(subject.data_content).ops.each do |op|
+    Mashie.new(subject.data_content).ops.each do |op|
       comment_id = op.attributes&.commentHighlight || op.attributes&.commentHighlightResolved
       if comment_id && comment_id.to_s == id.to_s
         highlight += " #{op.insert}"

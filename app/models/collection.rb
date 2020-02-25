@@ -16,6 +16,7 @@
 #  hide_submissions           :boolean          default(FALSE)
 #  master_template            :boolean          default(FALSE)
 #  name                       :string
+#  num_columns                :integer
 #  processing_status          :integer
 #  search_term                :string
 #  shared_with_organization   :boolean          default(FALSE)
@@ -150,6 +151,12 @@ class Collection < ApplicationRecord
            foreign_key: :parent_id,
            inverse_of: :parent
 
+  has_many :hidden_collection_cards,
+           -> { active.hidden },
+           class_name: 'CollectionCard::Primary',
+           foreign_key: :parent_id,
+           inverse_of: :parent
+
   # cards that live outside this collection, linking to this collection
   has_many :cards_linked_to_this_collection,
            class_name: 'CollectionCard::Link',
@@ -167,6 +174,11 @@ class Collection < ApplicationRecord
            class_name: 'CollectionCard::Primary',
            foreign_key: :parent_id,
            inverse_of: :parent
+
+  has_many :collection_cover_text_items,
+           -> { text_items },
+           through: :hidden_collection_cards,
+           source: :item
 
   has_many :items, through: :primary_collection_cards
   has_many :collections, through: :primary_collection_cards
@@ -330,12 +342,14 @@ class Collection < ApplicationRecord
       :parent,
       :submissions_collection,
       :submission_template,
+      :template,
       :collection_to_test,
       :live_test_collection,
       :collection_cover_items,
       :test_audiences,
       :restorable_parent,
       :collection_filters,
+      :collection_cover_text_items,
       roles: %i[pending_users users groups resource],
     ]
   end
@@ -966,6 +980,17 @@ class Collection < ApplicationRecord
 
   def broadcasting?
     broadcasting.present?
+  end
+
+  def inside_a_creative_difference_collection?
+    creative_difference_root_collection_id = ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID']
+
+    logger.debug(
+      'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.'
+    ) if !creative_difference_root_collection_id
+
+    inside_an_application_collection? ||
+    within_collection_or_self?(creative_difference_root_collection_id.to_i)
   end
 
   # =================================

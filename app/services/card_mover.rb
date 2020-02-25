@@ -121,7 +121,7 @@ class CardMover < SimpleService
   def move_cards_to_collection
     return [] if @to_collection.is_a? Collection::Board
 
-    pin_moving_cards = should_pin_moving_cards?
+    pin_moving_cards = @to_collection.should_pin_cards?(@placement)
 
     # Reorder all cards based on order of joined_cards
     @to_collection_cards.map.with_index do |card, i|
@@ -133,7 +133,7 @@ class CardMover < SimpleService
         if @to_collection.master_template?
           # any cards created in master_template's pinned area become pinned
           card.assign_attributes(pinned: pin_moving_cards)
-          if card.collection.present?
+          if card.primary? && card.collection.present?
             card.collection.convert_to_template!
           end
         elsif @to_collection != @from_collection
@@ -218,7 +218,7 @@ class CardMover < SimpleService
       collection = card.collection
       next unless collection.present?
 
-      if @to_collection.within_collection_or_self?(collection)
+      if @to_collection.within_collection_or_self?(collection.id)
         @errors << 'You can\'t move a collection inside of itself.'
         return true
       end
@@ -241,12 +241,5 @@ class CardMover < SimpleService
 
       Roles::MergeToChild.call(parent: @to_collection, child: card.record)
     end
-  end
-
-  def should_pin_moving_cards?
-    return false unless @moving_cards.first.present?
-
-    first_moving_card_placement = @to_collection_cards.find_index { |tc| tc == @moving_cards.first }
-    @to_collection.should_pin_cards?(first_moving_card_placement)
   end
 end

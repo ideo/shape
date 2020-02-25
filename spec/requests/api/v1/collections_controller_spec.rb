@@ -495,6 +495,49 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection_card.reload.order).to eq(1)
     end
 
+    context 'updating the cached_cover' do
+      before do
+        collection.update(
+          cached_cover: {
+            subtitle_hidden: true,
+            hardcoded_subtitle: 'Lorem ipsum.',
+          },
+        )
+      end
+
+      context 'without hardcoded cover attributes' do
+        let(:raw_params) do
+          {
+            id: collection.id,
+          }
+        end
+
+        it 'does not override existing hardcoded cover attributes' do
+          patch(path, params: params)
+          collection.reload
+          expect(collection.cached_cover['subtitle_hidden']).to be true
+          expect(collection.cached_cover['hardcoded_subtitle']).to eq 'Lorem ipsum.'
+        end
+      end
+
+      context 'with hardcoded cover attributes' do
+        let(:raw_params) do
+          {
+            id: collection.id,
+            subtitle_hidden: false,
+            hardcoded_subtitle: 'Dolor sit emet.',
+          }
+        end
+
+        it 'updates hardcoded cover attributes' do
+          patch(path, params: params)
+          collection.reload
+          expect(collection.cached_cover['subtitle_hidden']).to be false
+          expect(collection.cached_cover['hardcoded_subtitle']).to eq 'Dolor sit emet.'
+        end
+      end
+    end
+
     it 'broadcasts collection updates' do
       expect(CollectionUpdateBroadcaster).to receive(:call).with(
         collection,

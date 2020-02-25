@@ -1,7 +1,6 @@
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
-import { uiStore } from '~/stores'
-import expectTreeToMatchSnapshot from '#/helpers/expectTreeToMatchSnapshot'
 
+import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeLinkItem } from '#/mocks/data'
 
 jest.mock('../../../../app/javascript/stores')
@@ -13,15 +12,12 @@ describe('LinkItemCover', () => {
       item: fakeLinkItem,
       cardHeight: 1,
       dragging: false,
+      uiStore: fakeUiStore,
     }
     rerender = () => {
-      wrapper = shallow(<LinkItemCover {...props} />)
+      wrapper = shallow(<LinkItemCover.wrappedComponent {...props} />)
     }
     rerender()
-  })
-
-  it('renders snapshot', () => {
-    expectTreeToMatchSnapshot(wrapper)
   })
 
   it('renders the StyledLinkCover', () => {
@@ -79,7 +75,7 @@ describe('LinkItemCover', () => {
             describe(`at ${heightLabel} square height`, () => {
               beforeEach(() => {
                 props.cardHeight = height
-                uiStore.windowWidth = breakpoint.width
+                props.uiStore.windowWidth = breakpoint.width
                 rerender()
               })
 
@@ -93,7 +89,7 @@ describe('LinkItemCover', () => {
       })
     })
 
-    describe('with a name longer then 106 characters', () => {
+    describe('with a name longer than 106 characters', () => {
       beforeEach(() => {
         props.item.name =
           'Soccer News, Live Scores, Results & Transfers | Goal.com US | The latest soccer news, live scores, results, and rumours from around the world'
@@ -114,7 +110,7 @@ describe('LinkItemCover', () => {
             describe(`at ${heightLabel} square height`, () => {
               beforeEach(() => {
                 props.cardHeight = height
-                uiStore.windowWidth = breakpoint.width
+                props.uiStore.windowWidth = breakpoint.width
                 rerender()
               })
 

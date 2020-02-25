@@ -1,4 +1,4 @@
-import { startCase, flatten } from 'lodash'
+import { startCase, flatten, sortBy } from 'lodash'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -84,19 +84,26 @@ class MethodLibraryFilterBar extends React.Component {
     const { filters } = this.props
     let tagNames
     if (type === 'creativeQualities') {
+      // Preserve original array order
       tagNames = [...creativeQualities.keys()]
     } else if (type === 'subqualities') {
+      // Preserve original array order
       tagNames = flatten(
         [...creativeQualities.values()].map(val => val.subqualities)
       )
     } else {
-      tagNames = methodLibraryTagsByType[type]
+      // These types should be in alphabetical order
+      tagNames = methodLibraryTagsByType[type].sort()
     }
     const matchingFilters = filters.filter(filter =>
       tagNames.includes(filter.text.toLowerCase())
     )
-    if (!onlySelected) return matchingFilters
-    return matchingFilters.filter(filter => filter.selected)
+    const sortedFilters = sortBy(matchingFilters, filter => {
+      // Sort by position in the array
+      return tagNames.indexOf(filter.text.toLowerCase())
+    })
+    if (!onlySelected) return sortedFilters
+    return sortedFilters.filter(filter => filter.selected)
   }
 
   selectFilter = filter => {

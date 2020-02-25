@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_25_010741) do
+ActiveRecord::Schema.define(version: 2020_02_20_181647) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -29,9 +29,9 @@ ActiveRecord::Schema.define(version: 2020_01_25_010741) do
     t.bigint "source_id"
     t.string "destination_type"
     t.bigint "destination_id"
-    t.index ["action", "target_type", "organization_id"], name: "index_activities_action_target_org"
+    t.index ["action", "organization_id", "created_at", "target_type"], name: "activities_action_date"
+    t.index ["action", "organization_id", "target_type", "target_id"], name: "activities_action_target"
     t.index ["actor_id"], name: "index_activities_on_actor_id"
-    t.index ["created_at"], name: "index_activities_on_created_at"
     t.index ["destination_type", "destination_id"], name: "index_activities_on_destination_type_and_destination_id"
     t.index ["organization_id"], name: "index_activities_on_organization_id"
     t.index ["source_type", "source_id"], name: "index_activities_on_source_type_and_source_id"
@@ -198,6 +198,7 @@ ActiveRecord::Schema.define(version: 2020_01_25_010741) do
     t.integer "survey_response_id"
     t.string "search_term"
     t.integer "collection_type", default: 0
+    t.integer "num_columns"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
@@ -550,8 +551,8 @@ ActiveRecord::Schema.define(version: 2020_01_25_010741) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.bigint "idea_id"
     t.jsonb "selected_choice_ids", default: [], null: false
+    t.bigint "idea_id"
     t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
     t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"

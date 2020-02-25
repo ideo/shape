@@ -166,6 +166,10 @@ class LegendItemCover extends React.Component {
     })
   }
 
+  get parent() {
+    return this.props.card.parentCollection
+  }
+
   /*
    * Toggle's a dataset that already exists on the legend items and charts
    * to have it's data_items_dataset.selected property toggled
@@ -173,13 +177,13 @@ class LegendItemCover extends React.Component {
   @observable
   @action
   toggleDatasetsWithIdentifier = async ({ identifier, selected }) => {
-    const { parent } = this.props.card
+    const { parent } = this
     if (!selected) {
       await parent.API_selectDatasetsWithIdentifier({ identifier })
     } else {
       await parent.API_unselectDatasetsWithIdentifier({ identifier })
     }
-    parent.API_fetchCards()
+    parent.API_fetchCards({ include: ['datasets'] })
   }
 
   toggleComparisonSearch = () => {
@@ -211,7 +215,7 @@ class LegendItemCover extends React.Component {
    * This behavior may change in the future
    */
   onDeselectComparison = async dataset => {
-    const { parent } = this.props.card
+    const { parent } = this
     if (this.usesTestComparisonApi(dataset)) {
       await parent.API_removeComparison({ id: dataset.test_collection_id })
     } else {
@@ -231,14 +235,14 @@ class LegendItemCover extends React.Component {
    * This behavior may change in the future
    */
   onSelectComparison = async entity => {
-    const { card } = this.props
+    const { parent } = this
     if (this.usesTestComparisonApi(entity)) {
-      await card.parent.API_addComparison(entity)
+      await parent.API_addComparison(entity)
     } else {
       const { identifier, selected } = entity
       this.toggleDatasetsWithIdentifier({ identifier, selected })
     }
-    card.parent.API_fetchCards()
+    parent.API_fetchCards()
   }
 
   findDatasetByTest(testId) {
@@ -411,7 +415,7 @@ class LegendItemCover extends React.Component {
         <br />
         <StyledAddComparison>
           {comparisonMenuOpen && this.renderComparisonMenu}
-          {item.can_edit_content && !comparisonMenuOpen && (
+          {!comparisonMenuOpen && (
             <Heading3
               onClick={this.toggleComparisonSearch}
               role="button"

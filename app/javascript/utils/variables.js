@@ -46,13 +46,48 @@ export const DATASET_CHART_TYPES = {
 }
 
 export const DATA_MEASURES = [
-  { name: 'Participants', value: 'participants' },
-  { name: 'Viewers', value: 'viewers' },
-  { name: 'Activity', value: 'activity' },
-  { name: 'Content Use', value: 'content', tooltip: 'content activities' },
-  { name: 'Collections', value: 'collections' },
-  { name: 'Items', value: 'items' },
-  { name: 'Collections & Items', value: 'records' },
+  {
+    name: 'Participants',
+    value: 'participants',
+    description:
+      'Unique visitors that have commented or interacted with content',
+  },
+  {
+    name: 'Viewers',
+    value: 'viewers',
+    description: 'Unique visitors that have viewed content',
+  },
+  {
+    name: 'Activity',
+    value: 'activity',
+    description:
+      'Total actions including adding items, editing content, commenting, downloading, and duplicating, moving, or linking content',
+  },
+  {
+    name: 'Content Use',
+    value: 'content',
+    tooltip: 'content activities',
+    description:
+      'Total actions indicating content use: file downloads, PDF views, full-screen views, and link clicks',
+  },
+  {
+    name: 'Collections',
+    value: 'collections',
+    description:
+      'Total number of collections that exist (regular collections, foamcore collections, and submission box collections)',
+  },
+  {
+    name: 'Items',
+    value: 'items',
+    description:
+      'Total number of items that exist (text boxes, pictures and other media, files, links, and reports) ',
+  },
+  {
+    name: 'Collections & Items',
+    value: 'records',
+    description:
+      'Total number of collections and items that exist (regular collections, foamcore collections, and submission box collections, text boxes, pictures and other media, files, links, and reports) ',
+  },
 ]
 
 export const TEST_COLLECTION_SELECT_OPTIONS = [
@@ -147,6 +182,9 @@ export default {
   },
   topScrollTrigger: 210,
   maxTitleLength: 144,
+  maxButtonTextLength: 8,
+  maxPopoutMenuTextLength: 13,
+  maxSelectMeasureTextLength: 20,
   actionMenuWidth: 250,
   actionMenuHeight: 26,
 
@@ -173,37 +211,38 @@ export default {
   touchDeviceHoldToDragTime: 1500,
 
   colors: {
+    alert: '#d66742',
     black: '#120f0e',
-    white: '#ffffff',
-    commonLightest: '#f5f4f3',
-    commonLight: '#f2f1ee',
-    commonMediumTint: '#e3dedc',
-    commonMedium: '#c6c1bf',
+    caution: '#fcf113',
+    collectionCover: '#b6aaa6',
     commonDark: '#a89f9b',
     commonDarkest: '#787878',
-    primaryLightest: '#f0f4f6',
-    primaryLight: '#c0dbde',
-    primaryMedium: '#9ec1cc',
-    primaryMediumDark: '#86b2b7',
-    primaryDark: '#5698ae',
-    primaryDarkest: '#35889e',
-    secondaryLight: '#5a6a7c',
-    secondaryMedium: '#4a5b71',
-    secondaryDark: '#3f526a',
-    secondaryDarkest: '#242d37',
-    tertiaryMedium: '#de8f74',
-    tertiaryDark: '#c43a31',
+    commonLight: '#f2f1ee',
+    commonLightest: '#f5f4f3',
+    commonMedium: '#c6c1bf',
+    commonMediumTint: '#e3dedc',
     ctaPrimary: '#00a0e0',
-    alert: '#d66742',
     highlightActive: '#f8ed81',
     highlightInactive: '#fbf9dc',
-    caution: '#fcf113',
     offset: '#6a7c7e',
     placeholderGray: '#bcbcbc',
-    transparent: 'transparent',
+    primaryDark: '#5698ae',
+    primaryDarkest: '#35889e',
+    primaryLight: '#c0dbde',
+    primaryLightest: '#f0f4f6',
+    primaryMedium: '#9ec1cc',
+    primaryMediumDark: '#86b2b7',
+    prototype: '#eae3ce',
     respondentBannerBackground: '#41d3bd',
     respondentBannerText: '#305d6c',
-    collectionCover: '#b6aaa6',
+    secondaryDark: '#3f526a',
+    secondaryDarkest: '#242d37',
+    secondaryLight: '#5a6a7c',
+    secondaryMedium: '#4a5b71',
+    tertiaryDark: '#c43a31',
+    tertiaryMedium: '#de8f74',
+    transparent: 'transparent',
+    white: '#ffffff',
   },
 
   buttonSizes: {
@@ -242,6 +281,7 @@ export default {
     pageHeader: 220,
     popoutMenu: 201,
     scrollIndicator: 200,
+    zoomControls: 199,
     cardHovering: 160,
     gridCardTop: 151,
     gridCard: 150,

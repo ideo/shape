@@ -358,6 +358,23 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       end
     end
 
+    context 'if user can view collection via group-in-group' do
+      let(:master_group) { create(:group, organization: organization) }
+      let(:user_group) { create(:group, organization: organization) }
+      before do
+        current_user.remove_role(Role::EDITOR, find_collection)
+        current_user.add_role(Role::EDITOR, user_group)
+        user_group.add_role(Role::VIEWER, master_group)
+        master_group.add_role(Role::VIEWER, find_collection)
+        batch_reindex(Collection)
+      end
+
+      it 'returns collection' do
+        get(path, params: { query: find_collection.name })
+        expect(json['data'].size).to eq(1)
+      end
+    end
+
     context 'as a read-only viewer of the collection' do
       before do
         current_user.remove_role(Role::EDITOR, find_collection)
@@ -488,13 +505,13 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
 
     it 'should find similar named users' do
       get(path, params: { query: @user.first_name })
-      expect(json['data'].select { |d| d['type'] == 'users' }.count).to be 2
+      expect(json['data'].select { |d| d['type'] == 'users' }.count).to eq 2
     end
 
     it 'should find org groups' do
       # the org is named "first_name last_name organization"
       get(path, params: { query: @user.first_name })
-      expect(json['data'].select { |d| d['type'] == 'groups' }.count).to be 3
+      expect(json['data'].select { |d| d['type'] == 'groups' }.count).to eq 3
     end
 
     context 'with application bot user' do

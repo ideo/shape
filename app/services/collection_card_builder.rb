@@ -113,6 +113,12 @@ class CollectionCardBuilder
       end
       record.update(update_params)
     end
+
+    # Need to trickle down for all C∆ "app" subcollections
+    if @parent_collection.inside_a_creative_difference_collection?
+      @collection_card.update(filter: 'nothing', font_color: '#120F0E')
+    end
+
     @collection_card.parent.cache_cover! if @collection_card.should_update_parent_collection_cover?
     @collection_card.update_collection_cover if @collection_card.is_cover
     add_external_record

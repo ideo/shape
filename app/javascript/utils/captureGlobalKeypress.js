@@ -27,7 +27,11 @@ export const handleMouseDownSelection = e => {
       })
     }
     // if we clicked an empty space...
-    uiStore.deselectCards()
+    if (!e.shiftKey) {
+      // Shift click should not deselect cards in case you want to drag select
+      // more.
+      uiStore.deselectCards()
+    }
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
     uiStore.closeCardMenu()
@@ -47,6 +51,7 @@ const captureGlobalKeypress = e => {
   // allow normal keypress on input element, quill, and draftjs
   const shouldNormalKeyPressBeAllowed =
     activeElement.nodeName === 'INPUT' ||
+    (uiStore.viewingItem && uiStore.viewingItem.isText) ||
     _.intersection(activeElement.classList, [
       'ql-editor',
       'ql-container',
@@ -60,13 +65,12 @@ const captureGlobalKeypress = e => {
   const { selectedCardIds, viewingCollection } = uiStore
   const ctrlKeypress = metaKey || ctrlKey
   let card
+  const noCardsSelected =
+    !viewingCollection || !ctrlKeypress || !selectedCardIds.length
   switch (code) {
     // CTRL+X: Move
     case 'KeyX':
-      if (!viewingCollection || !ctrlKeypress) {
-        return false
-      }
-      if (!selectedCardIds.length) {
+      if (noCardsSelected) {
         return false
       }
       card = apiStore.find('collection_cards', selectedCardIds[0])
@@ -86,7 +90,7 @@ const captureGlobalKeypress = e => {
       break
     // CTRL+C: Duplicate
     case 'KeyC':
-      if (!viewingCollection || !ctrlKeypress) {
+      if (noCardsSelected) {
         return false
       }
       uiStore.openMoveMenu({
@@ -131,6 +135,9 @@ const captureGlobalKeypress = e => {
       card.API_archive()
       break
     case 'Escape':
+      if (uiStore.movingCardIds.length && !uiStore.dragging) {
+        uiStore.closeMoveMenu()
+      }
       // save on esc happens only when user clicks the title textarea
       const { editingCardCover } = uiStore
       if (editingCardCover) {
