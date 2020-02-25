@@ -129,13 +129,6 @@ describe('UiStore', () => {
         })
         expect(uiStore.zoomLevel).toEqual(2)
       })
-      it('should always revert to 1 if no showZoomControls is false', () => {
-        uiStore.adjustZoomLevel({
-          collection,
-          showZoomControls: false,
-        })
-        expect(uiStore.zoomLevel).toEqual(1)
-      })
       it('when zoomed out, should adjust to collection.maxZoom', () => {
         uiStore.adjustZoomLevel({ collection })
         expect(uiStore.zoomLevel).toEqual(3)

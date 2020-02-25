@@ -594,7 +594,6 @@ describe('FoamcoreGrid', () => {
     it('should call uiStore.adjustZoomLevel to ensure zoom is correct', () => {
       expect(props.uiStore.adjustZoomLevel).toHaveBeenCalledWith({
         collection: props.collection,
-        showZoomControls: true,
       })
     })
   })

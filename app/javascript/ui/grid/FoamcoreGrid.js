@@ -161,9 +161,8 @@ class FoamcoreGrid extends React.Component {
 
   componentDidMount() {
     const { collection, uiStore } = this.props
-    const { showZoomControls } = this
     uiStore.update('selectedAreaEnabled', true)
-    uiStore.adjustZoomLevel({ collection, showZoomControls })
+    uiStore.adjustZoomLevel({ collection })
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
     window.addEventListener('scroll', this.handleScroll)
@@ -171,10 +170,9 @@ class FoamcoreGrid extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { collection, uiStore } = this.props
-    const { showZoomControls } = this
     this.updateSelectedArea()
     if (collection.id !== prevProps.collection.id) {
-      uiStore.adjustZoomLevel({ collection, showZoomControls })
+      uiStore.adjustZoomLevel({ collection })
     }
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
       // e.g. if API_fetchCards has reset the loaded cards, we may want to
@@ -192,12 +190,20 @@ class FoamcoreGrid extends React.Component {
     window.removeEventListener('scroll', this.handleScroll)
   }
 
+  get zoomLevel() {
+    if (!this.showZoomControls) {
+      // force this at 1
+      return 1
+    }
+    return this.props.uiStore.zoomLevel
+  }
+
   // Load more cards if we are approaching a boundary of what we have loaded
   loadAfterScroll = async () => {
     if (this.loadingRow) return
 
-    const { collection, uiStore } = this.props
-    const { zoomLevel } = uiStore
+    const { collection } = this.props
+    const { zoomLevel } = this
     this.computeVisibleRows()
     this.computeVisibleCols()
 
@@ -260,8 +266,8 @@ class FoamcoreGrid extends React.Component {
   // relativeZoomLevel is either the actual zoom level (if not all the way zoomed out),
   // or else returns the precise zoom ratio that will fit all cards on the screen
   get relativeZoomLevel() {
-    const { collection, uiStore } = this.props
-    const { zoomLevel } = uiStore
+    const { collection } = this.props
+    const { zoomLevel } = this
     // this method only applies for the maxZoom level, return otherwise
     if (zoomLevel !== collection.maxZoom) return zoomLevel
     const gridWidth = this.maxGridWidth({ zoomLevel })
@@ -1058,9 +1064,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderMovableCard(card, key) {
-    const { canEditCollection, collection, uiStore, routingStore } = this.props
-    const { zoomLevel } = uiStore
-    const { pageMargins, relativeZoomLevel } = this
+    const { canEditCollection, collection, routingStore } = this.props
+    const { pageMargins, zoomLevel, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
 
     const position = this.positionForCoordinates(card)

@@ -1264,14 +1264,11 @@ export default class UiStore {
   // -----------------------
   // Foamcore zoom functions
   @action
-  adjustZoomLevel = ({ collection, showZoomControls = true } = {}) => {
+  adjustZoomLevel = ({ collection } = {}) => {
     if (!collection.isBoard) {
       return
     }
-    if (!showZoomControls) {
-      // when the full grid can fit in the window, zoom all the way in
-      this.zoomLevel = 1
-    } else if (this.zoomLevel > 1) {
+    if (this.zoomLevel > 1) {
       // when switching collections readjust what "zoomed out" means
       this.zoomLevel = collection.maxZoom
     }
