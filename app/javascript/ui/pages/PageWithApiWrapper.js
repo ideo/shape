@@ -125,7 +125,7 @@ class PageWithApiWrapper extends React.Component {
     if (fetchType && cachedFetchId) {
       // First check if we already have this record in the local store
       const record = apiStore.find(fetchType, cachedFetchId)
-      if (record) {
+      if (record && !record.awaiting_updates && !record.isTestCollection) {
         // mark as !fullyLoaded until we re-fetch the latest data
         // (mostly just used by RealtimeTextItem)
         record.updateFullyLoaded(false)

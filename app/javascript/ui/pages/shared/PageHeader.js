@@ -350,6 +350,7 @@ class PageHeader extends React.Component {
 
   get renderTemplateButton() {
     const { record } = this.props
+    const { template } = record
     if (record.isUsableTemplate && record.isMasterTemplate) {
       return (
         <Button
@@ -363,12 +364,12 @@ class PageHeader extends React.Component {
         </Button>
       )
     } else if (
+      template &&
       !record.isMasterTemplate &&
       !record.isSubTemplate &&
       !record.isTestCollection &&
       record.isTemplated
     ) {
-      const { template } = record
       const active = template.can_view || template.anyone_can_view
       return (
         <Button

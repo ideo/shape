@@ -33,6 +33,8 @@ Feature: Creating an "in-collection" Test Collection
 
     # Now you are in the Test Results
     And I wait for "@apiGetCollectionCards" to finish
+    And I wait for "@apiGetCollection" to finish
+    And I wait for 3 calls to "@apiGetItemDataset" to finish
     # should only generate 3 graphs; category satisfaction was hidden
     Then I should see 3 "DataItemCover"
     Then I should see "Clarity" in a "DataItemCover"
