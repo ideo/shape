@@ -165,7 +165,7 @@ class CollectionCardDuplicator < SimpleService
     return if @for_user.blank? || @building_template_instance || @system_collection
 
     @cards.each do |card|
-      ActivityAndNotificationWorker.perform_async(
+      ActivityAndNotificationForCardWorker.perform_async(
         @for_user&.id,
         card.id,
         :duplicated,
