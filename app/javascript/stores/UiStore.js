@@ -87,6 +87,8 @@ export default class UiStore {
   @observable
   isLoading = false
   @observable
+  isTransparentLoading = false
+  @observable
   isLoadingMoveAction = false
   @observable
   dismissedMoveHelper = false
@@ -522,6 +524,7 @@ export default class UiStore {
     this.dismissedMoveHelper = false
     this.templateName = ''
     this.isLoadingMoveAction = false
+    this.isTransparentLoading = false
     this.cardAction = 'move'
     this.movingCardIds.replace([])
     this.multiMoveCardIds.replace([])
@@ -557,6 +560,12 @@ export default class UiStore {
   @action
   setMovingCards(ids) {
     this.movingCardIds.replace(ids)
+  }
+
+  @action
+  setMovingIntoCollection(collection) {
+    this.movingIntoCollection = collection
+    this.isTransparentLoading = true
   }
 
   @computed
