@@ -77,6 +77,7 @@ const fakeUiStore = {
   organizationMenuGroupId: null,
   organizationMenuOpen: false,
   expandedThreadKey: null,
+  zoomLevel: 1,
   expandThread: jest.fn(),
   openGroup: jest.fn(),
   openOptionalMenus: jest.fn(),
@@ -120,6 +121,9 @@ const fakeUiStore = {
   reselectCardIds: jest.fn(),
   setMovingCards: jest.fn(),
   drag: jest.fn(),
+  adjustZoomLevel: jest.fn(),
+  zoomIn: jest.fn(),
+  zoomOut: jest.fn(),
 }
 
 export default fakeUiStore
