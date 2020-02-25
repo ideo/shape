@@ -2,6 +2,7 @@
   "baseUrl": "http://localhost:3001",
   "viewportWidth": 1320,
   "viewportHeight": 800,
+  "requestTimeout": 8000,
   "userAgent": "cypress",
   "supportFile": "cypress/support/setup.js",
   "pluginsFile": "cypress/support/plugins.js",
