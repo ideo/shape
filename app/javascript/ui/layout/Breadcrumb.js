@@ -5,7 +5,9 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import Tooltip from '~/ui/global/Tooltip'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
-import BreadcrumbItem from '~/ui/layout/BreadcrumbItem'
+import BreadcrumbItem, {
+  breadcrumbItemPropType,
+} from '~/ui/layout/BreadcrumbItem'
 
 const BreadcrumbPadding = styled.div`
   height: 1.7rem;
@@ -55,12 +57,7 @@ class Breadcrumb extends React.Component {
     return null
   }
 
-  get truncatedItems() {
-    const { items } = this.props
-    return this.truncateItems(items)
-  }
-
-  calculateMaxChars = () => {
+  get maxChars() {
     let width = this.props.containerWidth
     if (!width) {
       if (!this.breadcrumbWrapper.current) return 80
@@ -84,7 +81,13 @@ class Breadcrumb extends React.Component {
   }
 
   charsToTruncateForItems = items => {
-    return this.totalNameLength(items) - this.calculateMaxChars()
+    return this.totalNameLength(items) - this.maxChars
+  }
+
+  truncateItemName(item, amount) {
+    if (!item.ellipses && item.name && item.name.length > amount) {
+      item.truncatedName = item.name.slice(0, amount - 1)
+    }
   }
 
   transformToSubItems(items, firstItem = {}, lastItem = {}) {
@@ -98,62 +101,12 @@ class Breadcrumb extends React.Component {
     return subItems
   }
 
-  truncateItems = items => {
-    let charsLeftToTruncate = this.charsToTruncateForItems(items)
-
-    // The mobile menu should have the full breadcrumb trail in it's one item
+  addSubItems(items) {
     const { maxDepth } = this.props
     if (maxDepth === 1) {
-      // TODO how to get all items here?
-      const allItems = this.props.items
+      const allItems = this.items()
       const subItems = this.transformToSubItems(allItems, items[0])
       if (items[0]) items[0].subItems = subItems
-    }
-
-    // If we are within allowable number of chars, return items
-    if (charsLeftToTruncate <= 0) return items
-
-    // First try truncating any long items to 25 chars
-    _.each(items, item => {
-      if (!item.ellipses && item.name && item.name.length > 25) {
-        item.truncatedName = item.name.slice(0, 24)
-      }
-    })
-
-    charsLeftToTruncate = this.charsToTruncateForItems(items)
-
-    if (items.length === 1) {
-      const [item] = items
-      item.truncatedName = item.name.slice(0, this.calculateMaxChars())
-      return items
-    }
-
-    // Item names are still too long, show ... in place of their name
-    // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
-    let index = _.floor((items.length - 1) / 2)
-
-    // If event number of items, increment index first,
-    // otherwise if odd, decrement first
-    let increment = items.length % 2 === 0
-    let jumpBy = 1
-
-    while (charsLeftToTruncate > 0) {
-      const item = items[index]
-      if (!item) break
-      if (item.name !== 'My Collection' && !item.ellipses) {
-        // Subtract this item from chars to truncate
-        charsLeftToTruncate -= item.truncatedName
-          ? item.truncatedName.length
-          : item.name.length
-        // Continue marking for truncation until we reduce it to be short enough
-        item.ellipses = true
-        // clear out truncatedName so that just the ellipses is printed out
-        item.truncatedName = null
-      }
-      // Traverse on either side of midpoint
-      index = increment ? index + jumpBy : index - jumpBy
-      jumpBy += 1
-      increment = !increment
     }
 
     const ellipsesItems = items.filter(item => item.ellipses)
@@ -170,15 +123,67 @@ class Breadcrumb extends React.Component {
     } else {
       subItems = this.transformToSubItems(items)
     }
-    // My Collection breadcrumb should always have the full trail
+
+    // TODO fix shape-specific logic
     if (items[0] && items[0].name === 'My Collection') {
       items[0].subItems = subItems
     }
+  }
+
+  get truncatedItems() {
+    const { items } = this.props
+    // The mobile menu should have the full breadcrumb trail in it's one item
+    if (items.length === 1) {
+      const [item] = items
+      this.truncateItemName(item, this.maxChars)
+      return items
+    }
+
+    let charsLeftToTruncate = this.charsToTruncateForItems(items)
+
+    // If we are within allowable number of chars, return items
+    if (charsLeftToTruncate <= 0) return items
+
+    // First try truncating any long items to 25 chars
+    _.each(items, item => this.truncateItemName(item, 25))
+
+    charsLeftToTruncate = this.charsToTruncateForItems(items)
+
+    // Item names are still too long, show ... in place of their name
+    // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
+    let index = _.floor((items.length - 1) / 2)
+
+    // If event number of items, increment index first,
+    // otherwise if odd, decrement first
+    let increment = items.length % 2 === 0
+    let jumpBy = 1
+
+    while (charsLeftToTruncate > 0) {
+      const item = items[index]
+      if (!item) break
+      // TODO remove shape-specific my collection logic
+      if (item.name !== 'My Collection' && !item.ellipses) {
+        // Subtract this item from chars to truncate
+        charsLeftToTruncate -= item.truncatedName
+          ? item.truncatedName.length
+          : item.name.length
+        // Continue marking for truncation until we reduce it to be short enough
+        item.ellipses = true
+        // clear out truncatedName so that just the ellipses is printed out
+        item.truncatedName = null
+      }
+      // Traverse on either side of midpoint
+      index = increment ? index + jumpBy : index - jumpBy
+      jumpBy += 1
+      increment = !increment
+    }
+
+    this.addSubItems(items)
 
     return _.reject(items, { remove: true })
   }
 
-  restoreBreadcrumb = item => {
+  onRestoreBreadcrumb = item => {
     this.props.onRestore(item)
   }
 
@@ -199,7 +204,7 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
-    const { items } = this.props
+    const { items, isSmallScreen, isTouchDevice } = this.props
     const renderItems = items.length > 0
     const { truncatedItems } = this
     // We need a ref to wrapper so we always render that
@@ -221,9 +226,10 @@ class Breadcrumb extends React.Component {
                   item={item}
                   index={index}
                   numItems={items.length}
-                  restoreBreadcrumb={() => this.restoreBreadcrumb(item)}
-                  onHoverOver={() => this.onHoverOver(item)}
-                  onHoverOut={() => this.onHoverOut(item)}
+                  onBreadcrumbClick={this.props.onBreadcrumbClick}
+                  restoreBreadcrumb={() => this.onRestoreBreadcrumb(item)}
+                  isTouchDevice={isTouchDevice}
+                  isSmallScreen={isSmallScreen}
                 />
               </span>
             ))}
@@ -234,35 +240,30 @@ class Breadcrumb extends React.Component {
   }
 }
 
-const breadcrumbItemPropType = {
-  name: PropTypes.string.isRequired,
-  truncatedName: PropTypes.string,
-  id: PropTypes.string,
-  identifier: PropTypes.string,
-  type: PropTypes.string,
-  can_edit_content: PropTypes.bool,
-  ellipses: PropTypes.bool,
-  has_children: PropTypes.bool,
-}
-
 Breadcrumb.propTypes = {
   items: PropTypes.arrayOf(breadcrumbItemPropType).isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   onBack: PropTypes.func.isRequired,
   onRestore: PropTypes.func,
+  onBreadcrumbClick: PropTypes.func,
   containerWidth: PropTypes.number,
   maxDepth: PropTypes.number,
   showBackButton: PropTypes.bool,
   visiblyHidden: PropTypes.bool,
+  isTouchDevice: PropTypes.bool,
+  isSmallScreen: PropTypes.bool,
 }
 
 Breadcrumb.defaultProps = {
   breadcrumbWrapper: React.createRef(),
   onRestore: () => {},
+  onBreadcrumbClick: () => {},
   containerWidth: null,
   maxDepth: 6,
   showBackButton: false,
   visiblyHidden: false,
+  isTouchDevice: false,
+  isSmallScreen: false,
 }
 
 export default Breadcrumb

@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observable, action } from 'mobx'
+import axios from 'axios'
+import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
@@ -10,6 +11,8 @@ import { apiStore, uiStore, routingStore } from '~/stores'
 class PageBreadcrumb extends React.Component {
   @observable
   breadcrumbWithLinks = []
+  @observable
+  items = []
 
   constructor(props) {
     super(props)
@@ -29,23 +32,28 @@ class PageBreadcrumb extends React.Component {
     )
     // this will set record.inMyCollection = true/false
     apiStore.checkInMyCollection(record)
+    this.items = this.initItems()
   }
 
-  items = (clamp = true) => {
+  get myCollectionItemProps() {
+    return {
+      type: 'collections',
+      id: apiStore.currentUserCollectionId,
+      identifier: 'homepage',
+      name: 'My Collection',
+      can_edit_content: true,
+      truncatedName: null,
+      ellipses: false,
+      has_children: true,
+    }
+  }
+
+  initItems = (clamp = true) => {
     const { maxDepth, record } = this.props
     const items = []
     const breadcrumb = this.breadcrumbWithLinks
     if (record.inMyCollection || uiStore.linkedInMyCollection) {
-      items.push({
-        type: 'collections',
-        id: apiStore.currentUserCollectionId,
-        identifier: 'homepage',
-        name: 'My Collection',
-        can_edit_content: true,
-        truncatedName: null,
-        ellipses: false,
-        has_children: true,
-      })
+      items.push(this.myCollectionItemProps)
     }
     if (!breadcrumb) return items
 
@@ -85,6 +93,16 @@ class PageBreadcrumb extends React.Component {
     return _.compact(items).slice(depth)
   }
 
+  fetchBreadcrumbRecords = async itemId => {
+    const breadcrumbRecordsReq = await axios.get(
+      `/api/v1/collections/${itemId}/collection_cards/breadcrumb_records`
+    )
+    runInAction(() => {
+      const item = this.items.find(i => i.id === itemId)
+      item.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
+    })
+  }
+
   onBack = path => {
     routingStore.routeTo(path)
   }
@@ -95,8 +113,12 @@ class PageBreadcrumb extends React.Component {
     this.initBreadcrumb(this.props.record, true)
   }
 
+  onBreadcrumbClick = itemId => {
+    routingStore.routeTo('collections', itemId)
+  }
+
   render() {
-    const { record, isHomepage } = this.props
+    const { containerWidth, record, isHomepage } = this.props
     const { inMyCollection, breadcrumb } = record
     const renderItems =
       !isHomepage &&
@@ -108,8 +130,12 @@ class PageBreadcrumb extends React.Component {
       <Breadcrumb
         items={this.items}
         onBack={this.onBack}
+        onBreadcrumbDive={this.fetchBreadcrumbRecords}
         showBackButton={!uiStore.isLargeBreakpoint}
         visiblyHidden={!renderItems}
+        containerWidth={containerWidth}
+        isTouchDevice={uiStore.isTouchDevice}
+        isSmallScreen={uiStore.isMobileXs}
       />
     )
   }

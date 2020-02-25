@@ -55,7 +55,6 @@ const calculateTickLabelEdges = labelText => {
 const TickLabel = props => {
   let dx
 
-  console.log('label', props)
   if (props.index === 0)
     dx = props.isSmallChartStyle ? 5 : calculateTickLabelEdges(props.text)
   if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
