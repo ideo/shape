@@ -411,7 +411,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     to_id = @to_collection&.id
     return if action == :moved && from_id == to_id
 
-    ActivityAndNotificationWorker.perform_async(
+    ActivityAndNotificationForCardWorker.perform_async(
       current_user.id,
       card.id,
       action,

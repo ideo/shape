@@ -281,6 +281,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       actor: current_user,
       target: organization.primary_group,
       action: :joined,
+      async: true,
     )
   end
 
@@ -291,6 +292,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       source: template,
       action: :template_used,
       content: template.collection_type,
+      async: true,
     )
   end
 
@@ -299,6 +301,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       actor: current_user,
       target: @collection,
       action: activity,
+      async: true,
     )
   end
 

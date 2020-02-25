@@ -140,11 +140,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           actor: @user,
           target: @user.current_organization.primary_group,
           action: :joined,
+          async: true,
         )
         expect(ActivityAndNotificationBuilder).to receive(:call).once.ordered.with(
           actor: @user,
           target: collection,
           action: :viewed,
+          async: true,
         )
         get(path)
       end
@@ -370,6 +372,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           source: template,
           action: :template_used,
           content: template.collection_type,
+          async: true,
         )
         post(path, params: params)
       end
@@ -566,6 +569,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         actor: @user,
         target: collection,
         action: :edited,
+        async: true,
       )
       patch(path, params: params)
     end
