@@ -50,6 +50,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   loadedRows = 0
   @observable
   loadedCols = 0
+  // store the most recent zoom level of this collection (gets set in uiStore)
+  @observable
+  lastZoom = null
   // this stores the "virtual" search results collection
   searchResultsCollection = null
 
