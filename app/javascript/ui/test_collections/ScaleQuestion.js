@@ -134,7 +134,7 @@ class ScaleQuestion extends React.Component {
   }
 
   handleKeyPress = event => {
-    if (event.key === 'Enter') this.stopEditingIfContent()
+    if (event.key === 'Enter') this.handleBlur()
   }
 
   startEditing = () => {
