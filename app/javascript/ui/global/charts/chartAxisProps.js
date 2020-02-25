@@ -52,18 +52,34 @@ const calculateTickLabelEdges = labelText => {
   return labelText.length * 4
 }
 
-const TickLabel = props => {
-  let dx
+const calculateRelativeWidth = label => {
+  const modifier = label.isSmallChartStyle ? 10 : 8
+  return label.text.length * modifier
+}
 
-  console.log('label', props)
-  if (props.index === 0)
-    dx = props.isSmallChartStyle ? 5 : calculateTickLabelEdges(props.text)
-  if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
+const calculateDx = (x, w) => {
+  if (x === 0) return w
+  if (x - w < 1) return w - x
+  return 0
+}
+
+const TickLabel = props => {
+  const w = calculateRelativeWidth(props)
+  const dx = calculateDx(props.x, w)
+
+  console.log('props', props)
+
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
   })
   return (
-    <VictoryLabel {...props} dx={dx} dy={props.dy || 5} style={updatedStyle} />
+    <VictoryLabel
+      {...props}
+      textAnchor="end"
+      dx={dx}
+      dy={props.dy || 5}
+      style={updatedStyle}
+    />
   )
 }
 
@@ -117,10 +133,10 @@ const ChartAxisProps = ({
   datasetTimeframe,
   domain,
   isSmallChartStyle,
+  dateValues,
 }) => {
   // NOTE: The transform property is for IE11 which doesn't recognize CSS
   // transform properties on SVG
-
   let tickCount = 12
   if (isSmallChartStyle) {
     tickCount = 5
@@ -137,6 +153,10 @@ const ChartAxisProps = ({
     tickCount,
   }
 
+  if (dateValues) {
+    axisProps.tickValues = dateValues
+    axisProps.tickCount = null
+  }
   const datasetXAxisText = (date, index) => {
     return monthlyXAxisText(datasetValues, datasetTimeframe, date, index)
   }

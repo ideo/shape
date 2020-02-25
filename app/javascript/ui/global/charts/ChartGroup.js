@@ -173,11 +173,19 @@ class ChartGroup extends React.Component {
       })
     } else {
       const { timeframe } = this.primaryDataset
+      const datasetsWithData = [
+        this.primaryDataset,
+        ...this.secondaryDatasetsWithData,
+      ]
+      const dates = _.compact(
+        _.map(_.flatten(_.map(datasetsWithData, 'dataWithDates')), 'date')
+      )
       axisProps = chartAxisProps({
         datasetValues: this.primaryDatasetValues,
         datasetTimeframe: timeframe,
         domain: this.chartDomain,
         isSmallChartStyle: this.isSmallChartStyle,
+        dateValues: dates,
       })
     }
     return <VictoryAxis {...axisProps} />
