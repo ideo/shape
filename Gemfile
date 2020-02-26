@@ -52,6 +52,7 @@ gem 'rolify', '~> 5.2.0'
 
 # Exception notification
 gem 'appsignal'
+gem 'sentry-raven'
 
 # Easy DSL for cloning AR objects
 gem 'amoeba'
