@@ -107,7 +107,7 @@ class CollectionCardDuplicator < SimpleService
       @synchronous == :all_levels,
       @building_template_instance,
     )
-    return unless run_worker_sync?
+    return unless result && run_worker_sync?
 
     # when running sync, @new_cards is the result of the sync worker
     @new_cards = result
