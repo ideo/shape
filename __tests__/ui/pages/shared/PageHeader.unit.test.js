@@ -142,7 +142,7 @@ describe('PageHeader', () => {
       props.record.isMasterTemplate = false
       props.record.isTestCollection = false
       props.record.isTemplated = true
-      props.record.template = fakeCollection
+      props.template = fakeCollection
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
 
@@ -166,8 +166,8 @@ describe('PageHeader', () => {
 
     describe('when the instance has no access to the master template', () => {
       beforeEach(() => {
-        props.record.template.can_view = false
-        props.record.template.anyone_can_view = false
+        props.template.can_view = false
+        props.template.anyone_can_view = false
         wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
       })
 

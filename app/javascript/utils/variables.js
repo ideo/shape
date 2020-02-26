@@ -15,6 +15,9 @@ export const AUDIENCE_PRICES = {
     4.0,
 }
 
+export const FOAMCORE_MAX_ZOOM = 3
+export const FOUR_WIDE_MAX_ZOOM = 2
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',

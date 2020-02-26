@@ -26,6 +26,7 @@ const mockFind = (type, id) => {
 let service, mockCollection
 const reinitialize = ({ moveCardsResult = null } = {}) => {
   uiStore.reselectCardIds.mockClear()
+  uiStore.scrollToTop.mockClear()
   apiStore.moveCards = jest.fn().mockReturnValue(moveCardsResult || {})
   apiStore.find = jest.fn(mockFind)
   service = new CardMoveService({ apiStore, uiStore })
@@ -168,6 +169,21 @@ describe('CardMoveService', () => {
         await service.moveCards('beginning')
         expect(uiStore.resetSelectionAndBCT).toHaveBeenCalled()
         expect(uiStore.scrollToTop).toHaveBeenCalled()
+      })
+
+      describe('when movingIntoCollection', () => {
+        beforeEach(() => {
+          uiStore.movingIntoCollection = true
+        })
+        afterEach(() => {
+          uiStore.movingIntoCollection = false
+        })
+
+        it('deselects cards but does not scroll', async () => {
+          await service.moveCards('beginning')
+          expect(uiStore.resetSelectionAndBCT).toHaveBeenCalled()
+          expect(uiStore.scrollToTop).not.toHaveBeenCalled()
+        })
       })
     })
 

@@ -111,4 +111,47 @@ describe('UiStore', () => {
       expect(uiStore.draggingFromMDL).toEqual(false)
     })
   })
+
+  describe('zoom functions', () => {
+    const collection = fakeCollection
+    beforeEach(() => {
+      collection.isBoard = true
+      collection.maxZoom = 3
+      uiStore.update('zoomLevel', 2)
+      // this is used by zoomIn/Out
+      uiStore.setViewingRecord(collection)
+    })
+
+    describe('#adjustZoomLevel', () => {
+      it('when zoomed out, should adjust to collection.maxZoom', () => {
+        uiStore.adjustZoomLevel({ collection })
+        expect(uiStore.zoomLevel).toEqual(3)
+      })
+
+      it('should use collection.lastZoom if available', () => {
+        uiStore.adjustZoomLevel({ collection: { ...collection, lastZoom: 2 } })
+        expect(uiStore.zoomLevel).toEqual(2)
+      })
+    })
+
+    describe('#zoomIn', () => {
+      it('reduces zoom number until it reaches 1', () => {
+        expect(uiStore.zoomLevel).toEqual(2)
+        uiStore.zoomIn()
+        expect(uiStore.zoomLevel).toEqual(1)
+        uiStore.zoomIn()
+        expect(uiStore.zoomLevel).toEqual(1)
+      })
+    })
+
+    describe('#zoomIn', () => {
+      it('increase zoom number until it reaches maxZoom', () => {
+        expect(uiStore.zoomLevel).toEqual(2)
+        uiStore.zoomOut()
+        expect(uiStore.zoomLevel).toEqual(3)
+        uiStore.zoomOut()
+        expect(uiStore.zoomLevel).toEqual(3)
+      })
+    })
+  })
 })

@@ -19,6 +19,7 @@ import Item from './Item'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
+import { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 
@@ -49,6 +50,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   loadedRows = 0
   @observable
   loadedCols = 0
+  // store the most recent zoom level of this collection (gets set in uiStore)
+  @observable
+  lastZoom = null
   // this stores the "virtual" search results collection
   searchResultsCollection = null
 
@@ -379,6 +383,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isFourWideBoard() {
     return this.isBoard && this.num_columns === 4
+  }
+
+  get maxZoom() {
+    return this.isFourWideBoard ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
   }
 
   get isPublicJoinable() {
@@ -1324,7 +1332,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
-    uiStore.update('movingIntoCollection', toCollection)
+    uiStore.setMovingIntoCollection(toCollection)
 
     const success = await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),

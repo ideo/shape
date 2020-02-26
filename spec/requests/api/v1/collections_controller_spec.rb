@@ -86,7 +86,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       create(:collection, num_cards: 5, add_viewers: [user], parent_collection: parent_collection)
     end
     let(:created_by) { collection.created_by }
-    let(:path) { "/api/v1/collections/#{collection.id}" }
+    let(:path) { api_v1_collection_path(collection) }
 
     it 'returns a 200' do
       get(path)
@@ -105,7 +105,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       collection.recalculate_breadcrumb!
       get(path)
       expect(json['data']['attributes']['breadcrumb']).to match_array([
-        { type: 'collections', id: collection.id.to_s, name: collection.name, can_edit: false, has_children: false, collection_type: 'Collection' }.as_json,
+        {
+          type: 'collections',
+          id: collection.id.to_s,
+          name: collection.name,
+          can_edit: false,
+          has_children: false,
+          collection_type: 'Collection',
+        }.as_json,
       ])
     end
 
@@ -121,18 +128,28 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(json['data']['attributes']['can_edit']).to eq(false)
     end
 
-    it 'logs a viewed and org joined activity for the current user' do
-      expect(ActivityAndNotificationBuilder).to receive(:call).once.ordered.with(
-        actor: @user,
-        target: @user.current_organization.primary_group,
-        action: :joined,
-      )
-      expect(ActivityAndNotificationBuilder).to receive(:call).once.ordered.with(
-        actor: @user,
-        target: collection,
-        action: :viewed,
-      )
-      get(path)
+    it 'does not log activities by default' do
+      expect(ActivityAndNotificationBuilder).not_to receive(:call)
+    end
+
+    context 'with page_view=true' do
+      let(:path) { api_v1_collection_path(collection, page_view: true) }
+
+      it 'logs a viewed and org joined activity for the current user' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).once.ordered.with(
+          actor: @user,
+          target: @user.current_organization.primary_group,
+          action: :joined,
+          async: true,
+        )
+        expect(ActivityAndNotificationBuilder).to receive(:call).once.ordered.with(
+          actor: @user,
+          target: collection,
+          action: :viewed,
+          async: true,
+        )
+        get(path)
+      end
     end
 
     context 'with editor' do
@@ -355,6 +372,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           source: template,
           action: :template_used,
           content: template.collection_type,
+          async: true,
         )
         post(path, params: params)
       end
@@ -551,6 +569,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         actor: @user,
         target: collection,
         action: :edited,
+        async: true,
       )
       patch(path, params: params)
     end

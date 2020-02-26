@@ -47,7 +47,10 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
 
   before_action :load_and_authorize_organization_from_slug, only: %i[my_collection]
   def my_collection
-    redirect_to api_v1_collection_path(current_user.current_user_collection(@organization.id))
+    redirect_to api_v1_collection_path(
+      current_user.current_user_collection(@organization.id),
+      page_view: params[:page_view],
+    )
   end
 
   def add_terms_text
