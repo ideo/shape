@@ -108,7 +108,7 @@ class MeasureSelect extends React.Component {
     return []
   }
 
-  renderMeasureNameAndInfo = (measureName, description) => {
+  renderMeasureNameAndInfo = (measureName, description, menuOpen) => {
     return (
       <StyledInlineSelectItem>
         <StyledMeasureName>
@@ -117,7 +117,12 @@ class MeasureSelect extends React.Component {
             maxLength={v.maxSelectMeasureTextLength}
           />
         </StyledMeasureName>
-        {description && <HoverableDescriptionIcon description={description} />}
+        {description && (
+          <HoverableDescriptionIcon
+            description={description}
+            width={menuOpen ? 16 : 10}
+          />
+        )}
       </StyledInlineSelectItem>
     )
   }
@@ -147,7 +152,11 @@ class MeasureSelect extends React.Component {
               disabled={opt.value === 'contentMenu' && this.contentSelected}
               data-cy={`DataReportOption-${opt.value}`}
             >
-              {this.renderMeasureNameAndInfo(opt.name, opt.description)}
+              {this.renderMeasureNameAndInfo(
+                opt.name,
+                opt.description,
+                this.menuOpen
+              )}
               {opt.value === 'contentMenu' && (
                 <ToggleIconHolder
                   open={this.contentSectionOpen || this.contentSelected}
