@@ -550,7 +550,7 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Helmet title={collection.pageTitle} />
-        <PageHeader record={collection} />
+        <PageHeader record={collection} template={collection.template} />
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
           // pop up over the CollectionGrid

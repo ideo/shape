@@ -349,8 +349,7 @@ class PageHeader extends React.Component {
   }
 
   get renderTemplateButton() {
-    const { record } = this.props
-    const { template } = record
+    const { record, template } = this.props
     if (record.isUsableTemplate && record.isMasterTemplate) {
       return (
         <Button
@@ -541,6 +540,11 @@ class PageHeader extends React.Component {
 
 PageHeader.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  template: MobxPropTypes.objectOrObservableObject,
+}
+
+PageHeader.defaultProps = {
+  template: null,
 }
 
 PageHeader.wrappedComponent.propTypes = {
