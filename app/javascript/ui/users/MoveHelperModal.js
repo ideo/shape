@@ -12,10 +12,7 @@ const { CloseIcon } = ICONS
 import Button from '~/ui/global/Button'
 import TextButton from '~/ui/global/TextButton'
 import { Checkbox } from '~/ui/global/styled/forms'
-import {
-  SpecialDisplayHeading,
-  DisplayText,
-} from '~/ui/global/styled/typography'
+import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { useTemplateInMyCollection } from '~/utils/url'
 
@@ -40,6 +37,12 @@ const StyledDialog = styled(Dialog)`
   }
 `
 StyledDialog.displayName = 'StyledDialog'
+
+const StyledFormControl = styled(FormControl)`
+  width: 90%;
+`
+
+StyledFormControl.displayName = 'StyledFormControl'
 
 const ModalCloseButton = styled.button`
   cursor: pointer;
@@ -123,33 +126,29 @@ class MoveHelperModal extends React.Component {
   }
 
   get renderModalButtons() {
-    const { uiStore } = this.props
-
     return (
       <div>
-        <div style={{ marginBottom: '18px' }}>
-          <DisplayText>{uiStore.templateName}</DisplayText>
+        <div style={{ display: 'flex', margin: '0px 18px 20px 18px' }}>
+          <Button
+            onClick={this.letMePlaceIt}
+            minWidth={193}
+            size="sm"
+            colorScheme={v.colors.black}
+            outline
+            data-cy="MoveHelperModal-letMePlaceItBtn"
+          >
+            Let me place it
+          </Button>
+          <span style={{ flex: 1 }} />
+          <Button
+            onClick={this.handleAddToMyCollection}
+            minWidth={250}
+            size="sm"
+            data-cy="MoveHelperModal-addToMyCollectionBtn"
+          >
+            Add to my collection
+          </Button>
         </div>
-        <Button
-          onClick={this.handleAddToMyCollection}
-          minWidth={250}
-          size="sm"
-          data-cy="MoveHelperModal-addToMyCollectionBtn"
-        >
-          Add to my collection
-        </Button>
-        <div style={{ marginBottom: '12px', marginTop: '12px' }}>
-          <DisplayText>or</DisplayText>
-        </div>
-        <Button
-          onClick={this.letMePlaceIt}
-          size="sm"
-          colorScheme={v.colors.black}
-          outline
-          data-cy="MoveHelperModal-letMePlaceItBtn"
-        >
-          Let me place it
-        </Button>
       </div>
     )
   }
@@ -181,7 +180,7 @@ class MoveHelperModal extends React.Component {
           {currentUser.show_template_helper &&
             type == 'template' &&
             this.renderModalButtons}
-          <FormControl component="fieldset" required>
+          <StyledFormControl component="fieldset" required>
             <FormControlLabel
               classes={{ label: 'form-control' }}
               style={{ textAlign: 'left' }}
@@ -194,7 +193,7 @@ class MoveHelperModal extends React.Component {
               }
               label="Thanks, please don't show me this message again."
             />
-          </FormControl>
+          </StyledFormControl>
 
           {!(currentUser.show_template_helper && type == 'template') && (
             <div className="button--center">
