@@ -9,6 +9,7 @@ import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import ZendeskWidget from '~/ui/global/ZendeskWidget'
+import CaptureGoogleAnalyticsParams from '~/ui/global/CaptureGoogleAnalyticsParams'
 import Header from '~/ui/layout/Header'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import {
@@ -249,6 +250,7 @@ class Routes extends React.Component {
         blur={displayTermsPopup}
         id="AppWrapper"
       >
+        <CaptureGoogleAnalyticsParams />
         <LowerRightCorner />
         {selectedAreaEnabled && (
           <SelectedArea coords={this.selectedAreaStyleProps} />
