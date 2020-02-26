@@ -517,12 +517,12 @@ describe Collection, type: :model do
   describe '#copy_all_cards_into!' do
     let(:source_collection) { create(:collection, num_cards: 3) }
     let(:target_collection) { create(:collection, num_cards: 2) }
+    let(:first_record) { source_collection.collection_cards.first.record }
 
     it 'copies all cards from source to target, to the beginning' do
       source_collection.copy_all_cards_into!(target_collection, synchronous: true)
       target_collection.reload
       expect(target_collection.collection_cards.count).to eq 5
-      first_record = source_collection.collection_cards.first.record
       expect(target_collection.collection_cards.first.record.cloned_from).to eq first_record
     end
 
@@ -531,9 +531,27 @@ describe Collection, type: :model do
       target_collection.reload
       # first record should still be the original target_collection card
       expect(target_collection.collection_cards.first.record.cloned_from).to be nil
-      first_record = source_collection.collection_cards.first.record
       # check the second record
       expect(target_collection.collection_cards.second.record.cloned_from).to eq first_record
+    end
+
+    context 'with links' do
+      let(:fake_parent) { create(:collection) }
+      let(:source_collection) { create(:collection, num_cards: 3, record_type: :link_text, card_relation: :link) }
+      before do
+        # all these cards' linked records need corresponding parent_collection_cards for duplication
+        source_collection.link_collection_cards.each do |cc|
+          create(:collection_card, item: cc.record, parent: fake_parent)
+        end
+      end
+
+      it 'preserves links as links and does not convert them into primary cards' do
+        source_collection.copy_all_cards_into!(target_collection, synchronous: true)
+        target_collection.reload
+        expect(target_collection.collection_cards.count).to eq 5
+        expect(target_collection.link_collection_cards.count).to eq 3
+        expect(target_collection.link_collection_cards.first.record).to eq first_record
+      end
     end
   end
 

@@ -43,7 +43,7 @@ class CollectionCardDuplicationWorker
         placement = card.order
         placeholder = card
       else
-        source_card.pinned = false unless @building_template_instance
+        source_card.pinned = false unless preserve_pinned_value?
       end
 
       source_card.duplicate!(
@@ -125,5 +125,9 @@ class CollectionCardDuplicationWorker
     return unless mover.call
 
     @new_cards += mover.legend_item_cards
+  end
+
+  def preserve_pinned_value?
+    @building_template_instance || @parent_collection.master_template?
   end
 end

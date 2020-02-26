@@ -494,6 +494,8 @@ class Collection < ApplicationRecord
       placement: placement,
       system_collection: system_collection,
       synchronous: synchronous,
+      # important that we disable this so it preserves links
+      create_placeholders: false,
     )
 
     # return the set of created duplicates
