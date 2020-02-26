@@ -137,7 +137,7 @@ class PageWithApiWrapper extends React.Component {
 
     apiStore
       .request(requestPath)
-      .then(this.afterFetchData)
+      .then(res => this.afterFetchData(res, requestPath))
       .catch(err => {
         this.setRecord(null)
         if (!apiStore.currentUser && err.status === 401) {
@@ -150,11 +150,10 @@ class PageWithApiWrapper extends React.Component {
       })
   }
 
-  afterFetchData = res => {
+  afterFetchData = (res, requestPath) => {
     if (this.unmounted) return
-    const { uiStore, match } = this.props
-    const { requestPath } = this
 
+    const { uiStore, match } = this.props
     const record = res.data
     const { id } = match.params
 

@@ -86,23 +86,25 @@ describe('PageWithApiWrapper', () => {
   })
 
   describe('afterFetchData', () => {
+    let requestPath
+    const otherRecord = { id: '456' }
     beforeEach(() => {
-      instance.setPathRequested(
-        `${props.fetchType}/${match.params.id}?page_view=true`
-      )
+      requestPath = `${props.fetchType}/${match.params.id}?page_view=true`
+      instance.setRecord(otherRecord)
     })
 
     it('sets the record', () => {
-      instance.setRecord(null)
-      instance.afterFetchData({ data: fakeCollection })
+      // because this matches, it will set the record
+      expect(instance.pathRequested).toEqual(requestPath)
+      instance.afterFetchData({ data: fakeCollection }, requestPath)
       expect(instance.record).toEqual(fakeCollection)
     })
 
     it('does not set the record if pathRequested does not match', () => {
-      const otherRecord = { id: '456' }
-      instance.setRecord(otherRecord)
-      instance.setPathRequested('some/other/path')
-      instance.afterFetchData({ data: fakeCollection })
+      requestPath = `some/other/path`
+      // this does not match, so it will not set the record
+      expect(instance.pathRequested).not.toEqual(requestPath)
+      instance.afterFetchData({ data: fakeCollection }, requestPath)
       expect(instance.record).toEqual(otherRecord)
     })
   })
