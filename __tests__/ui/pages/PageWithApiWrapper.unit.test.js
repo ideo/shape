@@ -5,7 +5,7 @@ import { apiStore, uiStore } from '~/stores'
 jest.mock('../../../app/javascript/stores')
 
 let wrapper, location, match, props, instance, rerender
-
+let fakeCollection
 beforeEach(() => {
   location = {}
   match = {
@@ -25,6 +25,11 @@ beforeEach(() => {
     fetchType: 'collections',
     render: () => null,
   }
+
+  fakeCollection = { id: '123', updateFullyLoaded: jest.fn() }
+  apiStore.request = jest
+    .fn()
+    .mockReturnValue(Promise.resolve({ data: fakeCollection }))
 
   rerender = () => {
     wrapper = shallow(<PageWithApiWrapper.wrappedComponent {...props} />)
@@ -69,31 +74,50 @@ describe('PageWithApiWrapper', () => {
       instance.fetchData()
     })
 
-    it('calls apiStore request', () => {
+    it('calls apiStore request with page_view=true', () => {
       expect(apiStore.request).toHaveBeenCalledWith(
-        `${props.fetchType}/${match.params.id}`
+        `${props.fetchType}/${match.params.id}?page_view=true`
       )
+    })
+
+    it('calls record.updateFullyLoaded', () => {
+      expect(fakeCollection.updateFullyLoaded).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('afterFetchData', () => {
+    let requestPath
+    const otherRecord = { id: '456' }
+    beforeEach(() => {
+      requestPath = `${props.fetchType}/${match.params.id}?page_view=true`
+      instance.setRecord(otherRecord)
+    })
+
+    it('sets the record', () => {
+      // because this matches, it will set the record
+      expect(instance.pathRequested).toEqual(requestPath)
+      instance.afterFetchData({ data: fakeCollection }, requestPath)
+      expect(instance.record).toEqual(fakeCollection)
+    })
+
+    it('does not set the record if pathRequested does not match', () => {
+      requestPath = `some/other/path`
+      // this does not match, so it will not set the record
+      expect(instance.pathRequested).not.toEqual(requestPath)
+      instance.afterFetchData({ data: fakeCollection }, requestPath)
+      expect(instance.record).toEqual(otherRecord)
     })
   })
 
   describe('render', () => {
-    const fakeCollection = { id: 123 }
     const FakeComponent = () => <div />
-    const fakeApiStore = {
-      ...apiStore,
-      request: jest
-        .fn()
-        .mockReturnValue(Promise.resolve({ data: fakeCollection })),
-    }
     beforeEach(() => {
       wrapper = shallow(
         <PageWithApiWrapper.wrappedComponent
           {...props}
-          apiStore={fakeApiStore}
           render={collection => <FakeComponent collection={collection} />}
         />
       )
-      wrapper.setState({ data: fakeCollection })
     })
 
     it('passes data to its rendered component', () => {

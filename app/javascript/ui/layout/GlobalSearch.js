@@ -107,9 +107,9 @@ class GlobalSearch extends React.Component {
       <div>
         <ExpandableSearchInput
           background="white"
-          defaultOpen={routingStore.pathContains('/search')}
+          defaultOpen={routingStore.isSearch}
           open={this.open}
-          controlled={true}
+          controlled
           value={this.searchText}
           onChange={this.handleTextChange}
           onClear={this.clearSearch}

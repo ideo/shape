@@ -1332,7 +1332,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
-    uiStore.update('movingIntoCollection', toCollection)
+    uiStore.setMovingIntoCollection(toCollection)
 
     const success = await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),

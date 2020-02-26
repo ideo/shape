@@ -61,9 +61,9 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       )
     end
 
-    it 'calls ActivityAndNotificationWorker for each duplicated card' do
+    it 'calls ActivityAndNotificationForCardWorker for each duplicated card' do
       moving_cards.each do |card|
-        expect(ActivityAndNotificationWorker).to receive(:perform_async).with(
+        expect(ActivityAndNotificationForCardWorker).to receive(:perform_async).with(
           user.id,
           card.id,
           :duplicated,
@@ -80,9 +80,9 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         moving_cards.each { |c| c.update(pinned: true) }
       end
 
-      it 'calls ActivityAndNotificationWorker if you are duplicating a template' do
+      it 'calls ActivityAndNotificationForCardWorker if you are duplicating a template' do
         moving_cards.each do
-          expect(ActivityAndNotificationWorker).to receive(:perform_async)
+          expect(ActivityAndNotificationForCardWorker).to receive(:perform_async)
         end
         service.call
       end
@@ -115,8 +115,8 @@ RSpec.describe CollectionCardDuplicator, type: :service do
           to_collection.update(template: template)
         end
 
-        it 'does not call ActivityAndNotificationWorker' do
-          expect(ActivityAndNotificationWorker).not_to receive(:perform_async)
+        it 'does not call ActivityAndNotificationForCardWorker' do
+          expect(ActivityAndNotificationForCardWorker).not_to receive(:perform_async)
           service.call
         end
 
