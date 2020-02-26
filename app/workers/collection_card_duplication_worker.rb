@@ -20,7 +20,7 @@ class CollectionCardDuplicationWorker
     @system_collection = system_collection
     @building_template_instance = building_template_instance
     @new_cards = duplicate_cards
-    return false if infinite_loop_detected?
+    return [] if infinite_loop_detected?
 
     duplicate_legend_items
     update_parent_cover

@@ -33,7 +33,7 @@ class CollectionCardDuplicator < SimpleService
     deep_duplicate_cards
     reorder_and_update_cached_values
     create_notifications
-    return @new_cards if @synchronous == :async
+    return @new_cards unless run_worker_sync?
 
     # If synchronous, re-assign @new_cards to actual cards, overriding placeholders
     CollectionCard.where(id: @new_cards.map(&:id))
@@ -71,8 +71,6 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def register_card_mappings
-    run_worker_sync = %i[all_levels first_level].include?(@synchronous)
-
     card_ids = @cards.map(&:id)
     # ensure parent_collection_card exists
     if @building_template_instance && @cards.size == 1 && @to_collection.parent_collection_card.present?
@@ -82,7 +80,7 @@ class CollectionCardDuplicator < SimpleService
     end
 
     CardDuplicatorMapperFindLinkedCardsWorker.send(
-      "perform_#{run_worker_sync ? 'sync' : 'async'}",
+      "perform_#{run_worker_sync? ? 'sync' : 'async'}",
       @batch_id,
       card_ids,
       @for_user&.id,
@@ -91,7 +89,6 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def deep_duplicate_cards
-    run_worker_sync = %i[all_levels first_level].include?(@synchronous)
     # NOTE: the CardDuplicatorMapperFindLinkedCardsWorker needs
     #       to run before this duplication worker so that it
     #       can map all cards that need linking
@@ -100,8 +97,8 @@ class CollectionCardDuplicator < SimpleService
     else
       card_ids = @cards.pluck(:id)
     end
-    CollectionCardDuplicationWorker.send(
-      "perform_#{run_worker_sync ? 'sync' : 'async'}",
+    result = CollectionCardDuplicationWorker.send(
+      "perform_#{run_worker_sync? ? 'sync' : 'async'}",
       @batch_id,
       card_ids,
       @to_collection.id,
@@ -110,6 +107,10 @@ class CollectionCardDuplicator < SimpleService
       @synchronous == :all_levels,
       @building_template_instance,
     )
+    return unless run_worker_sync?
+
+    # when running sync, @new_cards is the result of the sync worker
+    @new_cards = result
   end
 
   def duplicate_cards_with_placeholders
@@ -176,6 +177,10 @@ class CollectionCardDuplicator < SimpleService
   end
 
   # helpers
+
+  def run_worker_sync?
+    %i[all_levels first_level].include?(@synchronous)
+  end
 
   def moving_to_board?
     @to_collection.is_a? Collection::Board

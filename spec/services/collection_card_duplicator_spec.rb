@@ -128,6 +128,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         let(:synchronous) { :all_levels }
         before do
           to_collection.update(template: template)
+          allow(CollectionCardDuplicationWorker).to receive(:perform_sync).and_call_original
         end
 
         it 'does not call ActivityAndNotificationForCardWorker' do
@@ -147,7 +148,8 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         end
 
         it 'passes building_template_instance to CollectionCardDuplicationWorker' do
-          expect(CollectionCardDuplicationWorker).to receive(:perform_sync).with(
+          service.call
+          expect(CollectionCardDuplicationWorker).to have_received(:perform_sync).with(
             instance_of(String), # batch id
             instance_of(Array), # new card ids
             to_collection.id,
@@ -156,7 +158,6 @@ RSpec.describe CollectionCardDuplicator, type: :service do
             true, # synchronous
             true, # building_template_instance
           )
-          service.call
         end
       end
     end
@@ -210,6 +211,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
             false, # synchronous
             false, # building_template_instance
           )
+          expect(new_cards.count).to eq moving_cards.count
         end
       end
     end
