@@ -6,6 +6,7 @@ import { LineSegment, VictoryLabel } from 'victory'
 import monthEdge from '~/utils/monthEdge'
 import { utcMoment, domainProps } from '~/ui/global/charts/ChartUtils'
 import v from '~/utils/variables'
+import { uiStore } from '~/stores'
 
 const tickLabelStyle = isSmallChartStyle => {
   if (isSmallChartStyle) {
@@ -46,33 +47,59 @@ const chartAxisStyle = isSmallChartStyle => {
   }
 }
 
-const calculateTickLabelEdges = labelText => {
-  if (!labelText) return 0
-
-  return labelText.length * 4
-}
-
 const calculateRelativeWidth = label => {
-  const modifier = label.isSmallChartStyle ? 10 : 8
+  const modifier = label.isSmallChartStyle ? 10.5 : 8
   return label.text.length * modifier
 }
 
-const calculateDx = (x, w) => {
-  if (x === 0) return w
-  if (x - w < 1) return w - x
+const calculateDx = (x, w, isSmallChartStyle) => {
+  if (isSmallChartStyle) {
+    if (x === 0) return w
+    if (x - w < 1) return w - x
+  }
   return 0
 }
 
+const areLabelsOverlapping = (a, b) => {
+  const ar = a.x + a.w
+  const br = b.x + b.w
+  return !(ar < b.x || a.x > br)
+}
+
+const ticks = {}
+
 const TickLabel = props => {
   const w = calculateRelativeWidth(props)
-  const dx = calculateDx(props.x, w)
-
-  console.log('props', props)
+  const dx = calculateDx(props.x, w, props.isSmallChartStyle)
 
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
   })
-  return (
+
+  ticks[props.itemId] = ticks[props.itemId] || []
+  const currentTicks = ticks[props.itemId]
+
+  if (props.isSmallChartStyle) {
+    currentTicks.forEach(tick => {
+      if (tick.props.id !== props.id) {
+        const overlapping = areLabelsOverlapping(
+          { ...props, w },
+          { ...tick.props, w: calculateRelativeWidth(tick.props) }
+        )
+        if (overlapping) {
+          uiStore.addLabelToHide({
+            id: props.id,
+            itemId: props.itemId,
+            text: props.text,
+            date: props.datum,
+            otherLabel: tick.props,
+          })
+        }
+      }
+    })
+  }
+
+  const Label = (
     <VictoryLabel
       {...props}
       textAnchor="end"
@@ -81,6 +108,14 @@ const TickLabel = props => {
       style={updatedStyle}
     />
   )
+
+  if (!currentTicks.find(t => t.props.id === props.id)) {
+    currentTicks.push({
+      props,
+      component: Label,
+    })
+  }
+  return Label
 }
 
 const fullDate = (date, index) => {
@@ -134,6 +169,7 @@ const ChartAxisProps = ({
   domain,
   isSmallChartStyle,
   dateValues,
+  itemId,
 }) => {
   // NOTE: The transform property is for IE11 which doesn't recognize CSS
   // transform properties on SVG
@@ -172,6 +208,7 @@ const ChartAxisProps = ({
             fontSize={tickLabelStyleProps.fontSize}
             dy={tickLabelStyleProps.dy}
             isSmallChartStyle={isSmallChartStyle}
+            itemId={itemId}
           />
         ),
         orientation: 'bottom',

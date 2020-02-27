@@ -25,6 +25,7 @@ import {
   chartDomainForDatasetValues,
   formatValuesForVictory,
 } from '~/ui/global/charts/ChartUtils'
+import { uiStore } from '~/stores'
 
 const NotEnoughDataContainer = styled.div`
   position: relative;
@@ -177,15 +178,28 @@ class ChartGroup extends React.Component {
         this.primaryDataset,
         ...this.secondaryDatasetsWithData,
       ]
-      const dates = _.compact(
+      let dates = _.compact(
         _.map(_.flatten(_.map(datasetsWithData, 'dataWithDates')), 'date')
       )
+      if (this.isSmallChartStyle) {
+        uiStore.labelsToHide.forEach(label => {
+          const { otherLabel } = label
+          if (otherLabel.datum.getTime() > label.date.getTime()) {
+            dates = _.filter(
+              dates,
+              date => date.getTime() !== label.date.getTime()
+            )
+          }
+        })
+      }
+      const { dataItem } = this.props
       axisProps = chartAxisProps({
         datasetValues: this.primaryDatasetValues,
         datasetTimeframe: timeframe,
         domain: this.chartDomain,
         isSmallChartStyle: this.isSmallChartStyle,
-        dateValues: dates,
+        dateValues: this.isSmallChartStyle ? dates : null,
+        itemId: dataItem.id,
       })
     }
     return <VictoryAxis {...axisProps} />
