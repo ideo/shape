@@ -99,7 +99,7 @@ class MoveHelperModal extends React.Component {
   handleClose = () => {
     const { uiStore, apiStore, type } = this.props
     const { currentUser } = apiStore
-    if (type === 'move') {
+    if (type === 'move' && this.dontShowChecked) {
       currentUser.API_hideHelper(type)
     }
     uiStore.update('dismissedMoveHelper', true)
@@ -165,6 +165,10 @@ class MoveHelperModal extends React.Component {
   render() {
     const { apiStore, type } = this.props
     const { currentUser } = apiStore
+    const modalLabel =
+      type === 'template'
+        ? v.helperModalLabels.templateHelper
+        : v.helperModalLabels.moveHelper
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
@@ -200,7 +204,7 @@ class MoveHelperModal extends React.Component {
                   value="yes"
                 />
               }
-              label="Thanks, please don't show me this message again."
+              label={modalLabel}
             />
           </StyledFormControl>
 

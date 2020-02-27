@@ -88,6 +88,9 @@ class User extends BaseRecord {
   API_updateUseTemplateSetting(useTemplateSetting = null) {
     if (!useTemplateSetting) return
 
+    // set it ahead of time so the helper immediately disappears
+    this['show_template_helper'] = false
+
     return this.API_updateCurrentUser({
       show_template_helper: false,
       use_template_setting: useTemplateSetting,

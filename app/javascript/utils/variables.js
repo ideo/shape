@@ -337,8 +337,8 @@ export default {
   },
 
   useTemplateSettings: {
-    addToMyCollection: 0,
-    letMePlaceIt: 1,
+    addToMyCollection: 1,
+    letMePlaceIt: 2,
   },
 
   helperModalLabels: {
