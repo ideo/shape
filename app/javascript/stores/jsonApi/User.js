@@ -85,6 +85,15 @@ class User extends BaseRecord {
     })
   }
 
+  API_updateUseTemplateSetting(useTemplateSetting = null) {
+    if (!useTemplateSetting) return
+
+    return this.API_updateCurrentUser({
+      show_template_helper: false,
+      use_template_setting: useTemplateSetting,
+    })
+  }
+
   API_hideHelper(type = '') {
     let show_helper = 'show_helper'
     if (['template', 'move'].indexOf(type) > -1) {

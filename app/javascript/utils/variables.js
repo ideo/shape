@@ -335,4 +335,15 @@ export default {
     duration: 350,
     smooth: true,
   },
+
+  useTemplateSettings: {
+    addToMyCollection: 0,
+    letMePlaceIt: 1,
+  },
+
+  helperModalLabels: {
+    templateHelper:
+      'Thanks, please remember my selection, and don’t ask me again. This can be changed in your settings.',
+    moveHelper: "Thanks, please don't show me this message again.",
+  },
 }

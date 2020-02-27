@@ -80,29 +80,38 @@ class MoveHelperModal extends React.Component {
   }
 
   handleAddToMyCollection = async e => {
-    await this.updateUserPreference()
+    await this.updateUserPreference({
+      useTemplateSetting: v.useTemplateSettings.addToMyCollection,
+    })
     return useTemplateInMyCollection(this.templateCollection.id)
   }
 
   @action
-  updateUserPreference = () => {
+  updateUserPreference = ({ useTemplateSetting = null } = {}) => {
     const { apiStore, type } = this.props
     const { currentUser } = apiStore
-    if (this.dontShowChecked) {
-      return currentUser.API_hideHelper(type)
+
+    if (this.dontShowChecked && type === 'template') {
+      return currentUser.API_updateUseTemplateSetting(useTemplateSetting)
     }
   }
 
   handleClose = () => {
-    const { uiStore } = this.props
-    this.updateUserPreference()
+    const { uiStore, apiStore, type } = this.props
+    const { currentUser } = apiStore
+    if (type === 'move') {
+      currentUser.API_hideHelper(type)
+    }
     uiStore.update('dismissedMoveHelper', true)
     uiStore.update('showTemplateHelperForCollection', null)
   }
 
-  letMePlaceIt = e => {
+  letMePlaceIt = async e => {
     const { uiStore } = this.props
     if (this.templateCollection) {
+      await this.updateUserPreference({
+        useTemplateSetting: v.useTemplateSettings.letMePlaceIt,
+      })
       uiStore.openMoveMenu({
         from: this.templateCollection,
         cardAction: 'useTemplate',
@@ -195,7 +204,7 @@ class MoveHelperModal extends React.Component {
             />
           </StyledFormControl>
 
-          {!(currentUser.show_template_helper && type == 'template') && (
+          {!(currentUser.show_template_helper && type === 'template') && (
             <div className="button--center">
               <TextButton
                 onClick={this.handleClose}
