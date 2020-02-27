@@ -206,9 +206,12 @@ class CollectionCover extends React.Component {
 
   get hasLaunchTestButton() {
     const { collection } = this.props
-    // FIXME: hide button since there's an issue when launching tests from the cover when no audience has been selected
     // TODO: Distinguish tests with test design from FSRC as FSRC shouldn't show the test buttons from the cover
-    return false
+    if (!collection.collection_to_test_id) {
+      // FIXME: hide button since there's an issue when launching tests from the cover when no audience has been selected
+      // so this only works for in-collection tests
+      return false
+    }
     return (
       // This button only appears for tests inside submissions
       collection.is_inside_a_submission &&

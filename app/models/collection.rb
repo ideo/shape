@@ -389,21 +389,6 @@ class Collection < ApplicationRecord
     batch_id: nil,
     card: nil
   )
-
-    # check if we are cloning a template inside a template instance;
-    # - this means we should likewise turn the template dup into its own instance
-    if master_template? && building_template_instance
-      builder = CollectionTemplateBuilder.new(
-        parent: parent,
-        template: self,
-        placement: parent_collection_card.order,
-        created_by: for_user,
-        # in this case the card has already been created
-        parent_card: parent_collection_card,
-        synchronous: synchronous ? :all_levels : :async,
-      )
-      return builder.call
-    end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     if c.is_a?(Collection::UserProfile)
@@ -414,6 +399,9 @@ class Collection < ApplicationRecord
       # when duplicating into a master_template, this collection should be a subtemplate
       c.template_id = nil
       c.master_template = true
+    elsif building_template_instance
+      c.template = self
+      c.master_template = false
     end
     # clear out cached submission_attrs
     c.cached_attributes.delete 'submission_attrs'
@@ -469,6 +457,7 @@ class Collection < ApplicationRecord
         for_user.try(:id),
         system_collection,
         synchronous,
+        building_template_instance,
       )
     end
 

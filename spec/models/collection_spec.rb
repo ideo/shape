@@ -253,6 +253,7 @@ describe Collection, type: :model do
     let(:parent) { collection.parent }
     let(:batch_id) { "duplicate-#{SecureRandom.hex(10)}" }
     let(:card) { nil }
+    let(:building_template_instance) { false }
     let(:duplicate) do
       dupe = collection.duplicate!(
         for_user: user,
@@ -260,6 +261,7 @@ describe Collection, type: :model do
         parent: parent,
         batch_id: batch_id,
         card: card,
+        building_template_instance: building_template_instance,
       )
       # Necessary because AR-relationship is cached
       user.roles.reload
@@ -328,7 +330,8 @@ describe Collection, type: :model do
           batch_id,
           collection.collection_cards.map(&:id),
           instance_of(Integer),
-          nil,
+          nil, # <-- nil user_id
+          false,
           false,
           false,
         )
@@ -385,6 +388,7 @@ describe Collection, type: :model do
           user.id,
           false,
           false,
+          false,
         )
         collection.duplicate!(
           for_user: user,
@@ -425,6 +429,7 @@ describe Collection, type: :model do
           anything,
           true,
           true,
+          false,
         )
         collection.duplicate!(
           batch_id: batch_id,
@@ -432,6 +437,31 @@ describe Collection, type: :model do
           system_collection: true,
           synchronous: true,
         )
+      end
+    end
+
+    context 'with building_template_instance' do
+      let(:building_template_instance) { true }
+      before do
+        collection.update(master_template: true)
+      end
+
+      it 'should set the template to itself, and set master_template = false' do
+        expect(duplicate.template).to eq collection
+        expect(duplicate.master_template?).to be false
+      end
+
+      it 'should pass building_template_instance to the worker' do
+        expect(CollectionCardDuplicationWorker).to receive(:perform_async).with(
+          batch_id,
+          collection.collection_cards.map(&:id),
+          instance_of(Integer),
+          user.id,
+          false,
+          false,
+          true, # <-- building_template_instance
+        )
+        duplicate
       end
     end
 
@@ -1041,6 +1071,9 @@ describe Collection, type: :model do
         collection.cache_card_count!
         expect(collection.cached_card_count).to eq 3
         expect(collection.cached_cover).not_to be nil
+        collection.update(submission_attrs: { submission: true })
+        collection.cache_card_count!
+        expect(collection.reload.submission?).to be true
       end
     end
     # <- end Caching methods
