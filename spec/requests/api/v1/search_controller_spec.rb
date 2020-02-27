@@ -150,22 +150,25 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
 
       context 'with master_template param' do
         let!(:templates) do
-          create_list(
+          templates = create_list(
             :collection,
             2,
             organization: organization,
             master_template: true,
             add_viewers: [current_user],
           )
+          test_collection = create(:collection, type: 'Collection::TestCollection')
+          templates << test_collection
+          templates
         end
         before do
           batch_reindex(Collection)
         end
 
-        it 'only finds template collections' do
+        it 'only finds template collections and filters out template collections' do
           get(path, params: { master_template: true })
           expect(json['data'].size).to eq(2)
-          expect(json['data'].map { |d| d['id'].to_i }).to match_array(templates.map(&:id))
+          expect(json['data'].map { |d| d['id'].to_i }).to match_array((templates.reject { |t| t.type == 'Collection::TestCollection' }).map(&:id))
         end
       end
 

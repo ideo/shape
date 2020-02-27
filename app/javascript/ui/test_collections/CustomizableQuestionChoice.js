@@ -46,11 +46,23 @@ class CustomizableQuestionChoice extends React.Component {
   constructor(props) {
     super(props)
     this.debouncedSaveChoice = _.debounce(this._saveChoice, 1050)
+    this.instanceDataContentUpdate = _.debounce(
+      this._instanceDataContentUpdate,
+      30000
+    )
   }
 
   _saveChoice = () => {
     const { choice } = this.props
     choice.save()
+  }
+
+  _instanceDataContentUpdate = () => {
+    const { handleInstanceDataContentUpdate } = this.props
+
+    if (handleInstanceDataContentUpdate) {
+      handleInstanceDataContentUpdate()
+    }
   }
 
   handleLabelClick = ev => {
@@ -63,6 +75,12 @@ class CustomizableQuestionChoice extends React.Component {
     const { choice } = this.props
     choice.text = ev.target.value
     this.debouncedSaveChoice()
+    this.instanceDataContentUpdate()
+  }
+
+  handleBlur = () => {
+    this.debouncedSaveChoice.flush()
+    this.instanceDataContentUpdate.flush()
   }
 
   handleDelete = ev => {
@@ -113,6 +131,7 @@ class CustomizableQuestionChoice extends React.Component {
         >
           <TextInput
             onFocus={handleFocus}
+            onBlur={this.handleBlur}
             onChange={this.handleInputChange}
             type="questionText"
             placeholder={placeholder}
@@ -143,18 +162,20 @@ CustomizableQuestionChoice.propTypes = {
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   isChecked: PropTypes.bool,
   editing: PropTypes.bool,
+  placeholder: PropTypes.string,
   onDelete: PropTypes.func,
   handleFocus: PropTypes.func,
-  placeholder: PropTypes.string,
+  handleInstanceDataContentUpdate: PropTypes.func,
 }
 
 CustomizableQuestionChoice.defaultProps = {
   questionAnswer: null,
   isChecked: false,
   editing: false,
+  placeholder: 'Write your option here',
   onDelete: () => {},
   handleFocus: () => true,
-  placeholder: 'Write your option here',
+  handleInstanceDataContentUpdate: () => true,
 }
 
 CustomizableQuestionChoice.displayName = 'CustomizableQuestionChoice'
