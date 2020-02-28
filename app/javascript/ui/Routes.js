@@ -1,4 +1,5 @@
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { Fragment } from 'react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import WindowSizeListener from 'react-window-size-listener'
@@ -9,7 +10,7 @@ import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import ZendeskWidget from '~/ui/global/ZendeskWidget'
-import CaptureGoogleAnalyticsParams from '~/ui/global/CaptureGoogleAnalyticsParams'
+import AppendUtmParams from '~/utils/googleAnalytics/AppendUtmParams'
 import Header from '~/ui/layout/Header'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import {
@@ -222,7 +223,12 @@ class Routes extends React.Component {
     if (apiStore.currentOrgSlug) {
       return <Redirect to={`/${apiStore.currentOrgSlug}`} />
     } else {
-      return <CreateOrgPage />
+      return (
+        <Fragment>
+          <AppendUtmParams />
+          <CreateOrgPage />
+        </Fragment>
+      )
     }
   }
 
@@ -250,7 +256,6 @@ class Routes extends React.Component {
         blur={displayTermsPopup}
         id="AppWrapper"
       >
-        <CaptureGoogleAnalyticsParams />
         <LowerRightCorner />
         {selectedAreaEnabled && (
           <SelectedArea coords={this.selectedAreaStyleProps} />
@@ -269,6 +274,11 @@ class Routes extends React.Component {
               <ActivityLogBox />
             </FixedActivityLogWrapper>
             {displayTermsPopup && <TermsOfUseModal currentUser={currentUser} />}
+            {/* Capture google analytics params if not root path */}
+            <Route
+              path={new RegExp('^/.+$')}
+              render={() => <AppendUtmParams />}
+            />
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
               <Route exact path="/" render={this.goToRoot} />

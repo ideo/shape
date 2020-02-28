@@ -1,3 +1,6 @@
+import { routingStore } from '~/stores'
+import { storeUtmParams } from '~/utils/googleAnalytics/utmUtils'
+
 export const loginRedirectPath = (redirect = null) => {
   let path = '/login'
   if (redirect) {
@@ -7,6 +10,8 @@ export const loginRedirectPath = (redirect = null) => {
 }
 
 export const routeToLogin = ({ redirect = null } = {}) => {
+  // Capture UTM params before redirecting
+  storeUtmParams(routingStore.utmQueryParams)
   window.location.href = loginRedirectPath(redirect)
 }
 

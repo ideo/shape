@@ -5,6 +5,7 @@ import queryString from 'query-string'
 
 import { apiStore, uiStore } from '~/stores'
 import { stringifyUrlParams } from '~/utils/url'
+import { utmParamsFromLocation } from '~/utils/googleAnalytics/utmUtils'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
@@ -134,6 +135,18 @@ class RoutingStore extends RouterStore {
     } else {
       this.routeTo('/')
     }
+  }
+
+  get utmQueryParams() {
+    return utmParamsFromLocation(this.location)
+  }
+
+  appendQueryString = queryString => {
+    if (!this.history) return
+    this.history.push({
+      pathname: this.location.pathname,
+      search: queryString,
+    })
   }
 }
 
