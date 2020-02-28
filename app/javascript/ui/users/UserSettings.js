@@ -7,7 +7,7 @@ import v from '~/utils/variables'
 
 import {
   Label,
-  LabelText,
+  LabelTextStandalone,
   LabelHint,
   Select,
   Checkbox,
@@ -18,14 +18,12 @@ const SettingsPageWrapper = styled.div`
   width: 700px;
 `
 
-const StyledLabelText = styled(LabelText)`
-  margin: 15px 0px 0px 0px;
-  text-transform: none;
-  font-weight: normal;
-`
-
 const StyledCheckbox = styled(Checkbox)`
   place-self: flex-start;
+`
+
+const CheckboxWrapper = styled.div`
+  margin-bottom: 10px;
 `
 
 @inject('apiStore', 'uiStore')
@@ -67,14 +65,13 @@ class UserSettings extends React.Component {
     uiStore.alert(message, 'Mail')
   }
 
-  handleAddToMyCollectionCheck = async ev => {
-    const addToMyCollectionChecked = ev.target.checked
-    v.useTemplateSettings.addToMyCollection
-    const useTemplateSetting = addToMyCollectionChecked
-      ? v.useTemplateSettings.addToMyCollection
-      : v.useTemplateSettings.letMePlaceIt
+  handleAddToMyCollectionCheck = ev => {
+    const { addToMyCollection, letMePlaceIt } = v.useTemplateSettings
+    const useTemplateSetting = ev.target.checked
+      ? addToMyCollection
+      : letMePlaceIt
     this.user.use_template_setting = useTemplateSetting
-    await this.user.API_updateUseTemplateSetting(useTemplateSetting)
+    this.user.API_updateUseTemplateSetting(useTemplateSetting)
   }
 
   get notifyValue() {
@@ -110,7 +107,7 @@ class UserSettings extends React.Component {
           </MenuItem>
         </Select>
 
-        <div>
+        <CheckboxWrapper>
           <FormControl component="fieldset">
             <FormControlLabel
               classes={{ label: 'form-control' }}
@@ -123,17 +120,17 @@ class UserSettings extends React.Component {
               }
               label={
                 <div>
-                  <StyledLabelText>
+                  <LabelTextStandalone>
                     {v.userSettingsLabels.mailingListText}
-                  </StyledLabelText>
+                  </LabelTextStandalone>
                   <LabelHint>{v.userSettingsLabels.mailingListHint}</LabelHint>
                 </div>
               }
             />
           </FormControl>
-        </div>
+        </CheckboxWrapper>
 
-        <div>
+        <CheckboxWrapper>
           <FormControl component="fieldset">
             <FormControlLabel
               classes={{ label: 'form-control' }}
@@ -149,15 +146,15 @@ class UserSettings extends React.Component {
               }
               label={
                 <div>
-                  <StyledLabelText>
+                  <LabelTextStandalone>
                     {v.userSettingsLabels.useTemplateLabel}
-                  </StyledLabelText>
+                  </LabelTextStandalone>
                   <LabelHint>{v.userSettingsLabels.useTemplateHint}</LabelHint>
                 </div>
               }
             />
           </FormControl>
-        </div>
+        </CheckboxWrapper>
       </SettingsPageWrapper>
     )
   }

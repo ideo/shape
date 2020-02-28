@@ -45,14 +45,15 @@ export const LabelText = styled.div`
 LabelText.displayName = 'StyledLabelText'
 
 export const LabelHint = styled.span`
-  color: ${v.colors.commonMedium};
+  color: ${v.colors.commonDark};
   font-size: 1rem;
 `
 
 export const LabelTextStandalone = styled.div`
   ${LabelStyle};
-  margin-bottom: 0;
-  margin-top: 12px;
+  font-weight: normal;
+  text-transform: none;
+  margin: 12px 0 4px 0;
 `
 
 export const LabelContainer = styled(FormControlLabel)`
