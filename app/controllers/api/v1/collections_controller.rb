@@ -150,7 +150,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def log_viewing_activities
-    return unless user_signed_in? && current_user.current_organization.present?
+    # collections#show can be fetched in non "page view" contexts which is why we include this optional param
+    return unless params[:page_view].present? && user_signed_in? && current_user.current_organization.present?
 
     log_organization_view_activity
     # TODO: we may want to log collection view for anonymous user
@@ -280,6 +281,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       actor: current_user,
       target: organization.primary_group,
       action: :joined,
+      async: true,
     )
   end
 
@@ -290,6 +292,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       source: template,
       action: :template_used,
       content: template.collection_type,
+      async: true,
     )
   end
 
@@ -298,6 +301,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       actor: current_user,
       target: @collection,
       action: activity,
+      async: true,
     )
   end
 

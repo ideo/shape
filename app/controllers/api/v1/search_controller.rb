@@ -76,6 +76,8 @@ class Api::V1::SearchController < Api::V1::BaseController
 
     if params[:master_template].present?
       where_clause[:master_template] = params[:master_template]
+      # always omit TestCollections from a master_template = true search
+      where_clause[:type] = { not: 'Collection::TestCollection' } if params[:master_template]
     end
 
     # super_admin has access to everything regardless of user/group_ids

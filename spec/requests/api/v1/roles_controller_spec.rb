@@ -221,9 +221,23 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
           organization.update(active_users_count: 3)
         end
 
-        it 'should return a 401' do
+        it 'should return a 400 with an error message' do
           post(path, params: params)
-          expect(response.status).to eq(401)
+          expect(json['errors'][0]).to include('over the free limit')
+          expect(response.status).to eq(400)
+        end
+      end
+
+      context 'with users already in the org' do
+        before do
+          users.each do |user|
+            user.add_role(Role::MEMBER, organization.primary_group)
+          end
+        end
+
+        it 'should return a 204' do
+          post(path, params: params)
+          expect(response.status).to eq(204)
         end
       end
 

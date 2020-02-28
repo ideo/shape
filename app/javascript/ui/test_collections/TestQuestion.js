@@ -85,6 +85,13 @@ class TestQuestion extends React.Component {
     afterQuestionAnswered(card)
   }
 
+  handleInstanceDataContentUpdate = () => {
+    const { parent } = this.props
+    if (parent && parent.isTemplate) {
+      parent.API_backgroundUpdateTemplateInstances()
+    }
+  }
+
   get givesIncentive() {
     return this.props.parent.gives_incentive
   }
@@ -123,6 +130,9 @@ class TestQuestion extends React.Component {
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
+            handleInstanceDataContentUpdate={
+              this.handleInstanceDataContentUpdate
+            }
           />
         )
       case 'question_single_choice':
@@ -134,6 +144,9 @@ class TestQuestion extends React.Component {
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             handleFocus={handleFocus}
+            handleInstanceDataContentUpdate={
+              this.handleInstanceDataContentUpdate
+            }
             question_choices={record.question_choices}
             isTestDraft={testStatus === 'draft'}
           />
@@ -148,6 +161,9 @@ class TestQuestion extends React.Component {
             parent={parent}
             canEdit={canEdit}
             handleFocus={handleFocus}
+            handleInstanceDataContentUpdate={
+              this.handleInstanceDataContentUpdate
+            }
           />
         )
       case 'question_description':
@@ -157,6 +173,9 @@ class TestQuestion extends React.Component {
             item={record}
             canEdit={canEdit}
             handleFocus={handleFocus}
+            handleInstanceDataContentUpdate={
+              this.handleInstanceDataContentUpdate
+            }
           />
         )
       case 'question_open':
@@ -168,6 +187,9 @@ class TestQuestion extends React.Component {
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             handleFocus={handleFocus}
+            handleInstanceDataContentUpdate={
+              this.handleInstanceDataContentUpdate
+            }
           />
         )
       case 'question_finish':

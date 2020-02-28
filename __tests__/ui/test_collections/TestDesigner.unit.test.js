@@ -304,4 +304,17 @@ describe('TestDesigner', () => {
       expect(component.styledTheme.borderColor).toEqual(v.colors.secondaryDark)
     })
   })
+
+  describe('with template instance cards with question_type null', () => {
+    beforeEach(() => {
+      props.collection.isTemplated = true
+      const empty_questions = props.collection.sortedCards
+      empty_questions.forEach(c => (c.card_question_type = null))
+      props.collection.sortedCards = empty_questions
+      rerender()
+    })
+    it('should not render QuestionLeftSide', () => {
+      expect(wrapper.find('QuestionLeftSide').exists()).toBe(false)
+    })
+  })
 })

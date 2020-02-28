@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_20_181647) do
+ActiveRecord::Schema.define(version: 2020_02_26_214443) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -696,6 +696,7 @@ ActiveRecord::Schema.define(version: 2020_02_20_181647) do
     t.jsonb "terms_accepted_data", default: {}
     t.jsonb "last_active_at", default: {}
     t.string "locale"
+    t.jsonb "user_settings_data", default: {}, null: false
     t.index ["email"], name: "index_users_on_email"
     t.index ["handle"], name: "index_users_on_handle", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token"

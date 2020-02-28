@@ -205,7 +205,7 @@ When('I enter {string} as my category', string => {
 When('I add an open response question with {string}', text => {
   cy.locate('QuestionHotEdgeButton')
     .last()
-    .click()
+    .click({ force: true })
   cy.wait('@apiCreateCollectionCard')
   // have to wait for the flipmove fade-in
   cy.wait(FLIPMOVE_DELAY + 500)
