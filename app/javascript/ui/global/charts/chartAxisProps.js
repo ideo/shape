@@ -55,9 +55,7 @@ const calculateTickLabelEdges = labelText => {
 const TickLabel = props => {
   let dx
 
-  console.log('label', props)
-  if (props.index === 0)
-    dx = props.isSmallChartStyle ? 5 : calculateTickLabelEdges(props.text)
+  if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
   if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
@@ -151,7 +149,6 @@ const ChartAxisProps = ({
           <TickLabel
             fontSize={tickLabelStyleProps.fontSize}
             dy={tickLabelStyleProps.dy}
-            isSmallChartStyle={isSmallChartStyle}
           />
         ),
         orientation: 'bottom',
