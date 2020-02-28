@@ -4,10 +4,11 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { useTemplateInMyCollection } from '~/utils/url'
+import v from '~/utils/variables'
 
 jest.mock('../../../app/javascript/utils/url')
 
-let props, wrapper, component, uiStore, routingStore
+let props, wrapper, component, uiStore, routingStore, rerender
 
 describe('MoveHelperModal', () => {
   beforeEach(() => {
@@ -22,12 +23,16 @@ describe('MoveHelperModal', () => {
     fakeUser.show_move_helper = true
     props = {
       currentUser: fakeUser,
-      type: 'move',
+      type: 'template',
       uiStore,
       routingStore,
       apiStore: fakeApiStore(),
     }
-    wrapper = shallow(<MoveHelperModal.wrappedComponent {...props} />)
+    rerender = () => {
+      wrapper = shallow(<MoveHelperModal.wrappedComponent {...props} />)
+      return wrapper
+    }
+    rerender()
     component = wrapper.instance()
   })
 
@@ -57,10 +62,10 @@ describe('MoveHelperModal', () => {
         component.letMePlaceIt(fakeEvent)
       })
 
-      it('should update the current user', () => {
-        expect(props.apiStore.currentUser.API_hideHelper).toHaveBeenCalledWith(
-          'move'
-        )
+      it("should update the current user's default template behavior setting to let the user place it using the MDL", () => {
+        expect(
+          props.apiStore.currentUser.API_updateUseTemplateSetting
+        ).toHaveBeenCalledWith(v.useTemplateSettings.letMePlaceIt)
       })
     })
   })
@@ -86,11 +91,22 @@ describe('MoveHelperModal', () => {
         component.handleAddToMyCollection(fakeEvent)
       })
 
-      it('should update the current user', () => {
-        expect(props.apiStore.currentUser.API_hideHelper).toHaveBeenCalledWith(
-          'move'
-        )
+      it("should update the current user's default template behavior setting to add to my collection ", () => {
+        expect(
+          props.apiStore.currentUser.API_updateUseTemplateSetting
+        ).toHaveBeenCalledWith(v.useTemplateSettings.addToMyCollection)
       })
+    })
+  })
+
+  describe("with type === 'move'", () => {
+    beforeEach(() => {
+      props.type = 'move'
+      rerender()
+    })
+
+    it('should render a Close button', () => {
+      expect(wrapper.find('TextButton').text()).toEqual('Close')
     })
   })
 

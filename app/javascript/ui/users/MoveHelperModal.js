@@ -11,17 +11,20 @@ import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
 import Button from '~/ui/global/Button'
 import TextButton from '~/ui/global/TextButton'
-import { Checkbox } from '~/ui/global/styled/forms'
-import {
-  SpecialDisplayHeading,
-  DisplayText,
-} from '~/ui/global/styled/typography'
+import { Checkbox, LabelHint, LabelText } from '~/ui/global/styled/forms'
+import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { useTemplateInMyCollection } from '~/utils/url'
 
 const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
   margin-bottom: 30px;
+`
+
+const StyledLabelText = styled(LabelText)`
+  margin: 15px 0px 0px 0px;
+  text-transform: none;
+  font-weight: normal;
 `
 
 const StyledDialog = styled(Dialog)`
@@ -40,6 +43,12 @@ const StyledDialog = styled(Dialog)`
   }
 `
 StyledDialog.displayName = 'StyledDialog'
+
+const StyledFormControl = styled(FormControl)`
+  width: 90%;
+`
+
+StyledFormControl.displayName = 'StyledFormControl'
 
 const ModalCloseButton = styled.button`
   cursor: pointer;
@@ -77,29 +86,38 @@ class MoveHelperModal extends React.Component {
   }
 
   handleAddToMyCollection = async e => {
-    await this.updateUserPreference()
+    await this.updateUserPreference({
+      useTemplateSetting: v.useTemplateSettings.addToMyCollection,
+    })
     return useTemplateInMyCollection(this.templateCollection.id)
   }
 
   @action
-  updateUserPreference = () => {
+  updateUserPreference = ({ useTemplateSetting = null } = {}) => {
     const { apiStore, type } = this.props
     const { currentUser } = apiStore
-    if (this.dontShowChecked) {
-      return currentUser.API_hideHelper(type)
+
+    if (this.dontShowChecked && type === 'template') {
+      return currentUser.API_updateUseTemplateSetting(useTemplateSetting)
     }
   }
 
   handleClose = () => {
-    const { uiStore } = this.props
-    this.updateUserPreference()
+    const { uiStore, apiStore, type } = this.props
+    const { currentUser } = apiStore
+    if (this.dontShowChecked && type === 'move') {
+      currentUser.API_hideMoveHelper(type)
+    }
     uiStore.update('dismissedMoveHelper', true)
     uiStore.update('showTemplateHelperForCollection', null)
   }
 
-  letMePlaceIt = e => {
+  letMePlaceIt = async e => {
     const { uiStore } = this.props
     if (this.templateCollection) {
+      await this.updateUserPreference({
+        useTemplateSetting: v.useTemplateSettings.letMePlaceIt,
+      })
       uiStore.openMoveMenu({
         from: this.templateCollection,
         cardAction: 'useTemplate',
@@ -123,33 +141,29 @@ class MoveHelperModal extends React.Component {
   }
 
   get renderModalButtons() {
-    const { uiStore } = this.props
-
     return (
       <div>
-        <div style={{ marginBottom: '18px' }}>
-          <DisplayText>{uiStore.templateName}</DisplayText>
+        <div style={{ display: 'flex', margin: '0px 18px 20px 18px' }}>
+          <Button
+            onClick={this.letMePlaceIt}
+            minWidth={193}
+            size="sm"
+            colorScheme={v.colors.black}
+            outline
+            data-cy="MoveHelperModal-letMePlaceItBtn"
+          >
+            Let me place it
+          </Button>
+          <span style={{ flex: 1 }} />
+          <Button
+            onClick={this.handleAddToMyCollection}
+            minWidth={250}
+            size="sm"
+            data-cy="MoveHelperModal-addToMyCollectionBtn"
+          >
+            Add to my collection
+          </Button>
         </div>
-        <Button
-          onClick={this.handleAddToMyCollection}
-          minWidth={250}
-          size="sm"
-          data-cy="MoveHelperModal-addToMyCollectionBtn"
-        >
-          Add to my collection
-        </Button>
-        <div style={{ marginBottom: '12px', marginTop: '12px' }}>
-          <DisplayText>or</DisplayText>
-        </div>
-        <Button
-          onClick={this.letMePlaceIt}
-          size="sm"
-          colorScheme={v.colors.black}
-          outline
-          data-cy="MoveHelperModal-letMePlaceItBtn"
-        >
-          Let me place it
-        </Button>
       </div>
     )
   }
@@ -157,6 +171,17 @@ class MoveHelperModal extends React.Component {
   render() {
     const { apiStore, type } = this.props
     const { currentUser } = apiStore
+    const modalLabel =
+      type === 'template' ? (
+        <div>
+          <StyledLabelText>
+            {v.helperModalLabels.templateHelperLabel}
+          </StyledLabelText>
+          <LabelHint>{v.helperModalLabels.templateHelperHint}</LabelHint>
+        </div>
+      ) : (
+        v.helperModalLabels.moveHelper
+      )
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}
@@ -181,7 +206,7 @@ class MoveHelperModal extends React.Component {
           {currentUser.show_template_helper &&
             type == 'template' &&
             this.renderModalButtons}
-          <FormControl component="fieldset" required>
+          <StyledFormControl component="fieldset" required>
             <FormControlLabel
               classes={{ label: 'form-control' }}
               style={{ textAlign: 'left' }}
@@ -192,11 +217,11 @@ class MoveHelperModal extends React.Component {
                   value="yes"
                 />
               }
-              label="Thanks, please don't show me this message again."
+              label={modalLabel}
             />
-          </FormControl>
+          </StyledFormControl>
 
-          {!(currentUser.show_template_helper && type == 'template') && (
+          {!(currentUser.show_template_helper && type === 'template') && (
             <div className="button--center">
               <TextButton
                 onClick={this.handleClose}

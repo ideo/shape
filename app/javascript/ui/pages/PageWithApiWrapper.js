@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { runInAction } from 'mobx'
+import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 
@@ -18,26 +18,17 @@ import googleTagManager from '~/vendor/googleTagManager'
 class PageWithApiWrapper extends React.Component {
   unmounted = false
 
-  state = {
-    data: null,
-  }
+  @observable
+  record = null
+  @observable
+  pathRequested = ''
 
   componentDidMount() {
-    const { fetchType, apiStore, uiStore } = this.props
-    const { cachedFetchId } = this
+    const { uiStore } = this.props
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
     uiStore.update('textEditingItem', null)
 
-    if (fetchType && cachedFetchId) {
-      // First check if we already have this record in the local store
-      const data = apiStore.find(fetchType, cachedFetchId)
-      if (data) {
-        // mark as !fullyLoaded until we re-fetch the latest data
-        runInAction(() => (data.fullyLoaded = false))
-        this.setState({ data })
-      }
-    }
     // fetch the data from the API
     this.fetchData()
   }
@@ -50,6 +41,16 @@ class PageWithApiWrapper extends React.Component {
 
   componentWillUnmount() {
     this.unmounted = true
+  }
+
+  @action
+  setRecord(data) {
+    this.record = data
+  }
+
+  @action
+  setPathRequested(path) {
+    this.pathRequested = path
   }
 
   get isMyCollectionPath() {
@@ -84,9 +85,9 @@ class PageWithApiWrapper extends React.Component {
   get requestPath() {
     const { fetchType, match } = this.props
     if (this.isMyCollectionPath) {
-      return `organizations/${match.params.org}/my_collection`
+      return `organizations/${match.params.org}/my_collection?page_view=true`
     }
-    return `${fetchType}/${this.fetchId}`
+    return `${fetchType}/${this.fetchId}?page_view=true`
   }
 
   requiresFetch = ({ location: prevLocation, match: prevMatch }) => {
@@ -115,50 +116,75 @@ class PageWithApiWrapper extends React.Component {
   }
 
   fetchData = () => {
-    const { apiStore, uiStore, match } = this.props
+    const { apiStore, uiStore, match, fetchType } = this.props
+    const { requestPath, cachedFetchId } = this
+
     uiStore.update('pageError', null)
+    uiStore.update('isTransparentLoading', true)
 
-    return apiStore
-      .request(this.requestPath)
-      .then(res => {
-        if (this.unmounted) return
-        const { data } = res
-        const { id } = match.params
+    if (fetchType && cachedFetchId) {
+      // First check if we already have this record in the local store
+      const record = apiStore.find(fetchType, cachedFetchId)
+      if (record && !record.awaiting_updates && !record.isTestCollection) {
+        // mark as !fullyLoaded until we re-fetch the latest data
+        // (mostly just used by RealtimeTextItem)
+        record.updateFullyLoaded(false)
+        this.setRecord(record)
+      }
+    }
 
-        if (id && id.toString() === this.fetchId && _.isString(data.name)) {
-          const name = data.name.replace(/[^\x00-\x7F]/g, '')
-          // Update URL so collections and items have slug with id and name
-          history.replaceState(
-            // state object
-            {},
-            // title: ignored by some browsers
-            name,
-            // URL, stripping non-ASCII characters
-            `${data.id}-${_.kebabCase(name)}`
-          )
-        }
+    this.setPathRequested(requestPath)
 
-        runInAction(() => (data.fullyLoaded = true))
-        this.setState({ data })
-        this.trackPageView(data)
-      })
+    apiStore
+      .request(requestPath)
+      .then(res => this.afterFetchData(res, requestPath))
       .catch(err => {
-        this.setState({ data: null }, () => {
-          if (!apiStore.currentUser && err.status === 401) {
-            // always redirect logged-out users to login
-            routeToLogin({ redirect: match.url })
-            return
-          }
-          uiStore.update('pageError', err)
-          trackError(err, { name: 'PageApiFetch' })
-        })
+        this.setRecord(null)
+        if (!apiStore.currentUser && err.status === 401) {
+          // always redirect logged-out users to login
+          routeToLogin({ redirect: match.url })
+          return
+        }
+        uiStore.update('pageError', err)
+        trackError(err, { name: 'PageApiFetch' })
       })
+  }
+
+  afterFetchData = (res, requestPath) => {
+    if (this.unmounted) return
+
+    const { uiStore, match } = this.props
+    const record = res.data
+    const { id } = match.params
+
+    if (id && id.toString() === this.fetchId && _.isString(record.name)) {
+      const name = record.name.replace(/[^\x00-\x7F]/g, '')
+      // Update URL so collections and items have slug with id and name
+      history.replaceState(
+        // state object
+        {},
+        // title: ignored by some browsers
+        name,
+        // URL, stripping non-ASCII characters
+        `${record.id}-${_.kebabCase(name)}`
+      )
+    }
+
+    record.updateFullyLoaded(true)
+    uiStore.update('isTransparentLoading', false)
+    // We may be in the callback of a request that we've since left (e.g. navigating multiple pages quickly),
+    // so only set this.record if we're returning from our current matching request
+    // -- could also abort past requests? https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+    if (requestPath === this.pathRequested) {
+      this.setRecord(record)
+    }
+    this.trackPageView(record)
   }
 
   render() {
     const { apiStore, uiStore } = this.props
     const { pageError } = uiStore
-    const { data } = this.state
+    const { record } = this
     if (
       apiStore.currentOrgIsDeactivated &&
       pageError &&
@@ -169,9 +195,9 @@ class PageWithApiWrapper extends React.Component {
     if (pageError) {
       return <PageError error={pageError} />
     }
-    if (!data) return ''
+    if (!record) return ''
 
-    return this.props.render(data)
+    return this.props.render(record)
   }
 }
 

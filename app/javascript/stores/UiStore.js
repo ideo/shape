@@ -91,6 +91,8 @@ export default class UiStore {
   @observable
   isLoading = false
   @observable
+  isTransparentLoading = false
+  @observable
   isLoadingMoveAction = false
   @observable
   dismissedMoveHelper = false
@@ -544,6 +546,7 @@ export default class UiStore {
     this.dismissedMoveHelper = false
     this.templateName = ''
     this.isLoadingMoveAction = false
+    this.isTransparentLoading = false
     this.cardAction = 'move'
     this.movingCardIds.replace([])
     this.multiMoveCardIds.replace([])
@@ -579,6 +582,12 @@ export default class UiStore {
   @action
   setMovingCards(ids) {
     this.movingCardIds.replace(ids)
+  }
+
+  @action
+  setMovingIntoCollection(collection) {
+    this.movingIntoCollection = collection
+    this.isTransparentLoading = true
   }
 
   @computed
@@ -1281,28 +1290,28 @@ export default class UiStore {
   // Foamcore zoom functions
   @action
   adjustZoomLevel = ({ collection } = {}) => {
-    if (!collection.isBoard) {
-      return
-    }
-    if (this.zoomLevel > 1) {
-      // when switching collections readjust what "zoomed out" means
-      this.zoomLevel = collection.maxZoom
+    const { lastZoom, maxZoom } = collection
+    if (lastZoom) {
+      this.zoomLevel = lastZoom
+    } else if (this.zoomLevel > 1) {
+      // if we haven't marked specific zoom on this collection, zoom out if needed
+      // and only store uiStore.zoomLevel, not the collection.lastZoom
+      this.zoomLevel = maxZoom
     }
   }
 
-  @action
   zoomOut() {
-    const collection = this.viewingCollection
-    if (this.zoomLevel >= collection.maxZoom) {
-      this.zoomLevel = collection.maxZoom
-      return
-    }
-    this.zoomLevel = this.zoomLevel + 1
+    this.updateZoomLevel(this.zoomLevel + 1)
+  }
+
+  zoomIn() {
+    this.updateZoomLevel(this.zoomLevel - 1)
   }
 
   @action
-  zoomIn() {
-    if (this.zoomLevel === 1) return
-    this.zoomLevel = this.zoomLevel - 1
+  updateZoomLevel(val, collection = this.viewingCollection) {
+    if (!collection || !collection.isBoard) return
+    this.zoomLevel = _.clamp(val, 1, collection.maxZoom)
+    collection.lastZoom = this.zoomLevel
   }
 }

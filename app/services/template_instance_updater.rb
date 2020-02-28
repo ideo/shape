@@ -50,16 +50,24 @@ class TemplateInstanceUpdater
   def update_instance_cards_by_templated_from_ids(templated_from_ids, instance)
     templated_from_ids.each do |id|
       master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
-      instance_card = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
+      card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
 
-      next if master_card.blank? || instance_card.blank?
+      next if master_card.blank? || card_within_instance.blank?
 
       TemplateInstanceCardUpdater.call(
-        instance_card: instance_card,
+        instance_card: card_within_instance,
         master_card: master_card,
         master_template: @master_template,
       )
-      next unless instance.archived?
+
+      # duplicate question choices when instances are duplicated
+      next unless master_card.record.is_a?(Item::QuestionItem) &&
+                  (master_card.record.question_multiple_choice? || master_card.record.question_single_choice?) &&
+                  master_card.record.question_choices.present?
+
+      duplicate_instance_question_choices(master_card, card_within_instance)
+
+      next unless card_within_instance.archived?
 
       card_within_instance.unarchive!
     end
@@ -72,15 +80,13 @@ class TemplateInstanceUpdater
     cards_to_add = []
     adding_cards.each do |id|
       master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
-      if instance.is_a?(Collection::TestCollection)
-        next unless master_card.card_question_type.present?
-      end
       # ABORT: should not allow duplicating a template instance in this manner;
       # this could lead to infinite loops. (similar to note above)
       next if master_card.record.try(:templated?)
 
       cards_to_add.push(master_card)
     end
+
     return if cards_to_add.empty?
 
     CollectionCardDuplicator.call(
@@ -201,5 +207,18 @@ class TemplateInstanceUpdater
     end
     add_cards_from_master_template(add_card_ids, instance) if add_card_ids.present?
     # NOTE: may need to archive empty 'Deleted From Collection' collection
+  end
+
+  def duplicate_instance_question_choices(master_card, instance_card)
+    master_question_choices = master_card.record.question_choices.select { |choice| choice.text.present? }
+    instance_question_choices = instance_card.record.question_choices
+    instance_choice_texts = instance_question_choices.pluck(:text)
+
+    master_question_choices.each_with_index do |master_choice, i|
+      master_choice_text = master_choice.text
+      next unless instance_question_choices[i].blank? || instance_choice_texts.exclude?(master_choice_text)
+
+      master_choice.duplicate!(assign_question: instance_card.record)
+    end
   end
 end

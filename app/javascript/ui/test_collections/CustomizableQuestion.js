@@ -7,7 +7,11 @@ import styled from 'styled-components'
 import ArrowIcon from '../icons/ArrowIcon'
 import CustomizableQuestionChoice from '~/ui/test_collections/CustomizableQuestionChoice'
 import { DisplayText, SmallHelperText } from '~/ui/global/styled/typography'
-import { TextInput, TextEnterButton, TextResponseHolder } from './shared'
+import {
+  TextInput,
+  TextEnterButton,
+  TextResponseHolder,
+} from '~/ui/test_collections/shared'
 import v from '~/utils/variables'
 
 const Question = styled.div`
@@ -62,6 +66,10 @@ class CustomizableQuestion extends React.Component {
     this.debouncedUpdateQuestionContent = debounce(
       this.updateQuestionContent,
       250
+    )
+    this.instanceDataContentUpdate = debounce(
+      this._instanceDataContentUpdate,
+      30000
     )
   }
 
@@ -141,9 +149,28 @@ class CustomizableQuestion extends React.Component {
     return false
   }
 
+  _instanceDataContentUpdate = () => {
+    const { handleInstanceDataContentUpdate } = this.props
+
+    if (handleInstanceDataContentUpdate) {
+      handleInstanceDataContentUpdate()
+    }
+  }
+
   handleInputChange = event => {
     this.setState({ questionContent: event.target.value })
     this.debouncedUpdateQuestionContent()
+    this.instanceDataContentUpdate()
+  }
+
+  handleBlur = () => {
+    const { questionContent } = this.state
+    this.debouncedUpdateQuestionContent.flush()
+    this.instanceDataContentUpdate.flush()
+
+    if (!questionContent) return
+
+    this.setState({ editing: false })
   }
 
   handleKeyPress = event => {
@@ -165,12 +192,6 @@ class CustomizableQuestion extends React.Component {
     this.setState({ editing: true })
   }
 
-  stopEditingIfContent = () => {
-    const { questionContent } = this.state
-    if (!questionContent) return
-    this.setState({ editing: false })
-  }
-
   updateQuestionContent = () => {
     const { questionContent } = this.state
     const { question } = this.props
@@ -189,7 +210,7 @@ class CustomizableQuestion extends React.Component {
               onFocus={handleFocus}
               onChange={this.handleInputChange}
               onKeyPress={this.handleKeyPress}
-              onBlur={this.stopEditingIfContent}
+              onBlur={this.handleBlur}
               value={questionContent}
               type="descriptionText"
               placeholder="write question here"
@@ -213,7 +234,13 @@ class CustomizableQuestion extends React.Component {
   }
 
   render() {
-    const { question, questionAnswer, editing, question_choices } = this.props
+    const {
+      question,
+      questionAnswer,
+      editing,
+      question_choices,
+      handleInstanceDataContentUpdate,
+    } = this.props
 
     return (
       <div style={{ width: '100%' }}>
@@ -233,6 +260,9 @@ class CustomizableQuestion extends React.Component {
                 editing={editing}
                 onCreate={this.onNewChoice}
                 onDelete={this.onDeleteChoice}
+                handleInstanceDataContentUpdate={
+                  handleInstanceDataContentUpdate
+                }
               />
             ))}
         </ChoicesHolder>
@@ -254,10 +284,11 @@ CustomizableQuestion.propTypes = {
   question: MobxPropTypes.objectOrObservableObject.isRequired,
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
-  onAnswer: PropTypes.func,
-  handleFocus: PropTypes.func,
   question_choices: MobxPropTypes.arrayOrObservableArray,
   isTestDraft: PropTypes.bool,
+  onAnswer: PropTypes.func,
+  handleFocus: PropTypes.func,
+  handleInstanceDataContentUpdate: PropTypes.func,
 }
 CustomizableQuestion.defaultProps = {
   questionAnswer: null,
@@ -266,5 +297,8 @@ CustomizableQuestion.defaultProps = {
   handleFocus: () => true,
   question_choices: [],
   isTestDraft: false,
+  onAnswer: PropTypes.func,
+  handleFocus: PropTypes.func,
+  handleInstanceDataContentUpdate: () => true,
 }
 export default CustomizableQuestion

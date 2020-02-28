@@ -21,6 +21,7 @@
     "google_auth_token": { "type": "string" },
     "feedback_contact_preference": { "type": "string" },
     "feedback_terms_accepted": { "type": ["boolean", "null"] },
+    "use_template_setting": { "type": ["integer", "null"] },
     "respondent_terms_accepted": { "type": ["boolean", "null"] },
     "current_org_terms_accepted": { "type": "boolean" },
     "current_incentive_balance": { "type": "number" },

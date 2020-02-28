@@ -2,6 +2,7 @@ import UserSettings from '~/ui/users/UserSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeUser } from '#/mocks/data'
+import v from '~/utils/variables'
 
 let wrapper, component, apiStore, uiStore, props, organization
 
@@ -73,6 +74,34 @@ describe('UserSettings', () => {
         mailing_list: true,
       })
       expect(uiStore.alert).toHaveBeenCalled()
+    })
+  })
+
+  describe('handleAddToMyCollectionCheck', () => {
+    const ev = { target: {} }
+
+    describe('when choosing let me place it as default behavior for using templates', () => {
+      beforeEach(() => {
+        ev.target.checked = false
+        component.handleAddToMyCollectionCheck(ev)
+      })
+
+      it("unsets the user's mailing list preference", () => {
+        expect(fakeUser.API_updateUseTemplateSetting).toHaveBeenCalledWith(
+          v.useTemplateSettings.letMePlaceIt
+        )
+      })
+    })
+
+    beforeEach(() => {
+      ev.target.checked = true
+      component.handleAddToMyCollectionCheck(ev)
+    })
+
+    it('when choosing let me place it as default behavior for using templates', () => {
+      expect(fakeUser.API_updateUseTemplateSetting).toHaveBeenCalledWith(
+        v.useTemplateSettings.addToMyCollection
+      )
     })
   })
 })

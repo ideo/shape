@@ -6,7 +6,7 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
   let(:template_collection) { create(:collection) }
   let(:template) { create(:collection, master_template: true, add_viewers: [user]) }
   let(:template_card) { create(:collection_card_collection, collection: template, width: 2) }
-  let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [viewer] )}
+  let(:submission_box) { create(:submission_box, add_editors: [user], add_viewers: [viewer]) }
   let(:submissions_collection) { submission_box.submissions_collection }
   let(:template_setter) do
     SubmissionBoxTemplateSetter.new(
@@ -112,6 +112,18 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
 
       it 'should not delete templates that have been submitted with' do
         expect(submission_box.collections.include?(previous_used_template)).to be true
+      end
+    end
+
+    context 'with pinned cards' do
+      let(:template) { create(:collection, master_template: true, add_viewers: [user], num_cards: 2, pin_cards: true) }
+
+      it 'should preserve pinned values in duplicate template' do
+        template_setter.call
+        dupe = submission_box.submission_template
+        expect(dupe.cloned_from).to eq template
+        expect(template.collection_cards.all?(&:pinned)).to be true
+        expect(dupe.collection_cards.all?(&:pinned)).to be true
       end
     end
 

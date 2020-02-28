@@ -7,11 +7,10 @@ class CollectionTemplateBuilder < SimpleService
     template:,
     placement: 'beginning',
     created_by: nil,
-    parent_card: nil,
+    create_parent_card: true,
     external_id: nil,
     collection_card_params: {},
-    collection_params: {},
-    synchronous: :async
+    collection_params: {}
   )
     @parent = parent
     @template = template
@@ -19,21 +18,21 @@ class CollectionTemplateBuilder < SimpleService
     @created_by = created_by
     @collection = template.class.new
     @errors = @collection.errors
-    @parent_card = parent_card
+    @create_parent_card = create_parent_card
     @external_id = external_id
     @collection_card_params = collection_card_params.to_h.symbolize_keys
     @raw_collection_params = collection_params
-    @synchronous = synchronous
   end
 
   def call
     return false unless create_collection
 
     place_collection_in_parent
+    setup_submission_attrs if creating_a_submission?
     setup_template_cards
     # mainly so template_num_instances will be refreshed in API cache
     @template.touch
-    setup_submission if creating_a_submission?
+    setup_submission_test if creating_a_submission?
     # re-save to capture cover, new breadcrumb + tag lists
     @collection.cache_cover!
     @collection
@@ -84,7 +83,7 @@ class CollectionTemplateBuilder < SimpleService
   end
 
   def place_collection_in_parent
-    if @parent_card.blank?
+    if @create_parent_card
       card_params = default_collection_card_params.merge(
         @collection_card_params,
       )
@@ -98,7 +97,8 @@ class CollectionTemplateBuilder < SimpleService
     @template.setup_templated_collection(
       for_user: @created_by,
       collection: @collection,
-      synchronous: @synchronous,
+      # async actually throws this off because it needs the first level of records to be created
+      synchronous: :first_level,
     )
   end
 
@@ -134,12 +134,14 @@ class CollectionTemplateBuilder < SimpleService
     }
   end
 
-  def setup_submission
+  def setup_submission_attrs
     # this will get persisted when calling cache_cover!
     @collection.submission_attrs = { submission: true }
-    if @parent.submission_box.hide_submissions
-      @collection.submission_attrs['hidden'] = true
-    end
+    @collection.submission_attrs['hidden'] = true if @parent.submission_box.hide_submissions?
+    @collection.save
+  end
+
+  def setup_submission_test
     submission_template = @parent.submission_box.submission_template
     test_id = submission_template.try(:submission_attrs).try(:[], 'launchable_test_id')
     return unless test_id.present?

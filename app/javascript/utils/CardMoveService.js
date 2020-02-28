@@ -23,6 +23,7 @@ export default class CardMoveService {
       viewingCollection,
       movingFromCollectionId,
       movingCardIds,
+      movingIntoCollection,
       cardAction,
       overflowFromMDL,
     } = uiStore
@@ -138,7 +139,8 @@ export default class CardMoveService {
       uiStore.popupSnackbar({ message: successMessage })
       uiStore.resetSelectionAndBCT()
       uiStore.closeMoveMenu()
-      if (!uiStore.movingIntoCollection) {
+
+      if (!movingIntoCollection) {
         if (placement === 'beginning') {
           uiStore.scrollToTop()
         } else if (placement === 'end') {
@@ -148,7 +150,7 @@ export default class CardMoveService {
 
       if (
         !meta.placeholder &&
-        ((cardAction === 'move' && !uiStore.movingIntoCollection) ||
+        ((cardAction === 'move' && !movingIntoCollection) ||
           cardAction === 'duplicate' ||
           cardAction === 'link')
       ) {

@@ -210,6 +210,10 @@ describe Api::V1::OrganizationsController, type: :request, json: true, auth: tru
     it 'redirects to show the user collection' do
       expect(get(path)).to redirect_to(api_v1_collection_path(user_collection))
     end
+
+    it 'passes page_view parameter to collections API' do
+      expect(get("#{path}?page_view=true")).to redirect_to(api_v1_collection_path(user_collection, page_view: true))
+    end
   end
 
   describe 'POST #create', vcr: { match_requests_on: %i[host path] } do

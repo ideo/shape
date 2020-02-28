@@ -118,6 +118,10 @@ class CollectionPage extends React.Component {
     }
 
     return collection.API_fetchCards(params).then(() => {
+      if (collection.id !== this.props.collection.id) {
+        // this may have changed during the course of the request if we navigated
+        return
+      }
       runInAction(() => {
         this.cardsFetched = true
         this.onAPILoad()
@@ -484,10 +488,10 @@ class CollectionPage extends React.Component {
     // Also, checking meta.snapshot seems to load more consistently than just collection.can_edit
     const isLoading =
       collection.meta.snapshot.can_edit === undefined ||
-      (!this.cardsFetched && collection.collection_cards.length === 0) ||
+      (!this.cardsFetched && collection.isEmpty) ||
       collection.awaiting_updates ||
       uiStore.isLoading
-    const isTransparentLoading = !!uiStore.movingIntoCollection
+    const { isTransparentLoading } = uiStore
 
     const {
       blankContentToolState,
@@ -546,7 +550,7 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Helmet title={collection.pageTitle} />
-        <PageHeader record={collection} />
+        <PageHeader record={collection} template={collection.template} />
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
           // pop up over the CollectionGrid

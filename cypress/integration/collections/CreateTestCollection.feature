@@ -59,6 +59,8 @@ Feature: Creating a Test Collection
     # this is used in the "visit current Test URL" below; capture before redirect to results
     When I capture the current URL
 
+    # just add some padding to how long it waits for things to finish
+    And I wait for 2 seconds
     And I wait for "@apiValidateLaunch" to finish
     And I wait for "@apiLaunchTest" to finish
     And I wait for "@apiGetCollectionCards" to finish

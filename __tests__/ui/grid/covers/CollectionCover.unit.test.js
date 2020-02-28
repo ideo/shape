@@ -80,10 +80,13 @@ describe('CollectionCover', () => {
         is_inside_a_submission: true,
         launchableTestId: '99',
         launchable: true,
+        collection_to_test_id: '123',
       }
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
     })
 
+    // Note: we temporarily disabled launching from collection cover unless there is a collection_to_test
+    // see: CollectionCover::hasLaunchTestButton()
     it('renders the launch test button', () => {
       expect(wrapper.find('LaunchButton').exists()).toBeTruthy()
     })

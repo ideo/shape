@@ -149,7 +149,7 @@ class MainMenuDropdown extends React.Component {
           onClick: this.handleExternalLink(IdeoSSO.profileUrl),
         },
         {
-          name: 'Notification Settings',
+          name: 'User Settings',
           icon: <SettingsIcon />,
           onClick: () => {
             routingStore.routeTo('/user_settings')

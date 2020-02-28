@@ -117,11 +117,18 @@ class Api::V1::RolesController < Api::V1::BaseController
     return unless root_object_params[:user_ids].present?
     return if current_organization.has_payment_method || !current_organization.in_app_billing
 
-    users_to_add_count = root_object_params[:user_ids].length
-    over_limit = current_organization.active_users_count + users_to_add_count > Organization::FREEMIUM_USER_LIMIT
-    if over_limit
-      head :unauthorized
-    end
+    users_to_add_ids = root_object_params[:user_ids].map(&:to_i)
+    non_members_to_add_count = (users_to_add_ids - current_organization.users.pluck(:id)).count
+    over_limit = current_organization.active_users_count + non_members_to_add_count > Organization::FREEMIUM_USER_LIMIT
+    return unless over_limit
+
+    # NOTE: This error message is just a fallback -- the frontend should have already caught this in RolesAdd.js
+    name = current_organization.name
+    error_message = %(
+      Inviting these people will take #{name} over the free limit of #{Organization::FREEMIUM_USER_LIMIT}.
+      Please add a payment method to continue.
+    ).strip
+    render json: { errors: [error_message] }, status: :bad_request
   end
 
   def authorize_view_record

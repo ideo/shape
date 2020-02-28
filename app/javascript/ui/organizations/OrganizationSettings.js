@@ -8,11 +8,12 @@ import {
   Checkbox,
   LabelContainer,
   LabelTextStandalone,
+  LabelHint,
 } from '~/ui/global/styled/forms'
-import { Heading2, SmallHelperText } from '~/ui/global/styled/typography'
+import { Heading2 } from '~/ui/global/styled/typography'
 import TagEditor from '~/ui/pages/shared/TagEditor'
 import TextEditor from '~/ui/global/TextEditor'
-import v from '~/utils/variables'
+// import v from '~/utils/variables'
 
 @inject('apiStore', 'routingStore', 'uiStore')
 @observer
@@ -180,7 +181,7 @@ class OrganizationSettings extends React.Component {
                 <LabelTextStandalone>
                   {`Include ${this.organization.name} Terms of Use `}
                 </LabelTextStandalone>
-                <SmallHelperText color={v.colors.commonDark}>
+                <LabelHint>
                   If you choose to include your own Terms of Use you are
                   responsible for the contents, legal applicability and
                   enforcement of the same. By ticking this box you agree that in
@@ -188,7 +189,7 @@ class OrganizationSettings extends React.Component {
                   of Use, Shape’s shall prevail and you will not attempt to
                   reverse or alter the contractual relationship of Shape and its
                   Users, including in respect of liability.
-                </SmallHelperText>
+                </LabelHint>
               </div>
             }
           />
