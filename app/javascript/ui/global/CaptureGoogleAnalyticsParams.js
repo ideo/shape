@@ -1,23 +1,27 @@
 import Cookies from 'js-cookie'
 import queryString from 'query-string'
+import { withRouter } from 'react-router'
+import ReactRouterPropTypes from 'react-router-prop-types'
 
-class CaptureGoogleAnalyticsParams extends React.PureComponent {
+class CaptureGoogleAnalyticsParams extends React.Component {
   constructor(props) {
     super(props)
   }
 
   componentDidMount() {
-    if (this.hasUtmQueryParams()) {
+    console.log('has params', this.hasUtmQueryParams)
+    if (this.hasUtmQueryParams) {
       this.storeParams()
-    } else {
+    } else if (this.hasStoredParams) {
+      console.log('has stored params')
+      this.appendParamsToUrl()
     }
   }
 
-  utmQueryParams() {
-    // const {
-    //   location: { search },
-    // } = this.props.location.search
-    const search = ''
+  get utmQueryParams() {
+    const {
+      location: { search },
+    } = this.props
     const values = queryString.parse(search)
     // Extract utm parameters we support
     const { utm_source, utm_medium, utm_campaign, utm_content } = values
@@ -29,24 +33,46 @@ class CaptureGoogleAnalyticsParams extends React.PureComponent {
     }
   }
 
-  hasUtmQueryParams() {
-    return this.utmQueryParams().keys.some(param => !!param)
+  get hasUtmQueryParams() {
+    return Object.values(this.utmQueryParams).some(param => !!param)
   }
 
   storeParams() {
     // Actually convert to string
-    const paramString = this.utmQueryParams().toString()
+    const paramString = queryString.stringify(this.utmQueryParams)
+    console.log('store params', paramString)
     Cookies.set('utmParams', paramString, { expires: 7 })
   }
 
-  appendParams() {
-    const params = Cookies.get('utmParams')
-    if (!params) return
-    // Extract params from string
+  get hasStoredParams() {
+    console.log('cookies value', Cookies.get('utmParams'))
+    return !!Cookies.get('utmParams')
+  }
+
+  appendParamsToUrl() {
+    const paramsQueryString = Cookies.get('utmParams')
+    if (!paramsQueryString) return
     // Append params to browser path
+    console.log('append', paramsQueryString)
+    this.props.history.push({
+      pathname: location.pathname,
+      search: paramsQueryString,
+    })
+    // Clear out cookie
+    console.log('clear cookie')
+    Cookies.remove('utmParams')
+  }
+
+  render() {
+    return null
   }
 }
 
-CaptureGoogleAnalyticsParams.propTypes = {}
+CaptureGoogleAnalyticsParams.propTypes = {
+  location: ReactRouterPropTypes.location.isRequired,
+  history: ReactRouterPropTypes.location.isRequired,
+}
 
-export default CaptureGoogleAnalyticsParams
+export default CaptureGoogleAnalyticsParams = withRouter(
+  CaptureGoogleAnalyticsParams
+)
