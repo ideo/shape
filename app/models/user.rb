@@ -32,6 +32,7 @@
 #  status                      :integer          default("active")
 #  terms_accepted_data         :jsonb
 #  uid                         :string
+#  user_settings_data          :jsonb            not null
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  current_organization_id     :integer
@@ -68,6 +69,9 @@ class User < ApplicationRecord
                  :feedback_terms_accepted,
                  :respondent_terms_accepted,
                  :org_terms_accepted_versions
+
+  store_accessor :user_settings_data,
+                 :use_template_setting
 
   devise :database_authenticatable, :registerable, :trackable,
          :rememberable, :validatable, :omniauthable,
@@ -162,6 +166,13 @@ class User < ApplicationRecord
     archived: 2,
     # limited = survey respondent user, does not have access to the full app
     limited: 3,
+  }
+
+  enum use_template_setting: {
+    # add_to_my_collection = will not show the template helper; defaults to use template
+    add_to_my_collection: 1,
+    # let_me_place_it = will not show the template helper; defaults to let_me_place_it
+    let_me_place_it: 2,
   }
 
   enum feedback_contact_preference: {

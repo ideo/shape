@@ -3,11 +3,27 @@ import FormControl from '@material-ui/core/FormControl'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import styled from 'styled-components'
+import v from '~/utils/variables'
 
-import { Label, LabelText, Select, Checkbox } from '~/ui/global/styled/forms'
+import {
+  Label,
+  LabelTextStandalone,
+  LabelHint,
+  Select,
+  Checkbox,
+} from '~/ui/global/styled/forms'
 
 const SettingsPageWrapper = styled.div`
   margin-top: 40px;
+  width: 700px;
+`
+
+const StyledCheckbox = styled(Checkbox)`
+  place-self: flex-start;
+`
+
+const CheckboxWrapper = styled.div`
+  margin-bottom: 10px;
 `
 
 @inject('apiStore', 'uiStore')
@@ -49,6 +65,15 @@ class UserSettings extends React.Component {
     uiStore.alert(message, 'Mail')
   }
 
+  handleAddToMyCollectionCheck = ev => {
+    const { addToMyCollection, letMePlaceIt } = v.useTemplateSettings
+    const useTemplateSetting = ev.target.checked
+      ? addToMyCollection
+      : letMePlaceIt
+    this.user.use_template_setting = useTemplateSetting
+    this.user.API_updateUseTemplateSetting(useTemplateSetting)
+  }
+
   get notifyValue() {
     if (!this.user) return 'off'
     return this.user.notify_through_email ? 'on' : 'off'
@@ -82,7 +107,7 @@ class UserSettings extends React.Component {
           </MenuItem>
         </Select>
 
-        <div>
+        <CheckboxWrapper>
           <FormControl component="fieldset">
             <FormControlLabel
               classes={{ label: 'form-control' }}
@@ -95,18 +120,41 @@ class UserSettings extends React.Component {
               }
               label={
                 <div>
-                  <LabelText
-                    style={{ display: 'block', marginTop: 15, marginBottom: 0 }}
-                  >
-                    Mailing List
-                  </LabelText>
-                  Stay current on new features and case studies by signing up
-                  for our mailing list
+                  <LabelTextStandalone>
+                    {v.userSettingsLabels.mailingListText}
+                  </LabelTextStandalone>
+                  <LabelHint>{v.userSettingsLabels.mailingListHint}</LabelHint>
                 </div>
               }
             />
           </FormControl>
-        </div>
+        </CheckboxWrapper>
+
+        <CheckboxWrapper>
+          <FormControl component="fieldset">
+            <FormControlLabel
+              classes={{ label: 'form-control' }}
+              control={
+                <StyledCheckbox
+                  checked={
+                    this.user.use_template_setting ===
+                    v.useTemplateSettings.addToMyCollection
+                  }
+                  onChange={this.handleAddToMyCollectionCheck}
+                  value="yes"
+                />
+              }
+              label={
+                <div>
+                  <LabelTextStandalone>
+                    {v.userSettingsLabels.useTemplateLabel}
+                  </LabelTextStandalone>
+                  <LabelHint>{v.userSettingsLabels.useTemplateHint}</LabelHint>
+                </div>
+              }
+            />
+          </FormControl>
+        </CheckboxWrapper>
       </SettingsPageWrapper>
     )
   }

@@ -111,7 +111,7 @@ describe('MainMenuDropdown', () => {
 
       it('has notifications option', () => {
         const link = component.menuItems.main.find(
-          item => item.name === 'Notification Settings'
+          item => item.name === 'User Settings'
         )
         expect(link).toBeDefined()
         expect(link.onClick).toBeInstanceOf(Function)

@@ -58,7 +58,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     it 'updates the users last_active_at timestamp' do
       expect { get(path) }.to change(user, :last_active_at)
       expect(
-        user.last_active_at_in_org(user.current_organization_id)
+        user.last_active_at_in_org(user.current_organization_id),
       ).to be_within(1.second).of(Time.current)
     end
 
@@ -137,12 +137,13 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
           show_move_helper: false,
           show_template_helper: false,
           feedback_terms_accepted: true,
+          use_template_setting: 2,
         },
       }.to_json
     end
 
     before do
-      user.update_attributes(terms_accepted: false, show_helper: true, feedback_terms_accepted: false)
+      user.update_attributes(terms_accepted: false, show_helper: true, feedback_terms_accepted: false, use_template_setting: 1)
     end
 
     it 'returns a 200' do
@@ -160,6 +161,12 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       expect(user.feedback_terms_accepted).to be false
       patch(path, params: params)
       expect(user.reload.feedback_terms_accepted).to be true
+    end
+
+    it 'updates use_template_setting for current_user' do
+      expect(user.use_template_setting).to be 1
+      patch(path, params: params)
+      expect(user.reload.use_template_setting).to be 2
     end
 
     it 'updates show_helpers for current_user' do
