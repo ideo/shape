@@ -11,7 +11,7 @@ import ICONS from '~/ui/icons/dialogIcons'
 const { CloseIcon } = ICONS
 import Button from '~/ui/global/Button'
 import TextButton from '~/ui/global/TextButton'
-import { Checkbox } from '~/ui/global/styled/forms'
+import { Checkbox, LabelHint, LabelText } from '~/ui/global/styled/forms'
 import { SpecialDisplayHeading } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 import { useTemplateInMyCollection } from '~/utils/url'
@@ -19,6 +19,12 @@ import { useTemplateInMyCollection } from '~/utils/url'
 const StyledSpecialDisplayHeading = styled(SpecialDisplayHeading)`
   margin: 0;
   margin-bottom: 30px;
+`
+
+const StyledLabelText = styled(LabelText)`
+  margin: 15px 0px 0px 0px;
+  text-transform: none;
+  font-weight: normal;
 `
 
 const StyledDialog = styled(Dialog)`
@@ -99,8 +105,8 @@ class MoveHelperModal extends React.Component {
   handleClose = () => {
     const { uiStore, apiStore, type } = this.props
     const { currentUser } = apiStore
-    if (type === 'move' && this.dontShowChecked) {
-      currentUser.API_hideHelper(type)
+    if (this.dontShowChecked && type === 'move') {
+      currentUser.API_hideMoveHelper(type)
     }
     uiStore.update('dismissedMoveHelper', true)
     uiStore.update('showTemplateHelperForCollection', null)
@@ -166,9 +172,16 @@ class MoveHelperModal extends React.Component {
     const { apiStore, type } = this.props
     const { currentUser } = apiStore
     const modalLabel =
-      type === 'template'
-        ? v.helperModalLabels.templateHelper
-        : v.helperModalLabels.moveHelper
+      type === 'template' ? (
+        <div>
+          <StyledLabelText>
+            {v.helperModalLabels.templateHelperLabel}
+          </StyledLabelText>
+          <LabelHint>{v.helperModalLabels.templateHelperHint}</LabelHint>
+        </div>
+      ) : (
+        v.helperModalLabels.moveHelper
+      )
     return (
       <StyledDialog
         classes={{ paper: 'modal__paper' }}

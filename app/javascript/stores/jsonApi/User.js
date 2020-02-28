@@ -89,7 +89,7 @@ class User extends BaseRecord {
     if (!useTemplateSetting) return
 
     // set it ahead of time so the helper immediately disappears
-    this['show_template_helper'] = false
+    this.show_template_helper = false
 
     return this.API_updateCurrentUser({
       show_template_helper: false,
@@ -97,14 +97,10 @@ class User extends BaseRecord {
     })
   }
 
-  API_hideHelper(type = '') {
-    let show_helper = 'show_helper'
-    if (['template', 'move'].indexOf(type) > -1) {
-      show_helper = `show_${type}_helper`
-    }
+  API_hideMoveHelper() {
     // set it ahead of time so the helper immediately disappears
-    this[show_helper] = false
-    return this.API_updateCurrentUser({ [show_helper]: false })
+    this.show_move_helper = false
+    return this.API_updateCurrentUser({ show_move_helper: false })
   }
 }
 

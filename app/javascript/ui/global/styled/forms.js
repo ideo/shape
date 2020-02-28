@@ -44,6 +44,11 @@ export const LabelText = styled.div`
 `
 LabelText.displayName = 'StyledLabelText'
 
+export const LabelHint = styled.span`
+  color: ${v.colors.commonMedium};
+  font-size: 1rem;
+`
+
 export const LabelTextStandalone = styled.div`
   ${LabelStyle};
   margin-bottom: 0;

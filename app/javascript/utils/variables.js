@@ -342,8 +342,20 @@ export default {
   },
 
   helperModalLabels: {
-    templateHelper:
-      'Thanks, please remember my selection, and don’t ask me again. This can be changed in your settings.',
+    templateHelperLabel: 'Thanks, please don’t ask me again.',
+    templateHelperHint: ' This can be changed in your settings.',
     moveHelper: "Thanks, please don't show me this message again.",
+  },
+
+  userSettingsLabels: {
+    useTemplateLabel: 'Add template instances to My Collection',
+    useTemplateHint:
+      'When using templates, choosing this setting will create template instances ' +
+      'in your My Collection by default. Turning this off will allow you to place templates ' +
+      'in any collection you have edit access to in Shape.',
+    mailingListText: 'Mailing List',
+    mailingListHint:
+      'Stay current on new features and case studies by signing up ' +
+      'for our mailing list',
   },
 }
