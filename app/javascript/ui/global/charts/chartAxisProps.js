@@ -55,7 +55,7 @@ const calculateTickLabelEdges = labelText => {
 const TickLabel = props => {
   let dx
 
-  if (props.index === 0) dx = -calculateTickLabelEdges(props.text)
+  if (props.index === 0) dx = calculateTickLabelEdges(props.text)
   if (props.x === 450) dx = -calculateTickLabelEdges(props.text)
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
