@@ -162,6 +162,7 @@ class Api::V1::UsersController < Api::V1::BaseController
       :feedback_terms_accepted,
       :respondent_terms_accepted,
       :locale,
+      :use_template_setting,
     )
   end
 

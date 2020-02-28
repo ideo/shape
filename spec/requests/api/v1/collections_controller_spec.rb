@@ -405,6 +405,18 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           expect(external_record.external_id).to eq('abc123')
         end
       end
+
+      context 'with submission template' do
+        let!(:submission_box) { create(:submission_box, add_editors: [user]) }
+        let!(:subcollections) { create_list(:collection, 2, parent_collection: template, master_template: true, num_cards: 2) }
+        let(:to_collection) { create(:submissions_collection, submission_box: submission_box) }
+
+        it 'should set up submission attrs' do
+          post(path, params: params)
+          template_instance = Collection.find(json['data']['id'])
+          expect(template_instance.submission?).to be true
+        end
+      end
     end
 
     context 'without permission' do

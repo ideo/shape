@@ -49,11 +49,10 @@ const QuestionLeftSide = ({
   onAddChoice,
   canAddIdeas,
 }) => {
-  let { isPinnedInTemplate, isPinnedAndLocked } = card
+  let { isPinnedInTemplate } = card
   if (ideasCollection && ideasCollection.parent_collection_card) {
     isPinnedInTemplate =
       ideasCollection.parent_collection_card.isPinnedInTemplate
-    isPinnedAndLocked = ideasCollection.parent_collection_card.isPinnedAndLocked
   }
 
   return (
@@ -89,8 +88,7 @@ const QuestionLeftSide = ({
         </TrashButton>
       )}
       <div style={{ color: v.colors.commonMedium }}>
-        {isPinnedAndLocked && <PinnedIcon locked />}
-        {isPinnedInTemplate && <PinnedIcon />}
+        {isPinnedInTemplate && <PinnedIcon locked />}
       </div>
       {canAddChoice && (
         <NamedActionButton
