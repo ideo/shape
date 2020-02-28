@@ -178,19 +178,19 @@ class ChartGroup extends React.Component {
         this.primaryDataset,
         ...this.secondaryDatasetsWithData,
       ]
-      let dates = _.compact(
+      const dates = _.compact(
         _.map(_.flatten(_.map(datasetsWithData, 'dataWithDates')), 'date')
       )
       if (this.isSmallChartStyle) {
-        uiStore.labelsToHide.forEach(label => {
-          const { otherLabel } = label
-          if (otherLabel.datum.getTime() > label.date.getTime()) {
-            dates = _.filter(
-              dates,
-              date => date.getTime() !== label.date.getTime()
-            )
-          }
-        })
+        // uiStore.labelsToHide.forEach(label => {
+        //   const { otherLabel } = label
+        //   if (otherLabel.datum.getTime() > label.date.getTime()) {
+        //     dates = _.filter(
+        //       dates,
+        //       date => date.getTime() !== label.date.getTime()
+        //     )
+        //   }
+        // })
       }
       const { dataItem } = this.props
       axisProps = chartAxisProps({
@@ -201,6 +201,7 @@ class ChartGroup extends React.Component {
         dateValues: this.isSmallChartStyle ? dates : null,
         itemId: dataItem.id,
       })
+      console.log('try', VictoryAxis.getBaseProps(axisProps))
     }
     return <VictoryAxis {...axisProps} />
   }
