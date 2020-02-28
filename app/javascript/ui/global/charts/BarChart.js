@@ -21,8 +21,10 @@ const formatValues = (values, datasetOrder) => {
 const BarChart = ({ dataset, cardArea, barsInGroup, routeToSearch }) => {
   const values = formatValues(dataset.data, dataset.order)
   const { total, max_domain } = dataset
+  // Values here for calculating the max should be percentages as that's how
+  // the chart should render, vs the actual values, which would be too high
   const domain = chartDomainForDatasetValues({
-    values,
+    values: values.map(v => ({ ...v, value: v.percentage })),
     maxYDomain: max_domain,
   })
   const totalBars = dataset.data.length
