@@ -24,6 +24,10 @@ const StyledLabelText = styled(LabelText)`
   font-weight: normal;
 `
 
+const StyledCheckbox = styled(Checkbox)`
+  place-self: flex-start;
+`
+
 @inject('apiStore', 'uiStore')
 @observer
 class UserSettings extends React.Component {
@@ -134,7 +138,7 @@ class UserSettings extends React.Component {
             <FormControlLabel
               classes={{ label: 'form-control' }}
               control={
-                <Checkbox
+                <StyledCheckbox
                   checked={
                     this.user.use_template_setting ===
                     v.useTemplateSettings.addToMyCollection
