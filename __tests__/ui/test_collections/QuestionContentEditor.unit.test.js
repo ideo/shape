@@ -1,5 +1,6 @@
 import QuestionContentEditor from '~/ui/test_collections/QuestionContentEditor'
 import { fakeQuestionItem } from '#/mocks/data'
+import fakeUiStore from '#/mocks/fakeUiStore'
 
 let wrapper, props, InputComponentSelector
 describe('QuestionContentEditor', () => {
@@ -12,10 +13,11 @@ describe('QuestionContentEditor', () => {
       maxLength: 500,
       singleLine: false,
       placeholder: 'add text here',
+      uiStore: fakeUiStore,
     }
     InputComponentSelector = '[data-cy="QuestionContentEditorText"]'
 
-    wrapper = shallow(<QuestionContentEditor {...props} />)
+    wrapper = shallow(<QuestionContentEditor.wrappedComponent {...props} />)
   })
 
   describe('render()', () => {
@@ -36,7 +38,7 @@ describe('QuestionContentEditor', () => {
         props.singleLine = true
         props.maxLength = 40
 
-        wrapper = shallow(<QuestionContentEditor {...props} />)
+        wrapper = shallow(<QuestionContentEditor.wrappedComponent {...props} />)
       })
 
       it('renders a <SingleLineInput/>', () => {
@@ -57,7 +59,7 @@ describe('QuestionContentEditor', () => {
     describe('when not editing', () => {
       beforeEach(() => {
         props.canEdit = false
-        wrapper = shallow(<QuestionContentEditor {...props} />)
+        wrapper = shallow(<QuestionContentEditor.wrappedComponent {...props} />)
       })
 
       it('renders the question with a simple question text', () => {

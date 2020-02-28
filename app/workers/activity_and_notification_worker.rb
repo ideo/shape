@@ -4,32 +4,27 @@ class ActivityAndNotificationWorker
 
   def perform(
     actor_id,
-    card_id,
+    target_id,
+    target_class,
+    source_id,
+    source_class,
     action,
-    from_collection_id,
-    to_collection_id
+    content = nil
   )
     actor = User.find(actor_id)
-    card = CollectionCard.find(card_id)
-    from_collection = nil
-    to_collection = nil
-    if from_collection_id
-      from_collection = Collection.find(from_collection_id)
+    target = target_class.safe_constantize.find(target_id)
+    source = nil
+    if source_id && source_class
+      source = source_class.safe_constantize.find(source_id)
     end
-    if to_collection_id
-      to_collection = Collection.find(to_collection_id)
-    end
-    record = card.record
-    editors = record.editors
 
     ActivityAndNotificationBuilder.call(
       actor: actor,
-      target: record,
+      target: target,
+      source: source,
       action: action,
-      subject_user_ids: editors[:users].pluck(:id),
-      subject_group_ids: editors[:groups].pluck(:id),
-      source: from_collection,
-      destination: to_collection,
+      content: content,
+      async: false,
     )
   end
 end

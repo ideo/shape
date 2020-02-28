@@ -15,7 +15,7 @@ const fakeApiStore = ({
       .fn()
       .mockReturnValue(Promise.resolve(requestResult))
       .mockName('request'),
-    requestJson: jest.fn().mockReturnValue(Promise.resolve()),
+    requestJson: jest.fn().mockReturnValue(Promise.resolve({ data: [] })),
     fetch: jest
       .fn()
       .mockReturnValue(Promise.resolve(requestResult))
@@ -87,6 +87,7 @@ const fakeApiStore = ({
       groups: [],
       terms_accepted: true,
       API_hideHelper: jest.fn(),
+      API_updateUseTemplateSetting: jest.fn(),
     },
     // NOTE: important that this matches currentUserOrganization.slug
     currentOrgSlug: 'org-slug',

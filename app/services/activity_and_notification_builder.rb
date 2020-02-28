@@ -14,7 +14,8 @@ class ActivityAndNotificationBuilder < SimpleService
     source: nil,
     destination: nil,
     organization: nil,
-    should_notify: true
+    should_notify: true,
+    async: false
   )
     @actor = actor
     @target = target
@@ -34,9 +35,15 @@ class ActivityAndNotificationBuilder < SimpleService
     @activity = nil
     @created_notifications = []
     @should_notify = should_notify
+    @async = async
   end
 
   def call
+    if @async
+      call_async
+      return
+    end
+
     create_activity
     cache_activity_count_and_reindex
     return unless @should_notify && @activity&.should_notify?
@@ -45,6 +52,18 @@ class ActivityAndNotificationBuilder < SimpleService
   end
 
   private
+
+  def call_async
+    ActivityAndNotificationWorker.perform_async(
+      @actor.id,
+      @target.id,
+      @target.class.name,
+      @source&.id,
+      @source&.class&.name,
+      @action,
+      @content,
+    )
+  end
 
   def create_activity
     @activity = Activity.new(

@@ -24,7 +24,7 @@ class RoutingStore extends RouterStore {
 
   @computed
   get isSearch() {
-    return this.location.pathname.includes('search')
+    return this.pathContains('/search')
   }
 
   @computed

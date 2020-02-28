@@ -20,7 +20,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
   before do
     user.reload
-    allow(ActivityAndNotificationWorker).to receive(:perform_async).and_call_original
+    allow(ActivityAndNotificationForCardWorker).to receive(:perform_async).and_call_original
   end
 
   describe 'GET #index' do
@@ -316,7 +316,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'creates an activity' do
         post(path, params: params)
-        expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+        expect(ActivityAndNotificationForCardWorker).to have_received(:perform_async).with(
           user.id,
           json['data']['id'].to_i,
           :created,
@@ -949,7 +949,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'creates an activity' do
-        expect(ActivityAndNotificationWorker).to receive(:perform_async).twice
+        expect(ActivityAndNotificationForCardWorker).to receive(:perform_async).twice
         patch(path, params: params)
       end
 
@@ -1258,7 +1258,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     it 'creates an activity' do
       patch(path, params: params)
-      expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+      expect(ActivityAndNotificationForCardWorker).to have_received(:perform_async).with(
         user.id,
         json['data']['id'].to_i,
         :edited,
@@ -1373,7 +1373,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'creates an activity' do
         patch(path, params: params)
-        expect(ActivityAndNotificationWorker).to have_received(:perform_async).with(
+        expect(ActivityAndNotificationForCardWorker).to have_received(:perform_async).with(
           user.id,
           json['data']['id'].to_i,
           :replaced,

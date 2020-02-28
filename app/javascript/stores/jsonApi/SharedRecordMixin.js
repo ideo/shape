@@ -17,6 +17,11 @@ const SharedRecordMixin = superclass =>
       this.forceMenuDisabled = true
     }
 
+    @action
+    updateFullyLoaded(val) {
+      this.fullyLoaded = val
+    }
+
     get menuDisabled() {
       return this.isSharedCollection || this.forceMenuDisabled || !this.can_view
     }

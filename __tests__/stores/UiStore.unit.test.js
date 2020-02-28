@@ -123,15 +123,14 @@ describe('UiStore', () => {
     })
 
     describe('#adjustZoomLevel', () => {
-      it('does not adjust unless collection is a board', () => {
-        uiStore.adjustZoomLevel({
-          collection: { ...collection, isBoard: false },
-        })
-        expect(uiStore.zoomLevel).toEqual(2)
-      })
       it('when zoomed out, should adjust to collection.maxZoom', () => {
         uiStore.adjustZoomLevel({ collection })
         expect(uiStore.zoomLevel).toEqual(3)
+      })
+
+      it('should use collection.lastZoom if available', () => {
+        uiStore.adjustZoomLevel({ collection: { ...collection, lastZoom: 2 } })
+        expect(uiStore.zoomLevel).toEqual(2)
       })
     })
 

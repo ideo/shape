@@ -7,13 +7,12 @@ class CollectionCardDuplicator < SimpleService
     system_collection: false,
     batch_id: nil,
     synchronous: :async,
-    placeholders: true,
+    create_placeholders: true,
     building_template_instance: false
   )
     @to_collection = to_collection
     @cards = cards
     @placement = placement
-    @placeholders = placeholders
     @for_user = for_user
     @system_collection = system_collection
     @batch_id = batch_id || "duplicate-#{SecureRandom.hex(10)}"
@@ -21,19 +20,20 @@ class CollectionCardDuplicator < SimpleService
     @should_update_cover = false
     @synchronous = validate_synchronous_value(synchronous)
     @building_template_instance = building_template_instance
+    # NOTE: building_template_instance always sets create_placeholders = false
+    @create_placeholders = create_placeholders && !building_template_instance
   end
 
   def call
     initialize_card_order
-    unless @building_template_instance
-      # this is the only case where we always skip this
+    if @create_placeholders
       duplicate_cards_with_placeholders
     end
     register_card_mappings
     deep_duplicate_cards
     reorder_and_update_cached_values
     create_notifications
-    return @new_cards if @synchronous == :async
+    return @new_cards unless run_worker_sync?
 
     # If synchronous, re-assign @new_cards to actual cards, overriding placeholders
     CollectionCard.where(id: @new_cards.map(&:id))
@@ -71,8 +71,6 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def register_card_mappings
-    run_worker_sync = %i[all_levels first_level].include?(@synchronous)
-
     card_ids = @cards.map(&:id)
     # ensure parent_collection_card exists
     if @building_template_instance && @cards.size == 1 && @to_collection.parent_collection_card.present?
@@ -82,7 +80,7 @@ class CollectionCardDuplicator < SimpleService
     end
 
     CardDuplicatorMapperFindLinkedCardsWorker.send(
-      "perform_#{run_worker_sync ? 'sync' : 'async'}",
+      "perform_#{run_worker_sync? ? 'sync' : 'async'}",
       @batch_id,
       card_ids,
       @for_user&.id,
@@ -91,17 +89,16 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def deep_duplicate_cards
-    run_worker_sync = %i[all_levels first_level].include?(@synchronous)
     # NOTE: the CardDuplicatorMapperFindLinkedCardsWorker needs
     #       to run before this duplication worker so that it
     #       can map all cards that need linking
-    if @building_template_instance
-      card_ids = @cards.pluck(:id)
-    else
+    if @create_placeholders
       card_ids = @new_cards.pluck(:id)
+    else
+      card_ids = @cards.pluck(:id)
     end
-    CollectionCardDuplicationWorker.send(
-      "perform_#{run_worker_sync ? 'sync' : 'async'}",
+    result = CollectionCardDuplicationWorker.send(
+      "perform_#{run_worker_sync? ? 'sync' : 'async'}",
       @batch_id,
       card_ids,
       @to_collection.id,
@@ -110,6 +107,10 @@ class CollectionCardDuplicator < SimpleService
       @synchronous == :all_levels,
       @building_template_instance,
     )
+    return unless result && run_worker_sync?
+
+    # when running sync, @new_cards is the result of the sync worker
+    @new_cards = result
   end
 
   def duplicate_cards_with_placeholders
@@ -162,10 +163,10 @@ class CollectionCardDuplicator < SimpleService
 
   def create_notifications
     # only notify when a user initiates this action
-    return if @for_user.blank? || @building_template_instance || @system_collection
+    return if system_initiated?
 
     @cards.each do |card|
-      ActivityAndNotificationWorker.perform_async(
+      ActivityAndNotificationForCardWorker.perform_async(
         @for_user&.id,
         card.id,
         :duplicated,
@@ -176,6 +177,10 @@ class CollectionCardDuplicator < SimpleService
   end
 
   # helpers
+
+  def run_worker_sync?
+    %i[all_levels first_level].include?(@synchronous)
+  end
 
   def moving_to_board?
     @to_collection.is_a? Collection::Board
@@ -194,5 +199,9 @@ class CollectionCardDuplicator < SimpleService
 
     # NOTE: this will always treat an empty to_collection as "unpinned", which may incorrectly unpin cards
     @to_collection.should_pin_cards?(@placement)
+  end
+
+  def system_initiated?
+    @for_user.blank? || !@create_placeholders || @building_template_instance || @system_collection
   end
 end
