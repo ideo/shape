@@ -142,11 +142,12 @@ class RoutingStore extends RouterStore {
   }
 
   appendQueryString = queryString => {
-    if (!this.history) return
+    if (!this.history) return false
     this.history.push({
       pathname: this.location.pathname,
       search: queryString,
     })
+    return true
   }
 }
 

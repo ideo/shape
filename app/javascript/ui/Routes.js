@@ -275,10 +275,7 @@ class Routes extends React.Component {
             </FixedActivityLogWrapper>
             {displayTermsPopup && <TermsOfUseModal currentUser={currentUser} />}
             {/* Capture google analytics params if not root path */}
-            <Route
-              path={new RegExp('^/.+$')}
-              render={() => <AppendUtmParams />}
-            />
+            <Route path="/(.+)" render={() => <AppendUtmParams />} />
             {/* Switch will stop when it finds the first matching path */}
             <Switch>
               <Route exact path="/" render={this.goToRoot} />
