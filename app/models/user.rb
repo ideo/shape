@@ -138,8 +138,13 @@ class User < ApplicationRecord
              optional: true
 
   has_many :test_audience_invitations
+  has_many :network_invitations
 
-  validates :email, presence: true, uniqueness: true, if: :email_required?
+  validates :email,
+            presence: true,
+            uniqueness: true,
+            format: { with: Devise.email_regexp },
+            if: :email_required?
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
@@ -323,13 +328,19 @@ class User < ApplicationRecord
     find_or_initialize_from_external(network_user_auth, 'ideo')
   end
 
-  def self.create_pending_user(email:)
-    create(
-      email: email,
+  def self.create_pending_user(invitation:, organization_id:)
+    pending_user = create(
+      email: invitation.email,
       status: User.statuses[:pending],
       password: Devise.friendly_token(40),
-      invitation_token: Devise.friendly_token(40),
     )
+    return pending_user unless pending_user.persisted?
+
+    pending_user.network_invitations.create(
+      token: invitation.token,
+      organization_id: organization_id,
+    )
+    pending_user
   end
 
   def self.pending_user_with_token(token)

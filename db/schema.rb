@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_26_214443) do
+ActiveRecord::Schema.define(version: 2020_03_02_212854) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -476,6 +476,16 @@ ActiveRecord::Schema.define(version: 2020_02_26_214443) do
     t.index ["question_type"], name: "index_items_on_question_type"
     t.index ["roles_anchor_collection_id"], name: "index_items_on_roles_anchor_collection_id"
     t.index ["type"], name: "index_items_on_type"
+  end
+
+  create_table "network_invitations", force: :cascade do |t|
+    t.string "token"
+    t.bigint "user_id"
+    t.bigint "organization_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_network_invitations_on_token"
+    t.index ["user_id", "organization_id"], name: "index_network_invitations_on_user_id_and_organization_id"
   end
 
   create_table "notifications", force: :cascade do |t|

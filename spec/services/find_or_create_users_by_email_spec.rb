@@ -1,11 +1,29 @@
 require 'rails_helper'
 
 RSpec.describe FindOrCreateUsersByEmail, type: :service do
-  let(:emails) { Array.new(3).map { Faker::Internet.email } }
-
-  describe '#call', :vcr do
+  describe '#call' do
+    # needs to have a current_org to pass through to the invitation
+    let!(:invited_by) { create(:user, current_organization_id: 1) }
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
-    let(:subject) { FindOrCreateUsersByEmail.new(emails: emails) }
+    let(:subject) do
+      FindOrCreateUsersByEmail.new(
+        emails: emails,
+        invited_by: invited_by,
+      )
+    end
+    let(:invited_emails) { emails }
+    let(:fake_invitations) do
+      invited_emails.map do |email|
+        Mashie.new(email: email, token: SecureRandom.alphanumeric(12))
+      end
+    end
+
+    before do
+      allow(NetworkApi::Invitation).to receive(:bulk_create).and_return(
+        fake_invitations,
+      )
+      allow(SyncNetworkGroups).to receive(:call).and_return true
+    end
 
     it 'should return pending users for all emails' do
       subject.call
@@ -14,29 +32,72 @@ RSpec.describe FindOrCreateUsersByEmail, type: :service do
       expect(subject.failed_emails).to be_empty
     end
 
-    it 'should strip any whitespace' do
-      cpu = FindOrCreateUsersByEmail.new(emails: ['email@address.com '])
-      cpu.call
-      expect(cpu.users.first.email).to eq('email@address.com')
+    it 'should create network_invitations for each user' do
+      expect(NetworkApi::Invitation).to receive(:bulk_create).with(
+        organization_id: invited_by.current_organization_id,
+        invited_by_uid: invited_by.uid,
+        emails: emails,
+      )
+      subject.call
+      user = subject.users.first
+      expect(user.network_invitations.first.token).to eq fake_invitations.first.token
+    end
+
+    context 'with an email with whitespace' do
+      let(:emails) { ['email@address.com  '] }
+
+      it 'should strip any whitespace' do
+        subject.call
+        expect(subject.users.first.email).to eq('email@address.com')
+      end
+    end
+
+    context 'with invalid email' do
+      let(:emails) { ['#T)(#HTgneoin)'] }
+
+      it 'should return failed_emails' do
+        expect(subject.call).to eq false
+        expect(subject.failed_emails).to match_array(emails)
+      end
+    end
+
+    context 'with email rejected by API' do
+      let(:fake_invitations) do
+        invited_emails.map do |email|
+          # if API call was unable to create an invite for that email, token will be nil
+          Mashie.new(email: email, token: nil)
+        end
+      end
+
+      it 'should return failed_emails' do
+        expect(subject.call).to eq false
+        expect(subject.failed_emails).to match_array(emails)
+      end
     end
 
     it 'should add the user to the group' do
       expect(SyncNetworkGroups).to receive(:call)
-      cpu = FindOrCreateUsersByEmail.new(emails: ['email@address.com '])
-      cpu.call
+      subject.call
     end
 
     context 'existing user with email' do
-      let!(:user) { create(:user, email: emails.first) }
+      let(:existing_email) { emails.first }
+      let!(:user) { create(:user, email: existing_email) }
+      let(:invited_emails) { emails - [existing_email] }
 
       it 'should not create a new user, but return existing user' do
-        expect { subject.call }.to change(User, :count).by(2)
+        expect(NetworkApi::Invitation).to receive(:bulk_create).with(
+          organization_id: invited_by.current_organization_id,
+          invited_by_uid: invited_by.uid,
+          emails: invited_emails,
+        )
+        expect { subject.call }.to change(User.pending, :count).by(2)
         expect(subject.users).to include(user)
       end
 
       it 'should not be case sensitive' do
-        user.update_attributes(email: emails.first.upcase)
-        expect { subject.call }.to change(User, :count).by(2)
+        user.update_attributes(email: existing_email.upcase)
+        expect { subject.call }.to change(User.pending, :count).by(2)
       end
     end
   end

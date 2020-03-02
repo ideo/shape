@@ -49,6 +49,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   def create_from_emails
     service = FindOrCreateUsersByEmail.new(
       emails: json_api_params[:emails],
+      invited_by: current_user,
     )
     if service.call
       render jsonapi: service.users
