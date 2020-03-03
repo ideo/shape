@@ -77,6 +77,10 @@ class ApiStore extends jsonapi(datxCollection) {
     this.routingStore = routingStore
     this.uiStore = uiStore
     this.undoStore = undoStore
+    _.each(['routingStore', 'uiStore', 'undoStore'], store => {
+      // also save reference back to itself for the stores to use
+      this[store].apiStore = this
+    })
   }
 
   fetch(type, id, skipCache = false) {
