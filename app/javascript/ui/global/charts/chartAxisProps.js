@@ -6,7 +6,6 @@ import { LineSegment, VictoryLabel } from 'victory'
 import monthEdge from '~/utils/monthEdge'
 import { utcMoment, domainProps } from '~/ui/global/charts/ChartUtils'
 import v from '~/utils/variables'
-import { uiStore } from '~/stores'
 
 const tickLabelStyle = isSmallChartStyle => {
   if (isSmallChartStyle) {
@@ -60,14 +59,6 @@ const calculateDx = (x, w, isSmallChartStyle) => {
   return 0
 }
 
-const areLabelsOverlapping = (a, b) => {
-  const ar = a.x + a.w
-  const br = b.x + b.w
-  return !(ar < b.x || a.x > br)
-}
-
-const ticks = {}
-
 const TickLabel = props => {
   const w = calculateRelativeWidth(props)
   const dx = calculateDx(props.x, w, props.isSmallChartStyle)
@@ -75,29 +66,6 @@ const TickLabel = props => {
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
   })
-
-  ticks[props.itemId] = ticks[props.itemId] || []
-  const currentTicks = ticks[props.itemId]
-
-  if (props.isSmallChartStyle) {
-    currentTicks.forEach(tick => {
-      if (tick.props.id !== props.id) {
-        const overlapping = areLabelsOverlapping(
-          { ...props, w },
-          { ...tick.props, w: calculateRelativeWidth(tick.props) }
-        )
-        if (overlapping) {
-          uiStore.addLabelToHide({
-            id: props.id,
-            itemId: props.itemId,
-            text: props.text,
-            date: props.datum,
-            otherLabel: tick.props,
-          })
-        }
-      }
-    })
-  }
 
   const Label = (
     <VictoryLabel
@@ -109,12 +77,6 @@ const TickLabel = props => {
     />
   )
 
-  if (!currentTicks.find(t => t.props.id === props.id)) {
-    currentTicks.push({
-      props,
-      component: Label,
-    })
-  }
   return Label
 }
 

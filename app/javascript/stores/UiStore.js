@@ -246,22 +246,6 @@ export default class UiStore {
   hoveringOverDataItem = false
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
-  @observable
-  labelsToHide = []
-
-  @action
-  addLabelToHide(label) {
-    const exists = this.labelsToHide.find(
-      l =>
-        l.text === label.text && l.itemId === label.itemId && l.id === label.id
-    )
-    if (!exists) this.labelsToHide.push(label)
-  }
-
-  @action
-  removeLabelToHide(label) {
-    this.labelsToHide.remove(label)
-  }
 
   @action
   setEditingCardCover(editingCardCoverId) {
