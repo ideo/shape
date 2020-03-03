@@ -171,12 +171,12 @@ class ChartGroup extends React.Component {
 
   areLabelsOverlapping(labelA, labelB) {
     return this.areElementsOverlapping(
-      { ...labelA, w: this.calculateRelativeWidth(labelA) },
-      { ...labelB, w: this.calculateRelativeWidth(labelB) }
+      { ...labelA, w: this.calculateLabelWidth(labelA) },
+      { ...labelB, w: this.calculateLabelWidth(labelB) }
     )
   }
 
-  calculateRelativeWidth(label) {
+  calculateLabelWidth(label) {
     const modifier = this.isSmallChartStyle ? 10.5 : 8
     return label.text.length * modifier
   }
