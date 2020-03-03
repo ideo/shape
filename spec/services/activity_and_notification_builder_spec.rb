@@ -14,6 +14,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
   let(:content) { nil }
   let(:source) { nil }
   let(:destination) { nil }
+  let(:async) { false }
   let(:builder) do
     ActivityAndNotificationBuilder.new(
       actor: actor,
@@ -27,6 +28,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       content: content,
       source: source,
       destination: destination,
+      async: async,
     )
   end
   let!(:comment_thread) { create(:collection_comment_thread, record: target) }
@@ -42,6 +44,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
     end
 
     it 'calls CreateActivityNotificationsWorker' do
+      # TODO: could rename/refactor this if we ever have ActivityAndNotificationBuilder be async by default
       expect(CreateActivityNotificationsWorker).to receive(:perform_async).with(
         anything,
         omit_user_ids,
@@ -127,6 +130,15 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
         builder.call
         expect(Activity.last.source).to eq(source)
         expect(Activity.last.destination).to eq(destination)
+      end
+    end
+
+    context 'with async' do
+      let(:async) { true }
+
+      it 'calls ActivityAndNotificationWorker' do
+        expect(ActivityAndNotificationWorker).to receive(:perform_async)
+        builder.call
       end
     end
   end

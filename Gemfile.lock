@@ -499,6 +499,8 @@ GEM
       activemodel (>= 5)
       elasticsearch (>= 6)
       hashie
+    sentry-raven (2.13.0)
+      faraday (>= 0.7.6, < 1.0)
     shellany (0.0.1)
     shoulda-matchers (3.1.2)
       activesupport (>= 4.0.0)
@@ -652,6 +654,7 @@ DEPENDENCIES
   schmooze
   scout_apm
   searchkick (~> 4.1.0)
+  sentry-raven
   shoulda-matchers (~> 3.1)
   sidekiq (~> 6)
   sidekiq-scheduler

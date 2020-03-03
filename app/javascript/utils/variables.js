@@ -15,6 +15,9 @@ export const AUDIENCE_PRICES = {
     4.0,
 }
 
+export const FOAMCORE_MAX_ZOOM = 3
+export const FOUR_WIDE_MAX_ZOOM = 2
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
@@ -331,5 +334,28 @@ export default {
     delay: 0,
     duration: 350,
     smooth: true,
+  },
+
+  useTemplateSettings: {
+    addToMyCollection: 1,
+    letMePlaceIt: 2,
+  },
+
+  helperModalLabels: {
+    templateHelperLabel: 'Thanks, please don’t ask me again.',
+    templateHelperHint: ' This can be changed in your settings.',
+    moveHelper: "Thanks, please don't show me this message again.",
+  },
+
+  userSettingsLabels: {
+    useTemplateLabel: 'Add template instances to My Collection',
+    useTemplateHint:
+      'When using templates, choosing this setting will create template instances ' +
+      'in your My Collection by default. Turning this off will allow you to place templates ' +
+      'in any collection you have edit access to in Shape.',
+    mailingListText: 'Mailing List',
+    mailingListHint:
+      'Stay current on new features and case studies by signing up ' +
+      'for our mailing list',
   },
 }

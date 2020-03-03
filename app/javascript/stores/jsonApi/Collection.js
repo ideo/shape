@@ -8,7 +8,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 // TODO: remove this apiStore import by refactoring static methods that depend on it
 import { apiStore } from '~/stores'
-import { apiUrl } from '~/utils/url'
+import { apiUrl, useTemplateInMyCollection } from '~/utils/url'
 
 import { findTopLeftCard } from '~/utils/CollectionGridCalculator'
 import BaseRecord from './BaseRecord'
@@ -19,6 +19,7 @@ import Item from './Item'
 import Role from './Role'
 import TestAudience from './TestAudience'
 import SharedRecordMixin from './SharedRecordMixin'
+import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 
@@ -49,6 +50,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   loadedRows = 0
   @observable
   loadedCols = 0
+  // store the most recent zoom level of this collection (gets set in uiStore)
+  @observable
+  lastZoom = null
   // this stores the "virtual" search results collection
   searchResultsCollection = null
 
@@ -379,6 +383,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isFourWideBoard() {
     return this.isBoard && this.num_columns === 4
+  }
+
+  get maxZoom() {
+    return this.isFourWideBoard ? FOUR_WIDE_MAX_ZOOM : FOAMCORE_MAX_ZOOM
   }
 
   get isPublicJoinable() {
@@ -1324,7 +1332,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return
     }
 
-    uiStore.update('movingIntoCollection', toCollection)
+    uiStore.setMovingIntoCollection(toCollection)
 
     const success = await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),
@@ -1411,15 +1419,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   toggleTemplateHelper() {
-    if (this.apiStore.currentUser.show_template_helper) {
-      this.uiStore.closeMoveMenu()
-      this.uiStore.update('showTemplateHelperForCollection', this)
-      this.uiStore.update('templateName', this.name)
-    } else {
+    const { apiStore } = this
+    const { currentUser } = apiStore
+    const { show_template_helper, use_template_setting } = currentUser
+    const { letMePlaceIt, addToMyCollection } = v.useTemplateSettings
+
+    if (
+      !show_template_helper &&
+      (!use_template_setting || use_template_setting === letMePlaceIt)
+    ) {
       this.uiStore.openMoveMenu({
         from: this,
         cardAction: 'useTemplate',
       })
+    } else if (
+      !show_template_helper &&
+      use_template_setting === addToMyCollection
+    ) {
+      return useTemplateInMyCollection(this.id)
+    } else {
+      this.uiStore.closeMoveMenu()
+      this.uiStore.update('showTemplateHelperForCollection', this)
+      this.uiStore.update('templateName', this.name)
     }
   }
 }

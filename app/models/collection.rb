@@ -291,7 +291,7 @@ class Collection < ApplicationRecord
       archived: archived,
       master_template: master_template,
       collection_type: collection_type,
-      activity_count: activities_and_child_activities_count
+      activity_count: activities_and_child_activities_count,
     }
   end
 
@@ -389,21 +389,6 @@ class Collection < ApplicationRecord
     batch_id: nil,
     card: nil
   )
-
-    # check if we are cloning a template inside a template instance;
-    # - this means we should likewise turn the template dup into its own instance
-    if master_template? && building_template_instance
-      builder = CollectionTemplateBuilder.new(
-        parent: parent,
-        template: self,
-        placement: parent_collection_card.order,
-        created_by: for_user,
-        # in this case the card has already been created
-        parent_card: parent_collection_card,
-        synchronous: synchronous ? :all_levels : :async,
-      )
-      return builder.call
-    end
     # Clones collection and all embedded items/collections
     c = amoeba_dup
     if c.is_a?(Collection::UserProfile)
@@ -414,6 +399,9 @@ class Collection < ApplicationRecord
       # when duplicating into a master_template, this collection should be a subtemplate
       c.template_id = nil
       c.master_template = true
+    elsif building_template_instance
+      c.template = self
+      c.master_template = false
     end
     # clear out cached submission_attrs
     c.cached_attributes.delete 'submission_attrs'
@@ -469,6 +457,7 @@ class Collection < ApplicationRecord
         for_user.try(:id),
         system_collection,
         synchronous,
+        building_template_instance,
       )
     end
 
@@ -494,6 +483,8 @@ class Collection < ApplicationRecord
       placement: placement,
       system_collection: system_collection,
       synchronous: synchronous,
+      # important that we disable this so it preserves links
+      create_placeholders: false,
     )
 
     # return the set of created duplicates
@@ -985,12 +976,14 @@ class Collection < ApplicationRecord
   def inside_a_creative_difference_collection?
     creative_difference_root_collection_id = ENV['CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID']
 
-    logger.debug(
-      'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.'
-    ) if !creative_difference_root_collection_id
+    unless creative_difference_root_collection_id
+      logger.debug(
+        'Please add "CREATIVE_DIFFERENCE_ADMINISTRATION_COLLECTION_ID" environment variable to your app config.',
+      )
+    end
 
     inside_an_application_collection? ||
-    within_collection_or_self?(creative_difference_root_collection_id.to_i)
+      within_collection_or_self?(creative_difference_root_collection_id.to_i)
   end
 
   # =================================

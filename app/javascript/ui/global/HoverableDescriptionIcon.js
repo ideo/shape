@@ -4,19 +4,19 @@ import Tooltip from '~/ui/global/Tooltip'
 import styled from 'styled-components'
 
 const StyledIconWrapper = styled.span`
-  margin-left: 3px;
+  margin-left: 4px;
   display: inline-block;
-  width: 10px;
+  width: ${props => (props.width ? props.width : 10)}px;
 `
 
-const HoverableDescriptionIcon = ({ description }) => {
+const HoverableDescriptionIcon = ({ description, width }) => {
   return (
     <Tooltip
       classes={{ tooltip: 'Tooltip' }}
       title={description}
       placement="bottom"
     >
-      <StyledIconWrapper>
+      <StyledIconWrapper width={width}>
         <InfoIconXs />
       </StyledIconWrapper>
     </Tooltip>
@@ -25,6 +25,11 @@ const HoverableDescriptionIcon = ({ description }) => {
 
 HoverableDescriptionIcon.propTypes = {
   description: PropTypes.string.isRequired,
+  width: PropTypes.number,
+}
+
+HoverableDescriptionIcon.defaultProps = {
+  width: 10,
 }
 
 export default HoverableDescriptionIcon

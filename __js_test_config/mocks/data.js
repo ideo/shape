@@ -55,9 +55,9 @@ export const fakeTextItemAttrs = {
 }
 
 const areaChartData = [
-  { date: '2018-07-10', value: 10 },
-  { date: '2018-08-10', value: 25 },
-  { date: '2018-09-10', value: 30 },
+  { date: '2018-07-10', value: 10, percentage: 10 },
+  { date: '2018-08-10', value: 25, percentage: 25 },
+  { date: '2018-09-10', value: 30, percentage: 30 },
 ]
 
 export const fakeAreaChartDataset = {
@@ -515,6 +515,7 @@ export const fakeUserAttrs = {
   API_updateCurrentUser: jest.fn(),
   API_updateSurveyRespondent: jest.fn(),
   API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_updateUseTemplateSetting: jest.fn().mockReturnValue(Promise.resolve({})),
   notify_through_email: true,
   show_move_modal: false,
 }

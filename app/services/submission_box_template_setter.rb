@@ -38,7 +38,7 @@ class SubmissionBoxTemplateSetter < SimpleService
       for_user: @user,
       placement: 'end',
       synchronous: :first_level,
-      placeholders: false,
+      create_placeholders: false,
     ).first
     @dup.collection.remove_all_viewer_roles!
     @dup.collection.update(name: "#{@submission_box.name} #{@dup.collection.name}")

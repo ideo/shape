@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ActivityAndNotificationWorker, type: :worker do
+RSpec.describe ActivityAndNotificationForCardWorker, type: :worker do
   describe '#perform' do
     let(:user) { create(:user) }
     let(:editor_group) { create(:group) }
@@ -11,7 +11,7 @@ RSpec.describe ActivityAndNotificationWorker, type: :worker do
     let(:action) { 'moved' }
 
     let(:run_worker) do
-      ActivityAndNotificationWorker.new.perform(
+      ActivityAndNotificationForCardWorker.new.perform(
         user.id,
         card.id,
         action,

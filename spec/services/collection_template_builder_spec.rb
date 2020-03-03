@@ -22,7 +22,6 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       template: template,
       placement: placement,
       created_by: user,
-      synchronous: :first_level, # Necessary to work in test env
     )
   end
   let(:instance) { builder.call }

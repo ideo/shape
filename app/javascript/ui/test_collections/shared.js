@@ -125,6 +125,8 @@ export const SingleLineInput = styled.input`
   }
 `
 
+SingleLineInput.displayName = 'SingleLineInput'
+
 export const TestQuestionHolder = styled.div`
   background-color: ${props =>
     props.userEditable

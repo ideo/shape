@@ -5,7 +5,7 @@ class SerializableCurrentUser < SerializableUser
              :show_helper, :show_move_helper, :show_template_helper,
              :mailing_list, :feedback_contact_preference,
              :feedback_terms_accepted, :respondent_terms_accepted,
-             :current_org_terms_accepted, :locale
+             :current_org_terms_accepted, :locale, :use_template_setting
 
   attribute :google_auth_token do
     # generate user login token for firebase
