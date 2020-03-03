@@ -99,7 +99,7 @@ describe('ChartGroup', () => {
         overlappingLabels = wrapper
           .instance()
           .findOverlappingLabels(labels)
-          .map(d => d.datum.toLocaleDateString())
+          .map(d => d.datum.toLocaleDateString('en-US'))
       })
 
       it('should return filtered date values for overlapping', () => {
