@@ -66,32 +66,32 @@ describe('ChartGroup', () => {
         // This data was generated from a real-world use case.
         labels = [
           {
-            datum: new Date('Thu Jul 19 2018 17:00:00 GMT-0700'),
+            datum: new Date('Thu Jul 19 2018 17:00:00 (GMT)'),
             text: 'Q3 2018',
             x: 321.2,
           },
           {
-            datum: new Date('Mon Dec 17 2018 16:00:00 GMT-0800'),
+            datum: new Date('Mon Dec 17 2018 16:00:00 (GMT)'),
             text: 'Q4 2018',
             x: 393.75,
           },
           {
-            datum: new Date('Sat Dec 31 2016 16:00:00 GMT-0800'),
+            datum: new Date('Sat Dec 31 2016 16:00:00 (GMT)'),
             text: 'Q1 2017',
             x: 50,
           },
           {
-            datum: new Date('Thu Mar 30 2017 17:00:00 GMT-0700'),
+            datum: new Date('Thu Mar 30 2017 17:00:00 (GMT)'),
             text: 'Q1 2017',
             x: 92.72,
           },
           {
-            datum: new Date('Sun Sep 30 2018 17:00:00 GMT-0700'),
+            datum: new Date('Sun Sep 30 2018 17:00:00 (GMT)'),
             text: 'Q4 2018',
             x: 356.31,
           },
           {
-            datum: new Date('Sun Dec 30 2018 16:00:00 GMT-0800'),
+            datum: new Date('Sun Dec 30 2018 16:00:00 (GMT)'),
             text: 'Q4 2018',
             x: 400,
           },
