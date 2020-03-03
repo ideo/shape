@@ -19,15 +19,6 @@ module IdeoSsoHelper
     end
   end
 
-  def ideo_sso_js_sdk_url
-    path = '/js/ideo-sso-js-sdk.min.js'
-    case ideo_sso_env
-    when :local then 'http://localhost:9000/' + path.gsub('.min', '')
-    when :staging then 'https://d278pcsqxz7fg5.cloudfront.net/1.1' + path
-    else 'https://d3none3dlnlrde.cloudfront.net/1.1' + path
-    end
-  end
-
   def ideo_sso_client_id
     ENV['IDEO_SSO_CLIENT_ID']
   end
