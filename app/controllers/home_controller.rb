@@ -26,6 +26,7 @@ class HomeController < ApplicationController
     end
     # might be nil which is ok
     @email = params[:email]
+    @token = params[:token]
   end
 
   def sign_out_and_redirect

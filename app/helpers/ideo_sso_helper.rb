@@ -4,6 +4,7 @@ module IdeoSsoHelper
       env: ideo_sso_env,
       client: ideo_sso_client_id,
       redirect: ideo_sso_redirect_url.to_s,
+      ssoHostname: ENV['IDEO_SSO_HOST'],
     }
   end
 
@@ -21,7 +22,7 @@ module IdeoSsoHelper
   def ideo_sso_js_sdk_url
     path = '/js/ideo-sso-js-sdk.min.js'
     case ideo_sso_env
-    when :local then 'http://localhost:9000/' + path
+    when :local then 'http://localhost:9000/' + path.gsub('.min', '')
     when :staging then 'https://d278pcsqxz7fg5.cloudfront.net/1.1' + path
     else 'https://d3none3dlnlrde.cloudfront.net/1.1' + path
     end
@@ -41,12 +42,25 @@ module IdeoSsoHelper
     )
   end
 
-  def ideo_sso_oauth_url(addtl_params = {})
-    NetworkApi::Authentication.uri_with_oauth_params(
+  def ideo_sso_url(method, addtl_params = {})
+    NetworkApi::Authentication.send(
+      method,
       redirect_url: ideo_sso_redirect_url.to_s,
       cookies: cookies,
       addtl_params: addtl_params,
-    ).to_s
+    )
+  end
+
+  def ideo_sso_oauth_url(addtl_params = {})
+    ideo_sso_url(:uri_with_oauth_params, addtl_params)
+  end
+
+  def ideo_sso_sign_up_url(addtl_params = {})
+    ideo_sso_url(:sign_up_url, addtl_params)
+  end
+
+  def ideo_sso_sign_in_url(addtl_params = {})
+    ideo_sso_url(:sign_in_url, addtl_params)
   end
 
   def stripe_js_sdk_url
