@@ -13,7 +13,7 @@ import { Heading3 } from '~/ui/global/styled/typography'
 import Avatar from '~/ui/global/Avatar'
 import Logo from '~/ui/layout/Logo'
 import v from '~/utils/variables'
-import { loginRedirectPath } from '~/utils/routeToLogin'
+import { loginRedirectPath } from '~/utils/url'
 
 const StyledLoginLink = styled(Heading3)`
   margin-left: 15px;

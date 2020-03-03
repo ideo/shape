@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
 
-import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v, {
   TOUCH_DEVICE_OS,
@@ -247,6 +246,10 @@ export default class UiStore {
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
 
+  get routingStore() {
+    return this.apiStore.routingStore
+  }
+
   @action
   setEditingCardCover(editingCardCoverId) {
     this.editingCardCover = editingCardCoverId
@@ -456,9 +459,9 @@ export default class UiStore {
 
   // TODO: rename this function to be clear it is show or reroute??
   showPermissionsAlert() {
-    const { viewingCollection } = this
+    const { viewingCollection, routingStore } = this
     if (viewingCollection && viewingCollection.isPublicJoinable) {
-      routeToLogin({ redirect: viewingCollection.frontend_url })
+      routingStore.routeToLogin({ redirect: viewingCollection.frontend_url })
       return
     }
     this.alert('You need permission to access this content.', 'Key')

@@ -1,5 +1,4 @@
 import { observable, action, computed } from 'mobx'
-import { routingStore, uiStore } from '~/stores'
 import { UNDO_ACTION_STATUS } from '~/enums/actionEnums'
 const MAX_UNDOSTACK_LENGTH = 10
 
@@ -14,6 +13,14 @@ export default class UndoStore {
 
   @observable
   actionStatus = UNDO_ACTION_STATUS.IDLE
+
+  get uiStore() {
+    return this.apiStore.uiStore
+  }
+
+  get routingStore() {
+    return this.apiStore.routingStore
+  }
 
   // block multiple requests from happening too quickly
   @computed
@@ -78,11 +85,11 @@ export default class UndoStore {
   @action
   async performAfterRedirect(redirectPath, action) {
     const { type, id } = redirectPath
-    const { viewingRecord } = uiStore
+    const { viewingRecord } = this.uiStore
     const { internalType, id: recordId } = viewingRecord
     // check if we don't have to redirect
     if (!!type && !!id && (internalType !== type || recordId !== id)) {
-      routingStore.routeTo(type, id)
+      this.routingStore.routeTo(type, id)
       this.actionAfterRoute = action
     } else {
       this.performAction(action)
@@ -106,7 +113,7 @@ export default class UndoStore {
         actionType,
       })
     }
-    uiStore.performPopupAction(message, actionType)
+    this.uiStore.performPopupAction(message, actionType)
     await action.apiCall()
     this.status = UNDO_ACTION_STATUS.IDLE
   }
@@ -120,13 +127,13 @@ export default class UndoStore {
 
   handleUndoKeypress = () => {
     if (this.currentlyUndoing) return false
-    if (uiStore.cancelUndo) return false
+    if (this.uiStore.cancelUndo) return false
     return this.undoLastAction()
   }
 
   handleRedoKeyPress = () => {
     if (this.currentlyRedoing) return false
-    if (uiStore.cancelRedo) return false
+    if (this.uiStore.cancelRedo) return false
     return this.redoLastAction()
   }
 }
