@@ -2,14 +2,10 @@ import React, { Fragment } from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
 import BreadcrumbCaretIcon from '~/ui/icons/BreadcrumbCaretIcon'
-import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
-import SubmissionBoxIconXs from '~/ui/icons/SubmissionBoxIconXs'
 import NestedArrowIcon from '~/ui/icons/NestedArrowIcon'
 import NestedLineIcon from '~/ui/icons/NestedLineIcon'
 import {
@@ -116,19 +112,6 @@ const NestedLineHolder = styled.div`
 `
 NestedLineHolder.displayName = 'NestedLineHolder'
 
-const IconHolder = styled.div`
-  color: ${v.colors.commonMedium};
-  display: inline-block;
-  margin-right: 6px;
-  transform: translate(0, -1px);
-
-  .icon.icon {
-    transform: none;
-    position: static;
-    vertical-align: bottom;
-  }
-`
-
 const NEST_AMOUNT_Y_PX = 45
 const MENU_WIDTH = 250
 const HOVER_TIMEOUT_MS = 300
@@ -161,8 +144,8 @@ export class BreadcrumbItem extends React.Component {
       dropdownOpen: false,
       menuItemOpenId: null,
       baseDropDownRecords: [],
+      hoverTimer: null,
     })
-    this.hoverTimer = null
     this.nestedMenuX = 0
     this.nestedMenuY = 0
   }
@@ -179,11 +162,12 @@ export class BreadcrumbItem extends React.Component {
     this.setState({
       dropdownOpen: true,
     })
-    clearTimeout(this.hoverTimer)
+    clearTimeout(this.state.hoverTimer)
   }
 
   async breadcrumbDive(item) {
     const { onBreadcrumbDive } = this.props
+    if (!onBreadcrumbDive) return
     await onBreadcrumbDive(item)
     this.setState({
       menuItemOpenId: item.id,
@@ -198,7 +182,9 @@ export class BreadcrumbItem extends React.Component {
   }
 
   onBreadcrumbHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 250)
+    this.setState({
+      hoverTimer: setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 250),
+    })
   }
 
   onBreadcrumbClick = ev => {
@@ -215,7 +201,7 @@ export class BreadcrumbItem extends React.Component {
     this.setState({
       dropdownOpen: true,
     })
-    clearTimeout(this.hoverTimer)
+    clearTimeout(this.state.hoverTimer)
   }
 
   onDropdownBreadcrumbClick = item => {
@@ -223,7 +209,9 @@ export class BreadcrumbItem extends React.Component {
   }
 
   onDropdownHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
+    this.setState({
+      hoverTimer: setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS),
+    })
   }
 
   // TODO refactor
@@ -252,7 +240,9 @@ export class BreadcrumbItem extends React.Component {
     cutRecords.push(item)
     item.nested = lastNestedLevel + 1
 
-    baseDropDownRecords = [...cutRecords]
+    this.setState({
+      baseDropDownRecords: [...cutRecords],
+    })
     this.nestedMenuY = (baseDropDownRecords.length - 1) * NEST_AMOUNT_Y_PX
   }
 
@@ -261,14 +251,14 @@ export class BreadcrumbItem extends React.Component {
     this.nestedMenuX = MENU_WIDTH
     this.breadcrumbDive(item)
     if (!item.nested && menuItemOpenId && menuItemOpenId !== item.id) {
-      this.nestedMenuLoading = true
+      this.state.nestedMenuLoading = true
       this.setNestedBaseRecords(item)
       // If the menu is moving back to the left position, we have to cancel
       // out the hover out timer on the menu so it doesn't close while it's
       // moving over there (because your mouse technically hovers off of it)
       setTimeout(() => {
         clearTimeout(this.nestedMenuTimer)
-        clearTimeout(this.hoverTimer)
+        clearTimeout(this.state.hoverTimer)
       }, HOVER_TIMEOUT_MS - 50)
     } else {
       this.nestedMenuY = (item.nested || 0) * NEST_AMOUNT_Y_PX
@@ -279,7 +269,7 @@ export class BreadcrumbItem extends React.Component {
     this.setState({
       dropdownOpen: true,
     })
-    clearTimeout(this.hoverTimer)
+    clearTimeout(this.state.hoverTimer)
     clearTimeout(this.nestedMenuTimer)
   }
 
@@ -288,24 +278,9 @@ export class BreadcrumbItem extends React.Component {
       this.closeNestedMenu,
       HOVER_TIMEOUT_MS + 50
     )
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
-  }
-
-  renderIcon(menuItem) {
-    // TODO refactor out
-    let icon
-    switch (menuItem.collection_type) {
-      case 'Collection':
-        icon = <CollectionIconXs />
-        break
-      case 'Collection::Board':
-        icon = <FoamcoreBoardIconXs />
-        break
-      case 'Collection::SubmissionBox':
-        icon = <SubmissionBoxIconXs />
-        break
-    }
-    return <IconHolder>{icon}</IconHolder>
+    this.setState({
+      hoverTimer: setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS),
+    })
   }
 
   renderNesting(menuItem) {
@@ -338,8 +313,16 @@ export class BreadcrumbItem extends React.Component {
     )
   }
 
+  renderIcon() {
+    const { item } = this.props
+    if (!item.icon) return null
+    return item.icon
+  }
+
   renderDropdown() {
-    if (!this.dropdownOpen) return null
+    const { baseDropDownRecords, dropdownOpen, menuItemOpenId } = this.state
+    const { item } = this.props
+    if (!dropdownOpen) return null
     const itemWidth = '90%'
 
     return (
@@ -349,8 +332,8 @@ export class BreadcrumbItem extends React.Component {
           onMouseOver={this.onDropdownHoverOver}
           onMouseOut={this.onDropdownHoverOut}
         >
-          {(!this.menuItemOpenId || this.nestedMenuX !== 0) &&
-            this.baseDropDownRecords.map(menuItem => (
+          {(!menuItemOpenId || this.nestedMenuX !== 0) &&
+            baseDropDownRecords.map(menuItem => (
               <StyledMenuItem
                 key={menuItem.id}
                 style={{ paddingLeft: '10px', width: itemWidth }}
@@ -360,7 +343,7 @@ export class BreadcrumbItem extends React.Component {
                   style={{ maxWidth: '200px', width: '86%' }}
                 >
                   {this.renderNesting(menuItem)}
-                  {this.renderIcon(menuItem)}
+                  {this.renderIcon()}
                   {this.renderMenuNameWithTooltip(menuItem)}
                 </StyledMenuButton>
                 {menuItem.has_children && (
@@ -371,7 +354,7 @@ export class BreadcrumbItem extends React.Component {
               </StyledMenuItem>
             ))}
         </StyledMenu>
-        {this.menuItemOpenId && (
+        {menuItemOpenId && (
           <StyledMenuWrapper
             offsetPosition={{ x: this.nestedMenuX, y: this.nestedMenuY }}
           >
@@ -380,14 +363,14 @@ export class BreadcrumbItem extends React.Component {
               onMouseOver={this.onNestedMenuHoverOver}
               onMouseOut={this.onNestedMenuHoverOut}
             >
-              {this.nestedMenuLoading && <InlineLoader />}
-              {item.breadcrumbDropDownRecord.map(menuItem => (
+              {this.state.nestedMenuLoading && <InlineLoader />}
+              {item.breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
                     onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
                     style={{ maxWidth: '200px', width: '86%' }}
                   >
-                    {this.renderIcon(menuItem)}
+                    {this.renderIcon()}
                     {this.renderMenuNameWithTooltip(menuItem)}
                   </StyledMenuButton>
                   {menuItem.has_children && (
@@ -409,26 +392,12 @@ export class BreadcrumbItem extends React.Component {
   render() {
     const { item, index, numItems, restoreBreadcrumb } = this.props
     const isLast = index === numItems - 1
-    let path
-    if (item.identifier === 'homepage') {
-      path = routingStore.pathTo('homepage')
-    } else {
-      path = routingStore.pathTo(item.type, item.id)
-      if (item.subItems) {
-        const linkItem = _.find(item.subItems, { isEllipsesLink: true })
-        if (linkItem) path = routingStore.pathTo(linkItem.type, linkItem.id)
-      }
-    }
-    const { currentlyDraggedOn } = this.props
-    const showDrag =
-      currentlyDraggedOn &&
-      currentlyDraggedOn.item.identifier === item.identifier
+
     return (
-      <Fragment key={path}>
+      <Fragment key={index}>
         <StyledBreadcrumbItem
           data-cy="Breadcrumb"
           ref={this.props.forwardedRef}
-          currentlyDraggedOn={!!showDrag}
           isLast={isLast}
           onMouseOver={this.onBreadcrumbHoverOver}
           onMouseOut={this.onBreadcrumbHoverOut}
@@ -445,9 +414,9 @@ export class BreadcrumbItem extends React.Component {
             </Tooltip>
           )}
           {item.ellipses || item.truncatedName ? (
-            <Link to={path}>{item.truncatedName}…</Link>
+            <a href={item.path}>{item.truncatedName}…</a>
           ) : (
-            <Link to={path}>{item.name}</Link>
+            <a href={item.path}>{item.name}</a>
           )}
         </StyledBreadcrumbItem>
         {this.renderDropdown()}
@@ -470,24 +439,28 @@ export const breadcrumbItemPropType = {
   subMenuOpen: PropTypes.bool,
   isTouchDevice: PropTypes.bool,
   isSmallScreen: PropTypes.bool,
+  icon: PropTypes.element,
 }
 
 BreadcrumbItem.propTypes = {
-  item: PropTypes.shapeOf(breadcrumbItemPropType),
-  onBreadcrumbDive: PropTypes.func.isRequired,
-  onBreadcrumbClick: PropTypes.func,
+  item: PropTypes.shape(breadcrumbItemPropType).isRequired,
   index: PropTypes.number.isRequired,
   numItems: PropTypes.number.isRequired,
-  forwardedRef: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   restoreBreadcrumb: PropTypes.func.isRequired,
-  isTouchDevice: false,
-  isSmallScreen: false,
+  onBreadcrumbDive: PropTypes.func,
+  onBreadcrumbClick: PropTypes.func,
+  forwardedRef: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  isTouchDevice: PropTypes.bool,
+  isSmallScreen: PropTypes.bool,
 }
 
 BreadcrumbItem.defaultProps = {
   onBreadcrumbClick: () => {},
+  onBreadcrumbDive: null,
   forwardedRef: React.createRef(),
   currentlyDraggedOn: null,
+  isTouchDevice: false,
+  isSmallScreen: false,
 }
 BreadcrumbItem.displayName = 'BreadcrumbItem'
 

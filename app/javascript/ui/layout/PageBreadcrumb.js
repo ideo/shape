@@ -5,7 +5,25 @@ import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import CollectionIconXs from '~/ui/icons/CollectionIconXs'
+import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
+import SubmissionBoxIconXs from '~/ui/icons/SubmissionBoxIconXs'
+import styled from 'styled-components'
 import { apiStore, uiStore, routingStore } from '~/stores'
+import v from '~/utils/variables'
+
+const IconHolder = styled.div`
+  color: ${v.colors.commonMedium};
+  display: inline-block;
+  margin-right: 6px;
+  transform: translate(0, -1px);
+
+  .icon.icon {
+    transform: none;
+    position: static;
+    vertical-align: bottom;
+  }
+`
 
 @observer
 class PageBreadcrumb extends React.Component {
@@ -33,19 +51,6 @@ class PageBreadcrumb extends React.Component {
     // this will set record.inMyCollection = true/false
     apiStore.checkInMyCollection(record)
     this.items = this.initItems()
-  }
-
-  get myCollectionItemProps() {
-    return {
-      type: 'collections',
-      id: apiStore.currentUserCollectionId,
-      identifier: 'homepage',
-      name: 'My Collection',
-      can_edit_content: true,
-      truncatedName: null,
-      ellipses: false,
-      has_children: true,
-    }
   }
 
   initItems = (clamp = true) => {
@@ -86,6 +91,7 @@ class PageBreadcrumb extends React.Component {
         ellipses: false,
         identifier,
         nested: 0,
+        icon: this.renderIcon(item),
       })
     })
 
@@ -93,12 +99,26 @@ class PageBreadcrumb extends React.Component {
     return _.compact(items).slice(depth)
   }
 
-  fetchBreadcrumbRecords = async itemId => {
+  get myCollectionItemProps() {
+    return {
+      type: 'collections',
+      id: apiStore.currentUserCollectionId,
+      identifier: 'homepage',
+      name: 'My Collection',
+      can_edit_content: true,
+      truncatedName: null,
+      ellipses: false,
+      has_children: true,
+    }
+  }
+
+  fetchBreadcrumbRecords = async breadcrumbItem => {
     const breadcrumbRecordsReq = await axios.get(
-      `/api/v1/collections/${itemId}/collection_cards/breadcrumb_records`
+      `/api/v1/collections/${breadcrumbItem.id}/collection_cards/breadcrumb_records`
     )
     runInAction(() => {
-      const item = this.items.find(i => i.id === itemId)
+      const item = this.items.find(i => i.id === breadcrumbItem.id)
+      console.log('fethc', breadcrumbItem.id, item)
       item.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
     })
   }
@@ -115,6 +135,22 @@ class PageBreadcrumb extends React.Component {
 
   onBreadcrumbClick = itemId => {
     routingStore.routeTo('collections', itemId)
+  }
+
+  renderIcon(menuItem) {
+    let icon
+    switch (menuItem.collection_type) {
+      case 'Collection':
+        icon = <CollectionIconXs />
+        break
+      case 'Collection::Board':
+        icon = <FoamcoreBoardIconXs />
+        break
+      case 'Collection::SubmissionBox':
+        icon = <SubmissionBoxIconXs />
+        break
+    }
+    return <IconHolder>{icon}</IconHolder>
   }
 
   render() {

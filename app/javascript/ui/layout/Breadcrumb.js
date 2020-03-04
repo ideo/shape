@@ -187,7 +187,6 @@ class Breadcrumb extends React.Component {
     this.props.onRestore(item)
   }
 
-  // TODO refactor out routing store
   renderBackButton() {
     const { showBackButton } = this.props
     const item = this.previousItem
@@ -204,7 +203,7 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
-    const { items, isSmallScreen, isTouchDevice } = this.props
+    const { items, isSmallScreen, isTouchDevice, onBreadcrumbDive } = this.props
     const renderItems = items.length > 0
     const { truncatedItems } = this
     // We need a ref to wrapper so we always render that
@@ -228,6 +227,7 @@ class Breadcrumb extends React.Component {
                   numItems={items.length}
                   onBreadcrumbClick={this.props.onBreadcrumbClick}
                   restoreBreadcrumb={() => this.onRestoreBreadcrumb(item)}
+                  onBreadcrumbDive={onBreadcrumbDive}
                   isTouchDevice={isTouchDevice}
                   isSmallScreen={isSmallScreen}
                 />
@@ -241,9 +241,10 @@ class Breadcrumb extends React.Component {
 }
 
 Breadcrumb.propTypes = {
-  items: PropTypes.arrayOf(breadcrumbItemPropType).isRequired,
-  breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  items: PropTypes.arrayOf(PropTypes.shape(breadcrumbItemPropType)).isRequired,
   onBack: PropTypes.func.isRequired,
+  breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  onBreadcrumbDive: PropTypes.func,
   onRestore: PropTypes.func,
   onBreadcrumbClick: PropTypes.func,
   containerWidth: PropTypes.number,
@@ -258,6 +259,7 @@ Breadcrumb.defaultProps = {
   breadcrumbWrapper: React.createRef(),
   onRestore: () => {},
   onBreadcrumbClick: () => {},
+  onBreadcrumbDive: null,
   containerWidth: null,
   maxDepth: 6,
   showBackButton: false,
