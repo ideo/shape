@@ -47,7 +47,6 @@ class FindOrCreateUsersByEmail
       )
       if user.persisted?
         users << user
-        user.sync_network_groups
       else
         @failed_emails << invitation.email
       end

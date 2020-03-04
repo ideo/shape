@@ -22,7 +22,6 @@ RSpec.describe FindOrCreateUsersByEmail, type: :service do
       allow(NetworkApi::Invitation).to receive(:bulk_create).and_return(
         fake_invitations,
       )
-      allow(SyncNetworkGroups).to receive(:call).and_return true
     end
 
     it 'should return pending users for all emails' do
@@ -73,11 +72,6 @@ RSpec.describe FindOrCreateUsersByEmail, type: :service do
         expect(subject.call).to eq false
         expect(subject.failed_emails).to match_array(emails)
       end
-    end
-
-    it 'should add the user to the group' do
-      expect(SyncNetworkGroups).to receive(:call)
-      subject.call
     end
 
     context 'existing user with email' do

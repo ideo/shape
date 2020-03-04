@@ -343,13 +343,6 @@ class User < ApplicationRecord
     pending_user
   end
 
-  def self.pending_user_with_token(token)
-    invitation = NetworkInvitation.find_by_token token
-    return unless invitation&.user&.pending?
-
-    invitation.user
-  end
-
   # Simplified format, used by action cable
   def as_json(_options = {})
     {
@@ -548,10 +541,6 @@ class User < ApplicationRecord
     return if first_line_owed.blank?
 
     first_line_owed.created_at + Audience::PAYMENT_WAITING_PERIOD
-  end
-
-  def sync_network_groups
-    SyncNetworkGroups.call(self)
   end
 
   # can return true, false, or 'outdated'
