@@ -23,7 +23,6 @@ import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import TruncatableText from '~/ui/global/TruncatableText'
 import v from '~/utils/variables'
-import routeToLogin from '~/utils/routeToLogin'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
@@ -316,13 +315,15 @@ class PageHeader extends React.Component {
   }
 
   get renderJoinCollectionButton() {
-    const { record } = this.props
+    const { record, routingStore } = this.props
     if (!record.isPublicJoinable) return null
     return (
       <Button
         style={{ marginLeft: '1rem' }}
         colorScheme={v.colors.primaryDarkest}
-        onClick={() => routeToLogin({ redirect: record.frontend_url })}
+        onClick={() =>
+          routingStore.routeToLogin({ redirect: record.frontend_url })
+        }
         size="sm"
         data-cy="HeaderFormButton"
       >

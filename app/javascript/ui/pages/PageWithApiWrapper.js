@@ -9,11 +9,10 @@ import Deactivated from '~/ui/layout/Deactivated'
 import CollectionPage from '~/ui/pages/CollectionPage'
 import ItemPage from '~/ui/pages/ItemPage'
 import trackError from '~/utils/trackError'
-import routeToLogin from '~/utils/routeToLogin'
 import _ from 'lodash'
 import googleTagManager from '~/vendor/googleTagManager'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class PageWithApiWrapper extends React.Component {
   unmounted = false
@@ -116,7 +115,7 @@ class PageWithApiWrapper extends React.Component {
   }
 
   fetchData = () => {
-    const { apiStore, uiStore, match, fetchType } = this.props
+    const { apiStore, uiStore, routingStore, match, fetchType } = this.props
     const { requestPath, cachedFetchId } = this
 
     uiStore.update('pageError', null)
@@ -142,7 +141,7 @@ class PageWithApiWrapper extends React.Component {
         this.setRecord(null)
         if (!apiStore.currentUser && err.status === 401) {
           // always redirect logged-out users to login
-          routeToLogin({ redirect: match.url })
+          routingStore.routeToLogin({ redirect: match.url })
           return
         }
         uiStore.update('pageError', err)
@@ -211,6 +210,7 @@ PageWithApiWrapper.propTypes = {
 PageWithApiWrapper.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 PageWithApiWrapper.defaultProps = {
   fetchId: null,
