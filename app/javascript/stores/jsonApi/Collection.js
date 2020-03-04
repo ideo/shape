@@ -390,10 +390,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isPublicJoinable() {
-    return (
-      (this.anyone_can_join ||
-        (this.anyone_can_view && this.parent.anyone_can_join)) &&
-      !this.apiStore.currentUser
+    if (this.apiStore.currentUser) return false
+    const anyoneCanJoinParent = _.pick(this, ['parent', 'anyone_can_join'])
+    return !!(
+      this.anyone_can_join ||
+      (this.anyone_can_view && anyoneCanJoinParent)
     )
   }
 
