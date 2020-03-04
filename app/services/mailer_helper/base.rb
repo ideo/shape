@@ -25,12 +25,16 @@ module MailerHelper
 
     def shape_invite_url
       if user&.pending?
-        router.accept_invitation_url(
-          token: user.invitation_token,
-        )
-      else
-        router.frontend_url_for(invited_to)
+        network_invitation = @user.network_invitations.find_by(organization: invited_to.organization)
+        if network_invitation.present?
+          redirect = router.frontend_path_for(invited_to)
+          return router.accept_invitation_url(
+            token: network_invitation.token,
+            redirect: redirect,
+          )
+        end
       end
+      router.frontend_url_for(invited_to)
     end
 
     def default?

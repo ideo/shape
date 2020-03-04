@@ -3,14 +3,17 @@ module ApplicationHelper
   def frontend_url_for(obj, with_id: true)
     return admin_root_url if obj == Role::SHAPE_ADMIN.to_s.titleize
 
-    url = root_url
+    "#{root_url.chomp('/')}#{frontend_path_for(obj, with_id: with_id)}"
+  end
+
+  def frontend_path_for(obj, with_id: true)
     slug = obj&.organization&.slug
-    url += "#{slug}/" if slug
+    url = "/#{slug}" if slug
     obj_id = with_id ? "/#{obj.id}" : ''
     if obj.is_a? Collection
-      url += "collections#{obj_id}"
+      url += "/collections#{obj_id}"
     elsif obj.is_a? Item
-      url += "items#{obj_id}"
+      url += "/items#{obj_id}"
     end
     url
   end
