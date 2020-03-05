@@ -85,6 +85,12 @@ class PageBreadcrumb extends React.Component {
         }
         return
       }
+      let path
+      if (item.identifier === 'homepage') {
+        path = routingStore.pathTo('homepage')
+      } else {
+        path = routingStore.pathTo(item.type, item.id)
+      }
       return items.push({
         ...item,
         name,
@@ -94,6 +100,7 @@ class PageBreadcrumb extends React.Component {
         nested: 0,
         icon: this.renderIcon(item),
         breadcrumbDropDownRecords: [],
+        path,
       })
     })
 
@@ -121,7 +128,6 @@ class PageBreadcrumb extends React.Component {
     const lookupId = !!rootItemId ? rootItemId : breadcrumbItem.id
     runInAction(() => {
       const item = this.items.find(i => i.id === lookupId)
-      console.log('fethc', item, breadcrumbRecordsReq.data.length, lookupId)
       item.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
     })
   }
@@ -170,6 +176,7 @@ class PageBreadcrumb extends React.Component {
         breadcrumbItemComponent={BreadcrumbWithDropping}
         items={this.items}
         onBack={this.onBack}
+        onBreadcrumbClick={this.onBreadcrumbClick}
         onBreadcrumbDive={this.fetchBreadcrumbRecords}
         showBackButton={!uiStore.isLargeBreakpoint}
         visiblyHidden={!renderItems}
