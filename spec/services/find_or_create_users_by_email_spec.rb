@@ -60,6 +60,24 @@ RSpec.describe FindOrCreateUsersByEmail, type: :service do
       end
     end
 
+    context 'with empty response from API' do
+      let(:fake_invitations) { [] }
+
+      it 'should return emails with errors from the invitations' do
+        expect(subject.call).to eq false
+        expect(subject.failed_emails).to match_array(emails)
+      end
+    end
+
+    context 'with error response from API' do
+      let(:fake_invitations) { Mashie.new(errors: ['Bad Request']) }
+
+      it 'should return emails with errors from the invitations' do
+        expect(subject.call).to eq false
+        expect(subject.failed_emails).to match_array(emails)
+      end
+    end
+
     context 'with email rejected by API' do
       let(:fake_invitations) do
         invited_emails.map do |email|
