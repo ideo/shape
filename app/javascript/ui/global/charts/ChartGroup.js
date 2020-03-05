@@ -196,26 +196,23 @@ class ChartGroup extends React.Component {
     const overlappingLabels = []
     sortedLabels.forEach((label, i) => {
       let overlapping = false
-      sortedLabels
-        .filter(l => l.datum !== label.datum)
-        .forEach(subLabel => {
-          overlapping = this.areLabelsOverlapping(label, subLabel)
-          if (overlapping) {
-            let subOverlapping = false
-            for (let j = i + 1; j < sortedLabels.length; j++) {
-              if (this.areLabelsOverlapping(subLabel, sortedLabels[j])) {
-                subOverlapping = this.areLabelsOverlapping(
-                  label,
-                  sortedLabels[j]
-                )
-              }
-            }
-            if (!subOverlapping) {
-              overlappingLabels.push(label)
-              return
-            }
+      for (let j = i + 1; j < sortedLabels.length; j++) {
+        const subLabel = sortedLabels[j]
+        overlapping = this.areLabelsOverlapping(label, subLabel)
+        if (overlapping) {
+          let subOverlapping = false
+          for (let k = j + 1; k < sortedLabels.length; k++) {
+            subOverlapping = this.areLabelsOverlapping(
+              sortedLabels[j],
+              sortedLabels[k]
+            )
           }
-        })
+          if (!subOverlapping) {
+            overlappingLabels.push(label)
+            continue
+          }
+        }
+      }
     })
     return _.uniq(overlappingLabels)
   }

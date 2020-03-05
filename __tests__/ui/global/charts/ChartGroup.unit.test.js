@@ -96,6 +96,7 @@ describe('ChartGroup', () => {
             x: 400,
           },
         ]
+
         overlappingLabels = wrapper
           .instance()
           .findOverlappingLabels(labels)
@@ -104,7 +105,7 @@ describe('ChartGroup', () => {
 
       it('should return filtered date values for overlapping', () => {
         expect(overlappingLabels.sort()).toEqual(
-          ['3/30/2017', '7/19/2018', '9/30/2018', '12/30/2018'].sort()
+          ['12/31/2016', '9/30/2018', '12/17/2018'].sort()
         )
       })
     })
