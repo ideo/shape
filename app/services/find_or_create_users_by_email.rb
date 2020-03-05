@@ -29,7 +29,7 @@ class FindOrCreateUsersByEmail
       invited_by_uid: @invited_by.uid,
       emails: @emails,
     )
-    if invitations.empty?
+    if invitations.empty? || invitations.errors.any?
       # NetworkApi call didn't work
       @failed_emails = @emails
       return
