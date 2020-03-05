@@ -5,6 +5,7 @@ import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
+import BreadcrumbWithDropping from '~/ui/layout/BreadcrumbWithDropping'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
 import SubmissionBoxIconXs from '~/ui/icons/SubmissionBoxIconXs'
@@ -166,6 +167,7 @@ class PageBreadcrumb extends React.Component {
       breadcrumb.length > 0
     return (
       <Breadcrumb
+        breadcrumbItemComponent={BreadcrumbWithDropping}
         items={this.items}
         onBack={this.onBack}
         onBreadcrumbDive={this.fetchBreadcrumbRecords}

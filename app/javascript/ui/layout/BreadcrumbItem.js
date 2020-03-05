@@ -16,7 +16,6 @@ import {
 } from '~/ui/global/PopoutMenu'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-import WithDropTarget from '~/ui/global/WithDropTarget'
 
 const StyledBreadcrumbCaret = styled.div`
   display: inline-block;
@@ -29,10 +28,10 @@ const StyledBreadcrumbCaret = styled.div`
 
 const StyledBreadcrumbItem = styled.div`
   display: inline-block;
-  ${props =>
-    props.currentlyDraggedOn &&
+  ${({ backgroundColor }) =>
+    backgroundColor &&
     `
-    background: ${v.colors.primaryLight};
+    background: ${backgroundColor};
   `};
   a {
     color: ${props => (props.isLast ? v.colors.black : v.colors.commonDark)};
@@ -216,7 +215,6 @@ export class BreadcrumbItem extends React.Component {
     })
   }
 
-  // TODO refactor
   setNestedBaseRecords(item) {
     const { baseDropDownRecords } = this.state
     const existingIdx = _.findIndex(
@@ -397,7 +395,13 @@ export class BreadcrumbItem extends React.Component {
   }
 
   render() {
-    const { item, index, numItems, restoreBreadcrumb } = this.props
+    const {
+      backgroundColor,
+      item,
+      index,
+      numItems,
+      restoreBreadcrumb,
+    } = this.props
     const isLast = index === numItems - 1
 
     return (
@@ -409,6 +413,7 @@ export class BreadcrumbItem extends React.Component {
           onMouseOver={this.onBreadcrumbHoverOver}
           onMouseOut={this.onBreadcrumbHoverOut}
           onClick={this.onBreadcrumbClick}
+          backgroundColor={backgroundColor}
         >
           {item.link && (
             <Tooltip
@@ -459,16 +464,17 @@ BreadcrumbItem.propTypes = {
   forwardedRef: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   isTouchDevice: PropTypes.bool,
   isSmallScreen: PropTypes.bool,
+  backgroundColor: PropTypes.string,
 }
 
 BreadcrumbItem.defaultProps = {
   onBreadcrumbClick: () => {},
   onBreadcrumbDive: null,
   forwardedRef: React.createRef(),
-  currentlyDraggedOn: null,
   isTouchDevice: false,
   isSmallScreen: false,
+  backgroundColor: null,
 }
 BreadcrumbItem.displayName = 'BreadcrumbItem'
 
-export default WithDropTarget(BreadcrumbItem)
+export default BreadcrumbItem

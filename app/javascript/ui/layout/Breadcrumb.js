@@ -161,8 +161,7 @@ class Breadcrumb extends React.Component {
     while (charsLeftToTruncate > 0) {
       const item = items[index]
       if (!item) break
-      // TODO remove shape-specific my collection logic
-      if (item.name !== 'My Collection' && !item.ellipses) {
+      if (!item.ellipses) {
         // Subtract this item from chars to truncate
         charsLeftToTruncate -= item.truncatedName
           ? item.truncatedName.length
@@ -203,11 +202,19 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
-    const { items, isSmallScreen, isTouchDevice, onBreadcrumbDive } = this.props
+    const {
+      breadcrumbItemComponent,
+      items,
+      isSmallScreen,
+      isTouchDevice,
+      onBreadcrumbDive,
+    } = this.props
     const renderItems = items.length > 0
     const { truncatedItems } = this
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
+
+    const BreadcrumbItemComponent = breadcrumbItemComponent || BreadcrumbItem
     return (
       <div ref={this.breadcrumbWrapper}>
         {!renderItems && <BreadcrumbPadding />}
@@ -220,7 +227,7 @@ class Breadcrumb extends React.Component {
                 key={`${item.name}-${index}`}
                 style={{ position: 'relative' }}
               >
-                <BreadcrumbItem
+                <BreadcrumbItemComponent
                   identifier={item.identifier}
                   item={item}
                   index={index}
@@ -244,6 +251,7 @@ Breadcrumb.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape(breadcrumbItemPropType)).isRequired,
   onBack: PropTypes.func.isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  breadcrumbItemComponent: PropTypes.node,
   onBreadcrumbDive: PropTypes.func,
   onRestore: PropTypes.func,
   onBreadcrumbClick: PropTypes.func,
@@ -257,6 +265,7 @@ Breadcrumb.propTypes = {
 
 Breadcrumb.defaultProps = {
   breadcrumbWrapper: React.createRef(),
+  breadcrumbItemComponent: null,
   onRestore: () => {},
   onBreadcrumbClick: () => {},
   onBreadcrumbDive: null,
