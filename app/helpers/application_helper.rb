@@ -8,8 +8,8 @@ module ApplicationHelper
 
   def frontend_path_for(obj, with_id: true)
     slug = obj&.organization&.slug
-    url = '/'
-    url += slug.to_s if slug
+    url = ''
+    url += "/#{slug}" if slug
     obj_id = with_id ? "/#{obj.id}" : ''
     if obj.is_a? Collection
       url += "/collections#{obj_id}"
