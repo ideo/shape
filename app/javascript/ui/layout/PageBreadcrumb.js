@@ -92,6 +92,7 @@ class PageBreadcrumb extends React.Component {
         identifier,
         nested: 0,
         icon: this.renderIcon(item),
+        breadcrumbDropDownRecords: [],
       })
     })
 
@@ -112,13 +113,14 @@ class PageBreadcrumb extends React.Component {
     }
   }
 
-  fetchBreadcrumbRecords = async breadcrumbItem => {
+  fetchBreadcrumbRecords = async (breadcrumbItem, rootItemId) => {
     const breadcrumbRecordsReq = await axios.get(
       `/api/v1/collections/${breadcrumbItem.id}/collection_cards/breadcrumb_records`
     )
+    const lookupId = !!rootItemId ? rootItemId : breadcrumbItem.id
     runInAction(() => {
-      const item = this.items.find(i => i.id === breadcrumbItem.id)
-      console.log('fethc', breadcrumbItem.id, item)
+      const item = this.items.find(i => i.id === lookupId)
+      console.log('fethc', item, breadcrumbRecordsReq.data.length, lookupId)
       item.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
     })
   }

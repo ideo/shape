@@ -150,7 +150,7 @@ export class BreadcrumbItem extends React.Component {
     this.nestedMenuY = 0
   }
 
-  closeNestedMenu() {
+  closeNestedMenu = () => {
     this.setState({
       menuItemOpenId: null,
     })
@@ -165,12 +165,14 @@ export class BreadcrumbItem extends React.Component {
     clearTimeout(this.state.hoverTimer)
   }
 
-  async breadcrumbDive(item) {
-    const { onBreadcrumbDive } = this.props
+  async breadcrumbDive(diveItem) {
+    const { item, onBreadcrumbDive } = this.props
+    const { menuItemOpenId } = this.state
+
     if (!onBreadcrumbDive) return
-    await onBreadcrumbDive(item)
+    await onBreadcrumbDive(diveItem, menuItemOpenId && item.id)
     this.setState({
-      menuItemOpenId: item.id,
+      menuItemOpenId: diveItem.id,
     })
   }
 
@@ -246,12 +248,14 @@ export class BreadcrumbItem extends React.Component {
     this.nestedMenuY = (baseDropDownRecords.length - 1) * NEST_AMOUNT_Y_PX
   }
 
-  onDiveClick = (item, level, ev) => {
+  onDiveClick = async (item, level, ev) => {
     const { menuItemOpenId } = this.state
     this.nestedMenuX = MENU_WIDTH
-    this.breadcrumbDive(item)
+    this.setState({
+      nestedMenuLoading: true,
+    })
+    await this.breadcrumbDive(item)
     if (!item.nested && menuItemOpenId && menuItemOpenId !== item.id) {
-      this.state.nestedMenuLoading = true
       this.setNestedBaseRecords(item)
       // If the menu is moving back to the left position, we have to cancel
       // out the hover out timer on the menu so it doesn't close while it's
@@ -263,6 +267,9 @@ export class BreadcrumbItem extends React.Component {
     } else {
       this.nestedMenuY = (item.nested || 0) * NEST_AMOUNT_Y_PX
     }
+    this.setState({
+      nestedMenuLoading: false,
+    })
   }
 
   onNestedMenuHoverOver = () => {
