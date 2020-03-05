@@ -34,11 +34,8 @@
       // this is just for frontend display, still important to make sure this is aligned with application.rb
       window.FREEMIUM_USER_LIMIT = <%= Organization::FREEMIUM_USER_LIMIT %>;
       window.AUDIENCE_PRICES = <%= Audience.price_constants.to_json.html_safe %>
-      // init variables for IdeoSSO
-      window.ideo_sso_init_params = <%= ideo_sso_init_params.to_json.html_safe %>
     </script>
-    <%# load this in the head of every page, after init params, to simulate old setup (external js file) %>
-    <%= javascript_pack_tag 'ideo-sso' %>
+
     <%= render 'layouts/trackers_and_widgets_head' %>
 
     <%= stylesheet_link_tag 'application', media: 'all' %>

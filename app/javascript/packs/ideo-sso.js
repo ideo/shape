@@ -1,5 +1,27 @@
-import IdeoSSO from 'ideo-sso-js-sdk'
+import IdeoSSO from '~/utils/IdeoSSO'
 
-// add this to the global context because (for legacy reasons) that's how other files are referencing it
-window.IdeoSSO = IdeoSSO
-IdeoSSO.init(window.ideo_sso_init_params || {})
+function init() {
+  // these params get created via Rails + ERB
+  if (!window.IDEO_SSO_PARAMS) {
+    return
+  }
+  const { action, email, token, logoutRequired } = window.IDEO_SSO_PARAMS
+
+  if (action === 'signIn') {
+    IdeoSSO.signIn({ email })
+    return
+  }
+  if (action === 'signUp') {
+    const signUp = () => {
+      IdeoSSO.signUp({ email, token })
+    }
+
+    if (logoutRequired) {
+      IdeoSSO.logout('/login').then(signUp)
+    } else {
+      signUp()
+    }
+  }
+}
+
+init()

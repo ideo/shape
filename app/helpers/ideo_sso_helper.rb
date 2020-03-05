@@ -1,24 +1,4 @@
 module IdeoSsoHelper
-  def ideo_sso_init_params
-    {
-      env: ideo_sso_env,
-      client: ideo_sso_client_id,
-      redirect: ideo_sso_redirect_url.to_s,
-      ssoHostname: ENV['IDEO_SSO_HOST'],
-    }
-  end
-
-  def ideo_sso_env
-    return ENV['IDEO_SSO_ENV'].to_sym if ENV['IDEO_SSO_ENV'].present?
-
-    hostname = URI.parse(request.url).hostname
-    if hostname.match(/(localhost|(staging\.shape\.space))$/).present?
-      :staging
-    else
-      :production
-    end
-  end
-
   def ideo_sso_client_id
     ENV['IDEO_SSO_CLIENT_ID']
   end

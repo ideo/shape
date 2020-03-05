@@ -1,14 +1,10 @@
 <script>
-  function signUp() {
-    <% if @token %>
-      IdeoSSO.signUpWithToken('<%= @token %>');
-    <% else %>
-      IdeoSSO.signUp('<%= @email %>');
-    <% end %>
+  window.IDEO_SSO_PARAMS = {
+    action: 'signUp',
+    email: '<%= @email %>',
+    token: '<%= @token %>',
+    logoutRequired: <%= @user_was_signed_in %>,
   }
-  <% if @user_was_signed_in %>
-    IdeoSSO.logout('/login').then(signUp)
-  <% else %>
-    signUp()
-  <% end %>
 </script>
+
+<%= javascript_pack_tag 'ideo-sso' %>

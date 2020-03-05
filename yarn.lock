@@ -7578,9 +7578,9 @@ identity-obj-proxy@^3.0.0:
   dependencies:
     harmony-reflect "^1.4.6"
 
-ideo-sso-js-sdk@ideo/sso-js-sdk#v2.0.0:
-  version "2.0.0"
-  resolved "git+ssh://git@github.com/ideo/sso-js-sdk.git#456cd938ab47594fc233902d6de26ed57d4aba12"
+ideo-sso-js-sdk@ideo/sso-js-sdk#v2.1.0:
+  version "2.1.0"
+  resolved "https://codeload.github.com/ideo/sso-js-sdk/tar.gz/fd66521d0ebb391f69c0dd5e2519e0e57b20d106"
   dependencies:
     babel-polyfill "^6.26.0"
     js-cookie "^2.2.0"

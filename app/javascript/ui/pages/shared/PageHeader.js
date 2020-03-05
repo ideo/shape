@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -27,9 +28,7 @@ import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
-import { some } from 'lodash'
-
-/* global IdeoSSO */
+import IdeoSSO from '~/utils/IdeoSSO'
 
 const IconHolder = styled.span`
   color: ${v.colors.commonDark};
@@ -148,7 +147,7 @@ class PageHeader extends React.Component {
     const { record } = this.props
     const leftConditions = [record.isProfileTemplate, record.isMasterTemplate]
 
-    if (some(leftConditions, bool => bool)) {
+    if (_.some(leftConditions, bool => bool)) {
       return (
         <IconHolder align="right">
           <CollectionTypeIcon record={record} />
@@ -168,7 +167,7 @@ class PageHeader extends React.Component {
       record.isBoard,
     ]
 
-    if (some(rightConditions, bool => bool)) {
+    if (_.some(rightConditions, bool => bool)) {
       return (
         <IconHolder align="right">
           <CollectionTypeIcon record={record} />
