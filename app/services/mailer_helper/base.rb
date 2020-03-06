@@ -1,6 +1,5 @@
 module MailerHelper
   class Base
-
     attr_reader :invited_to, :invited_to_type, :invited_by, :application, :user
 
     def initialize(application: nil, invited_to_type: nil, invited_to: nil, invited_by: nil, user: nil)
@@ -24,8 +23,8 @@ module MailerHelper
     end
 
     def shape_invite_url
-      if user&.pending?
-        network_invitation = @user.network_invitations.find_by(organization: invited_to.organization)
+      if user&.pending? && invited_to_organization.present?
+        network_invitation = @user.network_invitations.find_by(organization: invited_to_organization)
         if network_invitation.present?
           redirect = router.frontend_path_for(invited_to)
           return router.accept_invitation_url(
@@ -46,6 +45,12 @@ module MailerHelper
     end
 
     private
+
+    def invited_to_organization
+      return unless invited_to.respond_to?(:organization)
+
+      invited_to.organization
+    end
 
     def invited_to_name
       return invited_to.name if invited_to.respond_to?(:name)
