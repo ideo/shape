@@ -124,8 +124,7 @@ class Breadcrumb extends React.Component {
       subItems = this.transformToSubItems(items)
     }
 
-    // TODO fix shape-specific logic
-    if (items[0] && items[0].name === 'My Collection') {
+    if (items[0] && items[0].identifier === 'homepage') {
       items[0].subItems = subItems
     }
   }
