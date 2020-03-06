@@ -61,6 +61,7 @@ class HomeController < ApplicationController
   def store_redirect_param
     return if params[:redirect].blank?
 
+    @redirect = params[:redirect]
     redirect_uri = clean_redirect
     store_location_for :user, redirect_uri
     load_redirect_organization_from_url(redirect_uri)

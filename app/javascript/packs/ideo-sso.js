@@ -5,15 +5,28 @@ function init() {
   if (!window.IDEO_SSO_PARAMS) {
     return
   }
-  const { action, email, token, logoutRequired } = window.IDEO_SSO_PARAMS
+  const {
+    action,
+    email,
+    token,
+    logoutRequired,
+    redirect,
+    loginUrl,
+  } = window.IDEO_SSO_PARAMS
+
+  let confirmationRedirectUri = loginUrl
+  if (redirect) {
+    // append the redirect to the original oauth redirect path
+    confirmationRedirectUri += `?redirect=${redirect}`
+  }
 
   if (action === 'signIn') {
-    IdeoSSO.signIn({ email })
+    IdeoSSO.signIn({ email, confirmationRedirectUri })
     return
   }
   if (action === 'signUp') {
     const signUp = () => {
-      IdeoSSO.signUp({ email, token })
+      IdeoSSO.signUp({ email, token, confirmationRedirectUri })
     }
 
     if (logoutRequired) {
