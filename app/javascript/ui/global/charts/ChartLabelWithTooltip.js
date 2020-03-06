@@ -9,6 +9,8 @@ import { victoryTheme } from '~/ui/global/charts/ChartUtils'
 export const ChartTooltip = props => {
   const orientationHandler = _orientationProps => {
     const { domain } = props
+    if (!domain || !domain.y) return 'top'
+
     const maxYDomain = max(domain.y)
     const { _y } = _orientationProps
     if (_y === 0) return 'top'
