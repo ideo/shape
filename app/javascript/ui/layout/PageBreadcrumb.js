@@ -128,7 +128,9 @@ class PageBreadcrumb extends React.Component {
     const lookupId = !!rootItemId ? rootItemId : breadcrumbItem.id
     runInAction(() => {
       const item = this.items.find(i => i.id === lookupId)
-      item.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
+      if (item) {
+        item.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
+      }
     })
   }
 
