@@ -24,11 +24,7 @@ class FindOrCreateUsersByEmail
   end
 
   def create_pending_users
-    invitations = NetworkApi::Invitation.bulk_create(
-      organization_id: @organization_id,
-      invited_by_uid: @invited_by.uid,
-      emails: @emails,
-    )
+    invitations = create_invitations
     if invitations.empty? || invitations.respond_to?(:errors) && invitations.errors.any?
       # NetworkApi call didn't work
       @failed_emails = @emails
@@ -51,5 +47,23 @@ class FindOrCreateUsersByEmail
         @failed_emails << invitation.email
       end
     end
+  end
+
+  def create_invitations
+    if ENV['CYPRESS'].present?
+      # bypass the NetworkApi on Cypress
+      return @emails.map do |email|
+        Mashie.new(
+          email: email,
+          token: Devise.friendly_token(20),
+        )
+      end
+    end
+
+    NetworkApi::Invitation.bulk_create(
+      organization_id: @organization_id,
+      invited_by_uid: @invited_by.uid,
+      emails: @emails,
+    )
   end
 end
