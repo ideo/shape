@@ -7,23 +7,17 @@ module IdeoSsoHelper
     URI.join(ENV['IDEO_SSO_HOST'], ENV['IDEO_SSO_API_PATH'])
   end
 
-  def ideo_sso_token_auth_url(token = nil)
-    ideo_sso_oauth_url(
-      auth_token: token,
-    )
-  end
-
   def ideo_sso_url(method, addtl_params = {})
     NetworkApi::Authentication.send(
       method,
       redirect_url: ideo_sso_redirect_url.to_s,
       cookies: cookies,
       addtl_params: addtl_params,
-    )
+    ).to_s
   end
 
-  def ideo_sso_oauth_url(addtl_params = {})
-    ideo_sso_url(:uri_with_oauth_params, addtl_params)
+  def ideo_sso_token_auth_url(token = nil)
+    ideo_sso_url(:uri_with_oauth_params, auth_token: token)
   end
 
   def ideo_sso_sign_up_url(addtl_params = {})
