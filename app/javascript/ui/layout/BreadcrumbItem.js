@@ -28,6 +28,7 @@ const StyledBreadcrumbCaret = styled.div`
 
 const StyledBreadcrumbItem = styled.div`
   display: inline-block;
+  text-decoration: underline;
   ${({ backgroundColor }) =>
     backgroundColor &&
     `

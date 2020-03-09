@@ -40,6 +40,17 @@ describe('BreadcrumbItem', () => {
       expect(wrapper.find('StyledBreadcrumbItem').exists()).toBeTruthy()
     })
 
+    describe('with background color', () => {
+      beforeEach(() => {
+        props.backgroundColor = 'blue'
+        rerender()
+      })
+
+      it('should assign the background color on StyledBreadcrumbItem', () => {
+        expect(breadcrumbItem.props().backgroundColor).toEqual('blue')
+      })
+    })
+
     describe('with dropdown open', () => {
       beforeEach(() => {
         wrapper.setState({
