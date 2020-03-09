@@ -70,14 +70,16 @@ class Breadcrumb extends React.Component {
   // totalNameLength keeps getting called, with items potentially truncated
   totalNameLength = items => {
     if (!items) return 0
-    return _.sumBy(items, item => {
+    const sumby = _.sumBy(items, item => {
       let len = 0
-      if (item.ellipses) return
-      if (item.truncatedName) len = item.truncatedName.length
+      if (item.ellipses) return 0
+      if (item.truncatedName && item.truncatedName.length)
+        len = item.truncatedName.length
       else if (item.name) len = item.name.length
 
       return len
     })
+    return sumby
   }
 
   charsToTruncateForItems = items => {
@@ -86,7 +88,7 @@ class Breadcrumb extends React.Component {
 
   truncateItemName(item, amount) {
     if (!item.ellipses && item.name && item.name.length > amount) {
-      item.truncatedName = item.name.slice(0, amount - 1)
+      item.truncatedName = item.name.slice(0, amount)
     }
   }
 
@@ -190,7 +192,7 @@ class Breadcrumb extends React.Component {
     const item = this.previousItem
     if (!showBackButton || !item) return null
     return (
-      <button onClick={this.props.onBack}>
+      <button onClick={this.props.onBack} data-cy="BreadcrumbBackButton">
         <Tooltip title={item.name}>
           <BackIconContainer>
             <ArrowIcon />
@@ -222,7 +224,6 @@ class Breadcrumb extends React.Component {
             {this.renderBackButton()}
             {truncatedItems.map((item, index) => (
               <span
-                className="breadcrumb_item"
                 key={`${item.name}-${index}`}
                 style={{ position: 'relative' }}
               >
@@ -248,9 +249,9 @@ class Breadcrumb extends React.Component {
 
 Breadcrumb.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape(breadcrumbItemPropType)).isRequired,
-  onBack: PropTypes.func.isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   breadcrumbItemComponent: PropTypes.node,
+  onBack: PropTypes.func.isRequired,
   onBreadcrumbDive: PropTypes.func,
   onRestore: PropTypes.func,
   onBreadcrumbClick: PropTypes.func,

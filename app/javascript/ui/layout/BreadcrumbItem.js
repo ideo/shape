@@ -449,8 +449,6 @@ export const breadcrumbItemPropType = {
   has_children: PropTypes.bool,
   breadcrumbDropDownRecords: PropTypes.array,
   subMenuOpen: PropTypes.bool,
-  isTouchDevice: PropTypes.bool,
-  isSmallScreen: PropTypes.bool,
   icon: PropTypes.element,
 }
 
