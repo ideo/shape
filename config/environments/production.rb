@@ -136,11 +136,6 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # shared cookie for domain (needed for anycable setup)
-  config.session_store :cookie_store,
-                       key: '_shape_session',
-                       domain: :all
-
   if ENV['BASE_HOST'].present?
     # redirect all URLs that do not match BASE_HOST
     config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do

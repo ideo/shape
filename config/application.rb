@@ -48,5 +48,14 @@ module Shape
     config.i18n.fallbacks = [I18n.default_locale]
 
     config.log_level = ENV.fetch('LOG_LEVEL') { :debug }
+
+    # shared cookie for domain (needed for anycable setup)
+    domains = nil
+    if ENV['COOKIE_DOMAINS'].present?
+      domains = ENV['COOKIE_DOMAINS'].split(',').map(&:strip)
+    end
+    config.session_store :cookie_store,
+                         key: '_shape_user_session',
+                         domain: domains
   end
 end
