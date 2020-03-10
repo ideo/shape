@@ -270,7 +270,7 @@ class Routes extends React.Component {
             <DialogWrapper />
             <ZendeskWidget />
 
-            <Header />
+            {!window.SHAPE_IFRAME && <Header />}
 
             <FixedBoundary className="fixed_boundary" data-empty-space-click />
             <FixedActivityLogWrapper>
@@ -287,6 +287,10 @@ class Routes extends React.Component {
               <Route path="/collections/:id" component={CollectionApiWrapper} />
               <Route
                 path="/:org/collections/:id"
+                component={CollectionApiWrapper}
+              />
+              <Route
+                path="/iframe/:org/collections/:id"
                 component={CollectionApiWrapper}
               />
               <Route path="/items/:id" component={ItemApiWrapper} />

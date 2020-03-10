@@ -17,6 +17,10 @@ class HomeController < ApplicationController
   def marketing
   end
 
+  def iframe
+    response.headers.except! 'X-Frame-Options'
+  end
+
   def login; end
 
   def sign_up
