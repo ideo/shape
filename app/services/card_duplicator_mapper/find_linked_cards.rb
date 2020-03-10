@@ -13,6 +13,10 @@ module CardDuplicatorMapper
     end
 
     def call
+      all_cards.each do |card|
+        register_card(card)
+      end
+
       all_link_cards.each do |card|
         register_link_card(card)
       end
@@ -100,13 +104,8 @@ module CardDuplicatorMapper
       end.flatten
     end
 
-    def recursively_find_linked_cards(children_card_ids)
-      CardDuplicatorMapper::FindLinkedCards.call(
-        card_ids: children_card_ids,
-        batch_id: @batch_id,
-        for_user: @for_user,
-        system_collection: @system_collection,
-      )
+    def all_cards
+      @all_cards ||= @all_items.map(&:parent_collection_card) + @all_collections.map(&:parent_collection_card)
     end
 
     def filter_cards_for_user(cards_scope)
@@ -137,6 +136,13 @@ module CardDuplicatorMapper
       else
         false
       end
+    end
+
+    def register_card
+      register_card(
+        card_id: card.id,
+        data: {},
+      )
     end
 
     def register_link_card(card)

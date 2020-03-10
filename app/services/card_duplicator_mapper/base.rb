@@ -19,7 +19,23 @@ module CardDuplicatorMapper
       new(*args).call
     end
 
-    # Register a card that has been duplicated so it can be remappeds
+    def register_card(card_id:, data: {})
+      Cache.hash_set(
+        "#{@batch_id}_cards",
+        card_id,
+        data.to_hash,
+      )
+    end
+
+    def duplicated_cards
+      Cache.hash_get_all("#{@batch_id}_cards").presence || {}
+    end
+
+    def duplicated_card_ids
+      duplicated_cards.keys
+    end
+
+    # Register a card that has been duplicated so it can be remapped
     def register_duplicated_card(original_card_id:, to_card_id:)
       Cache.hash_set("#{@batch_id}_duplicated_cards", original_card_id, to_card_id)
       return unless all_cards_mapped?
@@ -75,11 +91,13 @@ module CardDuplicatorMapper
     end
 
     def expire_data_in_one_day!
+      Cache.expire("#{@batch_id}_cards", 1.day.to_i)
       Cache.expire("#{@batch_id}_linked_cards", 1.day.to_i)
       Cache.expire("#{@batch_id}_duplicated_cards", 1.day.to_i)
     end
 
     def clear_cached_data!
+      Cache.delete("#{@batch_id}_cards")
       Cache.delete("#{@batch_id}_linked_cards")
       Cache.delete("#{@batch_id}_duplicated_cards")
     end
