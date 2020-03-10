@@ -2,6 +2,7 @@ require "google/cloud/language"
 
 class CollectionAutotagger < SimpleService
   MIN_TEXT_LENGTH = 20
+  MIN_SALIENCE = 0.10
 
   def initialize(collection)
     @collection = collection
@@ -53,7 +54,9 @@ class CollectionAutotagger < SimpleService
     entities = client.analyze_entities(content: text, type: :PLAIN_TEXT).entities.first(5)
     # Reject if salience (relevance) is too low
     entities.select do |entity|
-      entity.salience >= 0.05
+      entity.salience >= MIN_SALIENCE &&
+        # Ignore people, unless it's a famous person with a wikipedia_url
+        (entity.type != :PERSON || entity.metadata['wikipedia_url'].present?)
     end
   end
 
