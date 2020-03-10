@@ -1,7 +1,6 @@
-production: &production
-  adapter: redis
-  url: <%= ENV['REDIS_URL'] %>
-development: &development
+production:
+  adapter: any_cable
+development:
   adapter: redis
   url: redis://localhost:6379
 test:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_26_214443) do
+ActiveRecord::Schema.define(version: 2020_03_10_183359) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -57,6 +57,14 @@ ActiveRecord::Schema.define(version: 2020_02_26_214443) do
     t.datetime "updated_at", null: false
     t.index ["application_id", "organization_id"], name: "index_api_tokens_on_app_id_org_id"
     t.index ["token"], name: "index_api_tokens_on_token"
+  end
+
+  create_table "app_metrics", force: :cascade do |t|
+    t.string "metric"
+    t.float "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["metric", "created_at"], name: "index_app_metrics_on_metric_and_created_at"
   end
 
   create_table "application_organizations", force: :cascade do |t|
