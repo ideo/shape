@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   config.webpacker.check_yarn_integrity = false # Settings specified here will take precedence over those in config/application.rb.
 
@@ -125,10 +127,6 @@ Rails.application.configure do
   #
   config.action_cable.url = ENV['ACTION_CABLE_URL']
 
-  config.session_store :cookie_store,
-                       key: '_any_cable_session',
-                       domain: '.shape.space'
-
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
@@ -138,10 +136,17 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # redirect all URLs that do not match BASE_HOST
   if ENV['BASE_HOST'].present?
+    uri = URI.parse(ENV['BASE_HOST'])
+    domain = uri.host.include?('shape.space') ? '.shape.space' : '.herokuapp.com'
+
+    # shared cookie for domain (needed for anycable setup)
+    config.session_store :cookie_store,
+                         key: '_any_cable_session',
+                         domain: domain
+
+    # redirect all URLs that do not match BASE_HOST
     config.middleware.insert_before(Rack::Runtime, Rack::Rewrite) do
-      uri = URI.parse(ENV['BASE_HOST'])
       r301 /.*/, "//#{uri.host}$&", if: proc { |rack_env|
         rack_env['SERVER_NAME'] != uri.host
       }
