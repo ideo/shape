@@ -614,6 +614,7 @@ DEPENDENCIES
   filestack (~> 2.6.1)
   friendly_id (~> 5.2.0)
   gibbon (~> 3.2)
+  globalize-accessors
   google-cloud-firestore (~> 0.21.0)
   guard
   guard-rspec

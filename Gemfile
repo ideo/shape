@@ -130,6 +130,7 @@ gem 'double_entry', '~> 2.0.0.beta1'
 
 # custom wrapper for globalize gem
 gem 'ideo-translation', git: 'https://github.com/ideo/ideo-translation.git'
+gem 'globalize-accessors', ref: '2bf2bde' # Latest commit on master to get dirty tracking
 
 gem 'slack-ruby-client'
 
