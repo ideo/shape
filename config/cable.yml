@@ -1,7 +1,8 @@
 production:
-  adapter: any_cable
+  adapter: <%= ENV.fetch('ACTION_CABLE_ADAPTER') { 'redis' } %>
+  url: <%= ENV['REDIS_URL'] %>
 development:
-  adapter: redis
-  url: redis://localhost:6379
+  adapter: <%= ENV.fetch('ACTION_CABLE_ADAPTER') { 'redis' } %>
+  url: <%= ENV.fetch('REDIS_URL') { 'redis://localhost:6379' } %>
 test:
   adapter: test

@@ -146,6 +146,11 @@ gem 'schmooze', require: false
 # Faker needed for generating fake names
 gem 'faker', '~> 1.9.5'
 
+# Anycable for more performant ActionCable
+# Note: you must `brew install anycable-go` if you want to run it locally
+# See: https://docs.anycable.io/#/using_with_rails
+gem 'anycable-rails', '>= 0.6.2'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
@@ -193,10 +198,6 @@ end
 
 group :production do
   gem 'heroku-deflater', github: 'ideo/heroku-deflater'
-  # Anycable for more performant ActionCable
-  # Note: you must `brew install anycable-go` if you want to run it locally
-  # See: https://docs.anycable.io/#/using_with_rails
-  gem 'anycable-rails', '>= 0.6.2'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

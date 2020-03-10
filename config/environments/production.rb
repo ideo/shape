@@ -1,7 +1,3 @@
-
-# Load anycable on production only
-require 'anycable-rails'
-
 Rails.application.configure do
   config.webpacker.check_yarn_integrity = false # Settings specified here will take precedence over those in config/application.rb.
 
