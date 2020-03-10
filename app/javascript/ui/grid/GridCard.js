@@ -135,7 +135,9 @@ class GridCard extends React.Component {
       record.menuDisabled ||
       uiStore.textEditingItem === record ||
       record.archived ||
-      card.isLoadingPlaceholder
+      card.isLoadingPlaceholder ||
+      (!apiStore.currentUser && !testCollectionCard) ||
+      window.SHAPE_IFRAME
     ) {
       return null
     }

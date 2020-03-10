@@ -266,6 +266,8 @@ Rails.application.routes.draw do
 
   # catch all marketing route request
   get '/product/*path', to: 'home#marketing', constraints: ->(req) { req.format == :html || req.format == '*/*' }
+  # catch all iframe route request
+  get '/iframe/*path', to: 'home#iframe', constraints: ->(req) { req.format == :html || req.format == '*/*' }
   # catch all HTML route requests, send to frontend
   get '*path', to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
 end
