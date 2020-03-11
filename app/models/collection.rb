@@ -298,6 +298,11 @@ class Collection < ApplicationRecord
   # just for reindexing, you can call:
   # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
+    # for now these are the same
+    activity_search_data
+  end
+
+  def activity_search_data
     {
       activity_count: activities_and_child_activities_count,
     }
