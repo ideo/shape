@@ -1,0 +1,5 @@
+production:
+  # production ANYCABLE_REDIS_URL is set via Procfile to $REDIS_URL
+  access_logs_disabled: false
+development:
+  redis_url: redis://localhost:6379/1

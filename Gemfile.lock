@@ -92,6 +92,13 @@ GEM
     annotate (2.7.5)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 13.0)
+    anycable (0.6.4)
+      anyway_config (~> 1.4.2)
+      grpc (~> 1.17)
+    anycable-rails (0.6.5)
+      anycable (~> 0.6.0)
+      rails (>= 5)
+    anyway_config (1.4.4)
     appsignal (2.5.1)
       rack
     arel (9.0.0)
@@ -591,6 +598,7 @@ DEPENDENCIES
   acts-as-taggable-on (~> 6.0.0)
   amoeba
   annotate
+  anycable-rails (>= 0.6.2)
   appsignal
   autoprefixer-rails
   barnes
