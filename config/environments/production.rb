@@ -127,6 +127,12 @@ Rails.application.configure do
   #
   config.action_cable.url = ENV['ACTION_CABLE_URL']
 
+  if ENV['ACTION_CABLE_ADAPTER'] == 'anycable'
+    config.session_store :cookie_store,
+                         key: '_shape_user_session',
+                         domain: '.shape.space'
+  end
+
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
