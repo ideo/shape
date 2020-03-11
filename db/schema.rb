@@ -486,6 +486,16 @@ ActiveRecord::Schema.define(version: 2020_03_10_183359) do
     t.index ["type"], name: "index_items_on_type"
   end
 
+  create_table "network_invitations", force: :cascade do |t|
+    t.string "token"
+    t.bigint "user_id"
+    t.bigint "organization_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_network_invitations_on_token"
+    t.index ["user_id", "organization_id"], name: "index_network_invitations_on_user_id_and_organization_id"
+  end
+
   create_table "notifications", force: :cascade do |t|
     t.boolean "read", default: false
     t.bigint "activity_id"

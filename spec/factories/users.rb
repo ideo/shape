@@ -39,7 +39,6 @@ FactoryBot.define do
 
     trait :pending do
       status User.statuses[:pending]
-      invitation_token { Devise.friendly_token(40) }
       provider nil
       uid nil
     end

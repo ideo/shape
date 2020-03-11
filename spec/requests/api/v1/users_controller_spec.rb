@@ -103,8 +103,9 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     end
   end
 
-  describe 'POST #create_from_emails', :vcr do
+  describe 'POST #create_from_emails' do
     let(:emails) { Array.new(3).map { Faker::Internet.email } }
+    let(:pending_users) { create_list(:user, 3, status: :pending) }
     let(:users_json) { json_included_objects_of_type('users') }
     let(:path) { '/api/v1/users/create_from_emails' }
     let(:params) do
@@ -112,16 +113,27 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
         'emails': emails,
       }.to_json
     end
+    let(:service_double) { double('FindOrCreateUsersByEmail') }
+
+    before do
+      allow(FindOrCreateUsersByEmail).to receive(:new).and_return(service_double)
+      allow(service_double).to receive(:call).and_return(true)
+      allow(service_double).to receive(:users).and_return(pending_users)
+    end
 
     it 'returns a 200' do
       post(path, params: params)
       expect(response.status).to eq(200)
     end
 
-    it 'returns 3 pending users' do
+    it 'returns pending users from FindOrCreateUsersByEmail service' do
+      expect(FindOrCreateUsersByEmail).to receive(:new).with(
+        emails: emails,
+        invited_by: user,
+      )
       post(path, params: params)
       expect(json['data'].size).to eq(3)
-      expect(json['data'].map { |u| u['attributes']['email'] }).to match_array(emails)
+      expect(json['data'].map { |u| u['attributes']['email'] }).to match_array(pending_users.map(&:email))
       expect(json['data'].all? { |u| u['attributes']['status'] == 'pending' }).to be true
     end
   end

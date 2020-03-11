@@ -39,7 +39,6 @@ module.exports = {
     localStorage: true,
     FileReader: true,
     DOMParser: true,
-    IdeoSSO: true,
   },
   settings: {
     'import/resolver': {
