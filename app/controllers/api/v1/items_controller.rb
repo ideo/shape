@@ -148,11 +148,14 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def log_item_activity(activity)
+    return if activity == :viewed && params[:page_view].blank?
+
     ActivityAndNotificationBuilder.call(
       actor: current_user,
       target: @item,
       action: activity,
       content: @item.content,
+      async: true,
     )
   end
 

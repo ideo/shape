@@ -64,7 +64,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
       expect(Collection).to receive(:where).with(
         id: [target_parent.id, target.id],
       ).and_call_original
-      expect(Collection).to receive(:reindex)
+      expect(Collection).to receive(:reindex).with(:activity_search_data)
       builder.call
     end
 

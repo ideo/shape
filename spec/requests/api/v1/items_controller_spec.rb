@@ -56,14 +56,22 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       expect(json['data']['attributes']['can_edit']).to eq(false)
     end
 
-    it 'creates an activity for viewing the item' do
-      expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        actor: @user,
-        target: item,
-        action: :viewed,
-        content: anything,
-      )
+    it 'does not create an activity for viewing the item unless page_view=true' do
+      expect(ActivityAndNotificationBuilder).not_to receive(:call)
       get(path)
+    end
+
+    context 'with page_view=true' do
+      it 'creates an activity for viewing the item' do
+        expect(ActivityAndNotificationBuilder).to receive(:call).with(
+          actor: @user,
+          target: item,
+          action: :viewed,
+          content: anything,
+          async: true,
+        )
+        get("#{path}?page_view=true")
+      end
     end
 
     context 'with a private item inside a private collection' do
@@ -226,6 +234,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         target: item,
         action: :edited,
         content: anything,
+        async: true,
       )
       patch(path, params: params)
     end
@@ -324,6 +333,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         target: item,
         action: :edited,
         content: anything,
+        async: true,
       )
       patch(path, params: params)
     end
