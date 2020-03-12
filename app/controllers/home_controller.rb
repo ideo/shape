@@ -39,6 +39,10 @@ class HomeController < ApplicationController
     redirect_to url
   end
 
+  def not_found
+    render plain: 'not found', status: :not_found
+  end
+
   before_action :require_dev_env, only: [:login_as]
   def login_as
     u = User.find(params[:id]) if params[:id]
