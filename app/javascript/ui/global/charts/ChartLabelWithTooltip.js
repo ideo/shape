@@ -1,35 +1,50 @@
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { VictoryLabel, VictoryTooltip } from 'victory'
+import { max } from 'lodash'
 
 import v from '~/utils/variables'
 import { victoryTheme } from '~/ui/global/charts/ChartUtils'
 
-export const ChartTooltip = props => (
-  <VictoryTooltip
-    {...props}
-    dy={props.dy}
-    cornerRadius={props.cornerRadius}
-    text={props.text}
-    active={props.active}
-    orientation="top"
-    theme={victoryTheme}
-    flyoutHeight={350}
-    style={{
-      fill: 'white',
-      fontFamily: v.fonts.sans,
-      fontSize: props.fontSize || 10,
-      fontWeight: 'normal',
-      padding: 16,
-    }}
-    pointerLength={0}
-    flyoutStyle={{
-      stroke: 'transparent',
-      fill: v.colors.black,
-      opacity: 0.8,
-    }}
-  />
-)
+export const ChartTooltip = props => {
+  const orientationHandler = _orientationProps => {
+    const { domain } = props
+    if (!domain || !domain.y) return 'top'
+
+    const maxYDomain = max(domain.y)
+    const { _y } = _orientationProps
+    if (_y === 0) return 'top'
+
+    const percentage = (_y / maxYDomain) * 100
+    if (percentage > 50) return 'bottom'
+    return 'top'
+  }
+  return (
+    <VictoryTooltip
+      {...props}
+      dy={props.dy}
+      cornerRadius={props.cornerRadius}
+      text={props.text}
+      active={props.active}
+      orientation={orientationHandler}
+      theme={victoryTheme}
+      flyoutHeight={350}
+      style={{
+        fill: 'white',
+        fontFamily: v.fonts.sans,
+        fontSize: props.fontSize || 10,
+        fontWeight: 'normal',
+        padding: 16,
+      }}
+      pointerLength={0}
+      flyoutStyle={{
+        stroke: 'transparent',
+        fill: v.colors.black,
+        opacity: 0.8,
+      }}
+    />
+  )
+}
 
 class ChartLabelWithTooltip extends React.Component {
   constructor(props) {
