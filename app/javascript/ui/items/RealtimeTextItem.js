@@ -427,31 +427,6 @@ class RealtimeTextItem extends React.Component {
     return _.get(prevHeaderSizeOp, 'attributes.header')
   }
 
-  adjustHeaderSizeIfNewline = delta => {
-    // Check if user added newline
-    // And if so, set their default text size if provided
-    if (this.newlineIndicesForDelta(delta).length === 0) return
-
-    const prevHeader = this.headerFromLastNewline(delta)
-    if (!prevHeader) return
-
-    // Apply previous line's header size to last operation
-    let newDelta = new Delta(delta)
-    const lastOp = _.last(newDelta.ops)
-    if (!lastOp.attributes) {
-      lastOp.attributes = { header: prevHeader }
-    } else if (lastOp.attributes.header) {
-      return
-    } else {
-      // remove lastOp, which is a `retain: 1` and causes the newline to be <p>
-      newDelta = new Delta({ ops: [newDelta.ops[0], newDelta.ops[1]] })
-        .retain(1)
-        .delete(1)
-    }
-    this.quillEditor.updateContents(newDelta, 'api')
-    return newDelta
-  }
-
   get cardId() {
     const { item } = this.props
     if (item.parent_collection_card) {
@@ -466,11 +441,7 @@ class RealtimeTextItem extends React.Component {
     // This adjustment is made so that the currently-selected
     // header size is preserved on new lines
 
-    let newDelta = new Delta(delta)
-    const adjustedDelta = this.adjustHeaderSizeIfNewline(delta)
-    if (adjustedDelta) {
-      newDelta = newDelta.compose(adjustedDelta)
-    }
+    const newDelta = new Delta(delta)
     const cursors = this.quillEditor.getModule('cursors')
     cursors.clearCursors()
 
