@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { computed, observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import {
@@ -52,6 +52,13 @@ class SubmissionBoxSettingsModal extends React.Component {
   loading = false
   @observable
   templates = []
+
+  componentDidMount() {
+    const { collection } = this.props
+    const { apiStore, submission_template_id } = collection
+    if (!submission_template_id) return
+    apiStore.fetch('collections', submission_template_id)
+  }
 
   get locked() {
     const { uiStore } = this.props
@@ -216,7 +223,9 @@ class SubmissionBoxSettingsModal extends React.Component {
     </SubmissionBoxRow>
   )
 
-  selectedOption = () => {
+  // computed to allow it to observe changing submission_template_id
+  @computed
+  get selectedOption() {
     const {
       submission_template_id,
       submission_box_type,
@@ -321,7 +330,7 @@ class SubmissionBoxSettingsModal extends React.Component {
           </RowItemLeft>
         </Row>
         <Heading3>Submission Format</Heading3>
-        {this.selectedOption()}
+        {this.selectedOption}
       </StyledTitleContent>
     )
   }
