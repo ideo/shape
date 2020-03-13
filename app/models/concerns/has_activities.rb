@@ -12,7 +12,8 @@ module HasActivities
     return unless respond_to?(:cached_activity_count)
 
     cache_attributes!(
-      cached_activity_count: activities.count,
+      { cached_activity_count: activities.count },
+      touch: false,
     )
   end
 end
