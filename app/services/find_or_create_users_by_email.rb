@@ -25,7 +25,7 @@ class FindOrCreateUsersByEmail
 
   def create_pending_users
     invitations = create_invitations
-    if invitations.empty? || invitations.respond_to?(:errors) && invitations.errors.any?
+    if invitations.empty? || invitations.try(:errors)&.any?
       # NetworkApi call didn't work
       @failed_emails = @emails
       return

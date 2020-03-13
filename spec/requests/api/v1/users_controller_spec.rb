@@ -136,6 +136,19 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
       expect(json['data'].map { |u| u['attributes']['email'] }).to match_array(pending_users.map(&:email))
       expect(json['data'].all? { |u| u['attributes']['status'] == 'pending' }).to be true
     end
+
+    context 'with failed emails' do
+      before do
+        allow(service_double).to receive(:call).and_return(false)
+        allow(service_double).to receive(:failed_emails).and_return(['email1@email.com'])
+      end
+
+      it 'returns a 422' do
+        post(path, params: params)
+        expect(response.status).to eq(422)
+        expect(json['errors']).to eq(['unable to process emails: email1@email.com'])
+      end
+    end
   end
 
   describe 'PATCH #update_current_user' do

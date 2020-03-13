@@ -54,7 +54,8 @@ class Api::V1::UsersController < Api::V1::BaseController
     if service.call
       render jsonapi: service.users
     else
-      render_api_errors service.failed_emails
+      errors = ["unable to process emails: #{service.failed_emails.join(',')}"]
+      render json: { errors: errors }, status: :unprocessable_entity
     end
   end
 
