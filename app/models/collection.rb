@@ -882,7 +882,8 @@ class Collection < ApplicationRecord
   end
 
   def subtemplate_instance?
-    templated? && template.subtemplate?
+    # is this an instance of a subtemplate
+    templated? && template&.subtemplate?
   end
 
   def inside_a_template_instance?

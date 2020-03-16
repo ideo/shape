@@ -77,7 +77,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render json: { success: true }
   end
 
-
   before_action :load_and_authorize_collection_destroy, only: %i[destroy]
   def destroy
     if @collection.destroy
