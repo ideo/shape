@@ -262,7 +262,7 @@ class RolesAdd extends React.Component {
               resolve(false)
             },
             onConfirm: () => resolve(true),
-            backgroundColor: `${v.colors.commonDark}`,
+            backgroundColor: `${v.colors.primaryLight}`,
           }
 
           const modalProps = {
