@@ -307,15 +307,18 @@ class RolesAdd extends React.Component {
     }
 
     let created = { data: [] }
+    let roles = []
     setLoading(true)
     if (emailUsers.length) {
       created = await this.props.onCreateUsers(emailUsers)
     }
-    const roles = await this.props.onCreateRoles(
-      [...created.data, ...fullUsers],
-      selectedRole,
-      { sendInvites, addToGroupId: this.selectedGroupId }
-    )
+    if (created && created.data) {
+      roles = await this.props.onCreateRoles(
+        [...created.data, ...fullUsers],
+        selectedRole,
+        { sendInvites, addToGroupId: this.selectedGroupId }
+      )
+    }
     setLoading(false)
     resetSelectedUsers()
     return roles
