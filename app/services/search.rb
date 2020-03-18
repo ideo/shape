@@ -1,22 +1,24 @@
 class Search
   attr_reader :options
 
-  DEFAULT_OPTIONS = {
-    fields: [
-      'name^50',
-      'handle^50',
-      'tags^20',
-      'content',
-    ],
-    # `missing` just means this field is allowed to be missing
-    boost_by: { activity_count: { factor: 0.2, missing: 0 } },
-    per_page: 10,
-    page: 1,
-    where: {},
-  }.freeze
+  def self.default_options
+    {
+      fields: [
+        'name^50',
+        'handle^50',
+        'tags^20',
+        'content',
+      ],
+      # `missing` just means this field is allowed to be missing
+      boost_by: { activity_count: { factor: 0.2, missing: 0 } },
+      per_page: 10,
+      page: 1,
+      where: {},
+    }
+  end
 
   def initialize(options = {})
-    @options = DEFAULT_OPTIONS.merge(options)
+    @options = self.class.default_options.merge(options)
   end
 
   def search(query)

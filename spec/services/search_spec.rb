@@ -59,7 +59,7 @@ RSpec.describe Search do
       expect(
         search.options[:where],
       ).to eq(
-        parent_ids: { all: [123456] },
+        parent_ids: { all: [123_456] },
         tags: { all: ['case study'] },
       )
     end
