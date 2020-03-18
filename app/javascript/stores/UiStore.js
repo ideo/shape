@@ -830,6 +830,11 @@ export default class UiStore {
   }
 
   @action
+  selectCardIds(cardIds) {
+    this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
+  }
+
+  @action
   async selectAll({ location, card = null } = {}) {
     const { viewingCollection } = this
     let collection = viewingCollection
