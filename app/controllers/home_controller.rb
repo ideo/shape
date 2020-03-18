@@ -2,6 +2,7 @@
 class HomeController < ApplicationController
   before_action :set_omniauth_state
   before_action :store_redirect_param, only: %i[login sign_up]
+  before_action :capture_email_and_token, only: %i[login sign_up]
 
   def index
     # limited users aren't allowed to access the full Shape app
@@ -20,12 +21,10 @@ class HomeController < ApplicationController
 
   def sign_up
     @user_was_signed_in = false
-    if user_signed_in?
-      sign_out :user
-      @user_was_signed_in = true
-    end
-    # might be nil which is ok
-    @email = params[:email]
+    return unless user_signed_in?
+
+    sign_out :user
+    @user_was_signed_in = true
   end
 
   def sign_out_and_redirect
@@ -38,6 +37,10 @@ class HomeController < ApplicationController
       cookies: cookies,
     )
     redirect_to url
+  end
+
+  def not_found
+    render plain: 'not found', status: :not_found
   end
 
   before_action :require_dev_env, only: [:login_as]
@@ -53,9 +56,16 @@ class HomeController < ApplicationController
 
   private
 
+  def capture_email_and_token
+    # might be nil which is ok
+    @email = params[:email]
+    @token = params[:token]
+  end
+
   def store_redirect_param
     return if params[:redirect].blank?
 
+    @redirect = params[:redirect]
     redirect_uri = clean_redirect
     store_location_for :user, redirect_uri
     load_redirect_organization_from_url(redirect_uri)

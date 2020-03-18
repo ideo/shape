@@ -263,52 +263,26 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
           expect(data_item_two.reload.legend_item).not_to eq(duplicated_legend_item)
         end
       end
+    end
 
-      context 'with potential infinite loop' do
-        # needs cloned_from_id as a pre-condition, to know we're in a nested copy
-        let!(:to_collection) { create(:collection, cloned_from_id: 99) }
+    context 'with potential infinite loop' do
+      # needs cloned_from_id as a pre-condition, to know we're in a nested copy
+      let!(:to_collection) { create(:collection, cloned_from_id: 99) }
 
-        context 'with breadcrumb.count > 50' do
-          before do
-            # have to fake this because the model callbacks will override the actual breadcrumb
-            allow_any_instance_of(Collection).to receive(:breadcrumb).and_return(
-              (1..60).to_a,
-            )
-          end
-
-          it 'will stop the loop and signal an error' do
-            expect(Appsignal).to receive(:set_error).with(
-              an_instance_of(StandardError),
-              parent_collection_id: to_collection.id,
-            )
-            expect(run_worker).to be false
-          end
+      context 'with breadcrumb.count > 50' do
+        before do
+          # have to fake this because the model callbacks will override the actual breadcrumb
+          allow_any_instance_of(Collection).to receive(:detect_infinite_loop).and_return(
+            ['breadcrumb too long'],
+          )
         end
 
-        context 'with repeating parent names' do
-          let(:parents) do
-            [
-              Mashie.new(name: 'prototype collection'),
-              Mashie.new(name: 'Inner contents'),
-              Mashie.new(name: 'Working agreements'),
-            ]
-          end
-
-          before do
-            allow_any_instance_of(Collection).to receive(:parents).and_return(
-              # repeat the same names several times
-              # there are only 3 unique vs 9 total, which will cause an error
-              parents * 3,
-            )
-          end
-
-          it 'will stop the loop and signal an error' do
-            expect(Appsignal).to receive(:set_error).with(
-              an_instance_of(StandardError),
-              parent_collection_id: to_collection.id,
-            )
-            expect(run_worker).to be false
-          end
+        it 'will stop the loop and signal an error' do
+          expect(Appsignal).to receive(:set_error).with(
+            an_instance_of(StandardError),
+            parent_collection_id: to_collection.id,
+          )
+          expect(run_worker).to be false
         end
       end
     end

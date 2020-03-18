@@ -1,3 +1,10 @@
 <script>
-  IdeoSSO.signIn();
+  window.IDEO_SSO_PARAMS = {
+    action: 'signIn',
+    email: '<%= @email %>',
+    redirect: '<%= @redirect %>',
+    loginUrl: '<%= login_url %>',
+  }
 </script>
+
+<%= javascript_packs_with_polyfill 'ideo-sso' %>

@@ -1,6 +1,6 @@
 import PageWithApiWrapper from '~/ui/pages/PageWithApiWrapper'
 import Deactivated from '~/ui/layout/Deactivated'
-import { apiStore, uiStore } from '~/stores'
+import { apiStore, uiStore, routingStore } from '~/stores'
 
 jest.mock('../../../app/javascript/stores')
 
@@ -22,6 +22,7 @@ beforeEach(() => {
     match,
     apiStore,
     uiStore,
+    routingStore,
     fetchType: 'collections',
     render: () => null,
   }

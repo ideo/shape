@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: https://github.com/ideo/network-api-ruby.git
-  revision: 4144ff85a9191c7dc2af7deaad8719fc6b264da2
+  revision: 2eeeacfe1f7b42bb99fcd6d558bc2c9b6a23e159
   specs:
-    network-api-ruby (0.0.21)
+    network-api-ruby (0.0.23)
       json_api_client (~> 1.5, >= 1.5.3)
 
 GIT
@@ -92,6 +92,13 @@ GEM
     annotate (2.7.5)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 13.0)
+    anycable (0.6.4)
+      anyway_config (~> 1.4.2)
+      grpc (~> 1.17)
+    anycable-rails (0.6.5)
+      anycable (~> 0.6.0)
+      rails (>= 5)
+    anyway_config (1.4.4)
     appsignal (2.5.1)
       rack
     arel (9.0.0)
@@ -196,7 +203,7 @@ GEM
       redis (>= 3.2, < 5.0)
     faraday (0.12.2)
       multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.13.1)
+    faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
     ffi (1.9.25)
     filestack (2.6.1)
@@ -591,6 +598,7 @@ DEPENDENCIES
   acts-as-taggable-on (~> 6.0.0)
   amoeba
   annotate
+  anycable-rails (>= 0.6.2)
   appsignal
   autoprefixer-rails
   barnes
@@ -614,6 +622,7 @@ DEPENDENCIES
   filestack (~> 2.6.1)
   friendly_id (~> 5.2.0)
   gibbon (~> 3.2)
+  globalize-accessors
   google-cloud-firestore (~> 0.21.0)
   guard
   guard-rspec

@@ -14,7 +14,11 @@ Rails.application.routes.draw do
     root to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
   end
 
-  mount ActionCable.server => '/cable'
+  if ENV['ACTION_CABLE_ADAPTER'] != 'anycable' || ENV['ANYCABLE_DEPLOYMENT']
+    mount ActionCable.server => '/cable'
+  else
+    get 'cable', to: 'home#not_found'
+  end
 
   namespace :api do
     namespace :v1 do

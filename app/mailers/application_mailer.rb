@@ -17,6 +17,7 @@ class ApplicationMailer < ActionMailer::Base
       # in a worker that emails all admins, and there are no admins left
       return
     end
+
     @mail_helper ||= MailerHelper::Shape.new
     args.delete :users
     super(args)
@@ -25,9 +26,14 @@ class ApplicationMailer < ActionMailer::Base
   end
 
   def restrict_to_ideo_products?
+    # for unit testing
+    return true if ENV['SHAPE_APP'] == 'test-restriction'
+    # otherwise don't restrict in test/dev where real emails aren't sent anyway
+    return false if Rails.env.test? || Rails.env.development?
+
     # Heroku apps are all Rails.env.production however not all of them are "production";
     # for those ones (e.g. development, staging), we don't want to send real emails to anyone
     # outside of the IDEO Products Group
-    ENV['SHAPE_APP'] != 'production' && (!Rails.env.test? || ENV['SHAPE_APP'] == 'test-restriction')
+    ENV['SHAPE_APP'] != 'production'
   end
 end

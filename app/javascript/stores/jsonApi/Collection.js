@@ -390,10 +390,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isPublicJoinable() {
-    return (
-      (this.anyone_can_join ||
-        (this.anyone_can_view && this.parent.anyone_can_join)) &&
-      !this.apiStore.currentUser
+    if (this.apiStore.currentUser) return false
+    const anyoneCanJoinParent = _.pick(this, ['parent', 'anyone_can_join'])
+    return !!(
+      this.anyone_can_join ||
+      (this.anyone_can_view && anyoneCanJoinParent)
     )
   }
 
@@ -1422,10 +1423,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const { apiStore } = this
     const { currentUser } = apiStore
     const { show_template_helper, use_template_setting } = currentUser
+    const { letMePlaceIt, addToMyCollection } = v.useTemplateSettings
 
     if (
       !show_template_helper &&
-      use_template_setting === v.useTemplateSettings.letMePlaceIt
+      (!use_template_setting || use_template_setting === letMePlaceIt)
     ) {
       this.uiStore.openMoveMenu({
         from: this,
@@ -1433,7 +1435,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     } else if (
       !show_template_helper &&
-      use_template_setting === v.useTemplateSettings.addToMyCollection
+      use_template_setting === addToMyCollection
     ) {
       return useTemplateInMyCollection(this.id)
     } else {

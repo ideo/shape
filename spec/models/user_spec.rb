@@ -424,16 +424,39 @@ describe User, type: :model do
   end
 
   describe '#create_pending_user' do
+    let!(:org) { create(:organization_without_groups) }
     let(:email) { Faker::Internet.email }
+    let(:invitation_from_network) do
+      Mashie.new(email: email, token: SecureRandom.alphanumeric(12))
+    end
+    let(:create_user) do
+      User.create_pending_user(
+        invitation: invitation_from_network,
+        organization_id: org.id,
+      )
+    end
 
     it 'should create a new pending user' do
-      user = User.create_pending_user(email: email)
+      user = create_user
       expect(user.persisted? && user.pending?).to be true
       expect(user.email).to eq(email)
     end
 
+    it 'should create network_invitation records' do
+      expect {
+        create_user
+      }.to change(NetworkInvitation, :count).by(1)
+    end
+
+    it 'should match network_invitation records to provided token and org' do
+      user = create_user
+      invitation_token = user.network_invitations.last
+      expect(invitation_token.token).to eq(invitation_from_network.token)
+      expect(invitation_token.organization).to eq(org)
+    end
+
     it 'should not be case sensitive' do
-      user = User.create_pending_user(email: email)
+      user = create_user
       user.update_attributes(email: email.upcase)
       expect(user.email).to eq(email.downcase)
     end

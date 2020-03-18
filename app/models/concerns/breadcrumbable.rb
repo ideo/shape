@@ -2,6 +2,7 @@ module Breadcrumbable
   extend ActiveSupport::Concern
 
   included do
+    before_validation :detect_infinite_loop
     before_save :calculate_breadcrumb
   end
 
@@ -110,6 +111,22 @@ module Breadcrumbable
       break if record_unsubscribed
     end
     record_unsubscribed
+  end
+
+  def detect_infinite_loop
+    return unless breadcrumb.present?
+
+    # anything this long is the result of an infinite loop error, would not have been intended
+    if breadcrumb.count > 50
+      errors.add(:breadcrumb, 'too long')
+    else
+      parent_names = parents.pluck(:name)
+      if (parent_names.count - parent_names.uniq.count) > 5
+        # we have 5 repeated parent names, seems like a problem
+        errors.add(:breadcrumb, 'repeating parent names')
+      end
+    end
+    errors.full_messages
   end
 
   private

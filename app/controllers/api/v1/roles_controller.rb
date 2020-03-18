@@ -118,8 +118,13 @@ class Api::V1::RolesController < Api::V1::BaseController
     return if current_organization.has_payment_method || !current_organization.in_app_billing
 
     users_to_add_ids = root_object_params[:user_ids].map(&:to_i)
-    non_members_to_add_count = (users_to_add_ids - current_organization.users.pluck(:id)).count
-    over_limit = current_organization.active_users_count + non_members_to_add_count > Organization::FREEMIUM_USER_LIMIT
+    current_user_ids = current_organization.users.pluck(:id)
+    diff = users_to_add_ids - current_user_ids
+    # can escape if no new users are being added
+    return unless diff.present?
+
+    new_total = (users_to_add_ids | current_user_ids).count
+    over_limit = new_total > Organization::FREEMIUM_USER_LIMIT
     return unless over_limit
 
     # NOTE: This error message is just a fallback -- the frontend should have already caught this in RolesAdd.js

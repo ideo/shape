@@ -53,50 +53,10 @@ class Api::V1::SearchController < Api::V1::BaseController
   end
 
   def search_records(index_name: Collection)
-    # search for tags via hashtag e.g. "#template"
-    where_clause = {
-      organization_id: current_organization.id,
-      archived: false,
-    }
-
-    order_opts = { _score: :desc }
-
-    if params[:type].present?
-      where_clause[:type] = params[:type]
-    end
-
-    if params[:order_by].present? && params[:order_direction].present?
-      order_opts = { params[:order_by] => params[:order_direction] }
-    end
-
-    if params[:show_archived].present?
-      # Only show deleted content when this is included
-      where_clause[:archived] = true
-    end
-
-    if params[:master_template].present?
-      where_clause[:master_template] = params[:master_template]
-      # always omit TestCollections from a master_template = true search
-      where_clause[:type] = { not: 'Collection::TestCollection' } if params[:master_template]
-    end
-
-    # super_admin has access to everything regardless of user/group_ids
-    unless current_user.has_cached_role?(Role::SUPER_ADMIN)
-      where_clause[:_or] = [
-        { user_ids: [current_user.id] },
-        { group_ids: current_user.all_current_org_group_ids },
-      ]
-    end
-
-    if params[:current_collection_id].present?
-      where_clause[:parent_id] = { not: params[:current_collection_id] }
-      where_clause[:id] = { not: params[:current_collection_id] }
-    end
-
     results = Search.new(
       # NOTE: This index may get replaced based on filters e.g. "type:item"
       index_name: index_name,
-      where: where_clause,
+      where: where_opts,
       per_page: per_page(10),
       page: @page,
       order: order_opts,
@@ -106,6 +66,56 @@ class Api::V1::SearchController < Api::V1::BaseController
       },
     ).search(@query)
     results
+  end
+
+  def order_opts
+    options = { _score: :desc }
+
+    if params[:order_by].present? && params[:order_direction].present?
+      options = { params[:order_by] => params[:order_direction] }
+    end
+
+    options
+  end
+
+  def where_opts
+    where_clause = {
+      organization_id: current_organization.id,
+      archived: false,
+    }
+
+    if params[:type].present?
+      where_clause[:type] = params[:type]
+    end
+
+    if params[:show_archived].present?
+      # Only show deleted content when this is included
+      where_clause[:archived] = true
+    end
+
+    if params[:master_template].present?
+      where_clause[:master_template] = params[:master_template]
+      if params[:master_template]
+        # only include normal/board collections when searching master_template = true
+        where_clause[:_or] ||= []
+        where_clause[:_or] << { type: nil }
+        where_clause[:_or] << { type: 'Collection::Board' }
+      end
+    end
+
+    # super_admin has access to everything regardless of user/group_ids
+    unless current_user.has_cached_role?(Role::SUPER_ADMIN)
+      where_clause[:_or] ||= []
+      where_clause[:_or] << { user_ids: [current_user.id] }
+      where_clause[:_or] << { group_ids: current_user.all_current_org_group_ids }
+    end
+
+    if params[:current_collection_id].present?
+      where_clause[:parent_id] = { not: params[:current_collection_id] }
+      where_clause[:id] = { not: params[:current_collection_id] }
+    end
+
+    where_clause
   end
 
   def search_users_and_groups

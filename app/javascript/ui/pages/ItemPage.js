@@ -81,11 +81,16 @@ class ItemPage extends React.Component {
   // Should this get attached to PageContainer?
   // It's on GridCard already but this.content doesn't return a grid card
   openContextMenu = ev => {
-    ev.preventDefault()
+    const { containerRef } = this
     const { item, uiStore } = this.props
     const { parent_collection_card } = item
+    if (!item.isText || !containerRef || !containerRef.getBoundingClientRect) {
+      return
+    }
+    // prevent default contextmenu
+    ev.preventDefault()
 
-    const rect = this.containerRef.getBoundingClientRect()
+    const rect = containerRef.getBoundingClientRect()
     const x = ev.clientX - rect.left
     const y = ev.clientY - rect.top
 

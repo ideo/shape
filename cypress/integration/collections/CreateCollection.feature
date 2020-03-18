@@ -8,6 +8,8 @@ Feature: Creating a Collection
     Then I should see "Hello World" in a "EditableNameHeading-recordName"
 
     # Test navigating back to the parent collection via the breadcrumb
+    # wait to make sure that the slug is in the URL
+    When I wait for 1 second
     When I capture the current URL
     And I create a normal collection named "Another One" in my empty collection
     And I navigate to the collection named "Another One" via the "CollectionCover"

@@ -42,8 +42,6 @@ module MailerHelper
     end
 
     def org_name
-      return if invited_to_org_group?
-
       invited_to.organization.name
     end
 

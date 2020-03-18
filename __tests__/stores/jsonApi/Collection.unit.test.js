@@ -638,4 +638,15 @@ describe('Collection', () => {
       })
     })
   })
+
+  describe('isPublicJoinable', () => {
+    it('returns false if collection.anyone_can_join is false', () => {
+      collection.anyone_can_join = false
+      expect(collection.isPublicJoinable).toEqual(false)
+    })
+    it('returns true if collection.anyone_can_join is true', () => {
+      collection.anyone_can_join = true
+      expect(collection.isPublicJoinable).toEqual(true)
+    })
+  })
 })

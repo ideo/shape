@@ -5,6 +5,10 @@ Given('I visit the Marketing Page', () => {
   cy.visit('/')
 })
 
+Given('I visit the Marketing Page with query string {string}', queryString => {
+  cy.visit(`/${queryString}`)
+})
+
 Given('I login and visit My Collection', () => {
   cy.loginAndVisitMyCollection()
 })

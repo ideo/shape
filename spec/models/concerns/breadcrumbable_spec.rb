@@ -108,4 +108,48 @@ describe Breadcrumbable, type: :concern do
       expect(other_subcollection.within_collection_or_self?(collection.id)).to be false
     end
   end
+
+  describe '#detect_infinite_loop' do
+    let(:collection) { create(:collection) }
+    context 'with long breadcrumb' do
+      before do
+        # have to fake this because the model callbacks will override the actual breadcrumb
+        allow(collection).to receive(:breadcrumb).and_return(
+          (1..60).to_a,
+        )
+      end
+
+      it 'returns breadcrumb errors' do
+        expect(collection.save).to be false
+        expect(collection.errors[:breadcrumb]).to eq ['too long']
+      end
+    end
+
+    context 'with repeating parent names' do
+      let(:parents) do
+        [
+          Mashie.new(name: 'prototype collection'),
+          Mashie.new(name: 'Inner contents'),
+          Mashie.new(name: 'Working agreements'),
+        ]
+      end
+
+      before do
+        allow(collection).to receive(:breadcrumb).and_return(
+          # just has to be not nil
+          [1, 2],
+        )
+        allow(collection).to receive(:parents).and_return(
+          # repeat the same names several times
+          # there are only 3 unique vs 9 total, which will cause an error
+          parents * 3,
+        )
+      end
+
+      it 'returns breadcrumb errors' do
+        expect(collection.save).to be false
+        expect(collection.errors[:breadcrumb]).to eq ['repeating parent names']
+      end
+    end
+  end
 end

@@ -25,7 +25,6 @@ import v from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
-import routeToLogin from '~/utils/routeToLogin'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import { Helmet } from 'react-helmet'
 
@@ -51,12 +50,12 @@ class CollectionPage extends React.Component {
   }
 
   componentDidMount() {
-    const { collection, apiStore } = this.props
+    const { collection, apiStore, routingStore } = this.props
     if (!apiStore.currentUser && !collection.anyone_can_view) {
       // in this case, if you're not logged in but you had access (joinable but not public)
       // we do require you to login
       // NOTE: the user will see a brief flash of the collection name before redirect
-      routeToLogin({ redirect: collection.frontend_url })
+      routingStore.routeToLogin({ redirect: collection.frontend_url })
     }
     this.setViewingRecordAndRestoreScrollPosition()
     this.loadCollectionCards({})

@@ -10,6 +10,7 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import ProfileIcon from '~/ui/icons/ProfileIcon'
 import SettingsIcon from '~/ui/icons/SettingsIcon'
 import SearchInput from '~/ui/global/SearchInput'
+import IdeoSSO from '~/utils/IdeoSSO'
 
 export const CONTEXT_USER = 'user'
 export const CONTEXT_ORG = 'org'
