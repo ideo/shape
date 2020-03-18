@@ -106,7 +106,6 @@ Cypress.Commands.add('createCard', cardType => {
       cy.locate('TextItemClose')
         .first()
         .click({ force: true })
-      cy.wait('@apiUpdateItem')
       cy.wait(50)
       break
     case 'data':
