@@ -33,16 +33,6 @@ describe HomeController, skip_frontend_render: true, type: :request do
         )
         get(path)
       end
-
-      context 'with organization slug' do
-        let!(:organization) { create(:organization, slug: 'intl-company') }
-        let!(:redirect) { 'http://www.shape.space/intl-company' }
-
-        it 'assigns @redirect_organization' do
-          get(path)
-          expect(assigns(:redirect_organization)).to eq(organization)
-        end
-      end
     end
   end
 
@@ -55,22 +45,21 @@ describe HomeController, skip_frontend_render: true, type: :request do
       expect(response.status).to eq 200
     end
 
-    context 'with redirect that has organization slug' do
-      let!(:organization) { create(:organization, slug: 'intl-company') }
-      let!(:redirect) { 'http://www.shape.space/intl-company' }
-
-      it 'assigns @redirect_organization' do
+    context 'with no redirect' do
+      it 'does not store redirect' do
+        expect_any_instance_of(HomeController).not_to receive(:store_location_for)
         get(path)
-        expect(assigns(:redirect_organization)).to eq(organization)
       end
     end
 
-    context 'with redirect that has invalid organization slug' do
-      let!(:redirect) { 'http://www.shape.space/intl-company' }
+    context 'with redirect' do
+      let(:redirect) { 'http://www.shape.space/redirectpath' }
 
-      it 'does not assign @redirect_organization' do
+      it 'remembers where to redirect the user' do
+        expect_any_instance_of(HomeController).to receive(:store_location_for).with(
+          :user, redirect
+        )
         get(path)
-        expect(assigns(:redirect_organization)).to be_nil
       end
     end
   end
