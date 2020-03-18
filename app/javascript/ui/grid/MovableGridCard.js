@@ -183,11 +183,6 @@ class MovableGridCard extends React.Component {
 
     if (!this.state.dragging) {
       uiStore.closeBlankContentTool()
-      if (!card.isMDLPlaceholder) {
-        // unless we're dragging the mdlPlaceholder, close the MoveMenu to prevent weird behaviors.
-        // don't deselect otherwise multimove (dragging multiple) will also deselect
-        uiStore.closeMoveMenu({ deselect: false })
-      }
       uiStore.startDragging(card.id)
       this.setState(
         {
@@ -247,8 +242,6 @@ class MovableGridCard extends React.Component {
     if (!this.state.resizing) {
       this.setState({ resizing: true, moveComplete: false })
       uiStore.resetSelectionAndBCT()
-      // close the MoveMenu to prevent weird behaviors
-      uiStore.closeMoveMenu()
       uiStore.setEditingCardCover(null)
     }
     const gridSettings = isBoardCollection

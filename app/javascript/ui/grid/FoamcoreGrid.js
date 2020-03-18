@@ -659,7 +659,8 @@ class FoamcoreGrid extends React.Component {
       onConfirm,
     })
 
-    this.resetCardPositions()
+    // don't close MDL when performing a resize
+    this.resetCardPositions({ keepMDLOpen: true })
   }
 
   moveCards = async masterCard => {
