@@ -10,6 +10,7 @@ import {
   calculateOpenSpotMatrix,
   calculateRowsCols,
   findClosestOpenSpot,
+  findTopLeftCard,
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -657,12 +658,12 @@ class FoamcoreGrid extends React.Component {
 
   moveCards = async masterCard => {
     if (this.dragGridSpot.size < 1) return
-    const { uiStore, collection } = this.props
+    const { apiStore, uiStore, collection } = this.props
     const {
       movingFromCollectionId,
       cardAction,
       draggingFromMDL,
-      overflowFromMDL,
+      movingCardsOverflow,
     } = uiStore
     // capture this as a normal array before it gets changed/observed e.g. in onConfirmOrCancel
     const multiMoveCardIds = [...uiStore.multiMoveCardIds]
@@ -674,7 +675,6 @@ class FoamcoreGrid extends React.Component {
 
     // This is for dragging onto the breadcrumb
     if (uiStore.activeDragTarget) {
-      const { apiStore } = this.props
       const targetRecord = uiStore.activeDragTarget.item
       if (uiStore.activeDragTarget.item.id === 'homepage') {
         targetRecord.id = apiStore.currentUserCollectionId
@@ -733,13 +733,31 @@ class FoamcoreGrid extends React.Component {
     if (outsideDraggableArea) {
       return onCancel()
     } else if (
-      draggingFromMDL &&
-      (overflowFromMDL || !movingWithinCollection)
+      movingCardsOverflow ||
+      (draggingFromMDL && !movingWithinCollection)
     ) {
       // movePlaceholder will represent the MDL dragged card position
-      const { row, col } = movePlaceholder
-      await CardMoveService.moveCards({ row, col })
+      let { row, col } = movePlaceholder
+      let collection_card_ids = uiStore.movingCardIds
+      const topLeftCard = findTopLeftCard(draggingPlaceholders)
+      if (!draggingFromMDL) {
+        // in this case we have "selected all" and are dragging more than what's actually visible
+        collection_card_ids = uiStore.multiMoveCardIds
+        row = topLeftCard.row
+        col = topLeftCard.col
+      }
+      if (!draggingFromMDL) {
+        // if we're overflowing, add the loading state while the cards get properly moved
+        uiStore.update('isTransparentLoading', true)
+      }
+      await CardMoveService.moveCards(
+        { row, col },
+        { collection_card_ids },
+        // pass in original card so we have it's unmoved row/col
+        topLeftCard.card
+      )
       this.resetCardPositions()
+      uiStore.update('isLoading', false)
       return
     }
 
@@ -937,7 +955,11 @@ class FoamcoreGrid extends React.Component {
    */
   determineDragMap(cardId) {
     const { collection, apiStore, uiStore } = this.props
-    const { multiMoveCardIds, movingFromCollectionId } = uiStore
+    const {
+      multiMoveCardIds,
+      movingFromCollectionId,
+      draggingFromMDL,
+    } = uiStore
 
     let movingFromCollection = collection
     if (movingFromCollectionId) {
@@ -951,9 +973,17 @@ class FoamcoreGrid extends React.Component {
     const masterCard = apiStore.find('collection_cards', cardId)
     const movingCardIds = multiMoveCardIds.filter(id => id !== cardId)
 
-    let movingCards = movingCardIds.map(movingCardId => {
-      return apiStore.find('collection_cards', movingCardId)
-    })
+    let overflow = false
+    let movingCards = _.compact(
+      movingCardIds.map(movingCardId => {
+        const card = apiStore.find('collection_cards', movingCardId)
+        if (!card) {
+          // if card is not in memory that means it's offscreen i.e. overflow
+          overflow = true
+        }
+        return card
+      })
+    )
 
     this.movingFromNormalCollection = false
     if (!movingFromCollection.isBoard) {
@@ -965,7 +995,6 @@ class FoamcoreGrid extends React.Component {
     }
     this.masterCard = masterCard
     this.movingCards = movingCards
-    let overflow = 0
     // Loop through non-master cards to calculate drag map
     const dragMap = movingCards.map(card => {
       let { col, row } = card
@@ -982,8 +1011,9 @@ class FoamcoreGrid extends React.Component {
       const colDiff = col - masterCol
       const rowDiff = row - masterRow
 
-      if (uiStore.draggingFromMDL && Math.abs(rowDiff) > 6) {
-        overflow += 1
+      if (draggingFromMDL && Math.abs(rowDiff) > 6) {
+        // overflow means rows are hidden/faded out beyond 6 rows
+        overflow = true
         return
       }
 
@@ -993,7 +1023,7 @@ class FoamcoreGrid extends React.Component {
         row: rowDiff,
       }
     })
-    uiStore.update('overflowFromMDL', overflow)
+    uiStore.update('movingCardsOverflow', overflow)
     return _.compact(dragMap)
   }
 
@@ -1253,7 +1283,7 @@ class FoamcoreGrid extends React.Component {
     if (!this.dragGridSpot.size || this.hoveringOverCollection) {
       return
     }
-    const { overflowFromMDL } = this.props.uiStore
+    const { movingCardsOverflow } = this.props.uiStore
 
     const draggingPlaceholders = [...this.dragGridSpot.values()]
     const maxRowCard = _.maxBy(draggingPlaceholders, 'row')
@@ -1263,7 +1293,7 @@ class FoamcoreGrid extends React.Component {
       const atMaxRow =
         placeholder.row === maxRow ||
         placeholder.row + placeholder.height - 1 === maxRow
-      if (overflowFromMDL && atMaxRow) {
+      if (movingCardsOverflow && atMaxRow) {
         placeholder.id = 'drag-overflow'
       }
       return this.positionBlank(placeholder, placeholder.id)

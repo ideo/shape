@@ -173,7 +173,8 @@ export default class UiStore {
   @observable
   draggingFromMDL = false
   @observable
-  overflowFromMDL = 0
+  // track if you are dragging/moving more cards than visible
+  movingCardsOverflow = false
   @observable
   textEditingItem = null
   @observable

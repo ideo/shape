@@ -329,10 +329,15 @@ describe('FoamcoreGrid', () => {
       })
 
       it('calls CardMoveService with the drag spot row/col', () => {
-        expect(CardMoveService.moveCards).toHaveBeenCalledWith({
-          col: 6,
-          row: 7,
-        })
+        expect(CardMoveService.moveCards).toHaveBeenCalledWith(
+          {
+            col: 6,
+            row: 7,
+          },
+          { collection_card_ids: [] },
+          // should pass in card as the "topLeftCard"
+          card
+        )
       })
     })
 

@@ -172,7 +172,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def move
     placement = json_api_params[:placement].presence || 'beginning'
     @card_action ||= 'move'
-    if @cards.count >= bulk_operation_threshold
+    if @cards.count >= bulk_operation_threshold && !moving_within_collection
       return perform_bulk_operation(
         placement: placement,
         action: @card_action,
@@ -455,6 +455,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       .ordered
       .not_placeholder
       .where(id: json_api_params[:collection_card_ids])
+  end
+
+  def moving_within_collection
+    return true if json_api_params[:from_id].blank?
+    @from_collection == @to_collection
   end
 
   def collection_card_update_params
