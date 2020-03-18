@@ -374,7 +374,12 @@ class FoamcoreGrid extends React.Component {
   coordinatesForPosition(position) {
     const { collection } = this.props
     const { x, y } = position
-    const width = position.width || 1
+    let width = 1
+    if (position.width && !this.hoveringOverCollection) {
+      // if we're hovering over a collection we leave the virtual width at 1
+      // so that we can still drag wide cards over 1x1 collections
+      width = position.width
+    }
     const { gridW, gridH, gutter } = this.gridSettings
     const { relativeZoomLevel } = this
 
@@ -432,7 +437,8 @@ class FoamcoreGrid extends React.Component {
           found &&
           (uiStore.cardAction !== 'move' ||
             // don't consider overlapping itself when performing a move
-            !_.includes(uiStore.multiMoveCardIds, found.id))
+            (uiStore.multiMoveCardIds.length > 0 &&
+              !_.includes(uiStore.multiMoveCardIds, found.id)))
         ) {
           return {
             card: found,
@@ -810,9 +816,11 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
 
     // If master dragging position hasn't changed, don't need to do anything
-    // if (objectsEqual(masterPosition, this.draggingCardMasterPosition)) return
-    this.draggingCardMasterPosition = masterPosition
+    if (objectsEqual(masterPosition, this.draggingCardMasterPosition)) {
+      return
+    }
 
+    this.draggingCardMasterPosition = masterPosition
     // reset these
     this.dragGridSpot.clear()
     this.hasDragCollision = false
@@ -826,9 +834,13 @@ class FoamcoreGrid extends React.Component {
     // track this before any collision modifications
     const unmodifiedMasterPosition = { ...masterPosition }
     this.updateDragGridSpotWithOpenPosition(masterPosition)
+    const previousHoveringOver = { ...this.hoveringOver }
+    // store whatever card (or not) that we're hovering over
+    this.setHoveringOver(this.findOverlap(unmodifiedMasterPosition))
 
     // Loop through any additional cards and add drag spots for them
     if (uiStore.multiMoveCardIds.length > 1) {
+      // track the "bumper" guard rails of keeping things in bounds of the grid
       const bump = { col: 0, row: 0 }
       this.draggingMap.forEach(mapped => {
         const relativePosition = {
@@ -865,9 +877,6 @@ class FoamcoreGrid extends React.Component {
       }
     }
 
-    const previousHoveringOver = { ...this.hoveringOver }
-    // store whatever card (or not) that we're hovering over
-    this.setHoveringOver(this.findOverlap(unmodifiedMasterPosition))
     if (
       this.hoveringOver &&
       (!previousHoveringOver.card ||
@@ -889,8 +898,7 @@ class FoamcoreGrid extends React.Component {
   @action
   updateDragGridSpotWithOpenPosition(position) {
     const { collection } = this.props
-    // track number of spaces (row/col) we may need to bump things to
-    // have them stay "in bounds"
+    // track number of spaces (row/col) we may need to bump things to stay "in bounds"
     const bump = {}
     if (!USE_COLLISION_DETECTION_ON_DRAG) {
       const { col, row, width } = position
