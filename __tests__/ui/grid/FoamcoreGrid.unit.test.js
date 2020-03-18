@@ -83,9 +83,19 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('findOverlap', () => {
+    let fakeCard = { row: 1, col: 5, width: 1, height: 1 }
+
+    it('returns false if uiStore.multiMoveCardIds is empty', () => {
+      // as noted in findOverlap, this prevented false positive overlap when you're actually done dragging
+      props.uiStore.multiMoveCardIds = []
+      const overlap = component.findOverlap(fakeCard)
+      expect(overlap).toBe(false)
+    })
+
     it('finds filledSpot (or not) where a card is trying to be dragged', () => {
+      // this has to be present for it to trigger an overlap
+      props.uiStore.multiMoveCardIds = ['anything']
       // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
-      let fakeCard = { row: 1, col: 5, width: 1, height: 1 }
       let overlap = component.findOverlap(fakeCard)
       expect(overlap.card).toEqual(cardA)
       // 2x2 should stick out and overlap cardA

@@ -436,7 +436,8 @@ class FoamcoreGrid extends React.Component {
         if (
           found &&
           (uiStore.cardAction !== 'move' ||
-            // don't consider overlapping itself when performing a move
+            // don't consider overlapping itself when performing a move,
+            // or when multiMoveCardIds is empty (prob result of a timing issue, because you're actually done dragging)
             (uiStore.multiMoveCardIds.length > 0 &&
               !_.includes(uiStore.multiMoveCardIds, found.id)))
         ) {
