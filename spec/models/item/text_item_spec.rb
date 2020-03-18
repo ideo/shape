@@ -120,7 +120,7 @@ RSpec.describe Item::TextItem, type: :model do
           end
           context 'not already broadcasting' do
             it 'should queue up the CollectionBroadcastWorker' do
-              expect(CollectionBroadcastWorker).to receive(:perform_in).with(3.seconds, parent.id)
+              expect(CollectionBroadcastWorker).to receive(:perform_in).with(3.seconds, parent.id, user.id)
               text_item.save_and_broadcast_quill_data(user, data)
             end
           end
@@ -129,7 +129,7 @@ RSpec.describe Item::TextItem, type: :model do
               parent.update(broadcasting: true)
             end
             it 'should not queue up the CollectionBroadcastWorker' do
-              expect(CollectionBroadcastWorker).not_to receive(:perform_in).with(3.seconds, parent.id)
+              expect(CollectionBroadcastWorker).not_to receive(:perform_in).with(3.seconds, parent.id, user.id)
               text_item.save_and_broadcast_quill_data(user, data)
             end
           end
