@@ -11,11 +11,13 @@ Feature: Undo actions
     When I click the first text item
     And I type " hello" in the first quill editor
     And I close the first open text item
+    And I wait for 1 second
     Then I should see the value "Testing hello" in the first text item
 
     When I click the first text item
     And I type " there" in the first quill editor
     And I close the first open text item
+    And I wait for 1 second
     Then I should see the value "Testing hello there" in the first text item
 
     When I undo with CTRL+Z

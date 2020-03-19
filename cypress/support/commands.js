@@ -98,10 +98,10 @@ Cypress.Commands.add('createCard', cardType => {
   switch (cardType) {
     case 'textItem':
       cy.selectBctType({ type: 'text', order: 'first' })
+      cy.wait('@apiCreateCollectionCard')
       cy.get('.ql-editor')
         .first()
         .type('Testing')
-      cy.wait('@apiCreateCollectionCard')
       cy.wait(300)
       cy.locate('TextItemClose')
         .first()
