@@ -12,6 +12,7 @@ class QuillClipboard extends Clipboard {
     headers.forEach(header => {
       this.addMatcher(header, this.remapUnsupportedHeaderToH2)
     })
+    this.addMatcher('span', this.preserveSpanSizeFormat)
   }
 
   remapUnsupportedHeaderToH2(node, delta) {
@@ -20,6 +21,20 @@ class QuillClipboard extends Clipboard {
       op.attributes.header = 2
       return op
     })
+    return delta
+  }
+
+  // https://github.com/quilljs/quill/issues/1083
+  preserveSpanSizeFormat(node, delta) {
+    const match = node.className.match(/ql-size-(.*)/)
+    if (match) {
+      delta.map(op => {
+        if (!op.attributes) op.attributes = {}
+        // grab the size from `ql-size-{x}`
+        op.attributes.size = match[1]
+        return op
+      })
+    }
     return delta
   }
 

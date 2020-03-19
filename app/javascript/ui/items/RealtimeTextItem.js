@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, toJS } from 'mobx'
+import { action, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
@@ -115,6 +115,10 @@ class RealtimeTextItem extends React.Component {
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
+  @observable
+  largeActive = false
+  @observable
+  hugeActive = false
 
   constructor(props) {
     super(props)
@@ -464,6 +468,7 @@ class RealtimeTextItem extends React.Component {
     // also store editor.getContents(range) for later reference
     if (source === 'user') {
       this.sendCursor()
+      this.checkActiveSizeFormat()
     }
   }
 
@@ -569,6 +574,22 @@ class RealtimeTextItem extends React.Component {
       val = null
     }
     quillEditor.format('size', val, 'user')
+    this.checkActiveSizeFormat()
+  }
+
+  @action
+  checkActiveSizeFormat = () => {
+    const currentFormat = this.quillEditor.getFormat()
+    if (currentFormat.size === 'large') {
+      this.largeActive = true
+    } else {
+      this.largeActive = false
+    }
+    if (currentFormat.size === 'huge') {
+      this.hugeActive = true
+    } else {
+      this.hugeActive = false
+    }
   }
 
   endOfHighlight = (range, context) => {
@@ -671,6 +692,8 @@ class RealtimeTextItem extends React.Component {
               onFormatHuge={this.onToggleSize('huge')}
               onFormatLarge={this.onToggleSize('large')}
               onComment={this.onComment}
+              largeActive={this.largeActive}
+              hugeActive={this.hugeActive}
             />
           )}
           <CloseButton
