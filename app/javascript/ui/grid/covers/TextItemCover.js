@@ -134,9 +134,6 @@ class TextItemCover extends React.Component {
       card.API_archiveSelf({ undoable: false })
       return
     }
-    // save final updates and broadcast to collection
-    item.API_updateWithoutSync({ cancel_sync: true })
-
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
     try {

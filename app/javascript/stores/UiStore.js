@@ -173,7 +173,8 @@ export default class UiStore {
   @observable
   draggingFromMDL = false
   @observable
-  overflowFromMDL = 0
+  // track if you are dragging/moving more cards than visible
+  movingCardsOverflow = false
   @observable
   textEditingItem = null
   @observable
@@ -826,6 +827,11 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+  }
+
+  @action
+  selectCardIds(cardIds) {
+    this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
   }
 
   @action

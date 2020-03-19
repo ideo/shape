@@ -431,6 +431,16 @@ RSpec.describe CardMover, type: :service do
           expect(card_mover.call).to be false
           expect(card_mover.errors).to match_array ["You can't move a collection inside of itself."]
         end
+
+        context 'when the card is a link card' do
+          let(:link_card) { create(:collection_card_link, collection: from_collection, parent: from_collection) }
+          let(:cards) { [link_card] }
+
+          it 'should allow the move' do
+            expect(card_mover.call).not_to be false
+            expect(link_card.reload.parent).to eq to_collection
+          end
+        end
       end
 
       context 'moving between orgs' do

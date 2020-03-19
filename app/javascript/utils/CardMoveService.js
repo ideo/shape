@@ -9,15 +9,15 @@ export default class CardMoveService {
     this.uiStore = uiStore
   }
 
-  static async moveCards(placement, overrideData = {}) {
-    return new this().moveCards(placement, overrideData)
+  static async moveCards(placement, overrideData = {}, topLeftCard = null) {
+    return new this().moveCards(placement, overrideData, topLeftCard)
   }
 
   static moveErrors(opts) {
     return new this().moveErrors(opts)
   }
 
-  async moveCards(placement, overrideData = {}) {
+  async moveCards(placement, overrideData = {}, topLeftCard = null) {
     const { apiStore, uiStore } = this
     const {
       viewingCollection,
@@ -25,7 +25,7 @@ export default class CardMoveService {
       movingCardIds,
       movingIntoCollection,
       cardAction,
-      overflowFromMDL,
+      movingCardsOverflow,
     } = uiStore
 
     let data = {
@@ -70,7 +70,7 @@ export default class CardMoveService {
     }
 
     const movingWithinCollection =
-      !overflowFromMDL &&
+      !movingCardsOverflow &&
       (movingFromCollection === toCollection && cardAction === 'move')
     try {
       uiStore.update('isLoadingMoveAction', true)
@@ -92,7 +92,7 @@ export default class CardMoveService {
               },
             })
           } else {
-            res = await apiStore.moveCards(data)
+            res = await apiStore.moveCards(data, { topLeftCard })
           }
           successMessage = 'Items successfully moved!'
           break

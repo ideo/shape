@@ -215,6 +215,8 @@ class CardMover < SimpleService
     @to_collection.recalculate_breadcrumb!
     @from_collection.recalculate_breadcrumb!
     @moving_cards.each do |card|
+      next if card.link?
+
       collection = card.collection
       next unless collection.present?
 

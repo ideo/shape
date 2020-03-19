@@ -840,8 +840,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     onCancel,
   }) {
     const performUpdate = async () => {
-      // close MoveMenu e.g. if you were dragging from MDL
-      this.uiStore.closeMoveMenu()
+      const { uiStore } = this
+      // close MoveMenu if you were dragging from MDL
+      if (uiStore.draggingFromMDL) uiStore.closeMoveMenu()
 
       const updatesByCardId = {}
       _.each(updates, update => {

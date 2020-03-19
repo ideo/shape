@@ -18,6 +18,7 @@ import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 import TrashIconXl from '~/ui/icons/TrashIconXl'
+import { findBottomRowCards } from '~/utils/CollectionGridCalculator'
 
 @inject('uiStore', 'apiStore')
 @observer
@@ -96,7 +97,7 @@ class ActionMenu extends React.Component {
     if (afterArchive && result) afterArchive({ type: 'archive' })
   }
 
-  selectAll = async () => {
+  selectAll = () => {
     const { uiStore, location, card } = this.props
     uiStore.selectAll({ location, card })
   }
@@ -143,10 +144,17 @@ class ActionMenu extends React.Component {
     window.print()
   }
 
-  selectCardsBelow = async () => {
-    const { uiStore, card } = this.props
-    const cardIds = await card.API_selectCardIdsBelow()
-    uiStore.reselectCardIds(cardIds)
+  selectCardsBelow = () => {
+    const { apiStore, uiStore, card } = this.props
+    uiStore.selectCardId(card.id)
+    const selectedCards = _.map(uiStore.selectedCardIds, id =>
+      apiStore.find('collection_cards', id)
+    )
+    // TODO: this could be made slightly more efficient, if we know that some of these cards
+    // have nothing below (by what is loaded in memory), we could skip API calls for those
+    const bottomCards = _.uniq([card, ...findBottomRowCards(selectedCards)])
+    uiStore.closeCardMenu()
+    _.each(bottomCards, card => card.API_selectCardIdsBelow())
   }
 
   get movingFromCollectionId() {

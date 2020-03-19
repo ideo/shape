@@ -63,12 +63,15 @@ class HomeController < ApplicationController
   end
 
   def store_redirect_param
-    return if params[:redirect].blank?
+    if params[:redirect].present?
+      redirect_uri = clean_redirect
+      store_location_for :user, redirect_uri
+    end
+    @redirect = stored_location_for(:user)
+    return unless @redirect.present?
 
-    @redirect = params[:redirect]
-    redirect_uri = clean_redirect
-    store_location_for :user, redirect_uri
-    load_redirect_organization_from_url(redirect_uri)
+    # capturing devise stored_location_for also deletes it, in this case we want to put it back
+    store_location_for :user, @redirect
   end
 
   def clean_redirect

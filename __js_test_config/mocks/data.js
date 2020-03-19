@@ -457,6 +457,7 @@ export const fakeCollection = {
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
   clearCollectionCards: jest.fn(),
+  toJsonApiWithCards: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',

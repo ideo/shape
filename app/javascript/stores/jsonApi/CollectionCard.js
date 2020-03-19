@@ -248,9 +248,7 @@ class CollectionCard extends BaseRecord {
 
   async API_selectCardIdsBelow() {
     const { apiStore, uiStore } = this
-
     let selectedCardIds = []
-
     const params = {
       collection_card_id: this.id,
       direction: 'bottom',
@@ -262,6 +260,7 @@ class CollectionCard extends BaseRecord {
           this.parent.id
         }/collection_cards/ids_in_direction?${queryString.stringify(params)}`
       )
+      uiStore.selectCardIds(selectedCardIds)
     } catch (e) {
       // TODO: when cards are unselectable?
       uiStore.defaultAlertError()
