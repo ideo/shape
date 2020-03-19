@@ -26,7 +26,7 @@ const chartAxisStyle = isSmallChartStyle => {
     return {
       axis: {
         stroke: v.colors.commonMedium,
-        strokeWidth: 30,
+        strokeWidth: 45,
         transform: 'translateY(26px)',
       },
       axisLabel: {
@@ -62,17 +62,20 @@ const calculateDx = (x, w, isSmallChartStyle) => {
 const TickLabel = props => {
   const w = calculateRelativeWidth(props)
   const dx = calculateDx(props.x, w, props.isSmallChartStyle)
+  let dy = props.dy || 5
 
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
   })
+
+  if (props.text === '|') dy = -25
 
   const Label = (
     <VictoryLabel
       {...props}
       textAnchor="end"
       dx={dx}
-      dy={props.dy || 5}
+      dy={dy}
       style={updatedStyle}
     />
   )

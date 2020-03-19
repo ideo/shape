@@ -209,6 +209,7 @@ class ChartGroup extends React.Component {
           }
           if (!subOverlapping) {
             overlappingLabels.push(label)
+            label.overlapping = true
             continue
           }
         }
@@ -230,12 +231,21 @@ class ChartGroup extends React.Component {
   get axisFilteredDateValues() {
     const victoryProps = VictoryAxis.getBaseProps(this.axisProps)
     const renderedLabels = this.extractLabelsFromVictoryProps(victoryProps)
-    const overlappingLabels = this.findOverlappingLabels(renderedLabels).map(
-      l => l.datum
-    )
+    const overlappingLabels = this.findOverlappingLabels(renderedLabels)
 
-    const dates = this.axisRawDateValues
-    return _.uniq(_.xorWith(dates, overlappingLabels, _.isEqual))
+    const nonPrioritizedLabels = []
+    overlappingLabels.forEach(l => {
+      const datum = this.primaryDatasetValues.find(dv => _.isEqual(dv.date, l.datum))
+      if (datum) {
+        if (datum.prioritized) {
+          datum.overlappingLabel = true
+        } else {
+          nonPrioritizedLabels.push(l)
+        }
+      }
+    })
+
+    return _.uniq(_.xorWith(renderedLabels, nonPrioritizedLabels, _.isEqual))
   }
 
   get axisProps() {
@@ -262,7 +272,16 @@ class ChartGroup extends React.Component {
   get chartAxis() {
     const { axisProps } = this
     if (this.isSmallChartStyle) {
-      axisProps.tickValues = this.axisFilteredDateValues
+      const overlappingIndexes = []
+      this.axisFilteredDateValues.forEach((l, i) => {
+        if (l.overlapping) overlappingIndexes.push(i)
+      })
+      const previousTickFormat = axisProps.tickFormat
+      axisProps.tickFormat = (label, index) => {
+        if (overlappingIndexes.includes(index)) return '|'
+        return previousTickFormat(label, index)
+      }
+      axisProps.tickValues = this.axisFilteredDateValues.map(l => l.datum)
     }
     return <VictoryAxis {...axisProps} />
   }
@@ -380,7 +399,7 @@ class ChartGroup extends React.Component {
     return (
       <VictoryChart
         theme={victoryTheme}
-        padding={{ top: 0, left: 0, right: 0, bottom: 8 }}
+        padding={{ top: 0, left: 0, right: 0, bottom: this.isSmallChartStyle ? 18 : 8 }}
         containerComponent={
           <VictoryVoronoiContainer portalZIndex={v.zIndex.gridCard} />
         }
