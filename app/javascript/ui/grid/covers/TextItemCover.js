@@ -82,7 +82,7 @@ class TextItemCover extends React.Component {
     return uiStore.textEditingItem === item
   }
 
-  handleClick = async e => {
+  handleClick = e => {
     if (this.props.handleClick) this.props.handleClick(e)
     e.stopPropagation()
     const { item, dragging, cardId, searchResult, uneditable } = this.props
@@ -101,11 +101,17 @@ class TextItemCover extends React.Component {
       // likewise on search results, never pop open the inline editor
       return false
     }
+    this.setState({ loading: true }, this.loadItem)
+    return null
+  }
+
+  loadItem = async () => {
+    const { item } = this.props
     await apiStore.fetch('items', item.id, true)
     // entering edit mode should deselect all cards
     uiStore.deselectCards()
     uiStore.update('textEditingItem', this.state.item)
-    return null
+    this.setState({ loading: false })
   }
 
   expand = () => {

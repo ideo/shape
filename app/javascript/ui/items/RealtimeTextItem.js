@@ -579,16 +579,21 @@ class RealtimeTextItem extends React.Component {
 
   @action
   checkActiveSizeFormat = () => {
-    const currentFormat = this.quillEditor.getFormat()
-    if (currentFormat.size === 'large') {
-      this.largeActive = true
-    } else {
-      this.largeActive = false
-    }
-    if (currentFormat.size === 'huge') {
-      this.hugeActive = true
-    } else {
-      this.hugeActive = false
+    if (this.unmounted) return
+    try {
+      const currentFormat = this.quillEditor.getFormat()
+      if (currentFormat.size === 'large') {
+        this.largeActive = true
+      } else {
+        this.largeActive = false
+      }
+      if (currentFormat.size === 'huge') {
+        this.hugeActive = true
+      } else {
+        this.hugeActive = false
+      }
+    } catch {
+      // console.warn('probably unmounted')
     }
   }
 
