@@ -235,7 +235,9 @@ class ChartGroup extends React.Component {
 
     const nonPrioritizedLabels = []
     overlappingLabels.forEach(l => {
-      const datum = this.primaryDatasetValues.find(dv => _.isEqual(dv.date, l.datum))
+      const datum = this.primaryDatasetValues.find(dv =>
+        _.isEqual(dv.date, l.datum)
+      )
       if (datum) {
         if (datum.prioritized) {
           datum.overlappingLabel = true
@@ -399,7 +401,12 @@ class ChartGroup extends React.Component {
     return (
       <VictoryChart
         theme={victoryTheme}
-        padding={{ top: 0, left: 0, right: 0, bottom: this.isSmallChartStyle ? 18 : 8 }}
+        padding={{
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: this.isSmallChartStyle ? 18 : 8,
+        }}
         containerComponent={
           <VictoryVoronoiContainer portalZIndex={v.zIndex.gridCard} />
         }
