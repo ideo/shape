@@ -13,6 +13,7 @@ class QuillClipboard extends Clipboard {
       this.addMatcher(header, this.remapUnsupportedHeaderToH2)
     })
     this.addMatcher('span', this.preserveSpanSizeFormat)
+    this.addMatcher('a', this.preserveSpanSizeFormat)
   }
 
   remapUnsupportedHeaderToH2(node, delta) {
@@ -27,11 +28,19 @@ class QuillClipboard extends Clipboard {
   // https://github.com/quilljs/quill/issues/1083
   preserveSpanSizeFormat(node, delta) {
     const match = node.className.match(/ql-size-(.*)/)
-    if (match) {
+    const fontSize = node.style['font-size']
+    // HACK: when className is not present, check style attribute
+    const styleMatch = fontSize && fontSize !== '16px'
+    if (match || styleMatch) {
       delta.map(op => {
         if (!op.attributes) op.attributes = {}
         // grab the size from `ql-size-{x}`
-        op.attributes.size = match[1]
+        if (match) {
+          op.attributes.size = match[1]
+        } else if (styleMatch) {
+          const large = fontSize === '13px' || fontSize === '0.8125rem'
+          op.attributes.size = large ? 'large' : 'huge'
+        }
         return op
       })
     }

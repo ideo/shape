@@ -468,7 +468,7 @@ class RealtimeTextItem extends React.Component {
     // also store editor.getContents(range) for later reference
     if (source === 'user') {
       this.sendCursor()
-      this.checkActiveSizeFormat()
+      if (range) this.checkActiveSizeFormat()
     }
   }
 
@@ -561,7 +561,7 @@ class RealtimeTextItem extends React.Component {
     const { apiStore, uiStore, item } = this.props
     const { range } = uiStore.selectedTextRangeForCard
     // prevent commenting without a selected range
-    if (!(range && range.length > 0)) return
+    if (!range || range.length === 0) return
     apiStore.openCurrentThreadToCommentOn(item)
   }
 
@@ -580,20 +580,16 @@ class RealtimeTextItem extends React.Component {
   @action
   checkActiveSizeFormat = () => {
     if (this.unmounted) return
-    try {
-      const currentFormat = this.quillEditor.getFormat()
-      if (currentFormat.size === 'large') {
-        this.largeActive = true
-      } else {
-        this.largeActive = false
-      }
-      if (currentFormat.size === 'huge') {
-        this.hugeActive = true
-      } else {
-        this.hugeActive = false
-      }
-    } catch {
-      // console.warn('probably unmounted')
+    const currentFormat = this.quillEditor.getFormat()
+    if (currentFormat.size === 'large') {
+      this.largeActive = true
+    } else {
+      this.largeActive = false
+    }
+    if (currentFormat.size === 'huge') {
+      this.hugeActive = true
+    } else {
+      this.hugeActive = false
     }
   }
 
