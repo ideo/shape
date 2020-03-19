@@ -98,7 +98,7 @@ class Item
       return if parent.nil? || parent.num_viewers < 2 || parent.broadcasting?
 
       parent.update(broadcasting: true)
-      CollectionBroadcastWorker.perform_in(3.seconds, parent.id, user.id)
+      CollectionBroadcastWorker.perform_in(3.seconds, parent.id)
     end
 
     def threadlocked_transform_realtime_delta(user, data)

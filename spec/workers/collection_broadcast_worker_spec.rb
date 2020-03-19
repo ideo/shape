@@ -2,15 +2,14 @@ require 'rails_helper'
 
 RSpec.describe CollectionBroadcastWorker, type: :worker do
   describe '#perform' do
-    let(:user) { create(:user) }
     let(:collection) { create(:collection, broadcasting: true) }
     let(:subject) do
       CollectionBroadcastWorker.new
     end
-    let(:run_worker) { subject.perform(collection.id, user.id) }
+    let(:run_worker) { subject.perform(collection.id) }
 
     it 'should call the broadcaster' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+      expect(CollectionUpdateBroadcaster).to receive(:call).with(collection)
       run_worker
     end
 
