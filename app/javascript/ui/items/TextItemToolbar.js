@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import ExpandIcon from '~/ui/icons/ExpandIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
-import CommentIcon from '../icons/CommentIcon'
+import CommentIcon from '~/ui/icons/CommentIcon'
 import ReactQuill from 'react-quill'
 
 // see: https://github.com/zenoamaro/react-quill/issues/188#issuecomment-445272662
@@ -35,17 +35,26 @@ const IconButton = styled(StyledButton)`
 const TextItemToolbar = props => (
   <div id="quill-toolbar">
     <span className="ql-formats">
-      <StyledButton className="ql-header ql-format-reg" value="">
+      <StyledButton className="ql-size ql-format-reg" value="">
         b
       </StyledButton>
-      <StyledButton
-        className="ql-header ql-format-large"
-        value="2"
-      ></StyledButton>
-      <StyledButton
-        className="ql-header ql-format-huge"
-        value="1"
-      ></StyledButton>
+      {props.onFormatLarge && (
+        <StyledButton
+          className={props.largeActive && 'ql-active'}
+          onClick={props.onFormatLarge}
+        >
+          H2
+        </StyledButton>
+      )}
+      {props.onFormatHuge && (
+        <StyledButton
+          className={props.hugeActive && 'ql-active'}
+          onClick={props.onFormatHuge}
+        >
+          H1
+        </StyledButton>
+      )}
+
       {/* use h5 for title */}
       <StyledButton className="ql-header ql-format-title" value="5">
         T
@@ -55,9 +64,11 @@ const TextItemToolbar = props => (
         <LinkIcon />
       </StyledButton>
 
-      <StyledButton onClick={props.onComment}>
-        <CommentIcon />
-      </StyledButton>
+      {props.onComment && (
+        <StyledButton onClick={props.onComment}>
+          <CommentIcon />
+        </StyledButton>
+      )}
       {props.onExpand && (
         <IconButton onClick={props.onExpand} className="ql-expand">
           <ExpandIcon />
@@ -69,10 +80,18 @@ const TextItemToolbar = props => (
 TextItemToolbar.propTypes = {
   onExpand: PropTypes.func,
   onComment: PropTypes.func,
+  onFormatLarge: PropTypes.func,
+  onFormatHuge: PropTypes.func,
+  hugeActive: PropTypes.bool,
+  largeActive: PropTypes.bool,
 }
 TextItemToolbar.defaultProps = {
   onExpand: null,
   onComment: null,
+  onFormatLarge: null,
+  onFormatHuge: null,
+  hugeActive: false,
+  largeActive: false,
 }
 
 export default TextItemToolbar

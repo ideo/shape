@@ -560,6 +560,17 @@ class RealtimeTextItem extends React.Component {
     apiStore.openCurrentThreadToCommentOn(item)
   }
 
+  onToggleSize = size => e => {
+    e.preventDefault()
+    const { quillEditor } = this
+    const currentFormat = quillEditor.getFormat()
+    let val = size
+    if (currentFormat.size === size) {
+      val = null
+    }
+    quillEditor.format('size', val, 'user')
+  }
+
   endOfHighlight = (range, context) => {
     if (!context.format || !context.format.commentHighlight) {
       return false
@@ -655,7 +666,12 @@ class RealtimeTextItem extends React.Component {
       >
         <DockedToolbar fullPageView={fullPageView}>
           {canEdit && (
-            <TextItemToolbar onExpand={onExpand} onComment={this.onComment} />
+            <TextItemToolbar
+              onExpand={onExpand}
+              onFormatHuge={this.onToggleSize('huge')}
+              onFormatLarge={this.onToggleSize('large')}
+              onComment={this.onComment}
+            />
           )}
           <CloseButton
             data-cy="TextItemClose"

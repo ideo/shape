@@ -291,7 +291,6 @@ export const QuillStyleWrapper = styled.div`
 
     h1 {
       ${TextItemHeading1Css};
-      color: ${v.colors.black};
     }
 
     h1,
@@ -299,11 +298,17 @@ export const QuillStyleWrapper = styled.div`
       margin-bottom: 0.75rem;
     }
 
-    h2 {
+    h2,
+    .ql-size-large {
       font-size: 0.8125rem;
       letter-spacing: 1px;
       margin-bottom: 0.8125rem;
       text-transform: uppercase;
+      font-weight: ${v.weights.medium};
+    }
+
+    .ql-size-huge {
+      ${Heading1TypographyCss};
     }
 
     h5 {
@@ -332,19 +337,17 @@ export const QuillStyleWrapper = styled.div`
       color: ${v.colors.ctaPrimary};
     }
 
-    /* NOTE: this is our test of custom highlights */
     sub {
+      /* remove actual sub styling to make it more like a span */
       vertical-align: baseline;
       font-size: inherit;
-      background: ${v.colors.highlightInactive};
-    }
-
-    sub[data-comment-id='new'] {
-      background: ${v.colors.highlightActive};
-    }
-
-    sub.highlightActive {
-      background: ${v.colors.highlightActive};
+      &[data-comment-id] {
+        background: ${v.colors.highlightInactive};
+      }
+      &[data-comment-id='new'],
+      &.highlightActive {
+        background: ${v.colors.highlightActive};
+      }
     }
 
     @keyframes blink-animation {
