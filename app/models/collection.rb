@@ -252,6 +252,7 @@ class Collection < ApplicationRecord
           ],
         },
         :tags,
+        :cards_linked_to_this_collection,
       ],
     )
   end
@@ -270,9 +271,14 @@ class Collection < ApplicationRecord
       ]
   end
 
+  def parent_ids
+    (
+      breadcrumb + cards_linked_to_this_collection.collection.pluck(:parent_id)
+    ).uniq
+  end
+
   # By default all string fields are searchable
   def search_data
-    parent_ids = breadcrumb
     updated_date = Arel.sql('DATE(updated_at)')
     activity_dates = activities.group(updated_date).pluck(updated_date)
     {
