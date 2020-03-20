@@ -105,6 +105,7 @@ Rails.application.routes.draw do
           patch 'replace'
           patch 'update'
           patch 'toggle_pin'
+          post 'insert_row'
           delete 'destroy'
         end
         collection do
