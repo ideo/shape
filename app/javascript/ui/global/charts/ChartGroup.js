@@ -195,7 +195,7 @@ class ChartGroup extends React.Component {
     let sortedLabels = _.sortBy(renderedLabels, 'x')
     // Take out first label if more than two data points
     if (sortedLabels.length > 2) {
-      sortedLabels = sortedLabels.lice(1)
+      sortedLabels = sortedLabels.slice(1)
     }
     const overlappingLabels = []
     sortedLabels.forEach((label, i) => {
