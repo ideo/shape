@@ -30,8 +30,8 @@ class TextItemHeaderMigrator < SimpleService
         # we have to split up the previous insert, move it to this op
         previous_op_split = previous_op.insert.split("\n")
         # pop the remainder off
-        op.insert = previous_op_split.pop + "\n"
-        previous_op.insert = previous_op_split.join("\n") + "\n"
+        op.insert = "#{previous_op_split.pop}\n"
+        previous_op.insert = "#{previous_op_split.join("\n")}\n"
 
         # modify current op (which would just be a "\n" for a quill header)
         op.attributes ||= {}
