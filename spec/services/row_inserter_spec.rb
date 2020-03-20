@@ -6,10 +6,12 @@ RSpec.describe RowInserter, type: :service do
   let(:collection) { create(:board_collection, num_cards: num_cards, add_viewers: [user]) }
   let(:cards) { collection.collection_cards }
   let(:selected_card) { cards.first }
+  let(:action) { 'add' }
   let(:inserter) do
     RowInserter.new(
       card: selected_card,
       direction: 'below',
+      action: action,
     )
   end
 
@@ -33,5 +35,23 @@ RSpec.describe RowInserter, type: :service do
     expect(cards[1].row).to eq 1
     expect(cards[3].row).to eq 3
     expect(cards[5].row).to eq 4
+  end
+
+  context 'when removing a row' do
+    let(:selected_card) { cards[3] }
+    let(:action) { 'remove' }
+
+    before do
+      # Row 3
+      cards[4].update(width: 1, height: 1, row: 4, col: 1)
+      cards[5].update(width: 1, height: 1, row: 4, col: 3)
+    end
+
+    it 'select the correct cards below the main one' do
+      inserter.call
+      cards.reload
+      expect(cards[3].row).to eq 2
+      expect(cards[5].row).to eq 3
+    end
   end
 end

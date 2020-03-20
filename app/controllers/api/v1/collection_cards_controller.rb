@@ -217,6 +217,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     head :no_content
   end
 
+  def remove_row
+    collection_card = CollectionCard.find(params[:id])
+    RowInserter.new(
+      card: collection_card,
+      direction: json_api_params[:direction],
+      action: 'remove'
+    ).call
+
+    head :no_content
+  end
+
   before_action :check_valid_duplication, only: %i[duplicate]
   def duplicate
     placement = json_api_params[:placement]

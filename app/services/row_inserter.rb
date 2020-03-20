@@ -3,11 +3,13 @@ class RowInserter < SimpleService
 
   def initialize(
     card:,
-    direction: 'below'
+    direction: 'below',
+    action: 'add'
   )
     @card = card
     @parent_collection = card.parent
     @direction = direction
+    @action = action
     @errors = []
   end
 
@@ -15,13 +17,14 @@ class RowInserter < SimpleService
     return false unless @card.parent.present?
 
     cards = @direction == 'below' ? select_all_cards_below : select_all_cards_above
-    move_all_cards_in_direction(cards)
+    move_all_cards_in_direction(cards, @action)
   end
 
   private
 
-  def move_all_cards_in_direction(cards)
-    cards.update_all('row = row + 1')
+  def move_all_cards_in_direction(cards, action)
+    movement = action == 'add' ? 1 : -1
+    cards.update_all("row = row + #{movement}")
   end
 
   def select_all_cards_below
