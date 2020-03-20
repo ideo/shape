@@ -105,7 +105,7 @@ describe('ChartGroup', () => {
 
       it('should return filtered date values for overlapping', () => {
         expect(overlappingLabels.sort()).toEqual(
-          ['12/31/2016', '9/30/2018', '12/17/2018'].sort()
+          ['9/30/2018', '12/17/2018'].sort()
         )
       })
     })
