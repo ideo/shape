@@ -163,22 +163,135 @@ class ChartGroup extends React.Component {
     )
   }
 
-  get chartAxis() {
-    let axisProps
+  areElementsOverlapping(a, b) {
+    const ar = a.x + a.w
+    const br = b.x + b.w
+    return !(ar < b.x || a.x > br)
+  }
+
+  areLabelsOverlapping(labelA, labelB) {
+    return this.areElementsOverlapping(
+      { ...labelA, w: this.calculateLabelWidth(labelA) },
+      { ...labelB, w: this.calculateLabelWidth(labelB) }
+    )
+  }
+
+  calculateLabelWidth(label) {
+    const modifier = this.isSmallChartStyle ? 10.5 : 8
+    return label.text.length * modifier
+  }
+
+  extractLabelsFromVictoryProps(victoryProps) {
+    return _.compact(
+      Object.entries(victoryProps).map(([key, val]) => {
+        if (_.isNumber(parseInt(key))) {
+          return val.tickLabels
+        }
+      })
+    )
+  }
+
+  findOverlappingLabels(renderedLabels) {
+    let sortedLabels = _.sortBy(renderedLabels, 'x')
+    // Take out first label if more than two data points
+    if (sortedLabels.length > 2) {
+      sortedLabels = sortedLabels.slice(1)
+    }
+    const overlappingLabels = []
+    sortedLabels.forEach((label, i) => {
+      let overlapping = false
+      for (let j = i + 1; j < sortedLabels.length; j++) {
+        const subLabel = sortedLabels[j]
+        overlapping = this.areLabelsOverlapping(label, subLabel)
+        if (overlapping) {
+          let subOverlapping = false
+          for (let k = j + 1; k < sortedLabels.length; k++) {
+            subOverlapping = this.areLabelsOverlapping(
+              sortedLabels[j],
+              sortedLabels[k]
+            )
+          }
+          if (!subOverlapping) {
+            overlappingLabels.push(label)
+            label.overlapping = true
+            continue
+          }
+        }
+      }
+    })
+    return _.uniq(overlappingLabels)
+  }
+
+  get axisRawDateValues() {
+    const datasetsWithData = [
+      this.primaryDataset,
+      ...this.secondaryDatasetsWithData,
+    ]
+    return _.compact(
+      _.map(_.flatten(_.map(datasetsWithData, 'dataWithDates')), 'date')
+    )
+  }
+
+  get axisFilteredDateValues() {
+    const victoryProps = VictoryAxis.getBaseProps(this.axisProps)
+    const renderedLabels = this.extractLabelsFromVictoryProps(victoryProps)
+    const overlappingLabels = this.findOverlappingLabels(renderedLabels)
+
+    const nonPrioritizedLabels = []
+    overlappingLabels.forEach(l => {
+      const datum = this.primaryDatasetValues.find(dv =>
+        _.isEqual(dv.date, l.datum)
+      )
+      if (datum) {
+        if (datum.prioritized) {
+          datum.overlappingLabel = true
+        } else {
+          nonPrioritizedLabels.push(l)
+        }
+      }
+    })
+
+    return _.uniq(_.xorWith(renderedLabels, nonPrioritizedLabels, _.isEqual))
+  }
+
+  get axisProps() {
     if (this.primaryDatasetBarChart) {
-      axisProps = barChartAxisProps({
+      return barChartAxisProps({
         dataset: this.primaryDataset,
         totalColumns: this.totalColumns,
         totalGroupings: this.totalGroupings,
       })
     } else {
       const { timeframe } = this.primaryDataset
-      axisProps = chartAxisProps({
+      const dates = this.axisRawDateValues
+      const axisProps = chartAxisProps({
         datasetValues: this.primaryDatasetValues,
         datasetTimeframe: timeframe,
         domain: this.chartDomain,
         isSmallChartStyle: this.isSmallChartStyle,
+        dateValues: this.isSmallChartStyle ? dates : null,
       })
+      return axisProps
+    }
+  }
+
+  get chartAxis() {
+    const { axisProps } = this
+    if (this.isSmallChartStyle) {
+      const overlappingIndexes = []
+      this.axisFilteredDateValues.forEach((l, i) => {
+        if (l.overlapping) overlappingIndexes.push(i)
+      })
+      const previousTickFormat = axisProps.tickFormat
+      axisProps.tickFormat = (label, index) => {
+        if (overlappingIndexes.includes(index)) return '|'
+        return previousTickFormat(label, index)
+      }
+      let filteredLabels = _.sortBy(this.axisFilteredDateValues, 'x')
+      if (filteredLabels.length > 2) {
+        filteredLabels = filteredLabels.slice(1)
+      }
+      axisProps.tickValues = filteredLabels.map(l => l.datum)
     }
     return <VictoryAxis {...axisProps} />
   }
@@ -296,7 +409,12 @@ class ChartGroup extends React.Component {
     return (
       <VictoryChart
         theme={victoryTheme}
-        padding={{ top: 0, left: 0, right: 0, bottom: 8 }}
+        padding={{
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: this.isSmallChartStyle ? 18 : 8,
+        }}
         containerComponent={
           <VictoryVoronoiContainer portalZIndex={v.zIndex.gridCard} />
         }
