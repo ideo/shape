@@ -176,7 +176,7 @@ class TextItemCover extends React.Component {
 
   renderEditing() {
     const { item } = this.state
-    const { initialFontTag, cardId } = this.props
+    const { initialSize, cardId } = this.props
     if (!item) return ''
 
     return (
@@ -186,7 +186,7 @@ class TextItemCover extends React.Component {
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
         onCancel={this.cancel}
-        initialFontTag={initialFontTag}
+        initialSize={initialSize}
         // if we are rendering editing then the item has been fetched
         fullyLoaded
       />
@@ -273,7 +273,7 @@ TextItemCover.propTypes = {
   dragging: PropTypes.bool.isRequired,
   cardId: PropTypes.string.isRequired,
   handleClick: PropTypes.func.isRequired,
-  initialFontTag: PropTypes.string.isRequired,
+  initialSize: PropTypes.string.isRequired,
   height: PropTypes.number,
   searchResult: PropTypes.bool,
   hideReadMore: PropTypes.bool,

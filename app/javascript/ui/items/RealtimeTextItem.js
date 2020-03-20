@@ -141,8 +141,10 @@ class RealtimeTextItem extends React.Component {
 
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
+    this.setInitialSize()
     setTimeout(() => {
       this.quillEditor.focus()
+      this.setInitialSize()
       this.clearQuillClipboardHistory()
     }, 100)
   }
@@ -182,6 +184,21 @@ class RealtimeTextItem extends React.Component {
     // fix for undo clearing out all text
     // https://github.com/zenoamaro/react-quill/issues/511
     this.quillEditor.history.clear()
+  }
+
+  setInitialSize() {
+    // only set this if we are in a brand new text item
+    if (this.version) return
+
+    const { quillEditor } = this
+    const { initialSize } = this.props
+    if (quillEditor && initialSize !== 'normal') {
+      const range = quillEditor.getSelection()
+      if (range && range.index) {
+        quillEditor.formatText(0, range.index, 'size', initialSize, 'user')
+      }
+      quillEditor.format('size', initialSize)
+    }
   }
 
   reapplyActiveHighlight() {
@@ -340,14 +357,6 @@ class RealtimeTextItem extends React.Component {
     const quillData = toJS(item.quill_data) || {}
     if (!quillData.ops) quillData.ops = []
     // Set initial font size - if text item is blank,
-    // and user has chosen a h* tag (e.g. h1)
-    // (p tag does not require any ops changes)
-    if (quillData.ops.length === 0 && this.headerSize) {
-      quillData.ops.push({
-        insert: '\n',
-        attributes: { header: this.headerSize },
-      })
-    }
     return quillData
   }
 
@@ -402,31 +411,6 @@ class RealtimeTextItem extends React.Component {
     const { quillEditor } = this
     const delta = fullContent || (quillEditor && quillEditor.getContents())
     uiStore.update('quillSnapshot', delta)
-  }
-
-  get headerSize() {
-    const { initialFontTag } = this.props
-    if (initialFontTag.includes('H')) {
-      return _.replace(initialFontTag, 'H', '')
-    }
-    return null
-  }
-
-  newlineIndicesForDelta = delta => {
-    const newlineOpIndices = []
-    _.each(delta.ops, (op, index) => {
-      if (op.insert && op.insert.includes('\n')) newlineOpIndices.push(index)
-    })
-    return newlineOpIndices
-  }
-
-  headerFromLastNewline = delta => {
-    // Check if user added newline
-    // And if so, set their default text size if provided
-    const newlineOpIndices = this.newlineIndicesForDelta(delta)
-    // Return if there wasn't a specified header size in previous newline operation
-    const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
-    return _.get(prevHeaderSizeOp, 'attributes.header')
   }
 
   get cardId() {
@@ -726,14 +710,14 @@ RealtimeTextItem.propTypes = {
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
   fullPageView: PropTypes.bool,
-  initialFontTag: PropTypes.oneOf(['H1', 'H3', 'P']),
+  initialSize: PropTypes.oneOf(['normal', 'huge', 'large']),
   containerRef: PropTypes.func,
 }
 RealtimeTextItem.defaultProps = {
   currentUserId: null,
   onExpand: null,
   fullPageView: false,
-  initialFontTag: 'P',
+  initialSize: 'normal',
   containerRef: null,
 }
 RealtimeTextItem.wrappedComponent.propTypes = {
