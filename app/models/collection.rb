@@ -252,7 +252,6 @@ class Collection < ApplicationRecord
           ],
         },
         :tags,
-        :cards_linked_to_this_collection,
       ],
     )
   end
