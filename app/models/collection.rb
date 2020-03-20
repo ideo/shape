@@ -272,7 +272,7 @@ class Collection < ApplicationRecord
 
   def parent_ids
     (
-      breadcrumb + cards_linked_to_this_collection.collection.pluck(:parent_id)
+      Array.wrap(breadcrumb) + cards_linked_to_this_collection.collection.pluck(:parent_id)
     ).uniq
   end
 
