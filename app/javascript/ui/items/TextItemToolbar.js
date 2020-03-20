@@ -6,12 +6,12 @@ import v from '~/utils/variables'
 import ExpandIcon from '~/ui/icons/ExpandIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import CommentIcon from '~/ui/icons/CommentIcon'
-import ReactQuill from 'react-quill'
+import { Quill } from 'react-quill'
 
 // see: https://github.com/zenoamaro/react-quill/issues/188#issuecomment-445272662
-const icons = ReactQuill.Quill.import('ui/icons')
-icons['link'] = () => ReactDOMServer.renderToString(<LinkIcon />)
-icons['comment'] = () => ReactDOMServer.renderToString(<CommentIcon />)
+const icons = Quill.import('ui/icons')
+icons.link = () => ReactDOMServer.renderToString(<LinkIcon />)
+icons.comment = () => ReactDOMServer.renderToString(<CommentIcon />)
 
 const StyledButton = styled.button`
   color: ${v.colors.commonDark};
@@ -38,27 +38,31 @@ const TextItemToolbar = props => (
       <StyledButton className="ql-size ql-format-reg" value="">
         b
       </StyledButton>
-      {props.onFormatLarge && (
-        <StyledButton
-          className={props.largeActive && 'ql-active'}
-          onClick={props.onFormatLarge}
-        >
-          H2
-        </StyledButton>
-      )}
-      {props.onFormatHuge && (
-        <StyledButton
-          className={props.hugeActive && 'ql-active'}
-          onClick={props.onFormatHuge}
-        >
-          H1
-        </StyledButton>
+
+      {props.toggleSize && (
+        <React.Fragment>
+          <StyledButton
+            className={props.activeSizeFormat === 'large' && 'ql-active'}
+            onClick={props.toggleSize('large')}
+            dangerouslySetInnerHTML={{ __html: icons.header[2] }}
+          ></StyledButton>
+          <StyledButton
+            className={props.activeSizeFormat === 'huge' && 'ql-active'}
+            onClick={props.toggleSize('huge')}
+            dangerouslySetInnerHTML={{ __html: icons.header[1] }}
+          ></StyledButton>
+        </React.Fragment>
       )}
 
       {/* use h5 for title */}
-      <StyledButton className="ql-header ql-format-title" value="5">
-        T
-      </StyledButton>
+      {props.toggleHeader && (
+        <StyledButton
+          onClick={props.toggleHeader(5)}
+          className="ql-format-title"
+        >
+          T
+        </StyledButton>
+      )}
       {/* quill inserts ql-link SVG */}
       <StyledButton className="ql-link">
         <LinkIcon />
@@ -80,18 +84,16 @@ const TextItemToolbar = props => (
 TextItemToolbar.propTypes = {
   onExpand: PropTypes.func,
   onComment: PropTypes.func,
-  onFormatLarge: PropTypes.func,
-  onFormatHuge: PropTypes.func,
-  hugeActive: PropTypes.bool,
-  largeActive: PropTypes.bool,
+  toggleSize: PropTypes.func,
+  toggleHeader: PropTypes.func,
+  activeSizeFormat: PropTypes.string,
 }
 TextItemToolbar.defaultProps = {
   onExpand: null,
   onComment: null,
-  onFormatLarge: null,
-  onFormatHuge: null,
-  hugeActive: false,
-  largeActive: false,
+  toggleSize: null,
+  toggleHeader: null,
+  activeSizeFormat: null,
 }
 
 export default TextItemToolbar

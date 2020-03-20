@@ -116,9 +116,7 @@ class RealtimeTextItem extends React.Component {
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
   @observable
-  largeActive = false
-  @observable
-  hugeActive = false
+  activeSizeFormat = null
 
   constructor(props) {
     super(props)
@@ -565,7 +563,7 @@ class RealtimeTextItem extends React.Component {
     apiStore.openCurrentThreadToCommentOn(item)
   }
 
-  onToggleSize = size => e => {
+  toggleSize = size => e => {
     e.preventDefault()
     const { quillEditor } = this
     const currentFormat = quillEditor.getFormat()
@@ -573,24 +571,28 @@ class RealtimeTextItem extends React.Component {
     if (currentFormat.size === size) {
       val = null
     }
+    quillEditor.format('header', false, 'user')
     quillEditor.format('size', val, 'user')
     this.checkActiveSizeFormat()
+  }
+
+  toggleHeader = header => e => {
+    e.preventDefault()
+    const { quillEditor } = this
+    const range = quillEditor.getSelection()
+    const [line] = quillEditor.getLine(range.index)
+    const currentFormat = quillEditor.getFormat()
+    quillEditor.removeFormat(line.offset(), line.length(), 'user')
+    if (currentFormat.header !== header) {
+      quillEditor.format('header', header, 'user')
+    }
   }
 
   @action
   checkActiveSizeFormat = () => {
     if (this.unmounted) return
     const currentFormat = this.quillEditor.getFormat()
-    if (currentFormat.size === 'large') {
-      this.largeActive = true
-    } else {
-      this.largeActive = false
-    }
-    if (currentFormat.size === 'huge') {
-      this.hugeActive = true
-    } else {
-      this.hugeActive = false
-    }
+    this.activeSizeFormat = currentFormat.size
   }
 
   endOfHighlight = (range, context) => {
@@ -690,11 +692,10 @@ class RealtimeTextItem extends React.Component {
           {canEdit && (
             <TextItemToolbar
               onExpand={onExpand}
-              onFormatHuge={this.onToggleSize('huge')}
-              onFormatLarge={this.onToggleSize('large')}
+              toggleSize={this.toggleSize}
+              toggleHeader={this.toggleHeader}
               onComment={this.onComment}
-              largeActive={this.largeActive}
-              hugeActive={this.hugeActive}
+              activeSizeFormat={this.activeSizeFormat}
             />
           )}
           <CloseButton

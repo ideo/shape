@@ -291,6 +291,7 @@ export const QuillStyleWrapper = styled.div`
 
     h1 {
       ${TextItemHeading1Css};
+      color: ${v.colors.black};
     }
 
     h1,
