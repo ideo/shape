@@ -192,7 +192,8 @@ class ChartGroup extends React.Component {
   }
 
   findOverlappingLabels(renderedLabels) {
-    const sortedLabels = _.sortBy(renderedLabels, 'x')
+    // Always take out first label
+    const sortedLabels = _.sortBy(renderedLabels, 'x').slice(1)
     const overlappingLabels = []
     sortedLabels.forEach((label, i) => {
       let overlapping = false
@@ -283,7 +284,8 @@ class ChartGroup extends React.Component {
         if (overlappingIndexes.includes(index)) return '|'
         return previousTickFormat(label, index)
       }
-      axisProps.tickValues = this.axisFilteredDateValues.map(l => l.datum)
+      const filteredLabels = _.sortBy(this.axisFilteredDateValues, 'x').slice(1)
+      axisProps.tickValues = filteredLabels.map(l => l.datum)
     }
     return <VictoryAxis {...axisProps} />
   }
