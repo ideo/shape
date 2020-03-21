@@ -1,6 +1,7 @@
 require 'rails_helper'
 
-describe Collection::TestCollection, type: :model do
+# seed to get default Audiences for valid test launch
+describe Collection::TestCollection, type: :model, seed: true do
   let(:user) { create(:user) }
   let(:test_parent) { create(:collection, add_editors: [user]) }
   let(:test_collection) do
@@ -473,6 +474,11 @@ describe Collection::TestCollection, type: :model do
           let!(:test_audience) { create(:test_audience, test_collection: test_collection) }
           let!(:test_audience2) { create(:test_audience, test_collection: test_collection) }
 
+          before do
+            # first remove the link sharing audience
+            test_collection.test_audiences.where(price_per_response: 0).destroy_all
+          end
+
           it 'does not call NotifyFeedbackCompletedWorker until all audiences are complete' do
             expect(NotifyFeedbackCompletedWorker).not_to receive(:perform_async)
             test_audience.closed!
@@ -678,6 +684,26 @@ describe Collection::TestCollection, type: :model do
         expect(submission.submission_attrs).to eq(
           'submission' => true,
         )
+      end
+    end
+
+    describe '#queue_update_live_test' do
+      let(:test_collection) { create(:test_collection, :launched) }
+      let(:card) { test_collection.collection_cards.last }
+
+      it 'should call the CreateContentWorker if the test is live' do
+        expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+          test_collection.test_results_collection.id,
+          nil,
+          card.id,
+        )
+        test_collection.queue_update_live_test(card.id)
+      end
+
+      it 'return early if the test is not live' do
+        test_collection.close!
+        expect(TestResultsCollection::CreateContentWorker).not_to receive(:perform_async)
+        test_collection.queue_update_live_test(card.id)
       end
     end
 

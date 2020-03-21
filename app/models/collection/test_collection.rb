@@ -692,6 +692,16 @@ class Collection
       )
     end
 
+    def queue_update_live_test(card_id)
+      return unless live?
+
+      ::TestResultsCollection::CreateContentWorker.perform_async(
+        test_results_collection.id,
+        nil,
+        card_id,
+      )
+    end
+
     private
 
     def question_items_from_sections(section_names)
@@ -701,7 +711,13 @@ class Collection
     end
 
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
-      return true if test_audience_params.blank?
+      if test_audience_params.blank?
+        # you can launch as long as you have the link sharing option open
+        return true if test_audiences.open.any?
+
+        errors.add(:base, 'Audience required to launch test')
+        return false
+      end
 
       # Make sure all prices are up-to-date
       test_audiences.each(&:update_price_per_response_from_audience!)

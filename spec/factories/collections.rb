@@ -78,6 +78,10 @@ FactoryBot.define do
 
       trait :completed do
         after(:create) do |collection|
+          if collection.test_audiences.present?
+            # open the link sharing audience so the test can launch
+            collection.test_audiences.first.update(status: :open)
+          end
           category_satisfaction_question = collection.question_items.detect(&:question_category_satisfaction?)
           category_satisfaction_question&.update(content: 'solutions')
           collection.question_items.select(&:question_open?).each do |open_response|

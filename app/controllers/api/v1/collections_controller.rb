@@ -6,7 +6,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   # NOTE: these have to be in the following order
   before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
-  before_action :load_and_authorize_collection_update, only: %i[update]
   before_action :load_collection_with_roles, only: %i[show update]
   after_action :broadcast_parent_collection_updates, only: %i[create_template clear_collection_cover]
 
@@ -42,6 +41,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_collection_update, only: %i[update]
   after_action :broadcast_collection_updates, only: %i[update]
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
@@ -55,7 +55,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  load_and_authorize_resource only: %i[clear_collection_cover]
   def clear_collection_cover
     @parent_collection = @collection.parent
     @collection.clear_collection_cover
@@ -63,7 +62,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render_collection
   end
 
-  load_and_authorize_resource only: %i[background_update_template_instances]
   def background_update_template_instances
     unless @collection.master_template?
       render json: { success: false }
@@ -74,6 +72,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       updated_card_ids: @collection.collection_cards.pluck(:id),
       template_update_action: 'update_all',
     )
+    render json: { success: true }
+  end
+
+  def background_update_live_test
+    card_id = json_api_params[:collection_card_id]
+    unless @collection.is_a?(Collection::TestCollection) &&
+           @collection.live? &&
+           card_id.present?
+      render json: { success: false }
+      return
+    end
+
+    @collection.queue_update_live_test(card_id)
     render json: { success: true }
   end
 

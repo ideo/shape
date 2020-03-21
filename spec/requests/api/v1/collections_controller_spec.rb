@@ -651,8 +651,27 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let!(:instance) { create(:collection, template: template) }
 
     it 'should call the UpdateTemplateInstancesWorker' do
-      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(template.id, template.collection_cards.pluck(:id), 'update_all')
+      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+        template.id,
+        template.collection_cards.pluck(:id),
+        'update_all',
+      )
       post(path)
+    end
+  end
+
+  describe 'POST #background_update_live_test' do
+    let(:test_collection) { create(:test_collection, :launched, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{test_collection.id}/background_update_live_test" }
+    let(:card) { test_collection.collection_cards.last }
+
+    it 'should call the TestResultsCollection::CreateContentWorker' do
+      expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+        test_collection.test_results_collection.id,
+        nil,
+        card.id,
+      )
+      post(path, params: { collection_card_id: card.id }.to_json)
     end
   end
 
