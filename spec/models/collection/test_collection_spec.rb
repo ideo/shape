@@ -1,7 +1,6 @@
 require 'rails_helper'
 
-# seed to get default Audiences for valid test launch
-describe Collection::TestCollection, type: :model, seed: true do
+describe Collection::TestCollection, type: :model do
   let(:user) { create(:user) }
   let(:test_parent) { create(:collection, add_editors: [user]) }
   let(:test_collection) do
@@ -355,15 +354,23 @@ describe Collection::TestCollection, type: :model, seed: true do
             let(:audience) { create(:audience) }
             let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 4.50) }
 
+            # before do
+            #   # remove link_sharing audience for this example
+            #   test_collection.test_audiences.where(price_per_response: 0).destroy_all
+            # end
+
             it 'should create test audience datasets for each question' do
               scale_question_num = test_collection.question_items.scale_questions.count
+              # All scale questions get test dataset, idea(s) datasets, test_audience dataset, test_audience + idea dataset
+              # since there is also link sharing, there are 2 more test_audience, test_audience + idea for a total of 6x
+              dataset_count = scale_question_num * 6
               expect do
                 Sidekiq::Testing.inline! do
                   test_collection.launch!(initiated_by: user)
                 end
               end.to change(
                 Dataset::Question, :count
-              ).by(scale_question_num * 4) # All scale questions get test dataset, idea(s) datasets and audience dataset
+              ).by(dataset_count)
               expect(Dataset::Question.last.groupings).to include(
                 'id' => test_audience.id, 'type' => 'TestAudience',
               )

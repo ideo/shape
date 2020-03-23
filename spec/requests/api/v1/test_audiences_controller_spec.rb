@@ -5,13 +5,13 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
   let(:organization) { create(:organization, admin: current_user) }
   let!(:link_sharing_audience) { create(:audience, :link_sharing, organizations: [organization]) }
   let!(:paid_audience) { create(:audience, organizations: [organization]) }
-  let!(:test_collection) { create(:test_collection, :completed, add_editors: [current_user]) }
+  let!(:test_collection) { create(:test_collection, :completed, organization: organization, add_editors: [current_user]) }
 
   describe 'PATCH #update' do
     let(:status) { :open }
     let(:test_audience) do
       # link sharing gets created after_create
-      test_collection.test_audiences.first
+      test_collection.test_audiences.where(audience: link_sharing_audience).first
     end
     let(:params) do
       json_api_params(
@@ -48,6 +48,9 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
     end
 
     context 'with a link sharing audience' do
+      # :completed factory defaults to link sharing open, so we test the API call setting it to closed
+      let(:status) { :closed }
+
       it 'returns a 200' do
         patch(path, params: params)
         expect(response.status).to eq(200)
@@ -63,6 +66,7 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
           patch(path, params: params)
           test_audience.reload
         }.to change(test_audience, :status)
+        expect(test_audience.status).to eq 'closed'
       end
     end
   end
