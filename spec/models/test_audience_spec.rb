@@ -91,12 +91,13 @@ RSpec.describe TestAudience, type: :model do
     describe '#closed?' do
       let(:user) { create(:user) }
       let(:test_collection) { create(:test_collection, :completed) }
+      let!(:test_audience) { create(:test_audience, test_collection: test_collection, sample_size: 5) }
       before do
+        test_collection.link_sharing_audience.closed!
         test_collection.launch!(initiated_by: user)
         expect(test_collection.live?).to be true
         expect(test_audience.closed_at).to be_nil
       end
-      let(:test_audience) { create(:test_audience, test_collection: test_collection, sample_size: 5) }
 
       before do
         # call this synchronously to make sure the completion checks are triggered

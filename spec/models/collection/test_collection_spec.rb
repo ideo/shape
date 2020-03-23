@@ -354,11 +354,6 @@ describe Collection::TestCollection, type: :model do
             let(:audience) { create(:audience) }
             let!(:test_audience) { create(:test_audience, audience: audience, test_collection: test_collection, price_per_response: 4.50) }
 
-            # before do
-            #   # remove link_sharing audience for this example
-            #   test_collection.test_audiences.where(price_per_response: 0).destroy_all
-            # end
-
             it 'should create test audience datasets for each question' do
               scale_question_num = test_collection.question_items.scale_questions.count
               # All scale questions get test dataset, idea(s) datasets, test_audience dataset, test_audience + idea dataset
@@ -371,8 +366,14 @@ describe Collection::TestCollection, type: :model do
               end.to change(
                 Dataset::Question, :count
               ).by(dataset_count)
-              expect(Dataset::Question.last.groupings).to include(
-                'id' => test_audience.id, 'type' => 'TestAudience',
+              data_groupings = test_collection
+                               .test_results_collection
+                               .data_items
+                               .map(&:datasets)
+                               .flatten
+                               .map(&:groupings)
+              expect(data_groupings).to include(
+                ['id' => test_audience.id, 'type' => 'TestAudience'],
               )
             end
 

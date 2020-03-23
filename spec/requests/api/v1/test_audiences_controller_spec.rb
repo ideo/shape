@@ -11,7 +11,7 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
     let(:status) { :open }
     let(:test_audience) do
       # link sharing gets created after_create
-      test_collection.test_audiences.where(audience: link_sharing_audience).first
+      test_collection.link_sharing_audience
     end
     let(:params) do
       json_api_params(

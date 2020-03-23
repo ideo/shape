@@ -88,7 +88,7 @@ class TestAudience < ApplicationRecord
   end
 
   def total_price
-    return 0 if price_per_response.blank?
+    return 0 if price_per_response.blank? || price_per_response.zero?
 
     sample_size * price_per_response
   end
