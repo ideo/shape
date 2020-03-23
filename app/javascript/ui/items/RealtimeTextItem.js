@@ -429,14 +429,9 @@ class RealtimeTextItem extends React.Component {
 
     this.combineAwaitingDeltas(delta)
     this.sendCombinedDelta()
-    if (
-      _.some(
-        delta.ops,
-        op => op.attributes && _.includes(_.keys(op.attributes), 'header')
-      )
-    ) {
-      this.checkForTitleText()
-    }
+    // NOTE: trying to check titleText only if the delta turned header on/off
+    // seemed to miss some cases, so we just check every time
+    this.checkForTitleText()
     this.instanceDataContentUpdate()
   }
 
