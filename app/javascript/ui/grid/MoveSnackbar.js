@@ -164,7 +164,7 @@ class MoveSnackbar extends React.Component {
   render() {
     const { uiStore } = this.props
     return (
-      <StyledSnackbar classes={{ root: 'Snackbar' }} open>
+      <StyledSnackbar classes={{ root: 'Snackbar' }} open fullWidth>
         {uiStore.isLoadingMoveAction ? (
           <SnackbarBackground>
             <InlineLoader />

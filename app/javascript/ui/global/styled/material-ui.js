@@ -11,6 +11,11 @@ export const StyledSnackbar = styled(Snackbar)`
     flex-grow: 1;
     color: white;
     background-color: transparent;
+    ${props =>
+      props.fullWidth &&
+      `
+      width: 100%
+    `}
   }
 `
 StyledSnackbar.displayName = 'StyledSnackbar'
