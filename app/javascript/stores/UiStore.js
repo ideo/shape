@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
 
-import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v, {
   TOUCH_DEVICE_OS,
@@ -174,9 +173,12 @@ export default class UiStore {
   @observable
   draggingFromMDL = false
   @observable
-  overflowFromMDL = 0
+  // track if you are dragging/moving more cards than visible
+  movingCardsOverflow = false
   @observable
   textEditingItem = null
+  @observable
+  textEditingItemHasTitleText = false
   @observable
   overdueBannerVisible = true
   @observable
@@ -246,6 +248,10 @@ export default class UiStore {
   hoveringOverDataItem = false
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
+
+  get routingStore() {
+    return this.apiStore.routingStore
+  }
 
   @action
   setEditingCardCover(editingCardCoverId) {
@@ -456,9 +462,9 @@ export default class UiStore {
 
   // TODO: rename this function to be clear it is show or reroute??
   showPermissionsAlert() {
-    const { viewingCollection } = this
+    const { viewingCollection, routingStore } = this
     if (viewingCollection && viewingCollection.isPublicJoinable) {
-      routeToLogin({ redirect: viewingCollection.frontend_url })
+      routingStore.routeToLogin({ redirect: viewingCollection.frontend_url })
       return
     }
     this.alert('You need permission to access this content.', 'Key')
@@ -823,6 +829,11 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+  }
+
+  @action
+  selectCardIds(cardIds) {
+    this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
   }
 
   @action

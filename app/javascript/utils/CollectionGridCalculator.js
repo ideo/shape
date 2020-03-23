@@ -22,6 +22,10 @@ export const findTopLeftCard = cards => {
   return _.minBy(minRowCards, 'col')
 }
 
+export const findBottomRowCards = cards => {
+  return _.uniqBy(_.orderBy(cards, ['row', 'col'], ['desc', 'asc']), 'col')
+}
+
 // calculate row/col of these cards as if they were in a 4-column grid sequentially
 export const calculateRowsCols = cards => {
   let row = 0

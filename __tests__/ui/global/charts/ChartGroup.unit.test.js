@@ -25,8 +25,8 @@ describe('ChartGroup', () => {
     dataItem.secondaryDatasets.mockReturnValue([{ ...secondaryDataset }])
     props.dataItem = dataItem
     props.simpleDateTooltip = true
-    props.width = 1
-    props.height = 1
+    props.width = 2
+    props.height = 2
     props.routingStore = fakeRoutingStore
     render = () =>
       (wrapper = shallow(<ChartGroup.wrappedComponent {...props} />))
@@ -54,6 +54,60 @@ describe('ChartGroup', () => {
 
     it('renders one label on X axis of the chart', () => {
       expect(wrapper.find('VictoryAxis').props().label).toEqual('Q3 2018')
+    })
+  })
+
+  describe('with a Creative Difference chart', () => {
+    describe('axisFilteredDateValues()', () => {
+      let overlappingLabels
+      let labels = []
+
+      beforeEach(() => {
+        // This data was generated from a real-world use case.
+        labels = [
+          {
+            datum: new Date('Thu Jul 19 2018 17:00:00 (GMT)'),
+            text: 'Q3 2018',
+            x: 321.2,
+          },
+          {
+            datum: new Date('Mon Dec 17 2018 16:00:00 (GMT)'),
+            text: 'Q4 2018',
+            x: 393.75,
+          },
+          {
+            datum: new Date('Sat Dec 31 2016 16:00:00 (GMT)'),
+            text: 'Q1 2017',
+            x: 50,
+          },
+          {
+            datum: new Date('Thu Mar 30 2017 17:00:00 (GMT)'),
+            text: 'Q1 2017',
+            x: 92.72,
+          },
+          {
+            datum: new Date('Sun Sep 30 2018 17:00:00 (GMT)'),
+            text: 'Q4 2018',
+            x: 356.31,
+          },
+          {
+            datum: new Date('Sun Dec 30 2018 16:00:00 (GMT)'),
+            text: 'Q4 2018',
+            x: 400,
+          },
+        ]
+
+        overlappingLabels = wrapper
+          .instance()
+          .findOverlappingLabels(labels)
+          .map(d => d.datum.toLocaleDateString('en-US'))
+      })
+
+      it('should return filtered date values for overlapping', () => {
+        expect(overlappingLabels.sort()).toEqual(
+          ['9/30/2018', '12/17/2018'].sort()
+        )
+      })
     })
   })
 

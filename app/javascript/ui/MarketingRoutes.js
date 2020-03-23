@@ -6,6 +6,7 @@ import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import MarketingHomepage from '~/ui/pages/MarketingHomepage'
 import MarketingProductPage from '~/ui/pages/MarketingProductPage'
 import TermsPage from '~/ui/pages/TermsPage'
+import CaptureUtmParams from '~/utils/googleAnalytics/CaptureUtmParams'
 import v from '~/utils/variables'
 
 export const browserHistory = createBrowserHistory()
@@ -30,6 +31,7 @@ class MarketingRoutes extends React.Component {
   render() {
     return (
       <ErrorBoundary>
+        <CaptureUtmParams />
         <MuiThemeProvider theme={this.theme}>
           <Switch>
             <Route exact path="/" component={MarketingHomepage} />

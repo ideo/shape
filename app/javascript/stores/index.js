@@ -4,6 +4,7 @@ import NetworkStore from './NetworkStore'
 import RoutingStore from './RoutingStore'
 import UiStore from './UiStore'
 import UndoStore from './UndoStore'
+import IdeoSSO from '~/utils/IdeoSSO'
 
 const isNetworkUrl = url => url.indexOf(IdeoSSO.baseApiUrl) > -1
 

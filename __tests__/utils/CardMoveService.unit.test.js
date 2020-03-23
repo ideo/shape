@@ -152,12 +152,30 @@ describe('CardMoveService', () => {
 
       it('should request the api to move the cards', async () => {
         await service.moveCards('beginning')
-        expect(apiStore.moveCards).toHaveBeenCalledWith({
-          to_id: uiStore.viewingCollection.id,
-          from_id: uiStore.movingFromCollectionId,
-          collection_card_ids: ['21', '23'],
-          placement: 'beginning',
-        })
+        expect(apiStore.moveCards).toHaveBeenCalledWith(
+          {
+            to_id: uiStore.viewingCollection.id,
+            from_id: uiStore.movingFromCollectionId,
+            collection_card_ids: ['21', '23'],
+            placement: 'beginning',
+          },
+          { topLeftCard: null }
+        )
+      })
+
+      it('should pass in board placement and topLeftCard', async () => {
+        const topLeftCard = { id: '123' }
+        const placement = { row: 1, col: 2 }
+        await service.moveCards(placement, {}, topLeftCard)
+        expect(apiStore.moveCards).toHaveBeenCalledWith(
+          {
+            to_id: uiStore.viewingCollection.id,
+            from_id: uiStore.movingFromCollectionId,
+            collection_card_ids: ['21', '23'],
+            placement,
+          },
+          { topLeftCard }
+        )
       })
 
       it('should close the move menu', async () => {

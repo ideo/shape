@@ -4,7 +4,7 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
   let(:user) { create(:user) }
   let(:from_collection) { create(:collection, num_cards: 3) }
   let(:to_collection) { create(:collection, num_cards: 1) }
-  let(:cards) { from_collection.collection_cards }
+  let(:cards) { CollectionCard.where(id: from_collection.collection_cards.pluck(:id)) }
   let(:placement) { 'beginning' }
   let(:action) { 'duplicate' }
 

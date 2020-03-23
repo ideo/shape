@@ -101,7 +101,6 @@ class SubscribeEmail extends React.Component {
                 type="text"
                 name="b_name"
                 tabIndex="-1"
-                value=""
                 placeholder="Freddie"
                 id="b_name"
               />
@@ -113,7 +112,6 @@ class SubscribeEmail extends React.Component {
                 type="email"
                 name="b_email"
                 tabIndex="-1"
-                value=""
                 placeholder="youremail@gmail.com"
                 id="b_email"
               />

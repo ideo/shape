@@ -15,7 +15,11 @@ const fakeRoutingStore = {
   scrollStates: [],
   updateScrollState: jest.fn(),
   toPathScrollY: jest.fn(),
-  history: {}
+  history: {},
+  utmQueryParams: {
+    utm_campign: 'marketing-campaign-1',
+  },
+  appendQueryString: jest.fn()
 }
 
 export default fakeRoutingStore

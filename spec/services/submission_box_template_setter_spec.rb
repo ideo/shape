@@ -24,12 +24,14 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
       expect do
         template_setter.call
       end.to change(submission_box.collection_cards, :count).by(1)
+      expect(template_setter.dup.collection.master_template?).to be true
     end
 
     it 'should set the submission box to use the new template' do
-      service = template_setter
       expect(template_setter.call).to be true
-      expect(submission_box.submission_template_id).to eq service.dup.collection.id
+      dup = template_setter.dup
+      expect(submission_box.submission_template_id).to eq dup.collection.id
+      expect(submission_box.submission_box_type).to eq 'template'
       expect(submission_box.submission_box_type).to eq 'template'
     end
 
@@ -43,9 +45,9 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
       expect(dup_template.name).to eq "#{submission_box.name} #{template_card.collection.name}"
     end
 
-    it 'should set the duplicate template card size to 1x1' do
+    it 'should set the duplicate template card size to match the original' do
       template_setter.call
-      expect(dup_template_card.width).to eq 1
+      expect(dup_template_card.width).to eq 2
       expect(dup_template_card.height).to eq 1
     end
 

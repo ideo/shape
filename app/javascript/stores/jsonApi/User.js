@@ -1,9 +1,8 @@
 import { uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
+import IdeoSSO from '~/utils/IdeoSSO'
 
 import BaseRecord from './BaseRecord'
-
-/* global IdeoSSO */
 
 class User extends BaseRecord {
   static type = 'users'

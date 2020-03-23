@@ -75,6 +75,19 @@ export const fakeAreaChartDataset = {
   })),
 }
 
+export const fakeCDChartDataset = (data, overrides) => ({
+  ...fakeAreaChartDataset,
+  dataWithDates: data.map(d => ({
+    date: new Date(d.date),
+    value: d.value,
+  })),
+  chart_type: 'area',
+  measure: 'Passion',
+  name: 'IDEO Products',
+  style: {fill: "#7e5396"},
+  order: overrides.order || 0,
+})
+
 const fakeBarChartData = [
   { column: 1, value: 5, percentage: 50, type: 'question_context' },
   { column: 2, value: 0, percentage: 0, type: 'question_context' },
@@ -457,6 +470,7 @@ export const fakeCollection = {
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
   clearCollectionCards: jest.fn(),
+  toJsonApiWithCards: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',

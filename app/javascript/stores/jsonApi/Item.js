@@ -114,7 +114,12 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   get isDownloadable() {
-    return this.isGenericFile || this.isPdfFile || this.isReportDownloadable
+    return (
+      this.isImage ||
+      this.isGenericFile ||
+      this.isPdfFile ||
+      this.isReportDownloadable
+    )
   }
 
   get isImage() {

@@ -1,6 +1,8 @@
 class Search
-  def initialize(options = {})
-    default_options = {
+  attr_reader :options
+
+  def self.default_options
+    {
       fields: [
         'name^50',
         'handle^50',
@@ -13,10 +15,22 @@ class Search
       page: 1,
       where: {},
     }
-    @options = default_options.merge(options)
+  end
+
+  def initialize(options = {})
+    @options = self.class.default_options.merge(options)
   end
 
   def search(query)
+    modified_query = apply_filters(query)
+
+    Searchkick.search(
+      modified_query.presence || '*',
+      @options,
+    )
+  end
+
+  def apply_filters(query)
     filters.each do |filter|
       f = filter.new(query)
       next unless f.match?
@@ -24,11 +38,7 @@ class Search
       @options = @options.deep_merge(f.options)
       query = f.modify_query
     end
-
-    Searchkick.search(
-      query.blank? ? '*' : query,
-      @options,
-    )
+    query
   end
 
   private

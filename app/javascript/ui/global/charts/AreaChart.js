@@ -87,6 +87,7 @@ const AreaChart = ({
         measure,
       })
   }
+
   return (
     <VictoryArea
       style={chartStyle(dataset.style || {}, colorOrder)}
@@ -98,6 +99,7 @@ const AreaChart = ({
           cardArea={cardArea}
           fontSize={cardArea === 1 ? 18 : 9}
           tooltipLabelComponent={tooltipLabelComponent}
+          domain={domain}
           neverShowLabels
         />
       }

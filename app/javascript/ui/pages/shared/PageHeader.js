@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -23,14 +24,11 @@ import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import TruncatableText from '~/ui/global/TruncatableText'
 import v from '~/utils/variables'
-import routeToLogin from '~/utils/routeToLogin'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
-import { some } from 'lodash'
-
-/* global IdeoSSO */
+import IdeoSSO from '~/utils/IdeoSSO'
 
 const IconHolder = styled.span`
   color: ${v.colors.commonDark};
@@ -149,7 +147,7 @@ class PageHeader extends React.Component {
     const { record } = this.props
     const leftConditions = [record.isProfileTemplate, record.isMasterTemplate]
 
-    if (some(leftConditions, bool => bool)) {
+    if (_.some(leftConditions, bool => bool)) {
       return (
         <IconHolder align="right">
           <CollectionTypeIcon record={record} />
@@ -169,7 +167,7 @@ class PageHeader extends React.Component {
       record.isBoard,
     ]
 
-    if (some(rightConditions, bool => bool)) {
+    if (_.some(rightConditions, bool => bool)) {
       return (
         <IconHolder align="right">
           <CollectionTypeIcon record={record} />
@@ -316,13 +314,15 @@ class PageHeader extends React.Component {
   }
 
   get renderJoinCollectionButton() {
-    const { record } = this.props
+    const { record, routingStore } = this.props
     if (!record.isPublicJoinable) return null
     return (
       <Button
         style={{ marginLeft: '1rem' }}
         colorScheme={v.colors.primaryDarkest}
-        onClick={() => routeToLogin({ redirect: record.frontend_url })}
+        onClick={() =>
+          routingStore.routeToLogin({ redirect: record.frontend_url })
+        }
         size="sm"
         data-cy="HeaderFormButton"
       >
