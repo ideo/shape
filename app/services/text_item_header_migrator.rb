@@ -7,7 +7,7 @@ class TextItemHeaderMigrator < SimpleService
     return unless @item.is_a?(Item::TextItem) && @item.ops.present?
 
     @item.ops = modify_quill_ops
-    @item.update_columns(data_content: @item.data_content, updated_at: Time.current)
+    @item.update_columns(data_content: @item.data_content)
   end
 
   private
