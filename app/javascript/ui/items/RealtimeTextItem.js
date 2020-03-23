@@ -424,15 +424,19 @@ class RealtimeTextItem extends React.Component {
 
   handleTextChange = (_content, delta, source, _editor) => {
     if (source !== 'user') return
-    // This adjustment is made so that the currently-selected
-    // header size is preserved on new lines
-
-    const newDelta = new Delta(delta)
     const cursors = this.quillEditor.getModule('cursors')
     cursors.clearCursors()
 
-    this.combineAwaitingDeltas(newDelta)
+    this.combineAwaitingDeltas(delta)
     this.sendCombinedDelta()
+    if (
+      _.some(
+        delta.ops,
+        op => op.attributes && _.includes(_.keys(op.attributes), 'header')
+      )
+    ) {
+      this.checkForTitleText()
+    }
     this.instanceDataContentUpdate()
   }
 
@@ -564,19 +568,36 @@ class RealtimeTextItem extends React.Component {
     e.preventDefault()
     const { quillEditor } = this
     const range = quillEditor.getSelection()
-    const [line] = quillEditor.getLine(range.index)
+    if (!range) return
+    const lines = quillEditor.getLines(range.index)
     const currentFormat = quillEditor.getFormat()
-    quillEditor.removeFormat(line.offset(), line.length(), 'user')
+    _.each(lines, line => {
+      quillEditor.removeFormat(line.offset(), line.length(), 'user')
+    })
     if (currentFormat.header !== header) {
       quillEditor.format('header', header, 'user')
     }
+    this.checkActiveSizeFormat()
+  }
+
+  checkForTitleText = () => {
+    const { uiStore } = this.props
+    let hasTitle = false
+    const contents = this.quillEditor.getContents()
+    _.each(contents.ops, op => {
+      if (op.attributes && op.attributes.header === 5) {
+        hasTitle = true
+      }
+    })
+    uiStore.update('textEditingItemHasTitleText', hasTitle)
   }
 
   @action
   checkActiveSizeFormat = () => {
     if (this.unmounted) return
-    const currentFormat = this.quillEditor.getFormat()
-    this.activeSizeFormat = currentFormat.size
+    const format = this.quillEditor.getFormat()
+    this.activeSizeFormat =
+      format.header && format.header === 5 ? 'title' : format.size
   }
 
   endOfHighlight = (range, context) => {

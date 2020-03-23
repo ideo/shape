@@ -110,6 +110,7 @@ class TextItemCover extends React.Component {
     await apiStore.fetch('items', item.id, true)
     // entering edit mode should deselect all cards
     uiStore.deselectCards()
+    uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
     uiStore.update('textEditingItem', this.state.item)
     this.setState({ loading: false })
   }
@@ -217,9 +218,12 @@ class TextItemCover extends React.Component {
   }
 
   get hasTitleText() {
-    const { props } = this
-    const { item } = props
+    const { isEditing } = this
+    const { item } = this.props
     const { quill_data } = item
+    if (isEditing) {
+      return uiStore.textEditingItemHasTitleText
+    }
     let hasTitle = false
     _.each(quill_data.ops, op => {
       if (op.attributes && op.attributes.header === 5) {

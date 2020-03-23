@@ -178,6 +178,8 @@ export default class UiStore {
   @observable
   textEditingItem = null
   @observable
+  textEditingItemHasTitleText = false
+  @observable
   overdueBannerVisible = true
   @observable
   editingCardCover = null
