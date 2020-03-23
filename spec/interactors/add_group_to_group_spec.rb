@@ -54,12 +54,15 @@ RSpec.describe AddGroupToGroup, type: :service do
 
       it 'when circular, does not repeat the path' do
         AddGroupToGroup.call(parent_group: grandparent_group, subgroup: child_group_a)
+        cid = child_group_a.id
+        gpid = grandparent_group.id
+        pid = parent_group.id
         expect(child_group_a.group_hierarchies.pluck(:path)).to match_array(
           [
-            [1, 4],
-            [1, 4, 1],
-            [1, 4, 3]
-          ]
+            [cid, gpid],
+            [cid, gpid, cid],
+            [cid, gpid, pid],
+          ],
         )
       end
     end
