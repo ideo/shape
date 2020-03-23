@@ -266,6 +266,20 @@ class CardCoverEditor extends React.Component {
     this.subtitleHidden = !this.subtitleHidden
   }
 
+  onToggleCoverCarousel = async e => {
+    const { card } = this.props
+    const { record } = card
+    runInAction(() => {
+      if (record.cover_type === 'cover_type_carousel') {
+        record.cover_type = 'cover_type_default'
+      } else {
+        record.cover_type = 'cover_type_carousel'
+      }
+    })
+    console.log('toggle second', record.cover_type)
+    await record.save()
+  }
+
   handleInputKeyPress = ev => {
     if (ev.key === 'Enter') {
       this.handleClose()
@@ -439,6 +453,22 @@ class CardCoverEditor extends React.Component {
                   options={filterOptions}
                   onSelect={this.onFilterOptionSelect}
                 />
+              )}
+              {card.record.internalType === 'collections' && (
+                <LabelContainer
+                  labelPlacement={'end'}
+                  control={
+                    <Checkbox
+                      onChange={this.onToggleCoverCarousel}
+                      checked={card.isCarouselCover}
+                    />
+                  }
+                  label={
+                    <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
+                      Carousel cover
+                    </div>
+                  }
+                ></LabelContainer>
               )}
               <MediumBreak />
               {(record.isCollection || record.isLink) && (

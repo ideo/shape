@@ -117,6 +117,10 @@ class CollectionCard extends BaseRecord {
     )
   }
 
+  get isCarouselCover() {
+    return this.record.isCarousel
+  }
+
   // This sets max W/H based on number of visible columns. Used by Grid + CollectionCover.
   // e.g. "maxWidth" might temporarily be 2 cols even though this card.width == 4
   @action
