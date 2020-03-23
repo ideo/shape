@@ -12,9 +12,16 @@ export const StyledSnackbar = styled(Snackbar)`
     color: white;
     background-color: transparent;
     ${props =>
-      props.fullWidth &&
+      props.placement &&
+      props.placement === 'bottom' &&
       `
       width: 100%
+    `}
+    ${props =>
+      props.placement &&
+      props.placement === 'top' &&
+      `
+      top: ${v.headerHeight + 12}px;
     `}
   }
 `
