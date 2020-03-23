@@ -45,7 +45,7 @@ RSpec.describe RemoveGrandparentToChildGroupRelations, type: :service do
 
         GroupHierarchy.create(
           parent_group: grand_parent_group,
-          path: [grand_parent_group.id, parent_group.id, subgroup],
+          path: [grand_parent_group.id, parent_group.id, subgroup.id],
           subgroup: subgroup,
         )
 
@@ -66,7 +66,7 @@ RSpec.describe RemoveGrandparentToChildGroupRelations, type: :service do
       end
 
       it 'destroys relationships between ancestors of the subgroup and children of subgroup' do
-        expect { interactor }.to change { GroupHierarchy.count }.from(8).to(3)
+        expect { interactor }.to change { GroupHierarchy.count }.from(8).to(2)
 
         expect(subgroup.subgroups).to include(child_group_a)
         expect(subgroup.subgroups).to include(child_group_b)
