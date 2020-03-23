@@ -55,7 +55,7 @@ class CoverRenderer extends React.Component {
               cardId={card.id}
               handleClick={handleClick}
               searchResult={searchResult}
-              initialFontTag={isLargeBoard ? 'H1' : 'P'}
+              initialSize={isLargeBoard ? 'huge' : 'normal'}
               hideReadMore={textItemHideReadMore}
               uneditable={textItemUneditable}
             />
