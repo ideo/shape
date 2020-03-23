@@ -21,6 +21,31 @@ class GroupHierarchy < ApplicationRecord
   belongs_to :subgroup, class_name: 'Group'
 
   before_create :set_default_path
+  validate :unique_parent_subgroup_path
+
+  def self.find_or_create_path(parent_group_id:, path:, subgroup_id:)
+    found = existing_group_hierarchy(
+      parent_group_id: parent_group_id,
+      path: path,
+      subgroup_id: subgroup_id,
+    )
+    return found if found.present?
+
+    GroupHierarchy.create(
+      parent_group_id: parent_group_id,
+      path: path,
+      subgroup_id: subgroup_id,
+    )
+  end
+
+  def self.existing_group_hierarchy(parent_group_id:, path:, subgroup_id:)
+    where(
+      parent_group_id: parent_group_id,
+      subgroup_id: subgroup_id,
+    ).where(
+      'path @> ?', path.to_s
+    ).first
+  end
 
   def extend_path_to(extension)
     if extension.is_a? GroupHierarchy
@@ -31,8 +56,8 @@ class GroupHierarchy < ApplicationRecord
       return false
     end
 
-    GroupHierarchy.find_or_create_by(
-      parent_group: parent_group,
+    self.class.find_or_create_path(
+      parent_group_id: parent_group_id,
       path: path + extended_path,
       subgroup_id: extended_path.last,
     )
@@ -42,5 +67,20 @@ class GroupHierarchy < ApplicationRecord
     return path if path.present?
 
     self.path = [parent_group, subgroup].map(&:id)
+  end
+
+  private
+
+  def unique_parent_subgroup_path
+    return unless path.present?
+
+    found = self.class.existing_group_hierarchy(
+      parent_group_id: parent_group_id,
+      path: path,
+      subgroup_id: subgroup_id,
+    )
+    return unless found.present?
+
+    errors.add(:path, 'must be unique')
   end
 end

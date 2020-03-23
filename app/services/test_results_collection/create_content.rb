@@ -5,12 +5,14 @@ module TestResultsCollection
     include CollectionCardBuilderHelpers
 
     schema :test_results_collection,
-           :created_by
+           :created_by,
+           :question_card
 
     require_in_context :test_results_collection
 
     delegate :test_results_collection,
              :created_by,
+             :question_card,
              to: :context
 
     delegate :ideas_collection,
@@ -27,6 +29,20 @@ module TestResultsCollection
     end
 
     def call
+      if question_card.present?
+        create_content_for_item_card(question_card)
+        # also call for each idea
+        if master_results_collection?
+          idea_items.each do |idea|
+            TestResultsCollection::CreateContent.call(
+              test_results_collection: idea.test_results_collection,
+              question_card: question_card,
+            )
+          end
+        end
+        return
+      end
+
       if test_show_media?
         create_idea_media_link
       else

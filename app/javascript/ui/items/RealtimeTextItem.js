@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, toJS } from 'mobx'
+import { action, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
@@ -115,6 +115,8 @@ class RealtimeTextItem extends React.Component {
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
+  @observable
+  activeSizeFormat = null
 
   constructor(props) {
     super(props)
@@ -139,8 +141,10 @@ class RealtimeTextItem extends React.Component {
 
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
+    this.setInitialSize()
     setTimeout(() => {
       this.quillEditor.focus()
+      this.setInitialSize()
       this.clearQuillClipboardHistory()
     }, 100)
   }
@@ -180,6 +184,21 @@ class RealtimeTextItem extends React.Component {
     // fix for undo clearing out all text
     // https://github.com/zenoamaro/react-quill/issues/511
     this.quillEditor.history.clear()
+  }
+
+  setInitialSize() {
+    // only set this if we are in a brand new text item
+    if (this.version) return
+
+    const { quillEditor } = this
+    const { initialSize } = this.props
+    if (quillEditor && initialSize !== 'normal') {
+      const range = quillEditor.getSelection()
+      if (range && range.index) {
+        quillEditor.formatText(0, range.index, 'size', initialSize, 'user')
+      }
+      quillEditor.format('size', initialSize)
+    }
   }
 
   reapplyActiveHighlight() {
@@ -338,14 +357,6 @@ class RealtimeTextItem extends React.Component {
     const quillData = toJS(item.quill_data) || {}
     if (!quillData.ops) quillData.ops = []
     // Set initial font size - if text item is blank,
-    // and user has chosen a h* tag (e.g. h1)
-    // (p tag does not require any ops changes)
-    if (quillData.ops.length === 0 && this.headerSize) {
-      quillData.ops.push({
-        insert: '\n',
-        attributes: { header: this.headerSize },
-      })
-    }
     return quillData
   }
 
@@ -402,31 +413,6 @@ class RealtimeTextItem extends React.Component {
     uiStore.update('quillSnapshot', delta)
   }
 
-  get headerSize() {
-    const { initialFontTag } = this.props
-    if (initialFontTag.includes('H')) {
-      return _.replace(initialFontTag, 'H', '')
-    }
-    return null
-  }
-
-  newlineIndicesForDelta = delta => {
-    const newlineOpIndices = []
-    _.each(delta.ops, (op, index) => {
-      if (op.insert && op.insert.includes('\n')) newlineOpIndices.push(index)
-    })
-    return newlineOpIndices
-  }
-
-  headerFromLastNewline = delta => {
-    // Check if user added newline
-    // And if so, set their default text size if provided
-    const newlineOpIndices = this.newlineIndicesForDelta(delta)
-    // Return if there wasn't a specified header size in previous newline operation
-    const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
-    return _.get(prevHeaderSizeOp, 'attributes.header')
-  }
-
   get cardId() {
     const { item } = this.props
     if (item.parent_collection_card) {
@@ -438,15 +424,14 @@ class RealtimeTextItem extends React.Component {
 
   handleTextChange = (_content, delta, source, _editor) => {
     if (source !== 'user') return
-    // This adjustment is made so that the currently-selected
-    // header size is preserved on new lines
-
-    const newDelta = new Delta(delta)
     const cursors = this.quillEditor.getModule('cursors')
     cursors.clearCursors()
 
-    this.combineAwaitingDeltas(newDelta)
+    this.combineAwaitingDeltas(delta)
     this.sendCombinedDelta()
+    // NOTE: trying to check titleText only if the delta turned header on/off
+    // seemed to miss some cases, so we just check every time
+    this.checkForTitleText()
     this.instanceDataContentUpdate()
   }
 
@@ -464,6 +449,7 @@ class RealtimeTextItem extends React.Component {
     // also store editor.getContents(range) for later reference
     if (source === 'user') {
       this.sendCursor()
+      if (range) this.checkActiveSizeFormat()
     }
   }
 
@@ -556,8 +542,57 @@ class RealtimeTextItem extends React.Component {
     const { apiStore, uiStore, item } = this.props
     const { range } = uiStore.selectedTextRangeForCard
     // prevent commenting without a selected range
-    if (!(range && range.length > 0)) return
+    if (!range || range.length === 0) return
     apiStore.openCurrentThreadToCommentOn(item)
+  }
+
+  toggleSize = size => e => {
+    e.preventDefault()
+    const { quillEditor } = this
+    const currentFormat = quillEditor.getFormat()
+    let val = size
+    if (currentFormat.size === size) {
+      val = null
+    }
+    quillEditor.format('header', false, 'user')
+    quillEditor.format('size', val, 'user')
+    this.checkActiveSizeFormat()
+  }
+
+  toggleHeader = header => e => {
+    e.preventDefault()
+    const { quillEditor } = this
+    const range = quillEditor.getSelection()
+    if (!range) return
+    const lines = quillEditor.getLines(range.index)
+    const currentFormat = quillEditor.getFormat()
+    _.each(lines, line => {
+      quillEditor.removeFormat(line.offset(), line.length(), 'user')
+    })
+    if (currentFormat.header !== header) {
+      quillEditor.format('header', header, 'user')
+    }
+    this.checkActiveSizeFormat()
+  }
+
+  checkForTitleText = () => {
+    const { uiStore } = this.props
+    let hasTitle = false
+    const contents = this.quillEditor.getContents()
+    _.each(contents.ops, op => {
+      if (op.attributes && op.attributes.header === 5) {
+        hasTitle = true
+      }
+    })
+    uiStore.update('textEditingItemHasTitleText', hasTitle)
+  }
+
+  @action
+  checkActiveSizeFormat = () => {
+    if (this.unmounted) return
+    const format = this.quillEditor.getFormat()
+    this.activeSizeFormat =
+      format.header && format.header === 5 ? 'title' : format.size
   }
 
   endOfHighlight = (range, context) => {
@@ -655,7 +690,13 @@ class RealtimeTextItem extends React.Component {
       >
         <DockedToolbar fullPageView={fullPageView}>
           {canEdit && (
-            <TextItemToolbar onExpand={onExpand} onComment={this.onComment} />
+            <TextItemToolbar
+              onExpand={onExpand}
+              toggleSize={this.toggleSize}
+              toggleHeader={this.toggleHeader}
+              onComment={this.onComment}
+              activeSizeFormat={this.activeSizeFormat}
+            />
           )}
           <CloseButton
             data-cy="TextItemClose"
@@ -685,14 +726,14 @@ RealtimeTextItem.propTypes = {
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
   fullPageView: PropTypes.bool,
-  initialFontTag: PropTypes.oneOf(['H1', 'H3', 'P']),
+  initialSize: PropTypes.oneOf(['normal', 'huge', 'large']),
   containerRef: PropTypes.func,
 }
 RealtimeTextItem.defaultProps = {
   currentUserId: null,
   onExpand: null,
   fullPageView: false,
-  initialFontTag: 'P',
+  initialSize: 'normal',
   containerRef: null,
 }
 RealtimeTextItem.wrappedComponent.propTypes = {

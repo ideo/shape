@@ -56,5 +56,5 @@ QuillHighlighter.attribute = 'data-comment-id'
 
 export class QuillHighlightResolver extends QuillInlineData {}
 QuillHighlightResolver.blotName = 'commentHighlightResolved'
-QuillHighlightResolver.tagName = 'span'
+QuillHighlightResolver.tagName = 'sub'
 QuillHighlightResolver.attribute = 'data-resolved-comment-id'

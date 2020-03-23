@@ -60,12 +60,12 @@ class QuestionContentEditor extends React.Component {
     return item[itemAttribute] || ''
   }
 
-  handleChange = ev => {
+  handleChange = async ev => {
     const { item, itemAttribute, maxLength } = this.props
     const { value } = ev.target
     item[itemAttribute] = value
     this.setState({ countLeft: maxLength - value.length })
-    this.save()
+    await this.save()
     this.instanceDataContentUpdate()
   }
 

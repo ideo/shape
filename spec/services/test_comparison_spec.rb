@@ -43,12 +43,12 @@ RSpec.describe TestComparison do
     end
 
     it 'adds datasets from comparison to test collection data items' do
-      expect(test_data_item.datasets.size).to eq(3)
+      expect(test_data_item.datasets.size).to eq(4)
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
       expect { add }.to change(DataItemsDataset, :count).by(num_scale_questions)
       test_data_item.datasets.reload
       expect(test_data_item.datasets).to include(comparison_data_item.datasets.first)
-      expect(test_data_item.datasets.size).to eq(4)
+      expect(test_data_item.datasets.size).to eq(5)
     end
 
     context 'if collection has different question type' do
@@ -72,12 +72,12 @@ RSpec.describe TestComparison do
       end
 
       it 'adds empty dataset' do
-        expect(not_matching_question_data_item.datasets.size).to eq(3)
+        expect(not_matching_question_data_item.datasets.size).to eq(4)
         expect(not_matching_question_data_item.datasets.pluck(:type)).not_to include('Dataset::Empty')
         expect { add }.to change(Dataset::Empty, :count).by(1)
         empty_dataset = Dataset::Empty.last
         not_matching_question_data_item.datasets.reload
-        expect(not_matching_question_data_item.datasets.size).to eq(4)
+        expect(not_matching_question_data_item.datasets.size).to eq(5)
         expect(not_matching_question_data_item.datasets).to include(empty_dataset)
       end
     end
@@ -130,12 +130,12 @@ RSpec.describe TestComparison do
     end
 
     it 'removes datasets from test collection data items' do
-      expect(test_data_item.datasets.size).to eq(4)
+      expect(test_data_item.datasets.size).to eq(5)
       expect(test_data_item.datasets).to include(comparison_data_item.datasets.first)
       expect { remove }.to change(DataItemsDataset, :count).by(-num_scale_questions)
       test_data_item.datasets.reload
       expect(test_data_item.datasets).not_to include(comparison_data_item.datasets.first)
-      expect(test_data_item.datasets.size).to eq(3)
+      expect(test_data_item.datasets.size).to eq(4)
     end
 
     context 'with an empty dataset' do
