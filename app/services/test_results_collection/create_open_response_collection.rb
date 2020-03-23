@@ -24,6 +24,8 @@ module TestResultsCollection
     def call
       if existing_card.present?
         existing_card.update(order: order) unless existing_card.order == order
+        # update name if you had changed the text of the open response question
+        existing_card.collection.update(name: open_response_collection_name)
       else
         create_card(
           params: open_response_collection_card_attrs(question_item),
@@ -49,12 +51,16 @@ module TestResultsCollection
         width: 2,
         identifier: identifier,
         collection_attributes: {
-          name: "#{question_item.content} Responses",
+          name: open_response_collection_name,
           type: 'Collection::TestOpenResponses',
           cover_type: :cover_type_carousel,
           question_item_id: question_item.id,
         },
       }
+    end
+
+    def open_response_collection_name
+      "#{question_item.content} Responses"
     end
 
     def test_collection
