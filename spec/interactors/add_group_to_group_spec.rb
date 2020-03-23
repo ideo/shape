@@ -29,5 +29,39 @@ RSpec.describe AddGroupToGroup, type: :service do
     it 'returned context is successful' do
       expect(interactor.success?).to eq true
     end
+
+    context 'with a circular reference' do
+      let!(:child_group_a) { create(:group) }
+      let!(:child_group_b) { create(:group) }
+      let!(:parent_group) { create(:group, add_subgroups: [child_group_a, child_group_b]) }
+      let!(:grandparent_group) { create(:group, add_subgroups: [parent_group]) }
+      before do
+        # Make circular reference back to grandparent
+        AddGroupToGroup.call(parent_group: child_group_a, subgroup: grandparent_group)
+      end
+
+      it 'when called again, does not create multiple GroupHierarchies with the same path' do
+        AddGroupToGroup.call(parent_group: child_group_a, subgroup: grandparent_group)
+        paths = child_group_a.group_hierarchies.pluck(:path)
+        expect(paths).to match_array(paths.uniq)
+      end
+
+      it 'does not create additional group hierarchies if called again' do
+        expect {
+          AddGroupToGroup.call(parent_group: child_group_a, subgroup: grandparent_group)
+        }.not_to change(GroupHierarchy, :count)
+      end
+
+      it 'when circular, does not repeat the path' do
+        AddGroupToGroup.call(parent_group: grandparent_group, subgroup: child_group_a)
+        expect(child_group_a.group_hierarchies.pluck(:path)).to match_array(
+          [
+            [1, 4],
+            [1, 4, 1],
+            [1, 4, 3]
+          ]
+        )
+      end
+    end
   end
 end

@@ -22,6 +22,23 @@ class GroupHierarchy < ApplicationRecord
 
   before_create :set_default_path
 
+  def self.find_or_create_path(parent_group_id:, path:, subgroup_id:)
+    existing_group_hierarchy = GroupHierarchy.where(
+      parent_group_id: parent_group_id,
+      subgroup_id: subgroup_id,
+    ).where(
+      'path @> ?', path.to_s
+    ).first
+
+    return existing_group_hierarchy if existing_group_hierarchy.present?
+
+    GroupHierarchy.create(
+      parent_group_id: parent_group_id,
+      path: path,
+      subgroup_id: subgroup_id,
+    )
+  end
+
   def extend_path_to(extension)
     if extension.is_a? GroupHierarchy
       extended_path = extension.path.drop(1)
@@ -31,8 +48,8 @@ class GroupHierarchy < ApplicationRecord
       return false
     end
 
-    GroupHierarchy.find_or_create_by(
-      parent_group: parent_group,
+    self.class.find_or_create_path(
+      parent_group_id: parent_group_id,
       path: path + extended_path,
       subgroup_id: extended_path.last,
     )
