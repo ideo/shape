@@ -22,6 +22,7 @@ class GroupHierarchy < ApplicationRecord
 
   before_create :set_default_path
   validate :unique_parent_subgroup_path
+  validate :non_repeated_path
 
   def self.find_or_create_path(parent_group_id:, path:, subgroup_id:)
     found = existing_group_hierarchy(
@@ -56,9 +57,17 @@ class GroupHierarchy < ApplicationRecord
       return false
     end
 
+    extended_path = path + extended_path
+    if extended_path.uniq != extended_path
+      # no need to add repeated references
+      #  - [1, 3] does not need to extend to [1, 3, 1]
+      #  - [4, 3, 1] does not need to extend to [4, 3, 1, 3]
+      return
+    end
+
     self.class.find_or_create_path(
       parent_group_id: parent_group_id,
-      path: path + extended_path,
+      path: extended_path,
       subgroup_id: extended_path.last,
     )
   end
@@ -84,5 +93,12 @@ class GroupHierarchy < ApplicationRecord
     return unless found.present?
 
     errors.add(:path, 'must be unique')
+  end
+
+  def non_repeated_path
+    return unless path.present?
+    return if path.uniq == path
+
+    errors.add(:path, 'must not include repeated elements')
   end
 end

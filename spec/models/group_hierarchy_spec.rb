@@ -48,6 +48,22 @@ RSpec.describe GroupHierarchy, type: :model do
         expect(group_hierarchy.save).to eq true
       end
     end
+
+    describe '#non_repeated_path' do
+      let(:group_hierarchy) do
+        build(
+          :group_hierarchy,
+          parent_group: parent_group,
+          path: [parent_group.id, subgroup.id, 123, subgroup.id],
+          subgroup: subgroup,
+        )
+      end
+
+      it 'should return errors if path has repeated elements' do
+        expect(group_hierarchy.save).to eq false
+        expect(group_hierarchy.errors[:path]).to eq ['must not include repeated elements']
+      end
+    end
   end
 
   describe 'methods' do

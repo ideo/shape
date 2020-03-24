@@ -14,7 +14,7 @@ class GrantParentAccessToSubgroup
     context.new_hierarchy = GroupHierarchy.find_or_create_path(
       parent_group_id: context.parent_group.id,
       path: [context.parent_group, context.subgroup].map(&:id),
-      subgroup_id: context.subgroup.id
+      subgroup_id: context.subgroup.id,
     )
 
     return context if context.new_hierarchy.persisted?
