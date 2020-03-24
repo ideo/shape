@@ -1,30 +1,19 @@
 module Slack
   class ProcessEventReceived
-    include Interactor
-    include Slack::Common
+    include Interactor::Organizer
 
     require_in_context :event
 
-    def call
-      respond_to_link_shared if link_shared?
+    before do
+      context.event = Hashie::Mash.new(context.event) if context.event.present?
     end
 
-    def respond_to_link_shared
-      Slack::Unfurl.call(
-        channel: event.channel,
-        message_ts: event.message_ts,
-        links: event.links,
-      )
-    end
+    organize ProcessMessageForLinks, AppMentioned, Unfurl
 
     private
 
-    def link_shared?
-      event.type == 'link_shared'
-    end
-
-    def event
-      @event ||= Hashie::Mash.new(context.event)
+    def client
+      @client ||= Slack::Web::Client.new
     end
   end
 end

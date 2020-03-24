@@ -1,12 +1,14 @@
 module Slack
   class Unfurl
     include Interactor
-    include Slack::Common
 
-    delegate_to_context :channel, :message_ts, :links
-    require_in_context :channel, :message_ts, :links
+    delegate_to_context :event
+    require_in_context :event
+    delegate :channel, :message_ts, :links, to: :event
 
     def call
+      return unless run?
+
       client.chat_unfurl(
         channel: channel,
         ts: message_ts,
@@ -65,6 +67,10 @@ module Slack
         title_link: url,
         image_url: image_url,
       }
+    end
+
+    def run?
+      event.type == 'link_shared'
     end
   end
 end

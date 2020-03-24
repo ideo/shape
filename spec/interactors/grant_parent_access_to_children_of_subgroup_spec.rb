@@ -43,5 +43,23 @@ RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
         expect(grandparent_group.subgroups).to include(subgroup)
       end
     end
+
+    context 'if child group adds grandparent as it`s subgroup' do
+      let(:adding_grandparent_as_child) do
+        GrantParentAccessToChildrenOfSubgroup.call(
+          parent_group: child_group_a,
+          subgroup: subgroup,
+          new_hierarchy: create(
+            :group_hierarchy,
+            parent_group: child_group_a,
+            subgroup: subgroup,
+          )
+        )
+      end
+
+      it 'does not run into an infinite loop' do
+        debugger
+      end
+    end
   end
 end
