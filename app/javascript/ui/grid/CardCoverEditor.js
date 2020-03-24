@@ -276,8 +276,10 @@ class CardCoverEditor extends React.Component {
         record.cover_type = 'cover_type_carousel'
       }
     })
-    console.log('toggle second', record.cover_type)
     await record.save()
+    runInAction(() => {
+      record.collection_cover_items = []
+    })
   }
 
   handleInputKeyPress = ev => {

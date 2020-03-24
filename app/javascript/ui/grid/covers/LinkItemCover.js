@@ -74,13 +74,13 @@ class LinkItemCover extends React.Component {
   }
 
   render() {
-    const { item, cardHeight, uiStore } = this.props
+    const { item, uiStore } = this.props
     const { url, thumbnail_url } = item
     const { truncatedName, truncatedContent } = coverTextClamp({
       name: item.name,
       subtitle: item.subtitle,
       windowWidth: uiStore.windowWidth,
-      cardHeight,
+      cardHeight: 2,
     })
     return (
       <StyledLinkCover>
@@ -90,7 +90,11 @@ class LinkItemCover extends React.Component {
               <Box style={{ width: '100%' }}>
                 <CardHeading className="name">{truncatedName}</CardHeading>
                 <p className="content">{truncatedContent}</p>
-                <GridCardIconWithName text={url} icon={this.icon} />
+                <GridCardIconWithName
+                  text={url}
+                  icon={this.icon}
+                  extraRightPadding={150}
+                />
               </Box>
             </Flex>
           )}
