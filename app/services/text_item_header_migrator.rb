@@ -57,5 +57,7 @@ class TextItemHeaderMigrator < SimpleService
     end
 
     ops
+  rescue
+    puts "error migrating item #{@item.id}"
   end
 end
