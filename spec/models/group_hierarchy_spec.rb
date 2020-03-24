@@ -44,21 +44,34 @@ RSpec.describe GroupHierarchy, type: :model do
         # now should get an error
         expect(group_hierarchy_dupe.save).to eq false
         expect(group_hierarchy_dupe.errors[:path]).to eq ['must be unique']
+        # re-saving the original should still work
+        expect(group_hierarchy.save).to eq true
       end
     end
   end
 
   describe 'methods' do
     describe '.find_or_create_path' do
-      it 'should return the existing path if found' do
-        params = [
+      let(:params) do
+        {
           parent_group_id: parent_group.id,
-          path: [parent_group.id, subgroup.id],
+          path: [123, parent_group.id, subgroup.id],
           subgroup_id: subgroup.id,
-        ]
-        gh = GroupHierarchy.find_or_create_path(*params)
+        }
+      end
+      let!(:existing_gh) { GroupHierarchy.find_or_create_path(params) }
+
+      it 'should return the existing path if found' do
         # should find the same one again
-        expect(GroupHierarchy.find_or_create_path(*params)).to eq gh
+        expect(GroupHierarchy.find_or_create_path(params)).to eq existing_gh
+      end
+
+      it 'should not find a false positive for a partial match' do
+        new_params = params.clone
+        new_params[:path] = [parent_group.id, subgroup.id]
+        expect {
+          GroupHierarchy.find_or_create_path(new_params)
+        }.to change(GroupHierarchy, :count).by(1)
       end
     end
 

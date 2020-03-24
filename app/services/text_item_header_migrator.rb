@@ -26,6 +26,8 @@ class TextItemHeaderMigrator < SimpleService
 
       size = op.attributes.header == 1 ? 'huge' : 'large'
       previous_op = Mashie.new(@item.ops[i - 1])
+      next if previous_op&.insert.nil?
+
       if previous_op.insert.include?("\n")
         # we have to split up the previous insert, move it to this op
         previous_op_split = previous_op.insert.split("\n")

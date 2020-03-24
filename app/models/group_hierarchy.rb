@@ -43,7 +43,7 @@ class GroupHierarchy < ApplicationRecord
       parent_group_id: parent_group_id,
       subgroup_id: subgroup_id,
     ).where(
-      'path @> ?', path.to_s
+      'path = ?', path.to_s
     ).first
   end
 
@@ -74,11 +74,13 @@ class GroupHierarchy < ApplicationRecord
   def unique_parent_subgroup_path
     return unless path.present?
 
-    found = self.class.existing_group_hierarchy(
-      parent_group_id: parent_group_id,
-      path: path,
-      subgroup_id: subgroup_id,
-    )
+    found = self.class
+                .where.not(id: id)
+                .existing_group_hierarchy(
+                  parent_group_id: parent_group_id,
+                  path: path,
+                  subgroup_id: subgroup_id,
+                )
     return unless found.present?
 
     errors.add(:path, 'must be unique')
