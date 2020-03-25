@@ -172,7 +172,7 @@ class Group < ApplicationRecord
 
   def identifiers
     # override resourceable method so that identifiers includes all subgroups
-    (path + all_subgroup_subgroup_ids).flatten.uniq.map do |group_id|
+    (subgroup_ids + all_subgroup_subgroup_ids).uniq.map do |group_id|
       Role.object_identifier_from_class_id(
         object_class: 'Group',
         object_id: group_id,
