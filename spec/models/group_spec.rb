@@ -165,6 +165,20 @@ RSpec.describe Group, type: :model do
       [group_a, group_b, group_c, group_d, group_e, group_f]
     end
 
+    # Graph of the group structure:
+    #
+    # Group A
+    #  -> Group B
+    #    -> Group C
+    #    -> Group D
+    #      -> Group E
+    #    -> Group F (connects to Group E)
+    #
+    # Group B is a subgroup of A, Group C and D are subgroups of B, etc.
+    # Group F is a subgroup of B, and Group E is a subgroup of F,
+    #   meaning Group E has two paths to Group B
+    #
+
     before do
       group_b.add_subgroup(group_a)
       group_c.add_subgroup(group_b)
