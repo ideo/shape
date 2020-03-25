@@ -9,6 +9,7 @@
 #  autojoin_emails              :jsonb
 #  handle                       :string
 #  name                         :string
+#  subgroup_ids                 :jsonb
 #  type                         :string
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -26,6 +27,7 @@
 #  index_groups_on_handle           (handle)
 #  index_groups_on_network_id       (network_id)
 #  index_groups_on_organization_id  (organization_id)
+#  index_groups_on_subgroup_ids     (subgroup_ids) USING gin
 #  index_groups_on_type             (type)
 #
 
@@ -69,11 +71,13 @@ class Group < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   has_many :groups_threads
 
+  # Legacy
   has_many :group_hierarchies, foreign_key: 'parent_group_id'
-  has_many :subgroups, class_name: 'Group', through: :group_hierarchies
+  has_many :legacy_subgroups, class_name: 'Group', through: :group_hierarchies
 
   has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id'
-  has_many :parent_groups, class_name: 'Group', through: :subgroup_memberships
+  has_many :legacy_parent_groups, class_name: 'Group', through: :subgroup_memberships
+  # End Legacy
 
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'
   has_many :activity_subjects, as: :subject
@@ -112,6 +116,50 @@ class Group < ApplicationRecord
     active?
   end
 
+  def subgroups
+    Group.where(id: subgroup_ids)
+  end
+
+  def all_subgroup_subgroup_ids
+    subgroups.pluck(:subgroup_ids).flatten.uniq
+  end
+
+  def parent_groups
+    Group.where(
+      'subgroup_ids @> ?', [id].to_s
+    )
+  end
+
+  def add_subgroup(group)
+    return if group.id == id
+
+    add_to_path = [group.id] + group.subgroup_ids
+    update(subgroup_ids: subgroup_ids | add_to_path)
+
+    parent_groups.each do |sub_group|
+      sub_group.update(
+        subgroup_ids: (sub_group.subgroup_ids | [group.id]) - [sub_group.id],
+      )
+    end
+  end
+
+  def remove_subgroup(group)
+    return if group.id == id
+
+    # Remove this group and its subgroups from path
+    # But exclude any groups also in all_subgroup_subgroup_ids,
+    # as that means there is another way to get to the group
+    remove_from_path = ([group.id] + group.subgroup_ids) - all_subgroup_subgroup_ids
+    update(subgroup_ids: subgroup_ids - remove_from_path)
+
+    # Find all other groups with this in hierarchy
+    group.parent_groups.each do |group_with_subgroup|
+      group_with_subgroup.update(
+        subgroup_ids: group_with_subgroup.subgroup_ids - remove_from_path,
+      )
+    end
+  end
+
   # Default for .roles are those where a
   # user is admin/member of this group
   def roles
@@ -122,14 +170,14 @@ class Group < ApplicationRecord
     roles_from_users.pluck(:id)
   end
 
-  def self.identifiers
-    # override resourceable method so that identifiers includes all subgroups
-    includes(:subgroups).map { |g| [g] + g.subgroups }.flatten.uniq.map(&:resource_identifier)
-  end
-
   def identifiers
-    # uses the above method to get all subgroup identifiers for this group
-    Group.where(id: id).identifiers
+    # override resourceable method so that identifiers includes all subgroups
+    (path + all_subgroup_subgroup_ids).flatten.uniq.map do |group_id|
+      Role.object_identifier_from_class_id(
+        object_class: 'Group',
+        object_id: group_id,
+      )
+    end
   end
 
   # Roles where this group is an editor/viewer of a collection/item
