@@ -55,7 +55,7 @@ class ActivityAndNotificationBuilder < SimpleService
 
   def call_async
     ActivityAndNotificationWorker.perform_async(
-      @actor.id,
+      @actor&.id,
       @target.id,
       @target.class.name,
       @source&.id,
