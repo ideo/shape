@@ -96,6 +96,8 @@ class Group < ApplicationRecord
             format: { with: Organization::SLUG_FORMAT },
             if: :validate_handle?
 
+  validate :non_repeated_subgroup_ids_without_self
+
   # Searchkick Config
   searchkick callbacks: :async, word_start: %i[name handle]
   scope :search_import, -> { where(archived: false) }
@@ -355,5 +357,15 @@ class Group < ApplicationRecord
     return unless organization_id? && organization_id_before_last_save.nil?
 
     OrganizationMembershipWorker.perform_async(user_ids, organization_id)
+  end
+
+  def non_repeated_subgroup_ids_without_self
+    return if subgroup_ids.blank?
+
+    subgroup_ids.uniq!
+
+    return unless persisted? && subgroup_ids.include?(id)
+
+    errors.add(:subgroup_ids, 'must not include this group')
   end
 end
