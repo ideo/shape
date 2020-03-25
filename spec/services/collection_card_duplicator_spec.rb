@@ -176,6 +176,9 @@ RSpec.describe CollectionCardDuplicator, type: :service do
     end
 
     context 'with synchronous settings' do
+      let(:new_cards) { service.call }
+      let(:new_card_ids) { a_collection_containing_exactly(*new_cards.pluck(:id)) }
+
       before do
         allow(CollectionCardDuplicationWorker).to receive(:perform_sync).and_call_original
       end
@@ -184,10 +187,10 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         let(:synchronous) { :all_levels }
 
         it 'calls CollectionCardDuplicationWorker synchronously' do
-          new_cards = service.call
+          new_cards
           expect(CollectionCardDuplicationWorker).to have_received(:perform_sync).with(
             instance_of(String), # batch id
-            new_cards.pluck(:id), # existing card ids
+            new_card_ids, # ignore array order
             to_collection.id,
             user.id,
             false, # system collection
@@ -201,10 +204,10 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         let(:synchronous) { :first_level }
 
         it 'calls CollectionCardDuplicationWorker synchronously, but async sub-processes' do
-          new_cards = service.call
+          new_cards
           expect(CollectionCardDuplicationWorker).to have_received(:perform_sync).with(
             instance_of(String), # batch id
-            new_cards.pluck(:id), # existing card ids
+            new_card_ids, # ignore array order
             to_collection.id,
             user.id,
             false, # system collection
