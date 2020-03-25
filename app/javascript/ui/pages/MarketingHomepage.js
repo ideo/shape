@@ -120,6 +120,7 @@ class MarketingPage extends React.Component {
               <ScrollElement name="ContentAnchor" />
               {this.sortedBlocks.map(block => (
                 <ContentBlock
+                  key={block.order}
                   order={block.order}
                   title={block.title}
                   content={block.content}

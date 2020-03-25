@@ -12,7 +12,7 @@ const props = {
   height: 200,
   cardId: '1',
   handleClick: jest.fn(),
-  initialFontTag: 'P',
+  initialSize: 'normal',
 }
 const e = {
   stopPropagation: jest.fn(),
@@ -127,14 +127,6 @@ describe('TextItemCover', () => {
   describe('cancel', () => {
     beforeEach(() => {
       item.content = '<p>'
-      item.API_updateWithoutSync = jest.fn()
-    })
-
-    it('calls item.API_updateWithoutSync', async () => {
-      component.cancel({ item, ev: e })
-      expect(props.item.API_updateWithoutSync).toHaveBeenCalledWith({
-        cancel_sync: true,
-      })
     })
 
     describe('with no content', () => {
@@ -142,7 +134,6 @@ describe('TextItemCover', () => {
       beforeEach(() => {
         item.content = ''
         item.version = null
-        item.API_updateWithoutSync = jest.fn()
         apiStore.find = jest.fn().mockReturnValue(card)
         card.API_archiveSelf.mockClear()
       })

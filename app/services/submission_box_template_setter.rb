@@ -21,6 +21,10 @@ class SubmissionBoxTemplateSetter < SimpleService
       return false
     end
     duplicate_template_card if @template_card.present?
+    if @errors.present?
+      return false
+    end
+
     set_template
     build_submissions_collection_if_needed
     delete_unused_templates
@@ -31,6 +35,17 @@ class SubmissionBoxTemplateSetter < SimpleService
   private
 
   def duplicate_template_card
+    original_template = @template_card.collection
+    if original_template.nil?
+      @errors << 'Unable to use template'
+      return false
+    end
+    # only allow "normal" and Board collections to be the top level template
+    unless [nil, 'Collection::Board'].include? original_template.type
+      @errors << 'Unable to use template'
+      return false
+    end
+
     # This will directly duplicate this card and run workers for all children
     @dup = CollectionCardDuplicator.call(
       to_collection: @submission_box,
@@ -40,10 +55,17 @@ class SubmissionBoxTemplateSetter < SimpleService
       synchronous: :first_level,
       create_placeholders: false,
     ).first
-    @dup.collection.remove_all_viewer_roles!
-    @dup.collection.update(name: "#{@submission_box.name} #{@dup.collection.name}")
-    @dup.update(width: 1, height: 1)
-    @dup.collection.add_submission_box_tag
+    if @dup.nil?
+      @errors << 'Unable to use template'
+      return false
+    end
+    template = @dup.collection
+    template.remove_all_viewer_roles!
+    template.update(
+      master_template: true,
+      name: "#{@submission_box.name} #{template.name}",
+    )
+    template.add_submission_box_tag
   end
 
   def set_template
@@ -51,6 +73,8 @@ class SubmissionBoxTemplateSetter < SimpleService
       submission_template: @dup.present? ? @dup.collection : nil,
       submission_box_type: @submission_box_type,
     )
+    # make sure this gets updated for caching purposes
+    @submission_box.submissions_collection&.touch
   end
 
   def build_submissions_collection_if_needed

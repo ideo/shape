@@ -24,11 +24,10 @@ class OrganizationAssigner < SimpleService
 
         create_network_organization
         create_network_subscription
-      else
-        @user.current_user_collection(@organization.id).update(
-          loading_content: false,
-        )
       end
+      @user.current_user_collection(@organization.id).update(
+        loading_content: false,
+      )
       OrganizationShellWorker.perform_async
     end
     !result.nil?

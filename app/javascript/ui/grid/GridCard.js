@@ -574,7 +574,9 @@ class GridCard extends React.Component {
         </StyledGridCardInner>
         {record.isCreativeDifferenceChartCover && (
           <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
-            <TextButton fontSizeEm={0.75}>More…</TextButton>
+            <TextButton fontSizeEm={0.75} color={v.colors.black}>
+              More…
+            </TextButton>
           </BottomRightActionHolder>
         )}
         <CollectionCardsTagEditorModal

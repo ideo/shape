@@ -69,10 +69,10 @@ class Group < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   has_many :groups_threads
 
-  has_many :group_hierarchies, foreign_key: 'parent_group_id'
+  has_many :group_hierarchies, foreign_key: 'parent_group_id', dependent: :destroy
   has_many :subgroups, class_name: 'Group', through: :group_hierarchies
 
-  has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id'
+  has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id', dependent: :destroy
   has_many :parent_groups, class_name: 'Group', through: :subgroup_memberships
 
   has_many :activities_as_subject, through: :activity_subjects, class_name: 'Activity'

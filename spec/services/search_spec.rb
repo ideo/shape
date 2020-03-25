@@ -17,11 +17,6 @@ RSpec.describe Search do
     }
   end
 
-  before do
-    filters = []
-    allow_any_instance_of(Search).to receive(:filters).and_return(filters)
-  end
-
   it 'has default options' do
     search = Search.new
     expect(Searchkick).to receive(:search)
@@ -50,6 +45,24 @@ RSpec.describe Search do
     search = Search.new
     expect(Searchkick).to receive(:search).with('*', expected_defaults)
     search.search('')
+  end
+
+  describe '#apply_filters' do
+    let(:search) { Search.new }
+
+    it 'removes filters from query' do
+      expect(search.apply_filters('#case-study within:123456')).to eq('')
+    end
+
+    it 'applies and combines filters' do
+      search.apply_filters('#case-study within:123456')
+      expect(
+        search.options[:where],
+      ).to eq(
+        parent_ids: { all: [123_456] },
+        tags: { all: ['case study'] },
+      )
+    end
   end
 
   it 'applies filters' do

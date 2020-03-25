@@ -6,6 +6,13 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
   let(:test_results_collection) { create(:test_results_collection, test_collection: test_collection) }
   let(:created_by) { create(:user) }
   let(:idea) { nil }
+  let(:link_sharing) { nil }
+
+  before do
+    # ignore link sharing
+    test_collection.link_sharing_audience.closed! unless link_sharing
+    test_collection.reload
+  end
 
   subject do
     TestResultsCollection::CreateResponsesCollection.call(
@@ -53,12 +60,14 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
     audience_collection = subject.all_responses_collection.collections.where(
       survey_response_id: nil,
     ).first
-    expect(audience_collection.name).to eq "#{test_collection.base_name} - #{test_collection.test_audiences.first.audience_name}"
+    audience_name = test_collection.test_audiences.open.first.audience_name
+    expect(audience_collection.name).to eq "#{test_collection.base_name} - #{audience_name}"
   end
 
   context 'with link sharing' do
+    let(:link_sharing) { true }
     let(:test_collection) do
-      create(:test_collection, :completed, :with_responses, :with_test_audience, :with_link_sharing, num_responses: num_responses)
+      create(:test_collection, :completed, :with_responses, :with_test_audience, num_responses: num_responses)
     end
     let(:link_sharing) { test_collection.test_audiences.where(price_per_response: 0).first }
 
@@ -67,10 +76,10 @@ RSpec.describe TestResultsCollection::CreateResponsesCollection, type: :service 
         survey_response_id: nil,
       )
       expect(audience_collections.count).to eq 2
-      expect(audience_collections.map(&:name)).to match_array([
-        "#{test_collection.base_name} - #{test_collection.test_audiences.first.audience_name}",
-        "#{test_collection.base_name} - #{test_collection.test_audiences.last.audience_name}",
-      ])
+      audience_trc_names = test_collection.test_audiences.map do |ta|
+        "#{test_collection.base_name} - #{ta.audience_name}"
+      end
+      expect(audience_collections.map(&:name)).to match_array(audience_trc_names)
     end
 
     context 'with link sharing turned off' do

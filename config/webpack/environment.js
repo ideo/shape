@@ -84,12 +84,6 @@ const addTypescriptLoader = env => {
   return env
 }
 
-const addIdeoSSOExternal = env => {
-  env.config.set('externals.ideo-sso', 'IdeoSSO')
-
-  return env
-}
-
 const addReactGlobal = env => {
   env.plugins.insert(
     'Provide',
@@ -127,7 +121,6 @@ const updateEnvironment = flow(
   addSentryWebpack,
   addReactSVGLoader,
   addTypescriptLoader,
-  addIdeoSSOExternal,
   addCleanWebpack,
   // skip chunk splitting in dev since it messes with HMR
   !DEV ? splitChunks : identity,

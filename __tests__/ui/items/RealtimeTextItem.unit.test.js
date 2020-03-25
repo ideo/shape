@@ -12,7 +12,7 @@ const props = {
   onExpand: jest.fn(),
   fullPageView: false,
   fullyLoaded: true,
-  initialFontTag: 'P',
+  initialSize: 'normal',
   uiStore: fakeUiStore,
   apiStore: fakeApiStore(),
 }
@@ -21,6 +21,20 @@ let wrapper, component
 const rerender = () => {
   wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
   component = wrapper.instance()
+  component.quillEditor = {
+    getSelection: jest.fn(),
+    getContents: jest.fn().mockReturnValue(fakeTextItem.quill_data),
+    setContents: jest.fn(),
+    formatText: jest.fn(),
+    format: jest.fn(),
+    updateContents: jest.fn(),
+    history: {
+      clear: jest.fn(),
+    },
+    root: {
+      innerHTML: '',
+    },
+  }
 }
 describe('TextItem', () => {
   beforeEach(() => {
@@ -94,30 +108,35 @@ describe('TextItem', () => {
     })
   })
 
-  describe('initialFontTag', () => {
+  describe('initialSize', () => {
     beforeEach(() => {
-      props.item.quill_data = { ops: null }
       rerender()
+      component.reactQuillRef = {}
+      // re-call with fake reactQuillRef set
+      component.componentDidMount()
     })
 
-    describe('with P (default)', () => {
-      it('should not affect quillData', () => {
-        expect(component.quillData).toEqual({ ops: [] })
+    describe('with default (size normal)', () => {
+      it('should not affect initial quill format', () => {
+        expect(component.quillEditor.format).not.toHaveBeenCalled()
       })
     })
 
-    describe('with H1', () => {
+    describe('with "huge" and a new text item', () => {
       beforeEach(() => {
-        props.item.quill_data = { ops: null }
-        props.initialFontTag = 'H1'
+        props.item = { ...fakeTextItem, version: null }
+        props.initialSize = 'huge'
         rerender()
+        component.reactQuillRef = {}
+        // re-call with fake reactQuillRef set
+        component.componentDidMount()
       })
 
-      it('should insert a newline with H1', () => {
-        const quillData = {
-          ops: [{ insert: '\n', attributes: { header: '1' } }],
-        }
-        expect(component.quillData).toEqual(quillData)
+      it('should begin with huge size format', () => {
+        expect(component.quillEditor.format).toHaveBeenCalledWith(
+          'size',
+          'huge'
+        )
       })
     })
   })

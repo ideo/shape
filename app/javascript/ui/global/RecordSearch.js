@@ -26,7 +26,7 @@ class RecordSearch extends React.Component {
       const tags = props.searchTags.map(tag => `#${tag}`).join(' ')
       const params = _.merge(
         {
-          query: `${tags} ${term}`,
+          query: _.trim(`${term} ${tags}`),
           per_page: 30,
         },
         props.searchParams

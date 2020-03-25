@@ -444,7 +444,10 @@ class Collection
     def setup_link_sharing_test_audience
       # find the link sharing audience
       audience = Audience.find_by(min_price_per_response: 0)
-      # e.g. in unit tests
+      # e.g. in unit tests, prevent having to load seeds in tests
+      if audience.nil? && Rails.env.test?
+        audience = Audience.create(name: 'Share via Link', global_default: 1, min_price_per_response: 0)
+      end
       return unless audience.present?
 
       test_audiences.find_or_create_by(
@@ -692,6 +695,16 @@ class Collection
       )
     end
 
+    def queue_update_live_test(card_id)
+      return unless live?
+
+      ::TestResultsCollection::CreateContentWorker.perform_async(
+        test_results_collection.id,
+        nil,
+        card_id,
+      )
+    end
+
     private
 
     def question_items_from_sections(section_names)
@@ -701,7 +714,13 @@ class Collection
     end
 
     def attempt_to_purchase_test_audiences!(user:, test_audience_params: nil)
-      return true if test_audience_params.blank?
+      if test_audience_params.blank?
+        # you can launch as long as you have the link sharing option open
+        return true if test_audiences.open.any? || collection_to_test.present?
+
+        errors.add(:base, 'Audience required to launch test')
+        return false
+      end
 
       # Make sure all prices are up-to-date
       test_audiences.each(&:update_price_per_response_from_audience!)

@@ -24,6 +24,7 @@ class CollectionCardReplacer
     result = @item.save
     check_parent_collection_cover
     update_template_instances
+    update_test_results_content_if_live
     result
   end
 
@@ -72,6 +73,20 @@ class CollectionCardReplacer
     @replacing_card.parent.queue_update_template_instances(
       updated_card_ids: @replacing_card.parent.collection_cards.pluck(:id),
       template_update_action: 'update_all',
+    )
+  end
+
+  def update_test_results_content_if_live
+    return unless @item.is_a?(Item::QuestionItem)
+
+    test_collection = @replacing_card.parent
+    return unless test_collection.live_or_was_launched? &&
+                  test_collection.test_results_collection.present?
+
+    TestResultsCollection::CreateContentWorker.perform_async(
+      test_collection.test_results_collection.id,
+      nil,
+      @replacing_card.id,
     )
   end
 end

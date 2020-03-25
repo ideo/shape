@@ -305,7 +305,7 @@ StyledTopRightActions.defaultProps = {
 StyledTopRightActions.displayName = 'StyledTopRightActions'
 
 export const BottomRightActionHolder = styled.div`
-  bottom: 20px;
+  bottom: 28px;
   right: 10px;
   position: absolute;
   z-index: ${v.zIndex.gridCardTop};

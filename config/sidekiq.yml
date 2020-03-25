@@ -62,3 +62,6 @@ production:
     organization_shell_refresh:
       cron: '0 23 */2 * * America/Los_Angeles'
       class: OrganizationShellRefreshWorker
+    log_app_metrics:
+      cron: '*/10 * * * * America/Los_Angeles'
+      class: LogChannelSubscribersWorker
