@@ -270,12 +270,6 @@ class Collection < ApplicationRecord
       ]
   end
 
-  def parent_ids
-    (
-      Array.wrap(breadcrumb) + cards_linked_to_this_collection.collection.pluck(:parent_id)
-    ).uniq
-  end
-
   # By default all string fields are searchable
   def search_data
     updated_date = Arel.sql('DATE(updated_at)')
