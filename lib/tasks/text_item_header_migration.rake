@@ -8,6 +8,10 @@ namespace :text_item_headers do
     Item::TextItem.find_in_batches(start: start).each_with_index do |batch, i|
       puts "migrating text item batch #{i} / #{batches}"
       batch.each do |item|
+        if item.breadcrumb.count > 40
+          item.destroy
+          next
+        end
         TextItemHeaderMigrator.call(item)
       end
     end
