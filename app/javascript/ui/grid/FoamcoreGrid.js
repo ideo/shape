@@ -1409,7 +1409,7 @@ class FoamcoreGrid extends React.Component {
       const { gridH, gutter } = cardHeight
       hotspots.push(
         <FoamcoreHotspot
-          row={row}
+          row={row - 1}
           cols={4}
           top={(gridH + gutter) * row - gutter}
           collection={collection}
