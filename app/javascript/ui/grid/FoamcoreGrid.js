@@ -95,6 +95,7 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
     display: none;
   }
 `
+BlankCard.displayName = 'BlankCard'
 
 const Grid = styled.div`
   position: relative;
@@ -119,6 +120,7 @@ const RightBlankActions = styled.div`
   right: 12px;
   top: calc(50% - 36px);
 `
+RightBlankActions.displayName = 'RightBlankActions'
 
 function getMapKey({ col, row }) {
   return `${col},${row}`
@@ -1218,6 +1220,7 @@ class FoamcoreGrid extends React.Component {
     const emptyRow =
       !_.some(collection_cards, { row }) &&
       !_.some(collection_cards, { row: row - 1, height: 2 })
+
     if (type === 'hover') {
       inner = (
         <div style={{ position: 'relative', height: '100%' }}>
