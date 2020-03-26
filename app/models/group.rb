@@ -72,10 +72,10 @@ class Group < ApplicationRecord
   has_many :groups_threads
 
   # Legacy
-  has_many :group_hierarchies, foreign_key: 'parent_group_id'
+  has_many :group_hierarchies, foreign_key: 'parent_group_id', dependent: :destroy
   has_many :legacy_subgroups, class_name: 'Group', through: :group_hierarchies
 
-  has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id'
+  has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id', dependent: :destroy
   has_many :legacy_parent_groups, class_name: 'Group', through: :subgroup_memberships
   # End Legacy
 
@@ -126,6 +126,13 @@ class Group < ApplicationRecord
     subgroups.pluck(:subgroup_ids).flatten.uniq
   end
 
+  def self.parent_groups(ids)
+    # see: https://dba.stackexchange.com/a/130863
+    Group.where(
+      %(subgroup_ids @> ANY (ARRAY [#{ids.map { |i| "'#{[i]}'" }.join(',')}]::jsonb[])),
+    )
+  end
+
   def parent_groups
     Group.where(
       'subgroup_ids @> ?', [id].to_s
@@ -142,9 +149,9 @@ class Group < ApplicationRecord
     add_to_path = [group.id] + group.subgroup_ids
     update(subgroup_ids: subgroup_ids | add_to_path)
 
-    parent_groups.each do |sub_group|
-      sub_group.update(
-        subgroup_ids: (sub_group.subgroup_ids | [group.id]) - [sub_group.id],
+    parent_groups.each do |parent|
+      parent.update(
+        subgroup_ids: (parent.subgroup_ids | [group.id]) - [parent.id],
       )
     end
   end

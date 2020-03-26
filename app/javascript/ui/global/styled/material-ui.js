@@ -6,12 +6,23 @@ import v from '~/utils/variables'
 /** @component */
 export const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
-    width: 100%;
     max-width: 673px;
     margin-bottom: 35px;
     flex-grow: 1;
     color: white;
     background-color: transparent;
+    ${props =>
+      props.placement &&
+      props.placement === 'bottom' &&
+      `
+      width: 100%
+    `}
+    ${props =>
+      props.placement &&
+      props.placement === 'top' &&
+      `
+      top: ${v.headerHeight + 12}px;
+    `}
   }
 `
 StyledSnackbar.displayName = 'StyledSnackbar'
