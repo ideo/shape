@@ -157,7 +157,7 @@ module RolifyExtensions
     elsif is_a?(Group)
       if resource.is_a? Group
         # destroy connections between group (resource) and other group (self)
-        RemoveGroupFromGroup.call(parent_group: resource, subgroup: self)
+        resource.remove_subgroup(self)
       end
       role.groups.destroy(self)
     else

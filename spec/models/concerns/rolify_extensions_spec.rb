@@ -231,7 +231,7 @@ describe RolifyExtensions, type: :concern do
 
     context 'when removing a group from another group' do
       it 'calls the group removal service' do
-        expect(RemoveGroupFromGroup).to receive(:call)
+        expect(other_group).to receive(:remove_subgroup).with(group)
         group.add_role(Role::MEMBER, other_group)
         group.remove_role(Role::MEMBER, other_group)
       end
