@@ -130,7 +130,7 @@ module RolifyExtensions
     elsif is_a?(Group)
       role.groups << self
       if resource.is_a?(Group)
-        AddGroupToGroup.call(parent_group: resource, subgroup: self)
+        resource.add_subgroup(self)
       end
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"

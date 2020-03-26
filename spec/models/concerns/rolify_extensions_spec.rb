@@ -203,8 +203,8 @@ describe RolifyExtensions, type: :concern do
     context 'when adding a group to another group' do
       let(:other_group) { create(:group, organization: organization) }
 
-      it 'calls the group hierachy service' do
-        expect(AddGroupToGroup).to receive(:call)
+      it 'calls add_subgroup' do
+        expect(other_group).to receive(:add_subgroup).with(group)
         group.add_role(Role::MEMBER, other_group)
       end
     end

@@ -132,6 +132,10 @@ class Group < ApplicationRecord
     )
   end
 
+  def parent_group_ids
+    parent_groups.pluck(:id)
+  end
+
   def add_subgroup(group)
     return if group.id == id
 
@@ -172,14 +176,19 @@ class Group < ApplicationRecord
     roles_from_users.pluck(:id)
   end
 
+  # override resourceable method so that identifiers includes all subgroups
   def identifiers
-    # override resourceable method so that identifiers includes all subgroups
-    (subgroup_ids + all_subgroup_subgroup_ids).uniq.map do |group_id|
+    ([id] + subgroup_ids + all_subgroup_subgroup_ids).uniq.map do |group_id|
       Role.object_identifier_from_class_id(
         object_class: 'Group',
         object_id: group_id,
       )
     end
+  end
+
+  # Override resourceable method so we can pass in correct identifiers
+  def user_ids
+    self.class.user_ids(identifiers)
   end
 
   # Roles where this group is an editor/viewer of a collection/item

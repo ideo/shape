@@ -52,10 +52,10 @@ module Resourceable
     end
 
     # really meant to be used on an AR Relation, where `select` is just the relevant records
-    def user_ids
+    def user_ids(resource_identifiers = identifiers)
       UsersRole
         .joins(:role)
-        .where(Role.arel_table[:resource_identifier].in(identifiers))
+        .where(Role.arel_table[:resource_identifier].in(resource_identifiers))
         .pluck(:user_id)
         .uniq
     end
