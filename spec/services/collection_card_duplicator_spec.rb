@@ -235,16 +235,15 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       end
     end
 
-    context 'when to_collection is a foamcore board' do
+    context 'when to_collection is an empty foamcore board' do
       let!(:to_collection) { create(:board_collection, add_editors: [user]) }
       let(:placement) { 'end' }
       let(:new_cards) { service.call }
 
-      it 'sets row of duplicated cards 2 rows after the last non-blank row' do
-        target_empty_row = to_collection.empty_row_for_moving_cards
+      it 'creates duplicated cards at row 0' do
         new_cards.each_with_index do |card, index|
           expect(card.parent_id).to eq to_collection.id
-          expect(card.row).to eq target_empty_row
+          expect(card.row).to eq 0
           expect(card.col).to eq index
         end
       end
