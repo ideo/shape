@@ -246,24 +246,6 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  async API_insertRow(direction) {
-    const { apiStore, uiStore } = this
-    const params = {
-      direction,
-    }
-
-    try {
-      await apiStore.request(
-        `collection_cards/${this.id}/insert_row`,
-        'POST',
-        params
-      )
-      return this.parentCollection.API_fetchCards()
-    } catch (e) {
-      uiStore.defaultAlertError()
-    }
-  }
-
   async API_selectCardIdsBelow() {
     const { apiStore, uiStore } = this
     let selectedCardIds = []

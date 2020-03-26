@@ -17,6 +17,7 @@ import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
+import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 import { calculatePageMargins } from '~/utils/pageUtils'
@@ -1395,6 +1396,29 @@ class FoamcoreGrid extends React.Component {
     return this.renderCard(placeholder)
   }
 
+  renderHotspots() {
+    const { collection, uiStore } = this.props
+    const { num_columns } = collection
+
+    if (num_columns !== 4) return null
+
+    const collectionMaxRow = collection.max_row_index
+    const hotspots = []
+    _.times(collectionMaxRow, row => {
+      const cardHeight = uiStore.gridSettings
+      const { gridH, gutter } = cardHeight
+      hotspots.push(
+        <FoamcoreHotspot
+          row={row}
+          cols={4}
+          top={(gridH + gutter) * row - gutter}
+          collection={collection}
+        />
+      )
+    })
+    return <div>{hotspots}</div>
+  }
+
   render() {
     const gridSize = this.totalGridSize
     return (
@@ -1416,6 +1440,7 @@ class FoamcoreGrid extends React.Component {
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}
         {this.renderMdlPlaceholder()}
+        {this.renderHotspots()}
         {this.renderVisibleCards()}
       </Grid>
     )

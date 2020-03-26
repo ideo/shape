@@ -3,7 +3,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   load_and_authorize_resource except: %i[index move replace]
   skip_before_action :check_api_authentication!, only: %i[index]
   before_action :load_and_authorize_parent_collection, only: %i[create replace]
-  before_action :load_and_authorize_parent_collection_for_update, only: %i[update insert_row]
+  before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
 
   before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction]
   before_action :check_cache, only: %i[index ids breadcrumb_records]
@@ -205,27 +205,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def link
     @card_action = 'link'
     move
-  end
-
-  def insert_row
-    collection_card = CollectionCard.find(params[:id])
-    RowInserter.new(
-      card: collection_card,
-      direction: json_api_params[:direction],
-    ).call
-
-    head :no_content
-  end
-
-  def remove_row
-    collection_card = CollectionCard.find(params[:id])
-    RowInserter.new(
-      card: collection_card,
-      direction: json_api_params[:direction],
-      action: 'remove'
-    ).call
-
-    head :no_content
   end
 
   before_action :check_valid_duplication, only: %i[duplicate]

@@ -32,6 +32,8 @@ Rails.application.routes.draw do
           patch 'submit'
           patch 'restore_permissions'
           post 'background_update_template_instances'
+          post 'insert_row'
+          post 'remove_row'
         end
         collection do
           post 'create_template'
@@ -105,8 +107,6 @@ Rails.application.routes.draw do
           patch 'replace'
           patch 'update'
           patch 'toggle_pin'
-          post 'insert_row'
-          post 'remove_row'
           delete 'destroy'
         end
         collection do
