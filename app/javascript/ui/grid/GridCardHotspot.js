@@ -7,15 +7,16 @@ import v from '~/utils/variables'
 export const StyledHotspot = styled.div`
   align-items: center;
   display: flex;
-  height: 100%;
+  height: ${props => props.height};
   justify-content: center;
   position: absolute;
   opacity: 0;
   ${({ top }) => top && `top: ${top};`}
   transition: all 100ms;
   /* e.g. "left: -27px;" */
-  ${props => `${props.position}: -27px;`} right: -27px;
-  width: 36px;
+  ${props => `${props.position}: -27px;`}
+  ${props => props.position && `right: -27px;`}
+  width: ${props => props.width};
   z-index: 100;
 
   cursor: pointer;
@@ -25,10 +26,12 @@ export const StyledHotspot = styled.div`
   }
 `
 StyledHotspot.propTypes = {
+  height: PropTypes.string,
   top: PropTypes.string,
   width: PropTypes.string,
 }
 StyledHotspot.defaultProps = {
+  height: '100%',
   top: null,
   width: '36px',
 }
@@ -39,7 +42,7 @@ export const HotspotLine = styled.div`
   background: ${v.colors.primaryLight};
   position: relative;
   left: ${props => props.left}px;
-  width: ${props => props.width}px;
+  width: ${props => props.width};
 `
 HotspotLine.propTypes = {
   left: PropTypes.number,
@@ -54,12 +57,15 @@ HotspotLine.displayName = 'HotspotLine'
 
 export const StyledPlusIcon = styled.div`
   position: relative;
-  left: ${props => props.left}px;
+  left: ${props => props.left};
   width: 12px;
   color: ${v.colors.secondaryMedium};
   font-size: 1.5rem;
   cursor: pointer;
 `
+StyledPlusIcon.defaultProps = {
+  left: '0px',
+}
 StyledPlusIcon.displayName = 'StyledPlusIcon'
 
 @inject('uiStore')

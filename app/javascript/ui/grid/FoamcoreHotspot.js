@@ -15,13 +15,8 @@ class FoamcoreHotspot extends React.Component {
     collection.API_insertRow(row)
   }
 
-  get hotspotMargins() {
-    return { line: 4, icon: -9 }
-  }
-
   render() {
     const { row, top, uiStore } = this.props
-    const { icon, line } = this.hotspotMargins
     const {
       gridSettings: { gutter },
     } = uiStore
@@ -30,12 +25,13 @@ class FoamcoreHotspot extends React.Component {
       <StyledHotspot
         onClick={this.onClick}
         gutter={uiStore.gridSettings.gutter}
-        data-row={row}
+        height={`${gutter}px`}
         top={`${top}px`}
         width="100%"
+        data-row={row}
       >
-        <HotspotLine left={line} height={`${gutter}px`} width="100%" />
-        <StyledPlusIcon left={icon}>+</StyledPlusIcon>
+        <HotspotLine height={`${gutter}px`} width="100%" />
+        <StyledPlusIcon left="calc(-50% + 12px)">+</StyledPlusIcon>
       </StyledHotspot>
     )
   }
