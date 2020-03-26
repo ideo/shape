@@ -4,16 +4,17 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 
-const StyledHotspot = styled.div`
-  position: absolute;
-  display: flex;
+export const StyledHotspot = styled.div`
   align-items: center;
+  display: flex;
+  height: 100%;
   justify-content: center;
+  position: absolute;
   opacity: 0;
+  ${({ top }) => top && `top: ${top};`}
   transition: all 100ms;
   /* e.g. "left: -27px;" */
   ${props => `${props.position}: -27px;`} right: -27px;
-  height: 100%;
   width: 36px;
   z-index: 100;
 
@@ -23,16 +24,35 @@ const StyledHotspot = styled.div`
     opacity: ${props => (props.dragging ? 0 : 1)};
   }
 `
+StyledHotspot.propTypes = {
+  top: PropTypes.string,
+  width: PropTypes.string,
+}
+StyledHotspot.defaultProps = {
+  top: null,
+  width: '36px',
+}
+StyledHotspot.displayName = 'StyledHotspot'
 
-const HotspotLine = styled.div`
-  height: 100%;
+export const HotspotLine = styled.div`
+  height: ${props => props.height};
   background: ${v.colors.primaryLight};
   position: relative;
   left: ${props => props.left}px;
-  width: ${props => props.gutter}px;
+  width: ${props => props.width}px;
 `
+HotspotLine.propTypes = {
+  left: PropTypes.number,
+  height: PropTypes.string,
+  width: PropTypes.string,
+}
+HotspotLine.defaultProps = {
+  height: '100%',
+  width: '100%',
+}
+HotspotLine.displayName = 'HotspotLine'
 
-const StyledPlusIcon = styled.div`
+export const StyledPlusIcon = styled.div`
   position: relative;
   left: ${props => props.left}px;
   width: 12px;
@@ -40,6 +60,7 @@ const StyledPlusIcon = styled.div`
   font-size: 1.5rem;
   cursor: pointer;
 `
+StyledPlusIcon.displayName = 'StyledPlusIcon'
 
 @inject('uiStore')
 @observer
@@ -76,7 +97,7 @@ class GridCardHotspot extends React.Component {
         dragging={dragging}
         onClick={this.clickHotspot}
       >
-        <HotspotLine left={line} gutter={uiStore.gridSettings.gutter} />
+        <HotspotLine left={line} width={uiStore.gridSettings.gutter} />
         <StyledPlusIcon left={icon}>+</StyledPlusIcon>
       </StyledHotspot>
     )

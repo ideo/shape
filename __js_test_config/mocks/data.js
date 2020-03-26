@@ -453,6 +453,8 @@ export const fakeCollection = {
   API_removeComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   API_selectCollectionType: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_insertRow: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_removeRow: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
