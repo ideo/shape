@@ -28,6 +28,7 @@ class DialogWrapper extends React.Component {
           vertical: 'top',
           horizontal: 'center',
         }}
+        placement={'top'}
       >
         <StyledSnackbarContent
           classes={{ root: 'SnackbarContent autoWidth' }}

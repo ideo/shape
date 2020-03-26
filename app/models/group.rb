@@ -72,10 +72,10 @@ class Group < ApplicationRecord
   has_many :groups_threads
 
   # Legacy
-  has_many :group_hierarchies, foreign_key: 'parent_group_id'
+  has_many :group_hierarchies, foreign_key: 'parent_group_id', dependent: :destroy
   has_many :legacy_subgroups, class_name: 'Group', through: :group_hierarchies
 
-  has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id'
+  has_many :subgroup_memberships, class_name: 'GroupHierarchy', foreign_key: 'subgroup_id', dependent: :destroy
   has_many :legacy_parent_groups, class_name: 'Group', through: :subgroup_memberships
   # End Legacy
 

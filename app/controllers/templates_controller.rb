@@ -1,6 +1,7 @@
 class TemplatesController < ApplicationController
   include ApplicationHelper
   # authenticate will store the path and make sure the user returns to it once they log in
+  # NOTE: in DeviseLoginFailure we redirect to sign_up for the use_in_my_collection route
   before_action :authenticate_user!
   before_action :load_and_authorize_collection_template, only: %i[use_in_my_collection]
 
