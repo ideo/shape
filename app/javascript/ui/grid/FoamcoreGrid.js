@@ -15,6 +15,8 @@ import {
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
+import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
+import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
@@ -24,6 +26,11 @@ import { calculatePageMargins } from '~/utils/pageUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
+
+const CircleIconHolder = styled.button`
+  height: 32px;
+  width: 32px;
+`
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -63,12 +70,24 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   }};
   z-index: ${props =>
     _.includes(props.type, 'drag') ? v.zIndex.cardHovering : 0};
+
+  ${CircleIconHolder} {
+    display: none;
+    height: 32px;
+    width: 32px;
+  }
+
   ${props =>
     props.type === 'unrendered'
       ? ''
       : `&:hover {
     background-color: ${v.colors.primaryLight} !important;
+
     .plus-icon {
+      display: block;
+    }
+
+    ${CircleIconHolder} {
       display: block;
     }
   }
@@ -91,6 +110,14 @@ export const StyledPlusIcon = styled.div`
   top: 38%;
   left: 38%;
   color: ${v.colors.secondaryMedium};
+`
+
+const RightBlankActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 12px;
+  top: calc(50% - 36px);
 `
 
 function getMapKey({ col, row }) {
@@ -562,6 +589,16 @@ class FoamcoreGrid extends React.Component {
 
   handleScroll = ev => {
     this.throttledLoadAfterScroll()
+  }
+
+  handleAddRowClick = row => {
+    const { collection } = this.props
+    collection.API_insertRow(row)
+  }
+
+  handleRemoveRowClick = row => {
+    const { collection } = this.props
+    collection.API_removeRow(row)
   }
 
   originalCard(cardId) {
@@ -1162,9 +1199,20 @@ class FoamcoreGrid extends React.Component {
     let inner = ''
     if (type === 'hover') {
       inner = (
-        <StyledPlusIcon className="plus-icon">
-          <PlusIcon />
-        </StyledPlusIcon>
+        <div>
+          <StyledPlusIcon className="plus-icon">
+            <PlusIcon />
+          </StyledPlusIcon>
+
+          <RightBlankActions>
+            <CircleIconHolder onClick={() => this.handleRemoveRowClick(row)}>
+              <CircleTrashIcon />
+            </CircleIconHolder>
+            <CircleIconHolder onClick={() => this.handleAddRowClick(row)}>
+              <CircleAddRowIcon />
+            </CircleIconHolder>
+          </RightBlankActions>
+        </div>
       )
     } else if (type === 'unrendered') {
       inner = <InlineLoader background={v.colors.commonLightest} />
