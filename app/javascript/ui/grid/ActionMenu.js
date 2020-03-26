@@ -157,12 +157,6 @@ class ActionMenu extends React.Component {
     _.each(bottomCards, card => card.API_selectCardIdsBelow())
   }
 
-  insertRow = direction => {
-    const { uiStore, card } = this.props
-    uiStore.selectCardId(card.id)
-    card.API_insertRow(direction)
-  }
-
   get movingFromCollectionId() {
     const { card, uiStore, location } = this.props
     // For PageMenu we're moving "from" the parent collection
@@ -324,21 +318,9 @@ class ActionMenu extends React.Component {
           iconRight: <SelectAllIcon />,
           onClick: this.selectCardsBelow,
         }
-        const insertRowBelow = {
-          name: 'Insert Row Below',
-          iconRight: <SelectAllIcon />,
-          onClick: () => this.insertRow('below'),
-        }
-        const insertRowAbove = {
-          name: 'Insert Row Above',
-          iconRight: <SelectAllIcon />,
-          onClick: () => this.insertRow('above'),
-        }
         items = [
           ...items.slice(0, selectAllIndex + 1),
           selectCardsBelow,
-          insertRowAbove,
-          insertRowBelow,
           ...items.slice(selectAllIndex + 1),
         ]
       }

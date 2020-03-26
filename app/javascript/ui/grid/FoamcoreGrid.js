@@ -103,7 +103,7 @@ const Grid = styled.div`
 `
 
 export const StyledPlusIcon = styled.div`
-  position: relative;
+  position: absolute;
   /* TODO: better styling than this? */
   width: 20%;
   height: 20%;
@@ -591,13 +591,15 @@ class FoamcoreGrid extends React.Component {
     this.throttledLoadAfterScroll()
   }
 
-  handleAddRowClick = row => {
+  handleAddRowClick = (row, ev) => {
     const { collection } = this.props
+    ev.stopPropagation()
     collection.API_insertRow(row)
   }
 
-  handleRemoveRowClick = row => {
+  handleRemoveRowClick = (row, ev) => {
     const { collection } = this.props
+    ev.stopPropagation()
     collection.API_removeRow(row)
   }
 
@@ -1192,26 +1194,37 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
+  renderRightBlankActions(row) {
+    return (
+      <RightBlankActions>
+        <CircleIconHolder onClick={ev => this.handleRemoveRowClick(row, ev)}>
+          <CircleTrashIcon />
+        </CircleIconHolder>
+        <CircleIconHolder onClick={ev => this.handleAddRowClick(row, ev)}>
+          <CircleAddRowIcon />
+        </CircleIconHolder>
+      </RightBlankActions>
+    )
+  }
+
   positionBlank({ row, col, width, height }, type = 'drag') {
     const position = this.positionForCoordinates({ col, row, width, height })
+    const {
+      collection: { collection_cards },
+    } = this.props
 
     const { relativeZoomLevel } = this
     let inner = ''
+    const emptyRow =
+      !_.some(collection_cards, { row }) &&
+      !_.some(collection_cards, { row: row - 1, height: 2 })
     if (type === 'hover') {
       inner = (
-        <div>
+        <div style={{ position: 'relative', height: '100%' }}>
           <StyledPlusIcon className="plus-icon">
             <PlusIcon />
           </StyledPlusIcon>
-
-          <RightBlankActions>
-            <CircleIconHolder onClick={() => this.handleRemoveRowClick(row)}>
-              <CircleTrashIcon />
-            </CircleIconHolder>
-            <CircleIconHolder onClick={() => this.handleAddRowClick(row)}>
-              <CircleAddRowIcon />
-            </CircleIconHolder>
-          </RightBlankActions>
+          {emptyRow && this.renderRightBlankActions(row)}
         </div>
       )
     } else if (type === 'unrendered') {
