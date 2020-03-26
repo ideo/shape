@@ -85,6 +85,7 @@ module Resourceable
 
   def roles_anchor_resource_identifier
     return resource_identifier if roles_anchor_collection_id.nil?
+    return resource_identifier if is_a?(Collection::UserProfile)
 
     "Collection_#{roles_anchor_collection_id}"
   end
