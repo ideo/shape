@@ -184,6 +184,10 @@ class Group < ApplicationRecord
   end
 
   # override resourceable method so that identifiers includes all subgroups
+  def self.identifiers
+    all.map(&:identifiers).flatten.uniq
+  end
+
   def identifiers
     ([id] + subgroup_ids + all_subgroup_subgroup_ids).uniq.map do |group_id|
       Role.object_identifier_from_class_id(
@@ -191,11 +195,6 @@ class Group < ApplicationRecord
         object_id: group_id,
       )
     end
-  end
-
-  # Override resourceable method so we can pass in correct identifiers
-  def user_ids
-    self.class.user_ids(identifiers)
   end
 
   # Roles where this group is an editor/viewer of a collection/item
