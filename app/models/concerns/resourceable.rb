@@ -70,6 +70,8 @@ module Resourceable
     end
   end
 
+  # Instance methods
+
   def roles_anchor
     roles_anchor_collection || self
   end

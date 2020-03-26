@@ -85,8 +85,15 @@ class Role < ApplicationRecord
     roles.map(&:resource).compact
   end
 
+  def self.object_identifier_from_class_id(object_class: nil, object_id: nil)
+    [object_class, object_id].select(&:present?).join('_')
+  end
+
   def self.object_identifier(object)
-    [object.class.base_class.to_s, object.id].select(&:present?).join('_')
+    object_identifier_from_class_id(
+      object_class: object.class.base_class.to_s,
+      object_id: object.id,
+    )
   end
 
   def self.identifier(role_name:, resource_identifier: nil, user_id: nil, group_id: nil)
