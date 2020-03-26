@@ -6,9 +6,10 @@ import {
   fakeSurveyResponse,
 } from '#/mocks/data'
 
-let wrapper, props
+let wrapper, props, component
 const rerender = () => {
   wrapper = shallow(<TestQuestion.wrappedComponent {...props} />)
+  component = wrapper.instance()
 }
 describe('TestQuestion', () => {
   beforeEach(() => {
@@ -69,6 +70,34 @@ describe('TestQuestion', () => {
     it('renders QuestionContentEditor', () => {
       const finishQuestion = wrapper.find('FinishQuestion')
       expect(finishQuestion.props().incentiveAmount).toEqual(1.75)
+    })
+  })
+
+  describe('handleInstanceDataContentUpdate', () => {
+    describe('if parent is a template', () => {
+      beforeEach(() => {
+        props.parent.isTemplate = true
+        props.parent.API_backgroundUpdateTemplateInstances = jest.fn()
+        rerender()
+        component.handleInstanceDataContentUpdate()
+      })
+      it('should call API_backgroundUpdateTemplateInstances', () => {
+        expect(
+          props.parent.API_backgroundUpdateTemplateInstances
+        ).toHaveBeenCalled()
+      })
+    })
+
+    describe('if parent is a live test', () => {
+      beforeEach(() => {
+        props.parent.isLiveTest = true
+        props.parent.API_backgroundUpdateLiveTest = jest.fn()
+        rerender()
+        component.handleInstanceDataContentUpdate()
+      })
+      it('should call API_backgroundUpdateLiveTest', () => {
+        expect(props.parent.API_backgroundUpdateLiveTest).toHaveBeenCalled()
+      })
     })
   })
 })

@@ -22,12 +22,16 @@ class DialogWrapper extends React.Component {
       <StyledSnackbar
         onClose={onClose}
         autoHideDuration={autoHideDuration}
+        // disableWindowBlurListener allows snackbar to hide even if window loses focus
+        // https://github.com/mui-org/material-ui/issues/10381
+        disableWindowBlurListener
         open={open}
         classes={{ root: 'Snackbar' }}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'center',
         }}
+        placement={'top'}
       >
         <StyledSnackbarContent
           classes={{ root: 'SnackbarContent autoWidth' }}

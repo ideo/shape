@@ -6,6 +6,7 @@ RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
     let!(:child_group_b) { create(:group) }
     let!(:subgroup) { create(:group, add_subgroups: [child_group_a, child_group_b]) }
     let!(:parent_group) { create(:group) }
+    let!(:grandparent_group) { create(:group, add_subgroups: [parent_group]) }
     let(:new_hierarchy) do
       create(
         :group_hierarchy,
@@ -13,8 +14,6 @@ RSpec.describe GrantParentAccessToChildrenOfSubgroup, type: :service do
         subgroup: subgroup,
       )
     end
-    let!(:grandparent_group) { create(:group, add_subgroups: [parent_group]) }
-
     let(:fake_context) do
       { parent_group: parent_group, subgroup: subgroup, new_hierarchy: new_hierarchy }
     end

@@ -14,6 +14,10 @@ RSpec.describe OrganizationAssigner, type: :service do
     end
 
     context 'with a shell organization' do
+      let(:user_collection) do
+        Collection::UserCollection.find_by(organization: builder.organization)
+      end
+
       before do
         allow(OrganizationShellWorker).to receive(:perform_async)
         builder.call
@@ -43,13 +47,15 @@ RSpec.describe OrganizationAssigner, type: :service do
       end
 
       it 'should assign the user collection to the user' do
-        user_collection = Collection::UserCollection.find_by(organization:
-                                                             builder.organization)
         expect(user.has_role?(Role::EDITOR, user_collection)).to be true
       end
 
       it 'should call OrganizationShellWorker to set up the next shell org' do
         expect(OrganizationShellWorker).to have_received(:perform_async)
+      end
+
+      it 'should set loading_content to false' do
+        expect(user_collection.loading_content).to be false
       end
     end
 

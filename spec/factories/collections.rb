@@ -78,6 +78,10 @@ FactoryBot.define do
 
       trait :completed do
         after(:create) do |collection|
+          if collection.test_audiences.present?
+            # open the link sharing audience so the test can launch
+            collection.test_audiences.first.update(status: :open)
+          end
           category_satisfaction_question = collection.question_items.detect(&:question_category_satisfaction?)
           category_satisfaction_question&.update(content: 'solutions')
           collection.question_items.select(&:question_open?).each do |open_response|
@@ -132,18 +136,6 @@ FactoryBot.define do
             audience: create(:audience),
             price_per_response: 4.50,
             launched_by: create(:user),
-          )
-        end
-      end
-
-      trait :with_link_sharing do
-        after(:create) do |collection|
-          create(
-            :test_audience,
-            test_collection: collection,
-            audience: create(:audience, min_price_per_response: 0),
-            sample_size: nil,
-            price_per_response: 0,
           )
         end
       end

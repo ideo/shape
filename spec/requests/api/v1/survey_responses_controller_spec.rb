@@ -65,6 +65,10 @@ describe Api::V1::SurveyResponsesController, type: :request, json: true do
       let(:test_audience) { test_collection.test_audiences.first }
 
       context 'without valid test_audience' do
+        before do
+          test_collection.link_sharing_audience.destroy
+        end
+
         it 'returns a 422' do
           post(path, params: params)
           expect(response.status).to eq(422)
@@ -89,7 +93,7 @@ describe Api::V1::SurveyResponsesController, type: :request, json: true do
     end
 
     context 'with link sharing enabled' do
-      let(:test_collection) { create(:test_collection, :with_link_sharing, test_status: :live) }
+      let(:test_collection) { create(:test_collection, test_status: :live) }
       let(:test_audience) { test_collection.test_audiences.first }
 
       it 'returns a 200 and uses link sharing audience by default' do

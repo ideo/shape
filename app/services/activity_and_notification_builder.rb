@@ -39,6 +39,8 @@ class ActivityAndNotificationBuilder < SimpleService
   end
 
   def call
+    return false if @actor.nil?
+
     if @async
       call_async
       return

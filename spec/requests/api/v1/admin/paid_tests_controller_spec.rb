@@ -8,7 +8,7 @@ describe Api::V1::Admin::PaidTestsController, type: :request, json: true, auth: 
 
   describe 'GET #pending_incentives_export', truncate: true do
     let!(:test_collection) { create(:test_collection, :with_test_audience, :completed, num_cards: 1) }
-    let!(:test_audience) { test_collection.test_audiences.first }
+    let!(:test_audience) { test_collection.test_audiences.paid.first }
     let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
     let(:user) { create(:user) }
     let(:survey_response) do

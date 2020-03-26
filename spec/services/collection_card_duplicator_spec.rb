@@ -176,6 +176,9 @@ RSpec.describe CollectionCardDuplicator, type: :service do
     end
 
     context 'with synchronous settings' do
+      let(:new_cards) { service.call }
+      let(:new_card_ids) { a_collection_containing_exactly(*new_cards.pluck(:id)) }
+
       before do
         allow(CollectionCardDuplicationWorker).to receive(:perform_sync).and_call_original
       end
@@ -184,10 +187,10 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         let(:synchronous) { :all_levels }
 
         it 'calls CollectionCardDuplicationWorker synchronously' do
-          new_cards = service.call
+          new_cards
           expect(CollectionCardDuplicationWorker).to have_received(:perform_sync).with(
             instance_of(String), # batch id
-            new_cards.pluck(:id), # existing card ids
+            new_card_ids, # ignore array order
             to_collection.id,
             user.id,
             false, # system collection
@@ -201,10 +204,10 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         let(:synchronous) { :first_level }
 
         it 'calls CollectionCardDuplicationWorker synchronously, but async sub-processes' do
-          new_cards = service.call
+          new_cards
           expect(CollectionCardDuplicationWorker).to have_received(:perform_sync).with(
             instance_of(String), # batch id
-            new_cards.pluck(:id), # existing card ids
+            new_card_ids, # ignore array order
             to_collection.id,
             user.id,
             false, # system collection
@@ -232,16 +235,15 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       end
     end
 
-    context 'when to_collection is a foamcore board' do
+    context 'when to_collection is an empty foamcore board' do
       let!(:to_collection) { create(:board_collection, add_editors: [user]) }
       let(:placement) { 'end' }
       let(:new_cards) { service.call }
 
-      it 'sets row of duplicated cards 2 rows after the last non-blank row' do
-        target_empty_row = to_collection.empty_row_for_moving_cards
+      it 'creates duplicated cards at row 0' do
         new_cards.each_with_index do |card, index|
           expect(card.parent_id).to eq to_collection.id
-          expect(card.row).to eq target_empty_row
+          expect(card.row).to eq 0
           expect(card.col).to eq index
         end
       end

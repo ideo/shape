@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe SurveyResponseCompletion, type: :service, truncate: true do
   let(:test_collection) { create(:test_collection, :with_test_audience, :launched) }
-  let(:test_audience) { test_collection.test_audiences.first }
+  let(:test_audience) { test_collection.test_audiences.paid.first }
   let!(:payment) { create(:payment, :paid, purchasable: test_audience, amount: test_audience.total_price) }
   let(:survey_response) { create(:survey_response, test_collection: test_collection, test_audience: test_audience) }
   let(:service) { SurveyResponseCompletion.new(survey_response) }

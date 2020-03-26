@@ -301,6 +301,7 @@ export default {
       'commentHighlight',
       'commentHighlightResolved',
       'highlight',
+      'size',
     ],
     modules: {
       toolbar: null,
