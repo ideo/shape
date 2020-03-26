@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_10_183359) do
+ActiveRecord::Schema.define(version: 2020_03_24_231908) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -412,11 +412,13 @@ ActiveRecord::Schema.define(version: 2020_03_10_183359) do
     t.string "network_id"
     t.integer "created_by_id"
     t.integer "application_id"
+    t.jsonb "subgroup_ids", default: []
     t.index ["archive_batch"], name: "index_groups_on_archive_batch"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["network_id"], name: "index_groups_on_network_id"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
+    t.index ["subgroup_ids"], name: "index_groups_on_subgroup_ids", using: :gin
     t.index ["type"], name: "index_groups_on_type"
   end
 
