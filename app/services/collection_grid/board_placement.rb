@@ -14,7 +14,7 @@ module CollectionGrid
       # e.g. in the case where we're creating a card, from_collection can just equal to_collection
       @from_collection = from_collection || to_collection
       @moving_cards = moving_cards
-      @row = row || @to_collection.empty_row_for_moving_cards
+      @row = row || calculate_empty_row
       @col = col || 0
     end
 
@@ -29,6 +29,16 @@ module CollectionGrid
         from_collection: @from_collection,
         moving_cards: @moving_cards,
       )
+    end
+
+    def calculate_empty_col
+      0
+    end
+
+    def calculate_empty_row
+      return 0 if @to_collection.collection_cards.none?
+
+      @to_collection.max_row_index + 2
     end
   end
 end

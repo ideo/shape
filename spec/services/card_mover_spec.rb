@@ -288,7 +288,7 @@ RSpec.describe CardMover, type: :service do
         let(:placement) { 'end' }
 
         it 'sets row of linked cards 2 rows after the last non-blank row' do
-          target_empty_row = to_collection.empty_row_for_moving_cards
+          target_empty_row = to_collection.max_row_index + 2
           card_mover.call
           to_collection.reload
           # they are all 1x1 so should fit consecutively
