@@ -180,6 +180,9 @@ export default class UiStore {
   @observable
   textEditingItemHasTitleText = false
   @observable
+  // have to track this e.g. if you are editing the original or link card (same item)
+  textEditingCardId = null
+  @observable
   overdueBannerVisible = true
   @observable
   editingCardCover = null

@@ -327,6 +327,7 @@ class GridCardBlank extends React.Component {
 
       if (type === ITEM_TYPES.TEXT) {
         this.props.uiStore.update('textEditingItem', card.record)
+        this.props.uiStore.update('textEditingCardId', card.id)
       }
     }
   }

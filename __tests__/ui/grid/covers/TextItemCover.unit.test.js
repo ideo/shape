@@ -103,6 +103,10 @@ describe('TextItemCover', () => {
         'textEditingItem',
         expect.any(Object)
       )
+      expect(uiStore.update).toHaveBeenCalledWith(
+        'textEditingCardId',
+        props.cardId
+      )
     })
 
     it('calls apiStore.fetch item if can_edit_content', async () => {
