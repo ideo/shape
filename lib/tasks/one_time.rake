@@ -5,11 +5,11 @@ namespace :one_time do
       GroupHierarchy
       .group(:parent_group_id, :subgroup_id)
       .pluck(:parent_group_id, :subgroup_id).each do |arr|
-        parent_group = Group.find(arr[0])
-        subgroup = Group.find(arr[1])
-        parent_group.add_subgroup(
-          subgroup,
-        )
+        parent_group = Group.find_by(id: arr[0])
+        subgroup = Group.find_by(id: arr[1])
+        next if parent_group.blank? || subgroup.blank?
+
+        parent_group.add_subgroup(subgroup)
       end
     end
     Group.reindex
