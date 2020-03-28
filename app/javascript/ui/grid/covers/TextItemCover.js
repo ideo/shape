@@ -129,6 +129,7 @@ class TextItemCover extends React.Component {
     if (!this.isEditing) return
     uiStore.update('textEditingItem', null)
     uiStore.update('textEditingCardId', null)
+    uiStore.update('textEditingItemHasTitleText', false)
   }
 
   // cancel should only ever be called for editors, since it is canceling out of edit view

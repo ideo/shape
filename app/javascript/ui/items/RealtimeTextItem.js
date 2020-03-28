@@ -570,6 +570,7 @@ class RealtimeTextItem extends React.Component {
       quillEditor.removeFormat(line.offset(), line.length(), 'user')
     })
     if (currentFormat.header !== header) {
+      quillEditor.format('size', null, 'user')
       quillEditor.format('header', header, 'user')
     }
     this.checkActiveSizeFormat()
