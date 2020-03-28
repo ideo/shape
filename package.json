@@ -122,7 +122,7 @@
     "hypher": "^0.2.5",
     "i18n-iso-countries": "3.7.3",
     "identity-obj-proxy": "^3.0.0",
-    "ideo-sso-js-sdk": "ideo/sso-js-sdk#v2.1.1",
+    "ideo-sso-js-sdk": "ideo/sso-js-sdk#v2.1.4",
     "if-emoji": "^0.1.0",
     "jest-styled-components": "7.0.0-2",
     "js-cookie": "^2.2.1",
