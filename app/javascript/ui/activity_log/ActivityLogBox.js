@@ -231,15 +231,36 @@ class ActivityLogBox extends React.Component {
     this.props.uiStore.update('activityLogMoving', false)
   }
 
+  // TODO: handle push contents above when keyboard is active for android and iOS safari clipping
   get mobileProps() {
     const { uiStore } = this.props
-    // TODO: handle push contents above when keyboard is active for android and iOS safari clipping
+
     if (!uiStore.activityLogForceWidth) {
+      if (uiStore.isIOS && !uiStore.isPortrait) {
+        // set height/width for IOS Portrait since it does not push contents when keyboard is active
+        const height = 250
+        const width = 500
+        return {
+          minWidth: width,
+          minHeight: height,
+          position: {
+            x: window.innerWidth / 2 - width / 2,
+            y: 0,
+          },
+          size: {
+            width,
+            height,
+          },
+          enableResizing: {},
+          disableDragging: true,
+        }
+      }
+
       return {}
     }
 
     // set height for Android since it does not push contents when keyboard is active
-    const height = uiStore.isIOS ? window.innerHeight : 300
+    const height = 100
     return {
       minWidth: uiStore.activityLogForceWidth,
       minHeight: height,
