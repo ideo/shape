@@ -126,8 +126,7 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   config.session_store :cookie_store,
-                       # version allows you to setup a new session when needed
-                       key: '_shape_user_session_v1',
+                       key: '_shape_user_session',
                        secure: true,
                        # cookie should only be used by other '.shape.space' domains
                        same_site: :strict,
