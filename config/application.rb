@@ -38,9 +38,6 @@ module Shape
     # ActionCable settings
     config.action_cable.url = ENV.fetch('ACTION_CABLE_URL') { 'ws://localhost:3000/cable' }
 
-    # override protect_from_forgery; TODO: use JWT instead of cookie for auth?
-    config.action_controller.default_protect_from_forgery = false
-
     # for serving gzipped assets
     config.middleware.use Rack::Deflater
 
