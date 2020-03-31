@@ -292,7 +292,7 @@ class ActivityLogBox extends React.Component {
     if (isAndroid) {
       height = 100
     } else if (isIOSSingleColumn) {
-      height = window.innerHeight
+      height = window.innerHeight / 1.25
     } else if (isIOSMultipleColumns) {
       height = 250
       width = 500

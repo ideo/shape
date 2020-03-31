@@ -69,14 +69,10 @@ class CommentInput extends React.Component {
         activityLogPositionAndHeight +
         maxCommentSuggestionsHeight -
         totalSuggestionsLength
-      console.log(
-        'clamped: ',
-        clampedSuggestionsLength === maxPossibleSuggestions
-      )
       top = `${
         clampedSuggestionsLength === maxPossibleSuggestions
-          ? newTop - 65
-          : newTop - 25
+          ? newTop - 70
+          : newTop - 45
       }px`
     } else if (uiStore.isIOSMultipleColumns && uiStore.isPortrait) {
       newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
