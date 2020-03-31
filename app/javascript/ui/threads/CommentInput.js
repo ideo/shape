@@ -29,7 +29,7 @@ class CommentInput extends React.Component {
     this.props.setEditor(null, { unset: true })
   }
 
-  /** NOTE: This menthod is due for refactoring/documenting.
+  /** NOTE: This method is due for refactoring/documenting.
    * It is responsible for handling comment input position based on:
    * - comment count
    * - activity log box height
@@ -60,51 +60,35 @@ class CommentInput extends React.Component {
     )
     const totalSuggestionsLength = 45 * clampedSuggestionsLength
     const activityLogPositionAndHeight = activityLogPosition + activityLogHeight
+    const isShowingAllSuggestions =
+      clampedSuggestionsLength === maxPossibleSuggestions
 
     let top = '0px'
     let newTop = 0
-    if (uiStore.isIOSSingleColumn) {
-      // For IOS phones, add activityLogPositionAndHeight since comment box is full-screen
-      newTop =
-        activityLogPositionAndHeight +
-        maxCommentSuggestionsHeight -
-        totalSuggestionsLength
-      top = `${
-        clampedSuggestionsLength === maxPossibleSuggestions
-          ? newTop - 70
-          : newTop - 45
-      }px`
-    } else if (uiStore.isIOSMultipleColumns && uiStore.isPortrait) {
+    let allSuggestionsTopOffset = 0
+    if (uiStore.isIOSMultipleColumns && uiStore.isPortrait) {
       newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
       // For iPad portrait, check if activity log is already placed where virtual keyboard will be
       const willBePushedByVirtualKeyboard =
         activityLogPositionAndHeight > window.innerHeight / 2 - 25
       if (willBePushedByVirtualKeyboard) {
-        newTop = newTop + 400
+        newTop = newTop + 325
       }
-      top = `${
-        clampedSuggestionsLength === maxPossibleSuggestions
-          ? newTop - 30
-          : newTop
-      }px`
-    } else if (
-      uiStore.isAndroidSingleColumn ||
-      uiStore.isAndroidMultipleColumns ||
-      ((uiStore.isIOSMultipleColumns && !uiStore.isPortrait) ||
-        uiStore.isTouchDevice)
-    ) {
-      // For Android phones/tablets and iPad landscape. will place at the top of the comment input
-      newTop = maxCommentSuggestionsHeight - totalSuggestionsLength
-      top = `${
-        clampedSuggestionsLength === maxPossibleSuggestions
-          ? newTop + 166
-          : newTop + 136
-      }px`
+      allSuggestionsTopOffset = newTop - 40
+    } else if (uiStore.isTouchDevice) {
+      // For all other touch devices
+      newTop =
+        activityLogPositionAndHeight +
+        maxCommentSuggestionsHeight -
+        totalSuggestionsLength
+      allSuggestionsTopOffset = uiStore.isIOSSingleColumn
+        ? newTop - 75
+        : newTop - 50
     } else {
       // Desktops
       const shouldPlaceSuggestionsAtBottom =
         decoratorRect.top + totalSuggestionsLength < window.innerHeight
-      newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+      const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
 
       return {
         top: `${
@@ -116,6 +100,12 @@ class CommentInput extends React.Component {
         }px`,
       }
     }
+
+    top = `${
+      isShowingAllSuggestions
+        ? allSuggestionsTopOffset
+        : allSuggestionsTopOffset + 45
+    }px`
 
     return {
       top,

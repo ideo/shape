@@ -273,12 +273,18 @@ class ActivityLogBox extends React.Component {
     let disableDragging = false
     let enableResizing = this.defaultResizingProps
     let position = this.defaultPositionProps
-    const topMiddlePosition = {
-      x: window.innerWidth / 2 - width / 2, // position in the top-middle
-      y: 0,
+
+    // initialize widths and heights for different devices
+    if (isAndroid) {
+      height = 100
+    } else if (isIOSSingleColumn) {
+      height = window.innerHeight
+    } else if (isIOSMultipleColumns && !isPortrait) {
+      height = window.innerHeight
+      width = 500
     }
 
-    // disable dragging and resizing whenever there is a virtual keyboard
+    // disable dragging and resizing, and set default position for devices with a fixed activity box
     if (
       isAndroid ||
       isIOSSingleColumn ||
@@ -286,16 +292,10 @@ class ActivityLogBox extends React.Component {
     ) {
       disableDragging = true
       enableResizing = {}
-      position = topMiddlePosition
-    }
-
-    if (isAndroid) {
-      height = 100
-    } else if (isIOSSingleColumn) {
-      height = window.innerHeight / 1.25
-    } else if (isIOSMultipleColumns) {
-      height = 250
-      width = 500
+      position = {
+        x: window.innerWidth / 2 - width / 2,
+        y: 0,
+      }
     }
 
     return {
