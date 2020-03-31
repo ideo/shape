@@ -110,6 +110,7 @@ class Routes extends React.Component {
       onSuccess: currentUser => {
         firebaseClient.authenticate(currentUser.google_auth_token)
       },
+      checkIdeoSSO: true,
     })
 
     document.addEventListener('keydown', captureGlobalKeypress)

@@ -13,7 +13,9 @@ import queryString from 'query-string'
 
 import { apiUrl } from '~/utils/url'
 import trackError from '~/utils/trackError'
+import IdeoSSO from '~/utils/IdeoSSO'
 import googleTagManager from '~/vendor/googleTagManager'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 import Activity from './jsonApi/Activity'
 import Audience from './jsonApi/Audience'
@@ -35,7 +37,6 @@ import SurveyResponse from './jsonApi/SurveyResponse'
 import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
-import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import QuestionChoice from './jsonApi/QuestionChoice'
 
 class ApiStore extends jsonapi(datxCollection) {
@@ -178,7 +179,15 @@ class ApiStore extends jsonapi(datxCollection) {
     return _.first(this.currentUser.organizations.filter(org => org.id === id))
   }
 
-  async loadCurrentUser({ onSuccess } = {}) {
+  async loadCurrentUser({ onSuccess, checkIdeoSSO = false } = {}) {
+    if (checkIdeoSSO) {
+      try {
+        await IdeoSSO.getUserInfo()
+      } catch {
+        IdeoSSO.logout('/login')
+        return
+      }
+    }
     try {
       const res = await this.request('users/me')
       const currentUser = res.data
