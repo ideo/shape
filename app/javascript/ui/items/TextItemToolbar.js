@@ -80,7 +80,8 @@ const TextItemToolbar = props => (
           T
         </StyledButton>
       )}
-      <StyledButton>
+      {/* ql-link class gives this button the URL link functionality */}
+      <StyledButton className="ql-link">
         <LinkIcon />
       </StyledButton>
 

@@ -130,6 +130,9 @@ Rails.application.configure do
   if ENV['ACTION_CABLE_ADAPTER'] == 'anycable'
     config.session_store :cookie_store,
                          key: '_shape_user_session',
+                         secure: true,
+                         # cookie should only be used by other '.shape.space' domains
+                         same_site: :strict,
                          domain: '.shape.space'
   end
 

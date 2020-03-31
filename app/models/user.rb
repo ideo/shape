@@ -97,19 +97,11 @@ class User < ApplicationRecord
            through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
-  has_many :parent_groups,
-           -> { distinct },
-           through: :groups,
-           source: :parent_groups
   has_many :current_org_groups,
            ->(u) { active.where(organization_id: u.current_organization_id) },
            through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
-  has_many :current_org_parent_groups,
-           -> { distinct },
-           through: :current_org_groups,
-           source: :parent_groups
 
   has_many :organizations, -> { distinct }, through: :groups
 
@@ -422,11 +414,13 @@ class User < ApplicationRecord
   end
 
   def all_group_ids
+    parent_group_ids = Group.parent_groups(group_ids).pluck(:id)
     # always include the Common Resource group as it may grant you access
     (group_ids + parent_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]).uniq
   end
 
   def all_current_org_group_ids
+    current_org_parent_group_ids = Group.parent_groups(current_org_group_ids).pluck(:id)
     (current_org_group_ids + current_org_parent_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]).uniq
   end
 

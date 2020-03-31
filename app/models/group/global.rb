@@ -9,6 +9,7 @@
 #  autojoin_emails              :jsonb
 #  handle                       :string
 #  name                         :string
+#  subgroup_ids                 :jsonb
 #  type                         :string
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -26,6 +27,7 @@
 #  index_groups_on_handle           (handle)
 #  index_groups_on_network_id       (network_id)
 #  index_groups_on_organization_id  (organization_id)
+#  index_groups_on_subgroup_ids     (subgroup_ids) USING gin
 #  index_groups_on_type             (type)
 #
 

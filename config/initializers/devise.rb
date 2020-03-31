@@ -1,8 +1,3 @@
-SETUP_PROC = lambda do |env|
-  request = Rack::Request.new(env)
-  request.session["omniauth.state"] = request.cookies['IdeoSSO-State']
-end
-
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|

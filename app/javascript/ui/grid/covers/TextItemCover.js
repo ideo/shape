@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { computed } from 'mobx'
+import { computed, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
@@ -78,8 +78,10 @@ class TextItemCover extends React.Component {
 
   @computed
   get isEditing() {
-    const { item } = this.props
-    return uiStore.textEditingItem === item
+    const { item, cardId } = this.props
+    return (
+      uiStore.textEditingItem === item && uiStore.textEditingCardId === cardId
+    )
   }
 
   handleClick = e => {
@@ -106,12 +108,15 @@ class TextItemCover extends React.Component {
   }
 
   loadItem = async () => {
-    const { item } = this.props
+    const { item, cardId } = this.props
     await apiStore.fetch('items', item.id, true)
     // entering edit mode should deselect all cards
-    uiStore.deselectCards()
-    uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
-    uiStore.update('textEditingItem', this.state.item)
+    runInAction(() => {
+      uiStore.deselectCards()
+      uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
+      uiStore.update('textEditingItem', this.state.item)
+      uiStore.update('textEditingCardId', cardId)
+    })
     this.setState({ loading: false })
   }
 
@@ -121,10 +126,10 @@ class TextItemCover extends React.Component {
   }
 
   clearTextEditingItem = () => {
-    const { item } = this.state
-    if (uiStore.textEditingItem && uiStore.textEditingItem.id === item.id) {
-      uiStore.update('textEditingItem', null)
-    }
+    if (!this.isEditing) return
+    uiStore.update('textEditingItem', null)
+    uiStore.update('textEditingCardId', null)
+    uiStore.update('textEditingItemHasTitleText', false)
   }
 
   // cancel should only ever be called for editors, since it is canceling out of edit view
