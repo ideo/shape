@@ -12,6 +12,8 @@ Cypress.Commands.add('loginAndVisitMyCollection', () => {
   cy.login({ email: 'cypress-test@ideo.com' })
   // go to My Collection, wait for loading to complete
   cy.visit('/')
+  // wait for the stubbed INA users/me check, just to verify it was called
+  cy.wait('@ideoSsoApi')
   cy.wait('@apiGetCurrentUser')
   cy.wait('@apiGetCollectionCards')
 })
