@@ -23,6 +23,12 @@ config.fetchReference = (url, opts) => {
   } else {
     opts.credentials = 'same-origin'
   }
+  opts.headers = opts.headers || {}
+  opts.headers
+  const csrfToken = document.head.querySelector("[name='csrf-token']")
+  if (csrfToken) {
+    opts.headers['X-CSRF-Token'] = csrfToken.content
+  }
   return fetch(requestUrl, opts)
 }
 
