@@ -261,6 +261,7 @@ class ActivityLogBox extends React.Component {
       isIOSMultipleColumns,
       isPortrait,
     } = uiStore
+
     if (!activityLogForceWidth && !isTouchDevice) {
       // override only for non-touch/desktop devices
       return {}
@@ -268,7 +269,7 @@ class ActivityLogBox extends React.Component {
 
     // default props for mobile devices
     let height = 325 // minimum height for comment and a half
-    const width = activityLogForceWidth || 375 // minimum width for small viewports
+    let width = activityLogForceWidth || 375 // minimum width for small viewports
     let disableDragging = false
     let enableResizing = this.defaultResizingProps
     let position = this.defaultPositionProps

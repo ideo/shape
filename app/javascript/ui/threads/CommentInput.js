@@ -59,11 +59,56 @@ class CommentInput extends React.Component {
       maxPossibleSuggestions
     )
     const totalSuggestionsLength = 45 * clampedSuggestionsLength
+    const activityLogPositionAndHeight = activityLogPosition + activityLogHeight
 
-    if (!uiStore.isTouchDevice) {
+    let top = '0px'
+    let newTop = 0
+    if (uiStore.isIOSSingleColumn) {
+      // For IOS phones, add activityLogPositionAndHeight since comment box is full-screen
+      newTop =
+        activityLogPositionAndHeight +
+        maxCommentSuggestionsHeight -
+        totalSuggestionsLength
+      console.log(
+        'clamped: ',
+        clampedSuggestionsLength === maxPossibleSuggestions
+      )
+      top = `${
+        clampedSuggestionsLength === maxPossibleSuggestions
+          ? newTop - 65
+          : newTop - 25
+      }px`
+    } else if (uiStore.isIOSMultipleColumns && uiStore.isPortrait) {
+      newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
+      // For iPad portrait, check if activity log is already placed where virtual keyboard will be
+      const willBePushedByVirtualKeyboard =
+        activityLogPositionAndHeight > window.innerHeight / 2 - 25
+      if (willBePushedByVirtualKeyboard) {
+        newTop = newTop + 400
+      }
+      top = `${
+        clampedSuggestionsLength === maxPossibleSuggestions
+          ? newTop - 30
+          : newTop
+      }px`
+    } else if (
+      uiStore.isAndroidSingleColumn ||
+      uiStore.isAndroidMultipleColumns ||
+      ((uiStore.isIOSMultipleColumns && !uiStore.isPortrait) ||
+        uiStore.isTouchDevice)
+    ) {
+      // For Android phones/tablets and iPad landscape. will place at the top of the comment input
+      newTop = maxCommentSuggestionsHeight - totalSuggestionsLength
+      top = `${
+        clampedSuggestionsLength === maxPossibleSuggestions
+          ? newTop + 166
+          : newTop + 136
+      }px`
+    } else {
+      // Desktops
       const shouldPlaceSuggestionsAtBottom =
         decoratorRect.top + totalSuggestionsLength < window.innerHeight
-      const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+      newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
 
       return {
         top: `${
@@ -74,54 +119,10 @@ class CommentInput extends React.Component {
             : newTop + 40
         }px`,
       }
-    } else {
-      let top = '0px'
-      const cols = _.get(uiStore, 'gridSettings.cols')
+    }
 
-      if (cols == 1 && uiStore.isIOS) {
-        // will place at the top of the comment input, use activity log height since iOS phone comment box is full-screen
-        const _maxCommentSuggestionsHeight =
-          activityLogPosition - activityLogHeight
-        const newTop =
-          _maxCommentSuggestionsHeight - totalSuggestionsLength + 50
-        top = `${
-          clampedSuggestionsLength === maxPossibleSuggestions
-            ? newTop
-            : newTop + 38
-        }px`
-      } else if (
-        (cols == 1 && uiStore.isAndroid) ||
-        (uiStore.isIOS && !uiStore.isPortrait)
-      ) {
-        // will place at the top of the comment input for android phones and iPad landscape
-        const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength
-        top = `${
-          clampedSuggestionsLength === maxPossibleSuggestions
-            ? newTop + 90
-            : newTop + 136
-        }px`
-      } else {
-        let newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
-        if (uiStore.isIOS && uiStore.isPortrait) {
-          // For iPad portrait, check if activity log is already placed where virtual keyboard will be
-          const activityLogPositionAndHeight =
-            activityLogPosition + activityLogHeight
-          const willBePushedByVirtualKeyboard =
-            activityLogPositionAndHeight > window.innerHeight / 2 - 25
-          if (willBePushedByVirtualKeyboard) {
-            newTop = newTop + 400
-          }
-          top = `${
-            clampedSuggestionsLength === maxPossibleSuggestions
-              ? newTop - 30
-              : newTop
-          }px`
-        }
-      }
-
-      return {
-        top,
-      }
+    return {
+      top,
     }
   }
 

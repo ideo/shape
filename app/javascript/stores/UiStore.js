@@ -624,21 +624,21 @@ export default class UiStore {
     const {
       gridSettings: { cols },
     } = this
-    return cols === 1 && this.isAndroid
+    return cols > 1 && this.isAndroid
   }
 
   get isIOSSingleColumn() {
     const {
       gridSettings: { cols },
     } = this
-    return cols === 1 && this.isAndroid
+    return cols === 1 && this.isIOS
   }
 
   get isIOSMultipleColumns() {
     const {
       gridSettings: { cols },
     } = this
-    return cols === 1 && this.isAndroid
+    return cols > 1 && this.isIOS
   }
 
   get isPortrait() {
