@@ -29,7 +29,7 @@ class CommentInput extends React.Component {
     this.props.setEditor(null, { unset: true })
   }
 
-  /** NOTE: This method is due for refactoring/documenting.
+  /** WIKI: https://github.com/ideo/shape/wiki/Comment-Mentions-Positioning
    * It is responsible for handling comment input position based on:
    * - comment count
    * - activity log box height
@@ -81,9 +81,7 @@ class CommentInput extends React.Component {
         activityLogPositionAndHeight +
         maxCommentSuggestionsHeight -
         totalSuggestionsLength
-      allSuggestionsTopOffset = uiStore.isIOSSingleColumn
-        ? newTop - 75
-        : newTop - 50
+      allSuggestionsTopOffset = newTop - 100
     } else {
       // Desktops
       const shouldPlaceSuggestionsAtBottom =
