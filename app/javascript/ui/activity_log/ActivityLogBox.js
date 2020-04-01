@@ -231,28 +231,83 @@ class ActivityLogBox extends React.Component {
     this.props.uiStore.update('activityLogMoving', false)
   }
 
-  get mobileProps() {
+  get defaultPositionProps() {
+    return { x: this.position.x, y: this.position.y }
+  }
+
+  get defaultResizingProps() {
+    return {
+      bottom: true,
+      bottomLeft: true,
+      bottomRight: true,
+      top: true,
+      topLeft: true,
+      topRight: true,
+      left: true,
+      right: true,
+    }
+  }
+
+  /** Overrides Rnd props for mobile devices
+   *  TODO: handle push contents above when keyboard is active for android and iOS safari clipping
+   */
+  get overrideProps() {
     const { uiStore } = this.props
-    // TODO: handle push contents above when keyboard is active for android and iOS safari clipping
-    if (!uiStore.activityLogForceWidth) {
+    const {
+      activityLogForceWidth,
+      isTouchDevice,
+      isAndroid,
+      isIOSSingleColumn,
+      isIOSMultipleColumns,
+      isPortrait,
+    } = uiStore
+
+    if (!activityLogForceWidth && !isTouchDevice) {
+      // override only for non-touch/desktop devices
       return {}
     }
 
-    // set height for Android since it does not push contents when keyboard is active
-    const height = uiStore.isIOS ? window.innerHeight : 300
-    return {
-      minWidth: uiStore.activityLogForceWidth,
-      minHeight: height,
-      position: {
-        x: 0,
+    // default props for mobile devices
+    let height = 325 // minimum height for comment and a half
+    let width = activityLogForceWidth || 375 // minimum width for small viewports
+    let disableDragging = false
+    let enableResizing = this.defaultResizingProps
+    let position = this.defaultPositionProps
+
+    // initialize widths and heights for different devices
+    if (isAndroid) {
+      height = 100
+    } else if (isIOSSingleColumn) {
+      height = window.innerHeight
+    } else if (isIOSMultipleColumns && !isPortrait) {
+      height = window.innerHeight
+      width = 500
+    }
+
+    // disable dragging and resizing, and set default position for devices with a fixed activity box
+    if (
+      isAndroid ||
+      isIOSSingleColumn ||
+      (isIOSMultipleColumns && !isPortrait)
+    ) {
+      disableDragging = true
+      enableResizing = {}
+      position = {
+        x: window.innerWidth / 2 - width / 2,
         y: 0,
-      },
+      }
+    }
+
+    return {
+      minWidth: width,
+      minHeight: height,
       size: {
-        width: uiStore.activityLogForceWidth,
+        width,
         height,
       },
-      enableResizing: {},
-      disableDragging: true,
+      position,
+      enableResizing,
+      disableDragging,
     }
   }
 
@@ -293,22 +348,13 @@ class ActivityLogBox extends React.Component {
         minHeight={MIN_HEIGHT}
         maxWidth={MAX_WIDTH}
         maxHeight={MAX_HEIGHT}
-        position={{ x: this.position.x, y: this.position.y }}
+        position={this.defaultPositionProps}
         dragHandleClassName=".activity_log-header"
         size={{
           width: this.position.w,
           height: this.position.h,
         }}
-        enableResizing={{
-          bottom: true,
-          bottomLeft: true,
-          bottomRight: true,
-          top: true,
-          topLeft: true,
-          topRight: true,
-          left: true,
-          right: true,
-        }}
+        enableResizing={this.defaultResizingProps}
         disableDragging={false}
         onDragStart={this.handleMoveStart}
         onResizeStart={this.handleMoveStart}
@@ -324,7 +370,7 @@ class ActivityLogBox extends React.Component {
           })
           this.updatePosition(fullPosition)
         }}
-        {...this.mobileProps}
+        {...this.overrideProps}
       >
         <div ref={this.draggableRef} style={{ height: '100%' }}>
           <StyledActivityLog>

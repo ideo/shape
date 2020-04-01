@@ -616,6 +616,39 @@ export default class UiStore {
     return getTouchDeviceOS() === TOUCH_DEVICE_OS.IOS
   }
 
+  get isAndroidSingleColumn() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols === 1 && this.isAndroid
+  }
+
+  get isAndroidMultipleColumns() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols > 1 && this.isAndroid
+  }
+
+  get isIOSSingleColumn() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols === 1 && this.isIOS
+  }
+
+  get isIOSMultipleColumns() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols > 1 && this.isIOS
+  }
+
+  get isPortrait() {
+    // assumes that the client is a mobile device
+    return window.innerHeight > window.innerWidth
+  }
+
   // NOTE: because we aren't tracking a difference between "closed" and null,
   // OrgMenu will always default back to "People & Groups" while in the process of closing/fading
   @computed

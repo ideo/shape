@@ -48,6 +48,11 @@ class CommentEntryForm extends React.Component {
   }
 
   focusTextArea = () => {
+    const { uiStore } = this.props
+
+    // Prevent virtual keyboard from popping up right away to allow comment mentions to be positioned correctly
+    if (uiStore.isTouchDevice) return
+
     // NOTE: draft-js-plugins need timeout, even with 0 delay, see:
     // https://github.com/draft-js-plugins/draft-js-plugins/issues/800#issuecomment-315950836
     setTimeout(() => {
