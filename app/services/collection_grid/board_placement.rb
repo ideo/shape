@@ -38,7 +38,7 @@ module CollectionGrid
     def calculate_empty_row
       return 0 if @to_collection.collection_cards.none?
 
-      @to_collection.max_row_index + 2
+      @to_collection.max_row_index + 1
     end
   end
 end

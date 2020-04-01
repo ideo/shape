@@ -39,7 +39,7 @@ RSpec.describe CollectionGrid::BoardPlacement, type: :service do
           # they are all 1x1 so should fit consecutively
           moving_cards.each_with_index do |card, index|
             expect(card.parent_id).to eq to_collection.id
-            expect(card.row).to eq 2
+            expect(card.row).to eq 1
             expect(card.col).to eq index
           end
         end
