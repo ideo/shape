@@ -683,13 +683,13 @@ class MovableGridCard extends React.Component {
         ref={c => (this.gridCardRef = c)}
         moving={mdlPlaceholder}
         hidden={shouldHide}
+        allowTouchAction
         // for mdlPlaceholder
         maxWidth={card.maxWidth}
         maxHeight={card.maxHeight}
         width={card.maxWidth * v.defaultGridSettings.gridW}
         height={card.maxHeight * v.defaultGridSettings.gridH}
         selectedMultiple={uiStore.movingCardIds.length > 1}
-        allowTouchAction={true}
         // <-----
       >
         <Rnd {...rndProps}>
