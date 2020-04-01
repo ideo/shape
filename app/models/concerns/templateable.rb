@@ -64,6 +64,7 @@ module Templateable
       instance.update(
         collection_to_test_id: collection_to_test_id.nil? ? nil : instance.parent.id,
       )
+      instance.hide_or_show_section_questions!
     end
   end
 
