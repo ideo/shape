@@ -38,6 +38,9 @@ module Shape
     # ActionCable settings
     config.action_cable.url = ENV.fetch('ACTION_CABLE_URL') { 'ws://localhost:3000/cable' }
 
+    # don't enable CSRF by default, opt-in via controller
+    config.action_controller.default_protect_from_forgery = false
+
     # for serving gzipped assets
     config.middleware.use Rack::Deflater
 
