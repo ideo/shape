@@ -41,7 +41,7 @@
 # Indexes
 #
 #  index_users_on_email             (email)
-#  index_users_on_handle            (handle) UNIQUE
+#  index_users_on_handle            (handle)
 #  index_users_on_invitation_token  (invitation_token)
 #  index_users_on_provider_and_uid  (provider,uid) UNIQUE
 #

@@ -76,6 +76,14 @@ describe Templateable, type: :concern do
       create(:test_collection, template: template, parent_collection: instance_parent)
     end
 
+    before do
+      template.setup_templated_collection(
+        for_user: nil,
+        collection: template_instance,
+        synchronous: true,
+      )
+    end
+
     it 'should update all instances with collection_to_test setting' do
       expect {
         template.update_test_template_instance_types!
@@ -83,6 +91,23 @@ describe Templateable, type: :concern do
       }.to change(template_instance, :collection_to_test_id)
       # collection_to_test in instance should refer to its own parent
       expect(template_instance.collection_to_test_id).to eq instance_parent.id
+    end
+
+    it 'should call hide_or_show_section_questions! on each instance' do
+      template.update_test_template_instance_types!
+      template.hide_or_show_section_questions!
+      template.reload
+      template_instance.reload
+      # template and instance should both have hidden 3 cards
+      hidden_cards = template_instance.collection_cards.hidden
+      hidden_template_cards = template.collection_cards.hidden
+      expect(hidden_cards.count).to eq 3
+      expect(hidden_cards.pluck(:templated_from_id)).to match_array(
+        hidden_template_cards.pluck(:id),
+      )
+      expect(hidden_cards.pluck(:section_type)).to eq(
+        %w[intro ideas outro],
+      )
     end
   end
 end
