@@ -278,12 +278,15 @@ class ActivityLogBox extends React.Component {
     }
   }
 
-  /** Overrides Rnd props for mobile devices
-   *  TODO: handle push contents above when keyboard is active for android and iOS safari clipping
-   */
+  /** Overrides Rnd props for mobile devices */
   get overrideProps() {
     const { uiStore } = this.props
-    const { activityLogForceWidth, isTouchDevice } = uiStore
+    const {
+      activityLogForceWidth,
+      isTouchDevice,
+      isIOSMultipleColumns,
+      isAndroidMultipleColumns,
+    } = uiStore
 
     if (!activityLogForceWidth && !isTouchDevice) {
       // override only for non-touch/desktop devices
@@ -293,12 +296,16 @@ class ActivityLogBox extends React.Component {
     // disable dragging and resizing, and set default position for devices with a fixed activity box
     if (isTouchDevice) {
       const { width, height } = this.touchDeviceFixedSize
+      const x =
+        isIOSMultipleColumns || isAndroidMultipleColumns
+          ? window.innerWidth - width
+          : 0
       return {
         disableDragging: true,
         enableResizing: {},
         maxHeight: window.innerHeight,
         position: {
-          x: window.innerWidth - width,
+          x,
           y: 0,
         },
         size: {

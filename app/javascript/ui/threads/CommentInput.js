@@ -49,7 +49,7 @@ class CommentInput extends React.Component {
     }
 
     const activityLogDiv = document.getElementsByClassName(
-      'activity_log-draggable react-draggable'
+      'activity_log-draggable'
     )[0]
     const activityLogY = activityLogDiv.getBoundingClientRect().y
     const maxCommentSuggestionsHeight = decoratorRect.top - activityLogY + 16 // height above the input and the activity box
