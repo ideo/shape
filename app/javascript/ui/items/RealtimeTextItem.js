@@ -8,6 +8,7 @@ import ReactQuill, { Quill } from 'react-quill'
 import QuillCursors from 'quill-cursors'
 import styled from 'styled-components'
 
+import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
@@ -30,6 +31,9 @@ Quill.register(QuillHighlighter)
 Quill.register(QuillHighlightResolver)
 
 const Keyboard = Quill.import('modules/keyboard')
+
+const CHANNEL_DISCONNECTED_MESSAGE =
+  'Disconnected from server, unable to edit text'
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
@@ -142,6 +146,8 @@ class RealtimeTextItem extends React.Component {
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
     this.setInitialSize()
+    this.checkActionCableConnection()
+
     setTimeout(() => {
       this.quillEditor.focus()
       this.setInitialSize()
@@ -201,6 +207,14 @@ class RealtimeTextItem extends React.Component {
     }
   }
 
+  checkActionCableConnection() {
+    if (ActionCableConsumer.connection.disconnected) {
+      this.channelDisconnected()
+      return false
+    }
+    return true
+  }
+
   reapplyActiveHighlight() {
     const { uiStore } = this.props
     const activeHighlightNode = document.querySelector(
@@ -246,11 +260,11 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
-  channelDisconnected = (message = 'Disconnected from channel') => {
+  // NOTE: ActionCable websocket should automatically/continually try to reconnect on its own
+  channelDisconnected = (message = CHANNEL_DISCONNECTED_MESSAGE) => {
     if (this.unmounted) return
-    // TODO: do anything here? try to reconnect?
-    console.warn(message)
-    const { fullPageView } = this.props
+    const { uiStore, fullPageView } = this.props
+    uiStore.popupSnackbar({ message })
     if (!fullPageView) {
       // this will cancel you out of the editor back to view-only mode
       this.cancel()
@@ -428,11 +442,14 @@ class RealtimeTextItem extends React.Component {
     cursors.clearCursors()
 
     this.combineAwaitingDeltas(delta)
-    this.sendCombinedDelta()
+    const connected = this.checkActionCableConnection()
+    if (connected) {
+      this.sendCombinedDelta()
+      this.instanceDataContentUpdate()
+    }
     // NOTE: trying to check titleText only if the delta turned header on/off
     // seemed to miss some cases, so we just check every time
     this.checkForTitleText()
-    this.instanceDataContentUpdate()
   }
 
   handleSelectionChange = (range, source, editor) => {
@@ -472,7 +489,7 @@ class RealtimeTextItem extends React.Component {
           // if we are stuck 15s in this `currentlySending` mode it means our socketSends are
           // silently failing... we've probably been unsubscribed and it's throwing a backend error
           if (this.currentlySending) {
-            this.channelDisconnected('stuck for 15s')
+            this.channelDisconnected('Disconnected from server')
           }
         }, 15 * 1000)
       }

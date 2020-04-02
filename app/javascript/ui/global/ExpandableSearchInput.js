@@ -97,6 +97,7 @@ class ExpandableSearchInput extends React.Component {
   }
 
   componentDidUpdate() {
+    if (this.props.defaultOpen) return
     runInAction(() => {
       if (this.props.controlled && this.open !== this.props.open) {
         this.open = this.props.open
