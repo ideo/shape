@@ -250,8 +250,17 @@ class ActivityLogBox extends React.Component {
   }
 
   get touchDeviceFixedSize() {
+    const { uiStore } = this.props
+    const { isIOSMultipleColumns, isAndroidMultipleColumns } = uiStore
+
+    // iPhone landscape won't show the close button unless it's less than the max width
+    const touchDeviceMaxWidth = MAX_WIDTH - 150
+    const width =
+      isIOSMultipleColumns || isAndroidMultipleColumns
+        ? touchDeviceMaxWidth
+        : window.innerWidth
     return {
-      width: window.innerWidth,
+      width,
       height: window.innerHeight,
     }
   }
@@ -283,16 +292,19 @@ class ActivityLogBox extends React.Component {
 
     // disable dragging and resizing, and set default position for devices with a fixed activity box
     if (isTouchDevice) {
+      const { width, height } = this.touchDeviceFixedSize
       return {
         disableDragging: true,
         enableResizing: {},
-        maxWidth: window.innerWidth,
         maxHeight: window.innerHeight,
         position: {
-          x: 0,
+          x: window.innerWidth - width,
           y: 0,
         },
-        size: this.touchDeviceFixedSize,
+        size: {
+          width,
+          height,
+        },
       }
     }
   }
