@@ -36,7 +36,7 @@ const rerender = () => {
     },
   }
 }
-describe('TextItem', () => {
+describe('RealtimeTextItem', () => {
   beforeEach(() => {
     rerender()
   })
