@@ -2,7 +2,7 @@ class RowInserter < SimpleService
   attr_reader :errors
 
   def initialize(
-    row:,
+    row: 0,
     collection:,
     action: 'add'
   )

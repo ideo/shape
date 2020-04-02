@@ -144,20 +144,22 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def insert_row
-    RowInserter.new(
+    RowInserter.call(
       row: json_api_params[:row],
       collection: @collection,
-    ).call
+    )
+    @collection.touch
 
     head :no_content
   end
 
   def remove_row
-    RowInserter.new(
+    RowInserter.call(
       row: json_api_params[:row],
       collection: @collection,
       action: 'remove'
-    ).call
+    )
+    @collection.touch
 
     head :no_content
   end

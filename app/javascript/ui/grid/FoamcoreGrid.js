@@ -20,6 +20,7 @@ import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
+import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 import { calculatePageMargins } from '~/utils/pageUtils'
@@ -28,6 +29,9 @@ import { calculatePageMargins } from '~/utils/pageUtils'
 const USE_COLLISION_DETECTION_ON_DRAG = false
 
 const CircleIconHolder = styled.button`
+  border: 1px solid ${v.colors.secondaryMedium};
+  border-radius: 50%;
+  color: ${v.colors.secondaryMedium};
   height: 32px;
   width: 32px;
 `
@@ -75,6 +79,10 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
     display: none;
     height: 32px;
     width: 32px;
+  }
+
+  ${CircleIconHolder} + ${CircleIconHolder} {
+    margin-top: 8px;
   }
 
   ${props =>
@@ -1203,12 +1211,24 @@ class FoamcoreGrid extends React.Component {
   renderRightBlankActions(row) {
     return (
       <RightBlankActions>
-        <CircleIconHolder onClick={ev => this.handleRemoveRowClick(row, ev)}>
-          <CircleTrashIcon />
-        </CircleIconHolder>
-        <CircleIconHolder onClick={ev => this.handleAddRowClick(row, ev)}>
-          <CircleAddRowIcon />
-        </CircleIconHolder>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Remove row"
+          placement="top"
+        >
+          <CircleIconHolder onClick={ev => this.handleRemoveRowClick(row, ev)}>
+            <CircleTrashIcon />
+          </CircleIconHolder>
+        </Tooltip>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Add row"
+          placement="top"
+        >
+          <CircleIconHolder onClick={ev => this.handleAddRowClick(row, ev)}>
+            <CircleAddRowIcon />
+          </CircleIconHolder>
+        </Tooltip>
       </RightBlankActions>
     )
   }
