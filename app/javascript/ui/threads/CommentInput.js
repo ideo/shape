@@ -29,15 +29,7 @@ class CommentInput extends React.Component {
     this.props.setEditor(null, { unset: true })
   }
 
-  /** WIKI: https://github.com/ideo/shape/wiki/Comment-Mentions-Positioning
-   * It is responsible for handling comment input position based on:
-   * - comment count
-   * - activity log box height
-   * - activity log box y position
-   * - device type: android, ios, web
-   * - for IOS/Android, device orientation: portrait, landscape
-   * - for IOS, will be pushed by virtual keyboard
-   */
+  /** WIKI: https://github.com/ideo/shape/wiki/Comment-Mentions-Positioning */
   positionSuggestions = ({ decoratorRect, state, props }) => {
     const { uiStore } = this.props
     const { isTouchDevice } = uiStore
@@ -52,7 +44,8 @@ class CommentInput extends React.Component {
       'activity_log-draggable'
     )[0]
     const activityLogY = activityLogDiv.getBoundingClientRect().y
-    const maxCommentSuggestionsHeight = decoratorRect.top - activityLogY + 16 // height above the input and the activity box
+    const heightBetweenActivityBoxAndCommentInput =
+      decoratorRect.top - activityLogY + 16 // max comment mentions position relative to the activity log and comment input
     const maxPossibleSuggestions = isTouchDevice ? 3 : 6 // show a max of 3.5 suggestions for phones/tablets and 6.5 suggestions for desktop
     const clampedSuggestionsLength = _.clamp(
       suggestions.length,
@@ -66,15 +59,16 @@ class CommentInput extends React.Component {
     const shouldPlaceSuggestionsAtBottom = isTouchDevice
       ? false
       : decoratorRect.top + totalSuggestionsLength < window.innerHeight
-    const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+    const mentionsRelativeTopPosition =
+      heightBetweenActivityBoxAndCommentInput - totalSuggestionsLength - 86
 
     return {
       top: `${
         shouldPlaceSuggestionsAtBottom
-          ? maxCommentSuggestionsHeight + 6
+          ? heightBetweenActivityBoxAndCommentInput + 6
           : isShowingAllSuggestions
-          ? newTop + 12
-          : newTop + 42
+          ? mentionsRelativeTopPosition
+          : mentionsRelativeTopPosition + 34
       }px`,
     }
   }
