@@ -699,6 +699,12 @@ class Collection < ApplicationRecord
     reindex_sync
   end
 
+  def self.reindex_async(ids)
+    ids.each do |collection_id|
+      search_index.reindex_queue.push(collection_id)
+    end
+  end
+
   def touch_related_cards
     try(:parent_collection_card).try(:touch)
     cards_linked_to_this_collection.update_all(updated_at: updated_at)
