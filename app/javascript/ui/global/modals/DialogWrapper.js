@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -10,14 +11,56 @@ import AlertDialog from '~/ui/global/modals/AlertDialog'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 import LoadingDialog from '~/ui/global/modals/LoadingDialog'
 import CloseIcon from '~/ui/icons/CloseIcon'
+import v from '~/utils/variables'
 
 // This wrapper exists to listen on uiStore for dialogConfig changes
 @inject('uiStore')
 @observer
 class DialogWrapper extends React.Component {
+  snackbarAction() {
+    const { uiStore } = this.props
+    const { onClose, showRefresh } = uiStore.snackbarConfig
+
+    const reloadPage = () => {
+      window.location.reload()
+    }
+
+    let button = (
+      <button onClick={onClose} style={{ height: '19px', width: '16px' }}>
+        <CloseIcon />
+      </button>
+    )
+    if (showRefresh) {
+      button = (
+        <button
+          style={{ fontFamily: v.fonts.sans, fontSize: '0.8rem' }}
+          onClick={reloadPage}
+        >
+          Reload page
+        </button>
+      )
+    }
+    return <div style={{ height: '19px', minWidth: '16px' }}>{button}</div>
+  }
+
   renderSnackbar() {
     const { uiStore } = this.props
-    const { message, onClose, autoHideDuration, open } = uiStore.snackbarConfig
+    const {
+      message,
+      onClose,
+      autoHideDuration,
+      open,
+      backgroundColor,
+    } = uiStore.snackbarConfig
+    const variant = { backgroundColor }
+
+    let snackbarMessage = ''
+    if (_.isString(message)) {
+      snackbarMessage = <StyledSnackbarText>{message}</StyledSnackbarText>
+    }
+
+    console.log({ message })
+
     return (
       <StyledSnackbar
         onClose={onClose}
@@ -34,18 +77,10 @@ class DialogWrapper extends React.Component {
         placement={'top'}
       >
         <StyledSnackbarContent
-          classes={{ root: 'SnackbarContent autoWidth' }}
-          message={<StyledSnackbarText>{message}</StyledSnackbarText>}
-          action={
-            <div style={{ height: '19px', width: '16px' }}>
-              <button
-                onClick={() => onClose()}
-                style={{ height: '19px', width: '16px' }}
-              >
-                <CloseIcon />
-              </button>
-            </div>
-          }
+          classes={{ root: `SnackbarContent autoWidth` }}
+          variant={variant}
+          message={snackbarMessage}
+          action={this.snackbarAction()}
         />
       </StyledSnackbar>
     )

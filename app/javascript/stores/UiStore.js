@@ -134,6 +134,8 @@ export default class UiStore {
     message: '',
     autoHideDuration: 4000,
     onClose: () => this.closeSnackbar(),
+    showRefresh: false,
+    backgroundColor: v.colors.commonDark,
   }
   @observable
   dialogConfig = { ...this.defaultDialogProps }

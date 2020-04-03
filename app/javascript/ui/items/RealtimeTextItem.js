@@ -32,8 +32,7 @@ Quill.register(QuillHighlightResolver)
 
 const Keyboard = Quill.import('modules/keyboard')
 
-const CHANNEL_DISCONNECTED_MESSAGE =
-  'Disconnected from server, unable to edit text'
+const CHANNEL_DISCONNECTED_MESSAGE = 'Connection lost, unable to edit.'
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
@@ -264,7 +263,11 @@ class RealtimeTextItem extends React.Component {
   channelDisconnected = (message = CHANNEL_DISCONNECTED_MESSAGE) => {
     if (this.unmounted) return
     const { uiStore, fullPageView } = this.props
-    uiStore.popupSnackbar({ message })
+    uiStore.popupSnackbar({
+      message,
+      showRefresh: true,
+      backgroundColor: v.colors.alert,
+    })
     if (!fullPageView) {
       // this will cancel you out of the editor back to view-only mode
       this.cancel()
