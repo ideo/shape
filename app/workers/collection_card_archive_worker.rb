@@ -44,11 +44,13 @@ class CollectionCardArchiveWorker
   end
 
   def get_target_participant_ids(record)
-    DataReport::CollectionsAndItems.new(dataset:
+    actor_ids = DataReport::CollectionsAndItems.new(dataset:
       Dataset.new(
         data_source: record,
         timeframe: 'ever',
         measure: 'participants',
       )).actor_ids
+    # ensure these users still exist
+    User.where(id: actor_ids).pluck(:id)
   end
 end
