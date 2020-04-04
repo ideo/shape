@@ -90,14 +90,12 @@ module Roles
         OrganizationMembershipAndLinkingWorker.perform_async(
           @added_users.pluck(:id),
           organization_id,
-
           # params that are needed for LinkToSharedCollectionsWorker...
           shared_user_ids,
           # NOTE: group_ids method here excludes Primary group
           group_ids,
           collections_to_link,
           items_to_link,
-
         )
       else
         OrganizationMembershipWorker.perform_async(
