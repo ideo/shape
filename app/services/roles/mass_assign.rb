@@ -181,17 +181,6 @@ module Roles
       )
     end
 
-    # def link_to_shared_collections
-    #   LinkToSharedCollectionsWorker.perform_in(
-    #     30.seconds,
-    #     shared_user_ids,
-    #     # NOTE: group_ids method here excludes Primary group
-    #     group_ids,
-    #     collections_to_link,
-    #     items_to_link,
-    #   )
-    # end
-
     def notify_users
       @added_users.each do |user|
         # skip people who have opted out
