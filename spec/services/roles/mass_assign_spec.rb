@@ -213,11 +213,13 @@ RSpec.describe Roles::MassAssign, type: :service do
                    accr + role.users
                  end
         end
-        expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
-          (users + all_group_users).map(&:id),
+        expect(OrganizationMembershipAndLinkingWorker).to receive(:perform_async).with(
+          users.map(&:id), # added_users
+          organization.id,
+          (users + all_group_users).map(&:id), # shared_user_ids
           groups.map(&:id),
-          [object.id],
-          [],
+          [object.id], # collections to link
+          [], # items to link
         )
         assign_role.call
       end
@@ -227,7 +229,9 @@ RSpec.describe Roles::MassAssign, type: :service do
         let!(:groups) { [create(:group, add_members: [users.first])] }
 
         it 'should only pass unique ids to create links' do
-          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+          expect(OrganizationMembershipAndLinkingWorker).to receive(:perform_async).with(
+            users.map(&:id), # added_users
+            organization.id,
             users.map(&:id),
             groups.map(&:id),
             [object.id],
@@ -246,7 +250,9 @@ RSpec.describe Roles::MassAssign, type: :service do
         end
 
         it 'should not link to any primary groups' do
-          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+          expect(OrganizationMembershipAndLinkingWorker).to receive(:perform_async).with(
+            users.map(&:id), # added_users
+            organization.id,
             users.map(&:id),
             [],
             [object.id],
@@ -272,11 +278,13 @@ RSpec.describe Roles::MassAssign, type: :service do
                  collection: linked_collection)
         end
         before do
-          allow(LinkToSharedCollectionsWorker).to receive(:perform_async).and_call_original
+          allow(OrganizationMembershipAndLinkingWorker).to receive(:perform_async).and_call_original
         end
 
         it 'should link all the group\'s shared collection cards' do
-          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).with(
+          expect(OrganizationMembershipAndLinkingWorker).to receive(:perform_async).with(
+            users.map(&:id), # added_users
+            organization.id,
             users.map(&:id),
             [],
             [linked_collection.id],
@@ -294,7 +302,7 @@ RSpec.describe Roles::MassAssign, type: :service do
         end
 
         it 'does not link app org collection to user collection' do
-          expect(LinkToSharedCollectionsWorker).to receive(:perform_async).once
+          expect(OrganizationMembershipAndLinkingWorker).to receive(:perform_async).once
           assign_role.call
         end
       end

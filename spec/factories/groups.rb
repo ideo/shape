@@ -26,11 +26,7 @@ FactoryBot.define do
 
       if evaluator.add_subgroups.present?
         evaluator.add_subgroups.each do |subgroup|
-          create(
-            :group_hierarchy,
-            parent_group: group,
-            subgroup: subgroup,
-          )
+          group.add_subgroup(subgroup)
         end
       end
     end

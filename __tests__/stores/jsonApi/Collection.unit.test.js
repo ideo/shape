@@ -412,6 +412,20 @@ describe('Collection', () => {
       expect(collection.collection_cards.length).toEqual(2)
     })
 
+    describe('with row parameters for a board', () => {
+      it('should update loadedRows', async () => {
+        collection = new Collection(
+          {
+            name: 'fakeCollection',
+            class_type: 'Collection::Board',
+          },
+          apiStore
+        )
+        await collection.API_fetchCards({ rows: [3, 10] })
+        expect(collection.loadedRows).toEqual(10)
+      })
+    })
+
     describe('as search collection with no filters', () => {
       let searchResultsCollection
       beforeEach(() => {

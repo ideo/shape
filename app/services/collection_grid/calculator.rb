@@ -89,7 +89,7 @@ module CollectionGrid
       moving_cards: [],
       debug: false
     )
-      return [] if collection.collection_cards.none?
+      return [] if collection.collection_cards.none? && drag_positions.empty?
 
       # omit moving cards from our matrix
       cards = collection
@@ -114,6 +114,7 @@ module CollectionGrid
       end
 
       if debug
+        pp '-' * 10
         output = matrix.map do |row|
           row.map { |c| c.nil? ? '' : c.id }
         end
@@ -189,11 +190,14 @@ module CollectionGrid
       )
 
       drag_positions = {}
-      drag_map.each do |mapped|
+      drag_map.each_with_index do |mapped, i|
         card = mapped.card
         position = Mashie.new(
-          row: mapped.row + master_position.row,
-          col: mapped.col + master_position.col,
+          # id is mostly just helpful for debugging output
+          id: "drag-#{i}",
+          # ensure row/col are > 0
+          row: [mapped.row + master_position.row, 0].max,
+          col: [mapped.col + master_position.col, 0].max,
           width: card.width,
           height: card.height,
         )

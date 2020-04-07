@@ -55,6 +55,15 @@ describe Users::OmniauthCallbacksController, type: :request do
       expect(User.find_by_uid(user.uid)).not_to be_nil
     end
 
+    it 'should mark the rememberable setting on the user' do
+      # should start off nil
+      expect(user.remember_created_at).to be nil
+      post(path)
+      created = User.find_by_uid(user.uid)
+      expect(created.remember_created_at).not_to be_nil
+      expect(created.remember_expires_at > Time.current).to be true
+    end
+
     context 'pending user is an admin of current organization', skip_frontend_render: true do
       let!(:organization) { create(:organization) }
       let!(:pending_user) do

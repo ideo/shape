@@ -8,6 +8,14 @@ class Api::V1::BaseController < ApplicationController
 
   respond_to :json
 
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { errors: [exception.message] }, status: :unauthorized
+  end
+
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    render json: { errors: [exception.message] }, status: :not_found
+  end
+
   # See all configuration options for the jsonapi in the jsonapi-rb-rails gem
 
   # jsonapi-rb has issues inferring STI classes,
@@ -83,10 +91,6 @@ class Api::V1::BaseController < ApplicationController
 
   def render_api_errors(errors)
     render jsonapi_errors: errors, status: :unprocessable_entity
-  end
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { errors: [exception.message] }, status: :unauthorized
   end
 
   private

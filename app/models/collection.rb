@@ -272,7 +272,6 @@ class Collection < ApplicationRecord
 
   # By default all string fields are searchable
   def search_data
-    parent_ids = breadcrumb
     updated_date = Arel.sql('DATE(updated_at)')
     activity_dates = activities.group(updated_date).pluck(updated_date)
     {
@@ -698,6 +697,12 @@ class Collection < ApplicationRecord
   # where you can't declare `after_commit :reindex_sync` with two different conditions
   def reindex_after_archive
     reindex_sync
+  end
+
+  def self.reindex_async(ids)
+    ids.each do |collection_id|
+      search_index.reindex_queue.push(collection_id)
+    end
   end
 
   def touch_related_cards

@@ -787,16 +787,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         }
         this.collection_cards.replace(newData)
       }
-      if (this.isBoard) {
-        this.updateMaxLoadedColsRows()
+      if (this.isBoard && rows) {
+        this.updateMaxLoadedColsRows({ maxRow: rows[1] })
       }
     })
     return data
   }
 
   @action
-  updateMaxLoadedColsRows = () => {
-    const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
+  updateMaxLoadedColsRows = ({ maxRow } = {}) => {
     const maxCol = (_.maxBy(this.collection_cards, 'col') || { col: 0 }).col
     if (maxRow > this.loadedRows) {
       this.loadedRows = maxRow

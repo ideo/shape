@@ -5,8 +5,14 @@ describe 'Slack API Requests' do
   let(:client_double) { double('slack') }
 
   before do
+    # turn CSRF protection on to test that we are bypassing it
+    ActionController::Base.allow_forgery_protection = true
     allow(client_double).to receive(:chat_unfurl)
     allow(Slack::Web::Client).to receive(:new).and_return(client_double)
+  end
+
+  after do
+    ActionController::Base.allow_forgery_protection = false
   end
 
   describe 'POST #event' do

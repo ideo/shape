@@ -1,8 +1,3 @@
-SETUP_PROC = lambda do |env|
-  request = Rack::Request.new(env)
-  request.session["omniauth.state"] = request.cookies['IdeoSSO-State']
-end
-
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
@@ -149,7 +144,8 @@ Devise.setup do |config|
 
   # ==> Configuration for :rememberable
   # The time the user will be remembered without asking for credentials again.
-  # config.remember_for = 2.weeks
+  # should line up with the INA rack session
+  config.remember_for = 30.days
 
   # Invalidates all the remember me tokens when the user signs out.
   config.expire_all_remember_me_on_sign_out = true
@@ -159,7 +155,7 @@ Devise.setup do |config|
 
   # Options to be passed to the created cookie. For instance, you can set
   # secure: true in order to force SSL only cookies.
-  # config.rememberable_options = {}
+  config.rememberable_options = { secure: Rails.env.production? }
 
   # ==> Configuration for :validatable
   # Range for password length.

@@ -201,6 +201,7 @@ class FoamcoreGrid extends React.Component {
 
   // Load more cards if we are approaching a boundary of what we have loaded
   loadAfterScroll = async () => {
+    // return if we're still loading a new page
     if (this.loadingRow) return
 
     const { collection } = this.props
@@ -217,8 +218,11 @@ class FoamcoreGrid extends React.Component {
     // Load more rows if currently loaded rows is less than
     // one full screen out of view
     if (collection.loadedRows < visRows.max + visRows.num) {
+      // get the max of what's currently visible
+      const maxRow = (_.maxBy(collection.collection_cards, 'row') || { row: 0 })
+        .row
       runInAction(() => {
-        this.loadingRow = collection.loadedRows + 1
+        this.loadingRow = maxRow
       })
       await this.loadMoreRows()
       runInAction(() => {
@@ -1327,6 +1331,7 @@ class FoamcoreGrid extends React.Component {
 
     let cards = []
     const leftPad = num_columns > 4 ? 3 : 0
+    const topPad = num_columns > 4 ? 3 : 1
     const across = _.min([10, num_columns])
     if (this.loadingRow) {
       _.times(across, i => {
@@ -1335,8 +1340,8 @@ class FoamcoreGrid extends React.Component {
             id: 'unrendered',
             // loading squares are centered, 3 from the left
             col: i + leftPad,
-            // 3 down from the beginning of loadingRow
-            row: this.loadingRow + j + 3,
+            // down from the beginning of loadingRow by topPad rows
+            row: this.loadingRow + j + topPad,
             width: 1,
             height: 1,
           })

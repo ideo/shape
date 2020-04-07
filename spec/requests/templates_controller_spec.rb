@@ -9,8 +9,9 @@ describe TemplatesController, type: :request, auth: true do
     let(:path) { "/templates/#{collection.id}/use_in_my_collection" }
 
     context 'not logged in', auth: false do
-      it 'should redirect to login' do
-        expect(get(path)).to redirect_to(login_url)
+      # this route specifically has logic to redirect to sign_up instead of login
+      it 'should redirect to sign up' do
+        expect(get(path)).to redirect_to(sign_up_url)
       end
     end
 

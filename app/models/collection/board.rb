@@ -87,9 +87,5 @@ class Collection
     def max_col_index
       collection_cards.maximum(:col) || 0
     end
-
-    def empty_row_for_moving_cards
-      max_row_index + 2
-    end
   end
 end

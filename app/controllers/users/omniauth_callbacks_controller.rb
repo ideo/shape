@@ -1,4 +1,5 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+  include Devise::Controllers::Rememberable
   def ideo
     @user = User.from_omniauth(request.env['omniauth.auth'])
     if @user.save
@@ -8,6 +9,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       end
       # this will throw if @user is not activated
       # will also redirect to stored path from any previous 401
+      remember_me(@user) if @user.active?
       sign_in_and_redirect @user, event: :authentication
     else
       redirect_to root_path

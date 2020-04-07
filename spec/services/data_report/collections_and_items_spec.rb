@@ -30,7 +30,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
     end
   end
   # to make test more predictable, fix the dates to end of current month
-  let(:end_date) { Time.current.end_of_month }
+  let(:end_date) { Time.current.next_month.beginning_of_month }
   let(:before_end_date) { end_date - 2.days }
   # will be in last month and also not "within last 30 days"
   let(:over_31_days_ago) { end_date - 33.days }

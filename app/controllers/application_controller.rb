@@ -1,6 +1,4 @@
 class ApplicationController < ActionController::Base
-  # protect_from_forgery with: :exception
-
   attr_reader :redirect_organization
   helper_method :redirect_organization
 

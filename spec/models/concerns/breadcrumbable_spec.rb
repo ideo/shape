@@ -109,6 +109,37 @@ describe Breadcrumbable, type: :concern do
     end
   end
 
+  describe '#parent_ids' do
+    let(:parent) { create(:collection) }
+    let(:collection) { create(:collection, parent_collection: parent) }
+    let(:item) { create(:text_item, parent_collection: parent) }
+
+    it 'includes parent collection ids' do
+      expect(collection.search_data[:parent_ids]).to eq([parent.id])
+      expect(item.search_data[:parent_ids]).to eq([parent.id])
+    end
+
+    context 'if linked' do
+      let(:linked_collection) { create(:collection) }
+      let!(:link_card) { create(:collection_card_link, parent: linked_collection, collection: collection) }
+      let!(:link_item_card) { create(:collection_card_link, parent: linked_collection, item: item) }
+      before do
+        # refresh relationships
+        collection.reload
+        item.reload
+      end
+
+      it 'includes parents where it was linked' do
+        expect(collection.parent_ids).to match_array(
+          [parent.id, linked_collection.id],
+        )
+        expect(item.parent_ids).to match_array(
+          [parent.id, linked_collection.id],
+        )
+      end
+    end
+  end
+
   describe '#detect_infinite_loop' do
     let(:collection) { create(:collection) }
     context 'with long breadcrumb' do
