@@ -1,3 +1,4 @@
+import React from 'react'
 import Icon from './Icon'
 
 const ArrowIcon = ({ rotation = 180 } = {}) => (

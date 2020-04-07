@@ -1,3 +1,4 @@
+import React from 'react'
 import Icon from './Icon'
 import v from '~/utils/variables'
 

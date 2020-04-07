@@ -1,3 +1,4 @@
+import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'

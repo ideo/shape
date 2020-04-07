@@ -1,3 +1,4 @@
+import React from 'react'
 import PropTypes from 'prop-types'
 import { CubeGrid } from 'styled-loaders-react'
 import { Flex, Box } from 'reflexbox'
