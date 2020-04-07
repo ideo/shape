@@ -27,6 +27,7 @@ import BillingStatement from '~/ui/pages/BillingStatement'
 import TermsOfUseModal from '~/ui/users/TermsOfUseModal'
 import OrganizationSettings from '~/ui/organizations/OrganizationSettings'
 import UserSettings from '~/ui/users/UserSettings'
+import OrgSettings from '~/ui/org_settings/OrgSettings'
 import v from '~/utils/variables'
 import firebaseClient from '~/vendor/firebase/clients/firebaseClient'
 import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
@@ -342,6 +343,14 @@ class Routes extends React.Component {
                 render={() => (
                   <SettingsPage>
                     <UserSettings />
+                  </SettingsPage>
+                )}
+              />
+              <Route
+                path="/org-settings"
+                render={() => (
+                  <SettingsPage>
+                    <OrgSettings />
                   </SettingsPage>
                 )}
               />
