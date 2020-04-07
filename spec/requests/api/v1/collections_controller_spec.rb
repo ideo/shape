@@ -784,8 +784,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     before do
       user.add_role(Role::EDITOR, collection)
-      collection.update_column(:updated_at, 2.day.ago)
-      allow(RowInserter)
     end
 
     it 'should call row inserter' do
@@ -817,8 +815,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     before do
       user.add_role(Role::EDITOR, collection)
-      collection.update_column(:updated_at, 2.day.ago)
-      allow(RowInserter)
     end
 
     it 'should call row inserter with remove action' do
@@ -836,9 +832,10 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     xit 'should touch the collection' do
+      collection.update_column(:updated_at, 2.day.ago)
       expect do
         post(path, params: params)
-      end.to change(collection, :updated_at)
+      end.to change(collection.reload, :updated_at)
     end
   end
 
