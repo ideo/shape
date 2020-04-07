@@ -190,19 +190,19 @@ const MobileLinks = ({ isHome }) => {
       </MobileMenuItem>
 
       <MobileMenuItem>
-        <NavLink href="/sign_up" align="left">
-          Signup
+        <NavLink href="/login" align="left">
+          Login
         </NavLink>
       </MobileMenuItem>
 
       <MobileMenuBtnItem>
         <MarketingMainBtn
           onClick={() => {
-            window.location = `${process.env.BASE_HOST}/login`
+            window.location = `${process.env.BASE_HOST}/sign_up`
           }}
           width={184}
         >
-          Log in
+          SIGN UP
         </MarketingMainBtn>
       </MobileMenuBtnItem>
     </MarketingFlex>
