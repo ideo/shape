@@ -1236,8 +1236,10 @@ class FoamcoreGrid extends React.Component {
   positionBlank({ row, col, width, height }, type = 'drag') {
     const position = this.positionForCoordinates({ col, row, width, height })
     const {
+      collection,
       collection: { collection_cards },
     } = this.props
+    const { num_columns } = collection
 
     const { relativeZoomLevel } = this
     let inner = ''
@@ -1251,7 +1253,7 @@ class FoamcoreGrid extends React.Component {
           <StyledPlusIcon className="plus-icon">
             <PlusIcon />
           </StyledPlusIcon>
-          {emptyRow && this.renderRightBlankActions(row)}
+          {num_columns === 4 && emptyRow && this.renderRightBlankActions(row)}
         </div>
       )
     } else if (type === 'unrendered') {
