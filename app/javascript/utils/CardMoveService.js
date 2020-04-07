@@ -165,6 +165,8 @@ export default class CardMoveService {
       return true
     } catch (e) {
       uiStore.update('isLoadingMoveAction', false)
+      uiStore.update('isTransparentLoading', false)
+      uiStore.closeMoveMenu()
       let message = 'You cannot move a collection within itself.'
       if (e && e.error && e.error[0]) {
         message = e.error[0]
