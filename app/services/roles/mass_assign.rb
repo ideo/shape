@@ -43,7 +43,6 @@ module Roles
       assign_role_to_groups
       add_editors_as_comment_thread_followers
       add_group_members_as_comment_thread_followers
-      link_to_shared_collections if @new_role
       add_roles_to_children if @propagate_to_children
       create_activities_and_notifications if @invited_by
       failed_users.blank? && failed_groups.blank?
@@ -85,10 +84,25 @@ module Roles
       organization_id = @object.organization&.id
       return unless organization_id.present?
 
-      OrganizationMembershipWorker.perform_async(
-        @added_users.pluck(:id),
-        organization_id,
-      )
+      # new_role means the user is being added (and not just switching roles), so we also run
+      # the LinkToSharedCollectionsWorker to link shared records into their user collection
+      if @new_role
+        OrganizationMembershipAndLinkingWorker.perform_async(
+          @added_users.pluck(:id),
+          organization_id,
+          # params that are needed for LinkToSharedCollectionsWorker...
+          shared_user_ids,
+          # NOTE: group_ids method here excludes Primary group
+          group_ids,
+          collections_to_link,
+          items_to_link,
+        )
+      else
+        OrganizationMembershipWorker.perform_async(
+          @added_users.pluck(:id),
+          organization_id,
+        )
+      end
     end
 
     def assign_role_to_groups
@@ -164,16 +178,6 @@ module Roles
       AddCommentThreadFollowers.perform_async(
         thread_ids,
         @added_users.map(&:id),
-      )
-    end
-
-    def link_to_shared_collections
-      LinkToSharedCollectionsWorker.perform_async(
-        shared_user_ids,
-        # NOTE: group_ids method here excludes Primary group
-        group_ids,
-        collections_to_link,
-        items_to_link,
       )
     end
 
