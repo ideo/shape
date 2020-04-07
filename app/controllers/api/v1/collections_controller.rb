@@ -254,7 +254,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :pinned,
       :filter,
       :font_color,
-      :font_background
+      :font_background,
     )
   end
 
