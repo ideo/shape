@@ -6,12 +6,23 @@ import v from '~/utils/variables'
 /** @component */
 export const StyledSnackbar = styled(Snackbar)`
   &.Snackbar {
-    width: 100%;
     max-width: 673px;
     margin-bottom: 35px;
     flex-grow: 1;
     color: white;
     background-color: transparent;
+    ${props =>
+      props.placement &&
+      props.placement === 'bottom' &&
+      `
+      width: 100%
+    `}
+    ${props =>
+      props.placement &&
+      props.placement === 'top' &&
+      `
+      top: ${v.headerHeight + 12}px;
+    `}
   }
 `
 StyledSnackbar.displayName = 'StyledSnackbar'
@@ -19,7 +30,8 @@ StyledSnackbar.displayName = 'StyledSnackbar'
 /** @component */
 export const StyledSnackbarContent = styled(SnackbarContent)`
   &.SnackbarContent {
-    background-color: ${v.colors.commonDark};
+    background-color: ${props =>
+      props.variant ? props.variant.backgroundColor : v.colors.commonDark};
     max-width: none;
     padding: 15px 30px;
     width: 100%;

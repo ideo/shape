@@ -48,7 +48,7 @@ class EditableSearchInput extends React.Component {
       <Holder>
         <ExpandableSearchInput
           background={v.colors.commonLight}
-          defaultOpen={true}
+          defaultOpen
           value={value}
           onChange={onChange}
           disabled={!editing}

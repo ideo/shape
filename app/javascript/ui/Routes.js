@@ -110,6 +110,9 @@ class Routes extends React.Component {
       onSuccess: currentUser => {
         firebaseClient.authenticate(currentUser.google_auth_token)
       },
+      // had to turn this off because SameSite cookie doesn't work on some versions of Safari
+      // https://bit.ly/3axsLgw
+      checkIdeoSSO: false,
     })
 
     document.addEventListener('keydown', captureGlobalKeypress)

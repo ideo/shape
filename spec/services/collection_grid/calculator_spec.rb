@@ -1,5 +1,6 @@
 require 'rails_helper'
 
+# NOTE: use board_matrix(debug: true) for helpful debugging of these tests
 RSpec.describe CollectionGrid::Calculator, type: :service do
   # this is intentionally written similar to CollectionGridCalculator frontend test
   context 'normal collection' do
@@ -123,6 +124,33 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
         moving_cards[2].update(row: 3, col: 8)
         moving_cards[3].update(row: 4, col: 5, height: 2)
         # drag_map = [[0, 0], [0, 1], [0, 3], [1, 0]]
+      end
+
+      context 'at placement row: 0, col: 0, moving to empty collection' do
+        before do
+          # clear out the collection
+          collection.collection_cards.destroy_all
+          moving_cards[0].update(row: 4, col: 1, height: 2)
+          moving_cards[1].update(row: 5, col: 0, height: 1, width: 1)
+          moving_cards[2].update(row: 6, col: 0, height: 1, width: 1)
+          moving_cards[3].update(row: 7, col: 0, height: 1, width: 1)
+          # drag_map = [[0, 0], [1, -1], [2, -1], [3, -1]]
+        end
+
+        let(:placement) do
+          { row: 0, col: 0 }
+        end
+
+        it 'should insert cards into the layout and calculate collisions' do
+          calculate
+          expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+            [0, 0, collection.id],
+            # this particular case was getting col: -1 until we corrected the calculation
+            [1, 1, collection.id],
+            [2, 0, collection.id],
+            [3, 0, collection.id],
+          ])
+        end
       end
 
       context 'at placement row: 1, col: 3' do

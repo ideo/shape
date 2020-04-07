@@ -134,6 +134,8 @@ export default class UiStore {
     message: '',
     autoHideDuration: 4000,
     onClose: () => this.closeSnackbar(),
+    showRefresh: false,
+    backgroundColor: v.colors.commonDark,
   }
   @observable
   dialogConfig = { ...this.defaultDialogProps }
@@ -179,6 +181,9 @@ export default class UiStore {
   textEditingItem = null
   @observable
   textEditingItemHasTitleText = false
+  @observable
+  // have to track this e.g. if you are editing the original or link card (same item)
+  textEditingCardId = null
   @observable
   overdueBannerVisible = true
   @observable
@@ -611,6 +616,39 @@ export default class UiStore {
 
   get isIOS() {
     return getTouchDeviceOS() === TOUCH_DEVICE_OS.IOS
+  }
+
+  get isAndroidSingleColumn() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols === 1 && this.isAndroid
+  }
+
+  get isAndroidMultipleColumns() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols > 1 && this.isAndroid
+  }
+
+  get isIOSSingleColumn() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols === 1 && this.isIOS
+  }
+
+  get isIOSMultipleColumns() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols > 1 && this.isIOS
+  }
+
+  get isPortrait() {
+    // assumes that the client is a mobile device
+    return window.innerHeight > window.innerWidth
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,

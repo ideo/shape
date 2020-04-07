@@ -130,7 +130,7 @@ module RolifyExtensions
     elsif is_a?(Group)
       role.groups << self
       if resource.is_a?(Group)
-        AddGroupToGroup.call(parent_group: resource, subgroup: self)
+        resource.add_subgroup(self)
       end
     else
       raise "RolifyExtension: Unsupported model '#{self.class.name}' for add_role"
@@ -157,7 +157,7 @@ module RolifyExtensions
     elsif is_a?(Group)
       if resource.is_a? Group
         # destroy connections between group (resource) and other group (self)
-        RemoveGroupFromGroup.call(parent_group: resource, subgroup: self)
+        resource.remove_subgroup(self)
       end
       role.groups.destroy(self)
     else

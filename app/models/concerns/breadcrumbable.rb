@@ -44,6 +44,19 @@ module Breadcrumbable
     Item.in_collection(self, order: nil)
   end
 
+  # used for indexing search_data e.g. to surface linked items/collections
+  def parent_ids
+    cards_linked = []
+    if is_a?(Item)
+      cards_linked = cards_linked_to_this_item
+    elsif is_a?(Collection)
+      cards_linked = cards_linked_to_this_collection
+    end
+    (
+      Array.wrap(breadcrumb) + cards_linked.pluck(:parent_id)
+    ).uniq
+  end
+
   def parents
     Collection.where(id: breadcrumb)
   end

@@ -42,18 +42,89 @@ RSpec.describe Group, type: :model do
 
   context 'associations' do
     it { should belong_to :filestack_file }
-    it { should have_many :group_hierarchies }
-    it { should have_many :subgroups }
-    it { should have_many :subgroup_memberships }
-    it { should have_many :parent_groups }
 
-    context 'with GroupHierarchy' do
+    context 'subgroups' do
+      let(:group_a) { create(:group, name: 'Group A', organization: organization) }
+      let(:group_b) { create(:group, name: 'Group B', organization: organization) }
+      let(:group_c) { create(:group, name: 'Group C', organization: organization) }
+      let(:group_d) { create(:group, name: 'Group D', organization: organization) }
+      let(:group_e) { create(:group, name: 'Group E', organization: organization) }
+      let(:group_f) { create(:group, name: 'Group F', organization: organization) }
+      let!(:all_groups) do
+        [group_a, group_b, group_c, group_d, group_e, group_f]
+      end
+
+      # Graph of the group structure:
+      #
+      #     E
+      #     | \
+      #  C  D  F
+      #   \ | /
+      #     B
+      #     |
+      #     A
+      #
+      # Group B is a subgroup of A, Group C and D are subgroups of B, etc.
+      # Group F is a subgroup of B, and Group E is a subgroup of F,
+      #   meaning Group E has two paths to Group B
+      #
+
+      before do
+        group_b.add_subgroup(group_a)
+        group_c.add_subgroup(group_b)
+        group_d.add_subgroup(group_b)
+        group_e.add_subgroup(group_d)
+        # Create second pathway from e to b
+        group_f.add_subgroup(group_b)
+        group_e.add_subgroup(group_f)
+        all_groups.map(&:reload)
+      end
+
+      describe '#add_subgroup' do
+        it 'creates right subgroup adjacency lists' do
+          expect(group_a.subgroup_ids).to match_array([])
+          expect(group_b.subgroup_ids).to match_array([group_a.id])
+          expect(group_c.subgroup_ids).to match_array([group_a.id, group_b.id])
+          expect(group_d.subgroup_ids).to match_array([group_a.id, group_b.id])
+          expect(group_e.subgroup_ids).to match_array([group_a.id, group_b.id, group_d.id, group_f.id])
+          expect(group_f.subgroup_ids).to match_array([group_a.id, group_b.id])
+        end
+      end
+
+      describe '#remove_subgroup' do
+        it 'removes group from all subgroups' do
+          group_b.remove_subgroup(group_a)
+          all_groups.map(&:reload)
+
+          expect(group_a.subgroup_ids).to match_array([])
+          expect(group_b.subgroup_ids).to match_array([])
+          expect(group_c.subgroup_ids).to match_array([group_b.id])
+          expect(group_d.subgroup_ids).to match_array([group_b.id])
+          expect(group_e.subgroup_ids).to match_array([group_b.id, group_d.id, group_f.id])
+          expect(group_f.subgroup_ids).to match_array([group_b.id])
+        end
+
+        it 'does not remove if there is another path' do
+          group_e.remove_subgroup(group_d)
+          all_groups.map(&:reload)
+
+          expect(group_a.subgroup_ids).to match_array([])
+          expect(group_b.subgroup_ids).to match_array([group_a.id])
+          expect(group_c.subgroup_ids).to match_array([group_a.id, group_b.id])
+          expect(group_d.subgroup_ids).to match_array([group_a.id, group_b.id])
+          expect(group_e.subgroup_ids).to match_array([group_a.id, group_b.id, group_f.id])
+          expect(group_f.subgroup_ids).to match_array([group_a.id, group_b.id])
+        end
+      end
+    end
+
+    context 'subgroups with users' do
       let(:group1_users) { create_list(:user, 2) }
       let(:group2_users) { create_list(:user, 2) }
       let(:group3_users) { create_list(:user, 3) }
-      let!(:group1) { create(:group, add_members: group1_users, add_subgroups: [group2, group3]) }
-      let!(:group2) { create(:group, add_members: group2_users, add_subgroups: [group3]) }
-      let!(:group3) { create(:group, add_members: group3_users) }
+      let!(:group1) { create(:group, name: 'group1', add_members: group1_users, add_subgroups: [group2, group3]) }
+      let!(:group2) { create(:group, name: 'group2', add_members: group2_users, add_subgroups: [group3]) }
+      let!(:group3) { create(:group, name: 'group3', add_members: group3_users) }
 
       describe '#parent_groups' do
         it 'returns associated parent groups' do

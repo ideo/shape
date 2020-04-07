@@ -7,6 +7,16 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     describe 'GET #show' do
       let(:path) { "/api/v1/collections/#{collection.id}" }
 
+      context 'with id not found' do
+        let(:collection) { Mashie.new(id: 99) }
+
+        it 'returns a 404' do
+          get(path)
+          expect(response.status).to eq(404)
+          expect(json['errors']).to eq(["Couldn't find Collection with 'id'=99"])
+        end
+      end
+
       context 'with a normal collection' do
         let(:collection) { create(:collection) }
         it 'returns a 401' do
