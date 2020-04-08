@@ -79,7 +79,9 @@ class OpenQuestion extends React.Component {
           placeholder="please enter question here"
           canEdit={canEdit}
           handleFocus={handleFocus}
-          handleInstanceQuestionContentUpdate={handleInstanceQuestionContentUpdate}
+          handleInstanceQuestionContentUpdate={
+            handleInstanceQuestionContentUpdate
+          }
           optional
         />
       </QuestionSpacingContainer>

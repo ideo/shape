@@ -21,6 +21,20 @@ class TemplateInstanceUpdater
       templated_collections.map { |i| move_cards_archived_from_master_template(i) }
     when 'create', 'duplicate', 'pin', 'unarchive'
       templated_collections.map { |i| insert_or_update_instance_cards(i) }
+    when 'update_text_content'
+      templated_collections do |i|
+        updated_card_id = @updated_card_ids.first
+        return unless updated_card_id
+
+        update_text_instance_card_for_instance(updated_card_id, i)
+      end
+    when 'update_question_content'
+      templated_collections do |i|
+        updated_card_id = @updated_card_ids.first
+        return unless updated_card_id
+
+        update_question_instance_card_for_instance(@updated_card_ids, i)
+      end
     else
       return
     end
@@ -74,6 +88,32 @@ class TemplateInstanceUpdater
 
     instance.reorder_cards!
     instance.touch
+  end
+
+  def update_text_instance_card_for_instance(templated_from_id, instance)
+    master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == templated_from_id }
+    card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
+
+    next if master_card.blank? || card_within_instance.blank?
+
+    TemplateInstanceTextCardUpdater.call(
+      instance_card: card_within_instance,
+      master_card: master_card,
+      master_template: @master_template,
+    )
+  end
+
+  def update_question_instance_card_for_instance(templated_from_id, instance)
+    master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == templated_from_id }
+    card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
+
+    next if master_card.blank? || card_within_instance.blank?
+
+    TemplateInstanceQuestionCardUpdater.call(
+      instance_card: card_within_instance,
+      master_card: master_card,
+      master_template: @master_template,
+    )
   end
 
   def add_cards_from_master_template(adding_cards, instance)
