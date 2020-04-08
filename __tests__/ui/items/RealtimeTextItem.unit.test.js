@@ -149,10 +149,10 @@ describe('RealtimeTextItem', () => {
 
     it('should flush debounced methods', () => {
       component.sendCombinedDelta.flush = jest.fn()
-      component.instanceDataContentUpdate.flush = jest.fn()
+      component.instanceTextContentUpdate.flush = jest.fn()
       component.cancel()
       expect(component.sendCombinedDelta.flush).toHaveBeenCalled()
-      expect(component.instanceDataContentUpdate.flush).toHaveBeenCalled()
+      expect(component.instanceTextContentUpdate.flush).toHaveBeenCalled()
     })
 
     it('should not call item pushTextUndo unless text has changed', () => {

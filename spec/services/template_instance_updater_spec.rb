@@ -108,8 +108,28 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
           expect(instance_text_item.data_content['ops']).to eq(template_text_item.data_content['ops'])
         end
 
+        it 'should update instance text item data_content when it\'s version is <= its template text item' do
+          template_text_item.transform_realtime_delta(user: user,
+                                                      delta: data.delta,
+                                                      version: data.version,
+                                                      full_content: data.full_content)
+          template_instance_updater.call
+          expect(instance_text_item.data_content['ops']).to eq(template_text_item.data_content['ops'])
+          expect(instance_text_item.version).to eq(template_text_item.version)
+        end
+
         it 'should not update instance text item data_content when it has an edit activity' do
           instance_text_item.activities << activity
+          template_text_item.transform_realtime_delta(user: user,
+                                                      delta: data.delta,
+                                                      version: data.version,
+                                                      full_content: data.full_content)
+          template_instance_updater.call
+          expect(instance_text_item.data_content['ops']).not_to eq(template_text_item.data_content['ops'])
+        end
+
+        it 'should not update instance text item data_content when it\'s version is > its template text item' do
+          instance_text_item.update(version: 10)
           template_text_item.transform_realtime_delta(user: user,
                                                       delta: data.delta,
                                                       version: data.version,

@@ -46,8 +46,8 @@ class CustomizableQuestionChoice extends React.Component {
   constructor(props) {
     super(props)
     this.debouncedSaveChoice = _.debounce(this._saveChoice, 1050)
-    this.instanceDataContentUpdate = _.debounce(
-      this._instanceDataContentUpdate,
+    this.instanceQuestionContentUpdate = _.debounce(
+      this._instanceQuestionContentUpdate,
       30000
     )
   }
@@ -57,11 +57,11 @@ class CustomizableQuestionChoice extends React.Component {
     choice.save()
   }
 
-  _instanceDataContentUpdate = () => {
-    const { handleInstanceDataContentUpdate } = this.props
+  _instanceQuestionContentUpdate = () => {
+    const { handleQuestionItemUpdate } = this.props
 
-    if (handleInstanceDataContentUpdate) {
-      handleInstanceDataContentUpdate()
+    if (handleQuestionItemUpdate) {
+      handleQuestionItemUpdate()
     }
   }
 
@@ -75,12 +75,12 @@ class CustomizableQuestionChoice extends React.Component {
     const { choice } = this.props
     choice.text = ev.target.value
     this.debouncedSaveChoice()
-    this.instanceDataContentUpdate()
+    this.instanceQuestionContentUpdate()
   }
 
   handleBlur = () => {
     this.debouncedSaveChoice.flush()
-    this.instanceDataContentUpdate.flush()
+    this.instanceQuestionContentUpdate.flush()
   }
 
   handleDelete = ev => {
@@ -165,7 +165,7 @@ CustomizableQuestionChoice.propTypes = {
   placeholder: PropTypes.string,
   onDelete: PropTypes.func,
   handleFocus: PropTypes.func,
-  handleInstanceDataContentUpdate: PropTypes.func,
+  handleQuestionItemUpdate: PropTypes.func,
 }
 
 CustomizableQuestionChoice.defaultProps = {
@@ -175,7 +175,7 @@ CustomizableQuestionChoice.defaultProps = {
   placeholder: 'Write your option here',
   onDelete: () => {},
   handleFocus: () => true,
-  handleInstanceDataContentUpdate: () => true,
+  handleQuestionItemUpdate: () => true,
 }
 
 CustomizableQuestionChoice.displayName = 'CustomizableQuestionChoice'
