@@ -1,15 +1,13 @@
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-import { fakeCollection } from '#/mocks/data'
-
 let wrapper, props, uiStore, render
 
 describe('FoamcoreHotspot', () => {
   beforeEach(() => {
     uiStore = fakeUiStore
     props = {
-      collection: fakeCollection,
+      onClick: jest.fn(),
       row: 1,
       top: 300,
       uiStore,
@@ -27,9 +25,9 @@ describe('FoamcoreHotspot', () => {
   })
 
   describe('onClick()', () => {
-    it('should insert a row into the row passed in', () => {
+    it('should call the passed in function', () => {
       wrapper.find('StyledHotspot').simulate('click')
-      expect(props.collection.API_insertRow).toHaveBeenCalled()
+      expect(props.onClick).toHaveBeenCalled()
     })
   })
 })

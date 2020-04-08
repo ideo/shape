@@ -10,27 +10,22 @@ import {
 @inject('uiStore')
 @observer
 class FoamcoreHotspot extends React.Component {
-  onClick = () => {
-    const { collection, row } = this.props
-    collection.API_insertRow(row)
-  }
-
   render() {
-    const { row, top, uiStore } = this.props
+    const { row, top, onClick, uiStore } = this.props
     const {
       gridSettings: { gutter },
     } = uiStore
 
+    const height = `${gutter}px`
     return (
       <StyledHotspot
-        onClick={this.onClick}
-        gutter={uiStore.gridSettings.gutter}
-        height={`${gutter}px`}
+        onClick={onClick}
+        height={height}
         top={`${top}px`}
         width="100%"
         data-row={row}
       >
-        <HotspotLine height={`${gutter}px`} width="100%" />
+        <HotspotLine height={height} width="100%" />
         <StyledPlusIcon left="calc(-50% + 12px)">+</StyledPlusIcon>
       </StyledHotspot>
     )
@@ -38,9 +33,9 @@ class FoamcoreHotspot extends React.Component {
 }
 
 FoamcoreHotspot.propTypes = {
-  collection: MobxPropTypes.objectOrObservableObject.isRequired,
   row: PropTypes.number.isRequired,
   top: PropTypes.number.isRequired,
+  onClick: PropTypes.func.isRequired,
 }
 FoamcoreHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

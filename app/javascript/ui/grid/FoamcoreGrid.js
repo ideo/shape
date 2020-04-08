@@ -605,16 +605,23 @@ class FoamcoreGrid extends React.Component {
     this.throttledLoadAfterScroll()
   }
 
-  handleAddRowClick = (row, ev) => {
-    const { collection } = this.props
-    ev.stopPropagation()
-    collection.API_insertRow(row)
+  handleInsertRowClick = (ev, row) => {
+    return this.handleRowClick(ev, row, 'insert_row')
   }
 
-  handleRemoveRowClick = (row, ev) => {
-    const { collection } = this.props
+  handleRemoveRowClick = (ev, row) => {
+    return this.handleRowClick(ev, row, 'remove_row')
+  }
+
+  handleRowClick = async (ev, row, action) => {
     ev.stopPropagation()
-    collection.API_removeRow(row)
+    const { collection, uiStore } = this.props
+    if (uiStore.isTransparentLoading) {
+      return false
+    }
+    uiStore.update('isTransparentLoading', true)
+    await collection.API_manipulateRow(row, action)
+    uiStore.update('isTransparentLoading', false)
   }
 
   originalCard(cardId) {
@@ -1216,7 +1223,7 @@ class FoamcoreGrid extends React.Component {
           title="Remove row"
           placement="top"
         >
-          <CircleIconHolder onClick={ev => this.handleRemoveRowClick(row, ev)}>
+          <CircleIconHolder onClick={ev => this.handleRemoveRowClick(ev, row)}>
             <CircleTrashIcon />
           </CircleIconHolder>
         </Tooltip>
@@ -1225,7 +1232,7 @@ class FoamcoreGrid extends React.Component {
           title="Add row"
           placement="top"
         >
-          <CircleIconHolder onClick={ev => this.handleAddRowClick(row, ev)}>
+          <CircleIconHolder onClick={ev => this.handleInsertRowClick(ev, row)}>
             <CircleAddRowIcon />
           </CircleIconHolder>
         </Tooltip>
@@ -1488,22 +1495,26 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderHotspots() {
-    const { collection, uiStore } = this.props
+    const { collection } = this.props
     const { num_columns } = collection
+    const { relativeZoomLevel, gridSettings } = this
 
     if (num_columns !== 4) return null
 
     const collectionMaxRow = collection.max_row_index
     const hotspots = []
+    let { gridH, gutter } = gridSettings
+    gutter = gutter / relativeZoomLevel
+    gridH = gridH / relativeZoomLevel
+
     _.times(collectionMaxRow, row => {
-      const cardHeight = uiStore.gridSettings
-      const { gridH, gutter } = cardHeight
       hotspots.push(
         <FoamcoreHotspot
+          key={`hotspot-${row}`}
           row={row - 1}
           cols={4}
           top={(gridH + gutter) * row - gutter}
-          collection={collection}
+          onClick={ev => this.handleInsertRowClick(ev, row - 1)}
         />
       )
     })
