@@ -43,12 +43,12 @@ IdeaQuestion.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool,
   handleFocus: PropTypes.func,
-  handleInstanceDataContentUpdate: PropTypes.func,
+  handleInstanceQuestionContentUpdate: PropTypes.func,
 }
 IdeaQuestion.defaultProps = {
   canEdit: false,
   handleFocus: () => true,
-  handleInstanceDataContentUpdate: () => true,
+  handleInstanceQuestionContentUpdate: () => true,
 }
 IdeaQuestion.displayName = 'IdeaQuestion'
 
