@@ -119,7 +119,7 @@ class Routes extends React.Component {
     document.addEventListener('touchmove', this.handleTouchMove, {
       passive: false,
     })
-    document.addEventListener('touchend', this.handleTouchEnd, {
+    document.addEventListener('touchend', this.handleTouchMove, {
       passive: false,
     })
   }
@@ -129,7 +129,7 @@ class Routes extends React.Component {
     document.removeEventListener('touchmove', this.handleTouchMove, {
       passive: false,
     })
-    document.removeEventListener('touchmove', this.handleTouchEnd, {
+    document.removeEventListener('touchend', this.handleTouchMove, {
       passive: false,
     })
   }
@@ -190,14 +190,6 @@ class Routes extends React.Component {
       maxY: null,
     })
     pageBoundsScroller.setScrolling(false)
-  }
-
-  handleTouchEnd = e => {
-    const { uiStore } = this.props
-    if (uiStore.dragging || uiStore.activityLogMoving) {
-      e.preventDefault()
-    }
-    this._dismissActivityLogBox(e)
   }
 
   handleTouchMove = e => {
