@@ -6,8 +6,6 @@ class TemplateInstanceTextCardUpdater < SimpleService
   end
 
   def call
-    return unless @instance_card.item.is_a?(Item::TextItem)
-
     @master_card.item.reload
     copy_data_content_from_master!
   end

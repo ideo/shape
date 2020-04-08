@@ -6,33 +6,44 @@ class TemplateInstanceCardUpdater < SimpleService
   end
 
   def call
-    copy_card_attributes!
-
-    return unless @master_template.is_a?(Collection::TestCollection) || @instance_card.item.is_a?(Item::TextItem)
+    @instance_card.copy_card_attributes!(@master_card)
 
     if @master_template.is_a?(Collection::TestCollection) && @master_template.inside_a_submission_box_template?
       TemplateInstanceQuestionCardUpdater.call(
         instance_card: @instance_card,
         master_card: @master_card,
-        master_template: @master_template,
       )
     elsif @instance_card.item.is_a?(Item::TextItem)
       TemplateInstanceTextCardUpdater.call(
         instance_card: @instance_card,
         master_card: @master_card,
-        master_template: @master_template,
       )
     end
+
+    # duplicate question choices when instances are duplicated
+    if @master_card.record.is_a?(Item::QuestionItem) &&
+       (@master_card.record.question_multiple_choice? || @master_card.record.question_single_choice?) &&
+       @master_card.record.question_choices.present?
+      duplicate_instance_question_choices
+    end
+
+    return unless @instance_card.archived?
+
+    @instance_card.unarchive!
   end
 
   private
 
-  def copy_card_attributes!
-    @instance_card.update_columns(
-      height: @master_card.height,
-      width: @master_card.width,
-      order: @master_card.order,
-      pinned: @master_card.pinned,
-    )
+  def duplicate_instance_question_choices
+    master_question_choices = @master_card.record.question_choices.select { |choice| choice.text.present? }
+    instance_question_choices = @instance_card.record.question_choices
+    instance_choice_texts = instance_question_choices.pluck(:text)
+
+    master_question_choices.each_with_index do |master_choice, i|
+      master_choice_text = master_choice.text
+      next unless instance_question_choices[i].blank? || instance_choice_texts.exclude?(master_choice_text)
+
+      master_choice.duplicate!(assign_question: @instance_card.record)
+    end
   end
 end

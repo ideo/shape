@@ -564,4 +564,13 @@ class CollectionCard < ApplicationRecord
 
     collection.touch
   end
+
+  def copy_card_attributes!(copy)
+    update_columns(
+      height: copy.height,
+      width: copy.width,
+      order: copy.order,
+      pinned: copy.pinned,
+    )
+  end
 end

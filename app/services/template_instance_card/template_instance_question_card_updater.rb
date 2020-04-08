@@ -1,13 +1,10 @@
 class TemplateInstanceQuestionCardUpdater < SimpleService
-  def initialize(instance_card:, master_card:, master_template:)
+  def initialize(instance_card:, master_card:)
     @instance_card = instance_card
     @master_card = master_card
-    @master_template = master_template
   end
 
   def call
-    return unless @master_template.is_a?(Collection::TestCollection) && @master_template.inside_a_submission_box_template?
-
     copy_test_details_from_master!
   end
 

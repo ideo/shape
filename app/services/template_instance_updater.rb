@@ -23,20 +23,12 @@ class TemplateInstanceUpdater
       templated_collections.map { |i| move_cards_archived_from_master_template(i) }
     when 'create', 'duplicate', 'pin', 'unarchive'
       templated_collections.map { |i| insert_or_update_instance_cards(i) }
-    when 'update_text_content'
-      templated_collections do |i|
-        updated_card_id = @updated_card_ids.first
-        return unless updated_card_id
+    when 'update_text_content', 'update_question_content'
+      # a single card is being passed through for these actions
+      updated_card_id = @updated_card_ids.first
+      return unless updated_card_id
 
-        update_text_instance_card_for_instance(updated_card_id, i)
-      end
-    when 'update_question_content'
-      templated_collections do |i|
-        updated_card_id = @updated_card_ids.first
-        return unless updated_card_id
-
-        update_question_instance_card_for_instance(@updated_card_ids, i)
-      end
+      templated_collections.map { |i| update_templated_card_for_instance(updated_card_id, i) }
     else
       return
     end
@@ -79,17 +71,6 @@ class TemplateInstanceUpdater
         master_card: master_card,
         master_template: @master_template,
       )
-
-      # duplicate question choices when instances are duplicated
-      next unless master_card.record.is_a?(Item::QuestionItem) &&
-                  (master_card.record.question_multiple_choice? || master_card.record.question_single_choice?) &&
-                  master_card.record.question_choices.present?
-
-      duplicate_instance_question_choices(master_card, card_within_instance)
-
-      next unless card_within_instance.archived?
-
-      card_within_instance.unarchive!
     end
 
     instance.reorder_cards!
@@ -103,41 +84,39 @@ class TemplateInstanceUpdater
 
       next if master_card.blank? || card_within_instance.blank?
 
-      TemplateInstanceCardUpdater.call(
-        instance_card: card_within_instance,
-        master_card: master_card,
-        master_template: @master_template,
-      )
+      card_within_instance.copy_card_attributes!(master_card)
     end
 
     instance.reorder_cards!
     instance.touch
   end
 
-  def update_text_instance_card_for_instance(templated_from_id, instance)
+  def update_templated_card_for_instance(templated_from_id, instance)
     master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == templated_from_id }
     card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
 
-    next if master_card.blank? || card_within_instance.blank?
+    return unless master_card.present? && card_within_instance.present?
 
-    TemplateInstanceTextCardUpdater.call(
-      instance_card: card_within_instance,
-      master_card: master_card,
-      master_template: @master_template,
-    )
-  end
+    case @template_update_action
+    when 'update_text_content'
+      return unless @instance_card.item.is_a?(Item::TextItem)
 
-  def update_question_instance_card_for_instance(templated_from_id, instance)
-    master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == templated_from_id }
-    card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
+      TemplateInstanceTextCardUpdater.call(
+        instance_card: card_within_instance,
+        master_card: master_card,
+        master_template: @master_template,
+      )
+    when 'update_question_content'
+      return unless @master_template.is_a?(Collection::TestCollection) && @master_template.inside_a_submission_box_template?
 
-    next if master_card.blank? || card_within_instance.blank?
-
-    TemplateInstanceQuestionCardUpdater.call(
-      instance_card: card_within_instance,
-      master_card: master_card,
-      master_template: @master_template,
-    )
+      TemplateInstanceQuestionCardUpdater.call(
+        instance_card: card_within_instance,
+        master_card: master_card,
+        master_template: @master_template,
+      )
+    else
+      return
+    end
   end
 
   def add_cards_from_master_template(adding_cards, instance)
@@ -271,18 +250,5 @@ class TemplateInstanceUpdater
     end
     add_cards_from_master_template(add_card_ids, instance) if add_card_ids.present?
     # NOTE: may need to archive empty 'Deleted From Collection' collection
-  end
-
-  def duplicate_instance_question_choices(master_card, instance_card)
-    master_question_choices = master_card.record.question_choices.select { |choice| choice.text.present? }
-    instance_question_choices = instance_card.record.question_choices
-    instance_choice_texts = instance_question_choices.pluck(:text)
-
-    master_question_choices.each_with_index do |master_choice, i|
-      master_choice_text = master_choice.text
-      next unless instance_question_choices[i].blank? || instance_choice_texts.exclude?(master_choice_text)
-
-      master_choice.duplicate!(assign_question: instance_card.record)
-    end
   end
 end
