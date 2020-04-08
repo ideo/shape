@@ -17,6 +17,8 @@ class TemplateInstanceUpdater
     case @template_update_action
     when 'update_all'
       templated_collections.map { |i| update_all_templated_cards_for_instance(i) }
+    when 'update_card_attributes'
+      templated_collections.map { |i| update_all_card_attributes_for_instance(i) }
     when 'archive'
       templated_collections.map { |i| move_cards_archived_from_master_template(i) }
     when 'create', 'duplicate', 'pin', 'unarchive'
@@ -49,6 +51,10 @@ class TemplateInstanceUpdater
 
   def update_all_templated_cards_for_instance(instance)
     update_instance_cards_by_templated_from_ids(@updated_card_ids, instance)
+  end
+
+  def update_all_card_attributes_for_instance(instance)
+    update_instance_card_attributes_by_templated_from_ids(@updated_card_ids, instance)
   end
 
   def insert_or_update_instance_cards(instance)
@@ -84,6 +90,24 @@ class TemplateInstanceUpdater
       next unless card_within_instance.archived?
 
       card_within_instance.unarchive!
+    end
+
+    instance.reorder_cards!
+    instance.touch
+  end
+
+  def update_instance_card_attributes_by_templated_from_ids(templated_from_ids, instance)
+    templated_from_ids.each do |id|
+      master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
+      card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
+
+      next if master_card.blank? || card_within_instance.blank?
+
+      TemplateInstanceCardUpdater.call(
+        instance_card: card_within_instance,
+        master_card: master_card,
+        master_template: @master_template,
+      )
     end
 
     instance.reorder_cards!

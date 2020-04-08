@@ -172,7 +172,7 @@ class CardMover < SimpleService
     if @to_collection == @from_collection && @from_collection.master_template?
       @from_collection.queue_update_template_instances(
         updated_card_ids: @from_collection.collection_cards.pluck(:id),
-        template_update_action: 'update_all',
+        template_update_action: 'update_card_attributes',
       )
       return
     end
