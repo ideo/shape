@@ -1435,6 +1435,31 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
+  async API_insertRow(row) {
+    const action = 'insert_row'
+    return this.API_manipulateRow(row, action)
+  }
+
+  async API_removeRow(row) {
+    const action = 'remove_row'
+    return this.API_manipulateRow(row, action)
+  }
+
+  async API_manipulateRow(row, action) {
+    const { apiStore, uiStore } = this
+    const params = {
+      row,
+    }
+
+    try {
+      await apiStore.request(`collections/${this.id}/${action}`, 'POST', params)
+      return this.API_fetchCards()
+    } catch (e) {
+      console.warn(e)
+      uiStore.defaultAlertError()
+    }
+  }
+
   toggleTemplateHelper() {
     const { apiStore } = this
     const { currentUser } = apiStore

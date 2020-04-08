@@ -14,9 +14,6 @@ export const getTouchDeviceOS = () => {
   }
 
   // iOS detection from: https://stackoverflow.com/a/58065241
-  if (/iPad|iPhone|iPod|Safari/.test(userAgent) && !window.MSStream) {
-  }
-
   if (
     (/iPad|iPhone|iPod/.test(navigator.platform) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) &&

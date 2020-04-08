@@ -165,6 +165,8 @@ export default class CardMoveService {
       return true
     } catch (e) {
       uiStore.update('isLoadingMoveAction', false)
+      uiStore.update('isTransparentLoading', false)
+      uiStore.closeMoveMenu()
       let message = 'You cannot move a collection within itself.'
       if (e && e.error && e.error[0]) {
         message = e.error[0]
@@ -213,17 +215,23 @@ export default class CardMoveService {
       // Set order for moved cards so they are between whole integers,
       // and API_batchUpdateCards will properly set/reorder it amongst the collection
       const sortedCards = _.sortBy(movingCards, 'order')
-      const toPinAllMovingCards = this.calculateToPinAllMovingCards(
-        collection,
-        order
-      )
+
+      let toPinAllMovingCards = false
+      if (collection.isMasterTemplate) {
+        toPinAllMovingCards = this.calculateToPinAllMovingCards(
+          collection,
+          order
+        )
+      }
 
       _.each(sortedCards, (card, idx) => {
         const sortedOrder = this.calculateOrderForMovingCard(order, idx)
         const update = {
           card,
           order: sortedOrder,
-          pinned: toPinAllMovingCards,
+        }
+        if (collection.isMasterTemplate) {
+          update.pinned = toPinAllMovingCards
         }
         updates.push(update)
       })

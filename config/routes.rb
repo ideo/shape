@@ -32,6 +32,8 @@ Rails.application.routes.draw do
           patch 'submit'
           patch 'restore_permissions'
           post 'background_update_template_instances'
+          post 'insert_row'
+          post 'remove_row'
           post 'background_update_live_test'
         end
         collection do
