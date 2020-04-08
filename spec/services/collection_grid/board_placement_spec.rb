@@ -32,16 +32,15 @@ RSpec.describe CollectionGrid::BoardPlacement, type: :service do
       end
 
       context 'moving to a collection with cards' do
-        let!(:to_collection_card) { create(:collection_card_text, parent: to_collection, row: 0) }
+        let!(:to_collection_card) { create(:collection_card_text, parent: to_collection, row: 0, col: 1) }
 
-        it 'should place them in the next empty row' do
+        it 'should place them in the next empty spot' do
           service.call
           # they are all 1x1 so should fit consecutively
-          moving_cards.each_with_index do |card, index|
-            expect(card.parent_id).to eq to_collection.id
-            expect(card.row).to eq 1
-            expect(card.col).to eq index
-          end
+          expect(moving_cards.pluck(:row, :col)).to eq([
+            [0, 2],
+            [0, 3],
+          ])
         end
       end
     end
