@@ -25,6 +25,8 @@ class RowInserter < SimpleService
   end
 
   def select_all_cards_below
-    @parent_collection.collection_cards.where(row: (@row + 1)..Float::INFINITY)
+    @parent_collection.collection_cards.where(
+      CollectionCard.arel_table[:row].gt(@row),
+    )
   end
 end

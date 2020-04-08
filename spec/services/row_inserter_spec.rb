@@ -29,7 +29,7 @@ RSpec.describe RowInserter, type: :service do
     cards[5].update(width: 1, height: 1, row: 3, col: 3)
   end
 
-  it 'insert a row below the row passed in' do
+  it 'inserts a row below the row passed in' do
     inserter.call
     cards.reload
     expect(cards[1].row).to eq 1
@@ -47,7 +47,7 @@ RSpec.describe RowInserter, type: :service do
       cards[5].update(width: 1, height: 1, row: 4, col: 3)
     end
 
-    it 'remove the row passed in' do
+    it 'removes the row passed in' do
       inserter.call
       cards.reload
       expect(cards[3].row).to eq 2
