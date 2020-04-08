@@ -1,8 +1,7 @@
 class TemplateInstanceTextCardUpdater < SimpleService
-  def initialize(instance_card:, master_card:, master_template:)
+  def initialize(instance_card:, master_card:)
     @instance_card = instance_card
     @master_card = master_card
-    @master_template = master_template
   end
 
   def call

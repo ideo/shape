@@ -104,7 +104,6 @@ class TemplateInstanceUpdater
       TemplateInstanceTextCardUpdater.call(
         instance_card: card_within_instance,
         master_card: master_card,
-        master_template: @master_template,
       )
     when 'update_question_content'
       return unless @master_template.is_a?(Collection::TestCollection) && @master_template.inside_a_submission_box_template?
@@ -112,7 +111,6 @@ class TemplateInstanceUpdater
       TemplateInstanceQuestionCardUpdater.call(
         instance_card: card_within_instance,
         master_card: master_card,
-        master_template: @master_template,
       )
     else
       return
