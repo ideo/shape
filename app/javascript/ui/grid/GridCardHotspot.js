@@ -103,8 +103,8 @@ class GridCardHotspot extends React.Component {
         dragging={dragging}
         onClick={this.clickHotspot}
       >
-        <HotspotLine left={line} width={uiStore.gridSettings.gutter} />
-        <StyledPlusIcon left={icon}>+</StyledPlusIcon>
+        <HotspotLine left={line} width={`${uiStore.gridSettings.gutter}px`} />
+        <StyledPlusIcon left={`${icon}px`}>+</StyledPlusIcon>
       </StyledHotspot>
     )
   }

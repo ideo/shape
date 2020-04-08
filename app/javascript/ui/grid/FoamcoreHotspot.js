@@ -24,6 +24,7 @@ class FoamcoreHotspot extends React.Component {
         top={`${top}px`}
         width="100%"
         data-row={row}
+        style={{ zIndex: 0 }}
       >
         <HotspotLine height={height} width="100%" />
         <StyledPlusIcon left="calc(-50% + 12px)">+</StyledPlusIcon>
