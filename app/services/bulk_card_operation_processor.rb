@@ -32,6 +32,8 @@ class BulkCardOperationProcessor < SimpleService
       order: order,
       row: row,
       col: col,
+      width: 1,
+      height: 1,
       item_attributes: {
         type: 'Item::TextItem',
         content: placeholder_message,
