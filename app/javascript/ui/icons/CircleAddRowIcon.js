@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const CircleTrashIcon = () => (
+const CircleAddRowIcon = () => (
   <Icon fill>
     <svg
       version="1.1"
@@ -24,4 +24,4 @@ const CircleTrashIcon = () => (
   </Icon>
 )
 
-export default CircleTrashIcon
+export default CircleAddRowIcon
