@@ -95,6 +95,13 @@ class CollectionUpdater < SimpleService
     @attributes[:collection_cards_attributes].select! do |card_attr|
       found_ids.include?(card_attr[:id].to_i)
     end
+
+    return unless @collection.templated?
+
+    @attributes[:collection_cards_attributes].each do |card_attr|
+      # don't allow changing this attr for template instances
+      card_attr.delete :pinned
+    end
   end
 
   def cache_collection_cover_if_needed

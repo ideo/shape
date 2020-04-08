@@ -782,6 +782,73 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
+  describe 'POST #insert_row' do
+    let!(:collection) { create(:collection) }
+    let(:raw_params) do
+      {
+        row: 1,
+      }
+    end.to_json
+    let(:params) { raw_params.to_json }
+    let(:path) { "/api/v1/collections/#{collection.id}/insert_row" }
+
+    before do
+      user.add_role(Role::EDITOR, collection)
+    end
+
+    it 'should call row inserter' do
+      expect(RowInserter).to receive(:call)
+      post(path, params: params)
+    end
+
+    it 'should return no content' do
+      post(path, params: params)
+      expect(response.status).to eq(204)
+    end
+
+    xit 'should touch the collection' do
+      expect do
+        post(path, params: params)
+      end.to change(collection, :updated_at)
+    end
+  end
+
+  describe 'POST #remove_row' do
+    let!(:collection) { create(:collection) }
+    let(:raw_params) do
+      {
+        row: 1,
+      }
+    end.to_json
+    let(:params) { raw_params.to_json }
+    let(:path) { "/api/v1/collections/#{collection.id}/remove_row" }
+
+    before do
+      user.add_role(Role::EDITOR, collection)
+    end
+
+    it 'should call row inserter with remove action' do
+      expect(RowInserter).to receive(:call).with(
+        collection: collection,
+        row: 1,
+        action: 'remove',
+      )
+      post(path, params: params)
+    end
+
+    it 'should return no content' do
+      post(path, params: params)
+      expect(response.status).to eq(204)
+    end
+
+    xit 'should touch the collection' do
+      collection.update_column(:updated_at, 2.day.ago)
+      expect do
+        post(path, params: params)
+      end.to change(collection.reload, :updated_at)
+    end
+  end
+
   describe 'POST #set_submission_box_template' do
     let!(:submission_box) { create(:submission_box) }
     let(:path) { '/api/v1/collections/set_submission_box_template' }

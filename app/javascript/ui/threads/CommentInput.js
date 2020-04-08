@@ -29,16 +29,10 @@ class CommentInput extends React.Component {
     this.props.setEditor(null, { unset: true })
   }
 
-  /** WIKI: https://github.com/ideo/shape/wiki/Comment-Mentions-Positioning
-   * It is responsible for handling comment input position based on:
-   * - comment count
-   * - activity log box height
-   * - activity log box y position
-   * - device type: android, ios, web
-   * - for IOS/Android, device orientation: portrait, landscape
-   * - for IOS, will be pushed by virtual keyboard
-   */
+  /** WIKI: https://github.com/ideo/shape/wiki/Comment-Mentions-Positioning */
   positionSuggestions = ({ decoratorRect, state, props }) => {
+    const { uiStore } = this.props
+    const { isTouchDevice } = uiStore
     const { suggestions } = props
     const { isActive } = state
 
@@ -46,67 +40,36 @@ class CommentInput extends React.Component {
       return
     }
 
-    const {
-      y: activityLogPosition,
-      h: activityLogHeight,
-    } = uiStore.activityLogPosition
-    const maxCommentSuggestionsHeight =
-      decoratorRect.top - activityLogPosition + 16 // height above the input and the activity box
-    const maxPossibleSuggestions = uiStore.isTouchDevice ? 3 : 6 // show a max of 3.5 suggestions for phones/tablets and 6.5 suggestions for desktop
+    const activityLogDiv = document.getElementsByClassName(
+      'activity_log-draggable'
+    )[0]
+    const activityLogY = activityLogDiv.getBoundingClientRect().y
+    const heightBetweenActivityBoxAndCommentInput =
+      decoratorRect.top - activityLogY + 16 // max comment mentions position relative to the activity log and comment input
+    const maxPossibleSuggestions = isTouchDevice ? 3 : 6 // show a max of 3.5 suggestions for phones/tablets and 6.5 suggestions for desktop
     const clampedSuggestionsLength = _.clamp(
       suggestions.length,
       0,
       maxPossibleSuggestions
     )
     const totalSuggestionsLength = 45 * clampedSuggestionsLength
-    const activityLogPositionAndHeight = activityLogPosition + activityLogHeight
     const isShowingAllSuggestions =
       clampedSuggestionsLength === maxPossibleSuggestions
 
-    let top = '0px'
-    let newTop = 0
-    let allSuggestionsTopOffset = 0
-    if (uiStore.isIOSMultipleColumns && uiStore.isPortrait) {
-      newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
-      // For iPad portrait, check if activity log is already placed where virtual keyboard will be
-      const willBePushedByVirtualKeyboard =
-        activityLogPositionAndHeight > window.innerHeight / 2 - 25
-      if (willBePushedByVirtualKeyboard) {
-        newTop = newTop + 325
-      }
-      allSuggestionsTopOffset = newTop - 40
-    } else if (uiStore.isTouchDevice) {
-      // For all other touch devices
-      newTop =
-        activityLogPositionAndHeight +
-        maxCommentSuggestionsHeight -
-        totalSuggestionsLength
-      allSuggestionsTopOffset = newTop - 100
-    } else {
-      // Desktops
-      const shouldPlaceSuggestionsAtBottom =
-        decoratorRect.top + totalSuggestionsLength < window.innerHeight
-      const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
-
-      return {
-        top: `${
-          shouldPlaceSuggestionsAtBottom
-            ? maxCommentSuggestionsHeight + 6
-            : clampedSuggestionsLength === maxPossibleSuggestions
-            ? newTop - 6
-            : newTop + 40
-        }px`,
-      }
-    }
-
-    top = `${
-      isShowingAllSuggestions
-        ? allSuggestionsTopOffset
-        : allSuggestionsTopOffset + 45
-    }px`
+    const shouldPlaceSuggestionsAtBottom = isTouchDevice
+      ? false
+      : decoratorRect.top + totalSuggestionsLength < window.innerHeight
+    const mentionsRelativeTopPosition =
+      heightBetweenActivityBoxAndCommentInput - totalSuggestionsLength - 86
 
     return {
-      top,
+      top: `${
+        shouldPlaceSuggestionsAtBottom
+          ? heightBetweenActivityBoxAndCommentInput + 6
+          : isShowingAllSuggestions
+          ? mentionsRelativeTopPosition
+          : mentionsRelativeTopPosition + 34
+      }px`,
     }
   }
 
