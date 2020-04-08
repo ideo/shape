@@ -1104,6 +1104,10 @@ export default class UiStore {
     const { range } = selectedTextRangeForCard
     if (!currentQuillEditor || !range || !range.length) return
 
+    const currentFormat = currentQuillEditor.getFormat(
+      range.index,
+      range.length
+    )
     // if no record then un-highlight
     const val = record ? 'new' : false
     currentQuillEditor.formatText(
@@ -1112,6 +1116,7 @@ export default class UiStore {
       {
         commentHighlight: val,
         commentHighlightResolved: false,
+        ...currentFormat,
       },
       'api'
     )
