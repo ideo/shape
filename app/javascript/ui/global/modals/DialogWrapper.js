@@ -59,8 +59,6 @@ class DialogWrapper extends React.Component {
       snackbarMessage = <StyledSnackbarText>{message}</StyledSnackbarText>
     }
 
-    console.log({ message })
-
     return (
       <StyledSnackbar
         onClose={onClose}
