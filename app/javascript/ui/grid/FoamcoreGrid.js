@@ -606,14 +606,14 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleInsertRowClick = (ev, row) => {
-    return this.handleRowClick(ev, row, 'insert_row')
+    return this.onRowClick(ev, row, 'insert_row')
   }
 
   handleRemoveRowClick = (ev, row) => {
-    return this.handleRowClick(ev, row, 'remove_row')
+    return this.onRowClick(ev, row, 'remove_row')
   }
 
-  handleRowClick = async (ev, row, action) => {
+  onRowClick = async (ev, row, action) => {
     ev.stopPropagation()
     const { collection, uiStore } = this.props
     if (uiStore.isTransparentLoading) {
@@ -1256,7 +1256,10 @@ class FoamcoreGrid extends React.Component {
 
     if (type === 'hover') {
       inner = (
-        <div style={{ position: 'relative', height: '100%' }}>
+        <div
+          style={{ position: 'relative', height: '100%' }}
+          data-empty-space-click
+        >
           <StyledPlusIcon className="plus-icon">
             <PlusIcon />
           </StyledPlusIcon>
