@@ -338,7 +338,8 @@ export const QuillStyleWrapper = styled.div`
       color: ${v.colors.ctaPrimary};
     }
 
-    sub {
+    sub,
+    sup {
       /* remove actual sub styling to make it more like a span */
       vertical-align: baseline;
       font-size: inherit;

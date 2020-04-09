@@ -6,6 +6,11 @@ import { apiStore } from '~/stores'
  * For whatever reason, domNode.get/setAttribute works better.
  * This is somewhat based on the LinkBlot example:
  * https://github.com/quilljs/parchment#example
+
+ * Additionally, the highlight and resolved highlight needed some non-span HTML tag to behave properly,
+ * and if they both used <sub> they would sometimes interfere with each other on the same line.
+ * This is why they use <sub> and <sup> and then we just style those elements to look appropriately in typography.js.
+ * All these workarounds are due to wanting to add a clickable element that stores a data-attr.
  */
 
 const Inline = Quill.import('blots/inline')
@@ -18,7 +23,7 @@ export class QuillInlineData extends Inline {
   }
 
   static formats(domNode) {
-    return domNode.getAttribute(this.attribute) || true
+    return domNode.getAttribute(this.attribute)
   }
 
   format(name, value) {
@@ -50,11 +55,12 @@ export class QuillHighlighter extends QuillInlineData {
   }
 }
 
+// see notes at top regarding <sub>/<sup> element reasoning
 QuillHighlighter.blotName = 'commentHighlight'
 QuillHighlighter.tagName = 'sub'
 QuillHighlighter.attribute = 'data-comment-id'
 
 export class QuillHighlightResolver extends QuillInlineData {}
 QuillHighlightResolver.blotName = 'commentHighlightResolved'
-QuillHighlightResolver.tagName = 'sub'
+QuillHighlightResolver.tagName = 'sup'
 QuillHighlightResolver.attribute = 'data-resolved-comment-id'
