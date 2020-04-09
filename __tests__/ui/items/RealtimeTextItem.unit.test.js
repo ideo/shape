@@ -155,6 +155,28 @@ describe('RealtimeTextItem', () => {
       expect(component.instanceTextContentUpdate.flush).toHaveBeenCalled()
     })
 
+    it('should call props.onCancel with all the relevant params', () => {
+      const fakeEv = {}
+      component.cancel(fakeEv)
+      expect(props.onCancel).toHaveBeenCalledWith({
+        item: props.item,
+        ev: fakeEv,
+        route: true,
+        num_viewers: 1,
+      })
+
+      rerender()
+      props.onCancel.mockClear()
+      component.num_viewers = 2
+      component.cancel(fakeEv)
+      expect(props.onCancel).toHaveBeenCalledWith({
+        item: props.item,
+        ev: fakeEv,
+        route: true,
+        num_viewers: 2,
+      })
+    })
+
     it('should not call item pushTextUndo unless text has changed', () => {
       component.cancel()
       expect(props.item.pushTextUndo).not.toHaveBeenCalled()
