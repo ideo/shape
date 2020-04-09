@@ -31,8 +31,8 @@ class QuestionContentEditor extends React.Component {
     const len = value ? value.length : 0
     this.inputRef = React.createRef()
     this.save = _.debounce(this._save, 1000)
-    this.instanceDataContentUpdate = _.debounce(
-      this._instanceDataContentUpdate,
+    this.instanceQuestionContentUpdate = _.debounce(
+      this._instanceQuestionContentUpdate,
       30000
     )
     this.state = {
@@ -47,11 +47,11 @@ class QuestionContentEditor extends React.Component {
     item.save()
   }
 
-  _instanceDataContentUpdate = () => {
-    const { handleInstanceDataContentUpdate } = this.props
+  _instanceQuestionContentUpdate = () => {
+    const { handleInstanceQuestionContentUpdate } = this.props
 
-    if (handleInstanceDataContentUpdate) {
-      handleInstanceDataContentUpdate()
+    if (handleInstanceQuestionContentUpdate) {
+      handleInstanceQuestionContentUpdate()
     }
   }
 
@@ -66,12 +66,12 @@ class QuestionContentEditor extends React.Component {
     item[itemAttribute] = value
     this.setState({ countLeft: maxLength - value.length })
     await this.save()
-    this.instanceDataContentUpdate()
+    this.instanceQuestionContentUpdate()
   }
 
   handleBlur = () => {
     this.save.flush()
-    this.instanceDataContentUpdate.flush()
+    this.instanceQuestionContentUpdate.flush()
     this.setState({ focused: false })
   }
 
@@ -136,7 +136,7 @@ QuestionContentEditor.propTypes = {
   optional: PropTypes.bool,
   singleLine: PropTypes.bool,
   handleFocus: PropTypes.func,
-  handleInstanceDataContentUpdate: PropTypes.func,
+  handleInstanceQuestionContentUpdate: PropTypes.func,
 }
 QuestionContentEditor.defaultProps = {
   itemAttribute: 'content',
@@ -145,7 +145,7 @@ QuestionContentEditor.defaultProps = {
   optional: false,
   singleLine: false,
   handleFocus: () => true,
-  handleInstanceDataContentUpdate: () => true,
+  handleInstanceQuestionContentUpdate: () => true,
 }
 
 QuestionContentEditor.wrappedComponent.propTypes = {

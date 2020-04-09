@@ -64,14 +64,18 @@ class ItemPage extends React.Component {
   save = (item, { cancel_sync = true } = {}) =>
     item.API_updateWithoutSync({ cancel_sync })
 
-  cancel = ({ item = this.state.item, route = true } = {}) => {
+  cancel = ({ item = this.state.item, route = true, num_viewers = 1 } = {}) => {
     const { uiStore, routingStore } = this.props
-    if (item.can_edit_content) this.save(item)
+    if (item.can_edit_content && num_viewers === 1) {
+      this.save(item)
+    }
     if (!route) return
+    const { previousViewingRecord } = uiStore
     if (
-      uiStore.previousViewingRecord &&
-      uiStore.previousViewingRecord.internalType === 'collections'
+      previousViewingRecord &&
+      previousViewingRecord.internalType === 'collections'
     ) {
+      routingStore.setRoutingTo('collections', previousViewingRecord.id)
       window.history.back()
     } else {
       routingStore.goToPath(item.parentPath)

@@ -133,7 +133,7 @@ class TextItemCover extends React.Component {
   }
 
   // cancel should only ever be called for editors, since it is canceling out of edit view
-  cancel = ({ item, ev } = {}) => {
+  cancel = ({ item, ev, num_viewers = 1 } = {}) => {
     if (this.unmounted) {
       return
     }
@@ -145,6 +145,10 @@ class TextItemCover extends React.Component {
       const card = apiStore.find('collection_cards', this.props.cardId)
       card.API_archiveSelf({ undoable: false })
       return
+    }
+    if (num_viewers === 1) {
+      // save final updates and broadcast to collection
+      item.API_updateWithoutSync({ cancel_sync: true })
     }
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
