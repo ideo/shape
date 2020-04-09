@@ -104,6 +104,7 @@ const StyledContainer = styled.div`
 @inject('uiStore', 'apiStore')
 @observer
 class RealtimeTextItem extends React.Component {
+  unmounted = false
   channelName = 'ItemRealtimeChannel'
   state = {
     disconnected: false,
@@ -137,7 +138,10 @@ class RealtimeTextItem extends React.Component {
   componentDidMount() {
     this.subscribeToItemRealtimeChannel()
     setTimeout(() => {
+      if (this.unmounted) return
+      // this slight delay seems to be help particularly for the full item page
       this.subscribeToItemRealtimeChannel()
+      this.checkActionCableConnection()
     }, 1250)
     this.calculateCanEdit()
     if (!this.reactQuillRef) return
@@ -145,7 +149,6 @@ class RealtimeTextItem extends React.Component {
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
     this.setInitialSize()
-    this.checkActionCableConnection()
 
     setTimeout(() => {
       this.quillEditor.focus()
@@ -178,9 +181,8 @@ class RealtimeTextItem extends React.Component {
     const { item } = this.props
     const routingToSameItem =
       routingTo.id === item.id && routingTo.type === 'items'
-    ChannelManager.unsubscribeAllFromChannel(this.channelName, {
-      keepOpen: routingToSameItem,
-    })
+    if (routingToSameItem) return
+    ChannelManager.unsubscribe(this.channelName, item.id)
   }
 
   clearQuillClipboardHistory() {
