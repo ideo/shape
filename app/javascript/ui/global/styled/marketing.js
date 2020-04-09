@@ -220,6 +220,7 @@ export const MarketingMainBtn = styled(MarketingContentLink)`
   text-transform: uppercase;
   font-size: 14px;
   font-weight: ${v.weights.medium};
+  ${props => props.width && `width: ${props.width}px;`}
 `
 MarketingMainBtn.displayName = 'StyledMarketingMainBtn'
 
