@@ -7,10 +7,15 @@ import { apiStore } from '~/stores'
  * This is somewhat based on the LinkBlot example:
  * https://github.com/quilljs/parchment#example
 
- * Additionally, the highlight and resolved highlight needed some non-span HTML tag to behave properly,
+ * Additionally, the highlight and resolved highlight needed a non-<span> tag to behave properly,
  * and if they both used <sub> they would sometimes interfere with each other on the same line.
  * This is why they use <sub> and <sup> and then we just style those elements to look appropriately in typography.js.
  * All these workarounds are due to wanting to add a clickable element that stores a data-attr.
+
+ * One last note is that <sub/sup> are not stored at all in the database, this is purely just to give Quill a way
+ * to render `{attributes: {commentHighlight: 123}}` in an inline clickable format that it understands.
+ * This means you can smoothly change the frontend handling of those attributes in this file,
+ * without needing to change/migrate the data.
  */
 
 const Inline = Quill.import('blots/inline')
