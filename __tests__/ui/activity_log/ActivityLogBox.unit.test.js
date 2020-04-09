@@ -212,4 +212,26 @@ describe('ActivityLogBox', () => {
       )
     })
   })
+
+  describe('overrideProps', () => {
+    beforeEach(() => {
+      props.uiStore.isTouchDevice = true
+      reRender()
+    })
+
+    it('disables resizing and dragging', () => {
+      const { overrideProps } = component
+
+      expect(overrideProps.disableDragging).toEqual(true)
+      expect(overrideProps.enableResizing).toEqual({})
+    })
+  })
+
+  describe('render', () => {
+    it('renders <Rnd/> component with activity_log-draggable className', () => {
+      expect(
+        wrapper.find('Rnd').hasClass('activity_log-draggable')
+      ).toBeTruthy()
+    })
+  })
 })

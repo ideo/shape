@@ -92,8 +92,8 @@ class ScaleQuestion extends React.Component {
       this.updateQuestionContent,
       1000
     )
-    this.instanceDataContentUpdate = debounce(
-      this._instanceDataContentUpdate,
+    this.instanceQuestionContentUpdate = debounce(
+      this._instanceQuestionContentUpdate,
       30000
     )
   }
@@ -103,11 +103,11 @@ class ScaleQuestion extends React.Component {
     this.props.onAnswer({ number })
   }
 
-  _instanceDataContentUpdate = () => {
-    const { handleInstanceDataContentUpdate } = this.props
+  _instanceQuestionContentUpdate = () => {
+    const { handleInstanceQuestionContentUpdate } = this.props
 
-    if (handleInstanceDataContentUpdate) {
-      handleInstanceDataContentUpdate()
+    if (handleInstanceQuestionContentUpdate) {
+      handleInstanceQuestionContentUpdate()
     }
   }
 
@@ -121,13 +121,13 @@ class ScaleQuestion extends React.Component {
   handleInputChange = event => {
     this.setState({ questionContent: event.target.value })
     this.debouncedUpdateQuestionContent()
-    this.instanceDataContentUpdate()
+    this.instanceQuestionContentUpdate()
   }
 
   handleBlur = () => {
     const { questionContent } = this.state
     this.debouncedUpdateQuestionContent.flush()
-    this.instanceDataContentUpdate.flush()
+    this.instanceQuestionContentUpdate.flush()
 
     if (!questionContent) return
     this.setState({ editing: false })
@@ -249,12 +249,12 @@ ScaleQuestion.propTypes = {
   questionAnswer: MobxPropTypes.objectOrObservableObject,
   editing: PropTypes.bool,
   onAnswer: PropTypes.func,
-  handleInstanceDataContentUpdate: PropTypes.func,
+  handleInstanceQuestionContentUpdate: PropTypes.func,
 }
 ScaleQuestion.defaultProps = {
   questionAnswer: null,
   editing: false,
   onAnswer: () => null,
-  handleInstanceDataContentUpdate: () => true,
+  handleInstanceQuestionContentUpdate: () => true,
 }
 export default ScaleQuestion

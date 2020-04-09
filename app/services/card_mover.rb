@@ -115,7 +115,9 @@ class CardMover < SimpleService
       col: @placement_col,
     )
     # BoardPlacement does not save the records, just updates their attrs
-    @moving_cards.each(&:save)
+    @moving_cards.each do |card|
+      card.save if card.board_placement_is_valid?
+    end
   end
 
   def move_cards_to_collection

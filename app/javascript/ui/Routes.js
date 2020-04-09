@@ -119,11 +119,17 @@ class Routes extends React.Component {
     document.addEventListener('touchmove', this.handleTouchMove, {
       passive: false,
     })
+    document.addEventListener('touchend', this.handleTouchMove, {
+      passive: false,
+    })
   }
 
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
     document.removeEventListener('touchmove', this.handleTouchMove, {
+      passive: false,
+    })
+    document.removeEventListener('touchend', this.handleTouchMove, {
       passive: false,
     })
   }
@@ -187,16 +193,11 @@ class Routes extends React.Component {
   }
 
   handleTouchMove = e => {
-    const { uiStore, apiStore } = this.props
+    const { uiStore } = this.props
     if (uiStore.dragging || uiStore.activityLogMoving) {
       e.preventDefault()
     }
-    if (!e.target.closest('.activity_log-draggable')) {
-      // close activity log when scroll happens outside of it
-      uiStore.setCommentingOnRecord(null)
-      uiStore.update('activityLogOpen', false)
-      apiStore.collapseReplies()
-    }
+    this._dismissActivityLogBox(e)
   }
 
   _setSelectedArea = (coords, e = {}) => {
@@ -206,6 +207,20 @@ class Routes extends React.Component {
       pageBoundsScroller.scrollIfNearPageBounds(e, { speed: 1.5 })
     }
     uiStore.setSelectedArea(coords, { shifted })
+  }
+
+  _dismissActivityLogBox = e => {
+    const { uiStore, apiStore } = this.props
+
+    if (
+      !e.target.closest('.activity_log-draggable') &&
+      uiStore.activityLogOpen
+    ) {
+      // close activity log when scroll happens outside of it
+      uiStore.setCommentingOnRecord(null)
+      uiStore.update('activityLogOpen', false)
+      apiStore.collapseReplies()
+    }
   }
 
   // Props for the div that shows area selected

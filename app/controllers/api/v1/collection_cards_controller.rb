@@ -459,6 +459,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def moving_within_collection
     return true if json_api_params[:from_id].blank?
+
     @from_collection == @to_collection
   end
 

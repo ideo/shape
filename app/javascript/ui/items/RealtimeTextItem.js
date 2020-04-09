@@ -104,6 +104,7 @@ const StyledContainer = styled.div`
 @inject('uiStore', 'apiStore')
 @observer
 class RealtimeTextItem extends React.Component {
+  unmounted = false
   channelName = 'ItemRealtimeChannel'
   state = {
     disconnected: false,
@@ -126,8 +127,8 @@ class RealtimeTextItem extends React.Component {
     this.reactQuillRef = undefined
     this.quillEditor = undefined
     this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 200)
-    this.instanceDataContentUpdate = _.debounce(
-      this._instanceDataContentUpdate,
+    this.instanceTextContentUpdate = _.debounce(
+      this._instanceTextContentUpdate,
       30000
     )
     this.sendCursor = _.throttle(this._sendCursor, 100)
@@ -137,7 +138,10 @@ class RealtimeTextItem extends React.Component {
   componentDidMount() {
     this.subscribeToItemRealtimeChannel()
     setTimeout(() => {
+      if (this.unmounted) return
+      // this slight delay seems to be help particularly for the full item page
       this.subscribeToItemRealtimeChannel()
+      this.checkActionCableConnection()
     }, 1250)
     this.calculateCanEdit()
     if (!this.reactQuillRef) return
@@ -145,7 +149,6 @@ class RealtimeTextItem extends React.Component {
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
     this.setInitialSize()
-    this.checkActionCableConnection()
 
     setTimeout(() => {
       this.quillEditor.focus()
@@ -178,9 +181,8 @@ class RealtimeTextItem extends React.Component {
     const { item } = this.props
     const routingToSameItem =
       routingTo.id === item.id && routingTo.type === 'items'
-    ChannelManager.unsubscribeAllFromChannel(this.channelName, {
-      keepOpen: routingToSameItem,
-    })
+    if (routingToSameItem) return
+    ChannelManager.unsubscribe(this.channelName, item.id)
   }
 
   clearQuillClipboardHistory() {
@@ -384,7 +386,7 @@ class RealtimeTextItem extends React.Component {
     // mark this as it may get called again from unmount, only want to cancel once
     this.canceled = true
     this.sendCombinedDelta.flush()
-    this.instanceDataContentUpdate.flush()
+    this.instanceTextContentUpdate.flush()
     // NOTE: cancel also means "save current text"!
     // event is passed through because TextItemCover uses it
     if (!canEdit) return onCancel({ item: this.props.item, ev, route })
@@ -448,7 +450,7 @@ class RealtimeTextItem extends React.Component {
     const connected = this.checkActionCableConnection()
     if (connected) {
       this.sendCombinedDelta()
-      this.instanceDataContentUpdate()
+      this.instanceTextContentUpdate()
     }
     // NOTE: trying to check titleText only if the delta turned header on/off
     // seemed to miss some cases, so we just check every time
@@ -520,7 +522,7 @@ class RealtimeTextItem extends React.Component {
     return this.combinedDelta
   }
 
-  _instanceDataContentUpdate = () => {
+  _instanceTextContentUpdate = () => {
     const { item, uiStore } = this.props
     const parent = item.parent || uiStore.viewingCollection
     if (parent && parent.isTemplate) {

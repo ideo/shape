@@ -41,16 +41,15 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
     let(:cards) { collection.collection_cards }
 
     before do
-      cards[0].update(row: 0, col: 0, width: 4, height: 1)
-      cards[1].update(row: 1, col: 0, width: 1, height: 2)
-      cards[2].update(row: 1, col: 1, width: 1, height: 1)
-      cards[3].update(row: 1, col: 2, width: 1, height: 1)
-      cards[4].update(row: 1, col: 4, width: 1, height: 1)
-      cards[5].update(row: 2, col: 2, width: 2, height: 1)
-      cards[6].update(row: 3, col: 1, width: 1, height: 1)
-      if cards.count > 7
-        cards[7].update(row: 3, col: 2, width: 3, height: 1)
-      end
+      cards[0]&.update(row: 0, col: 0, width: 4, height: 1)
+      cards[1]&.update(row: 1, col: 0, width: 1, height: 2)
+      cards[2]&.update(row: 1, col: 1, width: 1, height: 1)
+      cards[3]&.update(row: 1, col: 2, width: 1, height: 1)
+      cards[4]&.update(row: 1, col: 4, width: 1, height: 1)
+      cards[5]&.update(row: 2, col: 2, width: 2, height: 1)
+      cards[6]&.update(row: 3, col: 1, width: 1, height: 1)
+      cards[7]&.update(row: 3, col: 2, width: 3, height: 1)
+
       # board matrix
       # [[0, 0, 0, 0, _, _, _, _, _, _, _, _, _, _, _, _],
       #  [1, 2, 3, _, 4, _, _, _, _, _, _, _, _, _, _, _],
@@ -182,6 +181,97 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
             [1, 5, collection.id],
             [3, 0, collection.id],
           ])
+        end
+      end
+
+      context 'with nil placement' do
+        let(:placement) do
+          { row: nil, col: nil }
+        end
+
+        before do
+          moving_cards[0].update(row: 0, col: 2)
+          moving_cards[1].update(row: 0, col: 3, width: 2)
+          moving_cards[2].update(row: 0, col: 5)
+          moving_cards[3].update(row: 1, col: 2, height: 2)
+        end
+
+        it 'should insert cards after the last existing card' do
+          calculate
+          expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+            [3, 5, collection.id],
+            [3, 6, collection.id],
+            [3, 8, collection.id],
+            [4, 5, collection.id],
+          ])
+        end
+
+        context 'moving to 4-wide board' do
+          let(:collection) { create(:board_collection, num_cards: 6, num_columns: 4) }
+
+          before do
+            cards[4]&.update(row: 3, col: 1, width: 2, height: 1)
+            # board matrix
+            # [[0, 0, 0, 0],
+            #  [1, 2, 3, _,],
+            #  [1, _, 5, 5],
+            #  [_, 4, 4, _],
+          end
+
+          context 'if board is empty' do
+            let(:collection) { create(:board_collection, num_cards: 0, num_columns: 4) }
+
+            it 'should insert cards in the first open row' do
+              calculate
+              expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+                [0, 0, collection.id],
+                [0, 1, collection.id],
+                [0, 3, collection.id],
+                [1, 0, collection.id],
+              ])
+            end
+          end
+
+          context 'if cards can fit on the board in their original formation' do
+            before do
+              moving_cards[0].update(row: 0, col: 1)
+              moving_cards[1].update(row: 0, col: 2, width: 2)
+              moving_cards[2].update(row: 1, col: 0)
+              moving_cards[3].update(row: 1, col: 3, height: 2)
+            end
+
+            it 'should insert cards in the first open row' do
+              calculate
+              expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+                # first card should be at col 1 to make room for 3rd card at col 0
+                [4, 1, collection.id],
+                [4, 2, collection.id],
+                [5, 0, collection.id],
+                [5, 3, collection.id],
+              ])
+            end
+          end
+
+          context 'if cards cannot fit on the board in their original formation' do
+            before do
+              # this one will be at the end of the row sticking down
+              moving_cards[0].update(height: 2)
+              # make this one into a large square
+              moving_cards[1].update(width: 2, height: 2)
+              # expand col width of moving cards, too wide to fit on a 4W
+              moving_cards[2].update(row: 0, col: 10)
+            end
+            it 'should insert cards sequentially' do
+              calculate
+              expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+                [3, 3, collection.id],
+                [4, 0, collection.id],
+                [4, 2, collection.id],
+                # height of previous cards bumps this to next row
+                [5, 2, collection.id],
+              ])
+            end
+          end
         end
       end
     end

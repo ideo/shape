@@ -68,10 +68,12 @@ class ItemPage extends React.Component {
     const { uiStore, routingStore } = this.props
     if (item.can_edit_content) this.save(item)
     if (!route) return
+    const { previousViewingRecord } = uiStore
     if (
-      uiStore.previousViewingRecord &&
-      uiStore.previousViewingRecord.internalType === 'collections'
+      previousViewingRecord &&
+      previousViewingRecord.internalType === 'collections'
     ) {
+      routingStore.setRoutingTo('collections', previousViewingRecord.id)
       window.history.back()
     } else {
       routingStore.goToPath(item.parentPath)

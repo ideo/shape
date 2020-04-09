@@ -85,7 +85,7 @@ class TestQuestion extends React.Component {
     afterQuestionAnswered(card)
   }
 
-  handleInstanceDataContentUpdate = () => {
+  handleInstanceQuestionContentUpdate = () => {
     const { card, parent } = this.props
     if (parent && parent.isTemplate) {
       parent.API_backgroundUpdateTemplateInstances()
@@ -134,8 +134,8 @@ class TestQuestion extends React.Component {
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )
@@ -148,8 +148,8 @@ class TestQuestion extends React.Component {
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
             question_choices={record.question_choices}
             isTestDraft={testStatus === 'draft'}
@@ -165,8 +165,8 @@ class TestQuestion extends React.Component {
             parent={parent}
             canEdit={canEdit}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )
@@ -177,8 +177,8 @@ class TestQuestion extends React.Component {
             item={record}
             canEdit={canEdit}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )
@@ -191,8 +191,8 @@ class TestQuestion extends React.Component {
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )

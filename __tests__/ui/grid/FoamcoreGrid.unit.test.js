@@ -179,6 +179,34 @@ describe('FoamcoreGrid', () => {
     })
   })
 
+  describe('render blanks with blank rows', () => {
+    beforeEach(() => {
+      const collection = fakeCollection
+      cardA = createCard({ row: 1, col: 1 })
+      // Blank row
+      cardB = createCard({ row: 3, col: 2, height: 2 })
+      cardC = createCard({ row: 5, col: 1 })
+      collection.collection_cards = [cardA, cardB, cardC]
+      collection.num_columns = 4
+      props.collection = collection
+      rerender()
+    })
+
+    it('should have a modified blank card for empty rows', () => {
+      const blankCard = component.positionBlank(
+        {
+          row: 2,
+          col: 1,
+          width: 1,
+          height: 1,
+        },
+        'hover'
+      )
+      const blankCardComponent = mount(blankCard)
+      expect(blankCardComponent.find('RightBlankActions').exists()).toBe(true)
+    })
+  })
+
   describe('onDragOrResizeStop', () => {
     let cardId
 

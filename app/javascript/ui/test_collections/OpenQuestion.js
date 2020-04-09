@@ -68,7 +68,7 @@ class OpenQuestion extends React.Component {
       item,
       canEdit,
       handleFocus,
-      handleInstanceDataContentUpdate,
+      handleInstanceQuestionContentUpdate,
     } = this.props
 
     return (
@@ -79,7 +79,9 @@ class OpenQuestion extends React.Component {
           placeholder="please enter question here"
           canEdit={canEdit}
           handleFocus={handleFocus}
-          handleInstanceDataContentUpdate={handleInstanceDataContentUpdate}
+          handleInstanceQuestionContentUpdate={
+            handleInstanceQuestionContentUpdate
+          }
           optional
         />
       </QuestionSpacingContainer>
@@ -123,7 +125,7 @@ OpenQuestion.propTypes = {
   onAnswer: PropTypes.func,
   canEdit: PropTypes.bool,
   handleFocus: PropTypes.func,
-  handleInstanceDataContentUpdate: PropTypes.func,
+  handleInstanceQuestionContentUpdate: PropTypes.func,
 }
 OpenQuestion.defaultProps = {
   questionAnswer: null,
@@ -131,7 +133,7 @@ OpenQuestion.defaultProps = {
   onAnswer: () => null,
   canEdit: false,
   handleFocus: () => true,
-  handleInstanceDataContentUpdate: () => true,
+  handleInstanceQuestionContentUpdate: () => true,
 }
 
 export default OpenQuestion

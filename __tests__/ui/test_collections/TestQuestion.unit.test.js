@@ -73,13 +73,13 @@ describe('TestQuestion', () => {
     })
   })
 
-  describe('handleInstanceDataContentUpdate', () => {
+  describe('handleInstanceQuestionContentUpdate', () => {
     describe('if parent is a template', () => {
       beforeEach(() => {
         props.parent.isTemplate = true
         props.parent.API_backgroundUpdateTemplateInstances = jest.fn()
         rerender()
-        component.handleInstanceDataContentUpdate()
+        component.handleInstanceQuestionContentUpdate()
       })
       it('should call API_backgroundUpdateTemplateInstances', () => {
         expect(
@@ -93,7 +93,7 @@ describe('TestQuestion', () => {
         props.parent.isLiveTest = true
         props.parent.API_backgroundUpdateLiveTest = jest.fn()
         rerender()
-        component.handleInstanceDataContentUpdate()
+        component.handleInstanceQuestionContentUpdate()
       })
       it('should call API_backgroundUpdateLiveTest', () => {
         expect(props.parent.API_backgroundUpdateLiveTest).toHaveBeenCalled()
