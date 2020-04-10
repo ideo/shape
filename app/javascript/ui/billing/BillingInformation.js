@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import Section from '~shared/components/molecules/Section'
+import Tooltip from '~/ui/global/Tooltip'
 import Typography from '~shared/components/atoms/Typography'
 import FancyDollarAmount from '~shared/components/atoms/FancyDollarAmount'
 import Box from '~shared/components/atoms/Box'
@@ -52,9 +53,37 @@ const BlockHeader = styled.h3`
   }
 `
 
-const Block = ({ title, children }) => (
+const InfoIcon = styled.span`
+  align-items: center;
+  border: 1px solid ${v.colors.commonMedium};
+  border-radius: 50%;
+  color: ${v.colors.commonMedium};
+  display: inline-flex;
+  font-family: ${v.fonts.serif};
+  font-size: 12px;
+  height: 16px;
+  justify-content: center;
+  text-decoration: italic;
+  text-transform: none;
+  vertical-align: top;
+  width: 16px;
+`
+
+const Block = ({ title, children, headerTooltip }) => (
   <Grid item sm={12} md={4} lg={3}>
-    <BlockHeader>{title}</BlockHeader>
+    {headerTooltip && (
+      <BlockHeader>
+        {title}{' '}
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title={headerTooltip}
+          placement="top"
+        >
+          <InfoIcon>i</InfoIcon>
+        </Tooltip>
+      </BlockHeader>
+    )}
+    {!headerTooltip && <BlockHeader>{title}</BlockHeader>}
     <Box mt={1}>{children}</Box>
     <Hidden mdUp>
       {/* add spacing once the blocks stack at small sizes */}
@@ -65,6 +94,10 @@ const Block = ({ title, children }) => (
 Block.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  headerTooltip: PropTypes.string,
+}
+Block.defeaultProps = {
+  headerTooltip: null,
 }
 
 const TrialHighlight = styled.div`
@@ -191,11 +224,20 @@ class BillingInformation extends React.Component {
     const currentMonthlyRate =
       billableUserCount > 0 ? billableUserCount * price_per_user : 0
 
+    const activePeopleDesc = `
+      Shape bills based on the number of people who are active within the organization
+      within a 90 day period. The number of people below have been active within
+      ${name} in the last 90 days.
+    `
+
     return (
       <Wrapper>
         <Section title="Billing Information">
           <Grid container justify="space-between">
-            <Block title="Current Active People">
+            <Block
+              title="Current Active People"
+              headerTooltip={activePeopleDesc}
+            >
               <Grid container justify="space-between" alignItems="flex-end">
                 <Grid item>
                   <Typography variant="emphasis">
