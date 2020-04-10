@@ -13,6 +13,7 @@ import {
   findTopLeftCard,
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
@@ -606,22 +607,20 @@ class FoamcoreGrid extends React.Component {
   }
 
   handleInsertRowClick = (ev, row) => {
-    return this.handleRowClick(ev, row, 'insert_row')
+    return this.onRowClick(ev, row, ROW_ACTIONS.INSERT)
   }
 
   handleRemoveRowClick = (ev, row) => {
-    return this.handleRowClick(ev, row, 'remove_row')
+    return this.onRowClick(ev, row, ROW_ACTIONS.REMOVE)
   }
 
-  handleRowClick = async (ev, row, action) => {
+  onRowClick = async (ev, row, action) => {
     ev.stopPropagation()
     const { collection, uiStore } = this.props
     if (uiStore.isTransparentLoading) {
       return false
     }
-    uiStore.update('isTransparentLoading', true)
-    await collection.API_manipulateRow(row, action)
-    uiStore.update('isTransparentLoading', false)
+    collection.API_manipulateRow({ row, action })
   }
 
   originalCard(cardId) {
@@ -1256,7 +1255,10 @@ class FoamcoreGrid extends React.Component {
 
     if (type === 'hover') {
       inner = (
-        <div style={{ position: 'relative', height: '100%' }}>
+        <div
+          style={{ position: 'relative', height: '100%' }}
+          data-empty-space-click
+        >
           <StyledPlusIcon className="plus-icon">
             <PlusIcon />
           </StyledPlusIcon>

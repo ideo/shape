@@ -127,6 +127,11 @@ const MobileMenuItem = styled(Box)`
   padding: 12px 0px;
 `
 
+const MobileMenuBtnItem = styled(MobileMenuItem)`
+  position: relative;
+  left: 24px;
+`
+
 const MobileLinks = ({ isHome }) => {
   return (
     <MarketingFlex align="left" justify="left" w={1} column>
@@ -190,11 +195,16 @@ const MobileLinks = ({ isHome }) => {
         </NavLink>
       </MobileMenuItem>
 
-      <MobileMenuItem>
-        <NavLink href="/sign_up" align="left">
-          Signup
-        </NavLink>
-      </MobileMenuItem>
+      <MobileMenuBtnItem>
+        <MarketingMainBtn
+          onClick={() => {
+            window.location = `${process.env.BASE_HOST}/sign_up`
+          }}
+          width={184}
+        >
+          SIGN UP
+        </MarketingMainBtn>
+      </MobileMenuBtnItem>
     </MarketingFlex>
   )
 }
@@ -268,7 +278,7 @@ class MarketingMenu extends React.PureComponent {
               <Box w={15 / 32}>
                 <MarketingFlex align="center" justify="flex-end">
                   <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
-                  <NavLink href="/login">Login</NavLink>
+                  <NavLink href="/login">Log in</NavLink>
                   <MarketingMainBtn
                     id="header-sign-up"
                     onClick={() => {

@@ -23,6 +23,11 @@ import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 
+export const ROW_ACTIONS = {
+  INSERT: 'insert_row',
+  REMOVE: 'remove_row',
+}
+
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
   static endpoint = apiUrl('collections')
@@ -1440,25 +1445,51 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
-  async API_insertRow(row) {
-    const action = 'insert_row'
-    return this.API_manipulateRow(row, action)
-  }
-
-  async API_removeRow(row) {
-    const action = 'remove_row'
-    return this.API_manipulateRow(row, action)
-  }
-
-  async API_manipulateRow(row, action) {
+  async API_manipulateRow({ row, action, pushUndo = true } = {}) {
     const { apiStore, uiStore } = this
     const params = {
       row,
     }
+    let oppositeAction = ROW_ACTIONS.REMOVE
+    let actionMessage = 'Insert row'
+    if (action === ROW_ACTIONS.REMOVE) {
+      oppositeAction = ROW_ACTIONS.INSERT
+      actionMessage = 'Remove row'
+    }
 
     try {
+      uiStore.update('isTransparentLoading', true)
       await apiStore.request(`collections/${this.id}/${action}`, 'POST', params)
-      return this.API_fetchCards()
+      runInAction(() => {
+        // by making this an action it will cause one re-render instead of many
+        this.collection_cards.forEach(card => {
+          const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
+          if (card.row > row) {
+            card.row += shift
+          }
+        })
+      })
+      uiStore.update('isTransparentLoading', false)
+
+      if (!pushUndo) {
+        return
+      }
+      this.pushUndo({
+        apiCall: () => {
+          this.API_manipulateRow({
+            row,
+            action: oppositeAction,
+            pushUndo: false,
+          })
+        },
+        message: `${actionMessage} undone`,
+        redoAction: {
+          message: `${actionMessage} redone`,
+          apiCall: () =>
+            // re-call the same function
+            this.API_manipulateRow({ row, action }),
+        },
+      })
     } catch (e) {
       console.warn(e)
       uiStore.defaultAlertError()

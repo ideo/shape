@@ -115,6 +115,7 @@ class RealtimeTextItem extends React.Component {
   canceled = false
   currentlySending = false
   currentlySendingCheck = null
+  num_viewers = 1
   quillData = {}
   combinedDelta = new Delta()
   bufferDelta = new Delta()
@@ -279,8 +280,9 @@ class RealtimeTextItem extends React.Component {
     this.setState({ disconnected: true })
   }
 
-  channelReceivedData = ({ current_editor, data }) => {
+  channelReceivedData = ({ current_editor, data, num_viewers }) => {
     if (this.unmounted) return
+    this.num_viewers = num_viewers
     if (data && data.version) {
       this.handleReceivedDelta({ current_editor, data })
     }
@@ -387,13 +389,13 @@ class RealtimeTextItem extends React.Component {
     this.canceled = true
     this.sendCombinedDelta.flush()
     this.instanceTextContentUpdate.flush()
-    // NOTE: cancel also means "save current text"!
     // event is passed through because TextItemCover uses it
     if (!canEdit) return onCancel({ item: this.props.item, ev, route })
 
     const item = this.setItemQuillData()
     this.pushTextUndo()
-    return onCancel({ item, ev, route })
+    // tell the TextItemCover about number of viewers so it can know whether to perform an additional save
+    return onCancel({ item, ev, route, num_viewers: this.num_viewers })
   }
 
   pushTextUndo() {
