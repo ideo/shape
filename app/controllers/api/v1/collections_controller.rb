@@ -144,27 +144,31 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def insert_row
-    RowInserter.call(
-      row: json_api_params[:row],
-      collection: @collection,
-    )
-    @collection.touch
-
-    head :no_content
+    @action = :insert_row
+    manipulate_row
   end
 
   def remove_row
-    RowInserter.call(
-      row: json_api_params[:row],
-      collection: @collection,
-      action: 'remove'
-    )
-    @collection.touch
-
-    head :no_content
+    @action = :remove_row
+    manipulate_row
   end
 
   private
+
+  def manipulate_row
+    RowInserter.call(
+      row: json_api_params[:row],
+      collection: @collection,
+      action: @action,
+    )
+    @collection.touch
+    broadcaster.row_updated(
+      row: json_api_params[:row],
+      action: @action,
+    )
+
+    head :no_content
+  end
 
   def check_cache
     if @collection.organization.deactivated?
@@ -343,11 +347,18 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def broadcast_collection_updates
-    CollectionUpdateBroadcaster.call(@collection, current_user)
+    card_attrs = collection_params[:collection_cards_attributes]
+    if @collection.board_collection? && card_attrs.present?
+      broadcaster.cards_updated(
+        card_attrs,
+      )
+    else
+      broadcaster.call
+    end
   end
 
   def broadcast_parent_collection_updates
-    CollectionUpdateBroadcaster.call(@parent_collection, current_user)
+    broadcaster(@parent_collection).call
   end
 
   def join_collection_group?
@@ -371,5 +382,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     return if @collection.common_viewable?
 
     current_user.switch_to_organization(@collection.organization)
+  end
+
+  def broadcaster(collection = @collection)
+    CollectionUpdateBroadcaster.new(collection, current_user)
   end
 end

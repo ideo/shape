@@ -608,6 +608,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @action
   addCard(card) {
+    if (this.collection_cards.find(cc => cc.id === card.id)) {
+      return
+    }
     this.collection_cards.unshift(card)
     this._reorderCards()
   }
@@ -908,6 +911,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       onCancel,
       onConfirm: performUpdate,
     })
+  }
+
+  applyCollectionCardsAttributes(snapshot) {
+    return this.revertToSnapshot(snapshot)
   }
 
   revertToSnapshot(snapshot) {
@@ -1455,15 +1462,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     try {
       uiStore.update('isTransparentLoading', true)
       await apiStore.request(`collections/${this.id}/${action}`, 'POST', params)
-      runInAction(() => {
-        // by making this an action it will cause one re-render instead of many
-        this.collection_cards.forEach(card => {
-          const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
-          if (card.row > row) {
-            card.row += shift
-          }
-        })
-      })
+      this.applyRowUpdate({ row, action })
       uiStore.update('isTransparentLoading', false)
 
       if (!pushUndo) {
@@ -1489,6 +1488,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       console.warn(e)
       uiStore.defaultAlertError()
     }
+  }
+
+  @action
+  applyRowUpdate({ row, action }) {
+    // by making this an action it will cause one re-render instead of many
+    this.collection_cards.forEach(card => {
+      const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
+      if (card.row > row) {
+        card.row += shift
+      }
+    })
   }
 
   toggleTemplateHelper() {

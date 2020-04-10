@@ -23,6 +23,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
            }
   end
 
+  def show
+    render jsonapi: @collection_card,
+           include: CollectionCard.default_relationships_for_api
+  end
+
   # return all collection_card_ids for this particular collection
   def ids
     render json: @collection_card_ids.map(&:to_s)
@@ -72,8 +77,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       current_user.reload.reset_cached_roles!
       card.reload
       create_notification(card, :created)
-      # because TextItems get created empty, we don't broadcast their creation
-      broadcast_collection_create_updates unless card.record.is_a?(Item::TextItem)
+      broadcast_collection_create_updates(card)
       render jsonapi: card,
              include: CollectionCard.default_relationships_for_api,
              expose: { current_record: card.record }
@@ -95,7 +99,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     @collection_card.attributes = collection_card_update_params
     if @collection_card.save
       create_notification(@collection_card, :edited)
-      broadcast_collection_create_updates
+      broadcast_collection_create_updates(@collection_card)
       if @collection_card.saved_change_to_is_cover?
         broadcast_parent_collection_updates
       end
@@ -423,7 +427,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def broadcast_replacing_updates
     return unless @replacing_card.parent.present?
 
-    CollectionUpdateBroadcaster.call(@replacing_card.parent, current_user)
+    CollectionUpdateBroadcaster.new(@replacing_card.parent, current_user).card_updated(@replacing_card.id)
   end
 
   def broadcast_moving_collection_updates
@@ -433,8 +437,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionUpdateBroadcaster.call(@to_collection, current_user)
   end
 
-  def broadcast_collection_create_updates
-    CollectionUpdateBroadcaster.call(@collection, current_user)
+  def broadcast_collection_create_updates(card)
+    CollectionUpdateBroadcaster.new(@collection, current_user).card_updated(card.id)
   end
 
   def broadcast_parent_collection_updates
@@ -445,9 +449,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def broadcast_collection_archive_updates
-    return unless @collection_cards.first.present?
+    parent = @collection_cards.first&.parent
+    return unless parent.present?
 
-    CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
+    CollectionUpdateBroadcaster.new(parent, current_user).cards_archived(
+      @collection_cards.pluck(:id),
+    )
   end
 
   def ordered_cards

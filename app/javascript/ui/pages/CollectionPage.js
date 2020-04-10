@@ -295,6 +295,7 @@ class CollectionPage extends React.Component {
     uiStore.closeCardMenu()
   }
 
+  // TODO: break this out into some kind of collection collaborative updating service?
   receivedChannelData = async data => {
     const { collection, apiStore } = this.props
     // catch if receivedData happens after reload
@@ -309,7 +310,36 @@ class CollectionPage extends React.Component {
         return
       }
       this.setEditor(data.current_editor)
-      this.reloadData()
+      const updateData = data.data
+      if (!updateData) {
+        this.reloadData()
+        return
+      }
+      if (updateData.collection_cards_attributes) {
+        // e.g. cards were resized or dragged; apply those same updates
+        collection.applyCollectionCardsAttributes(updateData)
+        return
+      }
+      if (updateData.card_id) {
+        // a card has been created or updated, so fetch that individual card
+        const res = await apiStore.fetch(
+          'collection_cards',
+          updateData.card_id,
+          true
+        )
+        // make sure it's in our current collection
+        collection.addCard(res.data)
+        return
+      }
+      if (updateData.row_updated) {
+        // a row has been inserted or removed
+        collection.applyRowUpdate(updateData.row_updated)
+        return
+      }
+      if (updateData.archived_card_ids) {
+        collection.removeCardIds(updateData.archived_card_ids)
+        return
+      }
     }
   }
 
