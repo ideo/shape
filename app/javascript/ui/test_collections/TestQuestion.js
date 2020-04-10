@@ -89,10 +89,13 @@ class TestQuestion extends React.Component {
     const { card, parent } = this.props
     if (parent && parent.isTemplate) {
       const {
-        record: { type, id },
+        record: { type },
+        id,
       } = card
-      const ids = [id]
-      parent.API_backgroundUpdateTemplateInstances({ type, ids })
+      if (type && id) {
+        const ids = [id]
+        parent.API_backgroundUpdateTemplateInstances({ type, ids })
+      }
     }
     if (parent && parent.isLiveTest) {
       // e.g. if you add an OpenQuestion to a live test, we wait until you've entered the content

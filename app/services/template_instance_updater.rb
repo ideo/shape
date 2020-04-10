@@ -15,18 +15,18 @@ class TemplateInstanceUpdater
     templated_collections = @master_template.templated_collections.active
 
     case @template_update_action
-    when 'update_all'
+    when :update_all
       templated_collections.map { |i| update_all_templated_cards_for_instance(i) }
-    when 'update_card_attributes'
+    when :update_card_attributes
       templated_collections.map { |i| update_all_card_attributes_for_instance(i) }
-    when 'archive'
+    when :archive
       templated_collections.map { |i| move_cards_archived_from_master_template(i) }
-    when 'create', 'duplicate', 'pin', 'unarchive'
+    when :create, :duplicate, :pin, :unarchive
       templated_collections.map { |i| insert_or_update_instance_cards(i) }
-    when 'update_text_content', 'update_question_content'
+    when :update_text_content, :update_question_content
       # a single card is being passed through for these actions
       updated_card_id = @updated_card_ids.first
-      return unless updated_card_id
+      return unless updated_card_id.present?
 
       templated_collections.map { |i| update_templated_card_for_instance(updated_card_id, i) }
     else
@@ -66,7 +66,7 @@ class TemplateInstanceUpdater
 
       next if master_card.blank? || card_within_instance.blank?
 
-      TemplateInstanceCardUpdater.call(
+      TemplateInstanceCard::TemplateInstanceCardUpdater.call(
         instance_card: card_within_instance,
         master_card: master_card,
         master_template: @master_template,
@@ -93,22 +93,21 @@ class TemplateInstanceUpdater
 
   def update_templated_card_for_instance(templated_from_id, instance)
     master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == templated_from_id }
-    card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == id }
-
+    card_within_instance = instance.collection_cards.find { |instance_cards| instance_cards.templated_from_id == templated_from_id }
     return unless master_card.present? && card_within_instance.present?
 
     case @template_update_action
-    when 'update_text_content'
-      return unless @instance_card.item.is_a?(Item::TextItem)
+    when :update_text_content
+      return unless card_within_instance.item.is_a?(Item::TextItem)
 
-      TemplateInstanceTextCardUpdater.call(
+      TemplateInstanceCard::TemplateInstanceTextCardUpdater.call(
         instance_card: card_within_instance,
         master_card: master_card,
       )
-    when 'update_question_content'
+    when :update_question_content
       return unless @master_template.is_a?(Collection::TestCollection) && @master_template.inside_a_submission_box_template?
 
-      TemplateInstanceQuestionCardUpdater.call(
+      TemplateInstanceCard::TemplateInstanceQuestionCardUpdater.call(
         instance_card: card_within_instance,
         master_card: master_card,
       )

@@ -75,13 +75,15 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
     case type
     when 'Item::TextItem'
-      template_update_action = 'update_text_content'
-      updated_card_ids = json_api_params[:ids]
+      template_update_action = :update_text_content
+      ids = json_api_params[:ids]
+      updated_card_ids = ids.map(&:to_i)
     when 'Item::QuestionItem'
-      template_update_action = 'update_question_content'
-      updated_card_ids = json_api_params[:ids]
+      template_update_action = :update_question_content
+      ids = json_api_params[:ids]
+      updated_card_ids = ids.map(&:to_i)
     else
-      template_update_action = 'update_all'
+      template_update_action = :update_all
       updated_card_ids = @collection.collection_cards.pluck(:id)
     end
 

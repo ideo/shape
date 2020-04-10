@@ -562,14 +562,14 @@ describe Collection::TestCollection, type: :model do
       TemplateInstanceUpdater.new(
         master_template: test_collection,
         updated_card_ids: test_collection.collection_cards.pluck(:id),
-        template_update_action: 'create',
+        template_update_action: :create,
       )
     }
     let(:submission_template_updater) {
       TemplateInstanceUpdater.new(
         master_template: submission_template,
         updated_card_ids: submission_template.collection_cards.pluck(:id),
-        template_update_action: 'create',
+        template_update_action: :create,
       )
     }
 
