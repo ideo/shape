@@ -5,7 +5,7 @@ RSpec.describe RowInserter, type: :service do
   let(:user) { create(:user) }
   let(:collection) { create(:board_collection, num_cards: num_cards, add_viewers: [user]) }
   let(:cards) { collection.collection_cards }
-  let(:action) { 'add' }
+  let(:action) { :insert_row }
   let(:row) { 1 }
   let(:inserter) do
     RowInserter.new(
@@ -39,7 +39,7 @@ RSpec.describe RowInserter, type: :service do
 
   context 'when removing a row' do
     let(:row) { 2 }
-    let(:action) { 'remove' }
+    let(:action) { :remove_row }
 
     before do
       # Row 3
