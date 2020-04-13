@@ -508,6 +508,15 @@ class CollectionCard < ApplicationRecord
     record.cloned_from&.parent_collection_card&.id
   end
 
+  def copy_card_attributes!(copy)
+    update_columns(
+      height: copy.height,
+      width: copy.width,
+      order: copy.order,
+      pinned: copy.pinned,
+    )
+  end
+
   private
 
   def assign_default_height_and_width
@@ -563,14 +572,5 @@ class CollectionCard < ApplicationRecord
     return unless collection.present?
 
     collection.touch
-  end
-
-  def copy_card_attributes!(copy)
-    update_columns(
-      height: copy.height,
-      width: copy.width,
-      order: copy.order,
-      pinned: copy.pinned,
-    )
   end
 end
