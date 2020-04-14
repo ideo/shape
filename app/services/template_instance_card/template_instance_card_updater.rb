@@ -36,6 +36,8 @@ module TemplateInstanceCard
     private
 
     def duplicate_instance_question_choices
+      return unless @master_card.record&.question_choices&.any? && @instance_card.record&.question_choices&.any?
+
       master_question_choices = @master_card.record.question_choices.select { |choice| choice.text.present? }
       instance_question_choices = @instance_card.record.question_choices
       instance_choice_texts = instance_question_choices.pluck(:text)
