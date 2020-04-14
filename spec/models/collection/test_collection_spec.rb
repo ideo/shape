@@ -599,7 +599,7 @@ describe Collection::TestCollection, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
             test_collection.id,
             test_collection.collection_cards.pluck(:id),
-            'update_all',
+            :update_all,
           )
           test_collection.launch!(initiated_by: user)
         end

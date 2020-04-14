@@ -266,7 +266,7 @@ RSpec.describe CollectionCard, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
             collection.id,
             [anything],
-            'duplicate',
+            :duplicate,
           )
           duplicate
         end
@@ -670,7 +670,7 @@ RSpec.describe CollectionCard, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
             collection.id,
             collection.collection_cards.pluck(:id),
-            'archive',
+            :archive,
           )
           collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
         end
