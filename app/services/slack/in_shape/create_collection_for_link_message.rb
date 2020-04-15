@@ -35,7 +35,8 @@ module Slack
             collection: {
               name: plain_text.first(50),
               tag_list: message_collection_tags,
-            }
+              cover_type: :cover_type_carousel,
+            },
           },
           parent_collection: Collection.find(all_content_collection_id)
         )
