@@ -64,14 +64,18 @@ class ItemPage extends React.Component {
   save = (item, { cancel_sync = true } = {}) =>
     item.API_updateWithoutSync({ cancel_sync })
 
-  cancel = ({ item = this.state.item, route = true } = {}) => {
+  cancel = ({ item = this.state.item, route = true, num_viewers = 1 } = {}) => {
     const { uiStore, routingStore } = this.props
-    if (item.can_edit_content) this.save(item)
+    if (item.can_edit_content && num_viewers === 1) {
+      this.save(item)
+    }
     if (!route) return
+    const { previousViewingRecord } = uiStore
     if (
-      uiStore.previousViewingRecord &&
-      uiStore.previousViewingRecord.internalType === 'collections'
+      previousViewingRecord &&
+      previousViewingRecord.internalType === 'collections'
     ) {
+      routingStore.setRoutingTo('collections', previousViewingRecord.id)
       window.history.back()
     } else {
       routingStore.goToPath(item.parentPath)
@@ -81,11 +85,16 @@ class ItemPage extends React.Component {
   // Should this get attached to PageContainer?
   // It's on GridCard already but this.content doesn't return a grid card
   openContextMenu = ev => {
-    ev.preventDefault()
+    const { containerRef } = this
     const { item, uiStore } = this.props
     const { parent_collection_card } = item
+    if (!item.isText || !containerRef || !containerRef.getBoundingClientRect) {
+      return
+    }
+    // prevent default contextmenu
+    ev.preventDefault()
 
-    const rect = this.containerRef.getBoundingClientRect()
+    const rect = containerRef.getBoundingClientRect()
     const x = ev.clientX - rect.left
     const y = ev.clientY - rect.top
 

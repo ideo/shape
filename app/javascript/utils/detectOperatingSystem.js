@@ -13,8 +13,12 @@ export const getTouchDeviceOS = () => {
     return TOUCH_DEVICE_OS.ANDROID
   }
 
-  // iOS detection from: http://stackoverflow.com/a/9039885/177710
-  if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+  // iOS detection from: https://stackoverflow.com/a/58065241
+  if (
+    (/iPad|iPhone|iPod/.test(navigator.platform) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) &&
+    !window.MSStream
+  ) {
     return TOUCH_DEVICE_OS.IOS
   }
 

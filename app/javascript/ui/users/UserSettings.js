@@ -26,12 +26,23 @@ const CheckboxWrapper = styled.div`
   margin-bottom: 10px;
 `
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class UserSettings extends React.Component {
+  componentDidMount() {
+    if (!this.user) {
+      this.routeToLogin()
+    }
+  }
+
   get user() {
     const { apiStore } = this.props
     return apiStore.currentUser
+  }
+
+  routeToLogin() {
+    const { routingStore } = this.props
+    routingStore.routeToLogin({ redirect: '/user_settings' })
   }
 
   handleEmailNotifications = ev => {
@@ -79,12 +90,10 @@ class UserSettings extends React.Component {
     return this.user.notify_through_email ? 'on' : 'off'
   }
 
-  get sendToLogin() {
-    window.location = '/login?redirect=/user_settings'
-  }
-
   render() {
-    if (!this.user) this.sendToLogin()
+    if (!this.user) {
+      return null
+    }
 
     return (
       <SettingsPageWrapper>
@@ -163,6 +172,7 @@ class UserSettings extends React.Component {
 UserSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default UserSettings

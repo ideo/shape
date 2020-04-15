@@ -30,8 +30,6 @@ import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
-/* global IdeoSSO */
-
 const BackIconContainer = styled.span`
   color: ${v.colors.black};
   display: inline-block;

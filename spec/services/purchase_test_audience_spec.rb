@@ -43,19 +43,26 @@ describe PurchaseTestAudience, type: :service do
 
   context 'with a paid audience', truncate: true do
     let(:audiences) { create_list(:audience, 2, min_price_per_response: 5) }
+    let(:open_test_audiences) { test_collection.test_audiences.open }
+
+    before do
+      # remove this for the purpose of this test
+      test_collection.link_sharing_audience.closed!
+      test_collection.reload
+    end
 
     it 'is successful' do
       expect(result.success?).to be true
     end
 
     it 'creates test audiences matching the audience' do
-      expect(test_collection.test_audiences.count).to eq 2
-      expect(test_collection.test_audiences.first.price_per_response).to eq 5
-      expect(test_collection.test_audiences.last.price_per_response).to eq 5
+      expect(open_test_audiences.count).to eq 2
+      expect(open_test_audiences.first.price_per_response).to eq 5
+      expect(open_test_audiences.last.price_per_response).to eq 5
     end
 
     it 'calls NetworkApi::Payment.create' do
-      test_collection.test_audiences.each do |test_audience|
+      open_test_audiences.each do |test_audience|
         expect(NetworkApi::Payment).to have_received(:create).with(
           payment_method_id: payment_method_double.id,
           amount: test_audience.total_price,
@@ -95,7 +102,7 @@ describe PurchaseTestAudience, type: :service do
   end
 
   context 'with a free (link sharing) audience' do
-    let!(:audiences) { create_list(:audience, 1, min_price_per_response: 0) }
+    let(:audiences) { [test_collection.link_sharing_audience.audience] }
 
     it 'is successful' do
       expect(result.success?).to be true

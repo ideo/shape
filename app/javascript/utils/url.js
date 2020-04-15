@@ -23,6 +23,14 @@ export function useTemplateInMyCollection(templateId) {
   window.location.href = route
 }
 
+export const loginRedirectPath = (redirect = null) => {
+  let path = '/login'
+  if (redirect) {
+    path += `?redirect=${encodeURI(redirect)}`
+  }
+  return path
+}
+
 export default {
   apiUrl,
   parseUrl,

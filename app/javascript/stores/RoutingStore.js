@@ -3,16 +3,23 @@ import { RouterStore } from 'mobx-react-router'
 import { computed, observable, action } from 'mobx'
 import queryString from 'query-string'
 
-import { apiStore, uiStore } from '~/stores'
-import { stringifyUrlParams } from '~/utils/url'
+import { stringifyUrlParams, loginRedirectPath } from '~/utils/url'
+import {
+  storeUtmParams,
+  utmParamsFromLocation,
+} from '~/utils/googleAnalytics/utmUtils'
 
 // mobx-react-router with a couple of helper methods
 class RoutingStore extends RouterStore {
   previousPageBeforeSearch = null
   routingTo = { type: null, id: null }
 
+  get uiStore() {
+    return this.apiStore.uiStore
+  }
+
   get slug() {
-    const { currentOrgSlug } = apiStore
+    const { currentOrgSlug } = this.apiStore
     if (currentOrgSlug) return currentOrgSlug
     if (!this.location) return ''
 
@@ -56,7 +63,7 @@ class RoutingStore extends RouterStore {
 
   // this gets called when you click the Logo so that it always takes you to the top
   clearHomepageScrollState = () => {
-    const { currentUser } = apiStore
+    const { currentUser } = this.apiStore
     if (!currentUser) return
     this.updateScrollState(currentUser.current_user_collection_id, 0)
   }
@@ -84,8 +91,13 @@ class RoutingStore extends RouterStore {
     }
   }
 
-  routeTo = (type, id = null, params = {}) => {
+  setRoutingTo(type, id = null) {
     this.routingTo = { type, id }
+  }
+
+  routeTo = (type, id = null, params = {}) => {
+    this.setRoutingTo(type, id)
+    const { uiStore } = this
 
     // prevent accidental route changes while you are dragging/moving into collection
     if (uiStore.movingIntoCollection) {
@@ -105,6 +117,7 @@ class RoutingStore extends RouterStore {
   }
 
   beforeRouting() {
+    const { uiStore } = this
     // close the org/roles menus if either are open when we route to a new page
     uiStore.update('organizationMenuPage', null)
     uiStore.update('rolesMenuOpen', null)
@@ -121,6 +134,7 @@ class RoutingStore extends RouterStore {
   pathContains = str => this.location.pathname.indexOf(str) > -1
 
   updatePreviousPageBeforeSearch(page) {
+    const { uiStore } = this
     uiStore.setViewingRecord(null)
     if (page.pathname.indexOf('/search') === -1) {
       this.previousPageBeforeSearch = page.pathname
@@ -134,6 +148,25 @@ class RoutingStore extends RouterStore {
     } else {
       this.routeTo('/')
     }
+  }
+
+  get utmQueryParams() {
+    return utmParamsFromLocation(this.location)
+  }
+
+  routeToLogin = ({ redirect = null } = {}) => {
+    // Capture UTM params before redirecting
+    storeUtmParams(this.utmQueryParams)
+    window.location.href = loginRedirectPath(redirect)
+  }
+
+  appendQueryString = queryString => {
+    if (!this.history) return false
+    this.history.push({
+      pathname: this.location.pathname,
+      search: queryString,
+    })
+    return true
   }
 }
 

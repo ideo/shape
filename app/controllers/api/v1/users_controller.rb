@@ -49,11 +49,13 @@ class Api::V1::UsersController < Api::V1::BaseController
   def create_from_emails
     service = FindOrCreateUsersByEmail.new(
       emails: json_api_params[:emails],
+      invited_by: current_user,
     )
     if service.call
       render jsonapi: service.users
     else
-      render_api_errors service.failed_emails
+      errors = ["unable to process emails: #{service.failed_emails.join(',')}"]
+      render json: { errors: errors }, status: :unprocessable_entity
     end
   end
 

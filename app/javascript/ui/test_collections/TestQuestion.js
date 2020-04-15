@@ -85,10 +85,14 @@ class TestQuestion extends React.Component {
     afterQuestionAnswered(card)
   }
 
-  handleInstanceDataContentUpdate = () => {
-    const { parent } = this.props
+  handleInstanceQuestionContentUpdate = () => {
+    const { card, parent } = this.props
     if (parent && parent.isTemplate) {
       parent.API_backgroundUpdateTemplateInstances()
+    }
+    if (parent && parent.isLiveTest) {
+      // e.g. if you add an OpenQuestion to a live test, we wait until you've entered the content
+      parent.API_backgroundUpdateLiveTest(card.id)
     }
   }
 
@@ -130,8 +134,8 @@ class TestQuestion extends React.Component {
             editing={editing}
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )
@@ -144,8 +148,8 @@ class TestQuestion extends React.Component {
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
             question_choices={record.question_choices}
             isTestDraft={testStatus === 'draft'}
@@ -161,8 +165,8 @@ class TestQuestion extends React.Component {
             parent={parent}
             canEdit={canEdit}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )
@@ -173,8 +177,8 @@ class TestQuestion extends React.Component {
             item={record}
             canEdit={canEdit}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )
@@ -187,8 +191,8 @@ class TestQuestion extends React.Component {
             questionAnswer={questionAnswer}
             onAnswer={this.handleQuestionAnswer}
             handleFocus={handleFocus}
-            handleInstanceDataContentUpdate={
-              this.handleInstanceDataContentUpdate
+            handleInstanceQuestionContentUpdate={
+              this.handleInstanceQuestionContentUpdate
             }
           />
         )

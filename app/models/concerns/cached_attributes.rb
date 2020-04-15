@@ -1,7 +1,7 @@
 module CachedAttributes
   extend ActiveSupport::Concern
 
-  def cache_attributes!(fields)
+  def cache_attributes!(fields, touch: true)
     # not using the store_accessor directly here because of:
     # https://github.com/rails/rails/pull/32563
     self.cached_attributes ||= {}
@@ -11,6 +11,10 @@ module CachedAttributes
     # update without callbacks
     return unless changes.present?
 
-    update_columns cached_attributes: cached_attributes, updated_at: Time.current
+    attrs = { cached_attributes: cached_attributes }
+    if touch
+      attrs[:updated_at] = Time.current
+    end
+    update_columns attrs
   end
 end

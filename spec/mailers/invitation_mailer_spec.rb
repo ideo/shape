@@ -78,7 +78,7 @@ RSpec.describe InvitationMailer, type: :mailer do
         )
       end
 
-      context 'with an application' do
+      context 'with an application and network_invitation' do
         let(:application) do
           create(
             :application,
@@ -89,13 +89,20 @@ RSpec.describe InvitationMailer, type: :mailer do
             logo_url: 'https://creativedifference.ideo.com/logo.png',
           )
         end
+        let!(:network_invitation) do
+          create(
+            :network_invitation,
+            organization: organization,
+            user: user,
+          )
+        end
 
         it 'sets the from to creative difference' do
           expect(mail.from).to eq(['help@ideocreativedifference.com'])
         end
 
         it 'sets the invite url to Shape' do
-          expect(mail.text_part.body).to match("http://test.shape.com/invitations/#{user.invitation_token}")
+          expect(mail.text_part.body).to match("http://test.shape.com/invitations/#{network_invitation.token}")
         end
 
         it 'adds support message' do
@@ -123,9 +130,8 @@ RSpec.describe InvitationMailer, type: :mailer do
       end
 
       it 'renders the body with invite URL' do
-        helper = MailerHelper::Base.new(user: user)
         expect(mail.body.encoded).to match("#{invited_by.name} has invited you to join \"#{invited_to_type}\"")
-        expect(mail.body.encoded).to match("Or copy and paste this link into your browser: #{helper.shape_invite_url}")
+        expect(mail.text_part.body).to match('http://test.shape.com')
       end
     end
   end

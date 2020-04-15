@@ -41,7 +41,7 @@
 # Indexes
 #
 #  index_users_on_email             (email)
-#  index_users_on_handle            (handle) UNIQUE
+#  index_users_on_handle            (handle)
 #  index_users_on_invitation_token  (invitation_token)
 #  index_users_on_provider_and_uid  (provider,uid) UNIQUE
 #
@@ -97,19 +97,11 @@ class User < ApplicationRecord
            through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
-  has_many :parent_groups,
-           -> { distinct },
-           through: :groups,
-           source: :parent_groups
   has_many :current_org_groups,
            ->(u) { active.where(organization_id: u.current_organization_id) },
            through: :roles_for_groups,
            source: :resource,
            source_type: 'Group'
-  has_many :current_org_parent_groups,
-           -> { distinct },
-           through: :current_org_groups,
-           source: :parent_groups
 
   has_many :organizations, -> { distinct }, through: :groups
 
@@ -138,8 +130,13 @@ class User < ApplicationRecord
              optional: true
 
   has_many :test_audience_invitations
+  has_many :network_invitations
 
-  validates :email, presence: true, uniqueness: true, if: :email_required?
+  validates :email,
+            presence: true,
+            uniqueness: true,
+            format: { with: Devise.email_regexp },
+            if: :email_required?
   validates :uid, :provider, presence: true, if: :active?
   validates :uid, uniqueness: { scope: :provider }, if: :active?
 
@@ -323,20 +320,19 @@ class User < ApplicationRecord
     find_or_initialize_from_external(network_user_auth, 'ideo')
   end
 
-  def self.create_pending_user(email:)
-    create(
-      email: email,
+  def self.create_pending_user(invitation:, organization_id:)
+    pending_user = create(
+      email: invitation.email,
       status: User.statuses[:pending],
       password: Devise.friendly_token(40),
-      invitation_token: Devise.friendly_token(40),
     )
-  end
+    return pending_user unless pending_user.persisted?
 
-  def self.pending_user_with_token(token)
-    where(
-      invitation_token: token,
-      status: User.statuses[:pending],
-    ).first
+    pending_user.network_invitations.create(
+      token: invitation.token,
+      organization_id: organization_id,
+    )
+    pending_user
   end
 
   # Simplified format, used by action cable
@@ -418,11 +414,13 @@ class User < ApplicationRecord
   end
 
   def all_group_ids
+    parent_group_ids = Group.parent_groups(group_ids).pluck(:id)
     # always include the Common Resource group as it may grant you access
     (group_ids + parent_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]).uniq
   end
 
   def all_current_org_group_ids
+    current_org_parent_group_ids = Group.parent_groups(current_org_group_ids).pluck(:id)
     (current_org_group_ids + current_org_parent_group_ids + [Shape::COMMON_RESOURCE_GROUP_ID]).uniq
   end
 
@@ -537,10 +535,6 @@ class User < ApplicationRecord
     return if first_line_owed.blank?
 
     first_line_owed.created_at + Audience::PAYMENT_WAITING_PERIOD
-  end
-
-  def sync_network_groups
-    SyncNetworkGroups.call(self)
   end
 
   # can return true, false, or 'outdated'

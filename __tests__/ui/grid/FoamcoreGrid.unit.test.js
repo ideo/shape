@@ -83,9 +83,19 @@ describe('FoamcoreGrid', () => {
   })
 
   describe('findOverlap', () => {
+    let fakeCard = { row: 1, col: 5, width: 1, height: 1 }
+
+    it('returns false if uiStore.multiMoveCardIds is empty', () => {
+      // as noted in findOverlap, this prevented false positive overlap when you're actually done dragging
+      props.uiStore.multiMoveCardIds = []
+      const overlap = component.findOverlap(fakeCard)
+      expect(overlap).toBe(false)
+    })
+
     it('finds filledSpot (or not) where a card is trying to be dragged', () => {
+      // this has to be present for it to trigger an overlap
+      props.uiStore.multiMoveCardIds = ['anything']
       // similar to calculateFilledSpots, but given a card (needs width and height >= 1)
-      let fakeCard = { row: 1, col: 5, width: 1, height: 1 }
       let overlap = component.findOverlap(fakeCard)
       expect(overlap.card).toEqual(cardA)
       // 2x2 should stick out and overlap cardA
@@ -166,6 +176,34 @@ describe('FoamcoreGrid', () => {
         outsideDraggableArea: true,
         row: 0,
       })
+    })
+  })
+
+  describe('render blanks with blank rows', () => {
+    beforeEach(() => {
+      const collection = fakeCollection
+      cardA = createCard({ row: 1, col: 1 })
+      // Blank row
+      cardB = createCard({ row: 3, col: 2, height: 2 })
+      cardC = createCard({ row: 5, col: 1 })
+      collection.collection_cards = [cardA, cardB, cardC]
+      collection.num_columns = 4
+      props.collection = collection
+      rerender()
+    })
+
+    it('should have a modified blank card for empty rows', () => {
+      const blankCard = component.positionBlank(
+        {
+          row: 2,
+          col: 1,
+          width: 1,
+          height: 1,
+        },
+        'hover'
+      )
+      const blankCardComponent = mount(blankCard)
+      expect(blankCardComponent.find('RightBlankActions').exists()).toBe(true)
     })
   })
 
@@ -329,10 +367,15 @@ describe('FoamcoreGrid', () => {
       })
 
       it('calls CardMoveService with the drag spot row/col', () => {
-        expect(CardMoveService.moveCards).toHaveBeenCalledWith({
-          col: 6,
-          row: 7,
-        })
+        expect(CardMoveService.moveCards).toHaveBeenCalledWith(
+          {
+            col: 6,
+            row: 7,
+          },
+          { collection_card_ids: [] },
+          // should pass in card as the "topLeftCard"
+          card
+        )
       })
     })
 

@@ -10,7 +10,7 @@ FactoryBot.define do
 
     factory :text_item, class: 'Item::TextItem' do
       content { Faker::Movie.quote }
-      data_content { { ops: [{ insert: 'Hola, world.' }] } }
+      data_content { { ops: [{ insert: 'Hola, world.' }], version: 1 } }
     end
 
     factory :link_item, class: 'Item::LinkItem' do

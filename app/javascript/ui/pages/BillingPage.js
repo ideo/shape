@@ -11,7 +11,8 @@ import ManagePaymentMethods from '~/ui/billing/ManagePaymentMethods'
 import ManageInvoices from '~/ui/billing/ManageInvoices'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import ReactRouterPropTypes from 'react-router-prop-types'
-import { hasKeyValueParam } from '~/utils/paramUtils.js'
+import { hasKeyValueParam } from '~/utils/paramUtils'
+import IdeoSSO from '~/utils/IdeoSSO'
 
 import { apiStore, routingStore } from '~/stores'
 

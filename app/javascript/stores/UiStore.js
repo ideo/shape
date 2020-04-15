@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
 
-import routeToLogin from '~/utils/routeToLogin'
 import sleep from '~/utils/sleep'
 import v, {
   TOUCH_DEVICE_OS,
@@ -135,6 +134,8 @@ export default class UiStore {
     message: '',
     autoHideDuration: 4000,
     onClose: () => this.closeSnackbar(),
+    showRefresh: false,
+    backgroundColor: v.colors.commonDark,
   }
   @observable
   dialogConfig = { ...this.defaultDialogProps }
@@ -174,9 +175,15 @@ export default class UiStore {
   @observable
   draggingFromMDL = false
   @observable
-  overflowFromMDL = 0
+  // track if you are dragging/moving more cards than visible
+  movingCardsOverflow = false
   @observable
   textEditingItem = null
+  @observable
+  textEditingItemHasTitleText = false
+  @observable
+  // have to track this e.g. if you are editing the original or link card (same item)
+  textEditingCardId = null
   @observable
   overdueBannerVisible = true
   @observable
@@ -246,6 +253,10 @@ export default class UiStore {
   hoveringOverDataItem = false
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
+
+  get routingStore() {
+    return this.apiStore.routingStore
+  }
 
   @action
   setEditingCardCover(editingCardCoverId) {
@@ -456,9 +467,9 @@ export default class UiStore {
 
   // TODO: rename this function to be clear it is show or reroute??
   showPermissionsAlert() {
-    const { viewingCollection } = this
+    const { viewingCollection, routingStore } = this
     if (viewingCollection && viewingCollection.isPublicJoinable) {
-      routeToLogin({ redirect: viewingCollection.frontend_url })
+      routingStore.routeToLogin({ redirect: viewingCollection.frontend_url })
       return
     }
     this.alert('You need permission to access this content.', 'Key')
@@ -605,6 +616,39 @@ export default class UiStore {
 
   get isIOS() {
     return getTouchDeviceOS() === TOUCH_DEVICE_OS.IOS
+  }
+
+  get isAndroidSingleColumn() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols === 1 && this.isAndroid
+  }
+
+  get isAndroidMultipleColumns() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols > 1 && this.isAndroid
+  }
+
+  get isIOSSingleColumn() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols === 1 && this.isIOS
+  }
+
+  get isIOSMultipleColumns() {
+    const {
+      gridSettings: { cols },
+    } = this
+    return cols > 1 && this.isIOS
+  }
+
+  get isPortrait() {
+    // assumes that the client is a mobile device
+    return window.innerHeight > window.innerWidth
   }
 
   // NOTE: because we aren't tracking a difference between "closed" and null,
@@ -823,6 +867,11 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+  }
+
+  @action
+  selectCardIds(cardIds) {
+    this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
   }
 
   @action
@@ -1055,6 +1104,10 @@ export default class UiStore {
     const { range } = selectedTextRangeForCard
     if (!currentQuillEditor || !range || !range.length) return
 
+    const currentFormat = currentQuillEditor.getFormat(
+      range.index,
+      range.length
+    )
     // if no record then un-highlight
     const val = record ? 'new' : false
     currentQuillEditor.formatText(
@@ -1063,6 +1116,7 @@ export default class UiStore {
       {
         commentHighlight: val,
         commentHighlightResolved: false,
+        ...currentFormat,
       },
       'api'
     )

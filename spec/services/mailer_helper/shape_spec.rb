@@ -51,7 +51,7 @@ RSpec.describe MailerHelper::Shape, type: :service do
   describe '#invite_url' do
     it 'returns front-end url for group' do
       expect(subject.invite_url).to eq(
-        'http://test.shape.com/company/',
+        'http://test.shape.com/company',
       )
     end
 
@@ -66,14 +66,16 @@ RSpec.describe MailerHelper::Shape, type: :service do
       end
     end
 
-    context 'with pending user' do
+    context 'with pending user and network_invitation' do
       let!(:user) { create(:user, :pending) }
+      let!(:network_invitation) { create(:network_invitation, user: user, organization: organization) }
 
       it 'returns app invite url with invite redirect' do
         expect(subject.invite_url).to eq(
           url_helpers.accept_invitation_url(
-            token: user.invitation_token,
-          )
+            token: network_invitation.token,
+            redirect: '/company',
+          ),
         )
       end
     end

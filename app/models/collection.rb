@@ -272,7 +272,6 @@ class Collection < ApplicationRecord
 
   # By default all string fields are searchable
   def search_data
-    parent_ids = breadcrumb
     updated_date = Arel.sql('DATE(updated_at)')
     activity_dates = activities.group(updated_date).pluck(updated_date)
     {
@@ -298,6 +297,11 @@ class Collection < ApplicationRecord
   # just for reindexing, you can call:
   # Collection.reindex(:new_search_data) to only reindex those fields (more efficiently)
   def new_search_data
+    # for now these are the same
+    activity_search_data
+  end
+
+  def activity_search_data
     {
       activity_count: activities_and_child_activities_count,
     }
@@ -695,6 +699,12 @@ class Collection < ApplicationRecord
     reindex_sync
   end
 
+  def self.reindex_async(ids)
+    ids.each do |collection_id|
+      search_index.reindex_queue.push(collection_id)
+    end
+  end
+
   def touch_related_cards
     try(:parent_collection_card).try(:touch)
     cards_linked_to_this_collection.update_all(updated_at: updated_at)
@@ -877,7 +887,8 @@ class Collection < ApplicationRecord
   end
 
   def subtemplate_instance?
-    templated? && template.subtemplate?
+    # is this an instance of a subtemplate
+    templated? && template&.subtemplate?
   end
 
   def inside_a_template_instance?

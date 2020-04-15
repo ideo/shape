@@ -218,7 +218,7 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
 
       context 'going over freemium limit' do
         before do
-          organization.update(active_users_count: 3)
+          create_list(:user, 3, add_to_org: organization)
         end
 
         it 'should return a 400 with an error message' do
@@ -230,12 +230,13 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
 
       context 'with users already in the org' do
         before do
+          create_list(:user, 2, add_to_org: organization)
           users.each do |user|
             user.add_role(Role::MEMBER, organization.primary_group)
           end
         end
 
-        it 'should return a 204' do
+        it 'should not count towards freemium limit, return a 204' do
           post(path, params: params)
           expect(response.status).to eq(204)
         end
@@ -243,7 +244,8 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
 
       context 'going over freemium limit with a payment method' do
         before do
-          organization.update(active_users_count: 3, has_payment_method: true)
+          create_list(:user, 3, add_to_org: organization)
+          organization.update_columns(has_payment_method: true)
         end
 
         it 'should return a 204' do
@@ -254,7 +256,9 @@ describe Api::V1::RolesController, type: :request, json: true, auth: true do
 
       context 'going over freemium limit with in app billing off' do
         before do
-          organization.update_columns(active_users_count: 3, in_app_billing: false)
+          create_list(:user, 3, add_to_org: organization)
+          # update without triggering network callbacks
+          organization.update_columns(in_app_billing: false)
         end
 
         it 'should return a 204' do

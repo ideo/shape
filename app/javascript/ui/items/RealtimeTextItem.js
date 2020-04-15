@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, toJS } from 'mobx'
+import { action, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Delta from 'quill-delta'
 import ReactQuill, { Quill } from 'react-quill'
@@ -8,6 +8,7 @@ import ReactQuill, { Quill } from 'react-quill'
 import QuillCursors from 'quill-cursors'
 import styled from 'styled-components'
 
+import ActionCableConsumer from '~/utils/ActionCableConsumer'
 import ChannelManager from '~/utils/ChannelManager'
 import { CloseButton } from '~/ui/global/styled/buttons'
 import QuillLink from '~/ui/global/QuillLink'
@@ -30,6 +31,8 @@ Quill.register(QuillHighlighter)
 Quill.register(QuillHighlightResolver)
 
 const Keyboard = Quill.import('modules/keyboard')
+
+const CHANNEL_DISCONNECTED_MESSAGE = 'Connection lost, unable to edit.'
 
 const FULL_PAGE_TOP_PADDING = '2rem'
 const DockedToolbar = styled.div`
@@ -101,6 +104,7 @@ const StyledContainer = styled.div`
 @inject('uiStore', 'apiStore')
 @observer
 class RealtimeTextItem extends React.Component {
+  unmounted = false
   channelName = 'ItemRealtimeChannel'
   state = {
     disconnected: false,
@@ -111,18 +115,21 @@ class RealtimeTextItem extends React.Component {
   canceled = false
   currentlySending = false
   currentlySendingCheck = null
+  num_viewers = 1
   quillData = {}
   combinedDelta = new Delta()
   bufferDelta = new Delta()
   contentSnapshot = new Delta()
+  @observable
+  activeSizeFormat = null
 
   constructor(props) {
     super(props)
     this.reactQuillRef = undefined
     this.quillEditor = undefined
     this.sendCombinedDelta = _.debounce(this._sendCombinedDelta, 200)
-    this.instanceDataContentUpdate = _.debounce(
-      this._instanceDataContentUpdate,
+    this.instanceTextContentUpdate = _.debounce(
+      this._instanceTextContentUpdate,
       30000
     )
     this.sendCursor = _.throttle(this._sendCursor, 100)
@@ -132,15 +139,21 @@ class RealtimeTextItem extends React.Component {
   componentDidMount() {
     this.subscribeToItemRealtimeChannel()
     setTimeout(() => {
+      if (this.unmounted) return
+      // this slight delay seems to be help particularly for the full item page
       this.subscribeToItemRealtimeChannel()
+      this.checkActionCableConnection()
     }, 1250)
     this.calculateCanEdit()
     if (!this.reactQuillRef) return
 
     this.initQuillRefsAndData({ initSnapshot: true })
     this.clearQuillClipboardHistory()
+    this.setInitialSize()
+
     setTimeout(() => {
       this.quillEditor.focus()
+      this.setInitialSize()
       this.clearQuillClipboardHistory()
     }, 100)
   }
@@ -169,9 +182,8 @@ class RealtimeTextItem extends React.Component {
     const { item } = this.props
     const routingToSameItem =
       routingTo.id === item.id && routingTo.type === 'items'
-    ChannelManager.unsubscribeAllFromChannel(this.channelName, {
-      keepOpen: routingToSameItem,
-    })
+    if (routingToSameItem) return
+    ChannelManager.unsubscribe(this.channelName, item.id)
   }
 
   clearQuillClipboardHistory() {
@@ -180,6 +192,29 @@ class RealtimeTextItem extends React.Component {
     // fix for undo clearing out all text
     // https://github.com/zenoamaro/react-quill/issues/511
     this.quillEditor.history.clear()
+  }
+
+  setInitialSize() {
+    // only set this if we are in a brand new text item
+    if (this.version) return
+
+    const { quillEditor } = this
+    const { initialSize } = this.props
+    if (quillEditor && initialSize !== 'normal') {
+      const range = quillEditor.getSelection()
+      if (range && range.index) {
+        quillEditor.formatText(0, range.index, 'size', initialSize, 'user')
+      }
+      quillEditor.format('size', initialSize)
+    }
+  }
+
+  checkActionCableConnection() {
+    if (ActionCableConsumer.connection.disconnected) {
+      this.channelDisconnected()
+      return false
+    }
+    return true
   }
 
   reapplyActiveHighlight() {
@@ -227,11 +262,15 @@ class RealtimeTextItem extends React.Component {
     })
   }
 
-  channelDisconnected = (message = 'Disconnected from channel') => {
+  // NOTE: ActionCable websocket should automatically/continually try to reconnect on its own
+  channelDisconnected = (message = CHANNEL_DISCONNECTED_MESSAGE) => {
     if (this.unmounted) return
-    // TODO: do anything here? try to reconnect?
-    console.warn(message)
-    const { fullPageView } = this.props
+    const { uiStore, fullPageView } = this.props
+    uiStore.popupSnackbar({
+      message,
+      showRefresh: true,
+      backgroundColor: v.colors.alert,
+    })
     if (!fullPageView) {
       // this will cancel you out of the editor back to view-only mode
       this.cancel()
@@ -241,8 +280,9 @@ class RealtimeTextItem extends React.Component {
     this.setState({ disconnected: true })
   }
 
-  channelReceivedData = ({ current_editor, data }) => {
+  channelReceivedData = ({ current_editor, data, num_viewers }) => {
     if (this.unmounted) return
+    this.num_viewers = num_viewers
     if (data && data.version) {
       this.handleReceivedDelta({ current_editor, data })
     }
@@ -338,14 +378,6 @@ class RealtimeTextItem extends React.Component {
     const quillData = toJS(item.quill_data) || {}
     if (!quillData.ops) quillData.ops = []
     // Set initial font size - if text item is blank,
-    // and user has chosen a h* tag (e.g. h1)
-    // (p tag does not require any ops changes)
-    if (quillData.ops.length === 0 && this.headerSize) {
-      quillData.ops.push({
-        insert: '\n',
-        attributes: { header: this.headerSize },
-      })
-    }
     return quillData
   }
 
@@ -356,14 +388,14 @@ class RealtimeTextItem extends React.Component {
     // mark this as it may get called again from unmount, only want to cancel once
     this.canceled = true
     this.sendCombinedDelta.flush()
-    this.instanceDataContentUpdate.flush()
-    // NOTE: cancel also means "save current text"!
+    this.instanceTextContentUpdate.flush()
     // event is passed through because TextItemCover uses it
     if (!canEdit) return onCancel({ item: this.props.item, ev, route })
 
     const item = this.setItemQuillData()
     this.pushTextUndo()
-    return onCancel({ item, ev, route })
+    // tell the TextItemCover about number of viewers so it can know whether to perform an additional save
+    return onCancel({ item, ev, route, num_viewers: this.num_viewers })
   }
 
   pushTextUndo() {
@@ -402,56 +434,6 @@ class RealtimeTextItem extends React.Component {
     uiStore.update('quillSnapshot', delta)
   }
 
-  get headerSize() {
-    const { initialFontTag } = this.props
-    if (initialFontTag.includes('H')) {
-      return _.replace(initialFontTag, 'H', '')
-    }
-    return null
-  }
-
-  newlineIndicesForDelta = delta => {
-    const newlineOpIndices = []
-    _.each(delta.ops, (op, index) => {
-      if (op.insert && op.insert.includes('\n')) newlineOpIndices.push(index)
-    })
-    return newlineOpIndices
-  }
-
-  headerFromLastNewline = delta => {
-    // Check if user added newline
-    // And if so, set their default text size if provided
-    const newlineOpIndices = this.newlineIndicesForDelta(delta)
-    // Return if there wasn't a specified header size in previous newline operation
-    const prevHeaderSizeOp = delta.ops[_.last(newlineOpIndices)]
-    return _.get(prevHeaderSizeOp, 'attributes.header')
-  }
-
-  adjustHeaderSizeIfNewline = delta => {
-    // Check if user added newline
-    // And if so, set their default text size if provided
-    if (this.newlineIndicesForDelta(delta).length === 0) return
-
-    const prevHeader = this.headerFromLastNewline(delta)
-    if (!prevHeader) return
-
-    // Apply previous line's header size to last operation
-    let newDelta = new Delta(delta)
-    const lastOp = _.last(newDelta.ops)
-    if (!lastOp.attributes) {
-      lastOp.attributes = { header: prevHeader }
-    } else if (lastOp.attributes.header) {
-      return
-    } else {
-      // remove lastOp, which is a `retain: 1` and causes the newline to be <p>
-      newDelta = new Delta({ ops: [newDelta.ops[0], newDelta.ops[1]] })
-        .retain(1)
-        .delete(1)
-    }
-    this.quillEditor.updateContents(newDelta, 'api')
-    return newDelta
-  }
-
   get cardId() {
     const { item } = this.props
     if (item.parent_collection_card) {
@@ -463,20 +445,18 @@ class RealtimeTextItem extends React.Component {
 
   handleTextChange = (_content, delta, source, _editor) => {
     if (source !== 'user') return
-    // This adjustment is made so that the currently-selected
-    // header size is preserved on new lines
-
-    let newDelta = new Delta(delta)
-    const adjustedDelta = this.adjustHeaderSizeIfNewline(delta)
-    if (adjustedDelta) {
-      newDelta = newDelta.compose(adjustedDelta)
-    }
     const cursors = this.quillEditor.getModule('cursors')
     cursors.clearCursors()
 
-    this.combineAwaitingDeltas(newDelta)
-    this.sendCombinedDelta()
-    this.instanceDataContentUpdate()
+    this.combineAwaitingDeltas(delta)
+    const connected = this.checkActionCableConnection()
+    if (connected) {
+      this.sendCombinedDelta()
+      this.instanceTextContentUpdate()
+    }
+    // NOTE: trying to check titleText only if the delta turned header on/off
+    // seemed to miss some cases, so we just check every time
+    this.checkForTitleText()
   }
 
   handleSelectionChange = (range, source, editor) => {
@@ -493,6 +473,7 @@ class RealtimeTextItem extends React.Component {
     // also store editor.getContents(range) for later reference
     if (source === 'user') {
       this.sendCursor()
+      if (range) this.checkActiveSizeFormat()
     }
   }
 
@@ -515,7 +496,7 @@ class RealtimeTextItem extends React.Component {
           // if we are stuck 15s in this `currentlySending` mode it means our socketSends are
           // silently failing... we've probably been unsubscribed and it's throwing a backend error
           if (this.currentlySending) {
-            this.channelDisconnected('stuck for 15s')
+            this.channelDisconnected('Disconnected from server')
           }
         }, 15 * 1000)
       }
@@ -543,7 +524,7 @@ class RealtimeTextItem extends React.Component {
     return this.combinedDelta
   }
 
-  _instanceDataContentUpdate = () => {
+  _instanceTextContentUpdate = () => {
     const { item, uiStore } = this.props
     const parent = item.parent || uiStore.viewingCollection
     if (parent && parent.isTemplate) {
@@ -585,8 +566,58 @@ class RealtimeTextItem extends React.Component {
     const { apiStore, uiStore, item } = this.props
     const { range } = uiStore.selectedTextRangeForCard
     // prevent commenting without a selected range
-    if (!(range && range.length > 0)) return
+    if (!range || range.length === 0) return
     apiStore.openCurrentThreadToCommentOn(item)
+  }
+
+  toggleSize = size => e => {
+    e.preventDefault()
+    const { quillEditor } = this
+    const currentFormat = quillEditor.getFormat()
+    let val = size
+    if (currentFormat.size === size) {
+      val = null
+    }
+    quillEditor.format('header', false, 'user')
+    quillEditor.format('size', val, 'user')
+    this.checkActiveSizeFormat()
+  }
+
+  toggleHeader = header => e => {
+    e.preventDefault()
+    const { quillEditor } = this
+    const range = quillEditor.getSelection()
+    if (!range) return
+    const lines = quillEditor.getLines(range.index)
+    const currentFormat = quillEditor.getFormat()
+    _.each(lines, line => {
+      quillEditor.removeFormat(line.offset(), line.length(), 'user')
+    })
+    if (currentFormat.header !== header) {
+      quillEditor.format('size', null, 'user')
+      quillEditor.format('header', header, 'user')
+    }
+    this.checkActiveSizeFormat()
+  }
+
+  checkForTitleText = () => {
+    const { uiStore } = this.props
+    let hasTitle = false
+    const contents = this.quillEditor.getContents()
+    _.each(contents.ops, op => {
+      if (op.attributes && op.attributes.header === 5) {
+        hasTitle = true
+      }
+    })
+    uiStore.update('textEditingItemHasTitleText', hasTitle)
+  }
+
+  @action
+  checkActiveSizeFormat = () => {
+    if (this.unmounted) return
+    const format = this.quillEditor.getFormat()
+    this.activeSizeFormat =
+      format.header && format.header === 5 ? 'title' : format.size
   }
 
   endOfHighlight = (range, context) => {
@@ -684,7 +715,13 @@ class RealtimeTextItem extends React.Component {
       >
         <DockedToolbar fullPageView={fullPageView}>
           {canEdit && (
-            <TextItemToolbar onExpand={onExpand} onComment={this.onComment} />
+            <TextItemToolbar
+              onExpand={onExpand}
+              toggleSize={this.toggleSize}
+              toggleHeader={this.toggleHeader}
+              onComment={this.onComment}
+              activeSizeFormat={this.activeSizeFormat}
+            />
           )}
           <CloseButton
             data-cy="TextItemClose"
@@ -714,14 +751,14 @@ RealtimeTextItem.propTypes = {
   fullyLoaded: PropTypes.bool.isRequired,
   onExpand: PropTypes.func,
   fullPageView: PropTypes.bool,
-  initialFontTag: PropTypes.oneOf(['H1', 'H3', 'P']),
+  initialSize: PropTypes.oneOf(['normal', 'huge', 'large']),
   containerRef: PropTypes.func,
 }
 RealtimeTextItem.defaultProps = {
   currentUserId: null,
   onExpand: null,
   fullPageView: false,
-  initialFontTag: 'P',
+  initialSize: 'normal',
   containerRef: null,
 }
 RealtimeTextItem.wrappedComponent.propTypes = {

@@ -29,7 +29,10 @@ class CommentInput extends React.Component {
     this.props.setEditor(null, { unset: true })
   }
 
+  /** WIKI: https://github.com/ideo/shape/wiki/Comment-Mentions-Positioning */
   positionSuggestions = ({ decoratorRect, state, props }) => {
+    const { uiStore } = this.props
+    const { isTouchDevice } = uiStore
     const { suggestions } = props
     const { isActive } = state
 
@@ -37,83 +40,36 @@ class CommentInput extends React.Component {
       return
     }
 
-    const { y } = uiStore.activityLogPosition
-    const maxCommentSuggestionsHeight = decoratorRect.top - y + 16 // height above the input and the activity box
-    const maxPossibleSuggestions = uiStore.isTouchDevice ? 3 : 6 // show a max of 3.5 suggestions for phones/tablets and 6.5 suggestions for desktop
+    const activityLogDiv = document.getElementsByClassName(
+      'activity_log-draggable'
+    )[0]
+    const activityLogY = activityLogDiv.getBoundingClientRect().y
+    const heightBetweenActivityBoxAndCommentInput =
+      decoratorRect.top - activityLogY + 16 // max comment mentions position relative to the activity log and comment input
+    const maxPossibleSuggestions = isTouchDevice ? 3 : 6 // show a max of 3.5 suggestions for phones/tablets and 6.5 suggestions for desktop
     const clampedSuggestionsLength = _.clamp(
       suggestions.length,
       0,
       maxPossibleSuggestions
     )
     const totalSuggestionsLength = 45 * clampedSuggestionsLength
+    const isShowingAllSuggestions =
+      clampedSuggestionsLength === maxPossibleSuggestions
 
-    if (!uiStore.isTouchDevice) {
-      const shouldPlaceSuggestionsAtBottom =
-        decoratorRect.top + totalSuggestionsLength < window.innerHeight
-      const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 98
+    const shouldPlaceSuggestionsAtBottom = isTouchDevice
+      ? false
+      : decoratorRect.top + totalSuggestionsLength < window.innerHeight
+    const mentionsRelativeTopPosition =
+      heightBetweenActivityBoxAndCommentInput - totalSuggestionsLength - 86
 
-      return {
-        top: `${
-          shouldPlaceSuggestionsAtBottom
-            ? maxCommentSuggestionsHeight + 6
-            : clampedSuggestionsLength === maxPossibleSuggestions
-            ? newTop - 6
-            : newTop + 40
-        }px`,
-      }
-    } else {
-      let top = '0px'
-      const cols = _.get(uiStore, 'gridSettings.cols')
-
-      if (cols == 1 && uiStore.isIOS) {
-        // will place at the top of the comment input, use activity log height since iOS phone comment box is full-screen
-        const _maxCommentSuggestionsHeight = uiStore.activityLogPosition.h - y
-        const newTop =
-          _maxCommentSuggestionsHeight - totalSuggestionsLength + 50
-        top = `${
-          clampedSuggestionsLength === maxPossibleSuggestions
-            ? newTop
-            : newTop + 38
-        }px`
-      } else if (cols == 1 && uiStore.isAndroid) {
-        // will place at the top of the comment input for android phones
-        const newTop = maxCommentSuggestionsHeight - totalSuggestionsLength
-        top = `${
-          clampedSuggestionsLength === maxPossibleSuggestions
-            ? newTop + 90
-            : newTop + 136
-        }px`
-      } else {
-        let newTop = maxCommentSuggestionsHeight - totalSuggestionsLength - 60
-        if (uiStore.isIOS) {
-          // handle landscape and portrait differently
-          const isPortrait = cols == 2
-          const willBePushedByVirtualKeyboard = isPortrait
-            ? decoratorRect.top > window.innerHeight / 2
-            : decoratorRect.top > window.innerHeight / 2 - 260
-
-          // check if comment mentions are placed where virtual keyboard will be
-          if (willBePushedByVirtualKeyboard) {
-            const pushedTopOffset = isPortrait ? 400 : 500
-            newTop = newTop + pushedTopOffset
-          }
-          top = `${
-            clampedSuggestionsLength === maxPossibleSuggestions
-              ? newTop - 30
-              : newTop
-          }px`
-        } else {
-          top = `${
-            clampedSuggestionsLength === maxPossibleSuggestions
-              ? newTop - 30
-              : newTop
-          }px`
-        }
-      }
-
-      return {
-        top,
-      }
+    return {
+      top: `${
+        shouldPlaceSuggestionsAtBottom
+          ? heightBetweenActivityBoxAndCommentInput + 6
+          : isShowingAllSuggestions
+          ? mentionsRelativeTopPosition
+          : mentionsRelativeTopPosition + 34
+      }px`,
     }
   }
 

@@ -165,10 +165,13 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
           batch_reindex(Collection)
         end
 
-        it 'only finds template collections and filters out template collections' do
+        it 'only finds template collections and filters out non-standard collections' do
           get(path, params: { master_template: true })
           expect(json['data'].size).to eq(2)
-          expect(json['data'].map { |d| d['id'].to_i }).to match_array((templates.reject { |t| t.type == 'Collection::TestCollection' }).map(&:id))
+          ids = json['data'].map { |d| d['id'].to_i }
+          expect(ids).to match_array(
+            templates.reject { |t| t.type == 'Collection::TestCollection' }.map(&:id),
+          )
         end
       end
 
@@ -358,6 +361,19 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       it 'returns empty array' do
         get(path, params: { query: find_collection.name })
         expect(json['data']).to be_empty
+      end
+    end
+
+    context 'with super_admin role' do
+      before do
+        current_user.remove_role(Role::EDITOR, find_collection)
+        current_user.add_role(Role::SUPER_ADMIN)
+        batch_reindex(Collection)
+      end
+
+      it 'has access to everything' do
+        get(path, params: { query: find_collection.name })
+        expect(json['data'].size).to eq(1)
       end
     end
 

@@ -14,7 +14,11 @@ Rails.application.routes.draw do
     root to: 'home#index', constraints: ->(req) { req.format == :html || req.format == '*/*' }
   end
 
-  mount ActionCable.server => '/cable'
+  if ENV['ACTION_CABLE_ADAPTER'] != 'anycable' || ENV['ANYCABLE_DEPLOYMENT']
+    mount ActionCable.server => '/cable'
+  else
+    get 'cable', to: 'home#not_found'
+  end
 
   namespace :api do
     namespace :v1 do
@@ -28,6 +32,9 @@ Rails.application.routes.draw do
           patch 'submit'
           patch 'restore_permissions'
           post 'background_update_template_instances'
+          post 'insert_row'
+          post 'remove_row'
+          post 'background_update_live_test'
         end
         collection do
           post 'create_template'

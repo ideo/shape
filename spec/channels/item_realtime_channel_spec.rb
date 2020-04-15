@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ItemRealtimeChannel, type: :channel do
   let(:editor) { create(:user) }
-  let(:item) { create(:text_item, add_editors: [editor]) }
+  let(:item) { create(:text_item, add_editors: [editor], version: 1) }
   let(:other_user) { create(:user) }
   let(:stream_name) { item.stream_name }
 
@@ -52,9 +52,9 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
     let!(:subscription) { subscribe(id: item.id) }
     let(:data) do
       {
-        delta: { ops: [] },
-        version: 1,
-        full_content: { ops: [] },
+        delta: { ops: [{ insert: 'Yo.' }] },
+        version: 2,
+        full_content: { ops: [{ insert: 'Yo.' }] },
       }
     end
 

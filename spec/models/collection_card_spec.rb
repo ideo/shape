@@ -640,11 +640,12 @@ RSpec.describe CollectionCard, type: :model do
       end
 
       it 'should call the CollectionCardArchiveWorker' do
+        card_ids = collection.collection_cards.pluck(:id)
         expect(CollectionCardArchiveWorker).to receive(:perform_async).with(
-          collection_cards.map(&:id),
+          card_ids,
           user.id,
         )
-        collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
+        collection_cards.archive_all!(ids: card_ids, user_id: user.id)
       end
 
       context 'with a master template collection with 1 or more instances' do

@@ -5,7 +5,7 @@ import { ReferenceType, updateModelId } from 'datx'
 // apiStore must be imported first
 // or else you run into a circular dependency issue
 import { apiStore } from '~/stores'
-import Collection from '~/stores/jsonApi/Collection'
+import Collection, { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import Organization from '~/stores/jsonApi/Organization'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
@@ -412,6 +412,20 @@ describe('Collection', () => {
       expect(collection.collection_cards.length).toEqual(2)
     })
 
+    describe('with row parameters for a board', () => {
+      it('should update loadedRows', async () => {
+        collection = new Collection(
+          {
+            name: 'fakeCollection',
+            class_type: 'Collection::Board',
+          },
+          apiStore
+        )
+        await collection.API_fetchCards({ rows: [3, 10] })
+        expect(collection.loadedRows).toEqual(10)
+      })
+    })
+
     describe('as search collection with no filters', () => {
       let searchResultsCollection
       beforeEach(() => {
@@ -587,6 +601,72 @@ describe('Collection', () => {
     })
   })
 
+  describe('API_manipulateRow', () => {
+    beforeEach(() => {
+      apiStore.request = jest.fn()
+      apiStore.undoStore.pushUndoAction = jest.fn()
+      runInAction(() => {
+        collection.collection_cards = [
+          { ...collectionCard_1, row: 1 },
+          { ...collectionCard_2, row: 3 },
+          { ...collectionCard_3, row: 4 },
+        ]
+      })
+    })
+
+    it('should bump up the row numbers of corresponding cards when calling insert', async () => {
+      const action = ROW_ACTIONS.INSERT
+      const row = 1
+      await collection.API_manipulateRow({
+        row,
+        action,
+      })
+      const params = { row }
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}/${action}`,
+        'POST',
+        params
+      )
+      expect(apiStore.undoStore.pushUndoAction).toHaveBeenCalledWith({
+        actionType: expect.any(String),
+        apiCall: expect.any(Function),
+        message: 'Insert row undone',
+        redirectPath: { id: collection.id, type: 'collections' },
+        redoAction: {
+          apiCall: expect.any(Function),
+          message: 'Insert row redone',
+        },
+      })
+      expect(_.map(collection.collection_cards, 'row')).toEqual([1, 4, 5])
+    })
+
+    it('should bump down the row numbers of corresponding cards when calling remove', async () => {
+      const action = ROW_ACTIONS.REMOVE
+      const row = 2
+      await collection.API_manipulateRow({
+        row,
+        action,
+      })
+      const params = { row }
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}/${action}`,
+        'POST',
+        params
+      )
+      expect(apiStore.undoStore.pushUndoAction).toHaveBeenCalledWith({
+        actionType: expect.any(String),
+        apiCall: expect.any(Function),
+        message: 'Remove row undone',
+        redirectPath: { id: collection.id, type: 'collections' },
+        redoAction: {
+          apiCall: expect.any(Function),
+          message: 'Remove row redone',
+        },
+      })
+      expect(_.map(collection.collection_cards, 'row')).toEqual([1, 2, 3])
+    })
+  })
+
   describe('filter bar methods', () => {
     beforeEach(() => {
       collection.addReference(
@@ -636,6 +716,17 @@ describe('Collection', () => {
           'purpose',
         ])
       })
+    })
+  })
+
+  describe('isPublicJoinable', () => {
+    it('returns false if collection.anyone_can_join is false', () => {
+      collection.anyone_can_join = false
+      expect(collection.isPublicJoinable).toEqual(false)
+    })
+    it('returns true if collection.anyone_can_join is true', () => {
+      collection.anyone_can_join = true
+      expect(collection.isPublicJoinable).toEqual(true)
     })
   })
 })

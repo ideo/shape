@@ -394,7 +394,6 @@ class CollectionCover extends React.Component {
                   cardId={cardId}
                   handleClick={this.handleClick}
                   searchResult={searchResult}
-                  initialFontTag={'P'}
                   hideReadMore
                   uneditable
                   isTransparent={true}

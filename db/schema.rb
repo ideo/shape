@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_26_214443) do
+ActiveRecord::Schema.define(version: 2020_04_01_042139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -57,6 +57,14 @@ ActiveRecord::Schema.define(version: 2020_02_26_214443) do
     t.datetime "updated_at", null: false
     t.index ["application_id", "organization_id"], name: "index_api_tokens_on_app_id_org_id"
     t.index ["token"], name: "index_api_tokens_on_token"
+  end
+
+  create_table "app_metrics", force: :cascade do |t|
+    t.string "metric"
+    t.float "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["metric", "created_at"], name: "index_app_metrics_on_metric_and_created_at"
   end
 
   create_table "application_organizations", force: :cascade do |t|
@@ -404,11 +412,13 @@ ActiveRecord::Schema.define(version: 2020_02_26_214443) do
     t.string "network_id"
     t.integer "created_by_id"
     t.integer "application_id"
+    t.jsonb "subgroup_ids", default: []
     t.index ["archive_batch"], name: "index_groups_on_archive_batch"
     t.index ["autojoin_emails"], name: "index_groups_on_autojoin_emails", using: :gin
     t.index ["handle"], name: "index_groups_on_handle"
     t.index ["network_id"], name: "index_groups_on_network_id"
     t.index ["organization_id"], name: "index_groups_on_organization_id"
+    t.index ["subgroup_ids"], name: "index_groups_on_subgroup_ids", using: :gin
     t.index ["type"], name: "index_groups_on_type"
   end
 
@@ -476,6 +486,16 @@ ActiveRecord::Schema.define(version: 2020_02_26_214443) do
     t.index ["question_type"], name: "index_items_on_question_type"
     t.index ["roles_anchor_collection_id"], name: "index_items_on_roles_anchor_collection_id"
     t.index ["type"], name: "index_items_on_type"
+  end
+
+  create_table "network_invitations", force: :cascade do |t|
+    t.string "token"
+    t.bigint "user_id"
+    t.bigint "organization_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["token"], name: "index_network_invitations_on_token"
+    t.index ["user_id", "organization_id"], name: "index_network_invitations_on_user_id_and_organization_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -698,7 +718,7 @@ ActiveRecord::Schema.define(version: 2020_02_26_214443) do
     t.string "locale"
     t.jsonb "user_settings_data", default: {}, null: false
     t.index ["email"], name: "index_users_on_email"
-    t.index ["handle"], name: "index_users_on_handle", unique: true
+    t.index ["handle"], name: "index_users_on_handle"
     t.index ["invitation_token"], name: "index_users_on_invitation_token"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end

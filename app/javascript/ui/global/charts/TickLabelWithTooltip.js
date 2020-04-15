@@ -120,6 +120,7 @@ class TickLabelWithTooltip extends React.PureComponent {
       labelTextRenderer,
       tooltipTextRenderer,
       tooltipLabelComponent,
+      domain,
       x,
       y,
     } = this.props
@@ -138,6 +139,7 @@ class TickLabelWithTooltip extends React.PureComponent {
           dy={0}
           labelComponent={tooltipLabelComponent}
           text={tooltipText}
+          domain={domain}
         />
         {showAlways && !neverShowLabels && (
           <Fragment>
@@ -176,6 +178,7 @@ TickLabelWithTooltip.propTypes = {
   alwaysShowLabels: PropTypes.bool,
   neverShowLabels: PropTypes.bool,
   fontSize: PropTypes.number,
+  domain: PropTypes.object,
 }
 TickLabelWithTooltip.defaultProps = {
   maxValue: 0,
@@ -185,6 +188,7 @@ TickLabelWithTooltip.defaultProps = {
   alwaysShowLabels: false,
   neverShowLabels: false,
   fontSize: 18,
+  domain: null,
 }
 
 export default TickLabelWithTooltip

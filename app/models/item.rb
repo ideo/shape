@@ -227,6 +227,7 @@ class Item < ApplicationRecord
       content: search_content,
       user_ids: search_user_ids,
       parent_id: parent&.id,
+      parent_ids: parent_ids,
       group_ids: search_group_ids,
       organization_id: organization_id,
       archived: archived,

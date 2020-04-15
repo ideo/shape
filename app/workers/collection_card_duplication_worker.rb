@@ -64,22 +64,13 @@ class CollectionCardDuplicationWorker
   def infinite_loop_detected?
     return unless @parent_collection.cloned_from_id.present?
 
-    error = nil
-    # first just a simple blocker if breadcrumb gets way out of hand
-    if @parent_collection.breadcrumb.count > 50
-      error = "#{self.class.name}: breadcrumb > 50"
-    else
-      parent_names = @parent_collection.parents.pluck(:name)
-      if (parent_names.count - parent_names.uniq.count) > 5
-        # we have 5 repeated parent names, seems like a problem
-        error = "#{self.class.name}: parent names are repeating"
-      end
-    end
-    return unless error.present?
+    errors = @parent_collection.detect_infinite_loop
+    return unless errors.present?
 
-    logger.warn error unless Rails.env.test?
+    error_msg = "CollectionCardDuplicationWorker: #{errors.join(',')}"
+    logger.warn error_msg unless Rails.env.test?
     Appsignal.set_error(
-      StandardError.new(error),
+      StandardError.new(error_msg),
       parent_collection_id: @parent_collection.id,
     )
     true

@@ -22,21 +22,15 @@
       window.CONFIG = {
         stripeApiKey: '<%= stripe_js_api_key %>',
         clientId: '<%= ideo_sso_client_id %>',
-        networkApiBaseUrl: '<%= ideo_sso_api_base_url %>'
+        networkApiBaseUrl: '<%= ideo_sso_api_base_url %>',
+        IDEO_SSO_HOST: '<%= ENV['IDEO_SSO_HOST'] %>',
+        IDEO_SSO_CLIENT_ID: '<%= ENV['IDEO_SSO_CLIENT_ID'] %>',
+        BASE_HOST: '<%= ENV['BASE_HOST'] %>',
+        IDEO_SSO_REDIRECT_PATH: '<%= ENV['IDEO_SSO_REDIRECT_PATH'] %>'
       }
     </script>
     <script id="stripe-js" type="text/javascript" src="<%= stripe_js_sdk_url %>"></script>
-    <script type="text/javascript"
-      src="<%= ideo_sso_js_sdk_url %>">
-    </script>
     <script>
-      if (typeof IdeoSSO === 'undefined') {
-        window.IdeoSSO = {
-          init: function() {},
-          baseApiUrl: '<%= ENV['BASE_HOST'] %>',
-        }
-      }
-      IdeoSSO.init(<%= ideo_sso_init_params.to_json.html_safe %>)
       // useful variables for analytics
       window.analytics = {
         LOGGED_IN: <%= user_signed_in? %>,
@@ -45,6 +39,7 @@
       window.FREEMIUM_USER_LIMIT = <%= Organization::FREEMIUM_USER_LIMIT %>;
       window.AUDIENCE_PRICES = <%= Audience.price_constants.to_json.html_safe %>
     </script>
+
     <%= render 'layouts/trackers_and_widgets_head' %>
 
     <%= stylesheet_link_tag 'application', media: 'all' %>

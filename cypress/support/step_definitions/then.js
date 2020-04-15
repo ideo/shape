@@ -175,3 +175,9 @@ Then('I should see {int} active user(s)', num => {
     .children('div')
     .should('have.length', num)
 })
+
+Then('I should see query parameters {string}', queryString => {
+  cy.location().should(location => {
+    expect(location.search).to.eq(queryString)
+  })
+})

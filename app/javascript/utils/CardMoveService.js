@@ -9,15 +9,15 @@ export default class CardMoveService {
     this.uiStore = uiStore
   }
 
-  static async moveCards(placement, overrideData = {}) {
-    return new this().moveCards(placement, overrideData)
+  static async moveCards(placement, overrideData = {}, topLeftCard = null) {
+    return new this().moveCards(placement, overrideData, topLeftCard)
   }
 
   static moveErrors(opts) {
     return new this().moveErrors(opts)
   }
 
-  async moveCards(placement, overrideData = {}) {
+  async moveCards(placement, overrideData = {}, topLeftCard = null) {
     const { apiStore, uiStore } = this
     const {
       viewingCollection,
@@ -25,7 +25,7 @@ export default class CardMoveService {
       movingCardIds,
       movingIntoCollection,
       cardAction,
-      overflowFromMDL,
+      movingCardsOverflow,
     } = uiStore
 
     let data = {
@@ -70,7 +70,7 @@ export default class CardMoveService {
     }
 
     const movingWithinCollection =
-      !overflowFromMDL &&
+      !movingCardsOverflow &&
       (movingFromCollection === toCollection && cardAction === 'move')
     try {
       uiStore.update('isLoadingMoveAction', true)
@@ -92,7 +92,7 @@ export default class CardMoveService {
               },
             })
           } else {
-            res = await apiStore.moveCards(data)
+            res = await apiStore.moveCards(data, { topLeftCard })
           }
           successMessage = 'Items successfully moved!'
           break
@@ -165,6 +165,8 @@ export default class CardMoveService {
       return true
     } catch (e) {
       uiStore.update('isLoadingMoveAction', false)
+      uiStore.update('isTransparentLoading', false)
+      uiStore.closeMoveMenu()
       let message = 'You cannot move a collection within itself.'
       if (e && e.error && e.error[0]) {
         message = e.error[0]
@@ -213,17 +215,23 @@ export default class CardMoveService {
       // Set order for moved cards so they are between whole integers,
       // and API_batchUpdateCards will properly set/reorder it amongst the collection
       const sortedCards = _.sortBy(movingCards, 'order')
-      const toPinAllMovingCards = this.calculateToPinAllMovingCards(
-        collection,
-        order
-      )
+
+      let toPinAllMovingCards = false
+      if (collection.isMasterTemplate) {
+        toPinAllMovingCards = this.calculateToPinAllMovingCards(
+          collection,
+          order
+        )
+      }
 
       _.each(sortedCards, (card, idx) => {
         const sortedOrder = this.calculateOrderForMovingCard(order, idx)
         const update = {
           card,
           order: sortedOrder,
-          pinned: toPinAllMovingCards,
+        }
+        if (collection.isMasterTemplate) {
+          update.pinned = toPinAllMovingCards
         }
         updates.push(update)
       })

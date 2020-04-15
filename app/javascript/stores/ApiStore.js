@@ -13,7 +13,9 @@ import queryString from 'query-string'
 
 import { apiUrl } from '~/utils/url'
 import trackError from '~/utils/trackError'
+import IdeoSSO from '~/utils/IdeoSSO'
 import googleTagManager from '~/vendor/googleTagManager'
+import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 
 import Activity from './jsonApi/Activity'
 import Audience from './jsonApi/Audience'
@@ -35,7 +37,6 @@ import SurveyResponse from './jsonApi/SurveyResponse'
 import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
-import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import QuestionChoice from './jsonApi/QuestionChoice'
 
 class ApiStore extends jsonapi(datxCollection) {
@@ -77,6 +78,10 @@ class ApiStore extends jsonapi(datxCollection) {
     this.routingStore = routingStore
     this.uiStore = uiStore
     this.undoStore = undoStore
+    _.each(['routingStore', 'uiStore', 'undoStore'], store => {
+      // also save reference back to itself for the stores to use
+      this[store].apiStore = this
+    })
   }
 
   fetch(type, id, skipCache = false) {
@@ -174,7 +179,15 @@ class ApiStore extends jsonapi(datxCollection) {
     return _.first(this.currentUser.organizations.filter(org => org.id === id))
   }
 
-  async loadCurrentUser({ onSuccess } = {}) {
+  async loadCurrentUser({ onSuccess, checkIdeoSSO = false } = {}) {
+    if (checkIdeoSSO) {
+      try {
+        await IdeoSSO.getUserInfo()
+      } catch {
+        IdeoSSO.logout('/login')
+        return
+      }
+    }
     try {
       const res = await this.request('users/me')
       const currentUser = res.data
@@ -668,8 +681,19 @@ class ApiStore extends jsonapi(datxCollection) {
     unarchivedCollection.API_fetchCards()
   }
 
-  async moveCards(data, { undoSnapshot = {} } = {}) {
+  async moveCards(
+    data,
+    { undoing = false, undoSnapshot = {}, topLeftCard = null } = {}
+  ) {
     let res
+    let placement = 'beginning'
+    // before the move
+    if (topLeftCard) {
+      placement = {
+        row: topLeftCard.row,
+        col: topLeftCard.col,
+      }
+    }
     try {
       // trigger card_mover in backend
       res = await this.request('collection_cards/move', 'PATCH', data)
@@ -680,16 +704,18 @@ class ApiStore extends jsonapi(datxCollection) {
     }
     const toCollection = this.find('collections', data.to_id)
     // revert data if undoing card move
-    if (!_.isEmpty(undoSnapshot)) {
-      await this.request(`collections/${data.to_id}`, 'PATCH', {
-        data: undoSnapshot,
-      })
+    if (undoing) {
+      if (!_.isEmpty(undoSnapshot)) {
+        await this.request(`collections/${data.to_id}`, 'PATCH', {
+          data: undoSnapshot,
+        })
+      }
       await toCollection.API_fetchCards()
       return
     }
 
     // find origin collection
-    const fromCollection = this.find('collections', data.from_id)
+    let fromCollection = this.find('collections', data.from_id)
     // make snapshot of fromCollection data with cards for potential undo
     const onlyCardIds = toCollection.isBoard ? data.collection_card_ids : []
     const originalData = fromCollection.toJsonApiWithCards(onlyCardIds)
@@ -705,19 +731,26 @@ class ApiStore extends jsonapi(datxCollection) {
     // reverse to and from values for potential undo operation
     const reversedData = {
       ...data,
-      // override any row/col placement, card orders will get overriden by snapshot
-      placement: 'beginning',
+      placement,
       to_id: data.from_id,
       from_id: data.to_id,
+    }
+    let snapshotData = { undoing: true, undoSnapshot: originalData }
+    if (!data.from_id || data.from_id === data.to_id) {
+      reversedData.to_id = data.to_id
+      reversedData.from_id = null
+      fromCollection = toCollection
+      if (topLeftCard) {
+        // don't need snapshot if we can just move back to the original placement
+        snapshotData = { undoing: true, topLeftCard }
+      }
     }
 
     // add undo operation to stack so users can undo moving cards
     this.undoStore.pushUndoAction({
       message: 'Move undone',
       apiCall: () => {
-        this.moveCards(reversedData, {
-          undoSnapshot: originalData,
-        })
+        this.moveCards(reversedData, snapshotData)
       },
       redirectPath: {
         type: 'collections',
@@ -731,7 +764,7 @@ class ApiStore extends jsonapi(datxCollection) {
         message: 'Move redone',
         apiCall: async () => {
           // redo should just replicate the initial move
-          await this.moveCards(data)
+          await this.moveCards(data, { topLeftCard })
           toCollection.API_fetchCards()
         },
         actionType: POPUP_ACTION_TYPES.SNACKBAR,

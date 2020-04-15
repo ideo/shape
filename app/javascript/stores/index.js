@@ -4,6 +4,7 @@ import NetworkStore from './NetworkStore'
 import RoutingStore from './RoutingStore'
 import UiStore from './UiStore'
 import UndoStore from './UndoStore'
+import IdeoSSO from '~/utils/IdeoSSO'
 
 const isNetworkUrl = url => url.indexOf(IdeoSSO.baseApiUrl) > -1
 
@@ -21,6 +22,12 @@ config.fetchReference = (url, opts) => {
     opts.credentials = 'include'
   } else {
     opts.credentials = 'same-origin'
+  }
+  opts.headers = opts.headers || {}
+  opts.headers
+  const csrfToken = document.head.querySelector("[name='csrf-token']")
+  if (csrfToken) {
+    opts.headers['X-CSRF-Token'] = csrfToken.content
   }
   return fetch(requestUrl, opts)
 }

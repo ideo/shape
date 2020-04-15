@@ -55,9 +55,9 @@ export const fakeTextItemAttrs = {
 }
 
 const areaChartData = [
-  { date: '2018-07-10', value: 10 },
-  { date: '2018-08-10', value: 25 },
-  { date: '2018-09-10', value: 30 },
+  { date: '2018-07-10', value: 10, percentage: 10 },
+  { date: '2018-08-10', value: 25, percentage: 25 },
+  { date: '2018-09-10', value: 30, percentage: 30 },
 ]
 
 export const fakeAreaChartDataset = {
@@ -74,6 +74,19 @@ export const fakeAreaChartDataset = {
     value: d.value,
   })),
 }
+
+export const fakeCDChartDataset = (data, overrides) => ({
+  ...fakeAreaChartDataset,
+  dataWithDates: data.map(d => ({
+    date: new Date(d.date),
+    value: d.value,
+  })),
+  chart_type: 'area',
+  measure: 'Passion',
+  name: 'IDEO Products',
+  style: {fill: "#7e5396"},
+  order: overrides.order || 0,
+})
 
 const fakeBarChartData = [
   { column: 1, value: 5, percentage: 50, type: 'question_context' },
@@ -453,10 +466,12 @@ export const fakeCollection = {
   API_removeComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   API_selectCollectionType: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_manipulateRow: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
   clearCollectionCards: jest.fn(),
+  toJsonApiWithCards: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',

@@ -12,7 +12,7 @@ const props = {
   height: 200,
   cardId: '1',
   handleClick: jest.fn(),
-  initialFontTag: 'P',
+  initialSize: 'normal',
 }
 const e = {
   stopPropagation: jest.fn(),
@@ -103,6 +103,14 @@ describe('TextItemCover', () => {
         'textEditingItem',
         expect.any(Object)
       )
+      expect(uiStore.update).toHaveBeenCalledWith(
+        'textEditingCardId',
+        props.cardId
+      )
+      expect(uiStore.update).toHaveBeenCalledWith(
+        'textEditingItemHasTitleText',
+        false
+      )
     })
 
     it('calls apiStore.fetch item if can_edit_content', async () => {
@@ -130,10 +138,19 @@ describe('TextItemCover', () => {
       item.API_updateWithoutSync = jest.fn()
     })
 
-    it('calls item.API_updateWithoutSync', async () => {
-      component.cancel({ item, ev: e })
-      expect(props.item.API_updateWithoutSync).toHaveBeenCalledWith({
-        cancel_sync: true,
+    describe('with content', () => {
+      describe('with num_viewers === 1', () => {
+        it('should call API_updateWithoutSync', () => {
+          component.cancel({ item, ev: e })
+          expect(item.API_updateWithoutSync).toHaveBeenCalled()
+        })
+      })
+
+      describe('with num_viewers > 1', () => {
+        it('should not call API_updateWithoutSync', () => {
+          component.cancel({ item, ev: e, num_viewers: 2 })
+          expect(item.API_updateWithoutSync).not.toHaveBeenCalled()
+        })
       })
     })
 
@@ -142,7 +159,6 @@ describe('TextItemCover', () => {
       beforeEach(() => {
         item.content = ''
         item.version = null
-        item.API_updateWithoutSync = jest.fn()
         apiStore.find = jest.fn().mockReturnValue(card)
         card.API_archiveSelf.mockClear()
       })

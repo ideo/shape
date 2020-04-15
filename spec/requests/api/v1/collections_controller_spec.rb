@@ -7,6 +7,16 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     describe 'GET #show' do
       let(:path) { "/api/v1/collections/#{collection.id}" }
 
+      context 'with id not found' do
+        let(:collection) { Mashie.new(id: 99) }
+
+        it 'returns a 404' do
+          get(path)
+          expect(response.status).to eq(404)
+          expect(json['errors']).to eq(["Couldn't find Collection with 'id'=99"])
+        end
+      end
+
       context 'with a normal collection' do
         let(:collection) { create(:collection) }
         it 'returns a 401' do
@@ -651,8 +661,27 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let!(:instance) { create(:collection, template: template) }
 
     it 'should call the UpdateTemplateInstancesWorker' do
-      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(template.id, template.collection_cards.pluck(:id), 'update_all')
+      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+        template.id,
+        template.collection_cards.pluck(:id),
+        'update_all',
+      )
       post(path)
+    end
+  end
+
+  describe 'POST #background_update_live_test' do
+    let(:test_collection) { create(:test_collection, :launched, add_editors: [user]) }
+    let(:path) { "/api/v1/collections/#{test_collection.id}/background_update_live_test" }
+    let(:card) { test_collection.collection_cards.last }
+
+    it 'should call the TestResultsCollection::CreateContentWorker' do
+      expect(TestResultsCollection::CreateContentWorker).to receive(:perform_async).with(
+        test_collection.test_results_collection.id,
+        nil,
+        card.id,
+      )
+      post(path, params: { collection_card_id: card.id }.to_json)
     end
   end
 
@@ -750,6 +779,73 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         collection.reload
         expect(collection.cached_inheritance['private']).to be false
       end
+    end
+  end
+
+  describe 'POST #insert_row' do
+    let!(:collection) { create(:collection) }
+    let(:raw_params) do
+      {
+        row: 1,
+      }
+    end.to_json
+    let(:params) { raw_params.to_json }
+    let(:path) { "/api/v1/collections/#{collection.id}/insert_row" }
+
+    before do
+      user.add_role(Role::EDITOR, collection)
+    end
+
+    it 'should call row inserter' do
+      expect(RowInserter).to receive(:call)
+      post(path, params: params)
+    end
+
+    it 'should return no content' do
+      post(path, params: params)
+      expect(response.status).to eq(204)
+    end
+
+    xit 'should touch the collection' do
+      expect do
+        post(path, params: params)
+      end.to change(collection, :updated_at)
+    end
+  end
+
+  describe 'POST #remove_row' do
+    let!(:collection) { create(:collection) }
+    let(:raw_params) do
+      {
+        row: 1,
+      }
+    end.to_json
+    let(:params) { raw_params.to_json }
+    let(:path) { "/api/v1/collections/#{collection.id}/remove_row" }
+
+    before do
+      user.add_role(Role::EDITOR, collection)
+    end
+
+    it 'should call row inserter with remove action' do
+      expect(RowInserter).to receive(:call).with(
+        collection: collection,
+        row: 1,
+        action: 'remove',
+      )
+      post(path, params: params)
+    end
+
+    it 'should return no content' do
+      post(path, params: params)
+      expect(response.status).to eq(204)
+    end
+
+    xit 'should touch the collection' do
+      collection.update_column(:updated_at, 2.day.ago)
+      expect do
+        post(path, params: params)
+      end.to change(collection.reload, :updated_at)
     end
   end
 

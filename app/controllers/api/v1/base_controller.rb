@@ -8,6 +8,14 @@ class Api::V1::BaseController < ApplicationController
 
   respond_to :json
 
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { errors: [exception.message] }, status: :unauthorized
+  end
+
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    render json: { errors: [exception.message] }, status: :not_found
+  end
+
   # See all configuration options for the jsonapi in the jsonapi-rb-rails gem
 
   # jsonapi-rb has issues inferring STI classes,
@@ -85,10 +93,6 @@ class Api::V1::BaseController < ApplicationController
     render jsonapi_errors: errors, status: :unprocessable_entity
   end
 
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { errors: [exception.message] }, status: :unauthorized
-  end
-
   private
 
   def load_and_filter_index
@@ -113,6 +117,13 @@ class Api::V1::BaseController < ApplicationController
     exposables = {
       current_record: @collection,
     }
+    if @collection.is_a?(Collection::SubmissionsCollection)
+      include.delete_if do |val|
+        # don't include these relationships in the SubmissionsCollection response
+        # as they were already included with the SubmissionBox
+        val == :parent || val.try(:keys) == [:roles]
+      end
+    end
     exposables[:current_user] = current_user unless current_user.nil?
     render jsonapi: @collection,
            include: include,
