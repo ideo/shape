@@ -7,10 +7,12 @@ module Slack
       require_in_context :user, :timestamp, :channel, :text, :urls
 
       def call
-        return if find_collection_card.present?
+        # Exit if we've already created this message card
+        # TODO for the future, what if a new thread message was added?
+        return if find_message_collection_card.present?
 
         @collection = create_collection
-        create_text_item
+        create_text_card
         urls.each do |url|
           create_link_card(url)
         end
@@ -18,7 +20,7 @@ module Slack
 
       private
 
-      def find_collection_card
+      def find_message_collection_card
         CollectionCard.find_by(
           parent_id: all_content_collection_id,
           identifier: identifier,
@@ -32,13 +34,14 @@ module Slack
             identifier: identifier,
             collection: {
               name: plain_text.first(50),
+              tag_list: message_collection_tags,
             }
           },
           parent_collection: Collection.find(all_content_collection_id)
         )
       end
 
-      def create_text_item
+      def create_text_card
         CollectionCardBuilder.new(
           params: {
             identifier: identifier + '-text',
@@ -52,7 +55,7 @@ module Slack
         )
       end
 
-      def create_link_item(url)
+      def create_link_card(url)
         CollectionCardBuilder.new(
           params: {
             identifier: identifier + '-link',
@@ -64,6 +67,10 @@ module Slack
           },
           parent_collection: @collection
         )
+      end
+
+      def message_collection_tags
+        ["##{channel}", user]
       end
 
       def plain_text
