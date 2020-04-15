@@ -33,6 +33,7 @@ module Slack
         # parent is all_content_collection_id
         CollectionCardBuilder.new(
           params: {
+            order: 0,
             identifier: identifier,
             collection_attributes: {
               name: plain_text.first(50),
@@ -47,6 +48,7 @@ module Slack
       def create_text_card
         CollectionCardBuilder.new(
           params: {
+            order: 1,
             identifier: identifier + '-text',
             item_attributes: {
               type: 'Item::TextItem',
@@ -61,6 +63,7 @@ module Slack
       def create_link_card(url)
         CollectionCardBuilder.new(
           params: {
+            order: 0,
             identifier: identifier + '-link',
             item_attributes: {
               type: 'Item::LinkItem',
