@@ -46,15 +46,16 @@ class CarouselCover extends React.Component {
 
   constructor(props) {
     super(props)
-    this.loading = true
   }
 
   componentDidMount() {
     this.fetchCarouselCards()
   }
 
+  @action
   componentDidUpdate(prevProps) {
     if (prevProps.updatedAt !== this.props.updatedAt) {
+      this.loading = true
       this.fetchCarouselCards()
     }
   }
@@ -71,7 +72,9 @@ class CarouselCover extends React.Component {
       })
       if (!data || data.length === 0) this.props.onEmptyCarousel()
     } catch {
-      this.loading = false
+      runInAction(() => {
+        this.loading = false
+      })
       this.props.onEmptyCarousel()
     }
   }
@@ -87,7 +90,8 @@ class CarouselCover extends React.Component {
   }
 
   @action
-  handleNavigate = direction => {
+  handleNavigate = (direction, ev) => {
+    ev.stopPropagation()
     if (direction === -1 && this.currentIdx === 0) {
       this.currentIdx = this.records.length - 1
       return
@@ -129,10 +133,10 @@ class CarouselCover extends React.Component {
           <DisplayText color={v.colors.commonDark} data-cy="ItemCount">
             {this.currentIdx + 1} / {this.records.length}
           </DisplayText>
-          <CarouselButton onClick={() => this.handleNavigate(-1)}>
+          <CarouselButton onClick={ev => this.handleNavigate(-1, ev)}>
             <ArrowIcon rotation={180} />
           </CarouselButton>
-          <CarouselButton onClick={() => this.handleNavigate(1)}>
+          <CarouselButton onClick={ev => this.handleNavigate(1, ev)}>
             <ArrowIcon rotation={0} />
           </CarouselButton>
         </CarouselControl>

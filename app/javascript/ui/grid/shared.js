@@ -345,11 +345,15 @@ StyledFileCover.displayName = 'StyledFileCover'
 
 export class GridCardIconWithName extends React.PureComponent {
   render() {
-    const { icon, text } = this.props
+    const { icon, text, extraRightPadding } = this.props
     return (
       <Container>
         <IconHolder>{icon}</IconHolder>
-        <Truncator text={text} key={text} extraSpacing={80} />
+        <Truncator
+          text={text}
+          key={text}
+          extraSpacing={80 + extraRightPadding}
+        />
       </Container>
     )
   }
@@ -357,4 +361,5 @@ export class GridCardIconWithName extends React.PureComponent {
 GridCardIconWithName.propTypes = {
   text: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
+  extraRightPadding: PropTypes.number,
 }

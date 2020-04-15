@@ -340,9 +340,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get canSetACover() {
     return (
-      !this.isSharedCollection &&
-      !this.isUserCollection &&
-      this.cover_type === 'cover_type_default'
+      (!this.isSharedCollection &&
+        !this.isUserCollection &&
+        this.cover_type === 'cover_type_default') ||
+      this.cover_type === 'cover_type_carousel'
     )
   }
 

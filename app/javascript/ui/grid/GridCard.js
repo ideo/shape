@@ -340,8 +340,6 @@ class GridCard extends React.Component {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
-    } else if (record.isCarousel) {
-      return
     } else if (record.isCreativeDifferenceChartCover) {
       return
     } else if (record.isVideo || record.isImage || record.isLegend) {
