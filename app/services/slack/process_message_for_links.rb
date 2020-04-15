@@ -32,13 +32,14 @@ module Slack
     end
 
     def run?
-      event.type == 'message.channels' && urls_in_text.present?
+      # TODO why was this "message.channels" before?
+      event.type == 'message' && urls_in_text.present?
     end
 
     # Slack messages use markdown for formatting: https://api.slack.com/reference/surfaces/formatting#linking-urls
     # <https://link.com> or <https://link.com|My Link Text>
     def urls_in_text
-      text.scan(/<([^>]*)>/)
+      text.scan(/<([^>]*)>/).flatten
     end
   end
 end

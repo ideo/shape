@@ -37,9 +37,9 @@ module Slack
     def translate_string(string = nil)
       return string if string.blank?
 
-      IdeoTranslation::TranslateString.call(
-        string: string,
-      )
+      # IdeoTranslation::TranslateString.call(
+      #   string: string,
+      # )
     end
 
     def message_data(record, url)

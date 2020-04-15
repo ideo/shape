@@ -23,14 +23,14 @@ module Slack
         CollectionCardBuilder.new(
           params: {
             name: "##{channel}",
-            search_term: "##{channel.to_url}",
+            search_term: "##{channel}",
           },
           parent_collection: Collection.find(root_collection_id)
         )
       end
 
       def identifier
-        "slack-#{channel.to_url}"
+        "slack-#{channel}"
       end
     end
   end
