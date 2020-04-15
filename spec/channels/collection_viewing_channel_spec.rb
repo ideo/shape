@@ -18,32 +18,30 @@ RSpec.describe CollectionViewingChannel, type: :channel do
     end
   end
 
-  describe '#edited' do
-    let!(:subscription) { subscribe(id: collection.id) }
+  describe '#subscribed' do
+    let(:subscription) { subscribe(id: collection.id) }
 
-    it 'notifies the viewers of the collection' do
-      expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
-        current_editor: user.as_json,
-        num_viewers: 1,
-        record_id: collection.id.to_s,
-        record_type: 'collections',
-      )
+    it 'changes the num_viewers count' do
+      expect {
+        subscription
+      }.to change(collection, :num_viewers).by(1)
     end
 
     context 'with an existing viewer' do
       let(:user_2) { create(:user) }
 
       before do
-        collection.started_viewing(user_2)
+        subscription
       end
 
-      it 'notifies all viewers' do
-        expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
-          current_editor: user.as_json,
-          num_viewers: 2,
-          record_id: collection.id.to_s,
-          record_type: 'collections',
-        )
+      it 'changes the num_viewers count' do
+        expect {
+          collection.started_viewing(user_2)
+        }.to change(collection, :num_viewers).by(1)
+        expect {
+          collection.stopped_viewing(user)
+          collection.stopped_viewing(user_2)
+        }.to change(collection, :num_viewers).by(-2)
       end
     end
   end

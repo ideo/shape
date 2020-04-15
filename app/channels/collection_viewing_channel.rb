@@ -4,14 +4,8 @@ class CollectionViewingChannel < ApplicationCable::Channel
   def subscribed
     return reject if collection.nil? || current_ability.cannot?(:read, collection)
 
-    collection.started_viewing(current_user)
+    collection.started_viewing(current_user, dont_notify: true)
     stream_from collection.stream_name
-  end
-
-  def edited
-    return reject if collection.nil?
-
-    collection.started_editing(current_user)
   end
 
   def unsubscribed
