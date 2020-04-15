@@ -1,6 +1,8 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 RSpec.describe CollectionCardDuplicationWorker, type: :worker do
+  include_context 'CollectionUpdateBroadcaster setup'
   describe '#perform_sync' do
     let(:args) do
       [
@@ -86,7 +88,8 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
       end
 
       it 'broadcasts collection as stopped editing' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(to_collection).once
+        expect(CollectionUpdateBroadcaster).to receive(:new).with(to_collection).once
+        expect(broadcaster_instance).to receive(:reload_cards)
         run_worker
       end
 

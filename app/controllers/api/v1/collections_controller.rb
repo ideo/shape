@@ -350,15 +350,16 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def broadcast_collection_updates
     return unless @updated
 
-    card_attrs = collection_params[:collection_cards_attributes]
-    if card_attrs.blank?
-      collection_broadcaster.collection_updated
+    collection_broadcaster.collection_updated
+    if @collection.parent_collection_card.present?
       collection_broadcaster(@collection.parent).card_updated(
         @collection.parent_collection_card.id,
       )
-      queue_linked_updates
-      return
     end
+    queue_linked_updates
+
+    card_attrs = collection_params[:collection_cards_attributes]
+    return unless card_attrs.present?
 
     if @collection.board_collection?
       collection_broadcaster.cards_updated(

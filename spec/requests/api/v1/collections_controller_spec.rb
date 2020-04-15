@@ -449,7 +449,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   end
 
   describe 'PATCH #update' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
+    # give it a parent collection so that it has a parent_collection_card
+    let!(:collection) { create(:collection, parent_collection: create(:collection), add_editors: [user]) }
     let(:collection_card) do
       create(:collection_card_text, order: 0, width: 1, parent: collection)
     end
@@ -536,6 +537,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       patch(path, params: params)
       expect(collection_card.reload.width).to eq(3)
       expect(collection_card.reload.order).to eq(1)
+    end
+
+    it 'broadcasts collection_updated and parent card_updated' do
+      expect(broadcaster_instance).to receive(:collection_updated)
+      expect(broadcaster_instance).to receive(:card_updated).with(
+        collection.parent_collection_card.id,
+      )
+      patch(path, params: params)
     end
 
     context 'updating the cached_cover' do
