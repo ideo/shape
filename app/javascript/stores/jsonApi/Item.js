@@ -325,10 +325,8 @@ class Item extends SharedRecordMixin(BaseRecord) {
     // pick up "new" highlights that are currently in our quillEditor
     _.each(delta.ops, op => {
       if (op.attributes && op.attributes.commentHighlight === 'new') {
-        op.attributes = {
-          // replace them with persisted comment id
-          commentHighlight: commentId,
-        }
+        op.attributes = op.attributes || {}
+        op.attributes.commentHighlight = commentId
       }
     })
     // now set this local quill_data to have the new highlight + commentId

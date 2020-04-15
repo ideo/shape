@@ -84,7 +84,7 @@ Feature: Creating a Test Collection
     Then I should see a question with "question-terms" and 2 emojis
     When I accept the feedback survey terms
     Then I should see a question with "question-how-satisfied-are-you-with-your-current" and 4 emojis
-    When I click the last "ScaleEmojiBtn"
+    When I click the last answerable emoji
 
     # --- Idea 1 ---
     # ideas are randomized so we just search for 1 GridCard which represents the first idea / media
@@ -125,6 +125,7 @@ Feature: Creating a Test Collection
     When I fill the last "OpenQuestionTextInput" with some text
     And I click the last "OpenQuestionTextButton"
     And I wait for "@apiCreateQuestionAnswer" to finish
+    And I wait for 1 second
     Then I should see a question with "question-finish" and 1 emojis
     Then I should see a "FinishedEmojiHolder"
     Then I should see a question with "question-recontact" and 2 emojis

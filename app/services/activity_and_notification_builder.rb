@@ -39,6 +39,8 @@ class ActivityAndNotificationBuilder < SimpleService
   end
 
   def call
+    return false if @actor.nil?
+
     if @async
       call_async
       return
@@ -89,7 +91,7 @@ class ActivityAndNotificationBuilder < SimpleService
     ids = @target.breadcrumb
     ids += [@target.id] if @target.is_a?(Collection)
     # reindex for boosting search results by activity_count
-    Collection.where(id: ids).reindex(:activity_search_data)
+    Collection.reindex_async(ids)
   end
 
   def create_notifications_async

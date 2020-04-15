@@ -729,7 +729,8 @@ describe Collection, type: :model do
   end
 
   describe '#search_data' do
-    let(:collection) { create(:collection) }
+    let(:parent_collection) { nil }
+    let(:collection) { create(:collection, parent_collection: parent_collection) }
     let(:users) { create_list(:user, 2) }
     let(:groups) { create_list(:group, 2) }
 
@@ -760,6 +761,14 @@ describe Collection, type: :model do
       activity3 = collection.activities.create(actor: user, organization: organization, updated_at: 1.week.from_now)
       expected_activity_dates = [activity1.updated_at.to_date, activity3.updated_at.to_date]
       expect(collection.search_data[:activity_dates]).to match_array(expected_activity_dates)
+    end
+
+    context 'with parent collection' do
+      let!(:parent_collection) { create(:collection) }
+
+      it 'includes parent collections' do
+        expect(collection.search_data[:parent_ids]).to eq([parent_collection.id])
+      end
     end
   end
 

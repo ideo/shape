@@ -91,8 +91,12 @@ class RoutingStore extends RouterStore {
     }
   }
 
-  routeTo = (type, id = null, params = {}) => {
+  setRoutingTo(type, id = null) {
     this.routingTo = { type, id }
+  }
+
+  routeTo = (type, id = null, params = {}) => {
+    this.setRoutingTo(type, id)
     const { uiStore } = this
 
     // prevent accidental route changes while you are dragging/moving into collection

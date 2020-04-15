@@ -110,10 +110,16 @@ class Routes extends React.Component {
       onSuccess: currentUser => {
         firebaseClient.authenticate(currentUser.google_auth_token)
       },
+      // had to turn this off because SameSite cookie doesn't work on some versions of Safari
+      // https://bit.ly/3axsLgw
+      checkIdeoSSO: false,
     })
 
     document.addEventListener('keydown', captureGlobalKeypress)
     document.addEventListener('touchmove', this.handleTouchMove, {
+      passive: false,
+    })
+    document.addEventListener('touchend', this.handleTouchMove, {
       passive: false,
     })
   }
@@ -121,6 +127,9 @@ class Routes extends React.Component {
   componentWillUnmount() {
     document.removeEventListener('keydown', captureGlobalKeypress)
     document.removeEventListener('touchmove', this.handleTouchMove, {
+      passive: false,
+    })
+    document.removeEventListener('touchend', this.handleTouchMove, {
       passive: false,
     })
   }
@@ -184,16 +193,11 @@ class Routes extends React.Component {
   }
 
   handleTouchMove = e => {
-    const { uiStore, apiStore } = this.props
+    const { uiStore } = this.props
     if (uiStore.dragging || uiStore.activityLogMoving) {
       e.preventDefault()
     }
-    if (!e.target.closest('.activity_log-draggable')) {
-      // close activity log when scroll happens outside of it
-      uiStore.setCommentingOnRecord(null)
-      uiStore.update('activityLogOpen', false)
-      apiStore.collapseReplies()
-    }
+    this._dismissActivityLogBox(e)
   }
 
   _setSelectedArea = (coords, e = {}) => {
@@ -203,6 +207,20 @@ class Routes extends React.Component {
       pageBoundsScroller.scrollIfNearPageBounds(e, { speed: 1.5 })
     }
     uiStore.setSelectedArea(coords, { shifted })
+  }
+
+  _dismissActivityLogBox = e => {
+    const { uiStore, apiStore } = this.props
+
+    if (
+      !e.target.closest('.activity_log-draggable') &&
+      uiStore.activityLogOpen
+    ) {
+      // close activity log when scroll happens outside of it
+      uiStore.setCommentingOnRecord(null)
+      uiStore.update('activityLogOpen', false)
+      apiStore.collapseReplies()
+    }
   }
 
   // Props for the div that shows area selected

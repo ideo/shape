@@ -13,16 +13,29 @@ import {
   findTopLeftCard,
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
+import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
+import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
+import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
+import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 import { calculatePageMargins } from '~/utils/pageUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
+
+const CircleIconHolder = styled.button`
+  border: 1px solid ${v.colors.secondaryMedium};
+  border-radius: 50%;
+  color: ${v.colors.secondaryMedium};
+  height: 32px;
+  width: 32px;
+`
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -62,12 +75,28 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   }};
   z-index: ${props =>
     _.includes(props.type, 'drag') ? v.zIndex.cardHovering : 0};
+
+  ${CircleIconHolder} {
+    display: none;
+    height: 32px;
+    width: 32px;
+  }
+
+  ${CircleIconHolder} + ${CircleIconHolder} {
+    margin-top: 8px;
+  }
+
   ${props =>
     props.type === 'unrendered'
       ? ''
       : `&:hover {
     background-color: ${v.colors.primaryLight} !important;
+
     .plus-icon {
+      display: block;
+    }
+
+    ${CircleIconHolder} {
       display: block;
     }
   }
@@ -75,6 +104,7 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
     display: none;
   }
 `
+BlankCard.displayName = 'BlankCard'
 
 const Grid = styled.div`
   position: relative;
@@ -83,7 +113,7 @@ const Grid = styled.div`
 `
 
 export const StyledPlusIcon = styled.div`
-  position: relative;
+  position: absolute;
   /* TODO: better styling than this? */
   width: 20%;
   height: 20%;
@@ -91,6 +121,15 @@ export const StyledPlusIcon = styled.div`
   left: 38%;
   color: ${v.colors.secondaryMedium};
 `
+
+const RightBlankActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 12px;
+  top: calc(50% - 36px);
+`
+RightBlankActions.displayName = 'RightBlankActions'
 
 function getMapKey({ col, row }) {
   return `${col},${row}`
@@ -201,6 +240,7 @@ class FoamcoreGrid extends React.Component {
 
   // Load more cards if we are approaching a boundary of what we have loaded
   loadAfterScroll = async () => {
+    // return if we're still loading a new page
     if (this.loadingRow) return
 
     const { collection } = this.props
@@ -217,8 +257,11 @@ class FoamcoreGrid extends React.Component {
     // Load more rows if currently loaded rows is less than
     // one full screen out of view
     if (collection.loadedRows < visRows.max + visRows.num) {
+      // get the max of what's currently visible
+      const maxRow = (_.maxBy(collection.collection_cards, 'row') || { row: 0 })
+        .row
       runInAction(() => {
-        this.loadingRow = collection.loadedRows + 1
+        this.loadingRow = maxRow
       })
       await this.loadMoreRows()
       runInAction(() => {
@@ -561,6 +604,23 @@ class FoamcoreGrid extends React.Component {
 
   handleScroll = ev => {
     this.throttledLoadAfterScroll()
+  }
+
+  handleInsertRowClick = (ev, row) => {
+    return this.onRowClick(ev, row, ROW_ACTIONS.INSERT)
+  }
+
+  handleRemoveRowClick = (ev, row) => {
+    return this.onRowClick(ev, row, ROW_ACTIONS.REMOVE)
+  }
+
+  onRowClick = async (ev, row, action) => {
+    ev.stopPropagation()
+    const { collection, uiStore } = this.props
+    if (uiStore.isTransparentLoading) {
+      return false
+    }
+    collection.API_manipulateRow({ row, action })
   }
 
   originalCard(cardId) {
@@ -1154,16 +1214,56 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
+  renderRightBlankActions(row) {
+    return (
+      <RightBlankActions>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Remove row"
+          placement="top"
+        >
+          <CircleIconHolder onClick={ev => this.handleRemoveRowClick(ev, row)}>
+            <CircleTrashIcon />
+          </CircleIconHolder>
+        </Tooltip>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Add row"
+          placement="top"
+        >
+          <CircleIconHolder onClick={ev => this.handleInsertRowClick(ev, row)}>
+            <CircleAddRowIcon />
+          </CircleIconHolder>
+        </Tooltip>
+      </RightBlankActions>
+    )
+  }
+
   positionBlank({ row, col, width, height }, type = 'drag') {
     const position = this.positionForCoordinates({ col, row, width, height })
+    const {
+      collection,
+      collection: { collection_cards },
+    } = this.props
+    const { num_columns } = collection
 
     const { relativeZoomLevel } = this
     let inner = ''
+    const emptyRow =
+      !_.some(collection_cards, { row }) &&
+      !_.some(collection_cards, { row: row - 1, height: 2 })
+
     if (type === 'hover') {
       inner = (
-        <StyledPlusIcon className="plus-icon">
-          <PlusIcon />
-        </StyledPlusIcon>
+        <div
+          style={{ position: 'relative', height: '100%' }}
+          data-empty-space-click
+        >
+          <StyledPlusIcon className="plus-icon">
+            <PlusIcon />
+          </StyledPlusIcon>
+          {num_columns === 4 && emptyRow && this.renderRightBlankActions(row)}
+        </div>
       )
     } else if (type === 'unrendered') {
       inner = <InlineLoader background={v.colors.commonLightest} />
@@ -1327,6 +1427,7 @@ class FoamcoreGrid extends React.Component {
 
     let cards = []
     const leftPad = num_columns > 4 ? 3 : 0
+    const topPad = num_columns > 4 ? 3 : 1
     const across = _.min([10, num_columns])
     if (this.loadingRow) {
       _.times(across, i => {
@@ -1335,8 +1436,8 @@ class FoamcoreGrid extends React.Component {
             id: 'unrendered',
             // loading squares are centered, 3 from the left
             col: i + leftPad,
-            // 3 down from the beginning of loadingRow
-            row: this.loadingRow + j + 3,
+            // down from the beginning of loadingRow by topPad rows
+            row: this.loadingRow + j + topPad,
             width: 1,
             height: 1,
           })
@@ -1395,6 +1496,33 @@ class FoamcoreGrid extends React.Component {
     return this.renderCard(placeholder)
   }
 
+  renderHotspots() {
+    const { collection } = this.props
+    const { num_columns } = collection
+    const { relativeZoomLevel, gridSettings } = this
+
+    if (num_columns !== 4) return null
+
+    const collectionMaxRow = collection.max_row_index
+    const hotspots = []
+    let { gridH, gutter } = gridSettings
+    gutter = gutter / relativeZoomLevel
+    gridH = gridH / relativeZoomLevel
+
+    _.times(collectionMaxRow, row => {
+      hotspots.push(
+        <FoamcoreHotspot
+          key={`hotspot-${row}`}
+          row={row - 1}
+          cols={4}
+          top={(gridH + gutter) * row - gutter}
+          onClick={ev => this.handleInsertRowClick(ev, row - 1)}
+        />
+      )
+    })
+    return <div>{hotspots}</div>
+  }
+
   render() {
     const gridSize = this.totalGridSize
     return (
@@ -1416,6 +1544,7 @@ class FoamcoreGrid extends React.Component {
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}
         {this.renderMdlPlaceholder()}
+        {this.renderHotspots()}
         {this.renderVisibleCards()}
       </Grid>
     )

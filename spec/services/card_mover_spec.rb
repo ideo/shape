@@ -127,14 +127,15 @@ RSpec.describe CardMover, type: :service do
         end
         let(:placement) { 'end' }
 
-        it 'sets row of moved cards 2 rows after the last non-blank row' do
+        it 'places cards in their best fit after the last card' do
           card_mover.call
-
-          cards.reload.each_with_index do |card, index|
-            expect(card.parent_id).to eq to_collection.id
-            expect(card.row).to eq target_empty_row
-            expect(card.col).to eq index
-          end
+          to_collection.reload
+          # they are all 1x1 so should fit consecutively
+          expect(to_collection.collection_cards.last(3).pluck(:row, :col)).to eq([
+            [3, 1],
+            [3, 2],
+            [3, 3],
+          ])
         end
       end
     end
@@ -287,15 +288,15 @@ RSpec.describe CardMover, type: :service do
         end
         let(:placement) { 'end' }
 
-        it 'sets row of linked cards 2 rows after the last non-blank row' do
-          target_empty_row = to_collection.empty_row_for_moving_cards
+        it 'places cards in their best fit after the last card' do
           card_mover.call
           to_collection.reload
           # they are all 1x1 so should fit consecutively
-          to_collection.collection_cards.last(3).each_with_index do |card, index|
-            expect(card.row).to eq target_empty_row
-            expect(card.col).to eq index
-          end
+          expect(to_collection.collection_cards.last(3).pluck(:row, :col)).to eq([
+            [3, 1],
+            [3, 2],
+            [3, 3],
+          ])
         end
       end
     end

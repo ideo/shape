@@ -23,6 +23,11 @@ import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
 
+export const ROW_ACTIONS = {
+  INSERT: 'insert_row',
+  REMOVE: 'remove_row',
+}
+
 class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
   static endpoint = apiUrl('collections')
@@ -787,16 +792,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         }
         this.collection_cards.replace(newData)
       }
-      if (this.isBoard) {
-        this.updateMaxLoadedColsRows()
+      if (this.isBoard && rows) {
+        this.updateMaxLoadedColsRows({ maxRow: rows[1] })
       }
     })
     return data
   }
 
   @action
-  updateMaxLoadedColsRows = () => {
-    const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
+  updateMaxLoadedColsRows = ({ maxRow } = {}) => {
     const maxCol = (_.maxBy(this.collection_cards, 'col') || { col: 0 }).col
     if (maxRow > this.loadedRows) {
       this.loadedRows = maxRow
@@ -1156,15 +1160,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     uiStore.update('launchButtonLoading', true)
 
     try {
+      const selectedAudiences = {}
+      if (audiences) {
+        audiences.forEach((value, key) => {
+          if (value.selected) {
+            selectedAudiences[key] = value
+          }
+        })
+      }
       const launchedTest = await this.apiStore.request(
         `test_collections/${this.launchableTestId}/${actionName}`,
         'PATCH',
-        { audiences }
+        { audiences: selectedAudiences }
       )
 
       if (launchedTest && actionName === 'launch' && audiences) {
-        audiences.forEach((value, key, _map) => {
-          if (value.selected && !value.audience.isLinkSharing) {
+        _.each(selectedAudiences, (value, key) => {
+          if (!value.audience.isLinkSharing) {
             this.trackAudienceTargeting(value.audience)
           }
         })
@@ -1210,13 +1222,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.API_fetchCards()
   }
 
-  async API_backgroundUpdateTemplateInstances() {
-    await this.apiStore.request(
+  API_backgroundUpdateTemplateInstances() {
+    return this.apiStore.request(
       `collections/${this.id}/background_update_template_instances`,
       'POST'
     )
+  }
 
-    return
+  API_backgroundUpdateLiveTest(collection_card_id) {
+    const { apiStore } = this
+    const { currentUser } = apiStore
+    return apiStore.request(
+      `collections/${this.id}/background_update_live_test`,
+      'POST',
+      { collection_card_id, created_by_id: currentUser.id }
+    )
   }
 
   API_clearCollectionCover() {
@@ -1418,6 +1438,57 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     data.cancel_sync = true
     const apiPath = `collections/${this.id}`
     return this.apiStore.request(apiPath, 'PATCH', { data })
+  }
+
+  async API_manipulateRow({ row, action, pushUndo = true } = {}) {
+    const { apiStore, uiStore } = this
+    const params = {
+      row,
+    }
+    let oppositeAction = ROW_ACTIONS.REMOVE
+    let actionMessage = 'Insert row'
+    if (action === ROW_ACTIONS.REMOVE) {
+      oppositeAction = ROW_ACTIONS.INSERT
+      actionMessage = 'Remove row'
+    }
+
+    try {
+      uiStore.update('isTransparentLoading', true)
+      await apiStore.request(`collections/${this.id}/${action}`, 'POST', params)
+      runInAction(() => {
+        // by making this an action it will cause one re-render instead of many
+        this.collection_cards.forEach(card => {
+          const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
+          if (card.row > row) {
+            card.row += shift
+          }
+        })
+      })
+      uiStore.update('isTransparentLoading', false)
+
+      if (!pushUndo) {
+        return
+      }
+      this.pushUndo({
+        apiCall: () => {
+          this.API_manipulateRow({
+            row,
+            action: oppositeAction,
+            pushUndo: false,
+          })
+        },
+        message: `${actionMessage} undone`,
+        redoAction: {
+          message: `${actionMessage} redone`,
+          apiCall: () =>
+            // re-call the same function
+            this.API_manipulateRow({ row, action }),
+        },
+      })
+    } catch (e) {
+      console.warn(e)
+      uiStore.defaultAlertError()
+    }
   }
 
   toggleTemplateHelper() {

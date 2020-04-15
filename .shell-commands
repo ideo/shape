@@ -33,7 +33,7 @@ function shapecopydb {
       rake db:test:prepare
 
       echo "Searchkick reindexing..." &&
-      rake searchkick:reindex:all
+      rake searchkick:reindex_collections_items_last_week
       return 0
     else
       echo "Failed to drop local database."

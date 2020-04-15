@@ -4,17 +4,19 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 
-const StyledHotspot = styled.div`
-  position: absolute;
-  display: flex;
+export const StyledHotspot = styled.div`
   align-items: center;
+  display: flex;
+  height: ${props => props.height};
   justify-content: center;
+  position: absolute;
   opacity: 0;
+  ${({ top }) => top && `top: ${top};`}
   transition: all 100ms;
   /* e.g. "left: -27px;" */
-  ${props => `${props.position}: -27px;`} right: -27px;
-  height: 100%;
-  width: 36px;
+  ${props => `${props.position}: -27px;`}
+  ${props => props.position && `right: -27px;`}
+  width: ${props => props.width};
   z-index: 100;
 
   cursor: pointer;
@@ -23,23 +25,48 @@ const StyledHotspot = styled.div`
     opacity: ${props => (props.dragging ? 0 : 1)};
   }
 `
+StyledHotspot.propTypes = {
+  height: PropTypes.string,
+  top: PropTypes.string,
+  width: PropTypes.string,
+}
+StyledHotspot.defaultProps = {
+  height: '100%',
+  top: null,
+  width: '36px',
+}
+StyledHotspot.displayName = 'StyledHotspot'
 
-const HotspotLine = styled.div`
-  height: 100%;
+export const HotspotLine = styled.div`
+  height: ${props => props.height};
   background: ${v.colors.primaryLight};
   position: relative;
   left: ${props => props.left}px;
-  width: ${props => props.gutter}px;
+  width: ${props => props.width};
 `
+HotspotLine.propTypes = {
+  left: PropTypes.number,
+  height: PropTypes.string,
+  width: PropTypes.string,
+}
+HotspotLine.defaultProps = {
+  height: '100%',
+  width: '100%',
+}
+HotspotLine.displayName = 'HotspotLine'
 
-const StyledPlusIcon = styled.div`
+export const StyledPlusIcon = styled.div`
   position: relative;
-  left: ${props => props.left}px;
+  left: ${props => props.left};
   width: 12px;
   color: ${v.colors.secondaryMedium};
   font-size: 1.5rem;
   cursor: pointer;
 `
+StyledPlusIcon.defaultProps = {
+  left: '0px',
+}
+StyledPlusIcon.displayName = 'StyledPlusIcon'
 
 @inject('uiStore')
 @observer
@@ -76,8 +103,8 @@ class GridCardHotspot extends React.Component {
         dragging={dragging}
         onClick={this.clickHotspot}
       >
-        <HotspotLine left={line} gutter={uiStore.gridSettings.gutter} />
-        <StyledPlusIcon left={icon}>+</StyledPlusIcon>
+        <HotspotLine left={line} width={`${uiStore.gridSettings.gutter}px`} />
+        <StyledPlusIcon left={`${icon}px`}>+</StyledPlusIcon>
       </StyledHotspot>
     )
   }

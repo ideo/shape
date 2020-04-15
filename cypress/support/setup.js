@@ -91,6 +91,10 @@ const createNamedRoutes = () => {
     'apiAdminGetTestCollections'
   )
 
+  // mock INA routes since we don't actually login
+  cy.route('GET', '**/ideo-sso-profile-staging.herokuapp.com/**', {}).as(
+    'ideoSsoApi'
+  )
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
   cy.route('GET', '**/cloud.filestackapi.com/**').as('fileStackApi')

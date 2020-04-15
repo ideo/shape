@@ -39,6 +39,16 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
   end
 
   describe '#call' do
+    context 'with no actor' do
+      # e.g. current_user.nil?
+      let(:actor) { nil }
+
+      it 'returns false' do
+        expect { builder.call }.not_to change(Activity, :count)
+        expect(builder.call).to be false
+      end
+    end
+
     it 'creates one new activity' do
       expect { builder.call }.to change(Activity, :count).by(1)
     end
@@ -61,10 +71,7 @@ RSpec.describe ActivityAndNotificationBuilder, type: :service do
     end
 
     it 'reindexes the activity count' do
-      expect(Collection).to receive(:where).with(
-        id: [target_parent.id, target.id],
-      ).and_call_original
-      expect(Collection).to receive(:reindex).with(:activity_search_data)
+      expect(Collection).to receive(:reindex_async).with([target_parent.id, target.id])
       builder.call
     end
 

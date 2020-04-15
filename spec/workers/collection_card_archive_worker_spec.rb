@@ -69,10 +69,29 @@ RSpec.describe CollectionCardArchiveWorker, type: :worker do
         end
         run_worker
       end
+
+      context 'after user has been deleted' do
+        let(:other_user) { create(:user) }
+        let(:run_worker) do
+          CollectionCardArchiveWorker.new.perform(
+            collection_cards.map(&:id),
+            other_user.id,
+          )
+        end
+
+        before do
+          user.destroy
+        end
+
+        it 'should not notify you' do
+          expect(ActivityAndNotificationBuilder).not_to receive(:call)
+          run_worker
+        end
+      end
     end
 
     context 'with a collection you did not participate in' do
-      it 'should not notifiy you' do
+      it 'should not notify you' do
         expect(ActivityAndNotificationBuilder).not_to receive(:call)
         run_worker
       end

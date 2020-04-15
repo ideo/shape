@@ -23,12 +23,15 @@ module CollectionGrid
     end
 
     # this will add row/col value to any set of cards, as if they were a 4-col layout
-    def self.calculate_rows_cols(cards)
+    def self.calculate_rows_cols(cards, num_columns: 4, prefilled: 0)
       row = 0
       matrix = []
-      cols = 4
+      cols = num_columns
       # // create an empty row
       matrix.push(Array.new(cols))
+      if prefilled.positive?
+        matrix[0].fill('filled', 0, prefilled)
+      end
 
       cards.each do |card|
         # object_id for unpersisted cards
@@ -89,7 +92,7 @@ module CollectionGrid
       moving_cards: [],
       debug: false
     )
-      return [] if collection.collection_cards.none?
+      return [] if collection.collection_cards.none? && drag_positions.empty?
 
       # omit moving cards from our matrix
       cards = collection
@@ -114,6 +117,7 @@ module CollectionGrid
       end
 
       if debug
+        pp '-' * 10
         output = matrix.map do |row|
           row.map { |c| c.nil? ? '' : c.id }
         end
@@ -158,8 +162,8 @@ module CollectionGrid
     end
 
     def self.place_cards_on_board(
-      row:,
-      col:,
+      row: nil,
+      col: nil,
       collection:,
       from_collection:,
       moving_cards:
@@ -173,12 +177,22 @@ module CollectionGrid
         master_card = moving_cards.first
       end
 
-      master_position = Mashie.new(
-        row: row,
-        col: col,
-        height: master_card.height,
-        width: master_card.width,
-      )
+      if row.nil? || col.nil?
+        placement = calculate_best_placement(
+          collection: collection,
+          moving_cards: moving_cards,
+          master_card: master_card,
+        )
+        # alter the master_position based on calculation
+        row = placement.row
+        col = placement.col
+        unless placement.fit_entire_width
+          # re-flow all the cards into a uniform sequential grid
+          # and do this before determine_drag_map
+          calculate_rows_cols(moving_cards, num_columns: collection.num_columns, prefilled: col)
+        end
+      end
+
       drag_map = determine_drag_map(
         master_card: master_card,
         moving_cards: moving_cards,
@@ -188,12 +202,22 @@ module CollectionGrid
         moving_cards: moving_cards,
       )
 
+      master_position = Mashie.new(
+        row: row,
+        col: col,
+        height: master_card.height,
+        width: master_card.width,
+      )
+
       drag_positions = {}
-      drag_map.each do |mapped|
+      drag_map.each_with_index do |mapped, i|
         card = mapped.card
         position = Mashie.new(
-          row: mapped.row + master_position.row,
-          col: mapped.col + master_position.col,
+          # id is mostly just helpful for debugging output
+          id: "drag-#{i}",
+          # ensure row/col are > 0
+          row: [mapped.row + master_position.row, 0].max,
+          col: [mapped.col + master_position.col, 0].max,
           width: card.width,
           height: card.height,
         )
@@ -226,6 +250,42 @@ module CollectionGrid
       end
 
       moving_cards
+    end
+
+    # This method takes whatever cards you're moving, and tries to place
+    # them at the end of the target board.
+    # If the width of the moving cards can fit on the board, then find the
+    # first open spot (after the last card) that can fit them.
+    def self.calculate_best_placement(collection:, moving_cards:, master_card:)
+      placement = Mashie.new(
+        fit_entire_width: false,
+      )
+
+      col_widths = moving_cards.pluck(:col, :width)
+      min_col = col_widths.min[0]
+      max_col = col_widths.max[0] + col_widths.max[1]
+      # get the width span of the cards we're moving
+      span = max_col - min_col
+
+      last_card = collection.collection_cards.ordered.last || Mashie.new(row: 0, col: 0, width: 0)
+      last_row_open_width = collection.num_columns - (last_card.col + last_card.width)
+
+      if last_row_open_width >= span || (last_row_open_width.positive? && span > collection.num_columns)
+        placement.row = last_card.row
+        placement.col = last_card.col + last_card.width
+      else
+        placement.row = last_card.row + 1
+        placement.col = 0
+        last_row_open_width = collection.num_columns
+        if last_row_open_width >= span
+          placement.col = master_card.col - min_col
+        end
+      end
+
+      if last_row_open_width >= span
+        placement.fit_entire_width = true
+      end
+      placement
     end
 
     def self.find_closest_open_spot(position, open_spot_matrix)
@@ -311,6 +371,10 @@ module CollectionGrid
       )
       open_spot_matrix = [[]]
 
+      # always add some empty rows
+      4.times do
+        card_matrix.push(Array.new(collection.num_columns))
+      end
       card_matrix.each_with_index do |row, row_idx|
         open = 0
         open_spot_matrix[row_idx] = Array.new(collection.num_columns)
@@ -326,27 +390,6 @@ module CollectionGrid
         end
       end
       open_spot_matrix
-    end
-
-    def self.matrix_with_dragged_spots(
-      collection:,
-      drag_grid_spot:
-    )
-      card_matrix = board_matrix(collection: collection)
-      dragging_placeholders = drag_grid_spot.values
-      dragging_placeholders.each do |placeholder|
-        max_row = placeholder.row + placeholder.height
-        max_col = placeholder.col + placeholder.width
-        rows = (placeholder.row...max_row).to_a
-        cols = (placeholder.col...max_col).to_a
-
-        rows.each do |row|
-          cols.each do |col|
-            card_matrix[row][col] = placeholder
-          end
-        end
-      end
-      card_matrix
     end
 
     def self.columns_sticking_out_of(card, above_card)

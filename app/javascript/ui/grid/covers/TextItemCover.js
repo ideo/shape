@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { computed } from 'mobx'
+import { computed, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import ReactQuill from 'react-quill'
 import styled from 'styled-components'
@@ -78,11 +78,13 @@ class TextItemCover extends React.Component {
 
   @computed
   get isEditing() {
-    const { item } = this.props
-    return uiStore.textEditingItem === item
+    const { item, cardId } = this.props
+    return (
+      uiStore.textEditingItem === item && uiStore.textEditingCardId === cardId
+    )
   }
 
-  handleClick = async e => {
+  handleClick = e => {
     if (this.props.handleClick) this.props.handleClick(e)
     e.stopPropagation()
     const { item, dragging, cardId, searchResult, uneditable } = this.props
@@ -101,11 +103,21 @@ class TextItemCover extends React.Component {
       // likewise on search results, never pop open the inline editor
       return false
     }
+    this.setState({ loading: true }, this.loadItem)
+    return null
+  }
+
+  loadItem = async () => {
+    const { item, cardId } = this.props
     await apiStore.fetch('items', item.id, true)
     // entering edit mode should deselect all cards
-    uiStore.deselectCards()
-    uiStore.update('textEditingItem', this.state.item)
-    return null
+    runInAction(() => {
+      uiStore.deselectCards()
+      uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
+      uiStore.update('textEditingItem', this.state.item)
+      uiStore.update('textEditingCardId', cardId)
+    })
+    this.setState({ loading: false })
   }
 
   expand = () => {
@@ -114,14 +126,14 @@ class TextItemCover extends React.Component {
   }
 
   clearTextEditingItem = () => {
-    const { item } = this.state
-    if (uiStore.textEditingItem && uiStore.textEditingItem.id === item.id) {
-      uiStore.update('textEditingItem', null)
-    }
+    if (!this.isEditing) return
+    uiStore.update('textEditingItem', null)
+    uiStore.update('textEditingCardId', null)
+    uiStore.update('textEditingItemHasTitleText', false)
   }
 
   // cancel should only ever be called for editors, since it is canceling out of edit view
-  cancel = ({ item, ev } = {}) => {
+  cancel = ({ item, ev, num_viewers = 1 } = {}) => {
     if (this.unmounted) {
       return
     }
@@ -133,6 +145,10 @@ class TextItemCover extends React.Component {
       const card = apiStore.find('collection_cards', this.props.cardId)
       card.API_archiveSelf({ undoable: false })
       return
+    }
+    if (num_viewers === 1) {
+      // save final updates and broadcast to collection
+      item.API_updateWithoutSync({ cancel_sync: true })
     }
     // TODO figure out why ref wasn't working
     // eslint-disable-next-line react/no-find-dom-node
@@ -170,7 +186,7 @@ class TextItemCover extends React.Component {
 
   renderEditing() {
     const { item } = this.state
-    const { initialFontTag, cardId } = this.props
+    const { initialSize, cardId } = this.props
     if (!item) return ''
 
     return (
@@ -180,7 +196,7 @@ class TextItemCover extends React.Component {
         currentUserId={apiStore.currentUser.id}
         onExpand={item.id ? this.expand : null}
         onCancel={this.cancel}
-        initialFontTag={initialFontTag}
+        initialSize={initialSize}
         // if we are rendering editing then the item has been fetched
         fullyLoaded
       />
@@ -211,9 +227,12 @@ class TextItemCover extends React.Component {
   }
 
   get hasTitleText() {
-    const { props } = this
-    const { item } = props
+    const { isEditing } = this
+    const { item } = this.props
     const { quill_data } = item
+    if (isEditing) {
+      return uiStore.textEditingItemHasTitleText
+    }
     let hasTitle = false
     _.each(quill_data.ops, op => {
       if (op.attributes && op.attributes.header === 5) {
@@ -267,7 +286,7 @@ TextItemCover.propTypes = {
   dragging: PropTypes.bool.isRequired,
   cardId: PropTypes.string.isRequired,
   handleClick: PropTypes.func.isRequired,
-  initialFontTag: PropTypes.string.isRequired,
+  initialSize: PropTypes.string.isRequired,
   height: PropTypes.number,
   searchResult: PropTypes.bool,
   hideReadMore: PropTypes.bool,

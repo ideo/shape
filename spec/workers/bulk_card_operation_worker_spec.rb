@@ -124,6 +124,5 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         expect(CollectionCard.find_by_id(placeholder.id)).not_to be nil
       end
     end
-
   end
 end
