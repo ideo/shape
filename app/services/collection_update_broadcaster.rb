@@ -23,30 +23,33 @@ class CollectionUpdateBroadcaster < SimpleService
     broadcast(collection_cards_attributes: collection_cards_attributes)
   end
 
+  def collection_updated
+    broadcast(collection_updated: true)
+  end
+
+  def reload_cards
+    broadcast(reload_cards: true)
+  end
+
   def card_updated(card_id)
     broadcast(card_id: card_id.to_s)
   end
 
-  # NOTE: this method is not currently used as we investigate whether the frequency of updates
-  # was causing some of the collaborative issues.
-  # Resurrect `CollectionPage.js#handleTextItemUpdate` from this commit if you wish to restore.
   def text_item_updated(item)
-    return if @collection.nil?
-
-    @collection.received_changes(
-      {
-        item: {
-          id: item.id,
-          quill_data: item.quill_data,
-        },
+    broadcast(
+      text_item: {
+        id: item.id,
+        quill_data: item.quill_data,
+        parent_collection_card_id: item.parent_collection_card&.id,
       },
-      @user,
     )
   end
 
   private
 
   def broadcast(data)
+    return if @collection.nil?
+
     @collection.received_changes(data, @user)
   end
 end

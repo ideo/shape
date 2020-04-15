@@ -8,7 +8,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
-  after_action :broadcast_parent_collection_updates, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -23,6 +22,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
+  after_action :broadcast_parent_collection_updates, only: %i[create_template]
   def create_template
     builder = CollectionTemplateBuilder.new(
       parent: @parent_collection,
@@ -45,8 +45,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_update, only: %i[update]
   after_action :broadcast_collection_updates, only: %i[update]
   def update
-    updated = CollectionUpdater.call(@collection, collection_params)
-    if updated
+    @updated = CollectionUpdater.call(@collection, collection_params)
+    if @updated
       log_collection_activity(:edited) if log_activity?
       return if @cancel_sync
 
@@ -56,6 +56,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  after_action :broadcast_parent_collection_card_update, only: %i[clear_collection_cover]
   def clear_collection_cover
     @parent_collection = @collection.parent
     @collection.clear_collection_cover
@@ -162,7 +163,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       action: @action,
     )
     @collection.touch
-    broadcaster.row_updated(
+    collection_broadcaster.row_updated(
       row: json_api_params[:row],
       action: @action,
     )
@@ -347,18 +348,46 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def broadcast_collection_updates
+    return unless @updated
+
     card_attrs = collection_params[:collection_cards_attributes]
-    if @collection.board_collection? && card_attrs.present?
-      broadcaster.cards_updated(
+    if card_attrs.blank?
+      collection_broadcaster.collection_updated
+      collection_broadcaster(@collection.parent).card_updated(
+        @collection.parent_collection_card.id,
+      )
+      queue_linked_updates
+      return
+    end
+
+    if @collection.board_collection?
+      collection_broadcaster.cards_updated(
         card_attrs,
       )
-    else
-      broadcaster.call
+      return
     end
+
+    # just ping to reload the cards
+    collection_broadcaster.reload_cards
   end
 
   def broadcast_parent_collection_updates
-    broadcaster(@parent_collection).call
+    collection_broadcaster(@parent_collection).reload_cards
+  end
+
+  def broadcast_parent_collection_card_update
+    collection_broadcaster(@parent_collection).card_updated(@collection.parent_collection_card.id)
+  end
+
+  def queue_linked_updates
+    return unless @collection.cards_linked_to_this_collection.any?
+
+    # TODO...
+    # LinkBroadcastWorker.perform_async(
+    #   @collection.id,
+    #   'Collection',
+    #   @user.id,
+    # )
   end
 
   def join_collection_group?
@@ -382,9 +411,5 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     return if @collection.common_viewable?
 
     current_user.switch_to_organization(@collection.organization)
-  end
-
-  def broadcaster(collection = @collection)
-    CollectionUpdateBroadcaster.new(collection, current_user)
   end
 end

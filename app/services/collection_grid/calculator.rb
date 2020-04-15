@@ -270,7 +270,7 @@ module CollectionGrid
       last_card = collection.collection_cards.ordered.last || Mashie.new(row: 0, col: 0, width: 0)
       last_row_open_width = collection.num_columns - (last_card.col + last_card.width)
 
-      if last_row_open_width >= span || (last_row_open_width.positive? && span > collection.num_columns)
+      if last_card.col < 6 && last_row_open_width >= span || (last_row_open_width.positive? && span > collection.num_columns)
         placement.row = last_card.row
         placement.col = last_card.col + last_card.width
       else

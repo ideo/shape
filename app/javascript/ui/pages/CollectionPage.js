@@ -4,6 +4,7 @@ import pluralize from 'pluralize'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
+import { Helmet } from 'react-helmet'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
@@ -26,10 +27,27 @@ import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
-import { Helmet } from 'react-helmet'
+import { objectsEqual } from '~/utils/objectUtils'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
+
+// adapted from https://github.com/lodash/lodash/issues/2403#issuecomment-560461923
+const throttleById = (func, wait, options) => {
+  const memory = {}
+
+  return (...args) => {
+    // use first argument as a key
+    const [id] = args
+
+    if (typeof memory[id] === 'function') {
+      return memory[id](...args)
+    }
+
+    memory[id] = _.throttle(func, wait, options)
+    return memory[id](...args)
+  }
+}
 
 @inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
@@ -47,6 +65,7 @@ class CollectionPage extends React.Component {
     super(props)
     this.reloadData = _.throttle(this._reloadData, 3000)
     this.setEditor = _.throttle(this._setEditor, 4000)
+    this.handleTextItemUpdate = throttleById(this._handleTextItemUpdate, 3000)
   }
 
   componentDidMount() {
@@ -96,7 +115,13 @@ class CollectionPage extends React.Component {
     this.restoreWindowScrollPosition()
   }
 
-  loadCollectionCards = async ({ page, per_page, rows, cols }) => {
+  loadCollectionCards = async ({
+    page,
+    per_page,
+    rows,
+    cols,
+    reloading = false,
+  }) => {
     const { collection, undoStore } = this.props
     // if the collection is still awaiting updates, there are no cards to load
     if (collection.awaiting_updates) {
@@ -104,18 +129,14 @@ class CollectionPage extends React.Component {
       return
     }
 
-    let params
+    let params = { page, per_page }
     if (collection.isBoard) {
       params = { rows }
-    } else {
-      params = { page, per_page, rows, cols }
     }
-
     if (undoStore.actionAfterRoute) {
       // clear this out before we fetch, so that any undo/redo actions don't flash a previous state of the cards
       collection.clearCollectionCards()
     }
-
     return collection.API_fetchCards(params).then(() => {
       if (collection.id !== this.props.collection.id) {
         // this may have changed during the course of the request if we navigated
@@ -123,6 +144,7 @@ class CollectionPage extends React.Component {
       }
       runInAction(() => {
         this.cardsFetched = true
+        if (reloading) return
         this.onAPILoad()
       })
     })
@@ -309,26 +331,26 @@ class CollectionPage extends React.Component {
         // don't reload your own updates
         return
       }
-      this.setEditor(data.current_editor)
       const updateData = data.data
-      if (!updateData) {
+      if (updateData && !updateData.text_item) {
+        this.setEditor(data.current_editor)
+      }
+      if (!updateData || updateData.reload_cards) {
         this.reloadData()
+        return
+      }
+      if (updateData.collection_updated) {
+        collection.refetch()
         return
       }
       if (updateData.collection_cards_attributes) {
         // e.g. cards were resized or dragged; apply those same updates
-        collection.applyCollectionCardsAttributes(updateData)
+        collection.applyRemoteUpdates(updateData)
         return
       }
       if (updateData.card_id) {
         // a card has been created or updated, so fetch that individual card
-        const res = await apiStore.fetch(
-          'collection_cards',
-          updateData.card_id,
-          true
-        )
-        // make sure it's in our current collection
-        collection.addCard(res.data)
+        this.fetchCard(updateData.card_id)
         return
       }
       if (updateData.row_updated) {
@@ -340,7 +362,42 @@ class CollectionPage extends React.Component {
         collection.removeCardIds(updateData.archived_card_ids)
         return
       }
+      if (updateData.text_item) {
+        const { text_item } = updateData
+        if (text_item && text_item.quill_data) {
+          this.handleTextItemUpdate(text_item.id, text_item)
+        }
+        return
+      }
     }
+  }
+
+  _handleTextItemUpdate = (itemId, item) => {
+    const { apiStore, uiStore } = this.props
+    const localItem = apiStore.find('items', itemId)
+    if (localItem) {
+      // update with incoming content UNLESS we are editing that item
+      if (
+        uiStore.textEditingItem &&
+        uiStore.textEditingItem.id === localItem.id
+      ) {
+        return
+      }
+      // update the item which will cause it to re-render
+      if (!objectsEqual(localItem.quill_data, item.quill_data)) {
+        localItem.quill_data = item.quill_data
+      }
+    } else if (item.parent_collection_card_id) {
+      // we don't have the item, it must be a new card that we need to fetch
+      this.fetchCard(item.parent_collection_card_id)
+    }
+  }
+
+  async fetchCard(cardId) {
+    const { collection, apiStore } = this.props
+    const res = await apiStore.fetch('collection_cards', cardId, true)
+    // make sure it's in our current collection
+    collection.addCard(res.data)
   }
 
   async _reloadData() {
@@ -348,9 +405,12 @@ class CollectionPage extends React.Component {
     const per_page =
       collection.collection_cards.length || collection.recordsPerPage
     if (collection.isBoard) {
-      this.loadCollectionCards({ rows: [0, collection.loadedRows] })
+      this.loadCollectionCards({
+        reloading: true,
+        rows: [0, collection.loadedRows],
+      })
     } else {
-      this.loadCollectionCards({ per_page })
+      this.loadCollectionCards({ reloading: true, per_page })
     }
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)

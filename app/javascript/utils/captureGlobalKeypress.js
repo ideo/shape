@@ -23,7 +23,7 @@ export const handleMouseDownSelection = e => {
       // we need a tiny delay so that the highlight gets properly unset
       // before kicking out of the textEditingItem
       setTimeout(() => {
-        uiStore.update('textEditingItem', null)
+        uiStore.clearTextEditingItem()
       })
     }
     // if we clicked an empty space...

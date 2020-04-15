@@ -92,7 +92,9 @@ class CollectionCardDuplicationWorker
 
   def update_parent_collection_status
     @parent_collection.update(processing_status: nil)
-    CollectionUpdateBroadcaster.call(@parent_collection)
+    # TODO: tell collection about the new cards only? (and its status)
+    # @for_user is omitted so the user can reload their placeholder cards into the new ones
+    CollectionUpdateBroadcaster.new(@parent_collection).reload_cards
   end
 
   def update_parent_cover

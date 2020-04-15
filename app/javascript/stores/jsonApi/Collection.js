@@ -913,8 +913,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
-  applyCollectionCardsAttributes(snapshot) {
-    return this.revertToSnapshot(snapshot)
+  applyRemoteUpdates(params) {
+    if (params.collection_cards_attributes) {
+      // apply collection_cards_attributes
+      this.revertToSnapshot(params)
+    }
   }
 
   revertToSnapshot(snapshot) {

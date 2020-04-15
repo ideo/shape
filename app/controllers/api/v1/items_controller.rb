@@ -31,14 +31,17 @@ class Api::V1::ItemsController < Api::V1::BaseController
     @item.attributes = item_params
     if @item.save
       log_item_activity(:edited) if log_activity?
-      broadcaster = CollectionUpdateBroadcaster.new(@item.parent, current_user)
+      broadcaster = collection_broadcaster(@item.parent)
       if @item.is_a? Item::TextItem
         broadcaster.text_item_updated(@item)
       else
         broadcaster.call
       end
-      # cancel_sync means we don't want to render the item JSON
-      return if @cancel_sync
+      if @cancel_sync
+        # cancel_sync means we don't want to render the item JSON
+        head :no_content
+        return
+      end
 
       render jsonapi: @item, expose: { current_record: @item }
     else
@@ -52,8 +55,11 @@ class Api::V1::ItemsController < Api::V1::BaseController
       log_item_activity(:edited) if log_activity?
       broadcaster = CollectionUpdateBroadcaster.new(@item.parent, current_user)
       broadcaster.text_item_updated(@item)
-      # cancel_sync means we don't want to render the item JSON
-      return if @cancel_sync
+      if @cancel_sync
+        # cancel_sync means we don't want to render the item JSON
+        head :no_content
+        return
+      end
 
       render jsonapi: @item, expose: { current_record: @item }
     else

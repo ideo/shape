@@ -116,6 +116,7 @@ class RealtimeTextItem extends React.Component {
   currentlySending = false
   currentlySendingCheck = null
   num_viewers = 1
+  version = null
   quillData = {}
   combinedDelta = new Delta()
   bufferDelta = new Delta()
@@ -240,14 +241,11 @@ class RealtimeTextItem extends React.Component {
     if (!this.reactQuillRef) return
     if (typeof this.reactQuillRef.getEditor !== 'function') return
     this.quillEditor = this.reactQuillRef.getEditor()
+    this.version = this.props.item.version
 
     if (!initSnapshot) return
     this.contentSnapshot = this.quillEditor.getContents()
     this.updateUiStoreSnapshot()
-  }
-
-  get version() {
-    return this.props.item.version
   }
 
   createCursor({ id, name }) {
@@ -282,11 +280,14 @@ class RealtimeTextItem extends React.Component {
 
   channelReceivedData = ({ current_editor, data, num_viewers }) => {
     if (this.unmounted) return
+    // you may just be receiving data about someone joining/leaving
     this.num_viewers = num_viewers
-    if (data && data.version) {
+    if (!data) return
+
+    if (data.version) {
       this.handleReceivedDelta({ current_editor, data })
     }
-    if (data && data.range) {
+    if (data.range) {
       this.handleReceivedRange({ current_editor, data })
     }
   }
@@ -300,23 +301,23 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
-    const { item, currentUserId } = this.props
+    const { currentUserId } = this.props
 
     // update our local version number
     if (data.version) {
       if (!data.error && data.last_10) {
-        const diff = data.version - item.version
+        const diff = data.version - this.version
         if (diff > 0) {
           _.each(data.last_10, previous => {
             const delta = new Delta(previous.delta)
-            if (previous.version > item.version) {
+            if (previous.version > this.version) {
               if (previous.editor_id !== currentUserId) {
                 this.applyIncomingDelta(delta)
               }
               // update for later sending appropriately composed version to be saved
               this.contentSnapshot = this.contentSnapshot.compose(delta)
-              // set our local item.version to match the realtime data we got
-              item.version = previous.version
+              // set our local version to match the realtime data we got
+              this.version = previous.version
             }
           })
         }
@@ -413,7 +414,8 @@ class RealtimeTextItem extends React.Component {
   @action
   setItemQuillData() {
     const { item, uiStore } = this.props
-    const { quillEditor } = this
+    const { quillEditor, version } = this
+    item.version = version
     if (!quillEditor) {
       return item
     }
@@ -483,7 +485,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCursor = () => {
-    if (!this.quillEditor) return
+    if (!this.quillEditor || this.num_viewers === 1) return
     this.socketSend('cursor', {
       range: this.quillEditor.getSelection(),
     })

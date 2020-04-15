@@ -95,10 +95,9 @@ class Item
       # new_data may include an error message
       received_changes(new_data, user)
 
-      return if parent.nil? || parent.num_viewers < 2 || parent.broadcasting?
+      return if parent.nil? || parent.num_viewers.zero?
 
-      parent.update(broadcasting: true)
-      CollectionBroadcastWorker.perform_in(3.seconds, parent.id)
+      CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
     end
 
     def threadlocked_transform_realtime_delta(user, data)

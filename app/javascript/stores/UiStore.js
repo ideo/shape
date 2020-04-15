@@ -746,6 +746,7 @@ export default class UiStore {
     const { viewingCollection } = this
     this.deselectCards()
     this.closeCardMenu()
+    this.clearTextEditingItem()
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,
@@ -832,6 +833,13 @@ export default class UiStore {
     return this.viewingRecord && this.viewingRecord.internalType === 'items'
       ? this.viewingRecord
       : null
+  }
+
+  @action
+  clearTextEditingItem() {
+    this.textEditingItem = null
+    this.textEditingCardId = null
+    this.textEditingItemHasTitleText = false
   }
 
   get isEditingText() {

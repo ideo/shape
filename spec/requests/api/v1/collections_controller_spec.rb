@@ -1,6 +1,8 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
+  include_context 'CollectionUpdateBroadcaster setup'
   let(:user) { @user }
 
   context 'with anonymous (logged-out) user', auth: false do
@@ -365,11 +367,12 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
 
       it 'broadcasts collection updates' do
-        allow(CollectionUpdateBroadcaster).to receive(:call)
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        expect(CollectionUpdateBroadcaster).to receive(:new).with(
+          # broadcast to the collection where we built the template
           to_collection,
           user,
         )
+        expect(broadcaster_instance).to receive(:reload_cards)
         post(path, params: params)
       end
 
@@ -579,10 +582,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'broadcasts collection updates' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(
-        collection,
-        user,
-      )
+      expect(broadcaster_instance).to receive(:reload_cards)
       patch(path, params: params)
     end
 
@@ -612,6 +612,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     context 'with row and col' do
+      let!(:collection) { create(:board_collection, add_editors: [user]) }
       let(:params) do
         json_api_params(
           'collections',
@@ -635,11 +636,16 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(collection_card.row).to eq(4)
         expect(collection_card.col).to eq(5)
       end
+
+      it 'broadcasts cards_updated' do
+        expect(broadcaster_instance).to receive(:cards_updated)
+        patch(path, params: params)
+      end
     end
   end
 
   describe 'POST #clear_collection_cover' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
+    let!(:collection) { create(:collection, parent_collection: create(:collection), add_editors: [user]) }
     let(:collection_card) do
       create(:collection_card_image, order: 0, width: 1, parent: collection, is_cover: true)
     end
@@ -647,11 +653,18 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     before do
       user.add_role(Role::VIEWER, collection_card.item)
-      post(path)
     end
 
     it 'should clear the cover from the collection' do
+      post(path)
       expect(collection_card.reload.is_cover).to be false
+    end
+
+    it 'broadcasts card_updated with parent_collection_card' do
+      expect(broadcaster_instance).to receive(:card_updated).with(
+        collection.parent_collection_card.id,
+      )
+      post(path)
     end
   end
 
@@ -784,6 +797,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
   describe 'POST #insert_row' do
     let!(:collection) { create(:collection) }
+    let(:action) { :insert_row }
     let(:raw_params) do
       {
         row: 1,
@@ -800,7 +814,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(RowInserter).to receive(:call).with(
         collection: collection,
         row: 1,
-        action: :insert_row,
+        action: action,
       )
       post(path, params: params)
     end
@@ -810,18 +824,29 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(response.status).to eq(204)
     end
 
-    xit 'should touch the collection' do
+    it 'should touch the collection' do
       expect do
         post(path, params: params)
+        collection.reload
       end.to change(collection, :updated_at)
+    end
+
+    it 'should broadcast an update' do
+      expect(broadcaster_instance).to receive(:row_updated).with(
+        row: 1,
+        action: action,
+      )
+      post(path, params: params)
     end
   end
 
   describe 'POST #remove_row' do
     let!(:collection) { create(:collection) }
+    let(:action) { :remove_row }
     let(:raw_params) do
       {
         row: 1,
+        action: action,
       }
     end.to_json
     let(:params) { raw_params.to_json }
@@ -835,7 +860,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(RowInserter).to receive(:call).with(
         collection: collection,
         row: 1,
-        action: :remove_row,
+        action: action,
       )
       post(path, params: params)
     end
@@ -851,6 +876,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         post(path, params: params)
         collection.reload
       end.to change(collection, :updated_at)
+    end
+
+    it 'should broadcast an update' do
+      expect(broadcaster_instance).to receive(:row_updated).with(
+        row: 1,
+        action: action,
+      )
+      post(path, params: params)
     end
   end
 

@@ -101,7 +101,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       create_notification(@collection_card, :edited)
       broadcast_collection_create_updates(@collection_card)
       if @collection_card.saved_change_to_is_cover?
-        broadcast_parent_collection_updates
+        broadcast_parent_collection_updates(@collection_card)
       end
       render jsonapi: @collection_card.reload,
              include: CollectionCard.default_relationships_for_api
@@ -427,34 +427,42 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def broadcast_replacing_updates
     return unless @replacing_card.parent.present?
 
-    CollectionUpdateBroadcaster.new(@replacing_card.parent, current_user).card_updated(@replacing_card.id)
+    collection_broadcaster(@replacing_card.parent).card_updated(@replacing_card.id)
   end
 
   def broadcast_moving_collection_updates
     if @card_action == 'move'
-      CollectionUpdateBroadcaster.call(@from_collection, current_user)
+      # TODO: treat this as if they were "archived"
+      collection_broadcaster(@from_collection).reload_cards
     end
-    CollectionUpdateBroadcaster.call(@to_collection, current_user)
+    # TODO: reload all cards or just moved ones?
+    collection_broadcaster(@to_collection).reload_cards
   end
 
   def broadcast_collection_create_updates(card)
-    CollectionUpdateBroadcaster.new(@collection, current_user).card_updated(card.id)
+    collection_broadcaster.card_updated(card.id)
   end
 
-  def broadcast_parent_collection_updates
+  def broadcast_parent_collection_updates(card)
     parent = @collection.parent
     return unless parent.present?
 
-    CollectionUpdateBroadcaster.call(parent, current_user)
+    collection_broadcaster(parent).card_updated(card.id)
   end
 
   def broadcast_collection_archive_updates
     parent = @collection_cards.first&.parent
     return unless parent.present?
 
-    CollectionUpdateBroadcaster.new(parent, current_user).cards_archived(
-      @collection_cards.pluck(:id),
-    )
+    if params[:action] == 'archive'
+      collection_broadcaster(parent).cards_archived(
+        @collection_cards.pluck(:id),
+      )
+      return
+    end
+
+    # until we have a way to update multiple cards
+    collection_broadcaster(parent).reload_cards
   end
 
   def ordered_cards

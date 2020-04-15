@@ -270,6 +270,18 @@ class Item < ApplicationRecord
     # copy roles from parent (i.e. where it's being placed)
     i.roles_anchor_collection_id = parent.roles_anchor.id
     i.parent_collection_card = card if card
+
+    if i.is_a?(Item::TextItem)
+      # remove comment highlights from the dupe item
+      scrubbed_ops = Mashie.new(i.data_content).ops
+      scrubbed_ops.each do |op|
+        next unless op&.attributes
+
+        op.attributes = op.attributes.except!(:commentHighlight, :commentHighlightResolved)
+      end
+      i.ops = scrubbed_ops
+    end
+
     # save the dupe item first so that we can reference it later
     # return if it didn't work for whatever reason
     return i unless i.save
