@@ -22,7 +22,8 @@ module Slack
       def create_collection
         CollectionCardBuilder.new(
           params: {
-
+            name: "##{channel}",
+            search_term: "##{channel.to_url}",
           },
           parent_collection: Collection.find(root_collection_id)
         )

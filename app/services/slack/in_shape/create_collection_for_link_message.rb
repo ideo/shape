@@ -70,7 +70,7 @@ module Slack
       end
 
       def message_collection_tags
-        ["##{channel}", user]
+        ["##{channel.to_url}", user]
       end
 
       def plain_text
