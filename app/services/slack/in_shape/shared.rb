@@ -11,7 +11,7 @@ module Slack
 
       def all_content_collection_id
         CollectionCard.find_by(
-          parent_id: 777000,
+          parent_id: 1916091,
           identifier: 'all-content'
         )&.collection_id
       end

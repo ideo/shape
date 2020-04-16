@@ -23,6 +23,7 @@ module Slack
       private
 
       def find_message_collection_card
+        debugger
         CollectionCard.find_by(
           parent_id: all_content_collection_id,
           identifier: identifier,

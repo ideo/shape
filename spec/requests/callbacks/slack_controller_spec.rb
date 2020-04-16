@@ -71,3 +71,4 @@ describe 'Slack API Requests' do
     end
   end
 end
+# { "type": "message", "channel": "C024BE91L", "user": "U2147483697", "text": "Live long and prospect. <http://google.com>", "ts": "1355517523.000005", "event_ts": "1355517523.000005", "channel_type": "channel"}
