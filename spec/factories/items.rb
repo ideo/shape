@@ -39,13 +39,13 @@ FactoryBot.define do
 
       trait :with_multiple_choice_with_choices do
         question_type :question_multiple_choice
-      end
 
-      after(:build) do |question_item|
-        if question_item.question_choices_customizable?
-          question_item.question_choices = build_list(
-            :question_choice, 4
-          )
+        after(:build) do |question_item|
+          if question_item.question_choices_customizable?
+            question_item.question_choices = build_list(
+              :question_choice, 4
+            )
+          end
         end
       end
     end
