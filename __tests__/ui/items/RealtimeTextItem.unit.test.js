@@ -254,7 +254,7 @@ describe('RealtimeTextItem', () => {
       expect(component.combinedDelta).toEqual(helloWorld)
       expect(component.bufferDelta).toEqual(new Delta())
 
-      expect(component.version).toEqual(1)
+      expect(component.version).toEqual(null)
       // we receive someone else's response
       component.handleReceivedDelta({
         current_editor: { id: '88' },
