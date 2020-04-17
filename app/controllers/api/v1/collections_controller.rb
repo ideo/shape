@@ -1,5 +1,5 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
-  deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
+  deserializable_resource :collection, class: DeserializableCollection, only: %i[update clear_collection_cover]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
   skip_before_action :check_api_authentication!, only: %i[show]
@@ -225,7 +225,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def load_and_authorize_collection_update
     @collection = Collection.find(params[:id])
-    if json_api_params[:collection].present? && collection_params[:name].present? && collection_params[:name] != @collection.name
+    if collection_params[:name].present? && collection_params[:name] != @collection.name
       authorize! :edit_name, @collection
     else
       authorize! :edit_content, @collection

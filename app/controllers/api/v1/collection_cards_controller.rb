@@ -94,6 +94,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def update
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
+      create_notification(@collection_card, :edited)
       broadcast_collection_create_updates
       if @collection_card.saved_change_to_is_cover?
         broadcast_parent_collection_updates
@@ -108,6 +109,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def update_card_filter
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
+      create_notification(@collection_card, :edited)
       broadcast_collection_create_updates
       @collection_card.reload
       render_collection_card
@@ -258,7 +260,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def render_collection_card(include: nil)
     include ||= CollectionCard.default_relationships_for_api
-    render jsonapi: @collection,
+    render jsonapi: @collection_card,
            include: include
   end
 
