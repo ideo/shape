@@ -107,6 +107,7 @@ Rails.application.routes.draw do
         member do
           patch 'replace'
           patch 'update'
+          patch 'update_card_filter'
           patch 'toggle_pin'
           delete 'destroy'
         end
