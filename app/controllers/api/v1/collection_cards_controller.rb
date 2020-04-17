@@ -427,7 +427,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def broadcast_replacing_updates
     return unless @replacing_card.parent.present?
 
-    collection_broadcaster(@replacing_card.parent).card_updated(@replacing_card.id)
+    collection_broadcaster(@replacing_card.parent).card_updated(@replacing_card)
   end
 
   def broadcast_moving_collection_updates
@@ -440,14 +440,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def broadcast_collection_create_updates(card)
-    collection_broadcaster.card_updated(card.id)
+    collection_broadcaster.card_updated(card)
   end
 
   def broadcast_parent_collection_updates(card)
     parent = @collection.parent
     return unless parent.present?
 
-    collection_broadcaster(parent).card_updated(card.id)
+    collection_broadcaster(parent).card_updated(card)
   end
 
   def broadcast_collection_archive_updates

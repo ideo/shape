@@ -11,19 +11,17 @@ class LinkBroadcastWorker
 
   private
 
-  def broadcast_to_linked_collections
-    linked_cards.each do |card|
+  def broadcast_to_linked_records
+    linked_cards.find_each do |card|
+      next if card.parent.num_viewers.zero?
+
       CollectionUpdateBroadcaster
-        .new(collection, @user)
-        .send(@action)
+        .new(card.parent, @user)
+        .card_updated(card)
     end
   end
 
   def linked_cards
-    # Collection
-    #   .joins(:link_collection_cards)
-    #   .where(CollectionCard.arel_table["#{@record_class}_id"].eq(@record.id))
-    #   .distinct
     @record.send("cards_linked_to_this_#{@record_class.downcase}")
   end
 end

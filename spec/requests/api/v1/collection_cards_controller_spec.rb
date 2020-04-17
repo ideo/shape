@@ -383,8 +383,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
           it 'broadcasts collection updates' do
             post(path, params: params)
+            card = CollectionCard.find(json['data']['id'])
             expect(broadcaster_instance).to have_received(:card_updated).with(
-              json['data']['id'].to_i,
+              card,
             )
           end
         end
@@ -400,8 +401,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
           it 'broadcasts collection updates' do
             post(path, params: params)
+            card = CollectionCard.find(json['data']['id'])
             expect(broadcaster_instance).to have_received(:card_updated).with(
-              json['data']['id'].to_i,
+              card,
             )
           end
         end
@@ -1246,8 +1248,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     it 'broadcasts collection updates' do
       patch(path, params: params)
+      card = CollectionCard.find(json['data']['id'])
       expect(broadcaster_instance).to have_received(:card_updated).with(
-        json['data']['id'].to_i,
+        card,
       )
     end
 
@@ -1282,8 +1285,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           user,
         )
         patch(path, params: params)
+        card = CollectionCard.find(json['data']['id'])
         expect(broadcaster_instance).to have_received(:card_updated).with(
-          json['data']['id'].to_i,
+          card,
         ).twice
       end
     end
@@ -1382,8 +1386,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'broadcasts collection updates' do
         patch(path, params: params)
+        card = CollectionCard.find(json['data']['id'])
         expect(broadcaster_instance).to have_received(:card_updated).with(
-          json['data']['id'].to_i,
+          card,
         )
       end
 

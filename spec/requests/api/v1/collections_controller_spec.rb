@@ -542,7 +542,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     it 'broadcasts collection_updated and parent card_updated' do
       expect(broadcaster_instance).to receive(:collection_updated)
       expect(broadcaster_instance).to receive(:card_updated).with(
-        collection.parent_collection_card.id,
+        collection.parent_collection_card,
       )
       patch(path, params: params)
     end
@@ -593,6 +593,27 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     it 'broadcasts collection updates' do
       expect(broadcaster_instance).to receive(:reload_cards)
       patch(path, params: params)
+    end
+
+    it 'does not call LinkBroadcastWorker unless there are links' do
+      expect(LinkBroadcastWorker).not_to receive(:perform_async)
+      patch(path, params: params)
+    end
+
+    context 'with cards linked to this collection' do
+      let(:parent_of_links) { create(:collection) }
+      let!(:linked_card) do
+        create(:collection_card_link_collection, parent: parent_of_links, collection: collection)
+      end
+
+      it 'calls LinkBroadcastWorker' do
+        expect(LinkBroadcastWorker).to receive(:perform_async).with(
+          collection.id,
+          'Collection',
+          user.id,
+        )
+        patch(path, params: params)
+      end
     end
 
     it 'logs a edited activity for the collection' do
@@ -671,7 +692,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     it 'broadcasts card_updated with parent_collection_card' do
       expect(broadcaster_instance).to receive(:card_updated).with(
-        collection.parent_collection_card.id,
+        collection.parent_collection_card,
       )
       post(path)
     end

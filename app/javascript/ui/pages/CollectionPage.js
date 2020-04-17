@@ -332,7 +332,11 @@ class CollectionPage extends React.Component {
         return
       }
       const updateData = data.data
-      if (updateData && !updateData.text_item) {
+      if (updateData && !updateData.text_item && !updateData.card_id) {
+        // don't show editor for some updates:
+        // - text item updates would be too much
+        // - card_ids might even be for records linked into this collection,
+        //   might be odd to see someone "editing this collection"
         this.setEditor(data.current_editor)
       }
       if (!updateData || updateData.reload_cards) {

@@ -127,6 +127,11 @@ RSpec.describe Item::TextItem, type: :model do
               text_item.parent,
               user,
             )
+            expect(TextItemBroadcastWorker).to receive(:perform_in).with(
+              5.seconds,
+              text_item.id,
+              user.id,
+            )
             expect(broadcaster_instance).to receive(:text_item_updated).with(text_item)
             text_item.save_and_broadcast_quill_data(user, data)
           end

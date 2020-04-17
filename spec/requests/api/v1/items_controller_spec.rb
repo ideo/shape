@@ -1,6 +1,8 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 describe Api::V1::ItemsController, type: :request, json: true, auth: true do
+  include_context 'CollectionUpdateBroadcaster setup'
   let(:user) { @user }
 
   describe 'GET #index', api_token: true do
@@ -198,13 +200,6 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         content: 'The wheels on the bus...',
       )
     end
-    let(:broadcaster) { double('broadcaster') }
-
-    before do
-      allow(CollectionUpdateBroadcaster).to receive(:new).and_return(broadcaster)
-      allow(broadcaster).to receive(:text_item_updated).and_return(true)
-      allow(broadcaster).to receive(:call).and_return(true)
-    end
 
     it 'returns a 200' do
       patch(path, params: params)
@@ -230,7 +225,7 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
 
     it 'creates an activity' do
       expect(ActivityAndNotificationBuilder).to receive(:call).with(
-        actor: @user,
+        actor: user,
         target: item,
         action: :edited,
         content: anything,
@@ -241,9 +236,23 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
 
     context 'with a text item' do
       let!(:item) { create(:text_item, add_editors: [user]) }
+      let(:params) do
+        json_api_params(
+          'items',
+          content: 'The wheels on the bus...',
+          quill_data: { ops: [{ insert: 'Hi.' }] },
+        )
+      end
 
-      it 'broadcasts individual text updates' do
-        expect(broadcaster).to receive(:text_item_updated).with(
+      it 'does not broadcast individual text updates by default' do
+        expect(broadcaster_instance).not_to receive(:text_item_updated)
+        patch(path, params: params)
+      end
+
+      it 'broadcasts text updates if last_broadcast_at > 4 seconds ago and num_viewers.positive?' do
+        item.update(last_broadcast_at: 1.minute.ago, data_content: {})
+        item.parent.started_viewing(user)
+        expect(broadcaster_instance).to receive(:text_item_updated).with(
           item,
         )
         patch(path, params: params)
@@ -254,7 +263,9 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       let!(:item) { create(:link_item, add_editors: [user]) }
 
       it 'broadcasts collection updates' do
-        expect(broadcaster).to receive(:call)
+        expect(broadcaster_instance).to receive(:card_updated).with(
+          parent_collection_card,
+        )
         patch(path, params: params)
       end
     end
@@ -303,12 +314,6 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
         quill_data: highlighted_data_content,
       )
     end
-    let(:broadcaster) { double('broadcaster') }
-
-    before do
-      allow(CollectionUpdateBroadcaster).to receive(:new).and_return(broadcaster)
-      allow(broadcaster).to receive(:text_item_updated).and_return(true)
-    end
 
     it 'returns a 200' do
       patch(path, params: params)
@@ -338,8 +343,15 @@ describe Api::V1::ItemsController, type: :request, json: true, auth: true do
       patch(path, params: params)
     end
 
-    it 'broadcasts individual text updates' do
-      expect(broadcaster).to receive(:text_item_updated).with(
+    it 'does not broadcast individual text updates by default' do
+      expect(broadcaster_instance).not_to receive(:text_item_updated)
+      patch(path, params: params)
+    end
+
+    it 'broadcasts text updates if last_broadcast_at > 4 seconds ago and num_viewers.positive?' do
+      item.update(last_broadcast_at: 1.minute.ago, data_content: data_content)
+      item.parent.started_viewing(user)
+      expect(broadcaster_instance).to receive(:text_item_updated).with(
         item,
       )
       patch(path, params: params)

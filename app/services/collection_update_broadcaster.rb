@@ -31,16 +31,16 @@ class CollectionUpdateBroadcaster < SimpleService
     broadcast(reload_cards: true)
   end
 
-  def card_updated(card_id)
-    broadcast(card_id: card_id.to_s)
+  def card_updated(card)
+    broadcast(card_id: card.id.to_s)
   end
 
   def text_item_updated(item)
     broadcast(
       text_item: {
-        id: item.id,
+        id: item.id.to_s,
         quill_data: item.quill_data,
-        parent_collection_card_id: item.parent_collection_card&.id,
+        parent_collection_card_id: item.parent_collection_card&.id&.to_s,
       },
     )
   end

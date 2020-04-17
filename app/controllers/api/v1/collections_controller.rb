@@ -353,7 +353,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     collection_broadcaster.collection_updated
     if @collection.parent_collection_card.present?
       collection_broadcaster(@collection.parent).card_updated(
-        @collection.parent_collection_card.id,
+        @collection.parent_collection_card,
       )
     end
     queue_linked_updates
@@ -377,18 +377,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def broadcast_parent_collection_card_update
-    collection_broadcaster(@parent_collection).card_updated(@collection.parent_collection_card.id)
+    collection_broadcaster(@parent_collection).card_updated(
+      @collection.parent_collection_card,
+    )
   end
 
   def queue_linked_updates
     return unless @collection.cards_linked_to_this_collection.any?
 
-    # TODO...
-    # LinkBroadcastWorker.perform_async(
-    #   @collection.id,
-    #   'Collection',
-    #   @user.id,
-    # )
+    LinkBroadcastWorker.perform_async(
+      @collection.id,
+      'Collection',
+      current_user.id,
+    )
   end
 
   def join_collection_group?

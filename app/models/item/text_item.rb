@@ -95,9 +95,19 @@ class Item
       # new_data may include an error message
       received_changes(new_data, user)
 
-      return if parent.nil? || parent.num_viewers.zero?
+      return if last_broadcast_at.present? && (Time.current - last_broadcast_at) < 4
+
+      update_columns(last_broadcast_at: Time.current)
+      return if parent&.num_viewers&.zero?
 
       CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
+      # push one more broadcast to get any last updates e.g. that happened < 4 seconds
+      # and to call LinkBroadcastWorker
+      TextItemBroadcastWorker.perform_in(
+        5.seconds,
+        id,
+        user&.id,
+      )
     end
 
     def threadlocked_transform_realtime_delta(user, data)
