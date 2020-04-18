@@ -431,9 +431,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def broadcast_moving_collection_updates
-    if @card_action == 'move'
-      # TODO: treat this as if they were "archived"
-      collection_broadcaster(@from_collection).reload_cards
+    if @card_action == 'move' && !moving_within_collection
+      # treat this as if they were "archived"
+      collection_broadcaster(@from_collection).cards_archived(
+        @cards.pluck(:id),
+      )
     end
     # TODO: reload all cards or just moved ones?
     collection_broadcaster(@to_collection).reload_cards
@@ -461,7 +463,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       return
     end
 
-    # until we have a way to update multiple cards
+    # this is for unarchive -- until we have a way to update multiple cards
     collection_broadcaster(parent).reload_cards
   end
 

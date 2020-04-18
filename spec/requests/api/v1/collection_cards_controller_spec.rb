@@ -945,7 +945,10 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'broadcasts collection updates' do
-        expect(broadcaster_instance).to receive(:reload_cards).twice
+        expect(broadcaster_instance).to receive(:cards_archived).with(
+          moving_cards.pluck(:id),
+        )
+        expect(broadcaster_instance).to receive(:reload_cards)
         patch(path, params: params)
       end
 
