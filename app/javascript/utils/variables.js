@@ -243,6 +243,7 @@ export default {
     secondaryDarkest: '#242d37',
     secondaryLight: '#5a6a7c',
     secondaryMedium: '#4a5b71',
+    tabsBackground: '#FFFAF0',
     tertiaryDark: '#c43a31',
     tertiaryMedium: '#de8f74',
     transparent: 'transparent',

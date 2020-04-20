@@ -63,10 +63,9 @@ class OrgSettings extends React.Component {
   render() {
     if (!this.user) this.sendToLogin()
     // Should we fetch in the individual tabs instead of up here?
-    console.log('in render', this.cDeltaUser, this.businessUnits)
     return (
       <SettingsPageWrapper>
-        <CreativeDifferenceTabs tab={'teams'} />
+        <CreativeDifferenceTabs />
       </SettingsPageWrapper>
     )
   }
