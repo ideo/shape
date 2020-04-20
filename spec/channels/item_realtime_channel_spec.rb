@@ -25,6 +25,7 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
       it 'notifies of viewer' do
         expect { subscribe(id: item.id) }.to have_broadcasted_to(stream_name).with(
           current_editor: {},
+          viewers: [user.as_json],
           num_viewers: 1,
           record_id: item.id.to_s,
           record_type: 'items',
@@ -40,6 +41,7 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
     it 'notifies viewer left' do
       expect { subscription.unsubscribed }.to have_broadcasted_to(stream_name).with(
         current_editor: {},
+        viewers: [],
         num_viewers: 0,
         record_id: item.id.to_s,
         record_type: 'items',
@@ -62,6 +64,7 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
       expect { perform(:delta, data) }.to have_broadcasted_to(stream_name).with(
         hash_including(
           current_editor: user.as_json,
+          viewers: [user.as_json],
           num_viewers: 1,
           record_id: item.id.to_s,
           record_type: 'items',
@@ -86,6 +89,7 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
       expect { perform(:cursor, data) }.to have_broadcasted_to(stream_name).with(
         hash_including(
           current_editor: user.as_json,
+          viewers: [user.as_json],
           num_viewers: 1,
           record_id: item.id.to_s,
           record_type: 'items',

@@ -24,6 +24,7 @@ RSpec.describe CollectionViewingChannel, type: :channel do
     it 'notifies the viewers of the collection' do
       expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
         current_editor: user.as_json,
+        viewers: [user.as_json],
         num_viewers: 1,
         record_id: collection.id.to_s,
         record_type: 'collections',
@@ -40,6 +41,7 @@ RSpec.describe CollectionViewingChannel, type: :channel do
       it 'notifies all viewers' do
         expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
           current_editor: user.as_json,
+          viewers: [user_2.as_json, user.as_json],
           num_viewers: 2,
           record_id: collection.id.to_s,
           record_type: 'collections',

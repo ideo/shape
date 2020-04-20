@@ -28,12 +28,12 @@ module RealtimeEditorsViewers
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user = nil, dont_notify: false)
-    Cache.set_add(viewing_cache_key, user.id) if user
+    Cache.set_add(viewing_cache_key, user_json_stringified(user)) if user
     publish_to_channel unless dont_notify
   end
 
   def stopped_viewing(user = nil, dont_notify: false)
-    Cache.set_remove(viewing_cache_key, user.id) if user
+    Cache.set_remove(viewing_cache_key, user_json_stringified(user)) if user
     publish_to_channel unless dont_notify
   end
 
@@ -49,6 +49,10 @@ module RealtimeEditorsViewers
     Cache.set_members(viewing_cache_key).size
   end
 
+  def channel_viewers
+    Cache.set_members(viewing_cache_key).map { |m| JSON.parse(m) }
+  end
+
   private
 
   def currently_editing_user_as_json
@@ -61,6 +65,7 @@ module RealtimeEditorsViewers
   def publish_to_channel(merge_data = {})
     defaults = {
       current_editor: currently_editing_user_as_json,
+      viewers: channel_viewers,
       num_viewers: num_viewers,
       record_id: id.to_s,
       record_type: jsonapi_type_name,
@@ -75,5 +80,9 @@ module RealtimeEditorsViewers
 
   def viewing_cache_key
     "#{self.class.base_class.name}_#{id}_viewing"
+  end
+
+  def user_json_stringified(user)
+    user.as_json.to_json
   end
 end
