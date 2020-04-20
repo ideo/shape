@@ -217,6 +217,7 @@ export default {
     alert: '#d66742',
     black: '#120f0e',
     caution: '#fcf113',
+    cDeltaBlue: '#49B6CA',
     collectionCover: '#b6aaa6',
     commonDark: '#a89f9b',
     commonDarkest: '#787878',

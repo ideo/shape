@@ -7,30 +7,25 @@ import PageContainer from '~/ui/layout/PageContainer'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import { Label } from '~/ui/global/styled/forms'
 import v from '~/utils/variables'
+import { apiStore } from '~/stores'
 
 // TODO: Make separate component
 const SettingsNavLink = styled(RouterLink)`
   margin-right: 50px;
+  height: 32px;
+  line-height: 32px;
+  font-size: 13px;
   color: ${v.colors.black};
   display: inline-block;
   text-decoration: none;
-  background-color: ${props => (props.isActive ? v.colors.primaryCta : 'none')};
-  border-radius: ${props => (props.isActive ? '26px' : '0px')};
 
   &:hover {
     text-decoration: underline;
   }
 `
 
-const isActive = path => {
-  const regex = new RegExp(path, 'i')
-
-  return regex.test(window.location.pathname)
-}
-
-class SettingsPage extends React.PureComponent {
+class SettingsPage extends React.Component {
   render() {
-    console.log(isActive('/org-settings'))
     return (
       <div>
         <OverdueBanner />
@@ -38,20 +33,22 @@ class SettingsPage extends React.PureComponent {
           <Heading1>Settings</Heading1>
           <nav>
             <ul>
-              <SettingsNavLink to="/settings" isActive={isActive('/settings')}>
-                <Label>"Organization" Settings</Label>
+              <SettingsNavLink to="/settings">
+                <Label>{apiStore.currentUserOrganizationName} Settings</Label>
               </SettingsNavLink>
-              <SettingsNavLink
-                to="/user_settings"
-                isActive={isActive('/user_settings')}
-              >
+              <SettingsNavLink to="/user_settings">
                 <Label>My Settings</Label>
               </SettingsNavLink>
               <SettingsNavLink
                 to="/org-settings"
-                isActive={isActive('/org-settings')}
+                style={{
+                  borderRadius: '26px',
+                  background: v.colors.cDeltaBlue,
+                }}
               >
-                <Label>C∆ Creative Difference</Label>
+                <Label style={{ padding: '0px 16px' }}>
+                  C∆ Creative Difference
+                </Label>
               </SettingsNavLink>
             </ul>
           </nav>

@@ -98,7 +98,7 @@
     "babel-plugin-styled-components": "^1.7.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "browserslist": "^4.5.5",
-    "c-delta-organization-settings": "git+https://github.com/ideo/c-delta-organization-settings.git",
+    "c-delta-organization-settings": "/Users/mvillwock/projects/c-delta-organization-settings",
     "caniuse-lite": "^1.0.3",
     "clean-webpack-plugin": "^3.0.0",
     "color": "^3.1.2",
