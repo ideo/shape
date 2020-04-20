@@ -79,6 +79,7 @@ class CollectionTemplateBuilder < SimpleService
       type: @template.type,
       tag_list: @template.tag_list,
       collection_type: @template.collection_type,
+      num_columns: @template.num_columns,
     }.merge(@raw_collection_params)
   end
 
