@@ -109,6 +109,9 @@ gem 'gibbon', '~> 3.2'
 # distributed mutex
 gem 'redis-mutex', '~> 4.0.1'
 
+# make redis calls via ActiveRecord
+gem 'redis-objects'
+
 # performance tuning
 # gem 'tunemygc'
 gem 'barnes'
