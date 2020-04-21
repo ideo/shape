@@ -1241,7 +1241,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   API_clearCollectionCover() {
     return this.apiStore
-      .request(`collections/${this.id}/clear_collection_cover`, 'POST')
+      .request(`collections/${this.id}/clear_collection_cover`, 'POST', {
+        data: this.toJsonApi(),
+      })
       .catch(err => {
         console.warn(err)
         this.uiStore.alert(
