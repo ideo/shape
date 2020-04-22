@@ -1,13 +1,14 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
-  deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
+  deserializable_resource :collection, class: DeserializableCollection, only: %i[update clear_collection_cover]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[update destroy in_my_collection]
+  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
   skip_before_action :check_api_authentication!, only: %i[show]
   # NOTE: these have to be in the following order
   before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
+  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover]
   after_action :broadcast_parent_collection_updates, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -42,7 +43,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  before_action :load_and_authorize_collection_update, only: %i[update]
   after_action :broadcast_collection_updates, only: %i[update]
   def update
     updated = CollectionUpdater.call(@collection, collection_params)
@@ -157,7 +157,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     RowInserter.call(
       row: json_api_params[:row],
       collection: @collection,
-      action: 'remove'
+      action: 'remove',
     )
     @collection.touch
 

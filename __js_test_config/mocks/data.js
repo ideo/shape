@@ -30,6 +30,7 @@ export const fakeCollectionCard = {
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
+  API_updateCardFilter: jest.fn(), 
   ...fakeJsonApiAttrs,
 }
 

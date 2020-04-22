@@ -1304,6 +1304,61 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'PATCH #update_card_filter' do
+    let(:collection) { create(:collection, organization: organization) }
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/update_card_filter" }
+    let(:raw_params) do
+      {
+        parent_id: collection.id,
+        filter: 'nothing',
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+
+    before do
+      user.add_role(Role::CONTENT_EDITOR, collection_card.item)
+      user.add_role(Role::CONTENT_EDITOR, collection)
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches JSON schema' do
+      patch(path, params: params)
+      expect(json['data']['attributes']).to match_json_schema('collection_card')
+      expect(json['data']['attributes']['parent_id']).to eq collection.id
+    end
+
+    context 'without content editor access on the collection card' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      before do
+        user.add_role(Role::VIEWER, collection_card.item)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'without content editor access on the parent collection' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      before do
+        user.add_role(Role::VIEWER, collection)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
+
   describe 'PATCH #replace' do
     let(:collection) { create(:collection, organization: organization) }
     let(:collection_card) { create(:collection_card_image, parent: collection) }
