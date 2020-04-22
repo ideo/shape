@@ -50,6 +50,7 @@ module CachedAttributes
     # Have to init this here,
     # because the super's initialize freezes the object
     @cached_attributes_values = {}
+    @stored_cached_attributes_hash = Redis::Value.new({})
     super(*args)
   end
 
@@ -64,12 +65,11 @@ module CachedAttributes
 
   def cached_attributes_values
     # Must use merge because the class is frozen
-    # @cached_attributes_values.merge!(Cache.get(cached_attributes_cache_key) || {})
-    {}
+    @cached_attributes_values.merge!(stored_cached_attributes_hash.value || {})
   end
 
   def cached_attributes_values=(data)
-    Cache.set(cached_attributes_cache_key, data)
+    @stored_cached_attributes_hash.value = data
     @cached_attributes_values.merge!(data)
   end
 
