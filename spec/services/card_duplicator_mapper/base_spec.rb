@@ -17,9 +17,7 @@ RSpec.describe CardDuplicatorMapper::Base, type: :service do
         original_card_id: '123',
         to_card_id: '456',
       )
-      expect(subject.duplicated_cards).to eq(
-        '123' => '456',
-      )
+      expect(subject.duplicated_cards_hash['123']).to eq('456')
       expect(subject.duplicated_card_ids).to eq(['123'])
     end
 
@@ -48,9 +46,7 @@ RSpec.describe CardDuplicatorMapper::Base, type: :service do
     end
 
     it 'stores card data' do
-      expect(subject.linked_cards).to eq(
-        '789' => { 'type' => 'link_item' },
-      )
+      expect(subject.linked_cards_hash['789']).to eq({ type: :link_item }.to_s)
       expect(subject.linked_card_ids).to eq(['789'])
       expect(subject.linked_card?(card_id: '789')).to be true
     end
