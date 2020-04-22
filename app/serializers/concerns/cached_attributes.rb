@@ -64,7 +64,8 @@ module CachedAttributes
 
   def cached_attributes_values
     # Must use merge because the class is frozen
-    @cached_attributes_values.merge!(Cache.get(cached_attributes_cache_key) || {})
+    # @cached_attributes_values.merge!(Cache.get(cached_attributes_cache_key) || {})
+    {}
   end
 
   def cached_attributes_values=(data)

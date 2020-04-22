@@ -67,6 +67,7 @@
 #
 
 class Collection < ApplicationRecord
+  include Redis::Objects
   include Breadcrumbable
   include Resourceable
   include Archivable
@@ -107,6 +108,9 @@ class Collection < ApplicationRecord
                  :cached_inheritance,
                  :common_viewable,
                  :broadcasting
+
+  list :realtime_viewers, marshal: true
+  list :realtime_current_editor, marshal: true
 
   # validations
   validates :name, presence: true

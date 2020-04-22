@@ -102,7 +102,7 @@ class Item
     end
 
     def threadlocked_transform_realtime_delta(user, data)
-      RedisClassy.redis = Cache.client
+      RedisClassy.redis = Redis::Objects.redis
       lock_name = "rt_text_id_#{id}"
       RedisMutex.with_lock(lock_name, block: 0) do
         transform_realtime_delta(
