@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-
+import { Fragment, useState, useEffect } from 'react'
 // import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Tabs from '@material-ui/core/Tabs'
@@ -9,6 +9,7 @@ import Box from '~shared/components/atoms/Box'
 import TeamsTab from './TeamsTab'
 import OrganizationTab from './OrganizationTab'
 import v from '~/utils/variables'
+import { usersStore } from 'c-delta-organization-settings'
 
 function TabPanel(props) {
   const { children, value, index } = props
@@ -49,38 +50,70 @@ function a11yProps(index) {
 
 const CreativeDifferenceTabs = () => {
   // const classes = useStyles()
-  const [value, setValue] = React.useState(0)
+  const [value, setValue] = useState(0)
+  const [user, setUser] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
 
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
+
+  useEffect(() => {
+    const getCDeltaUser = async () => {
+      const userModel = new usersStore.model()
+      const userModelInstance = new userModel()
+      userModelInstance.set({
+        id: 'me',
+      })
+      console.log(userModelInstance)
+      try {
+        setIsLoading(true)
+        const response = await userModelInstance.fetch()
+        setUser(response)
+        setIsLoading(false)
+      } catch (err) {
+        setIsError(err)
+      }
+    }
+
+    getCDeltaUser()
+  }, [])
   // TODO: Figure out how to get makeStyles to work
+
   return (
     <div>
-      <AppBar
-        position="static"
-        style={{
-          flexGrow: 1,
-          backgroundColor: v.colors.cDeltaBlue,
-          color: v.colors.black,
-        }}
-      >
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="simple tabs example"
-        >
-          {/* TODO: How to inject icon into this? CSS before content? */}
-          <Tab label="C∆ Org Settings" {...a11yProps(0)} />
-          <Tab label="C∆ Teams" {...a11yProps(1)} />
-        </Tabs>
-      </AppBar>
-      <TabPanel value={value} index={0}>
-        <OrganizationTab />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <TeamsTab />
-      </TabPanel>
+      {isError && <div>Something went wrong... </div>}
+      {isLoading ? (
+        <div>Loading... </div>
+      ) : (
+        <Fragment>
+          <AppBar
+            position="static"
+            style={{
+              flexGrow: 1,
+              backgroundColor: v.colors.cDeltaBlue,
+              color: v.colors.black,
+            }}
+          >
+            <Tabs
+              value={value}
+              onChange={handleChange}
+              aria-label="simple tabs example"
+            >
+              {/* TODO: How to inject icon into this? CSS before content? */}
+              <Tab label="C∆ Org Settings" {...a11yProps(0)} />
+              <Tab label="C∆ Teams" {...a11yProps(1)} />
+            </Tabs>
+          </AppBar>
+          <TabPanel value={value} index={0}>
+            <OrganizationTab orgId={user.organization_id} />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <TeamsTab />
+          </TabPanel>
+        </Fragment>
+      )}
     </div>
   )
 }
