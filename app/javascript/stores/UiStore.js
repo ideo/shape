@@ -917,6 +917,11 @@ export default class UiStore {
   }
 
   @action
+  resetCollaborators() {
+    this.collaborators.replace([])
+  }
+
+  @action
   openOptionalMenus(opts = {}) {
     if (opts) {
       if (opts.open) {
