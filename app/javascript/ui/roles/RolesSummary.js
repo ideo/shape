@@ -52,7 +52,7 @@ class RolesSummary extends React.Component {
     const collaboratorEditors = _.filter(collaborators, v => {
       return v.can_edit_collection
     })
-    return [...collaboratorEditors, ...allEditors]
+    return _.uniqBy([...collaboratorEditors, ...allEditors], 'id')
   }
 
   get viewers() {
@@ -67,7 +67,7 @@ class RolesSummary extends React.Component {
     const collaboratorViewers = _.filter(collaborators, v => {
       return !v.can_edit_collection
     })
-    return [...collaboratorViewers, ...allViewers]
+    return _.uniqBy([...collaboratorViewers, ...allViewers], 'id')
   }
 
   // Return at most MAX_AVATARS_TO_SHOW users,
