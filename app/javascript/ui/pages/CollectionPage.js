@@ -296,7 +296,9 @@ class CollectionPage extends React.Component {
   }
 
   receivedChannelData = async data => {
-    const { collection, apiStore } = this.props
+    const { collection, apiStore, uiStore } = this.props
+    const { collaborators } = data
+    uiStore.update('collaborators', collaborators)
     // catch if receivedData happens after reload
     if (!collection) return
     const currentId = collection.id

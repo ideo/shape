@@ -28,12 +28,12 @@ module RealtimeEditorsViewers
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user = nil, dont_notify: false)
-    Cache.set_add(viewing_cache_key, user_json_stringified(user)) if user
+    Cache.set_add(viewing_cache_key, collaborator_json_stringified(user)) if user
     publish_to_channel unless dont_notify
   end
 
   def stopped_viewing(user = nil, dont_notify: false)
-    Cache.set_remove(viewing_cache_key, user_json_stringified(user)) if user
+    Cache.set_remove(viewing_cache_key, collaborator_json_stringified(user)) if user
     publish_to_channel unless dont_notify
   end
 
@@ -49,7 +49,8 @@ module RealtimeEditorsViewers
     Cache.set_members(viewing_cache_key).size
   end
 
-  def channel_viewers
+  def channel_collaborators
+    # NOTE: collaborators are users that are viewing the given collection who can have editor or viewer permission
     Cache.set_members(viewing_cache_key).map { |m| JSON.parse(m) }
   end
 
@@ -65,7 +66,7 @@ module RealtimeEditorsViewers
   def publish_to_channel(merge_data = {})
     defaults = {
       current_editor: currently_editing_user_as_json,
-      viewers: channel_viewers,
+      collaborators: channel_collaborators,
       num_viewers: num_viewers,
       record_id: id.to_s,
       record_type: jsonapi_type_name,
@@ -82,7 +83,9 @@ module RealtimeEditorsViewers
     "#{self.class.base_class.name}_#{id}_viewing"
   end
 
-  def user_json_stringified(user)
-    user.as_json.to_json
+  def collaborator_json_stringified(user)
+    user_hash = user.as_json
+    user_hash[:can_edit_collection] = can_edit?(user)
+    user_hash.to_json
   end
 end
