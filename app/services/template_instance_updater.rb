@@ -149,15 +149,13 @@ class TemplateInstanceUpdater
     deleted_from_template_collection = instance.collections.find_by(name: 'Deleted From Template')
     return deleted_from_template_collection if deleted_from_template_collection.present?
 
-    # add deleted_from_template_collection to the end of unpinned cards
+    # add deleted_from_template_collection to the end of the collection
     last_card = instance.collection_cards.last
-    last_unpinned_card = instance.collection_cards.unpinned.last
     last_card_order = last_card.present? ? last_card.order + 1 : 0
-    order = last_unpinned_card.present? ? last_unpinned_card.order + 1 : last_card_order
 
     builder = CollectionCardBuilder.new(
       params: {
-        order: order,
+        order: last_card_order,
         collection_attributes: {
           name: 'Deleted From Template',
         },
