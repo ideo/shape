@@ -28,7 +28,9 @@ module RealtimeEditorsViewers
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user = nil, dont_notify: false)
-    Cache.set_add(viewing_cache_key, collaborator_json_stringified(user)) if user
+    if user && !viewing?(user)
+      Cache.set_add(viewing_cache_key, collaborator_json_stringified(user))
+    end
     publish_to_channel unless dont_notify
   end
 
@@ -52,6 +54,10 @@ module RealtimeEditorsViewers
   def channel_collaborators
     # NOTE: collaborators are users that are viewing the given collection who can have editor or viewer permission
     Cache.set_members(viewing_cache_key).map { |m| JSON.parse(m) }
+  end
+
+  def viewing?(u)
+    Cache.set_members(viewing_cache_key).any? { |m| JSON.parse(m)['id'] == u.id.to_s }
   end
 
   private
@@ -86,6 +92,7 @@ module RealtimeEditorsViewers
   def collaborator_json_stringified(user)
     user_hash = user.as_json
     user_hash[:can_edit_collection] = can_edit?(user)
+    user_hash[:timestamp] = Time.now
     user_hash.to_json
   end
 end

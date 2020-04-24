@@ -49,9 +49,14 @@ class RolesSummary extends React.Component {
       [...editorRole.users, ...editorRole.groups],
       ['first_name']
     )
-    const collaboratorEditors = _.filter(collaborators, v => {
-      return v.can_edit_collection
-    })
+    const collaboratorEditors = _.sortBy(
+      _.filter(collaborators, v => {
+        return v.can_edit_collection
+      }),
+      e => {
+        return new Date(e.timestamp)
+      }
+    ).reverse()
     return _.uniqBy([...collaboratorEditors, ...allEditors], 'id')
   }
 
@@ -64,9 +69,16 @@ class RolesSummary extends React.Component {
       [...viewerRole.users, ...viewerRole.groups],
       ['first_name']
     )
-    const collaboratorViewers = _.filter(collaborators, v => {
-      return !v.can_edit_collection
-    })
+
+    const collaboratorViewers = _.sortBy(
+      _.filter(collaborators, v => {
+        return !v.can_edit_collection
+      }),
+      e => {
+        return new Date(e.timestamp)
+      }
+    ).reverse()
+
     return _.uniqBy([...collaboratorViewers, ...allViewers], 'id')
   }
 
