@@ -282,6 +282,11 @@ class GridCard extends React.Component {
     }
   }
 
+  closeContextMenu = () => {
+    // this happens any time you mouse off the whole card
+    uiStore.closeCardMenu()
+  }
+
   linkOffsite = url => {
     const { record } = this.props
     Activity.trackActivity('viewed', record)
@@ -520,6 +525,7 @@ class GridCard extends React.Component {
         data-cy="GridCard"
         onContextMenu={this.openContextMenu}
         ref={c => (this.gridCardRef = c)}
+        onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
         inSearchPage={searchResult}
       >
