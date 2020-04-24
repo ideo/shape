@@ -672,6 +672,15 @@ class MovableGridCard extends React.Component {
         // animate grid items that are moving as they're being displaced
         transition,
       },
+      resizeHandleStyles: {
+        bottomRight: {
+          zIndex: `${
+            uiStore.cardMenuOpen && uiStore.cardMenuOpen.id
+              ? -1 // place behind action menu when open
+              : v.zIndex.gridCard
+          }`,
+        },
+      },
     }
 
     return (
