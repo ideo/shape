@@ -48,7 +48,7 @@ function a11yProps(index) {
 //   },
 // })
 
-const CreativeDifferenceTabs = () => {
+const CreativeDifferenceTabs = ({ orgName }) => {
   // const classes = useStyles()
   const [value, setValue] = useState(0)
   const [user, setUser] = useState(0)
@@ -73,7 +73,8 @@ const CreativeDifferenceTabs = () => {
         setUser(response)
         setIsLoading(false)
       } catch (err) {
-        setIsError(err)
+        console.log('user request failed: ', err)
+        setIsError(true)
       }
     }
 
@@ -102,8 +103,9 @@ const CreativeDifferenceTabs = () => {
               aria-label="simple tabs example"
             >
               {/* TODO: How to inject icon into this? CSS before content? */}
-              <Tab label="C∆ Org Settings" {...a11yProps(0)} />
-              <Tab label="C∆ Teams" {...a11yProps(1)} />
+              {/* TODO: Change underline for selected tab from Material-UI default */}
+              <Tab label={`C∆ ${orgName} Settings`} {...a11yProps(0)} />
+              <Tab label={`C∆ ${orgName} Teams`} {...a11yProps(1)} />
             </Tabs>
           </AppBar>
           <TabPanel value={value} index={0}>
@@ -116,6 +118,10 @@ const CreativeDifferenceTabs = () => {
       )}
     </div>
   )
+}
+
+CreativeDifferenceTabs.propTypes = {
+  orgName: PropTypes.string,
 }
 
 export default CreativeDifferenceTabs

@@ -25,7 +25,9 @@ class OrgSettings extends React.Component {
 
     return (
       <SettingsPageWrapper>
-        <CreativeDifferenceTabs />
+        <CreativeDifferenceTabs
+          orgName={this.props.apiStore.currentUserOrganizationName}
+        />
       </SettingsPageWrapper>
     )
   }
