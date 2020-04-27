@@ -1,17 +1,21 @@
 import { Fragment, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
+import ReactTags from 'react-tag-autocomplete'
+
 import {
-  // organizationsStore,
+  organizationsStore,
   supportedLanguagesStore,
 } from 'c-delta-organization-settings'
 
+import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
+import Pill from '~/ui/global/Pill'
 import { Label } from '~/ui/global/styled/forms'
-import TagEditor from '~/ui/pages/shared/TagEditor'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
-const Languages = ({ organization }) => {
+const Languages = ({ organization = {} }) => {
   const [languageOptions, setLanguageOptions] = useState([])
+  const [orgLanguages, setOrgLanguages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
@@ -21,7 +25,6 @@ const Languages = ({ organization }) => {
         setIsLoading(true)
         const response = await supportedLanguagesStore.fetch()
         console.log(response)
-        // const response = options
         setLanguageOptions(response)
         setIsLoading(false)
       } catch (err) {
@@ -33,53 +36,63 @@ const Languages = ({ organization }) => {
     getSupportedLanguages()
   }, [])
 
-  const validateTag = language => {
-    console.log('validate language: ', language)
-    console.log('language options: ', languageOptions)
-    let error = null
-    let tag = null
-    tag = _.find(languageOptions, option => option.name === tag)
-    console.log('found tag: ', tag)
-    if (!tag) error = 'Please enter a valid language option.'
+  // const typeaheadOptions = () => _.map(languageOptions, option => option.name)
+  const languagesFromOrg = () =>
+    _.filter(languageOptions, option =>
+      organization.supported_languages.includes(option.handle)
+    )
 
-    console.log(tag, error)
-    return {
-      tag,
-      error,
-    }
-  }
+  // const validateTag = language => {
+  //   console.log('validate language: ', language)
+  //   console.log('language options: ', languageOptions)
+  //   let error = null
+  //   let tag = null
+  //   tag = _.find(languageOptions, option => option.name === tag)
+  //   console.log('found tag: ', tag)
+  //   if (!tag) error = 'Please enter a valid language option.'
 
-  const afterAddRemoveTag = language => {
-    console.log('afteraddremove: ', language)
+  //   console.log(tag, error)
+  //   return {
+  //     tag,
+  //     error,
+  //   }
+  // }
+
+  const afterAddRemoveTag = tag => {
+    console.log('event add/remove', event)
+    console.log('afteraddremove: ', tag)
+    console.log(orgLanguages)
     // capture value
     // patch organization
-    // const updateLanguages = async () => {
-    //   try {
-    //     setIsLoading(true)
-    //     const orgModel = new organizationsStore.model()
-    //     const orgModelInstance = new orgModel({
-    //       id: organization.id,
-    //     })
-    //     const promise = orgModelInstance.save(
-    //       {
-    //         organization: {
-    //           supported_languages: selectedLanguages,
-    //         },
-    //       },
-    //       {
-    //         optimistic: false,
-    //       }
-    //     )
-    //     const result = await promise
-    //     setSelectedLanguages(result)
-    //     setIsLoading(false)
-    //   } catch (err) {
-    //     console.log('language update failed: ', err)
-    //     setIsError(true)
-    //     setIsLoading(false)
-    //   }
-    // }
-    // updateLanguages()
+    const updateLanguages = async () => {
+      try {
+        setIsLoading(true)
+        const orgModel = new organizationsStore.model()
+        const orgModelInstance = new orgModel({
+          id: organization.id,
+        })
+        const promise = orgModelInstance.save(
+          {
+            organization: {
+              supported_languages: organization.supported_languages.concat([
+                tag.handle,
+              ]),
+            },
+          },
+          {
+            optimistic: false,
+          }
+        )
+        const result = await promise
+        setOrgLanguages(result.supported_languages)
+        setIsLoading(false)
+      } catch (err) {
+        console.log('language update failed: ', err)
+        setIsError(true)
+        setIsLoading(false)
+      }
+    }
+    updateLanguages()
   }
 
   return (
@@ -104,16 +117,20 @@ const Languages = ({ organization }) => {
               width={16}
             />
           </Label>
-          <TagEditor
-            canEdit
-            validateTag={validateTag}
-            placeholder="add additional available languages"
-            records={[organization]}
-            tagField="supported_languages"
-            tagColor="white"
-            afterAddTag={afterAddRemoveTag}
-            afterRemoveTag={afterAddRemoveTag}
-          />
+          <StyledReactTags>
+            <ReactTags
+              tags={languagesFromOrg()}
+              suggestions={languageOptions}
+              allowBackspace={false}
+              delimiterChars={[',']}
+              placeholder={'add additional available languages'}
+              handleAddition={tag => afterAddRemoveTag(tag)}
+              handleDelete={tag => ev => afterAddRemoveTag(tag)}
+              // handleInputChange={this.onInputChange}
+              tagComponent={Pill}
+              // allowNew
+            />
+          </StyledReactTags>
         </Fragment>
       )}
     </div>
