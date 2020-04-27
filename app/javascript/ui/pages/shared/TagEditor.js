@@ -67,7 +67,9 @@ class TagEditor extends React.Component {
 
   @action
   handleAddition = tagData => {
+    console.log(tagData)
     const { validateTag, records, tagField, afterAddTag } = this.props
+    console.log(records)
     tagData.name = tagData.name.trim()
     const newTag = this.createFormattedTag(tagData.name)
     this.error = ''
@@ -90,6 +92,7 @@ class TagEditor extends React.Component {
       }
     }
     this.tags.push(newTag)
+
     records.forEach(record => {
       // persist the tag locally on the Item/Collection
       record[tagField].push(newTag.name)
@@ -104,6 +107,8 @@ class TagEditor extends React.Component {
       runInAction(() => {
         this.tags.remove(tag)
         records.forEach(record => {
+          // TODO: make Org a Mobx object
+          // debugger
           record[tagField].remove(tag.name)
         })
         afterRemoveTag(tag.name)

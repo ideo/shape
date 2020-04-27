@@ -347,10 +347,10 @@ class Routes extends React.Component {
                 )}
               />
               <Route
-                path="/org-settings"
-                render={() => (
+                path="/org-settings/:tab?"
+                render={props => (
                   <SettingsPage>
-                    <OrgSettings />
+                    <OrgSettings {...props} />
                   </SettingsPage>
                 )}
               />

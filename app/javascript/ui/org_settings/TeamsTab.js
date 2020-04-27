@@ -1,53 +1,29 @@
-import { useState, useEffect } from 'react'
-import _ from 'lodash'
+import PropTypes from 'prop-types'
+import { useState, useEffect, Fragment } from 'react'
 
 import { businessUnitsStore } from 'c-delta-organization-settings'
 import { Row } from '../global/styled/layout'
-import { Select, SelectOption } from '~/ui/global/styled/forms'
+import IndustrySubcategorySelectField from './IndustrySubcategory'
+import ContentVersionSelectField from './ContentVersion'
 
-const options = [
-  {
-    id: 1,
-    name: 'foo',
-  },
-  {
-    id: 2,
-    name: 'bar',
-  },
-]
-
-const TeamsTab = () => {
-  const [subcategoryMenu, setSubcategoryMenu] = useState(false)
-  const [industrySubcategoryOptions, setIndustrySubcategoryOptions] = useState(
-    []
-  )
-  const initialIndustrySubcategory = options[1]
-  const [industrySubcategory, setIndustrySubcategory] = useState(
-    initialIndustrySubcategory
-  )
-
-  function handleIndustrySubcategoryChange(e) {
-    e.preventDefault()
-
-    setIndustrySubcategory(e.target.value)
-    // AJAX call to update value
-  }
+// TODO: pass in organization from C∆Tabs component
+const TeamsTab = ({ organization, industrySubcategories }) => {
+  const [businessUnits, setBusinessUnits] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    // TODO: Extract to be a custom effect?
-    // Filter data to just be subcategory names and ids?
     async function businessUnits() {
       console.log('fetching BUs')
       try {
+        setIsLoading(true)
         const response = await businessUnitsStore.fetch()
         console.log('BU response: ', response)
-        const subcategories = _.pick(response, [
-          'industry_subcategory_id',
-          'industry_subcategory_name',
-        ])
-        setIndustrySubcategoryOptions(subcategories)
+        setBusinessUnits(response)
+        setIsLoading(false)
       } catch (err) {
         console.log('failed to fetch BUs: ', err)
+        setIsError(true)
       }
     }
     businessUnits()
@@ -56,42 +32,31 @@ const TeamsTab = () => {
   // TODO: figure out table implemenation
   return (
     <div>
-      C∆ Teams
-      {industrySubcategoryOptions.map(option => (
-        <Row>
-          <form>
-            <Select
-              label="Industry Subcategory"
-              classes={{
-                root: 'select',
-                selectMenu: 'selectMenu',
-              }}
-              displayEmpty
-              disableUnderline
-              onChange={handleIndustrySubcategoryChange}
-              onClose={() => setSubcategoryMenu(false)}
-              value={industrySubcategory.name}
-              open={subcategoryMenu}
-              // inline
-            >
-              {options.map(option => (
-                <SelectOption
-                  classes={{
-                    root: 'selectOption',
-                    selected: 'selected',
-                  }}
-                  key={option.id}
-                  value={option.name}
-                >
-                  {option.name}{' '}
-                </SelectOption>
-              ))}{' '}
-            </Select>{' '}
-          </form>
-        </Row>
-      ))}
+      {isError && <div>Something went wrong...</div>}
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <Fragment>
+          {businessUnits.map(option => (
+            <Row>
+              <form>
+                <IndustrySubcategorySelectField
+                  organization={organization}
+                  industrySubcategories={industrySubcategories}
+                />
+                <ContentVersionSelectField organization={organization} />
+              </form>
+            </Row>
+          ))}
+        </Fragment>
+      )}
     </div>
   )
+}
+
+TeamsTab.propTypes = {
+  organization: PropTypes.object,
+  industrySubcategories: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default TeamsTab

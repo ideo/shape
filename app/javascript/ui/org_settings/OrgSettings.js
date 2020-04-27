@@ -1,4 +1,9 @@
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import {
+  inject,
+  observer,
+  PropTypes as MobxPropTypes,
+  PropTypes,
+} from 'mobx-react'
 import styled from 'styled-components'
 
 import CreativeDifferenceTabs from './CreativeDifferenceTabs'
@@ -22,15 +27,22 @@ class OrgSettings extends React.Component {
 
   render() {
     if (!this.user) this.sendToLogin()
+    const { match } = this.props
+    const tab = match.params.tab ? match.params.tab : 'organization'
 
     return (
       <SettingsPageWrapper>
         <CreativeDifferenceTabs
+          tab={tab}
           orgName={this.props.apiStore.currentUserOrganizationName}
         />
       </SettingsPageWrapper>
     )
   }
+}
+
+OrgSettings.propTypes = {
+  match: PropTypes.object,
 }
 
 OrgSettings.wrappedComponent.propTypes = {
