@@ -35,7 +35,7 @@ module RealtimeEditorsViewers
   end
 
   def stopped_viewing(user = nil, dont_notify: false)
-    Cache.set_remove(viewing_cache_key, collaborator_json_stringified(user)) if user
+    Cache.set_scan_and_remove(viewing_cache_key, 'id', user.id) if user
     publish_to_channel unless dont_notify
   end
 
@@ -56,8 +56,9 @@ module RealtimeEditorsViewers
     Cache.set_members(viewing_cache_key).map { |m| JSON.parse(m) }
   end
 
-  def viewing?(u)
-    Cache.set_members(viewing_cache_key).any? { |m| JSON.parse(m)['id'] == u.id.to_s }
+  def viewing?(user)
+    viewing_user = Cache.scan_for_value(viewing_cache_key, 'id', user.id)
+    viewing_user.present?
   end
 
   private

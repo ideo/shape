@@ -22,13 +22,16 @@ RSpec.describe CollectionViewingChannel, type: :channel do
     let!(:subscription) { subscribe(id: collection.id) }
 
     it 'notifies the viewers of the collection' do
-      expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
-        current_editor: user.as_json,
-        viewers: [user.as_json],
-        num_viewers: 1,
-        record_id: collection.id.to_s,
-        record_type: 'collections',
-      )
+      expect { perform(:edited) }.to have_broadcasted_to(stream_name)
+        .with(
+          hash_including(
+            current_editor: user.as_json,
+            collaborators: anything,
+            num_viewers: 1,
+            record_id: collection.id.to_s,
+            record_type: 'collections',
+          ),
+        )
     end
 
     context 'with an existing viewer' do
@@ -39,13 +42,16 @@ RSpec.describe CollectionViewingChannel, type: :channel do
       end
 
       it 'notifies all viewers' do
-        expect { perform(:edited) }.to have_broadcasted_to(stream_name).with(
-          current_editor: user.as_json,
-          viewers: [user_2.as_json, user.as_json],
-          num_viewers: 2,
-          record_id: collection.id.to_s,
-          record_type: 'collections',
-        )
+        expect { perform(:edited) }.to have_broadcasted_to(stream_name)
+          .with(
+            hash_including(
+              current_editor: user.as_json,
+              collaborators: anything,
+              num_viewers: 2,
+              record_id: collection.id.to_s,
+              record_type: 'collections',
+            ),
+          )
       end
     end
   end

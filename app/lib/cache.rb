@@ -60,6 +60,15 @@ class Cache
     client.srem(key, value) == '1'
   end
 
+  def self.set_scan_and_remove(key, value_key, value_id)
+    value = scan_for_value(key, value_key, value_id)
+    set_remove(key, value) == '1'
+  end
+
+  def self.scan_for_value(key, value_key, value_id)
+    client.sscan_each(key).find { |m| JSON.parse(m)[value_key] == value_id.to_s }
+  end
+
   def self.hash_set(key, field, value, raw: false)
     value = JSON.generate(value) unless raw
     client.hset(key, field, value)
