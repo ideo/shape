@@ -529,7 +529,7 @@ class Collection
 
       queue_update_template_instances(
         updated_card_ids: incomplete_card_ids,
-        template_update_action: 'archive',
+        template_update_action: :archive,
       )
       incomplete_question_items.select do |item|
         item.question_type.blank?
@@ -748,7 +748,7 @@ class Collection
         # make sure all templates get the latest question setup
         queue_update_template_instances(
           updated_card_ids: collection_cards.pluck(:id),
-          template_update_action: 'update_all',
+          template_update_action: :update_all,
         )
         remove_empty_question_items
         # submission box master template test doesn't create a test_design, move cards, etc.

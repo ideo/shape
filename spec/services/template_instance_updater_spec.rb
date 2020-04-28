@@ -22,7 +22,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
     let(:organization) { template.organization }
     let!(:updated_card_ids) { template.collection_cards.pluck(:id) }
     let!(:template_instance) { create(:collection, template: template, created_by: user, organization: organization) }
-    let!(:template_update_action) { 'create' }
+    let!(:template_update_action) { :create }
 
     context 'calling template_instance_updater with \'create\' template_update_action' do
       it 'should copy the template\'s pinned cards into the templated collections' do
@@ -36,7 +36,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
 
     context 'calling template_instance_updater with \'update_all\' template_update_action' do
       let!(:updated_card_ids) { template.collection_cards.pluck(:id) }
-      let!(:template_update_action) { 'update_all' }
+      let!(:template_update_action) { :update_all }
       before do
         template.setup_templated_collection(
           for_user: user,
@@ -148,7 +148,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
         [card_to_delete.id]
       end
       let(:deleted_from_template) { template_instance.collections.find_by(name: 'Deleted From Template') }
-      let!(:template_update_action) { 'archive' }
+      let!(:template_update_action) { :archive }
 
       before do
         template.setup_templated_collection(
@@ -201,7 +201,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
       let(:deleted_from_template) do
         create(:collection, name: 'Deleted From Template', parent_collection: template_instance, organization: organization)
       end
-      let!(:template_update_action) { 'unarchive' }
+      let!(:template_update_action) { :unarchive }
 
       before do
         template.setup_templated_collection(

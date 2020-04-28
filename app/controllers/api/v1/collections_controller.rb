@@ -69,9 +69,32 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       return
     end
 
+    type = json_api_params[:type]
+    template_update_action = nil
+    updated_card_ids = []
+
+    case type
+    when 'Item::TextItem'
+      template_update_action = :update_text_content
+      ids = json_api_params[:ids]
+      updated_card_ids = ids.map(&:to_i)
+    when 'Item::QuestionItem'
+      template_update_action = :update_question_content
+      ids = json_api_params[:ids]
+      updated_card_ids = ids.map(&:to_i)
+    else
+      template_update_action = :update_all
+      updated_card_ids = @collection.collection_cards.pluck(:id)
+    end
+
+    if updated_card_ids.empty?
+      render json: { success: false }
+      return
+    end
+
     @collection.queue_update_template_instances(
-      updated_card_ids: @collection.collection_cards.pluck(:id),
-      template_update_action: 'update_all',
+      updated_card_ids: updated_card_ids,
+      template_update_action: template_update_action,
     )
     render json: { success: true }
   end

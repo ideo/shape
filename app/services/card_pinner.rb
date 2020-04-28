@@ -17,7 +17,7 @@ class CardPinner < SimpleService
     # we just pinned a template card, so update the instances
     template.queue_update_template_instances(
       updated_card_ids: [@card.id],
-      template_update_action: 'pin',
+      template_update_action: :pin,
     )
 
     template.reorder_cards!
