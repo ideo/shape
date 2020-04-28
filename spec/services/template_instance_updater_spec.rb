@@ -166,6 +166,8 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
           deleted_from_template.collection_cards.first.templated_from_id,
         ).to eq(card_to_delete.id)
         expect(deleted_from_template.collection_cards.map(&:pinned).uniq).to eq([false])
+        # Places it at the end of the collection
+        expect(template_instance.collection_cards.last).to eq(deleted_from_template.parent_collection_card)
       end
 
       it 'notifies all editors that card has been moved' do
