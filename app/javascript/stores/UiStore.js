@@ -247,7 +247,7 @@ export default class UiStore {
     cardWidth: 1,
     cardHeight: 1,
   }
-  collaboratorColors: [
+  collaboratorColorsList = [
     v.colors.collaboratorPrimaryBlue,
     v.colors.collaboratorSecondaryBlue,
     v.colors.collaboratorPrimaryYellow,
@@ -267,7 +267,7 @@ export default class UiStore {
     v.colors.collaboratorPrimarySlate,
     v.colors.collaboratorSecondarySlate,
     v.colors.collaboratorPrimaryGrey,
-    v.colors.collaboratorSecondaryGrey
+    v.colors.collaboratorSecondaryGrey,
   ]
   @observable
   placeholderPosition = {
@@ -938,7 +938,7 @@ export default class UiStore {
     const colorMap = {}
     for (let i = 0; i < this.collaborators.length; i++) {
       const { id } = this.collaborators[i]
-      colorMap[id] = this.collaboratorColors[i % 10]
+      colorMap[id] = this.collaboratorColorsList[i % 10]
     }
     return colorMap
   }

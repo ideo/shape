@@ -115,22 +115,29 @@ class RolesSummary extends React.Component {
 
   get renderEditors() {
     const { editors, viewers, editorCount } = this.viewersAndEditorsLimited
+    const { collaboratorColors } = uiStore
     // If there aren't any editors or viewers, render with add user button
     // If there aren't any editors but are viewers, don't render label/button
     if (editors.length === 0 && !this.props.canEdit) return ''
     if (editors.length === 0 && viewers.length === 0) return ''
 
-    const editorAvatars = editors.map(editor => (
-      <Avatar
-        key={`${editor.internalType}_${editor.id}`}
-        title={editor.nameWithHints || editor.name}
-        url={editor.pic_url_square || editor.filestack_file_url}
-        className="editor"
-        // user_profile_collection_id will be null if its a group
-        linkToCollectionId={editor.user_profile_collection_id}
-        displayName
-      />
-    ))
+    const editorAvatars = editors.map(editor => {
+      const borderColor = collaboratorColors[editor.id]
+      const border = borderColor ? `4px solid ${borderColor}` : 'none'
+
+      return (
+        <Avatar
+          key={`${editor.internalType}_${editor.id}`}
+          title={editor.nameWithHints || editor.name}
+          url={editor.pic_url_square || editor.filestack_file_url}
+          className="editor"
+          // user_profile_collection_id will be null if its a group
+          linkToCollectionId={editor.user_profile_collection_id}
+          displayName
+          border={border}
+        />
+      )
+    })
 
     return (
       <AvatarGroup
@@ -145,19 +152,26 @@ class RolesSummary extends React.Component {
 
   get renderViewers() {
     const { viewers, viewerCount } = this.viewersAndEditorsLimited
+    const { collaboratorColors } = uiStore
 
     if (viewers.length === 0) return ''
-    const viewerAvatars = viewers.map(viewer => (
-      <Avatar
-        key={`${viewer.internalType}_${viewer.id}`}
-        title={viewer.nameWithHints || viewer.name}
-        url={viewer.pic_url_square || viewer.filestack_file_url}
-        className="viewer"
-        // user_profile_collection_id will be null if its a group
-        linkToCollectionId={viewer.user_profile_collection_id}
-        displayName
-      />
-    ))
+    const viewerAvatars = viewers.map(viewer => {
+      const borderColor = collaboratorColors[viewer.id]
+      const border = borderColor ? `4px solid ${borderColor}` : 'none'
+
+      return (
+        <Avatar
+          key={`${viewer.internalType}_${viewer.id}`}
+          title={viewer.nameWithHints || viewer.name}
+          url={viewer.pic_url_square || viewer.filestack_file_url}
+          className="viewer"
+          // user_profile_collection_id will be null if its a group
+          linkToCollectionId={viewer.user_profile_collection_id}
+          displayName
+          border={border}
+        />
+      )
+    })
     return (
       <AvatarGroup
         avatarCount={viewerCount}
