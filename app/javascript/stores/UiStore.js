@@ -247,6 +247,28 @@ export default class UiStore {
     cardWidth: 1,
     cardHeight: 1,
   }
+  collaboratorColors: [
+    v.colors.collaboratorPrimaryBlue,
+    v.colors.collaboratorSecondaryBlue,
+    v.colors.collaboratorPrimaryYellow,
+    v.colors.collaboratorSecondaryYellow,
+    v.colors.collaboratorPrimaryPurple,
+    v.colors.collaboratorSecondaryPurple,
+    v.colors.collaboratorPrimaryOlive,
+    v.colors.collaboratorSecondaryOlive,
+    v.colors.collaboratorPrimarySalmon,
+    v.colors.collaboratorSecondarySalmon,
+    v.colors.collaboratorPrimaryIcyBlue,
+    v.colors.collaboratorSecondaryIcyBlue,
+    v.colors.collaboratorPrimaryLavender,
+    v.colors.collaboratorSecondaryLavender,
+    v.colors.collaboratorPrimaryObsidian,
+    v.colors.collaboratorSecondaryObsidian,
+    v.colors.collaboratorPrimarySlate,
+    v.colors.collaboratorSecondarySlate,
+    v.colors.collaboratorPrimaryGrey,
+    v.colors.collaboratorSecondaryGrey
+  ]
   @observable
   placeholderPosition = {
     ...this.placeholderDefaults,
@@ -909,6 +931,16 @@ export default class UiStore {
   @computed
   get collectionCardIds() {
     return this.viewingCollection.cardIds
+  }
+
+  @computed
+  get collaboratorColors() {
+    const colorMap = {}
+    for (let i = 0; i < this.collaborators.length; i++) {
+      const { id } = this.collaborators[i]
+      colorMap[id] = this.collaboratorColors[i % 10]
+    }
+    return colorMap
   }
 
   @action

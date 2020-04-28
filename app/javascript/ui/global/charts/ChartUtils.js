@@ -221,19 +221,19 @@ export const AboveChartContainer = styled.div`
 export const colorScale = [
   v.colors.tertiaryMedium,
   v.colors.primaryLight,
-  '#738091',
+  v.colors.collaboratorPrimaryBlue,
+  v.colors.collaboratorPrimaryPurple,
+  v.colors.collaboratorPrimaryOlive,
+  v.colors.collaboratorPrimarySalmon,
+  v.colors.collaboratorPrimaryIcyBlue,
+  v.colors.collaboratorPrimaryLavender,
+  v.colors.collaboratorPrimaryObsidian,
+  v.colors.collaboratorPrimarySlate,
+  v.colors.collaboratorPrimaryGrey,
   '#A1A6B4',
-  '#88B6C6',
-  '#5473A6',
-  '#929E9E',
-  '#84AF99',
   '#C2BBB9',
-  '#8B83A2',
-  '#AE8CA3',
   '#D6C3C9',
-  '#DEA895',
   '#A85751',
-  '#454545',
 ]
 
 export const themeLabelStyles = {
