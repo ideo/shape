@@ -91,7 +91,7 @@ const DropdownSelect = ({
         labelid="subindustry-select-label"
         classes={{
           root: 'select',
-          selectMenu: 'selectMenu',
+          selectMenu: 'selectMenu bottomPadded',
         }}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
