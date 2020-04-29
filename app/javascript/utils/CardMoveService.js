@@ -138,6 +138,15 @@ export default class CardMoveService {
           true
         )
         viewingCollection.addCard(cardRes.data)
+      } else if (
+        toCollection === viewingCollection &&
+        (cardAction === 'duplicate' || cardAction === 'link')
+      ) {
+        // this happens in apiStore.moveCards which is why we only do this for dupe/link
+        viewingCollection.mergeCards(res.data)
+        if (!viewingCollection.isBoard) {
+          viewingCollection.API_fetchCardOrders()
+        }
       }
 
       uiStore.update('isLoadingMoveAction', false)

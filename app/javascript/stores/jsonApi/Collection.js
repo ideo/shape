@@ -1358,6 +1358,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
+  @action
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,
@@ -1366,6 +1367,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   } = {}) {
     const { uiStore } = this
     const { cardAction } = uiStore
+    // ensure it is a normal array
+    const cardIds_arr = [...cardIds]
     const movingFromCollectionId = uiStore.movingFromCollectionId || this.id
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
@@ -1382,7 +1385,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         iconName: 'Alert',
         onConfirm: () => {
           cancel()
-          uiStore.reselectCardIds(cardIds)
+          uiStore.reselectCardIds(cardIds_arr)
           uiStore.openMoveMenu({
             from: this,
             cardAction,
@@ -1400,13 +1403,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const success = await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),
       from_id: movingFromCollectionId,
-      collection_card_ids: cardIds,
+      collection_card_ids: cardIds_arr,
     })
     if (!success) return false
 
     // Explicitly remove cards from this collection so front-end updates
     if (cardAction === 'move' && movingFromCollectionId === this.id) {
-      this.removeCardIds(cardIds)
+      this.removeCardIds(cardIds_arr)
     }
 
     // onSuccess is really "successfully able to edit this collection"
