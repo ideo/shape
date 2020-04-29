@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
+import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
@@ -27,27 +28,9 @@ import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
-import { objectsEqual } from '~/utils/objectUtils'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
-
-// adapted from https://github.com/lodash/lodash/issues/2403#issuecomment-560461923
-const throttleById = (func, wait, options) => {
-  const memory = {}
-
-  return (...args) => {
-    // use first argument as a key
-    const [id] = args
-
-    if (typeof memory[id] === 'function') {
-      return memory[id](...args)
-    }
-
-    memory[id] = _.throttle(func, wait, options)
-    return memory[id](...args)
-  }
-}
 
 @inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
@@ -65,7 +48,6 @@ class CollectionPage extends React.Component {
     super(props)
     this.reloadData = _.throttle(this._reloadData, 3000)
     this.setEditor = _.throttle(this._setEditor, 4000)
-    this.handleTextItemUpdate = throttleById(this._handleTextItemUpdate, 3000)
   }
 
   componentDidMount() {
@@ -326,91 +308,28 @@ class CollectionPage extends React.Component {
     const submissions = collection.submissions_collection
     const submissionsId = submissions ? submissions.id : ''
 
-    if (_.includes(_.compact([currentId, submissionsId]), data.record_id)) {
-      if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
-        // don't reload your own updates
-        return
-      }
-      const updateData = data.data
-      if (updateData && !updateData.text_item && !updateData.card_id) {
-        // don't show editor for some updates:
-        // - text item updates would be too much
-        // - card_id might even be for records linked into this collection,
-        //   might be odd to see someone "editing this collection"
-        this.setEditor(data.current_editor)
-      }
-      if (!updateData || updateData.reload_cards) {
-        this.reloadData()
-        return
-      }
-      if (updateData.collection_updated) {
-        collection.refetch()
-        return
-      }
-      if (updateData.collection_cards_attributes) {
-        // e.g. cards were resized or dragged; apply those same updates
-        collection.applyRemoteUpdates(updateData)
-        return
-      }
-      if (updateData.card_id) {
-        // a card has been created or updated, so fetch that individual card
-        this.fetchCard(updateData.card_id)
-        return
-      }
-      if (updateData.card_ids) {
-        // a card has been created or updated, so fetch those cards
-        collection.API_fetchAndMergeCards(updateData.card_ids)
-        return
-      }
-      if (updateData.row_updated) {
-        // a row has been inserted or removed
-        collection.applyRowUpdate(updateData.row_updated)
-        return
-      }
-      if (updateData.archived_card_ids) {
-        collection.removeCardIds(updateData.archived_card_ids)
-        return
-      }
-      if (updateData.text_item) {
-        const { text_item } = updateData
-        if (text_item && text_item.quill_data) {
-          this.handleTextItemUpdate(text_item.id, text_item)
-        }
-        return
-      }
-      if (updateData.num_viewers_changed) {
-        // TODO: update collaborators
-        // uiStore.update('collaborators' ...)
-      }
+    if (!_.includes(_.compact([currentId, submissionsId]), data.record_id)) {
+      return
     }
-  }
-
-  _handleTextItemUpdate = (itemId, item) => {
-    const { apiStore, uiStore } = this.props
-    const localItem = apiStore.find('items', itemId)
-    if (localItem) {
-      // update with incoming content UNLESS we are editing that item
-      if (
-        uiStore.textEditingItem &&
-        uiStore.textEditingItem.id === localItem.id
-      ) {
-        return
-      }
-      // update the item which will cause it to re-render
-      if (!objectsEqual(localItem.quill_data, item.quill_data)) {
-        localItem.quill_data = item.quill_data
-      }
-    } else if (item.parent_collection_card_id) {
-      // we don't have the item, it must be a new card that we need to fetch
-      this.fetchCard(item.parent_collection_card_id)
+    if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
+      // don't reload your own updates
+      return
     }
-  }
 
-  async fetchCard(cardId) {
-    const { collection, apiStore } = this.props
-    const res = await apiStore.fetch('collection_cards', cardId, true)
-    // make sure it's in our current collection
-    collection.addCard(res.data)
+    const updateData = data.data
+    if (updateData && !updateData.text_item && !updateData.card_id) {
+      // don't show editor for some updates:
+      // - text item updates would be too much
+      // - card_id might even be for records linked into this collection,
+      //   might be odd to see someone "editing this collection"
+      this.setEditor(data.current_editor)
+    }
+    if (!updateData || updateData.reload_cards) {
+      this.reloadData()
+      return
+    }
+    const service = new CollectionCollaborationService({ collection })
+    service.handleReceivedData(updateData)
   }
 
   async _reloadData() {
