@@ -786,14 +786,14 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   linkCards(data) {
-    // TODO: currently no undo action for this
-    return this.request('collection_cards/link', 'POST', data)
+    // duplicateCards contains the same undo/redo actions we use for linking
+    return this.duplicateCards(data, 'link')
   }
 
-  async duplicateCards(data) {
+  async duplicateCards(data, action = 'duplicate') {
     let res
     try {
-      res = await this.request('collection_cards/duplicate', 'POST', data)
+      res = await this.request(`collection_cards/${action}`, 'POST', data)
     } catch (e) {
       // throw to be caught by CardMoveService
       throw e
@@ -806,16 +806,16 @@ class ApiStore extends jsonapi(datxCollection) {
       // would probably require an API-based undo
       this.undoStore.pushUndoAction({
         message:
-          "Bulk duplication can't be undone. Please manually delete any records you wish to remove.",
+          "Bulk actions can't be undone. Please manually delete any records you wish to remove.",
         apiCall: () => {},
         actionType: POPUP_ACTION_TYPES.ALERT,
       })
       return res
     }
     const newCardIds = _.map(res.data, 'id')
-
+    const actionName = _.capitalize(action)
     this.undoStore.pushUndoAction({
-      message: 'Duplicate undone',
+      message: `${actionName} undone`,
       apiCall: () =>
         this.archiveCards({
           cardIds: newCardIds,
@@ -824,7 +824,7 @@ class ApiStore extends jsonapi(datxCollection) {
         }),
       redirectPath: { type: 'collections', id: collection.id },
       redoAction: {
-        message: 'Redoing Duplicate',
+        message: `Redoing ${actionName}`,
         apiCall: () => {
           this.unarchiveCards({
             cardIds: newCardIds,
