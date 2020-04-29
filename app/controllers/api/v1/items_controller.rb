@@ -82,7 +82,9 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def archive
     if @item.archive!
-      CollectionUpdateBroadcaster.call(@item.parent, current_user)
+      collection_broadcaster(@item.parent).cards_archived(
+        [@item.parent_collection_card.id],
+      )
       render jsonapi: @item.reload
     else
       render_api_errors @item.errors
