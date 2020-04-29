@@ -26,6 +26,7 @@ class PageWithApiWrapper extends React.Component {
     const { uiStore } = this.props
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
+    uiStore.resetCollaborators()
     uiStore.clearTextEditingItem()
 
     // fetch the data from the API

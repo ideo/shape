@@ -18,17 +18,15 @@ module RealtimeEditorsViewers
   # Track viewers by user_id
   # Using an increment counter was prone to dupe issues (e.g. same user with two browser windows open)
   def started_viewing(user = nil, dont_notify: false)
-    Cache.set_add(viewing_cache_key, user.id) if user
-    return if dont_notify
-
-    received_changes(num_viewers_changed: true)
+    if user && !viewing?(user)
+      Cache.set_add(viewing_cache_key, collaborator_json_stringified(user))
+    end
+    received_changes(num_viewers_changed: true) unless dont_notify
   end
 
   def stopped_viewing(user = nil, dont_notify: false)
-    Cache.set_remove(viewing_cache_key, user.id) if user
-    return if dont_notify
-
-    received_changes(num_viewers_changed: true)
+    Cache.set_scan_and_remove(viewing_cache_key, 'id', user.id) if user
+    received_changes(num_viewers_changed: true) unless dont_notify
   end
 
   def stream_name
@@ -43,6 +41,16 @@ module RealtimeEditorsViewers
     Cache.set_members(viewing_cache_key).size
   end
 
+  def channel_collaborators
+    # NOTE: collaborators are users that are viewing the given collection who can have editor or viewer permission
+    Cache.set_members(viewing_cache_key).map { |m| JSON.parse(m) }
+  end
+
+  def viewing?(user)
+    viewing_user = Cache.scan_for_value(viewing_cache_key, 'id', user.id)
+    viewing_user.present?
+  end
+
   private
 
   def currently_editing_user_as_json
@@ -55,6 +63,7 @@ module RealtimeEditorsViewers
   def publish_to_channel(merge_data = {})
     defaults = {
       current_editor: currently_editing_user_as_json,
+      collaborators: channel_collaborators,
       num_viewers: num_viewers,
       record_id: id.to_s,
       record_type: jsonapi_type_name,
@@ -69,5 +78,12 @@ module RealtimeEditorsViewers
 
   def viewing_cache_key
     "#{self.class.base_class.name}_#{id}_viewing"
+  end
+
+  def collaborator_json_stringified(user)
+    user_hash = user.as_json
+    user_hash[:can_edit_collection] = can_edit?(user)
+    user_hash[:timestamp] = Time.now
+    user_hash.to_json
   end
 end

@@ -9,6 +9,7 @@ import Avatar from '~/ui/global/Avatar'
 import AvatarGroup, { MAX_AVATARS_TO_SHOW } from '~/ui/global/AvatarGroup'
 import v from '~/utils/variables'
 import { AddButton } from '~/ui/global/styled/buttons'
+import { uiStore } from '~/stores'
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -41,35 +42,66 @@ class RolesSummary extends React.Component {
 
   get editors() {
     const { roles } = this.props
+    const { collaborators } = uiStore
     const editorRole = _.find(roles, { name: 'editor' })
     if (!editorRole) return []
-    return [...editorRole.users, ...editorRole.groups]
+    const allEditors = _.sortBy(
+      [...editorRole.users, ...editorRole.groups],
+      ['first_name']
+    )
+    const collaboratorEditors = _.sortBy(
+      _.filter(collaborators, v => {
+        return v.can_edit_collection
+      }),
+      e => {
+        return new Date(e.timestamp)
+      }
+    ).reverse()
+    return _.uniqBy([...collaboratorEditors, ...allEditors], 'id')
   }
 
   get viewers() {
     const { roles } = this.props
+    const { collaborators } = uiStore
     const viewerRole = _.find(roles, { name: 'viewer' })
     if (!viewerRole) return []
-    return [...viewerRole.users, ...viewerRole.groups]
+    const allViewers = _.sortBy(
+      [...viewerRole.users, ...viewerRole.groups],
+      ['first_name']
+    )
+
+    const collaboratorViewers = _.sortBy(
+      _.filter(collaborators, v => {
+        return !v.can_edit_collection
+      }),
+      e => {
+        return new Date(e.timestamp)
+      }
+    ).reverse()
+
+    return _.uniqBy([...collaboratorViewers, ...allViewers], 'id')
   }
 
   // Return at most MAX_AVATARS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
-    let editors = _.sortBy(this.editors, ['first_name'])
-    let viewers = _.sortBy(this.viewers, ['first_name'])
+    const { editors, viewers } = this
     const editorCount = editors.length
     const viewerCount = viewers.length
-    editors = editors.slice(0, MAX_AVATARS_TO_SHOW)
+    const maxEditors = editors.slice(0, MAX_AVATARS_TO_SHOW)
 
-    if (editors.length < MAX_AVATARS_TO_SHOW) {
-      const numViewers = MAX_AVATARS_TO_SHOW - editors.length
-      viewers = viewers.slice(0, numViewers)
-    } else {
-      viewers = []
+    let maxViewers = []
+    if (maxEditors.length < MAX_AVATARS_TO_SHOW) {
+      const numViewers = MAX_AVATARS_TO_SHOW - maxEditors.length
+      maxViewers = viewers.slice(0, numViewers)
     }
 
-    return { editors, editorCount, viewers, viewerCount }
+    return {
+      editors: maxEditors,
+      editorCount,
+      viewers: maxViewers,
+      viewerCount,
+    }
   }
 
   roleLabel = roleName => {

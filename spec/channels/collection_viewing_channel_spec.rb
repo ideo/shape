@@ -21,15 +21,30 @@ RSpec.describe CollectionViewingChannel, type: :channel do
   describe '#subscribed' do
     let(:subscription) { subscribe(id: collection.id) }
 
+
     it 'changes the num_viewers count' do
       expect {
         subscription
       }.to change(collection, :num_viewers).by(1)
     end
 
+    it 'notifies the viewers of the collection' do
+      expect { subscription }.to have_broadcasted_to(stream_name)
+        .with(
+          hash_including(
+            # when notifying of num_viewers_changed, current_editor is empty
+            current_editor: {},
+            collaborators: anything,
+            num_viewers: 1,
+            record_id: collection.id.to_s,
+            record_type: 'collections',
+            data: { num_viewers_changed: true },
+          ),
+        )
+    end
+
     context 'with an existing viewer' do
       let(:user_2) { create(:user) }
-
       before do
         subscription
       end
@@ -42,6 +57,21 @@ RSpec.describe CollectionViewingChannel, type: :channel do
           collection.stopped_viewing(user)
           collection.stopped_viewing(user_2)
         }.to change(collection, :num_viewers).by(-2)
+      end
+
+      it 'notifies all viewers' do
+        expect { collection.started_viewing(user_2) }.to have_broadcasted_to(stream_name)
+          .with(
+            hash_including(
+              # when notifying of num_viewers_changed, current_editor is empty
+              current_editor: {},
+              collaborators: anything,
+              num_viewers: 2,
+              record_id: collection.id.to_s,
+              record_type: 'collections',
+              data: { num_viewers_changed: true },
+            ),
+          )
       end
     end
   end

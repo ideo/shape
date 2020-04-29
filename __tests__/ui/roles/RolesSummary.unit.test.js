@@ -8,8 +8,8 @@ const emptyProps = {
   rolesMenuOpen: false,
 }
 
-const editorRole = { ...fakeRole }
-const viewerRole = { ...fakeRole }
+const editorRole = { ...fakeRole, id: '1' }
+const viewerRole = { ...fakeRole, id: '2' }
 viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
@@ -31,11 +31,11 @@ describe('RolesSummary', () => {
     })
 
     it('renders editors', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(2)
+      expect(wrapper.find('[className="editor"]').length).toEqual(1)
     })
 
     it('renders viewers', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(2)
+      expect(wrapper.find('[className="viewer"]').length).toEqual(1)
     })
 
     it('does not render AddButton by default', () => {
@@ -52,8 +52,8 @@ describe('RolesSummary', () => {
       wrapper = shallow(<RolesSummary {...onlyViewersProps} />)
     })
 
-    it('renders 2 viewers and label', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(2)
+    it('renders viewer and label', () => {
+      expect(wrapper.find('[className="viewer"]').length).toEqual(1)
     })
 
     it('does not render editors', () => {
@@ -70,8 +70,8 @@ describe('RolesSummary', () => {
       wrapper = shallow(<RolesSummary {...newProps} />)
     })
 
-    it('renders 2 editors and label', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(2)
+    it('renders editor and label', () => {
+      expect(wrapper.find('[className="editor"]').length).toEqual(1)
     })
 
     it('does not render viewers', () => {
@@ -82,12 +82,12 @@ describe('RolesSummary', () => {
   describe('with more editors than should show', () => {
     beforeEach(() => {
       editorRole.users = [
-        fakeUser,
-        fakeUser,
-        fakeUser,
-        fakeUser,
-        fakeUser,
-        fakeUser,
+        { ...fakeUser, id: '1' },
+        { ...fakeUser, id: '2' },
+        { ...fakeUser, id: '3' },
+        { ...fakeUser, id: '4' },
+        { ...fakeUser, id: '5' },
+        { ...fakeUser, id: '6' },
       ]
       const newProps = {
         ...editorsAndViewersProps,

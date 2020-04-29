@@ -159,6 +159,8 @@ export default class UiStore {
   windowWidth = 0
   @observable
   emptySpaceClickHandlers = new Set()
+  @observable
+  collaborators = []
 
   // Comments + Threads
   // marked by thread.key (so it works for new records as well)
@@ -920,6 +922,11 @@ export default class UiStore {
   @action
   deselectCards() {
     this.selectedCardIds.replace([])
+  }
+
+  @action
+  resetCollaborators() {
+    this.collaborators.replace([])
   }
 
   @action
