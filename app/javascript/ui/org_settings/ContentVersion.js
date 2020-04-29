@@ -10,8 +10,8 @@ import {
   // LabelHint,
 } from '~/ui/global/styled/forms'
 import {
+  contentVersionsStore,
   organizationsStore,
-  // TODO: replace with contentVersionsStore
 } from 'c-delta-organization-settings'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 // Fetch all the categories and render the one with the ID of API
@@ -30,13 +30,9 @@ const ContentVersionSelectField = ({ organization }) => {
     async function getContentVersions() {
       try {
         setIsLoading(true)
-        // const result = await contentVersionsStore.fetch()
-        // console.log('contentversions fetch: ', result)
-        // setSubcategories(result)
-        setContentVersions([
-          { name: 'foo', id: 1 },
-          { name: 'bar', id: 2 },
-        ])
+        const result = await contentVersionsStore.fetch()
+        console.log('contentversions fetch: ', result)
+        setContentVersions(result)
         setIsLoading(false)
       } catch (err) {
         console.log('content version request failed')

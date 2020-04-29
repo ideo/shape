@@ -10,10 +10,11 @@ import TeamsTab from './TeamsTab'
 import OrganizationTab from './OrganizationTab'
 import v from '~/utils/variables'
 import {
+  contentVersionsStore,
   industrySubcategoriesStore,
-  organizationsStore,
 } from 'c-delta-organization-settings'
 import { routingStore } from '~/stores'
+import Loader from '~/ui/layout/Loader'
 
 function TabPanel(props) {
   const { children, value, tabName } = props
@@ -58,8 +59,7 @@ function a11yProps(index) {
 const CreativeDifferenceTabs = ({ orgName }) => {
   // const classes = useStyles()
   const [value, setValue] = useState('organization')
-  // const [user, setUser] = useState({})
-  const [organization, setOrganization] = useState({})
+  const [contentVersions, setContentVersions] = useState([])
   const [subcategories, setSubcategories] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
@@ -71,32 +71,24 @@ const CreativeDifferenceTabs = ({ orgName }) => {
     routingStore.goToPath(`/org-settings/${newValue}`)
   }
 
-  useEffect(() => {
-    const fetchJwtData = async () => {
-      try {
-        setIsLoading(true)
-        const orgModel = new organizationsStore.model()
-        const orgModelInstance = new orgModel({
-          id: 4,
-        })
-        const promise = orgModelInstance.fetch()
-        const result = await promise
-        setOrganization(result)
-        setIsLoading(false)
-      } catch (err) {
-        console.log('fetch org failed: ', err)
-        setIsError(true)
-        setIsLoading(false)
-      }
-      // const response = await someApiCall()
-      // const orgInfo = decrypt(response).organization
-      // setOrganization(orgInfo)
-    }
-    fetchJwtData()
-  }, [])
+  // useEffect(() => {
+  //   const fetchJwtData = async () => {
+  // try {
+  // setIsLoading(true)
+  // const response = await someApiCall()
+  // const orgInfo = decrypt(response).organization
+  // setOrganization(orgInfo)
+  // setIsLoading(false)
+  // } catch (err) {
+  //   setIsError(true)
+  // send error to Sentry?
+  // }
+  //   }
+  //   fetchJwtData()
+  // }, [])
 
   useEffect(() => {
-    async function getIndustrySubcategories() {
+    async function loadIndustrySubcategories() {
       try {
         setIsLoading(true)
         const result = await industrySubcategoriesStore.fetch()
@@ -109,7 +101,25 @@ const CreativeDifferenceTabs = ({ orgName }) => {
       }
     }
 
-    getIndustrySubcategories()
+    loadIndustrySubcategories()
+  }, [])
+
+  useEffect(() => {
+    async function getContentVersions() {
+      try {
+        setIsLoading(true)
+        console.log('Contentversionstore: ', contentVersionsStore)
+        const result = await contentVersionsStore.fetch()
+        console.log('contentversions fetch: ', result)
+        setContentVersions(result)
+        setIsLoading(false)
+      } catch (err) {
+        console.log('content version request failed: ', err)
+        setIsError(err)
+      }
+    }
+
+    getContentVersions()
   }, [])
 
   return (
@@ -122,7 +132,7 @@ const CreativeDifferenceTabs = ({ orgName }) => {
     >
       {isError && <div>Something went wrong... </div>}
       {isLoading ? (
-        <div>Loading... </div>
+        <Loader />
       ) : (
         <Fragment>
           <AppBar
@@ -154,15 +164,12 @@ const CreativeDifferenceTabs = ({ orgName }) => {
           </AppBar>
           <TabPanel value={value} tabName="organization">
             <OrganizationTab
-              organization={organization}
               industrySubcategories={subcategories}
+              contentVersions={contentVersions}
             />
           </TabPanel>
           <TabPanel value={value} tabName="teams">
-            <TeamsTab
-              organization={organization}
-              industrySubcategories={subcategories}
-            />
+            <TeamsTab industrySubcategories={subcategories} />
           </TabPanel>
         </Fragment>
       )}

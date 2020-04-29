@@ -37,11 +37,12 @@ const TeamsTab = ({ organization, industrySubcategories }) => {
         <div>Loading...</div>
       ) : (
         <Fragment>
-          {businessUnits.map(option => (
+          {businessUnits.map(businessUnit => (
             <Row>
               <form>
+                {/* TODO: replace with DropdownSelect */}
                 <IndustrySubcategorySelectField
-                  organization={organization}
+                  record={businessUnit}
                   industrySubcategories={industrySubcategories}
                 />
                 <ContentVersionSelectField organization={organization} />

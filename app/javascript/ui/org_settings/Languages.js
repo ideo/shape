@@ -128,7 +128,7 @@ const Languages = ({ organization = {} }) => {
               handleDelete={tag => ev => afterAddRemoveTag(tag)}
               // handleInputChange={this.onInputChange}
               tagComponent={Pill}
-              // allowNew
+              autofocus={false}
             />
           </StyledReactTags>
         </Fragment>
