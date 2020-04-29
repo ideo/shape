@@ -57,19 +57,26 @@ class TextItemCover extends React.Component {
   }
 
   state = {
+    // NOTE: item is stored in state, and set only on mount/update to protect from
+    //  observable changes triggering problematic re-renders of RealtimeTextItem
+    item: null,
     readMore: false,
     loading: false,
   }
 
   componentDidMount() {
-    const { height } = this.props
+    const { item, height } = this.props
     this.checkTextAreaHeight(height)
+    this.setState({ item })
   }
 
   componentDidUpdate(prevProps) {
-    const { height } = this.props
+    const { item, height } = this.props
     if (height !== prevProps.height) {
       this.checkTextAreaHeight(height)
+    }
+    if (item.id !== prevProps.item.id) {
+      this.setState({ item })
     }
   }
 
@@ -184,7 +191,8 @@ class TextItemCover extends React.Component {
   }
 
   renderEditing() {
-    const { item, initialSize, cardId } = this.props
+    const { item } = this.state
+    const { initialSize, cardId } = this.props
     if (!item) return ''
 
     return (

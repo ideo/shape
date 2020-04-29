@@ -500,7 +500,7 @@ class RealtimeTextItem extends React.Component {
           if (this.currentlySending) {
             this.channelDisconnected('Disconnected from server')
           }
-        }, 15 * 1000)
+        }, 10 * 1000)
       }
       return false
     }
