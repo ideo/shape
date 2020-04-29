@@ -26,7 +26,6 @@ class PageWithApiWrapper extends React.Component {
     const { uiStore } = this.props
     scroll.scrollToTop({ duration: 0 })
     uiStore.resetSelectionAndBCT()
-    uiStore.resetCollaborators()
     uiStore.update('textEditingItem', null)
 
     // fetch the data from the API
@@ -135,6 +134,7 @@ class PageWithApiWrapper extends React.Component {
         // (mostly just used by RealtimeTextItem)
         record.updateFullyLoaded(false)
         this.setRecord(record)
+        record.setCollaborators([])
       }
     }
 

@@ -159,8 +159,6 @@ export default class UiStore {
   windowWidth = 0
   @observable
   emptySpaceClickHandlers = new Set()
-  @observable
-  collaborators = []
 
   // Comments + Threads
   // marked by thread.key (so it works for new records as well)
@@ -935,9 +933,11 @@ export default class UiStore {
 
   @computed
   get collaboratorColors() {
+    if (!this.viewingRecord || !this.viewingRecord.collaborators) return {}
+
     const colorMap = {}
-    for (let i = 0; i < this.collaborators.length; i++) {
-      const { id } = this.collaborators[i]
+    for (let i = 0; i < this.viewingRecord.collaborators.length; i++) {
+      const { id } = this.viewingRecord.collaborators[i]
       colorMap[id] = this.collaboratorColorsList[i % 10]
     }
     return colorMap
@@ -946,11 +946,6 @@ export default class UiStore {
   @action
   deselectCards() {
     this.selectedCardIds.replace([])
-  }
-
-  @action
-  resetCollaborators() {
-    this.collaborators.replace([])
   }
 
   @action

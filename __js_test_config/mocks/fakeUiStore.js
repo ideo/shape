@@ -50,7 +50,6 @@ const fakeUiStore = {
   openCardMenu: jest.fn(),
   closeMoveMenu: jest.fn(),
   resetSelectionAndBCT: jest.fn(),
-  resetCollaborators: jest.fn(),
   rolesMenuOpen: false,
   isLoading: false,
   dismissedMoveHelper: false,
