@@ -208,7 +208,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
         TemplateInstanceUpdater.new(
           master_template: collection,
           updated_card_ids: collection.collection_cards.pluck(:id),
-          template_update_action: 'create',
+          template_update_action: :create,
         )
       }
 

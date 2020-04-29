@@ -167,7 +167,10 @@ RSpec.describe CollectionUpdater, type: :service do
       end
 
       it 'calls queue_update_template_instances if collection_cards_attributes present' do
-        expect(collection).to receive(:queue_update_template_instances)
+        expect(collection).to receive(:queue_update_template_instances).with(
+          updated_card_ids: collection.collection_cards.pluck(:id),
+          template_update_action: :update_card_attributes,
+        )
         service.call
       end
 

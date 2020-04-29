@@ -1,11 +1,11 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
-  deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace]
-  load_and_authorize_resource except: %i[index move replace]
+  deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace update_card_filter]
+  load_and_authorize_resource except: %i[index move replace update_card_filter]
   skip_before_action :check_api_authentication!, only: %i[index]
-  before_action :load_and_authorize_parent_collection, only: %i[create replace]
+  before_action :load_and_authorize_parent_collection, only: %i[create replace update_card_filter]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
-
   before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction]
+  before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   before_action :check_cache, only: %i[index ids breadcrumb_records]
   before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
   def index
@@ -85,15 +85,27 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def update
-    @collection_card.attributes = collection_card_update_params
-    if @collection_card.save
+    updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
+    if updated
       create_notification(@collection_card, :edited)
       broadcast_collection_create_updates(@collection_card)
       if @collection_card.saved_change_to_is_cover?
         broadcast_parent_collection_updates(@collection_card)
       end
-      render jsonapi: @collection_card.reload,
-             include: CollectionCard.default_relationships_for_api
+      @collection_card.reload
+      render_collection_card
+    else
+      render_api_errors @collection_card.errors
+    end
+  end
+
+  def update_card_filter
+    updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
+    if updated
+      create_notification(@collection_card, :edited)
+      broadcast_collection_create_updates
+      @collection_card.reload
+      render_collection_card
     else
       render_api_errors @collection_card.errors
     end
@@ -252,6 +264,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render_collection_cards(collection: @to_collection, collection_cards: new_cards)
   end
 
+  def render_collection_card(include: nil)
+    include ||= CollectionCard.default_relationships_for_api
+    render jsonapi: @collection_card,
+           include: include
+  end
+
   def perform_bulk_operation(placement:, action:)
     card = BulkCardOperationProcessor.call(
       placement: placement,
@@ -373,6 +391,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def load_and_authorize_replacing_card
     @replacing_card = CollectionCard.find(params[:id])
     authorize! :edit_content, @replacing_card.record
+  end
+
+  def load_and_authorize_collection_card_update
+    @collection_card = CollectionCard.find(params[:id])
+    authorize! :edit_content, @collection
   end
 
   def load_and_authorize_cards

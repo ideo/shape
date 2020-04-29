@@ -528,9 +528,19 @@ class RealtimeTextItem extends React.Component {
 
   _instanceTextContentUpdate = () => {
     const { item, uiStore } = this.props
-    const parent = item.parent || uiStore.viewingCollection
-    if (parent && parent.isTemplate) {
-      parent.API_backgroundUpdateTemplateInstances()
+    const { type, parent } = item
+    const instanceParentCollection = parent || uiStore.viewingCollection
+    if (
+      instanceParentCollection &&
+      instanceParentCollection.isTemplate &&
+      this.cardId &&
+      type
+    ) {
+      const ids = [this.cardId]
+      instanceParentCollection.API_backgroundUpdateTemplateInstances({
+        type,
+        ids,
+      })
     }
   }
 
