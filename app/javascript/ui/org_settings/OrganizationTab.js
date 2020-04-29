@@ -4,7 +4,7 @@ import { organizationsStore } from 'c-delta-organization-settings'
 
 import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
-// import Languages from './Languages'
+import Languages from './Languages'
 import Loader from '~/ui/layout/Loader'
 
 const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
@@ -66,13 +66,17 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
       ) : (
         <form>
           <DropdownSelect
+            label={'Industry'}
             record={organization}
             options={industrySubcategories}
             updateRecord={updateOrg}
             fieldToUpdate={'industry_subcategory_id'}
-            // value={currentValue()}
           />
           <DropdownSelect
+            label={'Content Version'}
+            toolTip={
+              'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
+            }
             record={organization}
             options={contentVersions}
             updateRecord={updateOrg}
@@ -80,7 +84,7 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
           />
           {/* TODO: How to populate OrganizationRoles? */}
           <OrganizationRoles />
-          {/* <Languages organization={organization} /> */}
+          <Languages organization={organization} />
         </form>
       )}
     </div>

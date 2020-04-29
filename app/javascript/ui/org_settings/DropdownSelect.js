@@ -11,6 +11,7 @@ import {
   // LabelHint,
 } from '~/ui/global/styled/forms'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
+import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
 
 const currentValue = (record, options, fieldToUpdate) => {
   const object = _.find(options, option => option.id === record[fieldToUpdate])
@@ -20,7 +21,14 @@ const currentValue = (record, options, fieldToUpdate) => {
   return ''
 }
 
-const DropdownSelect = ({ record, options, fieldToUpdate, updateRecord }) => {
+const DropdownSelect = ({
+  label,
+  toolTip,
+  record,
+  options,
+  fieldToUpdate,
+  updateRecord,
+}) => {
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [previousValue, setPreviousValue] = useState('')
@@ -58,19 +66,29 @@ const DropdownSelect = ({ record, options, fieldToUpdate, updateRecord }) => {
   }
 
   return (
-    <div>
+    <div style={{ marginTop: '22px' }}>
       <ConfirmationDialog
-        prompt={`You are about to change ${record.name}'s ${fieldToUpdate}. Would you like to Continue?`}
+        prompt={`You are about to change ${record.name ||
+          record.name_display}'s ${label}. Would you like to Continue?`}
         onConfirm={() => confirmSelection()}
         onCancel={() => cancelSelection()}
         open={isOpen()}
         iconName="Alert"
       />
-      <Label style={{ fontSize: '13px' }} id="subindustry-select-label">
-        Industry
+      <Label
+        style={{
+          fontSize: '13px',
+          marginBottom: '11px',
+        }}
+        id={`${label}-select-label`}
+      >
+        {label}
+        {toolTip && (
+          <HoverableDescriptionIcon description={toolTip} width={16} />
+        )}
       </Label>
       <Select
-        labelId="subindustry-select-label"
+        labelid="subindustry-select-label"
         classes={{
           root: 'select',
           selectMenu: 'selectMenu',
@@ -100,10 +118,12 @@ const DropdownSelect = ({ record, options, fieldToUpdate, updateRecord }) => {
 }
 
 DropdownSelect.propTypes = {
-  record: PropTypes.object, // TODO: make record to it can be a business unit
-  options: PropTypes.arrayOf(PropTypes.object), // TODO: make options so it can be content versions
-  fieldToUpdate: PropTypes.string, // TODO: provide field for record to update on change
-  updateRecord: PropTypes.func, // to update record on change
+  label: PropTypes.string.isRequired,
+  toolTip: PropTypes.string,
+  record: PropTypes.object.isRequired,
+  options: PropTypes.arrayOf(PropTypes.object).isRequired,
+  fieldToUpdate: PropTypes.string.isRequired,
+  updateRecord: PropTypes.func.isRequired,
 }
 
 export default DropdownSelect
