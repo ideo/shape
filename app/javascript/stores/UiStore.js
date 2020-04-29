@@ -159,8 +159,6 @@ export default class UiStore {
   windowWidth = 0
   @observable
   emptySpaceClickHandlers = new Set()
-  @observable
-  collaborators = []
 
   // Comments + Threads
   // marked by thread.key (so it works for new records as well)
@@ -247,6 +245,30 @@ export default class UiStore {
     cardWidth: 1,
     cardHeight: 1,
   }
+  collaboratorColorsPrimaryList = [
+    v.colors.collaboratorPrimaryBlue,
+    v.colors.collaboratorPrimaryYellow,
+    v.colors.collaboratorPrimaryPurple,
+    v.colors.collaboratorPrimaryOlive,
+    v.colors.collaboratorPrimarySalmon,
+    v.colors.collaboratorPrimaryIcyBlue,
+    v.colors.collaboratorPrimaryLavender,
+    v.colors.collaboratorPrimaryObsidian,
+    v.colors.collaboratorPrimarySlate,
+    v.colors.collaboratorPrimaryGrey,
+  ]
+  collaboratorColorsSecondaryList = [
+    v.colors.collaboratorSecondaryBlue,
+    v.colors.collaboratorSecondaryYellow,
+    v.colors.collaboratorSecondaryPurple,
+    v.colors.collaboratorSecondaryOlive,
+    v.colors.collaboratorSecondarySalmon,
+    v.colors.collaboratorSecondaryIcyBlue,
+    v.colors.collaboratorSecondaryLavender,
+    v.colors.collaboratorSecondaryObsidian,
+    v.colors.collaboratorSecondarySlate,
+    v.colors.collaboratorSecondaryGrey,
+  ]
   @observable
   placeholderPosition = {
     ...this.placeholderDefaults,
@@ -919,14 +941,33 @@ export default class UiStore {
     return this.viewingCollection.cardIds
   }
 
-  @action
-  deselectCards() {
-    this.selectedCardIds.replace([])
+  @computed
+  get collaboratorColorsPrimary() {
+    if (!this.viewingRecord || !this.viewingRecord.collaborators) return {}
+
+    const colorMap = {}
+    for (let i = 0; i < this.viewingRecord.collaborators.length; i++) {
+      const { id } = this.viewingRecord.collaborators[i]
+      colorMap[id] = this.collaboratorColorsPrimaryList[i % 10]
+    }
+    return colorMap
+  }
+
+  @computed
+  get collaboratorColorsSecondary() {
+    if (!this.viewingRecord || !this.viewingRecord.collaborators) return {}
+
+    const colorMap = {}
+    for (let i = 0; i < this.viewingRecord.collaborators.length; i++) {
+      const { id } = this.viewingRecord.collaborators[i]
+      colorMap[id] = this.collaboratorColorsSecondaryList[i % 10]
+    }
+    return colorMap
   }
 
   @action
-  resetCollaborators() {
-    this.collaborators.replace([])
+  deselectCards() {
+    this.selectedCardIds.replace([])
   }
 
   @action

@@ -19,7 +19,7 @@ import {
 } from '~/ui/global/QuillTextHighlighter'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
-import { routingStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
@@ -249,8 +249,12 @@ class RealtimeTextItem extends React.Component {
   }
 
   createCursor({ id, name }) {
+    const { collaboratorColorsSecondary } = uiStore
     const cursors = this.quillEditor.getModule('cursors')
-    cursors.createCursor(id, name, v.colors.tertiaryMedium)
+    const cursorColor = collaboratorColorsSecondary[id]
+      ? collaboratorColorsSecondary[id]
+      : v.colors.tertiaryMedium
+    cursors.createCursor(id, name, cursorColor)
   }
 
   channelConnected = () => {

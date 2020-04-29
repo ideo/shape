@@ -30,7 +30,7 @@ export const fakeCollectionCard = {
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
-  API_updateCardFilter: jest.fn(), 
+  API_updateCardFilter: jest.fn(),
   ...fakeJsonApiAttrs,
 }
 
@@ -449,6 +449,7 @@ export const fakeCollection = {
   cardIds: _.map(fakeCards, c => c.id),
   cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
   addCard: jest.fn(),
+  setCollaborators: jest.fn(),
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),

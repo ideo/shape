@@ -60,6 +60,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   lastZoom = null
   // this stores the "virtual" search results collection
   searchResultsCollection = null
+  @observable
+  collaborators = []
 
   attributesForAPI = [
     'name',
@@ -1316,6 +1318,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   updateScrollBottom(y) {
     this.scrollBottom = y
+  }
+
+  @action
+  setCollaborators(collaborators) {
+    this.collaborators.replace(collaborators)
   }
 
   reassignCover(newCover) {
