@@ -713,8 +713,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       per_page,
       include,
     }
-    if (!params.per_page) {
-      // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
+    if (!params.per_page && !this.isBoard) {
       params.per_page = this.recordsPerPage
     }
     if (this.currentOrder !== 'order') {
@@ -724,9 +723,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       params.hidden = true
     }
     if (this.isBoard) {
-      if (rows) {
-        params.rows = rows
-      }
+      // nullify these as they have no effect on boards
+      delete params.per_page
+      delete params.page
+      params.rows = rows || [0, 5]
       if (cols) {
         params.cols = cols
       }
@@ -779,8 +779,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           this.loadedCols = 0
         }
       } else {
-        // NOTE: (potential pre-optimization) if collection_cards grows in size,
-        // at some point do we reset back to a reasonable number?
+        if (this.currentPage < page) {
+          this.currentPage = page
+        }
         const newData = _.reverse(
           // de-dupe merged data (deferring to new cards first)
           // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
@@ -790,16 +791,46 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             'id'
           )
         )
-        if (this.currentPage < page) {
-          this.currentPage = page
-        }
         this.collection_cards.replace(newData)
       }
-      if (this.isBoard && rows) {
-        this.updateMaxLoadedColsRows({ maxRow: rows[1] })
+      if (this.isBoard && params.rows) {
+        this.updateMaxLoadedColsRows({ maxRow: params.rows[1] })
       }
     })
     return data
+  }
+
+  @action
+  mergeCards = cards => {
+    // de-dupe merged data (deferring to new cards first)
+    const newData = _.unionBy(cards, this.collection_cards, 'id')
+    this.collection_cards.replace(_.sortBy(newData, 'order'))
+  }
+
+  API_fetchCardOrders = async () => {
+    const res = await this.API_fetchAllCardIds()
+    runInAction(() => {
+      _.each(res.data, orderData => {
+        const card = this.collection_cards.find(cc => cc.id === orderData.id)
+        if (card) {
+          card.order = orderData.order
+        }
+      })
+      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
+    })
+  }
+
+  async API_fetchAndMergeCards(cardIds) {
+    const { apiStore } = this
+    const ids = cardIds.join(',')
+    const res = await apiStore.request(
+      `collections/${this.id}/collection_cards?select_ids=${ids}`
+    )
+    runInAction(() => {
+      this.mergeCards(res.data)
+      if (this.isBoard) return
+      this.API_fetchCardOrders()
+    })
   }
 
   @action

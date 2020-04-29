@@ -15,6 +15,8 @@ class CollectionTemplateBuilder < SimpleService
     @parent = parent
     @template = template
     @placement = placement
+    @placement_row = nil
+    @placement_col = nil
     @created_by = created_by
     @collection = template.class.new
     @errors = @collection.errors
@@ -85,11 +87,14 @@ class CollectionTemplateBuilder < SimpleService
 
   def place_collection_in_parent
     if @create_parent_card
+      @order = calculate_order_placement
       card_params = default_collection_card_params.merge(
         @collection_card_params,
       )
       card = @parent.primary_collection_cards.create(card_params)
-      card.increment_card_orders! if @placement != 'end'
+      if @placement != 'end' && !@parent.board_collection?
+        card.increment_card_orders!
+      end
     end
     @collection.recalculate_breadcrumb!
   end
@@ -113,8 +118,14 @@ class CollectionTemplateBuilder < SimpleService
     end
   end
 
-  def order_placement
+  def calculate_order_placement
     last = @parent.collection_cards.count
+    if @placement.respond_to?(:dig)
+      @collection_card_params[:row] = @placement['row']
+      @collection_card_params[:col] = @placement['col']
+      return last
+    end
+
     case @placement
     when 'beginning'
       0
@@ -131,7 +142,7 @@ class CollectionTemplateBuilder < SimpleService
       height: 1,
       pinned: @parent.master_template?,
       collection: @collection,
-      order: order_placement,
+      order: @order,
     }
   end
 

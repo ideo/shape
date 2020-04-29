@@ -899,7 +899,7 @@ export default class UiStore {
     this.reselectCardIds(all_collection_card_ids)
     try {
       const res = await collection.API_fetchAllCardIds()
-      all_collection_card_ids = res.data
+      all_collection_card_ids = _.map(res.data, 'id')
       this.reselectCardIds(all_collection_card_ids)
       // if the user had already initiated a move action, move the newly selected cards into the move action
       if (this.movingCardIds.length) {

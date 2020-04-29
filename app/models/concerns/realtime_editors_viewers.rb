@@ -21,14 +21,14 @@ module RealtimeEditorsViewers
     Cache.set_add(viewing_cache_key, user.id) if user
     return if dont_notify
 
-    publish_to_channel(num_viewers_changed: true)
+    received_changes(num_viewers_changed: true)
   end
 
   def stopped_viewing(user = nil, dont_notify: false)
     Cache.set_remove(viewing_cache_key, user.id) if user
     return if dont_notify
 
-    publish_to_channel(num_viewers_changed: true)
+    received_changes(num_viewers_changed: true)
   end
 
   def stream_name

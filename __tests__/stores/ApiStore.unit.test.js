@@ -64,6 +64,13 @@ describe('ApiStore', () => {
 
   describe('#moveCards', () => {
     let data
+    const res = {
+      data: [
+        { id: '1', order: 0 },
+        { id: '2', order: 1 },
+        { id: '3', order: 2 },
+      ],
+    }
     beforeEach(() => {
       data = {
         to_id: '1',
@@ -71,7 +78,7 @@ describe('ApiStore', () => {
         collection_card_ids: ['1', '2', '3'],
       }
       // mock some functions
-      apiStore.request = jest.fn()
+      apiStore.request = jest.fn().mockReturnValue(Promise.resolve(res))
     })
 
     it('should make collection_cards/move API call', async () => {
@@ -82,6 +89,16 @@ describe('ApiStore', () => {
         data
       )
       expect(collection.toJsonApiWithCards).toHaveBeenCalledWith([])
+    })
+
+    it('should merge the resulting cards', async () => {
+      await apiStore.moveCards(data)
+      expect(collection.mergeCards).toHaveBeenCalledWith(res.data)
+    })
+
+    it('should call API_fetchCardOrders if not a board collection', async () => {
+      await apiStore.moveCards(data)
+      expect(collection.API_fetchCardOrders).toHaveBeenCalled()
     })
 
     it('should push the undo action', async () => {
@@ -106,8 +123,8 @@ describe('ApiStore', () => {
     })
 
     describe('when undoing', () => {
-      const undoSnapshot = { something: 'xyz' }
-      it('should push the undo action', async () => {
+      const undoSnapshot = { attributes: 'xyz' }
+      it('should push the undo action and revert to the snapshot', async () => {
         await apiStore.moveCards(data, { undoing: true, undoSnapshot })
         expect(apiStore.request).toHaveBeenCalledWith(
           'collection_cards/move',
@@ -119,7 +136,9 @@ describe('ApiStore', () => {
           'PATCH',
           { data: undoSnapshot }
         )
-        expect(collection.API_fetchCards).toHaveBeenCalled()
+        expect(collection.revertToSnapshot).toHaveBeenCalledWith(
+          undoSnapshot.attributes
+        )
       })
     })
 

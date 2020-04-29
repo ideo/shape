@@ -5,10 +5,8 @@ class CollectionUpdateBroadcaster < SimpleService
   end
 
   def call
-    return if @collection.nil?
-
-    # single_edit method comes from RealtimeEditorsViewers concern
-    @collection.single_edit(@user)
+    # this just aliases to reload_cards since .call is still used in some places
+    reload_cards
   end
 
   def cards_archived(card_ids)
@@ -19,7 +17,7 @@ class CollectionUpdateBroadcaster < SimpleService
     broadcast(row_updated: params)
   end
 
-  def cards_updated(collection_cards_attributes)
+  def card_attrs_updated(collection_cards_attributes)
     broadcast(collection_cards_attributes: collection_cards_attributes)
   end
 
@@ -27,12 +25,12 @@ class CollectionUpdateBroadcaster < SimpleService
     broadcast(collection_updated: true)
   end
 
-  def reload_cards
-    broadcast(reload_cards: true)
-  end
-
   def card_updated(card)
     broadcast(card_id: card.id.to_s)
+  end
+
+  def cards_updated(card_ids)
+    broadcast(card_ids: card_ids.map(&:to_s))
   end
 
   def text_item_updated(item)
@@ -43,6 +41,11 @@ class CollectionUpdateBroadcaster < SimpleService
         parent_collection_card_id: item.parent_collection_card&.id&.to_s,
       },
     )
+  end
+
+  # kind of the last resort ping to tell clients to refetch cards
+  def reload_cards
+    broadcast(reload_cards: true)
   end
 
   private

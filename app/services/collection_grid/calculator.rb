@@ -161,6 +161,13 @@ module CollectionGrid
       open_spot && open_spot.row == card.row && open_spot.col == card.col
     end
 
+    def self.moving_cards_ordered_row_col(moving_cards)
+      # ensure row, col sorting so we find the best fit in order
+      moving_cards.sort do |a, b|
+        [a.row, a.col] <=> [b.row, b.col]
+      end
+    end
+
     def self.place_cards_on_board(
       row: nil,
       col: nil,
@@ -168,14 +175,17 @@ module CollectionGrid
       from_collection:,
       moving_cards:
     )
+      master_card = nil
       if from_collection.is_a?(Collection::Board)
         master_card = top_left_card(moving_cards)
       else
         # important to do this first to assign row/col onto the cards
         moving_cards = calculate_rows_cols(moving_cards)
-        # cards are already ordered
-        master_card = moving_cards.first
       end
+
+      moving_cards = moving_cards_ordered_row_col(moving_cards)
+      # e.g. for non-board collection we use the first based on the above sorting
+      master_card ||= moving_cards.first
 
       if row.nil? || col.nil?
         placement = calculate_best_placement(

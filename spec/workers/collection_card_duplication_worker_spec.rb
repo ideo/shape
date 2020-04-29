@@ -87,10 +87,12 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         run_worker
       end
 
-      it 'broadcasts collection as stopped editing' do
+      it 'broadcasts collection with cards that finished duplicating' do
         expect(CollectionUpdateBroadcaster).to receive(:new).with(to_collection).once
-        expect(broadcaster_instance).to receive(:reload_cards)
-        run_worker
+        new_cards = run_worker
+        expect(broadcaster_instance).to have_received(:cards_updated).with(
+          new_cards.pluck(:id)
+        )
       end
 
       it 'returns newly-duplicated cards' do

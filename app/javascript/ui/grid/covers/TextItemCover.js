@@ -57,19 +57,20 @@ class TextItemCover extends React.Component {
   }
 
   state = {
-    item: null,
     readMore: false,
     loading: false,
   }
 
   componentDidMount() {
-    const { height, item } = this.props
+    const { height } = this.props
     this.checkTextAreaHeight(height)
-    this.setState({ item })
   }
 
-  componentWillReceiveProps({ height }) {
-    this.checkTextAreaHeight(height)
+  componentDidUpdate(prevProps) {
+    const { height } = this.props
+    if (height !== prevProps.height) {
+      this.checkTextAreaHeight(height)
+    }
   }
 
   componentWillUnmount() {
@@ -114,7 +115,7 @@ class TextItemCover extends React.Component {
     runInAction(() => {
       uiStore.deselectCards()
       uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
-      uiStore.update('textEditingItem', this.state.item)
+      uiStore.update('textEditingItem', item)
       uiStore.update('textEditingCardId', cardId)
     })
     this.setState({ loading: false })
@@ -183,8 +184,7 @@ class TextItemCover extends React.Component {
   }
 
   renderEditing() {
-    const { item } = this.state
-    const { initialSize, cardId } = this.props
+    const { item, initialSize, cardId } = this.props
     if (!item) return ''
 
     return (

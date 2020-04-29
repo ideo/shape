@@ -335,7 +335,7 @@ class CollectionPage extends React.Component {
       if (updateData && !updateData.text_item && !updateData.card_id) {
         // don't show editor for some updates:
         // - text item updates would be too much
-        // - card_ids might even be for records linked into this collection,
+        // - card_id might even be for records linked into this collection,
         //   might be odd to see someone "editing this collection"
         this.setEditor(data.current_editor)
       }
@@ -357,6 +357,11 @@ class CollectionPage extends React.Component {
         this.fetchCard(updateData.card_id)
         return
       }
+      if (updateData.card_ids) {
+        // a card has been created or updated, so fetch those cards
+        collection.API_fetchAndMergeCards(updateData.card_ids)
+        return
+      }
       if (updateData.row_updated) {
         // a row has been inserted or removed
         collection.applyRowUpdate(updateData.row_updated)
@@ -372,6 +377,10 @@ class CollectionPage extends React.Component {
           this.handleTextItemUpdate(text_item.id, text_item)
         }
         return
+      }
+      if (updateData.num_viewers_changed) {
+        // TODO: update collaborators
+        // uiStore.update('collaborators' ...)
       }
     }
   }

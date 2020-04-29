@@ -81,6 +81,20 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       end
     end
 
+    context 'with row/col placement' do
+      let(:parent) { create(:board_collection, organization: organization, add_viewers: [viewer]) }
+      let(:placement) { { 'row' => 1, 'col' => 2 } }
+
+      it 'should place the collection in the parent collection at the right row/col' do
+        instance # evaluate builder.call
+        parent.reload
+        card = parent.collection_cards.first
+        expect(card.record).to eq instance
+        expect(card.row).to eq 1
+        expect(card.col).to eq 2
+      end
+    end
+
     context 'when parent is a master_template' do
       let(:parent) { create(:collection, master_template: true) }
 

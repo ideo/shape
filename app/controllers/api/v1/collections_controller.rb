@@ -35,8 +35,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
 
     if builder.call
-      log_template_used(template: @template_collection, instance: builder.collection)
-      render jsonapi: builder.collection, expose: { current_record: builder.collection }
+      @collection = builder.collection
+      log_template_used(template: @template_collection, instance: @collection)
+      render_collection
     else
       render_api_errors builder.errors
     end
@@ -362,18 +363,22 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     return unless card_attrs.present?
 
     if @collection.board_collection?
-      collection_broadcaster.cards_updated(
-        card_attrs,
+      collection_broadcaster.card_attrs_updated(
+        card_attrs.as_json,
       )
       return
     end
 
-    # just ping to reload the cards
+    # on a normal collection, just ping to reload the cards
     collection_broadcaster.reload_cards
   end
 
   def broadcast_parent_collection_updates
-    collection_broadcaster(@parent_collection).reload_cards
+    return unless @collection.present?
+
+    collection_broadcaster(@parent_collection).card_updated(
+      @collection.parent_collection_card,
+    )
   end
 
   def broadcast_parent_collection_card_update

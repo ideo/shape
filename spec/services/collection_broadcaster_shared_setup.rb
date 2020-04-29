@@ -6,6 +6,7 @@ RSpec.shared_context 'CollectionUpdateBroadcaster setup' do
       collection_updated: true,
       cards_updated: true,
       card_updated: true,
+      card_attrs_updated: true,
       cards_archived: true,
       row_updated: true,
       text_item_updated: true,

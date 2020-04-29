@@ -328,11 +328,12 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let(:template) { create(:collection, master_template: true, organization: organization) }
     let(:to_collection) { create(:collection, organization: organization) }
     let(:path) { '/api/v1/collections/create_template' }
+    let(:placement) { 'beginning' }
     let(:raw_params) do
       {
         parent_id: to_collection.id,
         template_id: template.id,
-        placement: 'beginning',
+        placement: placement,
       }
     end
     let(:params) { raw_params.to_json }
@@ -372,8 +373,11 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           to_collection,
           user,
         )
-        expect(broadcaster_instance).to receive(:reload_cards)
         post(path, params: params)
+        created = template.reload.templated_collections.last
+        expect(broadcaster_instance).to have_received(:card_updated).with(
+          created.parent_collection_card,
+        )
       end
 
       it 'creates Activity item' do
@@ -399,6 +403,20 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           post(path, params: params_with_name)
           template_instance = Collection.find(json['data']['id'])
           expect(template_instance.name).to eq('Awesomeness')
+        end
+      end
+
+      context 'with row/col placement' do
+        let(:placement) do
+          { row: 1, col: 2 }
+        end
+
+        it 'sets to correct placement' do
+          post(path, params: params)
+          template_instance = Collection.find(json['data']['id'])
+          parent_card = template_instance.parent_collection_card
+          expect(parent_card.row).to eq 1
+          expect(parent_card.col).to eq 2
         end
       end
 
@@ -643,16 +661,19 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     context 'with row and col' do
       let!(:collection) { create(:board_collection, add_editors: [user]) }
+      let(:card_attrs) do
+        [{
+          id: collection_card.id,
+          width: 3,
+          row: 4,
+          col: 5,
+        }]
+      end
       let(:params) do
         json_api_params(
           'collections',
           raw_params.merge(
-            collection_cards_attributes: [{
-              id: collection_card.id,
-              width: 3,
-              row: 4,
-              col: 5,
-            }],
+            collection_cards_attributes: card_attrs,
           ),
         )
       end
@@ -667,8 +688,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(collection_card.col).to eq(5)
       end
 
-      it 'broadcasts cards_updated' do
-        expect(broadcaster_instance).to receive(:cards_updated)
+      it 'broadcasts card_attrs_updated' do
+        expect(broadcaster_instance).to receive(:card_attrs_updated).with(card_attrs.as_json)
         patch(path, params: params)
       end
     end
