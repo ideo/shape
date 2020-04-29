@@ -41,8 +41,7 @@ class RolesSummary extends React.Component {
   }
 
   get editors() {
-    const { roles } = this.props
-    const { collaborators } = uiStore
+    const { collaborators, roles } = this.props
     const editorRole = _.find(roles, { name: 'editor' })
     if (!editorRole) return []
     const allEditors = _.sortBy(
@@ -61,8 +60,7 @@ class RolesSummary extends React.Component {
   }
 
   get viewers() {
-    const { roles } = this.props
-    const { collaborators } = uiStore
+    const { collaborators, roles } = this.props
     const viewerRole = _.find(roles, { name: 'viewer' })
     if (!viewerRole) return []
     const allViewers = _.sortBy(
@@ -209,6 +207,7 @@ class RolesSummary extends React.Component {
 
 RolesSummary.propTypes = {
   roles: MobxPropTypes.arrayOrObservableArray,
+  collaborators: MobxPropTypes.arrayOrObservableArray,
   handleClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   rolesMenuOpen: PropTypes.bool.isRequired,
@@ -216,6 +215,7 @@ RolesSummary.propTypes = {
 
 RolesSummary.defaultProps = {
   roles: [],
+  collaborators: [],
   canEdit: false,
 }
 

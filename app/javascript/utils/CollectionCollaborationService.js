@@ -46,7 +46,7 @@ export default class CollectionCollaborationService {
       return
     }
     if (updateData.num_viewers_changed) {
-      // TODO: update collaborators
+      // TODO: update collaborators here?
       // uiStore.update('collaborators' ...)
     }
   }

@@ -299,7 +299,6 @@ class CollectionPage extends React.Component {
     uiStore.closeCardMenu()
   }
 
-  // TODO: break this out into some kind of collection collaborative updating service?
   receivedChannelData = async data => {
     const { collection, apiStore } = this.props
     const { collaborators } = data

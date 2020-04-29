@@ -176,6 +176,7 @@ class Header extends React.Component {
         handleClick={this.showObjectRoleDialog}
         roles={record.roles}
         canEdit={record.can_edit}
+        collaborators={record.collaborators}
         rolesMenuOpen={!!uiStore.rolesMenuOpen}
       />
     )
