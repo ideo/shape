@@ -643,11 +643,24 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let(:collection_card) do
       create(:collection_card_image, order: 0, width: 1, parent: collection, is_cover: true)
     end
+    let(:raw_params) do
+      {
+        id: collection.id,
+        name: collection.name,
+      }
+    end
+    let(:params) do
+      json_api_params(
+        'collections',
+        raw_params,
+      )
+    end
+
     let(:path) { "/api/v1/collections/#{collection.id}/clear_collection_cover" }
 
     before do
       user.add_role(Role::VIEWER, collection_card.item)
-      post(path)
+      post(path, params: params)
     end
 
     it 'should clear the cover from the collection' do
@@ -656,17 +669,39 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   end
 
   describe 'POST #background_update_template_instances' do
-    let(:template) { create(:collection, master_template: true, add_editors: [user]) }
+    let(:template) { create(:collection, master_template: true, add_editors: [user], num_cards: 1) }
     let(:path) { "/api/v1/collections/#{template.id}/background_update_template_instances" }
     let!(:instance) { create(:collection, template: template) }
 
-    it 'should call the UpdateTemplateInstancesWorker' do
+    it 'should call the UpdateTemplateInstancesWorker with :update_all action' do
       expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
         template.id,
         template.collection_cards.pluck(:id),
-        'update_all',
+        :update_all,
       )
-      post(path)
+      post(path, params: { ids: [template.collection_cards.pluck(:id)] }.to_json)
+    end
+
+    describe 'with type Item::TextItem' do
+      it 'should call the UpdateTemplateInstancesWorker with :update_text_content action' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+          template.id,
+          template.collection_cards.pluck(:id),
+          :update_text_content,
+        )
+        post(path, params: { type: 'Item::TextItem', ids: [template.collection_cards.first.id] }.to_json)
+      end
+    end
+
+    describe 'with type Item::QuestionItem' do
+      it 'should call the UpdateTemplateInstancesWorker with :update_question_content action' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+          template.id,
+          template.collection_cards.pluck(:id),
+          :update_question_content,
+        )
+        post(path, params: { type: 'Item::QuestionItem', ids: [template.collection_cards.first.id] }.to_json)
+      end
     end
   end
 

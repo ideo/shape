@@ -36,6 +36,18 @@ FactoryBot.define do
 
     factory :question_item, class: 'Item::QuestionItem' do
       question_type :question_useful
+
+      trait :with_multiple_choice_with_choices do
+        question_type :question_multiple_choice
+
+        after(:build) do |question_item|
+          if question_item.question_choices_customizable?
+            question_item.question_choices = build_list(
+              :question_choice, 4
+            )
+          end
+        end
+      end
     end
 
     factory :data_item, class: 'Item::DataItem' do

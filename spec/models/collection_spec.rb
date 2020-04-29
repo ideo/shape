@@ -859,7 +859,7 @@ describe Collection, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
             collection.id,
             cards.pluck(:id),
-            'unarchive',
+            :unarchive,
           )
           collection.unarchive_cards!(cards, snapshot)
         end

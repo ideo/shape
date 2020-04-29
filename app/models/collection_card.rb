@@ -241,7 +241,7 @@ class CollectionCard < ApplicationRecord
       # we just added a template card, so update the instances
       parent.queue_update_template_instances(
         updated_card_ids: [cc.id],
-        template_update_action: 'duplicate',
+        template_update_action: :duplicate,
       )
     end
 
@@ -380,7 +380,7 @@ class CollectionCard < ApplicationRecord
       # we just archived a template card, so update the instances
       parent.queue_update_template_instances(
         updated_card_ids: ids,
-        template_update_action: 'archive',
+        template_update_action: :archive,
       )
     end
     CollectionCardArchiveWorker.perform_async(
@@ -506,6 +506,15 @@ class CollectionCard < ApplicationRecord
   def cloned_from_id
     # if the underlying record was cloned, get the parent card of the cloned_from record
     record.cloned_from&.parent_collection_card&.id
+  end
+
+  def copy_card_attributes!(copy)
+    update_columns(
+      height: copy.height,
+      width: copy.width,
+      order: copy.order,
+      pinned: copy.pinned,
+    )
   end
 
   private

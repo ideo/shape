@@ -266,7 +266,7 @@ RSpec.describe CollectionCard, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
             collection.id,
             [anything],
-            'duplicate',
+            :duplicate,
           )
           duplicate
         end
@@ -588,6 +588,20 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  describe 'copy_card_attributes!' do
+    let(:instance_card) { create(:collection_card, order: 3, pinned: true, width: 2, height: 1) }
+    let(:master_card) { create(:collection_card, order: 1, pinned: false, width: 1, height: 2) }
+
+    it 'should copy card attributes' do
+      instance_card.copy_card_attributes!(master_card)
+      instance_card.touch
+      expect(instance_card.height).to eq(master_card.height)
+      expect(instance_card.width).to eq(master_card.width)
+      expect(instance_card.pinned).to eq(master_card.pinned)
+      expect(instance_card.order).to eq(master_card.order)
+    end
+  end
+
   context 'archiving' do
     let(:collection) { create(:collection, num_cards: 5) }
     # we grab these manually because archiving the cards will alter collection.collection_cards
@@ -656,7 +670,7 @@ RSpec.describe CollectionCard, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
             collection.id,
             collection.collection_cards.pluck(:id),
-            'archive',
+            :archive,
           )
           collection_cards.archive_all!(ids: collection.collection_cards.pluck(:id), user_id: user.id)
         end

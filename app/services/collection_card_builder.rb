@@ -88,7 +88,7 @@ class CollectionCardBuilder
           # we just added a template card, so update the instances
           @parent_collection.queue_update_template_instances(
             updated_card_ids: [@collection_card.id],
-            template_update_action: 'create',
+            template_update_action: :create,
           )
         end
 

@@ -172,7 +172,7 @@ class CardMover < SimpleService
     if @to_collection == @from_collection && @from_collection.master_template?
       @from_collection.queue_update_template_instances(
         updated_card_ids: @from_collection.collection_cards.pluck(:id),
-        template_update_action: 'update_all',
+        template_update_action: :update_card_attributes,
       )
       return
     end
@@ -180,7 +180,7 @@ class CardMover < SimpleService
     if @from_collection.master_template?
       @from_collection.queue_update_template_instances(
         updated_card_ids: @moving_cards.pluck(:id),
-        template_update_action: 'archive',
+        template_update_action: :archive,
       )
     end
 
@@ -188,7 +188,7 @@ class CardMover < SimpleService
 
     @to_collection.queue_update_template_instances(
       updated_card_ids: @moving_cards.pluck(:id),
-      template_update_action: 'create',
+      template_update_action: :create,
     )
   end
 
