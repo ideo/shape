@@ -42,6 +42,13 @@ const Languages = ({ organization = {} }) => {
       organization.supported_languages.includes(option.handle)
     )
 
+  const tagsFromLanguages = () => {
+    return languagesFromOrg().map(object => {
+      object.label = object.string
+      object.name = object.string
+      return object
+    })
+  }
   // const validateTag = language => {
   //   console.log('validate language: ', language)
   //   console.log('language options: ', languageOptions)
@@ -105,11 +112,11 @@ const Languages = ({ organization = {} }) => {
           <Label
             style={{
               fontSize: '13px',
-              marginTop: '28px',
+              marginBottom: '11px',
             }}
-            id="content-version-select-label"
+            id="languages-select-label"
           >
-            Languages{''}
+            Languages
             <HoverableDescriptionIcon
               description={
                 'Please select the primary language(s) used at your organization.'
@@ -119,7 +126,7 @@ const Languages = ({ organization = {} }) => {
           </Label>
           <StyledReactTags>
             <ReactTags
-              tags={languagesFromOrg()}
+              tags={tagsFromLanguages()}
               suggestions={languageOptions}
               allowBackspace={false}
               delimiterChars={[',']}
