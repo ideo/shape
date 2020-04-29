@@ -75,8 +75,13 @@ describe('RealtimeTextItem', () => {
             version: 99,
             last_10: [{ version: 99, delta: {} }],
           },
+          collaborators: [fakeUser],
         })
         wrapper.update()
+      })
+
+      it('updates collaborators', () => {
+        expect(props.item.setCollaborators).toHaveBeenCalledWith([fakeUser])
       })
 
       it('applies last version delta', () => {

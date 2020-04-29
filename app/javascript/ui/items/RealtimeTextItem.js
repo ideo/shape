@@ -282,7 +282,12 @@ class RealtimeTextItem extends React.Component {
     this.setState({ disconnected: true })
   }
 
-  channelReceivedData = ({ current_editor, data, num_viewers }) => {
+  channelReceivedData = ({
+    current_editor,
+    data,
+    num_viewers,
+    collaborators,
+  }) => {
     if (this.unmounted) return
     // you may just be receiving data about someone joining/leaving
     this.num_viewers = num_viewers
@@ -294,6 +299,9 @@ class RealtimeTextItem extends React.Component {
     if (data.range) {
       this.handleReceivedRange({ current_editor, data })
     }
+
+    const { item } = this.props
+    item.setCollaborators(collaborators)
   }
 
   handleReceivedRange = ({ current_editor, data }) => {
