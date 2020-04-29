@@ -72,7 +72,7 @@ class CollectionCardReplacer
 
     @replacing_card.parent.queue_update_template_instances(
       updated_card_ids: @replacing_card.parent.collection_cards.pluck(:id),
-      template_update_action: 'update_all',
+      template_update_action: :update_all,
     )
   end
 

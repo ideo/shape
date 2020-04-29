@@ -670,7 +670,7 @@ class Collection < ApplicationRecord
 
     queue_update_template_instances(
       updated_card_ids: cards.pluck(:id),
-      template_update_action: 'unarchive',
+      template_update_action: :unarchive,
     )
   end
 

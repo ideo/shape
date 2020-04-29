@@ -1222,10 +1222,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.API_fetchCards()
   }
 
-  API_backgroundUpdateTemplateInstances() {
+  API_backgroundUpdateTemplateInstances({ type = null, ids = [] }) {
+    if (!type || _.isEmpty(ids)) return
+
+    const data = { type, ids }
+
     return this.apiStore.request(
       `collections/${this.id}/background_update_template_instances`,
-      'POST'
+      'POST',
+      data
     )
   }
 
@@ -1241,7 +1246,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   API_clearCollectionCover() {
     return this.apiStore
-      .request(`collections/${this.id}/clear_collection_cover`, 'POST')
+      .request(`collections/${this.id}/clear_collection_cover`, 'POST', {
+        data: this.toJsonApi(),
+      })
       .catch(err => {
         console.warn(err)
         this.uiStore.alert(

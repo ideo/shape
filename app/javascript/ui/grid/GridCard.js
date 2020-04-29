@@ -156,7 +156,7 @@ class GridCard extends React.Component {
         {this.downloadableRecord && (
           <Download record={this.downloadableRecord} />
         )}
-        {record.canSetACover && this.canEditCard && (
+        {record.canSetACover && this.canContentEditCard && (
           <CardCoverEditor
             card={card}
             parentRef={this.gridCardRef}
