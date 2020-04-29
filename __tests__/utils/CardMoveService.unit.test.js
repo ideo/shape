@@ -14,7 +14,9 @@ const uiStore = fakeUiStore
 uiStore.viewingCollection = {
   id: '3',
   API_fetchCards: jest.fn(),
+  API_fetchCardOrders: jest.fn(),
   addCard: jest.fn(),
+  mergeCards: jest.fn(),
 }
 
 const mockFind = (type, id) => {
@@ -235,6 +237,15 @@ describe('CardMoveService', () => {
         })
       })
 
+      it('should merge the cards and fetch the card orders', async () => {
+        await service.moveCards('beginning')
+        expect(uiStore.viewingCollection.mergeCards).toHaveBeenCalledWith(
+          data.data
+        )
+        // because it's not a board:
+        expect(uiStore.viewingCollection.API_fetchCardOrders).toHaveBeenCalled()
+      })
+
       it('should close the move menu', async () => {
         await service.moveCards('beginning')
         expect(uiStore.closeMoveMenu).toHaveBeenCalled()
@@ -245,8 +256,10 @@ describe('CardMoveService', () => {
         expect(uiStore.resetSelectionAndBCT).toHaveBeenCalled()
       })
 
-      it('should reselect newly created cards', async () => {
-        await service.moveCards('beginning')
+      it('should reselect newly created cards if moving into viewingCollection', async () => {
+        await service.moveCards('beginning', {
+          to_id: uiStore.viewingCollection.id,
+        })
         expect(uiStore.reselectCardIds).toHaveBeenCalledWith(
           _.map(data.data, 'id')
         )
