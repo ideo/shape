@@ -245,26 +245,28 @@ export default class UiStore {
     cardWidth: 1,
     cardHeight: 1,
   }
-  collaboratorColorsList = [
+  collaboratorColorsPrimaryList = [
     v.colors.collaboratorPrimaryBlue,
-    v.colors.collaboratorSecondaryBlue,
     v.colors.collaboratorPrimaryYellow,
-    v.colors.collaboratorSecondaryYellow,
     v.colors.collaboratorPrimaryPurple,
-    v.colors.collaboratorSecondaryPurple,
     v.colors.collaboratorPrimaryOlive,
-    v.colors.collaboratorSecondaryOlive,
     v.colors.collaboratorPrimarySalmon,
-    v.colors.collaboratorSecondarySalmon,
     v.colors.collaboratorPrimaryIcyBlue,
-    v.colors.collaboratorSecondaryIcyBlue,
     v.colors.collaboratorPrimaryLavender,
-    v.colors.collaboratorSecondaryLavender,
     v.colors.collaboratorPrimaryObsidian,
-    v.colors.collaboratorSecondaryObsidian,
     v.colors.collaboratorPrimarySlate,
-    v.colors.collaboratorSecondarySlate,
     v.colors.collaboratorPrimaryGrey,
+  ]
+  collaboratorColorsSecondaryList = [
+    v.colors.collaboratorSecondaryBlue,
+    v.colors.collaboratorSecondaryYellow,
+    v.colors.collaboratorSecondaryPurple,
+    v.colors.collaboratorSecondaryOlive,
+    v.colors.collaboratorSecondarySalmon,
+    v.colors.collaboratorSecondaryIcyBlue,
+    v.colors.collaboratorSecondaryLavender,
+    v.colors.collaboratorSecondaryObsidian,
+    v.colors.collaboratorSecondarySlate,
     v.colors.collaboratorSecondaryGrey,
   ]
   @observable
@@ -932,13 +934,25 @@ export default class UiStore {
   }
 
   @computed
-  get collaboratorColors() {
+  get collaboratorColorsPrimary() {
     if (!this.viewingRecord || !this.viewingRecord.collaborators) return {}
 
     const colorMap = {}
     for (let i = 0; i < this.viewingRecord.collaborators.length; i++) {
       const { id } = this.viewingRecord.collaborators[i]
-      colorMap[id] = this.collaboratorColorsList[i % 10]
+      colorMap[id] = this.collaboratorColorsPrimaryList[i % 10]
+    }
+    return colorMap
+  }
+
+  @computed
+  get collaboratorColorsSecondary() {
+    if (!this.viewingRecord || !this.viewingRecord.collaborators) return {}
+
+    const colorMap = {}
+    for (let i = 0; i < this.viewingRecord.collaborators.length; i++) {
+      const { id } = this.viewingRecord.collaborators[i]
+      colorMap[id] = this.collaboratorColorsSecondaryList[i % 10]
     }
     return colorMap
   }

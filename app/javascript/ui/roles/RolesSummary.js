@@ -115,14 +115,14 @@ class RolesSummary extends React.Component {
 
   get renderEditors() {
     const { editors, viewers, editorCount } = this.viewersAndEditorsLimited
-    const { collaboratorColors } = uiStore
+    const { collaboratorColorsPrimary } = uiStore
     // If there aren't any editors or viewers, render with add user button
     // If there aren't any editors but are viewers, don't render label/button
     if (editors.length === 0 && !this.props.canEdit) return ''
     if (editors.length === 0 && viewers.length === 0) return ''
 
     const editorAvatars = editors.map(editor => {
-      const borderColor = collaboratorColors[editor.id]
+      const borderColor = collaboratorColorsPrimary[editor.id]
       const border = borderColor ? `4px solid ${borderColor}` : 'none'
 
       return (
@@ -152,11 +152,11 @@ class RolesSummary extends React.Component {
 
   get renderViewers() {
     const { viewers, viewerCount } = this.viewersAndEditorsLimited
-    const { collaboratorColors } = uiStore
+    const { collaboratorColorsPrimary } = uiStore
 
     if (viewers.length === 0) return ''
     const viewerAvatars = viewers.map(viewer => {
-      const borderColor = collaboratorColors[viewer.id]
+      const borderColor = collaboratorColorsPrimary[viewer.id]
       const border = borderColor ? `4px solid ${borderColor}` : 'none'
 
       return (
