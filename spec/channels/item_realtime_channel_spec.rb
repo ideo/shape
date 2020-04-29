@@ -28,7 +28,7 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
           num_viewers: 1,
           record_id: item.id.to_s,
           record_type: 'items',
-          num_viewers_changed: true,
+          data: { num_viewers_changed: true },
         )
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
         num_viewers: 0,
         record_id: item.id.to_s,
         record_type: 'items',
-        num_viewers_changed: true,
+        data: { num_viewers_changed: true },
       )
     end
   end
