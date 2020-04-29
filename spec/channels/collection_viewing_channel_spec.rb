@@ -21,7 +21,6 @@ RSpec.describe CollectionViewingChannel, type: :channel do
   describe '#subscribed' do
     let(:subscription) { subscribe(id: collection.id) }
 
-
     it 'changes the num_viewers count' do
       expect {
         subscription
