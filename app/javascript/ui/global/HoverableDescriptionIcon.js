@@ -6,6 +6,7 @@ import styled from 'styled-components'
 const StyledIconWrapper = styled.span`
   margin-left: 4px;
   display: inline-block;
+  vertical-align: middle;
   width: ${props => (props.width ? props.width : 10)}px;
 `
 
