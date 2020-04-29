@@ -1369,6 +1369,13 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       expect(json['data']['attributes']['parent_id']).to eq collection.id
     end
 
+    it 'broadcasts collection updates' do
+      patch(path, params: params)
+      expect(broadcaster_instance).to have_received(:card_updated).with(
+        collection_card,
+      )
+    end
+
     context 'without content editor access on the collection card' do
       let(:user) { create(:user, add_to_org: create(:organization)) }
 

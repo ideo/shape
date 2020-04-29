@@ -103,7 +103,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
       create_notification(@collection_card, :edited)
-      broadcast_collection_create_updates
+      broadcast_collection_create_updates(@collection_card)
       @collection_card.reload
       render_collection_card
     else
