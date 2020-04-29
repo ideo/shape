@@ -73,11 +73,11 @@ module RealtimeEditorsViewers
   end
 
   def editing_cache_key
-    "#{self.class.base_class.name}_#{id}_editing"
+    "#{self.class.base_class.name}_#{id}_editing_v2"
   end
 
   def viewing_cache_key
-    "#{self.class.base_class.name}_#{id}_viewing"
+    "#{self.class.base_class.name}_#{id}_viewing_v2"
   end
 
   def collaborator_json_stringified(user)
