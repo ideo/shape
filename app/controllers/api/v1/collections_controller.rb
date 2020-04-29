@@ -1,5 +1,5 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
-  deserializable_resource :collection, class: DeserializableCollection, only: %i[update clear_collection_cover]
+  deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
   skip_before_action :check_api_authentication!, only: %i[show]
@@ -9,6 +9,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
   before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover]
+  after_action :broadcast_parent_collection_card_update, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -23,7 +24,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
-  after_action :broadcast_parent_collection_updates, only: %i[create_template]
   def create_template
     builder = CollectionTemplateBuilder.new(
       parent: @parent_collection,
@@ -57,7 +57,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  after_action :broadcast_parent_collection_card_update, only: %i[clear_collection_cover]
   def clear_collection_cover
     @parent_collection = @collection.parent
     @collection.clear_collection_cover
@@ -254,7 +253,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def load_and_authorize_collection_update
     @collection = Collection.find(params[:id])
-    if collection_params[:name].present? && collection_params[:name] != @collection.name
+    if params[:collection].present? && collection_params[:name].present? && collection_params[:name] != @collection.name
       authorize! :edit_name, @collection
     else
       authorize! :edit_content, @collection
@@ -394,14 +393,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
     # on a normal collection, just ping to reload the cards
     collection_broadcaster.reload_cards
-  end
-
-  def broadcast_parent_collection_updates
-    return unless @collection.present?
-
-    collection_broadcaster(@parent_collection).card_updated(
-      @collection.parent_collection_card,
-    )
   end
 
   def broadcast_parent_collection_card_update

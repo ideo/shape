@@ -700,19 +700,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let(:collection_card) do
       create(:collection_card_image, order: 0, width: 1, parent: collection, is_cover: true)
     end
-    let(:raw_params) do
-      {
-        id: collection.id,
-        name: collection.name,
-      }
-    end
-    let(:params) do
-      json_api_params(
-        'collections',
-        raw_params,
-      )
-    end
-
     let(:path) { "/api/v1/collections/#{collection.id}/clear_collection_cover" }
 
     before do
@@ -720,7 +707,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'should clear the cover from the collection' do
-      post(path, params: params)
+      post(path)
       expect(collection_card.reload.is_cover).to be false
     end
 
@@ -728,7 +715,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(broadcaster_instance).to receive(:card_updated).with(
         collection.parent_collection_card,
       )
-      post(path, params: params)
+      post(path)
     end
   end
 
