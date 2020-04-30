@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable, action } from 'mobx'
+import { observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -18,9 +18,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
   // starts null before it is loaded
   @observable
   inMyCollection = null
-
-  @observable
-  collaborators = []
 
   attributesForAPI = [
     'type',
@@ -252,11 +249,6 @@ class Item extends SharedRecordMixin(BaseRecord) {
   get collectionFilter() {
     if (!this.primaryDataset) return null
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
-  }
-
-  @action
-  setCollaborators(collaborators) {
-    this.collaborators.replace(collaborators)
   }
 
   pushTextUndo({ previousData, currentData, redirectTo }) {

@@ -10,6 +10,8 @@ const SharedRecordMixin = superclass =>
     forceMenuDisabled = false
     @observable
     fullyLoaded = null
+    @observable
+    collaborators = []
     highlightedRange = null
 
     @action
@@ -184,6 +186,11 @@ const SharedRecordMixin = superclass =>
         redoAction,
         actionType,
       })
+    }
+
+    @action
+    setCollaborators(collaborators) {
+      this.collaborators.replace(collaborators)
     }
   }
 
