@@ -13,6 +13,7 @@ class OrganizationShellBuilder
       @organization.save!
       create_user_collection
       create_templates
+      # TODO create user getting started content and be sure to set collection to
       true
     end
     !result.nil?
@@ -28,10 +29,6 @@ class OrganizationShellBuilder
 
     last_number = last_shell.name.split('-').last.to_i
     "shell-#{last_number + 1}"
-  end
-
-  def setup_user_membership_and_collections
-    @organization.setup_user_membership_and_collections(@user)
   end
 
   def create_user_collection
