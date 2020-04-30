@@ -12,6 +12,7 @@ import Loader from '~/ui/layout/Loader'
 
 const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
   const [isLoading, setIsLoading] = useState(false)
+  const [allFetchesComplete, setAllFetchesComplete] = useState(false)
   const [isError, setIsError] = useState(false)
   const [organization, setOrganization] = useState({})
   const [languageOptions, setLanguageOptions] = useState([])
@@ -42,6 +43,7 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
     const getSupportedLanguages = async () => {
       try {
         setIsLoading(true)
+        console.log(isLoading)
         const response = await supportedLanguagesStore.fetch()
         console.log(response)
         setLanguageOptions(response)
@@ -55,9 +57,14 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
     getSupportedLanguages()
   }, [])
 
+  useEffect(() => {
+    if (organization.id && languageOptions.length > 1) {
+      setAllFetchesComplete(true)
+    }
+  })
+
   const updateOrg = async orgParams => {
     try {
-      setIsLoading(true)
       const orgModel = new organizationsStore.model()
       const orgModelInstance = new orgModel({
         id: organization.id,
@@ -71,18 +78,16 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
       })
       const result = await promise
       setOrganization(result)
-      setIsLoading(false)
     } catch (err) {
       console.log('org update failed: ', err)
       setIsError(true)
-      setIsLoading(false)
     }
   }
 
   return (
     <div>
       {isError && <div>Something went wrong...</div>}
-      {isLoading ? (
+      {!allFetchesComplete ? (
         <Loader />
       ) : (
         <form>

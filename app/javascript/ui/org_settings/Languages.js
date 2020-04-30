@@ -34,6 +34,8 @@ const Languages = ({ organization, supportedLanguages, updateRecord }) => {
   }
 
   const addLanguage = tag => {
+    event.preventDefault()
+
     const params = {
       supported_languages: organization.supported_languages.concat([
         tag.handle,
@@ -43,6 +45,8 @@ const Languages = ({ organization, supportedLanguages, updateRecord }) => {
   }
 
   const removeLanguage = tag => {
+    event.preventDefault()
+
     const updatedLanguages = _.reject(
       organization.supported_languages,
       language => language === tag.handle
