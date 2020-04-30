@@ -1,6 +1,9 @@
 import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react'
-import { organizationsStore } from 'c-delta-organization-settings'
+import {
+  organizationsStore,
+  supportedLanguagesStore,
+} from 'c-delta-organization-settings'
 
 import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
@@ -11,6 +14,7 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
   const [organization, setOrganization] = useState({})
+  const [languageOptions, setLanguageOptions] = useState([])
 
   useEffect(() => {
     const loadOrganization = async () => {
@@ -32,6 +36,23 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
     }
 
     loadOrganization()
+  }, [])
+
+  useEffect(() => {
+    const getSupportedLanguages = async () => {
+      try {
+        setIsLoading(true)
+        const response = await supportedLanguagesStore.fetch()
+        console.log(response)
+        setLanguageOptions(response)
+        setIsLoading(false)
+      } catch (err) {
+        console.log('failed to fetch languages')
+        setIsError(true)
+        setIsLoading(false)
+      }
+    }
+    getSupportedLanguages()
   }, [])
 
   const updateOrg = async orgParams => {
@@ -84,7 +105,11 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
           />
           {/* TODO: How to populate OrganizationRoles? */}
           <OrganizationRoles />
-          <Languages organization={organization} updateRecord={updateOrg} />
+          <Languages
+            organization={organization}
+            supportedLanguages={languageOptions}
+            updateRecord={updateOrg}
+          />
         </form>
       )}
     </div>

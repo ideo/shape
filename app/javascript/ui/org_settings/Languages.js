@@ -1,40 +1,15 @@
-import { Fragment, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
-
-import { supportedLanguagesStore } from 'c-delta-organization-settings'
 
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 import Pill from '~/ui/global/Pill'
 import { Label } from '~/ui/global/styled/forms'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
-import Loader from '~/ui/layout/Loader'
 
-const Languages = ({ organization, updateRecord }) => {
-  const [languageOptions, setLanguageOptions] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [isError, setIsError] = useState(false)
-
-  useEffect(() => {
-    const getSupportedLanguages = async () => {
-      try {
-        setIsLoading(true)
-        const response = await supportedLanguagesStore.fetch()
-        console.log(response)
-        setLanguageOptions(response)
-        setIsLoading(false)
-      } catch (err) {
-        console.log('failed to fetch languages')
-        setIsError(true)
-        setIsLoading(false)
-      }
-    }
-    getSupportedLanguages()
-  }, [])
-
+const Languages = ({ organization, supportedLanguages, updateRecord }) => {
   const languagesFromOrg = () => {
-    const languages = _.filter(languageOptions, option =>
+    const languages = _.filter(supportedLanguages, option =>
       organization.supported_languages.includes(option.handle)
     )
     return tagsFromLanguages(languages)
@@ -51,7 +26,7 @@ const Languages = ({ organization, updateRecord }) => {
   }
 
   const availableLanguageOptions = () => {
-    const allowed = _.reject(languageOptions, option =>
+    const allowed = _.reject(supportedLanguages, option =>
       organization.supported_languages.includes(option.handle)
     )
     console.log('allowed languages: ', allowed)
@@ -79,47 +54,47 @@ const Languages = ({ organization, updateRecord }) => {
 
   return (
     <div>
-      {isError && <div>Something went wrong... </div>}
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <Fragment>
-          <Label
-            style={{
-              fontSize: '13px',
-              marginBottom: '11px',
-            }}
-            id="languages-select-label"
-          >
-            Languages
-            <HoverableDescriptionIcon
-              description={
-                'Please select the primary language(s) used at your organization.'
-              }
-              width={16}
-            />
-          </Label>
-          <StyledReactTags>
-            <ReactTags
-              tags={languagesFromOrg()}
-              suggestions={availableLanguageOptions()}
-              allowBackspace={false}
-              delimiterChars={[',']}
-              placeholder={'add additional available languages'}
-              handleAddition={tag => tag.onSelect()}
-              handleDelete={tag => tag.onDelete()}
-              tagComponent={Pill}
-              autofocus={false}
-            />
-          </StyledReactTags>
-        </Fragment>
-      )}
+      <Label
+        style={{
+          fontSize: '13px',
+          marginBottom: '11px',
+        }}
+        id="languages-select-label"
+      >
+        Languages
+        <HoverableDescriptionIcon
+          description={
+            'Please select the primary language(s) used at your organization.'
+          }
+          width={16}
+        />
+      </Label>
+      <StyledReactTags>
+        <ReactTags
+          tags={languagesFromOrg()}
+          suggestions={availableLanguageOptions()}
+          allowBackspace={false}
+          delimiterChars={[',']}
+          placeholder={'add additional available languages'}
+          handleAddition={tag => tag.onSelect()}
+          handleDelete={tag => tag.onDelete()}
+          tagComponent={Pill}
+          autofocus={false}
+        />
+      </StyledReactTags>
     </div>
   )
 }
 
+Languages.defaultProps = {
+  organization: {},
+  supported_languages: [],
+  updateRecord: () => null,
+}
+
 Languages.propTypes = {
   organization: PropTypes.object,
+  supportedLanguages: PropTypes.arrayOf(PropTypes.object),
   updateRecord: PropTypes.func,
 }
 
