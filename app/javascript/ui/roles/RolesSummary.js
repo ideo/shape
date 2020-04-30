@@ -115,22 +115,20 @@ class RolesSummary extends React.Component {
   }
 
   renderAvatar = (userOrGroup, type) => {
-    let borderColor
-    if (userOrGroup.color) {
-      borderColor = v.colors[`collaboratorPrimary${userOrGroup.color}`]
-    }
-    const border = borderColor ? `4px solid ${borderColor}` : 'none'
+    // the color class creates a box shadow via AvatarGroup styled-component
+    const className = `${type} outlined ${
+      userOrGroup.color ? `outline-${userOrGroup.color}` : ''
+    }`
 
     return (
       <Avatar
         key={`${userOrGroup.internalType}_${userOrGroup.id}`}
         title={userOrGroup.nameWithHints || userOrGroup.name}
         url={userOrGroup.pic_url_square || userOrGroup.filestack_file_url}
-        className={type}
+        className={className}
         // user_profile_collection_id will be null if its a group
         linkToCollectionId={userOrGroup.user_profile_collection_id}
         displayName
-        border={border}
       />
     )
   }

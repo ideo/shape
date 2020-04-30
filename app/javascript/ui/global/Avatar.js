@@ -14,7 +14,6 @@ const StyledAvatar = styled(MuiAvatar)`
     margin-right: 5px;
     height: ${props => props.size}px;
     cursor: ${props => props.cursor};
-    border: ${props => `${props.border} !important`};
     ${props =>
       props.responsive &&
       `
@@ -62,7 +61,6 @@ class Avatar extends React.Component {
       linkToCollectionId,
       responsive,
       clickable,
-      border,
     } = this.props
 
     const renderAvatar = (
@@ -77,7 +75,6 @@ class Avatar extends React.Component {
           linkToCollectionId || displayName || clickable ? 'pointer' : 'initial'
         }
         responsive={responsive ? 1 : 0}
-        border={border}
       />
     )
     let content = renderAvatar
@@ -105,7 +102,6 @@ Avatar.propTypes = {
   linkToCollectionId: PropTypes.string,
   responsive: PropTypes.bool,
   clickable: PropTypes.bool,
-  border: PropTypes.string,
 }
 Avatar.defaultProps = {
   url:
@@ -117,7 +113,6 @@ Avatar.defaultProps = {
   linkToCollectionId: null,
   responsive: true,
   clickable: false,
-  border: 'none',
 }
 
 export default Avatar

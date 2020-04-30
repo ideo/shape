@@ -203,6 +203,7 @@ const SharedRecordMixin = superclass =>
 
       _.each(sorted, collaborator => {
         if (!collaboratorColors.has(collaborator.id)) {
+          // size starts at 0 before any are added, this should get the first color
           const nextColor =
             v.collaboratorColorNames[collaboratorColors.size % 10]
           collaboratorColors.set(collaborator.id, nextColor)
