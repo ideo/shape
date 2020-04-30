@@ -19,7 +19,6 @@ import {
 } from '~/ui/global/QuillTextHighlighter'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
-import { routingStore, uiStore } from '~/stores'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
@@ -101,7 +100,7 @@ const StyledContainer = styled.div`
   `}
 `
 
-@inject('uiStore', 'apiStore')
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class RealtimeTextItem extends React.Component {
   unmounted = false
@@ -179,7 +178,7 @@ class RealtimeTextItem extends React.Component {
     this.cancel(null, { route: false })
     // check if you're leaving to go to the same item, e.g. item on CollectionPage -> ItemPage
     // in which case we keep the channel open
-    const { routingTo } = routingStore
+    const { routingTo } = this.props.routingStore
     const { item } = this.props
     const routingToSameItem =
       routingTo.id === item.id && routingTo.type === 'items'
@@ -249,11 +248,14 @@ class RealtimeTextItem extends React.Component {
   }
 
   createCursor({ id, name }) {
-    const { collaboratorColorsSecondary } = uiStore
+    const { uiStore } = this.props
+    const { collaboratorColors } = uiStore
     const cursors = this.quillEditor.getModule('cursors')
-    const cursorColor = collaboratorColorsSecondary[id]
-      ? collaboratorColorsSecondary[id]
-      : v.colors.tertiaryMedium
+    let cursorColor = v.colors.tertiaryMedium
+    if (collaboratorColors.has(id)) {
+      cursorColor =
+        v.colors[`collaboratorSecondary${collaboratorColors.get(id)}`]
+    }
     cursors.createCursor(id, name, cursorColor)
   }
 
@@ -788,6 +790,7 @@ RealtimeTextItem.defaultProps = {
 RealtimeTextItem.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default RealtimeTextItem

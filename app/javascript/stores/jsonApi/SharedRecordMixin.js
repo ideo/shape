@@ -1,7 +1,9 @@
 import _ from 'lodash'
 import { action, observable } from 'mobx'
 import queryString from 'query-string'
+
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
+import v from '~/utils/variables'
 
 // This contains some shared methods between Collection and Item
 const SharedRecordMixin = superclass =>
@@ -190,7 +192,24 @@ const SharedRecordMixin = superclass =>
 
     @action
     setCollaborators(collaborators) {
-      this.collaborators.replace(collaborators)
+      const { collaboratorColors } = this.uiStore
+      const sorted =
+        // sort by most recent first
+        _.reverse(
+          _.sortBy(collaborators, e => {
+            return new Date(e.timestamp)
+          })
+        )
+
+      _.each(sorted, collaborator => {
+        if (!collaboratorColors.has(collaborator.id)) {
+          const nextColor =
+            v.collaboratorColorNames[collaboratorColors.size % 10]
+          collaboratorColors.set(collaborator.id, nextColor)
+        }
+        collaborator.color = collaboratorColors.get(collaborator.id)
+      })
+      this.collaborators.replace(sorted)
     }
   }
 

@@ -2,6 +2,7 @@ import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import { fakeTextItem, fakeActionCableUser, fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import Delta from 'quill-delta'
 
 const props = {
@@ -14,6 +15,7 @@ const props = {
   fullyLoaded: true,
   initialSize: 'normal',
   uiStore: fakeUiStore,
+  routingStore: fakeRoutingStore,
   apiStore: fakeApiStore(),
 }
 

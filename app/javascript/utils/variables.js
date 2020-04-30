@@ -268,6 +268,19 @@ export default {
     collaboratorSecondaryGrey: '#CCCFD2',
   },
 
+  collaboratorColorNames: [
+    'Blue',
+    'Yellow',
+    'Purple',
+    'Olive',
+    'Salmon',
+    'IcyBlue',
+    'Lavender',
+    'Obsidian',
+    'Slate',
+    'Grey',
+  ],
+
   buttonSizes: {
     header: {
       width: 160,
