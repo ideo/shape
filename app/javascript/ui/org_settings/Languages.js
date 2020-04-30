@@ -3,19 +3,16 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
 
-import {
-  organizationsStore,
-  supportedLanguagesStore,
-} from 'c-delta-organization-settings'
+import { supportedLanguagesStore } from 'c-delta-organization-settings'
 
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 import Pill from '~/ui/global/Pill'
 import { Label } from '~/ui/global/styled/forms'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
+import Loader from '~/ui/layout/Loader'
 
-const Languages = ({ organization = {} }) => {
+const Languages = ({ organization, updateRecord }) => {
   const [languageOptions, setLanguageOptions] = useState([])
-  const [orgLanguages, setOrgLanguages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isError, setIsError] = useState(false)
 
@@ -36,77 +33,55 @@ const Languages = ({ organization = {} }) => {
     getSupportedLanguages()
   }, [])
 
-  // const typeaheadOptions = () => _.map(languageOptions, option => option.name)
-  const languagesFromOrg = () =>
-    _.filter(languageOptions, option =>
+  const languagesFromOrg = () => {
+    const languages = _.filter(languageOptions, option =>
       organization.supported_languages.includes(option.handle)
     )
+    return tagsFromLanguages(languages)
+  }
 
-  const tagsFromLanguages = () => {
-    return languagesFromOrg().map(object => {
+  const tagsFromLanguages = languages => {
+    return languages.map(object => {
       object.label = object.string
       object.name = object.string
+      object.onDelete = () => removeLanguage(object)
+      object.onSelect = () => addLanguage(object)
       return object
     })
   }
-  // const validateTag = language => {
-  //   console.log('validate language: ', language)
-  //   console.log('language options: ', languageOptions)
-  //   let error = null
-  //   let tag = null
-  //   tag = _.find(languageOptions, option => option.name === tag)
-  //   console.log('found tag: ', tag)
-  //   if (!tag) error = 'Please enter a valid language option.'
 
-  //   console.log(tag, error)
-  //   return {
-  //     tag,
-  //     error,
-  //   }
-  // }
+  const availableLanguageOptions = () => {
+    const allowed = _.reject(languageOptions, option =>
+      organization.supported_languages.includes(option.handle)
+    )
+    console.log('allowed languages: ', allowed)
+    return tagsFromLanguages(allowed)
+  }
 
-  const afterAddRemoveTag = tag => {
-    console.log('event add/remove', event)
-    console.log('afteraddremove: ', tag)
-    console.log(orgLanguages)
-    // capture value
-    // patch organization
-    const updateLanguages = async () => {
-      try {
-        setIsLoading(true)
-        const orgModel = new organizationsStore.model()
-        const orgModelInstance = new orgModel({
-          id: organization.id,
-        })
-        const promise = orgModelInstance.save(
-          {
-            organization: {
-              supported_languages: organization.supported_languages.concat([
-                tag.handle,
-              ]),
-            },
-          },
-          {
-            optimistic: false,
-          }
-        )
-        const result = await promise
-        setOrgLanguages(result.supported_languages)
-        setIsLoading(false)
-      } catch (err) {
-        console.log('language update failed: ', err)
-        setIsError(true)
-        setIsLoading(false)
-      }
+  const addLanguage = tag => {
+    const params = {
+      supported_languages: organization.supported_languages.concat([
+        tag.handle,
+      ]),
     }
-    updateLanguages()
+    updateRecord(params)
+  }
+
+  const removeLanguage = tag => {
+    const updatedLanguages = _.reject(
+      organization.supported_languages,
+      language => language === tag.handle
+    )
+    updateRecord({
+      supported_languages: updatedLanguages,
+    })
   }
 
   return (
     <div>
       {isError && <div>Something went wrong... </div>}
       {isLoading ? (
-        <div>Loading... </div>
+        <Loader />
       ) : (
         <Fragment>
           <Label
@@ -126,14 +101,13 @@ const Languages = ({ organization = {} }) => {
           </Label>
           <StyledReactTags>
             <ReactTags
-              tags={tagsFromLanguages()}
-              suggestions={languageOptions}
+              tags={languagesFromOrg()}
+              suggestions={availableLanguageOptions()}
               allowBackspace={false}
               delimiterChars={[',']}
               placeholder={'add additional available languages'}
-              handleAddition={tag => afterAddRemoveTag(tag)}
-              handleDelete={tag => ev => afterAddRemoveTag(tag)}
-              // handleInputChange={this.onInputChange}
+              handleAddition={tag => tag.onSelect()}
+              handleDelete={tag => tag.onDelete()}
               tagComponent={Pill}
               autofocus={false}
             />
@@ -146,6 +120,7 @@ const Languages = ({ organization = {} }) => {
 
 Languages.propTypes = {
   organization: PropTypes.object,
+  updateRecord: PropTypes.func,
 }
 
 export default Languages

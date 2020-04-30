@@ -84,7 +84,7 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
           />
           {/* TODO: How to populate OrganizationRoles? */}
           <OrganizationRoles />
-          <Languages organization={organization} />
+          <Languages organization={organization} updateRecord={updateOrg} />
         </form>
       )}
     </div>
