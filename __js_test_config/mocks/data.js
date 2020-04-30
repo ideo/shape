@@ -268,6 +268,7 @@ export const fakeTextItem = {
   pushUndo: jest.fn(),
   pushTextUndo: jest.fn(),
   setCollaborators: jest.fn(),
+  collaborators: [],
   version: 1,
   ...fakeJsonApiAttrs,
 }
@@ -451,6 +452,7 @@ export const fakeCollection = {
   cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
   addCard: jest.fn(),
   setCollaborators: jest.fn(),
+  collaborators: [],
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
