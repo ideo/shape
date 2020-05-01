@@ -48,11 +48,11 @@ describe('RolesSummary', () => {
     })
 
     it('renders editors', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(1)
+      expect(wrapper.find('.editor').length).toEqual(1)
     })
 
     it('renders viewers', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(1)
+      expect(wrapper.find('.viewer').length).toEqual(1)
     })
 
     it('does not render AddButton by default', () => {
@@ -70,11 +70,11 @@ describe('RolesSummary', () => {
     })
 
     it('renders viewer and label', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(1)
+      expect(wrapper.find('.viewer').length).toEqual(1)
     })
 
     it('does not render editors', () => {
-      expect(wrapper.find('[className="editor"]').exists()).toBe(false)
+      expect(wrapper.find('.editor').exists()).toBe(false)
     })
   })
 
@@ -88,11 +88,11 @@ describe('RolesSummary', () => {
     })
 
     it('renders editor and label', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(1)
+      expect(wrapper.find('.editor').length).toEqual(1)
     })
 
     it('does not render viewers', () => {
-      expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
+      expect(wrapper.find('.viewer').exists()).toBe(false)
     })
   })
 
@@ -114,11 +114,11 @@ describe('RolesSummary', () => {
     })
 
     it('renders only 4 editors', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(4)
+      expect(wrapper.find('.editor').length).toEqual(4)
     })
 
     it('does not render any viewers or viewer label', () => {
-      expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
+      expect(wrapper.find('.viewer').exists()).toBe(false)
       expect(wrapper.render().text()).not.toMatch(/viewer/i)
     })
   })
@@ -137,8 +137,8 @@ describe('RolesSummary', () => {
     })
 
     it('does not render editors or viewers', () => {
-      expect(wrapper.find('[className="editor"]').exists()).toBe(false)
-      expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
+      expect(wrapper.find('.editor').exists()).toBe(false)
+      expect(wrapper.find('.viewer').exists()).toBe(false)
     })
   })
 
