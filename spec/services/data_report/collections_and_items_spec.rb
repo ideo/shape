@@ -310,7 +310,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           actors = Activity
                    .where_participated
                    .where.not(target: other_collection)
-                   .where('created_at >= ?', end_date - 30.days)
+                   .where('created_at >= ?', end_date - 1.month)
                    .group(:actor_id).count.count
           expect(actors).to eq 8
         end
@@ -400,7 +400,7 @@ RSpec.describe DataReport::CollectionsAndItems, type: :service do
           # just some math checking, we have 4 child collections (+ parent to total the 5 activities)
           expect(Collection.in_collection(parent_collection).count).to eq(4)
           # these should be the 2 recent ones
-          expect(Collection.in_collection(parent_collection).where('created_at > ?', end_date - 30.days).count).to eq(2)
+          expect(Collection.in_collection(parent_collection).where('created_at > ?', end_date - 1.month).count).to eq(2)
         end
       end
 
