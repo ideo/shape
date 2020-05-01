@@ -677,3 +677,10 @@ export const fakeCollectionFilter = {
   selected: true,
   API_toggleSelected: jest.fn().mockReturnValue(Promise.resolve({})),
 }
+
+export const fakeCollaborator = {
+  id: '1',
+  can_edit_collection: false,
+  timestamp: '2020-04-30 11:34:50 -0700',
+  color: 'Blue'
+}
