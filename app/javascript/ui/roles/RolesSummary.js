@@ -116,8 +116,8 @@ class RolesSummary extends React.Component {
 
   renderAvatar = (userOrGroup, type) => {
     // the color class creates a box shadow via AvatarGroup styled-component
-    const className = `${type} ${
-      userOrGroup.color ? `outlined outline-${userOrGroup.color}` : ''
+    const className = `${type}${
+      userOrGroup.color ? ` outlined outline-${userOrGroup.color}` : ''
     }`
 
     return (

@@ -1,7 +1,6 @@
 import RolesSummary from '~/ui/roles/RolesSummary'
 
 import { fakeRole, fakeUser, fakeCollaborator } from '#/mocks/data'
-import v from '~/utils/variables'
 
 const emptyProps = {
   roles: [],
@@ -174,7 +173,7 @@ describe('RolesSummary', () => {
     })
 
     it('renders two viewers', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(2)
+      expect(wrapper.find('.viewer').length).toEqual(2)
     })
 
     it('renders a border around the avatar', () => {
@@ -211,7 +210,7 @@ describe('RolesSummary', () => {
     })
 
     it('renders three viewers', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(3)
+      expect(wrapper.find('.viewer').length).toEqual(3)
     })
 
     it('renders first two avatars (live collaborators) with default border in order', () => {
@@ -219,15 +218,15 @@ describe('RolesSummary', () => {
         wrapper
           .find('Avatar')
           .at(0)
-          .prop('border')
-      ).toEqual(`4px solid ${v.colors.collaboratorPrimaryBlue}`)
+          .prop('className')
+      ).toEqual('viewer outlined outline-Blue')
 
       expect(
         wrapper
           .find('Avatar')
           .at(1)
-          .prop('border')
-      ).toEqual(`4px solid ${v.colors.collaboratorPrimaryYellow}`)
+          .prop('className')
+      ).toEqual('viewer outlined outline-Yellow')
     })
 
     it('renders viewer who is not a collaborator last and without border', () => {
@@ -235,8 +234,8 @@ describe('RolesSummary', () => {
         wrapper
           .find('Avatar')
           .at(2)
-          .prop('border')
-      ).toEqual('none')
+          .prop('className')
+      ).toEqual('viewer')
     })
   })
 })
