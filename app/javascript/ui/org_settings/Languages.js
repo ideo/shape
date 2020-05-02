@@ -61,7 +61,8 @@ const Languages = ({ organization, supportedLanguages, updateRecord }) => {
       <Label
         style={{
           fontSize: '13px',
-          marginBottom: '11px',
+          marginTop: '22px',
+          marginBottom: '10px', // Not 16 because react tags has padding already
         }}
         id="languages-select-label"
       >

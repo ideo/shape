@@ -11,6 +11,7 @@ import v from '~/utils/variables'
 import { AddButton } from '~/ui/global/styled/buttons'
 import { objectsEqual } from '~/utils/objectUtils'
 
+// TODO: Don't hide this on mobile if it is being used for C∆ Settings tabs
 const StyledRolesSummary = styled.div`
   position: relative;
   top: 5px;
@@ -178,17 +179,20 @@ class RolesSummary extends React.Component {
     )
   }
 
+  // TODO: Why not make this a component to pass in?
   get addUserBtn() {
     const { canEdit } = this.props
+    console.log('in addUserBtn: ', canEdit)
     if (!canEdit) return ''
     return (
-      <Tooltip title="Share">
+      <Tooltip title={this.props.buttonText}>
         <AddButton onClick={this.props.handleClick}>+</AddButton>
       </Tooltip>
     )
   }
 
   render() {
+    console.log('RolesSummary#render', this.props)
     const { editors, viewers } = this.viewersAndEditorsLimited
     return (
       <StyledRolesSummary>
@@ -209,6 +213,7 @@ RolesSummary.propTypes = {
   handleClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   rolesMenuOpen: PropTypes.bool.isRequired,
+  buttonText: PropTypes.string, // TODO: Should this be required?
 }
 
 RolesSummary.defaultProps = {

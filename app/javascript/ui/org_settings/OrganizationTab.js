@@ -9,6 +9,7 @@ import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
 import Languages from './Languages'
 import Loader from '~/ui/layout/Loader'
+import { apiStore } from '~/stores'
 
 const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -57,8 +58,18 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
     getSupportedLanguages()
   }, [])
 
+  // TODO: make OrganizationTab a class so it can be an observer
+  useEffect(() => {
+    apiStore.fetch(
+      'groups',
+      apiStore.currentUserOrganization.primary_group.id,
+      true
+    )
+  }, [])
+
   useEffect(() => {
     if (organization.id && languageOptions.length > 1) {
+      // check if primary group has roles
       setAllFetchesComplete(true)
     }
   })
@@ -108,8 +119,10 @@ const OrganizationTab = ({ industrySubcategories, contentVersions }) => {
             updateRecord={updateOrg}
             fieldToUpdate={'default_content_version_id'}
           />
-          {/* TODO: How to populate OrganizationRoles? */}
-          <OrganizationRoles />
+          <OrganizationRoles
+            roles={apiStore.currentUserOrganization.primary_group.roles}
+            canEdit={apiStore.currentUserOrganization.primary_group.can_edit}
+          />
           <Languages
             organization={organization}
             supportedLanguages={languageOptions}
@@ -125,6 +138,8 @@ OrganizationTab.propTypes = {
   organization: PropTypes.object,
   contentVersions: PropTypes.arrayOf(PropTypes.object),
   industrySubcategories: PropTypes.arrayOf(PropTypes.object),
+  // TODO: load all groups and roles for organization
+  // http://localhost:3001/api/v1/organizations/1/groups
 }
 
 export default OrganizationTab
