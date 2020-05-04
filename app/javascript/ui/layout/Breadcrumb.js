@@ -87,12 +87,6 @@ class Breadcrumb extends React.Component {
     return this.totalNameLength(items) - this.maxChars
   }
 
-  truncateItemName(item, amount) {
-    if (!item.ellipses && item.name && item.name.length > amount) {
-      item.truncatedName = item.name.slice(0, amount)
-    }
-  }
-
   transformToSubItems(items, firstItem = {}, lastItem = {}) {
     const subItems = items.map((item, idx) => {
       const subItem = { ...item }
@@ -104,64 +98,59 @@ class Breadcrumb extends React.Component {
     return subItems
   }
 
-  addSubItems(items) {
+  addSubItems(copyItems) {
     const { maxDepth } = this.props
     if (maxDepth === 1) {
       const allItems = this.items()
-      const subItems = this.transformToSubItems(allItems, items[0])
-      if (items[0]) items[0].subItems = subItems
+      const subItems = this.transformToSubItems(allItems, copyItems[0])
+      if (copyItems[0]) copyItems[0].subItems = subItems
     }
 
-    const ellipsesItems = items.filter(item => item.ellipses)
+    const ellipsesItems = copyItems.filter(item => item.ellipses)
     let subItems
     if (ellipsesItems.length) {
       const firstEllipsesItem = ellipsesItems.shift()
       const lastEllipsesItem = ellipsesItems.pop()
       subItems = this.transformToSubItems(
-        items,
+        copyItems,
         firstEllipsesItem,
         lastEllipsesItem
       )
       firstEllipsesItem.subItems = subItems
     } else {
-      subItems = this.transformToSubItems(items)
+      subItems = this.transformToSubItems(copyItems)
     }
 
-    if (items[0] && items[0].identifier === 'homepage') {
-      items[0].subItems = subItems
+    if (copyItems[0] && copyItems[0].identifier === 'homepage') {
+      copyItems[0].subItems = subItems
     }
+    return copyItems
   }
 
   get truncatedItems() {
     const { items } = this.props
+    const copyItems = [...items]
     // The mobile menu should have the full breadcrumb trail in it's one item
-    if (items.length === 1) {
-      const [item] = items
-      this.truncateItemName(item, this.maxChars)
-      return items
+    if (copyItems.length === 1) {
+      return copyItems
     }
 
-    let charsLeftToTruncate = this.charsToTruncateForItems(items)
+    let charsLeftToTruncate = this.charsToTruncateForItems(copyItems)
 
     // If we are within allowable number of chars, return items
-    if (charsLeftToTruncate <= 0) return items
-
-    // First try truncating any long items to 25 chars
-    _.each(items, item => this.truncateItemName(item, 25))
-
-    charsLeftToTruncate = this.charsToTruncateForItems(items)
+    if (charsLeftToTruncate <= 0) return copyItems
 
     // Item names are still too long, show ... in place of their name
     // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
-    let index = _.floor((items.length - 1) / 2)
+    let index = _.floor((copyItems.length - 1) / 2)
 
     // If event number of items, increment index first,
     // otherwise if odd, decrement first
-    let increment = items.length % 2 === 0
+    let increment = copyItems.length % 2 === 0
     let jumpBy = 1
 
     while (charsLeftToTruncate > 0) {
-      const item = items[index]
+      const item = copyItems[index]
       if (!item) break
       if (!item.ellipses) {
         // Subtract this item from chars to truncate
@@ -179,9 +168,9 @@ class Breadcrumb extends React.Component {
       increment = !increment
     }
 
-    this.addSubItems(items)
+    const modifiedItems = this.addSubItems([...copyItems])
 
-    return _.reject(items, { remove: true })
+    return _.reject(modifiedItems, { remove: true })
   }
 
   onRestoreBreadcrumb = item => {
