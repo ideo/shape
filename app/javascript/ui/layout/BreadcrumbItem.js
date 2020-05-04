@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import BreadcrumbCaretIcon from '~/ui/icons/BreadcrumbCaretIcon'
-import InlineLoader from '~/ui/layout/InlineLoader'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import NestedArrowIcon from '~/ui/icons/NestedArrowIcon'
 import NestedLineIcon from '~/ui/icons/NestedLineIcon'
@@ -369,7 +368,6 @@ export class BreadcrumbItem extends React.Component {
               onMouseOver={this.onNestedMenuHoverOver}
               onMouseOut={this.onNestedMenuHoverOut}
             >
-              {this.state.nestedMenuLoading && <InlineLoader />}
               {item.breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton

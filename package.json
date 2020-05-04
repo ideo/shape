@@ -222,7 +222,7 @@
   },
   "bit": {
     "env": {
-      "compiler": "bit.envs/compilers/react@1.0.16"
+      "compiler": "bit.envs/bundlers/webpack@4.0.1"
     },
     "componentsDefaultDirectory": "app/javascript/ui/{name}",
     "packageManager": "yarn",
