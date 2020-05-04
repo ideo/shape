@@ -13,7 +13,6 @@ class OrganizationShellBuilder
       @organization.save!
       create_user_collection
       create_templates
-      # TODO create user getting started content and be sure to set collection to
       true
     end
     !result.nil?
