@@ -37,7 +37,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "ideo-products.shared-components/components/breadcrumb@0.1.1": {
+    "ideo-products.shared-components/components/breadcrumb@0.1.2": {
         "files": [
             {
                 "relativePath": "app/javascript/ui/layout/Breadcrumb.js",
