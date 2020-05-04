@@ -2,6 +2,7 @@ import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import { fakeTextItem, fakeActionCableUser, fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import Delta from 'quill-delta'
 
 const props = {
@@ -14,6 +15,7 @@ const props = {
   fullyLoaded: true,
   initialSize: 'normal',
   uiStore: fakeUiStore,
+  routingStore: fakeRoutingStore,
   apiStore: fakeApiStore(),
 }
 
@@ -75,8 +77,13 @@ describe('RealtimeTextItem', () => {
             version: 99,
             last_10: [{ version: 99, delta: {} }],
           },
+          collaborators: [fakeUser],
         })
         wrapper.update()
+      })
+
+      it('updates collaborators', () => {
+        expect(props.item.setCollaborators).toHaveBeenCalledWith([fakeUser])
       })
 
       it('applies last version delta', () => {
@@ -254,7 +261,7 @@ describe('RealtimeTextItem', () => {
       expect(component.combinedDelta).toEqual(helloWorld)
       expect(component.bufferDelta).toEqual(new Delta())
 
-      expect(component.version).toEqual(1)
+      expect(component.version).toEqual(null)
       // we receive someone else's response
       component.handleReceivedDelta({
         current_editor: { id: '88' },

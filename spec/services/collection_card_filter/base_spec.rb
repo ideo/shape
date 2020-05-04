@@ -170,8 +170,11 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
       context 'with ids_only setting' do
         let(:ids_only) { true }
 
-        it 'returns ids of all visible cards' do
-          expect(subject).to match_array(visible_cards.map(&:id))
+        it 'returns ids and orders of all visible cards' do
+          data = visible_cards.map do |cc|
+            { id: cc.id.to_s, order: cc.order }
+          end
+          expect(subject).to match_array(data)
         end
       end
     end

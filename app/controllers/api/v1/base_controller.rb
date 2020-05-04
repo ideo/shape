@@ -221,4 +221,8 @@ class Api::V1::BaseController < ApplicationController
       I18n.locale = I18n.default_locale
     end
   end
+
+  def collection_broadcaster(collection = @collection)
+    CollectionUpdateBroadcaster.new(collection, current_user)
+  end
 end

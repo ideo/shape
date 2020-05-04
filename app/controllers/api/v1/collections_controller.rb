@@ -1,5 +1,5 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
-  deserializable_resource :collection, class: DeserializableCollection, only: %i[update clear_collection_cover]
+  deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
   skip_before_action :check_api_authentication!, only: %i[show]
@@ -9,7 +9,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
   before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover]
-  after_action :broadcast_parent_collection_updates, only: %i[create_template clear_collection_cover]
+  after_action :broadcast_parent_collection_card_update, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
   def index
@@ -36,8 +36,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
 
     if builder.call
-      log_template_used(template: @template_collection, instance: builder.collection)
-      render jsonapi: builder.collection, expose: { current_record: builder.collection }
+      @collection = builder.collection
+      log_template_used(template: @template_collection, instance: @collection)
+      render_collection
     else
       render_api_errors builder.errors
     end
@@ -45,8 +46,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   after_action :broadcast_collection_updates, only: %i[update]
   def update
-    updated = CollectionUpdater.call(@collection, collection_params)
-    if updated
+    @updated = CollectionUpdater.call(@collection, collection_params)
+    if @updated
       log_collection_activity(:edited) if log_activity?
       return if @cancel_sync
 
@@ -167,27 +168,31 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def insert_row
-    RowInserter.call(
-      row: json_api_params[:row],
-      collection: @collection,
-    )
-    @collection.touch
-
-    head :no_content
+    @action = :insert_row
+    manipulate_row
   end
 
   def remove_row
-    RowInserter.call(
-      row: json_api_params[:row],
-      collection: @collection,
-      action: 'remove',
-    )
-    @collection.touch
-
-    head :no_content
+    @action = :remove_row
+    manipulate_row
   end
 
   private
+
+  def manipulate_row
+    RowInserter.call(
+      row: json_api_params[:row],
+      collection: @collection,
+      action: @action,
+    )
+    @collection.touch
+    collection_broadcaster.row_updated(
+      row: json_api_params[:row],
+      action: @action,
+    )
+
+    head :no_content
+  end
 
   def check_cache
     if @collection.organization.deactivated?
@@ -248,7 +253,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def load_and_authorize_collection_update
     @collection = Collection.find(params[:id])
-    if collection_params[:name].present? && collection_params[:name] != @collection.name
+    if params[:collection].present? && collection_params[:name].present? && collection_params[:name] != @collection.name
       authorize! :edit_name, @collection
     else
       authorize! :edit_content, @collection
@@ -366,11 +371,44 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def broadcast_collection_updates
-    CollectionUpdateBroadcaster.call(@collection, current_user)
+    return unless @updated
+
+    collection_broadcaster.collection_updated
+    if @collection.parent_collection_card.present?
+      collection_broadcaster(@collection.parent).card_updated(
+        @collection.parent_collection_card,
+      )
+    end
+    queue_linked_updates
+
+    card_attrs = collection_params[:collection_cards_attributes]
+    return unless card_attrs.present?
+
+    if @collection.board_collection?
+      collection_broadcaster.card_attrs_updated(
+        card_attrs.as_json,
+      )
+      return
+    end
+
+    # on a normal collection, just ping to reload the cards
+    collection_broadcaster.reload_cards
   end
 
-  def broadcast_parent_collection_updates
-    CollectionUpdateBroadcaster.call(@parent_collection, current_user)
+  def broadcast_parent_collection_card_update
+    collection_broadcaster(@parent_collection).card_updated(
+      @collection.parent_collection_card,
+    )
+  end
+
+  def queue_linked_updates
+    return unless @collection.cards_linked_to_this_collection.any?
+
+    LinkBroadcastWorker.perform_async(
+      @collection.id,
+      'Collection',
+      current_user.id,
+    )
   end
 
   def join_collection_group?

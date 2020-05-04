@@ -14,7 +14,6 @@ const StyledAvatar = styled(MuiAvatar)`
     margin-right: 5px;
     height: ${props => props.size}px;
     cursor: ${props => props.cursor};
-
     ${props =>
       props.responsive &&
       `
@@ -63,6 +62,7 @@ class Avatar extends React.Component {
       responsive,
       clickable,
     } = this.props
+
     const renderAvatar = (
       <StyledAvatar
         alt={title}

@@ -1,6 +1,8 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 describe WebhooksController, type: :request do
+  include_context 'CollectionUpdateBroadcaster setup'
   describe 'GET #filestack' do
     let(:params) do
       {
@@ -29,7 +31,8 @@ describe WebhooksController, type: :request do
     end
 
     it 'broadcasts the updates to the parent collection' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(collection)
+      expect(CollectionUpdateBroadcaster).to receive(:new).with(collection)
+      expect(broadcaster_instance).to receive(:card_updated).with(item.parent_collection_card)
       post(path, params: params)
     end
   end

@@ -1,6 +1,6 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { map, range } from 'lodash'
 
 import Avatar from '~/ui/global/Avatar'
 import v from '~/utils/variables'
@@ -17,20 +17,59 @@ const StyledAvatarGroup = styled.div`
     display: inline-block;
     margin-left: 0px;
     margin-right: -12px;
-    border: 1px solid ${v.colors.commonLight};
     /* for any transparent avatars */
     background-color: white;
     &:last-child {
       margin-right: 0;
     }
     ${props =>
-      map(
-        range(1, 6),
+      _.map(
+        _.range(1, 6),
         i =>
           `:nth-child(${i}) {
             z-index: ${10 - i};
           }`
       )};
+
+    box-shadow: 0 0 0 1px;
+    /* box-shadow will use the color property by default */
+    color: ${v.colors.commonLight};
+    &.outlined {
+      /* thicker outline */
+      box-shadow: 0 0 0 4px;
+      margin-right: -8px;
+    }
+    /* not the cleanest way to do this but it works; see note above about color */
+    &.outline-Blue {
+      color: ${v.colors.collaboratorPrimaryBlue};
+    }
+    &.outline-Yellow {
+      color: ${v.colors.collaboratorPrimaryYellow};
+    }
+    &.outline-Purple {
+      color: ${v.colors.collaboratorPrimaryPurple};
+    }
+    &.outline-Olive {
+      color: ${v.colors.collaboratorPrimaryOlive};
+    }
+    &.outline-Salmon {
+      color: ${v.colors.collaboratorPrimarySalmon};
+    }
+    &.outline-IcyBlue {
+      color: ${v.colors.collaboratorPrimaryIcyBlue};
+    }
+    &.outline-Lavender {
+      color: ${v.colors.collaboratorPrimaryLavender};
+    }
+    &.outline-Obsidian {
+      color: ${v.colors.collaboratorPrimaryObsidian};
+    }
+    &.outline-Slate {
+      color: ${v.colors.collaboratorPrimarySlate};
+    }
+    &.outline-Grey {
+      color: ${v.colors.collaboratorPrimaryGrey};
+    }
   }
   .placeholder {
     background-color: ${v.colors.commonMedium};

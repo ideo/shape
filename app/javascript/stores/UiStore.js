@@ -253,6 +253,8 @@ export default class UiStore {
   hoveringOverDataItem = false
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
+  @observable
+  collaboratorColors = new Map()
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -746,6 +748,7 @@ export default class UiStore {
     const { viewingCollection } = this
     this.deselectCards()
     this.closeCardMenu()
+    this.clearTextEditingItem()
     this.blankContentToolState = {
       ...this.defaultBCTState,
       order: 0,
@@ -834,6 +837,13 @@ export default class UiStore {
       : null
   }
 
+  @action
+  clearTextEditingItem() {
+    this.textEditingItem = null
+    this.textEditingCardId = null
+    this.textEditingItemHasTitleText = false
+  }
+
   get isEditingText() {
     const { textEditingItem, viewingItem } = this
     return textEditingItem || (viewingItem && viewingItem.isText)
@@ -891,7 +901,7 @@ export default class UiStore {
     this.reselectCardIds(all_collection_card_ids)
     try {
       const res = await collection.API_fetchAllCardIds()
-      all_collection_card_ids = res.data
+      all_collection_card_ids = _.map(res.data, 'id')
       this.reselectCardIds(all_collection_card_ids)
       // if the user had already initiated a move action, move the newly selected cards into the move action
       if (this.movingCardIds.length) {

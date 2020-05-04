@@ -76,6 +76,7 @@ export default class CardMoveService {
       uiStore.update('isLoadingMoveAction', true)
       let successMessage
       let res = {}
+      let newCardIds
       switch (cardAction) {
         case 'move':
           if (movingWithinCollection) {
@@ -120,19 +121,32 @@ export default class CardMoveService {
         default:
           return
       }
+      if (cardAction !== 'useTemplate') {
+        newCardIds = _.map(res.data, 'id')
+      }
       const meta = res.meta || {}
       // if we received a bulk operation placeholder, place that in the collection
       if (meta.placeholder && toCollection === viewingCollection) {
         runInAction(() => {
           toCollection.collection_cards.unshift(res.data)
         })
-      } else if (!movingWithinCollection) {
-        // always refresh the current collection
-        const fetchData = {}
-        if (data.placement && data.placement.row) {
-          fetchData.rows = [data.placement.row, data.placement.row + 20]
+      } else if (cardAction === 'useTemplate') {
+        const { parent_collection_card } = res.data
+        const cardRes = await apiStore.fetch(
+          'collection_cards',
+          parent_collection_card.id,
+          true
+        )
+        viewingCollection.addCard(cardRes.data)
+      } else if (
+        toCollection === viewingCollection &&
+        (cardAction === 'duplicate' || cardAction === 'link')
+      ) {
+        // this happens in apiStore.moveCards which is why we only do this for dupe/link
+        viewingCollection.mergeCards(res.data)
+        if (!viewingCollection.isBoard) {
+          viewingCollection.API_fetchCardOrders()
         }
-        await viewingCollection.API_fetchCards(fetchData)
       }
 
       uiStore.update('isLoadingMoveAction', false)
@@ -157,9 +171,9 @@ export default class CardMoveService {
         if (movingWithinCollection) {
           // reselect moved cards
           uiStore.reselectCardIds(data.collection_card_ids)
-        } else if (viewingCollection === toCollection && meta.new_cards) {
+        } else if (viewingCollection === toCollection && newCardIds) {
           // select newly created cards
-          uiStore.reselectCardIds(meta.new_cards)
+          uiStore.reselectCardIds(newCardIds)
         }
       }
       return true
