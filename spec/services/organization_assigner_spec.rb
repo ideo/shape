@@ -53,10 +53,6 @@ RSpec.describe OrganizationAssigner, type: :service do
       it 'should call OrganizationShellWorker to set up the next shell org' do
         expect(OrganizationShellWorker).to have_received(:perform_async)
       end
-
-      it 'should set loading_content to false' do
-        expect(user_collection.loading_content).to be false
-      end
     end
 
     context 'without an existing shell organization' do
