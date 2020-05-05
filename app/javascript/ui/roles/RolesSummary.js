@@ -50,12 +50,18 @@ class RolesSummary extends React.Component {
       return
     }
 
+    // check role change (likely we navigated between different records)
+    const roleIds = _.map(props.roles, 'id')
+    const prevRoleIds = _.map(prevProps.roles, 'id')
+    const rolesChanged = !objectsEqual(roleIds, prevRoleIds)
+    // check collaborator change (someone coming/going)
     const collabIds = _.map(props.collaborators, 'id')
     const prevCollabIds = _.map(prevProps.collaborators, 'id')
     const collaboratorsChanged = !objectsEqual(collabIds, prevCollabIds)
+    // check if we just closed the rolesMenu
     const rolesMenuClosed = props.rolesMenuOpen !== prevProps.rolesMenuOpen
-    // once you close the menu, or if collaborators have changed, update the list
-    if (collaboratorsChanged || rolesMenuClosed) {
+    // if any of those have changed, re-initialize the list
+    if (rolesChanged || collaboratorsChanged || rolesMenuClosed) {
       this.initEditorsAndViewers()
     }
   }

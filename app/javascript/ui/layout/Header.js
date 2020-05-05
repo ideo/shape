@@ -174,7 +174,7 @@ class Header extends React.Component {
       <RolesSummary
         key="roles"
         handleClick={this.showObjectRoleDialog}
-        roles={record.roles}
+        roles={[...record.roles]}
         canEdit={record.can_edit}
         // convert observable to normal array to trigger render changes
         collaborators={[...record.collaborators]}

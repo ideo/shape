@@ -269,6 +269,7 @@ export const fakeTextItem = {
   pushTextUndo: jest.fn(),
   setCollaborators: jest.fn(),
   collaborators: [],
+  roles: [],
   version: 1,
   ...fakeJsonApiAttrs,
 }

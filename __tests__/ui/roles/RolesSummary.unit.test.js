@@ -26,18 +26,32 @@ const canEditProps = {
 let wrapper, instance
 describe('RolesSummary', () => {
   describe('componentDidUpdate', () => {
+    const updateProps = {
+      ...emptyProps,
+      roles: [viewerRole],
+      collaborators: [{ ...fakeCollaborator }],
+    }
     beforeEach(() => {
       wrapper = shallow(<RolesSummary {...emptyProps} />)
       instance = wrapper.instance()
       instance.initEditorsAndViewers = jest.fn()
-      instance.componentDidUpdate({
-        ...emptyProps,
-        roles: [viewerRole],
-        collaborators: [{ ...fakeCollaborator }],
-      })
+      wrapper.setProps(updateProps)
     })
 
     it('should call initEditorsAndViewers', () => {
+      expect(instance.initEditorsAndViewers).toHaveBeenCalled()
+    })
+
+    it('should initEditorsAndViewers when roles change', () => {
+      instance.initEditorsAndViewers.mockClear()
+      // now call again, with same roles
+      wrapper.setProps(updateProps)
+      expect(instance.initEditorsAndViewers).not.toHaveBeenCalled()
+      // now call again, with new roles
+      wrapper.setProps({
+        ...updateProps,
+        roles: [viewerRole, editorRole],
+      })
       expect(instance.initEditorsAndViewers).toHaveBeenCalled()
     })
   })
