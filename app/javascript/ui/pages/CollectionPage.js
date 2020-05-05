@@ -402,11 +402,19 @@ class CollectionPage extends React.Component {
   get renderEditorPill() {
     const { currentEditor } = this
     const { currentUserId } = this.props.apiStore
+    const { collaborators } = this.props.collection
     let hidden = ''
     // don't let logged-out users see who's editing, but they can still receive realtime updates
     if (!currentUserId) return
-    if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId)
+
+    const collaborator = _.find(collaborators, c => c.id === currentEditor.id)
+    if (collaborator && collaborator.color) {
+      currentEditor.color = collaborator.color
+    }
+    if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId) {
+      // toggle hidden on/off to allow EditorPill CSS to fade in/out
       hidden = 'hidden'
+    }
     return (
       <EditorPill className={`editor-pill ${hidden}`} editor={currentEditor} />
     )

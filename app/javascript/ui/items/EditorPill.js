@@ -46,6 +46,10 @@ const StyledEditorPill = styled.div`
 class EditorPill extends React.PureComponent {
   render() {
     const { editor, className } = this.props
+    let editorClassName = 'editor'
+    if (editor.color) {
+      editorClassName += ` outlined outline-${editor.color}`
+    }
     return (
       <StyledEditorPill className={className}>
         {editor.name && (
@@ -54,7 +58,7 @@ class EditorPill extends React.PureComponent {
               title={editor.name}
               url={editor.pic_url_square}
               size={38}
-              className="editor"
+              className={editorClassName}
             />
             <div className="name">{editor.name} (Editing...)</div>
           </Fragment>
@@ -68,6 +72,7 @@ EditorPill.propTypes = {
   editor: PropTypes.shape({
     name: PropTypes.string,
     pic_url_square: PropTypes.string,
+    color: PropTypes.string,
   }).isRequired,
   className: PropTypes.string,
 }

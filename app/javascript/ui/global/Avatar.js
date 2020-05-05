@@ -23,6 +23,48 @@ const StyledAvatar = styled(MuiAvatar)`
       }
     `};
   }
+  &.bordered {
+    box-shadow: 0 0 0 1px;
+    /* box-shadow will use the color property by default */
+    color: ${v.colors.commonLight};
+  }
+  &.outlined {
+    /* thicker outline */
+    box-shadow: 0 0 0 4px;
+    /* box-shadow will use the color property by default */
+    color: ${v.colors.commonLight};
+  }
+  /* not the cleanest way to do this but it works; see note above about color */
+  &.outline-Blue {
+    color: ${v.colors.collaboratorPrimaryBlue};
+  }
+  &.outline-Yellow {
+    color: ${v.colors.collaboratorPrimaryYellow};
+  }
+  &.outline-Purple {
+    color: ${v.colors.collaboratorPrimaryPurple};
+  }
+  &.outline-Olive {
+    color: ${v.colors.collaboratorPrimaryOlive};
+  }
+  &.outline-Salmon {
+    color: ${v.colors.collaboratorPrimarySalmon};
+  }
+  &.outline-IcyBlue {
+    color: ${v.colors.collaboratorPrimaryIcyBlue};
+  }
+  &.outline-Lavender {
+    color: ${v.colors.collaboratorPrimaryLavender};
+  }
+  &.outline-Obsidian {
+    color: ${v.colors.collaboratorPrimaryObsidian};
+  }
+  &.outline-Slate {
+    color: ${v.colors.collaboratorPrimarySlate};
+  }
+  &.outline-Grey {
+    color: ${v.colors.collaboratorPrimaryGrey};
+  }
 `
 
 @observer

@@ -235,7 +235,7 @@ describe('RolesSummary', () => {
           .find('Avatar')
           .at(2)
           .prop('className')
-      ).toEqual('viewer')
+      ).toEqual('viewer bordered')
     })
   })
 })

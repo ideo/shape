@@ -31,44 +31,15 @@ const StyledAvatarGroup = styled.div`
           }`
       )};
 
-    box-shadow: 0 0 0 1px;
-    /* box-shadow will use the color property by default */
-    color: ${v.colors.commonLight};
     &.outlined {
-      /* thicker outline */
-      box-shadow: 0 0 0 4px;
+      /* thicker outline needs different spacing */
       margin-right: -8px;
-    }
-    /* not the cleanest way to do this but it works; see note above about color */
-    &.outline-Blue {
-      color: ${v.colors.collaboratorPrimaryBlue};
-    }
-    &.outline-Yellow {
-      color: ${v.colors.collaboratorPrimaryYellow};
-    }
-    &.outline-Purple {
-      color: ${v.colors.collaboratorPrimaryPurple};
-    }
-    &.outline-Olive {
-      color: ${v.colors.collaboratorPrimaryOlive};
-    }
-    &.outline-Salmon {
-      color: ${v.colors.collaboratorPrimarySalmon};
-    }
-    &.outline-IcyBlue {
-      color: ${v.colors.collaboratorPrimaryIcyBlue};
-    }
-    &.outline-Lavender {
-      color: ${v.colors.collaboratorPrimaryLavender};
-    }
-    &.outline-Obsidian {
-      color: ${v.colors.collaboratorPrimaryObsidian};
-    }
-    &.outline-Slate {
-      color: ${v.colors.collaboratorPrimarySlate};
-    }
-    &.outline-Grey {
-      color: ${v.colors.collaboratorPrimaryGrey};
+      &:first-child {
+        margin-left: 4px;
+      }
+      &:last-child {
+        margin-right: 4px;
+      }
     }
   }
   .placeholder {

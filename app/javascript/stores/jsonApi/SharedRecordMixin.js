@@ -193,10 +193,15 @@ const SharedRecordMixin = superclass =>
     @action
     setCollaborators(collaborators) {
       const { collaboratorColors } = this.uiStore
+      const { currentUserId } = this.apiStore
+      const otherCollaborators = _.reject(
+        collaborators,
+        c => c.id === currentUserId
+      )
       const sorted =
         // sort by most recent first
         _.reverse(
-          _.sortBy(collaborators, e => {
+          _.sortBy(otherCollaborators, e => {
             return new Date(e.timestamp)
           })
         )
