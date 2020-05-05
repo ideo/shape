@@ -92,13 +92,24 @@ class Item
     def save_and_broadcast_quill_data(user, data)
       # update delta with transformed one
       new_data = threadlocked_transform_realtime_delta(user, Mashie.new(data))
-      # new_data may include an error message
+      # broadcast to fellow text channel viewers; new_data may include an error message
       received_changes(new_data, user)
 
-      return if parent.nil? || parent.num_viewers < 2 || parent.broadcasting?
+      # only continue if we haven't broadcasted to the collection in the last 4 seconds
+      return if last_broadcast_at.present? && (Time.current - last_broadcast_at) < 4
 
-      parent.update(broadcasting: true)
-      CollectionBroadcastWorker.perform_in(3.seconds, parent.id)
+      update_columns(last_broadcast_at: Time.current)
+      # only continue if anyone else is still viewing the text item's collection
+      return if parent&.num_viewers&.zero?
+
+      CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
+      # push one more broadcast to get any last updates e.g. that happened < 4 seconds
+      # and to call LinkBroadcastWorker
+      TextItemBroadcastWorker.perform_in(
+        5.seconds,
+        id,
+        user&.id,
+      )
     end
 
     def threadlocked_transform_realtime_delta(user, data)

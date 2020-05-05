@@ -1,18 +1,21 @@
 module CollectionCardFilter
   class Base < SimpleService
-    def initialize(collection:, user:, filters:, application: nil, ids_only: false)
+    def initialize(collection:, user:, filters:, application: nil, ids_only: false, select_ids: nil)
       @collection_order = nil
       @collection = collection
       @user = user
       @filters = filters
       @application = application
       @cards = []
+      # ids_only means literally just return collection card ids
       @ids_only = ids_only
+      # select_ids limits the selection those card ids (still returning the full card)
+      @select_ids = select_ids
     end
 
     def call
       initialize_cards
-      apply_order unless @ids_only
+      apply_order
       apply_hidden
 
       if public_collection? && user_does_not_have_access?
@@ -38,7 +41,11 @@ module CollectionCardFilter
         filter_identifier if @filters[:identifier].present?
       end
 
-      return @cards.pluck(:id) if @ids_only
+      if @ids_only
+        return @cards.map do |cc|
+          { id: cc.id.to_s, order: cc.order }
+        end
+      end
 
       @cards
     end
@@ -118,6 +125,10 @@ module CollectionCardFilter
         @cards = @cards.active
       end
 
+      if @select_ids.present?
+        @cards = @cards.where(id: @select_ids)
+      end
+
       return @cards if @ids_only
 
       @cards = @cards.includes(CollectionCard.default_includes_for_api)
@@ -168,7 +179,7 @@ module CollectionCardFilter
 
     def fields
       if @ids_only
-        arr = ['collection_cards.id']
+        arr = ['collection_cards.id', 'collection_cards.order']
       else
         arr = ['collection_cards.*']
       end

@@ -169,6 +169,22 @@ RSpec.describe CardMover, type: :service do
         ])
       end
 
+      context 'with moving with same collection that\'s a master template' do
+        let!(:from_collection) { to_collection }
+
+        before do
+          from_collection.update(master_template: true)
+        end
+
+        it 'should call update_template_instances' do
+          expect(from_collection).to receive(:queue_update_template_instances).with(
+            updated_card_ids: from_collection.collection_cards.pluck(:id),
+            template_update_action: :update_card_attributes,
+          )
+          card_mover.call
+        end
+      end
+
       context 'with pinned cards that already exist in to_collection' do
         before do
           # update first 2 cards to be pinned

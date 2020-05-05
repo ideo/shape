@@ -182,10 +182,6 @@ class SerializableCollection < BaseJsonSerializer
     end
   end
 
-  attribute :show_language_selector do
-    @object.inside_an_application_collection?
-  end
-
   attribute :launchable, if: -> { @object.test_or_test_results_collection? } do
     @object.launchable?
   end

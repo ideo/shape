@@ -9,23 +9,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :check_cache, only: %i[index ids breadcrumb_records]
   before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
   def index
-    params[:card_order] ||= @collection.default_card_order
+    render_collection_cards
+  end
 
-    render jsonapi: @collection_cards,
-           include: CollectionCard.default_relationships_for_api,
-           expose: {
-             card_order: params[:card_order],
-             current_record: @collection,
-             parent: @collection,
-             inside_a_submission: @collection.submission? || @collection.inside_a_submission?,
-             inside_hidden_submission_box: @collection.hide_submissions || @collection.inside_hidden_submission_box?,
-             include: params[:include],
-           }
+  def show
+    render jsonapi: @collection_card,
+           include: CollectionCard.default_relationships_for_api
   end
 
   # return all collection_card_ids for this particular collection
   def ids
-    render json: @collection_card_ids.map(&:to_s)
+    render json: @collection_card_ids
   end
 
   def ids_in_direction
@@ -72,8 +66,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       current_user.reload.reset_cached_roles!
       card.reload
       create_notification(card, :created)
-      # because TextItems get created empty, we don't broadcast their creation
-      broadcast_collection_create_updates unless card.record.is_a?(Item::TextItem)
+      broadcast_collection_create_updates(card)
       render jsonapi: card,
              include: CollectionCard.default_relationships_for_api,
              expose: { current_record: card.record }
@@ -95,9 +88,9 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
       create_notification(@collection_card, :edited)
-      broadcast_collection_create_updates
+      broadcast_collection_create_updates(@collection_card)
       if @collection_card.saved_change_to_is_cover?
-        broadcast_parent_collection_updates
+        broadcast_parent_collection_updates(@collection_card)
       end
       @collection_card.reload
       render_collection_card
@@ -110,7 +103,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
       create_notification(@collection_card, :edited)
-      broadcast_collection_create_updates
+      broadcast_collection_create_updates(@collection_card)
       @collection_card.reload
       render_collection_card
     else
@@ -180,7 +173,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   before_action :load_and_authorize_moving_collections, only: %i[move]
-  after_action :broadcast_moving_collection_updates, only: %i[move link]
+  after_action :broadcast_moving_collection_updates, only: %i[move]
   def move
     placement = json_api_params[:placement].presence || 'beginning'
     @card_action ||= 'move'
@@ -197,8 +190,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       placement: placement,
       card_action: @card_action,
     )
-    moved_cards = mover.call
-    if moved_cards
+    @moved_cards = mover.call
+    if @moved_cards
       # we still create notifications on the original @cards
       @cards.map do |card|
         create_notification(
@@ -206,14 +199,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
           Activity.map_move_action(@card_action),
         )
       end
-      render_to_collection_with_cards(moved_cards)
+      render_to_collection_with_cards(@moved_cards)
     else
       render json: { errors: mover.errors }, status: :unprocessable_entity
     end
   end
 
-  # has its own route even though it's mostly the same as #move
   before_action :load_and_authorize_linking_collections, only: %i[link duplicate]
+  after_action :broadcast_linking_collection_updates, only: %i[link]
   def link
     @card_action = 'link'
     move
@@ -252,10 +245,23 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   private
 
+  def render_collection_cards(collection: @collection, collection_cards: @collection_cards)
+    params[:card_order] ||= collection.default_card_order
+
+    render jsonapi: collection_cards,
+           include: CollectionCard.default_relationships_for_api,
+           expose: {
+             card_order: params[:card_order],
+             current_record: collection,
+             parent: collection,
+             inside_a_submission: collection.submission? || collection.inside_a_submission?,
+             inside_hidden_submission_box: collection.hide_submissions || collection.inside_hidden_submission_box?,
+             include: params[:include],
+           }
+  end
+
   def render_to_collection_with_cards(new_cards)
-    render jsonapi: @to_collection.reload,
-           meta: { new_cards: new_cards.pluck(:id).map(&:to_s) },
-           expose: { current_record: @to_collection }
+    render_collection_cards(collection: @to_collection, collection_cards: new_cards)
   end
 
   def render_collection_card(include: nil)
@@ -307,6 +313,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     ids_only = params[:action] == 'ids'
     filter_params = params[:filter].present? ? params[:filter] : params
     filter_params.merge(q: params[:q]) if params[:q].present?
+    select_ids = params[:select_ids].present? ? params[:select_ids].split(',') : nil
     @collection_cards = CollectionCardFilter::Base
                         .call(
                           collection: @collection,
@@ -314,6 +321,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                           filters: filter_params.merge(page: @page),
                           application: current_application,
                           ids_only: ids_only,
+                          select_ids: select_ids,
                         )
     return unless user_signed_in?
 
@@ -446,31 +454,58 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def broadcast_replacing_updates
     return unless @replacing_card.parent.present?
 
-    CollectionUpdateBroadcaster.call(@replacing_card.parent, current_user)
+    collection_broadcaster(@replacing_card.parent).card_updated(@replacing_card)
   end
 
   def broadcast_moving_collection_updates
-    if @card_action == 'move'
-      CollectionUpdateBroadcaster.call(@from_collection, current_user)
+    card_ids = @cards.pluck(:id)
+    unless moving_within_collection
+      # treat this as if they were "archived"
+      collection_broadcaster(@from_collection).cards_archived(
+        card_ids,
+      )
     end
-    CollectionUpdateBroadcaster.call(@to_collection, current_user)
+
+    collection_broadcaster(@to_collection).cards_updated(
+      card_ids,
+    )
   end
 
-  def broadcast_collection_create_updates
-    CollectionUpdateBroadcaster.call(@collection, current_user)
+  def broadcast_linking_collection_updates
+    return if @moved_cards.blank?
+
+    collection_broadcaster(@to_collection).cards_updated(
+      @moved_cards.pluck(:id),
+    )
   end
 
-  def broadcast_parent_collection_updates
+  def broadcast_collection_create_updates(card)
+    collection_broadcaster.card_updated(card)
+  end
+
+  def broadcast_parent_collection_updates(card)
     parent = @collection.parent
     return unless parent.present?
 
-    CollectionUpdateBroadcaster.call(parent, current_user)
+    collection_broadcaster(parent).card_updated(card)
   end
 
   def broadcast_collection_archive_updates
-    return unless @collection_cards.first.present?
+    parent = @collection_cards.first&.parent
+    return unless parent.present?
 
-    CollectionUpdateBroadcaster.call(@collection_cards.first.parent, current_user)
+    card_ids = @collection_cards.pluck(:id)
+    if params[:action] == 'archive'
+      collection_broadcaster(parent).cards_archived(
+        card_ids,
+      )
+      return
+    end
+
+    # this is for unarchive
+    collection_broadcaster(parent).cards_updated(
+      card_ids,
+    )
   end
 
   def ordered_cards

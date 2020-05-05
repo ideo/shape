@@ -6,6 +6,8 @@ class TextItemHighlighter < SimpleService
 
   def call
     unless @item.can_edit?(@user)
+      # this basically just validates that read-only users are only highlighting
+      # and not changing the text content
       return false if @item.plain_content_changed?
     end
 

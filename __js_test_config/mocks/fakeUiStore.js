@@ -124,6 +124,7 @@ const fakeUiStore = {
   adjustZoomLevel: jest.fn(),
   zoomIn: jest.fn(),
   zoomOut: jest.fn(),
+  clearTextEditingItem: jest.fn(),
 }
 
 export default fakeUiStore

@@ -6,7 +6,7 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import fakeUndoStore from '#/mocks/fakeUndoStore'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeUser } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/ChannelManager')
 jest.mock('../../../app/javascript/stores')
@@ -191,9 +191,11 @@ describe('CollectionPage', () => {
         wrapper.setProps({
           collection: { ...collection, id: 99, loadedRows: [0, 8] },
         })
-        wrapper
-          .instance()
-          .receivedChannelData({ record_id: 99, current_editor: {} })
+        wrapper.instance().receivedChannelData({
+          record_id: 99,
+          current_editor: {},
+          collaborators: [fakeUser],
+        })
         wrapper.instance().reloadData.flush()
       })
 
@@ -201,6 +203,10 @@ describe('CollectionPage', () => {
         expect(collection.API_fetchCards).toHaveBeenCalledWith({
           rows: collection.loadedRows,
         })
+      })
+
+      it('should update realtime collaborators', () => {
+        expect(collection.setCollaborators).toHaveBeenCalledWith([fakeUser])
       })
     })
   })

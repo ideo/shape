@@ -6,7 +6,7 @@ RSpec.describe UpdateTemplateInstancesWorker, type: :worker do
 
     it 'calls #update_template_instances' do
       expect_any_instance_of(TemplateInstanceUpdater).to receive(:call)
-      UpdateTemplateInstancesWorker.new.perform(master_template.id, master_template.collection_cards.pluck(:id), 'update_all')
+      UpdateTemplateInstancesWorker.new.perform(master_template.id, master_template.collection_cards.pluck(:id), :update_all)
     end
   end
 end

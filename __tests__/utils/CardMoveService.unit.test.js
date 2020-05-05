@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { observable } from 'mobx'
 import CardMoveService from '~/utils/CardMoveService'
 
@@ -13,6 +14,9 @@ const uiStore = fakeUiStore
 uiStore.viewingCollection = {
   id: '3',
   API_fetchCards: jest.fn(),
+  API_fetchCardOrders: jest.fn(),
+  addCard: jest.fn(),
+  mergeCards: jest.fn(),
 }
 
 const mockFind = (type, id) => {
@@ -207,7 +211,7 @@ describe('CardMoveService', () => {
 
     describe('using link action on an editable collection', () => {
       const data = {
-        meta: { new_cards: ['10', '11'] },
+        data: [{ id: '10' }, { id: '11' }],
       }
       beforeEach(() => {
         apiStore.currentUser = fakeUser
@@ -233,6 +237,15 @@ describe('CardMoveService', () => {
         })
       })
 
+      it('should merge the cards and fetch the card orders', async () => {
+        await service.moveCards('beginning')
+        expect(uiStore.viewingCollection.mergeCards).toHaveBeenCalledWith(
+          data.data
+        )
+        // because it's not a board:
+        expect(uiStore.viewingCollection.API_fetchCardOrders).toHaveBeenCalled()
+      })
+
       it('should close the move menu', async () => {
         await service.moveCards('beginning')
         expect(uiStore.closeMoveMenu).toHaveBeenCalled()
@@ -243,10 +256,12 @@ describe('CardMoveService', () => {
         expect(uiStore.resetSelectionAndBCT).toHaveBeenCalled()
       })
 
-      it('should reselect newly created cards', async () => {
-        await service.moveCards('beginning')
+      it('should reselect newly created cards if moving into viewingCollection', async () => {
+        await service.moveCards('beginning', {
+          to_id: uiStore.viewingCollection.id,
+        })
         expect(uiStore.reselectCardIds).toHaveBeenCalledWith(
-          data.meta.new_cards
+          _.map(data.data, 'id')
         )
       })
 
@@ -257,9 +272,16 @@ describe('CardMoveService', () => {
     })
 
     describe('creating a template', () => {
+      const data = {
+        data: {
+          parent_collection_card: { id: '10' },
+        },
+      }
       beforeEach(() => {
         apiStore.currentUser = fakeUser
-        apiStore.request = jest.fn().mockReturnValue(Promise.resolve())
+        apiStore.createTemplateInstance = jest
+          .fn()
+          .mockReturnValue(Promise.resolve(data))
         uiStore.movingFromCollectionId = '3'
         uiStore.cardAction = 'useTemplate'
         uiStore.viewingCollection = {
@@ -281,7 +303,12 @@ describe('CardMoveService', () => {
           template: uiStore.viewingCollection,
         })
         // expect the collection to reload
-        expect(uiStore.viewingCollection.API_fetchCards).toHaveBeenCalled()
+        expect(apiStore.fetch).toHaveBeenCalledWith(
+          'collection_cards',
+          data.data.parent_collection_card.id,
+          true
+        )
+        expect(uiStore.viewingCollection.addCard).toHaveBeenCalled()
       })
 
       it('should show a success message', () => {

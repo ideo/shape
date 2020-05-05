@@ -97,7 +97,6 @@ Feature: Undo actions
     # Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
 
     When I click the down arrow on the MDL snackbar
-    And I wait for "@apiGetCollectionCards" to finish
     And I wait for "@apiMoveCollectionCards" to finish
     And I wait for 1 second
     Then I should see a collection card named "Hello World"

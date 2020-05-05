@@ -31,14 +31,17 @@ class Api::V1::ItemsController < Api::V1::BaseController
     @item.attributes = item_params
     if @item.save
       log_item_activity(:edited) if log_activity?
-      broadcaster = CollectionUpdateBroadcaster.new(@item.parent, current_user)
-      if @item.is_a? Item::TextItem
-        broadcaster.text_item_updated(@item)
-      else
-        broadcaster.call
+      # text item has its own broadcast already happening in #save_and_broadcast_quill_data
+      unless @item.is_a? Item::TextItem
+        collection_broadcaster(@item.parent).card_updated(
+          @item.parent_collection_card,
+        )
       end
-      # cancel_sync means we don't want to render the item JSON
-      return if @cancel_sync
+      if @cancel_sync
+        # cancel_sync means we don't want to render the item JSON
+        head :no_content
+        return
+      end
 
       render jsonapi: @item, expose: { current_record: @item }
     else
@@ -46,14 +49,17 @@ class Api::V1::ItemsController < Api::V1::BaseController
     end
   end
 
+  # this is a different endpoint because it only requires read permissions
   def highlight
     @item.attributes = item_params
     if TextItemHighlighter.call(item: @item, user: current_user)
       log_item_activity(:edited) if log_activity?
-      broadcaster = CollectionUpdateBroadcaster.new(@item.parent, current_user)
-      broadcaster.text_item_updated(@item)
-      # cancel_sync means we don't want to render the item JSON
-      return if @cancel_sync
+      # text item has its own broadcast already happening in #save_and_broadcast_quill_data
+      if @cancel_sync
+        # cancel_sync means we don't want to render the item JSON
+        head :no_content
+        return
+      end
 
       render jsonapi: @item, expose: { current_record: @item }
     else
@@ -76,7 +82,9 @@ class Api::V1::ItemsController < Api::V1::BaseController
 
   def archive
     if @item.archive!
-      CollectionUpdateBroadcaster.call(@item.parent, current_user)
+      collection_broadcaster(@item.parent).cards_archived(
+        [@item.parent_collection_card.id],
+      )
       render jsonapi: @item.reload
     else
       render_api_errors @item.errors

@@ -19,7 +19,6 @@ import {
 } from '~/ui/global/QuillTextHighlighter'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
-import { routingStore } from '~/stores'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
@@ -101,7 +100,7 @@ const StyledContainer = styled.div`
   `}
 `
 
-@inject('uiStore', 'apiStore')
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class RealtimeTextItem extends React.Component {
   unmounted = false
@@ -116,6 +115,7 @@ class RealtimeTextItem extends React.Component {
   currentlySending = false
   currentlySendingCheck = null
   num_viewers = 1
+  version = null
   quillData = {}
   combinedDelta = new Delta()
   bufferDelta = new Delta()
@@ -178,7 +178,7 @@ class RealtimeTextItem extends React.Component {
     this.cancel(null, { route: false })
     // check if you're leaving to go to the same item, e.g. item on CollectionPage -> ItemPage
     // in which case we keep the channel open
-    const { routingTo } = routingStore
+    const { routingTo } = this.props.routingStore
     const { item } = this.props
     const routingToSameItem =
       routingTo.id === item.id && routingTo.type === 'items'
@@ -240,19 +240,23 @@ class RealtimeTextItem extends React.Component {
     if (!this.reactQuillRef) return
     if (typeof this.reactQuillRef.getEditor !== 'function') return
     this.quillEditor = this.reactQuillRef.getEditor()
+    this.version = this.props.item.version
 
     if (!initSnapshot) return
     this.contentSnapshot = this.quillEditor.getContents()
     this.updateUiStoreSnapshot()
   }
 
-  get version() {
-    return this.props.item.version
-  }
-
   createCursor({ id, name }) {
+    const { uiStore } = this.props
+    const { collaboratorColors } = uiStore
     const cursors = this.quillEditor.getModule('cursors')
-    cursors.createCursor(id, name, v.colors.tertiaryMedium)
+    let cursorColor = v.colors.tertiaryMedium
+    if (collaboratorColors.has(id)) {
+      cursorColor =
+        v.colors[`collaboratorSecondary${collaboratorColors.get(id)}`]
+    }
+    cursors.createCursor(id, name, cursorColor)
   }
 
   channelConnected = () => {
@@ -280,15 +284,26 @@ class RealtimeTextItem extends React.Component {
     this.setState({ disconnected: true })
   }
 
-  channelReceivedData = ({ current_editor, data, num_viewers }) => {
+  channelReceivedData = ({
+    current_editor,
+    data,
+    num_viewers,
+    collaborators,
+  }) => {
     if (this.unmounted) return
+    // you may just be receiving data about someone joining/leaving
     this.num_viewers = num_viewers
-    if (data && data.version) {
+    if (!data) return
+
+    if (data.version) {
       this.handleReceivedDelta({ current_editor, data })
     }
-    if (data && data.range) {
+    if (data.range) {
       this.handleReceivedRange({ current_editor, data })
     }
+
+    const { item } = this.props
+    item.setCollaborators(collaborators)
   }
 
   handleReceivedRange = ({ current_editor, data }) => {
@@ -300,23 +315,23 @@ class RealtimeTextItem extends React.Component {
   }
 
   handleReceivedDelta = ({ current_editor, data }) => {
-    const { item, currentUserId } = this.props
+    const { currentUserId } = this.props
 
     // update our local version number
     if (data.version) {
       if (!data.error && data.last_10) {
-        const diff = data.version - item.version
+        const diff = data.version - this.version
         if (diff > 0) {
           _.each(data.last_10, previous => {
             const delta = new Delta(previous.delta)
-            if (previous.version > item.version) {
+            if (previous.version > this.version) {
               if (previous.editor_id !== currentUserId) {
                 this.applyIncomingDelta(delta)
               }
               // update for later sending appropriately composed version to be saved
               this.contentSnapshot = this.contentSnapshot.compose(delta)
-              // set our local item.version to match the realtime data we got
-              item.version = previous.version
+              // set our local version to match the realtime data we got
+              this.version = previous.version
             }
           })
         }
@@ -413,7 +428,8 @@ class RealtimeTextItem extends React.Component {
   @action
   setItemQuillData() {
     const { item, uiStore } = this.props
-    const { quillEditor } = this
+    const { quillEditor, version } = this
+    item.version = version
     if (!quillEditor) {
       return item
     }
@@ -483,7 +499,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   _sendCursor = () => {
-    if (!this.quillEditor) return
+    if (!this.quillEditor || this.num_viewers === 1) return
     this.socketSend('cursor', {
       range: this.quillEditor.getSelection(),
     })
@@ -498,7 +514,7 @@ class RealtimeTextItem extends React.Component {
           if (this.currentlySending) {
             this.channelDisconnected('Disconnected from server')
           }
-        }, 15 * 1000)
+        }, 10 * 1000)
       }
       return false
     }
@@ -526,9 +542,19 @@ class RealtimeTextItem extends React.Component {
 
   _instanceTextContentUpdate = () => {
     const { item, uiStore } = this.props
-    const parent = item.parent || uiStore.viewingCollection
-    if (parent && parent.isTemplate) {
-      parent.API_backgroundUpdateTemplateInstances()
+    const { type, parent } = item
+    const instanceParentCollection = parent || uiStore.viewingCollection
+    if (
+      instanceParentCollection &&
+      instanceParentCollection.isTemplate &&
+      this.cardId &&
+      type
+    ) {
+      const ids = [this.cardId]
+      instanceParentCollection.API_backgroundUpdateTemplateInstances({
+        type,
+        ids,
+      })
     }
   }
 
@@ -764,6 +790,7 @@ RealtimeTextItem.defaultProps = {
 RealtimeTextItem.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default RealtimeTextItem

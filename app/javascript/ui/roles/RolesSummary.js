@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import _ from 'lodash'
 import pluralize from 'pluralize'
@@ -9,6 +9,7 @@ import Avatar from '~/ui/global/Avatar'
 import AvatarGroup, { MAX_AVATARS_TO_SHOW } from '~/ui/global/AvatarGroup'
 import v from '~/utils/variables'
 import { AddButton } from '~/ui/global/styled/buttons'
+import { objectsEqual } from '~/utils/objectUtils'
 
 const StyledRolesSummary = styled.div`
   position: relative;
@@ -29,47 +30,79 @@ const StyledSeparator = styled.div`
   display: inline-block;
 `
 
-// NOTE: intentionally not an observer so that searching roles within the menu doesn't affect this list on the fly
-// however it will automatically update after you close the RolesModal
+@observer
 class RolesSummary extends React.Component {
-  shouldComponentUpdate(nextProps, nextState) {
-    // while the rolesMenu is open, the users/groups attached to roles might be changing (e.g. searching)
-    // and we want the RolesSummary to ignore all that (see note above)
-    if (nextProps.rolesMenuOpen) return false
-    return true
+  // NOTE: editors and viewers are stored in state so that searching roles
+  // within the menu doesn't affect this list on the fly
+  state = {
+    editors: [],
+    viewers: [],
   }
 
-  get editors() {
-    const { roles } = this.props
-    const editorRole = _.find(roles, { name: 'editor' })
-    if (!editorRole) return []
-    return [...editorRole.users, ...editorRole.groups]
+  componentDidMount() {
+    this.initEditorsAndViewers()
   }
 
-  get viewers() {
-    const { roles } = this.props
-    const viewerRole = _.find(roles, { name: 'viewer' })
-    if (!viewerRole) return []
-    return [...viewerRole.users, ...viewerRole.groups]
+  componentDidUpdate(prevProps) {
+    const { props } = this
+    // don't update the editors/viewers when the rolesMenu is open
+    if (props.rolesMenuOpen) {
+      return
+    }
+
+    const collabIds = _.map(props.collaborators, 'id')
+    const prevCollabIds = _.map(prevProps.collaborators, 'id')
+    const collaboratorsChanged = !objectsEqual(collabIds, prevCollabIds)
+    const rolesMenuClosed = props.rolesMenuOpen !== prevProps.rolesMenuOpen
+    // once you close the menu, or if collaborators have changed, update the list
+    if (collaboratorsChanged || rolesMenuClosed) {
+      this.initEditorsAndViewers()
+    }
+  }
+
+  initEditorsAndViewers() {
+    this.setState({
+      editors: this.usersAndGroupsForRole('editor'),
+      viewers: this.usersAndGroupsForRole('viewer'),
+    })
+  }
+
+  usersAndGroupsForRole = roleName => {
+    const { collaborators, roles } = this.props
+    const role = _.find(roles, { name: roleName })
+    if (!role) return []
+    const sortedUsers = _.sortBy(role.users, 'name')
+    const sortedGroups = _.sortBy(role.groups, 'name')
+    // collaborators are already sorted by most recent first
+    const collaboratorUsers = _.filter(collaborators, v => {
+      const can_edit = v.can_edit_collection
+      return roleName === 'editor' ? can_edit : !can_edit
+    })
+
+    const allUsers = _.uniqBy([...collaboratorUsers, ...sortedUsers], 'id')
+    return [...allUsers, ...sortedGroups]
   }
 
   // Return at most MAX_AVATARS_TO_SHOW users,
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
-    let editors = _.sortBy(this.editors, ['first_name'])
-    let viewers = _.sortBy(this.viewers, ['first_name'])
+    const { editors, viewers } = this.state
     const editorCount = editors.length
     const viewerCount = viewers.length
-    editors = editors.slice(0, MAX_AVATARS_TO_SHOW)
+    const maxEditors = editors.slice(0, MAX_AVATARS_TO_SHOW)
 
-    if (editors.length < MAX_AVATARS_TO_SHOW) {
-      const numViewers = MAX_AVATARS_TO_SHOW - editors.length
-      viewers = viewers.slice(0, numViewers)
-    } else {
-      viewers = []
+    let maxViewers = []
+    if (maxEditors.length < MAX_AVATARS_TO_SHOW) {
+      const numViewers = MAX_AVATARS_TO_SHOW - maxEditors.length
+      maxViewers = viewers.slice(0, numViewers)
     }
 
-    return { editors, editorCount, viewers, viewerCount }
+    return {
+      editors: maxEditors,
+      editorCount,
+      viewers: maxViewers,
+      viewerCount,
+    }
   }
 
   roleLabel = roleName => {
@@ -81,6 +114,25 @@ class RolesSummary extends React.Component {
     return pluralize(_.startCase(label))
   }
 
+  renderAvatar = (userOrGroup, type) => {
+    // the color class creates a box shadow via AvatarGroup styled-component
+    const className = `${type}${
+      userOrGroup.color ? ` outlined outline-${userOrGroup.color}` : ' bordered'
+    }`
+
+    return (
+      <Avatar
+        key={`${userOrGroup.internalType}_${userOrGroup.id}`}
+        title={userOrGroup.nameWithHints || userOrGroup.name}
+        url={userOrGroup.pic_url_square || userOrGroup.filestack_file_url}
+        className={className}
+        // user_profile_collection_id will be null if its a group
+        linkToCollectionId={userOrGroup.user_profile_collection_id}
+        displayName
+      />
+    )
+  }
+
   get renderEditors() {
     const { editors, viewers, editorCount } = this.viewersAndEditorsLimited
     // If there aren't any editors or viewers, render with add user button
@@ -88,17 +140,9 @@ class RolesSummary extends React.Component {
     if (editors.length === 0 && !this.props.canEdit) return ''
     if (editors.length === 0 && viewers.length === 0) return ''
 
-    const editorAvatars = editors.map(editor => (
-      <Avatar
-        key={`${editor.internalType}_${editor.id}`}
-        title={editor.nameWithHints || editor.name}
-        url={editor.pic_url_square || editor.filestack_file_url}
-        className="editor"
-        // user_profile_collection_id will be null if its a group
-        linkToCollectionId={editor.user_profile_collection_id}
-        displayName
-      />
-    ))
+    const editorAvatars = editors.map(editor =>
+      this.renderAvatar(editor, 'editor')
+    )
 
     return (
       <AvatarGroup
@@ -115,17 +159,9 @@ class RolesSummary extends React.Component {
     const { viewers, viewerCount } = this.viewersAndEditorsLimited
 
     if (viewers.length === 0) return ''
-    const viewerAvatars = viewers.map(viewer => (
-      <Avatar
-        key={`${viewer.internalType}_${viewer.id}`}
-        title={viewer.nameWithHints || viewer.name}
-        url={viewer.pic_url_square || viewer.filestack_file_url}
-        className="viewer"
-        // user_profile_collection_id will be null if its a group
-        linkToCollectionId={viewer.user_profile_collection_id}
-        displayName
-      />
-    ))
+    const viewerAvatars = viewers.map(viewer =>
+      this.renderAvatar(viewer, 'viewer')
+    )
     return (
       <AvatarGroup
         avatarCount={viewerCount}
@@ -163,6 +199,7 @@ class RolesSummary extends React.Component {
 
 RolesSummary.propTypes = {
   roles: MobxPropTypes.arrayOrObservableArray,
+  collaborators: MobxPropTypes.arrayOrObservableArray,
   handleClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   rolesMenuOpen: PropTypes.bool.isRequired,
@@ -170,6 +207,7 @@ RolesSummary.propTypes = {
 
 RolesSummary.defaultProps = {
   roles: [],
+  collaborators: [],
   canEdit: false,
 }
 

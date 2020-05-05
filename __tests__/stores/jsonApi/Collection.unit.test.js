@@ -15,16 +15,20 @@ import queryString from 'query-string'
 import { fakeRole } from '#/mocks/data'
 jest.mock('../../../app/javascript/vendor/googleTagManager')
 
-const collectionCard_1 = new CollectionCard()
-updateModelId(collectionCard_1, '1')
-const collectionCard_2 = new CollectionCard()
-updateModelId(collectionCard_2, '2')
-const collectionCard_3 = new CollectionCard()
-updateModelId(collectionCard_3, '3')
+let collectionCard_1, collectionCard_2, collectionCard_3
+
+const initializeCards = () => {
+  collectionCard_1 = new CollectionCard()
+  updateModelId(collectionCard_1, '1')
+  collectionCard_2 = new CollectionCard()
+  updateModelId(collectionCard_2, '2')
+  collectionCard_3 = new CollectionCard()
+  updateModelId(collectionCard_3, '3')
+}
 
 describe('Collection', () => {
   let collection, organization
-
+  initializeCards()
   beforeEach(() => {
     collection = new Collection(
       {
@@ -42,6 +46,7 @@ describe('Collection', () => {
       apiStore
     )
     updateModelId(organization, '1')
+    initializeCards()
     runInAction(() => {
       apiStore.currentUserOrganizationId = '1'
     })
@@ -570,9 +575,9 @@ describe('Collection', () => {
         ]
       })
     })
-    it('should call apiStore and apply local updates', () => {
+    it('should call apiStore and apply local updates', async () => {
       expect(collectionCard_1.row).toEqual(0)
-      collection.API_batchUpdateCardsWithUndo({
+      await collection.API_batchUpdateCardsWithUndo({
         updates,
         undoMessage: 'Undoing action',
       })
@@ -664,6 +669,40 @@ describe('Collection', () => {
         },
       })
       expect(_.map(collection.collection_cards, 'row')).toEqual([1, 2, 3])
+    })
+  })
+
+  describe('API_fetchCardOrders', () => {
+    const res = { data: [{ id: '1', order: 2 }, { id: '2', order: 1 }] }
+    beforeEach(() => {
+      collection.API_fetchAllCardIds = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(res))
+
+      runInAction(() => {
+        collection.collection_cards = [collectionCard_1, collectionCard_2]
+      })
+    })
+
+    it('should update the card orders based on the API response', async () => {
+      expect(_.map(collection.collection_cards, 'id')).toEqual(['1', '2'])
+      await collection.API_fetchCardOrders()
+      expect(_.map(collection.collection_cards, 'id')).toEqual(['2', '1'])
+    })
+  })
+
+  describe('mergeCards', () => {
+    beforeEach(() => {
+      runInAction(() => {
+        collection.collection_cards = [collectionCard_1, collectionCard_3]
+      })
+    })
+
+    it('should merge new cards with existing cards and sort them', () => {
+      const data = [collectionCard_3, collectionCard_2]
+      collection.mergeCards(data)
+      expect(collection.collection_cards.length).toEqual(3)
+      expect(_.map(collection.collection_cards, 'id')).toEqual(['1', '3', '2'])
     })
   })
 

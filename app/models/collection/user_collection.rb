@@ -78,7 +78,6 @@ class Collection
       # if they don't already have one
       collection = create(
         organization: organization,
-        loading_content: organization.users.count == 1,
       )
       # we want to keep track of this for later org setup
       collection.newly_created = true

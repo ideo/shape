@@ -103,7 +103,7 @@ Rails.application.routes.draw do
         end
       end
       resources :items, only: %i[create]
-      resources :collection_cards, shallow: true, except: %i[show] do
+      resources :collection_cards, shallow: true do
         member do
           patch 'replace'
           patch 'update'

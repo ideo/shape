@@ -240,10 +240,10 @@ class FoamcoreGrid extends React.Component {
 
   // Load more cards if we are approaching a boundary of what we have loaded
   loadAfterScroll = async () => {
-    // return if we're still loading a new page
-    if (this.loadingRow) return
-
     const { collection } = this.props
+    // return if we're still loading a new page
+    if (this.loadingRow || collection.loadedRows === 0) return
+
     const { zoomLevel } = this
     this.computeVisibleRows()
     this.computeVisibleCols()

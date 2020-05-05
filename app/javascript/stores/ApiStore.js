@@ -678,7 +678,8 @@ class ApiStore extends jsonapi(datxCollection) {
     }
 
     const unarchivedCollection = res.data
-    unarchivedCollection.API_fetchCards()
+    // the API call returns the parent collection; refetch the unarchived cards
+    unarchivedCollection.API_fetchAndMergeCards(cardIds)
   }
 
   async moveCards(
@@ -686,14 +687,21 @@ class ApiStore extends jsonapi(datxCollection) {
     { undoing = false, undoSnapshot = {}, topLeftCard = null } = {}
   ) {
     let res
-    let placement = 'beginning'
+    // default the undo placement to end
+    let undoPlacement = 'end'
     // before the move
     if (topLeftCard) {
-      placement = {
+      undoPlacement = {
         row: topLeftCard.row,
         col: topLeftCard.col,
       }
     }
+    const toCollection = this.find('collections', data.to_id)
+    let fromCollection = this.find('collections', data.from_id)
+    // make snapshot of fromCollection data with cards for potential undo
+    const onlyCardIds = toCollection.isBoard ? data.collection_card_ids : []
+    const originalData = fromCollection.toJsonApiWithCards(onlyCardIds)
+
     try {
       // trigger card_mover in backend
       res = await this.request('collection_cards/move', 'PATCH', data)
@@ -702,23 +710,27 @@ class ApiStore extends jsonapi(datxCollection) {
       throw e
       return
     }
-    const toCollection = this.find('collections', data.to_id)
-    // revert data if undoing card move
-    if (undoing) {
-      if (!_.isEmpty(undoSnapshot)) {
-        await this.request(`collections/${data.to_id}`, 'PATCH', {
+
+    runInAction(() => {
+      toCollection.mergeCards(res.data)
+      if (undoing && !_.isEmpty(undoSnapshot)) {
+        // revert data if undoing card move
+        this.request(`collections/${data.to_id}`, 'PATCH', {
           data: undoSnapshot,
         })
+        // apply this locally at the same time
+        toCollection.revertToSnapshot(undoSnapshot.attributes)
+        return
+      } else if (!toCollection.isBoard) {
+        toCollection.API_fetchCardOrders()
       }
-      await toCollection.API_fetchCards()
+    })
+
+    if (undoing) {
+      // exit early, don't push another undo if we're undoing
       return
     }
 
-    // find origin collection
-    let fromCollection = this.find('collections', data.from_id)
-    // make snapshot of fromCollection data with cards for potential undo
-    const onlyCardIds = toCollection.isBoard ? data.collection_card_ids : []
-    const originalData = fromCollection.toJsonApiWithCards(onlyCardIds)
     if (!fromCollection.can_view) {
       this.undoStore.pushUndoAction({
         message:
@@ -731,18 +743,18 @@ class ApiStore extends jsonapi(datxCollection) {
     // reverse to and from values for potential undo operation
     const reversedData = {
       ...data,
-      placement,
+      placement: undoPlacement,
       to_id: data.from_id,
       from_id: data.to_id,
     }
-    let snapshotData = { undoing: true, undoSnapshot: originalData }
+    let undoOptions = { undoing: true, undoSnapshot: originalData }
     if (!data.from_id || data.from_id === data.to_id) {
       reversedData.to_id = data.to_id
       reversedData.from_id = null
       fromCollection = toCollection
       if (topLeftCard) {
         // don't need snapshot if we can just move back to the original placement
-        snapshotData = { undoing: true, topLeftCard }
+        undoOptions = { undoing: true, topLeftCard }
       }
     }
 
@@ -750,7 +762,7 @@ class ApiStore extends jsonapi(datxCollection) {
     this.undoStore.pushUndoAction({
       message: 'Move undone',
       apiCall: () => {
-        this.moveCards(reversedData, snapshotData)
+        this.moveCards(reversedData, undoOptions)
       },
       redirectPath: {
         type: 'collections',
@@ -762,10 +774,9 @@ class ApiStore extends jsonapi(datxCollection) {
       },
       redoAction: {
         message: 'Move redone',
-        apiCall: async () => {
+        apiCall: () => {
           // redo should just replicate the initial move
-          await this.moveCards(data, { topLeftCard })
-          toCollection.API_fetchCards()
+          this.moveCards(data, { topLeftCard })
         },
         actionType: POPUP_ACTION_TYPES.SNACKBAR,
       },
@@ -775,14 +786,14 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   linkCards(data) {
-    // TODO: currently no undo action for this
-    return this.request('collection_cards/link', 'POST', data)
+    // duplicateCards contains the same undo/redo actions we use for linking
+    return this.duplicateCards(data, 'link')
   }
 
-  async duplicateCards(data) {
+  async duplicateCards(data, action = 'duplicate') {
     let res
     try {
-      res = await this.request('collection_cards/duplicate', 'POST', data)
+      res = await this.request(`collection_cards/${action}`, 'POST', data)
     } catch (e) {
       // throw to be caught by CardMoveService
       throw e
@@ -790,32 +801,33 @@ class ApiStore extends jsonapi(datxCollection) {
     }
     const collection = this.find('collections', data.to_id)
     const { meta } = res
-    if (!meta.new_cards) {
+    if (meta.placeholder) {
       // TODO: how to allow you to undo a bulk duplication?
       // would probably require an API-based undo
       this.undoStore.pushUndoAction({
         message:
-          "Bulk duplication can't be undone. Please manually delete any records you wish to remove.",
+          "Bulk actions can't be undone. Please manually delete any records you wish to remove.",
         apiCall: () => {},
         actionType: POPUP_ACTION_TYPES.ALERT,
       })
       return res
     }
-
+    const newCardIds = _.map(res.data, 'id')
+    const actionName = _.capitalize(action)
     this.undoStore.pushUndoAction({
-      message: 'Duplicate undone',
+      message: `${actionName} undone`,
       apiCall: () =>
         this.archiveCards({
-          cardIds: res.meta.new_cards,
+          cardIds: newCardIds,
           collection,
           undoable: false,
         }),
       redirectPath: { type: 'collections', id: collection.id },
       redoAction: {
-        message: 'Redoing Duplicate',
+        message: `Redoing ${actionName}`,
         apiCall: () => {
           this.unarchiveCards({
-            cardIds: res.meta.new_cards,
+            cardIds: newCardIds,
             collection,
           })
         },

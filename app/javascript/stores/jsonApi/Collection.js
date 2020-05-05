@@ -608,6 +608,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @action
   addCard(card) {
+    if (this.collection_cards.find(cc => cc.id === card.id)) {
+      return
+    }
     this.collection_cards.unshift(card)
     this._reorderCards()
   }
@@ -710,8 +713,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       per_page,
       include,
     }
-    if (!params.per_page) {
-      // NOTE: If this is a Board, per_page will be ignored in favor of default 16x16 rows/cols
+    if (!params.per_page && !this.isBoard) {
       params.per_page = this.recordsPerPage
     }
     if (this.currentOrder !== 'order') {
@@ -721,9 +723,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       params.hidden = true
     }
     if (this.isBoard) {
-      if (rows) {
-        params.rows = rows
-      }
+      // nullify these as they have no effect on boards
+      delete params.per_page
+      delete params.page
+      params.rows = rows || [0, 5]
       if (cols) {
         params.cols = cols
       }
@@ -776,8 +779,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           this.loadedCols = 0
         }
       } else {
-        // NOTE: (potential pre-optimization) if collection_cards grows in size,
-        // at some point do we reset back to a reasonable number?
+        if (this.currentPage < page) {
+          this.currentPage = page
+        }
         const newData = _.reverse(
           // de-dupe merged data (deferring to new cards first)
           // reverse + reverse so that new cards (e.g. page 2) are replaced first but then put back at the end
@@ -787,16 +791,46 @@ class Collection extends SharedRecordMixin(BaseRecord) {
             'id'
           )
         )
-        if (this.currentPage < page) {
-          this.currentPage = page
-        }
         this.collection_cards.replace(newData)
       }
-      if (this.isBoard && rows) {
-        this.updateMaxLoadedColsRows({ maxRow: rows[1] })
+      if (this.isBoard && params.rows) {
+        this.updateMaxLoadedColsRows({ maxRow: params.rows[1] })
       }
     })
     return data
+  }
+
+  @action
+  mergeCards = cards => {
+    // de-dupe merged data (deferring to new cards first)
+    const newData = _.unionBy(cards, this.collection_cards, 'id')
+    this.collection_cards.replace(_.sortBy(newData, 'order'))
+  }
+
+  API_fetchCardOrders = async () => {
+    const res = await this.API_fetchAllCardIds()
+    runInAction(() => {
+      _.each(res.data, orderData => {
+        const card = this.collection_cards.find(cc => cc.id === orderData.id)
+        if (card) {
+          card.order = orderData.order
+        }
+      })
+      this.collection_cards.replace(_.sortBy(this.collection_cards, 'order'))
+    })
+  }
+
+  async API_fetchAndMergeCards(cardIds) {
+    const { apiStore } = this
+    const ids = cardIds.join(',')
+    const res = await apiStore.request(
+      `collections/${this.id}/collection_cards?select_ids=${ids}`
+    )
+    runInAction(() => {
+      this.mergeCards(res.data)
+      if (this.isBoard) return
+      this.API_fetchCardOrders()
+    })
   }
 
   @action
@@ -908,6 +942,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       onCancel,
       onConfirm: performUpdate,
     })
+  }
+
+  applyRemoteUpdates(params) {
+    if (params.collection_cards_attributes) {
+      // apply collection_cards_attributes
+      this.revertToSnapshot(params)
+    }
   }
 
   revertToSnapshot(snapshot) {
@@ -1222,10 +1263,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.API_fetchCards()
   }
 
-  API_backgroundUpdateTemplateInstances() {
+  API_backgroundUpdateTemplateInstances({ type = null, ids = [] }) {
+    if (!type || _.isEmpty(ids)) return
+
+    const data = { type, ids }
+
     return this.apiStore.request(
       `collections/${this.id}/background_update_template_instances`,
-      'POST'
+      'POST',
+      data
     )
   }
 
@@ -1241,9 +1287,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   API_clearCollectionCover() {
     return this.apiStore
-      .request(`collections/${this.id}/clear_collection_cover`, 'POST', {
-        data: this.toJsonApi(),
-      })
+      .request(`collections/${this.id}/clear_collection_cover`, 'POST')
       .catch(err => {
         console.warn(err)
         this.uiStore.alert(
@@ -1319,6 +1363,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath, 'PATCH', { data })
   }
 
+  @action
   async API_moveCardsIntoCollection({
     toCollection,
     cardIds,
@@ -1327,6 +1372,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   } = {}) {
     const { uiStore } = this
     const { cardAction } = uiStore
+    // ensure it is a normal array
+    const cardIds_arr = [...cardIds]
     const movingFromCollectionId = uiStore.movingFromCollectionId || this.id
     const can_edit = toCollection.can_edit_content || toCollection.can_edit
     const cancel = () => {
@@ -1343,7 +1390,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         iconName: 'Alert',
         onConfirm: () => {
           cancel()
-          uiStore.reselectCardIds(cardIds)
+          uiStore.reselectCardIds(cardIds_arr)
           uiStore.openMoveMenu({
             from: this,
             cardAction,
@@ -1361,13 +1408,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const success = await CardMoveService.moveCards('beginning', {
       to_id: toCollection.id.toString(),
       from_id: movingFromCollectionId,
-      collection_card_ids: cardIds,
+      collection_card_ids: cardIds_arr,
     })
     if (!success) return false
 
     // Explicitly remove cards from this collection so front-end updates
     if (cardAction === 'move' && movingFromCollectionId === this.id) {
-      this.removeCardIds(cardIds)
+      this.removeCardIds(cardIds_arr)
     }
 
     // onSuccess is really "successfully able to edit this collection"
@@ -1457,15 +1504,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     try {
       uiStore.update('isTransparentLoading', true)
       await apiStore.request(`collections/${this.id}/${action}`, 'POST', params)
-      runInAction(() => {
-        // by making this an action it will cause one re-render instead of many
-        this.collection_cards.forEach(card => {
-          const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
-          if (card.row > row) {
-            card.row += shift
-          }
-        })
-      })
+      this.applyRowUpdate({ row, action })
       uiStore.update('isTransparentLoading', false)
 
       if (!pushUndo) {
@@ -1491,6 +1530,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       console.warn(e)
       uiStore.defaultAlertError()
     }
+  }
+
+  @action
+  applyRowUpdate({ row, action }) {
+    // by making this an action it will cause one re-render instead of many
+    this.collection_cards.forEach(card => {
+      const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
+      if (card.row > row) {
+        card.row += shift
+      }
+    })
   }
 
   toggleTemplateHelper() {

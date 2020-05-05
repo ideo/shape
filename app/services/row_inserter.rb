@@ -4,7 +4,7 @@ class RowInserter < SimpleService
   def initialize(
     row: 0,
     collection:,
-    action: 'add'
+    action: :insert_row
   )
     @row = row
     @parent_collection = collection
@@ -13,15 +13,14 @@ class RowInserter < SimpleService
   end
 
   def call
-    cards = select_all_cards_below
-    move_all_cards_in_direction(cards, @action)
+    move_all_cards_in_direction
   end
 
   private
 
-  def move_all_cards_in_direction(cards, action)
-    movement = action == 'add' ? 1 : -1
-    cards.update_all("row = row + #{movement}")
+  def move_all_cards_in_direction
+    movement = @action.to_sym == :insert_row ? 1 : -1
+    select_all_cards_below.update_all("row = row + #{movement}")
   end
 
   def select_all_cards_below
