@@ -58,6 +58,8 @@ RSpec.describe Item::TextItem, type: :model do
           expect(RedisMutex).to receive(:with_lock).and_raise(RedisMutex::LockError)
           expect(result).to include(
             error: 'locked',
+            version: text_item.version,
+            last_10: nil,
           )
         end
 

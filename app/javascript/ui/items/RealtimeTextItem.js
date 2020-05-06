@@ -267,7 +267,7 @@ class RealtimeTextItem extends React.Component {
   }
 
   // NOTE: ActionCable websocket should automatically/continually try to reconnect on its own
-  channelDisconnected = (message = CHANNEL_DISCONNECTED_MESSAGE) => {
+  channelDisconnected = ({ message = CHANNEL_DISCONNECTED_MESSAGE } = {}) => {
     if (this.unmounted) return
     const { uiStore, fullPageView } = this.props
     uiStore.popupSnackbar({
@@ -318,23 +318,21 @@ class RealtimeTextItem extends React.Component {
     const { currentUserId } = this.props
 
     // update our local version number
-    if (data.version) {
-      if (!data.error && data.last_10) {
-        const diff = data.version - this.version
-        if (diff > 0) {
-          _.each(data.last_10, previous => {
-            const delta = new Delta(previous.delta)
-            if (previous.version > this.version) {
-              if (previous.editor_id !== currentUserId) {
-                this.applyIncomingDelta(delta)
-              }
-              // update for later sending appropriately composed version to be saved
-              this.contentSnapshot = this.contentSnapshot.compose(delta)
-              // set our local version to match the realtime data we got
-              this.version = previous.version
+    if (data.version && data.last_10) {
+      const diff = data.version - this.version
+      if (diff > 0) {
+        _.each(data.last_10, previous => {
+          const delta = new Delta(previous.delta)
+          if (this.version === null || previous.version > this.version) {
+            if (previous.editor_id !== currentUserId) {
+              this.applyIncomingDelta(delta)
             }
-          })
-        }
+            // update for later sending appropriately composed version to be saved
+            this.contentSnapshot = this.contentSnapshot.compose(delta)
+            // set our local version to match the realtime data we got
+            this.version = previous.version
+          }
+        })
       }
     }
 
@@ -512,7 +510,7 @@ class RealtimeTextItem extends React.Component {
           // if we are stuck 15s in this `currentlySending` mode it means our socketSends are
           // silently failing... we've probably been unsubscribed and it's throwing a backend error
           if (this.currentlySending) {
-            this.channelDisconnected('Disconnected from server')
+            this.channelDisconnected({ message: 'Disconnected from server' })
           }
         }, 10 * 1000)
       }
@@ -524,6 +522,10 @@ class RealtimeTextItem extends React.Component {
     // persist the change locally e.g. when we close the text box
     this.updateUiStoreSnapshot(full_content)
 
+    // for the first update
+    if (this.version === null) {
+      this.version = 1
+    }
     // NOTE: will get rejected if this.version < server saved version,
     // in which case the handleReceivedDelta error will try to resend
     this.socketSend('delta', {

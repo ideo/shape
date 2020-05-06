@@ -256,12 +256,14 @@ describe('RealtimeTextItem', () => {
       component.combineAwaitingDeltas(helloWorld)
       expect(component.combinedDelta).toEqual(helloWorld)
       expect(component.bufferDelta).toEqual(helloWorld)
+      expect(component.version).toEqual(null)
 
       component._sendCombinedDelta()
       expect(component.combinedDelta).toEqual(helloWorld)
       expect(component.bufferDelta).toEqual(new Delta())
 
-      expect(component.version).toEqual(null)
+      // the first send should always bump to at least 1
+      expect(component.version).toEqual(1)
       // we receive someone else's response
       component.handleReceivedDelta({
         current_editor: { id: '88' },

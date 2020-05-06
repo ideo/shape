@@ -125,7 +125,11 @@ class Item
       end
     rescue RedisMutex::LockError
       # error needs to alert the frontend to the latest version
-      { error: 'locked', version: data_content['version'].to_i }
+      {
+        error: 'locked',
+        version: version.to_i,
+        last_10: last_10,
+      }
     end
 
     def transform_realtime_delta(user: nil, delta:, version:, full_content:)
@@ -133,7 +137,11 @@ class Item
 
       if version.to_i < saved_version
         # error needs to alert the frontend to the latest version
-        return { error: 'locked', version: saved_version }
+        return {
+          error: 'locked',
+          version: saved_version,
+          last_10: last_10,
+        }
       end
 
       new_version = saved_version + 1
