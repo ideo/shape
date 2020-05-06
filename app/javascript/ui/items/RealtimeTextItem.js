@@ -425,19 +425,25 @@ class RealtimeTextItem extends React.Component {
 
   @action
   setItemQuillData() {
-    const { item, uiStore } = this.props
+    const { item } = this.props
     const { quillEditor, version } = this
     item.version = version
     if (!quillEditor) {
       return item
     }
 
-    // just like in uiStore... revert to snapshot to reset highlights
-    quillEditor.setContents(uiStore.quillSnapshot)
-
+    // scrub any "new" unpersisted highlights
+    const delta = new Delta(quillEditor.getContents())
+    const ops = _.map(delta.ops, op => {
+      if (op.attributes && op.attributes.commentHighlight === 'new') {
+        delete op.attributes.commentHighlight
+      }
+      return op
+    })
+    delta.ops = ops
+    quillEditor.setContents(delta)
     item.content = quillEditor.root.innerHTML
-    const delta = quillEditor.getContents()
-    item.quill_data = new Delta(delta)
+    item.quill_data = delta
     return item
   }
 
