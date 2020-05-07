@@ -60,6 +60,7 @@ class CollectionPage extends React.Component {
     }
     this.setViewingRecordAndRestoreScrollPosition()
     this.loadCollectionCards({})
+    this.subscribeToChannel(collection.id)
   }
 
   componentDidUpdate(prevProps) {
@@ -70,7 +71,9 @@ class CollectionPage extends React.Component {
       runInAction(() => {
         this.cardsFetched = false
       })
+      // unsubscribe from previous collection; subscribe to new one
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
+      this.subscribeToChannel(currentId)
       // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
       this.setViewingRecordAndRestoreScrollPosition()
@@ -152,8 +155,6 @@ class CollectionPage extends React.Component {
     } = this.props
 
     apiStore.checkCurrentOrg({ id: collection.organization_id })
-
-    this.subscribeToChannel(collection.id)
 
     if (collection.isSubmissionsCollection) {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
