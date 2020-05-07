@@ -51,6 +51,7 @@ class Item
 
     before_save :scrub_data_attrs
     before_save :perform_realtime_update, if: :quill_data_changed?
+    before_create :set_default_version
 
     attr_accessor :quill_data_was
 
@@ -153,11 +154,11 @@ class Item
         editor_id: user ? user.id.to_s : 'api',
       }
       full_content['last_10'] = full_content['last_10'].last(10)
-      # NOTE: is a "full update" too heavy here for performance, or ok?
-      # it basically means it's calling a few related updates on the parent / cards
-      # update_column(:data_content, full_content)
       # -- this is the only place a text_item's data_content should get directly updated
-      update(data_content: full_content)
+      # NOTE: intentionally NOT doing a full update otherwise callbacks would get called again!
+      update_columns(data_content: full_content, updated_at: Time.current)
+      # perform the "touch" without doing another full lifecycle update
+      touch_related_cards
       {
         delta: delta.as_json,
         version: full_content['version'],
@@ -183,15 +184,15 @@ class Item
     end
 
     def perform_realtime_update
-      # determine the diff that we just applied
+      # determine the Quill diff that we just applied
+      # NOTE: Schmooze::JavaScript::Error can happen here which probably means badly formatted data;
+      # we don't rescue so that AppSignal can flag these
       delta = QuillSchmoozer.diff(quill_data_was, quill_data)
       data = Mashie.new(
         delta: delta,
         version: version,
         full_content: quill_data,
       )
-      # NOTE: there is the edge case where another realtime update came through
-      # faster than this one, technically we should retry...
       save_and_broadcast_quill_data(nil, data)
     end
 
@@ -230,6 +231,10 @@ class Item
       return unless name == 'Text'
 
       generate_name
+    end
+
+    def set_default_version
+      self.version ||= 1
     end
   end
 end

@@ -195,18 +195,17 @@ class RealtimeTextItem extends React.Component {
   }
 
   setInitialSize() {
-    // only set this if we are in a brand new text item
-    if (this.version) return
-
-    const { quillEditor } = this
+    const { version, quillEditor } = this
     const { initialSize } = this.props
-    if (quillEditor && initialSize !== 'normal') {
-      const range = quillEditor.getSelection()
-      if (range && range.index) {
-        quillEditor.formatText(0, range.index, 'size', initialSize, 'user')
-      }
-      quillEditor.format('size', initialSize)
+    if (!quillEditor || initialSize === 'normal' || version > 1) {
+      // version > 1 means we are not in a brand new text item
+      return
     }
+    const range = quillEditor.getSelection()
+    if (range && range.index) {
+      quillEditor.formatText(0, range.index, 'size', initialSize, 'user')
+    }
+    quillEditor.format('size', initialSize)
   }
 
   checkActionCableConnection() {
@@ -240,9 +239,9 @@ class RealtimeTextItem extends React.Component {
     if (!this.reactQuillRef) return
     if (typeof this.reactQuillRef.getEditor !== 'function') return
     this.quillEditor = this.reactQuillRef.getEditor()
-    this.version = this.props.item.version
 
     if (!initSnapshot) return
+    this.version = this.props.item.version
     this.contentSnapshot = this.quillEditor.getContents()
     this.updateUiStoreSnapshot()
   }
@@ -323,7 +322,7 @@ class RealtimeTextItem extends React.Component {
       if (diff > 0) {
         _.each(data.last_10, previous => {
           const delta = new Delta(previous.delta)
-          if (this.version === null || previous.version > this.version) {
+          if (previous.version > this.version) {
             if (previous.editor_id !== currentUserId) {
               this.applyIncomingDelta(delta)
             }
@@ -341,7 +340,9 @@ class RealtimeTextItem extends React.Component {
       clearTimeout(this.currentlySendingCheck)
       this.currentlySendingCheck = null
       this.currentlySending = false
-      if (data.error) {
+      if (data.error && data.error === 'locked') {
+        // try to resend
+        this.sendCombinedDelta()
         return
       }
       // clear out our combinedDelta with whatever had been typed in the meantime
@@ -528,10 +529,6 @@ class RealtimeTextItem extends React.Component {
     // persist the change locally e.g. when we close the text box
     this.updateUiStoreSnapshot(full_content)
 
-    // for the first update
-    if (this.version === null) {
-      this.version = 1
-    }
     // NOTE: will get rejected if this.version < server saved version,
     // in which case the handleReceivedDelta error will try to resend
     this.socketSend('delta', {

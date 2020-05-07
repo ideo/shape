@@ -20,8 +20,9 @@ const props = {
 }
 
 let wrapper, component
-const rerender = () => {
-  wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+const rerender = (merge = {}) => {
+  const mergedProps = { ...props, ...merge }
+  wrapper = shallow(<RealtimeTextItem.wrappedComponent {...mergedProps} />)
   component = wrapper.instance()
   component.quillEditor = {
     getSelection: jest.fn(),
@@ -130,13 +131,15 @@ describe('RealtimeTextItem', () => {
     })
 
     describe('with "huge" and a new text item', () => {
-      beforeEach(() => {
-        props.item = { ...fakeTextItem, version: null }
-        props.initialSize = 'huge'
-        rerender()
+      beforeEach(async () => {
+        rerender({
+          item: { ...fakeTextItem, quill_data: { ops: [] }, version: 1 },
+          initialSize: 'huge',
+        })
+        component.version = 1
         component.reactQuillRef = {}
         // re-call with fake reactQuillRef set
-        component.componentDidMount()
+        await component.componentDidMount()
       })
 
       it('should begin with huge size format', () => {
@@ -213,7 +216,7 @@ describe('RealtimeTextItem', () => {
     const error = {
       // current user
       current_editor: { id: '1' },
-      data: { error: true },
+      data: { error: 'locked' },
     }
     const success = {
       // current user
@@ -262,8 +265,6 @@ describe('RealtimeTextItem', () => {
       expect(component.combinedDelta).toEqual(helloWorld)
       expect(component.bufferDelta).toEqual(new Delta())
 
-      // the first send should always bump to at least 1
-      expect(component.version).toEqual(1)
       // we receive someone else's response
       component.handleReceivedDelta({
         current_editor: { id: '88' },

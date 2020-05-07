@@ -4,6 +4,18 @@ require './spec/services/collection_broadcaster_shared_setup'
 RSpec.describe Item::TextItem, type: :model do
   include_context 'CollectionUpdateBroadcaster setup'
 
+  context 'callbacks' do
+    describe '#set_default_version' do
+      let(:item) { build(:text_item, data_content: { ops: [] }) }
+
+      it 'should set version to 1' do
+        expect(item.version).to be nil
+        item.save
+        expect(item.version).to eq 1
+      end
+    end
+  end
+
   context 'instance methods' do
     let(:data_content) do
       {
