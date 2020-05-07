@@ -274,7 +274,7 @@ class Item < ApplicationRecord
 
     if i.is_a?(Item::TextItem)
       # remove comment highlights from the dupe item
-      scrubbed_ops = Mashie.new(i.data_content).ops
+      scrubbed_ops = Mashie.new(i.data_content).ops || []
       scrubbed_ops.each do |op|
         next unless op&.attributes
 

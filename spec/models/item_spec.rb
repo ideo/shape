@@ -109,6 +109,16 @@ RSpec.describe Item, type: :model do
       end
     end
 
+    context 'with text item with nil ops' do
+      before do
+        item.update(ops: nil)
+      end
+
+      it 'duplicates the item' do
+        expect { duplicate }.to change(Item::TextItem, :count).by(1)
+      end
+    end
+
     context 'with external records' do
       let!(:external_records) do
         [
