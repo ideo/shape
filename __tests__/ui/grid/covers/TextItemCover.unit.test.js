@@ -134,11 +134,14 @@ describe('TextItemCover', () => {
 
   describe('cancel', () => {
     beforeEach(() => {
-      item.content = '<p>'
+      item.content = '<p></p>'
       item.API_updateWithoutSync = jest.fn()
     })
 
     describe('with content', () => {
+      beforeEach(() => {
+        item.content = '<p>some content</p>'
+      })
       describe('with num_viewers === 1', () => {
         it('should call API_updateWithoutSync', () => {
           component.cancel({ item, ev: e })
@@ -162,9 +165,9 @@ describe('TextItemCover', () => {
         apiStore.find = jest.fn().mockReturnValue(card)
         card.API_archiveSelf.mockClear()
       })
-      describe('and no version', () => {
+      describe('and version === 1', () => {
         beforeEach(() => {
-          item.version = null
+          item.version = 1
           wrapper = shallow(<TextItemCover {...props} />)
           component = wrapper.instance()
         })
@@ -177,9 +180,9 @@ describe('TextItemCover', () => {
           expect(card.API_archiveSelf).toHaveBeenCalled()
         })
       })
-      describe('and a version', () => {
+      describe('and a version > 1', () => {
         beforeEach(() => {
-          item.version = 1
+          item.version = 2
           wrapper = shallow(<TextItemCover {...props} />)
           component = wrapper.instance()
         })

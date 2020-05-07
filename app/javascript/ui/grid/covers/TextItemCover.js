@@ -149,7 +149,7 @@ class TextItemCover extends React.Component {
     if (!hasContent && item.version === 1) {
       // archive empty text item when you hit "X"
       const card = apiStore.find('collection_cards', this.props.cardId)
-      card.API_archiveSelf({ undoable: false })
+      if (card) card.API_archiveSelf({ undoable: false })
       return
     }
     if (num_viewers === 1) {
