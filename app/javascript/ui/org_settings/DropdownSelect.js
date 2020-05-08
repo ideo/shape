@@ -14,9 +14,10 @@ import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
 
 const currentValue = (record, options, fieldToUpdate) => {
+  debugger
   const object = _.find(options, option => option.id === record[fieldToUpdate])
-  console.log('current value record in select dropdown: ', object)
   console.log(record, options, fieldToUpdate)
+  console.log('current value record in select dropdown: ', object)
   if (object) return object.id
   return ''
 }
@@ -29,12 +30,11 @@ const DropdownSelect = ({
   fieldToUpdate,
   updateRecord,
 }) => {
+  const value = currentValue(record, options, fieldToUpdate)
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [previousValue, setPreviousValue] = useState('')
-  const [selectedValue, setSelectedValue] = useState(
-    currentValue(record, options, fieldToUpdate)
-  )
+  const [selectedValue, setSelectedValue] = useState(value)
 
   const isOpen = () => {
     return modalOpen ? 'confirm' : ''
@@ -72,6 +72,7 @@ const DropdownSelect = ({
           record.name_display}'s ${label}. Would you like to Continue?`}
         onConfirm={() => confirmSelection()}
         onCancel={() => cancelSelection()}
+        onClose={() => setModalOpen(false)}
         open={isOpen()}
         iconName="Alert"
       />

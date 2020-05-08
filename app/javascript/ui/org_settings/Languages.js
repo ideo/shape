@@ -1,21 +1,43 @@
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
 
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 import Pill from '~/ui/global/Pill'
 import { Label } from '~/ui/global/styled/forms'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
-const Languages = ({ organization, supportedLanguages, updateRecord }) => {
-  const languagesFromOrg = () => {
-    const languages = _.filter(supportedLanguages, option =>
-      organization.supported_languages.includes(option.handle)
-    )
-    return tagsFromLanguages(languages)
+@observer
+class Languages extends React.Component {
+  @observable
+  supportedLanguages = []
+  @observable
+  orgLanguages = []
+
+  constructor(props) {
+    super(props)
+    console.log('Languages#constructor props: ', props)
+
+    runInAction(() => {
+      this.supportedLanguages = props.supportedLanguages
+      this.orgLanguages = props.orgLanguages
+    })
   }
 
-  const tagsFromLanguages = languages => {
+  languagesFromOrg = () => {
+    const { orgLanguages, supportedLanguages } = this
+
+    const languages = _.filter(supportedLanguages, option =>
+      orgLanguages.includes(option.handle)
+    )
+    return this.tagsFromLanguages(languages)
+  }
+
+  tagsFromLanguages = languages => {
+    const { removeLanguage, addLanguage } = this
+
     return languages.map(object => {
       object.label = object.string
       object.name = object.string
@@ -25,30 +47,34 @@ const Languages = ({ organization, supportedLanguages, updateRecord }) => {
     })
   }
 
-  const availableLanguageOptions = () => {
+  availableLanguageOptions = () => {
+    const { orgLanguages, supportedLanguages } = this
+
     const allowed = _.reject(supportedLanguages, option =>
-      organization.supported_languages.includes(option.handle)
+      orgLanguages.includes(option.handle)
     )
     console.log('allowed languages: ', allowed)
-    return tagsFromLanguages(allowed)
+    return this.tagsFromLanguages(allowed)
   }
 
-  const addLanguage = tag => {
+  addLanguage = tag => {
+    const { orgLanguages } = this
+    const { updateRecord } = this.props
     event.preventDefault()
 
     const params = {
-      supported_languages: organization.supported_languages.concat([
-        tag.handle,
-      ]),
+      supported_languages: orgLanguages.concat([tag.handle]),
     }
     updateRecord(params)
   }
 
-  const removeLanguage = tag => {
+  removeLanguage = tag => {
+    const { orgLanguages } = this
+    const { updateRecord } = this.props
     event.preventDefault()
 
     const updatedLanguages = _.reject(
-      organization.supported_languages,
+      orgLanguages,
       language => language === tag.handle
     )
     updateRecord({
@@ -56,50 +82,49 @@ const Languages = ({ organization, supportedLanguages, updateRecord }) => {
     })
   }
 
-  return (
-    <div>
-      <Label
-        style={{
-          fontSize: '13px',
-          marginTop: '22px',
-          marginBottom: '10px', // Not 16 because react tags has padding already
-        }}
-        id="languages-select-label"
-      >
-        Languages
-        <HoverableDescriptionIcon
-          description={
-            'Please select the primary language(s) used at your organization.'
-          }
-          width={16}
-        />
-      </Label>
-      <StyledReactTags>
-        <ReactTags
-          tags={languagesFromOrg()}
-          suggestions={availableLanguageOptions()}
-          allowBackspace={false}
-          delimiterChars={[',']}
-          placeholder={'add additional available languages'}
-          handleAddition={tag => tag.onSelect()}
-          handleDelete={tag => tag.onDelete()}
-          tagComponent={Pill}
-          autofocus={false}
-        />
-      </StyledReactTags>
-    </div>
-  )
-}
-
-Languages.defaultProps = {
-  organization: {},
-  supported_languages: [],
-  updateRecord: () => null,
+  render() {
+    const { orgLanguages, supportedLanguages } = this
+    console.log('Languages#render : ', orgLanguages, supportedLanguages)
+    // FIXME: WHY ARE THE LANGUAGES NOT RENDERING
+    return (
+      <div>
+        <Label
+          style={{
+            fontSize: '13px',
+            marginTop: '22px',
+            marginBottom: '10px', // Not 16 because react tags has 6px padding already
+          }}
+          id="languages-select-label"
+        >
+          Languages
+          <HoverableDescriptionIcon
+            description={
+              'Please select the primary language(s) used at your organization.'
+            }
+            width={16}
+          />
+        </Label>
+        <StyledReactTags>
+          <ReactTags
+            tags={this.languagesFromOrg()}
+            suggestions={this.availableLanguageOptions()}
+            allowBackspace={false}
+            delimiterChars={[',']}
+            placeholder={'add additional available languages'}
+            handleAddition={tag => tag.onSelect()}
+            handleDelete={tag => tag.onDelete()}
+            tagComponent={Pill}
+            autofocus={false}
+          />
+        </StyledReactTags>
+      </div>
+    )
+  }
 }
 
 Languages.propTypes = {
-  organization: PropTypes.object,
-  supportedLanguages: PropTypes.arrayOf(PropTypes.object),
+  orgLanguages: PropTypes.arrayOf(PropTypes.string),
+  supportedLanguages: MobxPropTypes.arrayOrObservableArray,
   updateRecord: PropTypes.func,
 }
 
