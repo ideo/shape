@@ -66,7 +66,7 @@ class CreativeDifferenceTabs extends React.Component {
   @observable
   contentVersions = []
   @observable
-  organization = {}
+  organization = null
   @observable
   isLoading = false
   @observable
@@ -150,7 +150,9 @@ class CreativeDifferenceTabs extends React.Component {
         optimistic: false,
       })
       const result = await promise
-      console.log('Languages update org response', result)
+      runInAction(() => {
+        this.organization = result
+      })
       this.setLoading(false)
     } catch (err) {
       console.log('org update failed: ', err)
@@ -177,7 +179,7 @@ class CreativeDifferenceTabs extends React.Component {
     return (
       <div
         style={{
-          height: '1000px',
+          height: '1200px',
           // background:
           //   'url(https://www.startrek.com/sites/default/files/styles/content_full/public/images/2019-07/c82b013313066e0702d58dc70db033ca.jpg?itok=9-M5ggoe)',
         }}
@@ -213,32 +215,38 @@ class CreativeDifferenceTabs extends React.Component {
             </Tabs>
           </AppBar>
           <TabPanel value={tabValue} tabName="organization">
-            <DropdownSelect
-              label={'Industry'}
-              record={organization}
-              options={industrySubcategories}
-              updateRecord={updateOrg}
-              fieldToUpdate={'industry_subcategory_id'}
-            />{' '}
-            <DropdownSelect
-              label={'Content Version'}
-              toolTip={
-                'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
-              }
-              record={organization}
-              options={contentVersions}
-              updateRecord={updateOrg}
-              fieldToUpdate={'default_content_version_id'}
-            />{' '}
-            <OrganizationRoles
-              roles={apiStore.currentUserOrganization.primary_group.roles}
-              canEdit={apiStore.currentUserOrganization.primary_group.can_edit}
-            />{' '}
-            <Languages
-              orgLanguages={organization.supported_languages}
-              supportedLanguages={supportedLanguages}
-              updateRecord={updateOrg}
-            />
+            {organization && (
+              <React.Fragment>
+                <DropdownSelect
+                  label={'Industry'}
+                  record={organization}
+                  options={industrySubcategories}
+                  updateRecord={updateOrg}
+                  fieldToUpdate={'industry_subcategory_id'}
+                />
+                <DropdownSelect
+                  label={'Content Version'}
+                  toolTip={
+                    'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
+                  }
+                  record={organization}
+                  options={contentVersions}
+                  updateRecord={updateOrg}
+                  fieldToUpdate={'default_content_version_id'}
+                />
+                <OrganizationRoles
+                  roles={apiStore.currentUserOrganization.primary_group.roles}
+                  canEdit={
+                    apiStore.currentUserOrganization.primary_group.can_edit
+                  }
+                />
+                <Languages
+                  orgLanguages={organization.supported_languages}
+                  supportedLanguages={supportedLanguages}
+                  updateRecord={updateOrg}
+                />
+              </React.Fragment>
+            )}
           </TabPanel>
           <TabPanel value={tabValue} tabName="teams">
             {/* <TeamsTab industrySubcategories={industrySubcategories} /> */}

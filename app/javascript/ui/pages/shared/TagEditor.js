@@ -107,8 +107,6 @@ class TagEditor extends React.Component {
       runInAction(() => {
         this.tags.remove(tag)
         records.forEach(record => {
-          // TODO: make Org a Mobx object
-          // debugger
           record[tagField].remove(tag.name)
         })
         afterRemoveTag(tag.name)

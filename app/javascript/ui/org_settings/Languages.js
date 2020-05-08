@@ -1,33 +1,20 @@
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 import Pill from '~/ui/global/Pill'
 import { Label } from '~/ui/global/styled/forms'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
-@observer
 class Languages extends React.Component {
-  @observable
-  supportedLanguages = []
-  @observable
-  orgLanguages = []
-
   constructor(props) {
     super(props)
-    console.log('Languages#constructor props: ', props)
-
-    runInAction(() => {
-      this.supportedLanguages = props.supportedLanguages
-      this.orgLanguages = props.orgLanguages
-    })
   }
 
   languagesFromOrg = () => {
-    const { orgLanguages, supportedLanguages } = this
+    const { orgLanguages, supportedLanguages } = this.props
 
     const languages = _.filter(supportedLanguages, option =>
       orgLanguages.includes(option.handle)
@@ -48,7 +35,7 @@ class Languages extends React.Component {
   }
 
   availableLanguageOptions = () => {
-    const { orgLanguages, supportedLanguages } = this
+    const { orgLanguages, supportedLanguages } = this.props
 
     const allowed = _.reject(supportedLanguages, option =>
       orgLanguages.includes(option.handle)
@@ -58,8 +45,7 @@ class Languages extends React.Component {
   }
 
   addLanguage = tag => {
-    const { orgLanguages } = this
-    const { updateRecord } = this.props
+    const { orgLanguages, updateRecord } = this.props
     event.preventDefault()
 
     const params = {
@@ -69,8 +55,7 @@ class Languages extends React.Component {
   }
 
   removeLanguage = tag => {
-    const { orgLanguages } = this
-    const { updateRecord } = this.props
+    const { orgLanguages, updateRecord } = this.props
     event.preventDefault()
 
     const updatedLanguages = _.reject(
@@ -83,9 +68,9 @@ class Languages extends React.Component {
   }
 
   render() {
-    const { orgLanguages, supportedLanguages } = this
+    const { orgLanguages, supportedLanguages } = this.props
     console.log('Languages#render : ', orgLanguages, supportedLanguages)
-    // FIXME: WHY ARE THE LANGUAGES NOT RENDERING
+
     return (
       <div>
         <Label
@@ -123,7 +108,7 @@ class Languages extends React.Component {
 }
 
 Languages.propTypes = {
-  orgLanguages: PropTypes.arrayOf(PropTypes.string),
+  orgLanguages: MobxPropTypes.arrayOrObservableArrayOf(PropTypes.string),
   supportedLanguages: MobxPropTypes.arrayOrObservableArray,
   updateRecord: PropTypes.func,
 }

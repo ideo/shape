@@ -14,7 +14,6 @@ import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
 
 const currentValue = (record, options, fieldToUpdate) => {
-  debugger
   const object = _.find(options, option => option.id === record[fieldToUpdate])
   console.log(record, options, fieldToUpdate)
   console.log('current value record in select dropdown: ', object)
@@ -31,6 +30,7 @@ const DropdownSelect = ({
   updateRecord,
 }) => {
   const value = currentValue(record, options, fieldToUpdate)
+  console.log('first value: ', value)
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [previousValue, setPreviousValue] = useState('')
