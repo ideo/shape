@@ -138,7 +138,7 @@ const ChartAxisProps = ({
 }) => {
   // NOTE: The transform property is for IE11 which doesn't recognize CSS
   // transform properties on SVG
-  let tickCount = 12
+  let tickCount = Math.min(datasetValues.length, 12)
   if (isSmallChartStyle) {
     tickCount = 5
   } else {
