@@ -99,6 +99,10 @@ class Dataset < ApplicationRecord
     "#{object.class.base_class.name}-#{object.id}"
   end
 
+  def self.default_includes_for_api
+    %i[group]
+  end
+
   def link_when_duplicating?
     # Link (instead of duplicating)
     # If a dataset was created by an application,

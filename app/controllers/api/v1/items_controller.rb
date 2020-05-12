@@ -106,7 +106,8 @@ class Api::V1::ItemsController < Api::V1::BaseController
   end
 
   def datasets
-    render jsonapi: @item.selected_datasets
+    render jsonapi: @item.selected_datasets,
+           include: Dataset.default_includes_for_api
   end
 
   def csv_report

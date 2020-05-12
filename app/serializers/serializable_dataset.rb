@@ -1,7 +1,7 @@
 class SerializableDataset < BaseJsonSerializer
   type 'datasets'
   attributes(
-    :chart_type, # see below TODO
+    :chart_type,
     :identifier,
     :timeframe,
     :measure,
@@ -23,4 +23,10 @@ class SerializableDataset < BaseJsonSerializer
   )
 
   belongs_to :data_source
+
+  belongs_to :group do
+    data do
+      @object.group
+    end
+  end
 end
