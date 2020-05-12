@@ -91,7 +91,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         expect(CollectionUpdateBroadcaster).to receive(:new).with(to_collection).once
         new_cards = run_worker
         expect(broadcaster_instance).to have_received(:cards_updated).with(
-          new_cards.pluck(:id)
+          new_cards.pluck(:id),
         )
       end
 
@@ -107,6 +107,14 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
           collection.cache_cover!
           # simulate the scenario where this collection has been copied with its cover settings
           to_collection.update(cached_cover: collection.cached_cover)
+        end
+
+        it 'reorders and updates cached card count' do
+          expect(CollectionCard).to receive(:import)
+          expect {
+            run_worker
+            to_collection.reload
+          }.to change(to_collection, :cached_card_count)
         end
 
         it 'updates the parent collection cover if the cover cards were copied over' do

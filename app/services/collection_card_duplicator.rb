@@ -31,7 +31,6 @@ class CollectionCardDuplicator < SimpleService
     end
     register_card_mappings
     deep_duplicate_cards
-    reorder_and_update_cached_values
     create_notifications
     return @new_cards unless run_worker_sync?
 
@@ -153,12 +152,6 @@ class CollectionCardDuplicator < SimpleService
 
     CollectionCard.import(@new_cards)
     @to_collection.update(processing_status: :duplicating)
-  end
-
-  def reorder_and_update_cached_values
-    @to_collection.reorder_cards!
-    @to_collection.cache_card_count!
-    @to_collection.cache_cover!
   end
 
   def create_notifications
