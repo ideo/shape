@@ -201,6 +201,17 @@ When('I enter {string} as my category', string => {
     .type(string)
 })
 
+When('I enter {string} into group search', string => {
+  cy.get('#react-select-chip input')
+    .first()
+    .click({ force: true })
+    .type(string)
+  cy.wait('@apiSearchUsersAndGroups')
+  cy.locateDataOrClass('Autocomplete-Option-CypressTest')
+    .first()
+    .click({ force: true })
+})
+
 // NOTE: this just adds an open response in the "last" spot
 When('I add an open response question with {string}', text => {
   cy.locate('QuestionHotEdgeButton')

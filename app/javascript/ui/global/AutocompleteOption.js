@@ -95,6 +95,7 @@ class AutocompleteOption extends React.Component {
         selected={isFocused}
         onClick={this.handleClick}
         component="div"
+        data-cy={`Autocomplete-Option-${entity.name}`}
       >
         {content}
       </SelectOption>
