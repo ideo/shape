@@ -46,6 +46,7 @@ class CollectionCardDuplicationWorker
         source_card.pinned = false unless preserve_pinned_value?
       end
 
+      return if !source_card
       source_card.duplicate!(
         for_user: @for_user,
         parent: @parent_collection,

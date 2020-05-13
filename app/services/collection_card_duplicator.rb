@@ -30,6 +30,7 @@ class CollectionCardDuplicator < SimpleService
       duplicate_cards_with_placeholders
     end
     register_card_mappings
+    # FIXME: Don't try to duplicate cards that haven't been registered
     deep_duplicate_cards
     reorder_and_update_cached_values
     create_notifications
