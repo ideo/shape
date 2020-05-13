@@ -25,6 +25,7 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def call
+    filter_out_invalid_cards
     initialize_card_order
     if @create_placeholders
       duplicate_cards_with_placeholders
@@ -41,6 +42,12 @@ class CollectionCardDuplicator < SimpleService
   end
 
   private
+
+  def filter_out_invalid_cards
+    @cards = @cards.reject do |card|
+      card.record.is_a?(Collection::Global) || card.record.parent_collection_card.blank?
+    end
+  end
 
   def validate_synchronous_value(value)
     if value == true
