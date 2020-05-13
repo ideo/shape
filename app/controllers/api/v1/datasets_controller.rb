@@ -25,7 +25,7 @@ class Api::V1::DatasetsController < Api::V1::BaseController
           current_application.id,
         )
       end
-      render jsonapi: @dataset
+      render jsonapi: @dataset, include: Dataset.default_includes_for_api
     else
       render_api_errors @dataset.errors
     end
@@ -33,8 +33,9 @@ class Api::V1::DatasetsController < Api::V1::BaseController
 
   def update
     @dataset.attributes = dataset_params
+
     if @dataset.save
-      render jsonapi: @dataset
+      render jsonapi: @dataset, include: Dataset.default_includes_for_api
     else
       render_api_errors @dataset.errors
     end
@@ -111,12 +112,12 @@ class Api::V1::DatasetsController < Api::V1::BaseController
       :measure,
       :timeframe,
       :identifier,
-      :data_source_id,
       :chart_type,
       :data_source_type,
       :data_source_id,
       :external_id,
       :anyone_can_view,
+      groupings: %i[id type],
       style: {},
       tiers: [
         :value,

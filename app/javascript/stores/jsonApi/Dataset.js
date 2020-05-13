@@ -8,6 +8,21 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
   static type = 'datasets'
   static endpoint = apiUrl('datasets')
 
+  attributesForAPI = [
+    'type',
+    'name',
+    'identifier',
+    'description',
+    'max_domain',
+    'measure',
+    'timeframe',
+    'identifier',
+    'chart_type',
+    'data_source_type',
+    'data_source_id',
+    'groupings',
+  ]
+
   get identifier() {
     this.rawAttributes().identifier
   }
