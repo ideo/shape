@@ -571,8 +571,8 @@ ActiveRecord::Schema.define(version: 2020_04_01_042139) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "open_response_item_id"
-    t.jsonb "selected_choice_ids", default: [], null: false
     t.bigint "idea_id"
+    t.jsonb "selected_choice_ids", default: [], null: false
     t.index ["question_id", "idea_id", "survey_response_id"], name: "index_question_answers_on_unique_idea_response", unique: true, where: "(idea_id IS NOT NULL)"
     t.index ["question_id", "survey_response_id"], name: "index_question_answers_on_unique_response", unique: true, where: "(idea_id IS NULL)"
     t.index ["survey_response_id"], name: "index_question_answers_on_survey_response_id"

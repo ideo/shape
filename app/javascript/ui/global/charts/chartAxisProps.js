@@ -47,7 +47,7 @@ const chartAxisStyle = isSmallChartStyle => {
 }
 
 const calculateRelativeWidth = label => {
-  const modifier = label.isSmallChartStyle ? 10.5 : 8
+  const modifier = label.isSmallChartStyle ? 11 : 8
   return label.text.length * modifier
 }
 
@@ -163,7 +163,6 @@ const ChartAxisProps = ({
   }
 
   const tickLabelStyleProps = tickLabelStyle(isSmallChartStyle)
-
   return datasetValues.length > 1
     ? {
         ...axisProps,

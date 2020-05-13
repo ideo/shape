@@ -177,7 +177,7 @@ class ChartGroup extends React.Component {
   }
 
   calculateLabelWidth(label) {
-    const modifier = this.isSmallChartStyle ? 10.5 : 8
+    const modifier = this.isSmallChartStyle ? 12 : 8
     return label.text.length * modifier
   }
 
