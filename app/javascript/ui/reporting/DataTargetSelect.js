@@ -1,19 +1,10 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import trackError from '~/utils/trackError'
 import { Select, SelectOption } from '~/ui/global/styled/forms'
 import AutoComplete from '~/ui/global/AutoComplete'
 import v from '~/utils/variables'
-
-function formatCollections(collections) {
-  return collections.map(collection => ({
-    value: collection.id,
-    label: collection.name,
-    data: collection,
-  }))
-}
+import { debouncedAutocompleteSearch } from '~/ui/reporting/utils'
 
 @inject('apiStore')
 @observer
@@ -25,22 +16,7 @@ class DataTargetSelect extends React.Component {
 
   constructor(props) {
     super(props)
-    this.debouncedSearch = _.debounce((term, callback) => {
-      if (!term) {
-        callback()
-        return
-      }
-
-      this.props.apiStore
-        .searchCollections({
-          query: term,
-          per_page: 30,
-        })
-        .then(res => callback(formatCollections(res.data)))
-        .catch(e => {
-          trackError(e)
-        })
-    }, 350)
+    this.debouncedSearch = debouncedAutocompleteSearch('searchCollections')
   }
 
   componentDidMount() {

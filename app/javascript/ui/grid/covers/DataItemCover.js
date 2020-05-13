@@ -26,7 +26,10 @@ class DataItemCover extends React.Component {
 
   async loadDatasets() {
     const { item } = this.props
-    await item.API_fetchDatasets()
+    if (!item.loadingDatasets) {
+      await item.API_fetchDatasets()
+    }
+    if (!item.primaryDataset) return
     const { data_source_id, data_source_type } = item.primaryDataset
     if (data_source_id && data_source_type === 'Collection') {
       this.loadTargetCollection(data_source_id)

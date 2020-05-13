@@ -316,7 +316,9 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   async API_fetchDatasets() {
+    this.loadingDatasets = true
     const datasets = await this.apiStore.request(`items/${this.id}/datasets`)
+    this.loadingDatasets = false
     this.datasets = datasets.data
     return datasets
   }

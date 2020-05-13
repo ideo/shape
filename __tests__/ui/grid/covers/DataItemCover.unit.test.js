@@ -13,6 +13,7 @@ const fakeCollection = { id: 123 }
 const apiStore = fakeApiStore({ requestResult: { data: fakeCollection } })
 
 const render = () => {
+  props.item.API_fetchDatasets.mockClear()
   wrapper = shallow(<DataItemCover.wrappedComponent {...props} />)
   component = wrapper.instance()
 }
@@ -21,14 +22,13 @@ describe('DataItemCover', () => {
     props.apiStore = apiStore
     props.item = fakeDataItemCollectionsItemsAttrs
     props.item.primaryDataset = fakeDataset
+    props.item.loadingDatasets = false
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     render()
   })
 
   describe('item with "report_type_collections_and_items"', () => {
     beforeEach(() => {
-      props.item = fakeDataItemCollectionsItemsAttrs
-      props.item.primaryDataset = fakeDataset
       props.card.record = props.item
       render()
     })
@@ -36,6 +36,31 @@ describe('DataItemCover', () => {
     it('renders DataItemCoverCollectionsItems', () => {
       expect(wrapper.find('DataItemCoverCollectionsItems').exists()).toBe(true)
       expect(wrapper.find('DataItemCoverDisplayOnly').exists()).toBe(false)
+    })
+
+    it('calls item.API_fetchDatasets', () => {
+      expect(props.item.API_fetchDatasets).toHaveBeenCalledTimes(1)
+    })
+
+    describe('componentDidUpdate with no primaryDataset', () => {
+      beforeEach(() => {
+        props.item.primaryDataset = null
+      })
+
+      it('will reload datasets', () => {
+        wrapper.setProps({ item: props.item })
+        expect(props.item.API_fetchDatasets).toHaveBeenCalledTimes(2)
+      })
+
+      describe('when item is already fetching datasets', () => {
+        beforeEach(() => {
+          props.item.loadingDatasets = true
+        })
+        it('does not call item.API_fetchDatasets again', () => {
+          wrapper.setProps({ item: props.item })
+          expect(props.item.API_fetchDatasets).toHaveBeenCalledTimes(1)
+        })
+      })
     })
 
     describe('with data_source_id', () => {
