@@ -258,15 +258,21 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     context 'on different org' do
+      let!(:first_org) { create(:organization, member: user) }
       let!(:other_org) { create(:organization, member: user) }
       let!(:collection) do
         create(:collection, organization: other_org, add_viewers: [user])
       end
 
+      before do
+        user.switch_to_organization(first_org)
+      end
+
       it 'should switch the user to the org' do
+        expect(user.current_organization).to eq first_org
         get(path)
         expect(response.status).to eq(200)
-        expect(user.current_organization).to eq other_org
+        expect(user.reload.current_organization).to eq other_org
       end
 
       context 'with a common_viewable resource' do
@@ -277,7 +283,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         it 'should not switch the user to the org' do
           get(path)
           expect(response.status).to eq(200)
-          expect(user.current_organization).not_to eq other_org
+          expect(user.reload.current_organization).not_to eq other_org
         end
       end
     end
