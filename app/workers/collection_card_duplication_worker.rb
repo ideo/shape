@@ -23,7 +23,7 @@ class CollectionCardDuplicationWorker
     return false if infinite_loop_detected?
 
     duplicate_legend_items
-    update_parent_cover
+    reorder_and_update_cached_values!
     update_parent_collection_status
     @new_cards
   end
@@ -98,7 +98,7 @@ class CollectionCardDuplicationWorker
     )
   end
 
-  def update_parent_cover
+  def update_parent_cover!
     cover_card_ids = @parent_collection.cached_cover.try(:[], 'card_ids')
     return unless cover_card_ids.present?
 
@@ -108,6 +108,12 @@ class CollectionCardDuplicationWorker
 
     # at this point we know the copied cover ids are referencing old ones, so we re-cache
     @parent_collection.cache_cover!
+  end
+
+  def reorder_and_update_cached_values!
+    @parent_collection.reorder_cards!
+    @parent_collection.cache_card_count!
+    update_parent_cover!
   end
 
   def duplicate_legend_items
