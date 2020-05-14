@@ -17,9 +17,9 @@ class DataItemCover extends React.Component {
     this.loadDatasets()
   }
 
-  componentDidUpdate() {
-    const { item } = this.props
-    if (!item.primaryDataset) {
+  componentDidUpdate(prevProps) {
+    const { item, datasetLength } = this.props
+    if (!item.primaryDataset || datasetLength > prevProps.datasetLength) {
       this.loadDatasets()
     }
   }
@@ -79,7 +79,6 @@ class DataItemCover extends React.Component {
 DataItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
   datasetLength: PropTypes.number,
 }
 
