@@ -1,5 +1,5 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { startCase, find } from 'lodash'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { runInAction, observable, computed } from 'mobx'
@@ -18,9 +18,11 @@ import EditableButton from '~/ui/reporting/EditableButton'
 import MeasureSelect from '~/ui/reporting/MeasureSelect'
 import DataTargetButton from '~/ui/reporting/DataTargetButton'
 import DataTargetSelect from '~/ui/reporting/DataTargetSelect'
+import { debouncedAutocompleteSearch } from '~/ui/reporting/utils'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 import OrganicGridPng from '~/assets/organic_grid_black.png'
 import { StyledDataItemCover } from '~/ui/grid/covers/data-item/StyledDataItemCover'
+import DataItemGroupingControl from '~/ui/grid/covers/data-item/DataItemGroupingControl'
 import v, { DATA_MEASURES } from '~/utils/variables'
 
 const GraphKey = styled.span`
@@ -40,6 +42,11 @@ class DataItemCoverCollectionsItems extends React.Component {
   loading = false
   @observable
   changingTimeframe = false
+
+  constructor(props) {
+    super(props)
+    this.debouncedGroupSearch = debouncedAutocompleteSearch('searchGroups')
+  }
 
   componentDidMount() {
     const { item, uiStore } = this.props
@@ -103,23 +110,28 @@ class DataItemCoverCollectionsItems extends React.Component {
     return { width: size, height: size }
   }
 
-  async saveSettings(settings) {
+  saveSettings = async settings => {
     const { card, item } = this.props
+    const { primaryDataset } = item
     runInAction(() => {
-      Object.assign(item.primaryDataset, settings)
+      Object.assign(primaryDataset, settings)
       this.loading = true
       if (settings.timeframe) {
         this.changingTimeframe = true
       }
+      if (settings.groupings && _.isEmpty(settings.groupings)) {
+        primaryDataset.group = null
+      }
     })
-    await item.primaryDataset.save()
+    await primaryDataset.patch()
+
     // If the timeframe changed we have to resize the card
     if (settings.timeframe) {
       const { height, width } = this.correctGridSize
       if (card.height !== height || card.width !== width) {
         card.height = height
         card.width = width
-        await card.save()
+        await card.patch()
       }
     }
     // TODO: investigate why data isn't being updated with just `save()`
@@ -161,7 +173,7 @@ class DataItemCoverCollectionsItems extends React.Component {
   }
 
   renderInfoIconTooltip = metric => {
-    const measure = find(DATA_MEASURES, measure => measure.value === metric)
+    const measure = _.find(DATA_MEASURES, measure => measure.value === metric)
     return <HoverableDescriptionIcon description={measure.description} />
   }
 
@@ -189,7 +201,12 @@ class DataItemCoverCollectionsItems extends React.Component {
         </EditableButton>
       )
     }
-    return <span>{measure}</span>
+    return (
+      <span>
+        {measure}
+        {this.renderInfoIconTooltip(measure)}
+      </span>
+    )
   }
 
   get targetControl() {
@@ -218,6 +235,25 @@ class DataItemCoverCollectionsItems extends React.Component {
     )
   }
 
+  onGroupSearch = (value, callback) =>
+    this.debouncedGroupSearch(value, callback)
+
+  get groupingControl() {
+    const { item } = this.props
+    const { can_edit_content } = item
+    const { group } = item.primaryDataset
+
+    return (
+      <DataItemGroupingControl
+        group={group}
+        canEdit={can_edit_content}
+        editing={this.editing}
+        onEditClick={this.handleEditClick}
+        saveSettings={this.saveSettings}
+      />
+    )
+  }
+
   get collectionsAndItemsControls() {
     const { item } = this.props
     const { timeframe } = item.primaryDataset
@@ -225,7 +261,8 @@ class DataItemCoverCollectionsItems extends React.Component {
       return (
         <span className="titleAndControls">
           within {!item.datasets[0].data_source_id ? 'the ' : ''}
-          {this.targetControl} {this.timeframeControl}
+          {this.targetControl}
+          {this.groupingControl} {this.timeframeControl}
         </span>
       )
     }
@@ -237,6 +274,7 @@ class DataItemCoverCollectionsItems extends React.Component {
         <SmallHelperText color={v.colors.black}>
           <GraphKey />
           {this.targetControl}
+          {this.groupingControl}
         </SmallHelperText>
       </Fragment>
     )
@@ -246,20 +284,11 @@ class DataItemCoverCollectionsItems extends React.Component {
     const { item } = this.props
     const { name, primaryDataset } = item
     if (item.isReportTypeNetworkAppMetric) {
-      return startCase(primaryDataset.measure)
+      return _.startCase(primaryDataset.measure)
     } else if (item.isReportTypeCollectionsItems) {
       return this.collectionsAndItemsControls
     }
     return name
-  }
-
-  handleMouseOver = () => {
-    const { uiStore } = this.props
-    uiStore.update('hoveringOverDataItem', true)
-  }
-  handleMouseOut = () => {
-    const { uiStore } = this.props
-    uiStore.update('hoveringOverDataItem', false)
   }
 
   renderSingleValue() {

@@ -562,14 +562,14 @@ describe Collection::TestCollection, type: :model do
       TemplateInstanceUpdater.new(
         master_template: test_collection,
         updated_card_ids: test_collection.collection_cards.pluck(:id),
-        template_update_action: 'create',
+        template_update_action: :create,
       )
     }
     let(:submission_template_updater) {
       TemplateInstanceUpdater.new(
         master_template: submission_template,
         updated_card_ids: submission_template.collection_cards.pluck(:id),
-        template_update_action: 'create',
+        template_update_action: :create,
       )
     }
 
@@ -599,7 +599,7 @@ describe Collection::TestCollection, type: :model do
           expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
             test_collection.id,
             test_collection.collection_cards.pluck(:id),
-            'update_all',
+            :update_all,
           )
           test_collection.launch!(initiated_by: user)
         end

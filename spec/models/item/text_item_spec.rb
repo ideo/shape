@@ -1,6 +1,21 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 RSpec.describe Item::TextItem, type: :model do
+  include_context 'CollectionUpdateBroadcaster setup'
+
+  context 'callbacks' do
+    describe '#set_default_version' do
+      let(:item) { build(:text_item, data_content: { ops: [] }) }
+
+      it 'should set version to 1' do
+        expect(item.version).to be nil
+        item.save
+        expect(item.version).to eq 1
+      end
+    end
+  end
+
   context 'instance methods' do
     let(:data_content) do
       {
@@ -55,6 +70,8 @@ RSpec.describe Item::TextItem, type: :model do
           expect(RedisMutex).to receive(:with_lock).and_raise(RedisMutex::LockError)
           expect(result).to include(
             error: 'locked',
+            version: text_item.version,
+            last_10: nil,
           )
         end
 
@@ -108,8 +125,8 @@ RSpec.describe Item::TextItem, type: :model do
             full_content: text_item.quill_data,
           )
         end
-        it 'should not queue up the CollectionBroadcastWorker unless there are multiple viewers' do
-          expect(CollectionBroadcastWorker).not_to receive(:perform_in).with(3.seconds, parent.id)
+        it 'should not broadcast unless there are multiple viewers' do
+          expect(CollectionUpdateBroadcaster).not_to receive(:new)
           text_item.save_and_broadcast_quill_data(user, data)
         end
 
@@ -118,20 +135,19 @@ RSpec.describe Item::TextItem, type: :model do
             parent.started_viewing(user, dont_notify: true)
             parent.started_viewing(create(:user), dont_notify: true)
           end
-          context 'not already broadcasting' do
-            it 'should queue up the CollectionBroadcastWorker' do
-              expect(CollectionBroadcastWorker).to receive(:perform_in).with(3.seconds, parent.id)
-              text_item.save_and_broadcast_quill_data(user, data)
-            end
-          end
-          context 'already broadcasting' do
-            before do
-              parent.update(broadcasting: true)
-            end
-            it 'should not queue up the CollectionBroadcastWorker' do
-              expect(CollectionBroadcastWorker).not_to receive(:perform_in).with(3.seconds, parent.id)
-              text_item.save_and_broadcast_quill_data(user, data)
-            end
+
+          it 'should broadcast the updates' do
+            expect(CollectionUpdateBroadcaster).to receive(:new).with(
+              text_item.parent,
+              user,
+            )
+            expect(TextItemBroadcastWorker).to receive(:perform_in).with(
+              5.seconds,
+              text_item.id,
+              user.id,
+            )
+            expect(broadcaster_instance).to receive(:text_item_updated).with(text_item)
+            text_item.save_and_broadcast_quill_data(user, data)
           end
         end
       end

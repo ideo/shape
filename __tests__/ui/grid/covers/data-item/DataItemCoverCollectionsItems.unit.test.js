@@ -7,10 +7,10 @@ import { Heading3 } from '~/ui/global/styled/typography'
 
 const props = {}
 const fakeEv = { preventDefault: jest.fn() }
-let wrapper, render
+let wrapper, render, component
 const uiStore = fakeUiStore
 const apiStore = fakeApiStore()
-describe('DataItemCover', () => {
+describe('DataItemCoverCollectionsItems', () => {
   beforeEach(() => {
     props.uiStore = uiStore
     props.apiStore = apiStore
@@ -19,10 +19,12 @@ describe('DataItemCover', () => {
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     props.uiStore.editingCardCover = 0
     props.loadTargetCollection = jest.fn()
-    render = () =>
-      (wrapper = shallow(
+    render = () => {
+      wrapper = shallow(
         <DataItemCoverCollectionsItems.wrappedComponent {...props} />
-      ))
+      )
+      component = wrapper.instance()
+    }
 
     render()
   })
@@ -124,6 +126,23 @@ describe('DataItemCover', () => {
       expect(wrapper.find('EditableButton').length).toEqual(2)
     })
 
+    describe('with a grouping group', () => {
+      const fakeGroup = { name: 'My Group' }
+      beforeEach(() => {
+        props.item.primaryDataset.group = fakeGroup
+        render()
+      })
+
+      it('renders the DataItemGroupingControl', () => {
+        const groupingControl = wrapper.find('DataItemGroupingControl')
+        expect(groupingControl.exists()).toBeTruthy()
+        const groupingProps = groupingControl.props()
+        expect(groupingProps.group).toEqual(fakeGroup)
+        expect(groupingProps.canEdit).toEqual(props.item.can_edit_content)
+        expect(groupingProps.editing).toEqual(component.editing)
+      })
+    })
+
     describe('when editing', () => {
       beforeEach(() => {
         props.uiStore.editingCardCover = props.card.id
@@ -132,6 +151,11 @@ describe('DataItemCover', () => {
 
       it('should show selects for timeframe and measure', () => {
         expect(wrapper.find('MeasureSelect').length).toEqual(2)
+      })
+
+      it('renders the DataItemGroupingControl with editing=true', () => {
+        const groupingProps = wrapper.find('DataItemGroupingControl').props()
+        expect(groupingProps.editing).toEqual(true)
       })
     })
   })
@@ -216,21 +240,6 @@ describe('DataItemCover', () => {
       it('should not show editing controls', () => {
         expect(wrapper.find('.editableMetric').exists()).toBe(false)
       })
-    })
-  })
-
-  describe('handleMouseOver', () => {
-    it('sets uiStore.hoveringOverDataItem', () => {
-      const cover = wrapper.find('StyledDataItemCover')
-      cover.simulate('mouseOver')
-      expect(uiStore.update).toHaveBeenCalledWith('hoveringOverDataItem', true)
-    })
-  })
-  describe('handleMouseOut', () => {
-    it('unsets uiStore.hoveringOverDataItem', () => {
-      const cover = wrapper.find('StyledDataItemCover')
-      cover.simulate('mouseOut')
-      expect(uiStore.update).toHaveBeenCalledWith('hoveringOverDataItem', false)
     })
   })
 })

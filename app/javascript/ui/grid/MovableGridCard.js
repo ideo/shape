@@ -578,7 +578,7 @@ class MovableGridCard extends React.Component {
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!activeDragTarget
-    if (dragging) {
+    if (dragging || this.state.allowTouchDeviceDragging) {
       transform += ` translate(${xAdjust}px, ${yAdjust}px) rotate(${cardTiltDegrees}deg)`
       if (draggedOverBreadcrumb) {
         transform += ' scaleX(0.75) scaleY(0.75) translate(0px, 180px)'
@@ -670,6 +670,15 @@ class MovableGridCard extends React.Component {
       style: {
         // animate grid items that are moving as they're being displaced
         transition,
+      },
+      resizeHandleStyles: {
+        bottomRight: {
+          zIndex: `${
+            uiStore.cardMenuOpen && uiStore.cardMenuOpen.id
+              ? -1 // place behind action menu when open
+              : v.zIndex.gridCard
+          }`,
+        },
       },
     }
 

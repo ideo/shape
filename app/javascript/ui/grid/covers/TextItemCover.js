@@ -57,19 +57,27 @@ class TextItemCover extends React.Component {
   }
 
   state = {
+    // NOTE: item is stored in state, and set only on mount/update to protect from
+    //  observable changes triggering problematic re-renders of RealtimeTextItem
     item: null,
     readMore: false,
     loading: false,
   }
 
   componentDidMount() {
-    const { height, item } = this.props
+    const { item, height } = this.props
     this.checkTextAreaHeight(height)
     this.setState({ item })
   }
 
-  componentWillReceiveProps({ height }) {
-    this.checkTextAreaHeight(height)
+  componentDidUpdate(prevProps) {
+    const { item, height } = this.props
+    if (height !== prevProps.height) {
+      this.checkTextAreaHeight(height)
+    }
+    if (item.id !== prevProps.item.id) {
+      this.setState({ item })
+    }
   }
 
   componentWillUnmount() {
@@ -114,7 +122,7 @@ class TextItemCover extends React.Component {
     runInAction(() => {
       uiStore.deselectCards()
       uiStore.update('textEditingItemHasTitleText', this.hasTitleText)
-      uiStore.update('textEditingItem', this.state.item)
+      uiStore.update('textEditingItem', item)
       uiStore.update('textEditingCardId', cardId)
     })
     this.setState({ loading: false })
@@ -127,9 +135,7 @@ class TextItemCover extends React.Component {
 
   clearTextEditingItem = () => {
     if (!this.isEditing) return
-    uiStore.update('textEditingItem', null)
-    uiStore.update('textEditingCardId', null)
-    uiStore.update('textEditingItemHasTitleText', false)
+    uiStore.clearTextEditingItem()
   }
 
   // cancel should only ever be called for editors, since it is canceling out of edit view
@@ -140,10 +146,10 @@ class TextItemCover extends React.Component {
     if (ev && ev.stopPropagation) ev.stopPropagation()
     this.clearTextEditingItem()
     const hasContent = stripTags(item.content).length
-    if (!hasContent && !item.version) {
+    if (!hasContent && item.version === 1) {
       // archive empty text item when you hit "X"
       const card = apiStore.find('collection_cards', this.props.cardId)
-      card.API_archiveSelf({ undoable: false })
+      if (card) card.API_archiveSelf({ undoable: false })
       return
     }
     if (num_viewers === 1) {

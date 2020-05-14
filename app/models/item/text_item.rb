@@ -51,6 +51,7 @@ class Item
 
     before_save :scrub_data_attrs
     before_save :perform_realtime_update, if: :quill_data_changed?
+    before_create :set_default_version
 
     attr_accessor :quill_data_was
 
@@ -92,13 +93,24 @@ class Item
     def save_and_broadcast_quill_data(user, data)
       # update delta with transformed one
       new_data = threadlocked_transform_realtime_delta(user, Mashie.new(data))
-      # new_data may include an error message
+      # broadcast to fellow text channel viewers; new_data may include an error message
       received_changes(new_data, user)
 
-      return if parent.nil? || parent.num_viewers < 2 || parent.broadcasting?
+      # only continue if we haven't broadcasted to the collection in the last 4 seconds
+      return if last_broadcast_at.present? && (Time.current - last_broadcast_at) < 4
 
-      parent.update(broadcasting: true)
-      CollectionBroadcastWorker.perform_in(3.seconds, parent.id)
+      update_columns(last_broadcast_at: Time.current)
+      # only continue if anyone else is still viewing the text item's collection
+      return if parent&.num_viewers&.zero?
+
+      CollectionUpdateBroadcaster.new(parent, user).text_item_updated(self)
+      # push one more broadcast to get any last updates e.g. that happened < 4 seconds
+      # and to call LinkBroadcastWorker
+      TextItemBroadcastWorker.perform_in(
+        5.seconds,
+        id,
+        user&.id,
+      )
     end
 
     def threadlocked_transform_realtime_delta(user, data)
@@ -114,7 +126,11 @@ class Item
       end
     rescue RedisMutex::LockError
       # error needs to alert the frontend to the latest version
-      { error: 'locked', version: data_content['version'].to_i }
+      {
+        error: 'locked',
+        version: version.to_i,
+        last_10: last_10,
+      }
     end
 
     def transform_realtime_delta(user: nil, delta:, version:, full_content:)
@@ -122,7 +138,11 @@ class Item
 
       if version.to_i < saved_version
         # error needs to alert the frontend to the latest version
-        return { error: 'locked', version: saved_version }
+        return {
+          error: 'locked',
+          version: saved_version,
+          last_10: last_10,
+        }
       end
 
       new_version = saved_version + 1
@@ -134,11 +154,11 @@ class Item
         editor_id: user ? user.id.to_s : 'api',
       }
       full_content['last_10'] = full_content['last_10'].last(10)
-      # NOTE: is a "full update" too heavy here for performance, or ok?
-      # it basically means it's calling a few related updates on the parent / cards
-      # update_column(:data_content, full_content)
       # -- this is the only place a text_item's data_content should get directly updated
-      update(data_content: full_content)
+      # NOTE: intentionally NOT doing a full update otherwise callbacks would get called again!
+      update_columns(data_content: full_content, updated_at: Time.current)
+      # perform the "touch" without doing another full lifecycle update
+      touch_related_cards
       {
         delta: delta.as_json,
         version: full_content['version'],
@@ -164,15 +184,15 @@ class Item
     end
 
     def perform_realtime_update
-      # determine the diff that we just applied
+      # determine the Quill diff that we just applied
+      # NOTE: Schmooze::JavaScript::Error can happen here which probably means badly formatted data;
+      # we don't rescue so that AppSignal can flag these
       delta = QuillSchmoozer.diff(quill_data_was, quill_data)
       data = Mashie.new(
         delta: delta,
         version: version,
         full_content: quill_data,
       )
-      # NOTE: there is the edge case where another realtime update came through
-      # faster than this one, technically we should retry...
       save_and_broadcast_quill_data(nil, data)
     end
 
@@ -211,6 +231,10 @@ class Item
       return unless name == 'Text'
 
       generate_name
+    end
+
+    def set_default_version
+      self.version ||= 1
     end
   end
 end

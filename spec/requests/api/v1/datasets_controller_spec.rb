@@ -5,6 +5,7 @@ describe Api::V1::DatasetsController, type: :request, json: true do
     def jsonapi_headers
       headers = super
       return headers if @api_token.blank?
+
       headers['Authorization'] = "Bearer #{@api_token.token}"
       headers
     end
@@ -44,7 +45,6 @@ describe Api::V1::DatasetsController, type: :request, json: true do
           ).to eq([dataset_with_external_id.id])
         end
       end
-
     end
 
     describe 'POST #create' do
@@ -92,6 +92,29 @@ describe Api::V1::DatasetsController, type: :request, json: true do
       it 'updates dataset' do
         jsonapi_put(path, update_params)
         expect(dataset.reload.measure).to eq('experimentation')
+      end
+
+      describe 'with groupings' do
+        let!(:group) { create(:group) }
+        let(:update_params) do
+          {
+            data: {
+              type: 'datasets',
+              id: dataset.id,
+              attributes: {
+                groupings: [{ id: group.id, type: 'Group' }],
+              },
+            },
+          }
+        end
+
+        it 'should update the dataset to have the Group grouping' do
+          jsonapi_put(path, update_params)
+          expect(json['data']['relationships']['group']['data']).to eq(
+            { type: 'groups', id: group.id.to_s }.as_json,
+          )
+          expect(dataset.reload.group).to eq(group)
+        end
       end
     end
   end

@@ -442,19 +442,25 @@ class GridCardBlank extends React.Component {
   }
 
   createTextItem = item => {
-    this.createCard(
-      {
-        item_attributes: {
-          name: 'Text',
-          content: '',
-          quill_data: { ops: [] },
-          type: ITEM_TYPES.TEXT,
+    // prevent multiple clicks (or pressing enter) to create multiple items
+    if (this.state.loading) {
+      return
+    }
+    this.setState({ loading: true }, () => {
+      this.createCard(
+        {
+          item_attributes: {
+            name: 'Text',
+            content: '',
+            quill_data: { ops: [] },
+            type: ITEM_TYPES.TEXT,
+          },
         },
-      },
-      {
-        afterCreate: this.afterCreate(ITEM_TYPES.TEXT),
-      }
-    )
+        {
+          afterCreate: this.afterCreate(ITEM_TYPES.TEXT),
+        }
+      )
+    })
   }
 
   closeBlankContentTool = () => {

@@ -108,13 +108,6 @@ class GridCard extends React.Component {
     return uiStore.editingCardCover === id
   }
 
-  get isHoveringOverDataItem() {
-    const { card } = this.props
-    // when you're hovering over a data item hide StyledTopRightActions
-    // so that you can still see the tooltips
-    return card.record && card.record.isData && uiStore.hoveringOverDataItem
-  }
-
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
@@ -143,8 +136,6 @@ class GridCard extends React.Component {
     let className = 'show-on-hover'
     if (this.isEditingCardCover) {
       className = 'hide-on-cover-edit'
-    } else if (this.isHoveringOverDataItem) {
-      className = 'hide-for-data-item'
     }
 
     return (
@@ -156,7 +147,7 @@ class GridCard extends React.Component {
         {this.downloadableRecord && (
           <Download record={this.downloadableRecord} />
         )}
-        {record.canSetACover && this.canEditCard && (
+        {record.canSetACover && this.canContentEditCard && (
           <CardCoverEditor
             card={card}
             parentRef={this.gridCardRef}

@@ -30,6 +30,7 @@ export const fakeCollectionCard = {
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
+  API_updateCardFilter: jest.fn(),
   ...fakeJsonApiAttrs,
 }
 
@@ -266,6 +267,9 @@ export const fakeTextItem = {
   toJSON: jest.fn().mockReturnValue(fakeTextItemAttrs),
   pushUndo: jest.fn(),
   pushTextUndo: jest.fn(),
+  setCollaborators: jest.fn(),
+  collaborators: [],
+  roles: [],
   version: 1,
   ...fakeJsonApiAttrs,
 }
@@ -448,6 +452,8 @@ export const fakeCollection = {
   cardIds: _.map(fakeCards, c => c.id),
   cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
   addCard: jest.fn(),
+  setCollaborators: jest.fn(),
+  collaborators: [],
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
@@ -467,11 +473,14 @@ export const fakeCollection = {
   API_addComparison: jest.fn().mockReturnValue(Promise.resolve({})),
   API_selectCollectionType: jest.fn().mockReturnValue(Promise.resolve({})),
   API_manipulateRow: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_fetchCardOrders: jest.fn().mockReturnValue(Promise.resolve({})),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
   clearCollectionCards: jest.fn(),
   toJsonApiWithCards: jest.fn(),
+  mergeCards: jest.fn(),
+  revertToSnapshot: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',
@@ -668,4 +677,11 @@ export const fakeCollectionFilter = {
   text: 'plants',
   selected: true,
   API_toggleSelected: jest.fn().mockReturnValue(Promise.resolve({})),
+}
+
+export const fakeCollaborator = {
+  id: '1',
+  can_edit_collection: false,
+  timestamp: '2020-04-30 11:34:50 -0700',
+  color: 'Blue'
 }

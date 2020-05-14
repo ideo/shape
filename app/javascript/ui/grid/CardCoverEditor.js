@@ -378,8 +378,7 @@ class CardCoverEditor extends React.Component {
   onFilterOptionSelect = async option => {
     const { uiStore, card } = this.props
     uiStore.setEditingCardCover(null)
-    card.filter = option.type
-    await card.save()
+    await card.API_updateCardFilter(option.type)
   }
 
   get showFilters() {

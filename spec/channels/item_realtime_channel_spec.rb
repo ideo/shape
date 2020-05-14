@@ -23,12 +23,17 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
     context 'with edit access' do
       let(:user) { editor }
       it 'notifies of viewer' do
-        expect { subscribe(id: item.id) }.to have_broadcasted_to(stream_name).with(
-          current_editor: {},
-          num_viewers: 1,
-          record_id: item.id.to_s,
-          record_type: 'items',
-        )
+        expect { subscribe(id: item.id) }.to have_broadcasted_to(stream_name)
+          .with(
+            hash_including(
+              current_editor: {},
+              collaborators: anything,
+              num_viewers: 1,
+              record_id: item.id.to_s,
+              record_type: 'items',
+              data: { num_viewers_changed: true },
+            ),
+          )
       end
     end
   end
@@ -40,9 +45,11 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
     it 'notifies viewer left' do
       expect { subscription.unsubscribed }.to have_broadcasted_to(stream_name).with(
         current_editor: {},
+        collaborators: [],
         num_viewers: 0,
         record_id: item.id.to_s,
         record_type: 'items',
+        data: { num_viewers_changed: true },
       )
     end
   end
@@ -59,19 +66,21 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
     end
 
     it 'notifies of item delta' do
-      expect { perform(:delta, data) }.to have_broadcasted_to(stream_name).with(
-        hash_including(
-          current_editor: user.as_json,
-          num_viewers: 1,
-          record_id: item.id.to_s,
-          record_type: 'items',
-          data: hash_including(
-            delta: data[:delta],
-            version: data[:version],
-            last_10: anything,
+      expect { perform(:delta, data) }.to have_broadcasted_to(stream_name)
+        .with(
+          hash_including(
+            current_editor: user.as_json,
+            collaborators: anything,
+            num_viewers: 1,
+            record_id: item.id.to_s,
+            record_type: 'items',
+            data: hash_including(
+              delta: data[:delta],
+              version: data[:version],
+              last_10: anything,
+            ),
           ),
-        ),
-      )
+        )
     end
   end
 
@@ -83,18 +92,20 @@ RSpec.describe ItemRealtimeChannel, type: :channel do
     end
 
     it 'notifies of cursor position' do
-      expect { perform(:cursor, data) }.to have_broadcasted_to(stream_name).with(
-        hash_including(
-          current_editor: user.as_json,
-          num_viewers: 1,
-          record_id: item.id.to_s,
-          record_type: 'items',
-          data: {
-            range: data[:range],
-            action: 'cursor',
-          },
-        ),
-      )
+      expect { perform(:cursor, data) }.to have_broadcasted_to(stream_name)
+        .with(
+          hash_including(
+            current_editor: user.as_json,
+            collaborators: anything,
+            num_viewers: 1,
+            record_id: item.id.to_s,
+            record_type: 'items',
+            data: {
+              range: data[:range],
+              action: 'cursor',
+            },
+          ),
+        )
     end
   end
 end

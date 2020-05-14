@@ -221,4 +221,14 @@ class Api::V1::BaseController < ApplicationController
       I18n.locale = I18n.default_locale
     end
   end
+
+  def collection_broadcaster(collection = @collection)
+    CollectionUpdateBroadcaster.new(collection, current_user)
+  end
+
+  def switch_to_organization
+    return if @collection.common_viewable?
+
+    current_user.switch_to_organization(@collection.organization)
+  end
 end

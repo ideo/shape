@@ -500,6 +500,18 @@ class CollectionCard extends BaseRecord {
 
     return this.parentCollection._reorderCards()
   }
+
+  @action
+  async API_updateCardFilter(filter) {
+    if (!filter) return
+    this.filter = filter
+
+    await this.apiStore.request(
+      `collection_cards/${this.id}/update_card_filter`,
+      'PATCH',
+      { data: this.toJsonApi() }
+    )
+  }
 }
 
 export default CollectionCard

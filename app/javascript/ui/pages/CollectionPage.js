@@ -4,9 +4,11 @@ import pluralize from 'pluralize'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
+import { Helmet } from 'react-helmet'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
+import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
@@ -26,7 +28,6 @@ import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
-import { Helmet } from 'react-helmet'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -59,6 +60,7 @@ class CollectionPage extends React.Component {
     }
     this.setViewingRecordAndRestoreScrollPosition()
     this.loadCollectionCards({})
+    this.subscribeToChannel(collection.id)
   }
 
   componentDidUpdate(prevProps) {
@@ -69,7 +71,9 @@ class CollectionPage extends React.Component {
       runInAction(() => {
         this.cardsFetched = false
       })
+      // unsubscribe from previous collection; subscribe to new one
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
+      this.subscribeToChannel(currentId)
       // when navigating between collections, close BCT
       this.props.uiStore.closeBlankContentTool()
       this.setViewingRecordAndRestoreScrollPosition()
@@ -96,7 +100,13 @@ class CollectionPage extends React.Component {
     this.restoreWindowScrollPosition()
   }
 
-  loadCollectionCards = async ({ page, per_page, rows, cols }) => {
+  loadCollectionCards = async ({
+    page,
+    per_page,
+    rows,
+    cols,
+    reloading = false,
+  }) => {
     const { collection, undoStore } = this.props
     // if the collection is still awaiting updates, there are no cards to load
     if (collection.awaiting_updates) {
@@ -104,18 +114,14 @@ class CollectionPage extends React.Component {
       return
     }
 
-    let params
+    let params = { page, per_page }
     if (collection.isBoard) {
       params = { rows }
-    } else {
-      params = { page, per_page, rows, cols }
     }
-
     if (undoStore.actionAfterRoute) {
       // clear this out before we fetch, so that any undo/redo actions don't flash a previous state of the cards
       collection.clearCollectionCards()
     }
-
     return collection.API_fetchCards(params).then(() => {
       if (collection.id !== this.props.collection.id) {
         // this may have changed during the course of the request if we navigated
@@ -123,6 +129,7 @@ class CollectionPage extends React.Component {
       }
       runInAction(() => {
         this.cardsFetched = true
+        if (reloading) return
         this.onAPILoad()
       })
     })
@@ -148,8 +155,6 @@ class CollectionPage extends React.Component {
     } = this.props
 
     apiStore.checkCurrentOrg({ id: collection.organization_id })
-
-    this.subscribeToChannel(collection.id)
 
     if (collection.isSubmissionsCollection) {
       // NOTE: SubmissionsCollections are not meant to be viewable, so we route
@@ -297,20 +302,33 @@ class CollectionPage extends React.Component {
 
   receivedChannelData = async data => {
     const { collection, apiStore } = this.props
+    const { collaborators } = data
+    collection.setCollaborators(collaborators)
     // catch if receivedData happens after reload
     if (!collection) return
     const currentId = collection.id
     const submissions = collection.submissions_collection
     const submissionsId = submissions ? submissions.id : ''
 
-    if (_.includes(_.compact([currentId, submissionsId]), data.record_id)) {
-      if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
-        // don't reload your own updates
-        return
-      }
-      this.setEditor(data.current_editor)
-      this.reloadData()
+    if (!_.includes(_.compact([currentId, submissionsId]), data.record_id)) {
+      return
     }
+    if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
+      // don't reload your own updates
+      return
+    }
+
+    const updateData = data.data
+    if (updateData && !updateData.text_item) {
+      // don't show editor for text item updates, might be overkill
+      this.setEditor(data.current_editor)
+    }
+    if (!updateData || updateData.reload_cards) {
+      this.reloadData()
+      return
+    }
+    const service = new CollectionCollaborationService({ collection })
+    service.handleReceivedData(updateData)
   }
 
   async _reloadData() {
@@ -318,9 +336,12 @@ class CollectionPage extends React.Component {
     const per_page =
       collection.collection_cards.length || collection.recordsPerPage
     if (collection.isBoard) {
-      this.loadCollectionCards({ rows: [0, collection.loadedRows] })
+      this.loadCollectionCards({
+        reloading: true,
+        rows: [0, collection.loadedRows],
+      })
     } else {
-      this.loadCollectionCards({ per_page })
+      this.loadCollectionCards({ reloading: true, per_page })
     }
     if (this.collection.submissions_collection) {
       this.setLoadedSubmissions(false)
@@ -379,11 +400,19 @@ class CollectionPage extends React.Component {
   get renderEditorPill() {
     const { currentEditor } = this
     const { currentUserId } = this.props.apiStore
+    const { collaborators } = this.props.collection
     let hidden = ''
     // don't let logged-out users see who's editing, but they can still receive realtime updates
     if (!currentUserId) return
-    if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId)
+
+    const collaborator = _.find(collaborators, c => c.id === currentEditor.id)
+    if (collaborator && collaborator.color) {
+      currentEditor.color = collaborator.color
+    }
+    if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId) {
+      // toggle hidden on/off to allow EditorPill CSS to fade in/out
       hidden = 'hidden'
+    }
     return (
       <EditorPill className={`editor-pill ${hidden}`} editor={currentEditor} />
     )

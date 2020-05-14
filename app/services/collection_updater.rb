@@ -26,7 +26,7 @@ class CollectionUpdater < SimpleService
             # we just moved the template cards, so update the instances
             @collection.queue_update_template_instances(
               updated_card_ids: @collection.collection_cards.pluck(:id),
-              template_update_action: 'update_all',
+              template_update_action: :update_card_attributes,
             )
           end
           if @collection.saved_change_to_collection_to_test_id

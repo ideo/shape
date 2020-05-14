@@ -1,6 +1,8 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 RSpec.describe CollectionCardDuplicationWorker, type: :worker do
+  include_context 'CollectionUpdateBroadcaster setup'
   describe '#perform_sync' do
     let(:args) do
       [
@@ -85,9 +87,12 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
         run_worker
       end
 
-      it 'broadcasts collection as stopped editing' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(to_collection).once
-        run_worker
+      it 'broadcasts collection with cards that finished duplicating' do
+        expect(CollectionUpdateBroadcaster).to receive(:new).with(to_collection).once
+        new_cards = run_worker
+        expect(broadcaster_instance).to have_received(:cards_updated).with(
+          new_cards.pluck(:id),
+        )
       end
 
       it 'returns newly-duplicated cards' do
@@ -102,6 +107,14 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
           collection.cache_cover!
           # simulate the scenario where this collection has been copied with its cover settings
           to_collection.update(cached_cover: collection.cached_cover)
+        end
+
+        it 'reorders and updates cached card count' do
+          expect(CollectionCard).to receive(:import)
+          expect {
+            run_worker
+            to_collection.reload
+          }.to change(to_collection, :cached_card_count)
         end
 
         it 'updates the parent collection cover if the cover cards were copied over' do

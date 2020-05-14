@@ -1,6 +1,6 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { map, range } from 'lodash'
 
 import Avatar from '~/ui/global/Avatar'
 import v from '~/utils/variables'
@@ -17,20 +17,30 @@ const StyledAvatarGroup = styled.div`
     display: inline-block;
     margin-left: 0px;
     margin-right: -12px;
-    border: 1px solid ${v.colors.commonLight};
     /* for any transparent avatars */
     background-color: white;
     &:last-child {
       margin-right: 0;
     }
     ${props =>
-      map(
-        range(1, 6),
+      _.map(
+        _.range(1, 6),
         i =>
           `:nth-child(${i}) {
             z-index: ${10 - i};
           }`
       )};
+
+    &.outlined {
+      /* thicker outline needs different spacing */
+      margin-right: -8px;
+      &:first-child {
+        margin-left: 4px;
+      }
+      &:last-child {
+        margin-right: 4px;
+      }
+    }
   }
   .placeholder {
     background-color: ${v.colors.commonMedium};

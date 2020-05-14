@@ -2,6 +2,7 @@ import RealtimeTextItem from '~/ui/items/RealtimeTextItem'
 import { fakeTextItem, fakeActionCableUser, fakeUser } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import Delta from 'quill-delta'
 
 const props = {
@@ -14,12 +15,14 @@ const props = {
   fullyLoaded: true,
   initialSize: 'normal',
   uiStore: fakeUiStore,
+  routingStore: fakeRoutingStore,
   apiStore: fakeApiStore(),
 }
 
 let wrapper, component
-const rerender = () => {
-  wrapper = shallow(<RealtimeTextItem.wrappedComponent {...props} />)
+const rerender = (merge = {}) => {
+  const mergedProps = { ...props, ...merge }
+  wrapper = shallow(<RealtimeTextItem.wrappedComponent {...mergedProps} />)
   component = wrapper.instance()
   component.quillEditor = {
     getSelection: jest.fn(),
@@ -75,8 +78,13 @@ describe('RealtimeTextItem', () => {
             version: 99,
             last_10: [{ version: 99, delta: {} }],
           },
+          collaborators: [fakeUser],
         })
         wrapper.update()
+      })
+
+      it('updates collaborators', () => {
+        expect(props.item.setCollaborators).toHaveBeenCalledWith([fakeUser])
       })
 
       it('applies last version delta', () => {
@@ -123,13 +131,15 @@ describe('RealtimeTextItem', () => {
     })
 
     describe('with "huge" and a new text item', () => {
-      beforeEach(() => {
-        props.item = { ...fakeTextItem, version: null }
-        props.initialSize = 'huge'
-        rerender()
+      beforeEach(async () => {
+        rerender({
+          item: { ...fakeTextItem, quill_data: { ops: [] }, version: 1 },
+          initialSize: 'huge',
+        })
+        component.version = 1
         component.reactQuillRef = {}
         // re-call with fake reactQuillRef set
-        component.componentDidMount()
+        await component.componentDidMount()
       })
 
       it('should begin with huge size format', () => {
@@ -206,7 +216,7 @@ describe('RealtimeTextItem', () => {
     const error = {
       // current user
       current_editor: { id: '1' },
-      data: { error: true },
+      data: { error: 'locked' },
     }
     const success = {
       // current user
@@ -249,12 +259,12 @@ describe('RealtimeTextItem', () => {
       component.combineAwaitingDeltas(helloWorld)
       expect(component.combinedDelta).toEqual(helloWorld)
       expect(component.bufferDelta).toEqual(helloWorld)
+      expect(component.version).toEqual(null)
 
       component._sendCombinedDelta()
       expect(component.combinedDelta).toEqual(helloWorld)
       expect(component.bufferDelta).toEqual(new Delta())
 
-      expect(component.version).toEqual(1)
       // we receive someone else's response
       component.handleReceivedDelta({
         current_editor: { id: '88' },

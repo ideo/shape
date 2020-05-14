@@ -1,4 +1,5 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 def remove_access(collection_cards, user)
   collection_cards.each do |card|
@@ -9,6 +10,7 @@ def remove_access(collection_cards, user)
 end
 
 describe Api::V1::CollectionCardsController, type: :request, json: true, auth: true do
+  include_context 'CollectionUpdateBroadcaster setup'
   let(:user) { @user }
   let(:organization) { create(:organization_without_groups) }
   let(:collection) do
@@ -45,6 +47,25 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       get(path)
       expect(json['data'].count).to eq 5
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
+    end
+
+    context 'on different org' do
+      let(:first_org) { create(:organization, member: user) }
+      let!(:other_org) { create(:organization, member: user) }
+      let!(:collection) do
+        create(:collection, organization: other_org, add_viewers: [user])
+      end
+
+      before do
+        user.switch_to_organization(first_org)
+      end
+
+      it 'should switch the user to the org' do
+        expect(user.current_organization).to eq first_org
+        get(path)
+        expect(response.status).to eq(200)
+        expect(user.reload.current_organization).to eq other_org
+      end
     end
 
     describe 'included' do
@@ -172,6 +193,15 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'with select_id options' do
+      let(:last_3) { collection.collection_cards.last(3) }
+      it 'only returns the selected ids' do
+        get("#{path}?select_ids=#{last_3.map(&:id).join(',')}")
+        expect(json['data'].count).to eq 3
+        expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(last_3.map(&:id))
+      end
+    end
+
     context 'with Board collection' do
       let!(:board_collection) do
         create(:board_collection, num_cards: 4, add_editors: [user])
@@ -213,11 +243,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids" }
 
-    it 'returns stringified ids of collection.collection_cards' do
+    it 'returns id and order collection.collection_cards' do
       get(path)
       expect(response.status).to eq(200)
       expect(json.length).to eq(5)
-      expect(json).to eq(collection.collection_cards.pluck(:id).map(&:to_s))
+      data = collection.collection_cards.map do |cc|
+        { order: cc.order, id: cc.id.to_s }
+      end
+      expect(json).to eq data.as_json
     end
   end
 
@@ -246,7 +279,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let!(:collection) { create(:collection, record_type: :collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/breadcrumb_records" }
 
-    it 'returns stringified ids of collection.collection_cards' do
+    it 'returns breadcrumb json data of collection_cards' do
       get(path)
       expect(response.status).to eq(200)
       expect(json.length).to eq(5)
@@ -379,10 +412,12 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
             }
           end
 
-          it 'does not broadcast collection updates' do
-            # text items get created empty so we don't broadcast yet
-            expect(CollectionUpdateBroadcaster).not_to receive(:call)
+          it 'broadcasts collection updates' do
             post(path, params: params)
+            card = CollectionCard.find(json['data']['id'])
+            expect(broadcaster_instance).to have_received(:card_updated).with(
+              card,
+            )
           end
         end
 
@@ -396,11 +431,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           end
 
           it 'broadcasts collection updates' do
-            expect(CollectionUpdateBroadcaster).to receive(:call).with(
-              collection,
-              user,
-            )
             post(path, params: params)
+            card = CollectionCard.find(json['data']['id'])
+            expect(broadcaster_instance).to have_received(:card_updated).with(
+              card,
+            )
           end
         end
       end
@@ -530,7 +565,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     # user is an editor of collection
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/archive' }
-    let(:params) { { card_ids: collection_cards.map(&:id) }.to_json }
+    let(:card_ids) { collection_cards.pluck(:id) }
+    let(:params) { { card_ids: card_ids }.to_json }
 
     context 'without record edit access' do
       before do
@@ -571,9 +607,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
-          collection,
-          user,
+        expect(broadcaster_instance).to receive(:cards_archived).with(
+          array_including(card_ids),
         )
         patch(path, params: params)
       end
@@ -583,8 +618,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   describe 'PATCH #unarchive' do
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
     let(:path) { '/api/v1/collection_cards/unarchive' }
+    let(:card_ids) { collection_cards.pluck(:id) }
     let(:raw_params) do
-      { card_ids: collection_cards.map(&:id) }
+      { card_ids: card_ids }
     end
     let(:params) { raw_params.to_json }
 
@@ -615,9 +651,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
-          collection,
-          user,
+        expect(broadcaster_instance).to receive(:cards_updated).with(
+          array_including(card_ids),
         )
         patch(path, params: params)
       end
@@ -944,7 +979,14 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).twice
+        expect(broadcaster_instance).to receive(:cards_archived).with(
+          # this is for the from_collection
+          moving_cards.pluck(:id),
+        )
+        expect(broadcaster_instance).to receive(:cards_updated).with(
+          # this is for the to_collection
+          moving_cards.pluck(:id),
+        )
         patch(path, params: params)
       end
 
@@ -1054,11 +1096,15 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(response.status).to eq(200)
       end
 
-      it 'returns the new link cards as meta.new_cards' do
+      it 'returns the new link cards' do
+        amount = moving_cards.count
         expect {
           post(path, params: params)
-        }.to change(CollectionCard::Link, :count)
-        expect(json['meta']['new_cards'].count).to eq(moving_cards.count)
+        }.to change(CollectionCard::Link, :count).by(amount)
+        expect(json['data'].first['attributes']).to match_json_schema('collection_card')
+        expect(json['data'].count).to eq amount
+        created_ids = CollectionCard::Link.last(amount).pluck(:id)
+        expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(created_ids)
       end
 
       it 'links cards from one collection to the other' do
@@ -1070,11 +1116,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
-          to_collection,
-          user,
-        )
         post(path, params: params)
+        card_ids = to_collection.collection_cards.first(2).pluck(:id)
+        expect(broadcaster_instance).to have_received(:cards_updated).with(
+          array_including(card_ids),
+        )
       end
 
       context 'even if from_id param is absent' do
@@ -1171,9 +1217,15 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(response.status).to eq(200)
       end
 
-      it 'returns the new duplicate cards as meta.new_cards' do
-        post(path, params: params)
-        expect(json['meta']['new_cards'].count).to eq(moving_cards.count)
+      it 'returns the new duplicate cards' do
+        amount = moving_cards.count
+        expect {
+          post(path, params: params)
+        }.to change(CollectionCard::Placeholder, :count).by(amount)
+        expect(json['data'].first['attributes']).to match_json_schema('collection_card')
+        expect(json['data'].count).to eq amount
+        created_ids = CollectionCard::Placeholder.last(amount).pluck(:id)
+        expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(created_ids)
       end
 
       it 'duplicates cards from one collection to the other' do
@@ -1249,11 +1301,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
 
     it 'broadcasts collection updates' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(
-        collection,
-        user,
-      )
       patch(path, params: params)
+      card = CollectionCard.find(json['data']['id'])
+      expect(broadcaster_instance).to have_received(:card_updated).with(
+        card,
+      )
     end
 
     it 'creates an activity' do
@@ -1278,15 +1330,19 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'broadcasts both collection + parent collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        expect(CollectionUpdateBroadcaster).to receive(:new).with(
           collection,
           user,
         )
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        expect(CollectionUpdateBroadcaster).to receive(:new).with(
           parent_collection,
           user,
         )
         patch(path, params: params)
+        card = CollectionCard.find(json['data']['id'])
+        expect(broadcaster_instance).to have_received(:card_updated).with(
+          card,
+        ).twice
       end
     end
 
@@ -1295,6 +1351,68 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       before do
         user.add_role(Role::EDITOR, collection_card.item)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+  end
+
+  describe 'PATCH #update_card_filter' do
+    let(:collection) { create(:collection, organization: organization) }
+    let(:collection_card) { create(:collection_card_text, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}/update_card_filter" }
+    let(:raw_params) do
+      {
+        parent_id: collection.id,
+        filter: 'nothing',
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+
+    before do
+      user.add_role(Role::CONTENT_EDITOR, collection_card.item)
+      user.add_role(Role::CONTENT_EDITOR, collection)
+    end
+
+    it 'returns a 200' do
+      patch(path, params: params)
+      expect(response.status).to eq(200)
+    end
+
+    it 'matches JSON schema' do
+      patch(path, params: params)
+      expect(json['data']['attributes']).to match_json_schema('collection_card')
+      expect(json['data']['attributes']['parent_id']).to eq collection.id
+    end
+
+    it 'broadcasts collection updates' do
+      patch(path, params: params)
+      expect(broadcaster_instance).to have_received(:card_updated).with(
+        collection_card,
+      )
+    end
+
+    context 'without content editor access on the collection card' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      before do
+        user.add_role(Role::VIEWER, collection_card.item)
+      end
+
+      it 'returns a 401' do
+        patch(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'without content editor access on the parent collection' do
+      let(:user) { create(:user, add_to_org: create(:organization)) }
+
+      before do
+        user.add_role(Role::VIEWER, collection)
       end
 
       it 'returns a 401' do
@@ -1383,11 +1501,11 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
 
       it 'broadcasts collection updates' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
-          collection,
-          user,
-        )
         patch(path, params: params)
+        card = CollectionCard.find(json['data']['id'])
+        expect(broadcaster_instance).to have_received(:card_updated).with(
+          card,
+        )
       end
 
       context 'with question item params' do

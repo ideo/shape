@@ -70,6 +70,7 @@ describe('Header', () => {
   describe('with an editable item', () => {
     beforeEach(() => {
       fakeTextItem.can_edit = true
+      fakeTextItem.collaborators = [{ id: 1, avatar: 'x' }]
       props.uiStore.viewingRecord = fakeTextItem
       render()
     })
@@ -93,6 +94,12 @@ describe('Header', () => {
     it('passes canEdit through to RolesSummary', () => {
       expect(wrapper.find('RolesSummary').props().canEdit).toEqual(
         component.record.can_edit
+      )
+    })
+
+    it('passes collaborators through to RolesSummary', () => {
+      expect(wrapper.find('RolesSummary').props().collaborators).toEqual(
+        fakeTextItem.collaborators
       )
     })
 

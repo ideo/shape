@@ -10,7 +10,9 @@ class WebhooksController < ApplicationController
         size: params[:metadata][:result][:file_size],
       )
       # alert the collection that it has been updated
-      CollectionUpdateBroadcaster.call(item.parent)
+      CollectionUpdateBroadcaster.new(item.parent).card_updated(
+        item.parent_collection_card,
+      )
     end
     head :no_content
   end

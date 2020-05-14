@@ -215,7 +215,7 @@ describe('CardCoverEditor', () => {
     })
 
     it('should save the card', () => {
-      expect(props.card.save).toHaveBeenCalled()
+      expect(props.card.API_updateCardFilter).toHaveBeenCalled()
     })
   })
 

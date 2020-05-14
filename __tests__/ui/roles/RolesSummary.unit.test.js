@@ -1,6 +1,6 @@
 import RolesSummary from '~/ui/roles/RolesSummary'
 
-import { fakeRole, fakeUser } from '#/mocks/data'
+import { fakeRole, fakeUser, fakeCollaborator } from '#/mocks/data'
 
 const emptyProps = {
   roles: [],
@@ -8,8 +8,8 @@ const emptyProps = {
   rolesMenuOpen: false,
 }
 
-const editorRole = { ...fakeRole }
-const viewerRole = { ...fakeRole }
+const editorRole = { ...fakeRole, id: '1' }
+const viewerRole = { ...fakeRole, id: '2' }
 viewerRole.name = 'viewer'
 
 const editorsAndViewersProps = {
@@ -23,19 +23,49 @@ const canEditProps = {
   canEdit: true,
 }
 
-let wrapper
+let wrapper, instance
 describe('RolesSummary', () => {
+  describe('componentDidUpdate', () => {
+    const updateProps = {
+      ...emptyProps,
+      roles: [viewerRole],
+      collaborators: [{ ...fakeCollaborator }],
+    }
+    beforeEach(() => {
+      wrapper = shallow(<RolesSummary {...emptyProps} />)
+      instance = wrapper.instance()
+      instance.initEditorsAndViewers = jest.fn()
+      wrapper.setProps(updateProps)
+    })
+
+    it('should call initEditorsAndViewers', () => {
+      expect(instance.initEditorsAndViewers).toHaveBeenCalled()
+    })
+
+    it('should initEditorsAndViewers when roles change', () => {
+      instance.initEditorsAndViewers.mockClear()
+      // now call again, with same roles
+      wrapper.setProps(updateProps)
+      expect(instance.initEditorsAndViewers).not.toHaveBeenCalled()
+      // now call again, with new roles
+      wrapper.setProps({
+        ...updateProps,
+        roles: [viewerRole, editorRole],
+      })
+      expect(instance.initEditorsAndViewers).toHaveBeenCalled()
+    })
+  })
   describe('with editors and viewers', () => {
     beforeEach(() => {
       wrapper = shallow(<RolesSummary {...editorsAndViewersProps} />)
     })
 
     it('renders editors', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(2)
+      expect(wrapper.find('.editor').length).toEqual(1)
     })
 
     it('renders viewers', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(2)
+      expect(wrapper.find('.viewer').length).toEqual(1)
     })
 
     it('does not render AddButton by default', () => {
@@ -52,12 +82,12 @@ describe('RolesSummary', () => {
       wrapper = shallow(<RolesSummary {...onlyViewersProps} />)
     })
 
-    it('renders 2 viewers and label', () => {
-      expect(wrapper.find('[className="viewer"]').length).toEqual(2)
+    it('renders viewer and label', () => {
+      expect(wrapper.find('.viewer').length).toEqual(1)
     })
 
     it('does not render editors', () => {
-      expect(wrapper.find('[className="editor"]').exists()).toBe(false)
+      expect(wrapper.find('.editor').exists()).toBe(false)
     })
   })
 
@@ -70,24 +100,24 @@ describe('RolesSummary', () => {
       wrapper = shallow(<RolesSummary {...newProps} />)
     })
 
-    it('renders 2 editors and label', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(2)
+    it('renders editor and label', () => {
+      expect(wrapper.find('.editor').length).toEqual(1)
     })
 
     it('does not render viewers', () => {
-      expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
+      expect(wrapper.find('.viewer').exists()).toBe(false)
     })
   })
 
   describe('with more editors than should show', () => {
     beforeEach(() => {
       editorRole.users = [
-        fakeUser,
-        fakeUser,
-        fakeUser,
-        fakeUser,
-        fakeUser,
-        fakeUser,
+        { ...fakeUser, id: '1' },
+        { ...fakeUser, id: '2' },
+        { ...fakeUser, id: '3' },
+        { ...fakeUser, id: '4' },
+        { ...fakeUser, id: '5' },
+        { ...fakeUser, id: '6' },
       ]
       const newProps = {
         ...editorsAndViewersProps,
@@ -97,11 +127,11 @@ describe('RolesSummary', () => {
     })
 
     it('renders only 4 editors', () => {
-      expect(wrapper.find('[className="editor"]').length).toEqual(4)
+      expect(wrapper.find('.editor').length).toEqual(4)
     })
 
     it('does not render any viewers or viewer label', () => {
-      expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
+      expect(wrapper.find('.viewer').exists()).toBe(false)
       expect(wrapper.render().text()).not.toMatch(/viewer/i)
     })
   })
@@ -120,8 +150,8 @@ describe('RolesSummary', () => {
     })
 
     it('does not render editors or viewers', () => {
-      expect(wrapper.find('[className="editor"]').exists()).toBe(false)
-      expect(wrapper.find('[className="viewer"]').exists()).toBe(false)
+      expect(wrapper.find('.editor').exists()).toBe(false)
+      expect(wrapper.find('.viewer').exists()).toBe(false)
     })
   })
 
@@ -135,6 +165,91 @@ describe('RolesSummary', () => {
       expect(wrapper.find('AddButton').props().onClick).toEqual(
         canEditProps.handleClick
       )
+    })
+  })
+
+  describe('with collaborators', () => {
+    beforeEach(() => {
+      const editorsAndCollaboratorViewerProps = {
+        ...emptyProps,
+        roles: [viewerRole],
+        collaborators: [
+          fakeCollaborator,
+          {
+            ...fakeCollaborator,
+            id: '2',
+            timestamp: '2020-04-30 11:34:50 -0700',
+            color: 'Yellow',
+          },
+        ],
+      }
+      wrapper = shallow(<RolesSummary {...editorsAndCollaboratorViewerProps} />)
+    })
+
+    it('renders two viewers', () => {
+      expect(wrapper.find('.viewer').length).toEqual(2)
+    })
+
+    it('renders a border around the avatar', () => {
+      expect(
+        wrapper
+          .find('Avatar')
+          .first()
+          .prop('border')
+      ).not.toEqual('none')
+    })
+  })
+
+  describe('with 3 viewers which two are live collaborators (viewing real time)', () => {
+    beforeEach(() => {
+      viewerRole.users = [
+        { ...fakeUser, id: '1' },
+        { ...fakeUser, id: '2' },
+        { ...fakeUser, id: '3' },
+      ]
+      const editorsAndCollaboratorViewerProps = {
+        ...emptyProps,
+        roles: [viewerRole],
+        collaborators: [
+          { ...fakeCollaborator, id: '2' },
+          {
+            ...fakeCollaborator,
+            id: '3',
+            timestamp: '2020-04-30 11:34:50 -0700',
+            color: 'Yellow',
+          },
+        ],
+      }
+      wrapper = shallow(<RolesSummary {...editorsAndCollaboratorViewerProps} />)
+    })
+
+    it('renders three viewers', () => {
+      expect(wrapper.find('.viewer').length).toEqual(3)
+    })
+
+    it('renders first two avatars (live collaborators) with default border in order', () => {
+      expect(
+        wrapper
+          .find('Avatar')
+          .at(0)
+          .prop('className')
+      ).toEqual('viewer outlined outline-Blue')
+
+      expect(
+        wrapper
+          .find('Avatar')
+          .at(1)
+          .prop('className')
+      ).toEqual('viewer outlined outline-Yellow')
+    })
+
+    it('renders viewer who is not a collaborator last and without border', () => {
+      expect(
+        wrapper
+          .find('Avatar')
+          .at(2)
+          .prop('className')
+      ).toEqual('viewer bordered')
     })
   })
 })

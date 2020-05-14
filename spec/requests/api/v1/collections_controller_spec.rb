@@ -1,6 +1,8 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 describe Api::V1::CollectionsController, type: :request, json: true, auth: true do
+  include_context 'CollectionUpdateBroadcaster setup'
   let(:user) { @user }
 
   context 'with anonymous (logged-out) user', auth: false do
@@ -256,15 +258,21 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     context 'on different org' do
+      let!(:first_org) { create(:organization, member: user) }
       let!(:other_org) { create(:organization, member: user) }
       let!(:collection) do
         create(:collection, organization: other_org, add_viewers: [user])
       end
 
+      before do
+        user.switch_to_organization(first_org)
+      end
+
       it 'should switch the user to the org' do
+        expect(user.current_organization).to eq first_org
         get(path)
         expect(response.status).to eq(200)
-        expect(user.current_organization).to eq other_org
+        expect(user.reload.current_organization).to eq other_org
       end
 
       context 'with a common_viewable resource' do
@@ -275,7 +283,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         it 'should not switch the user to the org' do
           get(path)
           expect(response.status).to eq(200)
-          expect(user.current_organization).not_to eq other_org
+          expect(user.reload.current_organization).not_to eq other_org
         end
       end
     end
@@ -326,11 +334,12 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let(:template) { create(:collection, master_template: true, organization: organization) }
     let(:to_collection) { create(:collection, organization: organization) }
     let(:path) { '/api/v1/collections/create_template' }
+    let(:placement) { 'beginning' }
     let(:raw_params) do
       {
         parent_id: to_collection.id,
         template_id: template.id,
-        placement: 'beginning',
+        placement: placement,
       }
     end
     let(:params) { raw_params.to_json }
@@ -365,12 +374,16 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
 
       it 'broadcasts collection updates' do
-        allow(CollectionUpdateBroadcaster).to receive(:call)
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(
+        expect(CollectionUpdateBroadcaster).to receive(:new).with(
+          # broadcast to the collection where we built the template
           to_collection,
           user,
         )
         post(path, params: params)
+        created = template.reload.templated_collections.last
+        expect(broadcaster_instance).to have_received(:card_updated).with(
+          created.parent_collection_card,
+        )
       end
 
       it 'creates Activity item' do
@@ -396,6 +409,20 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           post(path, params: params_with_name)
           template_instance = Collection.find(json['data']['id'])
           expect(template_instance.name).to eq('Awesomeness')
+        end
+      end
+
+      context 'with row/col placement' do
+        let(:placement) do
+          { row: 1, col: 2 }
+        end
+
+        it 'sets to correct placement' do
+          post(path, params: params)
+          template_instance = Collection.find(json['data']['id'])
+          parent_card = template_instance.parent_collection_card
+          expect(parent_card.row).to eq 1
+          expect(parent_card.col).to eq 2
         end
       end
 
@@ -446,7 +473,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   end
 
   describe 'PATCH #update' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
+    # give it a parent collection so that it has a parent_collection_card
+    let!(:collection) { create(:collection, parent_collection: create(:collection), add_editors: [user]) }
     let(:collection_card) do
       create(:collection_card_text, order: 0, width: 1, parent: collection)
     end
@@ -535,6 +563,14 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection_card.reload.order).to eq(1)
     end
 
+    it 'broadcasts collection_updated and parent card_updated' do
+      expect(broadcaster_instance).to receive(:collection_updated)
+      expect(broadcaster_instance).to receive(:card_updated).with(
+        collection.parent_collection_card,
+      )
+      patch(path, params: params)
+    end
+
     context 'updating the cached_cover' do
       before do
         collection.update(
@@ -579,11 +615,29 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'broadcasts collection updates' do
-      expect(CollectionUpdateBroadcaster).to receive(:call).with(
-        collection,
-        user,
-      )
+      expect(broadcaster_instance).to receive(:reload_cards)
       patch(path, params: params)
+    end
+
+    it 'does not call LinkBroadcastWorker unless there are links' do
+      expect(LinkBroadcastWorker).not_to receive(:perform_async)
+      patch(path, params: params)
+    end
+
+    context 'with cards linked to this collection' do
+      let(:parent_of_links) { create(:collection) }
+      let!(:linked_card) do
+        create(:collection_card_link_collection, parent: parent_of_links, collection: collection)
+      end
+
+      it 'calls LinkBroadcastWorker' do
+        expect(LinkBroadcastWorker).to receive(:perform_async).with(
+          collection.id,
+          'Collection',
+          user.id,
+        )
+        patch(path, params: params)
+      end
     end
 
     it 'logs a edited activity for the collection' do
@@ -612,16 +666,20 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     context 'with row and col' do
+      let!(:collection) { create(:board_collection, add_editors: [user]) }
+      let(:card_attrs) do
+        [{
+          id: collection_card.id,
+          width: 3,
+          row: 4,
+          col: 5,
+        }]
+      end
       let(:params) do
         json_api_params(
           'collections',
           raw_params.merge(
-            collection_cards_attributes: [{
-              id: collection_card.id,
-              width: 3,
-              row: 4,
-              col: 5,
-            }],
+            collection_cards_attributes: card_attrs,
           ),
         )
       end
@@ -635,11 +693,16 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         expect(collection_card.row).to eq(4)
         expect(collection_card.col).to eq(5)
       end
+
+      it 'broadcasts card_attrs_updated' do
+        expect(broadcaster_instance).to receive(:card_attrs_updated).with(card_attrs.as_json)
+        patch(path, params: params)
+      end
     end
   end
 
   describe 'POST #clear_collection_cover' do
-    let!(:collection) { create(:collection, add_editors: [user]) }
+    let!(:collection) { create(:collection, parent_collection: create(:collection), add_editors: [user]) }
     let(:collection_card) do
       create(:collection_card_image, order: 0, width: 1, parent: collection, is_cover: true)
     end
@@ -647,26 +710,55 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
     before do
       user.add_role(Role::VIEWER, collection_card.item)
-      post(path)
     end
 
     it 'should clear the cover from the collection' do
+      post(path)
       expect(collection_card.reload.is_cover).to be false
+    end
+
+    it 'broadcasts card_updated with parent_collection_card' do
+      expect(broadcaster_instance).to receive(:card_updated).with(
+        collection.parent_collection_card,
+      )
+      post(path)
     end
   end
 
   describe 'POST #background_update_template_instances' do
-    let(:template) { create(:collection, master_template: true, add_editors: [user]) }
+    let(:template) { create(:collection, master_template: true, add_editors: [user], num_cards: 1) }
     let(:path) { "/api/v1/collections/#{template.id}/background_update_template_instances" }
     let!(:instance) { create(:collection, template: template) }
 
-    it 'should call the UpdateTemplateInstancesWorker' do
+    it 'should call the UpdateTemplateInstancesWorker with :update_all action' do
       expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
         template.id,
         template.collection_cards.pluck(:id),
-        'update_all',
+        :update_all,
       )
-      post(path)
+      post(path, params: { ids: [template.collection_cards.pluck(:id)] }.to_json)
+    end
+
+    describe 'with type Item::TextItem' do
+      it 'should call the UpdateTemplateInstancesWorker with :update_text_content action' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+          template.id,
+          template.collection_cards.pluck(:id),
+          :update_text_content,
+        )
+        post(path, params: { type: 'Item::TextItem', ids: [template.collection_cards.first.id] }.to_json)
+      end
+    end
+
+    describe 'with type Item::QuestionItem' do
+      it 'should call the UpdateTemplateInstancesWorker with :update_question_content action' do
+        expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+          template.id,
+          template.collection_cards.pluck(:id),
+          :update_question_content,
+        )
+        post(path, params: { type: 'Item::QuestionItem', ids: [template.collection_cards.first.id] }.to_json)
+      end
     end
   end
 
@@ -784,6 +876,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
 
   describe 'POST #insert_row' do
     let!(:collection) { create(:collection) }
+    let(:action) { :insert_row }
     let(:raw_params) do
       {
         row: 1,
@@ -797,7 +890,11 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'should call row inserter' do
-      expect(RowInserter).to receive(:call)
+      expect(RowInserter).to receive(:call).with(
+        collection: collection,
+        row: 1,
+        action: action,
+      )
       post(path, params: params)
     end
 
@@ -806,18 +903,29 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(response.status).to eq(204)
     end
 
-    xit 'should touch the collection' do
+    it 'should touch the collection' do
       expect do
         post(path, params: params)
+        collection.reload
       end.to change(collection, :updated_at)
+    end
+
+    it 'should broadcast an update' do
+      expect(broadcaster_instance).to receive(:row_updated).with(
+        row: 1,
+        action: action,
+      )
+      post(path, params: params)
     end
   end
 
   describe 'POST #remove_row' do
     let!(:collection) { create(:collection) }
+    let(:action) { :remove_row }
     let(:raw_params) do
       {
         row: 1,
+        action: action,
       }
     end.to_json
     let(:params) { raw_params.to_json }
@@ -831,7 +939,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(RowInserter).to receive(:call).with(
         collection: collection,
         row: 1,
-        action: 'remove',
+        action: action,
       )
       post(path, params: params)
     end
@@ -841,11 +949,20 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(response.status).to eq(204)
     end
 
-    xit 'should touch the collection' do
+    it 'should touch the collection' do
       collection.update_column(:updated_at, 2.day.ago)
       expect do
         post(path, params: params)
-      end.to change(collection.reload, :updated_at)
+        collection.reload
+      end.to change(collection, :updated_at)
+    end
+
+    it 'should broadcast an update' do
+      expect(broadcaster_instance).to receive(:row_updated).with(
+        row: 1,
+        action: action,
+      )
+      post(path, params: params)
     end
   end
 

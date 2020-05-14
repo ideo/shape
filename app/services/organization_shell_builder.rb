@@ -30,10 +30,6 @@ class OrganizationShellBuilder
     "shell-#{last_number + 1}"
   end
 
-  def setup_user_membership_and_collections
-    @organization.setup_user_membership_and_collections(@user)
-  end
-
   def create_user_collection
     Collection::UserCollection.create(
       organization: @organization,

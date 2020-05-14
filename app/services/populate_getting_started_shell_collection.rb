@@ -8,9 +8,8 @@ class PopulateGettingStartedShellCollection < SimpleService
     @cloned_from = @collection.cloned_from
     return false unless @cloned_from.present?
 
-    duplicate_cards
-    @collection.cache_card_count!
     @collection.update(getting_started_shell: false)
+    duplicate_cards
     @collection
   end
 

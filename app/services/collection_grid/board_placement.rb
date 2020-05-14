@@ -13,7 +13,7 @@ module CollectionGrid
       @to_collection = to_collection
       # e.g. in the case where we're creating a card, from_collection can just equal to_collection
       @from_collection = from_collection || to_collection
-      @moving_cards = moving_cards_ordered_row_col(moving_cards)
+      @moving_cards = moving_cards
       @row = row
       @col = col
     end
@@ -29,13 +29,6 @@ module CollectionGrid
         from_collection: @from_collection,
         moving_cards: @moving_cards,
       )
-    end
-
-    def moving_cards_ordered_row_col(moving_cards)
-      # ensure row, col sorting so we find the best fit in order
-      moving_cards.sort do |a, b|
-        [a.row, a.col] <=> [b.row, b.col]
-      end
     end
   end
 end

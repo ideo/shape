@@ -322,8 +322,6 @@ class Organization < ApplicationRecord
   def create_user_getting_started_content(user_collection, synchronous: false)
     return if getting_started_collection.blank?
 
-    # user_collection = user.current_user_collection(id)
-
     # this will copy them to the beginning
     getting_started_collection.copy_all_cards_into!(
       user_collection,
@@ -331,7 +329,6 @@ class Organization < ApplicationRecord
       # allows copies to continue even if the user can't view the original content
       system_collection: true,
     )
-    user_collection.save if user_collection.cached_attributes.delete 'loading_content'
     user_collection
   end
 

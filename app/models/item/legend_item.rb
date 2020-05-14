@@ -13,6 +13,7 @@
 #  data_settings              :jsonb
 #  data_source_type           :string
 #  icon_url                   :string
+#  last_broadcast_at          :datetime
 #  legend_search_source       :integer
 #  name                       :string
 #  question_type              :integer
