@@ -334,7 +334,6 @@ describe('GridCard', () => {
     afterEach(() => {
       // clean up values that were changed
       uiStore.editingCardCover = null
-      uiStore.hoveringOverDataItem = false
       props.card.record.isData = false
     })
 
@@ -351,18 +350,6 @@ describe('GridCard', () => {
       it('uses hide-on-cover-edit class', () => {
         const topRight = wrapper.find('StyledTopRightActions').last()
         expect(topRight.props().className).toEqual('hide-on-cover-edit')
-      })
-    })
-
-    describe('isHoveringOverDataItem and record.isData', () => {
-      beforeEach(() => {
-        uiStore.hoveringOverDataItem = true
-        props.card.record.isData = true
-        rerender()
-      })
-      it('uses hide-for-data-item class', () => {
-        const topRight = wrapper.find('StyledTopRightActions').last()
-        expect(topRight.props().className).toEqual('hide-for-data-item')
       })
     })
   })

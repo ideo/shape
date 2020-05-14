@@ -115,9 +115,6 @@ export const showOnHoverCss = css`
     opacity: 0;
     z-index: 1;
   }
-  .hide-for-data-item {
-    opacity: 0;
-  }
   .show-on-hover {
     opacity: 0;
     transition: opacity 0.25s;

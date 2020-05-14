@@ -291,15 +291,6 @@ class DataItemCoverCollectionsItems extends React.Component {
     return name
   }
 
-  handleMouseOver = () => {
-    const { uiStore } = this.props
-    uiStore.update('hoveringOverDataItem', true)
-  }
-  handleMouseOut = () => {
-    const { uiStore } = this.props
-    uiStore.update('hoveringOverDataItem', false)
-  }
-
   renderSingleValue() {
     const { primaryDataset } = this.props.item
     const { single_value } = primaryDataset
