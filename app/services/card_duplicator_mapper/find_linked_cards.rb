@@ -49,7 +49,7 @@ module CardDuplicatorMapper
       return @all_link_cards if @all_link_cards.present?
 
       links = filter_cards_for_user(
-        CollectionCard::Link.where(
+        CollectionCard::Link.active.where(
           parent_id: all_collections.map(&:id),
         ),
       )
