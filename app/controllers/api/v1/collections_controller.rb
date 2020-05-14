@@ -427,10 +427,4 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     # only add_role if it's not the guest group
     current_user.add_role(Role::MEMBER, group) unless group.guest?
   end
-
-  def switch_to_organization
-    return if @collection.common_viewable?
-
-    current_user.switch_to_organization(@collection.organization)
-  end
 end

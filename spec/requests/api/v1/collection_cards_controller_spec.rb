@@ -49,6 +49,25 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
     end
 
+    context 'on different org' do
+      let(:first_org) { create(:organization, member: user) }
+      let!(:other_org) { create(:organization, member: user) }
+      let!(:collection) do
+        create(:collection, organization: other_org, add_viewers: [user])
+      end
+
+      before do
+        user.switch_to_organization(first_org)
+      end
+
+      it 'should switch the user to the org' do
+        expect(user.current_organization).to eq first_org
+        get(path)
+        expect(response.status).to eq(200)
+        expect(user.reload.current_organization).to eq other_org
+      end
+    end
+
     describe 'included' do
       let(:items_json) { json_included_objects_of_type('items') }
 

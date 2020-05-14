@@ -8,6 +8,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   before_action :check_cache, only: %i[index ids breadcrumb_records]
   before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
+
   def index
     render_collection_cards
   end
@@ -310,6 +311,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_collection_cards
+    # always ensure we're on @collection.organization first
+    switch_to_organization
     ids_only = params[:action] == 'ids'
     filter_params = params[:filter].present? ? params[:filter] : params
     filter_params.merge(q: params[:q]) if params[:q].present?
