@@ -60,6 +60,17 @@ export const primaryFillColorFromDataset = dataset => {
   return dataset.style && dataset.style.fill ? dataset.style.fill : '#000000'
 }
 
+export const domainXForSingleValue = date => {
+  return [
+    moment(date)
+      .subtract('months', 1)
+      .toDate(),
+    moment(date)
+      .add('months', 1)
+      .toDate(),
+  ]
+}
+
 export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
   if (values.length === 0) {
     return {
