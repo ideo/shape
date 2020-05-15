@@ -122,6 +122,7 @@ DropdownSelect.propTypes = {
   label: PropTypes.string.isRequired,
   toolTip: PropTypes.string,
   record: PropTypes.object.isRequired,
+  // TODO: fix these to use MobxPropTypes
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   fieldToUpdate: PropTypes.string.isRequired,
   updateRecord: PropTypes.func.isRequired,

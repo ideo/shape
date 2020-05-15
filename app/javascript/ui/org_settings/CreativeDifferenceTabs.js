@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 // import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Tabs from '@material-ui/core/Tabs'
@@ -13,6 +14,7 @@ import {
   industrySubcategoriesStore,
   organizationsStore,
   supportedLanguagesStore,
+  businessUnitsStore,
 } from 'c-delta-organization-settings'
 import Loader from '~/ui/layout/Loader'
 import { runInAction, observable, action } from 'mobx'
@@ -20,6 +22,17 @@ import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
 import Languages from './Languages'
+import { Row } from '../global/styled/layout'
+// import InfoIcon from '../icons/InfoIcon'
+import InfoIconXs from '~/ui/icons/InfoIconXs'
+// import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
+
+const StyledIconWrapper = styled.span`
+  margin-left: 4px;
+  display: inline-block;
+  vertical-align: middle;
+  width: ${props => (props.width ? props.width : 10)}px;
+`
 
 function TabPanel(props) {
   const { children, value, tabName } = props
@@ -77,6 +90,8 @@ class CreativeDifferenceTabs extends React.Component {
   roles = []
   @observable
   supportedLanguages = []
+  @observable
+  businessUnits = []
 
   constructor(props) {
     super(props)
@@ -103,6 +118,7 @@ class CreativeDifferenceTabs extends React.Component {
       contentVersionsStore.fetch(),
       orgModelInstance.fetch(),
       supportedLanguagesStore.fetch(),
+      businessUnitsStore.fetch(),
     ])
 
     runInAction(() => {
@@ -110,6 +126,7 @@ class CreativeDifferenceTabs extends React.Component {
       this.contentVersions = responses[1]
       this.organization = responses[2]
       this.supportedLanguages = responses[3]
+      this.businessUnits = responses[4]
     })
   }
 
@@ -166,6 +183,7 @@ class CreativeDifferenceTabs extends React.Component {
       industrySubcategories,
       contentVersions,
       supportedLanguages,
+      businessUnits,
       organization,
       isError,
       isLoading,
@@ -249,7 +267,52 @@ class CreativeDifferenceTabs extends React.Component {
             )}
           </TabPanel>
           <TabPanel value={tabValue} tabName="teams">
-            {/* <TeamsTab industrySubcategories={industrySubcategories} /> */}
+            <React.Fragment>
+              {/* Replace this with styled component */}
+              <div style={{ color: v.colors.cDeltaBlue }}>
+                {/* TODO: Use InfoIconXs with custom StyledIconWrapper; style the text  */}
+                <StyledIconWrapper width={'16'}>
+                  <InfoIconXs />
+                </StyledIconWrapper>
+                In Creative Difference, a team is a group of individuals working
+                together towards a common output. Examples of this are business
+                units, segments, squads, etc.
+              </div>
+              {businessUnits.map(businessUnit => (
+                <Row>
+                  <form style={{ display: 'flex' }}>
+                    <DropdownSelect
+                      label={'Industry'}
+                      record={organization}
+                      options={industrySubcategories}
+                      updateRecord={updateOrg}
+                      fieldToUpdate={'industry_subcategory_id'}
+                    />
+                    <DropdownSelect
+                      label={'Content Version'}
+                      toolTip={
+                        'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
+                      }
+                      record={organization}
+                      options={contentVersions}
+                      updateRecord={updateOrg}
+                      fieldToUpdate={'default_content_version_id'}
+                    />
+                    <DropdownSelect
+                      label={'Vertical or Horizontal'}
+                      toolTip={'SOMETHING HERE'}
+                      record={businessUnit}
+                      options={[
+                        { value: 'Vertical', id: 'Vertical' },
+                        { value: 'Horizontal', id: 'Horizontal' },
+                      ]}
+                      updateRecord={updateOrg}
+                      fieldToUpdate={'structure'}
+                    />
+                  </form>
+                </Row>
+              ))}
+            </React.Fragment>
           </TabPanel>
         </React.Fragment>
       </div>

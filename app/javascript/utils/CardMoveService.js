@@ -71,7 +71,8 @@ export default class CardMoveService {
 
     const movingWithinCollection =
       !movingCardsOverflow &&
-      (movingFromCollection === toCollection && cardAction === 'move')
+      movingFromCollection === toCollection &&
+      cardAction === 'move'
     try {
       uiStore.update('isLoadingMoveAction', true)
       let successMessage

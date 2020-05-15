@@ -134,7 +134,9 @@ describe('ApiStore', () => {
         expect(apiStore.request).toHaveBeenCalledWith(
           `collections/${data.to_id}`,
           'PATCH',
-          { data: undoSnapshot }
+          {
+            data: undoSnapshot,
+          }
         )
         expect(collection.revertToSnapshot).toHaveBeenCalledWith(
           undoSnapshot.attributes
