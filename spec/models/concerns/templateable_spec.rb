@@ -59,7 +59,7 @@ describe Templateable, type: :concern do
     it 'should preserve links as links' do
       # the collection links should not get converted into actual collections
       expect(collection.collections).to be_empty
-      expect(collection.link_collection_cards.count).to eq(2)
+      expect(collection.link_collection_cards.count).to eq(1)
     end
   end
 
