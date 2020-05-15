@@ -25,7 +25,7 @@ module Slack
       private
 
       def find_message_collection_card
-        CollectionCard.find_by(
+        CollectionCard.active.find_by(
           parent_id: all_content_collection_id,
           identifier: identifier,
         )
