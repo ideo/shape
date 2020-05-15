@@ -252,7 +252,6 @@ class ChartGroup extends React.Component {
       nonPrioritizedLabels.push(l)
     })
 
-    console.log('here', nonPrioritizedLabels.map(l => l.x))
     return _.uniq(_.xorWith(renderedLabels, nonPrioritizedLabels, _.isEqual))
   }
 

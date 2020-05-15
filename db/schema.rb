@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_17_163307) do
+ActiveRecord::Schema.define(version: 2020_04_01_042139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -477,7 +477,6 @@ ActiveRecord::Schema.define(version: 2020_04_17_163307) do
     t.integer "legend_item_id"
     t.integer "legend_search_source"
     t.jsonb "style"
-    t.datetime "last_broadcast_at"
     t.index "((cached_attributes ->> 'pending_transcoding_uuid'::text))", name: "index_items_on_transcoding_uuid"
     t.index ["archive_batch"], name: "index_items_on_archive_batch"
     t.index ["breadcrumb"], name: "index_items_on_breadcrumb", using: :gin
