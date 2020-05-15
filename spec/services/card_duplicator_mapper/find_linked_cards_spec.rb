@@ -29,6 +29,18 @@ RSpec.describe CardDuplicatorMapper::FindLinkedCards, type: :service do
       )
     end
 
+    it 'does not register archived link card and card it references' do
+      subject.call
+      archived_linked_card_record_card = archived_linked_text_card.record.parent_collection_card
+      expect(subject.linked_cards).to_not include(
+        archived_linked_text_card.id.to_s => {
+          'remapper' => 'CardDuplicatorMapper::RemapLinkItem',
+          'record_card_id' => archived_linked_card_record_card.id.to_s,
+        },
+        archived_linked_card_record_card.id.to_s => {},
+      )
+    end
+
     it 'registers search collection and referenced collection' do
       subject.call
       linked_collection_card = search_collection_target.parent_collection_card
