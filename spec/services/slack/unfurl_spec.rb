@@ -25,17 +25,24 @@ RSpec.describe Slack::Unfurl, type: :service do
         url => unfurled_link,
       }
     end
-    subject do
-      Slack::Unfurl.new(
+    let(:event) do
+      Mashie.new(
         links: [{ url: url }],
         channel: channel,
         message_ts: message_ts,
+        type: 'link_shared',
+      )
+    end
+
+    subject do
+      Slack::Unfurl.new(
+        client: client_double,
+        event: event,
       )
     end
 
     before do
       allow(client_double).to receive(:chat_unfurl)
-      allow_any_instance_of(Slack::Common).to receive(:client).and_return(client_double)
     end
 
     it 'parses each url and returns the proper unfurl data' do

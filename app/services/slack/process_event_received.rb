@@ -1,14 +1,22 @@
 module Slack
   class ProcessEventReceived
     include Interactor::Organizer
+    include Interactor::Schema
 
-    require_in_context :event
+    schema :event, :client
 
     before do
-      context.event = Hashie::Mash.new(context.event) if context.event.present?
+      context.event = Mashie.new(context.event) if context.event.present?
+      context.client = client
     end
 
-    organize ProcessMessageForLinks, AppMentioned, Unfurl
+    # An incoming slack event should only hit one of these interactors
+    # as they each check for a particular event.type
+    organize(
+      AppMentioned,
+      ProcessMessageForLinks,
+      Unfurl,
+    )
 
     private
 

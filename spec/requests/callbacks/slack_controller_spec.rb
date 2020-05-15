@@ -56,7 +56,16 @@ describe 'Slack API Requests' do
         expect(response.status).to eq 200
       end
 
+      it 'calls Slack::ProcessEventReceived service' do
+        expect(Slack::ProcessEventReceived).to receive(:call).with(event: ActionController::Parameters.new(params[:event]))
+        post(
+          '/callbacks/slack/event',
+          params: params,
+        )
+      end
+
       it 'calls Slack client unfurl method with updated rich media' do
+        # NOTE: this is testing the internals of Slack::ProcessEventReceived
         expect(client_double).to receive(:chat_unfurl).with(
           channel: params[:event][:channel],
           ts: params[:event][:message_ts],
@@ -71,4 +80,3 @@ describe 'Slack API Requests' do
     end
   end
 end
-# { "type": "message", "channel": "C024BE91L", "user": "U2147483697", "text": "Live long and prospect. <http://google.com>", "ts": "1355517523.000005", "event_ts": "1355517523.000005", "channel_type": "channel"}

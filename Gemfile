@@ -153,7 +153,7 @@ gem 'faker', '~> 1.9.5'
 gem 'anycable-rails', '>= 0.6.2'
 
 # Markdown parser
-gem 'redcarpet'
+gem 'redcarpet', require: false
 
 # https://devcenter.heroku.com/articles/rails-autoscale
 gem 'rails_autoscale_agent'

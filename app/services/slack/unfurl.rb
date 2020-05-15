@@ -2,8 +2,8 @@ module Slack
   class Unfurl
     include Interactor
 
-    delegate_to_context :event
-    require_in_context :event
+    delegate_to_context :event, :client
+    require_in_context :event #, :client
     delegate :channel, :message_ts, :links, to: :event
 
     def call
@@ -37,9 +37,9 @@ module Slack
     def translate_string(string = nil)
       return string if string.blank?
 
-      # IdeoTranslation::TranslateString.call(
-      #   string: string,
-      # )
+      IdeoTranslation::TranslateString.call(
+        string: string,
+      )
     end
 
     def message_data(record, url)

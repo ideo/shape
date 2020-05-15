@@ -5,7 +5,7 @@ class CollectionCardBuilder
     @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
     @parent_collection = parent_collection
-    @params[:order] ||= 0
+    @params[:order] ||= next_card_order
     unless parent_collection.is_a? Collection::Board
       # row and col can come from GridCardHotspot, but we nullify for non-Boards
       @params.delete :row
@@ -37,8 +37,7 @@ class CollectionCardBuilder
   private
 
   def next_card_order
-    1
-    # @parent_collection.card_order_at('end')
+    @parent_collection.card_order_at('end')
   end
 
   def hide_helper_for_user
