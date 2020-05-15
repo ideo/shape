@@ -30,6 +30,7 @@ yarn-error.log*
 .yarn-integrity
 
 build/
+dist/
 
 # redis dump
 dump.rdb
