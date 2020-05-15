@@ -13,12 +13,13 @@ import {
   themeLabelStyles,
 } from '~/ui/global/charts/ChartUtils'
 
-const chartStyle = (style, order) => {
+const chartStyle = (style, order, singleDataPoint) => {
   if (style.fill) {
     const darkFill = darkenColor(style.fill, order)
     const opacity = 0.8
+    const strokeWidth = singleDataPoint ? 10 : null
     return {
-      data: { fill: darkFill, opacity },
+      data: { fill: darkFill, opacity, strokeWidth },
       labels: {
         fontSize: 18,
       },
@@ -87,10 +88,10 @@ const AreaChart = ({
         measure,
       })
   }
-
+  const singleDataPoint = values.length === 2 && values[1].isDuplicate
   return (
     <VictoryArea
-      style={chartStyle(dataset.style || {}, colorOrder)}
+      style={chartStyle(dataset.style || {}, colorOrder, singleDataPoint)}
       labels={d => d.value}
       labelComponent={
         <TickLabelWithTooltip

@@ -47,7 +47,7 @@ const chartAxisStyle = isSmallChartStyle => {
 }
 
 const calculateRelativeWidth = label => {
-  const modifier = label.isSmallChartStyle ? 10.5 : 8
+  const modifier = label.isSmallChartStyle ? 11 : 8
   return label.text.length * modifier
 }
 
@@ -138,7 +138,7 @@ const ChartAxisProps = ({
 }) => {
   // NOTE: The transform property is for IE11 which doesn't recognize CSS
   // transform properties on SVG
-  let tickCount = 12
+  let tickCount = Math.min(datasetValues.length, 12)
   if (isSmallChartStyle) {
     tickCount = 5
   } else {
@@ -163,7 +163,6 @@ const ChartAxisProps = ({
   }
 
   const tickLabelStyleProps = tickLabelStyle(isSmallChartStyle)
-
   return datasetValues.length > 1
     ? {
         ...axisProps,
