@@ -46,7 +46,6 @@ class CollectionCardDuplicationWorker
         source_card.pinned = false unless preserve_pinned_value?
       end
 
-      # TODO: Do we want to keep this guard?
       next unless source_card
 
       source_card.duplicate!(

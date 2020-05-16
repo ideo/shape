@@ -145,7 +145,7 @@ module CardDuplicatorMapper
       return if !all_collections.include?(card.record) && !all_items.include?(card.record)
 
       record_parent_collection_card = card.record.parent_collection_card
-      # TODO: Do we want to keep this guard?
+
       return unless record_parent_collection_card
 
       register_linked_card(

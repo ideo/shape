@@ -29,7 +29,6 @@ module CardDuplicatorMapper
     end
 
     def search_target_duplicate_card
-      # TODO: Do we want to keep this guard?
       return unless original_search_target&.parent_collection_card
 
       search_target_duplicate_card_id = duplicate_id_for_card_id(
