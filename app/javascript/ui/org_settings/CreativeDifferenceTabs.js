@@ -23,9 +23,7 @@ import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
 import Languages from './Languages'
 import { Row } from '../global/styled/layout'
-// import InfoIcon from '../icons/InfoIcon'
 import InfoIconXs from '~/ui/icons/InfoIconXs'
-// import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
 
 const StyledIconWrapper = styled.span`
   margin-left: 4px;
@@ -177,6 +175,35 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
+  // TODO: Add to Teams dropdown props below, fix function signature
+  updateBusinessUnit = async (businessUnit, params) => {
+    try {
+      this.setLoading(true)
+      const model = new businessUnitsStore.model()
+      const modelInstance = new model({
+        id: businessUnit.id,
+      })
+      const data = {
+        business_unit: params,
+      }
+      console.log('sending data for business unit: ', data)
+      const promise = modelInstance.save(data, {
+        optimistic: false,
+      })
+      const result = await promise
+      console.log('BU update result: ', result)
+      runInAction(async () => {
+        // fetch all the business units after an update
+        this.businessUnits = await businessUnitsStore.fetch()
+        // TODO: Just update one BU so we don't have to refetch all the BUs?
+      })
+      this.setLoading(false)
+    } catch (err) {
+      console.log('org update failed: ', err)
+      this.setError(true)
+    }
+  }
+
   render() {
     const { orgName, tab, apiStore } = this.props
     const {
@@ -300,11 +327,13 @@ class CreativeDifferenceTabs extends React.Component {
                     />
                     <DropdownSelect
                       label={'Vertical or Horizontal'}
-                      toolTip={'SOMETHING HERE'}
+                      toolTip={
+                        "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
+                      }
                       record={businessUnit}
                       options={[
-                        { value: 'Vertical', id: 'Vertical' },
-                        { value: 'Horizontal', id: 'Horizontal' },
+                        { name: 'Vertical', id: 'Vertical' },
+                        { name: 'Horizontal', id: 'Horizontal' },
                       ]}
                       updateRecord={updateOrg}
                       fieldToUpdate={'structure'}

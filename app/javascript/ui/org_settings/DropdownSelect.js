@@ -1,15 +1,10 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
 import _ from 'lodash'
 
-import {
-  // LabelContainer,
-  Select,
-  SelectOption,
-  Label,
-  // LabelTextStandalone,
-  // LabelHint,
-} from '~/ui/global/styled/forms'
+import { Select, SelectOption, Label } from '~/ui/global/styled/forms'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
 
@@ -81,7 +76,7 @@ const DropdownSelect = ({
           fontSize: '13px',
           marginBottom: '11px',
         }}
-        id={`${label}-select-label`}
+        id={`${label.split(' ').join('')}-select-label`}
       >
         {label}
         {toolTip && (
@@ -89,7 +84,7 @@ const DropdownSelect = ({
         )}
       </Label>
       <Select
-        labelid="subindustry-select-label"
+        labelid={`${label.split(' ').join('')}-select-label`}
         classes={{
           root: 'select',
           selectMenu: 'selectMenu bottomPadded',
@@ -107,7 +102,7 @@ const DropdownSelect = ({
               root: 'selectOption',
               selected: 'selected',
             }}
-            key={option.id} // TODO: need actual unique key here?
+            key={uuidv4()}
             value={option.id}
           >
             {option.name}
@@ -126,6 +121,10 @@ DropdownSelect.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   fieldToUpdate: PropTypes.string.isRequired,
   updateRecord: PropTypes.func.isRequired,
+}
+
+DropdownSelect.defaultPropTypes = {
+  toolTip: '',
 }
 
 export default DropdownSelect
