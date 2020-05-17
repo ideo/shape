@@ -19,6 +19,7 @@ import MethodIconLg from '~/ui/icons/MethodIconLg'
 import ProfileIconLg from '~/ui/icons/ProfileIconLg'
 import ProfileIconXs from '~/ui/icons/ProfileIconXs'
 import PhaseIcon from '~/ui/icons/PhaseIcon'
+import ChallengeIcon from '~/ui/icons/ChallengeIcon'
 
 // Only for use in collectionTitle, not menu
 export const largeCollectionIconMap = {
@@ -28,6 +29,7 @@ export const largeCollectionIconMap = {
   method: <MethodIconLg />,
   prototype: <PrototypeIconLg />,
   phase: <PhaseIcon large />,
+  challenge: <ChallengeIcon large />,
 }
 
 export const smallCollectionIconMap = {
@@ -37,6 +39,7 @@ export const smallCollectionIconMap = {
   method: <MethodIcon />,
   prototype: <PrototypeIcon />,
   phase: <PhaseIcon />,
+  challenge: <ChallengeIcon />,
 }
 
 export const collectionTypeToIcon = ({ type, size }) => {

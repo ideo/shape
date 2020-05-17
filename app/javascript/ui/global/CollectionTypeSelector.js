@@ -48,6 +48,7 @@ class CollectionTypeSelector extends React.Component {
       'phase',
       'prototype',
       'profile',
+      'challenge',
     ]
 
     return collectionTypes.map(collectionType => {
