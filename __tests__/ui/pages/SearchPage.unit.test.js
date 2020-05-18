@@ -2,13 +2,12 @@ import SearchPage from '~/ui/pages/SearchPage'
 import Deactivated from '~/ui/layout/Deactivated'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
 // needed for checkOrg import
 jest.mock('../../../app/javascript/stores')
 
 let wrapper, location, match
-let apiStore, uiStore, routingStore, props
+let apiStore, uiStore, props
 const query = 'stuff'
 
 beforeEach(() => {
@@ -16,7 +15,6 @@ beforeEach(() => {
     requestResult: { data: [], meta: { page: 1 } },
   })
   uiStore = fakeUiStore
-  routingStore = fakeRoutingStore
   location = {
     search: `?q=${query}`,
     pathname: `/${apiStore.currentUserOrganization.slug}/search?q=${query}`,
@@ -27,7 +25,7 @@ beforeEach(() => {
       org: apiStore.currentUserOrganization.slug,
     },
   }
-  props = { apiStore, uiStore, routingStore, location, match }
+  props = { apiStore, uiStore, location, match }
 
   wrapper = shallow(<SearchPage.wrappedComponent {...props} />)
 })

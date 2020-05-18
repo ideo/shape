@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, computed, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -7,32 +8,34 @@ import CoverImageToggle from '~/ui/grid/CoverImageToggle'
 import CardCoverEditor from '~/ui/grid/CardCoverEditor'
 import GridCardHotspot from '~/ui/grid/GridCardHotspot'
 import CoverRenderer from '~/ui/grid/CoverRenderer'
-
-import Activity from '~/stores/jsonApi/Activity'
-import ActionMenu from '~/ui/grid/ActionMenu'
-import CardActionHolder from '~/ui/icons/CardActionHolder'
-
-import EditButton from '~/ui/reporting/EditButton'
-import TextButton from '~/ui/global/TextButton'
-import { NamedActionButton } from '~/ui/global/styled/buttons'
-import FullScreenIcon from '~/ui/icons/FullScreenIcon'
-import Loader from '~/ui/layout/Loader'
 import Download from '~/ui/grid/Download'
-import RestoreIcon from '~/ui/icons/RestoreIcon'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
-import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
-import { routingStore, uiStore, apiStore } from '~/stores'
-import hexToRgba from '~/utils/hexToRgba'
-import v, { ITEM_TYPES } from '~/utils/variables'
 import ReplaceCardButton from '~/ui/grid/ReplaceCardButton'
 import {
   BottomRightActionHolder,
   StyledGridCard,
   StyledGridCardInner,
   StyledTopRightActions,
-} from './shared'
+} from '~/ui/grid/shared'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
+import ActionMenu from '~/ui/grid/ActionMenu'
+
+import Activity from '~/stores/jsonApi/Activity'
+import { routingStore, uiStore, apiStore } from '~/stores'
+
+import Loader from '~/ui/layout/Loader'
+import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
+import TextButton from '~/ui/global/TextButton'
+import { NamedActionButton } from '~/ui/global/styled/buttons'
+import CardActionHolder from '~/ui/icons/CardActionHolder'
+import RestoreIcon from '~/ui/icons/RestoreIcon'
+import FullScreenIcon from '~/ui/icons/FullScreenIcon'
+import EditButton from '~/ui/reporting/EditButton'
+import hexToRgba from '~/utils/hexToRgba'
+import v from '~/utils/variables'
+import { linkOffsite } from '~/utils/url'
+import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 
 const CardLoader = () => {
   return (
@@ -278,18 +281,6 @@ class GridCard extends React.Component {
     uiStore.closeCardMenu()
   }
 
-  linkOffsite = url => {
-    const { record } = this.props
-    Activity.trackActivity('viewed', record)
-    const anchor = Object.assign(document.createElement('a'), {
-      target: '_blank',
-      href: url,
-    })
-    document.body.append(anchor)
-    anchor.click()
-    anchor.remove()
-  }
-
   // Only data cards are editable right now
   editCard = ev => {
     ev.preventDefault()
@@ -311,45 +302,87 @@ class GridCard extends React.Component {
     return !!record.thumbnail_url
   }
 
-  handleMoreCoverClick = e => {
-    this.props.handleClick(e)
+  handleMoreCoverClick = ev => {
+    this.defaultHandleClick(ev)
   }
 
-  handleClick = e => {
+  defaultHandleClick = ev => {
+    pageBoundsScroller.setScrolling(false)
+    const { cardType, record } = this.props
+    if (uiStore.cardMenuOpenAndPositioned) {
+      uiStore.closeCardMenu()
+      return
+    }
+    const formTags = ['SELECT', 'OPTION']
+
+    if (
+      typeof ev.target.className !== 'string' ||
+      // cancel for elements matching or inside a .cancelGridClick
+      ev.target.className.match(/cancelGridClick/) ||
+      ev.target.closest('.cancelGridClick') ||
+      ev.target.className.match(/selectMenu/) ||
+      // cancel for links within the card as these should handle their own routing
+      (ev.target.tagName === 'A' && ev.target.href) ||
+      formTags.includes(ev.target.tagName) ||
+      record.type === 'Item::DataItem' ||
+      ev.target.className.match(/CollectionCoverFormButton/)
+    ) {
+      return
+    }
+
+    if (!record.can_view) {
+      uiStore.showPermissionsAlert()
+      return
+    }
+
+    // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
+    setTimeout(() => {
+      if (record.isCarousel) {
+        // special behavior for carousels with LinkItems
+        const coverItem = _.get(record, 'collection_cover_items[0]')
+        if (coverItem && coverItem.isLink) {
+          linkOffsite(coverItem)
+          return
+        }
+      }
+      // default behavior -- route to Collection/Item
+      routingStore.routeTo(cardType, record.id)
+    })
+  }
+
+  handleClick = ev => {
     const { card, dragging, record } = this.props
     if (dragging || card.isLoadingPlaceholder) {
       return false
     }
-    if (uiStore.captureKeyboardGridClick(e, card.id)) {
+    if (uiStore.captureKeyboardGridClick(ev, card.id)) {
       return
     }
-    if (record.type === ITEM_TYPES.LINK) {
-      this.linkOffsite(record.url)
+    if (record.isLink) {
+      linkOffsite(record)
       return
     }
     if (record.isPdfFile) {
       // TODO: could replace with preview
       Activity.trackActivity('downloaded', record)
       return
-    } else if (record.isCarousel) {
-      return
     } else if (record.isCreativeDifferenceChartCover) {
       return
     } else if (record.isVideo || record.isImage || record.isLegend) {
       return
     } else if (record.mimeBaseType === 'image') {
-      this.props.handleClick(e)
+      this.defaultHandleClick(ev)
       return
     } else if (record.isGenericFile) {
       // TODO: could replace with preview
-      this.linkOffsite(record.fileUrl)
+      linkOffsite(record, 'fileUrl')
       return
     }
     // capture breadcrumb trail when navigating via Link cards, but not from My Collection
     if (card.link) {
       this.storeLinkedBreadcrumb(card)
     }
-    this.props.handleClick(e)
+    this.defaultHandleClick(ev)
   }
 
   handleRestore = ev => {
@@ -406,7 +439,6 @@ class GridCard extends React.Component {
       height,
       dragging,
       searchResult,
-      handleClick,
       isBoardCollection,
       testCollectionCard,
     } = this.props
@@ -442,7 +474,7 @@ class GridCard extends React.Component {
         height={height}
         dragging={dragging}
         searchResult={searchResult}
-        handleClick={handleClick}
+        handleClick={this.defaultHandleClick}
         isBoardCollection={isBoardCollection}
         isTestCollectionCard={testCollectionCard}
         nestedTextItem={nestedTextItem}
@@ -586,7 +618,6 @@ GridCard.propTypes = {
   canEditCollection: PropTypes.bool,
   isSharedCollection: PropTypes.bool,
   isBoardCollection: PropTypes.bool,
-  handleClick: PropTypes.func,
   dragging: PropTypes.bool,
   hoveringOver: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
@@ -602,7 +633,6 @@ GridCard.defaultProps = {
   canEditCollection: false,
   isSharedCollection: false,
   isBoardCollection: false,
-  handleClick: () => null,
   dragging: false,
   hoveringOver: false,
   lastPinnedCard: false,

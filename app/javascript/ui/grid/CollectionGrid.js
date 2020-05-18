@@ -41,7 +41,7 @@ const StyledGrid = styled.div`
 StyledGrid.displayName = 'StyledGrid'
 
 // needs to be an observer to observe changes to the collection + items
-@inject('apiStore', 'routingStore', 'uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class CollectionGrid extends React.Component {
   @observable
@@ -952,12 +952,7 @@ class CollectionGrid extends React.Component {
 
   renderPositionedCards = () => {
     const grid = []
-    const {
-      collection,
-      canEditCollection,
-      routingStore,
-      loadCollectionCards,
-    } = this.props
+    const { collection, canEditCollection, loadCollectionCards } = this.props
     let i = 0
     _.each(this.cards, card => {
       i += 1
@@ -978,6 +973,7 @@ class CollectionGrid extends React.Component {
           key={card.id}
           card={card}
           cardType={cardType}
+          upd={card.updated_at}
           canEditCollection={canEditCollection}
           isUserCollection={collection.isUserCollection}
           isSharedCollection={collection.isSharedCollection}
@@ -989,7 +985,6 @@ class CollectionGrid extends React.Component {
           onDragOrResizeStop={this.onDragOrResizeStop}
           onResize={this.onResize}
           onResizeStop={this.onResizeStop}
-          routeTo={routingStore.routeTo}
           parent={collection}
           lastPinnedCard={card.isPinnedAndLocked && i === this.cards.length - 1}
           loadCollectionCards={loadCollectionCards}
@@ -1049,7 +1044,6 @@ CollectionGrid.propTypes = {
 }
 CollectionGrid.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionGrid.defaultProps = {

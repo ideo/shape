@@ -58,6 +58,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // store the most recent zoom level of this collection (gets set in uiStore)
   @observable
   lastZoom = null
+  @observable
+  carouselIdx = 0
   // this stores the "virtual" search results collection
   searchResultsCollection = null
 
@@ -135,6 +137,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setReloading(value) {
     this.reloading = value
+  }
+
+  @action
+  setCarouselIdx(value) {
+    this.carouselIdx = value
+  }
+
+  get currentCarouselRecord() {
+    if (_.isEmpty(this.collection_cover_items)) {
+      return
+    }
+    return this.collection_cover_items[this.carouselIdx]
   }
 
   cardIdsBetween(firstCardId, lastCardId) {

@@ -22,7 +22,6 @@ beforeEach(() => {
     hasMore: false,
     total: 10,
     loadMore: jest.fn(),
-    routeTo: jest.fn(),
   }
 
   wrapper = shallow(<SearchResultsInfinite {...props} />)
