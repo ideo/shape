@@ -38,6 +38,10 @@ describe Templateable, type: :concern do
     let!(:other_template) { create(:collection, parent_collection: other_collection, master_template: true, num_cards: 1) }
     let!(:link_card) { create(:collection_card_link_collection, collection: other_template, parent: template, order: 4) }
     let!(:link_card_2) { create(:collection_card_link_text, parent: template, order: 5) }
+    # give this record a parent_collection_card, which is needed for duplication
+    let!(:link_card_2_parent_card) { create(:collection_card_text, item: link_card_2.item) }
+    # check that this card with no parent_collection_card gets filtered out of duplication
+    let!(:parentless_link_card) { create(:collection_card_link_text, parent: template, order: 6) }
     let(:collection) { create(:collection) }
 
     before do
@@ -59,8 +63,8 @@ describe Templateable, type: :concern do
     it 'should preserve links as links' do
       # the collection links should not get converted into actual collections
       expect(collection.collections).to be_empty
-      # Doesn't copy link_card_2 because it has no parent_collection_card
-      expect(collection.link_collection_cards.count).to eq(1)
+      # Doesn't copy parentless_link_card because it has no parent_collection_card
+      expect(collection.link_collection_cards.count).to eq(2)
     end
   end
 
