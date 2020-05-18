@@ -907,6 +907,10 @@ class Collection < ApplicationRecord
     parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
   end
 
+  def parent_challenge
+    parents.find_by(collection_type: :challenge)
+  end
+
   def inside_getting_started?
     parents.any?(&:getting_started?)
   end
