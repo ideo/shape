@@ -7,7 +7,7 @@ import InfiniteScroll from 'react-infinite-scroller'
 import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
-import { uiStore } from '~/stores'
+import { uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import Loader from '~/ui/layout/Loader'
@@ -151,10 +151,8 @@ class SearchResultsInfinite extends React.Component {
                   cardType={result.internalType}
                   record={result}
                   menuOpen={uiStore.cardMenuOpen.id === card.id}
-                  // NOTE: this will have to get modified when we eventually
-                  // turn off item routing for videos and images
                   handleClick={() =>
-                    this.props.routeTo(result.internalType, result.id)
+                    routingStore.routeTo(result.internalType, result.id)
                   }
                   searchResult
                 />
@@ -191,7 +189,6 @@ SearchResultsInfinite.propTypes = {
   searchResults: MobxPropTypes.arrayOrObservableArray.isRequired,
   gridSettings: MobxPropTypes.objectOrObservableObject.isRequired,
   gridMaxW: PropTypes.number.isRequired,
-  routeTo: PropTypes.func.isRequired,
   loadMore: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
   total: PropTypes.number.isRequired,

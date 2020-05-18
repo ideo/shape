@@ -1,17 +1,20 @@
 import UserSettings from '~/ui/users/UserSettings'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { fakeUser } from '#/mocks/data'
 import v from '~/utils/variables'
 
-let wrapper, component, apiStore, uiStore, props, organization
+let wrapper, component, apiStore, uiStore, routingStore
+let props, organization
 
 beforeEach(() => {
   apiStore = fakeApiStore()
   apiStore.currentUser = fakeUser
   uiStore = fakeUiStore
+  routingStore = fakeRoutingStore
   organization = apiStore.currentUserOrganization
-  props = { apiStore, uiStore }
+  props = { apiStore, uiStore, routingStore }
 })
 
 describe('UserSettings', () => {
