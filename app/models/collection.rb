@@ -938,6 +938,12 @@ class Collection < ApplicationRecord
     parents.where(type: 'Collection::SubmissionBox').any?
   end
 
+  def inside_a_challenge?
+    return true if collection_type == :challenge
+
+    parents.where(collection_type: 'challenge').any?
+  end
+
   def submission_box_template_test?
     return false unless is_a?(Collection::TestCollection)
 
