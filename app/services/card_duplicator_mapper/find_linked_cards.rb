@@ -49,7 +49,7 @@ module CardDuplicatorMapper
       return @all_link_cards if @all_link_cards.present?
 
       links = filter_cards_for_user(
-        CollectionCard::Link.where(
+        CollectionCard::Link.active.where(
           parent_id: all_collections.map(&:id),
         ),
       )
@@ -72,7 +72,8 @@ module CardDuplicatorMapper
 
     def all_search_collections
       all_collections.select do |collection|
-        collection.is_a?(Collection::SearchCollection)
+        collection.is_a?(Collection::SearchCollection) &&
+          collection.within_collection_id.present?
       end
     end
 
@@ -144,6 +145,8 @@ module CardDuplicatorMapper
       return if !all_collections.include?(card.record) && !all_items.include?(card.record)
 
       record_parent_collection_card = card.record.parent_collection_card
+
+      return unless record_parent_collection_card
 
       register_linked_card(
         card_id: card.id,

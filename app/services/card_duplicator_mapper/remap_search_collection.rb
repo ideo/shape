@@ -8,7 +8,7 @@ module CardDuplicatorMapper
     end
 
     def call
-      return if duplicated_search_collection.blank? || search_target_duplicate_card.blank?
+      return if duplicated_search_collection.blank? || original_search_target.blank? || search_target_duplicate_card.blank?
 
       duplicated_search_collection.reassign_search_term_within!(
         from_collection_id: original_search_target.id,
@@ -29,6 +29,8 @@ module CardDuplicatorMapper
     end
 
     def search_target_duplicate_card
+      return unless original_search_target&.parent_collection_card
+
       search_target_duplicate_card_id = duplicate_id_for_card_id(
         original_card_id: original_search_target.parent_collection_card.id,
       )
