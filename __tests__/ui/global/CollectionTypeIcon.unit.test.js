@@ -1,5 +1,8 @@
-import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon, {
+  collectionTypeToIcon,
+} from '~/ui/global/CollectionTypeIcon'
 import { fakeCollection } from '#/mocks/data'
+import PhaseIcon from '~/ui/icons/PhaseIcon'
 
 const props = {
   record: fakeCollection,
@@ -112,6 +115,20 @@ describe('CollectionTypeIcon', () => {
     })
     it('renders the SystemIcon', () => {
       expect(wrapper.find('SystemIcon').exists()).toBeTruthy()
+    })
+  })
+})
+
+describe('collectionTypeToIcon', () => {
+  describe('when is phase type', () => {
+    it('returns the icon', () => {
+      expect(collectionTypeToIcon({ type: 'phase' })).toEqual(<PhaseIcon />)
+    })
+
+    it('returns the large icon when size requested', () => {
+      expect(collectionTypeToIcon({ type: 'phase', size: 'lg' })).toEqual(
+        <PhaseIcon large />
+      )
     })
   })
 })
