@@ -166,6 +166,22 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
+  attribute :is_inside_a_challenge do
+    @object.inside_a_challenge?
+  end
+
+  attribute :challenge_name do
+    if @object.parents.present? && @object.inside_a_challenge?
+      @object.parents.pluck(:name).first
+    end
+  end
+
+  attribute :challenge_id do
+    if @object.parents.present? && @object.inside_a_challenge?
+      @object.parents.pluck(:id).first
+    end
+  end
+
   attribute :is_subtemplate_or_instance do
     @object.subtemplate? || @object.subtemplate_instance?
   end
