@@ -227,6 +227,7 @@ class Api::V1::BaseController < ApplicationController
   end
 
   def switch_to_organization
+    return unless user_signed_in?
     return if @collection.common_viewable?
 
     current_user.switch_to_organization(@collection.organization)
