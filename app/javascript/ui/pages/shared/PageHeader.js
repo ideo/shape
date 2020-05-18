@@ -49,7 +49,7 @@ const IconHolder = styled.span`
   }
 `
 
-const StyledSubHeaderTitle = styled(Heading2)`
+const StyledSubHeaderLink = styled(Heading2)`
   display: inline-block;
   color: ${v.colors.commonDark};
   font-size: 13px;
@@ -59,6 +59,8 @@ const StyledSubHeaderTitle = styled(Heading2)`
   bottom: 3px;
   cursor: pointer;
 `
+
+StyledSubHeaderLink.displayName = 'StyledSubHeaderLink'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -470,13 +472,13 @@ class PageHeader extends React.Component {
           title={'go to challenge'}
           placement="top"
         >
-          <StyledSubHeaderTitle
+          <StyledSubHeaderLink
             onClick={() => {
               routingStore.routeTo('collections', record.challenge_id)
             }}
           >
             {record.challenge_name}
-          </StyledSubHeaderTitle>
+          </StyledSubHeaderLink>
         </Tooltip>
         <IconHolder
           align="right"

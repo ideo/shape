@@ -220,4 +220,22 @@ describe('PageHeader', () => {
       ).toEqual('Restore')
     })
   })
+
+  describe('with a collection inside a challenge', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.challenge_id = 999
+      props.record.challenge_name = 'Open Innovation Sustainability Challenge'
+      props.record.is_inside_a_challenge = true
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('should render the challenge navigation link with tooltip', () => {
+      expect(wrapper.find('Tooltip').props().title).toEqual('go to challenge')
+      expect(wrapper.find('StyledSubHeaderLink').html()).toContain(
+        'Open Innovation Sustainability Challenge'
+      )
+    })
+  })
 })
