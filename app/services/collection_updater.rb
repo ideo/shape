@@ -61,7 +61,6 @@ class CollectionUpdater < SimpleService
     @collection.update_cached_tag_lists
     # always touch the updated timestamp even though we may just be updating the related cards
     @collection.updated_at = Time.now
-    @collection.all_child_collections.map(&:touch) if @attributes[:collection_type].present?
   end
 
   def mark_subcollection_as_private

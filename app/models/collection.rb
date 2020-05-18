@@ -780,9 +780,14 @@ class Collection < ApplicationRecord
 
   def cache_key(card_order = 'order', user_id = nil)
     test_details = ''
+    challenge_details = ''
     if test_or_test_results_collection?
       # make sure these details factor into caching
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
+    end
+
+    if inside_a_challenge?
+      challenge_details = "parent_challenge_id=#{parent_challenge.id}"
     end
 
     %(#{jsonapi_cache_key}
@@ -791,8 +796,9 @@ class Collection < ApplicationRecord
       /order_#{card_order}
       /cards_#{collection_cards.maximum(:updated_at).to_i}
       /#{test_details}
+      /#{challenge_details}
       /gs_#{getting_started_shell}
-      /org_#{organization.updated_at}
+        /org_#{organization.updated_at}
       /user_id_#{user_id}
       /locale_#{I18n.locale}
       /roles_#{anchored_roles.maximum(:updated_at).to_i}
