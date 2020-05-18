@@ -341,7 +341,7 @@ class GridCard extends React.Component {
         // special behavior for carousels with LinkItems
         const coverItem = _.get(record, 'collection_cover_items[0]')
         if (coverItem && coverItem.isLink) {
-          linkOffsite(coverItem)
+          this.linkOffsite(coverItem)
           return
         }
       }
@@ -359,7 +359,7 @@ class GridCard extends React.Component {
       return
     }
     if (record.isLink) {
-      linkOffsite(record)
+      this.linkOffsite(record)
       return
     }
     if (record.isPdfFile) {
@@ -375,7 +375,7 @@ class GridCard extends React.Component {
       return
     } else if (record.isGenericFile) {
       // TODO: could replace with preview
-      linkOffsite(record, 'fileUrl')
+      this.linkOffsite(record, 'fileUrl')
       return
     }
     // capture breadcrumb trail when navigating via Link cards, but not from My Collection
@@ -390,6 +390,12 @@ class GridCard extends React.Component {
     ev.stopPropagation()
     const { record } = this.props
     record.restore()
+  }
+
+  linkOffsite = (record, field) => {
+    linkOffsite(record, field, () => {
+      Activity.trackActivity('viewed', record)
+    })
   }
 
   storeLinkedBreadcrumb = card => {

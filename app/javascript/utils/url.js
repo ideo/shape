@@ -1,4 +1,4 @@
-import Activity from '~/stores/jsonApi/Activity'
+import _ from 'lodash'
 
 export function parseUrl(urlStr) {
   const url = document.createElement('a')
@@ -25,11 +25,13 @@ export function useTemplateInMyCollection(templateId) {
   window.location.href = route
 }
 
-export function linkOffsite(record, field = 'url') {
+export function linkOffsite(record, field = 'url', onLink = null) {
   const url = record[field]
   if (!url) return
 
-  Activity.trackActivity('viewed', record)
+  if (onLink && _.isFunction(onLink)) {
+    onLink()
+  }
   const anchor = Object.assign(document.createElement('a'), {
     target: '_blank',
     href: url,

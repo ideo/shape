@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import CoverRenderer from '~/ui/grid/CoverRenderer'
@@ -36,7 +36,6 @@ const CarouselButton = styled(TextEnterButton)`
   }
 `
 
-@inject('routingStore')
 @observer
 class CarouselCover extends React.Component {
   @observable
@@ -70,10 +69,6 @@ class CarouselCover extends React.Component {
       this.loading = false
       this.props.onEmptyCarousel()
     }
-  }
-
-  get currentIdx() {
-    return this.props.collection.carouselIdx
   }
 
   get records() {
@@ -119,7 +114,7 @@ class CarouselCover extends React.Component {
         />
         <CarouselControl>
           <DisplayText color={v.colors.commonDark} data-cy="ItemCount">
-            {this.currentIdx + 1} / {this.records.length}
+            {collection.carouselIdx + 1} / {this.records.length}
           </DisplayText>
           <CarouselButton onClick={e => this.handleNavigate(e, -1)}>
             <ArrowIcon rotation={180} />
@@ -138,9 +133,6 @@ CarouselCover.propTypes = {
   updatedAt: PropTypes.string.isRequired,
   dragging: PropTypes.bool,
   onEmptyCarousel: PropTypes.func,
-}
-CarouselCover.wrappedComponent.propTypes = {
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 CarouselCover.defaultProps = {
