@@ -130,6 +130,7 @@ export const monthlyXAxisText = (
 
 const ChartAxisProps = ({
   datasetValues,
+  secondaryValues,
   datasetTimeframe,
   domain,
   isSmallChartStyle,
@@ -163,7 +164,8 @@ const ChartAxisProps = ({
   }
 
   const tickLabelStyleProps = tickLabelStyle(isSmallChartStyle)
-  return datasetValues.length > 1
+  return datasetValues.length > 1 ||
+    (secondaryValues && secondaryValues.length > 1)
     ? {
         ...axisProps,
         tickFormat: isSmallChartStyle ? fullDate : datasetXAxisText,

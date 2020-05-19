@@ -86,6 +86,7 @@ class ChartGroup extends React.Component {
   }
 
   get chartDomain() {
+    const { secondaryDatasets } = this.props.dataItem
     const allValues = [...this.primaryDatasetValues]
     this.secondaryDatasetsWithData.forEach(dataset => {
       // Format data in the same way it will show up in other secondary charts
@@ -100,7 +101,8 @@ class ChartGroup extends React.Component {
       values: allValues,
       maxYDomain: this.primaryDataset.max_domain,
     })
-    if (allValues.length === 1) {
+    // If there's one single value, do this.
+    if (allValues.length === 1 && secondaryDatasets.length === 0) {
       domain.x = domainXForSingleValue(allValues[0].date)
     }
     return domain
@@ -267,6 +269,7 @@ class ChartGroup extends React.Component {
       const dates = this.axisRawDateValues
       const axisProps = chartAxisProps({
         datasetValues: this.primaryDatasetValues,
+        secondaryValues: this.secondaryDatasetsWithData,
         datasetTimeframe: timeframe,
         domain: this.chartDomain,
         isSmallChartStyle: this.isSmallChartStyle,
