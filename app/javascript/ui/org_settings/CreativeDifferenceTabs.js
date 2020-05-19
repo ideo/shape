@@ -333,6 +333,7 @@ class CreativeDifferenceTabs extends React.Component {
                   id={'name-label'}
                 >
                   Team
+                  {/* Make Add Team button its own component? */}
                   <Tooltip
                     classes={{
                       tooltip: 'Tooltip',
@@ -525,6 +526,19 @@ class CreativeDifferenceTabs extends React.Component {
                   </form>
                 </Row>
               ))}
+              <div>
+                <Tooltip
+                  classes={{
+                    tooltip: 'Tooltip',
+                  }}
+                  title={'Add new team'}
+                  placement="bottom"
+                >
+                  <StyledIconWrapper width={16}>
+                    <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
+                  </StyledIconWrapper>
+                </Tooltip>
+              </div>
             </React.Fragment>
           </TabPanel>
         </React.Fragment>
