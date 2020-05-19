@@ -249,16 +249,40 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def render_collection_cards(collection: @collection, collection_cards: @collection_cards)
     params[:card_order] ||= collection.default_card_order
 
-    render jsonapi: collection_cards,
-           include: CollectionCard.default_relationships_for_api,
-           expose: {
-             card_order: params[:card_order],
-             current_record: collection,
-             parent: collection,
-             inside_a_submission: collection.submission? || collection.inside_a_submission?,
-             inside_hidden_submission_box: collection.hide_submissions || collection.inside_hidden_submission_box?,
-             include: params[:include],
-           }
+
+    renderer = JSONAPI::Serializable::Renderer.new
+
+    puts '!~' * 10
+    puts params.as_json
+    puts '!~' * 10
+    json_data = Rails.cache.fetch(Digest::MD5.hexdigest("collection-cards-#{@collection.cache_key}-#{params.as_json}")) do
+      puts 'NOT CACHED -- fetching...'
+      renderer.render(
+        collection_cards,
+        class: jsonapi_class,
+        include: CollectionCard.default_relationships_for_api,
+        expose: jsonapi_expose.merge(
+          card_order: params[:card_order],
+          current_record: collection,
+          parent: collection,
+          inside_a_submission: collection.submission? || collection.inside_a_submission?,
+          inside_hidden_submission_box: collection.hide_submissions || collection.inside_hidden_submission_box?,
+          include: params[:include],
+        ),
+      )
+    end
+    render json: json_data
+
+    # render jsonapi: collection_cards,
+    #        include: CollectionCard.default_relationships_for_api,
+    #        expose: {
+    #          card_order: params[:card_order],
+    #          current_record: collection,
+    #          parent: collection,
+    #          inside_a_submission: collection.submission? || collection.inside_a_submission?,
+    #          inside_hidden_submission_box: collection.hide_submissions || collection.inside_hidden_submission_box?,
+    #          include: params[:include],
+    #        }
   end
 
   def render_to_collection_with_cards(new_cards)

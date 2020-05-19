@@ -124,10 +124,18 @@ class Api::V1::BaseController < ApplicationController
         val == :parent || val.try(:keys) == [:roles]
       end
     end
-    exposables[:current_user] = current_user unless current_user.nil?
-    render jsonapi: @collection,
-           include: include,
-           expose: exposables
+    renderer = JSONAPI::Serializable::Renderer.new
+    json_data = renderer.render(
+      @collection,
+      class: jsonapi_class,
+      include: include,
+      expose: jsonapi_expose,
+    )
+    render json: json_data
+
+    # render jsonapi: @collection,
+    #        include: include,
+    #        expose: exposables
   end
 
   def check_api_authentication!
