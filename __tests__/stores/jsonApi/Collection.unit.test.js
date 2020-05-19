@@ -671,7 +671,12 @@ describe('Collection', () => {
   })
 
   describe('API_fetchCardOrders', () => {
-    const res = { data: [{ id: '1', order: 2 }, { id: '2', order: 1 }] }
+    const res = {
+      data: [
+        { id: '1', order: 2 },
+        { id: '2', order: 1 },
+      ],
+    }
     beforeEach(() => {
       collection.API_fetchAllCardIds = jest
         .fn()

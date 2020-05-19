@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { Fragment } from 'react'
-import { Label } from '~/ui/global/styled/forms'
+// import { Label } from '~/ui/global/styled/forms'
 import RolesSummary from '~/ui/roles/RolesSummary'
 import { uiStore } from '~/stores'
 // import OrganizationMenu from '~/ui/organizations'
@@ -23,17 +23,6 @@ const OrganizationRoles = ({ roles, canEdit }) => {
 
   return (
     <Fragment>
-      <Label
-        style={{
-          fontSize: '13px',
-          marginTop: '28px',
-          marginBottom: '16px',
-        }}
-        // id="content-version-select-label"
-      >
-        Organization Roles
-      </Label>
-
       <RolesSummary
         // TODO: Modify RolesSummary to handle these props
         editorRoleName={'admin'}

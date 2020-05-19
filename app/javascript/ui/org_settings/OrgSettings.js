@@ -10,7 +10,7 @@ import CreativeDifferenceTabs from './CreativeDifferenceTabs'
 
 const SettingsPageWrapper = styled.div`
   margin-top: 40px;
-  width: 700px;
+  ${'' /* width: 700px; */}
 `
 
 @inject('apiStore', 'uiStore')

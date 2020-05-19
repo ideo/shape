@@ -4,9 +4,10 @@ import { v4 as uuidv4 } from 'uuid'
 
 import _ from 'lodash'
 
-import { Select, SelectOption, Label } from '~/ui/global/styled/forms'
+import { Select, SelectOption } from '~/ui/global/styled/forms'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
-import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
+// import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
+// import TruncatableText from '../global/TruncatableText'
 
 const currentValue = (record, options, fieldToUpdate) => {
   const object = _.find(options, option => option.id === record[fieldToUpdate])
@@ -18,7 +19,7 @@ const currentValue = (record, options, fieldToUpdate) => {
 
 const DropdownSelect = ({
   label,
-  toolTip,
+  // toolTip,
   record,
   options,
   fieldToUpdate,
@@ -61,7 +62,9 @@ const DropdownSelect = ({
   }
 
   return (
-    <div style={{ marginTop: '22px' }}>
+    // Should this really be setting margin?
+    // Shouldn't its parent or container do that?
+    <React.Fragment>
       <ConfirmationDialog
         prompt={`You are about to change ${record.name ||
           record.name_display}'s ${label}. Would you like to Continue?`}
@@ -71,19 +74,8 @@ const DropdownSelect = ({
         open={isOpen()}
         iconName="Alert"
       />
-      <Label
-        style={{
-          fontSize: '13px',
-          marginBottom: '11px',
-        }}
-        id={`${label.split(' ').join('')}-select-label`}
-      >
-        {label}
-        {toolTip && (
-          <HoverableDescriptionIcon description={toolTip} width={16} />
-        )}
-      </Label>
       <Select
+        style={{ width: '244px' }}
         labelid={`${label.split(' ').join('')}-select-label`}
         classes={{
           root: 'select',
@@ -109,13 +101,13 @@ const DropdownSelect = ({
           </SelectOption>
         ))}
       </Select>
-    </div>
+    </React.Fragment>
   )
 }
 
 DropdownSelect.propTypes = {
   label: PropTypes.string.isRequired,
-  toolTip: PropTypes.string,
+  // toolTip: PropTypes.string,
   record: PropTypes.object.isRequired,
   // TODO: fix these to use MobxPropTypes
   options: PropTypes.arrayOf(PropTypes.object).isRequired,

@@ -24,9 +24,15 @@ import OrganizationRoles from './OrganizationRoles'
 import Languages from './Languages'
 import { Row } from '../global/styled/layout'
 import InfoIconXs from '~/ui/icons/InfoIconXs'
+import { Label } from '~/ui/global/styled/forms'
+import { DisplayText } from '~/ui/global/styled/typography'
+import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
+import Tooltip from '~/ui/global/Tooltip'
+import PopoutMenu from '../global/PopoutMenu'
+import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
 
 const StyledIconWrapper = styled.span`
-  margin-left: 4px;
+  margin-left: 8px;
   display: inline-block;
   vertical-align: middle;
   width: ${props => (props.width ? props.width : 10)}px;
@@ -223,11 +229,13 @@ class CreativeDifferenceTabs extends React.Component {
 
     return (
       <div
-        style={{
-          height: '1200px',
-          // background:
-          //   'url(https://www.startrek.com/sites/default/files/styles/content_full/public/images/2019-07/c82b013313066e0702d58dc70db033ca.jpg?itok=9-M5ggoe)',
-        }}
+        style={
+          {
+            // height: '1200px',
+            // background:
+            //   'url(https://www.startrek.com/sites/default/files/styles/content_full/public/images/2019-07/c82b013313066e0702d58dc70db033ca.jpg?itok=9-M5ggoe)',
+          }
+        }
       >
         {isError && <div>Something went wrong... </div>}
         {isLoading ? <Loader /> : ''}
@@ -296,48 +304,224 @@ class CreativeDifferenceTabs extends React.Component {
           <TabPanel value={tabValue} tabName="teams">
             <React.Fragment>
               {/* Replace this with styled component */}
-              <div style={{ color: v.colors.cDeltaBlue }}>
+              <div
+                style={{
+                  color: v.colors.cDeltaBlue,
+                  marginBottom: '23px',
+                  marginTop: '20px',
+                }}
+              >
                 {/* TODO: Use InfoIconXs with custom StyledIconWrapper; style the text  */}
-                <StyledIconWrapper width={'16'}>
+                <StyledIconWrapper width={'16'} style={{ marginRight: '9px' }}>
                   <InfoIconXs />
                 </StyledIconWrapper>
-                In Creative Difference, a team is a group of individuals working
-                together towards a common output. Examples of this are business
-                units, segments, squads, etc.
+                <span>
+                  In Creative Difference, a team is a group of individuals
+                  working together towards a common output. Examples of this are
+                  business units, segments, squads, etc.
+                </span>
               </div>
+              {/* Table Headers */}
+              <Row>
+                <Label
+                  style={{
+                    fontSize: '13px',
+                    marginBottom: '11px',
+                    marginRight: '20px',
+                    width: '170px',
+                  }}
+                  id={'name-label'}
+                >
+                  Team
+                  <Tooltip
+                    classes={{
+                      tooltip: 'Tooltip',
+                    }}
+                    title={'Add new team'}
+                    placement="bottom"
+                  >
+                    <StyledIconWrapper width={16}>
+                      <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
+                    </StyledIconWrapper>
+                  </Tooltip>
+                </Label>
+                <Label
+                  style={{
+                    fontSize: '13px',
+                    marginBottom: '11px',
+                    marginRight: '20px',
+                    width: '244px',
+                  }}
+                  id={`industry-select-label`}
+                >
+                  Industry
+                </Label>
+                <Label
+                  style={{
+                    fontSize: '13px',
+                    marginRight: '20px',
+                    marginBottom: '11px',
+                    width: '244px',
+                  }}
+                  id={`content-version-select-label`}
+                >
+                  Content Version
+                  <HoverableDescriptionIcon
+                    description={
+                      'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
+                    }
+                    width={16}
+                  />
+                </Label>
+                <Label
+                  style={{
+                    fontSize: '13px',
+                    marginRight: '20px',
+                    marginBottom: '11px',
+                    width: '244px',
+                  }}
+                  id={`vertical-horizontal-select-label`}
+                >
+                  Vertical or Horizontal
+                  <HoverableDescriptionIcon
+                    description={
+                      "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
+                    }
+                    width={16}
+                  />
+                </Label>
+                <div
+                  style={{
+                    fontSize: '13px',
+                    width: '42px',
+                    marginRight: '20px',
+                  }}
+                >
+                  {/* No header here */}
+                </div>
+                <Label
+                  style={{
+                    fontSize: '13px',
+                    width: '80px',
+                    marginRight: '20px',
+                  }}
+                >
+                  Admins
+                </Label>
+                <Label
+                  style={{
+                    fontSize: '13px',
+                    width: '80px',
+                  }}
+                >
+                  Members
+                </Label>
+              </Row>
               {businessUnits.map(businessUnit => (
                 <Row>
-                  <form style={{ display: 'flex' }}>
-                    <DropdownSelect
-                      label={'Industry'}
-                      record={organization}
-                      options={industrySubcategories}
-                      updateRecord={updateOrg}
-                      fieldToUpdate={'industry_subcategory_id'}
-                    />
-                    <DropdownSelect
-                      label={'Content Version'}
-                      toolTip={
-                        'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
-                      }
-                      record={organization}
-                      options={contentVersions}
-                      updateRecord={updateOrg}
-                      fieldToUpdate={'default_content_version_id'}
-                    />
-                    <DropdownSelect
-                      label={'Vertical or Horizontal'}
-                      toolTip={
-                        "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
-                      }
-                      record={businessUnit}
-                      options={[
-                        { name: 'Vertical', id: 'Vertical' },
-                        { name: 'Horizontal', id: 'Horizontal' },
-                      ]}
-                      updateRecord={updateOrg}
-                      fieldToUpdate={'structure'}
-                    />
+                  <form
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <div
+                      style={{
+                        width: '170px',
+                        marginRight: '20px',
+                      }}
+                    >
+                      <DisplayText>{businessUnit.name}</DisplayText>
+                    </div>
+                    <div
+                      style={{
+                        marginRight: '20px',
+                      }}
+                    >
+                      <DropdownSelect
+                        label={'Industry'}
+                        record={organization}
+                        options={industrySubcategories}
+                        updateRecord={updateOrg}
+                        fieldToUpdate={'industry_subcategory_id'}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        marginRight: '20px',
+                      }}
+                    >
+                      <DropdownSelect
+                        label={'Content Version'}
+                        toolTip={
+                          'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
+                        }
+                        record={organization}
+                        options={contentVersions}
+                        updateRecord={updateOrg}
+                        fieldToUpdate={'default_content_version_id'}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        marginRight: '20px',
+                      }}
+                    >
+                      <DropdownSelect
+                        label={'Vertical or Horizontal'}
+                        toolTip={
+                          "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
+                        }
+                        record={businessUnit}
+                        options={[
+                          { name: 'Vertical', id: 'Vertical' },
+                          { name: 'Horizontal', id: 'Horizontal' },
+                        ]}
+                        updateRecord={updateOrg}
+                        fieldToUpdate={'structure'}
+                      />
+                    </div>
+                    {/* Gonna have to use pieces inside this???? */}
+                    <div
+                      style={{
+                        width: '42px',
+                        marginRight: '20px',
+                        marginTop: '2px',
+                      }}
+                    >
+                      <PopoutMenu />
+                    </div>
+                    {/* Admins */}
+                    <div
+                      style={{
+                        width: '80px',
+                        marginTop: '-10px',
+                      }}
+                    >
+                      <OrganizationRoles
+                        roles={
+                          apiStore.currentUserOrganization.primary_group.roles
+                        }
+                        canEdit={
+                          apiStore.currentUserOrganization.primary_group
+                            .can_edit
+                        }
+                      />
+                    </div>
+                    {/* Members */}
+                    <div
+                      style={{
+                        width: '80px',
+                        marginTop: '-10px',
+                      }}
+                    >
+                      <OrganizationRoles
+                        roles={
+                          apiStore.currentUserOrganization.primary_group.roles
+                        }
+                        canEdit={
+                          apiStore.currentUserOrganization.primary_group
+                            .can_edit
+                        }
+                      />{' '}
+                    </div>
                   </form>
                 </Row>
               ))}
