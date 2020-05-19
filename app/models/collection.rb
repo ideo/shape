@@ -786,7 +786,7 @@ class Collection < ApplicationRecord
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
     end
 
-    if inside_a_challenge?
+    if parent_challenge.present?
       challenge_details = "parent_challenge_id=#{parent_challenge.id}"
     end
 
@@ -946,12 +946,6 @@ class Collection < ApplicationRecord
     return true if is_a?(Collection::SubmissionBox)
 
     parents.where(type: 'Collection::SubmissionBox').any?
-  end
-
-  def inside_a_challenge?
-    return true if collection_type == :challenge
-
-    parents.where(collection_type: 'challenge').any?
   end
 
   def submission_box_template_test?

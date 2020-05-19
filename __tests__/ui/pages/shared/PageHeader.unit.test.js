@@ -226,7 +226,7 @@ describe('PageHeader', () => {
       props.record = fakeCollection
       props.record.challenge_id = 999
       props.record.challenge_name = 'Open Innovation Sustainability Challenge'
-      props.record.is_inside_a_challenge = true
+      props.record.isInsideAChallenge = true
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
       component = wrapper.instance()
     })

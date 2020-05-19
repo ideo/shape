@@ -166,10 +166,6 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
-  attribute :is_inside_a_challenge do
-    @object.inside_a_challenge?
-  end
-
   attribute :challenge_name do
     @object.parent_challenge&.name
   end

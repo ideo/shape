@@ -509,7 +509,7 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          {record.is_inside_a_challenge && this.renderSubHeader()}
+          {record.isInsideAChallenge && this.renderSubHeader()}
           <div style={{ minHeight: '72px' }}>
             <StyledTitleAndRoles
               data-empty-space-click

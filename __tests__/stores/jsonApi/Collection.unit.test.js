@@ -768,4 +768,11 @@ describe('Collection', () => {
       expect(collection.isPublicJoinable).toEqual(true)
     })
   })
+
+  describe('isInsideAChallenge', () => {
+    it('returns true when a parent collection id is present', () => {
+      collection.challenge_id = 999
+      expect(collection.isInsideAChallenge).toEqual(true)
+    })
+  })
 })

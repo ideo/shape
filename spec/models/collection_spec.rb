@@ -1093,10 +1093,6 @@ describe Collection, type: :model do
     let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: parent_collection) }
     let!(:inner_subcollection) { create(:collection, num_cards: 2, parent_collection: subcollection) }
 
-    it 'should mark its subcollections as inside a challenge' do
-      expect(subcollection.inside_a_challenge?).to be true
-    end
-
     it 'the collection inside the subcollection should have a reference to its parent challenge' do
       expect(inner_subcollection.parent_challenge).to eq parent_collection
     end
