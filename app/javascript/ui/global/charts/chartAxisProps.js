@@ -11,7 +11,7 @@ const tickLabelStyle = isSmallChartStyle => {
   if (isSmallChartStyle) {
     return {
       fontSize: '18px',
-      dy: -5,
+      dy: -20,
     }
   } else {
     return {
@@ -34,6 +34,7 @@ const chartAxisStyle = isSmallChartStyle => {
         fontSize: '18px',
         dy: -5,
       },
+      ticks: { stroke: 'black', size: 13, transform: 'translateY(-11px)' },
     }
   }
   return {
@@ -62,7 +63,8 @@ const calculateDx = (x, w, isSmallChartStyle) => {
 const TickLabel = props => {
   const w = calculateRelativeWidth(props)
   const dx = calculateDx(props.x, w, props.isSmallChartStyle)
-  let dy = props.dy || 5
+  console.log('poprs', props.dy)
+  let dy = props.dy || 0
 
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,
@@ -186,7 +188,10 @@ const ChartAxisProps = ({
         ...axisProps,
         tickFormat: t => null,
         axisLabelComponent: (
-          <TickLabel fontSize={tickLabelStyleProps.fontSize} />
+          <TickLabel
+            fontSize={tickLabelStyleProps.fontSize}
+            dy={3}
+          />
         ),
         style: chartAxisStyle(isSmallChartStyle),
         label: fullDate(datasetValues[0].date),

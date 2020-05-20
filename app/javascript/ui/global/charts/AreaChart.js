@@ -17,7 +17,7 @@ const chartStyle = (style, order, singleDataPoint) => {
   if (style.fill) {
     const darkFill = darkenColor(style.fill, order)
     const opacity = 0.8
-    const strokeWidth = singleDataPoint ? 10 : null
+    const strokeWidth = singleDataPoint ? 1000 : null
     return {
       data: { fill: darkFill, opacity, strokeWidth },
       labels: {
