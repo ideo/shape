@@ -1066,6 +1066,20 @@ class Collection < ApplicationRecord
     collection_cards[left_of_first_moving_card_index].pinned?
   end
 
+  def create_challenge_roles
+    return unless collection_type == :challenge
+
+    ActiveRecord::Base.transaction do
+      admin_group = Group.create(organization_id: organization.id, name: "#{name} Admins")
+      reviewer_group = Group.create(organization_id: organization.id, name: "#{name} Reviewers")
+      participant_group = Group.create(organization_id: organization.id, name: "#{name} Participants")
+
+      admin_group.add_role(Role::EDITOR, @challenge)
+      reviewer_group.add_role(Role::VIEWER, @challenge)
+      participant_group.add_role(Role::VIEWER, @challenge)
+    end
+  end
+
   private
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)
