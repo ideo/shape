@@ -63,8 +63,7 @@ const calculateDx = (x, w, isSmallChartStyle) => {
 const TickLabel = props => {
   const w = calculateRelativeWidth(props)
   const dx = calculateDx(props.x, w, props.isSmallChartStyle)
-  console.log('poprs', props.dy)
-  let dy = props.dy || 0
+  let dy = props.dy || 5
 
   const updatedStyle = Object.assign({}, props.style, {
     fontSize: props.fontSize,

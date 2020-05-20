@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { VictoryArea, VictoryLabel } from 'victory'
 
 import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
@@ -13,9 +14,11 @@ import {
   themeLabelStyles,
 } from '~/ui/global/charts/ChartUtils'
 
-const chartStyle = (style, order, singleDataPoint) => {
+const chartStyle = (style, order, singleDataPoint, pattern) => {
   if (style.fill) {
-    const darkFill = darkenColor(style.fill, order)
+    const darkFill = pattern
+      ? 'url(#PatternLine)'
+      : darkenColor(style.fill, order)
     const opacity = 0.8
     const strokeWidth = singleDataPoint ? 1000 : null
     return {
@@ -89,9 +92,9 @@ const AreaChart = ({
       })
   }
   const singleDataPoint = values.length === 2 && values[1].isDuplicate
-  return (
+  return [
     <VictoryArea
-      style={chartStyle(dataset.style || {}, colorOrder, singleDataPoint)}
+      style={chartStyle(dataset.style || {}, colorOrder, singleDataPoint, true)}
       labels={d => d.value}
       labelComponent={
         <TickLabelWithTooltip
@@ -109,8 +112,16 @@ const AreaChart = ({
       y="value"
       x="date"
       key={`dataset-${order}`}
-    />
-  )
+    />,
+    <VictoryArea
+      style={chartStyle(dataset.style || {}, colorOrder, singleDataPoint)}
+      domain={domain}
+      data={values}
+      y="value"
+      x="date"
+      key={`dataset-${order}`}
+    />,
+  ]
 }
 
 AreaChart.propTypes = {
