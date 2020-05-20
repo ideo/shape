@@ -119,6 +119,7 @@ class Collection < ApplicationRecord
   before_validation :inherit_parent_organization_id, on: :create
   before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
   before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
+  before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
@@ -1082,23 +1083,17 @@ class Collection < ApplicationRecord
   end
 
   def create_challenge_groups_and_assign_roles
-    return unless collection_type == 'challenge'
+    admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
+    reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
+    participant_group = create_challenge_participant_group(name: "#{name} Participants", organization: organization)
 
-    ActiveRecord::Base.transaction do
-      admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
-      reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
-      participant_group = create_challenge_participant_group(name: "#{name} Participants", organization_id: organization)
+    self.challenge_admin_group_id = admin_group.id
+    self.challenge_reviewer_group_id = reviewer_group.id
+    self.challenge_participant_group_id = participant_group.id
 
-      update_columns(
-        challenge_admin_group_id: admin_group.id,
-        challenge_reviewer_group_id: reviewer_group.id,
-        challenge_participant_group_id: participant_group.id,
-      )
-
-      admin_group.add_role(Role::EDITOR, self)
-      reviewer_group.add_role(Role::VIEWER, self)
-      participant_group.add_role(Role::VIEWER, self)
-    end
+    admin_group.add_role(Role::EDITOR, self)
+    reviewer_group.add_role(Role::VIEWER, self)
+    participant_group.add_role(Role::VIEWER, self)
   end
 
   private
@@ -1171,5 +1166,9 @@ class Collection < ApplicationRecord
     return unless templated? && inside_a_master_template?
 
     errors.add(:base, "can't be an instance inside a template")
+  end
+
+  def will_become_a_challenge?
+    will_save_change_to_collection_type? && collection_type_in_database != 'challenge' && collection_type == 'challenge'
   end
 end
