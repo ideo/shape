@@ -1083,6 +1083,8 @@ class Collection < ApplicationRecord
   end
 
   def create_challenge_groups_and_assign_roles
+    return if challenge_admin_group.present? && challenge_reviewer_group.present? && challenge_participant_group.present?
+
     admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
     reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
     participant_group = create_challenge_participant_group(name: "#{name} Participants", organization: organization)
