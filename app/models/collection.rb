@@ -2,48 +2,51 @@
 #
 # Table name: collections
 #
-#  id                         :bigint(8)        not null, primary key
-#  anyone_can_join            :boolean          default(FALSE)
-#  anyone_can_view            :boolean          default(FALSE)
-#  archive_batch              :string
-#  archived                   :boolean          default(FALSE)
-#  archived_at                :datetime
-#  breadcrumb                 :jsonb
-#  cached_attributes          :jsonb
-#  cached_test_scores         :jsonb
-#  collection_type            :integer          default("collection")
-#  cover_type                 :integer          default("cover_type_default")
-#  hide_submissions           :boolean          default(FALSE)
-#  master_template            :boolean          default(FALSE)
-#  name                       :string
-#  num_columns                :integer
-#  processing_status          :integer
-#  search_term                :string
-#  shared_with_organization   :boolean          default(FALSE)
-#  submission_box_type        :integer
-#  submissions_enabled        :boolean          default(TRUE)
-#  test_closed_at             :datetime
-#  test_launched_at           :datetime
-#  test_show_media            :boolean          default(TRUE)
-#  test_status                :integer
-#  type                       :string
-#  unarchived_at              :datetime
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  cloned_from_id             :bigint(8)
-#  collection_to_test_id      :bigint(8)
-#  created_by_id              :integer
-#  default_group_id           :integer
-#  idea_id                    :integer
-#  joinable_group_id          :bigint(8)
-#  organization_id            :bigint(8)
-#  question_item_id           :integer
-#  roles_anchor_collection_id :bigint(8)
-#  submission_box_id          :bigint(8)
-#  submission_template_id     :integer
-#  survey_response_id         :integer
-#  template_id                :integer
-#  test_collection_id         :bigint(8)
+#  id                             :bigint(8)        not null, primary key
+#  anyone_can_join                :boolean          default(FALSE)
+#  anyone_can_view                :boolean          default(FALSE)
+#  archive_batch                  :string
+#  archived                       :boolean          default(FALSE)
+#  archived_at                    :datetime
+#  breadcrumb                     :jsonb
+#  cached_attributes              :jsonb
+#  cached_test_scores             :jsonb
+#  collection_type                :integer          default("collection")
+#  cover_type                     :integer          default("cover_type_default")
+#  hide_submissions               :boolean          default(FALSE)
+#  master_template                :boolean          default(FALSE)
+#  name                           :string
+#  num_columns                    :integer
+#  processing_status              :integer
+#  search_term                    :string
+#  shared_with_organization       :boolean          default(FALSE)
+#  submission_box_type            :integer
+#  submissions_enabled            :boolean          default(TRUE)
+#  test_closed_at                 :datetime
+#  test_launched_at               :datetime
+#  test_show_media                :boolean          default(TRUE)
+#  test_status                    :integer
+#  type                           :string
+#  unarchived_at                  :datetime
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  challenge_admin_group_id       :integer
+#  challenge_participant_group_id :integer
+#  challenge_reviewer_group_id    :integer
+#  cloned_from_id                 :bigint(8)
+#  collection_to_test_id          :bigint(8)
+#  created_by_id                  :integer
+#  default_group_id               :integer
+#  idea_id                        :integer
+#  joinable_group_id              :bigint(8)
+#  organization_id                :bigint(8)
+#  question_item_id               :integer
+#  roles_anchor_collection_id     :bigint(8)
+#  submission_box_id              :bigint(8)
+#  submission_template_id         :integer
+#  survey_response_id             :integer
+#  template_id                    :integer
+#  test_collection_id             :bigint(8)
 #
 # Indexes
 #
@@ -206,6 +209,18 @@ class Collection < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
   belongs_to :joinable_group, class_name: 'Group', optional: true
+  belongs_to :challenge_admin_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
+  belongs_to :challenge_reviewer_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
+  belongs_to :challenge_participant_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
@@ -1070,13 +1085,19 @@ class Collection < ApplicationRecord
     return unless collection_type == 'challenge'
 
     ActiveRecord::Base.transaction do
-      admin_group = Group.create(organization_id: organization.id, name: "#{name} Admins")
-      reviewer_group = Group.create(organization_id: organization.id, name: "#{name} Reviewers")
-      participant_group = Group.create(organization_id: organization.id, name: "#{name} Participants")
+      admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
+      reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
+      participant_group = create_challenge_participant_group(name: "#{name} Participants", organization_id: organization)
 
-      admin_group.add_role(Role::EDITOR, @challenge)
-      reviewer_group.add_role(Role::VIEWER, @challenge)
-      participant_group.add_role(Role::VIEWER, @challenge)
+      update_columns(
+        challenge_admin_group_id: admin_group.id,
+        challenge_reviewer_group_id: reviewer_group.id,
+        challenge_participant_group_id: participant_group.id,
+      )
+
+      admin_group.add_role(Role::EDITOR, self)
+      reviewer_group.add_role(Role::VIEWER, self)
+      participant_group.add_role(Role::VIEWER, self)
     end
   end
 
