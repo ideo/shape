@@ -12,6 +12,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
+import ChallengeIcon from '~/ui/icons/ChallengeIcon'
 import BackIcon from '~/ui/icons/BackIcon'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -19,6 +20,7 @@ import Button from '~/ui/global/Button'
 import {
   SubduedHeading1,
   HeaderButtonText,
+  Heading2,
 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
@@ -32,14 +34,13 @@ import IdeoSSO from '~/utils/IdeoSSO'
 
 const IconHolder = styled.span`
   color: ${v.colors.commonDark};
-  display: block;
-  height: 32px;
+  display: ${props => (props.display ? props.display : 'block')};
+  height: ${props => (props.height ? props.height : 32)}px;
   ${props =>
-    props.align === 'left'
-      ? 'margin-right: 12px;'
-      : 'margin-left: 6px;'} margin-top: 12px;
+    props.align === 'left' ? 'margin-right: 12px;' : 'margin-left: 6px;'}
+  margin-top: ${props => (props.marginTop ? props.marginTop : 12)}px;
   overflow: hidden;
-  width: 32px;
+  width: ${props => (props.width ? props.width : 32)}px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     height: 36px;
@@ -47,6 +48,19 @@ const IconHolder = styled.span`
     width: 20px;
   }
 `
+
+const StyledSubHeaderLink = styled(Heading2)`
+  display: inline-block;
+  color: ${v.colors.commonDark};
+  font-size: 13px;
+  line-height: 16px;
+  margin: 0px;
+  position: relative;
+  bottom: 3px;
+  cursor: pointer;
+`
+
+StyledSubHeaderLink.displayName = 'StyledSubHeaderLink'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -449,6 +463,36 @@ class PageHeader extends React.Component {
     }
   }
 
+  renderSubHeader() {
+    const { record, routingStore } = this.props
+    return (
+      <span>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title={'go to challenge'}
+          placement="top"
+        >
+          <StyledSubHeaderLink
+            onClick={() => {
+              routingStore.routeTo('collections', record.challenge_id)
+            }}
+          >
+            {record.challenge_name}
+          </StyledSubHeaderLink>
+        </Tooltip>
+        <IconHolder
+          align="right"
+          height={16}
+          width={16}
+          display={'inline-block'}
+          marginTop={0}
+        >
+          <ChallengeIcon />
+        </IconHolder>
+      </span>
+    )
+  }
+
   render() {
     const { record, uiStore } = this.props
     const tagEditorOpen =
@@ -465,6 +509,7 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
+          {record.isInsideAChallenge && this.renderSubHeader()}
           <div style={{ minHeight: '72px' }}>
             <StyledTitleAndRoles
               data-empty-space-click

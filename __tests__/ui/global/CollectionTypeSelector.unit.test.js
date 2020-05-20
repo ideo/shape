@@ -19,6 +19,7 @@ const types = [
   'phase',
   'prototype',
   'profile',
+  'challenge',
 ]
 
 describe('CollectionTypeSelector', () => {
