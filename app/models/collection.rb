@@ -1066,8 +1066,8 @@ class Collection < ApplicationRecord
     collection_cards[left_of_first_moving_card_index].pinned?
   end
 
-  def create_challenge_roles
-    return unless collection_type == :challenge
+  def create_challenge_groups_and_assign_roles
+    return unless collection_type == 'challenge'
 
     ActiveRecord::Base.transaction do
       admin_group = Group.create(organization_id: organization.id, name: "#{name} Admins")
