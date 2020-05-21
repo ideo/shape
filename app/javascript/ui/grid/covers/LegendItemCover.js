@@ -138,12 +138,13 @@ class LegendItemCover extends React.Component {
 
   rendersAsLine(selectedDataset, isPrimary) {
     if (selectedDataset.chart_type === 'line') return true
-    if (
-      selectedDataset.chart_type === 'area' &&
-      !isPrimary &&
-      !selectedDataset.hasDates
-    )
-      return true
+    const isSecondaryAreaChart =
+      selectedDataset.chart_type === 'area' && !isPrimary
+    if (isSecondaryAreaChart) {
+      if (!selectedDataset.hasDates || selectedDataset.tiers.length) {
+        return true
+      }
+    }
     return false
   }
 
@@ -349,24 +350,19 @@ class LegendItemCover extends React.Component {
     const { identifier, name, style } = dataset
     const primary = order === 0
     let icon
+    const { item } = this.props
+    const itemStyle = item.style
+    let renderedColor =
+      style && style.fill
+        ? darkenColor(style.fill, colorOrder)
+        : colorScale[order]
+    // Style on the item itself should aways override dataset style.
+    if (itemStyle && itemStyle.fill) {
+      renderedColor = itemStyle.fill
+    }
     if (this.rendersAsLine(dataset, primary)) {
-      icon = (
-        <LineChartIcon
-          color={(style && style.fill) || '#000000'}
-          order={order}
-        />
-      )
+      icon = <LineChartIcon color={renderedColor} order={order} />
     } else {
-      const { item } = this.props
-      const itemStyle = item.style
-      let renderedColor =
-        style && style.fill
-          ? darkenColor(style.fill, colorOrder)
-          : colorScale[order]
-      // Style on the item itself should aways override dataset style.
-      if (itemStyle && itemStyle.fill) {
-        renderedColor = itemStyle.fill
-      }
       icon = (
         <AreaChartIcon
           color={renderedColor}

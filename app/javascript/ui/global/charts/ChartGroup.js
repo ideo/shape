@@ -322,6 +322,10 @@ class ChartGroup extends React.Component {
       } else {
         modifiedChartType = 'line'
       }
+      // Creative Difference chart comparisons should just be lines.
+      if (order > 0 && this.isSmallChartStyle) {
+        modifiedChartType = 'line'
+      }
     }
     const dashWidth = index * 2
     switch (modifiedChartType) {
