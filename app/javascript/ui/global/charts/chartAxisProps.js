@@ -187,10 +187,7 @@ const ChartAxisProps = ({
         ...axisProps,
         tickFormat: t => null,
         axisLabelComponent: (
-          <TickLabel
-            fontSize={tickLabelStyleProps.fontSize}
-            dy={3}
-          />
+          <TickLabel fontSize={tickLabelStyleProps.fontSize} dy={3} />
         ),
         style: chartAxisStyle(isSmallChartStyle),
         label: fullDate(datasetValues[0].date),

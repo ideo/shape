@@ -12,7 +12,6 @@ import {
 
 import { DisplayText } from '~/ui/global/styled/typography'
 import OrganicGrid from '~/ui/icons/OrganicGrid'
-import PatternLine from '~/ui/icons/PatternLine'
 import v, { DATASET_CHART_TYPES } from '~/utils/variables'
 import AreaChart from '~/ui/global/charts/AreaChart'
 import BarChart from '~/ui/global/charts/BarChart'
@@ -443,7 +442,6 @@ class ChartGroup extends React.Component {
         data-cy="ChartContainer"
       >
         <OrganicGrid />
-        <PatternLine class="grid-pattern" />
         {this.renderVictoryChart}
       </ChartContainer>
     )

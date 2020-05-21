@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import { Fragment } from 'react'
 import { VictoryArea, VictoryLabel } from 'victory'
 
 import TickLabelWithTooltip from '~/ui/global/charts/TickLabelWithTooltip'
@@ -92,9 +91,9 @@ const AreaChart = ({
       })
   }
   const singleDataPoint = values.length === 2 && values[1].isDuplicate
-  return [
+  return (
     <VictoryArea
-      style={chartStyle(dataset.style || {}, colorOrder, singleDataPoint, true)}
+      style={chartStyle(dataset.style || {}, colorOrder, singleDataPoint)}
       labels={d => d.value}
       labelComponent={
         <TickLabelWithTooltip
@@ -112,16 +111,8 @@ const AreaChart = ({
       y="value"
       x="date"
       key={`dataset-${order}`}
-    />,
-    <VictoryArea
-      style={chartStyle(dataset.style || {}, colorOrder, singleDataPoint)}
-      domain={domain}
-      data={values}
-      y="value"
-      x="date"
-      key={`dataset-${order}`}
-    />,
-  ]
+    />
+  )
 }
 
 AreaChart.propTypes = {
