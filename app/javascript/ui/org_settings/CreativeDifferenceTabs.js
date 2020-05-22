@@ -22,16 +22,14 @@ import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
 import Languages from './Languages'
+import BusinessUnitActionMenu from './BusinessUnitActionMenu'
 import { Row } from '../global/styled/layout'
 import InfoIconXs from '~/ui/icons/InfoIconXs'
 import { Label } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
 import Tooltip from '~/ui/global/Tooltip'
-import PopoutMenu from '../global/PopoutMenu'
-import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
-import TrashIcon from '../icons/TrashIcon'
-import CalloutBoxIcon from '../icons/CalloutBoxIcon'
+import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
 const StyledIconWrapper = styled.span`
   margin-left: 8px;
@@ -255,6 +253,7 @@ class CreativeDifferenceTabs extends React.Component {
 
   handleRemoveBusinessUnit = businessUnit => {
     event.preventDefault()
+    // TODO: This is supposed to archive from frontend but keep in backend
     console.log('removing: ', businessUnit.id)
   }
 
@@ -532,30 +531,20 @@ class CreativeDifferenceTabs extends React.Component {
                         fieldToUpdate={'structure'}
                       />
                     </div>
-                    {/* Gonna have to use pieces inside this???? */}
                     <div
                       style={{
                         width: '42px',
                         marginTop: '2px',
                       }}
                     >
-                      {/* TODO: have handleClone/handleRemove accept a BU  */}
-                      <PopoutMenu
-                        menuOpen={true} // TODO: set dynamically
-                        menuItems={[
-                          {
-                            name: 'Clone',
-                            onClick: () =>
-                              this.handleCloneBusinessUnit(businessUnit),
-                            iconRight: <CalloutBoxIcon />, // Do we have a copy icon?
-                          },
-                          {
-                            name: 'Remove',
-                            onClick: () =>
-                              this.handleRemoveBusinessUnit(businessUnit),
-                            iconRight: <TrashIcon />,
-                          },
-                        ]}
+                      <BusinessUnitActionMenu
+                        name={businessUnit.name}
+                        handleClone={() =>
+                          this.handleCloneBusinessUnit(businessUnit)
+                        }
+                        handleRemove={() =>
+                          this.handleRemoveBusinessUnit(businessUnit)
+                        }
                       />
                     </div>
                     {/* Admins */}
