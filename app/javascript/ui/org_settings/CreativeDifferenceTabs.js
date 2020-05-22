@@ -341,7 +341,7 @@ class CreativeDifferenceTabs extends React.Component {
                     title={'Add new team'}
                     placement="bottom"
                   >
-                    <StyledIconWrapper width={16}>
+                    <StyledIconWrapper width={30}>
                       <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
                     </StyledIconWrapper>
                   </Tooltip>
@@ -352,6 +352,8 @@ class CreativeDifferenceTabs extends React.Component {
                     marginBottom: '11px',
                     marginRight: '20px',
                     width: '244px',
+                    height: '32px',
+                    marginTop: 'auto',
                   }}
                   id={`industry-select-label`}
                 >
@@ -363,6 +365,8 @@ class CreativeDifferenceTabs extends React.Component {
                     marginRight: '20px',
                     marginBottom: '11px',
                     width: '244px',
+                    height: '32px',
+                    marginTop: 'auto',
                   }}
                   id={`content-version-select-label`}
                 >
@@ -380,6 +384,8 @@ class CreativeDifferenceTabs extends React.Component {
                     marginRight: '20px',
                     marginBottom: '11px',
                     width: '244px',
+                    height: '32px',
+                    marginTop: 'auto',
                   }}
                   id={`vertical-horizontal-select-label`}
                 >
@@ -396,6 +402,8 @@ class CreativeDifferenceTabs extends React.Component {
                     fontSize: '13px',
                     width: '42px',
                     marginRight: '20px',
+                    height: '32px',
+                    marginTop: 'auto',
                   }}
                 >
                   {/* No header here */}
@@ -403,8 +411,11 @@ class CreativeDifferenceTabs extends React.Component {
                 <Label
                   style={{
                     fontSize: '13px',
-                    width: '80px',
+                    width: '72px',
                     marginRight: '20px',
+                    height: '32px',
+                    marginTop: 'auto',
+                    marginBottom: '11px',
                   }}
                 >
                   Admins
@@ -413,6 +424,9 @@ class CreativeDifferenceTabs extends React.Component {
                   style={{
                     fontSize: '13px',
                     width: '80px',
+                    height: '32px',
+                    marginTop: 'auto',
+                    marginBottom: '11px',
                   }}
                 >
                   Members
@@ -483,7 +497,6 @@ class CreativeDifferenceTabs extends React.Component {
                     <div
                       style={{
                         width: '42px',
-                        marginRight: '20px',
                         marginTop: '2px',
                       }}
                     >
@@ -534,7 +547,7 @@ class CreativeDifferenceTabs extends React.Component {
                   title={'Add new team'}
                   placement="bottom"
                 >
-                  <StyledIconWrapper width={16}>
+                  <StyledIconWrapper width={30}>
                     <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
                   </StyledIconWrapper>
                 </Tooltip>
