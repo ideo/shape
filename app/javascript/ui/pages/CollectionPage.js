@@ -56,7 +56,7 @@ class CollectionPage extends React.Component {
       // in this case, if you're not logged in but you had access (joinable but not public)
       // we do require you to login
       // NOTE: the user will see a brief flash of the collection name before redirect
-      routingStore.routeToLogin({ redirect: collection.frontend_url })
+      routingStore.routeToLogin({ redirect: collection.frontendUrl })
     }
     this.setViewingRecordAndRestoreScrollPosition()
     this.loadCollectionCards({})

@@ -471,7 +471,7 @@ export default class UiStore {
   showPermissionsAlert() {
     const { viewingCollection, routingStore } = this
     if (viewingCollection && viewingCollection.isPublicJoinable) {
-      routingStore.routeToLogin({ redirect: viewingCollection.frontend_url })
+      routingStore.routeToLogin({ redirect: viewingCollection.frontendUrl })
       return
     }
     this.alert('You need permission to access this content.', 'Key')
