@@ -23,12 +23,11 @@ import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
 import Languages from './Languages'
 import BusinessUnitActionMenu from './BusinessUnitActionMenu'
-import { Row } from '../global/styled/layout'
+import AddTeamButton from './AddTeamButton'
+import { Row } from '~/ui/global/styled/layout'
 import InfoIconXs from '~/ui/icons/InfoIconXs'
 import { Label } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
-import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
-import Tooltip from '~/ui/global/Tooltip'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
 const StyledIconWrapper = styled.span`
@@ -74,25 +73,6 @@ function a11yProps(index) {
 //     backgroundColor: v.colors.cDeltaBlue,
 //   },
 // })
-
-const AddTeamButton = ({ handleClick }) => {
-  return (
-    <Tooltip
-      classes={{
-        tooltip: 'Tooltip',
-      }}
-      title={'Add new team'}
-      placement="bottom"
-    >
-      <StyledIconWrapper width={30} onClick={handleClick}>
-        <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
-      </StyledIconWrapper>
-    </Tooltip>
-  )
-}
-AddTeamButton.propTypes = {
-  handleClick: PropTypes.func.isRequired,
-}
 
 @inject('apiStore', 'routingStore')
 @observer
@@ -382,7 +362,9 @@ class CreativeDifferenceTabs extends React.Component {
                 >
                   Team
                   {/* Make Add Team button its own component? */}
-                  <AddTeamButton handleClick={handleCreateBusinessUnit} />
+                  <AddTeamButton
+                    createBusinessUnit={handleCreateBusinessUnit}
+                  />
                 </Label>
                 <Label
                   style={{
