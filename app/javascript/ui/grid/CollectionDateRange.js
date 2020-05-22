@@ -8,7 +8,6 @@ import v from '~/utils/variables'
 import TextButton from '~/ui/global/TextButton'
 import InlineModal from '~/ui/global/modals/InlineModal'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
-import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const EditIcon = styled.span`
   margin-left: 6px;
@@ -118,9 +117,6 @@ class CollectionDateRange extends React.Component {
           leftButton={this.clearButton}
           anchorElement={this.dateDisplayRef.current}
         >
-          {datePickerOpen && 1 === 2 && (
-            <ClickWrapper clickHandlers={[e => e.stopPropagation()]} />
-          )}
           <StaticDateRangePicker
             displayStaticWrapperAs="desktop"
             calendars={1}
