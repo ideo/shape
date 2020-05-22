@@ -12,7 +12,15 @@ const props = {
   location: 'CollectionCover',
 }
 let wrapper
-const types = ['collection', 'project', 'method', 'prototype', 'profile']
+const types = [
+  'collection',
+  'project',
+  'method',
+  'phase',
+  'prototype',
+  'profile',
+  'challenge',
+]
 
 describe('CollectionTypeSelector', () => {
   beforeEach(() => {

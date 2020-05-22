@@ -239,6 +239,7 @@ class Collection < ApplicationRecord
     prototype: 3,
     profile: 4, # Different from UserProfile
     phase: 5,
+    challenge: 6,
   }, _prefix: true
 
   # Searchkick Config
@@ -781,9 +782,14 @@ class Collection < ApplicationRecord
 
   def cache_key(card_order = 'order', user_id = nil)
     test_details = ''
+    challenge_details = ''
     if test_or_test_results_collection?
       # make sure these details factor into caching
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
+    end
+
+    if parent_challenge.present?
+      challenge_details = "parent_challenge_id=#{parent_challenge.id}"
     end
 
     %(#{jsonapi_cache_key}
@@ -792,8 +798,9 @@ class Collection < ApplicationRecord
       /order_#{card_order}
       /cards_#{collection_cards.maximum(:updated_at).to_i}
       /#{test_details}
+      /#{challenge_details}
       /gs_#{getting_started_shell}
-      /org_#{organization.updated_at}
+        /org_#{organization.updated_at}
       /user_id_#{user_id}
       /locale_#{I18n.locale}
       /roles_#{anchored_roles.maximum(:updated_at).to_i}
@@ -906,6 +913,10 @@ class Collection < ApplicationRecord
 
   def parent_submission
     parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
+  end
+
+  def parent_challenge
+    parents.find_by(collection_type: :challenge)
   end
 
   def inside_getting_started?
