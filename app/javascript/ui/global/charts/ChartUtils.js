@@ -22,7 +22,16 @@ export const barWidthPx = (totalColumns, totalGroupings) => {
 // 30 / (5 / 1 / 2)
 
 export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
-  const dashWidths = [[2, 4], [3, 1], [4, 2], [2, 8], [8, 6], [1, 5], [5, 1], [9, 7]]
+  const dashWidths = [
+    [2, 4],
+    [3, 1],
+    [4, 2],
+    [2, 8],
+    [8, 6],
+    [1, 5],
+    [5, 1],
+    [9, 7],
+  ]
   const values = dashWidths[order - 1] ? dashWidths[order - 1] : dashWidths[0]
   return values.map(val => val * scale).join(',')
 }
