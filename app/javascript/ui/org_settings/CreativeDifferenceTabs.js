@@ -75,6 +75,25 @@ function a11yProps(index) {
 //   },
 // })
 
+const AddTeamButton = ({ handleClick }) => {
+  return (
+    <Tooltip
+      classes={{
+        tooltip: 'Tooltip',
+      }}
+      title={'Add new team'}
+      placement="bottom"
+    >
+      <StyledIconWrapper width={30} onClick={handleClick}>
+        <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
+      </StyledIconWrapper>
+    </Tooltip>
+  )
+}
+AddTeamButton.propTypes = {
+  handleClick: PropTypes.func.isRequired,
+}
+
 @inject('apiStore', 'routingStore')
 @observer
 class CreativeDifferenceTabs extends React.Component {
@@ -210,6 +229,23 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
+  handleCreateBusinessUnit = async e => {
+    e.preventDefault()
+    console.log('creating new BU')
+    try {
+      const businessUnitParams = {
+        business_unit: {
+          name: 'New BU Here',
+        },
+      }
+      console.log(businessUnitParams)
+      const result = await businessUnitsStore.create(businessUnitParams)
+      console.log(result)
+    } catch (err) {
+      console.log('error creating new BU: ', err)
+    }
+  }
+
   render() {
     const { orgName, tab, apiStore } = this.props
     const {
@@ -223,6 +259,7 @@ class CreativeDifferenceTabs extends React.Component {
       tabValue,
       handleChange,
       updateOrg,
+      handleCreateBusinessUnit,
     } = this
 
     console.log('C∆ Tabs render: ', organization, supportedLanguages)
@@ -334,17 +371,7 @@ class CreativeDifferenceTabs extends React.Component {
                 >
                   Team
                   {/* Make Add Team button its own component? */}
-                  <Tooltip
-                    classes={{
-                      tooltip: 'Tooltip',
-                    }}
-                    title={'Add new team'}
-                    placement="bottom"
-                  >
-                    <StyledIconWrapper width={30}>
-                      <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
-                    </StyledIconWrapper>
-                  </Tooltip>
+                  <AddTeamButton handleClick={handleCreateBusinessUnit} />
                 </Label>
                 <Label
                   style={{
@@ -540,17 +567,7 @@ class CreativeDifferenceTabs extends React.Component {
                 </Row>
               ))}
               <div>
-                <Tooltip
-                  classes={{
-                    tooltip: 'Tooltip',
-                  }}
-                  title={'Add new team'}
-                  placement="bottom"
-                >
-                  <StyledIconWrapper width={30}>
-                    <PlusCircleIcon fillColor={v.colors.cDeltaBlue} />
-                  </StyledIconWrapper>
-                </Tooltip>
+                <AddTeamButton handleClick={handleCreateBusinessUnit} />
               </div>
             </React.Fragment>
           </TabPanel>
