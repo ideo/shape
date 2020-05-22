@@ -139,6 +139,7 @@ class CollectionDateRange extends React.Component {
         <div
           onClick={() => this.setDatePickerOpen(!datePickerOpen)}
           ref={this.dateDisplayRef}
+          className="date-range"
         >
           {this.dateRangeDisplay}
           <EditIcon>
