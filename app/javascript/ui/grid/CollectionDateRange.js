@@ -20,8 +20,6 @@ const EditIcon = styled.span`
   }
 `
 
-const nullRange = [null, null]
-
 class CollectionDateRange extends React.Component {
   constructor(props) {
     super(props)
@@ -31,8 +29,8 @@ class CollectionDateRange extends React.Component {
 
   state = {
     datePickerOpen: false,
-    dateRange: nullRange,
-    selectedDateRange: nullRange,
+    dateRange: [null, null],
+    selectedDateRange: [null, null],
   }
 
   componentDidMount() {
@@ -64,7 +62,11 @@ class CollectionDateRange extends React.Component {
     const { dateRange } = this.state
     e.preventDefault()
     e.stopPropagation()
-    this.setState({ dateRange: nullRange, previousDateRange: dateRange })
+    this.setState({
+      dateRange: [null, null],
+      selectedDateRange: [null, null],
+      previousDateRange: dateRange,
+    })
   }
 
   handleCancelDateChange = e => {
@@ -86,8 +88,8 @@ class CollectionDateRange extends React.Component {
   setDatePickerOpen(value) {
     this.setState({
       datePickerOpen: value,
-      selectedDateRange: nullRange,
-      previousDateRange: nullRange,
+      selectedDateRange: [null, null],
+      previousDateRange: [null, null],
     })
   }
 
@@ -113,7 +115,7 @@ class CollectionDateRange extends React.Component {
 
   get dateRangeDisplay() {
     const { dateRange } = this.state
-    if (dateRange === nullRange) {
+    if (dateRange[0] === null && dateRange[1] === null) {
       return 'No dates selected'
     } else {
       return (

@@ -65,13 +65,11 @@ const billingTypography = {
 const dateRangeStartBorderStyle = {
   borderTopLeftRadius: '4px',
   borderBottomLeftRadius: '4px',
-  borderLeftColor: 'transparent',
 }
 
 const dateRangeEndBorderStyle = {
   borderTopRightRadius: '4px',
   borderBottomRightRadius: '4px',
-  borderRightColor: 'transparent',
 }
 
 const theme = {
@@ -130,6 +128,8 @@ const theme = {
       rangeIntervalDay: {
         '&:first-child $rangeIntervalDayPreview': dateRangeStartBorderStyle,
         '&:last-child $rangeIntervalDayPreview': dateRangeEndBorderStyle,
+        marginTop: '2px', // This is what spaces out the weeks in the range
+        marginBottom: '2px', // This is what spaces out the weeks in the range
       },
       rangeIntervalDayHighlight: {
         backgroundColor: v.colors.commonMedium,
@@ -144,10 +144,12 @@ const theme = {
       },
       rangeIntervalPreview: {
         borderColor: 'transparent',
+        borderWidth: '1px', // This made spacing between ranges a bit tight
       },
       rangeIntervalDayPreview: {
-        borderColor: 'transparent',
-        backgroundColor: v.colors.commonLightest,
+        borderColor: v.colors.commonMedium,
+        borderWidth: '1px', // This made spacing between ranges a bit tight
+        borderStyle: 'solid',
         '&$rangeIntervalDayPreviewStart': dateRangeStartBorderStyle,
         '&$rangeIntervalDayPreviewEnd': dateRangeEndBorderStyle,
       },

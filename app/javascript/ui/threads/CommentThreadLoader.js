@@ -3,7 +3,7 @@ import { observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 // import styled from 'styled-components'
 
-import { TextButton } from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import RefreshIcon from '~/ui/icons/RefreshIcon'
 import v from '~/utils/variables'
