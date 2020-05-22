@@ -1,8 +1,8 @@
-//import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { StaticDateRangePicker } from '@material-ui/pickers'
 import moment from 'moment-mini'
 import styled from 'styled-components'
+import { Fragment } from 'react'
 
 import v from '~/utils/variables'
 import TextButton from '~/ui/global/TextButton'
@@ -89,9 +89,23 @@ class CollectionDateRange extends React.Component {
     )
   }
 
+  get dateRangeDisplay() {
+    const { dateRange } = this.state
+    if (dateRange[0] === null || dateRange[1] === null) {
+      return 'No dates selected'
+    } else {
+      return (
+        <Fragment>
+          {moment(dateRange[0]).format('M.D.YY')}
+          {' to '}
+          {moment(dateRange[1]).format('M.D.YY')}
+        </Fragment>
+      )
+    }
+  }
+
   render() {
     const { dateRange, datePickerOpen } = this.state
-    if (dateRange[0] === null || dateRange[1] === null) return ''
     return (
       <div
         ref={this.collectionDateRangeWrapperRef}
@@ -102,9 +116,7 @@ class CollectionDateRange extends React.Component {
           onClick={() => this.setDatePickerOpen(!datePickerOpen)}
           ref={this.dateDisplayRef}
         >
-          {moment(dateRange[0]).format('M.D.YY')}
-          {' to '}
-          {moment(dateRange[1]).format('M.D.YY')}
+          {this.dateRangeDisplay}
           <EditIcon>
             <EditPencilIcon />
           </EditIcon>

@@ -351,12 +351,12 @@ class CollectionCover extends React.Component {
       cardId,
       fontColor,
     } = this.props
-    const { subtitle } = collection
+    const { subtitle, collection_type } = collection
     const { gridW, gutter } = uiStore.gridSettings
     const collectionIcon =
-      collection.collection_type !== 'collection' &&
+      collection_type !== 'collection' &&
       collectionTypeToIcon({
-        type: collection.collection_type,
+        type: collection_type,
         size: 'lg',
       })
     return (
@@ -426,7 +426,9 @@ class CollectionCover extends React.Component {
                   </PositionedCardHeading>
                 </div>
                 <div className="bottom">
-                  <CollectionDateRange collection={collection} />
+                  {['phase', 'project'].includes(collection_type) && (
+                    <CollectionDateRange collection={collection} />
+                  )}
                   {this.launchTestButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}

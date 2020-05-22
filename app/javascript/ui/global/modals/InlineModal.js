@@ -69,28 +69,20 @@ class InlineModal extends React.PureComponent {
 }
 
 InlineModal.propTypes = {
-  children: PropTypes.node,
   open: PropTypes.bool.isRequired,
+  children: PropTypes.node,
   onConfirm: PropTypes.func,
   onCancel: PropTypes.func,
-  maxWidth: PropTypes.string,
-  backgroundColor: PropTypes.oneOf(Object.values(v.colors)),
-  overrideWithLoader: PropTypes.bool,
   leftButton: PropTypes.node,
   anchorElement: PropTypes.node,
 }
+
 InlineModal.defaultProps = {
   children: null,
-  maxWidth: 'xs', // 'xs' == 360px
-  backgroundColor: v.colors.white,
   onConfirm: null,
   onCancel: null,
   leftButton: null,
   anchorElement: null,
-  overrideWithLoader: false,
 }
-// all propTypes except required `children` node, to be used by Information/ConfirmationModal
-const { ...childPropTypes } = InlineModal.propTypes
-InlineModal.childPropTypes = childPropTypes
 
 export default InlineModal
