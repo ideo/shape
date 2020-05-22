@@ -30,6 +30,8 @@ import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import PopoutMenu from '../global/PopoutMenu'
 import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
+import TrashIcon from '../icons/TrashIcon'
+import CalloutBoxIcon from '../icons/CalloutBoxIcon'
 
 const StyledIconWrapper = styled.span`
   margin-left: 8px;
@@ -244,6 +246,16 @@ class CreativeDifferenceTabs extends React.Component {
     } catch (err) {
       console.log('error creating new BU: ', err)
     }
+  }
+
+  handleCloneBusinessUnit = businessUnit => {
+    event.preventDefault()
+    console.log('cloning: ', businessUnit.id)
+  }
+
+  handleRemoveBusinessUnit = businessUnit => {
+    event.preventDefault()
+    console.log('removing: ', businessUnit.id)
   }
 
   render() {
@@ -527,7 +539,24 @@ class CreativeDifferenceTabs extends React.Component {
                         marginTop: '2px',
                       }}
                     >
-                      <PopoutMenu />
+                      {/* TODO: have handleClone/handleRemove accept a BU  */}
+                      <PopoutMenu
+                        menuOpen={true} // TODO: set dynamically
+                        menuItems={[
+                          {
+                            name: 'Clone',
+                            onClick: () =>
+                              this.handleCloneBusinessUnit(businessUnit),
+                            iconRight: <CalloutBoxIcon />, // Do we have a copy icon?
+                          },
+                          {
+                            name: 'Remove',
+                            onClick: () =>
+                              this.handleRemoveBusinessUnit(businessUnit),
+                            iconRight: <TrashIcon />,
+                          },
+                        ]}
+                      />
                     </div>
                     {/* Admins */}
                     <div
