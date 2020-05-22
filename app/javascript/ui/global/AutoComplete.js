@@ -217,7 +217,7 @@ const styles = theme => ({
   },
 })
 
-const SelectWrappedWithStyles = withTheme()(SelectWrapped)
+const SelectWrappedWithStyles = withTheme(SelectWrapped)
 
 SelectWrapped.propTypes = {
   classes: PropTypes.shape({

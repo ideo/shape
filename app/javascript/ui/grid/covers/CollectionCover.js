@@ -18,6 +18,7 @@ import CollectionCoverTitle, {
   IconHolder,
 } from '~/ui/grid/covers/CollectionCoverTitle'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionDateRange from '~/ui/grid/CollectionDateRange'
 
 const LaunchButton = styled(Button)`
   font-size: 0.9rem;
@@ -425,6 +426,7 @@ class CollectionCover extends React.Component {
                   </PositionedCardHeading>
                 </div>
                 <div className="bottom">
+                  <CollectionDateRange collection={collection} />
                   {this.launchTestButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}

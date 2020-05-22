@@ -62,6 +62,16 @@ const billingTypography = {
   },
 }
 
+const dateRangeStartBorderStyle = {
+  borderTopLeftRadius: '4px',
+  borderBottomLeftRadius: '4px',
+}
+
+const dateRangeEndBorderStyle = {
+  borderTopRightRadius: '4px',
+  borderBottomRightRadius: '4px',
+}
+
 const theme = {
   typography: {
     // https://material-ui.com/style/typography/#migration-to-typography-v2
@@ -105,6 +115,57 @@ const theme = {
       root: {
         borderRadius: '1px !important',
         boxShadow: '0px 0px 8px 0px rgba(0, 0, 0, 0.2) !important',
+      },
+    },
+    // Customization for DateRangePicker
+    // Source classes: https://github.com/mui-org/material-ui-pickers/blob/360ad0a1554f5ce86d265b7c27fc0dfe20c73d42/lib/src/views/Calendar/Day.tsx
+    MuiPickersCalendarHeader: {
+      switchHeader: {
+        textTransform: 'lowercase',
+      },
+    },
+    MuiPickersDateRangeDay: {
+      rangeIntervalDay: {
+        '&:first-child $rangeIntervalDayPreview': dateRangeStartBorderStyle,
+        '&:last-child $rangeIntervalDayPreview': dateRangeEndBorderStyle,
+      },
+      rangeIntervalDayHighlight: {
+        backgroundColor: v.colors.commonMedium,
+        '&:first-child': dateRangeStartBorderStyle,
+        '&:last-child': dateRangeEndBorderStyle,
+      },
+      rangeIntervalDayHighlightStart: {
+        ...dateRangeStartBorderStyle,
+      },
+      rangeIntervalDayHighlightEnd: {
+        ...dateRangeEndBorderStyle,
+      },
+      rangeIntervalDayPreview: {
+        borderColor: v.colors.commonMedium,
+        '&$rangeIntervalDayPreviewStart': dateRangeStartBorderStyle,
+        '&$rangeIntervalDayPreviewEnd': dateRangeEndBorderStyle,
+      },
+    },
+    MuiPickersDay: {
+      day: {
+        fontSize: '1em',
+        fontWeight: 'normal',
+        fontFamily: v.fonts.sans,
+        color: v.colors.black,
+        borderRadius: '4px',
+      },
+      daySelected: {
+        color: v.colors.white,
+        backgroundColor: v.colors.black,
+      },
+      dayDisabled: {
+        color: v.colors.commonMedium,
+      },
+      today: {
+        borderRadius: '5px',
+      },
+      current: {
+        color: v.colors.black,
       },
     },
   },
