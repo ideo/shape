@@ -28,6 +28,12 @@ class CollectionTypeSelector extends React.Component {
   updateCollectionType = async collectionType => {
     const { collection } = this.props
     await collection.API_selectCollectionType(collectionType)
+
+    if (collectionType === 'challenge') {
+      // NOTE: Force reload to get latest groups and users
+      window.location.reload()
+    }
+
     // TODO: Do we want error handling?
     // If so, I think this needs a try/catch block?
     this.hidePopoutMenu()
