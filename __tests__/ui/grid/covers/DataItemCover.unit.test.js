@@ -23,6 +23,7 @@ describe('DataItemCover', () => {
     props.item = fakeDataItemCollectionsItemsAttrs
     props.item.primaryDataset = fakeDataset
     props.item.loadingDatasets = false
+    props.datasetLength = 0
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     render()
   })
@@ -87,6 +88,8 @@ describe('DataItemCover', () => {
             data_source_type: 'Collection',
           }
           render()
+          // simulate for componentDidUpdate
+          wrapper.setProps({ datasetLength: 1 })
         })
         it('loads the datasource into targetCollection', () => {
           // first it tries to find

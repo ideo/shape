@@ -18,6 +18,7 @@ class Item extends SharedRecordMixin(BaseRecord) {
   // starts null before it is loaded
   @observable
   inMyCollection = null
+  loadingDatasets = false
 
   attributesForAPI = [
     'type',
