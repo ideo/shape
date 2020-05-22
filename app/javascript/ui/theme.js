@@ -65,11 +65,13 @@ const billingTypography = {
 const dateRangeStartBorderStyle = {
   borderTopLeftRadius: '4px',
   borderBottomLeftRadius: '4px',
+  borderLeftColor: 'transparent',
 }
 
 const dateRangeEndBorderStyle = {
   borderTopRightRadius: '4px',
   borderBottomRightRadius: '4px',
+  borderRightColor: 'transparent',
 }
 
 const theme = {
@@ -140,8 +142,12 @@ const theme = {
       rangeIntervalDayHighlightEnd: {
         ...dateRangeEndBorderStyle,
       },
+      rangeIntervalPreview: {
+        borderColor: 'transparent',
+      },
       rangeIntervalDayPreview: {
-        borderColor: v.colors.commonMedium,
+        borderColor: 'transparent',
+        backgroundColor: v.colors.commonLightest,
         '&$rangeIntervalDayPreviewStart': dateRangeStartBorderStyle,
         '&$rangeIntervalDayPreviewEnd': dateRangeEndBorderStyle,
       },
@@ -163,9 +169,11 @@ const theme = {
       },
       today: {
         borderRadius: '5px',
-      },
-      current: {
-        color: v.colors.black,
+        backgroundColor: v.colors.commonDarkest,
+        '&:not($daySelected)': {
+          backgroundColor: v.colors.commonDark,
+          borderColor: 'transparent',
+        },
       },
     },
   },

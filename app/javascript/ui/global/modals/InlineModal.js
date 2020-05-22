@@ -47,7 +47,7 @@ class InlineModal extends React.PureComponent {
             <Grid item xs={8} style={{ textAlign: 'right' }}>
               <TextButton
                 onClick={this.handleCancel}
-                fontSizeEm="0.75"
+                fontSizeEm={0.75}
                 color={v.colors.black}
                 style={{ marginRight: '2em' }}
               >
@@ -55,7 +55,7 @@ class InlineModal extends React.PureComponent {
               </TextButton>
               <TextButton
                 onClick={this.handleConfirm}
-                fontSizeEm="0.75"
+                fontSizeEm={0.75}
                 color={v.colors.black}
               >
                 OK

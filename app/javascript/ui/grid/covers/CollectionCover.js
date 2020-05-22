@@ -19,6 +19,7 @@ import CollectionCoverTitle, {
 } from '~/ui/grid/covers/CollectionCoverTitle'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 import CollectionDateRange from '~/ui/grid/CollectionDateRange'
+import DateProgressBar from '~/ui/grid/DateProgressBar'
 
 const LaunchButton = styled(Button)`
   font-size: 0.9rem;
@@ -386,6 +387,12 @@ class CollectionCover extends React.Component {
             useTextBackground={this.useTextBackground}
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
+            {collection.isPhaseOrProject && (
+              <DateProgressBar
+                startDate={collection.start_date}
+                endDate={collection.end_date}
+              />
+            )}
             {textItem ? (
               <div className="top text-item">
                 <TextItemCover
@@ -426,7 +433,7 @@ class CollectionCover extends React.Component {
                   </PositionedCardHeading>
                 </div>
                 <div className="bottom">
-                  {['phase', 'project'].includes(collection_type) && (
+                  {collection.isPhaseOrProject && (
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}

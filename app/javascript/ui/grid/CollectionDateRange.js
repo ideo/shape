@@ -20,6 +20,8 @@ const EditIcon = styled.span`
   }
 `
 
+const nullRange = [null, null]
+
 class CollectionDateRange extends React.Component {
   constructor(props) {
     super(props)
@@ -29,8 +31,8 @@ class CollectionDateRange extends React.Component {
 
   state = {
     datePickerOpen: false,
-    dateRange: [null, null],
-    selectedDateRange: [null, null],
+    dateRange: nullRange,
+    selectedDateRange: nullRange,
   }
 
   componentDidMount() {
@@ -48,25 +50,45 @@ class CollectionDateRange extends React.Component {
 
   handleConfirmDateChange = e => {
     const { selectedDateRange } = this.state
+    const { collection } = this.props
     this.setState({
       datePickerOpen: false,
       dateRange: selectedDateRange,
     })
-    // TODO: Update collection
+    collection.start_date = selectedDateRange[0]
+    collection.end_date = selectedDateRange[1]
+    collection.save()
   }
 
   handleClearDates = e => {
+    const { dateRange } = this.state
     e.preventDefault()
     e.stopPropagation()
-    this.setState({ dateRange: [null, null] })
+    this.setState({ dateRange: nullRange, previousDateRange: dateRange })
   }
 
   handleCancelDateChange = e => {
-    this.setState({ datePickerOpen: false })
+    const { previousDateRange, dateRange } = this.state
+    let setDateRange = dateRange
+
+    // If there was a previous value, and they've now canceled clearing the value,
+    // restore the original value
+    if (previousDateRange && dateRange[0] === null) {
+      setDateRange = previousDateRange
+    }
+
+    this.setState({
+      datePickerOpen: false,
+      dateRange: setDateRange,
+    })
   }
 
   setDatePickerOpen(value) {
-    this.setState({ datePickerOpen: value, selectedDateRange: [null, null] })
+    this.setState({
+      datePickerOpen: value,
+      selectedDateRange: nullRange,
+      previousDateRange: nullRange,
+    })
   }
 
   stopPropagationToParents = e => {
@@ -81,7 +103,7 @@ class CollectionDateRange extends React.Component {
     return (
       <TextButton
         onClick={this.handleClearDates}
-        fontSizeEm="0.75"
+        fontSizeEm={0.75}
         color={v.colors.black}
       >
         Clear
@@ -91,7 +113,7 @@ class CollectionDateRange extends React.Component {
 
   get dateRangeDisplay() {
     const { dateRange } = this.state
-    if (dateRange[0] === null || dateRange[1] === null) {
+    if (dateRange === nullRange) {
       return 'No dates selected'
     } else {
       return (
