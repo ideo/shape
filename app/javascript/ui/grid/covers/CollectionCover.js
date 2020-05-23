@@ -19,7 +19,7 @@ import CollectionCoverTitle, {
 } from '~/ui/grid/covers/CollectionCoverTitle'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 import CollectionDateRange from '~/ui/grid/CollectionDateRange'
-import DateProgressBar from '~/ui/grid/DateProgressBar'
+import DateProgressBar from '~/ui/global/DateProgressBar'
 
 const LaunchButton = styled(Button)`
   font-size: 0.9rem;

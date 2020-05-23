@@ -14,18 +14,17 @@ const Progress = styled.div`
   width: 100%;
   background-color: ${unfilledBackgroundColor};
 `
+Progress.displayName = 'Progress'
 
 const ProgressBar = styled.div`
   width: ${props => props.width}%;
   background-color: ${v.colors.black};
   height: 100%;
 `
+ProgressBar.displayName = 'ProgressBar'
 
-const barWidth = (startDate, endDate) => {
-  if (!startDate || !endDate) return 0
-
-  const start = moment(startDate)
-  const end = moment(endDate)
+export const percentOfDateRange = (start, end) => {
+  if (!start || !end) return 0
 
   const now = moment()
   if (now > end) return 100
@@ -40,7 +39,9 @@ const barWidth = (startDate, endDate) => {
 const DateProgressBar = ({ startDate, endDate } = {}) => {
   return (
     <Progress>
-      <ProgressBar width={barWidth(moment(startDate), moment(endDate))} />
+      <ProgressBar
+        width={percentOfDateRange(moment(startDate), moment(endDate))}
+      />
     </Progress>
   )
 }
