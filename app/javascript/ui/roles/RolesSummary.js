@@ -54,6 +54,7 @@ class RolesSummary extends React.Component {
     const roleIds = _.map(props.roles, 'id')
     const prevRoleIds = _.map(prevProps.roles, 'id')
     const rolesChanged = !objectsEqual(roleIds, prevRoleIds)
+
     // check collaborator change (someone coming/going)
     const collabIds = _.map(props.collaborators, 'id')
     const prevCollabIds = _.map(prevProps.collaborators, 'id')
@@ -61,7 +62,12 @@ class RolesSummary extends React.Component {
     // check if we just closed the rolesMenu
     const rolesMenuClosed = props.rolesMenuOpen !== prevProps.rolesMenuOpen
     // if any of those have changed, re-initialize the list
-    if (rolesChanged || collaboratorsChanged || rolesMenuClosed) {
+    if (
+      rolesChanged ||
+      collaboratorsChanged ||
+      rolesMenuClosed ||
+      this.props.usersAndGroupsLength > prevProps.usersAndGroupsLength
+    ) {
       this.initEditorsAndViewers()
     }
   }
@@ -209,12 +215,14 @@ RolesSummary.propTypes = {
   handleClick: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   rolesMenuOpen: PropTypes.bool.isRequired,
+  usersAndGroupsLength: PropTypes.number,
 }
 
 RolesSummary.defaultProps = {
   roles: [],
   collaborators: [],
   canEdit: false,
+  usersAndGroupsLength: 0,
 }
 
 export default RolesSummary
