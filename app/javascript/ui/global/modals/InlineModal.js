@@ -50,6 +50,7 @@ class InlineModal extends React.PureComponent {
                 fontSizeEm={0.75}
                 color={v.colors.black}
                 style={{ marginRight: '2em' }}
+                className="cancel-button"
               >
                 Cancel
               </TextButton>
@@ -57,6 +58,7 @@ class InlineModal extends React.PureComponent {
                 onClick={this.handleConfirm}
                 fontSizeEm={0.75}
                 color={v.colors.black}
+                className="ok-button"
               >
                 OK
               </TextButton>
