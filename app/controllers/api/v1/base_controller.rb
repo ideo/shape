@@ -1,5 +1,6 @@
+require_dependency "#{Rails.root}/lib/jsonapi_mappings"
+
 class Api::V1::BaseController < ApplicationController
-  include ApplicationHelper
   include ReplaceGlobalTranslationVariables
   before_action :check_api_authentication!
   before_action :check_cancel_sync
@@ -22,40 +23,7 @@ class Api::V1::BaseController < ApplicationController
   # so we must explicitly tell it what serializer to use
   # See: https://github.com/jsonapi-rb/jsonapi-rails/issues/68
   def jsonapi_class
-    super.merge(
-      'ActsAsTaggableOn::Tag': SerializableTag,
-      'Item::VideoItem': SerializableItem,
-      'Item::TextItem': SerializableItem,
-      'Item::FileItem': SerializableItem,
-      'Item::ExternalImageItem': SerializableItem,
-      'Item::LinkItem': SerializableItem,
-      'Item::QuestionItem': SerializableItem,
-      'Item::ChartItem': SerializableItem,
-      'Item::DataItem': SerializableDataItem,
-      'Item::LegendItem': SerializableLegendItem,
-      'Collection::UserCollection': SerializableCollection,
-      'Collection::ApplicationCollection': SerializableCollection,
-      'Collection::Board': SerializableCollection,
-      'Collection::SearchCollection': SerializableCollection,
-      'Collection::SharedWithMeCollection': SerializableCollection,
-      'Collection::Global': SerializableCollection,
-      'Collection::TestCollection': SerializableCollection,
-      'Collection::TestDesign': SerializableCollection,
-      'Collection::TestResultsCollection': SerializableCollection,
-      'Collection::TestOpenResponses': SerializableCollection,
-      'Collection::SubmissionBox': SerializableCollection,
-      'Collection::SubmissionsCollection': SerializableSubmissionsCollection,
-      'Collection::UserProfile': SerializableCollection,
-      'CollectionCard::Primary': SerializableCollectionCard,
-      'CollectionCard::Link': SerializableCollectionCard,
-      'CollectionCard::Placeholder': SerializableCollectionCard,
-      'Dataset::CollectionsAndItems': SerializableDataset,
-      'Dataset::Empty': SerializableDataset,
-      'Dataset::External': SerializableDataset,
-      'Dataset::NetworkAppMetric': SerializableDataset,
-      'Dataset::Question': SerializableDataset,
-      'Group::Global': SerializableGroup,
-    )
+    super.merge(::JSONAPI_CUSTOM_MAPPINGS)
   end
 
   # Add items to this hash to make them available
@@ -65,7 +33,6 @@ class Api::V1::BaseController < ApplicationController
       current_user: current_user || User.new,
       current_ability: current_ability,
       current_api_token: current_api_token,
-      frontend_url_for: lambda { |obj| frontend_url_for(obj) },
     }
   end
 
@@ -114,9 +81,6 @@ class Api::V1::BaseController < ApplicationController
   def render_collection(include: nil)
     # include collection_cards for UI to receive any updates
     include ||= Collection.default_relationships_for_api
-    exposables = {
-      current_record: @collection,
-    }
     if @collection.is_a?(Collection::SubmissionsCollection)
       include.delete_if do |val|
         # don't include these relationships in the SubmissionsCollection response
@@ -129,7 +93,9 @@ class Api::V1::BaseController < ApplicationController
       @collection,
       class: jsonapi_class,
       include: include,
-      expose: jsonapi_expose,
+      expose: jsonapi_expose.merge(
+        current_record: @collection,
+      ),
     )
     render json: json_data
 
