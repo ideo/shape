@@ -85,24 +85,33 @@ class ChartGroup extends React.Component {
     )
   }
 
+  get hasPercentileComparison() {
+    return (
+      this.secondaryDatasetsWithData[0] &&
+      this.secondaryDatasetsWithData[0].chart_type === 'line'
+    )
+  }
+
   get chartDomain() {
-    const { secondaryDatasets } = this.props.dataItem
     const allValues = [...this.primaryDatasetValues]
     this.secondaryDatasetsWithData.forEach(dataset => {
-      // Format data in the same way it will show up in other secondary charts
-      allValues.push(
-        ...formatSecondaryDatasetValues(
-          dataset.dataWithDates,
-          this.primaryDatasetValues
+      if (dataset.data[0].date) {
+        // Format data in the same way it will show up in other secondary charts
+        allValues.push(
+          ...formatSecondaryDatasetValues(
+            dataset.dataWithDates,
+            this.primaryDatasetValues
+          )
         )
-      )
+      }
     })
     const domain = chartDomainForDatasetValues({
       values: allValues,
       maxYDomain: this.primaryDataset.max_domain,
     })
-    // If there's one single value, do this.
-    if (allValues.length === 1 && secondaryDatasets.length === 0) {
+    // If there's one single value, and the secondary datasets are only
+    // the percentitles (with no dates), then spread the domain out.
+    if (allValues.length === 1 && this.hasPercentileComparison) {
       domain.x = domainXForSingleValue(allValues[0].date)
     }
     return domain
@@ -320,6 +329,10 @@ class ChartGroup extends React.Component {
       if (dataset.hasDates) {
         modifiedChartType = 'area'
       } else {
+        modifiedChartType = 'line'
+      }
+      // Creative Difference chart comparisons should just be lines.
+      if (order > 0 && this.isSmallChartStyle) {
         modifiedChartType = 'line'
       }
     }
