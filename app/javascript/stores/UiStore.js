@@ -226,6 +226,8 @@ export default class UiStore {
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
+  @observable
+  shouldRenderFixedHeader = false
   hoveringOverDefaults = {
     order: null,
     direction: null,

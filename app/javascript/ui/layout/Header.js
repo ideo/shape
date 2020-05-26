@@ -306,6 +306,7 @@ class Header extends React.Component {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
+    const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -450,7 +451,9 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-          {viewingChallenge && this.renderChallengeFixedHeader()}
+          {viewingChallenge &&
+            shouldRenderFixedHeader &&
+            this.renderChallengeFixedHeader()}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>
