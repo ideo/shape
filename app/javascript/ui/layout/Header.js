@@ -105,6 +105,10 @@ class Header extends React.Component {
     this.props.uiStore.update('organizationMenuPage', null)
   }
 
+  handleChallengeSettingsClick = () => {
+    // TODO: show challenge settings modal
+  }
+
   get onArchivedPage() {
     const { record } = this
     const { routingStore } = this.props
@@ -293,6 +297,7 @@ class Header extends React.Component {
               colorScheme={v.colors.primaryDarkest}
               size="sm"
               width={256}
+              onClick={this.handleChallengeSettingsClick}
             >
               Challenge Settings
             </Button>
