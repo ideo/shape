@@ -8,21 +8,21 @@ const billingTypography = {
     fontSize: '1rem',
   },
   // heading-1
-  headline: {
+  h1: {
     textTransform: 'uppercase',
     fontWeight: 500,
     fontSize: pxToRem(32),
     letterSpacing: pxToRem(1.2),
   },
   // heading-2
-  subheading: {
+  h2: {
     textTransform: 'uppercase',
     fontWeight: 500,
     fontSize: pxToRem(20),
     letterSpacing: pxToRem(0.5),
   },
   // heading-3
-  title: {
+  h3: {
     display: 'inline',
     fontSize: pxToRem(14),
     fontWeight: 500,
@@ -33,7 +33,7 @@ const billingTypography = {
     letterSpacing: pxToRem(0.5),
   },
   // heading-4
-  display1: {
+  h4: {
     fontSize: pxToRem(16),
     letterSpacing: pxToRem(0.6),
     textTransform: 'none',
@@ -74,8 +74,6 @@ const dateRangeEndBorderStyle = {
 
 const theme = {
   typography: {
-    // https://material-ui.com/style/typography/#migration-to-typography-v2
-    useNextVariants: true,
     // Use the Shape font instead of the default Roboto font.
     fontFamily: v.fonts.sans,
   },

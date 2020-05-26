@@ -93,7 +93,7 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   }),
   loadingIndicator: () => ({}),
   loadingMessage: () => ({
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
   }),
   menu: base => ({
     ...base,
@@ -109,7 +109,7 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   multiValueLabel: () => ({}),
   multiValueRemove: () => ({}),
   noOptionsMessage: () => ({
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
   }),
   option: (base, state) => ({
     ...base,
@@ -209,7 +209,7 @@ const styles = theme => ({
     width: '100%',
   },
   chip: {
-    margin: theme.spacing.unit / 4,
+    margin: theme.spacing(0.25),
     paddingBottom: 0,
     paddingLeft: '4px',
     paddingRight: '4px',
