@@ -1,13 +1,14 @@
 import v from '~/utils/variables'
 import styled from 'styled-components'
+import PropTypes from 'prop-types'
 
 const IconHolder = styled.span`
   color: ${v.colors.commonDark};
-  display: ${props => (props.display ? props.display : 'block')};
-  height: ${props => (props.height ? props.height : 32)}px;
-  ${props =>
-    props.align === 'left' ? 'margin-right: 12px;' : 'margin-left: 6px;'}
-  margin-top: ${props => (props.marginTop ? props.marginTop : 12)}px;
+  display: ${props => props.display};
+  height: ${props => props.height}px;
+  margin-top: ${props => props.marginTop}px;
+  margin-left: ${props => props.marginLeft}px;
+  margin-right: ${props => props.marginRight}px;
   overflow: hidden;
   width: ${props => (props.width ? props.width : 32)}px;
 
@@ -17,5 +18,23 @@ const IconHolder = styled.span`
     width: 20px;
   }
 `
+
+IconHolder.propTypes = {
+  display: PropTypes.string,
+  height: PropTypes.number,
+  width: PropTypes.number,
+  marginTop: PropTypes.number,
+  marginLeft: PropTypes.number,
+  marginRight: PropTypes.number,
+}
+
+IconHolder.defaultProps = {
+  display: 'block',
+  height: 32,
+  width: 32,
+  marginTop: 12,
+  marginLeft: 0,
+  marginRight: 0,
+}
 
 export default IconHolder

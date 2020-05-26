@@ -284,18 +284,18 @@ class Header extends React.Component {
           align="center"
           style={{ minHeight: v.headerHeight }}
         >
-          <Box style={{ paddingRight: '12px' }}>
+          <Box>
             <EditableName
               name={uiStore.viewingRecord.name}
               updateNameHandler={e => e.preventDefault()}
               inline
             />
             <IconHolder
-              align="right"
               height={32}
               width={32}
               display={'inline-block'}
-              marginTop={0}
+              marginTop={8}
+              marginLeft={10}
             >
               {collectionTypeToIcon({
                 type: uiStore.viewingRecord.collection_type,

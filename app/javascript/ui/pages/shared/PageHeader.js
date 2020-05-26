@@ -147,7 +147,7 @@ class PageHeader extends React.Component {
 
     if (_.some(leftConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -167,7 +167,7 @@ class PageHeader extends React.Component {
 
     if (_.some(rightConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -184,7 +184,7 @@ class PageHeader extends React.Component {
 
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           {collectionTypeToIcon({
             type: record.collection_type,
             size: 'lg',
@@ -204,7 +204,7 @@ class PageHeader extends React.Component {
           size="lg"
           record={record}
           IconWrapper={({ children }) => (
-            <IconHolder align="right">{children}</IconHolder>
+            <IconHolder marginRight={12}>{children}</IconHolder>
           )}
         />
       )
@@ -465,11 +465,11 @@ class PageHeader extends React.Component {
           </StyledSubHeaderLink>
         </Tooltip>
         <IconHolder
-          align="right"
           height={16}
           width={16}
           display={'inline-block'}
           marginTop={0}
+          marginRight={12}
         >
           <ChallengeIcon />
         </IconHolder>
