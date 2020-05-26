@@ -13,11 +13,9 @@ import {
   themeLabelStyles,
 } from '~/ui/global/charts/ChartUtils'
 
-const chartStyle = (style, order, singleDataPoint, pattern) => {
+const chartStyle = (style, order, singleDataPoint) => {
   if (style.fill) {
-    const darkFill = pattern
-      ? 'url(#PatternLine)'
-      : darkenColor(style.fill, order)
+    const darkFill = darkenColor(style.fill, order)
     const opacity = 0.8
     const strokeWidth = singleDataPoint ? 1000 : null
     return {
