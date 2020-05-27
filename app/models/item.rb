@@ -144,6 +144,7 @@ class Item < ApplicationRecord
       question_type: unanswerable_question_types,
     )
   }
+  scope :searchable, -> { where.not(type: unsearchable_types) }
 
   scope :in_ideas_section, -> {
     joins(:primary_collection_cards)
@@ -190,10 +191,16 @@ class Item < ApplicationRecord
 
   # active == don't index archived items
   scope :search_import, -> do
-    includes(
+    searchable.includes(
       :tags,
       parent_collection_card: :parent,
     )
+  end
+
+  def self.unsearchable_types
+    [
+      'Item::LegendItem',
+    ]
   end
 
   def dataset_display_name

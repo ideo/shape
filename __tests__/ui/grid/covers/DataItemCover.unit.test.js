@@ -21,9 +21,9 @@ describe('DataItemCover', () => {
   beforeEach(() => {
     props.apiStore = apiStore
     props.item = fakeDataItemCollectionsItemsAttrs
-    props.item.primaryDataset = fakeDataset
+    props.item.primaryDataset = null
     props.item.loadingDatasets = false
-    props.datasetLength = 0
+    props.datasetIds = []
     props.card = { id: 1, record: props.item, width: 1, height: 1 }
     render()
   })
@@ -89,10 +89,9 @@ describe('DataItemCover', () => {
           }
           render()
           // simulate for componentDidUpdate
-          wrapper.setProps({ datasetLength: 1 })
+          wrapper.setProps({ datasetIds: ['123'] })
         })
         it('loads the datasource into targetCollection', () => {
-          // first it tries to find
           expect(apiStore.find).toHaveBeenCalledWith('collections', 123)
           // then fetch
           expect(apiStore.fetch).toHaveBeenCalledWith('collections', 123)
