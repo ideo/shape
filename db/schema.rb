@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_14_232956) do
+ActiveRecord::Schema.define(version: 2020_05_20_210612) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -207,6 +207,9 @@ ActiveRecord::Schema.define(version: 2020_05_14_232956) do
     t.string "search_term"
     t.integer "collection_type", default: 0
     t.integer "num_columns"
+    t.integer "challenge_admin_group_id"
+    t.integer "challenge_reviewer_group_id"
+    t.integer "challenge_participant_group_id"
     t.datetime "start_date"
     t.datetime "end_date"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"

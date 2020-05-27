@@ -77,6 +77,20 @@ class Header extends React.Component {
     uiStore.update('rolesMenuOpen', record)
   }
 
+  getUsersAndGroupsLength = () => {
+    const { record } = this
+
+    const flattenUsersAndGroupsForRole = role => {
+      return _.flatten([_.map(role.users, 'id'), _.map(role.groups, 'id')])
+    }
+    const usersAndGroupsIds = _.flatMap(
+      record.roles,
+      flattenUsersAndGroupsForRole
+    )
+
+    return usersAndGroupsIds.length
+  }
+
   openMenu = ev => {
     const { uiStore } = this.props
     uiStore.update('pageMenuOpen', true)
@@ -179,6 +193,7 @@ class Header extends React.Component {
         // convert observable to normal array to trigger render changes
         collaborators={[...record.collaborators]}
         rolesMenuOpen={!!uiStore.rolesMenuOpen}
+        usersAndGroupsLength={this.getUsersAndGroupsLength()}
       />
     )
   }
