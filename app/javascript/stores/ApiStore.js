@@ -436,6 +436,26 @@ class ApiStore extends jsonapi(datxCollection) {
     this.setCurrentPageThreadKey(null)
   }
 
+  async setupCommentThreadAndMenusForPage(record) {
+    const { uiStore, routingStore, currentUser } = this
+    if (!currentUser) {
+      return
+    }
+    if (uiStore.activityLogOpen) {
+      this.update('loadingThreads', true)
+      const thread = await this.findOrBuildCommentThread(record)
+      runInAction(() => {
+        uiStore.expandThread(thread.key)
+        this.update('loadingThreads', false)
+      })
+    }
+    if (!_.isEmpty(routingStore.query)) {
+      // This must run after findOrBuildCommentThread,
+      // as it needs that if displaying in-collection test
+      uiStore.openOptionalMenus(routingStore.query)
+    }
+  }
+
   expandAndOpenThreadForRecord(record) {
     const { uiStore } = this
     const { viewingRecord } = uiStore

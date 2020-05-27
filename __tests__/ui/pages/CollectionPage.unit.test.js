@@ -62,6 +62,12 @@ describe('CollectionPage', () => {
     expect(helmet.props().title).toBe(collection.pageTitle)
   })
 
+  it('calls apiStore.setupCommentThreadAndMenusForPage', () => {
+    expect(apiStore.setupCommentThreadAndMenusForPage).toHaveBeenCalledWith(
+      collection
+    )
+  })
+
   describe('componentDidUpdate()', () => {
     describe('on a different collection', () => {
       beforeEach(() => {
@@ -211,43 +217,6 @@ describe('CollectionPage', () => {
     })
   })
 
-  describe('with params ?open=comments', () => {
-    beforeEach(() => {
-      wrapper = shallow(
-        <CollectionPage.wrappedComponent
-          {...props}
-          routingStore={{
-            ...routingStore,
-            query: '?open=comments',
-          }}
-        />
-      )
-    })
-
-    it('should call uiStore to open the comments', () => {
-      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith('?open=comments')
-    })
-  })
-
-  describe('with params ?manage_group_id=1', () => {
-    beforeEach(() => {
-      wrapper = shallow(
-        <CollectionPage.wrappedComponent
-          {...props}
-          routingStore={{
-            ...routingStore,
-            query: '?manage_group_id=1',
-          }}
-        />
-      )
-    })
-
-    it('should call uiStore to open the group editing modal', () => {
-      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith(
-        '?manage_group_id=1'
-      )
-    })
-  })
   describe('with undoAfterRoute', () => {
     beforeEach(() => {
       wrapper = shallow(
