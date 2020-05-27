@@ -17,7 +17,7 @@ const Progress = styled.div`
 Progress.displayName = 'Progress'
 
 const ProgressBar = styled.div`
-  width: ${props => props.width}%;
+  width: ${props => (props.width ? props.width : 0)}%;
   background-color: ${v.colors.black};
   height: 100%;
 `

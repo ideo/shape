@@ -387,12 +387,14 @@ class CollectionCover extends React.Component {
             useTextBackground={this.useTextBackground}
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
-            {collection.isPhaseOrProject && (
-              <DateProgressBar
-                startDate={collection.start_date}
-                endDate={collection.end_date}
-              />
-            )}
+            {collection.isPhaseOrProject &&
+              collection.start_date &&
+              collection.end_date && (
+                <DateProgressBar
+                  startDate={collection.start_date}
+                  endDate={collection.end_date}
+                />
+              )}
             {textItem ? (
               <div className="top text-item">
                 <TextItemCover

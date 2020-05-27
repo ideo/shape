@@ -148,7 +148,7 @@ class ConfirmationDialog extends React.PureComponent {
           <FormActionsContainer>
             <ButtonEl
               data-cy="CancelButton"
-              maxWidth="200"
+              maxWidth={200}
               onClick={this.handleCancel}
             >
               {props.cancelText}
