@@ -263,7 +263,7 @@ class SubmissionBoxSettingsModal extends React.Component {
 
     return (
       <StyledTitleContent>
-        <Heading2>Submission Box Settings</Heading2>
+        <Heading2 data-cy="modal-title">Submission Box Settings</Heading2>
         {this.loading && <InlineLoader />}
         <Row>
           <span

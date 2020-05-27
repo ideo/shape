@@ -175,7 +175,6 @@ class Modal extends React.Component {
         open={open}
         onClose={this.handleclose}
         onBackdropClick={disableBackdropClick ? null : this.handleClose}
-        aria-labelledby={title}
         BackdropProps={{ invisible: true }}
       >
         {/*

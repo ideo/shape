@@ -138,8 +138,17 @@ const SelectWrapped = props => {
     menuStyles,
     numOptionsToShow,
     onMenuClose,
+    inputRef,
     ...other
   } = props
+
+  React.useImperativeHandle(inputRef, () => ({
+    focus: () => {
+      // No-op, but this must be implemented for MUI
+      // https://material-ui.com/components/text-fields/#integration-with-3rd-party-input-libraries
+    },
+  }))
+
   if (keepMenuClosed) {
     other.menuIsOpen = false
   }
