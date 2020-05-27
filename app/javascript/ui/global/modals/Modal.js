@@ -159,12 +159,14 @@ class Modal extends React.Component {
       scrollVisible,
     } = this.props
     let wrappedTitle = title
+    const labeledBy = {}
     if (typeof title === 'string') {
       wrappedTitle = (
         <Heading2 mb="15px" ml="15px">
           {title}
         </Heading2>
       )
+      labeledBy['aria-labelledby'] = title
     }
     const scrollVisibleClass = scrollVisible ? 'modal__scroll-visible' : ''
     // TODO progamatically set disableAutoFocus
@@ -176,6 +178,7 @@ class Modal extends React.Component {
         onClose={this.handleclose}
         onBackdropClick={disableBackdropClick ? null : this.handleClose}
         BackdropProps={{ invisible: true }}
+        {...wrappedTitle}
       >
         {/*
           NOTE: DialogTitle / DialogContent need to be direct children of Dialog
