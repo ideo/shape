@@ -425,6 +425,7 @@ class Header extends React.Component {
             <ChallengeFixedHeader
               challengeName={uiStore.viewingRecord.name}
               collectionType={uiStore.viewingRecord.collection_type}
+              onSettingsClick={this.handleChallengeSettingsClick}
             />
           )}
         </FixedHeader>
