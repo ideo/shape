@@ -24,15 +24,12 @@ import {
   MaxWidthContainer,
   HeaderSpacer,
 } from '~/ui/global/styled/layout'
-import Button from '~/ui/global/Button'
-import EditableName from '~/ui/pages/shared/EditableName'
 import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
+import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
-import IconHolder from '~/ui/icons/IconHolder'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 
 const BackIconContainer = styled.span`
   color: ${v.colors.black};
@@ -120,7 +117,8 @@ class Header extends React.Component {
   }
 
   handleChallengeSettingsClick = () => {
-    // TODO: show challenge settings modal
+    const { uiStore } = this.props
+    uiStore.update('challengeSettingsOpen', true)
   }
 
   get onArchivedPage() {
@@ -275,58 +273,11 @@ class Header extends React.Component {
     )
   }
 
-  renderChallengeFixedHeader() {
-    const { uiStore } = this.props
-    return (
-      <MaxWidthContainer>
-        <Flex
-          data-empty-space-click
-          align="center"
-          style={{ minHeight: v.headerHeight }}
-        >
-          <Box>
-            <EditableName
-              name={uiStore.viewingRecord.name}
-              updateNameHandler={e => e.preventDefault()}
-              inline
-            />
-            <IconHolder
-              height={32}
-              width={32}
-              display={'inline-block'}
-              marginTop={8}
-              marginLeft={10}
-            >
-              {collectionTypeToIcon({
-                type: uiStore.viewingRecord.collection_type,
-                size: 'lg',
-              })}
-            </IconHolder>
-          </Box>
-
-          <Box auto></Box>
-
-          <Box flex align="center" style={{ marginLeft: '8px' }}>
-            <Button
-              style={{ marginLeft: '1rem' }}
-              colorScheme={v.colors.primaryDarkest}
-              size="sm"
-              width={256}
-              onClick={this.handleChallengeSettingsClick}
-            >
-              Challenge Settings
-            </Button>
-          </Box>
-        </Flex>
-      </MaxWidthContainer>
-    )
-  }
-
   render() {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
-    const { shouldRenderFixedHeader } = uiStore
+    // const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -471,9 +422,13 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-          {viewingChallenge &&
-            shouldRenderFixedHeader &&
-            this.renderChallengeFixedHeader()}
+          {viewingChallenge && (
+            <ChallengeFixedHeader
+              challengeName={uiStore.viewingRecord.name}
+              collectionType={uiStore.viewingRecord.collection_type}
+              onSettingsClick={this.handleChallengeSettingsClick}
+            />
+          )}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>

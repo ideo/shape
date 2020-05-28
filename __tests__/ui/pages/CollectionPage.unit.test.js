@@ -361,4 +361,27 @@ describe('CollectionPage', () => {
       )
     })
   })
+
+  describe('renderPageHeader', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          collection={{
+            ...fakeCollection,
+            isSearchCollection: true,
+          }}
+          uiStore={{
+            ...uiStore,
+            loadedSubmissions: true,
+          }}
+        />
+      )
+      component = wrapper.instance()
+    })
+
+    it('should render VisibilitySensor', () => {
+      expect(wrapper.find('VisibilitySensor').exists()).toBeTruthy()
+    })
+  })
 })

@@ -130,6 +130,12 @@ Dialog.defaultProps = {
   onEntered: disableOverflowScroll,
 }
 
+/*
+ * A modal that appears in the middle of the page while graying out the rest
+ * of the page.
+ *
+ * @component
+ */
 class Modal extends React.Component {
   constructor(props) {
     super(props)
@@ -214,13 +220,30 @@ class Modal extends React.Component {
   }
 }
 Modal.propTypes = {
-  onClose: PropTypes.func,
+  /** The title of the modal, that appears as a header at the top */
   title: PropTypes.node.isRequired,
+  /** The content to be put in the modal */
   children: PropTypes.node,
+  /**
+   * The state for when the modal should be open, must be set to true to display
+   * the modal
+   */
   open: PropTypes.bool,
+  /**
+   * Adds a back button to the header of the modal and allows you to control
+   * what happens when it's pressed
+   */
   onBack: PropTypes.func,
+  /** The close handler for when user closes the modal with the close button */
+  onClose: PropTypes.func,
+  /**
+   * Disable the functionality that closes the modal when you click on the grayed
+   * out backdrop
+   */
   disableBackdropClick: PropTypes.bool,
+  /** Disables all scrolling in the modal */
   noScroll: PropTypes.bool,
+  /** Sets a class to make the scrolling visible at all times */
   scrollVisible: PropTypes.bool,
 }
 

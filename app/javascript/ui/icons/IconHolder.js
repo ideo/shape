@@ -10,7 +10,7 @@ const IconHolder = styled.span`
   margin-left: ${props => props.marginLeft}px;
   margin-right: ${props => props.marginRight}px;
   overflow: hidden;
-  width: ${props => (props.width ? props.width : 32)}px;
+  width: ${props => props.width}px;
 
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     height: 36px;
