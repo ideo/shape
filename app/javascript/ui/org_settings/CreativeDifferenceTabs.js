@@ -227,12 +227,32 @@ class CreativeDifferenceTabs extends React.Component {
   }
 
   cloneBusinessUnit = async businessUnit => {
-    event.preventDefault()
-    console.log('cloning: ', businessUnit.id)
+    try {
+      this.setLoading(true)
+      const model = new businessUnitsStore.model()
+      const modelInstance = new model({
+        id: businessUnit.id,
+      })
+      console.log('cloning: ', businessUnit.id)
+
+      const promise = modelInstance.rpc('clone', {
+        optimistic: false,
+      })
+      const result = await promise
+      console.log('BU clone result: ', result)
+      const allBusinessUnits = await businessUnitsStore.fetch()
+      runInAction(async () => {
+        // fetch all the business units after an update
+        this.businessUnits = allBusinessUnits
+        // TODO: Just update one BU so we don't have to refetch all the BUs?
+      })
+      this.setLoading(false)
+    } catch (err) {
+      console.log('error is: ', err)
+    }
   }
 
   removeBusinessUnit = async businessUnit => {
-    event.preventDefault()
     // TODO: This is supposed to archive from frontend but keep in backend
     try {
       this.setLoading(true)
