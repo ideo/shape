@@ -36,7 +36,7 @@ const CardButtonWrapper = styled.div`
 `
 CardButtonWrapper.displayName = 'CardButtonWrapper'
 
-const StyledCollectionCover = styled.div`
+export const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${props => props.backgroundColor};

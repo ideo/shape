@@ -1,5 +1,5 @@
 import React from 'react'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
@@ -27,7 +27,7 @@ class CollectionViewToggle extends React.Component {
     return (
       <Flex align="center">
         <IconHolder onClick={this.onGridClick}>
-          <GridIcon/>
+          <GridIcon />
         </IconHolder>
         <IconHolder onClick={this.onListClick}>
           <ListIcon />
