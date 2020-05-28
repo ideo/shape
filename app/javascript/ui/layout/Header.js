@@ -117,7 +117,8 @@ class Header extends React.Component {
   }
 
   handleChallengeSettingsClick = () => {
-    // TODO: show challenge settings modal
+    const { uiStore } = this.props
+    uiStore.update('challengeSettingsOpen', true)
   }
 
   get onArchivedPage() {
@@ -276,7 +277,7 @@ class Header extends React.Component {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
-    const { shouldRenderFixedHeader } = uiStore
+    // const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -421,7 +422,7 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-          {viewingChallenge && shouldRenderFixedHeader && (
+          {viewingChallenge && (
             <ChallengeFixedHeader
               challengeName={uiStore.viewingRecord.name}
               collectionType={uiStore.viewingRecord.collection_type}

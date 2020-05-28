@@ -1,11 +1,14 @@
-import IconHolder from '~/ui/icons/IconHolder'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
-import Button from '~/ui/global/Button'
-import EditableName from '~/ui/pages/shared/EditableName'
-import { MaxWidthContainer } from '~/ui/global/styled/layout'
-import { Flex, Box } from 'reflexbox'
-import v from '~/utils/variables'
 import PropTypes from 'prop-types'
+import { Flex, Box } from 'reflexbox'
+
+import Button from '~/ui/global/Button'
+import ChallengeSettingsModal from '~/ui/challenges/ChallengeSettingsModal'
+import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import EditableName from '~/ui/pages/shared/EditableName'
+import IconHolder from '~/ui/icons/IconHolder'
+import { MaxWidthContainer } from '~/ui/global/styled/layout'
+import { uiStore } from '~/stores'
+import v from '~/utils/variables'
 
 const ChallengeFixedHeader = ({
   challengeName,
@@ -14,6 +17,7 @@ const ChallengeFixedHeader = ({
 }) => {
   return (
     <MaxWidthContainer>
+      <ChallengeSettingsModal open={uiStore.challengeSettingsOpen} />
       <Flex
         data-empty-space-click
         align="center"

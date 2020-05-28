@@ -257,6 +257,8 @@ export default class UiStore {
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
   collaboratorColors = new Map()
+  @observable
+  challengeSettingsOpen = false
 
   get routingStore() {
     return this.apiStore.routingStore
