@@ -37,7 +37,7 @@ module JsonapiCache
     private
 
     def cached_card_data(card)
-      Rails.cache.fetch(cache_key(card)) do
+      Rails.cache.fetch(card.cache_key) do
         renderer = JSONAPI::Serializable::Renderer.new
         renderer.render(
           card,
@@ -109,20 +109,10 @@ module JsonapiCache
       json
     end
 
-    def cache_key(card)
-      # no real point in trying to cache a search result with no parent card, but this allows it to work
-      key = [
-        card.id || "search-result-#{card.record.id}",
-        card.updated_at || Time.current,
-      ].join('-')
-      "CollectionCardCache::#{key}"
-    end
-
     def can_edit_parent
       return false if @collection.nil?
 
       @can_edit_parent ||= @current_ability.can?(:edit_content, @collection)
-      true
     end
 
     def breadcrumb_attributes(record)

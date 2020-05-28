@@ -517,6 +517,15 @@ class CollectionCard < ApplicationRecord
     )
   end
 
+  def cache_key
+    key = [
+      # no real point in trying to cache a search result with no parent card, but this allows it to work
+      id || "search-result-#{record.id}",
+      updated_at || Time.current,
+    ].join('-')
+    "CollectionCardCache::#{key}"
+  end
+
   private
 
   def assign_default_height_and_width
