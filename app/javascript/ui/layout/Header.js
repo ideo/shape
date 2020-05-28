@@ -27,6 +27,7 @@ import {
 import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
+import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
@@ -113,6 +114,10 @@ class Header extends React.Component {
 
   closeOrgMenu = () => {
     this.props.uiStore.update('organizationMenuPage', null)
+  }
+
+  handleChallengeSettingsClick = () => {
+    // TODO: show challenge settings modal
   }
 
   get onArchivedPage() {
@@ -271,6 +276,7 @@ class Header extends React.Component {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
+    const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -299,6 +305,10 @@ class Header extends React.Component {
         'id'
       )}`
     }
+
+    const viewingChallenge =
+      _.get(uiStore.viewingRecord, 'collection_type') === 'challenge' ||
+      _.get(uiStore.viewingRecord, 'isInsideAChallenge')
 
     return (
       <Fragment>
@@ -411,6 +421,13 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
+          {viewingChallenge && shouldRenderFixedHeader && (
+            <ChallengeFixedHeader
+              challengeName={uiStore.viewingRecord.name}
+              collectionType={uiStore.viewingRecord.collection_type}
+              onSettingsClick={this.handleChallengeSettingsClick}
+            />
+          )}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>

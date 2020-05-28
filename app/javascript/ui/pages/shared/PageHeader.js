@@ -31,23 +31,7 @@ import CollectionTypeIcon, {
 } from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
-
-const IconHolder = styled.span`
-  color: ${v.colors.commonDark};
-  display: ${props => (props.display ? props.display : 'block')};
-  height: ${props => (props.height ? props.height : 32)}px;
-  ${props =>
-    props.align === 'left' ? 'margin-right: 12px;' : 'margin-left: 6px;'}
-  margin-top: ${props => (props.marginTop ? props.marginTop : 12)}px;
-  overflow: hidden;
-  width: ${props => (props.width ? props.width : 32)}px;
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    height: 36px;
-    margin-top: 8px;
-    width: 20px;
-  }
-`
+import IconHolder from '~/ui/icons/IconHolder'
 
 const StyledSubHeaderLink = styled(Heading2)`
   display: inline-block;
@@ -163,7 +147,7 @@ class PageHeader extends React.Component {
 
     if (_.some(leftConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -183,7 +167,7 @@ class PageHeader extends React.Component {
 
     if (_.some(rightConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -200,7 +184,7 @@ class PageHeader extends React.Component {
 
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           {collectionTypeToIcon({
             type: record.collection_type,
             size: 'lg',
@@ -220,7 +204,7 @@ class PageHeader extends React.Component {
           size="lg"
           record={record}
           IconWrapper={({ children }) => (
-            <IconHolder align="right">{children}</IconHolder>
+            <IconHolder marginRight={12}>{children}</IconHolder>
           )}
         />
       )
@@ -481,11 +465,11 @@ class PageHeader extends React.Component {
           </StyledSubHeaderLink>
         </Tooltip>
         <IconHolder
-          align="right"
           height={16}
           width={16}
           display={'inline-block'}
           marginTop={0}
+          marginRight={12}
         >
           <ChallengeIcon />
         </IconHolder>
