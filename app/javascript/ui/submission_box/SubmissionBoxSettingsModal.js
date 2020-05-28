@@ -37,4 +37,4 @@ const SubmissionBoxSettingsModal = props => {
 SubmissionBoxSettingsModal.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-export default SubmissionBoxSettings
+export default SubmissionBoxSettingsModal

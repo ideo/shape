@@ -1,11 +1,8 @@
 import _ from 'lodash'
-import pluralize from 'pluralize'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { computed, observable, runInAction } from 'mobx'
-import styled from 'styled-components'
+import { computed, observable } from 'mobx'
 
 import {
-  Heading2,
   Heading3,
   SmallHelperText,
   DisplayText,
@@ -160,7 +157,7 @@ class SubmissionBoxSettings extends React.Component {
           </RowItemLeft>
         </Row>
         <Heading3>Submission Format</Heading3>
-        <SubmissionBoxFormat />
+        <SubmissionBoxFormat collection={collection} />
       </React.Fragment>
     )
   }

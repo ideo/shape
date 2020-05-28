@@ -1,63 +1,32 @@
-import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { Flex } from 'reflexbox'
 
 import { apiStore } from '~/stores'
-import { submissionTypeForName } from '~/ui/submission_box/SubmissionBoxSettings'
-import {
-  SubmissionBoxRowForItem,
-  SubmissionBoxRowForTemplate,
-} from '~/ui/submission_box/SubmissionBoxRow'
+import { SubmissionBoxRowForTemplate } from '~/ui/submission_box/SubmissionBoxRow'
+
+const showSubmissionBoxFormatModal = () => {
+  console.log('open the modal')
+}
 
 const SubmissionBoxFormat = props => {
-  const {
-    submissionTemplateId,
-    submissionBoxTypeName,
-    onChooseTemplate,
-    onChooseNonTemplateType,
-  } = props
+  const { submission_template_id } = props.collection
   let template
-  let row
-  if (submissionTemplateId) {
-    template = apiStore.find('collections', submissionTemplateId)
+  if (submission_template_id) {
+    template = apiStore.find('collections', submission_template_id)
   }
-  if (template) {
-    row = (
-      <SubmissionBoxRowForTemplate
-        template={template}
-        onChooseTemplate={onChooseTemplate}
-      />
-    )
-  } else if (submissionBoxTypeName && submissionBoxTypeName !== 'template') {
-    const type = submissionTypeForName(submissionBoxTypeName)
-    row = (
-      <SubmissionBoxRowForItem
-        type={type}
-        onChooseType={onChooseNonTemplateType}
-      />
-    )
-  }
-
   return (
-    <React.Fragment>
-      {row}
-      <div onClick={/* open EditSubmissionBoxFormatModal */}>
-        [edit]
+    <Flex column justify="flex-start">
+      <div onClick={showSubmissionBoxFormatModal}>
+        {template && (
+          <SubmissionBoxRowForTemplate template={template} canEdit={true} />
+        )}
       </div>
-    </React.Fragment>
+    </Flex>
   )
 }
 
 SubmissionBoxFormat.propTypes = {
-  submissionTemplateId: PropTypes.number,
-  submissionBoxTypeName: PropTypes.string,
-  onChooseTemplate: PropTypes.func,
-  onChooseNonTemplateType: PropTypes.func,
-}
-
-SubmissionBoxFormat.defaultProps = {
-  submissionTemplateId: null,
-  submissionBoxTypeName: null,
-  onChooseTemplate: () => null,
-  onChooseNonTemplateType: () => null,
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SubmissionBoxFormat

@@ -2,43 +2,18 @@ import _ from 'lodash'
 import pluralize from 'pluralize'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { computed, observable, runInAction } from 'mobx'
-import styled from 'styled-components'
 
 import Modal from '~/ui/global/modals/Modal'
-import {
-  Heading2,
-  Heading3,
-  SmallHelperText,
-  DisplayText,
-} from '~/ui/global/styled/typography'
-import { Checkbox } from '~/ui/global/styled/forms'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import { Row, RowItemLeft } from '~/ui/global/styled/layout'
-import AlertIcon from '~/ui/icons/AlertIcon'
-import AddTextIcon from '~/ui/icons/AddTextIcon'
-import AddFileIcon from '~/ui/icons/AddFileIcon'
-import AddLinkIcon from '~/ui/icons/AddLinkIcon'
-import InlineLoader from '~/ui/layout/InlineLoader'
-import Modal from '~/ui/global/modals/Modal'
+import { Heading2 } from '~/ui/global/styled/typography'
 import RecordSearch from '~/ui/global/RecordSearch'
-import v from '~/utils/variables'
 import {
   SubmissionBoxRowForItem,
   SubmissionBoxRowForTemplate,
 } from '~/ui/submission_box/SubmissionBoxRow'
-
-const StyledTitleContent = styled.div`
-  border-bottom: 1px solid ${v.colors.commonMedium};
-`
-
-export const submissionItemTypes = [
-  { name: 'text', Icon: AddTextIcon },
-  { name: 'link', Icon: AddLinkIcon },
-  { name: 'file', Icon: AddFileIcon },
-]
-
-export const submissionTypeForName = typeName =>
-  _.find(submissionItemTypes, t => t.name === typeName)
+import {
+  submissionItemTypes,
+  submissionTypeForName,
+} from '~/ui/submission_box/SubmissionBoxSettings'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer

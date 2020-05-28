@@ -8,6 +8,8 @@ import v from '~/utils/variables'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import { ThumbnailHolder } from '~/ui/threads/CommentThumbnail'
+import EditPencilIcon from '~/ui/icons/EditPencilIcon'
+import Tooltip from '~/ui/global/Tooltip'
 
 const SubmissionBoxRow = styled(Row)`
   cursor: pointer;
@@ -55,7 +57,7 @@ SubmissionBoxRowForItem.defaultProps = {
 }
 
 export const SubmissionBoxRowForTemplate = props => {
-  const { template, onChooseTemplate } = props
+  const { template, onChooseTemplate, canEdit } = props
   return (
     <SubmissionBoxRow
       key={template.id}
@@ -69,6 +71,16 @@ export const SubmissionBoxRowForTemplate = props => {
         {!template.cover.image_url && <TemplateIcon circled filled />}
       </ThumbnailHolder>
       <SubmissionBoxRowText>{template.name}</SubmissionBoxRowText>
+      {canEdit && (
+        <div style={{ float: 'right', width: '24px' }}>
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title="Edit submission template"
+          >
+            <EditPencilIcon />
+          </Tooltip>
+        </div>
+      )}
     </SubmissionBoxRow>
   )
 }
@@ -76,8 +88,10 @@ export const SubmissionBoxRowForTemplate = props => {
 SubmissionBoxRowForTemplate.propTypes = {
   template: MobxPropTypes.objectOrObservableObject.isRequired,
   onChooseTemplate: PropTypes.func,
+  canEdit: PropTypes.boolean,
 }
 
 SubmissionBoxRowForTemplate.defaultProps = {
   onChooseTemplate: () => null,
+  canEdit: false,
 }
