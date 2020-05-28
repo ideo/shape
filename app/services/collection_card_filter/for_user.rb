@@ -29,7 +29,7 @@ module CollectionCardFilter
         LEFT JOIN items ON items.id = collection_cards.item_id
         LEFT JOIN collections ON collections.id = collection_cards.collection_id
         JOIN roles ON (
-          roles.resource_identifier = #{Collection.resource_identifier_sql}
+          roles.resource_identifier = #{Collection.roles_anchor_identifier_sql}
         )
         LEFT JOIN users_roles ON
         users_roles.role_id = roles.id and

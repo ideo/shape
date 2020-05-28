@@ -172,7 +172,7 @@ module JsonapiCache
                     .select(%(
                       collection_cards.item_id,
                       collection_cards.collection_id,
-                      #{Collection.resource_identifier_sql} AS sql_resource_identifier
+                      #{Collection.roles_anchor_identifier_sql} AS sql_resource_identifier
                     ))
                     .map(&:sql_resource_identifier)
                     .uniq

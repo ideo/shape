@@ -69,8 +69,8 @@ module Resourceable
       ).distinct # because of left joins
     end
 
-    def resource_identifier_sql
-      # placed here so it can be used within different services e.g. Collection.resource_identifier_sql
+    def roles_anchor_identifier_sql
+      # placed here so it can be used within different services e.g. Collection.roles_anchor_identifier_sql
       %(
         CASE WHEN COALESCE(
           items.roles_anchor_collection_id,
