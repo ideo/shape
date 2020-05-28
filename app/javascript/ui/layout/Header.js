@@ -307,10 +307,6 @@ class Header extends React.Component {
       )}`
     }
 
-    const viewingChallenge =
-      _.get(uiStore.viewingRecord, 'collection_type') === 'challenge' ||
-      _.get(uiStore.viewingRecord, 'isInsideAChallenge')
-
     return (
       <Fragment>
         <style
@@ -422,17 +418,20 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-          {viewingChallenge && shouldRenderFixedHeader && (
-            <ChallengeFixedHeader
-              challengeName={uiStore.viewingRecord.challenge_name}
-              collectionName={uiStore.viewingRecord.name}
-              collectionType={uiStore.viewingRecord.collection_type}
-              onSettingsClick={this.handleChallengeSettingsClick}
-              challengeNavigationHandler={() => {
-                routingStore.routeTo('collections', record.challenge_id)
-              }}
-            />
-          )}
+          {record &&
+            record.isChallengeOrInsideChallenge &&
+            shouldRenderFixedHeader && (
+              <ChallengeFixedHeader
+                challengeName={record.challenge_name}
+                collectionName={record.name}
+                collectionType={record.collection_type}
+                onSettingsClick={this.handleChallengeSettingsClick}
+                isInsideAChallenge={record.isInsideAChallenge}
+                challengeNavigationHandler={() => {
+                  routingStore.routeTo('collections', record.challenge_id)
+                }}
+              />
+            )}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>

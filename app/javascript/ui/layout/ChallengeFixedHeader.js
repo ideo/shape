@@ -20,10 +20,12 @@ const ChallengeFixedHeader = ({
   return (
     <MaxWidthContainer>
       <ChallengeSettingsModal open={uiStore.challengeSettingsOpen} />
-      <ChallengeSubHeader
-        challengeName={challengeName}
-        challengeNavigationHandler={challengeNavigationHandler}
-      />
+      {collectionType !== 'challenge' && (
+        <ChallengeSubHeader
+          challengeName={challengeName}
+          challengeNavigationHandler={challengeNavigationHandler}
+        />
+      )}
       <Flex
         data-empty-space-click
         align="center"
@@ -60,11 +62,19 @@ const ChallengeFixedHeader = ({
 }
 
 ChallengeFixedHeader.propTypes = {
-  challengeName: PropTypes.string.isRequired,
-  collectionName: PropTypes.string.isRequired,
-  collectionType: PropTypes.string.isRequired,
-  onSettingsClick: PropTypes.func.isRequired,
-  challengeNavigationHandler: PropTypes.func.isRequired,
+  challengeName: PropTypes.string,
+  collectionName: PropTypes.string,
+  collectionType: PropTypes.string,
+  onSettingsClick: PropTypes.func,
+  challengeNavigationHandler: PropTypes.func,
+}
+
+ChallengeFixedHeader.defaultProps = {
+  challengeName: '',
+  collectionName: '',
+  collectionType: null,
+  onSettingsClick: () => {},
+  challengeNavigationHandler: () => {},
 }
 
 export default ChallengeFixedHeader

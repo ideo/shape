@@ -521,7 +521,7 @@ class PageHeader extends React.Component {
                 </Flex>
               )}
 
-              {record.isInsideAChallenge && (
+              {record.isChallengeOrInsideChallenge && (
                 <ChallengeSettingsButton
                   onSettingsClick={this.handleChallengeSettingsClick}
                 />
