@@ -17,10 +17,6 @@ const SortContainer = styled.div`
   top: ${props => (props.top ? props.top : 0)}px;
 `
 
-const GrowFlex = styled(Flex)`
-  flex-grow: 1;
-`
-
 @observer
 class CollectionFilter extends React.Component {
   @observable
