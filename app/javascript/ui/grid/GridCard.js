@@ -17,6 +17,7 @@ import {
   StyledGridCard,
   StyledGridCardInner,
   StyledTopRightActions,
+  StyledGridCardPrivate,
 } from '~/ui/grid/shared'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
@@ -30,6 +31,7 @@ import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagE
 import TextButton from '~/ui/global/TextButton'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import EditButton from '~/ui/reporting/EditButton'
@@ -532,7 +534,11 @@ class GridCard extends React.Component {
 
     let contents
     if (card.private_card || _.isEmpty(record)) {
-      contents = <h1>oopsie doo</h1>
+      contents = (
+        <StyledGridCardPrivate>
+          <HiddenIcon />
+        </StyledGridCardPrivate>
+      )
     } else {
       contents = (
         <Fragment>
