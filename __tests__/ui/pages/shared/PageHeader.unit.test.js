@@ -231,11 +231,12 @@ describe('PageHeader', () => {
       component = wrapper.instance()
     })
 
-    it('should render the challenge navigation link with tooltip', () => {
-      expect(wrapper.find('Tooltip').props().title).toEqual('go to challenge')
-      expect(wrapper.find('StyledSubHeaderLink').html()).toContain(
-        'Open Innovation Sustainability Challenge'
-      )
+    it('should render the ChallengeSubHeader', () => {
+      expect(wrapper.find('ChallengeSubHeader').exists()).toBeTruthy()
+    })
+
+    it('should render the ChallengeSettingsButton', () => {
+      expect(wrapper.find('ChallengeSettingsButton').exists()).toBeTruthy()
     })
   })
 })

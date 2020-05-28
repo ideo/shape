@@ -27,8 +27,8 @@ import {
 import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
-import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
+import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const BackIconContainer = styled.span`
@@ -277,7 +277,7 @@ class Header extends React.Component {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
-    // const { shouldRenderFixedHeader } = uiStore
+    const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -422,11 +422,15 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-          {viewingChallenge && (
+          {viewingChallenge && shouldRenderFixedHeader && (
             <ChallengeFixedHeader
-              challengeName={uiStore.viewingRecord.name}
+              challengeName={uiStore.viewingRecord.challenge_name}
+              collectionName={uiStore.viewingRecord.name}
               collectionType={uiStore.viewingRecord.collection_type}
               onSettingsClick={this.handleChallengeSettingsClick}
+              challengeNavigationHandler={() => {
+                routingStore.routeTo('collections', record.challenge_id)
+              }}
             />
           )}
         </FixedHeader>

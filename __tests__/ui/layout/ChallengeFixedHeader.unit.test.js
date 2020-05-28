@@ -4,7 +4,9 @@ describe('ChallengeFixedHeader', () => {
   beforeEach(() => {
     props = {
       challengeName: 'Reusable Cup Challenge',
+      collectionName: 'Reusable Cup Challenge Phase 1',
       collectionType: 'challenge',
+      challengeNavigationHandler: jest.fn(),
       onSettingsClick: jest.fn(),
     }
     rerender = () => {
@@ -16,7 +18,7 @@ describe('ChallengeFixedHeader', () => {
   it('should render an inline EditableName with the chalenge name', () => {
     expect(wrapper.find('EditableName').props().inline).toEqual(true)
     expect(wrapper.find('EditableName').props().name).toEqual(
-      'Reusable Cup Challenge'
+      'Reusable Cup Challenge Phase 1'
     )
   })
 
@@ -24,7 +26,11 @@ describe('ChallengeFixedHeader', () => {
     expect(wrapper.find('ChallengeIcon').exists()).toEqual(true)
   })
 
-  it('should render a challenge settings Button', () => {
-    expect(wrapper.find('Button').exists()).toEqual(true)
+  it('should render challenge ChallengeSubHeader', () => {
+    expect(wrapper.find('ChallengeSubHeader').exists()).toEqual(true)
+  })
+
+  it('should render ChallengeSettingsButton', () => {
+    expect(wrapper.find('ChallengeSettingsButton').exists()).toEqual(true)
   })
 })
