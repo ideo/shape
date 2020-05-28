@@ -60,6 +60,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   lastZoom = null
   @observable
   carouselIdx = 0
+  @observable
+  viewMode = 'grid'
   // this stores the "virtual" search results collection
   searchResultsCollection = null
 
@@ -142,6 +144,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setCarouselIdx(value) {
     this.carouselIdx = value
+  }
+
+  @action
+  setViewMode(mode) {
+    this.viewMode = mode
   }
 
   get currentCarouselRecord() {
