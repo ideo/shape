@@ -153,7 +153,7 @@ class CollectionFilter extends React.Component {
             onSelect={this.onSelectFilter}
           />
         )}
-        <GrowFlex align="flex-end">
+        <Flex align="flex-end">
           {isFilterBarActive && (
             <FilterBar
               filters={filterBarFilters}
@@ -198,7 +198,7 @@ class CollectionFilter extends React.Component {
               />
             )}
           </Flex>
-        </GrowFlex>
+        </Flex>
       </Fragment>
     )
   }

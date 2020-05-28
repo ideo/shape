@@ -11,6 +11,7 @@ import ChannelManager from '~/utils/ChannelManager'
 import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionList from '~/ui/grid/CollectionList'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
@@ -560,6 +561,13 @@ class CollectionPage extends React.Component {
       inner = this.renderTestDesigner()
     } else if (collection.isSearchCollection) {
       inner = this.renderSearchCollection()
+    } else if (collection.viewMode === 'list') {
+      inner = (
+        <CollectionList
+          {...genericCollectionProps}
+          cardsFetched={this.cardsFetched}
+        />
+      )
     } else {
       inner = (
         <CollectionGrid
