@@ -631,15 +631,6 @@ class ApiStore extends jsonapi(datxCollection) {
     return result
   }
 
-  async fetchAllPages(url, page = 1, acc = []) {
-    // {page: 1, total: 15, size: 10}
-    const res = await this.request(`${url}&page=${page}`)
-    const { links } = res
-    const all = [...acc, ...res.data]
-    if (links.last === page) return all
-    return this.fetchAllPages(url, page + 1, all)
-  }
-
   async archiveCards({ cardIds, collection, undoable = true }) {
     const archiveResult = await this.request(
       'collection_cards/archive',
@@ -855,15 +846,6 @@ class ApiStore extends jsonapi(datxCollection) {
       },
     })
     return res
-  }
-
-  async checkInMyCollection(record) {
-    const inMyCollection = await this.requestJson(
-      `${record.internalType}/${record.id}/in_my_collection`
-    )
-    runInAction(() => {
-      record.inMyCollection = inMyCollection
-    })
   }
 
   async searchRoles(

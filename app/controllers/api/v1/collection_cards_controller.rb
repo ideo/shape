@@ -14,13 +14,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def show
-    render jsonapi: @collection_card,
-           include: CollectionCard.default_relationships_for_api
+    render_collection_card
   end
 
   # return all collection_card_ids for this particular collection
   def ids
-    render json: @collection_card_ids
+    # load_collection_cards will have just returned the ids here
+    render json: @collection_cards
   end
 
   def ids_in_direction
@@ -62,15 +62,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                                         user: current_user)
 
     if builder.create
-      card = builder.collection_card
+      @collection_card = builder.collection_card
       # reload the user's roles
       current_user.reload.reset_cached_roles!
-      card.reload
-      create_notification(card, :created)
-      broadcast_collection_create_updates(card)
-      render jsonapi: card,
-             include: CollectionCard.default_relationships_for_api,
-             expose: { current_record: card.record }
+      @collection_card.reload
+      create_notification(@collection_card, :created)
+      broadcast_collection_create_updates(@collection_card)
+      render_collection_card
     else
       render_api_errors builder.errors
     end
@@ -165,9 +163,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     if builder.replace
       card = builder.replacing_card
       create_notification(card, :replaced)
-      render jsonapi: card.reload,
-             include: CollectionCard.default_relationships_for_api,
-             expose: { current_record: card.record }
+      @collection_card = card.reload
+      render_collection_card
     else
       render_api_errors builder.errors
     end
@@ -241,58 +238,33 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
     pinner.call
 
-    render jsonapi: @collection_card.reload, include: CollectionCard.default_relationships_for_api
+    @collection_card.reload
+    render_collection_card
   end
 
   private
 
   def render_collection_cards(collection: @collection, collection_cards: @collection_cards)
-    params[:card_order] ||= collection.default_card_order
-
-
-    renderer = JSONAPI::Serializable::Renderer.new
-
-    puts '!~' * 10
-    puts params.as_json
-    puts '!~' * 10
-    json_data = Rails.cache.fetch(Digest::MD5.hexdigest("collection-cards-#{@collection.cache_key}-#{params.as_json}")) do
-      puts 'NOT CACHED -- fetching...'
-      renderer.render(
-        collection_cards,
-        class: jsonapi_class,
-        include: CollectionCard.default_relationships_for_api,
-        expose: jsonapi_expose.merge(
-          card_order: params[:card_order],
-          current_record: collection,
-          parent: collection,
-          inside_a_submission: collection.submission? || collection.inside_a_submission?,
-          inside_hidden_submission_box: collection.hide_submissions || collection.inside_hidden_submission_box?,
-          include: params[:include],
-        ),
-      )
-    end
+    json_data = JsonapiCache::CollectionCardRenderer.call(
+      cards: collection_cards,
+      collection: collection,
+      user: current_user,
+    )
     render json: json_data
-
-    # render jsonapi: collection_cards,
-    #        include: CollectionCard.default_relationships_for_api,
-    #        expose: {
-    #          card_order: params[:card_order],
-    #          current_record: collection,
-    #          parent: collection,
-    #          inside_a_submission: collection.submission? || collection.inside_a_submission?,
-    #          inside_hidden_submission_box: collection.hide_submissions || collection.inside_hidden_submission_box?,
-    #          include: params[:include],
-    #        }
   end
 
   def render_to_collection_with_cards(new_cards)
     render_collection_cards(collection: @to_collection, collection_cards: new_cards)
   end
 
-  def render_collection_card(include: nil)
-    include ||= CollectionCard.default_relationships_for_api
-    render jsonapi: @collection_card,
-           include: include
+  def render_collection_card
+    json_data = JsonapiCache::CollectionCardRenderer.new(
+      collection: @collection || @collection_card.parent,
+      user: current_user,
+    ).render_cached_card(
+      @collection_card,
+    )
+    render json: json_data
   end
 
   def perform_bulk_operation(placement:, action:)
@@ -350,18 +322,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
                           ids_only: ids_only,
                           select_ids: select_ids,
                         )
-    return unless user_signed_in?
-
-    # ids_only does not need to precache roles
-    if ids_only
-      @collection_card_ids = @collection_cards
-      return
-    end
-    # precache roles because these will be referred to in the serializers (e.g. can_edit?)
-    current_user.precache_roles_for(
-      [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      @collection_cards.map(&:record).compact,
-    )
   end
 
   def load_and_authorize_parent_collection

@@ -6,10 +6,10 @@ module RolifyExtensions
     @has_role_by_identifier ||= Hash.new do |h, key|
       role_name = key.first
       resource_identifier = key.last
-      role = rolify_roles.where(
+      role = rolify_roles.find_by(
         name: role_name,
         resource_identifier: resource_identifier,
-      ).first
+      )
       if is_a?(User) || is_a?(Group)
         h[key] = role.present? || role_via_org_groups(role_name, resource_identifier).present?
       else
@@ -32,11 +32,11 @@ module RolifyExtensions
         .where(GroupsRole.arel_table[:group_id].in(related_group_ids))
   end
 
-  def precache_roles_for(role_names, resources)
+  def precache_roles_for(role_names, resources: [], resource_identifiers: nil)
     return unless @has_role_by_identifier.present? && is_a?(User)
-    return unless resources.present?
+    return unless resources.present? || resource_identifiers.present?
 
-    resource_identifiers = resources.map(&:roles_anchor_resource_identifier).uniq
+    resource_identifiers ||= resources.map(&:roles_anchor_resource_identifier).uniq
     roles = rolify_roles.where(
       name: role_names,
       resource_identifier: resource_identifiers,

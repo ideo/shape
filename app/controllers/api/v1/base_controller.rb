@@ -23,7 +23,7 @@ class Api::V1::BaseController < ApplicationController
   # so we must explicitly tell it what serializer to use
   # See: https://github.com/jsonapi-rb/jsonapi-rails/issues/68
   def jsonapi_class
-    super.merge(::JSONAPI_CUSTOM_MAPPINGS)
+    super.merge(JsonapiMappings::CUSTOM_MAPPINGS)
   end
 
   # Add items to this hash to make them available

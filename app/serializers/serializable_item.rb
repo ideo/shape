@@ -1,5 +1,7 @@
 class SerializableItem < BaseJsonSerializer
   include SerializedExternalId
+  include UserSpecificFields
+
   type 'items'
   attributes(
     :name,
@@ -23,12 +25,6 @@ class SerializableItem < BaseJsonSerializer
     :subtitle_hidden,
     :cloned_from_id,
   )
-
-  has_many :roles do
-    data do
-      @object.anchored_roles(viewing_organization_id: @current_user.current_organization_id)
-    end
-  end
 
   has_many :question_choices do
     data do
@@ -75,25 +71,6 @@ class SerializableItem < BaseJsonSerializer
     @object.replaced_media?
   end
 
-  attribute :breadcrumb, if: -> { @object == @current_record || @force_breadcrumbs } do
-    Breadcrumb::ForUser.new(
-      @object,
-      @current_user,
-    ).viewable_to_api
-  end
-
-  attribute :can_view do
-    @current_ability.can?(:read, @object)
-  end
-
-  attribute :can_edit do
-    @current_ability.can?(:edit, @object)
-  end
-
-  attribute :can_edit_content do
-    @object.active? && @current_ability.can?(:edit_content, @object)
-  end
-
   attribute :pinned_and_locked do
     # might be nil, particularly in tests
     @object.pinned_and_locked? || false
@@ -101,11 +78,6 @@ class SerializableItem < BaseJsonSerializer
 
   attribute :pending_transcoding do
     @object.pending_transcoding_uuid.present?
-  end
-
-  attribute :common_viewable do
-    # only `true` if you're viewing the common resource outside of its home org
-    @object.common_viewable? && @object.organization_id != @current_user.current_organization_id
   end
 
   attribute :is_restorable do

@@ -18,7 +18,7 @@ let wrapper, component, titles
 
 describe('Breadcrumb', () => {
   beforeEach(() => {
-    props.record.inMyCollection = false
+    props.record.in_my_collection = false
     wrapper = shallow(<Breadcrumb {...props} />)
     component = wrapper.instance()
     titles = component.truncatedItems.map(t => t.name)
@@ -47,7 +47,7 @@ describe('With narrow window and more breadcrumb items', () => {
         {...props}
         record={{
           ...props.record,
-          inMyCollection: true,
+          in_my_collection: true,
           breadcrumb: [
             { type: 'collections', id: 1, name: 'My Workspace' },
             { type: 'collections', id: 12, name: 'One more Level' },
@@ -73,7 +73,7 @@ describe('With narrow window and more breadcrumb items', () => {
 
 describe('In My Collection', () => {
   beforeEach(() => {
-    props.record.inMyCollection = true
+    props.record.in_my_collection = true
     props.breadcrumbWrapper = {
       current: {
         offsetWidth: 900,

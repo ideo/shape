@@ -21,7 +21,11 @@ export function debouncedAutocompleteSearch(functionName, wait = 350) {
       query: term,
       per_page: 30,
     })
-      .then(res => callback(formatSearchData(res.data)))
+      .then(res => {
+        const cards = res.data
+        const records = _.map(cards, 'record')
+        callback(formatSearchData(records))
+      })
       .catch(e => {
         trackError(e)
       })

@@ -29,7 +29,7 @@ module CollectionCardFilter
         LEFT JOIN items ON items.id = collection_cards.item_id
         LEFT JOIN collections ON collections.id = collection_cards.collection_id
         JOIN roles ON (
-          roles.resource_identifier = #{resource_identifier_sql}
+          roles.resource_identifier = #{Collection.resource_identifier_sql}
         )
         LEFT JOIN users_roles ON
         users_roles.role_id = roles.id and
@@ -37,27 +37,6 @@ module CollectionCardFilter
         LEFT JOIN groups_roles ON
         groups_roles.role_id = roles.id and
         groups_roles.group_id IN (#{group_ids.present? ? group_ids.join(',') : 'NULL'})
-      )
-    end
-
-    def resource_identifier_sql
-      %(
-        CASE WHEN COALESCE(
-          items.roles_anchor_collection_id,
-          collections.roles_anchor_collection_id
-        ) IS NOT NULL
-        THEN
-          CONCAT('Collection_', COALESCE(
-            items.roles_anchor_collection_id,
-            collections.roles_anchor_collection_id
-          ))
-        ELSE
-          CONCAT(
-            (CASE WHEN collection_cards.item_id IS NOT NULL THEN 'Item' ELSE 'Collection' END),
-            '_',
-            COALESCE(collection_cards.item_id, collection_cards.collection_id)
-          )
-        END
       )
     end
   end

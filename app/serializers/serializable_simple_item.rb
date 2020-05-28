@@ -24,8 +24,4 @@ class SerializableSimpleItem < BaseJsonSerializer
   attribute :is_restorable do
     @object.try(:restorable?)
   end
-
-  attribute :can_edit, if: -> { @current_ability } do
-    @current_ability.can?(:edit, @object)
-  end
 end

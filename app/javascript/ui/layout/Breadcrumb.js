@@ -67,8 +67,6 @@ class Breadcrumb extends React.Component {
       // this may also have the effect of marking uiStore.linkedInMyCollection
       uiStore.linkedBreadcrumbTrailForRecord(record)
     )
-    // this will set record.inMyCollection = true/false
-    apiStore.checkInMyCollection(record)
   }
 
   calculateMaxChars = () => {
@@ -90,10 +88,13 @@ class Breadcrumb extends React.Component {
   }
 
   items = (clamp = true) => {
-    const { maxDepth, record } = this.props
+    const { maxDepth, record, useLinkedBreadcrumb } = this.props
     const items = []
     const breadcrumb = this.breadcrumbWithLinks
-    if (record.inMyCollection || uiStore.linkedInMyCollection) {
+    const inMyCollection =
+      record.in_my_collection ||
+      (useLinkedBreadcrumb && uiStore.linkedInMyCollection)
+    if (inMyCollection) {
       items.push({
         type: 'collections',
         id: apiStore.currentUserCollectionId,
@@ -283,13 +284,8 @@ class Breadcrumb extends React.Component {
 
   render() {
     const { record, isHomepage } = this.props
-    const { inMyCollection, breadcrumb } = record
-    const renderItems =
-      !isHomepage &&
-      // wait until we load this value before rendering
-      inMyCollection !== null &&
-      breadcrumb &&
-      breadcrumb.length > 0
+    const { breadcrumb } = record
+    const renderItems = !isHomepage && breadcrumb && breadcrumb.length > 0
     const items = this.truncatedItems
     // We need a ref to wrapper so we always render that
     // Tried using innerRef on styled component but it isn't available on mount
@@ -330,6 +326,7 @@ Breadcrumb.propTypes = {
   containerWidth: PropTypes.number,
   maxDepth: PropTypes.number,
   backButton: PropTypes.bool,
+  useLinkedBreadcrumb: PropTypes.bool,
 }
 
 Breadcrumb.defaultProps = {
@@ -338,6 +335,7 @@ Breadcrumb.defaultProps = {
   containerWidth: null,
   maxDepth: 6,
   backButton: false,
+  useLinkedBreadcrumb: true,
 }
 
 export default Breadcrumb

@@ -102,22 +102,11 @@ class SearchResultsInfinite extends React.Component {
       total,
     } = this.props
 
-    const results = searchResults.map((result, i) => {
-      // ActionMenu is rendered as if we were operating on the parent_collection_card
-      let card = result.parent_collection_card
-      if (!card) {
-        // catch for special/global templates that don't have a parent card
-        card = {
-          id: `card-${i}`,
-          width: 1,
-          height: 1,
-        }
-      }
-      // need to make this available in the reverse direction
-      card.record = result
+    const results = searchResults.map((card, i) => {
+      const { record } = card
 
       return (
-        <FlipMove appearAnimation="fade" key={result.id}>
+        <FlipMove appearAnimation="fade" key={record.id}>
           <VisibilitySensor
             partialVisibility
             scrollCheck
@@ -130,10 +119,11 @@ class SearchResultsInfinite extends React.Component {
             <StyledCardWrapper>
               <StyledBreadcrumb>
                 <Breadcrumb
-                  record={result}
+                  record={record}
                   isHomepage={false}
+                  useLinkedBreadcrumb={false}
                   // re-mount every time the record / breadcrumb changes
-                  key={`${result.identifier}_${result.breadcrumbSize}`}
+                  key={`${record.identifier}_${record.breadcrumbSize}`}
                 />
               </StyledBreadcrumb>
               <StyledSearchResult
@@ -148,11 +138,11 @@ class SearchResultsInfinite extends React.Component {
               >
                 <GridCard
                   card={card}
-                  cardType={result.internalType}
-                  record={result}
+                  cardType={record.internalType}
+                  record={record}
                   menuOpen={uiStore.cardMenuOpen.id === card.id}
                   handleClick={() =>
-                    routingStore.routeTo(result.internalType, result.id)
+                    routingStore.routeTo(record.internalType, record.id)
                   }
                   searchResult
                 />
