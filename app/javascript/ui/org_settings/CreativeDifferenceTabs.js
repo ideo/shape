@@ -210,12 +210,12 @@ class CreativeDifferenceTabs extends React.Component {
   }
 
   createBusinessUnit = async e => {
-    e.preventDefault()
     console.log('creating new BU')
     try {
       const businessUnitParams = {
         business_unit: {
           name: 'New BU Here',
+          // Where to pull other params from?
         },
       }
       console.log(businessUnitParams)

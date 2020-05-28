@@ -3,8 +3,7 @@ import { useState } from 'react'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TrashIcon from '~/ui/icons/TrashIcon'
-// TODO: replace with clone icon
-import CalloutBoxIcon from '~/ui/icons/CalloutBoxIcon'
+import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 
 const BusinessUnitActionMenu = ({ handleClone, handleRemove, name }) => {
@@ -64,7 +63,7 @@ const BusinessUnitActionMenu = ({ handleClone, handleRemove, name }) => {
           {
             name: 'Clone',
             onClick: handleCloneClick,
-            iconRight: <CalloutBoxIcon />, // Do we have a copy icon?
+            iconRight: <DuplicateIcon />, // Do we have a copy icon?
           },
           {
             name: 'Remove',
