@@ -4,7 +4,7 @@
       "id": "990",
       "type": "audiences",
       "attributes": {
-        "name": "{Challenge Name} Admins",
+        "name": "Admins",
         "global_default": null,
         "age_list": [
 
@@ -31,7 +31,7 @@
 
         ],
         "min_price_per_response": 0.0,
-        "order": 990,
+        "order": -1,
         "global": false
       }
     },
@@ -39,7 +39,7 @@
       "id": "991",
       "type": "audiences",
       "attributes": {
-        "name": "{Challenge Name} Reviewers",
+        "name": "Reviewers",
         "global_default": null,
         "age_list": [
 
@@ -66,7 +66,7 @@
 
         ],
         "min_price_per_response": 0.0,
-        "order": 991,
+        "order": -2,
         "global": false
       }
     },
@@ -75,7 +75,7 @@
       "id": "992",
       "type": "audiences",
       "attributes": {
-        "name": "{Challenge Name} Participants",
+        "name": "Participants",
         "global_default": null,
         "age_list": [
 
@@ -102,7 +102,7 @@
 
         ],
         "min_price_per_response": 0.0,
-        "order": 992,
+        "order": -3,
         "global": false
       }
     }
