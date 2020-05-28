@@ -66,7 +66,7 @@ const ConfirmOption = styled(ConfirmText)`
 `
 
 const OptionsButton = styled(TextButton)`
-  color: ${v.colors.black};
+  color: ${props => props.color};
   font-size: 0.75rem;
 `
 
@@ -110,6 +110,10 @@ class ConfirmationDialog extends React.PureComponent {
     return v.colors.commonDark
   }
 
+  get buttonColor() {
+    return this.bigModal ? v.colors.black : v.colors.white
+  }
+
   render() {
     // these props get passed in from uiStore.dialogConfig in DialogWrapper
     const {
@@ -150,6 +154,7 @@ class ConfirmationDialog extends React.PureComponent {
               data-cy="CancelButton"
               maxWidth={200}
               onClick={this.handleCancel}
+              color={this.buttonColor}
             >
               {props.cancelText}
             </ButtonEl>
@@ -174,6 +179,7 @@ class ConfirmationDialog extends React.PureComponent {
               data-cy="ConfirmButton"
               maxWidth="200"
               onClick={this.handleConfirm}
+              color={this.buttonColor}
             >
               {props.confirmText}
             </ButtonEl>

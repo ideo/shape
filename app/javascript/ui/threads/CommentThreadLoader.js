@@ -12,6 +12,7 @@ const StyledCommentThreadLoader = styled(TextButton)`
   height: 40px;
   position: relative;
   margin-bottom: 5px;
+  color: ${v.colors.white};
   background: ${props =>
     props.disabled ? v.colors.commonDark : v.colors.secondaryMedium};
   width: 100%;
