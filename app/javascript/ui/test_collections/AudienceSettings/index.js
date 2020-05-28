@@ -9,6 +9,7 @@ import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/Audie
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
 import v from '~/utils/variables'
+import challenge_audiences from '~/ui/test_collections/temp/challenge_audiences.json'
 
 const FormButtonWrapper = styled.div`
   margin: 2rem;
@@ -37,22 +38,35 @@ class AudienceSettings extends React.Component {
   }
 
   fetchAvailableAudiences = async () => {
-    const { apiStore } = this.props
+    const { apiStore, testCollection } = this.props
 
     await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
+    // TODO: Hardcoded value
+    if (testCollection.isInsideAChallenge) {
+      apiStore.sync(challenge_audiences)
+    }
     this.initAudienceSettings()
   }
 
   @action
   initAudienceSettings() {
-    const { testCollection } = this.props
+    const { testCollection, apiStore } = this.props
     const { audiences, audienceSettings } = this
+    const { test_audiences } = testCollection
+    // NOTE: temporary hardcode for video-demo
+    const challengeAudiences = [
+      apiStore.find('audiences', 990),
+      apiStore.find('audiences', 991),
+      apiStore.find('audiences', 992),
+    ]
+
     _.each(audiences, audience => {
-      const testAudience = testCollection.test_audiences.find(
+      const testAudience = test_audiences.find(
         testAudience => testAudience.audience_id === audience.id
       )
+
       const { isLinkSharing } = audience
       let selected = !!testAudience
       if (testAudience && isLinkSharing) {
@@ -62,10 +76,19 @@ class AudienceSettings extends React.Component {
         selected || isLinkSharing || (!this.locked && audience.order <= 6)
       audienceSettings.set(audience.id, {
         selected,
-        sample_size: testAudience ? testAudience.sample_size : '0',
+        // sample_size: testAudience ? testAudience.sample_size : '0',
         audience,
-        test_audience: testAudience,
+        // test_audience: testAudience,
         displayCheckbox,
+      })
+    })
+
+    // FIXME: should render challenge audiences
+    _.each(challengeAudiences, challengeAudience => {
+      audienceSettings.set(challengeAudience.id, {
+        selected: false,
+        audience: challengeAudience,
+        displayCheckbox: false,
       })
     })
   }

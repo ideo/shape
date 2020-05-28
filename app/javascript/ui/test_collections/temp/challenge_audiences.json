@@ -1,0 +1,110 @@
+{
+  "data": [
+    {
+      "id": "990",
+      "type": "audiences",
+      "attributes": {
+        "name": "{Challenge Name} Admins",
+        "global_default": null,
+        "age_list": [
+
+        ],
+        "children_age_list": [
+
+        ],
+        "country_list": [
+
+        ],
+        "education_level_list": [
+
+        ],
+        "gender_list": [
+
+        ],
+        "adopter_type_list": [
+
+        ],
+        "interest_list": [
+
+        ],
+        "publication_list": [
+
+        ],
+        "min_price_per_response": 0.0,
+        "order": 990,
+        "global": false
+      }
+    },
+    {
+      "id": "991",
+      "type": "audiences",
+      "attributes": {
+        "name": "{Challenge Name} Reviewers",
+        "global_default": null,
+        "age_list": [
+
+        ],
+        "children_age_list": [
+
+        ],
+        "country_list": [
+
+        ],
+        "education_level_list": [
+
+        ],
+        "gender_list": [
+
+        ],
+        "adopter_type_list": [
+
+        ],
+        "interest_list": [
+
+        ],
+        "publication_list": [
+
+        ],
+        "min_price_per_response": 0.0,
+        "order": 991,
+        "global": false
+      }
+    },
+
+    {
+      "id": "992",
+      "type": "audiences",
+      "attributes": {
+        "name": "{Challenge Name} Participants",
+        "global_default": null,
+        "age_list": [
+
+        ],
+        "children_age_list": [
+
+        ],
+        "country_list": [
+
+        ],
+        "education_level_list": [
+
+        ],
+        "gender_list": [
+
+        ],
+        "adopter_type_list": [
+
+        ],
+        "interest_list": [
+
+        ],
+        "publication_list": [
+
+        ],
+        "min_price_per_response": 0.0,
+        "order": 992,
+        "global": false
+      }
+    }
+  ]
+}
