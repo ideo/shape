@@ -204,12 +204,12 @@ class CreativeDifferenceTabs extends React.Component {
       })
       this.setLoading(false)
     } catch (err) {
-      console.log('org update failed: ', err)
+      console.log('BU update failed: ', err)
       this.setError(true)
     }
   }
 
-  handleCreateBusinessUnit = async e => {
+  createBusinessUnit = async e => {
     e.preventDefault()
     console.log('creating new BU')
     try {
@@ -226,15 +226,37 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
-  handleCloneBusinessUnit = businessUnit => {
+  cloneBusinessUnit = async businessUnit => {
     event.preventDefault()
     console.log('cloning: ', businessUnit.id)
   }
 
-  handleRemoveBusinessUnit = businessUnit => {
+  removeBusinessUnit = async businessUnit => {
     event.preventDefault()
     // TODO: This is supposed to archive from frontend but keep in backend
-    console.log('removing: ', businessUnit.id)
+    try {
+      this.setLoading(true)
+      const model = new businessUnitsStore.model()
+      const modelInstance = new model({
+        id: businessUnit.id,
+      })
+      console.log('removing: ', businessUnit.id)
+
+      const promise = modelInstance.destroy({
+        optimistic: false,
+      })
+      const result = await promise
+      console.log('BU destroy result: ', result)
+      const allBusinessUnits = await businessUnitsStore.fetch()
+      runInAction(async () => {
+        // fetch all the business units after an update
+        this.businessUnits = allBusinessUnits
+        // TODO: Just update one BU so we don't have to refetch all the BUs?
+      })
+      this.setLoading(false)
+    } catch (err) {
+      console.log('error is: ', err)
+    }
   }
 
   render() {
@@ -250,7 +272,7 @@ class CreativeDifferenceTabs extends React.Component {
       tabValue,
       handleChange,
       updateOrg,
-      handleCreateBusinessUnit,
+      createBusinessUnit,
     } = this
 
     console.log('C∆ Tabs render: ', organization, supportedLanguages)
@@ -362,9 +384,7 @@ class CreativeDifferenceTabs extends React.Component {
                 >
                   Team
                   {/* Make Add Team button its own component? */}
-                  <AddTeamButton
-                    createBusinessUnit={handleCreateBusinessUnit}
-                  />
+                  <AddTeamButton createBusinessUnit={createBusinessUnit} />
                 </Label>
                 <Label
                   style={{
@@ -521,11 +541,9 @@ class CreativeDifferenceTabs extends React.Component {
                     >
                       <BusinessUnitActionMenu
                         name={businessUnit.name}
-                        handleClone={() =>
-                          this.handleCloneBusinessUnit(businessUnit)
-                        }
+                        handleClone={() => this.cloneBusinessUnit(businessUnit)}
                         handleRemove={() =>
-                          this.handleRemoveBusinessUnit(businessUnit)
+                          this.removeBusinessUnit(businessUnit)
                         }
                       />
                     </div>
@@ -561,13 +579,13 @@ class CreativeDifferenceTabs extends React.Component {
                           apiStore.currentUserOrganization.primary_group
                             .can_edit
                         }
-                      />{' '}
+                      />
                     </div>
                   </form>
                 </Row>
               ))}
               <div>
-                <AddTeamButton handleClick={handleCreateBusinessUnit} />
+                <AddTeamButton handleClick={createBusinessUnit} />
               </div>
             </React.Fragment>
           </TabPanel>
