@@ -354,6 +354,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SubmissionsCollection'
   }
 
+  get submissionFormat() {
+    if (this.submission_template_id) return 'template'
+    if (this.submission_box_type && this.submission_box_type !== 'template')
+      return 'item'
+    return null
+  }
+
   get isSubmission() {
     return this.submission_attrs && this.submission_attrs.submission
   }
@@ -1055,6 +1062,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isInsideAChallenge() {
     return !!this.challenge_id
+  }
+
+  get isChallengeOrInsideChallenge() {
+    return this.collection_type === 'challenge' || this.isInsideAChallenge
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order

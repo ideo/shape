@@ -12,7 +12,6 @@ import Tooltip from '~/ui/global/Tooltip'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
-import ChallengeIcon from '~/ui/icons/ChallengeIcon'
 import BackIcon from '~/ui/icons/BackIcon'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -20,7 +19,6 @@ import Button from '~/ui/global/Button'
 import {
   SubduedHeading1,
   HeaderButtonText,
-  Heading2,
 } from '~/ui/global/styled/typography'
 import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
@@ -32,19 +30,8 @@ import CollectionTypeIcon, {
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
-
-const StyledSubHeaderLink = styled(Heading2)`
-  display: inline-block;
-  color: ${v.colors.commonDark};
-  font-size: 13px;
-  line-height: 16px;
-  margin: 0px;
-  position: relative;
-  bottom: 3px;
-  cursor: pointer;
-`
-
-StyledSubHeaderLink.displayName = 'StyledSubHeaderLink'
+import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
+import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -86,8 +73,14 @@ const StyledButtonIconWrapper = styled.span`
     right: 6px;
   `}
 `
-
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
+
+const FixedRightContainer = styled(Flex)`
+  position: relative;
+  top: 22px;
+  right: 60px;
+  height: 33px;
+`
 
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
@@ -134,6 +127,11 @@ class PageHeader extends React.Component {
 
   handleFilterClick = ev => {
     ev.preventDefault()
+  }
+
+  handleChallengeSettingsClick = () => {
+    const { uiStore } = this.props
+    uiStore.update('challengeSettingsOpen', true)
   }
 
   openMoveMenuForTemplate = e => {
@@ -447,38 +445,8 @@ class PageHeader extends React.Component {
     }
   }
 
-  renderSubHeader() {
-    const { record, routingStore } = this.props
-    return (
-      <span>
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title={'go to challenge'}
-          placement="top"
-        >
-          <StyledSubHeaderLink
-            onClick={() => {
-              routingStore.routeTo('collections', record.challenge_id)
-            }}
-          >
-            {record.challenge_name}
-          </StyledSubHeaderLink>
-        </Tooltip>
-        <IconHolder
-          height={16}
-          width={16}
-          display={'inline-block'}
-          marginTop={0}
-          marginRight={12}
-        >
-          <ChallengeIcon />
-        </IconHolder>
-      </span>
-    )
-  }
-
   render() {
-    const { record, uiStore } = this.props
+    const { record, uiStore, routingStore } = this.props
     const tagEditorOpen =
       record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
@@ -493,7 +461,14 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          {record.isInsideAChallenge && this.renderSubHeader()}
+          {record.isInsideAChallenge && (
+            <ChallengeSubHeader
+              challengeName={record.challenge_name}
+              challengeNavigationHandler={() => {
+                routingStore.routeTo('collections', record.challenge_id)
+              }}
+            />
+          )}
           <div style={{ minHeight: '72px' }}>
             <StyledTitleAndRoles
               data-empty-space-click
@@ -540,16 +515,17 @@ class PageHeader extends React.Component {
               </Flex>
 
               {record.show_language_selector && (
-                <Flex
-                  style={{
-                    position: 'relative',
-                    top: '22px',
-                    right: '60px',
-                    height: '33px',
-                  }}
-                >
+                <FixedRightContainer>
                   <LanguageSelector />
-                </Flex>
+                </FixedRightContainer>
+              )}
+
+              {record.isChallengeOrInsideChallenge && (
+                <FixedRightContainer>
+                  <ChallengeSettingsButton
+                    handleShowSettings={this.handleChallengeSettingsClick}
+                  />
+                </FixedRightContainer>
               )}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (

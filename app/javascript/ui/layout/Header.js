@@ -27,8 +27,9 @@ import {
 import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
-import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
+import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
+import ChallengeSettingsModal from '~/ui/challenges/ChallengeSettingsModal'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const BackIconContainer = styled.span`
@@ -116,9 +117,9 @@ class Header extends React.Component {
     this.props.uiStore.update('organizationMenuPage', null)
   }
 
-  handleChallengeSettingsClick = () => {
+  handleOpenChallengeSettings = ({ open = true }) => {
     const { uiStore } = this.props
-    uiStore.update('challengeSettingsOpen', true)
+    uiStore.update('challengeSettingsOpen', open)
   }
 
   get onArchivedPage() {
@@ -277,7 +278,7 @@ class Header extends React.Component {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
-    // const { shouldRenderFixedHeader } = uiStore
+    const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -306,10 +307,6 @@ class Header extends React.Component {
         'id'
       )}`
     }
-
-    const viewingChallenge =
-      _.get(uiStore.viewingRecord, 'collection_type') === 'challenge' ||
-      _.get(uiStore.viewingRecord, 'isInsideAChallenge')
 
     return (
       <Fragment>
@@ -422,13 +419,27 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-          {viewingChallenge && (
-            <ChallengeFixedHeader
-              collection={uiStore.viewingRecord}
-              onSettingsClick={this.handleChallengeSettingsClick}
-              showSettingsModal={uiStore.challengeSettingsOpen}
+          {record && record.isChallengeOrInsideChallenge && (
+            <ChallengeSettingsModal
+              collection={record}
+              open={uiStore.challengeSettingsOpen}
+              onClose={() => this.handleOpenChallengeSettings({ open: false })}
             />
           )}
+          {record &&
+            record.isChallengeOrInsideChallenge &&
+            shouldRenderFixedHeader && (
+              <ChallengeFixedHeader
+                collection={record}
+                showSettingsModal={uiStore.challengeSettingsOpen}
+                handleShowSettings={() =>
+                  this.handleOpenChallengeSettings({ open: true })
+                }
+                challengeNavigationHandler={() => {
+                  routingStore.routeTo('collections', record.challenge_id)
+                }}
+              />
+            )}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>

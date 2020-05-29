@@ -8,11 +8,9 @@ import v from '~/utils/variables'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
 import { ThumbnailHolder } from '~/ui/threads/CommentThumbnail'
-import EditPencilIcon from '~/ui/icons/EditPencilIcon'
-import Tooltip from '~/ui/global/Tooltip'
 
 const SubmissionBoxRow = styled(Row)`
-  cursor: pointer;
+  ${props => props.clickable && 'cursor: pointer;'}
   font-family: ${v.fonts.sans};
   transition: background-color 0.3s;
   padding: 0.5rem 0;
@@ -23,22 +21,29 @@ const SubmissionBoxRow = styled(Row)`
     background: ${v.colors.primaryLight};
   }
 `
+
 const SubmissionBoxRowText = styled(RowItemLeft)`
   padding-top: 0.75rem;
 `
 
-export const SubmissionBoxRowForItem = ({ type, onChooseType }) => {
+export const SubmissionBoxRowForItem = ({
+  type,
+  onSelect,
+  rightSideComponent,
+}) => {
   const { name, Icon } = type
   return (
     <SubmissionBoxRow
       key={name}
       noSpacing
-      onClick={() => onChooseType && onChooseType(name)}
+      clickable={!!onSelect}
+      onClick={() => onSelect && onSelect(name)}
     >
       <BctButton>
         <Icon />
       </BctButton>
       <SubmissionBoxRowText>{_.startCase(name)} Item</SubmissionBoxRowText>
+      {rightSideComponent}
     </SubmissionBoxRow>
   )
 }
@@ -48,23 +53,26 @@ SubmissionBoxRowForItem.propTypes = {
     name: PropTypes.string,
     Icon: PropTypes.node,
   }).isRequired,
-  onChooseType: PropTypes.func,
+  onSelect: PropTypes.func,
+  rightSideComponent: PropTypes.node,
 }
 
 SubmissionBoxRowForItem.defaultProps = {
-  onChooseType: () => null,
+  onSelect: () => null,
+  rightSideComponent: <span />,
 }
 
 export const SubmissionBoxRowForTemplate = ({
   template,
-  onChooseTemplate,
-  canEdit,
+  onSelect,
+  rightSideComponent,
 }) => {
   return (
     <SubmissionBoxRow
       key={template.id}
       noSpacing
-      onClick={() => onChooseTemplate && onChooseTemplate(template)}
+      clickable={!!onSelect}
+      onClick={() => onSelect && onSelect(template)}
     >
       <ThumbnailHolder>
         {template.cover.image_url && (
@@ -73,27 +81,18 @@ export const SubmissionBoxRowForTemplate = ({
         {!template.cover.image_url && <TemplateIcon circled filled />}
       </ThumbnailHolder>
       <SubmissionBoxRowText>{template.name}</SubmissionBoxRowText>
-      {canEdit && (
-        <div style={{ float: 'right', width: '24px' }}>
-          <Tooltip
-            classes={{ tooltip: 'Tooltip' }}
-            title="Edit submission template"
-          >
-            <EditPencilIcon />
-          </Tooltip>
-        </div>
-      )}
+      {rightSideComponent}
     </SubmissionBoxRow>
   )
 }
 
 SubmissionBoxRowForTemplate.propTypes = {
   template: MobxPropTypes.objectOrObservableObject.isRequired,
-  onChooseTemplate: PropTypes.func,
-  canEdit: PropTypes.bool,
+  onSelect: PropTypes.func,
+  rightSideComponent: PropTypes.node,
 }
 
 SubmissionBoxRowForTemplate.defaultProps = {
-  onChooseTemplate: () => null,
-  canEdit: false,
+  onSelect: null,
+  rightSideComponent: <span />,
 }

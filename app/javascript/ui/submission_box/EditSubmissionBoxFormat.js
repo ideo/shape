@@ -1,23 +1,18 @@
 import _ from 'lodash'
 import pluralize from 'pluralize'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { computed, observable, runInAction } from 'mobx'
+import { observable, runInAction } from 'mobx'
 
-import Modal from '~/ui/global/modals/Modal'
-import { Heading2 } from '~/ui/global/styled/typography'
 import RecordSearch from '~/ui/global/RecordSearch'
 import {
   SubmissionBoxRowForItem,
   SubmissionBoxRowForTemplate,
 } from '~/ui/submission_box/SubmissionBoxRow'
-import {
-  submissionItemTypes,
-  submissionTypeForName,
-} from '~/ui/submission_box/SubmissionBoxSettings'
+import { submissionItemTypes } from '~/ui/submission_box/SubmissionBoxSettings'
 
 @inject('apiStore', 'uiStore', 'routingStore')
 @observer
-class EditSubmissionBoxFormatModal extends React.Component {
+class EditSubmissionBoxFormat extends React.Component {
   @observable
   loading = false
   @observable
@@ -35,36 +30,6 @@ class EditSubmissionBoxFormatModal extends React.Component {
     // if the modal is open via CollectionPage and not from uiStore, that means
     // settings are required and the modal is locked open (cannot close)
     return !uiStore.submissionBoxSettingsOpen
-  }
-
-  handleClose = ev => {
-    const { apiStore, uiStore, routingStore, collection } = this.props
-    if (!this.locked) {
-      uiStore.update('submissionBoxSettingsOpen', false)
-      return
-    }
-    // Note that the meaning of "cancel" and "confirm" are sort of reversed in this context.
-    // "cancel" means cancel creating the SubmissionBox, which will delete it and go back.
-    // "confirm" means do nothing so that you can continue with setup.
-    uiStore.confirm({
-      iconName: 'Alert',
-      prompt: `Closing the submission settings without choosing a submission format
-               will delete this submission box.`,
-      confirmText: 'Choose',
-      cancelText: 'Delete',
-      onCancel: async () => {
-        await apiStore.request(`collections/${collection.id}`, 'DELETE')
-        if (collection.parent_collection_card.parent_id) {
-          routingStore.routeTo(
-            'collections',
-            collection.parent_collection_card.parent_id
-          )
-        } else {
-          routingStore.routeTo('homepage')
-        }
-      },
-      onConfirm: () => uiStore.closeDialog(),
-    })
   }
 
   confirmSubmissionTemplateChange = ({ type, template } = {}, callback) => {
@@ -133,48 +98,17 @@ class EditSubmissionBoxFormatModal extends React.Component {
     }
   }
 
-  chooseTemplate = template => () => {
+  chooseTemplate = template => {
     this.confirmSubmissionTemplateChange({ template }, () => {
       this.setTemplate({ template })
     })
   }
 
-  chooseNonTemplateType = type => () => {
+  chooseNonTemplateType = type => {
     this.confirmSubmissionTemplateChange({ type }, () => {
       this.props.collection.submission_template = null
       this.setTemplate({ type })
     })
-  }
-
-  // computed to allow it to observe changing submission_template_id
-  @computed
-  get selectedOption() {
-    const {
-      submission_template_id,
-      submission_box_type,
-    } = this.props.collection
-    const { apiStore } = this.props
-    let template
-    if (submission_template_id) {
-      template = apiStore.find('collections', submission_template_id)
-    }
-    if (template) {
-      return (
-        <SubmissionBoxRowForTemplate
-          template={template}
-          onChooseTemplate={this.chooseTemplate}
-        />
-      )
-    } else if (submission_box_type && submission_box_type !== 'template') {
-      const type = submissionTypeForName(submission_box_type)
-      return (
-        <SubmissionBoxRowForItem
-          type={type}
-          onChooseType={this.chooseNonTemplateType}
-        />
-      )
-    }
-    return ''
   }
 
   searchFilter = collection => {
@@ -193,7 +127,7 @@ class EditSubmissionBoxFormatModal extends React.Component {
 
   render() {
     return (
-      <Modal title={<Heading2>Edit Submission Box Format</Heading2>}>
+      <div>
         <RecordSearch
           onSelect={() => {}}
           onSearch={this.onSearch}
@@ -202,20 +136,31 @@ class EditSubmissionBoxFormatModal extends React.Component {
           searchParams={{ master_template: true }}
         />
         {this.nonSelectedSubmissionTypes.map(type => (
-          <SubmissionBoxRowForItem type={type} />
+          <SubmissionBoxRowForItem
+            type={type}
+            onSelect={this.chooseNonTemplateType}
+            key={type.name}
+          />
         ))}
-      </Modal>
+        {this.templates.map(template => (
+          <SubmissionBoxRowForTemplate
+            template={template}
+            onSelect={this.chooseTemplate}
+            key={template.id}
+          />
+        ))}
+      </div>
     )
   }
 }
 
-EditSubmissionBoxFormatModal.propTypes = {
+EditSubmissionBoxFormat.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
-EditSubmissionBoxFormatModal.wrappedComponent.propTypes = {
+EditSubmissionBoxFormat.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default EditSubmissionBoxFormatModal
+export default EditSubmissionBoxFormat

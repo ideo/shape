@@ -21,12 +21,13 @@ class ChallengeSettingsModal extends React.Component {
   }
 
   render() {
-    const { open } = this.props
+    const { open, onClose } = this.props
     return (
       <ModalWithNavigation
         title="Challenge settings"
         contents={this.contents}
         open={open}
+        onClose={onClose}
       />
     )
   }
@@ -34,6 +35,7 @@ class ChallengeSettingsModal extends React.Component {
 
 ChallengeSettingsModal.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  onClose: PropTypes.func.isRequired,
   open: PropTypes.bool,
 }
 

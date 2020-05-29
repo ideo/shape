@@ -21,7 +21,7 @@ const SubmissionsSettings = ({ collection }) => {
       setIsLoading(false)
     }
     fetchSubmissions()
-  })
+  }, [collection])
 
   return (
     <div>
