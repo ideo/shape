@@ -2,24 +2,45 @@ import React from 'react'
 import { Flex } from 'reflexbox'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
+import ArrowIcon from '~/ui/icons/ArrowIcon'
 import ListCard, { Column } from './ListCard'
 import TextButton from '~/ui/global/TextButton'
 import v from '~/utils/variables'
 
 class CollectionList extends React.Component {
   componentDidMount() {
+    this.fetchCards()
+  }
+
+  fetchCards({ sort } = {}) {
     const { collection } = this.props
     collection.API_fetchCards({ include: ['roles'] })
   }
 
   get columns() {
     return [
-      { name: '', style: { width: '50px' } },
-      { name: 'Idea names', style: { width: '500px' } },
-      { name: 'Last updated', style: { width: '400px' } },
-      { name: 'Permissions', style: {} },
-      { name: '', style: { marginLeft: 'auto' } },
+      { displayName: '', style: { width: '50px' } },
+      {
+        displayName: 'Idea name',
+        name: 'name',
+        style: { width: '500px' },
+        sortable: true,
+      },
+      {
+        displayName: 'Last updated',
+        name: 'last_updated',
+        style: { width: '400px' },
+        sortable: true,
+      },
+      { displayName: 'Permissions', style: {} },
+      { displayName: '', style: { marginLeft: 'auto' } },
     ]
+  }
+
+  handleSort = column => {
+    const { collection } = this.props
+    uiStore.update('collectionCardSortOrder', ev.target.value)
+    collection.API_sortCards()
   }
 
   render() {
@@ -31,7 +52,17 @@ class CollectionList extends React.Component {
         <Flex mb={1}>
           {this.columns.map(column => (
             <Column {...column.style}>
-              <TextButton color={v.colors.black}>{column.name}</TextButton>
+              <TextButton
+                color={v.colors.black}
+                onClick={() => this.handleSort(column)}
+              >
+                {column.displayName}
+              </TextButton>
+              {column.sortable && (
+                <span style={{ width: '12px', height: '12px' }}>
+                  <ArrowIcon rotation={90} />
+                </span>
+              )}
             </Column>
           ))}
         </Flex>
