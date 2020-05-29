@@ -249,8 +249,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   def render_collection_cards(collection: @collection, collection_cards: @collection_cards)
     params[:card_order] ||= collection.default_card_order
 
+    includes = CollectionCard.default_relationships_for_api,
+    if params[:include].present? && params[:include].first == 'roles'
+      includes = CollectionCard.default_relationships_for_api_with_roles
+    end
+
     render jsonapi: collection_cards,
-           include: CollectionCard.default_relationships_for_api,
+           include: includes,
            expose: {
              card_order: params[:card_order],
              current_record: collection,

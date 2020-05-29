@@ -7,6 +7,11 @@ import TextButton from '~/ui/global/TextButton'
 import v from '~/utils/variables'
 
 class CollectionList extends React.Component {
+  componentDidMount() {
+    const { collection } = this.props
+    collection.API_fetchCards({ include: ['roles'] })
+  }
+
   get columns() {
     return [
       { name: '', style: { width: '50px' } },
