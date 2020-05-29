@@ -126,6 +126,25 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           collection_type: 'Collection',
         }.as_json,
       ])
+      expect(json['data']['attributes']['in_my_collection']).to be false
+    end
+
+    context 'with a collection that is linked into the user\'s UserCollection (a.k.a. "My Collection")' do
+      # make an org where the user has a current_user_collection
+      let!(:organization) { create(:organization, member: user) }
+      let!(:link_to_my_collection) do
+        create(
+          :collection_card_link_collection,
+          # breadcrumb starts at parent_collection, so that's what has to be linked in
+          collection: parent_collection,
+          parent: user.current_user_collection,
+        )
+      end
+
+      it 'adds in_my_collection = true to the json response' do
+        get(path)
+        expect(json['data']['attributes']['in_my_collection']).to be true
+      end
     end
 
     it 'has no editors' do

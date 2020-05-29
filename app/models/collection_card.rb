@@ -127,7 +127,6 @@ class CollectionCard < ApplicationRecord
 
   def self.default_relationships_for_api
     [
-      # :parent, # <-- can we remove this?
       record: [
         :filestack_file,
         :datasets,
