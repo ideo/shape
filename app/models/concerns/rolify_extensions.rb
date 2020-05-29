@@ -32,10 +32,16 @@ module RolifyExtensions
         .where(GroupsRole.arel_table[:group_id].in(related_group_ids))
   end
 
+  # Because @has_role_by_identifier gets memoized, this function can be used to preload a bunch of
+  # role -> resource relations for the current user, e.g.
+  #   user.precache_roles_for([Role::EDITOR], resources: [...collections])
+  # That way when you are later querying `collection.can_edit?(user)` it will have already cached
+  # true/false via this initial rolify_roles bulk query
   def precache_roles_for(role_names, resources: [], resource_identifiers: nil)
     return unless @has_role_by_identifier.present? && is_a?(User)
     return unless resources.present? || resource_identifiers.present?
 
+    # the roles only exist on the roles_anchor records, so first consolidate those
     resource_identifiers ||= resources.map(&:roles_anchor_resource_identifier).uniq
     roles = rolify_roles.where(
       name: role_names,
