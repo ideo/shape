@@ -9,6 +9,7 @@ import v from '~/utils/variables'
 class CollectionList extends React.Component {
   get columns() {
     return [
+      { name: '', style: { width: '50px' } },
       { name: 'Idea names', style: { width: '500px' } },
       { name: 'Last updated', style: { width: '400px' } },
       { name: 'Permissions', style: {} },

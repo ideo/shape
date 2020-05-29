@@ -7,8 +7,12 @@ import styled from 'styled-components'
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import FileIcon from '~/ui/grid/covers/FileIcon'
+import LinkIcon from '~/ui/icons/LinkIcon'
 import ListCoverRenderer from '~/ui/grid/ListCoverRenderer'
-import TextIcon from '~/ui/icons/TextIcon'
+import SelectionCircle from '~/ui/grid/SelectionCircle'
+import TextIconXs from '~/ui/icons/TextIconXs'
+import VideoIcon from '~/ui/icons/VideoIcon'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { uiStore } from '~/stores'
@@ -79,18 +83,31 @@ class ListCard extends React.Component {
         </Fragment>
       )
     }
-    if (card.record.type === ITEM_TYPES.TEXT)
-      return (
-        <IconHolder>
-          <TextIcon />
-        </IconHolder>
-      )
+    let icon = null
+    switch (card.record.type) {
+      case ITEM_TYPES.TEXT:
+        icon = <TextIconXs />
+        break
+      case ITEM_TYPES.FILE:
+        icon = <FileIcon mimeType={card.record.filestack_file.mimetype} />
+        break
+      case ITEM_TYPES.VIDEO:
+        icon = <VideoIcon />
+        break
+      case ITEM_TYPES.LINK:
+        icon = <LinkIcon />
+        break
+    }
+    return <IconHolder>{icon}</IconHolder>
   }
 
   render() {
     const { card } = this.props
     return (
       <Row>
+        <Column width="50px">
+          <SelectionCircle cardId={card.id} />
+        </Column>
         <Column width="500px">
           <ListCoverRenderer
             card={card}

@@ -49,7 +49,7 @@ class ListCoverRenderer extends React.Component {
           return <div style={{ padding: '20px' }}>File not found.</div>
         }
         case ITEM_TYPES.VIDEO:
-          return <VideoItemCover item={record} dragging={dragging} />
+          return <VideoItemCover item={record} dragging={dragging} unPlayable />
         case ITEM_TYPES.LINK:
           return (
             <LinkItemCover
