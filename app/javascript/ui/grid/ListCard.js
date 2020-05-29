@@ -1,14 +1,18 @@
-import React from 'react'
+import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
 import { computed } from 'mobx'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
+import CollectionIconXs from '~/ui/icons/CollectionIconXs'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import ListCoverRenderer from '~/ui/grid/ListCoverRenderer'
+import TextIcon from '~/ui/icons/TextIcon'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { uiStore } from '~/stores'
+import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const Column = styled.div`
   ${DisplayTextCss}
@@ -27,6 +31,14 @@ const Row = styled(Flex)`
   align-items: center;
   height: 50px;
   margin-bottom: 8px;
+`
+
+const IconHolder = styled.div`
+  color: ${v.colors.commonDark};
+  display: flex;
+  height: 16px;
+  margin-left: 8px;
+  width: 16px;
 `
 
 class ListCard extends React.Component {
@@ -53,11 +65,33 @@ class ListCard extends React.Component {
     }
   }
 
+  get renderIcons() {
+    const { card } = this.props
+    if (card.record.isCollection) {
+      return (
+        <Fragment>
+          <IconHolder>
+            <CollectionIconXs />
+          </IconHolder>
+          <IconHolder>
+            <CollectionTypeIcon record={card.record} />
+          </IconHolder>
+        </Fragment>
+      )
+    }
+    if (card.record.type === ITEM_TYPES.TEXT)
+      return (
+        <IconHolder>
+          <TextIcon />
+        </IconHolder>
+      )
+  }
+
   render() {
     const { card } = this.props
     return (
       <Row>
-        <Column width="400px">
+        <Column width="500px">
           <ListCoverRenderer
             card={card}
             cardType={card.record.internalType}
@@ -66,6 +100,7 @@ class ListCard extends React.Component {
             handleClick={this.handleRecordClick}
           />
           {card.record.name}
+          {this.renderIcons}
         </Column>
         <Column width="400px">{defaultTimeFormat(card.updated_at)}</Column>
         <Column>PERMISSIONs</Column>

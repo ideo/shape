@@ -4,8 +4,6 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { routingStore, uiStore } from '~/stores'
 import PlainLink from '~/ui/global/PlainLink'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
-import TextIcon from '~/ui/icons/TextIcon'
-import CollectionIcon from '~/ui/icons/CollectionIcon'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
 import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
@@ -33,9 +31,7 @@ class ListCoverRenderer extends React.Component {
         case ITEM_TYPES.TEXT:
           return (
             <StyledCollectionCover backgroundColor={v.colors.commonDark}>
-              <div style={{ padding: '16px 20px' }}>
-                <TextIcon />
-              </div>
+              <div style={{ padding: '16px 20px' }}></div>
             </StyledCollectionCover>
           )
         case ITEM_TYPES.EXTERNAL_IMAGE:
@@ -82,9 +78,9 @@ class ListCoverRenderer extends React.Component {
       }
     } else if (this.isCollection) {
       return (
-        <StyledCollectionCover backgroundColor={v.colors.commonDark}>
-          <CollectionIcon />
-        </StyledCollectionCover>
+        <StyledCollectionCover
+          backgroundColor={v.colors.commonDark}
+        ></StyledCollectionCover>
       )
     }
     return <div />
