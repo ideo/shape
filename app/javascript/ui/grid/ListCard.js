@@ -10,6 +10,7 @@ import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import ListCoverRenderer from '~/ui/grid/ListCoverRenderer'
+import RolesSummary from '~/ui/roles/RolesSummary'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
@@ -69,6 +70,13 @@ class ListCard extends React.Component {
     }
   }
 
+  handleRolesClick = () => {
+    const {
+      card: { record },
+    } = this.props
+    uiStore.update('rolesMenuOpen', record)
+  }
+
   get renderIcons() {
     const { card } = this.props
     if (card.record.isCollection) {
@@ -103,6 +111,7 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
+    console.log('roles', [...card.record.roles])
     return (
       <Row>
         <Column width="50px">
@@ -120,7 +129,17 @@ class ListCard extends React.Component {
           {this.renderIcons}
         </Column>
         <Column width="400px">{defaultTimeFormat(card.updated_at)}</Column>
-        <Column>PERMISSIONs</Column>
+        <Column>
+          <RolesSummary
+            key="roles"
+            handleClick={this.handleRolesClick}
+            roles={[...card.record.roles]}
+            canEdit={card.record.can_edit}
+            // convert observable to normal array to trigger render changes
+            collaborators={[...card.record.collaborators]}
+            rolesMenuOpen={!!uiStore.rolesMenuOpen}
+          />
+        </Column>
         <Column marginLeft="auto">
           <ActionMenu
             location="GridCard"

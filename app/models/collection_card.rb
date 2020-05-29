@@ -139,6 +139,22 @@ class CollectionCard < ApplicationRecord
     ]
   end
 
+  def self.default_relationships_for_api_with_roles
+    [
+      :parent,
+      record: [
+        :roles,
+        :filestack_file,
+        :datasets,
+        :translations,
+        :parent_collection_card,
+        :question_choices,
+        :collection_cover_text_items,
+        collection_cover_items: :datasets,
+      ],
+    ]
+  end
+
   def self.default_includes_for_api
     {
       collection: [:collection_cover_items],
