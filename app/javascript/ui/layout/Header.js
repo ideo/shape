@@ -27,8 +27,8 @@ import {
 import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
-import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
+import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const BackIconContainer = styled.span`
@@ -117,7 +117,8 @@ class Header extends React.Component {
   }
 
   handleChallengeSettingsClick = () => {
-    // TODO: show challenge settings modal
+    const { uiStore } = this.props
+    uiStore.update('challengeSettingsOpen', true)
   }
 
   get onArchivedPage() {
@@ -306,10 +307,6 @@ class Header extends React.Component {
       )}`
     }
 
-    const viewingChallenge =
-      _.get(uiStore.viewingRecord, 'collection_type') === 'challenge' ||
-      _.get(uiStore.viewingRecord, 'isInsideAChallenge')
-
     return (
       <Fragment>
         <style
@@ -421,13 +418,20 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
-          {viewingChallenge && shouldRenderFixedHeader && (
-            <ChallengeFixedHeader
-              challengeName={uiStore.viewingRecord.name}
-              collectionType={uiStore.viewingRecord.collection_type}
-              onSettingsClick={this.handleChallengeSettingsClick}
-            />
-          )}
+          {record &&
+            record.isChallengeOrInsideChallenge &&
+            shouldRenderFixedHeader && (
+              <ChallengeFixedHeader
+                challengeName={record.challenge_name}
+                collectionName={record.name}
+                collectionType={record.collection_type}
+                onSettingsClick={this.handleChallengeSettingsClick}
+                isInsideAChallenge={record.isInsideAChallenge}
+                challengeNavigationHandler={() => {
+                  routingStore.routeTo('collections', record.challenge_id)
+                }}
+              />
+            )}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>
