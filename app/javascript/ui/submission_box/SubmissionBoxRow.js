@@ -27,8 +27,7 @@ const SubmissionBoxRowText = styled(RowItemLeft)`
   padding-top: 0.75rem;
 `
 
-export const SubmissionBoxRowForItem = props => {
-  const { type, onChooseType } = props
+export const SubmissionBoxRowForItem = ({ type, onChooseType }) => {
   const { name, Icon } = type
   return (
     <SubmissionBoxRow
@@ -56,8 +55,11 @@ SubmissionBoxRowForItem.defaultProps = {
   onChooseType: () => null,
 }
 
-export const SubmissionBoxRowForTemplate = props => {
-  const { template, onChooseTemplate, canEdit } = props
+export const SubmissionBoxRowForTemplate = ({
+  template,
+  onChooseTemplate,
+  canEdit,
+}) => {
   return (
     <SubmissionBoxRow
       key={template.id}
@@ -88,7 +90,7 @@ export const SubmissionBoxRowForTemplate = props => {
 SubmissionBoxRowForTemplate.propTypes = {
   template: MobxPropTypes.objectOrObservableObject.isRequired,
   onChooseTemplate: PropTypes.func,
-  canEdit: PropTypes.boolean,
+  canEdit: PropTypes.bool,
 }
 
 SubmissionBoxRowForTemplate.defaultProps = {

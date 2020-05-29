@@ -844,6 +844,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  API_fetchChallengeSubmissionBoxCollections() {
+    const apiPath = `collections/${this.id}/challenge_submission_boxes`
+    return this.apiStore.request(apiPath)
+  }
+
   API_fetchBreadcrumbRecords() {
     const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
     return this.apiStore.request(apiPath)

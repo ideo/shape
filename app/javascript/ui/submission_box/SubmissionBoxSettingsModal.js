@@ -17,8 +17,7 @@ const closeSubmissionBoxSettings = () => {
   uiStore.closeDialog()
 }
 
-const SubmissionBoxSettingsModal = props => {
-  const { collection } = props
+const SubmissionBoxSettingsModal = ({ collection }) => {
   return (
     <Modal
       title={

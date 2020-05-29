@@ -8,8 +8,8 @@ const showSubmissionBoxFormatModal = () => {
   console.log('open the modal')
 }
 
-const SubmissionBoxFormat = props => {
-  const { submission_template_id } = props.collection
+const SubmissionBoxFormat = ({ collection }) => {
+  const { submission_template_id } = collection
   let template
   if (submission_template_id) {
     template = apiStore.find('collections', submission_template_id)

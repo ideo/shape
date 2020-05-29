@@ -424,9 +424,9 @@ class Header extends React.Component {
           </MaxWidthContainer>
           {viewingChallenge && (
             <ChallengeFixedHeader
-              challengeName={uiStore.viewingRecord.name}
-              collectionType={uiStore.viewingRecord.collection_type}
+              collection={uiStore.viewingRecord}
               onSettingsClick={this.handleChallengeSettingsClick}
+              showSettingsModal={uiStore.challengeSettingsOpen}
             />
           )}
         </FixedHeader>
