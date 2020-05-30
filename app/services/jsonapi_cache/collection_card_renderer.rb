@@ -14,10 +14,12 @@ module JsonapiCache
       @current_ability = Ability.new(@user)
       @search_result = search_records.present?
       @search_records = search_records
+      @cached_data = {}
     end
 
     def call
       preload_roles_and_breadcrumb_collections
+      fetch_multi_keys
       render_json_data
     end
 
@@ -37,17 +39,36 @@ module JsonapiCache
     private
 
     def cached_card_data(card)
+      cached = @cached_data[card.cache_key]
+      if cached.present?
+        return cached
+      end
+
       Rails.cache.fetch(card.cache_key) do
-        renderer = JSONAPI::Serializable::Renderer.new
-        renderer.render(
-          card,
-          class: JsonapiMappings::ALL_MAPPINGS,
-          include: CollectionCard.default_relationships_for_api,
-          expose: {
-            inside_a_submission: inside_a_submission,
-            inside_hidden_submission_box: inside_hidden_submission_box,
-          },
-        )
+        cache_card_json(card)
+      end
+    end
+
+    def cache_card_json(card)
+      renderer = JSONAPI::Serializable::Renderer.new
+      renderer.render(
+        card,
+        class: JsonapiMappings::ALL_MAPPINGS,
+        include: CollectionCard.default_relationships_for_api,
+        expose: {
+          inside_a_submission: inside_a_submission,
+          inside_hidden_submission_box: inside_hidden_submission_box,
+        },
+      )
+    end
+
+    def fetch_multi_keys
+      card_map = {}
+      @cards.each do |card|
+        card_map[card.cache_key] = card
+      end
+      @cached_data = Rails.cache.fetch_multi(*@cards.map(&:cache_key)) do |cache_key|
+        cache_card_json(card_map[cache_key])
       end
     end
 
