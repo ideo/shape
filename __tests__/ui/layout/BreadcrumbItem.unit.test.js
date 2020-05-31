@@ -5,6 +5,7 @@ import {
   StyledMenuItem,
   StyledMenuWrapper,
 } from '~/ui/global/PopoutMenu'
+import Tooltip from '~/ui/global/Tooltip'
 
 jest.mock('../../../app/javascript/stores')
 jest.useFakeTimers()
@@ -112,7 +113,7 @@ describe('BreadcrumbItem', () => {
 
         it('should render a tooltip on the breadcrumb name', () => {
           const menuButton = wrapper.find(StyledMenuButton).at(0)
-          expect(menuButton.find('Tooltip').exists()).toBeTruthy()
+          expect(menuButton.find(Tooltip).exists()).toBeTruthy()
         })
       })
 
@@ -209,7 +210,7 @@ describe('BreadcrumbItem', () => {
       })
 
       it('renders a tooltip with the "switch to" location button', () => {
-        const tooltip = wrapper.find('Tooltip')
+        const tooltip = wrapper.find(Tooltip)
         expect(tooltip.props().title).toMatch(`switch to ${props.item.name}`)
         expect(tooltip.find('StyledRestoreButton').exists()).toBeTruthy()
       })

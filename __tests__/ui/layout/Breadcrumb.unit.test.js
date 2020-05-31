@@ -1,5 +1,4 @@
 import Breadcrumb from '~/ui/layout/Breadcrumb'
-// import { fakeCollection } from '#/mocks/data'
 
 let wrapper, component, render
 
@@ -60,21 +59,6 @@ describe('Breadcrumb', () => {
   })
 
   describe('truncate()', () => {
-    describe('an item with more than 25 chars', () => {
-      beforeEach(() => {
-        props.items = [
-          { name: 'A really long name longer than twenty five chars' },
-          { name: 'a normal thing 123456789' },
-        ]
-        props.containerWidth = 875
-        render()
-      })
-
-      it('should truncate it to 25 chars', () => {
-        expect(component.truncatedItems[0].truncatedName.length).toEqual(25)
-      })
-    })
-
     describe('multiple items that have to be truncated', () => {
       beforeEach(() => {
         props.items = [
