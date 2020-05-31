@@ -29,6 +29,12 @@ const StyledInfoIconWrapper = styled.span`
   }
 `
 
+const AssignReviewersLink = styled.h3`
+  display: inline-block;
+  color: #00a6ff;
+  font-size: 12px;
+`
+
 const AudienceCheckbox = ({
   selected,
   audience,
@@ -58,6 +64,17 @@ const AudienceCheckbox = ({
             <div>
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
                 <StyledLabelText>{name}</StyledLabelText>
+                {// FIXME: hardcode participant id
+                id === '991' && (
+                  <AssignReviewersLink
+                    onClick={e => {
+                      e.preventDefault()
+                      console.log('handle assign reviewers')
+                    }}
+                  >
+                    ASSIGN REVIEWERS
+                  </AssignReviewersLink>
+                )}
               </div>
             </div>
           }
@@ -71,7 +88,8 @@ const AudienceCheckbox = ({
           }}
           className="audienceLabel"
         >
-          <InfoIcon />
+          {// FIXME: Hide info icon
+          false && <InfoIcon />}
         </StyledInfoIconWrapper>
       )}
     </StyledRowFlexParent>

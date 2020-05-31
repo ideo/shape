@@ -4,7 +4,7 @@
       "id": "990",
       "type": "audiences",
       "attributes": {
-        "name": "Admins",
+        "name": "Administrators",
         "global_default": null,
         "age_list": [
 
@@ -31,7 +31,7 @@
 
         ],
         "min_price_per_response": 0.0,
-        "order": -1,
+        "order": -2,
         "global": false
       }
     },
@@ -66,7 +66,7 @@
 
         ],
         "min_price_per_response": 0.0,
-        "order": -2,
+        "order": -3,
         "global": false
       }
     },
@@ -102,7 +102,7 @@
 
         ],
         "min_price_per_response": 0.0,
-        "order": -3,
+        "order": -1,
         "global": false
       }
     }
