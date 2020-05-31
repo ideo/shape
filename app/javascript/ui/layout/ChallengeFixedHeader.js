@@ -6,7 +6,7 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import IconHolder from '~/ui/icons/IconHolder'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
-import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
+import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
@@ -54,7 +54,10 @@ const ChallengeFixedHeader = ({
         <Box auto></Box>
 
         <Box flex align="center" style={{ marginLeft: '8px' }}>
-          <ChallengeSettingsButton onSettingsClick={onSettingsClick} />
+          <TopRightChallengeButton
+            name={'Challenge Settings'}
+            onClick={onSettingsClick}
+          />
         </Box>
       </Flex>
     </MaxWidthContainer>

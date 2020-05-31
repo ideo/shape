@@ -235,8 +235,11 @@ describe('PageHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
     })
 
-    it('should render the ChallengeSettingsButton', () => {
-      expect(wrapper.find('ChallengeSettingsButton').exists()).toBe(true)
+    it('should render the TopRightChallengeButton', () => {
+      expect(wrapper.find('TopRightChallengeButton').exists()).toBe(true)
+      expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
+        'Challenge Settings'
+      )
     })
 
     describe('with a phase collection type inside a challenge', () => {

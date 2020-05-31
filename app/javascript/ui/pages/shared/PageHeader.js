@@ -30,7 +30,7 @@ import CollectionTypeIcon, {
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
-import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
+import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 
 const LiveTestIndicator = styled.span`
@@ -126,6 +126,10 @@ class PageHeader extends React.Component {
   handleChallengeSettingsClick = () => {
     const { uiStore } = this.props
     uiStore.update('challengeSettingsOpen', true)
+  }
+
+  onReviewSubmissionsClick = () => {
+    console.log('handle review submissions click')
   }
 
   openMoveMenuForTemplate = e => {
@@ -430,6 +434,22 @@ class PageHeader extends React.Component {
     return null
   }
 
+  get renderTopRightButton() {
+    const { record } = this.props
+
+    const buttonProps = !record.isSubmissionBox
+      ? {
+          name: 'Challenge Settings',
+          onClick: this.handleChallengeSettingsClick,
+        }
+      : {
+          name: 'Review Submissions',
+          color: `${v.colors.alert}`,
+          onClick: this.onReviewSubmissionsClick,
+        }
+    return <TopRightChallengeButton {...buttonProps} />
+  }
+
   get cardsForTagging() {
     const { apiStore, record } = this.props
     if (apiStore.selectedCards.length > 0) {
@@ -521,11 +541,7 @@ class PageHeader extends React.Component {
                 </Flex>
               )}
 
-              {record.isChallengeOrInsideChallenge && (
-                <ChallengeSettingsButton
-                  onSettingsClick={this.handleChallengeSettingsClick}
-                />
-              )}
+              {record.isChallengeOrInsideChallenge && this.renderTopRightButton}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (
               <CollectionFilter collection={record} canEdit={this.canEdit} />

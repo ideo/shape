@@ -30,8 +30,11 @@ describe('ChallengeFixedHeader', () => {
     expect(wrapper.find('ChallengeSubHeader').exists()).toEqual(false)
   })
 
-  it('should render ChallengeSettingsButton', () => {
-    expect(wrapper.find('ChallengeSettingsButton').exists()).toEqual(true)
+  it('should render TopRightChallengeButton', () => {
+    expect(wrapper.find('TopRightChallengeButton').exists()).toEqual(true)
+    expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
+      'Challenge Settings'
+    )
   })
 
   describe('collection is not a challenge', () => {
