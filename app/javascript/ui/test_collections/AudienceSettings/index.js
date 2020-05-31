@@ -245,9 +245,12 @@ class AudienceSettings extends React.Component {
 
   get showAudienceSettings() {
     const { testCollection } = this.props
+
+    // show audience settings by default for feedback inside challenges
     return (
-      !testCollection.collection_to_test_id &&
-      !testCollection.is_submission_box_template_test
+      testCollection.isInsideAChallenge ||
+      (!testCollection.collection_to_test_id &&
+        !testCollection.is_submission_box_template_test)
     )
   }
 
