@@ -158,6 +158,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  def challenge_submission_boxes
+    collections = @collection.all_child_collections
+                             .where(type: 'Collection::SubmissionBox')
+                             .includes(:parent_collection_card)
+    render jsonapi: collections,
+           include: Collection.default_relationships_for_api
+  end
+
   def restore_permissions
     RestorePermission.call(
       object: @collection,

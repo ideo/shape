@@ -73,8 +73,14 @@ const StyledButtonIconWrapper = styled.span`
     right: 6px;
   `}
 `
-
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
+
+const FixedRightContainer = styled(Flex)`
+  position: relative;
+  top: 22px;
+  right: 60px;
+  height: 33px;
+`
 
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
@@ -128,8 +134,8 @@ class PageHeader extends React.Component {
     uiStore.update('challengeSettingsOpen', true)
   }
 
-  onReviewSubmissionsClick = () => {
-    console.log('handle review submissions click')
+  handleReviewSubmissionsClick = () => {
+    console.log('handle review submissions')
   }
 
   openMoveMenuForTemplate = e => {
@@ -445,7 +451,7 @@ class PageHeader extends React.Component {
       : {
           name: 'Review Submissions',
           color: `${v.colors.alert}`,
-          onClick: this.onReviewSubmissionsClick,
+          onClick: this.handleReviewSubmissionsClick,
         }
     return <TopRightChallengeButton {...buttonProps} />
   }
@@ -529,19 +535,16 @@ class PageHeader extends React.Component {
               </Flex>
 
               {record.show_language_selector && (
-                <Flex
-                  style={{
-                    position: 'relative',
-                    top: '22px',
-                    right: '60px',
-                    height: '33px',
-                  }}
-                >
+                <FixedRightContainer>
                   <LanguageSelector />
-                </Flex>
+                </FixedRightContainer>
               )}
 
-              {record.isChallengeOrInsideChallenge && this.renderTopRightButton}
+              {record.isChallengeOrInsideChallenge && (
+                <FixedRightContainer>
+                  {this.renderTopRightButton}
+                </FixedRightContainer>
+              )}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (
               <CollectionFilter collection={record} canEdit={this.canEdit} />
