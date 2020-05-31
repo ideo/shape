@@ -1052,6 +1052,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return !!this.challenge_id
   }
 
+  get isChallengeOrInsideChallenge() {
+    return this.collection_type === 'challenge' || this.isInsideAChallenge
+  }
+
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {

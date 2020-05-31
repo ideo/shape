@@ -1,19 +1,31 @@
-import IconHolder from '~/ui/icons/IconHolder'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
-import Button from '~/ui/global/Button'
-import EditableName from '~/ui/pages/shared/EditableName'
-import { MaxWidthContainer } from '~/ui/global/styled/layout'
-import { Flex, Box } from 'reflexbox'
-import v from '~/utils/variables'
 import PropTypes from 'prop-types'
+import { Flex, Box } from 'reflexbox'
+import ChallengeSettingsModal from '~/ui/challenges/ChallengeSettingsModal'
+import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import EditableName from '~/ui/pages/shared/EditableName'
+import IconHolder from '~/ui/icons/IconHolder'
+import { MaxWidthContainer } from '~/ui/global/styled/layout'
+import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
+import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
+import { uiStore } from '~/stores'
+import v from '~/utils/variables'
 
 const ChallengeFixedHeader = ({
   challengeName,
+  collectionName,
   collectionType,
   onSettingsClick,
+  challengeNavigationHandler,
 }) => {
   return (
     <MaxWidthContainer>
+      <ChallengeSettingsModal open={uiStore.challengeSettingsOpen} />
+      {collectionType !== 'challenge' && (
+        <ChallengeSubHeader
+          challengeName={challengeName}
+          challengeNavigationHandler={challengeNavigationHandler}
+        />
+      )}
       <Flex
         data-empty-space-click
         align="center"
@@ -21,7 +33,7 @@ const ChallengeFixedHeader = ({
       >
         <Box>
           <EditableName
-            name={challengeName}
+            name={collectionName}
             updateNameHandler={e => e.preventDefault()}
             inline
           />
@@ -42,15 +54,7 @@ const ChallengeFixedHeader = ({
         <Box auto></Box>
 
         <Box flex align="center" style={{ marginLeft: '8px' }}>
-          <Button
-            style={{ marginLeft: '1rem' }}
-            colorScheme={v.colors.primaryDarkest}
-            size="sm"
-            width={256}
-            onClick={onSettingsClick}
-          >
-            Challenge Settings
-          </Button>
+          <ChallengeSettingsButton onSettingsClick={onSettingsClick} />
         </Box>
       </Flex>
     </MaxWidthContainer>
@@ -58,9 +62,19 @@ const ChallengeFixedHeader = ({
 }
 
 ChallengeFixedHeader.propTypes = {
-  challengeName: PropTypes.string.isRequired,
-  collectionType: PropTypes.string.isRequired,
-  onSettingsClick: PropTypes.func.isRequired,
+  challengeName: PropTypes.string,
+  collectionName: PropTypes.string,
+  collectionType: PropTypes.string,
+  onSettingsClick: PropTypes.func,
+  challengeNavigationHandler: PropTypes.func,
+}
+
+ChallengeFixedHeader.defaultProps = {
+  challengeName: '',
+  collectionName: '',
+  collectionType: null,
+  onSettingsClick: () => {},
+  challengeNavigationHandler: () => {},
 }
 
 export default ChallengeFixedHeader
