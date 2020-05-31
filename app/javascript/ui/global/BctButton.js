@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
-import v from '@bit/ideo-products.shared-components.utils.variables'
+import v from '~/utils/variables'
 
 const BctButton = styled.button`
   position: relative;
