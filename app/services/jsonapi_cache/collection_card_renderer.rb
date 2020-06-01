@@ -2,6 +2,9 @@ require_dependency "#{Rails.root}/lib/jsonapi_mappings"
 
 module JsonapiCache
   class CollectionCardRenderer < SimpleService
+    # kick out old cached data
+    EXPIRY_TIME = 1.month
+
     def initialize(
       cards: [],
       user: nil,
@@ -44,12 +47,14 @@ module JsonapiCache
         return cached
       end
 
-      Rails.cache.fetch(card.cache_key) do
+      Rails.cache.fetch(card.cache_key, expires_in: EXPIRY_TIME) do
         cache_card_json(card)
       end
     end
 
     def cache_card_json(card)
+      puts "we DONT gotcha #{card.id}"
+
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         card,
@@ -67,7 +72,7 @@ module JsonapiCache
       @cards.each do |card|
         card_map[card.cache_key] = card
       end
-      @cached_data = Rails.cache.fetch_multi(*@cards.map(&:cache_key)) do |cache_key|
+      @cached_data = Rails.cache.fetch_multi(*@cards.map(&:cache_key), expires_in: EXPIRY_TIME) do |cache_key|
         cache_card_json(card_map[cache_key])
       end
     end
