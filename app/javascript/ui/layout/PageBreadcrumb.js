@@ -43,6 +43,13 @@ class PageBreadcrumb extends React.Component {
     this.initBreadcrumb(record)
   }
 
+  componentDidUpdate(prevProps) {
+    const { record, windowWidth } = this.props
+    if (prevProps.windowWidth !== windowWidth) {
+      this.initBreadcrumb(record)
+    }
+  }
+
   @action
   initBreadcrumb(record) {
     this.breadcrumbWithLinks.replace(
@@ -104,8 +111,7 @@ class PageBreadcrumb extends React.Component {
       })
     })
 
-    const depth = clamp && maxDepth ? maxDepth * -1 : 0
-    return _.compact(items).slice(depth)
+    return _.compact(items)
   }
 
   get myCollectionItemProps() {
@@ -165,7 +171,7 @@ class PageBreadcrumb extends React.Component {
   }
 
   render() {
-    const { containerWidth, record, isHomepage } = this.props
+    const { containerWidth, record, isHomepage, maxDepth } = this.props
     const { inMyCollection, breadcrumb } = record
     const renderItems =
       !isHomepage &&
@@ -173,9 +179,11 @@ class PageBreadcrumb extends React.Component {
       inMyCollection !== null &&
       breadcrumb &&
       breadcrumb.length > 0
+
     return (
       <Breadcrumb
         breadcrumbItemComponent={BreadcrumbWithDropping}
+        maxDepth={maxDepth}
         items={this.items}
         onBack={this.onBack}
         onBreadcrumbClick={this.onBreadcrumbClick}
@@ -196,6 +204,7 @@ PageBreadcrumb.propTypes = {
   containerWidth: PropTypes.number,
   maxDepth: PropTypes.number,
   backButton: PropTypes.bool,
+  windowWidth: PropTypes.number,
 }
 
 PageBreadcrumb.defaultProps = {
@@ -203,6 +212,7 @@ PageBreadcrumb.defaultProps = {
   containerWidth: null,
   maxDepth: 6,
   backButton: false,
+  windowWidth: 1024,
 }
 
 export default PageBreadcrumb
