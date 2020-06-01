@@ -4,7 +4,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
-import { apiStore } from '~/stores'
+import { apiStore, routingStore } from '~/stores'
 import {
   SubmissionBoxRowForTemplate,
   SubmissionBoxRowForItem,
@@ -12,6 +12,7 @@ import {
 import EditSubmissionBoxFormat from '~/ui/submission_box/EditSubmissionBoxFormat'
 import { submissionTypeForName } from '~/ui/submission_box/SubmissionBoxSettings'
 import EditPencilIcon from '~/ui/icons/EditPencilIcon'
+import SwitchIcon from '~/ui/icons/SwitchIcon'
 import Tooltip from '~/ui/global/Tooltip'
 
 const IconRight = styled.div`
@@ -29,14 +30,19 @@ const EditActions = ({ onEdit, onSwitch }) => {
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
             title="Edit submission template"
+            placement="top"
           >
             <EditPencilIcon />
           </Tooltip>
         </IconRight>
       )}
       <IconRight onClick={onSwitch}>
-        <Tooltip classes={{ tooltip: 'Tooltip' }} title="Switch format">
-          <EditPencilIcon />
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Switch format"
+          placement="top"
+        >
+          <SwitchIcon />
         </Tooltip>
       </IconRight>
     </React.Fragment>
@@ -49,11 +55,11 @@ EditActions.propTypes = {
 }
 
 EditActions.defaultProps = {
-  onEdit: () => null,
+  onEdit: null,
 }
 
-const SubmissionBoxFormat = ({ collection }) => {
-  const [showEditFormat, setShowEditFormat] = useState(true)
+const SubmissionBoxFormat = ({ collection, closeModal }) => {
+  const [showEditFormat, setShowEditFormat] = useState(false)
   const {
     submissionFormat,
     submission_template_id,
@@ -63,16 +69,22 @@ const SubmissionBoxFormat = ({ collection }) => {
   let submissionType
   if (submissionFormat === 'template') {
     template = apiStore.find('collections', submission_template_id)
-  }
-  if (template || submissionFormat === 'item') {
-    // They have chosen a format
+  } else if (submissionFormat === 'item') {
     submissionType = submissionTypeForName(submission_box_type)
-    useEffect(() => {
-      setShowEditFormat(false)
-    }, [submission_template_id, submissionFormat])
   }
+  useEffect(() => {
+    // If they have not chosen a format, show edit format
+    if (!template && !submissionType) {
+      setShowEditFormat(true)
+    }
+  }, [submission_template_id, submission_box_type])
   if (showEditFormat) {
-    return <EditSubmissionBoxFormat collection={collection} />
+    return (
+      <EditSubmissionBoxFormat
+        collection={collection}
+        onDone={() => setShowEditFormat(false)}
+      />
+    )
   } else {
     return (
       <Flex column justify="flex-start">
@@ -81,13 +93,16 @@ const SubmissionBoxFormat = ({ collection }) => {
             template={template}
             rightSideComponent={
               <EditActions
-                onEdit={() => console.log('go to template')}
+                onEdit={() => {
+                  closeModal() &&
+                    routingStore.routeTo('collections', template.id)
+                }}
                 onSwitch={() => setShowEditFormat(true)}
               />
             }
           />
         )}
-        {submissionFormat === 'item' && (
+        {submissionFormat === 'item' && submissionType && (
           <SubmissionBoxRowForItem
             type={submissionType}
             rightSideComponent={
@@ -102,6 +117,7 @@ const SubmissionBoxFormat = ({ collection }) => {
 
 SubmissionBoxFormat.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  closeModal: PropTypes.func.isRequired,
 }
 
 export default SubmissionBoxFormat

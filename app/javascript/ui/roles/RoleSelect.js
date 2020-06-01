@@ -151,7 +151,7 @@ class RoleSelect extends React.Component {
         !record.system_required &&
         !record.pinned_and_locked)
     return (
-      <Row>
+      <Row data-cy="role-row">
         <RowItemGrid container alignItems="center" justify="space-between">
           <EntityAvatarAndName
             entity={entity}

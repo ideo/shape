@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { computed, observable } from 'mobx'
+import PropTypes from 'prop-types'
+import { observable } from 'mobx'
 
 import {
   Heading3,
@@ -16,10 +17,6 @@ import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import v from '~/utils/variables'
-import {
-  SubmissionBoxRowForItem,
-  SubmissionBoxRowForTemplate,
-} from '~/ui/submission_box/SubmissionBoxRow'
 import SubmissionBoxFormat from '~/ui/submission_box/SubmissionBoxFormat'
 
 export const submissionItemTypes = [
@@ -46,27 +43,6 @@ class SubmissionBoxSettings extends React.Component {
     apiStore.fetch('collections', submission_template_id)
   }
 
-  // computed to allow it to observe changing submission_template_id
-  @computed
-  get selectedOption() {
-    const {
-      submission_template_id,
-      submission_box_type,
-    } = this.props.collection
-    const { apiStore } = this.props
-    let template
-    if (submission_template_id) {
-      template = apiStore.find('collections', submission_template_id)
-    }
-    if (template) {
-      return <SubmissionBoxRowForTemplate template={template} />
-    } else if (submission_box_type && submission_box_type !== 'template') {
-      const type = submissionTypeForName(submission_box_type)
-      return <SubmissionBoxRowForItem type={type} />
-    }
-    return ''
-  }
-
   updateHidden = ev => {
     ev.preventDefault()
     const { collection } = this.props
@@ -87,7 +63,7 @@ class SubmissionBoxSettings extends React.Component {
   }
 
   render() {
-    const { collection } = this.props
+    const { collection, closeModal } = this.props
     const { submissions_enabled, hide_submissions } = collection
     return (
       <React.Fragment>
@@ -105,9 +81,9 @@ class SubmissionBoxSettings extends React.Component {
           </span>
           <RowItemLeft>
             <SmallHelperText>
-              Anyone invited to this collection box will be able to instantly
-              create their own instance of the template that you choose. Use one
-              of our templates or create your own.
+              Anyone invited to this collection will be able to add their
+              version of the submission format selected below. Use one of our
+              templates or create your own.
             </SmallHelperText>
             <FormControlLabel
               style={{ marginLeft: '-42px' }}
@@ -157,7 +133,7 @@ class SubmissionBoxSettings extends React.Component {
           </RowItemLeft>
         </Row>
         <Heading3>Submission Format</Heading3>
-        <SubmissionBoxFormat collection={collection} />
+        <SubmissionBoxFormat collection={collection} closeModal={closeModal} />
       </React.Fragment>
     )
   }
@@ -165,6 +141,7 @@ class SubmissionBoxSettings extends React.Component {
 
 SubmissionBoxSettings.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  closeModal: PropTypes.func.isRequired,
 }
 SubmissionBoxSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

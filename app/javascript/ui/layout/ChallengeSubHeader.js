@@ -6,6 +6,11 @@ import v from '~/utils/variables'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
+const SubHeaderWrapper = styled.div`
+  margin-bottom: -10px;
+  margin-top: 10px;
+`
+
 const StyledSubHeaderLink = styled(Heading2)`
   display: inline-block;
   color: ${v.colors.commonDark};
@@ -21,10 +26,10 @@ StyledSubHeaderLink.displayName = 'StyledSubHeaderLink'
 
 const ChallengeSubHeader = ({ challengeName, challengeNavigationHandler }) => {
   return (
-    <span>
+    <SubHeaderWrapper>
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
-        title={'go to challenge'}
+        title={'Go to challenge'}
         placement="top"
       >
         <StyledSubHeaderLink onClick={challengeNavigationHandler}>
@@ -40,7 +45,7 @@ const ChallengeSubHeader = ({ challengeName, challengeNavigationHandler }) => {
       >
         <ChallengeIcon />
       </IconHolder>
-    </span>
+    </SubHeaderWrapper>
   )
 }
 

@@ -7,11 +7,13 @@ import SubmissionsSettings from '~/ui/challenges/SubmissionsSettings'
 
 class ChallengeSettingsModal extends React.Component {
   get contents() {
-    const { collection } = this.props
+    const { collection, onClose } = this.props
     return [
       {
         name: 'Submission settings',
-        component: <SubmissionsSettings collection={collection} />,
+        component: (
+          <SubmissionsSettings collection={collection} closeModal={onClose} />
+        ),
       },
       { name: 'Phases', component: <div></div> },
       { name: 'People', component: <div></div> },

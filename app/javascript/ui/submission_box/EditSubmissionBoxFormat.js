@@ -1,7 +1,9 @@
 import _ from 'lodash'
 import pluralize from 'pluralize'
+import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
+import { Box } from 'reflexbox'
 
 import RecordSearch from '~/ui/global/RecordSearch'
 import {
@@ -68,7 +70,7 @@ class EditSubmissionBoxFormat extends React.Component {
     runInAction(() => {
       this.loading = true
     })
-    const { collection, uiStore, apiStore } = this.props
+    const { collection, uiStore, apiStore, onDone } = this.props
     const templateCardId = template ? template.parent_collection_card.id : null
     const submission_box_type = template ? 'template' : type
     const data = {
@@ -78,7 +80,7 @@ class EditSubmissionBoxFormat extends React.Component {
     }
     try {
       await collection.API_setSubmissionBoxTemplate(data)
-      uiStore.update('submissionBoxSettingsOpen', false)
+      onDone()
       if (collection.submissions_collection) {
         // Re-fetch submissions collection as submissions names change
         await apiStore.fetch(
@@ -135,20 +137,22 @@ class EditSubmissionBoxFormat extends React.Component {
           searchFilter={this.searchFilter}
           searchParams={{ master_template: true }}
         />
-        {this.nonSelectedSubmissionTypes.map(type => (
-          <SubmissionBoxRowForItem
-            type={type}
-            onSelect={this.chooseNonTemplateType}
-            key={type.name}
-          />
-        ))}
-        {this.templates.map(template => (
-          <SubmissionBoxRowForTemplate
-            template={template}
-            onSelect={this.chooseTemplate}
-            key={template.id}
-          />
-        ))}
+        <Box mt={2} mb={2}>
+          {this.nonSelectedSubmissionTypes.map(type => (
+            <SubmissionBoxRowForItem
+              type={type}
+              onSelect={this.chooseNonTemplateType}
+              key={type.name}
+            />
+          ))}
+          {this.templates.map(template => (
+            <SubmissionBoxRowForTemplate
+              template={template}
+              onSelect={this.chooseTemplate}
+              key={template.id}
+            />
+          ))}
+        </Box>
       </div>
     )
   }
@@ -156,6 +160,7 @@ class EditSubmissionBoxFormat extends React.Component {
 
 EditSubmissionBoxFormat.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  onDone: PropTypes.func.isRequired,
 }
 EditSubmissionBoxFormat.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

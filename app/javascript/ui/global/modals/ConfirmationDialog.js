@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { FormControlLabel, Grid } from '@material-ui/core'
 import styled from 'styled-components'
 
-import { TextButton } from '~/ui/global/styled/buttons'
+import TextButton from '~/ui/global/TextButton'
 import { FormActionsContainer, Checkbox } from '~/ui/global/styled/forms'
 import { ConfirmText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -66,7 +66,7 @@ const ConfirmOption = styled(ConfirmText)`
 `
 
 const OptionsButton = styled(TextButton)`
-  color: ${v.colors.black};
+  color: ${props => props.color};
   font-size: 0.75rem;
 `
 
@@ -110,6 +110,10 @@ class ConfirmationDialog extends React.PureComponent {
     return v.colors.commonDark
   }
 
+  get buttonColor() {
+    return this.bigModal ? v.colors.black : v.colors.white
+  }
+
   render() {
     // these props get passed in from uiStore.dialogConfig in DialogWrapper
     const {
@@ -148,8 +152,9 @@ class ConfirmationDialog extends React.PureComponent {
           <FormActionsContainer>
             <ButtonEl
               data-cy="CancelButton"
-              maxWidth="200"
+              maxWidth={200}
               onClick={this.handleCancel}
+              color={this.buttonColor}
             >
               {props.cancelText}
             </ButtonEl>
@@ -174,6 +179,7 @@ class ConfirmationDialog extends React.PureComponent {
               data-cy="ConfirmButton"
               maxWidth="200"
               onClick={this.handleConfirm}
+              color={this.buttonColor}
             >
               {props.confirmText}
             </ButtonEl>
