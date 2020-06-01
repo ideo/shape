@@ -93,7 +93,7 @@ class AudienceSettingsWidget extends React.Component {
   get hidePaidAudienceSettings() {
     const { uiStore } = this.props
 
-    return uiStore.viewingRecord.isInsideAChallenge
+    return _.get(uiStore, 'viewingRecord.isInsideAChallenge')
   }
 
   get displayedAudiences() {
