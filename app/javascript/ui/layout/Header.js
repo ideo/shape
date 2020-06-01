@@ -6,7 +6,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 import Hidden from '@material-ui/core/Hidden'
 
-import Breadcrumb from '~/ui/layout/Breadcrumb'
+import PageBreadcrumb from '~/ui/layout/PageBreadcrumb'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import Logo from '~/ui/layout/Logo'
 import PlainLink from '~/ui/global/PlainLink'
@@ -346,9 +346,8 @@ class Header extends React.Component {
                           flex: uiStore.isMobile ? '1 1 auto' : '0 1 auto',
                         }}
                       >
-                        <Breadcrumb
+                        <PageBreadcrumb
                           maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
-                          backButton={!uiStore.isLargeBreakpoint}
                           record={record}
                           isHomepage={uiStore.isViewingHomepage}
                           // re-mount every time the record / breadcrumb changes

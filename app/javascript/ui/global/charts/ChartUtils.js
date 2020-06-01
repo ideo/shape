@@ -22,7 +22,16 @@ export const barWidthPx = (totalColumns, totalGroupings) => {
 // 30 / (5 / 1 / 2)
 
 export const lineChartDashWithForOrder = ({ order, scale = 1 }) => {
-  const dashWidths = [[2, 4], [3, 1], [4, 2], [2, 8], [8, 6], [1, 5]]
+  const dashWidths = [
+    [2, 4],
+    [3, 1],
+    [4, 2],
+    [2, 8],
+    [8, 6],
+    [1, 5],
+    [5, 1],
+    [9, 7],
+  ]
   const values = dashWidths[order - 1] ? dashWidths[order - 1] : dashWidths[0]
   return values.map(val => val * scale).join(',')
 }
@@ -58,6 +67,17 @@ export const datasetPropType = PropTypes.shape({
 export const primaryFillColorFromDataset = dataset => {
   if (!dataset) return '#000000'
   return dataset.style && dataset.style.fill ? dataset.style.fill : '#000000'
+}
+
+export const domainXForSingleValue = date => {
+  return [
+    moment(date)
+      .subtract('months', 1)
+      .toDate(),
+    moment(date)
+      .add('months', 1)
+      .toDate(),
+  ]
 }
 
 export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {

@@ -17,9 +17,7 @@ import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
 import GridCardEmptyHotspot from '~/ui/grid/GridCardEmptyHotspot'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
-import ScrollNearPageBoundsService from '~/utils/ScrollNearPageBoundsService'
-
-const pageBoundsScroller = new ScrollNearPageBoundsService()
+import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 
 const StyledResizeIcon = styled.div`
   position: absolute;
@@ -269,40 +267,6 @@ class MovableGridCard extends React.Component {
     })
   }
 
-  // this function gets passed down to the card, so it can place the onClick handler
-  handleClick = e => {
-    pageBoundsScroller.setScrolling(false)
-    const { cardType, record } = this.props
-    if (uiStore.cardMenuOpenAndPositioned) {
-      uiStore.closeCardMenu()
-      return
-    }
-    const formTags = ['SELECT', 'OPTION']
-    if (
-      typeof e.target.className !== 'string' ||
-      // cancel for elements matching or inside a .cancelGridClick
-      e.target.className.match(/cancelGridClick/) ||
-      e.target.closest('.cancelGridClick') ||
-      e.target.className.match(/selectMenu/) ||
-      // cancel for links within the card as these should handle their own routing
-      (e.target.tagName === 'A' && e.target.href) ||
-      formTags.includes(e.target.tagName) ||
-      record.type === 'Item::DataItem' ||
-      e.target.className.match(/CollectionCoverFormButton/)
-    ) {
-      return
-    }
-
-    if (record.can_view) {
-      // timeout is just a stupid thing so that Draggable doesn't complain about unmounting
-      setTimeout(() => {
-        this.props.routeTo(cardType, record.id)
-      })
-    } else {
-      uiStore.showPermissionsAlert()
-    }
-  }
-
   clearDragTimeout = () => {
     if (this.timeoutId) {
       clearTimeout(this.timeoutId)
@@ -542,7 +506,6 @@ class MovableGridCard extends React.Component {
       // we want to track "dragging" until the transition is complete
       // also so that click handler doesn't register while dragging
       dragging: !moveComplete,
-      handleClick: this.handleClick,
       canEditCollection,
       isUserCollection,
       isBoardCollection,
@@ -737,7 +700,6 @@ MovableGridCard.propTypes = {
   isUserCollection: PropTypes.bool,
   isSharedCollection: PropTypes.bool,
   isBoardCollection: PropTypes.bool,
-  routeTo: PropTypes.func,
   lastPinnedCard: PropTypes.bool,
   zoomLevel: PropTypes.number,
   maxResizeRow: PropTypes.number,
@@ -762,7 +724,6 @@ MovableGridCard.defaultProps = {
     x: 0,
     y: 0,
   },
-  routeTo: () => null,
   searchResult: false,
 }
 

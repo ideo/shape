@@ -21,7 +21,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
   end
 
   before do
-    user.reload
+    user&.reload
     allow(ActivityAndNotificationForCardWorker).to receive(:perform_async).and_call_original
   end
 
@@ -47,6 +47,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       get(path)
       expect(json['data'].count).to eq 5
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
+    end
+
+    context 'with no user session and public collection', auth: false do
+      # just so there is a user in context, but this user is not logged in
+      let(:user) { create(:user) }
+      let(:collection) { create(:collection, anyone_can_view: true) }
+
+      it 'returns a 200' do
+        get(path)
+        expect(response.status).to eq(200)
+      end
     end
 
     context 'on different org' do

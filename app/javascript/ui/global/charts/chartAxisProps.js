@@ -11,7 +11,7 @@ const tickLabelStyle = isSmallChartStyle => {
   if (isSmallChartStyle) {
     return {
       fontSize: '18px',
-      dy: -5,
+      dy: -20,
     }
   } else {
     return {
@@ -34,6 +34,7 @@ const chartAxisStyle = isSmallChartStyle => {
         fontSize: '18px',
         dy: -5,
       },
+      ticks: { stroke: 'black', size: 13, transform: 'translateY(-11px)' },
     }
   }
   return {
@@ -47,7 +48,7 @@ const chartAxisStyle = isSmallChartStyle => {
 }
 
 const calculateRelativeWidth = label => {
-  const modifier = label.isSmallChartStyle ? 10.5 : 8
+  const modifier = label.isSmallChartStyle ? 11 : 8
   return label.text.length * modifier
 }
 
@@ -130,6 +131,7 @@ export const monthlyXAxisText = (
 
 const ChartAxisProps = ({
   datasetValues,
+  secondaryValues,
   datasetTimeframe,
   domain,
   isSmallChartStyle,
@@ -138,7 +140,7 @@ const ChartAxisProps = ({
 }) => {
   // NOTE: The transform property is for IE11 which doesn't recognize CSS
   // transform properties on SVG
-  let tickCount = 12
+  let tickCount = Math.min(datasetValues.length, 12)
   if (isSmallChartStyle) {
     tickCount = 5
   } else {
@@ -163,8 +165,8 @@ const ChartAxisProps = ({
   }
 
   const tickLabelStyleProps = tickLabelStyle(isSmallChartStyle)
-
-  return datasetValues.length > 1
+  return datasetValues.length > 1 ||
+    (secondaryValues && secondaryValues.length > 1)
     ? {
         ...axisProps,
         tickFormat: isSmallChartStyle ? fullDate : datasetXAxisText,
@@ -185,7 +187,7 @@ const ChartAxisProps = ({
         ...axisProps,
         tickFormat: t => null,
         axisLabelComponent: (
-          <TickLabel fontSize={tickLabelStyleProps.fontSize} />
+          <TickLabel fontSize={tickLabelStyleProps.fontSize} dy={3} />
         ),
         style: chartAxisStyle(isSmallChartStyle),
         label: fullDate(datasetValues[0].date),

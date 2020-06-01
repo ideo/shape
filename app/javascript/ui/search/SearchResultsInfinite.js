@@ -7,9 +7,9 @@ import InfiniteScroll from 'react-infinite-scroller'
 import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
-import { uiStore } from '~/stores'
+import { uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
+import PageBreadcrumb from '~/ui/layout/PageBreadcrumb'
 import Loader from '~/ui/layout/Loader'
 import GridCard from '~/ui/grid/GridCard'
 import { StyledCardWrapper } from '~/ui/grid/shared'
@@ -129,11 +129,15 @@ class SearchResultsInfinite extends React.Component {
           >
             <StyledCardWrapper>
               <StyledBreadcrumb>
-                <Breadcrumb
+                <PageBreadcrumb
+                  maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
                   record={result}
                   isHomepage={false}
                   // re-mount every time the record / breadcrumb changes
                   key={`${result.identifier}_${result.breadcrumbSize}`}
+                  // force props update if windowWidth changes
+                  windowWidth={uiStore.windowWidth}
+                  containerWidth={this.maxBreadcrumbContainerWidth}
                 />
               </StyledBreadcrumb>
               <StyledSearchResult
@@ -151,10 +155,8 @@ class SearchResultsInfinite extends React.Component {
                   cardType={result.internalType}
                   record={result}
                   menuOpen={uiStore.cardMenuOpen.id === card.id}
-                  // NOTE: this will have to get modified when we eventually
-                  // turn off item routing for videos and images
                   handleClick={() =>
-                    this.props.routeTo(result.internalType, result.id)
+                    routingStore.routeTo(result.internalType, result.id)
                   }
                   searchResult
                 />
@@ -191,7 +193,6 @@ SearchResultsInfinite.propTypes = {
   searchResults: MobxPropTypes.arrayOrObservableArray.isRequired,
   gridSettings: MobxPropTypes.objectOrObservableObject.isRequired,
   gridMaxW: PropTypes.number.isRequired,
-  routeTo: PropTypes.func.isRequired,
   loadMore: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
   total: PropTypes.number.isRequired,
