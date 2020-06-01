@@ -1,13 +1,14 @@
 import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
+import { fakeCollection } from '#/mocks/data'
 let props, wrapper, rerender
 describe('ChallengeFixedHeader', () => {
   beforeEach(() => {
+    fakeCollection.collection_type = 'challenge'
     props = {
-      challengeName: 'Reusable Cup Challenge',
-      collectionName: 'Reusable Cup Challenge',
-      collectionType: 'challenge',
+      collection: fakeCollection,
       challengeNavigationHandler: jest.fn(),
-      onSettingsClick: jest.fn(),
+      handleShowSettings: jest.fn(),
+      handleReviewSubmissions: jest.fn(),
     }
     rerender = () => {
       wrapper = shallow(<ChallengeFixedHeader {...props} />)
@@ -18,7 +19,7 @@ describe('ChallengeFixedHeader', () => {
   it('should render an inline EditableName with the chalenge name', () => {
     expect(wrapper.find('EditableName').props().inline).toEqual(true)
     expect(wrapper.find('EditableName').props().name).toEqual(
-      'Reusable Cup Challenge'
+      fakeCollection.name
     )
   })
 
@@ -39,7 +40,11 @@ describe('ChallengeFixedHeader', () => {
 
   describe('collection is not a challenge', () => {
     beforeEach(() => {
-      props.collectionType = 'phase'
+      fakeCollection.collection_type = 'phase'
+      props = {
+        collection: fakeCollection,
+        ...props,
+      }
       rerender()
     })
 
