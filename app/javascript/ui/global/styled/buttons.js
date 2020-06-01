@@ -201,22 +201,6 @@ FormButton.defaultProps = {
   color: v.colors.black,
 }
 
-/** @component */
-export const TextButton = styled.button`
-  text-transform: uppercase;
-  font-family: ${v.fonts.sans};
-  font-size: 0.9375rem;
-  font-weight: 500;
-  letter-spacing: 0.09375rem;
-  cursor: pointer;
-  max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
-`
-TextButton.displayName = 'StyledTextButton'
-
-export const CollectionCoverTextButton = styled(TextButton)`
-  font-size: 0.75rem;
-`
-
 /* invert text color for transparent buttons, add colors as you go */
 const invertColor = color => {
   switch (color) {

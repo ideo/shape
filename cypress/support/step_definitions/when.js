@@ -133,10 +133,7 @@ When('I close the snackbar', () => {
 
 When('I place a card to the bottom using the snackbar', () => {
   // NOTE: snackbar tests have proven fickle, so instead we just wait a bit for it
-  cy.locateDataOrClass('.MuiSnackbarContent-action')
-    .find('button')
-    .first()
-    .click({ force: true })
+  cy.locateDataOrClass('MoveSnackbarArrow-down').click({ force: true })
   // allow it to disappear
   cy.wait(300)
 })

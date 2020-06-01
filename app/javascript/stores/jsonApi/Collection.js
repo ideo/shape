@@ -669,6 +669,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get isPhaseOrProject() {
+    return ['phase', 'project'].includes(this.collection_type)
+  }
+
   @computed
   get filterBarFilters() {
     if (!this.isParentMethodLibrary) return this.collection_filters

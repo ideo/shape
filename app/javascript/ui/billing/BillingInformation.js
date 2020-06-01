@@ -128,7 +128,7 @@ const FreeTrial = ({
 }) => (
   <div>
     <FreeTrialTitle>{trialTitle}</FreeTrialTitle>
-    <Grid container justify="space-between" spacing={16}>
+    <Grid container justify="space-between" spacing={2}>
       <Grid item>
         <Label>{trialLabel}</Label>
       </Grid>
@@ -137,7 +137,7 @@ const FreeTrial = ({
       </Grid>
     </Grid>
     {trialEndsAt && (
-      <Grid container justify="space-between" spacing={16}>
+      <Grid container justify="space-between" spacing={2}>
         <Grid item>
           <Label>Trial expires:</Label>
         </Grid>
@@ -284,7 +284,7 @@ class BillingInformation extends React.Component {
                   </Instructional>
                 </Block>
                 <Block title="Current Billing Period">
-                  <Grid container justify="space-between" spacing={16}>
+                  <Grid container justify="space-between" spacing={2}>
                     <Grid item>
                       <Label>Start date:</Label>
                     </Grid>
@@ -292,7 +292,7 @@ class BillingInformation extends React.Component {
                       {formatISODate(current_billing_period_start)}
                     </Grid>
                   </Grid>
-                  <Grid container justify="space-between" spacing={16}>
+                  <Grid container justify="space-between" spacing={2}>
                     <Grid item>
                       <Label>End date:</Label>
                     </Grid>

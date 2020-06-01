@@ -18,6 +18,8 @@ import CollectionCoverTitle, {
   IconHolder,
 } from '~/ui/grid/covers/CollectionCoverTitle'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionDateRange from '~/ui/grid/CollectionDateRange'
+import DateProgressBar from '~/ui/global/DateProgressBar'
 
 const LaunchButton = styled(Button)`
   font-size: 0.9rem;
@@ -350,12 +352,12 @@ class CollectionCover extends React.Component {
       cardId,
       fontColor,
     } = this.props
-    const { subtitle } = collection
+    const { subtitle, collection_type } = collection
     const { gridW, gutter } = uiStore.gridSettings
     const collectionIcon =
-      collection.collection_type !== 'collection' &&
+      collection_type !== 'collection' &&
       collectionTypeToIcon({
-        type: collection.collection_type,
+        type: collection_type,
         size: 'lg',
       })
     return (
@@ -385,6 +387,14 @@ class CollectionCover extends React.Component {
             useTextBackground={this.useTextBackground}
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
+            {collection.isPhaseOrProject &&
+              collection.start_date &&
+              collection.end_date && (
+                <DateProgressBar
+                  startDate={collection.start_date}
+                  endDate={collection.end_date}
+                />
+              )}
             {textItem ? (
               <div className="top text-item">
                 <TextItemCover
@@ -425,6 +435,9 @@ class CollectionCover extends React.Component {
                   </PositionedCardHeading>
                 </div>
                 <div className="bottom">
+                  {collection.isPhaseOrProject && (
+                    <CollectionDateRange collection={collection} />
+                  )}
                   {this.launchTestButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}

@@ -562,6 +562,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         tag_list
         search_term
         num_columns
+        start_date
+        end_date
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,

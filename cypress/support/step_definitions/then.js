@@ -171,9 +171,7 @@ Then(
 )
 
 Then('I should see {int} active user(s)', num => {
-  cy.locateDataOrClass('.MuiCollapse-wrapperInner')
-    .children('div')
-    .should('have.length', num)
+  cy.locateDataOrClass('role-row').should('have.length', num)
 })
 
 Then('I should see query parameters {string}', queryString => {
