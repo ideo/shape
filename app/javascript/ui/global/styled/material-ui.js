@@ -31,7 +31,7 @@ StyledSnackbar.displayName = 'StyledSnackbar'
 export const StyledSnackbarContent = styled(SnackbarContent)`
   &.SnackbarContent {
     background-color: ${props =>
-      props.variant ? props.variant.backgroundColor : v.colors.commonDark};
+      props.backgroundColor ? props.backgroundColor : v.colors.commonDark};
     max-width: none;
     padding: 15px 30px;
     width: 100%;

@@ -50,7 +50,7 @@ class OverdueBanner extends React.Component {
         Add payment method <Link to="/billing">here.</Link>
       </div>
     ) : (
-      <Grid container spacing={16} alignItems="flex-end">
+      <Grid container spacing={2} alignItems="flex-end">
         <Grid item>Contact your admin for assistance.</Grid>
         <Grid item>
           <StyledClickableIconWrapper onClick={this.hide}>

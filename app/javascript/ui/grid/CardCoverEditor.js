@@ -455,7 +455,7 @@ class CardCoverEditor extends React.Component {
                       />
                     }
                     label={
-                      <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
+                      <div style={{ maxWidth: '582px', paddingTop: '9px' }}>
                         Hide subtitle
                       </div>
                     }
