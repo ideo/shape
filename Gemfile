@@ -155,6 +155,8 @@ gem 'anycable-rails', '>= 0.6.2'
 # https://devcenter.heroku.com/articles/rails-autoscale
 gem 'rails_autoscale_agent'
 
+gem 'rails_same_site_cookie'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]

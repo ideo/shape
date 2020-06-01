@@ -23,6 +23,7 @@ import {
   victoryTheme,
   emojiSeriesForQuestionType,
   chartDomainForDatasetValues,
+  domainXForSingleValue,
   formatValuesForVictory,
 } from '~/ui/global/charts/ChartUtils'
 
@@ -84,21 +85,36 @@ class ChartGroup extends React.Component {
     )
   }
 
+  get hasPercentileComparison() {
+    return (
+      this.secondaryDatasetsWithData[0] &&
+      this.secondaryDatasetsWithData[0].chart_type === 'line'
+    )
+  }
+
   get chartDomain() {
     const allValues = [...this.primaryDatasetValues]
     this.secondaryDatasetsWithData.forEach(dataset => {
-      // Format data in the same way it will show up in other secondary charts
-      allValues.push(
-        ...formatSecondaryDatasetValues(
-          dataset.dataWithDates,
-          this.primaryDatasetValues
+      if (dataset.data[0].date) {
+        // Format data in the same way it will show up in other secondary charts
+        allValues.push(
+          ...formatSecondaryDatasetValues(
+            dataset.dataWithDates,
+            this.primaryDatasetValues
+          )
         )
-      )
+      }
     })
-    return chartDomainForDatasetValues({
+    const domain = chartDomainForDatasetValues({
       values: allValues,
       maxYDomain: this.primaryDataset.max_domain,
     })
+    // If there's one single value, and the secondary datasets are only
+    // the percentitles (with no dates), then spread the domain out.
+    if (allValues.length === 1 && this.hasPercentileComparison) {
+      domain.x = domainXForSingleValue(allValues[0].date)
+    }
+    return domain
   }
 
   get isSmallChartStyle() {
@@ -177,7 +193,8 @@ class ChartGroup extends React.Component {
   }
 
   calculateLabelWidth(label) {
-    const modifier = this.isSmallChartStyle ? 10.5 : 8
+    const modifier = this.isSmallChartStyle ? 12 : 8
+    if (!label.text) return 0
     return label.text.length * modifier
   }
 
@@ -198,6 +215,7 @@ class ChartGroup extends React.Component {
       sortedLabels = sortedLabels.slice(1)
     }
     const overlappingLabels = []
+    if (sortedLabels.length === 1) return []
     sortedLabels.forEach((label, i) => {
       let overlapping = false
       for (let j = i + 1; j < sortedLabels.length; j++) {
@@ -215,6 +233,9 @@ class ChartGroup extends React.Component {
             overlappingLabels.push(label)
             label.overlapping = true
             continue
+          } else {
+            overlappingLabels.push(subLabel)
+            subLabel.overlapping = true
           }
         }
       }
@@ -239,16 +260,7 @@ class ChartGroup extends React.Component {
 
     const nonPrioritizedLabels = []
     overlappingLabels.forEach(l => {
-      const datum = this.primaryDatasetValues.find(dv =>
-        _.isEqual(dv.date, l.datum)
-      )
-      if (datum) {
-        if (datum.prioritized) {
-          datum.overlappingLabel = true
-        } else {
-          nonPrioritizedLabels.push(l)
-        }
-      }
+      nonPrioritizedLabels.push(l)
     })
 
     return _.uniq(_.xorWith(renderedLabels, nonPrioritizedLabels, _.isEqual))
@@ -266,6 +278,7 @@ class ChartGroup extends React.Component {
       const dates = this.axisRawDateValues
       const axisProps = chartAxisProps({
         datasetValues: this.primaryDatasetValues,
+        secondaryValues: this.secondaryDatasetsWithData,
         datasetTimeframe: timeframe,
         domain: this.chartDomain,
         isSmallChartStyle: this.isSmallChartStyle,
@@ -316,6 +329,10 @@ class ChartGroup extends React.Component {
       if (dataset.hasDates) {
         modifiedChartType = 'area'
       } else {
+        modifiedChartType = 'line'
+      }
+      // Creative Difference chart comparisons should just be lines.
+      if (order > 0 && this.isSmallChartStyle) {
         modifiedChartType = 'line'
       }
     }

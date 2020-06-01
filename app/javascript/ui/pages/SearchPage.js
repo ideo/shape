@@ -11,7 +11,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 import { stringifyUrlParams } from '~/utils/url'
 
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore')
 @observer
 class SearchPage extends React.Component {
   unmounted = false
@@ -132,7 +132,7 @@ class SearchPage extends React.Component {
   }
 
   renderSearchResults = () => {
-    const { uiStore, routingStore, location } = this.props
+    const { uiStore, location } = this.props
     const query = this.searchQuery(location)
     if (!query) {
       return null
@@ -154,7 +154,6 @@ class SearchPage extends React.Component {
 
     return (
       <SearchResultsInfinite
-        routeTo={routingStore.routeTo}
         gridSettings={uiStore.gridSettings}
         gridMaxW={uiStore.gridMaxW}
         searchResults={this.searchResults}
@@ -189,7 +188,6 @@ SearchPage.propTypes = {
 SearchPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SearchPage

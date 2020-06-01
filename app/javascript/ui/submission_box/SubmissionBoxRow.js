@@ -1,4 +1,4 @@
-import { BctButton } from '~/ui/grid/shared'
+import BctButton from '~/ui/global/BctButton'
 import styled from 'styled-components'
 import _ from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'

@@ -196,7 +196,7 @@
     "eslint-plugin-cypress": "^2.0.1",
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jest": "^21.7.0",
-    "eslint-plugin-jsx-a11y": "~6.0.3",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-node": "~5.1.1",
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-promise": "~3.5.0",
@@ -220,5 +220,17 @@
   "resolutions": {
     "react": "16.8.6",
     "react-dom": "16.8.6"
+  },
+  "bit": {
+    "env": {
+      "compiler": "bit.envs/bundlers/webpack@4.0.1"
+    },
+    "componentsDefaultDirectory": "app/javascript/ui/{name}",
+    "packageManager": "yarn",
+    "resolveModules": {
+      "aliases": {
+        "~": "app/javascript"
+      }
+    }
   }
 }

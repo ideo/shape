@@ -22,6 +22,7 @@ module CardDuplicatorMapper
     # Register a card that has been duplicated so it can be remappeds
     def register_duplicated_card(original_card_id:, to_card_id:)
       Cache.hash_set("#{@batch_id}_duplicated_cards", original_card_id, to_card_id)
+      # TODO: How to ensure all cards were mapped or if duplication failed
       return unless all_cards_mapped?
 
       CardDuplicatorMapper::RemapLinkedCards.call(batch_id: @batch_id)

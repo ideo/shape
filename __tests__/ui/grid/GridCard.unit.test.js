@@ -13,7 +13,6 @@ const props = {
   card: fakeItemCard,
   cardType: 'items',
   record: fakeTextItem,
-  handleClick: jest.fn(),
   onMoveStart: jest.fn(),
   dragging: false,
   height: 100,
@@ -22,9 +21,13 @@ const props = {
   searchResult: false,
 }
 
+const fakeEvent = {
+  preventDefault: jest.fn(),
+  target: { className: '', closest: jest.fn() },
+}
+
 let wrapper, component
 const rerender = function() {
-  props.handleClick.mockClear()
   wrapper = shallow(<GridCard {...props} />)
   component = wrapper.instance()
   return wrapper
@@ -46,7 +49,7 @@ describe('GridCard', () => {
 
       it('renders a StyledGridCardInner with passed in onClick prop', () => {
         expect(wrapper.find('StyledGridCardInner').props().onClick).toEqual(
-          wrapper.instance().handleClick
+          component.handleClick
         )
       })
 
@@ -90,7 +93,6 @@ describe('GridCard', () => {
     describe('menuOpen', () => {
       it('opens and closes via openActionMenu and closeMenu', () => {
         expect(component.menuOpen).toBe(false)
-        const fakeEvent = { target: { closest: jest.fn() } }
         // NOTE: this test works because this file imports the actual uiStore
         component.openActionMenu(fakeEvent)
         expect(component.menuOpen).toBe(true)
@@ -132,12 +134,13 @@ describe('GridCard', () => {
       })
 
       it('calls storeLinkedBreadcrumb on handleClick', () => {
-        wrapper.instance().handleClick({})
+        component.defaultHandleClick = jest.fn()
+        component.handleClick(fakeEvent)
         expect(uiStore.update).toHaveBeenCalledWith(
           'actionAfterRoute',
           expect.any(Function)
         )
-        expect(props.handleClick).toHaveBeenCalled()
+        expect(component.defaultHandleClick).toHaveBeenCalled()
       })
     })
 
@@ -268,8 +271,9 @@ describe('GridCard', () => {
     })
 
     it('prevents any action on the click handler', () => {
-      expect(wrapper.instance().handleClick()).toBe(false)
-      expect(props.handleClick).not.toHaveBeenCalled()
+      component.defaultHandleClick = jest.fn()
+      expect(component.handleClick(fakeEvent)).toBe(false)
+      expect(component.defaultHandleClick).not.toHaveBeenCalled()
     })
   })
 
@@ -350,6 +354,30 @@ describe('GridCard', () => {
       it('uses hide-on-cover-edit class', () => {
         const topRight = wrapper.find('StyledTopRightActions').last()
         expect(topRight.props().className).toEqual('hide-on-cover-edit')
+      })
+    })
+
+    describe('handleClick', () => {
+      beforeEach(() => {
+        uiStore.showPermissionsAlert = jest.fn()
+      })
+
+      it('does not call showPermissionsAlert', () => {
+        expect(props.record.can_view).toEqual(true)
+        component.handleClick(fakeEvent)
+        expect(uiStore.showPermissionsAlert).not.toHaveBeenCalled()
+      })
+
+      describe('if user cannot view', () => {
+        beforeEach(() => {
+          props.record.can_view = false
+          rerender()
+        })
+
+        it('calls showPermissionsAlert', () => {
+          component.handleClick(fakeEvent)
+          expect(uiStore.showPermissionsAlert).toHaveBeenCalled()
+        })
       })
     })
   })

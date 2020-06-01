@@ -90,6 +90,12 @@ class AudienceSettingsWidget extends React.Component {
     selectedAudienceMenuItem: null,
   }
 
+  get hidePaidAudienceSettings() {
+    const { uiStore } = this.props
+
+    return uiStore.viewingRecord.isInsideAChallenge
+  }
+
   get displayedAudiences() {
     const { audiences, audienceSettings } = this.props
     return _.sortBy(
@@ -212,14 +218,16 @@ class AudienceSettingsWidget extends React.Component {
   renderTableBody(audience) {
     const { onInputChange, numPaidQuestions } = this.props
     return (
-      <TableBody
-        audience={audience}
-        onInputChange={onInputChange}
-        selected={this.isAudienceSelected(audience)}
-        numPaidQuestions={numPaidQuestions}
-        sampleSize={this.sampleSize(audience)}
-        locked={this.isAudienceLocked(audience)}
-      />
+      !this.hidePaidAudienceSettings && (
+        <TableBody
+          audience={audience}
+          onInputChange={onInputChange}
+          selected={this.isAudienceSelected(audience)}
+          numPaidQuestions={numPaidQuestions}
+          sampleSize={this.sampleSize(audience)}
+          locked={this.isAudienceLocked(audience)}
+        />
+      )
     )
   }
 
@@ -291,16 +299,18 @@ class AudienceSettingsWidget extends React.Component {
                 return (
                   <StyledColumnFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
-                    <TableHeader />
+                    {!this.hidePaidAudienceSettings && <TableHeader />}
                     {this.renderTableBody(audience)}
                   </StyledColumnFlexParent>
                 )
               })}
-              <StyledRowFlexParent style={{ marginTop: '15px' }}>
-                {newAudienceButton}
-                <AudienceRowCell />
-                {totalPriceDisplay}
-              </StyledRowFlexParent>
+              {!this.hidePaidAudienceSettings && (
+                <StyledRowFlexParent style={{ marginTop: '15px' }}>
+                  {newAudienceButton}
+                  <AudienceRowCell />
+                  {totalPriceDisplay}
+                </StyledRowFlexParent>
+              )}
             </StyledColumnFlexParent>
           </MobileWrapper>
 
@@ -308,7 +318,7 @@ class AudienceSettingsWidget extends React.Component {
             <StyledRowFlexParent column>
               <StyledRowFlexParent>
                 <StyledRowFlexItem />
-                <TableHeader />
+                {!this.hidePaidAudienceSettings && <TableHeader />}
               </StyledRowFlexParent>
               {displayedAudiences.map(audience => {
                 return (
@@ -318,11 +328,13 @@ class AudienceSettingsWidget extends React.Component {
                   </StyledRowFlexParent>
                 )
               })}
-              <StyledRowFlexParent>
-                {newAudienceButton}
-                <AudienceRowCell />
-                {totalPriceDisplay}
-              </StyledRowFlexParent>
+              {!this.hidePaidAudienceSettings && (
+                <StyledRowFlexParent>
+                  {newAudienceButton}
+                  <AudienceRowCell />
+                  {totalPriceDisplay}
+                </StyledRowFlexParent>
+              )}
             </StyledRowFlexParent>
           </DesktopWrapper>
 

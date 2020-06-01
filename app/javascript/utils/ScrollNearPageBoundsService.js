@@ -145,3 +145,5 @@ export default class ScrollNearPageBoundsService {
     return window.requestAnimationFrame(this.scrollRight)
   }
 }
+
+export const pageBoundsScroller = new ScrollNearPageBoundsService()
