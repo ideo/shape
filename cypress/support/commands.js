@@ -266,6 +266,9 @@ Cypress.Commands.add(
       .first()
       .click({ force: true })
     cy.wait('@apiCreateCollectionCard')
+    if (['searchCollection', 'submissionBox'].includes(type)) {
+      cy.wait('@apiGetCollectionCards')
+    }
     cy.wait(50)
     return
   }
