@@ -166,6 +166,20 @@ class Api::V1::CollectionsController < Api::V1::BaseController
            include: Collection.default_relationships_for_api
   end
 
+  def challenge_phase_collection_data
+    collections = @collection.all_child_collections
+                             .where(collection_type: :phase)
+                             .order(start_date: :asc)
+
+    render json: collections.map do |collection|
+      {
+        id: collection.id,
+        start_date: start_date,
+        end_date: end_date,
+      }
+    end
+  end
+
   def restore_permissions
     RestorePermission.call(
       object: @collection,
