@@ -52,7 +52,10 @@ const SubmissionBoxSettingsModal = ({ collection }) => {
       onClose={() => closeSubmissionBoxSettings(collection)}
       open
     >
-      <SubmissionBoxSettings collection={collection} />
+      <SubmissionBoxSettings
+        collection={collection}
+        closeModal={() => closeSubmissionBoxSettings(collection)}
+      />
     </Modal>
   )
 }

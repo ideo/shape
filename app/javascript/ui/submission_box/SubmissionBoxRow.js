@@ -51,7 +51,7 @@ export const SubmissionBoxRowForItem = ({
 SubmissionBoxRowForItem.propTypes = {
   type: PropTypes.exact({
     name: PropTypes.string,
-    Icon: PropTypes.node,
+    Icon: PropTypes.func,
   }).isRequired,
   onSelect: PropTypes.func,
   rightSideComponent: PropTypes.node,
