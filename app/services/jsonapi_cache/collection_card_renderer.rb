@@ -53,8 +53,6 @@ module JsonapiCache
     end
 
     def cache_card_json(card)
-      puts "we DONT gotcha #{card.id}"
-
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         card,

@@ -9,7 +9,7 @@ import VisibilitySensor from 'react-visibility-sensor'
 
 import { uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
+import PageBreadcrumb from '~/ui/layout/PageBreadcrumb'
 import Loader from '~/ui/layout/Loader'
 import GridCard from '~/ui/grid/GridCard'
 import { StyledCardWrapper } from '~/ui/grid/shared'
@@ -103,6 +103,7 @@ class SearchResultsInfinite extends React.Component {
     } = this.props
 
     const results = searchResults.map((card, i) => {
+      // search results are cards, so we pull the record off the card
       const { record } = card
 
       return (
@@ -118,12 +119,16 @@ class SearchResultsInfinite extends React.Component {
           >
             <StyledCardWrapper>
               <StyledBreadcrumb>
-                <Breadcrumb
+                <PageBreadcrumb
+                  maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
                   record={record}
                   isHomepage={false}
                   useLinkedBreadcrumb={false}
                   // re-mount every time the record / breadcrumb changes
                   key={`${record.identifier}_${record.breadcrumbSize}`}
+                  // force props update if windowWidth changes
+                  windowWidth={uiStore.windowWidth}
+                  containerWidth={this.maxBreadcrumbContainerWidth}
                 />
               </StyledBreadcrumb>
               <StyledSearchResult

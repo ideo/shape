@@ -2,11 +2,12 @@ import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import { uiStore } from '~/stores'
 import { fakeTextItem } from '#/mocks/data'
 
+import Tooltip from '~/ui/global/Tooltip'
+
 jest.mock('../../../app/javascript/stores/index')
 
 describe('HiddenIconButton', () => {
   let wrapper, props
-
   beforeEach(() => {
     props = {
       clickable: false,
@@ -18,7 +19,7 @@ describe('HiddenIconButton', () => {
   describe('render', () => {
     it('should render a button with a Tooltip', () => {
       expect(wrapper.find('StyledHiddenIconButton').exists()).toBeTruthy()
-      expect(wrapper.find('Tooltip').exists()).toBeTruthy()
+      expect(wrapper.find(Tooltip).exists()).toBeTruthy()
     })
 
     describe('not clickable', () => {
