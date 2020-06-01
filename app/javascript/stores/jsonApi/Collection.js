@@ -62,6 +62,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   carouselIdx = 0
   @observable
   viewMode = 'grid'
+
   // this stores the "virtual" search results collection
   searchResultsCollection = null
 
@@ -688,6 +689,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.parent.name &&
       this.parent.name.match(/method\s+library/i) !== null
     )
+  }
+
+  get isPhaseOrProject() {
+    return ['phase', 'project'].includes(this.collection_type)
   }
 
   @computed

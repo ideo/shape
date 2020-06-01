@@ -8,21 +8,21 @@ const billingTypography = {
     fontSize: '1rem',
   },
   // heading-1
-  headline: {
+  h1: {
     textTransform: 'uppercase',
     fontWeight: 500,
     fontSize: pxToRem(32),
     letterSpacing: pxToRem(1.2),
   },
   // heading-2
-  subheading: {
+  h2: {
     textTransform: 'uppercase',
     fontWeight: 500,
     fontSize: pxToRem(20),
     letterSpacing: pxToRem(0.5),
   },
   // heading-3
-  title: {
+  h3: {
     display: 'inline',
     fontSize: pxToRem(14),
     fontWeight: 500,
@@ -33,7 +33,7 @@ const billingTypography = {
     letterSpacing: pxToRem(0.5),
   },
   // heading-4
-  display1: {
+  h4: {
     fontSize: pxToRem(16),
     letterSpacing: pxToRem(0.6),
     textTransform: 'none',
@@ -62,10 +62,18 @@ const billingTypography = {
   },
 }
 
+const dateRangeStartBorderStyle = {
+  borderTopLeftRadius: '4px',
+  borderBottomLeftRadius: '4px',
+}
+
+const dateRangeEndBorderStyle = {
+  borderTopRightRadius: '4px',
+  borderBottomRightRadius: '4px',
+}
+
 const theme = {
   typography: {
-    // https://material-ui.com/style/typography/#migration-to-typography-v2
-    useNextVariants: true,
     // Use the Shape font instead of the default Roboto font.
     fontFamily: v.fonts.sans,
   },
@@ -105,6 +113,67 @@ const theme = {
       root: {
         borderRadius: '1px !important',
         boxShadow: '0px 0px 8px 0px rgba(0, 0, 0, 0.2) !important',
+      },
+    },
+    // Customization for DateRangePicker
+    // Source classes: https://github.com/mui-org/material-ui-pickers/blob/360ad0a1554f5ce86d265b7c27fc0dfe20c73d42/lib/src/views/Calendar/Day.tsx
+    MuiPickersCalendarHeader: {
+      switchHeader: {
+        textTransform: 'lowercase',
+      },
+    },
+    MuiPickersDateRangeDay: {
+      rangeIntervalDay: {
+        '&:first-child $rangeIntervalDayPreview': dateRangeStartBorderStyle,
+        '&:last-child $rangeIntervalDayPreview': dateRangeEndBorderStyle,
+        marginTop: '2px', // This is what spaces out the weeks in the range
+        marginBottom: '2px', // This is what spaces out the weeks in the range
+      },
+      rangeIntervalDayHighlight: {
+        backgroundColor: v.colors.commonMedium,
+        '&:first-child': dateRangeStartBorderStyle,
+        '&:last-child': dateRangeEndBorderStyle,
+      },
+      rangeIntervalDayHighlightStart: {
+        ...dateRangeStartBorderStyle,
+      },
+      rangeIntervalDayHighlightEnd: {
+        ...dateRangeEndBorderStyle,
+      },
+      rangeIntervalPreview: {
+        borderColor: 'transparent',
+        borderWidth: '1px', // This made spacing between ranges a bit tight
+      },
+      rangeIntervalDayPreview: {
+        borderColor: v.colors.commonMedium,
+        borderWidth: '1px', // This made spacing between ranges a bit tight
+        borderStyle: 'solid',
+        '&$rangeIntervalDayPreviewStart': dateRangeStartBorderStyle,
+        '&$rangeIntervalDayPreviewEnd': dateRangeEndBorderStyle,
+      },
+    },
+    MuiPickersDay: {
+      day: {
+        fontSize: '1em',
+        fontWeight: 'normal',
+        fontFamily: v.fonts.sans,
+        color: v.colors.black,
+        borderRadius: '4px',
+      },
+      daySelected: {
+        color: v.colors.white,
+        backgroundColor: v.colors.black,
+      },
+      dayDisabled: {
+        color: v.colors.commonMedium,
+      },
+      today: {
+        borderRadius: '5px',
+        backgroundColor: v.colors.commonDarkest,
+        '&:not($daySelected)': {
+          backgroundColor: v.colors.commonDark,
+          borderColor: 'transparent',
+        },
       },
     },
   },

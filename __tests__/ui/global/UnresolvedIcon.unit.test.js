@@ -1,6 +1,8 @@
 import UnresolvedButton from '~/ui/global/UnresolvedButton'
 import { fakeTextItem } from '#/mocks/data'
 
+import Tooltip from '~/ui/global/Tooltip'
+
 jest.mock('../../../app/javascript/stores/index')
 
 describe('UnresolvedButton', () => {
@@ -18,7 +20,7 @@ describe('UnresolvedButton', () => {
   describe('render', () => {
     it('should render a button with a Tooltip', () => {
       expect(wrapper.find('StyledUnresolvedButton').exists()).toBeTruthy()
-      expect(wrapper.find('Tooltip').exists()).toBeTruthy()
+      expect(wrapper.find(Tooltip).exists()).toBeTruthy()
     })
   })
 })

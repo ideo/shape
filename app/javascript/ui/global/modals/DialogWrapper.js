@@ -52,7 +52,6 @@ class DialogWrapper extends React.Component {
       open,
       backgroundColor,
     } = uiStore.snackbarConfig
-    const variant = { backgroundColor }
 
     let snackbarMessage = ''
     if (_.isString(message)) {
@@ -76,7 +75,7 @@ class DialogWrapper extends React.Component {
       >
         <StyledSnackbarContent
           classes={{ root: `SnackbarContent autoWidth` }}
-          variant={variant}
+          backgroundColor={backgroundColor}
           message={snackbarMessage}
           action={this.snackbarAction()}
         />
