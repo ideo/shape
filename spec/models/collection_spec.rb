@@ -140,6 +140,21 @@ describe Collection, type: :model do
         expect(collection.joinable_group_id).to eq guest_group.id
       end
     end
+
+    describe '#create_challenge_groups_and_assign_roles' do
+      let(:organization) { create(:organization) }
+      let!(:collection) { create(:collection, organization: organization, collection_type: 'project') }
+
+      it 'should create a challenge admin group, participant group, and reviewer group' do
+        expect(collection.challenge_admin_group_id.present?).to be false
+        expect(collection.challenge_participant_group_id.present?).to be false
+        expect(collection.challenge_reviewer_group_id.present?).to be false
+        collection.update(collection_type: 'challenge')
+        expect(collection.challenge_admin_group_id.present?).to be true
+        expect(collection.challenge_participant_group_id.present?).to be true
+        expect(collection.challenge_reviewer_group_id.present?).to be true
+      end
+    end
   end
 
   describe '#inherit_parent_organization_id' do
@@ -1086,5 +1101,15 @@ describe Collection, type: :model do
       end
     end
     # <- end Caching methods
+  end
+
+  context 'with a subcollection that\'s inside a challenge' do
+    let(:parent_collection) { create(:collection, collection_type: 'challenge') }
+    let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: parent_collection) }
+    let!(:inner_subcollection) { create(:collection, num_cards: 2, parent_collection: subcollection) }
+
+    it 'the collection inside the subcollection should have a reference to its parent challenge' do
+      expect(inner_subcollection.parent_challenge).to eq parent_collection
+    end
   end
 end

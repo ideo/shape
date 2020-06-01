@@ -226,6 +226,8 @@ export default class UiStore {
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
+  @observable
+  shouldRenderFixedHeader = false
   hoveringOverDefaults = {
     order: null,
     direction: null,
@@ -255,6 +257,8 @@ export default class UiStore {
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
   collaboratorColors = new Map()
+  @observable
+  challengeSettingsOpen = false
 
   get routingStore() {
     return this.apiStore.routingStore

@@ -10,7 +10,7 @@ import { Heading1, Heading1TypographyCss } from '~/ui/global/styled/typography'
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 
 const StyledName = styled.div`
-  display: block;
+  display: ${props => (props.inline ? 'inline-block' : 'block')};
   margin-top: 0;
   vertical-align: top;
 
@@ -179,7 +179,7 @@ class EditableName extends React.Component {
       )
     }
     return (
-      <StyledName className="styled-name">
+      <StyledName className="styled-name" inline={this.props.inline}>
         <TypographyComponent
           className="editable-name-heading"
           data-cy={`EditableNameHeading-${fieldName}`}
@@ -209,6 +209,7 @@ EditableName.propTypes = {
   fieldName: PropTypes.string,
   editingMarginTop: PropTypes.string,
   placeholder: PropTypes.string,
+  inline: PropTypes.bool,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -224,6 +225,7 @@ EditableName.defaultProps = {
   typographyCss: Heading1TypographyCss,
   fieldName: 'name',
   placeholder: '',
+  inline: false,
 }
 
 EditableName.displayName = 'EditableName'

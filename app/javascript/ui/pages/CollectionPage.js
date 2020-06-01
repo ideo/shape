@@ -29,6 +29,7 @@ import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
+import VisibilitySensor from 'react-visibility-sensor'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -484,6 +485,25 @@ class CollectionPage extends React.Component {
     return <TestDesigner collection={this.props.collection} />
   }
 
+  renderPageHeader() {
+    const { collection } = this.props
+
+    return (
+      <VisibilitySensor onChange={this.handleHeaderVisibility}>
+        {({ isVisible }) => {
+          return (
+            <PageHeader record={collection} template={collection.template} />
+          )
+        }}
+      </VisibilitySensor>
+    )
+  }
+
+  handleHeaderVisibility = isVisible => {
+    const { uiStore } = this.props
+    uiStore.update('shouldRenderFixedHeader', !isVisible)
+  }
+
   loader = () => (
     <div style={{ marginTop: v.headerHeight }}>
       <Loader />
@@ -586,7 +606,7 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Helmet title={collection.pageTitle} />
-        <PageHeader record={collection} template={collection.template} />
+        {this.renderPageHeader()}
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
           // pop up over the CollectionGrid

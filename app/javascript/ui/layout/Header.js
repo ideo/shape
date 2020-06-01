@@ -28,6 +28,7 @@ import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
+import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const BackIconContainer = styled.span`
@@ -77,6 +78,20 @@ class Header extends React.Component {
     uiStore.update('rolesMenuOpen', record)
   }
 
+  getUsersAndGroupsLength = () => {
+    const { record } = this
+
+    const flattenUsersAndGroupsForRole = role => {
+      return _.flatten([_.map(role.users, 'id'), _.map(role.groups, 'id')])
+    }
+    const usersAndGroupsIds = _.flatMap(
+      record.roles,
+      flattenUsersAndGroupsForRole
+    )
+
+    return usersAndGroupsIds.length
+  }
+
   openMenu = ev => {
     const { uiStore } = this.props
     uiStore.update('pageMenuOpen', true)
@@ -99,6 +114,11 @@ class Header extends React.Component {
 
   closeOrgMenu = () => {
     this.props.uiStore.update('organizationMenuPage', null)
+  }
+
+  handleChallengeSettingsClick = () => {
+    const { uiStore } = this.props
+    uiStore.update('challengeSettingsOpen', true)
   }
 
   get onArchivedPage() {
@@ -179,6 +199,7 @@ class Header extends React.Component {
         // convert observable to normal array to trigger render changes
         collaborators={[...record.collaborators]}
         rolesMenuOpen={!!uiStore.rolesMenuOpen}
+        usersAndGroupsLength={this.getUsersAndGroupsLength()}
       />
     )
   }
@@ -256,6 +277,7 @@ class Header extends React.Component {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
+    const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -396,6 +418,20 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
+          {record &&
+            record.isChallengeOrInsideChallenge &&
+            shouldRenderFixedHeader && (
+              <ChallengeFixedHeader
+                challengeName={record.challenge_name}
+                collectionName={record.name}
+                collectionType={record.collection_type}
+                onSettingsClick={this.handleChallengeSettingsClick}
+                isInsideAChallenge={record.isInsideAChallenge}
+                challengeNavigationHandler={() => {
+                  routingStore.routeTo('collections', record.challenge_id)
+                }}
+              />
+            )}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>

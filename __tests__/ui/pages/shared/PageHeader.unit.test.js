@@ -220,4 +220,40 @@ describe('PageHeader', () => {
       ).toEqual('Restore')
     })
   })
+
+  describe('with a challenge collection type', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.challenge_id = 999
+      props.record.challenge_name = 'Open Innovation Sustainability Challenge'
+      props.record.isChallengeOrInsideChallenge = true
+      props.record.collection_type = 'challenge'
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+    })
+
+    it('should render the ChallengeSubHeader', () => {
+      expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
+    })
+
+    it('should render the ChallengeSettingsButton', () => {
+      expect(wrapper.find('ChallengeSettingsButton').exists()).toBe(true)
+    })
+
+    describe('with a phase collection type inside a challenge', () => {
+      beforeEach(() => {
+        props.record = fakeCollection
+        props.record.challenge_id = 999
+        props.record.challenge_name =
+          'Open Innovation Sustainability Challenge Phase 1'
+        props.record.isInsideAChallenge = true
+        props.record.collection_type = 'phase'
+        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+        component = wrapper.instance()
+      })
+
+      it('should render the ChallengeSubHeader', () => {
+        expect(wrapper.find('ChallengeSubHeader').exists()).toBe(true)
+      })
+    })
+  })
 })

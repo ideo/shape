@@ -30,24 +30,9 @@ import CollectionTypeIcon, {
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
-
-const IconHolder = styled.span`
-  color: ${v.colors.commonDark};
-  display: block;
-  height: 32px;
-  ${props =>
-    props.align === 'left'
-      ? 'margin-right: 12px;'
-      : 'margin-left: 6px;'} margin-top: 12px;
-  overflow: hidden;
-  width: 32px;
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    height: 36px;
-    margin-top: 8px;
-    width: 20px;
-  }
-`
+import IconHolder from '~/ui/icons/IconHolder'
+import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
+import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -139,6 +124,11 @@ class PageHeader extends React.Component {
     ev.preventDefault()
   }
 
+  handleChallengeSettingsClick = () => {
+    const { uiStore } = this.props
+    uiStore.update('challengeSettingsOpen', true)
+  }
+
   openMoveMenuForTemplate = e => {
     const { record } = this.props
     record.toggleTemplateHelper()
@@ -150,7 +140,7 @@ class PageHeader extends React.Component {
 
     if (_.some(leftConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -170,7 +160,7 @@ class PageHeader extends React.Component {
 
     if (_.some(rightConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -187,7 +177,7 @@ class PageHeader extends React.Component {
 
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           {collectionTypeToIcon({
             type: record.collection_type,
             size: 'lg',
@@ -207,7 +197,7 @@ class PageHeader extends React.Component {
           size="lg"
           record={record}
           IconWrapper={({ children }) => (
-            <IconHolder align="right">{children}</IconHolder>
+            <IconHolder marginRight={12}>{children}</IconHolder>
           )}
         />
       )
@@ -451,7 +441,7 @@ class PageHeader extends React.Component {
   }
 
   render() {
-    const { record, uiStore } = this.props
+    const { record, uiStore, routingStore } = this.props
     const tagEditorOpen =
       record.parent_collection_card &&
       uiStore.tagsModalOpenId === record.parent_collection_card.id
@@ -467,6 +457,14 @@ class PageHeader extends React.Component {
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           <div style={{ minHeight: '72px', display: 'flex' }}>
+            {record.isInsideAChallenge && (
+              <ChallengeSubHeader
+                challengeName={record.challenge_name}
+                challengeNavigationHandler={() => {
+                  routingStore.routeTo('collections', record.challenge_id)
+                }}
+              />
+            )}
             <StyledTitleAndRoles
               data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -522,6 +520,12 @@ class PageHeader extends React.Component {
                 >
                   <LanguageSelector />
                 </Flex>
+              )}
+
+              {record.isChallengeOrInsideChallenge && (
+                <ChallengeSettingsButton
+                  onSettingsClick={this.handleChallengeSettingsClick}
+                />
               )}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (

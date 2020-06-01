@@ -28,6 +28,7 @@ class CollectionTypeSelector extends React.Component {
   updateCollectionType = async collectionType => {
     const { collection } = this.props
     await collection.API_selectCollectionType(collectionType)
+
     // TODO: Do we want error handling?
     // If so, I think this needs a try/catch block?
     this.hidePopoutMenu()
@@ -45,8 +46,10 @@ class CollectionTypeSelector extends React.Component {
       'collection',
       'project',
       'method',
+      'phase',
       'prototype',
       'profile',
+      'challenge',
     ]
 
     return collectionTypes.map(collectionType => {
