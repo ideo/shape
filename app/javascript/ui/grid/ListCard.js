@@ -109,8 +109,8 @@ class ListCard extends React.Component {
 
   handlePotentialReviewerClick = reviewer => {
     runInAction(() => {
-      console.log('fuckufkcufkcufkcu')
       this.currentReviewerRoles[0].users.push(reviewer)
+      this.currentReviewerRoles[0].activeCount += 1
     })
   }
 
@@ -173,7 +173,6 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
-    console.log('render', this.reviewersAddOpen)
     return (
       <Row>
         <Column width="50px">
