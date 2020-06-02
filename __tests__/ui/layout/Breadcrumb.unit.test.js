@@ -23,7 +23,6 @@ describe('Breadcrumb', () => {
     render = () => {
       wrapper = shallow(<Breadcrumb {...props} />)
       component = wrapper.instance()
-      // titles = component.truncatedItems.map(t => t.name)
     }
     render()
   })

@@ -1,66 +1,9 @@
 require 'rails_helper'
+require_relative 'shared_setup'
 
 RSpec.describe CollectionCardFilter::Base, type: :service do
-  describe '#call (Collection#collection_cards_viewable_by)' do
-    let(:user) { nil }
-    let(:editor) { create(:user) }
-    let(:viewer) { create(:user) }
-    let(:super_admin) do
-      user = create(:user)
-      user.add_role(Role::SUPER_ADMIN)
-      user
-    end
-    let(:organization) { create(:organization, admin: editor, member: viewer) }
-    let!(:group) { create(:group, organization: organization) }
-    let!(:collection) do
-      create(:collection,
-             organization: organization,
-             num_cards: 5,
-             record_type: :collection,
-             add_viewers: [viewer])
-    end
-    let(:filters) { {} }
-    let(:application) { nil }
-    let(:cards) { collection.collection_cards }
-    let(:visible_card_1) { cards[0] }
-    let(:visible_card_2) { cards[1] }
-    let(:visible_cards) { [visible_card_1, visible_card_2] }
-    let(:hidden_card) { cards[2] }
-    let(:private_card) { cards[3] }
-    let!(:archived_card) { cards[4] }
-    let(:ids_only) { false }
-    before do
-      # And group to collection
-      group.add_role(Role::VIEWER, collection)
-
-      # Add editor directly to collection
-      editor.add_role(Role::EDITOR, collection)
-
-      cards.each do |card|
-        record = card.record
-        record.unanchor!
-        editor.add_role(Role::EDITOR, record)
-        if card == private_card
-          # Make private card private
-          record.cached_inheritance = { private: true, updated_at: Time.current }
-          record.save
-        else
-          # Don't add group/viewer role to the private card
-          group.add_role(Role::VIEWER, record)
-        end
-      end
-
-      # Anchor visible and hidden cards
-      [visible_card_1, visible_card_2, hidden_card].each do |card|
-        card.record.update(roles_anchor_collection: collection)
-      end
-
-      # Hide the hidden card
-      hidden_card.update(hidden: true)
-
-      # Archive the last card
-      archived_card.archive!
-    end
+  describe '#call' do
+    include_context 'CollectionCardFilter setup'
     subject do
       CollectionCardFilter::Base.call(
         collection: collection,
@@ -89,6 +32,40 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
           # Default per_page is made to be at least 50,
           # so best way to test is to make sure we didn't receive any cards -- though not ideal
           expect(subject).to be_empty
+        end
+      end
+
+      context 'with card_order filters' do
+        context 'card_order = updated_at' do
+          let(:filters) { { card_order: 'updated_at' } }
+
+          before do
+            visible_cards.each_with_index do |c, i|
+              c.update(updated_at: Time.current - i.minutes)
+            end
+          end
+
+          it 'should return results sorted by updated_at' do
+            sorted = visible_cards.sort_by(&:updated_at).reverse
+            viewable = subject
+
+            expect(viewable.first).to eq(sorted.first)
+            expect(viewable.last).to eq(sorted.last)
+          end
+        end
+
+        context 'card_order by test score' do
+          let(:filters) { { card_order: 'question_useful' } }
+          it 'should return results according to the cached_test_scores sorting param' do
+            scored1 = collection.collections.first
+            scored1.update(cached_test_scores: { 'question_useful' => 30 })
+            scored2 = collection.collections.last
+            scored2.update(cached_test_scores: { 'question_useful' => 20 })
+
+            viewable = subject
+            expect(viewable.first).to eq(scored1.parent_collection_card)
+            expect(viewable.second).to eq(scored2.parent_collection_card)
+          end
         end
       end
 
@@ -134,7 +111,7 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
 
         it 'should return all cards archived in the same batch as parent' do
           expect(subject).to match_array(
-            [visible_card_1],
+            [visible_card_1, private_card],
           )
         end
       end
@@ -184,7 +161,7 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
 
       it 'returns all non-hidden cards' do
         expect(subject).to match_array(
-          visible_cards + [private_card],
+          visible_cards,
         )
       end
     end
@@ -194,7 +171,7 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
 
       it 'returns all public or private, non-hidden cards' do
         expect(subject).to match_array(
-          visible_cards + [private_card],
+          visible_cards,
         )
       end
 
@@ -203,7 +180,7 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
 
         it 'returns all cards' do
           expect(subject).to match_array(
-            visible_cards + [hidden_card, private_card],
+            visible_cards + [hidden_card],
           )
         end
       end
@@ -263,29 +240,6 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
         expect(subject).to match_array(
           [visible_card_2],
         )
-      end
-    end
-
-    context 'with groups' do
-      let(:user) { create(:user, current_organization: organization) }
-      let!(:child_group) { create(:group, organization: organization) }
-      let!(:group) { create(:group, organization: organization, add_subgroups: [child_group]) }
-      before do
-        group.add_role(Role::VIEWER, private_card.record)
-      end
-
-      it 'returns no visible cards when user is not a viewer or member of any group' do
-        expect(collection.can_view?(user)).to be false
-        expect(subject).to match_array([])
-      end
-
-      context 'when user is a(ny) member of a group that is a subgroup of another group' do
-        let!(:child_group) { create(:group, organization: organization, add_members: [user]) }
-
-        it 'returns all cards that the farthest away ancestor group can view' do
-          expect(collection.can_view?(user)).to be true
-          expect(subject).to match_array([visible_card_1, visible_card_2, private_card])
-        end
       end
     end
   end

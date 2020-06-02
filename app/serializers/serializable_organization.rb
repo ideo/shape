@@ -15,6 +15,7 @@ class SerializableOrganization < BaseJsonSerializer
   end
 
   attribute :current_user_collection_id, if: -> { @include_user_collection_ids } do
+    # this is used with organizations#index by the Shape API + gem
     @current_user.current_user_collection(@object.id)&.id
   end
 

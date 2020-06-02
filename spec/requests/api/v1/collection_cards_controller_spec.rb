@@ -105,7 +105,15 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
       it 'only shows items viewable by the user' do
         get(path)
-        expect(json['data'].count).to eq 4
+        # still shows all 5, however...
+        expect(json['data'].count).to eq 5
+        first_card = Mashie.new(json['data'].first)
+        private_card = Mashie.new(json['data'].last)
+        expect(first_card.attributes.private_card).to be nil
+        expect(first_card.relationships.record.data.type).to eq 'items'
+        # the last card is private and it does not include the record
+        expect(private_card.attributes.private_card).to be true
+        expect(private_card.relationships.record.meta.included).to be false
       end
     end
 
@@ -174,33 +182,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
 
     context 'with sort options' do
       let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?card_order=updated_at" }
-      let(:collection_json) do
-        json['included'].select { |c| c['id'].to_i == collection.id }.first
+      before do
+        collection.collection_cards.each_with_index do |card, i|
+          card.update(updated_at: i.minutes.ago)
+        end
       end
 
       it 'should sort by the passed in card_order param' do
         get(path)
-        expect(collection_json['attributes']['card_order']).to eq 'updated_at'
         cards = json['data']
-        # kind of a hacky way to say that the first card is "newer" than the second
-        expect(cards.first['id'] > cards.second['id']).to be true
-      end
-
-      context 'with SharedWithMeCollection' do
-        let!(:collection) do
-          create(:shared_with_me_collection, num_cards: 5, add_viewers: [user])
-        end
-
-        before do
-          collection.collection_cards.each do |cc|
-            user.add_role(Role::VIEWER, cc.record)
-          end
-        end
-
-        it 'should sort by updated_at by default' do
-          get(path)
-          expect(collection_json['attributes']['card_order']).to eq 'updated_at'
-        end
+        sorted_cards = cards.sort_by { |c| c['attributes']['updated_at'] }.reverse
+        expect(cards).to eq(sorted_cards)
       end
     end
 

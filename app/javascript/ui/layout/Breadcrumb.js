@@ -243,7 +243,7 @@ class Breadcrumb extends React.Component {
 Breadcrumb.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape(breadcrumbItemPropType)).isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
-  breadcrumbItemComponent: PropTypes.node,
+  breadcrumbItemComponent: PropTypes.object,
   onBack: PropTypes.func.isRequired,
   onBreadcrumbDive: PropTypes.func,
   onRestore: PropTypes.func,

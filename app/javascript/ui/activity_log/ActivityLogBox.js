@@ -80,9 +80,10 @@ class ActivityLogBox extends React.Component {
 
   constructor(props) {
     super(props)
+    const { apiStore, uiStore } = props
     this.draggableRef = React.createRef()
     // attach observable position to UiStore so other components can know where the ALB is
-    this.position = props.uiStore.activityLogPosition
+    this.position = uiStore.activityLogPosition
     runInAction(() => {
       if (this.position.w < MIN_WIDTH || this.position.h < MIN_HEIGHT) {
         this.position.w = DEFAULT.w
@@ -90,6 +91,9 @@ class ActivityLogBox extends React.Component {
       }
     })
     this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
+      if (change.newValue === true) {
+        apiStore.setupCommentThreadAndMenusForPage(uiStore.viewingRecord)
+      }
       if (this.isOffscreen()) {
         this.setToDefaultPosition()
       }

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import { observable, action, runInAction } from 'mobx'
+import { toJS, observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
@@ -56,16 +56,17 @@ class PageBreadcrumb extends React.Component {
       // this may also have the effect of marking uiStore.linkedInMyCollection
       uiStore.linkedBreadcrumbTrailForRecord(record)
     )
-    // this will set record.inMyCollection = true/false
-    apiStore.checkInMyCollection(record)
     this.items = this.initItems()
   }
 
   initItems = (clamp = true) => {
-    const { maxDepth, record } = this.props
+    const { maxDepth, record, useLinkedBreadcrumb } = this.props
     const items = []
     const breadcrumb = this.breadcrumbWithLinks
-    if (record.inMyCollection || uiStore.linkedInMyCollection) {
+    const inMyCollection =
+      record.in_my_collection ||
+      (useLinkedBreadcrumb && uiStore.linkedInMyCollection)
+    if (inMyCollection) {
       items.push(this.myCollectionItemProps)
     }
     if (!breadcrumb) return items
@@ -172,19 +173,14 @@ class PageBreadcrumb extends React.Component {
 
   render() {
     const { containerWidth, record, isHomepage, maxDepth } = this.props
-    const { inMyCollection, breadcrumb } = record
-    const renderItems =
-      !isHomepage &&
-      // wait until we load this value before rendering
-      inMyCollection !== null &&
-      breadcrumb &&
-      breadcrumb.length > 0
+    const { breadcrumb } = record
+    const renderItems = !isHomepage && breadcrumb && breadcrumb.length > 0
 
     return (
       <Breadcrumb
         breadcrumbItemComponent={BreadcrumbWithDropping}
         maxDepth={maxDepth}
-        items={this.items}
+        items={toJS(this.items)}
         onBack={this.onBack}
         onBreadcrumbClick={this.onBreadcrumbClick}
         onBreadcrumbDive={this.fetchBreadcrumbRecords}
@@ -204,6 +200,7 @@ PageBreadcrumb.propTypes = {
   containerWidth: PropTypes.number,
   maxDepth: PropTypes.number,
   backButton: PropTypes.bool,
+  useLinkedBreadcrumb: PropTypes.bool,
   windowWidth: PropTypes.number,
 }
 
@@ -212,6 +209,7 @@ PageBreadcrumb.defaultProps = {
   containerWidth: null,
   maxDepth: 6,
   backButton: false,
+  useLinkedBreadcrumb: true,
   windowWidth: 1024,
 }
 

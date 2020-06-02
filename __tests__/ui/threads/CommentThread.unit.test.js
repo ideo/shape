@@ -13,6 +13,7 @@ describe('CommentThread', () => {
       afterSubmit: jest.fn(),
       onEditorHeightChange: jest.fn(),
       updateContainerSize: jest.fn(),
+      loadingThreads: false,
     }
     wrapper = shallow(<CommentThread.wrappedComponent {...props} />)
   })

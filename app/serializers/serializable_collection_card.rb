@@ -1,7 +1,9 @@
 class SerializableCollectionCard < BaseJsonSerializer
   type 'collection_cards'
 
-  id { @object.id_with_idea_id }
+  id do
+    @object.id ? @object.id_with_idea_id : "result-#{@object.record.id}"
+  end
 
   attributes(
     :order,
@@ -20,12 +22,17 @@ class SerializableCollectionCard < BaseJsonSerializer
     :row,
     :section_type,
     :font_color,
-    :font_background
+    :font_background,
   )
 
   stringified_attributes(
     :idea_id,
   )
+
+  belongs_to :item
+  belongs_to :collection
+  belongs_to :record
+  belongs_to :templated_from
 
   attribute :link do
     @object.is_a? CollectionCard::Link
@@ -35,21 +42,12 @@ class SerializableCollectionCard < BaseJsonSerializer
     @object.pinned_and_locked?
   end
 
-  attribute :can_edit_parent do
-    @current_ability ? @current_ability.can?(:edit_content, (@parent || @object.try(:parent))) : false
-  end
-
   attribute :is_master_template_card do
     @object.master_template_card?
   end
 
-  belongs_to :item
-  belongs_to :collection
-  belongs_to :parent do
-    data do
-      @parent || @object.parent
-    end
+  # for cached rendering this attribute will get added later
+  attribute :can_edit_parent, if: -> { @current_ability } do
+    @current_ability.can?(:edit_content, (@parent || @object.try(:parent)))
   end
-  belongs_to :record
-  belongs_to :templated_from
 end

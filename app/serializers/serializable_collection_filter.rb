@@ -2,7 +2,7 @@ class SerializableCollectionFilter < BaseJsonSerializer
   type 'collection_filters'
   attributes(
     :text,
-    :filter_type
+    :filter_type,
   )
 
   attribute :selected do

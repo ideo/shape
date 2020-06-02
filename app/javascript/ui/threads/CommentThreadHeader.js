@@ -204,6 +204,7 @@ class CommentThreadHeader extends React.Component {
             )}
             <span
               className="name"
+              data-cy="CommentThreadHeaderName"
               ref={r => {
                 this.title = r
               }}

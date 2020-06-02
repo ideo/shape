@@ -605,14 +605,6 @@ class Collection < ApplicationRecord
     )
   end
 
-  def collection_cards_viewable_by(user:, filters: {})
-    CollectionCardFilter::Base.call(
-      collection: self,
-      user: user,
-      filters: filters,
-    )
-  end
-
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     CollectionCard.import(

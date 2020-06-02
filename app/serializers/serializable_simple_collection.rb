@@ -5,17 +5,21 @@
 class SerializableSimpleCollection < BaseJsonSerializer
   type 'collections'
 
-  attributes :created_at, :updated_at, :name, :organization_id,
-             :master_template, :archived, :collection_type
+  attributes(
+    :created_at,
+    :updated_at,
+    :name,
+    :organization_id,
+    :master_template,
+    :archived,
+    :collection_type,
+  )
+
+  has_one :parent_collection_card
+  has_many :collection_cards
+
   attribute :cover do
     @object.cached_cover || {}
-  end
-
-  attribute :breadcrumb, if: -> { @force_breadcrumbs } do
-    Breadcrumb::ForUser.new(
-      @object,
-      @current_user,
-    ).viewable_to_api
   end
 
   attribute :is_profile_template do
@@ -30,6 +34,22 @@ class SerializableSimpleCollection < BaseJsonSerializer
     @object.try(:restorable?)
   end
 
+  attribute :serializer do
+    'SerializableSimpleCollection'
+  end
+
+  # TODO: reuse UserSpecificFields here? the logic is only slightly different...
+  attribute :breadcrumb, if: -> { @current_user && @force_breadcrumbs } do
+    Breadcrumb::ForUser.new(
+      @object,
+      @current_user,
+    ).viewable_to_api
+  end
+
+  attribute :in_my_collection, if: -> { @current_user && @force_breadcrumbs } do
+    @current_user.in_my_collection?(@object)
+  end
+
   attribute :can_view, if: -> { @current_ability } do
     # intentionally not using ability so `anyone_can_view?` does not return true
     @current_user ? @object.can_view?(@current_user) : false
@@ -37,16 +57,5 @@ class SerializableSimpleCollection < BaseJsonSerializer
 
   attribute :can_edit, if: -> { @current_ability } do
     @current_ability.can?(:edit, @object)
-  end
-
-  attribute :can_view, if: -> { @current_ability } do
-    @current_ability.can?(:read, @object)
-  end
-
-  has_one :parent_collection_card
-  has_many :collection_cards
-
-  attribute :serializer do
-    'SerializableSimpleCollection'
   end
 end
