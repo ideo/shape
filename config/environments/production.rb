@@ -128,8 +128,8 @@ Rails.application.configure do
   config.session_store :cookie_store,
                        key: '_shape_user_session',
                        secure: true,
-                       domain: is_anycable ? '.shape.space' : nil
-                       # NOTE: SameSite cookie setting provided by 'rails_same_site_cookie' gem
+                       # SameSite setting provided by 'rails_same_site_cookie' gem
+                       domain: is_anycable ? '.shape.space' : :all
 
   if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)

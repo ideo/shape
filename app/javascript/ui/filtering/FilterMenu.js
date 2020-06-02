@@ -48,8 +48,7 @@ class FilterMenu extends React.Component {
     return (
       <Box ml={'auto'}>
         <FilterIconButton
-          marginTop={`${marginTop}px`}
-          marginBottom={marginTop > 0 ? 'inherit' : '12px'}
+          marginBottom={marginTop > 0 ? 'inherit' : '24px'}
           onClick={this.handleFilterClick}
         >
           <FilterIcon />

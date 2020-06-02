@@ -27,6 +27,7 @@ import v from '~/utils/variables'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
@@ -481,15 +482,15 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          {record.isInsideAChallenge && (
-            <ChallengeSubHeader
-              challengeName={record.challenge_name}
-              challengeNavigationHandler={() => {
-                routingStore.routeTo('collections', record.challenge_id)
-              }}
-            />
-          )}
-          <div style={{ minHeight: '72px' }}>
+          <div style={{ minHeight: '72px', display: 'flex' }}>
+            {record.isInsideAChallenge && (
+              <ChallengeSubHeader
+                challengeName={record.challenge_name}
+                challengeNavigationHandler={() => {
+                  routingStore.routeTo('collections', record.challenge_id)
+                }}
+              />
+            )}
             <StyledTitleAndRoles
               data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -547,7 +548,10 @@ class PageHeader extends React.Component {
               )}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (
-              <CollectionFilter collection={record} canEdit={this.canEdit} />
+              <div style={{ marginBottom: '-16px', display: 'flex' }}>
+                <CollectionViewToggle collection={record} />
+                <CollectionFilter collection={record} canEdit={this.canEdit} />
+              </div>
             )}
           </div>
         </MaxWidthContainer>
