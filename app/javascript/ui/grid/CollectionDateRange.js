@@ -21,8 +21,8 @@ const EditIcon = styled.span`
   }
 `
 
-export const DateRangeDisplay = props => {
-  const { dateRange } = props
+// dateRange is an array of [date, date]
+export const formatDateRange = dateRange => {
   if (dateRange[0] === null && dateRange[1] === null) {
     return 'No dates selected'
   } else {
@@ -34,10 +34,6 @@ export const DateRangeDisplay = props => {
       </Fragment>
     )
   }
-}
-
-DateRangeDisplay.propTypes = {
-  dateRange: PropTypes.array.isRequired,
 }
 
 const CollectionDateRange = props => {
@@ -103,7 +99,7 @@ const CollectionDateRange = props => {
         ref={dateDisplayRef}
         className="date-range-wrapper"
       >
-        <DateRangeDisplay dateRange={dateRange} />
+        {formatDateRange(dateRange)}
         <EditIcon>
           <EditPencilIcon />
         </EditIcon>

@@ -1,5 +1,5 @@
 import CollectionDateRange, {
-  DateRangeDisplay,
+  formatDateRange,
 } from '~/ui/grid/CollectionDateRange'
 
 import { fakeCollection } from '#/mocks/data'
@@ -44,30 +44,23 @@ describe('CollectionDateRange', () => {
   })
 })
 
-describe('DateRangeDisplay', () => {
-  const rerender = () => {
-    wrapper = shallow(<DateRangeDisplay {...props} />)
-  }
+describe('formatDateRange', () => {
+  let dateRange
   beforeEach(() => {
-    props = {
-      dateRange: ['2025-05-22T20:25:02.962Z', '2025-06-26T20:25:02.962Z'],
-    }
-    rerender()
+    dateRange = ['2025-05-22T20:25:02.962Z', '2025-06-26T20:25:02.962Z']
   })
 
   it('renders dates', () => {
-    expect(wrapper.text()).toMatch('5.22.25 to 6.26.25')
-    expect(wrapper.text()).not.toMatch('No dates selected')
+    expect(formatDateRange(dateRange)).toMatch('5.22.25 to 6.26.25')
   })
 
   describe('without dates selected', () => {
     beforeEach(() => {
-      props.dateRange = [null, null]
-      rerender()
+      dateRange = [null, null]
     })
 
-    it('renders No dates selected', () => {
-      expect(wrapper.text()).toMatch('No dates selected')
+    it('renders no dates selected', () => {
+      expect(formatDateRange(dateRange)).toMatch('No dates selected')
     })
   })
 })
