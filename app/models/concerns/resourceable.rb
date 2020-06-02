@@ -68,6 +68,28 @@ module Resourceable
         joined.where(GroupsRole.arel_table[:group_id].in(group_ids)),
       ).distinct # because of left joins
     end
+
+    def roles_anchor_identifier_sql
+      # placed here so it can be used within different services e.g. Collection.roles_anchor_identifier_sql
+      %(
+        CASE WHEN COALESCE(
+          items.roles_anchor_collection_id,
+          collections.roles_anchor_collection_id
+        ) IS NOT NULL
+        THEN
+          CONCAT('Collection_', COALESCE(
+            items.roles_anchor_collection_id,
+            collections.roles_anchor_collection_id
+          ))
+        ELSE
+          CONCAT(
+            (CASE WHEN collection_cards.item_id IS NOT NULL THEN 'Item' ELSE 'Collection' END),
+            '_',
+            COALESCE(collection_cards.item_id, collection_cards.collection_id)
+          )
+        END
+      )
+    end
   end
 
   # Instance methods
@@ -327,8 +349,13 @@ module Resourceable
   end
 
   def common_viewable?
+    return if is_a?(Group)
+
     # `common_viewable` comes from cached_attributes
-    roles_anchor.try(:common_viewable)
+    # can also get set via CollectionCardRenderer to save from looking up the roles_anchor
+    return common_viewable unless common_viewable.nil?
+
+    roles_anchor&.common_viewable.present?
   end
 
   # these are defined here so that all resourceable types can return true/false

@@ -59,19 +59,10 @@ class CommentThreadContainer extends React.Component {
   @observable
   bottomOfExpandedThread = false
   @observable
-  loadingThreads = false
-  @observable
   isBottomVisible = false
 
-  constructor(props) {
-    super(props)
-    runInAction(() => {
-      this.loadingThreads = props.loadingThreads
-    })
-  }
-
   componentDidUpdate(prevProps) {
-    const { expandedThreadKey, loadingThreads } = this.props
+    const { expandedThreadKey } = this.props
     if (
       !expandedThreadKey &&
       prevProps.expandedThreadKey &&
@@ -81,11 +72,6 @@ class CommentThreadContainer extends React.Component {
       this.containerDiv.scrollTop = this.prevScrollPosition
       // and reset the stored value
       this.prevScrollPosition = 0
-    }
-    if (loadingThreads !== prevProps.loadingThreads) {
-      runInAction(() => {
-        this.loadingThreads = loadingThreads
-      })
     }
   }
 
@@ -147,16 +133,7 @@ class CommentThreadContainer extends React.Component {
 
     // don't try to load comments of our newly constructed threads
     if (thread.persisted) {
-      runInAction(() => {
-        this.loadingThreads = true
-      })
-      try {
-        await thread.API_fetchComments()
-      } finally {
-        runInAction(() => {
-          this.loadingThreads = false
-        })
-      }
+      await thread.API_fetchComments()
     }
     // scroll again after any more comments have loaded
     uiStore.scrollToBottomOfComments()
@@ -233,6 +210,7 @@ class CommentThreadContainer extends React.Component {
     return (
       <CommentThread
         thread={thread}
+        loadingThreads={this.props.loadingThreads}
         commentCount={thread.visibleCommentsAndRepliesCount}
         afterSubmit={this.scrollToBottomOfThread}
         onEditorHeightChange={this.scrollToBottomOfThread}
@@ -306,7 +284,7 @@ class CommentThreadContainer extends React.Component {
   }
 
   render() {
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, loadingThreads } = this.props
     return (
       <Fragment>
         {this.renderHeader()}
@@ -317,7 +295,7 @@ class CommentThreadContainer extends React.Component {
           moving={uiStore.activityLogMoving}
           id={v.commentScrollOpts.containerId}
         >
-          {this.loadingThreads && <InlineLoader fixed background="none" />}
+          {loadingThreads && <InlineLoader fixed background="none" />}
           {this.renderThreads()}
           {this.renderExpandedThread()}
           <div id="ctc-older-threads">

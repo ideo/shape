@@ -152,8 +152,7 @@ gem 'faker', '~> 1.9.5'
 # See: https://docs.anycable.io/#/using_with_rails
 gem 'anycable-rails', '>= 0.6.2'
 
-# https://devcenter.heroku.com/articles/rails-autoscale
-gem 'rails_autoscale_agent'
+gem 'rails_same_site_cookie'
 
 gem 'rails_same_site_cookie'
 
@@ -204,6 +203,8 @@ end
 
 group :production do
   gem 'heroku-deflater', github: 'ideo/heroku-deflater'
+  # https://devcenter.heroku.com/articles/rails-autoscale
+  gem 'rails_autoscale_agent'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

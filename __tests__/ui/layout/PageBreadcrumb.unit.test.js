@@ -9,38 +9,40 @@ jest.mock('../../../app/javascript/stores')
 
 apiStore.currentUserCollectionId = '123'
 const props = {
-  record: fakeCollection,
+  record: {
+    ...fakeCollection,
+    in_my_collection: false,
+  },
   isHomepage: false,
 }
 let wrapper, component
 
 describe('PageBreadcrumb', () => {
-  let render
+  let rerender
   let breadcrumbComponent
 
   beforeEach(() => {
-    props.record.inMyCollection = false
     props.record.breadcrumb = [
       {
         type: 'collections',
-        id: 1,
+        id: '1',
         name: 'My Workspace',
         collection_type: 'Collection',
       },
       {
         type: 'collections',
-        id: 99,
+        id: '99',
         name: 'Use Cases',
         collection_type: 'Collection::Board',
       },
     ]
 
-    render = () => {
+    rerender = () => {
       wrapper = shallow(<PageBreadcrumb {...props} />)
       component = wrapper.instance()
       breadcrumbComponent = wrapper.find('Breadcrumb')
     }
-    render()
+    rerender()
   })
 
   describe('render()', () => {
@@ -61,6 +63,18 @@ describe('PageBreadcrumb', () => {
     it('should use axios to get the breadcrumb record', async () => {
       component.fetchBreadcrumbRecords(1)
       expect(axios.get).toHaveBeenCalled()
+    })
+  })
+
+  describe('In My Collection', () => {
+    beforeEach(() => {
+      props.record.in_my_collection = true
+      rerender()
+    })
+
+    it('has My Collection, then all titles', () => {
+      const titles = component.items.map(i => i.name)
+      expect(titles).toEqual(['My Collection', 'My Workspace', 'Use Cases'])
     })
   })
 })

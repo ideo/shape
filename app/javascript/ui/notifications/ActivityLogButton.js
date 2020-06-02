@@ -54,6 +54,7 @@ class ActivityLogButton extends React.Component {
         key="comments"
         active={uiStore.activityLogOpen}
         onClick={this.handleClick}
+        data-cy="ActivityLogButton"
       >
         <CommentIcon />
         {this.activityCount > 0 && (

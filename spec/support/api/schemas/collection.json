@@ -25,6 +25,7 @@
     "cover": { "type": ["object"] },
     "test_scores": { "type": ["object"] },
     "organization_id": { "type": "string" },
+    "in_my_collection": { "type": ["boolean", "null"] },
     "is_org_template_collection": { "type": ["boolean"] },
     "is_profile_template": { "type": ["boolean"] },
     "is_profile_collection": { "type": ["boolean"] },

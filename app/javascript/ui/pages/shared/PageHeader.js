@@ -321,7 +321,7 @@ class PageHeader extends React.Component {
         style={{ marginLeft: '1rem' }}
         colorScheme={v.colors.primaryDarkest}
         onClick={() =>
-          routingStore.routeToLogin({ redirect: record.frontend_url })
+          routingStore.routeToLogin({ redirect: record.frontendUrl })
         }
         size="sm"
         data-cy="HeaderFormButton"

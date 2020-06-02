@@ -253,8 +253,6 @@ When(
       .click({ force: true })
     cy.wait('@apiGetCollection')
     cy.wait('@apiGetCollectionCards')
-    cy.wait('@apiGetCommentThread')
-    cy.wait('@apiGetInMyCollection')
   }
 )
 
@@ -305,8 +303,6 @@ When('I wait for {int} calls to {string} to finish', (num, apiCall) => {
 When('I wait for the collection to finish loading', () => {
   cy.wait('@apiGetCollection')
   cy.wait('@apiGetCollectionCards')
-  cy.wait('@apiGetCommentThread')
-  cy.wait('@apiGetInMyCollection')
 })
 
 When('I wait for {int} second(s)', num => {

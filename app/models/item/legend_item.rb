@@ -73,8 +73,9 @@ class Item
       'Legend'
     end
 
-    def datasets_viewable_by(user)
-      datasets.viewable_by_user(user).map do |dataset|
+    def datasets_viewable_by(user = nil)
+      filtered_datasets = user ? datasets.viewable_by_user(user) : datasets
+      filtered_datasets.map do |dataset|
         dataset.cached_data_items_datasets = data_items_datasets_by_dataset_id[dataset.id]
         dataset
       end.sort_by(&:order)
