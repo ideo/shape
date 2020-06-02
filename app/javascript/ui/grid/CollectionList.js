@@ -17,6 +17,10 @@ class CollectionList extends React.Component {
     collection.API_fetchCards({ include: ['roles'] })
   }
 
+  get isChallenge() {
+    return true
+  }
+
   get columns() {
     return [
       { displayName: '', style: { width: '50px' } },
@@ -32,7 +36,10 @@ class CollectionList extends React.Component {
         style: { width: '400px' },
         sortable: true,
       },
-      { displayName: 'Permissions', style: {} },
+      {
+        displayName: this.isChallenge ? 'Reviewers' : 'Permissions',
+        style: {},
+      },
       { displayName: '', style: { marginLeft: 'auto' } },
     ]
   }

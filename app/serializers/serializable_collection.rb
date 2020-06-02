@@ -44,6 +44,7 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :organization
   belongs_to :created_by
   belongs_to :template
+  belongs_to :challenge_reviewer_group
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection

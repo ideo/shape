@@ -73,9 +73,10 @@ class RolesSummary extends React.Component {
   }
 
   initEditorsAndViewers() {
+    const { reviewers } = this.props
     this.setState({
-      editors: this.usersAndGroupsForRole('editor'),
-      viewers: this.usersAndGroupsForRole('viewer'),
+      editors: this.usersAndGroupsForRole(reviewers ? 'admin' : 'editor'),
+      viewers: this.usersAndGroupsForRole(reviewers ? 'member' : 'viewer'),
     })
   }
 
@@ -127,6 +128,7 @@ class RolesSummary extends React.Component {
   }
 
   renderAvatar = (userOrGroup, type) => {
+    // const reviewColors = ['#39BE8E', '#D26A3B', '#E34744']
     // the color class creates a box shadow via AvatarGroup styled-component
     const className = `${type}${
       userOrGroup.color ? ` outlined outline-${userOrGroup.color}` : ' bordered'
@@ -195,12 +197,17 @@ class RolesSummary extends React.Component {
   }
 
   render() {
+    const { reviewers } = this.props
     const { editors, viewers } = this.viewersAndEditorsLimited
     return (
       <StyledRolesSummary>
         <div className="roles-summary--inner">
-          {this.renderEditors}
-          {editors.length > 0 && viewers.length > 0 ? <StyledSeparator /> : ''}
+          {reviewers ? null : this.renderEditors}
+          {!reviewers && editors.length > 0 && viewers.length > 0 ? (
+            <StyledSeparator />
+          ) : (
+            ''
+          )}
           {this.renderViewers}
           {this.addUserBtn}
         </div>
@@ -216,6 +223,7 @@ RolesSummary.propTypes = {
   canEdit: PropTypes.bool,
   rolesMenuOpen: PropTypes.bool.isRequired,
   usersAndGroupsLength: PropTypes.number,
+  reviewers: PropTypes.bool,
 }
 
 RolesSummary.defaultProps = {
@@ -223,6 +231,7 @@ RolesSummary.defaultProps = {
   collaborators: [],
   canEdit: false,
   usersAndGroupsLength: 0,
+  reviewers: false,
 }
 
 export default RolesSummary

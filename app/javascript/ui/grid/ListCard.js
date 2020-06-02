@@ -1,13 +1,15 @@
 import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
-import { computed } from 'mobx'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { computed, observable, runInAction } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import FileIcon from '~/ui/grid/covers/FileIcon'
+import InlineModal from '~/ui/global/modals/InlineModal'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import ListCoverRenderer from '~/ui/grid/ListCoverRenderer'
 import RolesSummary from '~/ui/roles/RolesSummary'
@@ -46,7 +48,31 @@ const IconHolder = styled.div`
   width: 16px;
 `
 
+const SelectionButton = styled.button`
+  display: block;
+  width: 100%;
+
+  &:hover {
+    background-color: ${v.colors.commonLight};
+  }
+`
+
+@observer
 class ListCard extends React.Component {
+  @observable
+  reviewersAddOpen = false
+  @observable
+  currentReviewers = []
+
+  constructor(props) {
+    super(props)
+    this.rolesWrapperRef = React.createRef()
+    if (props.card.record.challenge_reviewer_group) {
+      this.currentReviewerRoles =
+        props.card.record.challenge_reviewer_group.roles
+    }
+  }
+
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
@@ -74,7 +100,22 @@ class ListCard extends React.Component {
     const {
       card: { record },
     } = this.props
-    uiStore.update('rolesMenuOpen', record)
+    if (record.challenge_reviewer_group) {
+      runInAction(() => (this.reviewersAddOpen = true))
+    } else {
+      uiStore.update('rolesMenuOpen', record)
+    }
+  }
+
+  handlePotentialReviewerClick = reviewer => {
+    runInAction(() => {
+      console.log('fuckufkcufkcufkcu')
+      this.currentReviewerRoles[0].users.push(reviewer)
+    })
+  }
+
+  handleReviewersClose = () => {
+    runInAction(() => (this.reviewersAddOpen = false))
   }
 
   get renderIcons() {
@@ -109,9 +150,30 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
+  get roles() {
+    const {
+      card: { record },
+    } = this.props
+    if (record.challenge_reviewer_group) {
+      return this.currentReviewerRoles
+    }
+    return record.roles
+  }
+
+  get possibleReviewers() {
+    const {
+      card: { record },
+    } = this.props
+    const editorRole = record.roles.find(role => role.name === 'editor')
+    const viewerRole = record.roles.find(role => role.name === 'viewer')
+    const editors = editorRole ? editorRole.users || [] : []
+    const viewers = viewerRole ? viewerRole.users || [] : []
+    return [...editors, ...viewers]
+  }
+
   render() {
     const { card } = this.props
-    console.log('roles', [...card.record.roles])
+    console.log('render', this.reviewersAddOpen)
     return (
       <Row>
         <Column width="50px">
@@ -130,15 +192,36 @@ class ListCard extends React.Component {
         </Column>
         <Column width="400px">{defaultTimeFormat(card.updated_at)}</Column>
         <Column>
-          <RolesSummary
-            key="roles"
-            handleClick={this.handleRolesClick}
-            roles={[...card.record.roles]}
-            canEdit={card.record.can_edit}
-            // convert observable to normal array to trigger render changes
-            collaborators={[...card.record.collaborators]}
-            rolesMenuOpen={!!uiStore.rolesMenuOpen}
-          />
+          <div ref={this.rolesWrapperRef}>
+            <RolesSummary
+              key="roles"
+              handleClick={this.handleRolesClick}
+              roles={[...this.roles]}
+              canEdit={card.record.can_edit}
+              // convert observable to normal array to trigger render changes
+              collaborators={[...card.record.collaborators]}
+              rolesMenuOpen={!!uiStore.rolesMenuOpen}
+              reviewers
+            />
+            <InlineModal
+              title=""
+              onCancel={this.handleReviewersClose}
+              open={this.reviewersAddOpen}
+              anchorElement={this.rolesWrapperRef.current}
+              anchorOrigin={{ horizontal: 'left', vertical: 'center' }}
+              noButtons
+            >
+              {this.possibleReviewers.map(possibleReviewer => (
+                <SelectionButton
+                  onClick={() =>
+                    this.handlePotentialReviewerClick(possibleReviewer)
+                  }
+                >
+                  <EntityAvatarAndName entity={possibleReviewer} />
+                </SelectionButton>
+              ))}
+            </InlineModal>
+          </div>
         </Column>
         <Column marginLeft="auto">
           <ActionMenu
