@@ -1027,6 +1027,7 @@ class Collection < ApplicationRecord
 
   def should_pin_cards?(placement)
     return false unless master_template?
+    return false if board_collection?
 
     has_pinned_cards = collection_cards.pinned.any?
 
