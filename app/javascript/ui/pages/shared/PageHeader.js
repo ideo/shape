@@ -483,7 +483,7 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          <div style={{ minHeight: '72px', display: 'flex' }}>
+          <div style={{ minHeight: '84px', display: 'flex' }}>
             {record.isInsideAChallenge && (
               <ChallengeSubHeader
                 challengeName={record.challenge_name}

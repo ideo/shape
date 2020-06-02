@@ -9,6 +9,8 @@ import PropTypes from 'prop-types'
 const SubHeaderWrapper = styled.div`
   margin-bottom: -10px;
   margin-top: 10px;
+  position: absolute;
+  top: 0;
 `
 
 const StyledSubHeaderLink = styled(Heading2)`
