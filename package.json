@@ -103,7 +103,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "color": "^3.1.2",
     "core-js": "^3.1.3",
-    "date-fns": "2.0.0-alpha.27",
+    "date-fns": "^2.14",
     "datx": "^0.11.4",
     "datx-jsonapi": "^0.11.4",
     "dotenv": "^5.0.1",
