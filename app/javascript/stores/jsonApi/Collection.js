@@ -32,9 +32,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
   static endpoint = apiUrl('collections')
 
-  // starts null before it is loaded
-  @observable
-  inMyCollection = null
   @observable
   reloading = false
   @observable
@@ -721,7 +718,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     rows,
     cols,
     searchTerm,
-    include = [],
   } = {}) {
     runInAction(() => {
       if (order) this.currentOrder = order
@@ -729,7 +725,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const params = {
       page,
       per_page,
-      include,
     }
     if (!params.per_page && !this.isBoard) {
       params.per_page = this.recordsPerPage
@@ -816,6 +811,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       }
     })
     return data
+  }
+
+  API_fetchCard = async cardId => {
+    const { apiStore } = this
+    const res = await apiStore.fetch('collection_cards', cardId, true)
+    // make sure it's in our current collection
+    this.addCard(res.data)
   }
 
   @action
@@ -1366,16 +1368,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setReloading(false)
   }
 
-  async API_addComparison(comparisonTest) {
-    const apiPath = `test_collections/${this.id}/add_comparison`
-    const data = { comparison_collection_id: comparisonTest.id }
+  async API_updateComparison(comparisonTest, action) {
+    let { id } = this
+    let test_results_collection_id = null
+    if (this.isTestResultsCollection) {
+      id = this.test_collection_id
+      test_results_collection_id = this.id
+    }
+    const apiPath = `test_collections/${id}/${action}_comparison`
+    const data = {
+      comparison_collection_id: comparisonTest.id,
+      test_results_collection_id,
+    }
     return this.apiStore.request(apiPath, 'POST', { data })
   }
 
-  async API_removeComparison(comparisonTest) {
-    const apiPath = `test_collections/${this.id}/remove_comparison`
-    const data = { comparison_collection_id: comparisonTest.id }
-    return this.apiStore.request(apiPath, 'POST', { data })
+  API_addComparison(comparisonTest) {
+    return this.API_updateComparison(comparisonTest, 'add')
+  }
+
+  API_removeComparison(comparisonTest) {
+    return this.API_updateComparison(comparisonTest, 'remove')
   }
 
   async API_selectCollectionType(collectionType) {
@@ -1473,6 +1486,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  // find all data cards in the collection and refetch
+  // e.g. when adding a new LegendItem comparison
+  reloadDataItemsDatasets() {
+    _.each(this.collection_cards, card => {
+      let { record } = card
+      const { coverItem } = record
+      if (coverItem && coverItem.isData) {
+        record = coverItem
+      }
+      if (record.isData) {
+        record.API_fetchDatasets()
+      }
+    })
+  }
+
   get subtitle() {
     const { cover } = this
     if (cover.subtitle_hidden) {
@@ -1492,6 +1520,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       return cover
     }
     return false
+  }
+
+  get coverItem() {
+    const { collection_cover_items } = this
+    if (!collection_cover_items || collection_cover_items.length === 0)
+      return null
+    return collection_cover_items[0]
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing

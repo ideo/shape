@@ -99,10 +99,9 @@ class Breadcrumb extends React.Component {
   }
 
   addSubItems(copyItems) {
-    const { maxDepth } = this.props
+    const { items, maxDepth } = this.props
     if (maxDepth === 1) {
-      const allItems = this.items()
-      const subItems = this.transformToSubItems(allItems, copyItems[0])
+      const subItems = this.transformToSubItems(items, copyItems[0])
       if (copyItems[0]) copyItems[0].subItems = subItems
     }
 
@@ -128,11 +127,15 @@ class Breadcrumb extends React.Component {
   }
 
   get truncatedItems() {
-    const { items } = this.props
+    const { items, maxDepth } = this.props
     const copyItems = [...items]
     // The mobile menu should have the full breadcrumb trail in it's one item
     if (copyItems.length === 1) {
       return copyItems
+    }
+    if (maxDepth === 1) {
+      // make an array of the last item and transform via addSubItems
+      return this.addSubItems(copyItems.slice(-1))
     }
 
     let charsLeftToTruncate = this.charsToTruncateForItems(copyItems)
@@ -221,7 +224,7 @@ class Breadcrumb extends React.Component {
                   identifier={item.identifier}
                   item={item}
                   index={index}
-                  numItems={items.length}
+                  numItems={truncatedItems.length}
                   onBreadcrumbClick={this.props.onBreadcrumbClick}
                   restoreBreadcrumb={() => this.onRestoreBreadcrumb(item)}
                   onBreadcrumbDive={onBreadcrumbDive}
@@ -240,7 +243,7 @@ class Breadcrumb extends React.Component {
 Breadcrumb.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape(breadcrumbItemPropType)).isRequired,
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
-  breadcrumbItemComponent: PropTypes.node,
+  breadcrumbItemComponent: PropTypes.object,
   onBack: PropTypes.func.isRequired,
   onBreadcrumbDive: PropTypes.func,
   onRestore: PropTypes.func,

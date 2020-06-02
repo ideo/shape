@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -91,11 +92,11 @@ class CoverRenderer extends React.Component {
             />
           )
         case ITEM_TYPES.DATA:
-          // We must pass in dataset length to trigger
+          // We must pass in dataset ids to trigger
           // re-render when new datasets are added
           return (
             <DataItemCover
-              datasetLength={record.datasets ? record.datasets.length : 0}
+              datasetIds={record.datasets ? _.map(record.datasets, 'id') : []}
               height={height}
               item={record}
               card={card}

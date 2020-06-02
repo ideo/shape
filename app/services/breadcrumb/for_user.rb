@@ -3,9 +3,10 @@ module Breadcrumb
     VIEW_ROLE = Role::VIEWER
     EDIT_ROLE = Role::EDITOR
 
-    def initialize(object, user)
+    def initialize(object, user, add_user_fields: false)
       @object = object
       @user = user || User.new
+      @add_user_fields = add_user_fields
     end
 
     def viewable
@@ -67,15 +68,20 @@ module Breadcrumb
 
     # API expects downcase, pluralized classname (e.g. 'collections')
     def breadcrumb_item_for_api(object)
-      type = object.class.base_class.name.downcase.pluralize
-      {
-        type: type,
+      breadcrumb_item = {
+        type: object.class.base_class.name.downcase.pluralize,
         collection_type: object.class.name,
         id: object.id.to_s,
         name: object.name,
-        can_edit: object == @object ? object.can_edit?(@user) : editable.include?(object.id),
         has_children: object.has_child_collections?,
       }
+      unless @add_user_fields
+        return breadcrumb_item
+      end
+
+      breadcrumb_item.merge(
+        can_edit: object == @object ? object.can_edit?(@user) : editable.include?(object.id),
+      )
     end
 
     def breadcrumb_collections

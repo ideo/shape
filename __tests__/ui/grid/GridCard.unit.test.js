@@ -317,6 +317,24 @@ describe('GridCard', () => {
     })
   })
 
+  describe('with private card', () => {
+    beforeEach(() => {
+      props.card.private_card = true
+      rerender()
+    })
+    afterEach(() => {
+      props.card.private_card = false
+    })
+
+    it('only shows the GridCardPrivate with HiddenIcon', () => {
+      expect(wrapper.find('StyledGridCardPrivate').exists()).toBe(true)
+      expect(wrapper.find('HiddenIcon').exists()).toBe(true)
+      // does not render the normal card
+      expect(wrapper.find('StyledTopRightActions').exists()).toBe(false)
+      expect(wrapper.find('StyledGridCardInner').exists()).toBe(false)
+    })
+  })
+
   describe('renderReplaceControl', () => {
     beforeEach(() => {
       props.card.show_replace = true

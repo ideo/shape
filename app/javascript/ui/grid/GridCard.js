@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observable, computed, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -16,6 +17,7 @@ import {
   StyledGridCard,
   StyledGridCardInner,
   StyledTopRightActions,
+  StyledGridCardPrivate,
 } from '~/ui/grid/shared'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
@@ -29,6 +31,7 @@ import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagE
 import TextButton from '~/ui/global/TextButton'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
+import HiddenIcon from '~/ui/icons/HiddenIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import EditButton from '~/ui/reporting/EditButton'
@@ -339,7 +342,7 @@ class GridCard extends React.Component {
     setTimeout(() => {
       if (record.isCarousel) {
         // special behavior for carousels with LinkItems
-        const coverItem = _.get(record, 'collection_cover_items[0]')
+        const { coverItem } = record
         if (coverItem && coverItem.isLink) {
           this.linkOffsite(coverItem)
           return
@@ -403,7 +406,7 @@ class GridCard extends React.Component {
     const { record } = card
     // get a plain JS copy of breadcrumb
     const breadcrumb = [...uiStore.viewingRecord.breadcrumb]
-    const { inMyCollection } = uiStore.viewingRecord
+    const inMyCollection = uiStore.viewingRecord.in_my_collection
     uiStore.update('actionAfterRoute', () => {
       uiStore.updateLinkedBreadcrumbTrail({
         breadcrumb,
@@ -420,16 +423,9 @@ class GridCard extends React.Component {
     routingStore.routeTo('items', card.record.id)
   }
 
-  get coverItem() {
-    const { collection_cover_items } = this.props.record
-    if (!collection_cover_items || collection_cover_items.length === 0)
-      return null
-    return collection_cover_items[0]
-  }
-
   get downloadableRecord() {
     const { record } = this.props
-    const { coverItem } = this
+    const { coverItem } = record
     if (record.isDownloadable) {
       return record
     }
@@ -449,13 +445,12 @@ class GridCard extends React.Component {
       testCollectionCard,
     } = this.props
     let { record, cardType } = this.props
-    const { collection_cover_text_items } = record
+    const { coverItem, collection_cover_text_items } = record
 
     let nestedTextItem = null
     // Carousels have their own renderer in CollectionCover,
     // so don't behave the same as the other cover item types
-    const isCoverItem =
-      this.coverItem && record.cover_type !== 'cover_type_carousel'
+    const isCoverItem = coverItem && record.cover_type !== 'cover_type_carousel'
     if (
       collection_cover_text_items &&
       collection_cover_text_items.length > 0 &&
@@ -464,9 +459,9 @@ class GridCard extends React.Component {
       // If this is a special cover with both image and text, pass the text
       // item through
       nestedTextItem = collection_cover_text_items[0]
-    } else if (this.coverItem && record.cover_type !== 'cover_type_carousel') {
+    } else if (coverItem && record.cover_type !== 'cover_type_carousel') {
       // Instead use the item for the cover rather than the collection
-      record = this.coverItem
+      record = coverItem
       cardType = 'items'
     }
 
@@ -491,7 +486,7 @@ class GridCard extends React.Component {
   get transparentBackground() {
     const { cardType, record } = this.props
     // If a data item and is a collection cover, it's transparent
-    if (this.coverItem && this.coverItem.isData) return true
+    if (record.coverItem && record.coverItem.isData) return true
     // If this is a legend, data or text item it's transparent
     if (
       cardType === 'items' &&
@@ -537,6 +532,73 @@ class GridCard extends React.Component {
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
     const showRestore = searchResult && record.isRestorable
 
+    let contents
+    if (card.private_card || _.isEmpty(record)) {
+      contents = (
+        <StyledGridCardPrivate>
+          <HiddenIcon />
+        </StyledGridCardPrivate>
+      )
+    } else {
+      contents = (
+        <Fragment>
+          <StyledTopRightActions>
+            <TextActionMenu card={card} />
+          </StyledTopRightActions>
+          {showHotEdge && firstCardInRow && !card.isPinnedAndLocked && (
+            <GridCardHotspot card={card} dragging={dragging} position="left" />
+          )}
+          {showHotEdge && (!card.isPinnedAndLocked || lastPinnedCard) && (
+            <GridCardHotspot card={card} dragging={dragging} />
+          )}
+          {this.renderReplaceControl()}
+          {this.renderTopRightActions()}
+          {uiStore.viewingRecord && !uiStore.viewingRecord.isTestCollection && (
+            <BottomLeftCardIcons
+              card={card}
+              cardType={cardType}
+              record={record}
+            />
+          )}
+          {/* onClick placed here so it's separate from hotspot click */}
+          <StyledGridCardInner
+            onClick={this.handleClick}
+            hasOverflow={record.isData || record.isLegend || record.isText}
+            filter={card.filter}
+            forceFilter={!this.hasCover}
+            isText={record.isText}
+            visibleOverflow={record.isReportTypeRecord}
+          >
+            {showRestore && (
+              <StyledTopRightActions
+                color={this.actionsColor}
+                zoomLevel={zoomLevel}
+              >
+                <NamedActionButton onClick={this.handleRestore}>
+                  <RestoreIcon />
+                  Restore
+                </NamedActionButton>
+              </StyledTopRightActions>
+            )}
+            {card.isLoadingPlaceholder && <CardLoader />}
+            {this.renderCover}
+          </StyledGridCardInner>
+          {record.isCreativeDifferenceChartCover && (
+            <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
+              <TextButton fontSizeEm={0.75} color={v.colors.black}>
+                More…
+              </TextButton>
+            </BottomRightActionHolder>
+          )}
+          <CollectionCardsTagEditorModal
+            cards={this.cardsForTagging}
+            canEdit={this.canEditCard}
+            open={tagEditorOpen}
+          />
+        </Fragment>
+      )
+    }
+
     return (
       <StyledGridCard
         background={
@@ -558,59 +620,7 @@ class GridCard extends React.Component {
         selected={this.isSelected || this.props.hoveringOver}
         inSearchPage={searchResult}
       >
-        <StyledTopRightActions>
-          <TextActionMenu card={card} />
-        </StyledTopRightActions>
-        {showHotEdge && firstCardInRow && !card.isPinnedAndLocked && (
-          <GridCardHotspot card={card} dragging={dragging} position="left" />
-        )}
-        {showHotEdge && (!card.isPinnedAndLocked || lastPinnedCard) && (
-          <GridCardHotspot card={card} dragging={dragging} />
-        )}
-        {this.renderReplaceControl()}
-        {this.renderTopRightActions()}
-        {uiStore.viewingRecord && !uiStore.viewingRecord.isTestCollection && (
-          <BottomLeftCardIcons
-            card={card}
-            cardType={cardType}
-            record={record}
-          />
-        )}
-        {/* onClick placed here so it's separate from hotspot click */}
-        <StyledGridCardInner
-          onClick={this.handleClick}
-          hasOverflow={record.isData || record.isLegend || record.isText}
-          filter={card.filter}
-          forceFilter={!this.hasCover}
-          isText={record.isText}
-          visibleOverflow={record.isReportTypeRecord}
-        >
-          {showRestore && (
-            <StyledTopRightActions
-              color={this.actionsColor}
-              zoomLevel={zoomLevel}
-            >
-              <NamedActionButton onClick={this.handleRestore}>
-                <RestoreIcon />
-                Restore
-              </NamedActionButton>
-            </StyledTopRightActions>
-          )}
-          {card.isLoadingPlaceholder && <CardLoader />}
-          {this.renderCover}
-        </StyledGridCardInner>
-        {record.isCreativeDifferenceChartCover && (
-          <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
-            <TextButton fontSizeEm={0.75} color={v.colors.black}>
-              More…
-            </TextButton>
-          </BottomRightActionHolder>
-        )}
-        <CollectionCardsTagEditorModal
-          cards={this.cardsForTagging}
-          canEdit={this.canEditCard}
-          open={tagEditorOpen}
-        />
+        {contents}
       </StyledGridCard>
     )
   }
@@ -618,7 +628,7 @@ class GridCard extends React.Component {
 
 GridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  cardType: PropTypes.string.isRequired,
+  cardType: PropTypes.string,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   height: PropTypes.number,
   canEditCollection: PropTypes.bool,
@@ -635,6 +645,7 @@ GridCard.propTypes = {
 }
 
 GridCard.defaultProps = {
+  cardType: null,
   height: 1,
   canEditCollection: false,
   isSharedCollection: false,

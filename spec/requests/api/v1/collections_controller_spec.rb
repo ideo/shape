@@ -126,6 +126,25 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           collection_type: 'Collection',
         }.as_json,
       ])
+      expect(json['data']['attributes']['in_my_collection']).to be false
+    end
+
+    context 'with a collection that is linked into the user\'s UserCollection (a.k.a. "My Collection")' do
+      # make an org where the user has a current_user_collection
+      let!(:organization) { create(:organization, member: user) }
+      let!(:link_to_my_collection) do
+        create(
+          :collection_card_link_collection,
+          # breadcrumb starts at parent_collection, so that's what has to be linked in
+          collection: parent_collection,
+          parent: user.current_user_collection,
+        )
+      end
+
+      it 'adds in_my_collection = true to the json response' do
+        get(path)
+        expect(json['data']['attributes']['in_my_collection']).to be true
+      end
     end
 
     it 'has no editors' do
@@ -519,22 +538,29 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
 
       context 'updating collection cards attributes' do
+        let(:card_attrs) do
+          [{
+            id: collection_card.id,
+            width: 3,
+            row: 4,
+            col: 5,
+          }]
+        end
         let(:raw_params) do
           {
             id: collection.id,
-            collection_cards_attributes: [
-              {
-                id: collection_card.id,
-                order: 1,
-                width: 3,
-              },
-            ],
+            collection_cards_attributes: card_attrs,
           }
         end
 
         it 'returns a 200' do
           patch(path, params: params)
           expect(response.status).to eq(200)
+        end
+
+        it 'broadcasts collection updates' do
+          expect(broadcaster_instance).to receive(:card_attrs_updated).with(card_attrs.as_json)
+          patch(path, params: params)
         end
       end
     end
@@ -615,7 +641,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'broadcasts collection updates' do
-      expect(broadcaster_instance).to receive(:reload_cards)
+      expect(broadcaster_instance).to receive(:collection_updated)
       patch(path, params: params)
     end
 

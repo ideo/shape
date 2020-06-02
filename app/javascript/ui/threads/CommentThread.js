@@ -22,17 +22,25 @@ class CommentThread extends React.Component {
       apiStore,
       thread,
       commentCount,
+      loadingThreads,
       handleScrollOnCommentUpdate,
     } = this.props
-    if (commentCount !== prevProps.commentCount) {
-      this.updateContainerSize()
+
+    const finishedLoading =
+      commentCount !== prevProps.commentCount ||
+      (!loadingThreads && prevProps.loadingThreads)
+    const switchingThreads = thread.id !== prevProps.thread.id
+    if (!switchingThreads && !finishedLoading) {
+      return
+    }
+    // when switching between threads
+    this.updateContainerSize()
+    if (switchingThreads) {
+      apiStore.collapseReplies()
+    }
+    if (finishedLoading) {
       // this scroll only happens when you're at the bottom of the thread
       handleScrollOnCommentUpdate()
-    }
-    if (thread.id !== prevProps.thread.id) {
-      // when switching between threads
-      this.updateContainerSize()
-      apiStore.collapseReplies()
     }
   }
 
@@ -114,6 +122,7 @@ CommentThread.propTypes = {
   commentCount: PropTypes.number.isRequired,
   updateContainerSize: PropTypes.func.isRequired,
   handleScrollOnCommentUpdate: PropTypes.func.isRequired,
+  loadingThreads: PropTypes.bool.isRequired,
 }
 CommentThread.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

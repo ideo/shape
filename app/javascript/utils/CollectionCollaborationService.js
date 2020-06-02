@@ -21,7 +21,7 @@ export default class CollectionCollaborationService {
     }
     if (updateData.card_id) {
       // a card has been created or updated, so fetch that individual card
-      this.fetchCard(updateData.card_id)
+      collection.API_fetchCard(updateData.card_id)
       return
     }
     if (updateData.card_ids) {
@@ -52,7 +52,7 @@ export default class CollectionCollaborationService {
   }
 
   handleTextItemUpdate = (itemId, item) => {
-    const { apiStore, uiStore } = this
+    const { collection, apiStore, uiStore } = this
     const localItem = apiStore.find('items', itemId)
     if (localItem) {
       // update with incoming content UNLESS we are editing that item
@@ -68,14 +68,7 @@ export default class CollectionCollaborationService {
       }
     } else if (item.parent_collection_card_id) {
       // we don't have the item, it must be a new card that we need to fetch
-      this.fetchCard(item.parent_collection_card_id)
+      collection.API_fetchCard(item.parent_collection_card_id)
     }
-  }
-
-  async fetchCard(cardId) {
-    const { collection, apiStore } = this
-    const res = await apiStore.fetch('collection_cards', cardId, true)
-    // make sure it's in our current collection
-    collection.addCard(res.data)
   }
 }

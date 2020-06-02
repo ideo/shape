@@ -1,6 +1,13 @@
 module CollectionCardFilter
   class Base < SimpleService
-    def initialize(collection:, user:, filters:, application: nil, ids_only: false, select_ids: nil)
+    def initialize(
+      collection:,
+      user:,
+      filters:,
+      application: nil,
+      ids_only: false,
+      select_ids: nil
+    )
       @collection_order = nil
       @collection = collection
       @user = user
@@ -24,14 +31,7 @@ module CollectionCardFilter
           collection_order: @collection_order,
           ids_only: @ids_only,
         )
-      elsif @user.present?
-        @cards = CollectionCardFilter::ForUser.call(
-          cards_scope: @cards,
-          user: @user,
-          collection_order: @collection_order,
-          ids_only: @ids_only,
-        )
-      else
+      elsif @user.nil?
         return []
       end
 
@@ -43,7 +43,10 @@ module CollectionCardFilter
 
       if @ids_only
         return @cards.map do |cc|
-          { id: cc.id.to_s, order: cc.order }
+          {
+            id: cc.id.to_s,
+            order: cc.order,
+          }
         end
       end
 
@@ -157,7 +160,8 @@ module CollectionCardFilter
 
     def filter_external_id
       join_sql = %(
-        INNER JOIN external_records ON external_records.externalizable_id = COALESCE(collection_cards.item_id, collection_cards.collection_id)
+        INNER JOIN external_records
+        ON external_records.externalizable_id = COALESCE(collection_cards.item_id, collection_cards.collection_id)
       )
 
       @cards = @cards

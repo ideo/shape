@@ -75,23 +75,26 @@ class CommentThread extends BaseRecord {
   async API_fetchComments({ next = false } = {}) {
     if (!this.persisted) return
 
+    const { apiStore } = this
     // always fire an async request to markViewed
     this.API_markViewed()
 
     const page = next ? this.links.next : 1
     // if we had previously loaded additional pages, return it to the state
     // where we just have the first page worth of comments
-    if (page === 1 && this.comments.length > PER_PAGE) {
-      runInAction(() => {
+    runInAction(() => {
+      if (page === 1 && this.comments.length > PER_PAGE) {
         this.comments.replace(this.comments.toJS().slice(PER_PAGE * -1))
-      })
-    }
+      }
+      apiStore.update('loadingThreads', true)
+    })
     const apiPath = `comment_threads/${this.id}/comments?page=${page}`
     const res = await this.apiStore.request(apiPath, 'GET')
     runInAction(() => {
       this.links = res.links
+      this.importComments(res.data)
+      apiStore.update('loadingThreads', false)
     })
-    this.importComments(res.data)
   }
 
   async API_saveComment(commentData) {
@@ -188,13 +191,16 @@ class CommentThread extends BaseRecord {
   }
 
   API_markViewed() {
-    if (!this.persisted) return false
+    const { apiStore } = this
+    if (!this.persisted || apiStore.loadingThreads) {
+      return false
+    }
     const apiPath = `comment_threads/${this.id}/view`
     if (this.users_thread) {
       // simulate backend effect
       this.users_thread.unread_count = 0
     }
-    return this.apiStore.request(apiPath, 'POST')
+    return apiStore.request(apiPath, 'POST')
   }
 
   API_subscribe() {

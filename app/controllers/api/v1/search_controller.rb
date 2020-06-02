@@ -1,21 +1,16 @@
 class Api::V1::SearchController < Api::V1::BaseController
   before_action :capture_query_params
-
   before_action :load_and_authorize_organization_from_slug, only: %i[search]
   load_and_authorize_resource :organization, only: %i[search_collection_cards]
   before_action :switch_to_organization, only: %i[search search_collection_cards]
+
   def search
-    render(
-      render_attrs(search_records, simple_collection: true),
-    )
+    render json: cached_card_json(search_records)
   end
 
   def search_collection_cards
-    render(
-      render_attrs(
-        search_records(index_name: [Collection, Item]),
-      ),
-    )
+    results = search_records(index_name: [Collection, Item])
+    render json: cached_card_json(results)
   end
 
   before_action :authorize_resource, only: :users_and_groups
@@ -206,35 +201,40 @@ class Api::V1::SearchController < Api::V1::BaseController
     current_user.switch_to_organization(@organization)
   end
 
-  def default_render_attrs(results)
-    {
+  def cached_card_json(results)
+    records = results.results.compact
+    # we searched for Collection/Item results, however we want to
+    # map those onto their parent cards as that's what we render
+    cards = records.map do |result|
+      card = result.parent_collection_card
+      # parent card will be nil e.g. for some Global Collections
+      if card.nil?
+        card = CollectionCard.new
+      end
+      # make sure card.record is cached on there since we have it already
+      if result.is_a?(Collection)
+        card.collection = result
+      else
+        card.item = result
+      end
+      card
+    end.compact
+
+    json_data = JsonapiCache::CollectionCardRenderer.call(
+      cards: cards,
+      user: current_user,
+      search_records: records,
+    ).merge(
       meta: {
         page: @page,
         total: results.total_count,
         total_pages: results.total_pages,
         size: results.size,
       },
-      include: %i[parent_collection_card filestack_file],
-      expose: {
-        force_breadcrumbs: true,
-      },
-    }
-  end
+      links: jsonapi_pagination(results),
+    )
 
-  def render_attrs(results, simple_collection: false)
-    if simple_collection
-      default_render_attrs(results).merge(
-        jsonapi: results,
-        class: jsonapi_class.merge(
-          Collection: SerializableSimpleCollection,
-        ),
-      )
-    else
-      default_render_attrs(results).merge(
-        include: CollectionCard.default_relationships_for_api,
-        jsonapi: results.results.map(&:parent_collection_card).compact,
-      )
-    end
+    json_data
   end
 
   def per_page(default)

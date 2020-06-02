@@ -38,6 +38,20 @@ const IconHolder = styled.div`
   }
 `
 
+export const StyledGridCardPrivate = styled.div`
+  background: ${v.colors.commonMedium};
+  text-align: center;
+  color: ${v.colors.collectionCover};
+  width: 100%;
+  height: 100%;
+  svg {
+    width: 90px;
+    display: inline;
+    margin: auto;
+  }
+`
+StyledGridCardPrivate.displayName = 'StyledGridCardPrivate'
+
 export const StyledGridCard = styled.div`
   background: ${props => props.background || 'white'};
   box-shadow: ${props =>
