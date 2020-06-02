@@ -141,7 +141,11 @@ class PageBreadcrumb extends React.Component {
     })
   }
 
-  onBack = path => {
+  onBack = item => {
+    let path = routingStore.pathTo(item.type, item.id)
+    if (item.identifier === 'homepage') {
+      path = routingStore.pathTo('homepage')
+    }
     routingStore.routeTo(path)
   }
 
