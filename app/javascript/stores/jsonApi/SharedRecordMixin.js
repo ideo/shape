@@ -34,6 +34,13 @@ const SharedRecordMixin = superclass =>
       return `/${this.internalType}/${this.id}`
     }
 
+    get frontendUrl() {
+      return (
+        _.get(window, 'CONFIG.BASE_HOST', 'https://www.shape.space') +
+        this.frontendPath
+      )
+    }
+
     get isCommonViewable() {
       return this.common_viewable
     }

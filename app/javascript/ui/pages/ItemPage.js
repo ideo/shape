@@ -38,21 +38,16 @@ class ItemPage extends React.Component {
   }
 
   onAPILoad = () => {
-    const { item, apiStore, uiStore, routingStore, undoStore } = this.props
+    const { item, apiStore, uiStore, undoStore } = this.props
     if (uiStore.actionAfterRoute) {
       uiStore.performActionAfterRoute()
     }
     this.setState({ item }, async () => {
       uiStore.update('dragTargets', [])
       uiStore.setViewingRecord(item)
-      if (item.parent)
+      apiStore.setupCommentThreadAndMenusForPage(item)
+      if (item.parent) {
         apiStore.checkCurrentOrg({ id: item.parent.organization_id })
-      if (apiStore.currentUser) {
-        const thread = await apiStore.findOrBuildCommentThread(item)
-        uiStore.expandThread(thread.key)
-        if (routingStore.query) {
-          uiStore.openOptionalMenus(routingStore.query)
-        }
       }
       if (undoStore.actionAfterRoute) {
         // the only relevant one is a text item undo

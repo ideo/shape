@@ -281,7 +281,7 @@ class PublicSharingOptions extends React.Component {
     } = this.props
 
     const { anyoneCanView, sharingOptionsVisible } = this.state
-    const { frontend_url } = record
+    const { frontendUrl } = record
     if (!anyoneCanView && !sharingOptionsVisible) return
 
     return (
@@ -301,7 +301,7 @@ class PublicSharingOptions extends React.Component {
           })`}
         />
         {anyoneCanView && (
-          <CopyToClipboard text={frontend_url}>
+          <CopyToClipboard text={frontendUrl}>
             <PublicViewLink
               aria-label="Get link"
               onClick={() => uiStore.popupSnackbar({ message: 'Link Copied' })}

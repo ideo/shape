@@ -3,7 +3,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
   skip_before_action :check_api_authentication!, only: %i[show]
-  # NOTE: these have to be in the following order
+
   before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
@@ -301,7 +301,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
     current_user.precache_roles_for(
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-      ([@collection] + Collection.where(id: @collection.breadcrumb)),
+      resources: ([@collection] + Collection.where(id: @collection.breadcrumb)),
     )
   end
 
@@ -402,15 +402,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     card_attrs = collection_params[:collection_cards_attributes]
     return unless card_attrs.present?
 
-    if @collection.board_collection?
-      collection_broadcaster.card_attrs_updated(
-        card_attrs.as_json,
-      )
-      return
-    end
-
-    # on a normal collection, just ping to reload the cards
-    collection_broadcaster.reload_cards
+    collection_broadcaster.card_attrs_updated(
+      card_attrs.as_json,
+    )
   end
 
   def broadcast_parent_collection_card_update

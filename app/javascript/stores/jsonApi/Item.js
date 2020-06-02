@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import { apiUrl } from '~/utils/url'
@@ -15,9 +15,8 @@ class Item extends SharedRecordMixin(BaseRecord) {
   static type = 'items'
   static endpoint = apiUrl('items')
 
-  // starts null before it is loaded
   @observable
-  inMyCollection = null
+  loadingDatasets = false
 
   attributesForAPI = [
     'type',
@@ -316,11 +315,15 @@ class Item extends SharedRecordMixin(BaseRecord) {
   }
 
   async API_fetchDatasets() {
-    this.loadingDatasets = true
-    const datasets = await this.apiStore.request(`items/${this.id}/datasets`)
-    this.loadingDatasets = false
-    this.datasets = datasets.data
-    return datasets
+    runInAction(() => {
+      this.loadingDatasets = true
+    })
+    const res = await this.apiStore.request(`items/${this.id}/datasets`)
+    runInAction(() => {
+      this.loadingDatasets = false
+      this.datasets = res.data
+    })
+    return this.datasets
   }
 
   async API_persistHighlight({ commentId, delta } = {}) {

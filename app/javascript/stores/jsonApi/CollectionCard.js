@@ -237,8 +237,8 @@ class CollectionCard extends BaseRecord {
     }
     try {
       await this.apiStore.request('collection_cards/link', 'POST', data)
-      if (this.record && !this.record.inMyCollection) {
-        this.apiStore.checkInMyCollection(this.record)
+      if (this.record && !this.record.in_my_collection) {
+        this.record.in_my_collection = true
       }
       uiStore.alertOk('Added to your collection')
     } catch (e) {
@@ -351,7 +351,10 @@ class CollectionCard extends BaseRecord {
   }
 
   get shouldHideFromUI() {
-    const { uiStore } = this
+    const { uiStore, parentCollection } = this
+    if (parentCollection && !parentCollection.isBoard && this.private_card) {
+      return true
+    }
     return (
       ((uiStore.dragging || uiStore.movingIntoCollection) &&
         uiStore.cardAction === 'move' &&

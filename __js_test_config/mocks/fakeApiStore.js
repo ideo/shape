@@ -55,6 +55,9 @@ const fakeApiStore = ({
     findOrBuildCommentThread: jest
       .fn()
       .mockReturnValue(Promise.resolve({ key: 'x' })),
+    setupCommentThreadAndMenusForPage: jest
+      .fn()
+      .mockReturnValue(Promise.resolve({ key: 'x' })),
     findThreadForRecord: jest.fn(),
     loadNextThreadPage: jest.fn(),
     createTemplateInstance: jest.fn().mockReturnValue(Promise.resolve({})),

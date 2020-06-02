@@ -58,7 +58,7 @@ class CollectionPage extends React.Component {
       // in this case, if you're not logged in but you had access (joinable but not public)
       // we do require you to login
       // NOTE: the user will see a brief flash of the collection name before redirect
-      routingStore.routeToLogin({ redirect: collection.frontend_url })
+      routingStore.routeToLogin({ redirect: collection.frontendUrl })
     }
     this.setViewingRecordAndRestoreScrollPosition()
     this.loadCollectionCards({})
@@ -132,6 +132,7 @@ class CollectionPage extends React.Component {
       runInAction(() => {
         this.cardsFetched = true
         if (reloading) return
+        // this only needs to run on the initial load not when we reload/refetch cards
         this.onAPILoad()
       })
     })
@@ -177,19 +178,11 @@ class CollectionPage extends React.Component {
       apiStore.checkJoinableGroup(collection.joinable_group_id)
     }
     if (collection.isNormalCollection) {
-      if (apiStore.currentUser) {
-        const thread = await apiStore.findOrBuildCommentThread(collection)
-        uiStore.expandThread(thread.key)
-      }
       this.checkSubmissionBox()
     } else {
       apiStore.clearUnpersistedThreads()
     }
-    if (apiStore.currentUser && routingStore.query) {
-      // This must run after findOrBuildCommentThread,
-      // as it needs that if displaying in-collection test
-      uiStore.openOptionalMenus(routingStore.query)
-    }
+    apiStore.setupCommentThreadAndMenusForPage(collection)
     if (collection.processing_status) {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
@@ -209,7 +202,7 @@ class CollectionPage extends React.Component {
     if (
       collection.isUserCollection &&
       previousViewingRecord &&
-      previousViewingRecord.inMyCollection
+      previousViewingRecord.in_my_collection
     ) {
       // we went from a record in my collection -> My Collection
       isComingFromViewingRecordBreadcrumb = true

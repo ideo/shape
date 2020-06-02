@@ -62,6 +62,46 @@ describe('ApiStore', () => {
     })
   })
 
+  describe('#setupCommentThreadAndMenusForPage', () => {
+    beforeEach(async () => {
+      apiStore.request = jest
+        .fn()
+        .mockReturnValue(Promise.resolve({ data: { id: '11' } }))
+      // need to set up current user
+      await apiStore.loadCurrentUser()
+      apiStore.findOrBuildCommentThread = jest
+        .fn()
+        .mockReturnValue(Promise.resolve({ id: '123', key: 'threadkey' }))
+    })
+
+    it('does not proceed unless routingStore.query or activityLogOpen', () => {
+      apiStore.setupCommentThreadAndMenusForPage(collection)
+      expect(apiStore.findOrBuildCommentThread).not.toHaveBeenCalled()
+    })
+
+    it('continues if activityLogOpen', async () => {
+      uiStore.activityLogOpen = true
+      routingStore.query = null
+      await apiStore.setupCommentThreadAndMenusForPage(collection)
+      expect(apiStore.findOrBuildCommentThread).toHaveBeenCalledWith(collection)
+      expect(uiStore.expandThread).toHaveBeenCalledWith('threadkey')
+      expect(uiStore.openOptionalMenus).not.toHaveBeenCalled()
+
+      routingStore.query = { open: 'comments' }
+      await apiStore.setupCommentThreadAndMenusForPage(collection)
+      expect(uiStore.expandThread).toHaveBeenCalledWith('threadkey')
+      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith(routingStore.query)
+    })
+
+    it('continues if routingStore.query and activityLog is not open', async () => {
+      uiStore.activityLogOpen = false
+      routingStore.query = { manage_group_id: 1 }
+      await apiStore.setupCommentThreadAndMenusForPage(collection)
+      expect(apiStore.findOrBuildCommentThread).not.toHaveBeenCalled()
+      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith(routingStore.query)
+    })
+  })
+
   describe('#moveCards', () => {
     let data
     const res = {

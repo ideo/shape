@@ -33,7 +33,7 @@ class RecordSearch extends React.Component {
       )
       props.apiStore
         .searchCollections(params)
-        .then(res => res.data.filter(props.searchFilter))
+        .then(res => _.map(res.data, 'record').filter(props.searchFilter))
         .then(records =>
           props.onSearch
             ? props.onSearch(records)

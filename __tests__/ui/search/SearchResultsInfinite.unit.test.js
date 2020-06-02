@@ -1,5 +1,6 @@
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 import {
+  fakeCollectionCard,
   fakeCollection,
   fakeLinkItem,
   fakeTextItem,
@@ -11,11 +12,11 @@ let wrapper, props
 beforeEach(() => {
   props = {
     searchResults: [
-      fakeCollection,
-      fakeTextItem,
-      fakeVideoItem,
-      fakeCollection,
-      fakeLinkItem,
+      { ...fakeCollectionCard, record: fakeCollection },
+      { ...fakeCollectionCard, record: fakeTextItem },
+      { ...fakeCollectionCard, record: fakeVideoItem },
+      { ...fakeCollectionCard, record: fakeCollection },
+      { ...fakeCollectionCard, record: fakeLinkItem },
     ],
     gridSettings: { cols: 4 },
     gridMaxW: 100,

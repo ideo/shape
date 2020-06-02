@@ -75,10 +75,11 @@ export const SubmissionBoxRowForTemplate = ({
       onClick={() => onSelect && onSelect(template)}
     >
       <ThumbnailHolder>
-        {template.cover.image_url && (
+        {template.cover && template.cover.image_url && (
           <img src={template.cover.image_url} alt={template.name} />
         )}
-        {!template.cover.image_url && <TemplateIcon circled filled />}
+        {!template.cover ||
+          (!template.cover.image_url && <TemplateIcon circled filled />)}
       </ThumbnailHolder>
       <SubmissionBoxRowText>{template.name}</SubmissionBoxRowText>
       {rightSideComponent}

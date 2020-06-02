@@ -69,6 +69,12 @@ class Api::V1::DatasetsController < Api::V1::BaseController
         selected: selected,
       )
     end
+    legend_item_ids = @collection.items.legend_items.pluck(:id)
+    Item.where(id: legend_item_ids).each do |item|
+      # break any card caching
+      item.touch
+      item.touch_related_cards
+    end
     # break any collection caching
     @collection.touch
   end
@@ -84,22 +90,24 @@ class Api::V1::DatasetsController < Api::V1::BaseController
 
   # All direct data items, plus any that are cover items for this collection
   def collection_data_item_ids
-    arel_data_item_type = Item.arel_table[:type].eq('Item::DataItem')
+    @collection_data_item_ids ||= begin
+      arel_data_item_type = Item.arel_table[:type].eq('Item::DataItem')
 
-    visible_data_item_ids = @collection
-                            .primary_collection_cards
-                            .visible
-                            .joins(:item)
-                            .where(arel_data_item_type)
-                            .pluck(Item.arel_table[:id])
+      visible_data_item_ids = @collection
+                              .primary_collection_cards
+                              .visible
+                              .joins(:item)
+                              .where(arel_data_item_type)
+                              .pluck(Item.arel_table[:id])
 
-    collection_cover_data_item_ids = @collection
-                                     .collections
-                                     .joins(:collection_cover_items)
-                                     .where(arel_data_item_type)
-                                     .pluck(Item.arel_table[:id])
+      collection_cover_data_item_ids = @collection
+                                       .collections
+                                       .joins(:collection_cover_items)
+                                       .where(arel_data_item_type)
+                                       .pluck(Item.arel_table[:id])
 
-    (visible_data_item_ids + collection_cover_data_item_ids).uniq
+      (visible_data_item_ids + collection_cover_data_item_ids).uniq
+    end
   end
 
   def dataset_params

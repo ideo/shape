@@ -38,9 +38,9 @@ class CollectionList extends React.Component {
   }
 
   handleSort = column => {
-    const { collection } = this.props
-    uiStore.update('collectionCardSortOrder', ev.target.value)
-    collection.API_sortCards()
+    // const { collection } = this.props
+    // uiStore.update('collectionCardSortOrder', ev.target.value)
+    // collection.API_sortCards()
   }
 
   render() {
