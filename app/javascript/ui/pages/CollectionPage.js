@@ -122,6 +122,11 @@ class CollectionPage extends React.Component {
       // clear this out before we fetch, so that any undo/redo actions don't flash a previous state of the cards
       collection.clearCollectionCards()
     }
+    if (reloading) {
+      runInAction(() => {
+        collection.storedCacheKey = null
+      })
+    }
     return collection.API_fetchCards(params).then(() => {
       if (collection.id !== this.props.collection.id) {
         // this may have changed during the course of the request if we navigated

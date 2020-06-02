@@ -248,7 +248,7 @@ module CollectionGrid
         drag_positions[card_id] = position
 
         # now actually move the card (to be persisted in wrapping services)
-        card.parent_id = collection.id
+        card.parent = collection
         card.row = position.row
         card.col = position.col
 

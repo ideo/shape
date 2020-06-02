@@ -508,9 +508,11 @@ class CollectionCard < ApplicationRecord
   end
 
   def copy_card_attributes!(copy)
-    update_columns(
+    update(
       height: copy.height,
       width: copy.width,
+      col: copy.col,
+      row: copy.row,
       order: copy.order,
       pinned: copy.pinned,
     )
