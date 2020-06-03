@@ -162,14 +162,22 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     collections = @collection.all_child_collections
                              .where(type: 'Collection::SubmissionBox')
                              .includes(:parent_collection_card)
+                             .select do |collection|
+                               collection.can_view?(current_user)
+                             end
+
     render jsonapi: collections,
            include: Collection.default_relationships_for_api
   end
 
   def challenge_phase_collections
-    collections = @collection.all_child_collections
-                             .where(collection_type: :phase)
-                             .order(start_date: :asc)
+    # This returns all phase collections that are children,
+    # or descendants of a parent challenge
+    collections = ChallengeRelevantPhaseCollections.call(
+      collection: @collection,
+      for_user: current_user,
+    )
+
     # Only include collection data
     render jsonapi: collections
   end
