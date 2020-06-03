@@ -166,6 +166,7 @@ class Collection < ApplicationRecord
   before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
+  after_commit :rename_challenge_groups, if: :saved_change_to_name?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
   after_commit :reindex_after_archive, if: :saved_change_to_archived?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -762,6 +763,20 @@ class Collection < ApplicationRecord
   def touch_related_cards
     try(:parent_collection_card).try(:touch)
     cards_linked_to_this_collection.update_all(updated_at: updated_at)
+  end
+
+  def rename_challenge_groups
+    if challenge_admin_group.present?
+      challenge_admin_group.update(name: "#{name} Admins")
+    end
+
+    if challenge_reviewer_group.present?
+      challenge_reviewer_group.update(name: "#{name} Reviewers")
+    end
+
+    return unless challenge_participant_group.present?
+
+    challenge_participant_group.update(name: "#{name} Participants")
   end
 
   def owned_tag_list
