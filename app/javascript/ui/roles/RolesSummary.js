@@ -100,13 +100,15 @@ class RolesSummary extends React.Component {
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
     const { editors, viewers } = this.state
+    const { maxAvatarsOverride } = this.props
     const editorCount = editors.length
     const viewerCount = viewers.length
-    const maxEditors = editors.slice(0, MAX_AVATARS_TO_SHOW)
+    const maxAvatarNumber = maxAvatarsOverride || MAX_AVATARS_TO_SHOW
+    const maxEditors = editors.slice(0, maxAvatarNumber)
 
     let maxViewers = []
-    if (maxEditors.length < MAX_AVATARS_TO_SHOW) {
-      const numViewers = MAX_AVATARS_TO_SHOW - maxEditors.length
+    if (maxEditors.length < maxAvatarNumber) {
+      const numViewers = maxAvatarNumber - maxEditors.length
       maxViewers = viewers.slice(0, numViewers)
     }
 
@@ -230,6 +232,7 @@ RolesSummary.propTypes = {
   rolesMenuOpen: PropTypes.bool.isRequired,
   usersAndGroupsLength: PropTypes.number,
   reviewers: PropTypes.bool,
+  maxAvatarsOverride: PropTypes.number,
 }
 
 RolesSummary.defaultProps = {
@@ -238,6 +241,7 @@ RolesSummary.defaultProps = {
   canEdit: false,
   usersAndGroupsLength: 0,
   reviewers: false,
+  maxAvatarsOverride: null,
 }
 
 export default RolesSummary

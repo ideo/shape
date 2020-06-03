@@ -18,7 +18,7 @@ import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
-import { uiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const Column = styled.div`
@@ -107,12 +107,27 @@ class ListCard extends React.Component {
     }
   }
 
-  handlePotentialReviewerClick = reviewer => {
-    // TODO use backend call here
-    runInAction(() => {
-      this.currentReviewerRoles[0].users.push(reviewer)
-      this.currentReviewerRoles[0].activeCount += 1
-    })
+  handlePotentialReviewerClick = async reviewer => {
+    const {
+      card: { record },
+    } = this.props
+    runInAction(() => (this.reviewersAddOpen = false))
+    console.log('click', record.challenge_reviewer_group)
+    if (record.challenge_reviewer_group) {
+      const data = {
+        role: { name: 'member' },
+        group_ids: [],
+        user_ids: [reviewer.id],
+        is_switching: false,
+        send_invites: false,
+      }
+      await apiStore.request(
+        `groups/${record.challenge_reviewer_group.id}/roles`,
+        'POST',
+        data
+      )
+      apiStore.fetchRoles(record.challenge_reviewer_group)
+    }
   }
 
   handleReviewersClose = () => {
@@ -201,6 +216,7 @@ class ListCard extends React.Component {
               // convert observable to normal array to trigger render changes
               collaborators={[...card.record.collaborators]}
               rolesMenuOpen={!!uiStore.rolesMenuOpen}
+              maxAvatarsOverride={8}
               reviewers
             />
             <InlineModal
