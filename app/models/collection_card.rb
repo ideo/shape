@@ -523,6 +523,8 @@ class CollectionCard < ApplicationRecord
       # no real point in trying to cache a search result with no parent card, but this allows it to work
       id || "search-result-#{record.id}",
       updated_at || Time.current,
+      # ensure e.g. Placeholder -> Primary STI type busts the cache even if timestamp is within 1 second
+      type,
     ].join('-')
     "CollectionCardCache::#{key}"
   end
