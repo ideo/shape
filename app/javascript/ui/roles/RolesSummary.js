@@ -130,9 +130,9 @@ class RolesSummary extends React.Component {
   renderAvatar = (userOrGroup, type) => {
     const { reviewers } = this.props
     const reviewColors = ['#39BE8E', '#D26A3B', '#E34744']
-    const assignedColorIdx = Math.floor(Math.random() * 3)
+    const assignedColorIdx = parseInt(userOrGroup.id) % 3
+    const assignedColor = reviewColors[assignedColorIdx]
     // the color class creates a box shadow via AvatarGroup styled-component
-
     const className = `${type}${
       userOrGroup.color || reviewers
         ? ` outlined outline-${userOrGroup.color}`
@@ -147,7 +147,7 @@ class RolesSummary extends React.Component {
         className={className}
         // user_profile_collection_id will be null if its a group
         linkToCollectionId={userOrGroup.user_profile_collection_id}
-        colorOverride={reviewers && reviewColors[assignedColorIdx]}
+        colorOverride={reviewers && assignedColor}
         displayName
       />
     )
