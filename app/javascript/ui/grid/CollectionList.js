@@ -18,6 +18,7 @@ class CollectionList extends React.Component {
   }
 
   get isChallenge() {
+    // TODO use real logic here.
     return true
   }
 

@@ -108,6 +108,7 @@ class ListCard extends React.Component {
   }
 
   handlePotentialReviewerClick = reviewer => {
+    // TODO use backend call here
     runInAction(() => {
       this.currentReviewerRoles[0].users.push(reviewer)
       this.currentReviewerRoles[0].activeCount += 1
