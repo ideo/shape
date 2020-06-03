@@ -155,6 +155,30 @@ describe Collection, type: :model do
         expect(collection.challenge_reviewer_group_id.present?).to be true
       end
     end
+
+    describe '#rename_challenge_groups' do
+      let(:admin_group) { create(:group, name: 'Collection Admins') }
+      let(:reviewer_group) { create(:group, name: 'Collection Reviewers') }
+      let(:participant_group) { create(:group, name: 'Collection Participants') }
+      let!(:collection) {
+        create(:collection,
+               name: 'Collection',
+               collection_type: 'challenge',
+               challenge_admin_group_id: admin_group.id,
+               challenge_reviewer_group_id: reviewer_group.id,
+               challenge_participant_group_id: participant_group.id)
+      }
+
+      it 'should create a challenge admin group, participant group, and reviewer group' do
+        expect(collection.challenge_admin_group.name).to eq 'Collection Admins'
+        expect(collection.challenge_reviewer_group.name).to eq 'Collection Reviewers'
+        expect(collection.challenge_participant_group.name).to eq 'Collection Participants'
+        collection.update(name: 'Challenge')
+        expect(collection.challenge_admin_group.name).to eq 'Challenge Admins'
+        expect(collection.challenge_reviewer_group.name).to eq 'Challenge Reviewers'
+        expect(collection.challenge_participant_group.name).to eq 'Challenge Participants'
+      end
+    end
   end
 
   describe '#inherit_parent_organization_id' do
