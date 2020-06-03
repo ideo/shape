@@ -25,6 +25,10 @@ export const MarketingGradientTop = styled(MarketingBack)`
       rgba(255, 255, 255, 1) 100%
     ),
     url(${organicGridPillGray}), no-repeat, right, top;
+
+  background: url('https://firebasestorage.googleapis.com/v0/b/shape-marketing.appspot.com/o/marketing%2Fweb%2FHome%20Page%2FBLM%20Background.png?alt=media&token=b1547ff9-300e-43e2-af8d-fa0d258f9910');
+  background-size: auto 720px;
+  background-position: center;
   overflow: hidden;
   position: relative;
   padding-bottom: 40px;
@@ -160,7 +164,7 @@ InvertMarketingH2.displayName = 'StyledInvertMarketingH2'
 
 /** @component */
 export const MarketingTagLine = styled(MarketingH2)`
-  color: black;
+  color: white;
   text-transform: none;
   font-family: ${v.fonts.serif};
   font-weight: ${v.weights.book};

@@ -37,6 +37,12 @@ const MenuWrapper = styled.div`
     .ToggleLogo {
       display: none;
     }
+    .NavLink {
+      ${props =>
+        props.location &&
+        props.location.pathname === '/' &&
+        'color: white !important;'}
+    }
   }
 
   @keyframes appear {
@@ -263,7 +269,9 @@ class MarketingMenu extends React.PureComponent {
                     isHome={isHome}
                     handleScrollToContent={() => handleScrollToContent(isHome)}
                   />
-                  <NavLink href="/product/pricing">Pricing</NavLink>
+                  <NavLink className="NavLink" href="/product/pricing">
+                    Pricing
+                  </NavLink>
                 </MarketingFlex>
               </Box>
 
@@ -277,8 +285,12 @@ class MarketingMenu extends React.PureComponent {
 
               <Box w={15 / 32}>
                 <MarketingFlex align="center" justify="flex-end">
-                  <NavLink onClick={handleScrollToFooter}>Contact</NavLink>
-                  <NavLink href="/login">Log in</NavLink>
+                  <NavLink className="NavLink" onClick={handleScrollToFooter}>
+                    Contact
+                  </NavLink>
+                  <NavLink className="NavLink" href="/login">
+                    Log in
+                  </NavLink>
                   <MarketingMainBtn
                     id="header-sign-up"
                     onClick={() => {
@@ -314,7 +326,7 @@ class MarketingMenu extends React.PureComponent {
                   role="button"
                   onClick={this.toggleDrawer(true)}
                   float="right"
-                  style={{ marginBottom: 0 }}
+                  style={{ marginBottom: 0, backgroundColor: 'white' }}
                 />
               </Box>
             </MarketingFlex>
@@ -342,13 +354,20 @@ class MarketingMenu extends React.PureComponent {
     const isMobile = width <= v.responsive.medBreakpoint
 
     return (
-      <MenuWrapper>
+      <MenuWrapper location={this.props.location}>
         <Headroom disableInlineStyles pinStart={400}>
           {isMobile ? this.renderMobile() : this.renderDesktop()}
         </Headroom>
       </MenuWrapper>
     )
   }
+}
+
+MarketingMenu.propTypes = {
+  location: PropTypes.object,
+}
+MarketingMenu.defaultProps = {
+  location: {},
 }
 
 export default MarketingMenu

@@ -73,7 +73,12 @@ const MenuDropdown = ({ items, isHome, handleScrollToContent }) => {
   return (
     <MenuList>
       <MenuListItem>
-        <NavLink onClick={() => handleScrollToContent(isHome)}>Product</NavLink>
+        <NavLink
+          className="NavLink"
+          onClick={() => handleScrollToContent(isHome)}
+        >
+          Product
+        </NavLink>
         <DropdownSpacer />
         <SubmenuDropdown
           items={items}

@@ -6,22 +6,23 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import {
   MarketingBack,
   MarketingFlex,
-  MarketingHeroButtonContainer,
+  // MarketingHeroButtonContainer,
   Center,
   MarketingTagLine,
-  MarketingAlternateBtn,
-  MarketingShapeLogo,
+  // MarketingAlternateBtn,
+  // MarketingShapeLogo,
   MarketingVideoWrapper,
   MarketingMainBtn,
   MarketingGradientTop,
-} from '~/ui/global/styled/marketing.js'
+} from '~/ui/global/styled/marketing'
 import MarketingMenu from '~/ui/marketing/MarketingMenu'
 import ContentBlock from '~/ui/marketing/ContentBlock'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import { Pricing } from '~/ui/marketing/Pricing'
 import ReactPlayer from 'react-player'
-import PageFooter from '~/ui/marketing/PageFooter.js'
-import { hasKeyValueParam } from '~/utils/paramUtils.js'
+import PageFooter from '~/ui/marketing/PageFooter'
+import { hasKeyValueParam } from '~/utils/paramUtils'
+import { linkOffsite } from '~/utils/url'
 
 class MarketingPage extends React.Component {
   constructor(props) {
@@ -67,9 +68,9 @@ class MarketingPage extends React.Component {
     const { location } = this.props
     const { videoPlaying, content } = this.state
     const { hero, footer } = content
-    const videoPlayingButtonText = !videoPlaying
-      ? hero && hero.watchVideoButton
-      : hero && hero.closeVideoButton
+    // const videoPlayingButtonText = !videoPlaying
+    //   ? hero && hero.watchVideoButton
+    //   : hero && hero.closeVideoButton
 
     return (
       <Fragment>
@@ -79,9 +80,18 @@ class MarketingPage extends React.Component {
             <MarketingMenu location={location} />
 
             <Center>
-              <MarketingShapeLogo videoPlaying={videoPlaying} />
+              {/* <MarketingShapeLogo videoPlaying={videoPlaying} /> */}
+              <div style={{ height: '140px' }} />
               <MarketingTagLine videoPlaying={videoPlaying}>
                 {hero && hero.tagLine}
+                <div style={{ height: '60px' }} />
+                <MarketingMainBtn
+                  onClick={() =>
+                    linkOffsite({ url: 'https://www.joincampaignzero.org/' })
+                  }
+                >
+                  Donate
+                </MarketingMainBtn>
               </MarketingTagLine>
             </Center>
 
@@ -96,7 +106,7 @@ class MarketingPage extends React.Component {
               </MarketingVideoWrapper>
             </MarketingFlex>
 
-            <Center>
+            {/* <Center>
               <MarketingHeroButtonContainer>
                 <a className="get-early-access-header" href="/sign_up">
                   <MarketingMainBtn>
@@ -112,7 +122,7 @@ class MarketingPage extends React.Component {
                   </MarketingAlternateBtn>
                 )}
               </MarketingHeroButtonContainer>
-            </Center>
+            </Center> */}
           </MarketingGradientTop>
 
           <MarketingFlex align="center" justify="center" wrap w={1}>
