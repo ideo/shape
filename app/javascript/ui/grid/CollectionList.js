@@ -79,7 +79,7 @@ class CollectionList extends React.Component {
           ))}
         </Flex>
         {collection_cards.map(card => (
-          <ListCard card={card} onRolesUpdate={this.onRolesUpdate}/>
+          <ListCard card={card} onRolesUpdate={this.onRolesUpdate} />
         ))}
       </div>
     )
