@@ -35,7 +35,7 @@ const CardActionHolder = ({
     <StyledIcon
       className="icon"
       disableHover={disableHover}
-      fill={active ? v.colors.black : v.colors.commonMedium}
+      fill={active ? v.colors.black : v.colors.commonDarkest}
       size={size}
       onClick={onClick}
       data-cy={`CardAction-${tooltipText}`}

@@ -2,7 +2,7 @@ import React from 'react'
 import { Flex } from 'reflexbox'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
-import ArrowIcon from '~/ui/icons/ArrowIcon'
+import DropdownIcon from '~/ui/icons/DropdownIcon'
 import ListCard, { Column } from './ListCard'
 import TextButton from '~/ui/global/TextButton'
 import v from '~/utils/variables'
@@ -15,6 +15,11 @@ class CollectionList extends React.Component {
   fetchCards({ sort } = {}) {
     const { collection } = this.props
     collection.API_fetchCards({ include: ['roles'] })
+  }
+
+  get isChallenge() {
+    // TODO use real logic here.
+    return true
   }
 
   get columns() {
@@ -32,12 +37,16 @@ class CollectionList extends React.Component {
         style: { width: '400px' },
         sortable: true,
       },
-      { displayName: 'Permissions', style: {} },
+      {
+        displayName: this.isChallenge ? 'Reviewers' : 'Permissions',
+        style: {},
+      },
       { displayName: '', style: { marginLeft: 'auto' } },
     ]
   }
 
   handleSort = column => {
+    // TODO implement
     // const { collection } = this.props
     // uiStore.update('collectionCardSortOrder', ev.target.value)
     // collection.API_sortCards()
@@ -59,8 +68,8 @@ class CollectionList extends React.Component {
                 {column.displayName}
               </TextButton>
               {column.sortable && (
-                <span style={{ width: '12px', height: '12px' }}>
-                  <ArrowIcon rotation={90} />
+                <span style={{ width: '24px', height: '24px' }}>
+                  <DropdownIcon />
                 </span>
               )}
             </Column>

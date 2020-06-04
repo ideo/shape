@@ -1,13 +1,16 @@
 import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
-import { computed } from 'mobx'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { computed, observable, runInAction } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
+import { Checkbox } from '~/ui/global/styled/forms'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import FileIcon from '~/ui/grid/covers/FileIcon'
+import InlineModal from '~/ui/global/modals/InlineModal'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import ListCoverRenderer from '~/ui/grid/ListCoverRenderer'
 import RolesSummary from '~/ui/roles/RolesSummary'
@@ -16,7 +19,7 @@ import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
-import { uiStore } from '~/stores'
+import { apiStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const Column = styled.div`
@@ -46,7 +49,16 @@ const IconHolder = styled.div`
   width: 16px;
 `
 
+@observer
 class ListCard extends React.Component {
+  @observable
+  reviewersAddOpen = false
+
+  constructor(props) {
+    super(props)
+    this.rolesWrapperRef = React.createRef()
+  }
+
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
@@ -74,7 +86,44 @@ class ListCard extends React.Component {
     const {
       card: { record },
     } = this.props
-    uiStore.update('rolesMenuOpen', record)
+    if (record.challenge_reviewer_group) {
+      runInAction(() => (this.reviewersAddOpen = true))
+    } else {
+      uiStore.update('rolesMenuOpen', record)
+    }
+  }
+
+  handlePotentialReviewer = async reviewer => {
+    const {
+      card: { record },
+    } = this.props
+    runInAction(() => (this.reviewersAddOpen = false))
+    const action = this.isReviewerSelected(reviewer) ? 'DELETE' : 'POST'
+    if (record.challenge_reviewer_group) {
+      const data = {
+        role: { name: 'member' },
+        group_ids: [],
+        user_ids: [reviewer.id],
+        is_switching: false,
+        send_invites: false,
+      }
+      await apiStore.request(
+        `groups/${record.challenge_reviewer_group.id}/roles`,
+        action,
+        data
+      )
+      apiStore.fetch('collections', record.id, true)
+    }
+  }
+
+  handleReviewersClose = () => {
+    runInAction(() => (this.reviewersAddOpen = false))
+  }
+
+  isReviewerSelected(reviewer) {
+    if (!this.roles.length) return false
+    const selectedUsers = this.roles[1].users
+    return selectedUsers.find(selectedUser => selectedUser.id === reviewer.id)
   }
 
   get renderIcons() {
@@ -109,9 +158,31 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
+  @computed
+  get roles() {
+    const {
+      card: { record },
+    } = this.props
+    if (record.challenge_reviewer_group) {
+      return record.challenge_reviewer_group.roles
+    }
+    return record.roles
+  }
+
+  get possibleReviewers() {
+    // TODO refactor this and it's rendering out of this class into it's own
+    const {
+      card: { record },
+    } = this.props
+    const editorRole = record.roles.find(role => role.name === 'editor')
+    const viewerRole = record.roles.find(role => role.name === 'viewer')
+    const editors = editorRole ? editorRole.users || [] : []
+    const viewers = viewerRole ? viewerRole.users || [] : []
+    return [...editors, ...viewers]
+  }
+
   render() {
     const { card } = this.props
-    console.log('roles', [...card.record.roles])
     return (
       <Row>
         <Column width="50px">
@@ -130,15 +201,44 @@ class ListCard extends React.Component {
         </Column>
         <Column width="400px">{defaultTimeFormat(card.updated_at)}</Column>
         <Column>
-          <RolesSummary
-            key="roles"
-            handleClick={this.handleRolesClick}
-            roles={[...card.record.roles]}
-            canEdit={card.record.can_edit}
-            // convert observable to normal array to trigger render changes
-            collaborators={[...card.record.collaborators]}
-            rolesMenuOpen={!!uiStore.rolesMenuOpen}
-          />
+          <div ref={this.rolesWrapperRef}>
+            <RolesSummary
+              key="roles"
+              handleClick={this.handleRolesClick}
+              roles={[...this.roles]}
+              canEdit={card.record.can_edit}
+              usersAndGroupsLength={
+                this.roles.length && this.roles[1].users.length
+              }
+              // convert observable to normal array to trigger render changes
+              collaborators={[...card.record.collaborators]}
+              rolesMenuOpen={!!uiStore.rolesMenuOpen}
+              maxAvatarsOverride={8}
+              reviewers
+            />
+            <InlineModal
+              title=""
+              onCancel={this.handleReviewersClose}
+              open={this.reviewersAddOpen}
+              anchorElement={this.rolesWrapperRef.current}
+              anchorOrigin={{ horizontal: 'left', vertical: 'center' }}
+              noButtons
+            >
+              {this.possibleReviewers.map(possibleReviewer => (
+                <Flex>
+                  <Checkbox
+                    color="primary"
+                    checked={this.isReviewerSelected(possibleReviewer)}
+                    onChange={ev =>
+                      this.handlePotentialReviewer(possibleReviewer)
+                    }
+                    value="yes"
+                  />
+                  <EntityAvatarAndName entity={possibleReviewer} />
+                </Flex>
+              ))}
+            </InlineModal>
+          </div>
         </Column>
         <Column marginLeft="auto">
           <ActionMenu

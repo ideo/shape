@@ -165,6 +165,7 @@ module Resourceable
   end
 
   def can_edit?(user_or_group)
+    return true if user_or_group.nil?
     return true if user_or_group.has_cached_role?(Role::SUPER_ADMIN)
 
     raise_role_name_not_set(:edit_role) if self.class.edit_role.blank?

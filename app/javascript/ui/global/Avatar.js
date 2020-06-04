@@ -33,6 +33,11 @@ const StyledAvatar = styled(MuiAvatar)`
     box-shadow: 0 0 0 4px;
     /* box-shadow will use the color property by default */
     color: ${v.colors.commonLight};
+    ${props =>
+      props.colorOverride &&
+      `
+      color: ${props.colorOverride};
+    `}
   }
   /* not the cleanest way to do this but it works; see note above about color */
   &.outline-Blue {
@@ -103,6 +108,7 @@ class Avatar extends React.Component {
       linkToCollectionId,
       responsive,
       clickable,
+      colorOverride,
     } = this.props
 
     const renderAvatar = (
@@ -112,6 +118,7 @@ class Avatar extends React.Component {
         className={`avatar ${className}`}
         src={this.url}
         imgProps={{ onError: this.onError }}
+        colorOverride={colorOverride}
         onClick={this.handleClick}
         cursor={
           linkToCollectionId || displayName || clickable ? 'pointer' : 'initial'
@@ -142,6 +149,7 @@ Avatar.propTypes = {
   className: PropTypes.string,
   displayName: PropTypes.bool,
   linkToCollectionId: PropTypes.string,
+  colorOverride: PropTypes.string,
   responsive: PropTypes.bool,
   clickable: PropTypes.bool,
 }
@@ -153,6 +161,7 @@ Avatar.defaultProps = {
   title: 'Avatar',
   displayName: false,
   linkToCollectionId: null,
+  colorOverride: null,
   responsive: true,
   clickable: false,
 }

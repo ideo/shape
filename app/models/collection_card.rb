@@ -126,6 +126,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def self.default_relationships_for_api
+    # TODO fix this so it doesn't always include all roles and challenge groups
     [
       record: [
         :filestack_file,
@@ -134,6 +135,8 @@ class CollectionCard < ApplicationRecord
         :parent_collection_card,
         :question_choices,
         :collection_cover_text_items,
+        roles: :users,
+        challenge_reviewer_group: [roles: :users],
         collection_cover_items: :datasets,
       ],
     ]
@@ -145,6 +148,7 @@ class CollectionCard < ApplicationRecord
       record: [
         :roles,
         :filestack_file,
+        :challenge_reviewer_group,
         :datasets,
         :translations,
         :parent_collection_card,

@@ -73,9 +73,11 @@ class RolesSummary extends React.Component {
   }
 
   initEditorsAndViewers() {
+    // TODO come up with better code design for this vs reviewers prop
+    const { reviewers } = this.props
     this.setState({
-      editors: this.usersAndGroupsForRole('editor'),
-      viewers: this.usersAndGroupsForRole('viewer'),
+      editors: this.usersAndGroupsForRole(reviewers ? 'admin' : 'editor'),
+      viewers: this.usersAndGroupsForRole(reviewers ? 'member' : 'viewer'),
     })
   }
 
@@ -99,13 +101,15 @@ class RolesSummary extends React.Component {
   // prioritizing editors over viewers
   get viewersAndEditorsLimited() {
     const { editors, viewers } = this.state
+    const { maxAvatarsOverride } = this.props
     const editorCount = editors.length
     const viewerCount = viewers.length
-    const maxEditors = editors.slice(0, MAX_AVATARS_TO_SHOW)
+    const maxAvatarNumber = maxAvatarsOverride || MAX_AVATARS_TO_SHOW
+    const maxEditors = editors.slice(0, maxAvatarNumber)
 
     let maxViewers = []
-    if (maxEditors.length < MAX_AVATARS_TO_SHOW) {
-      const numViewers = MAX_AVATARS_TO_SHOW - maxEditors.length
+    if (maxEditors.length < maxAvatarNumber) {
+      const numViewers = maxAvatarNumber - maxEditors.length
       maxViewers = viewers.slice(0, numViewers)
     }
 
@@ -127,9 +131,16 @@ class RolesSummary extends React.Component {
   }
 
   renderAvatar = (userOrGroup, type) => {
+    const { reviewers } = this.props
+    // TODO use real data for colors here, not randomized based on id
+    const reviewColors = ['#39BE8E', '#D26A3B', '#E34744']
+    const assignedColorIdx = parseInt(userOrGroup.id) % 3
+    const assignedColor = reviewColors[assignedColorIdx]
     // the color class creates a box shadow via AvatarGroup styled-component
     const className = `${type}${
-      userOrGroup.color ? ` outlined outline-${userOrGroup.color}` : ' bordered'
+      userOrGroup.color || reviewers
+        ? ` outlined outline-${userOrGroup.color}`
+        : ' bordered'
     }`
 
     return (
@@ -140,6 +151,7 @@ class RolesSummary extends React.Component {
         className={className}
         // user_profile_collection_id will be null if its a group
         linkToCollectionId={userOrGroup.user_profile_collection_id}
+        colorOverride={reviewers && assignedColor}
         displayName
       />
     )
@@ -195,12 +207,17 @@ class RolesSummary extends React.Component {
   }
 
   render() {
+    const { reviewers } = this.props
     const { editors, viewers } = this.viewersAndEditorsLimited
     return (
       <StyledRolesSummary>
         <div className="roles-summary--inner">
-          {this.renderEditors}
-          {editors.length > 0 && viewers.length > 0 ? <StyledSeparator /> : ''}
+          {reviewers ? null : this.renderEditors}
+          {!reviewers && editors.length > 0 && viewers.length > 0 ? (
+            <StyledSeparator />
+          ) : (
+            ''
+          )}
           {this.renderViewers}
           {this.addUserBtn}
         </div>
@@ -216,6 +233,8 @@ RolesSummary.propTypes = {
   canEdit: PropTypes.bool,
   rolesMenuOpen: PropTypes.bool.isRequired,
   usersAndGroupsLength: PropTypes.number,
+  reviewers: PropTypes.bool,
+  maxAvatarsOverride: PropTypes.number,
 }
 
 RolesSummary.defaultProps = {
@@ -223,6 +242,8 @@ RolesSummary.defaultProps = {
   collaborators: [],
   canEdit: false,
   usersAndGroupsLength: 0,
+  reviewers: false,
+  maxAvatarsOverride: null,
 }
 
 export default RolesSummary
