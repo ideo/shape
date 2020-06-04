@@ -26,7 +26,7 @@ import BusinessUnitActionMenu from './BusinessUnitActionMenu'
 import AddTeamButton from './AddTeamButton'
 import { Row } from '~/ui/global/styled/layout'
 import InfoIconXs from '~/ui/icons/InfoIconXs'
-import { Label } from '~/ui/global/styled/forms'
+import { Label, TextField } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
@@ -95,6 +95,12 @@ class CreativeDifferenceTabs extends React.Component {
   supportedLanguages = []
   @observable
   businessUnits = []
+  @observable
+  showNewTeamRow = false
+  @observable
+  newTeamValues = null
+  @observable
+  businessUnitErrors = null
 
   constructor(props) {
     super(props)
@@ -209,20 +215,40 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
-  createBusinessUnit = async e => {
+  // TODO: have to add a placeholder row component for this?
+  // Since the BU being added isn't real yet (e.g., not in the businessUnits observable )
+  createBusinessUnit = async () => {
     console.log('creating new BU')
+    const values = this.newTeamValues
     try {
+      // TODO: remove content_version_id
       const businessUnitParams = {
-        business_unit: {
-          name: 'New BU Here',
-          // Where to pull other params from?
-        },
+        business_unit: values,
       }
-      console.log(businessUnitParams)
-      const result = await businessUnitsStore.create(businessUnitParams)
-      console.log(result)
+      console.log({ businessUnitParams })
+      const foo = businessUnitsStore
+      const businessUnitModelInstance = foo.build(values)
+      businessUnitModelInstance.set({ id: null })
+      console.log(businessUnitModelInstance.toJS())
+      const saveReq = businessUnitModelInstance.save(businessUnitParams, {
+        optimistic: false,
+      })
+      const outcome = await saveReq
+
+      if (outcome) {
+        console.log('refetching BUs')
+        const allBusinessUnits = await businessUnitsStore.fetch()
+        runInAction(async () => {
+          this.showNewTeamRow = false
+          this.newTeamValues = null
+          // fetch all the business units after an update
+          this.businessUnits = allBusinessUnits
+          // TODO: Just update one BU so we don't have to refetch all the BUs?
+        })
+      }
     } catch (err) {
       console.log('error creating new BU: ', err)
+      // set errors
     }
   }
 
@@ -279,6 +305,60 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
+  initialNewTeamValues = () => {
+    const {
+      default_industry_subcategory_id,
+      supported_languages,
+      id,
+    } = this.organization
+
+    // Content version handled after create in backend
+    return {
+      name: `Team ${this.businessUnits.length + 1}`,
+      organization_id: id,
+      industry_subcategory_id: default_industry_subcategory_id,
+      structure: 'Vertical',
+      supported_languages,
+    }
+  }
+
+  @action
+  populateNewTeamRow = () => {
+    this.showNewTeamRow = true
+    this.newTeamValues = this.initialNewTeamValues()
+
+    setTimeout(this.focusOnNameInput, 100)
+  }
+
+  handleNameInputKeyPress = e => {
+    console.log('pressed: ', e.key)
+    if (e.key === 'Enter') {
+      this.handleSaveBusinessUnit()
+    }
+    console.log(e.target.value, this.newTeamValues.name)
+  }
+
+  @action
+  handleNameInputChange = e => {
+    console.log('updating name input: ', e.target.value)
+    this.newTeamValues.name = e.target.value
+    console.log('new name: ', this.newTeamValues.name)
+  }
+
+  handleSaveBusinessUnit = e => {
+    console.log('saving BU')
+    // TODO: validate newTeamValues
+    this.createBusinessUnit()
+    // TOOD: Is this superfluous?
+  }
+
+  focusOnNameInput = () => {
+    const element = document.getElementById('new-team-name')
+    console.log('element to focus: ', element)
+    element.focus()
+    element.select()
+  }
+
   render() {
     const { orgName, tab, apiStore } = this.props
     const {
@@ -292,7 +372,12 @@ class CreativeDifferenceTabs extends React.Component {
       tabValue,
       handleChange,
       updateOrg,
-      createBusinessUnit,
+      populateNewTeamRow,
+      showNewTeamRow,
+      newTeamValues,
+      handleNameInputChange,
+      handleNameInputKeyPress,
+      handleSaveBusinessUnit,
     } = this
 
     console.log('C∆ Tabs render: ', organization, supportedLanguages)
@@ -403,8 +488,7 @@ class CreativeDifferenceTabs extends React.Component {
                   id={'name-label'}
                 >
                   Team
-                  {/* Make Add Team button its own component? */}
-                  <AddTeamButton createBusinessUnit={createBusinessUnit} />
+                  <AddTeamButton handleClick={populateNewTeamRow} />
                 </Label>
                 <Label
                   style={{
@@ -605,7 +689,144 @@ class CreativeDifferenceTabs extends React.Component {
                 </Row>
               ))}
               <div>
-                <AddTeamButton handleClick={createBusinessUnit} />
+                {showNewTeamRow && (
+                  <Row>
+                    <form
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '170px',
+                          marginRight: '20px',
+                        }}
+                      >
+                        {/* Make this a component that accepts name/functions as props so it rerenders on name update */}
+                        <TextField
+                          style={{
+                            width: 'inherit',
+                          }}
+                          id={'new-team-name'}
+                          value={newTeamValues.name}
+                          // None of these are working as intended
+                          onChange={handleNameInputChange}
+                          onBlur={handleSaveBusinessUnit}
+                          onKeyPress={handleNameInputKeyPress}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          marginRight: '20px',
+                        }}
+                      >
+                        <DropdownSelect
+                          disabled
+                          label={'Industry'}
+                          record={newTeamValues}
+                          options={industrySubcategories}
+                          updateRecord={updateOrg}
+                          fieldToUpdate={'industry_subcategory_id'}
+                        />{' '}
+                      </div>{' '}
+                      <div
+                        style={{
+                          marginRight: '20px',
+                        }}
+                      >
+                        <DropdownSelect
+                          disabled
+                          label={'Content Version'}
+                          toolTip={
+                            'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
+                          }
+                          record={newTeamValues}
+                          options={contentVersions}
+                          updateRecord={updateOrg}
+                          fieldToUpdate={'default_content_version_id'}
+                        />{' '}
+                      </div>{' '}
+                      <div
+                        style={{
+                          marginRight: '20px',
+                        }}
+                      >
+                        <DropdownSelect
+                          disabled
+                          label={'Vertical or Horizontal'}
+                          toolTip={
+                            "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
+                          }
+                          record={newTeamValues}
+                          options={[
+                            {
+                              name: 'Vertical',
+                              id: 'Vertical',
+                            },
+                            {
+                              name: 'Horizontal',
+                              id: 'Horizontal',
+                            },
+                          ]}
+                          updateRecord={updateOrg}
+                          fieldToUpdate={'structure'}
+                        />{' '}
+                      </div>{' '}
+                      <div
+                        style={{
+                          width: '42px',
+                          marginTop: '2px',
+                        }}
+                      >
+                        <BusinessUnitActionMenu
+                          name={newTeamValues.name}
+                          // handleClone={() =>
+                          //   this.cloneBusinessUnit(businessUnit)
+                          // }
+                          // handleRemove={() =>
+                          //   this.removeBusinessUnit(businessUnit)
+                          // }
+                        />{' '}
+                      </div>{' '}
+                      {/* Admins */}{' '}
+                      <div
+                        style={{
+                          width: '80px',
+                          marginTop: '-10px',
+                        }}
+                      >
+                        <OrganizationRoles
+                          roles={
+                            apiStore.currentUserOrganization.primary_group.roles
+                          }
+                          canEdit={
+                            apiStore.currentUserOrganization.primary_group
+                              .can_edit
+                          }
+                        />{' '}
+                      </div>{' '}
+                      {/* Members */}{' '}
+                      <div
+                        style={{
+                          width: '80px',
+                          marginTop: '-10px',
+                        }}
+                      >
+                        <OrganizationRoles
+                          roles={
+                            apiStore.currentUserOrganization.primary_group.roles
+                          }
+                          canEdit={
+                            apiStore.currentUserOrganization.primary_group
+                              .can_edit
+                          }
+                        />{' '}
+                      </div>{' '}
+                    </form>{' '}
+                  </Row>
+                )}
+                <AddTeamButton handleClick={populateNewTeamRow} />
               </div>
             </React.Fragment>
           </TabPanel>

@@ -24,6 +24,7 @@ const DropdownSelect = ({
   options,
   fieldToUpdate,
   updateRecord,
+  ...additionalProps
 }) => {
   const value = currentValue(record, options, fieldToUpdate)
   console.log('first value: ', value)
@@ -75,6 +76,7 @@ const DropdownSelect = ({
         iconName="Alert"
       />
       <Select
+        {...additionalProps}
         style={{ width: '244px' }}
         labelid={`${label.split(' ').join('')}-select-label`}
         classes={{

@@ -356,9 +356,9 @@ class CollectionGrid extends React.Component {
     } else if (
       dragType === 'drag' &&
       draggingFromMDL &&
-      (placeholderOrder !== null &&
-        !_.isEmpty(placeholder) &&
-        !movingWithinCollection)
+      placeholderOrder !== null &&
+      !_.isEmpty(placeholder) &&
+      !movingWithinCollection
     ) {
       cardMover.moveCards(Math.ceil(placeholderOrder))
       this.positionCardsFromProps()
