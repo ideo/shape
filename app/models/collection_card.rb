@@ -524,9 +524,11 @@ class CollectionCard < ApplicationRecord
   end
 
   def copy_card_attributes!(copy)
-    update_columns(
+    update(
       height: copy.height,
       width: copy.width,
+      col: copy.col,
+      row: copy.row,
       order: copy.order,
       pinned: copy.pinned,
     )
@@ -536,8 +538,10 @@ class CollectionCard < ApplicationRecord
     key = [
       # no real point in trying to cache a search result with no parent card, but this allows it to work
       id || "search-result-#{record.id}",
-      updated_at || Time.current,
-    ].join('-')
+      "#{(updated_at || Time.current).to_f}",
+      # ensure e.g. Placeholder -> Primary STI type busts the cache
+      type.gsub('CollectionCard::', ''),
+    ].join('--')
     "CollectionCardCache::#{key}"
   end
 
