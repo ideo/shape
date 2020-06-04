@@ -64,10 +64,24 @@ class ChallengeRelevantPhaseCollections < SimpleService
     end.min
   end
 
-  # This returns all phases that are the first descendants of this collection
+  # This returns all phases that are descendants of this collection,
+  # including all collections + linked collections
+
+  # If we want to instead use just collections that live directly in the subtree, it would be:
+  #
+  #  @collection.all_child_collections.where(collection_type: :phase).order(start_date: :asc)
+  #
   def phase_collections
-    @phase_collections ||= @collection.all_child_collections
-                                      .where(collection_type: :phase)
-                                      .order(start_date: :asc)
+    return @phase_collections unless @phase_collections.nil?
+
+    all_collection_ids = Collection.in_collection(@collection.id).pluck(:id) + [@collection.id]
+
+    @phase_collections = CollectionCard.where(parent_id: all_collection_ids)
+                                       .collection
+                                       .joins(:collection)
+                                       .includes(:collection)
+                                       .merge(Collection.collection_type_phase)
+                                       .map(&:collection)
+                                       .sort_by(&:start_date)
   end
 end
