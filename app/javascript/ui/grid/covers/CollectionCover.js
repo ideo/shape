@@ -373,7 +373,6 @@ class CollectionCover extends React.Component {
             // trigger a reload
             updatedAt={collection.updated_at}
             dragging={false}
-            handleClick={this.handleClick}
             onEmptyCarousel={this.setEmptyCarousel}
           />
         ) : (

@@ -141,7 +141,7 @@ const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
 
 // needs to be an observer to observe changes to the collection + items
-@inject('apiStore', 'routingStore', 'uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class FoamcoreGrid extends React.Component {
   gridRef = null
@@ -1164,7 +1164,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderMovableCard(card, key) {
-    const { canEditCollection, collection, routingStore } = this.props
+    const { canEditCollection, collection } = this.props
     const { pageMargins, zoomLevel, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
 
@@ -1201,7 +1201,6 @@ class FoamcoreGrid extends React.Component {
         onDragStart={this.onDragStart}
         onDragOrResizeStop={this.onDragOrResizeStop}
         onResize={this.onResize}
-        routeTo={routingStore.routeTo}
         parent={collection}
         // don't apply any zoom to the mdlPlaceholder
         zoomLevel={mdlInSnackbar ? 1 : relativeZoomLevel}
@@ -1566,7 +1565,6 @@ FoamcoreGrid.propTypes = {
 }
 FoamcoreGrid.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 FoamcoreGrid.defaultProps = {

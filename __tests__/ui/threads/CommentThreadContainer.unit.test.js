@@ -23,12 +23,7 @@ describe('CommentThreadContainer', () => {
   })
 
   describe('componentDidUpdate', () => {
-    it('should set loadingThreads true', () => {
-      wrapper.setProps({ loadingThreads: true })
-      expect(component.loadingThreads).toEqual(true)
-    })
-
-    it('should set loadingThreads false and expandedThread if expanded', () => {
+    it('should set expandedThread if expanded', () => {
       wrapper.setProps({
         loadingThreads: false,
         uiStore: {
@@ -38,7 +33,6 @@ describe('CommentThreadContainer', () => {
       })
       wrapper.update()
       component = wrapper.instance()
-      expect(component.loadingThreads).toEqual(false)
       expect(component.expandedThread).toEqual(apiStore.currentThreads[0])
     })
   })

@@ -46,6 +46,8 @@ class CollectionCardDuplicationWorker
         source_card.pinned = false unless preserve_pinned_value?
       end
 
+      next unless source_card
+
       source_card.duplicate!(
         for_user: @for_user,
         parent: @parent_collection,
@@ -62,8 +64,6 @@ class CollectionCardDuplicationWorker
   private
 
   def infinite_loop_detected?
-    return unless @parent_collection.cloned_from_id.present?
-
     errors = @parent_collection.detect_infinite_loop
     return unless errors.present?
 

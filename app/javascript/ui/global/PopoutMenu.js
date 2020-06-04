@@ -1,12 +1,13 @@
+import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
+import BctButton from '~/ui/global/BctButton'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
+import Checkbox from '~/ui/forms/Checkbox'
 import MenuIcon from '~/ui/icons/MenuIcon'
-import { Checkbox } from '~/ui/global/styled/forms'
-import { BctButton } from '~/ui/grid/shared'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`

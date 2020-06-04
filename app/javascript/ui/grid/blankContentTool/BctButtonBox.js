@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import { Box } from 'reflexbox'
 
+import BctButton from '~/ui/global/BctButton'
 import Tooltip from '~/ui/global/Tooltip'
-import { BctButton } from '~/ui/grid/shared'
 
 const BctButtonBox = ({ type, tooltip, size, creating, onClick, Icon }) => (
   <Box>

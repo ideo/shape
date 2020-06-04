@@ -19,10 +19,19 @@ Rails.application.configure do
   if Rails.root.join('tmp', 'caching-dev.txt').exist?
     config.action_controller.perform_caching = true
 
+    # see: https://github.com/petergoldstein/dalli/issues/746
+    # issue with using `fetch_multi` and `dalli_store` on localhost
     config.cache_store = :mem_cache_store
     config.public_file_server.headers = {
       'Cache-Control' => "public, max-age=#{2.days.seconds.to_i}",
     }
+
+    # allows you to test cloud memcache in dev if set in ENV
+    if ENV['MEMCACHEDCLOUD_SERVERS']
+      config.cache_store = :dalli_store,
+                           ENV['MEMCACHEDCLOUD_SERVERS'].split(','),
+                           { username: ENV['MEMCACHEDCLOUD_USERNAME'], password: ENV['MEMCACHEDCLOUD_PASSWORD'] }
+    end
   else
     config.action_controller.perform_caching = false
 

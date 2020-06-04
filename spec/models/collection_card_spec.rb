@@ -590,15 +590,18 @@ RSpec.describe CollectionCard, type: :model do
 
   describe 'copy_card_attributes!' do
     let(:instance_card) { create(:collection_card, order: 3, pinned: true, width: 2, height: 1) }
-    let(:master_card) { create(:collection_card, order: 1, pinned: false, width: 1, height: 2) }
+    let(:master_card) { create(:collection_card, order: 1, pinned: false, width: 1, height: 2, col: 2, row: 2) }
 
     it 'should copy card attributes' do
-      instance_card.copy_card_attributes!(master_card)
-      instance_card.touch
+      expect {
+        instance_card.copy_card_attributes!(master_card)
+      }.to change(instance_card, :updated_at)
       expect(instance_card.height).to eq(master_card.height)
       expect(instance_card.width).to eq(master_card.width)
       expect(instance_card.pinned).to eq(master_card.pinned)
       expect(instance_card.order).to eq(master_card.order)
+      expect(instance_card.row).to eq(master_card.row)
+      expect(instance_card.col).to eq(master_card.col)
     end
   end
 

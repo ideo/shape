@@ -24,6 +24,17 @@ RSpec.shared_context 'CardDuplicatorMapper setup' do
     )
   end
   let!(:linked_text_card) { create(:collection_card_link_text, parent: parent_collection, item: text_item) }
+  let!(:archivable_parent_collection) { create(:collection, parent_collection: root_collection) }
+  let(:archivable_text_item) { create(:text_item, parent_collection: parent_collection) }
+  let!(:archived_linked_text_card) do
+    card = create(
+      :collection_card_link_text,
+      parent: archivable_parent_collection,
+      item: archivable_text_item,
+    )
+    card.archive!
+    card
+  end
   let!(:cards) do
     [
       text_item.parent_collection_card,
@@ -32,6 +43,7 @@ RSpec.shared_context 'CardDuplicatorMapper setup' do
       collection_with_filter.parent_collection_card,
       collection_with_filter_target.parent_collection_card,
       linked_text_card,
+      archived_linked_text_card,
     ]
   end
   let(:card_ids) { cards.map(&:id) }

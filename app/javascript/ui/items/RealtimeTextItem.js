@@ -391,7 +391,6 @@ class RealtimeTextItem extends React.Component {
     const { item } = this.props
     const quillData = toJS(item.quill_data) || {}
     if (!quillData.ops) quillData.ops = []
-    // Set initial font size - if text item is blank,
     return quillData
   }
 

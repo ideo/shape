@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export function parseUrl(urlStr) {
   const url = document.createElement('a')
   url.href = urlStr
@@ -21,6 +23,22 @@ export function useTemplateInMyCollection(templateId) {
   const route = `/templates/${templateId}/use_in_my_collection`
   // can't use router in this case, have to full redirect
   window.location.href = route
+}
+
+export function linkOffsite(record, field = 'url', onLink = null) {
+  const url = record[field]
+  if (!url) return
+
+  if (onLink && _.isFunction(onLink)) {
+    onLink()
+  }
+  const anchor = Object.assign(document.createElement('a'), {
+    target: '_blank',
+    href: url,
+  })
+  document.body.append(anchor)
+  anchor.click()
+  anchor.remove()
 }
 
 export const loginRedirectPath = (redirect = null) => {

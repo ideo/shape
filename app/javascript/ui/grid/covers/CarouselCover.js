@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import CoverRenderer from '~/ui/grid/CoverRenderer'
@@ -36,20 +36,15 @@ const CarouselButton = styled(TextEnterButton)`
   }
 `
 
-@inject('routingStore')
 @observer
 class CarouselCover extends React.Component {
   @observable
-  currentIdx = 0
-  @observable
-  loading = false
-
-  constructor(props) {
-    super(props)
-    this.loading = true
-  }
+  loading = true
 
   componentDidMount() {
+    const { collection } = this.props
+    // reset this on mount
+    collection.setCarouselIdx(0)
     this.fetchCarouselCards()
   }
 
@@ -76,63 +71,55 @@ class CarouselCover extends React.Component {
     }
   }
 
-  get currentCarouselRecord() {
-    if (!this.records) return null
-    return this.records[this.currentIdx]
-  }
-
   get records() {
     const { collection } = this.props
     return collection.collection_cover_items || []
   }
 
   @action
-  handleNavigate = direction => {
-    if (direction === -1 && this.currentIdx === 0) {
-      this.currentIdx = this.records.length - 1
-      return
+  handleNavigate = (e, direction) => {
+    // prevent normal grid click
+    e.stopPropagation()
+    const { collection } = this.props
+    // capture non-observable int value
+    let idx = parseInt(collection.carouselIdx)
+    if (direction === -1 && idx === 0) {
+      idx = this.records.length - 1
+    } else if (direction === 1 && idx === this.records.length - 1) {
+      idx = 0
+    } else {
+      idx += direction
     }
-    if (direction === 1 && this.currentIdx === this.records.length - 1) {
-      this.currentIdx = 0
-      return
-    }
-    this.currentIdx += direction
-  }
-
-  handleClick = ev => {
-    ev.preventDefault()
-    ev.stopPropagation()
-    const { collection, routingStore } = this.props
-    routingStore.routeTo('collections', collection.id)
+    collection.setCarouselIdx(idx)
   }
 
   render() {
     const { collection } = this.props
+    const { currentCarouselRecord } = collection
 
     if (this.loading) return <InlineLoader />
 
     if (!this.records.length) return null
-    if (!this.currentCarouselRecord) return null
+    if (!currentCarouselRecord) return null
 
     return (
       <div style={{ color: 'black', height: '100%' }}>
         <CoverRenderer
           card={collection.parent_collection_card}
           cardType={'items'}
-          record={this.currentCarouselRecord}
+          record={currentCarouselRecord}
           dragging={this.props.dragging}
-          handleClick={this.handleClick}
           textItemHideReadMore
           textItemUneditable
         />
         <CarouselControl>
           <DisplayText color={v.colors.commonDark} data-cy="ItemCount">
-            {this.currentIdx + 1} / {this.records.length}
+            {collection.carouselIdx + 1} / {this.records.length}
           </DisplayText>
-          <CarouselButton onClick={() => this.handleNavigate(-1)}>
+          <CarouselButton onClick={e => this.handleNavigate(e, -1)}>
             <ArrowIcon rotation={180} />
           </CarouselButton>
-          <CarouselButton onClick={() => this.handleNavigate(1)}>
+          <CarouselButton onClick={e => this.handleNavigate(e, 1)}>
             <ArrowIcon rotation={0} />
           </CarouselButton>
         </CarouselControl>
@@ -146,9 +133,6 @@ CarouselCover.propTypes = {
   updatedAt: PropTypes.string.isRequired,
   dragging: PropTypes.bool,
   onEmptyCarousel: PropTypes.func,
-}
-CarouselCover.wrappedComponent.propTypes = {
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 CarouselCover.defaultProps = {

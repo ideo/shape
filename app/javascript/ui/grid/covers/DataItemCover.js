@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { action, observable } from 'mobx'
@@ -14,13 +15,18 @@ class DataItemCover extends React.Component {
   targetCollection = null
 
   componentDidMount() {
-    this.loadDatasets()
+    const { item } = this.props
+    if (!item.primaryDataset) {
+      this.loadDatasets()
+    }
   }
 
   componentDidUpdate(prevProps) {
-    const { item, datasetLength } = this.props
-    if (!item.primaryDataset || datasetLength > prevProps.datasetLength) {
+    const { item, datasetIds } = this.props
+    if (!item.primaryDataset) {
       this.loadDatasets()
+    } else if (!_.isEqual(datasetIds, prevProps.datasetIds)) {
+      this.loadDatasetTargetCollection()
     }
   }
 
@@ -29,6 +35,10 @@ class DataItemCover extends React.Component {
     if (!item.loadingDatasets) {
       await item.API_fetchDatasets()
     }
+  }
+
+  async loadDatasetTargetCollection() {
+    const { item } = this.props
     if (!item.primaryDataset) return
     const { data_source_id, data_source_type } = item.primaryDataset
     if (data_source_id && data_source_type === 'Collection') {
@@ -79,11 +89,7 @@ class DataItemCover extends React.Component {
 DataItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  datasetLength: PropTypes.number,
-}
-
-DataItemCover.defaultProps = {
-  datasetLength: 1,
+  datasetIds: PropTypes.array.isRequired,
 }
 
 DataItemCover.wrappedComponent.propTypes = {

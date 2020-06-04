@@ -1,19 +1,10 @@
 import React, { Fragment } from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import axios from 'axios'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { action, observable, runInAction } from 'mobx'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
-import { routingStore, uiStore } from '~/stores'
 import BreadcrumbCaretIcon from '~/ui/icons/BreadcrumbCaretIcon'
-import CollectionIconXs from '~/ui/icons/CollectionIconXs'
-import InlineLoader from '~/ui/layout/InlineLoader'
-import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
-import SubmissionBoxIconXs from '~/ui/icons/SubmissionBoxIconXs'
 import NestedArrowIcon from '~/ui/icons/NestedArrowIcon'
 import NestedLineIcon from '~/ui/icons/NestedLineIcon'
 import {
@@ -24,7 +15,6 @@ import {
 } from '~/ui/global/PopoutMenu'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-import WithDropTarget from '~/ui/global/WithDropTarget'
 
 const StyledBreadcrumbCaret = styled.div`
   display: inline-block;
@@ -37,10 +27,11 @@ const StyledBreadcrumbCaret = styled.div`
 
 const StyledBreadcrumbItem = styled.div`
   display: inline-block;
-  ${props =>
-    props.currentlyDraggedOn &&
+  text-decoration: underline;
+  ${({ backgroundColor }) =>
+    backgroundColor &&
     `
-    background: ${v.colors.primaryLight};
+    background: ${backgroundColor};
   `};
   a {
     color: ${props => (props.isLast ? v.colors.black : v.colors.commonDark)};
@@ -120,123 +111,114 @@ const NestedLineHolder = styled.div`
 `
 NestedLineHolder.displayName = 'NestedLineHolder'
 
-const IconHolder = styled.div`
-  color: ${v.colors.commonMedium};
-  display: inline-block;
-  margin-right: 6px;
-  transform: translate(0, -1px);
-
-  .icon.icon {
-    transform: none;
-    position: static;
-    vertical-align: bottom;
-  }
-`
-
 const NEST_AMOUNT_Y_PX = 45
 const MENU_WIDTH = 250
 const HOVER_TIMEOUT_MS = 300
 
-@observer
-// also export unwrapped component for unit test
 export class BreadcrumbItem extends React.Component {
-  @observable
-  breadcrumbDropDownRecords = []
-  @observable
-  baseDropDownRecords = []
-  @observable
-  dropdownOpen = false
-  @observable
-  menuItemOpenId = null
-  @observable
-  nestedMenuLoading = false
-  hoverTimer = null
+  state = {
+    baseDropDownRecords: [],
+    dropdownOpen: false,
+    menuItemOpenId: null,
+    nestedMenuLoading: false,
+    hoverTimer: null,
+  }
   nestedMenuTimer = null
   nestedMenuY = 0
   nestedMenuX = 0
 
-  fetchBreadcrumbRecords = async itemId => {
-    const breadcrumbRecordsReq = await axios.get(
-      `/api/v1/collections/${itemId}/collection_cards/breadcrumb_records`
-    )
-    runInAction(() => {
-      this.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
-      this.menuItemOpenId = itemId
-      this.nestedMenuLoading = false
-    })
-  }
-
-  @action
-  closeDropdown = () => {
-    this.hoverTimer = null
-    this.dropdownOpen = false
-    this.menuItemOpenId = null
-    this.nestedMenuX = 0
-    this.nestedMenuY = 0
-    this.baseDropDownRecords = []
-  }
-
-  @action
-  closeNestedMenu() {
-    this.breadcrumbDropDownRecords = []
-    this.menuItemOpenId = null
-    this.nestedMenuY = 0
-  }
-
-  @action
   setInitialBaseRecords() {
     const { item } = this.props
     let menuItems = [item]
     if (item.subItems) {
       menuItems = [...item.subItems]
     }
-    this.baseDropDownRecords = menuItems
+    this.setState({
+      baseDropDownRecords: menuItems,
+    })
   }
 
-  @action
+  closeDropdown = () => {
+    this.setState({
+      dropdownOpen: false,
+      menuItemOpenId: null,
+      baseDropDownRecords: [],
+      hoverTimer: null,
+    })
+    this.nestedMenuX = 0
+    this.nestedMenuY = 0
+  }
+
+  closeNestedMenu = () => {
+    this.setState({
+      menuItemOpenId: null,
+    })
+    this.nestedMenuY = 0
+  }
+
   openBreadcrumb() {
     this.setInitialBaseRecords()
-    this.dropdownOpen = true
-    clearTimeout(this.hoverTimer)
+    this.setState({
+      dropdownOpen: true,
+    })
+    clearTimeout(this.state.hoverTimer)
   }
 
-  @action
+  async breadcrumbDive(diveItem) {
+    const { item, onBreadcrumbDive } = this.props
+    const { menuItemOpenId } = this.state
+
+    if (!onBreadcrumbDive) return
+    await onBreadcrumbDive(diveItem, menuItemOpenId && item.id)
+    this.setState({
+      menuItemOpenId: diveItem.id,
+    })
+  }
+
   onBreadcrumbHoverOver = () => {
+    const { isTouchDevice, isSmallScreen } = this.props
     // The hover even fires on mobile after a click
-    if (uiStore.isTouchDevice && uiStore.isMobileXs) return
+    if (isTouchDevice && isSmallScreen) return
     this.openBreadcrumb()
   }
 
   onBreadcrumbHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 250)
+    this.setState({
+      hoverTimer: setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS - 250),
+    })
   }
 
   onBreadcrumbClick = ev => {
+    const { isTouchDevice, isSmallScreen } = this.props
     // The dropdown should only show up on touch devices large enough to handle it
-    if (uiStore.isTouchDevice && !uiStore.isMobileXs) {
+    if (isTouchDevice && !isSmallScreen) {
       ev.stopPropagation()
       this.openBreadcrumb()
     }
   }
 
-  @action
   onDropdownHoverOver = () => {
     // Keep the dropdown open in the same was as hovering over a breadcrumb
-    this.dropdownOpen = true
-    clearTimeout(this.hoverTimer)
+    this.setState({
+      dropdownOpen: true,
+    })
+    clearTimeout(this.state.hoverTimer)
   }
 
   onDropdownBreadcrumbClick = item => {
-    routingStore.routeTo('collections', item.id)
+    this.props.onBreadcrumbClick(item.id)
   }
 
   onDropdownHoverOut = async ev => {
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
+    this.setState({
+      hoverTimer: setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS),
+    })
   }
 
   setNestedBaseRecords(item) {
+    const { baseDropDownRecords } = this.state
     const existingIdx = _.findIndex(
-      this.baseDropDownRecords,
+      baseDropDownRecords,
       menuItem => menuItem.id === item.id
     )
     if (existingIdx > -1) {
@@ -244,13 +226,13 @@ export class BreadcrumbItem extends React.Component {
       return
     }
     const idx = _.findIndex(
-      this.baseDropDownRecords,
-      menuItem => menuItem.id === this.menuItemOpenId
+      baseDropDownRecords,
+      menuItem => menuItem.id === this.state.menuItemOpenId
     )
-    let cutRecords = [...this.baseDropDownRecords]
+    let cutRecords = [...baseDropDownRecords]
     let lastNestedLevel = -1
     if (idx > -1) {
-      cutRecords = this.baseDropDownRecords.splice(0, idx + 1)
+      cutRecords = baseDropDownRecords.splice(0, idx + 1)
       const lastItem = cutRecords[cutRecords.length - 1]
       lastNestedLevel = lastItem.nested
     }
@@ -258,37 +240,41 @@ export class BreadcrumbItem extends React.Component {
     cutRecords.push(item)
     item.nested = lastNestedLevel + 1
 
-    this.baseDropDownRecords = [...cutRecords]
-    this.nestedMenuY = (this.baseDropDownRecords.length - 1) * NEST_AMOUNT_Y_PX
+    this.setState({
+      baseDropDownRecords: [...cutRecords],
+    })
+    this.nestedMenuY = (baseDropDownRecords.length - 1) * NEST_AMOUNT_Y_PX
   }
 
-  @action
-  onDiveClick = (item, level, ev) => {
+  onDiveClick = async (item, level, ev) => {
+    const { menuItemOpenId } = this.state
     this.nestedMenuX = MENU_WIDTH
-    this.fetchBreadcrumbRecords(item.id)
-    if (
-      !item.nested &&
-      this.menuItemOpenId &&
-      this.menuItemOpenId !== item.id
-    ) {
-      this.nestedMenuLoading = true
+    this.setState({
+      nestedMenuLoading: true,
+    })
+    await this.breadcrumbDive(item)
+    if (!item.nested && menuItemOpenId && menuItemOpenId !== item.id) {
       this.setNestedBaseRecords(item)
       // If the menu is moving back to the left position, we have to cancel
       // out the hover out timer on the menu so it doesn't close while it's
       // moving over there (because your mouse technically hovers off of it)
       setTimeout(() => {
         clearTimeout(this.nestedMenuTimer)
-        clearTimeout(this.hoverTimer)
+        clearTimeout(this.state.hoverTimer)
       }, HOVER_TIMEOUT_MS - 50)
     } else {
       this.nestedMenuY = (item.nested || 0) * NEST_AMOUNT_Y_PX
     }
+    this.setState({
+      nestedMenuLoading: false,
+    })
   }
 
-  @action
   onNestedMenuHoverOver = () => {
-    this.dropdownOpen = true
-    clearTimeout(this.hoverTimer)
+    this.setState({
+      dropdownOpen: true,
+    })
+    clearTimeout(this.state.hoverTimer)
     clearTimeout(this.nestedMenuTimer)
   }
 
@@ -297,23 +283,9 @@ export class BreadcrumbItem extends React.Component {
       this.closeNestedMenu,
       HOVER_TIMEOUT_MS + 50
     )
-    this.hoverTimer = setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS)
-  }
-
-  renderIcon(menuItem) {
-    let icon
-    switch (menuItem.collection_type) {
-      case 'Collection':
-        icon = <CollectionIconXs />
-        break
-      case 'Collection::Board':
-        icon = <FoamcoreBoardIconXs />
-        break
-      case 'Collection::SubmissionBox':
-        icon = <SubmissionBoxIconXs />
-        break
-    }
-    return <IconHolder>{icon}</IconHolder>
+    this.setState({
+      hoverTimer: setTimeout(this.closeDropdown, HOVER_TIMEOUT_MS),
+    })
   }
 
   renderNesting(menuItem) {
@@ -346,8 +318,16 @@ export class BreadcrumbItem extends React.Component {
     )
   }
 
+  renderIcon() {
+    const { item } = this.props
+    if (!item.icon) return null
+    return item.icon
+  }
+
   renderDropdown() {
-    if (!this.dropdownOpen) return null
+    const { baseDropDownRecords, dropdownOpen, menuItemOpenId } = this.state
+    const { item } = this.props
+    if (!dropdownOpen) return null
     const itemWidth = '90%'
 
     return (
@@ -357,8 +337,8 @@ export class BreadcrumbItem extends React.Component {
           onMouseOver={this.onDropdownHoverOver}
           onMouseOut={this.onDropdownHoverOut}
         >
-          {(!this.menuItemOpenId || this.nestedMenuX !== 0) &&
-            this.baseDropDownRecords.map(menuItem => (
+          {(!menuItemOpenId || this.nestedMenuX !== 0) &&
+            baseDropDownRecords.map(menuItem => (
               <StyledMenuItem
                 key={menuItem.id}
                 style={{ paddingLeft: '10px', width: itemWidth }}
@@ -368,7 +348,7 @@ export class BreadcrumbItem extends React.Component {
                   style={{ maxWidth: '200px', width: '86%' }}
                 >
                   {this.renderNesting(menuItem)}
-                  {this.renderIcon(menuItem)}
+                  {this.renderIcon()}
                   {this.renderMenuNameWithTooltip(menuItem)}
                 </StyledMenuButton>
                 {menuItem.has_children && (
@@ -379,7 +359,7 @@ export class BreadcrumbItem extends React.Component {
               </StyledMenuItem>
             ))}
         </StyledMenu>
-        {this.menuItemOpenId && (
+        {menuItemOpenId && (
           <StyledMenuWrapper
             offsetPosition={{ x: this.nestedMenuX, y: this.nestedMenuY }}
           >
@@ -388,14 +368,13 @@ export class BreadcrumbItem extends React.Component {
               onMouseOver={this.onNestedMenuHoverOver}
               onMouseOut={this.onNestedMenuHoverOut}
             >
-              {this.nestedMenuLoading && <InlineLoader />}
-              {this.breadcrumbDropDownRecords.map(menuItem => (
+              {item.breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
                     onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
                     style={{ maxWidth: '200px', width: '86%' }}
                   >
-                    {this.renderIcon(menuItem)}
+                    {this.renderIcon()}
                     {this.renderMenuNameWithTooltip(menuItem)}
                   </StyledMenuButton>
                   {menuItem.has_children && (
@@ -415,32 +394,25 @@ export class BreadcrumbItem extends React.Component {
   }
 
   render() {
-    const { item, index, numItems, restoreBreadcrumb } = this.props
+    const {
+      backgroundColor,
+      item,
+      index,
+      numItems,
+      restoreBreadcrumb,
+    } = this.props
     const isLast = index === numItems - 1
-    let path
-    if (item.identifier === 'homepage') {
-      path = routingStore.pathTo('homepage')
-    } else {
-      path = routingStore.pathTo(item.type, item.id)
-      if (item.subItems) {
-        const linkItem = _.find(item.subItems, { isEllipsesLink: true })
-        if (linkItem) path = routingStore.pathTo(linkItem.type, linkItem.id)
-      }
-    }
-    const { currentlyDraggedOn } = this.props
-    const showDrag =
-      currentlyDraggedOn &&
-      currentlyDraggedOn.item.identifier === item.identifier
+
     return (
-      <Fragment key={path}>
+      <Fragment key={index}>
         <StyledBreadcrumbItem
           data-cy="Breadcrumb"
           ref={this.props.forwardedRef}
-          currentlyDraggedOn={!!showDrag}
           isLast={isLast}
           onMouseOver={this.onBreadcrumbHoverOver}
           onMouseOut={this.onBreadcrumbHoverOut}
           onClick={this.onBreadcrumbClick}
+          backgroundColor={backgroundColor}
         >
           {item.link && (
             <Tooltip
@@ -453,9 +425,9 @@ export class BreadcrumbItem extends React.Component {
             </Tooltip>
           )}
           {item.ellipses || item.truncatedName ? (
-            <Link to={path}>{item.truncatedName}…</Link>
+            <a href={item.path}>{item.truncatedName}…</a>
           ) : (
-            <Link to={path}>{item.name}</Link>
+            <a href={item.path}>{item.name}</a>
           )}
         </StyledBreadcrumbItem>
         {this.renderDropdown()}
@@ -465,19 +437,41 @@ export class BreadcrumbItem extends React.Component {
   }
 }
 
+export const breadcrumbItemPropType = {
+  name: PropTypes.string.isRequired,
+  truncatedName: PropTypes.string,
+  id: PropTypes.string,
+  identifier: PropTypes.string,
+  type: PropTypes.string,
+  can_edit_content: PropTypes.bool,
+  ellipses: PropTypes.bool,
+  has_children: PropTypes.bool,
+  breadcrumbDropDownRecords: PropTypes.array,
+  subMenuOpen: PropTypes.bool,
+  icon: PropTypes.element,
+}
+
 BreadcrumbItem.propTypes = {
-  item: MobxPropTypes.objectOrObservableObject.isRequired,
+  item: PropTypes.shape(breadcrumbItemPropType).isRequired,
   index: PropTypes.number.isRequired,
   numItems: PropTypes.number.isRequired,
-  forwardedRef: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
-  currentlyDraggedOn: MobxPropTypes.objectOrObservableObject,
   restoreBreadcrumb: PropTypes.func.isRequired,
+  onBreadcrumbDive: PropTypes.func,
+  onBreadcrumbClick: PropTypes.func,
+  forwardedRef: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
+  isTouchDevice: PropTypes.bool,
+  isSmallScreen: PropTypes.bool,
+  backgroundColor: PropTypes.string,
 }
 
 BreadcrumbItem.defaultProps = {
+  onBreadcrumbClick: () => {},
+  onBreadcrumbDive: null,
   forwardedRef: React.createRef(),
-  currentlyDraggedOn: null,
+  isTouchDevice: false,
+  isSmallScreen: false,
+  backgroundColor: null,
 }
 BreadcrumbItem.displayName = 'BreadcrumbItem'
 
-export default WithDropTarget(BreadcrumbItem)
+export default BreadcrumbItem
