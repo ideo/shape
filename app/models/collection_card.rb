@@ -369,7 +369,7 @@ class CollectionCard < ApplicationRecord
   # gets called by API collection_cards_controller
   def self.archive_all!(ids:, user_id:)
     cards = CollectionCard.where(id: ids)
-    cards.update_all(archived: true)
+    cards.update_all(archived: true, updated_at: Time.current)
     # should generally only be the one parent collection, but an array to be safe
     parents = cards.map(&:parent).uniq.compact
     parents.each do |parent|

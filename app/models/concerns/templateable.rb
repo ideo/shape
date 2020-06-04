@@ -119,7 +119,10 @@ module Templateable
     all_child_collections.update_all(master_template: true, template_id: nil)
     CollectionCard
       .where(parent_id: [id] + all_child_collections.pluck(:id))
-      .update_all(pinned: true)
+      .update_all(
+        pinned: true,
+        updated_at: Time.current,
+      )
     update(master_template: true, template_id: nil)
   end
 end
