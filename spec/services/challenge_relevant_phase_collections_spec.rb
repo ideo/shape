@@ -70,6 +70,22 @@ RSpec.describe ChallengeRelevantPhaseCollections, type: :service do
           expect(subject).to match_array(phase_collections - [hidden_phase])
         end
       end
+
+      context 'with phase collection that is linked in' do
+        let!(:linked_phase_collection) do
+          create(
+            :collection,
+            :phase,
+            add_viewers: [user],
+            card_relation: :link,
+            parent_collection: challenge,
+          )
+        end
+
+        it 'returns all phase collections' do
+          expect(subject).to match_array(phase_collections + [linked_phase_collection])
+        end
+      end
     end
 
     context 'two sibling sub-collections with phases' do
