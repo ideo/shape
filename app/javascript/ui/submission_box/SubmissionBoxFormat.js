@@ -94,8 +94,8 @@ const SubmissionBoxFormat = ({ collection, closeModal }) => {
             rightSideComponent={
               <EditActions
                 onEdit={() => {
-                  closeModal() &&
-                    routingStore.routeTo('collections', template.id)
+                  closeModal()
+                  routingStore.routeTo('collections', template.id)
                 }}
                 onSwitch={() => setShowEditFormat(true)}
               />
