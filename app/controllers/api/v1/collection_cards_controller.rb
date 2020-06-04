@@ -249,6 +249,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       cards: collection_cards,
       collection: collection,
       user: current_user,
+    ).merge(
+      links: jsonapi_pagination(collection_cards),
     )
     render json: json_data
   end

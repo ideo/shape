@@ -20,7 +20,10 @@ class RowInserter < SimpleService
 
   def move_all_cards_in_direction
     movement = @action.to_sym == :insert_row ? 1 : -1
-    select_all_cards_below.update_all("row = row + #{movement}")
+    select_all_cards_below.update_all([
+      "row = row + #{movement}, updated_at = ?",
+      Time.current,
+    ])
   end
 
   def select_all_cards_below
