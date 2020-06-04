@@ -12,7 +12,7 @@ import {
 } from '~/ui/submission_box/SubmissionBoxRow'
 import { submissionItemTypes } from '~/ui/submission_box/SubmissionBoxSettings'
 
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore')
 @observer
 class EditSubmissionBoxFormat extends React.Component {
   @observable
@@ -36,26 +36,21 @@ class EditSubmissionBoxFormat extends React.Component {
 
   confirmSubmissionTemplateChange = ({ type, template } = {}, callback) => {
     const { uiStore, collection } = this.props
-    if (collection.countSubmissions) {
-      uiStore.confirm({
-        iconName: 'Alert',
-        prompt: `Are you sure?
-                There are already ${collection.countSubmissions} submissions.
-                New submissions will be
-                ${
-                  template
-                    ? pluralize(template.name)
-                    : pluralize(`${type} item`)
-                }.`,
-        confirmText: 'Continue',
-        cancelText: 'Cancel',
-        onConfirm: () => callback(),
-        onCancel: () => uiStore.closeDialog(),
-      })
-      return
-    }
-    // otherwise just go straight to the callback if no submissions
-    callback()
+    if (!collection.countSubmissions) callback()
+
+    uiStore.confirm({
+      iconName: 'Alert',
+      prompt: `Are you sure?
+              There are already ${collection.countSubmissions} submissions.
+              New submissions will be
+              ${
+                template ? pluralize(template.name) : pluralize(`${type} item`)
+              }.`,
+      confirmText: 'Continue',
+      cancelText: 'Cancel',
+      onConfirm: () => callback(),
+      onCancel: () => uiStore.closeDialog(),
+    })
   }
 
   onSearch = templates => {
@@ -165,7 +160,6 @@ EditSubmissionBoxFormat.propTypes = {
 EditSubmissionBoxFormat.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default EditSubmissionBoxFormat

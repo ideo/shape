@@ -22,8 +22,7 @@ const closeSubmissionBoxSettings = collection => {
   // "confirm" means do nothing so that you can continue with setup.
   uiStore.confirm({
     iconName: 'Alert',
-    prompt: `Closing the submission settings without choosing a submission format
-             will delete this submission box.`,
+    prompt: `Closing the submission settings without choosing a submission format will delete this submission box.`,
     confirmText: 'Choose',
     cancelText: 'Delete',
     onCancel: async () => {

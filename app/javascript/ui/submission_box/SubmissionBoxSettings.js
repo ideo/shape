@@ -146,5 +146,6 @@ SubmissionBoxSettings.propTypes = {
 SubmissionBoxSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+SubmissionBoxSettings.displayName = 'SubmissionBoxSettings'
 
 export default SubmissionBoxSettings
