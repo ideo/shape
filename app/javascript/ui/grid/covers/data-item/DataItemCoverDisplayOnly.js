@@ -122,7 +122,7 @@ class DataItemCoverDisplayOnly extends React.Component {
             )}
           </StyledTitleAndDescription>
         </AboveChartContainer>
-        {!primaryDataset ? (
+        {!primaryDataset || item.loadingDatasets ? (
           <InlineLoader />
         ) : (
           <ChartGroup

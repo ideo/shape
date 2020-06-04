@@ -37,6 +37,14 @@ RSpec.describe RowInserter, type: :service do
     expect(cards[5].row).to eq 4
   end
 
+  it 'updates the timestamps' do
+    card = cards[3]
+    expect {
+      inserter.call
+      card.reload
+    }.to change(card, :updated_at)
+  end
+
   context 'when removing a row' do
     let(:row) { 2 }
     let(:action) { :remove_row }

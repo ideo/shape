@@ -23,6 +23,24 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       )
     end
 
+    describe 'with invalid cards' do
+      let(:default_moving_cards) { from_collection.collection_cards.first(3) }
+      let(:invalid_card) do
+        create(
+          :collection_card,
+          collection: create(:global_collection),
+        )
+      end
+      before do
+        from_collection.collection_cards << invalid_card
+        from_collection.save
+      end
+
+      it 'filters out invalid cards (global collections or missing a parent collection card' do
+        expect(service.call.length).to eq 2
+      end
+    end
+
     it 'creates Placeholder cards that point to the originals' do
       expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
       new_cards = service.call

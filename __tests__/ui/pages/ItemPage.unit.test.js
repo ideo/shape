@@ -38,6 +38,12 @@ describe('ItemPage', () => {
     expect(wrapper.find('ItemPageContainer').exists()).toEqual(true)
   })
 
+  it('calls apiStore.setupCommentThreadAndMenusForPage', () => {
+    expect(apiStore.setupCommentThreadAndMenusForPage).toHaveBeenCalledWith(
+      item
+    )
+  })
+
   describe('cancel', () => {
     beforeEach(() => {
       item.API_updateWithoutSync = jest.fn()
@@ -57,24 +63,6 @@ describe('ItemPage', () => {
     it('does not save unless item.can_edit_content', () => {
       component.cancel({ item })
       expect(item.API_updateWithoutSync).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('with params ?open=comments', () => {
-    beforeEach(() => {
-      wrapper = shallow(
-        <ItemPage.wrappedComponent
-          {...props}
-          routingStore={{
-            ...routingStore,
-            query: '?open=comments',
-          }}
-        />
-      )
-    })
-
-    it('should call uiStore to open the comments', () => {
-      expect(uiStore.openOptionalMenus).toHaveBeenCalledWith('?open=comments')
     })
   })
 

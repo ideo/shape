@@ -106,7 +106,8 @@ module Archivable
           archived: false,
           archived_at: nil,
           archive_batch: nil,
-          unarchived_at: Time.now,
+          unarchived_at: Time.current,
+          updated_at: Time.current,
         )
     end
   end

@@ -7,9 +7,9 @@ import InfiniteScroll from 'react-infinite-scroller'
 import FlipMove from 'react-flip-move'
 import VisibilitySensor from 'react-visibility-sensor'
 
-import { uiStore } from '~/stores'
+import { uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
-import Breadcrumb from '~/ui/layout/Breadcrumb'
+import PageBreadcrumb from '~/ui/layout/PageBreadcrumb'
 import Loader from '~/ui/layout/Loader'
 import GridCard from '~/ui/grid/GridCard'
 import { StyledCardWrapper } from '~/ui/grid/shared'
@@ -102,22 +102,12 @@ class SearchResultsInfinite extends React.Component {
       total,
     } = this.props
 
-    const results = searchResults.map((result, i) => {
-      // ActionMenu is rendered as if we were operating on the parent_collection_card
-      let card = result.parent_collection_card
-      if (!card) {
-        // catch for special/global templates that don't have a parent card
-        card = {
-          id: `card-${i}`,
-          width: 1,
-          height: 1,
-        }
-      }
-      // need to make this available in the reverse direction
-      card.record = result
+    const results = searchResults.map((card, i) => {
+      // search results are cards, so we pull the record off the card
+      const { record } = card
 
       return (
-        <FlipMove appearAnimation="fade" key={result.id}>
+        <FlipMove appearAnimation="fade" key={record.id}>
           <VisibilitySensor
             partialVisibility
             scrollCheck
@@ -129,11 +119,16 @@ class SearchResultsInfinite extends React.Component {
           >
             <StyledCardWrapper>
               <StyledBreadcrumb>
-                <Breadcrumb
-                  record={result}
+                <PageBreadcrumb
+                  maxDepth={uiStore.isLargeBreakpoint ? 6 : 1}
+                  record={record}
                   isHomepage={false}
+                  useLinkedBreadcrumb={false}
                   // re-mount every time the record / breadcrumb changes
-                  key={`${result.identifier}_${result.breadcrumbSize}`}
+                  key={`${record.identifier}_${record.breadcrumbSize}`}
+                  // force props update if windowWidth changes
+                  windowWidth={uiStore.windowWidth}
+                  containerWidth={this.maxBreadcrumbContainerWidth}
                 />
               </StyledBreadcrumb>
               <StyledSearchResult
@@ -148,13 +143,11 @@ class SearchResultsInfinite extends React.Component {
               >
                 <GridCard
                   card={card}
-                  cardType={result.internalType}
-                  record={result}
+                  cardType={record.internalType}
+                  record={record}
                   menuOpen={uiStore.cardMenuOpen.id === card.id}
-                  // NOTE: this will have to get modified when we eventually
-                  // turn off item routing for videos and images
                   handleClick={() =>
-                    this.props.routeTo(result.internalType, result.id)
+                    routingStore.routeTo(record.internalType, record.id)
                   }
                   searchResult
                 />
@@ -191,7 +184,6 @@ SearchResultsInfinite.propTypes = {
   searchResults: MobxPropTypes.arrayOrObservableArray.isRequired,
   gridSettings: MobxPropTypes.objectOrObservableObject.isRequired,
   gridMaxW: PropTypes.number.isRequired,
-  routeTo: PropTypes.func.isRequired,
   loadMore: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
   total: PropTypes.number.isRequired,

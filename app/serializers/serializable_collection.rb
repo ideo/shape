@@ -1,5 +1,7 @@
 class SerializableCollection < BaseJsonSerializer
   include SerializedExternalId
+  include UserSpecificFields
+
   type 'collections'
   attributes(
     :name,
@@ -36,31 +38,25 @@ class SerializableCollection < BaseJsonSerializer
     :default_group_id,
   )
 
-  has_many :roles do
-    data do
-      @object.anchored_roles(viewing_organization_id: @current_user&.current_organization_id)
-    end
-  end
-
-  has_many :collection_cover_items do
-    data do
-      @object.serial_collection_cover_items
-    end
-  end
-
-  has_many :collection_cover_text_items
-  has_one :parent_collection_card
-  has_one :parent
-  has_one :live_test_collection
   belongs_to :submissions_collection
   belongs_to :submission_template
   belongs_to :collection_to_test
   belongs_to :organization
   belongs_to :created_by
   belongs_to :template
-  has_many :test_audiences
+  has_one :parent_collection_card
+  has_one :parent
+  has_one :live_test_collection
   has_one :test_results_collection
+  has_many :collection_cover_text_items
+  has_many :test_audiences
   has_many :collection_filters
+
+  has_many :collection_cover_items do
+    data do
+      @object.serial_collection_cover_items
+    end
+  end
 
   attribute :system_required do
     @object.system_required?
@@ -82,38 +78,12 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_test_scores || {}
   end
 
-  attribute :breadcrumb, if: -> { @current_record.nil? || @object == @current_record } do
-    Breadcrumb::ForUser.new(
-      @object,
-      @current_user,
-    ).viewable_to_api
-  end
-
   attribute :processing_status do
     @object.processing_status.try(:titleize)
   end
 
   attribute :collection_card_count do
     @object.cached_card_count || 0
-  end
-
-  attribute :card_order, if: -> { @object == @current_record } do
-    @card_order || 'order'
-  end
-
-  attribute :can_view do
-    @search_collection ? true : @current_ability.can?(:read, @object)
-  end
-
-  attribute :can_edit do
-    @search_collection ? false : @current_ability.can?(:edit, @object)
-  end
-
-  attribute :can_edit_content do
-    # NOTE: this also ends up coming into play when you are an editor
-    # but the collection is "pinned_and_locked"
-    # -- also, if the collection is archived you can't edit content e.g. add/move cards
-    @object.active? && @current_ability.can?(:edit_content, @object)
   end
 
   attribute :submissions_collection_id, if: -> { @object.is_a? Collection::SubmissionBox } do
@@ -220,15 +190,6 @@ class SerializableCollection < BaseJsonSerializer
     @object.is_a?(Collection::Board) ? @object.max_col_index : nil
   end
 
-  attribute :frontend_url do
-    @frontend_url_for.call(@object)
-  end
-
-  attribute :common_viewable do
-    # only `true` if you're viewing the common resource outside of its home org
-    @object.common_viewable? && @object.organization_id != @current_user.current_organization_id
-  end
-
   attribute :is_test_locked do
     @object.try(:purchased?)
   end
@@ -243,10 +204,6 @@ class SerializableCollection < BaseJsonSerializer
 
   has_one :restorable_parent do
     @object.try(:restorable_parent)
-  end
-
-  attribute :cache_key, if: -> { @object == @current_record } do
-    Digest::MD5.hexdigest(@object.cache_key(@card_order || 'order', @current_user.try(:id)))
   end
 
   attribute :serializer do
