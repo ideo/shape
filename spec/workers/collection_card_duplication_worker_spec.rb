@@ -279,8 +279,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
     end
 
     context 'with potential infinite loop' do
-      # needs cloned_from_id as a pre-condition, to know we're in a nested copy
-      let!(:to_collection) { create(:collection, cloned_from_id: 99) }
+      let!(:to_collection) { create(:collection) }
 
       context 'with breadcrumb.count > 50' do
         before do

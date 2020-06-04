@@ -181,11 +181,12 @@ class Breadcrumb extends React.Component {
   }
 
   renderBackButton() {
-    const { showBackButton } = this.props
+    const { showBackButton, onBack } = this.props
     const item = this.previousItem
     if (!showBackButton || !item) return null
+
     return (
-      <button onClick={this.props.onBack} data-cy="BreadcrumbBackButton">
+      <button onClick={() => onBack(item)} data-cy="BreadcrumbBackButton">
         <Tooltip title={item.name}>
           <BackIconContainer>
             <ArrowIcon />

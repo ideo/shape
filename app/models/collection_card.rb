@@ -369,7 +369,7 @@ class CollectionCard < ApplicationRecord
   # gets called by API collection_cards_controller
   def self.archive_all!(ids:, user_id:)
     cards = CollectionCard.where(id: ids)
-    cards.update_all(archived: true)
+    cards.update_all(archived: true, updated_at: Time.current)
     # should generally only be the one parent collection, but an array to be safe
     parents = cards.map(&:parent).uniq.compact
     parents.each do |parent|
@@ -508,9 +508,11 @@ class CollectionCard < ApplicationRecord
   end
 
   def copy_card_attributes!(copy)
-    update_columns(
+    update(
       height: copy.height,
       width: copy.width,
+      col: copy.col,
+      row: copy.row,
       order: copy.order,
       pinned: copy.pinned,
     )
@@ -520,8 +522,8 @@ class CollectionCard < ApplicationRecord
     key = [
       # no real point in trying to cache a search result with no parent card, but this allows it to work
       id || "search-result-#{record.id}",
-      updated_at || Time.current,
-    ].join('-')
+      (updated_at || Time.current).to_f,
+    ].join('--')
     "CollectionCardCache::#{key}"
   end
 

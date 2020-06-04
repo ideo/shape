@@ -691,7 +691,11 @@ class Collection < ApplicationRecord
   def increment_card_orders_at(order, amount: 1)
     collection_cards
       .where(CollectionCard.arel_table[:order].gteq(order))
-      .update_all(['"order" = "order" + ?', amount])
+      .update_all([
+        '"order" = "order" + ?, updated_at = ?',
+        amount,
+        Time.current,
+      ])
   end
 
   def unarchive_cards!(cards, card_attrs_snapshot)
@@ -897,13 +901,12 @@ class Collection < ApplicationRecord
     all_collections = Collection.in_collection(self)
     all_items = Item.in_collection(self)
     [all_collections, all_items].each do |records|
-      records.update_all(roles_anchor_collection_id: roles_anchor.id)
+      records.update_all(
+        roles_anchor_collection_id: roles_anchor.id,
+        updated_at: Time.current,
+      )
       records.find_each do |record|
-        if record.roles.present?
-          record.roles.destroy_all
-        else
-          record.touch
-        end
+        record.roles.destroy_all if record.roles.present?
       end
     end
   end

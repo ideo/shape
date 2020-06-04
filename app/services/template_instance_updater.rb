@@ -2,7 +2,7 @@ class TemplateInstanceUpdater
   def initialize(master_template:, updated_card_ids:, template_update_action:)
     @master_template = master_template
     @updated_card_ids = updated_card_ids
-    @template_update_action = template_update_action
+    @template_update_action = template_update_action.to_sym
   end
 
   def call
@@ -16,19 +16,19 @@ class TemplateInstanceUpdater
 
     case @template_update_action
     when :update_all
-      templated_collections.map { |i| update_all_templated_cards_for_instance(i) }
+      templated_collections.find_each { |i| update_all_templated_cards_for_instance(i) }
     when :update_card_attributes
-      templated_collections.map { |i| update_all_card_attributes_for_instance(i) }
+      templated_collections.find_each { |i| update_all_card_attributes_for_instance(i) }
     when :archive
-      templated_collections.map { |i| move_cards_archived_from_master_template(i) }
+      templated_collections.find_each { |i| move_cards_archived_from_master_template(i) }
     when :create, :duplicate, :pin, :unarchive
-      templated_collections.map { |i| insert_or_update_instance_cards(i) }
+      templated_collections.find_each { |i| insert_or_update_instance_cards(i) }
     when :update_text_content, :update_question_content
       # a single card is being passed through for these actions
       updated_card_id = @updated_card_ids.first
       return unless updated_card_id.present?
 
-      templated_collections.map { |i| update_templated_card_for_instance(updated_card_id, i) }
+      templated_collections.find_each { |i| update_templated_card_for_instance(updated_card_id, i) }
     else
       return
     end
