@@ -152,9 +152,8 @@ describe JsonapiCache::CollectionCardRenderer, type: :concern do
         it 'will update the cached value when a card goes from Placeholder to Primary' do
           json = subject.render_cached_card(card)
           expect(json[:data][:attributes][:class_type]).to eq 'CollectionCard::Placeholder'
-          # update without busting cache
           expect {
-            card.update_columns(type: 'CollectionCard::Primary')
+            card.update(type: 'CollectionCard::Primary')
           }.to change(card, :cache_key)
           json = subject.render_cached_card(card)
           expect(json[:data][:attributes][:class_type]).to eq 'CollectionCard::Primary'
