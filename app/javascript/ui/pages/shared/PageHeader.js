@@ -352,6 +352,8 @@ class PageHeader extends React.Component {
 
   get renderTemplateButton() {
     const { record, template } = this.props
+    // TODO fix logic for having multiple buttons on challenge header
+    if (record.isChallengeOrInsideChallenge) return null
     if (record.isUsableTemplate && record.isMasterTemplate) {
       return (
         <Button
