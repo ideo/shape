@@ -42,7 +42,7 @@ class Api::V1::BaseController < ApplicationController
 
   def jsonapi_pagination(collection)
     # check for pagination being enabled
-    return unless (current_page = collection.try(:current_page))
+    return {} unless (current_page = collection.try(:current_page))
 
     total = collection.total_pages
     last_page = total.zero? || collection.last_page?
