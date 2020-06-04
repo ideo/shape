@@ -64,8 +64,6 @@ class CollectionCardDuplicationWorker
   private
 
   def infinite_loop_detected?
-    return unless @parent_collection.cloned_from_id.present?
-
     errors = @parent_collection.detect_infinite_loop
     return unless errors.present?
 

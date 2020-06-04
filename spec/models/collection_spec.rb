@@ -867,6 +867,14 @@ describe Collection, type: :model do
       collection.reload
       expect(collection.collection_cards.map(&:order)).to eq [1, 6, 7]
     end
+
+    it 'should modify timestamps' do
+      card = collection.collection_cards.first
+      expect {
+        collection.increment_card_orders_at(0)
+        card.reload
+      }.to change(card, :updated_at)
+    end
   end
 
   describe '#card_order_at' do

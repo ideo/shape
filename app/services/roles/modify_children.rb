@@ -76,7 +76,10 @@ module Roles
 
       children
         .where(roles_anchor_collection_id: @previous_anchor_id)
-        .update_all(roles_anchor_collection_id: @parent.id)
+        .update_all(
+          roles_anchor_collection_id: @parent.id,
+          updated_at: Time.current,
+        )
     end
   end
 end
