@@ -375,6 +375,7 @@ class Collection < ApplicationRecord
       :collection_filters,
       :collection_cover_text_items,
       roles: %i[pending_users users groups resource],
+      challenge_reviewer_group: [roles: :users],
     ]
   end
 

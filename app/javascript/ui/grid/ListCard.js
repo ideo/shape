@@ -6,6 +6,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
+import { Checkbox } from '~/ui/global/styled/forms'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
@@ -49,29 +50,14 @@ const IconHolder = styled.div`
   width: 16px;
 `
 
-const SelectionButton = styled.button`
-  display: block;
-  width: 100%;
-
-  &:hover {
-    background-color: ${v.colors.commonLight};
-  }
-`
-
 @observer
 class ListCard extends React.Component {
   @observable
   reviewersAddOpen = false
-  @observable
-  currentReviewers = []
 
   constructor(props) {
     super(props)
     this.rolesWrapperRef = React.createRef()
-    if (props.card.record.challenge_reviewer_group) {
-      this.currentReviewerRoles =
-        props.card.record.challenge_reviewer_group.roles
-    }
   }
 
   @computed
@@ -108,12 +94,12 @@ class ListCard extends React.Component {
     }
   }
 
-  handlePotentialReviewerClick = async reviewer => {
+  handlePotentialReviewer = async reviewer => {
     const {
       card: { record },
     } = this.props
     runInAction(() => (this.reviewersAddOpen = false))
-    console.log('click', record.challenge_reviewer_group)
+    const action = this.isReviewerSelected(reviewer) ? 'DELETE' : 'POST'
     if (record.challenge_reviewer_group) {
       const data = {
         role: { name: 'member' },
@@ -124,15 +110,21 @@ class ListCard extends React.Component {
       }
       await apiStore.request(
         `groups/${record.challenge_reviewer_group.id}/roles`,
-        'POST',
+        action,
         data
       )
-      this.props.onRolesUpdate()
+      apiStore.fetch('collections', record.id, true)
     }
   }
 
   handleReviewersClose = () => {
     runInAction(() => (this.reviewersAddOpen = false))
+  }
+
+  isReviewerSelected(reviewer) {
+    if (!this.roles.length) return false
+    const selectedUsers = this.roles[1].users
+    return selectedUsers.find(selectedUser => selectedUser.id === reviewer.id)
   }
 
   get renderIcons() {
@@ -167,12 +159,13 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
+  @computed
   get roles() {
     const {
       card: { record },
     } = this.props
     if (record.challenge_reviewer_group) {
-      return this.currentReviewerRoles
+      return record.challenge_reviewer_group.roles
     }
     return record.roles
   }
@@ -214,6 +207,9 @@ class ListCard extends React.Component {
               handleClick={this.handleRolesClick}
               roles={[...this.roles]}
               canEdit={card.record.can_edit}
+              usersAndGroupsLength={
+                this.roles.length && this.roles[1].users.length
+              }
               // convert observable to normal array to trigger render changes
               collaborators={[...card.record.collaborators]}
               rolesMenuOpen={!!uiStore.rolesMenuOpen}
@@ -229,13 +225,17 @@ class ListCard extends React.Component {
               noButtons
             >
               {this.possibleReviewers.map(possibleReviewer => (
-                <SelectionButton
-                  onClick={() =>
-                    this.handlePotentialReviewerClick(possibleReviewer)
-                  }
-                >
+                <Flex>
+                  <Checkbox
+                    color="primary"
+                    checked={this.isReviewerSelected(possibleReviewer)}
+                    onChange={ev =>
+                      this.handlePotentialReviewer(possibleReviewer)
+                    }
+                    value="yes"
+                  />
                   <EntityAvatarAndName entity={possibleReviewer} />
-                </SelectionButton>
+                </Flex>
               ))}
             </InlineModal>
           </div>
