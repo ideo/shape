@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
 import { computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -126,7 +127,7 @@ class ListCard extends React.Component {
         'POST',
         data
       )
-      apiStore.fetchRoles(record.challenge_reviewer_group)
+      this.props.onRolesUpdate()
     }
   }
 
@@ -257,6 +258,7 @@ class ListCard extends React.Component {
 }
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  onRolesUpdate: PropTypes.func.isRequired,
 }
 
 export default ListCard
