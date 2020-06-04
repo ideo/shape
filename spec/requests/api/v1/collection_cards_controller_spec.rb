@@ -49,6 +49,16 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
     end
 
+    it 'includes pagination info' do
+      get(path)
+      expect(json['links']).to eq({
+        first: 1,
+        last: 1,
+        next: nil,
+        prev: nil,
+      }.as_json)
+    end
+
     context 'with no user session and public collection', auth: false do
       # just so there is a user in context, but this user is not logged in
       let(:user) { create(:user) }

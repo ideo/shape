@@ -691,6 +691,7 @@ class Collection
       )
       primary_collection_cards.update_all(
         section_type: :ideas,
+        updated_at: Time.current,
       )
       question_finish = items.question_finish.first
       return unless question_finish.present?
