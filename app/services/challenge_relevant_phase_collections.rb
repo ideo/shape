@@ -76,12 +76,12 @@ class ChallengeRelevantPhaseCollections < SimpleService
 
     all_collection_ids = Collection.in_collection(@collection.id).pluck(:id) + [@collection.id]
 
-    @phase_collections = CollectionCard.where(parent_id: all_collection_ids)
-                                       .collection
-                                       .joins(:collection)
-                                       .includes(:collection)
-                                       .merge(Collection.collection_type_phase)
-                                       .map(&:collection)
-                                       .sort_by(&:start_date)
+    @phase_collections = Collection.collection_type_phase
+                                   .joins(:parent_collection_cards)
+                                   .merge(
+                                     CollectionCard.visible.where(parent_id: all_collection_ids),
+                                   )
+                                   .distinct
+                                   .order(start_date: :asc)
   end
 end

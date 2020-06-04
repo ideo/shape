@@ -217,6 +217,11 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
+  # all primary + link collection cards that contain this collection
+  has_many :parent_collection_cards,
+           class_name: 'CollectionCard',
+           inverse_of: :collection
+
   has_many :collection_cover_cards,
            -> { active.is_cover.ordered },
            class_name: 'CollectionCard::Primary',
