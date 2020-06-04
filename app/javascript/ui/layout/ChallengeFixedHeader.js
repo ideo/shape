@@ -64,7 +64,7 @@ const ChallengeFixedHeader = ({
         <Box
           flex
           align="center"
-          style={{ marginLeft: '8px', marginRight: '30px' }}
+          style={{ marginLeft: 'auto', marginRight: '168px' }}
         >
           <TopRightChallengeButton {...buttonProps} />
         </Box>
