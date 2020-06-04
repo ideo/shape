@@ -208,7 +208,7 @@ class ListCard extends React.Component {
               roles={[...this.roles]}
               canEdit={card.record.can_edit}
               usersAndGroupsLength={
-                this.roles.length && this.roles[1].users.length
+                this.roles.length === 2 && this.roles[1].users.length
               }
               // convert observable to normal array to trigger render changes
               collaborators={[...card.record.collaborators]}
