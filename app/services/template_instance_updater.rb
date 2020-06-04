@@ -33,9 +33,12 @@ class TemplateInstanceUpdater
       return
     end
 
-    # worth doing this?
-    templated_collections.find_each do |i|
-      CollectionUpdateBroadcaster.new(i).reload_cards
+    # NOTE: this service is already in a bg job (UpdateTemplateInstancesWorker)
+    #  which is why we don't mind running through each instance yet again
+    templated_collections.find_each do |c|
+      next if c.num_viewers.zero?
+
+      CollectionUpdateBroadcaster.new(c).reload_cards
     end
 
     return unless @master_template.submission_box_template_test?
@@ -71,9 +74,6 @@ class TemplateInstanceUpdater
 
       next if master_card.blank? || card_within_instance.blank?
 
-      # TODO: if unpinned then don't copy any attrs??
-      # next if !master_card.pinned?
-
       TemplateInstanceCard::TemplateInstanceCardUpdater.call(
         instance_card: card_within_instance,
         master_card: master_card,
@@ -81,8 +81,7 @@ class TemplateInstanceUpdater
       )
     end
 
-    instance.reorder_cards!
-    instance.touch
+    update_instance_card_orders_and_placement!(instance)
   end
 
   def update_instance_card_attributes_by_templated_from_ids(templated_from_ids, instance)
@@ -92,10 +91,27 @@ class TemplateInstanceUpdater
 
       next if master_card.blank? || card_within_instance.blank?
 
-      card_within_instance.copy_card_attributes!(master_card)
+      card_within_instance.copy_master_card_attributes!(master_card)
     end
 
-    instance.reorder_cards!
+    update_instance_card_orders_and_placement!(instance)
+  end
+
+  def update_instance_card_orders_and_placement!(instance)
+    unpinned_instance_cards = instance.collection_cards.where(pinned: false)
+    if instance.board_collection? && unpinned_instance_cards.any?
+      # make sure all unpinned cards are in a valid placement now
+      first_card = unpinned_instance_cards.first
+      CollectionGrid::BoardPlacement.call(
+        to_collection: instance,
+        moving_cards: unpinned_instance_cards,
+        row: first_card.row,
+        col: first_card.col,
+      )
+      unpinned_instance_cards.each(&:save)
+    else
+      instance.reorder_cards!
+    end
     instance.touch
   end
 

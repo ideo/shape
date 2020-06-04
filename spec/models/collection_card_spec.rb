@@ -588,13 +588,13 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
-  describe 'copy_card_attributes!' do
-    let(:instance_card) { create(:collection_card, order: 3, pinned: true, width: 2, height: 1) }
+  describe 'copy_master_card_attributes!' do
+    let(:instance_card) { create(:collection_card, order: 3, pinned: true, width: 2, height: 1, col: 1, row: 1) }
     let(:master_card) { create(:collection_card, order: 1, pinned: false, width: 1, height: 2, col: 2, row: 2) }
 
     it 'should copy card attributes' do
       expect {
-        instance_card.copy_card_attributes!(master_card)
+        instance_card.copy_master_card_attributes!(master_card)
       }.to change(instance_card, :updated_at)
       expect(instance_card.height).to eq(master_card.height)
       expect(instance_card.width).to eq(master_card.width)
@@ -602,6 +602,19 @@ RSpec.describe CollectionCard, type: :model do
       expect(instance_card.order).to eq(master_card.order)
       expect(instance_card.row).to eq(master_card.row)
       expect(instance_card.col).to eq(master_card.col)
+    end
+
+    context 'with an unpinned master_card created a while ago' do
+      it 'should not copy all attributes' do
+        master_card.update(created_at: 3.days.ago, pinned: false)
+        instance_card.copy_master_card_attributes!(master_card)
+        expect(instance_card.height).not_to eq(master_card.height)
+        expect(instance_card.width).not_to eq(master_card.width)
+        expect(instance_card.row).not_to eq(master_card.row)
+        expect(instance_card.col).not_to eq(master_card.col)
+        # this should always match
+        expect(instance_card.pinned).to eq(master_card.pinned)
+      end
     end
   end
 

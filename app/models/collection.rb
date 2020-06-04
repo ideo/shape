@@ -607,6 +607,9 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
+    # no need to do this for boards
+    return if board_collection?
+
     CollectionCard.import(
       calculate_reordered_cards,
       validate: false,
