@@ -45,11 +45,8 @@ class CollectionList extends React.Component {
     ]
   }
 
-  onRolesUpdate = () => {
-    this.fetchCards()
-  }
-
   handleSort = column => {
+    // TODO implement
     // const { collection } = this.props
     // uiStore.update('collectionCardSortOrder', ev.target.value)
     // collection.API_sortCards()
@@ -79,7 +76,7 @@ class CollectionList extends React.Component {
           ))}
         </Flex>
         {collection_cards.map(card => (
-          <ListCard card={card} onRolesUpdate={this.onRolesUpdate} />
+          <ListCard card={card} />
         ))}
       </div>
     )

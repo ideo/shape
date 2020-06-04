@@ -73,6 +73,7 @@ class RolesSummary extends React.Component {
   }
 
   initEditorsAndViewers() {
+    // TODO come up with better code design for this vs reviewers prop
     const { reviewers } = this.props
     this.setState({
       editors: this.usersAndGroupsForRole(reviewers ? 'admin' : 'editor'),
@@ -131,6 +132,7 @@ class RolesSummary extends React.Component {
 
   renderAvatar = (userOrGroup, type) => {
     const { reviewers } = this.props
+    // TODO use real data for colors here, not randomized based on id
     const reviewColors = ['#39BE8E', '#D26A3B', '#E34744']
     const assignedColorIdx = parseInt(userOrGroup.id) % 3
     const assignedColor = reviewColors[assignedColorIdx]

@@ -1,5 +1,4 @@
 import { Fragment } from 'react'
-import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
 import { computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -171,6 +170,7 @@ class ListCard extends React.Component {
   }
 
   get possibleReviewers() {
+    // TODO refactor this and it's rendering out of this class into it's own
     const {
       card: { record },
     } = this.props
@@ -258,7 +258,6 @@ class ListCard extends React.Component {
 }
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  onRolesUpdate: PropTypes.func.isRequired,
 }
 
 export default ListCard

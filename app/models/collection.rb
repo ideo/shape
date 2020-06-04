@@ -359,6 +359,7 @@ class Collection < ApplicationRecord
 
   # default relationships to include when rendering Collections in the API
   def self.default_relationships_for_api
+    # TODO fix this so it doesn't always include challenge groups
     [
       :created_by,
       :organization,
