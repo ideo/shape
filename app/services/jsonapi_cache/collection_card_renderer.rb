@@ -92,11 +92,7 @@ module JsonapiCache
 
         if @current_ability.can?(:read, record)
           json = cached_card_with_user_fields(json, record)
-
-          # merge any included records into the overall list
-          json_data[:included] = (json[:included] + json_data[:included]).uniq do |i|
-            [i[:id], i[:type]]
-          end
+          json_data = merge_included_data(json_data, json)
         else
           # don't include unreadable records if this is search result
           next if @search_result
@@ -109,6 +105,14 @@ module JsonapiCache
         json_data[:data].push(json[:data])
       end
 
+      json_data
+    end
+
+    def merge_included_data(json_data, json)
+      # merge any included records into the overall list
+      json_data[:included] = (json[:included] + json_data[:included]).uniq do |i|
+        [i[:id], i[:type]]
+      end
       json_data
     end
 
