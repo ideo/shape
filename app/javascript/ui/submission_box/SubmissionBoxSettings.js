@@ -1,7 +1,6 @@
-import _ from 'lodash'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { find } from 'lodash'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import PropTypes from 'prop-types'
-import { observable } from 'mobx'
 
 import {
   Heading3,
@@ -15,7 +14,6 @@ import AlertIcon from '~/ui/icons/AlertIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
-import InlineLoader from '~/ui/layout/InlineLoader'
 import v from '~/utils/variables'
 import SubmissionBoxFormat from '~/ui/submission_box/SubmissionBoxFormat'
 
@@ -26,40 +24,21 @@ export const submissionItemTypes = [
 ]
 
 export const submissionTypeForName = typeName =>
-  _.find(submissionItemTypes, t => t.name === typeName)
+  find(submissionItemTypes, t => t.name === typeName)
 
-@inject('apiStore')
-@observer
 class SubmissionBoxSettings extends React.Component {
-  @observable
-  loading = false
-  @observable
-  templates = []
-
-  componentDidMount() {
-    const { collection } = this.props
-    const { apiStore, submission_template_id } = collection
-    if (!submission_template_id) return
-    apiStore.fetch('collections', submission_template_id)
-  }
-
-  updateHidden = ev => {
+  toggleHidden = ev => {
     ev.preventDefault()
     const { collection } = this.props
     collection.hide_submissions = !collection.hide_submissions
     return collection.save()
   }
 
-  updateEnabled = ev => {
+  toggleEnabled = ev => {
     ev.preventDefault()
     const { collection } = this.props
     collection.submissions_enabled = !collection.submissions_enabled
     return collection.save()
-  }
-
-  searchFilter = c => {
-    const { submission_template_id } = this.props.collection
-    return submission_template_id !== c.id
   }
 
   render() {
@@ -67,7 +46,6 @@ class SubmissionBoxSettings extends React.Component {
     const { submissions_enabled, hide_submissions } = collection
     return (
       <React.Fragment>
-        {this.loading && <InlineLoader />}
         <Row>
           <span
             style={{
@@ -91,7 +69,7 @@ class SubmissionBoxSettings extends React.Component {
               control={
                 <Checkbox
                   checked={submissions_enabled}
-                  onChange={this.updateEnabled}
+                  onChange={this.toggleEnabled}
                   value="yes"
                 />
               }
@@ -115,7 +93,7 @@ class SubmissionBoxSettings extends React.Component {
               control={
                 <Checkbox
                   checked={hide_submissions}
-                  onChange={this.updateHidden}
+                  onChange={this.toggleHidden}
                   value="yes"
                 />
               }
@@ -143,9 +121,5 @@ SubmissionBoxSettings.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   closeModal: PropTypes.func.isRequired,
 }
-SubmissionBoxSettings.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-}
-SubmissionBoxSettings.displayName = 'SubmissionBoxSettings'
 
 export default SubmissionBoxSettings

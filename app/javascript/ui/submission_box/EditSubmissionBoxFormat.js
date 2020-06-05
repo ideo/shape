@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import { Box } from 'reflexbox'
+import InlineLoader from '~/ui/layout/InlineLoader'
 
 import RecordSearch from '~/ui/global/RecordSearch'
 import {
@@ -133,6 +134,7 @@ class EditSubmissionBoxFormat extends React.Component {
           searchParams={{ master_template: true }}
         />
         <Box mt={2} mb={2}>
+          {this.loading && <InlineLoader />}
           {this.nonSelectedSubmissionTypes.map(type => (
             <SubmissionBoxRowForItem
               type={type}
@@ -161,5 +163,6 @@ EditSubmissionBoxFormat.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+EditSubmissionBoxFormat.displayName = 'EditSubmissionBoxFormat'
 
 export default EditSubmissionBoxFormat
