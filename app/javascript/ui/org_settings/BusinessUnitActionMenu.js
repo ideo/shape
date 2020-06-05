@@ -5,8 +5,14 @@ import PopoutMenu from '~/ui/global/PopoutMenu'
 import TrashIcon from '~/ui/icons/TrashIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
+import EditPencilIcon from '../icons/EditPencilIcon'
 
-const BusinessUnitActionMenu = ({ handleClone, handleRemove, name }) => {
+const BusinessUnitActionMenu = ({
+  handleClone,
+  handleRemove,
+  handleRename,
+  name,
+}) => {
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -35,6 +41,13 @@ const BusinessUnitActionMenu = ({ handleClone, handleRemove, name }) => {
     setModalOpen(true)
   }
 
+  const handleRenameClick = e => {
+    e.preventDefault()
+    console.log('clicked rename')
+    handleRename()
+    setOpen(false)
+  }
+
   const confirmRemove = () => {
     handleRemove()
     setOpen(false)
@@ -61,9 +74,14 @@ const BusinessUnitActionMenu = ({ handleClone, handleRemove, name }) => {
         menuOpen={open}
         menuItems={[
           {
+            name: 'Rename',
+            onClick: handleRenameClick,
+            iconRight: <EditPencilIcon />, // TODO: use new icon from ticket
+          },
+          {
             name: 'Clone',
             onClick: handleCloneClick,
-            iconRight: <DuplicateIcon />, // Do we have a copy icon?
+            iconRight: <DuplicateIcon />,
           },
           {
             name: 'Remove',
@@ -80,6 +98,7 @@ BusinessUnitActionMenu.propTypes = {
   name: PropTypes.string.isRequired,
   handleClone: PropTypes.func.isRequired,
   handleRemove: PropTypes.func.isRequired,
+  handleRename: PropTypes.func.isRequired,
 }
 
 export default BusinessUnitActionMenu

@@ -706,6 +706,10 @@ class CreativeDifferenceTabs extends React.Component {
                         handleRemove={() =>
                           this.removeBusinessUnit(businessUnit)
                         }
+                        handleRename={() => {
+                          this.setEditingBusinessUnitName(businessUnit.name)
+                          this.setEditingBusinessUnitId(businessUnit.id)
+                        }}
                       />
                     </div>
                     {/* Admins */}
