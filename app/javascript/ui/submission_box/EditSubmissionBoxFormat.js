@@ -21,13 +21,6 @@ class EditSubmissionBoxFormat extends React.Component {
   @observable
   templates = []
 
-  componentDidMount() {
-    const { collection } = this.props
-    const { apiStore, submission_template_id } = collection
-    if (!submission_template_id) return
-    apiStore.fetch('collections', submission_template_id)
-  }
-
   get locked() {
     const { uiStore } = this.props
     // if the modal is open via CollectionPage and not from uiStore, that means
