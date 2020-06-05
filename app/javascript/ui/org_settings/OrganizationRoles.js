@@ -13,11 +13,11 @@ import { uiStore } from '~/stores'
 const OrganizationRoles = ({ roles, canEdit }) => {
   // /users/me doesn't get the roles for all groups
   // need to fetch roles for primary_group before rendering
-  console.log(roles, canEdit)
+  // console.log(roles, canEdit)
 
   // TODO: this won't work because it's using an action
   const showObjectRoleDialog = () => {
-    console.log('showObjectRoleDialog')
+    // console.log('showObjectRoleDialog')
     uiStore.update('rolesMenuOpen', 'OrganizationRoles')
   }
 

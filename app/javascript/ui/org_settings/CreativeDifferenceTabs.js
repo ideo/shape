@@ -101,6 +101,12 @@ class CreativeDifferenceTabs extends React.Component {
   newTeamValues = null
   @observable
   businessUnitErrors = null
+  @observable
+  editingBusinessUnitId = null
+  @observable
+  editingBusinessUnitName = null
+  @observable
+  focusNameInputForNewTeam = null
 
   constructor(props) {
     super(props)
@@ -154,6 +160,40 @@ class CreativeDifferenceTabs extends React.Component {
     this.isError = value
   }
 
+  @action
+  setEditingBusinessUnitId(id) {
+    this.editingBusinessUnitId = id
+  }
+
+  @action
+  setEditingBusinessUnitName(name) {
+    this.editingBusinessUnitName = name
+  }
+
+  @action
+  setBusinessUnits(businessUnits) {
+    this.businessUnits = businessUnits
+  }
+
+  @action
+  setFocusNameInputForNewTeam(value) {
+    this.focusNameInputForNewTeam = value
+  }
+
+  @action
+  refreshBusinessUnits = async () => {
+    console.log('ACTION: refreshing Business Units')
+    try {
+      const results = await businessUnitsStore.fetch()
+      this.setBusinessUnits(results)
+      if (this.focusNameInputForNewTeam) {
+        this.focusOnNameInput()
+      }
+    } catch (err) {
+      console.log('error fetching BUs: ', err)
+    }
+  }
+
   handleChange = (event, newValue) => {
     // event.preventDefault()
     console.log(event, newValue)
@@ -186,28 +226,29 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
-  // TODO: Add to Teams dropdown props below, fix function signature
+  @action
   updateBusinessUnit = async (businessUnit, params) => {
+    console.log('updating BU: ', businessUnit.id, params)
+    this.setLoading(true)
+    const model = new businessUnitsStore.model()
+    const modelInstance = new model({
+      id: businessUnit.id,
+    })
+    const data = {
+      business_unit: params,
+    }
+    console.log('sending data for business unit: ', data)
+
     try {
-      this.setLoading(true)
-      const model = new businessUnitsStore.model()
-      const modelInstance = new model({
-        id: businessUnit.id,
-      })
-      const data = {
-        business_unit: params,
-      }
-      console.log('sending data for business unit: ', data)
       const promise = modelInstance.save(data, {
         optimistic: false,
       })
       const result = await promise
       console.log('BU update result: ', result)
-      runInAction(async () => {
-        // fetch all the business units after an update
-        this.businessUnits = await businessUnitsStore.fetch()
-        // TODO: Just update one BU so we don't have to refetch all the BUs?
-      })
+      this.setEditingBusinessUnitId(null)
+      this.setEditingBusinessUnitName(null)
+      this.refreshBusinessUnits()
+      // TODO: Just update one BU so we don't have to refetch all the BUs?
       this.setLoading(false)
     } catch (err) {
       console.log('BU update failed: ', err)
@@ -215,36 +256,34 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
-  // TODO: have to add a placeholder row component for this?
-  // Since the BU being added isn't real yet (e.g., not in the businessUnits observable )
+  @action
   createBusinessUnit = async () => {
     console.log('creating new BU')
-    const values = this.newTeamValues
-    try {
-      // TODO: remove content_version_id
-      const businessUnitParams = {
-        business_unit: values,
-      }
-      console.log({ businessUnitParams })
-      const foo = businessUnitsStore
-      const businessUnitModelInstance = foo.build(values)
-      businessUnitModelInstance.set({ id: null })
-      console.log(businessUnitModelInstance.toJS())
-      const saveReq = businessUnitModelInstance.save(businessUnitParams, {
-        optimistic: false,
-      })
-      const outcome = await saveReq
+    const values = this.initialNewTeamValues()
+    const businessUnitParams = {
+      business_unit: values,
+    }
+    const foo = businessUnitsStore
+    const businessUnitModelInstance = foo.build(values)
+    businessUnitModelInstance.set({ id: null })
+    console.log(businessUnitModelInstance.toJS())
 
-      if (outcome) {
-        console.log('refetching BUs')
-        const allBusinessUnits = await businessUnitsStore.fetch()
-        runInAction(async () => {
-          this.showNewTeamRow = false
-          this.newTeamValues = null
-          // fetch all the business units after an update
-          this.businessUnits = allBusinessUnits
-          // TODO: Just update one BU so we don't have to refetch all the BUs?
-        })
+    try {
+      const creatingBusinessUnit = businessUnitModelInstance.save(
+        businessUnitParams,
+        {
+          optimistic: false,
+        }
+      )
+      const result = await creatingBusinessUnit
+      console.log('created BU: ', result)
+      if (result) {
+        console.log('after create, setting values and fetching all BUs')
+        this.setEditingBusinessUnitId(result.id)
+        this.setEditingBusinessUnitName(result.name)
+        this.refreshBusinessUnits()
+        this.setFocusNameInputForNewTeam(true)
+        // TODO: Just update one BU so we don't have to refetch all the BUs?
       }
     } catch (err) {
       console.log('error creating new BU: ', err)
@@ -266,20 +305,15 @@ class CreativeDifferenceTabs extends React.Component {
       })
       const result = await promise
       console.log('BU clone result: ', result)
-      const allBusinessUnits = await businessUnitsStore.fetch()
-      runInAction(async () => {
-        // fetch all the business units after an update
-        this.businessUnits = allBusinessUnits
-        // TODO: Just update one BU so we don't have to refetch all the BUs?
-      })
+      this.refreshBusinessUnits()
       this.setLoading(false)
     } catch (err) {
       console.log('error is: ', err)
     }
   }
 
+  @action
   removeBusinessUnit = async businessUnit => {
-    // TODO: This is supposed to archive from frontend but keep in backend
     try {
       this.setLoading(true)
       const model = new businessUnitsStore.model()
@@ -293,12 +327,7 @@ class CreativeDifferenceTabs extends React.Component {
       })
       const result = await promise
       console.log('BU destroy result: ', result)
-      const allBusinessUnits = await businessUnitsStore.fetch()
-      runInAction(async () => {
-        // fetch all the business units after an update
-        this.businessUnits = allBusinessUnits
-        // TODO: Just update one BU so we don't have to refetch all the BUs?
-      })
+      this.refreshBusinessUnits()
       this.setLoading(false)
     } catch (err) {
       console.log('error is: ', err)
@@ -313,8 +342,10 @@ class CreativeDifferenceTabs extends React.Component {
     } = this.organization
 
     // Content version handled after create in backend
+    // TODO: How to assert it is the correct one coming back?
     return {
       name: `Team ${this.businessUnits.length + 1}`,
+      // TODO: causes issues when deleting records, since soft archive means they are still around
       organization_id: id,
       industry_subcategory_id: default_industry_subcategory_id,
       structure: 'Vertical',
@@ -322,39 +353,36 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
-  @action
-  populateNewTeamRow = () => {
-    this.showNewTeamRow = true
-    this.newTeamValues = this.initialNewTeamValues()
-
-    setTimeout(this.focusOnNameInput, 100)
-  }
-
-  handleNameInputKeyPress = e => {
-    console.log('pressed: ', e.key)
-    if (e.key === 'Enter') {
-      this.handleSaveBusinessUnit()
+  handleNameInputKeyPress = businessUnit => {
+    console.log('pressed: ', event.key)
+    if (event.key === 'Enter') {
+      console.log('On enter sending name as: ', this.editingBusinessUnitName)
+      this.handleSaveBusinessUnit(businessUnit, {
+        name: this.editingBusinessUnitName,
+      })
     }
-    console.log(e.target.value, this.newTeamValues.name)
   }
 
   @action
   handleNameInputChange = e => {
     console.log('updating name input: ', e.target.value)
-    this.newTeamValues.name = e.target.value
-    console.log('new name: ', this.newTeamValues.name)
+    this.setEditingBusinessUnitName(e.target.value)
+    console.log('new name: ', this.editingBusinessUnitName)
   }
 
-  handleSaveBusinessUnit = e => {
-    console.log('saving BU')
-    // TODO: validate newTeamValues
-    this.createBusinessUnit()
-    // TOOD: Is this superfluous?
+  handleSaveBusinessUnit = businessUnit => {
+    console.log('saving BU: ', businessUnit)
+    console.log('On blur sending name as: ', this.editingBusinessUnitName)
+    this.updateBusinessUnit(businessUnit, {
+      name: this.editingBusinessUnitName,
+    })
   }
 
   focusOnNameInput = () => {
     const element = document.getElementById('new-team-name')
     console.log('element to focus: ', element)
+    if (!element) return
+
     element.focus()
     element.select()
   }
@@ -372,9 +400,9 @@ class CreativeDifferenceTabs extends React.Component {
       tabValue,
       handleChange,
       updateOrg,
-      populateNewTeamRow,
-      showNewTeamRow,
-      newTeamValues,
+      createBusinessUnit,
+      editingBusinessUnitId,
+      editingBusinessUnitName,
       handleNameInputChange,
       handleNameInputKeyPress,
       handleSaveBusinessUnit,
@@ -488,7 +516,7 @@ class CreativeDifferenceTabs extends React.Component {
                   id={'name-label'}
                 >
                   Team
-                  <AddTeamButton handleClick={populateNewTeamRow} />
+                  <AddTeamButton handleClick={createBusinessUnit} />
                 </Label>
                 <Label
                   style={{
@@ -579,7 +607,10 @@ class CreativeDifferenceTabs extends React.Component {
               {businessUnits.map(businessUnit => (
                 <Row>
                   <form
-                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
                   >
                     <div
                       style={{
@@ -587,7 +618,22 @@ class CreativeDifferenceTabs extends React.Component {
                         marginRight: '20px',
                       }}
                     >
-                      <DisplayText>{businessUnit.name}</DisplayText>
+                      {editingBusinessUnitId == businessUnit.id ? (
+                        <TextField
+                          style={{
+                            width: 'inherit',
+                          }}
+                          id={'new-team-name'}
+                          value={editingBusinessUnitName} // TODO: May need to make this a separate component to handle updating value
+                          onChange={handleNameInputChange}
+                          onBlur={e => handleSaveBusinessUnit(businessUnit)}
+                          onKeyPress={e =>
+                            handleNameInputKeyPress(businessUnit)
+                          }
+                        />
+                      ) : (
+                        <DisplayText> {businessUnit.name} </DisplayText>
+                      )}
                     </div>
                     <div
                       style={{
@@ -689,144 +735,7 @@ class CreativeDifferenceTabs extends React.Component {
                 </Row>
               ))}
               <div>
-                {showNewTeamRow && (
-                  <Row>
-                    <form
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '170px',
-                          marginRight: '20px',
-                        }}
-                      >
-                        {/* Make this a component that accepts name/functions as props so it rerenders on name update */}
-                        <TextField
-                          style={{
-                            width: 'inherit',
-                          }}
-                          id={'new-team-name'}
-                          value={newTeamValues.name}
-                          // None of these are working as intended
-                          onChange={handleNameInputChange}
-                          onBlur={handleSaveBusinessUnit}
-                          onKeyPress={handleNameInputKeyPress}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          marginRight: '20px',
-                        }}
-                      >
-                        <DropdownSelect
-                          disabled
-                          label={'Industry'}
-                          record={newTeamValues}
-                          options={industrySubcategories}
-                          updateRecord={updateOrg}
-                          fieldToUpdate={'industry_subcategory_id'}
-                        />{' '}
-                      </div>{' '}
-                      <div
-                        style={{
-                          marginRight: '20px',
-                        }}
-                      >
-                        <DropdownSelect
-                          disabled
-                          label={'Content Version'}
-                          toolTip={
-                            'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
-                          }
-                          record={newTeamValues}
-                          options={contentVersions}
-                          updateRecord={updateOrg}
-                          fieldToUpdate={'default_content_version_id'}
-                        />{' '}
-                      </div>{' '}
-                      <div
-                        style={{
-                          marginRight: '20px',
-                        }}
-                      >
-                        <DropdownSelect
-                          disabled
-                          label={'Vertical or Horizontal'}
-                          toolTip={
-                            "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
-                          }
-                          record={newTeamValues}
-                          options={[
-                            {
-                              name: 'Vertical',
-                              id: 'Vertical',
-                            },
-                            {
-                              name: 'Horizontal',
-                              id: 'Horizontal',
-                            },
-                          ]}
-                          updateRecord={updateOrg}
-                          fieldToUpdate={'structure'}
-                        />{' '}
-                      </div>{' '}
-                      <div
-                        style={{
-                          width: '42px',
-                          marginTop: '2px',
-                        }}
-                      >
-                        <BusinessUnitActionMenu
-                          name={newTeamValues.name}
-                          // handleClone={() =>
-                          //   this.cloneBusinessUnit(businessUnit)
-                          // }
-                          // handleRemove={() =>
-                          //   this.removeBusinessUnit(businessUnit)
-                          // }
-                        />{' '}
-                      </div>{' '}
-                      {/* Admins */}{' '}
-                      <div
-                        style={{
-                          width: '80px',
-                          marginTop: '-10px',
-                        }}
-                      >
-                        <OrganizationRoles
-                          roles={
-                            apiStore.currentUserOrganization.primary_group.roles
-                          }
-                          canEdit={
-                            apiStore.currentUserOrganization.primary_group
-                              .can_edit
-                          }
-                        />{' '}
-                      </div>{' '}
-                      {/* Members */}{' '}
-                      <div
-                        style={{
-                          width: '80px',
-                          marginTop: '-10px',
-                        }}
-                      >
-                        <OrganizationRoles
-                          roles={
-                            apiStore.currentUserOrganization.primary_group.roles
-                          }
-                          canEdit={
-                            apiStore.currentUserOrganization.primary_group
-                              .can_edit
-                          }
-                        />{' '}
-                      </div>{' '}
-                    </form>{' '}
-                  </Row>
-                )}
-                <AddTeamButton handleClick={populateNewTeamRow} />
+                <AddTeamButton handleClick={createBusinessUnit} />
               </div>
             </React.Fragment>
           </TabPanel>

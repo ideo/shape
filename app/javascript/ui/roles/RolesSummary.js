@@ -182,8 +182,8 @@ class RolesSummary extends React.Component {
   // TODO: Why not make this a component to pass in?
   get addUserBtn() {
     const { canEdit } = this.props
-    console.log('in addUserBtn: ', canEdit)
     if (!canEdit) return ''
+
     return (
       <Tooltip title={this.props.buttonText}>
         <AddButton onClick={this.props.handleClick}>+</AddButton>
@@ -192,7 +192,6 @@ class RolesSummary extends React.Component {
   }
 
   render() {
-    console.log('RolesSummary#render', this.props)
     const { editors, viewers } = this.viewersAndEditorsLimited
     return (
       <StyledRolesSummary>

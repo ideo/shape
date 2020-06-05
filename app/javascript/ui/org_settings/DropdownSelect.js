@@ -11,8 +11,8 @@ import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 
 const currentValue = (record, options, fieldToUpdate) => {
   const object = _.find(options, option => option.id === record[fieldToUpdate])
-  console.log(record, options, fieldToUpdate)
-  console.log('current value record in select dropdown: ', object)
+  // console.log(record, options, fieldToUpdate)
+  // console.log('current value record in select dropdown: ', object)
   if (object) return object.id
   return ''
 }
@@ -27,7 +27,7 @@ const DropdownSelect = ({
   ...additionalProps
 }) => {
   const value = currentValue(record, options, fieldToUpdate)
-  console.log('first value: ', value)
+  // console.log('first value: ', value)
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [previousValue, setPreviousValue] = useState('')
