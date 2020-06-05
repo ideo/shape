@@ -246,10 +246,12 @@ class GridCard extends React.Component {
   }
 
   openContextMenu = ev => {
+    ev.preventDefault()
     const { menuItemCount, props } = this
     const { card } = props
-
-    ev.preventDefault()
+    if (card.isPrivate) {
+      return
+    }
     // for some reason, Android treats long-press as right click
     if (uiStore.isAndroid) return false
 
@@ -533,7 +535,7 @@ class GridCard extends React.Component {
     const showRestore = searchResult && record.isRestorable
 
     let contents
-    if (card.private_card || _.isEmpty(record)) {
+    if (card.isPrivate || _.isEmpty(record)) {
       contents = (
         <StyledGridCardPrivate>
           <HiddenIcon />
