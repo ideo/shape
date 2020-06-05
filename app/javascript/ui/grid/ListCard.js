@@ -121,8 +121,9 @@ class ListCard extends React.Component {
   }
 
   isReviewerSelected(reviewer) {
-    if (!this.roles.length) return false
-    const selectedUsers = this.roles[1].users
+    // TODO roles length logic should be corrected
+    if (this.roles.length !== 2) return false
+    const selectedUsers = this.roles[1].users || []
     return selectedUsers.find(selectedUser => selectedUser.id === reviewer.id)
   }
 
