@@ -76,6 +76,10 @@ class Collection
              foreign_key: :parent_id,
              inverse_of: :parent
 
+    has_many :items_and_linked_items,
+             through: :collection_cards,
+             source: :item
+
     def max_col_limit
       num_columns - 1
     end
