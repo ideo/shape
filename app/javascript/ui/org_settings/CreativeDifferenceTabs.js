@@ -161,6 +161,11 @@ class CreativeDifferenceTabs extends React.Component {
   }
 
   @action
+  setBusinessUnitErrors(value) {
+    this.businessUnitErrors = value
+  }
+
+  @action
   setEditingBusinessUnitId(id) {
     this.editingBusinessUnitId = id
   }
@@ -253,6 +258,7 @@ class CreativeDifferenceTabs extends React.Component {
     } catch (err) {
       console.log('BU update failed: ', err)
       this.setError(true)
+      this.setBusinessUnitErrors(err.errors)
     }
   }
 
@@ -287,7 +293,8 @@ class CreativeDifferenceTabs extends React.Component {
       }
     } catch (err) {
       console.log('error creating new BU: ', err)
-      // set errors
+      this.setError(true)
+      this.setBusinessUnitErrors(err.errors)
     }
   }
 
@@ -401,6 +408,7 @@ class CreativeDifferenceTabs extends React.Component {
       handleChange,
       updateOrg,
       createBusinessUnit,
+      businessUnitErrors,
       editingBusinessUnitId,
       editingBusinessUnitName,
       handleNameInputChange,
@@ -619,18 +627,21 @@ class CreativeDifferenceTabs extends React.Component {
                       }}
                     >
                       {editingBusinessUnitId == businessUnit.id ? (
-                        <TextField
-                          style={{
-                            width: 'inherit',
-                          }}
-                          id={'new-team-name'}
-                          value={editingBusinessUnitName} // TODO: May need to make this a separate component to handle updating value
-                          onChange={handleNameInputChange}
-                          onBlur={e => handleSaveBusinessUnit(businessUnit)}
-                          onKeyPress={e =>
-                            handleNameInputKeyPress(businessUnit)
-                          }
-                        />
+                        <React.Fragment>
+                          <TextField
+                            style={{
+                              width: 'inherit',
+                            }}
+                            id={'new-team-name'}
+                            value={editingBusinessUnitName} // TODO: May need to make this a separate component to handle updating value
+                            onChange={handleNameInputChange}
+                            onBlur={e => handleSaveBusinessUnit(businessUnit)}
+                            onKeyPress={e =>
+                              handleNameInputKeyPress(businessUnit)
+                            }
+                          />
+                          <span>{businessUnitErrors}</span>
+                        </React.Fragment>
                       ) : (
                         <DisplayText> {businessUnit.name} </DisplayText>
                       )}
