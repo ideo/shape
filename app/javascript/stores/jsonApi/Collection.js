@@ -22,6 +22,8 @@ import SharedRecordMixin from './SharedRecordMixin'
 import v, { FOAMCORE_MAX_ZOOM, FOUR_WIDE_MAX_ZOOM } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { methodLibraryTags } from '~/utils/creativeDifferenceVariables'
+// FIXME: remove once audiences can be queried from the backend
+import challenge_audiences from '~/ui/test_collections/temp/challenge_audiences.json'
 
 export const ROW_ACTIONS = {
   INSERT: 'insert_row',
@@ -1088,6 +1090,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.collection_type === 'challenge' || this.isInsideAChallenge
   }
 
+  get challenge() {
+    if (!this.challenge_id) return null
+    apiStore.fetch('collection', this.challenge_id)
+  }
+
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
@@ -1640,6 +1647,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.uiStore.update('showTemplateHelperForCollection', this)
       this.uiStore.update('templateName', this.name)
     }
+  }
+
+  async API_fetchChallengeAudiences() {
+    if (!this.isChallengeOrInsideChallenge) return
+    // const { apiStore } = this
+    return challenge_audiences
   }
 }
 

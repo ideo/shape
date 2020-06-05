@@ -41,6 +41,7 @@ const AudienceCheckbox = ({
   onToggleCheckbox,
   disabled,
   openAudienceMenu,
+  useChallengeAudienceSettings,
 }) => {
   const { id, name, global_default } = audience
   return (
@@ -65,7 +66,7 @@ const AudienceCheckbox = ({
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
                 <StyledLabelText>{name}</StyledLabelText>
                 {// FIXME: hardcode participant id
-                id === '991' && (
+                useChallengeAudienceSettings && id === '991' && (
                   <AssignReviewersLink
                     onClick={e => {
                       e.preventDefault()
@@ -88,8 +89,7 @@ const AudienceCheckbox = ({
           }}
           className="audienceLabel"
         >
-          {// FIXME: Hide info icon
-          false && <InfoIcon />}
+          {!useChallengeAudienceSettings && <InfoIcon />}
         </StyledInfoIconWrapper>
       )}
     </StyledRowFlexParent>
@@ -102,10 +102,12 @@ AudienceCheckbox.propTypes = {
   onToggleCheckbox: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   openAudienceMenu: PropTypes.func.isRequired,
+  useChallengeAudienceSettings: PropTypes.bool,
 }
 
 AudienceCheckbox.defaultProps = {
   disabled: false,
+  useChallengeAudienceSettings: false,
 }
 
 export default AudienceCheckbox

@@ -9,7 +9,6 @@ import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/Audie
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
 import v from '~/utils/variables'
-import challenge_audiences from '~/ui/test_collections/temp/challenge_audiences.json'
 
 const FormButtonWrapper = styled.div`
   margin: 2rem;
@@ -38,32 +37,29 @@ class AudienceSettings extends React.Component {
   }
 
   fetchAvailableAudiences = async () => {
-    const { apiStore, testCollection } = this.props
+    const { apiStore } = this.props
 
     await apiStore.fetchOrganizationAudiences(
       apiStore.currentUserOrganizationId
     )
-    // FIXME: Hardcoded value
-    if (testCollection.isInsideAChallenge) {
-      apiStore.sync(challenge_audiences)
-    }
     this.initAudienceSettings()
   }
 
   @action
-  initAudienceSettings() {
+  async initAudienceSettings() {
     const { testCollection, apiStore } = this.props
     const { audiences, audienceSettings } = this
     const { test_audiences } = testCollection
-    // FIXME: temporary hardcode for video-demo
-    const challengeAudiences = [
-      apiStore.find('audiences', 990),
-      apiStore.find('audiences', 991),
-      apiStore.find('audiences', 992),
-    ]
-
-    // FIXME: should render challenge audiences
     if (testCollection.isInsideAChallenge) {
+      // FIXME: sync fake audience data with audience settings
+      const fakeChallengeAudiences = await testCollection.API_fetchChallengeAudiences()
+      // A hack to convert json to a datX Model
+      apiStore.sync(fakeChallengeAudiences)
+      const challengeAudiences = [
+        apiStore.find('audiences', 990),
+        apiStore.find('audiences', 991),
+        apiStore.find('audiences', 992),
+      ]
       _.each(challengeAudiences, challengeAudience => {
         // append challenge name to audience name
         challengeAudience.name = `${testCollection.name} ${challengeAudience.name}`
@@ -302,6 +298,7 @@ class AudienceSettings extends React.Component {
             afterAddAudience={this.afterAddAudience}
             locked={this.locked}
             challengeName={testCollection.name}
+            useChallengeAudienceSettings={testCollection.isInsideAChallenge}
           />
         )}
         <FormButtonWrapper>

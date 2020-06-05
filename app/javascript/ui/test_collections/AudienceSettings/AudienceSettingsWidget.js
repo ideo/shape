@@ -90,21 +90,16 @@ class AudienceSettingsWidget extends React.Component {
     selectedAudienceMenuItem: null,
   }
 
-  get hidePaidAudienceSettings() {
-    const { uiStore } = this.props
-
-    return _.get(uiStore, 'viewingRecord.isInsideAChallenge')
-  }
-
   get displayedAudiences() {
     const { audiences, audienceSettings } = this.props
-    return _.sortBy(
+    const displayed = _.sortBy(
       _.filter(audiences, a => {
         const setting = audienceSettings.get(a.id)
         return setting && setting.displayCheckbox
       }),
       'order'
     )
+    return displayed
   }
 
   toggleAddAudienceMenu = e => {
@@ -216,9 +211,13 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   renderTableBody(audience) {
-    const { onInputChange, numPaidQuestions } = this.props
+    const {
+      onInputChange,
+      numPaidQuestions,
+      useChallengeAudienceSettings,
+    } = this.props
     return (
-      !this.hidePaidAudienceSettings && (
+      !useChallengeAudienceSettings && (
         <TableBody
           audience={audience}
           onInputChange={onInputChange}
@@ -232,7 +231,7 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   renderCheckbox(audience) {
-    const { onToggleCheckbox } = this.props
+    const { onToggleCheckbox, useChallengeAudienceSettings } = this.props
     return (
       <AudienceCheckbox
         audience={audience}
@@ -240,15 +239,20 @@ class AudienceSettingsWidget extends React.Component {
         onToggleCheckbox={onToggleCheckbox}
         disabled={this.isAudienceLocked(audience)}
         openAudienceMenu={this.openAudienceMenu}
+        useChallengeAudienceSettings={useChallengeAudienceSettings}
       />
     )
   }
 
   render() {
-    const { totalPrice, locked } = this.props
+    const {
+      uiStore,
+      totalPrice,
+      locked,
+      useChallengeAudienceSettings,
+    } = this.props
     const { displayedAudiences } = this
     const { addAudienceMenuOpen, popoutMenuOffsetPosition } = this.state
-    const { uiStore } = this.props
 
     let newAudienceButton = (
       <Flex align="center">
@@ -299,12 +303,12 @@ class AudienceSettingsWidget extends React.Component {
                 return (
                   <StyledColumnFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
-                    {!this.hidePaidAudienceSettings && <TableHeader />}
+                    {!useChallengeAudienceSettings && <TableHeader />}
                     {this.renderTableBody(audience)}
                   </StyledColumnFlexParent>
                 )
               })}
-              {!this.hidePaidAudienceSettings && (
+              {!useChallengeAudienceSettings && (
                 <StyledRowFlexParent style={{ marginTop: '15px' }}>
                   {newAudienceButton}
                   <AudienceRowCell />
@@ -318,7 +322,7 @@ class AudienceSettingsWidget extends React.Component {
             <StyledRowFlexParent column>
               <StyledRowFlexParent>
                 <StyledRowFlexItem />
-                {!this.hidePaidAudienceSettings && <TableHeader />}
+                {!useChallengeAudienceSettings && <TableHeader />}
               </StyledRowFlexParent>
               {displayedAudiences.map(audience => {
                 return (
@@ -328,7 +332,7 @@ class AudienceSettingsWidget extends React.Component {
                   </StyledRowFlexParent>
                 )
               })}
-              {!this.hidePaidAudienceSettings && (
+              {!useChallengeAudienceSettings && (
                 <StyledRowFlexParent>
                   {newAudienceButton}
                   <AudienceRowCell />
@@ -367,6 +371,7 @@ AudienceSettingsWidget.propTypes = {
   totalPrice: PropTypes.string.isRequired,
   numPaidQuestions: PropTypes.number.isRequired,
   locked: PropTypes.bool,
+  useChallengeAudienceSettings: PropTypes.bool,
 }
 
 AudienceSettingsWidget.wrappedComponent.propTypes = {
@@ -375,6 +380,7 @@ AudienceSettingsWidget.wrappedComponent.propTypes = {
 
 AudienceSettingsWidget.defaultProps = {
   locked: false,
+  useChallengeAudienceSettings: false,
 }
 
 export default AudienceSettingsWidget
