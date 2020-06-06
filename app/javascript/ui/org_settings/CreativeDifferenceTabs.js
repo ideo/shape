@@ -409,6 +409,7 @@ class CreativeDifferenceTabs extends React.Component {
       handleChange,
       updateOrg,
       createBusinessUnit,
+      updateBusinessUnit,
       businessUnitErrors,
       editingBusinessUnitId,
       editingBusinessUnitName,
@@ -648,7 +649,7 @@ class CreativeDifferenceTabs extends React.Component {
                           </span>
                         </React.Fragment>
                       ) : (
-                        <DisplayText> {businessUnit.name} </DisplayText>
+                        <DisplayText>{businessUnit.name}</DisplayText>
                       )}
                     </div>
                     <div
@@ -658,9 +659,11 @@ class CreativeDifferenceTabs extends React.Component {
                     >
                       <DropdownSelect
                         label={'Industry'}
-                        record={organization}
+                        record={businessUnit}
                         options={industrySubcategories}
-                        updateRecord={updateOrg}
+                        updateRecord={params =>
+                          updateBusinessUnit(businessUnit, params)
+                        }
                         fieldToUpdate={'industry_subcategory_id'}
                       />
                     </div>
@@ -669,15 +672,20 @@ class CreativeDifferenceTabs extends React.Component {
                         marginRight: '20px',
                       }}
                     >
+                      {/*
+                        TODO: this updates a BU Deployment, not the BU itself
+                        - It should probably accept the BU Deployment as the record
+                        - and use content_version_id as the fieldToUpdate
+                      */}
                       <DropdownSelect
                         label={'Content Version'}
                         toolTip={
                           'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
                         }
-                        record={organization}
+                        record={{ content_version_id: 1 }}
                         options={contentVersions}
-                        updateRecord={updateOrg}
-                        fieldToUpdate={'default_content_version_id'}
+                        updateRecord={updateBusinessUnit}
+                        fieldToUpdate={'content_version_id'}
                       />
                     </div>
                     <div
@@ -686,7 +694,7 @@ class CreativeDifferenceTabs extends React.Component {
                       }}
                     >
                       <DropdownSelect
-                        label={'Vertical or Horizontal'}
+                        label={'Structure'}
                         toolTip={
                           "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
                         }
@@ -695,7 +703,9 @@ class CreativeDifferenceTabs extends React.Component {
                           { name: 'Vertical', id: 'Vertical' },
                           { name: 'Horizontal', id: 'Horizontal' },
                         ]}
-                        updateRecord={updateOrg}
+                        updateRecord={params =>
+                          updateBusinessUnit(businessUnit, params)
+                        }
                         fieldToUpdate={'structure'}
                       />
                     </div>
