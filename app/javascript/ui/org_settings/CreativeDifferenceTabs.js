@@ -259,7 +259,7 @@ class CreativeDifferenceTabs extends React.Component {
     } catch (err) {
       console.log('BU update failed: ', err)
       this.setError(true)
-      this.setBusinessUnitErrors(err.payload)
+      this.setBusinessUnitErrors(err.error)
     }
   }
 
@@ -295,7 +295,7 @@ class CreativeDifferenceTabs extends React.Component {
     } catch (err) {
       console.log('error creating new BU: ', err)
       this.setError(true)
-      this.setBusinessUnitErrors(err.payload)
+      this.setBusinessUnitErrors(err.error)
     }
   }
 
@@ -344,7 +344,7 @@ class CreativeDifferenceTabs extends React.Component {
 
   initialNewTeamValues = () => {
     const {
-      default_industry_subcategory_id,
+      industry_subcategory_id,
       supported_languages,
       id,
     } = this.organization
@@ -355,7 +355,7 @@ class CreativeDifferenceTabs extends React.Component {
       name: `Team ${this.businessUnits.length + 1}`,
       // TODO: causes issues when deleting records, since soft archive means they are still around
       organization_id: id,
-      industry_subcategory_id: default_industry_subcategory_id,
+      industry_subcategory_id,
       structure: 'Vertical',
       supported_languages,
     }
