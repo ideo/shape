@@ -2,10 +2,10 @@ import PropTypes from 'prop-types'
 import { useState } from 'react'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
-import TrashIcon from '~/ui/icons/TrashIcon'
 import DuplicateIcon from '~/ui/icons/DuplicateIcon'
+import EditPencilIconXs from '~/ui/icons/EditPencilIconXs'
+import TrashIconXl from '~/ui/icons/TrashIconXl'
 import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
-import EditPencilIcon from '../icons/EditPencilIcon'
 
 const BusinessUnitActionMenu = ({
   handleClone,
@@ -76,7 +76,7 @@ const BusinessUnitActionMenu = ({
           {
             name: 'Rename',
             onClick: handleRenameClick,
-            iconRight: <EditPencilIcon />, // TODO: use new icon from ticket
+            iconRight: <EditPencilIconXs />,
           },
           {
             name: 'Clone',
@@ -86,7 +86,7 @@ const BusinessUnitActionMenu = ({
           {
             name: 'Remove',
             onClick: handleRemoveClick,
-            iconRight: <TrashIcon />,
+            iconRight: <TrashIconXl />,
           },
         ]}
       />
