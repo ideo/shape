@@ -15,6 +15,7 @@ import {
   organizationsStore,
   supportedLanguagesStore,
   businessUnitsStore,
+  businessUnitDeploymentsStore,
 } from 'c-delta-organization-settings'
 import Loader from '~/ui/layout/Loader'
 import { runInAction, observable, action } from 'mobx'
@@ -342,6 +343,28 @@ class CreativeDifferenceTabs extends React.Component {
     }
   }
 
+  updateBusinessUnitDeployment = async (businessUnitDeployment, params) => {
+    console.log('updating BU Deployment')
+    const model = new businessUnitDeploymentsStore.model()
+    const modelInstance = new model({
+      id: businessUnitDeployment.id,
+    })
+    const data = {
+      business_unit_deployment: params,
+    }
+    try {
+      const promise = modelInstance.save(data, {
+        optimistic: false,
+      })
+      const result = await promise
+      if (result) {
+        this.refreshBusinessUnits()
+      }
+    } catch (err) {
+      console.log('error updating BU Deployment: ', err)
+    }
+  }
+
   initialNewTeamValues = () => {
     const {
       industry_subcategory_id,
@@ -410,6 +433,7 @@ class CreativeDifferenceTabs extends React.Component {
       updateOrg,
       createBusinessUnit,
       updateBusinessUnit,
+      updateBusinessUnitDeployment,
       businessUnitErrors,
       editingBusinessUnitId,
       editingBusinessUnitName,
@@ -682,9 +706,15 @@ class CreativeDifferenceTabs extends React.Component {
                         toolTip={
                           'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
                         }
-                        record={{ content_version_id: 1 }}
+                        objectToUpdateName={businessUnit.name}
+                        record={businessUnit.closest_business_unit_deployment}
                         options={contentVersions}
-                        updateRecord={updateBusinessUnit}
+                        updateRecord={params =>
+                          updateBusinessUnitDeployment(
+                            businessUnit.closest_business_unit_deployment,
+                            params
+                          )
+                        }
                         fieldToUpdate={'content_version_id'}
                       />
                     </div>
