@@ -615,6 +615,8 @@ class GridCard extends React.Component {
         data-width={card.width}
         data-height={card.height}
         data-order={card.order}
+        data-col={card.col}
+        data-row={card.row}
         data-cy="GridCard"
         onContextMenu={this.openContextMenu}
         ref={c => (this.gridCardRef = c)}
