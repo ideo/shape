@@ -252,13 +252,14 @@ class CreativeDifferenceTabs extends React.Component {
       console.log('BU update result: ', result)
       this.setEditingBusinessUnitId(null)
       this.setEditingBusinessUnitName(null)
+      this.setBusinessUnitErrors(null)
       this.refreshBusinessUnits()
       // TODO: Just update one BU so we don't have to refetch all the BUs?
       this.setLoading(false)
     } catch (err) {
       console.log('BU update failed: ', err)
       this.setError(true)
-      this.setBusinessUnitErrors(err.errors)
+      this.setBusinessUnitErrors(err.payload)
     }
   }
 
@@ -294,7 +295,7 @@ class CreativeDifferenceTabs extends React.Component {
     } catch (err) {
       console.log('error creating new BU: ', err)
       this.setError(true)
-      this.setBusinessUnitErrors(err.errors)
+      this.setBusinessUnitErrors(err.payload)
     }
   }
 
@@ -632,6 +633,8 @@ class CreativeDifferenceTabs extends React.Component {
                             style={{
                               width: 'inherit',
                             }}
+                            autoFocus
+                            onFocus={() => this.focusOnNameInput()}
                             id={'new-team-name'}
                             value={editingBusinessUnitName} // TODO: May need to make this a separate component to handle updating value
                             onChange={handleNameInputChange}
@@ -640,7 +643,9 @@ class CreativeDifferenceTabs extends React.Component {
                               handleNameInputKeyPress(businessUnit)
                             }
                           />
-                          <span>{businessUnitErrors}</span>
+                          <span style={{ color: 'red' }}>
+                            {businessUnitErrors}
+                          </span>
                         </React.Fragment>
                       ) : (
                         <DisplayText> {businessUnit.name} </DisplayText>
