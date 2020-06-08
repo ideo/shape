@@ -32,6 +32,7 @@ class SelectionCircle extends React.Component {
     if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return
     }
+    e.stopPropagation()
     uiStore.toggleSelectedCardId(cardId)
   }
 

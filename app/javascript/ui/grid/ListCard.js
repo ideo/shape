@@ -47,6 +47,10 @@ const Row = styled(Flex)`
       display: flex;
     }
   }
+
+  *::selection {
+    background: transparent;
+  }
 `
 
 const ColumnLink = styled.button`
