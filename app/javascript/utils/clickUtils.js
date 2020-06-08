@@ -94,11 +94,8 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
 export const openContextMenu = (
   ev,
   card,
-  {
-    targetRef,
-    onOpenMenu,
-    menuItemCount,
-  }) => {
+  { targetRef, onOpenMenu, menuItemCount }
+) => {
   let x = ev.clientX - 1600
   let y = ev.clientY - 360
   if (targetRef) {
@@ -118,6 +115,5 @@ export const openContextMenu = (
   }, delay)
   return false
 }
-
 
 export { calculatePopoutMenuOffset }

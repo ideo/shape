@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
-import { action, computed, observable,} from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
