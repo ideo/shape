@@ -207,11 +207,11 @@ ActiveRecord::Schema.define(version: 2020_05_20_210612) do
     t.string "search_term"
     t.integer "collection_type", default: 0
     t.integer "num_columns"
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.integer "challenge_admin_group_id"
     t.integer "challenge_reviewer_group_id"
     t.integer "challenge_participant_group_id"
-    t.datetime "start_date"
-    t.datetime "end_date"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
