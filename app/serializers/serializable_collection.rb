@@ -9,6 +9,7 @@ class SerializableCollection < BaseJsonSerializer
     :updated_at,
     :master_template,
     :template_id,
+    :parent_challenge,
     :submission_box_type,
     :submission_box_id,
     :submission_template_id,
@@ -136,14 +137,6 @@ class SerializableCollection < BaseJsonSerializer
     @inside_a_submission.nil? ?
       @object.inside_a_submission? :
       @inside_a_submission
-  end
-
-  attribute :challenge_name do
-    @object.parent_challenge&.name || @object&.collection_type == 'challenge' && @object.name
-  end
-
-  attribute :challenge_id do
-    @object.parent_challenge&.id
   end
 
   attribute :is_subtemplate_or_instance do

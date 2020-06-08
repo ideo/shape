@@ -1083,7 +1083,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isInsideAChallenge() {
-    return !!this.challenge_id
+    return !!this.parent_challenge
   }
 
   get isChallengeOrInsideChallenge() {
@@ -1091,8 +1091,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get challenge() {
-    if (!this.challenge_id) return null
-    apiStore.fetch('collection', this.challenge_id)
+    if (this.collection_type === 'challenge') return this
+    return this.parent_challenge
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order

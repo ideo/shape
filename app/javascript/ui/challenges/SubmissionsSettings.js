@@ -30,7 +30,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
       const audiencesForSettings = audiencesRequest.data
       const audienceSettingsMap = new Map()
       _.each(audiencesForSettings, audience => {
-        audience.name = `${collection.challenge_name} ${audience.attributes.name}`
+        audience.name = `${collection.challenge.name} ${audience.attributes.name}`
         audienceSettingsMap.set(audience.id, {
           selected: false,
           audience,

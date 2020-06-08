@@ -442,7 +442,7 @@ class Header extends React.Component {
                   this.handleReviewSubmissions()
                 }}
                 challengeNavigationHandler={() => {
-                  routingStore.routeTo('collections', record.challenge_id)
+                  routingStore.routeTo('collections', record.challenge.id)
                 }}
               />
             )}
