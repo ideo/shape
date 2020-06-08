@@ -4,6 +4,7 @@ module ActiveRecordWhereIdsOrdered
     # Find all records with given ids, and return them in the same order as ids array
     # From: https://www.justinweiss.com/articles/how-to-select-database-records-in-an-arbitrary-order//
     def where_ids_ordered(ids)
+      return none if ids.blank?
       return where(id: ids) if ids.size <= 1
 
       order_clause = 'CASE id '
