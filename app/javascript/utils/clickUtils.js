@@ -96,8 +96,8 @@ export const openContextMenu = (
   card,
   { targetRef, onOpenMenu, menuItemCount }
 ) => {
-  let x = ev.clientX - 1600
-  let y = ev.clientY - 360
+  let x = ev.clientX
+  let y = ev.clientY
   if (targetRef) {
     const rect = targetRef.getBoundingClientRect()
     x = ev.clientX - rect.left - rect.width
