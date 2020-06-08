@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
 import { computed } from 'mobx'
+import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -16,7 +17,7 @@ import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
-import { uiStore } from '~/stores'
+import { routingStore, uiStore } from '~/stores'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const Column = styled.div`
@@ -36,6 +37,22 @@ const Row = styled(Flex)`
   align-items: center;
   height: 50px;
   margin-bottom: 8px;
+
+  ${Column} > .show-on-hover {
+    display: none;
+  }
+
+  &:hover {
+    ${Column} > .show-on-hover {
+      display: flex;
+    }
+  }
+`
+
+const ColumnLink = styled.button`
+  align-items: center;
+  cursor: pointer;
+  display: flex;
 `
 
 const IconHolder = styled.div`
@@ -52,8 +69,24 @@ class ListCard extends React.Component {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
   }
 
+  handleRecordClick = ev => {
+    const { card } = this.props
+    ev.preventDefault()
+    ev.stopPropagation()
+    routingStore.routeTo('items', card.record.id)
+  }
+
+  handleRowClick = ev => {
+    const { card } = this.props
+    if (uiStore.captureKeyboardGridClick(ev, card.id)) {
+      return
+    }
+    uiStore.toggleSelectedCardId(card.id)
+  }
+
   handleActionMenuClick = ev => {
     const { card } = this.props
+    ev.stopPropagation()
 
     uiStore.openContextMenu(ev, {
       card,
@@ -70,10 +103,11 @@ class ListCard extends React.Component {
     }
   }
 
-  handleRolesClick = () => {
+  handleRolesClick = ev => {
     const {
       card: { record },
     } = this.props
+    ev.stopPropagation()
     uiStore.update('rolesMenuOpen', record)
   }
 
@@ -111,22 +145,25 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
-    console.log('roles', [...card.record.roles])
     return (
-      <Row>
+      <Row onClick={this.handleRowClick}>
         <Column width="50px">
-          <SelectionCircle cardId={card.id} />
+          <div className="show-on-hover">
+            <SelectionCircle cardId={card.id} />
+          </div>
         </Column>
         <Column width="500px">
-          <ListCoverRenderer
-            card={card}
-            cardType={card.record.internalType}
-            record={card.record}
-            height={1}
-            handleClick={this.handleRecordClick}
-          />
-          {card.record.name}
-          {this.renderIcons}
+          <ColumnLink onClick={this.handleRecordClick}>
+            <ListCoverRenderer
+              card={card}
+              cardType={card.record.internalType}
+              record={card.record}
+              height={1}
+              handleClick={this.handleRecordClick}
+            />
+            {card.record.name}
+            {this.renderIcons}
+          </ColumnLink>
         </Column>
         <Column width="400px">{defaultTimeFormat(card.updated_at)}</Column>
         <Column>
@@ -158,6 +195,10 @@ class ListCard extends React.Component {
 }
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  insideChallenge: PropTypes.bool,
+}
+ListCard.defaultProps = {
+  insideChallenge: false,
 }
 
 export default ListCard
