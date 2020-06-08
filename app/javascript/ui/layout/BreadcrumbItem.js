@@ -190,7 +190,6 @@ export class BreadcrumbItem extends React.Component {
 
   onBreadcrumbClick = ev => {
     const { isTouchDevice, isSmallScreen } = this.props
-    console.log('breadcrumb click')
     // The dropdown should only show up on touch devices large enough to handle it
     if (isTouchDevice && !isSmallScreen) {
       ev.stopPropagation()
