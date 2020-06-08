@@ -23,6 +23,7 @@ const PhaseIcon = styled.div`
     max-height: 30px;
   }
 `
+PhaseIcon.displayName = 'PhaseIcon'
 
 // I couldn't find any similar-enough style in typography.js
 // So created a new style for this tooltip
@@ -33,7 +34,7 @@ const TooltipHeader = styled.div`
   font-weight: bold;
 `
 
-const phaseIcons = [
+export const phaseIcons = [
   <BuildIcon />,
   <FeedbackIcon />,
   <ResearchIcon />,
