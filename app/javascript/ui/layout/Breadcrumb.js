@@ -116,6 +116,9 @@ class Breadcrumb extends React.Component {
         lastEllipsesItem
       )
       firstEllipsesItem.subItems = subItems
+      if (lastEllipsesItem) {
+        firstEllipsesItem.id = lastEllipsesItem.id
+      }
     } else {
       subItems = this.transformToSubItems(copyItems)
     }
@@ -210,6 +213,7 @@ class Breadcrumb extends React.Component {
     // Tried using innerRef on styled component but it isn't available on mount
 
     const BreadcrumbItemComponent = breadcrumbItemComponent || BreadcrumbItem
+
     return (
       <div ref={this.breadcrumbWrapper}>
         {!renderItems && <BreadcrumbPadding />}
