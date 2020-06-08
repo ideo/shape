@@ -165,8 +165,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                              .select do |collection|
                                collection.can_view?(current_user)
                              end
+    include = Collection.default_relationships_for_api.concat([:submission_template_test])
     render jsonapi: collections,
-           include: Collection.default_relationships_for_api
+           include: include
   end
 
   def restore_permissions

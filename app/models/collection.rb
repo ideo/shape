@@ -1152,6 +1152,13 @@ class Collection < ApplicationRecord
     participant_group.add_role(Role::VIEWER, self)
   end
 
+  def submission_template_test
+    return [] unless submission_template&.collection_cards.present?
+
+    submission_template_test_card = submission_template.collection_cards.find { |cc| cc.record.type == 'Collection::TestCollection' }
+    submission_template_test_card&.record
+  end
+
   private
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)

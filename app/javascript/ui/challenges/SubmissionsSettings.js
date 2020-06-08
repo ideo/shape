@@ -22,24 +22,27 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
       setSubmissionBoxes(subBoxes)
       if (subBoxes.length > 0) {
         setViewingSubmissionBoxId(subBoxes[0].id)
-      }
 
-      const audiencesRequest = await collection.API_fetchChallengeAudiences()
-      setAudiences(audiencesRequest.data)
+        const { submission_template_test } = subBoxes[0]
 
-      const audiencesForSettings = audiencesRequest.data
-      const audienceSettingsMap = new Map()
-      _.each(audiencesForSettings, audience => {
-        audience.name = `${collection.challenge.name} ${audience.attributes.name}`
-        audienceSettingsMap.set(audience.id, {
-          selected: false,
-          audience,
-          displayCheckbox: true,
-          challenge: collection.challenge,
+        // FIXME: this will returns mock data at the moment
+        const audiencesRequest = await submission_template_test.API_fetchChallengeAudiences()
+        setAudiences(audiencesRequest.data)
+
+        const audiencesForSettings = audiencesRequest.data
+        const audienceSettingsMap = new Map()
+        _.each(audiencesForSettings, audience => {
+          audience.name = `${collection.challenge.name} ${audience.attributes.name}`
+          audienceSettingsMap.set(audience.id, {
+            selected: false,
+            audience,
+            displayCheckbox: true,
+            challenge: collection.challenge,
+          })
         })
-      })
 
-      setAudienceSettings(audienceSettingsMap)
+        setAudienceSettings(audienceSettingsMap)
+      }
 
       setIsLoading(false)
     }
@@ -61,7 +64,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
           />
         </Panel>
       ))}
-      {
+      {audienceSettings.size > 0 && (
         <AudienceSettingsWidget
           onToggleCheckbox={() => {}}
           onInputChange={() => {}}
@@ -73,7 +76,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
           locked={false}
           useChallengeAudienceSettings={true}
         />
-      }
+      )}
     </div>
   )
 }
