@@ -1,7 +1,6 @@
 import { Fragment } from 'react'
-import { Flex } from 'reflexbox'
 import PropTypes from 'prop-types'
-import { action, computed, observable } from 'mobx'
+import { action, computed, observable,} from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -34,9 +33,10 @@ Column.defaultProps = {
   width: 'auto',
 }
 
-const Row = styled(Flex)`
+const Row = styled.div`
   align-items: center;
   height: 50px;
+  display: flex;
   margin-bottom: 8px;
 
   ${Column} > .show-on-hover {
@@ -107,7 +107,7 @@ class ListCard extends React.Component {
     if (uiStore.isAndroid) return false
 
     return openContextMenu(ev, card, {
-      target: null,
+      targetRef: this.cardRef,
       onOpenMenu: uiStore.openContextMenu,
       menuItemCount,
     })
@@ -178,7 +178,7 @@ class ListCard extends React.Component {
       <Row
         onClick={this.handleRowClick}
         onContextMenu={this.handleContextMenu}
-        baseRef={c => (this.cardRef = c)}
+        ref={c => (this.cardRef = c)}
       >
         <Column width="50px">
           <div className="show-on-hover">
