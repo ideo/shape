@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { StaticDateRangePicker } from '@material-ui/pickers'
 import moment from 'moment-mini'
