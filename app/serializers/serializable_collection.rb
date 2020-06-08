@@ -29,7 +29,7 @@ class SerializableCollection < BaseJsonSerializer
     :cloned_from_id,
     :num_columns,
     :start_date,
-    :end_date
+    :end_date,
   )
 
   stringified_attributes(
@@ -139,7 +139,7 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :challenge_name do
-    @object.parent_challenge&.name
+    @object.parent_challenge&.name || @object&.collection_type == 'challenge' && @object.name
   end
 
   attribute :challenge_id do
