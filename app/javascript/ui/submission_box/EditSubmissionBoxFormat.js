@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import { Box } from 'reflexbox'
+import InlineLoader from '~/ui/layout/InlineLoader'
 
 import RecordSearch from '~/ui/global/RecordSearch'
 import {
@@ -12,20 +13,13 @@ import {
 } from '~/ui/submission_box/SubmissionBoxRow'
 import { submissionItemTypes } from '~/ui/submission_box/SubmissionBoxSettings'
 
-@inject('apiStore', 'uiStore', 'routingStore')
+@inject('apiStore', 'uiStore')
 @observer
 class EditSubmissionBoxFormat extends React.Component {
   @observable
   loading = false
   @observable
   templates = []
-
-  componentDidMount() {
-    const { collection } = this.props
-    const { apiStore, submission_template_id } = collection
-    if (!submission_template_id) return
-    apiStore.fetch('collections', submission_template_id)
-  }
 
   get locked() {
     const { uiStore } = this.props
@@ -36,26 +30,21 @@ class EditSubmissionBoxFormat extends React.Component {
 
   confirmSubmissionTemplateChange = ({ type, template } = {}, callback) => {
     const { uiStore, collection } = this.props
-    if (collection.countSubmissions) {
-      uiStore.confirm({
-        iconName: 'Alert',
-        prompt: `Are you sure?
-                There are already ${collection.countSubmissions} submissions.
-                New submissions will be
-                ${
-                  template
-                    ? pluralize(template.name)
-                    : pluralize(`${type} item`)
-                }.`,
-        confirmText: 'Continue',
-        cancelText: 'Cancel',
-        onConfirm: () => callback(),
-        onCancel: () => uiStore.closeDialog(),
-      })
-      return
-    }
-    // otherwise just go straight to the callback if no submissions
-    callback()
+    if (!collection.countSubmissions) callback()
+
+    uiStore.confirm({
+      iconName: 'Alert',
+      prompt: `Are you sure?
+              There are already ${collection.countSubmissions} submissions.
+              New submissions will be
+              ${
+                template ? pluralize(template.name) : pluralize(`${type} item`)
+              }.`,
+      confirmText: 'Continue',
+      cancelText: 'Cancel',
+      onConfirm: () => callback(),
+      onCancel: () => uiStore.closeDialog(),
+    })
   }
 
   onSearch = templates => {
@@ -138,6 +127,7 @@ class EditSubmissionBoxFormat extends React.Component {
           searchParams={{ master_template: true }}
         />
         <Box mt={2} mb={2}>
+          {this.loading && <InlineLoader />}
           {this.nonSelectedSubmissionTypes.map(type => (
             <SubmissionBoxRowForItem
               type={type}
@@ -165,7 +155,7 @@ EditSubmissionBoxFormat.propTypes = {
 EditSubmissionBoxFormat.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+EditSubmissionBoxFormat.displayName = 'EditSubmissionBoxFormat'
 
 export default EditSubmissionBoxFormat
