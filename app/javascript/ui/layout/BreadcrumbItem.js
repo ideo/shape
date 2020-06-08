@@ -194,6 +194,10 @@ export class BreadcrumbItem extends React.Component {
     if (isTouchDevice && !isSmallScreen) {
       ev.stopPropagation()
       this.openBreadcrumb()
+    } else {
+      const { item } = this.props
+      ev.preventDefault()
+      this.props.onBreadcrumbClick(item.id)
     }
   }
 
