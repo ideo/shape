@@ -11,7 +11,7 @@ module JsonapiCache
       collection: nil,
       search_records: nil
     )
-      @cards = cards.to_a
+      @cards = cards
       @collection = collection
       @user = user
       @current_ability = Ability.new(@user)
