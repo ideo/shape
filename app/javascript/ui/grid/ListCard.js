@@ -1,8 +1,8 @@
 import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
-import { computed } from 'mobx'
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, computed, observable,} from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -18,6 +18,7 @@ import VideoIcon from '~/ui/icons/VideoIcon'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { routingStore, uiStore } from '~/stores'
+import { openContextMenu } from '~/utils/clickUtils'
 import v, { ITEM_TYPES } from '~/utils/variables'
 
 export const Column = styled.div`
@@ -67,10 +68,20 @@ const IconHolder = styled.div`
   width: 16px;
 `
 
+@observer
 class ListCard extends React.Component {
+  @observable
+  menuItemCount = 1
+
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
+  }
+
+  @action
+  setMenuItemsCount = count => {
+    // counts menuitems in actionmenu
+    this.menuItemCount = count
   }
 
   handleRecordClick = ev => {
@@ -86,6 +97,20 @@ class ListCard extends React.Component {
       return
     }
     uiStore.toggleSelectedCardId(card.id)
+  }
+
+  handleContextMenu = ev => {
+    const { menuItemCount, props } = this
+    const { card } = props
+
+    ev.preventDefault()
+    if (uiStore.isAndroid) return false
+
+    return openContextMenu(ev, card, {
+      target: null,
+      onOpenMenu: uiStore.openContextMenu,
+      menuItemCount,
+    })
   }
 
   handleActionMenuClick = ev => {
@@ -150,7 +175,11 @@ class ListCard extends React.Component {
   render() {
     const { card } = this.props
     return (
-      <Row onClick={this.handleRowClick}>
+      <Row
+        onClick={this.handleRowClick}
+        onContextMenu={this.handleContextMenu}
+        baseRef={c => (this.cardRef = c)}
+      >
         <Column width="50px">
           <div className="show-on-hover">
             <SelectionCircle cardId={card.id} />
@@ -191,6 +220,7 @@ class ListCard extends React.Component {
             menuOpen={this.menuOpen}
             onOpen={this.handleActionMenuClick}
             onLeave={this.handleCloseMenu}
+            menuItemsCount={this.getMenuItemsCount}
           />
         </Column>
       </Row>

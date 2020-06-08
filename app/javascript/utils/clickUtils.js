@@ -91,4 +91,33 @@ const calculatePopoutMenuOffset = (e, eventSource, popoutMenuItemCount = 1) => {
   }
 }
 
+export const openContextMenu = (
+  ev,
+  card,
+  {
+    targetRef,
+    onOpenMenu,
+    menuItemCount,
+  }) => {
+  let x = ev.clientX - 1600
+  let y = ev.clientY - 360
+  if (targetRef) {
+    const rect = targetRef.getBoundingClientRect()
+    x = ev.clientX - rect.left - rect.width
+    y = ev.clientY - rect.top - 15
+  }
+
+  ev.persist()
+  let delay = 0
+  if (card.record.isText) {
+    // delay so that contextMenu can determine whether you right-clicked and selected text
+    delay = 200
+  }
+  setTimeout(() => {
+    onOpenMenu(ev, { x, y, card, menuItemCount })
+  }, delay)
+  return false
+}
+
+
 export { calculatePopoutMenuOffset }
