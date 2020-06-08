@@ -557,6 +557,7 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.8)
     timecop (0.9.1)
+    tunemygc (1.0.71)
     twilio-ruby (5.23.1)
       faraday (~> 0.9)
       jwt (>= 1.5, <= 2.5)
@@ -680,6 +681,7 @@ DEPENDENCIES
   spring-watcher-listen (~> 2.0.0)
   stackprof
   timecop
+  tunemygc
   twilio-ruby
   uglifier (>= 1.3.0)
   vcr

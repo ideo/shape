@@ -109,9 +109,6 @@ gem 'gibbon', '~> 3.2'
 # distributed mutex
 gem 'redis-mutex', '~> 4.0.1'
 
-# performance tuning
-# gem 'tunemygc'
-gem 'barnes'
 gem 'oj'
 gem 'scout_apm'
 
@@ -203,6 +200,9 @@ group :production do
   gem 'heroku-deflater', github: 'ideo/heroku-deflater'
   # https://devcenter.heroku.com/articles/rails-autoscale
   gem 'rails_autoscale_agent'
+  # performance tuning
+  gem 'tunemygc'
+  gem 'barnes'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
