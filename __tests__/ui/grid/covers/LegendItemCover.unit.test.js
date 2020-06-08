@@ -220,6 +220,10 @@ describe('LegendItemCover', () => {
         expect(
           parentCollection.API_selectDatasetsWithIdentifier
         ).toHaveBeenCalled()
+        expect(parentCollection.API_fetchCard).toHaveBeenCalledWith(
+          fakeLegendItem.parent_collection_card.id
+        )
+        expect(parentCollection.reloadDataItemsDatasets).toHaveBeenCalled()
       })
     })
   })

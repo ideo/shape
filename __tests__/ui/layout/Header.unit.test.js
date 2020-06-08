@@ -52,7 +52,9 @@ describe('Header', () => {
     })
 
     it('should render the breadcrumb', () => {
-      expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeCollection)
+      expect(wrapper.find('PageBreadcrumb').prop('record')).toEqual(
+        fakeCollection
+      )
     })
 
     describe('on the homepage', () => {
@@ -62,7 +64,7 @@ describe('Header', () => {
       })
 
       it('should not render the breadcrumb', () => {
-        expect(wrapper.find('Breadcrumb').prop('isHomepage')).toBeTruthy()
+        expect(wrapper.find('PageBreadcrumb').prop('isHomepage')).toBeTruthy()
       })
     })
   })
@@ -76,7 +78,9 @@ describe('Header', () => {
     })
 
     it('should render the breadcrumb', () => {
-      expect(wrapper.find('Breadcrumb').prop('record')).toEqual(fakeTextItem)
+      expect(wrapper.find('PageBreadcrumb').prop('record')).toEqual(
+        fakeTextItem
+      )
     })
 
     it('should render the roles', () => {

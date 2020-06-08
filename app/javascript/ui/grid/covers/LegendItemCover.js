@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -115,10 +115,6 @@ class LegendItemCover extends React.Component {
     comparisonMenuOpen: false,
   }
 
-  componentDidMount() {
-    this.searchTestCollections(' ')
-  }
-
   componentWillUnMount() {
     const { uiStore } = this.props
     uiStore.removeEmptySpaceClickHandler(this.onSearchClose)
@@ -138,12 +134,13 @@ class LegendItemCover extends React.Component {
 
   rendersAsLine(selectedDataset, isPrimary) {
     if (selectedDataset.chart_type === 'line') return true
-    if (
-      selectedDataset.chart_type === 'area' &&
-      !isPrimary &&
-      !selectedDataset.hasDates
-    )
-      return true
+    const isSecondaryAreaChart =
+      selectedDataset.chart_type === 'area' && !isPrimary
+    if (isSecondaryAreaChart) {
+      if (!selectedDataset.hasDates || selectedDataset.tiers.length) {
+        return true
+      }
+    }
     return false
   }
 
@@ -174,7 +171,6 @@ class LegendItemCover extends React.Component {
    * Toggle's a dataset that already exists on the legend items and charts
    * to have it's data_items_dataset.selected property toggled
    */
-  @observable
   @action
   toggleDatasetsWithIdentifier = async ({ identifier, selected }) => {
     const { parent } = this
@@ -183,7 +179,7 @@ class LegendItemCover extends React.Component {
     } else {
       await parent.API_unselectDatasetsWithIdentifier({ identifier })
     }
-    parent.API_fetchCards({ include: ['datasets'] })
+    this.refetchLegendCardAndData()
   }
 
   toggleComparisonSearch = () => {
@@ -218,11 +214,11 @@ class LegendItemCover extends React.Component {
     const { parent } = this
     if (this.usesTestComparisonApi(dataset)) {
       await parent.API_removeComparison({ id: dataset.test_collection_id })
+      this.refetchLegendCardAndData()
     } else {
       const { identifier, selected } = dataset
       this.toggleDatasetsWithIdentifier({ identifier, selected })
     }
-    parent.API_fetchCards()
   }
 
   /*
@@ -238,11 +234,20 @@ class LegendItemCover extends React.Component {
     const { parent } = this
     if (this.usesTestComparisonApi(entity)) {
       await parent.API_addComparison(entity)
+      this.refetchLegendCardAndData()
     } else {
       const { identifier, selected } = entity
       this.toggleDatasetsWithIdentifier({ identifier, selected })
     }
-    parent.API_fetchCards()
+  }
+
+  refetchLegendCardAndData() {
+    const { parent } = this
+    const { item } = this.props
+    parent.API_fetchCard(item.parent_collection_card.id)
+    // go through and find all data cards in the collection and refetch
+    // NOTE: this is not strictly tied to the LegendItem but easiest way to refetch
+    parent.reloadDataItemsDatasets()
   }
 
   findDatasetByTest(testId) {
@@ -253,7 +258,7 @@ class LegendItemCover extends React.Component {
     return dataSet
   }
 
-  searchTestCollections = (term, callback) => {
+  searchTestCollections = async (term, callback) => {
     const { item, apiStore } = this.props
     if (!apiStore.currentUser) {
       return
@@ -262,23 +267,26 @@ class LegendItemCover extends React.Component {
       callback()
       return
     }
-    return apiStore
-      .searchCollections({
+    try {
+      const res = await apiStore.searchCollections({
         query: `${term}`,
         type: 'Collection::TestCollection',
         order_by: 'updated_at',
         order_direction: 'desc',
         per_page: 30,
       })
-      .then(res => res.data)
-      .then(records => records.filter(record => record.id !== item.parent_id))
-      .then(records =>
-        records.filter(record => !this.findDatasetByTest(record.id))
-      )
-      .then(records => callback && callback(formatForAutocomplete(records)))
-      .catch(e => {
-        trackError(e)
-      })
+      const cards = res.data
+      let records = cards
+        .map(card => card.record)
+        .filter(record => record.id !== item.parent_id)
+        .filter(record => !this.findDatasetByTest(record.id))
+      if (callback && _.isFunction(callback)) {
+        records = callback(formatForAutocomplete(records))
+      }
+      return records
+    } catch (e) {
+      trackError(e)
+    }
   }
 
   handleUnselectedDatasetOption = event => {
@@ -349,24 +357,19 @@ class LegendItemCover extends React.Component {
     const { identifier, name, style } = dataset
     const primary = order === 0
     let icon
+    const { item } = this.props
+    const itemStyle = item.style
+    let renderedColor =
+      style && style.fill
+        ? darkenColor(style.fill, colorOrder)
+        : colorScale[order]
+    // Style on the item itself should aways override dataset style.
+    if (itemStyle && itemStyle.fill) {
+      renderedColor = itemStyle.fill
+    }
     if (this.rendersAsLine(dataset, primary)) {
-      icon = (
-        <LineChartIcon
-          color={(style && style.fill) || '#000000'}
-          order={order}
-        />
-      )
+      icon = <LineChartIcon color={renderedColor} order={order} />
     } else {
-      const { item } = this.props
-      const itemStyle = item.style
-      let renderedColor =
-        style && style.fill
-          ? darkenColor(style.fill, colorOrder)
-          : colorScale[order]
-      // Style on the item itself should aways override dataset style.
-      if (itemStyle && itemStyle.fill) {
-        renderedColor = itemStyle.fill
-      }
       icon = (
         <AreaChartIcon
           color={renderedColor}

@@ -127,7 +127,7 @@ describe RolifyExtensions, type: :concern do
     end
 
     it 'returns nil unless `has_role_by_identifier?` has been called' do
-      has_roles = user.precache_roles_for([Role::VIEWER], collection)
+      has_roles = user.precache_roles_for([Role::VIEWER], resources: [collection])
       expect(has_roles).to be nil
     end
 
@@ -137,7 +137,23 @@ describe RolifyExtensions, type: :concern do
       user.has_role_by_identifier? Role::EDITOR, collection.roles_anchor_resource_identifier
       has_roles = user.precache_roles_for(
         [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
-        collection.children_and_linked_children,
+        resources: collection.children_and_linked_children,
+      )
+      expect(has_roles).to include(
+        ['editor', collection.roles_anchor_resource_identifier] => true,
+        ['viewer', collection_cards.first.record.roles_anchor_resource_identifier] => true,
+        ['viewer', collection_cards.second.record.roles_anchor_resource_identifier] => true,
+      )
+    end
+
+    it 'precaches role relationships using resource_identifiers' do
+      # perform one query to prime the @has_role_by_identifier hash
+      # (e.g. this may happen during load_and_authorize_resource)
+      user.has_role_by_identifier? Role::EDITOR, collection.roles_anchor_resource_identifier
+      identifiers = collection.children_and_linked_children.map(&:roles_anchor_resource_identifier).uniq
+      has_roles = user.precache_roles_for(
+        [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
+        resource_identifiers: identifiers,
       )
       expect(has_roles).to include(
         ['editor', collection.roles_anchor_resource_identifier] => true,

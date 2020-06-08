@@ -48,6 +48,18 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       )
     end
 
+    let(:first_result) do
+      json['data'].first
+    end
+    let(:first_record_id) do
+      first_result['relationships']['record']['data']['id'].to_i
+    end
+    let(:record_ids) do
+      json['data'].map do |d|
+        d['relationships']['record']['data']['id'].to_i
+      end
+    end
+
     before do
       Collection.reindex
       Collection.searchkick_index.refresh
@@ -72,7 +84,9 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       it 'returns collection that matches name search' do
         get(path, params: { query: find_collection.name })
         expect(json['data'].size).to eq(1)
-        expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+        # this is how the card id is generated when there is no parent_collection_card
+        expect(first_result['id']).to eq("result-#{find_collection.id}")
+        expect(first_record_id).to eq(find_collection.id)
       end
 
       it 'returns collection that matches sub-item text search' do
@@ -80,13 +94,13 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         text = collection_with_text.collection_cards.first.item.plain_content
         get(path, params: { query: text })
         expect(json['data'].size).to eq(1)
-        expect(json['data'].first['id'].to_i).to eq(collection_with_text.id)
+        expect(first_record_id).to eq(collection_with_text.id)
       end
 
       it 'returns collection that matches tag search' do
         get(path, params: { query: tag_list.first })
         expect(json['data'].size).to eq(1)
-        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+        expect(first_record_id).to eq(collection_with_tags.id)
       end
 
       it 'returns empty array if no match' do
@@ -98,31 +112,31 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         # casing shouldn't matter
         get(path, params: { query: '#blockChain' })
         expect(json['data'].size).to eq(1)
-        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+        expect(first_record_id).to eq(collection_with_tags.id)
         get(path, params: { query: '#prototype' })
         expect(json['data'].size).to eq(1)
-        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+        expect(first_record_id).to eq(collection_with_tags.id)
         get(path, params: { query: '#Innovation-Metrics' })
         expect(json['data'].size).to eq(1)
-        expect(json['data'].first['id'].to_i).to eq(collection_with_tags.id)
+        expect(first_record_id).to eq(collection_with_tags.id)
       end
 
       context 'searching by ID' do
         it 'should find records by ID' do
           get(path, params: { query: find_collection.id })
           expect(json['data'].size).to eq(1)
-          expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+          expect(first_record_id).to eq(find_collection.id)
         end
 
         it 'should find records by ID and slug' do
           get(path, params: { query: "#{find_collection.id}-any-slug-could-have-123-numbers" })
           expect(json['data'].size).to eq(1)
-          expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+          expect(first_record_id).to eq(find_collection.id)
         end
 
         it 'should find records named with a number (not ID)' do
           get(path, params: { query: '3rd' })
-          expect(json['data'].first['id'].to_i).to eq(number_collection.id)
+          expect(first_record_id).to eq(number_collection.id)
         end
       end
 
@@ -144,6 +158,8 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
           get(path, params: { query: 'shared name', per_page: 2 })
           expect(json['data'].size).to eq(2)
           expect(json['meta']['page']).to eq(1)
+          expect(json['meta']['total_pages']).to eq(2)
+          expect(json['meta']['total']).to eq(4)
           expect(json['links']['last']).to eq(2)
         end
       end
@@ -168,8 +184,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         it 'only finds template collections and filters out non-standard collections' do
           get(path, params: { master_template: true })
           expect(json['data'].size).to eq(2)
-          ids = json['data'].map { |d| d['id'].to_i }
-          expect(ids).to match_array(
+          expect(record_ids).to match_array(
             templates.reject { |t| t.type == 'Collection::TestCollection' }.map(&:id),
           )
         end
@@ -213,17 +228,17 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
             query = "Updated(#{3.days.ago.strftime('%d/%m/%Y')}, #{3.days.from_now.strftime('%d/%m/%Y')})"
 
             get(path, params: { query: query })
-            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range1.id.to_s })
-            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range2.id.to_s })
-            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range1.id.to_s })
-            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range2.id.to_s })
+            expect(record_ids).to include(collection_with_activity_in_range1.id)
+            expect(record_ids).to include(collection_with_activity_in_range2.id)
+            expect(record_ids).not_to include(collection_with_activity_out_of_range1.id)
+            expect(record_ids).not_to include(collection_with_activity_out_of_range2.id)
             expect(json['meta']['size']).to eq(2)
           end
 
           it 'works with search terms' do
             query = "foo Updated(#{3.days.ago.strftime('%d/%m/%Y')}, #{3.days.from_now.strftime('%d/%m/%Y')})"
             get(path, params: { query: query })
-            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range1.id.to_s })
+            expect(record_ids).to include(collection_with_activity_in_range1.id)
             expect(json['meta']['size']).to eq(1)
           end
         end
@@ -232,11 +247,11 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
           it 'includes collections with activity outside of the date range' do
             query = "NotUpdated(#{3.days.ago.strftime('%d/%m/%Y')}, #{3.days.from_now.strftime('%d/%m/%Y')})"
             get(path, params: { query: query })
-            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range1.id.to_s })
-            expect(json['data']).not_to include(an_object_satisfying { |x| x['id'] == collection_with_activity_in_range2.id.to_s })
-            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range1.id.to_s })
-            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_activity_out_of_range2.id.to_s })
-            expect(json['data']).to include(an_object_satisfying { |x| x['id'] == collection_with_no_activity.id.to_s })
+            expect(record_ids).not_to include(collection_with_activity_in_range1.id)
+            expect(record_ids).not_to include(collection_with_activity_in_range2.id)
+            expect(record_ids).to include(collection_with_activity_out_of_range1.id)
+            expect(record_ids).to include(collection_with_activity_out_of_range2.id)
+            expect(record_ids).to include(collection_with_no_activity.id)
           end
         end
       end
@@ -323,7 +338,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         test_answer = survey_response_alias_collection.search_data[:test_answer].sample
         expect(test_answer).not_to be_nil
         get(path, params: { query: "test_answer(#{test_answer})" })
-        expect(json['data'].map { |d| d['id'].to_i }).to eq([survey_response_alias_collection.id])
+        expect(record_ids).to eq([survey_response_alias_collection.id])
       end
     end
 
@@ -404,7 +419,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       it 'returns collection that matches name search' do
         get(path, params: { query: find_collection.name })
         expect(json['data'].size).to eq(1)
-        expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+        expect(first_record_id).to eq(find_collection.id)
       end
     end
 
@@ -421,7 +436,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       it 'does not return collection that has same name in another org' do
         get(path, params: { query: find_collection.name })
         expect(json['data'].size).to be(1)
-        expect(json['data'].first['id'].to_i).to eq(find_collection.id)
+        expect(first_record_id).to eq(find_collection.id)
       end
     end
 
@@ -441,7 +456,7 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
       it 'only returns collections of that type' do
         get(path, params: { type: 'Collection::TestCollection' })
         expect(json['data'].size).to equal(1)
-        expect(json['data'].first['id'].to_i).to eq(test_collection.id)
+        expect(first_record_id).to eq(test_collection.id)
       end
     end
 
@@ -452,18 +467,15 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         batch_reindex(Collection)
       end
 
-      it 'sorts according to given params' do
+      it 'sorts according to given params (desc)' do
         get(path, params: { order_by: :created_at, order_direction: :desc })
-        expect(json['data'].first['id'].to_i).to eq(find_collection.id)
-
-        get(path, params: { order_by: :created_at, order_direction: :asc })
-        expect(json['data'].first['id'].to_i).not_to eq(find_collection.id)
+        expect(first_record_id).to eq(find_collection.id)
       end
-    end
 
-    it 'uses simple serializer' do
-      get(path, params: { query: find_collection.name })
-      expect(json['data'].first['attributes']['serializer']).to eq('SerializableSimpleCollection')
+      it 'sorts according to given params (asc)' do
+        get(path, params: { order_by: :created_at, order_direction: :asc })
+        expect(first_record_id).not_to eq(find_collection.id)
+      end
     end
 
     describe 'GET #search_collection_cards' do

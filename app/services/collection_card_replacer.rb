@@ -22,6 +22,7 @@ class CollectionCardReplacer
     @errors = @item.errors
     assign_item_attributes
     result = @item.save
+    @replacing_card.touch
     check_parent_collection_cover
     update_template_instances
     update_test_results_content_if_live

@@ -26,11 +26,6 @@ const props = {
   dragOffset: { x: 0, y: 0 },
 }
 
-const fakeEvent = {
-  preventDefault: jest.fn(),
-  target: { className: '', closest: jest.fn() },
-}
-
 let wrapper, component
 describe('MovableGridCard', () => {
   it('renders a placeholder card if cardType is "placeholder"', () => {
@@ -155,26 +150,6 @@ describe('MovableGridCard', () => {
       const data = { x: 0, y: 0 }
       component.handleDrag(e, data)
       expect(uiStore.drag).toHaveBeenCalledWith({ x: pageX, y: pageY })
-    })
-  })
-
-  describe('handleClick', () => {
-    it('does not call showPermissionsAlert', () => {
-      expect(props.record.can_view).toEqual(true)
-      wrapper.instance().handleClick(fakeEvent)
-      expect(uiStore.showPermissionsAlert).not.toHaveBeenCalled()
-    })
-
-    describe('if user cannot view', () => {
-      beforeEach(() => {
-        props.record.can_view = false
-        wrapper = shallow(<MovableGridCard {...props} />)
-      })
-
-      it('calls showPermissionsAlert', () => {
-        wrapper.instance().handleClick(fakeEvent)
-        expect(uiStore.showPermissionsAlert).toHaveBeenCalled()
-      })
     })
   })
 })

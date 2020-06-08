@@ -166,6 +166,7 @@ class Collection < ApplicationRecord
   before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
+  after_commit :rename_challenge_groups, if: :saved_change_to_name?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
   after_commit :reindex_after_archive, if: :saved_change_to_archived?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -672,14 +673,6 @@ class Collection < ApplicationRecord
     )
   end
 
-  def collection_cards_viewable_by(user:, filters: {})
-    CollectionCardFilter::Base.call(
-      collection: self,
-      user: user,
-      filters: filters,
-    )
-  end
-
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     CollectionCard.import(
@@ -703,7 +696,11 @@ class Collection < ApplicationRecord
   def increment_card_orders_at(order, amount: 1)
     collection_cards
       .where(CollectionCard.arel_table[:order].gteq(order))
-      .update_all(['"order" = "order" + ?', amount])
+      .update_all([
+        '"order" = "order" + ?, updated_at = ?',
+        amount,
+        Time.current,
+      ])
   end
 
   def unarchive_cards!(cards, card_attrs_snapshot)
@@ -775,6 +772,20 @@ class Collection < ApplicationRecord
   def touch_related_cards
     try(:parent_collection_card).try(:touch)
     cards_linked_to_this_collection.update_all(updated_at: updated_at)
+  end
+
+  def rename_challenge_groups
+    if challenge_admin_group.present?
+      challenge_admin_group.update(name: "#{name} Admins")
+    end
+
+    if challenge_reviewer_group.present?
+      challenge_reviewer_group.update(name: "#{name} Reviewers")
+    end
+
+    return unless challenge_participant_group.present?
+
+    challenge_participant_group.update(name: "#{name} Participants")
   end
 
   def owned_tag_list
@@ -895,13 +906,12 @@ class Collection < ApplicationRecord
     all_collections = Collection.in_collection(self)
     all_items = Item.in_collection(self)
     [all_collections, all_items].each do |records|
-      records.update_all(roles_anchor_collection_id: roles_anchor.id)
+      records.update_all(
+        roles_anchor_collection_id: roles_anchor.id,
+        updated_at: Time.current,
+      )
       records.find_each do |record|
-        if record.roles.present?
-          record.roles.destroy_all
-        else
-          record.touch
-        end
+        record.roles.destroy_all if record.roles.present?
       end
     end
   end

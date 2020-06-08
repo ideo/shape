@@ -1,3 +1,4 @@
+import React from 'react'
 import PropTypes from 'prop-types'
 import MuiTooltip from '@material-ui/core/Tooltip'
 import { withStyles } from '@material-ui/core/styles'
@@ -16,7 +17,6 @@ const styles = {
   },
 }
 
-@withStyles(styles)
 class Tooltip extends React.PureComponent {
   // using the @withStyles decorator, this syntax is more appropriate
   static propTypes = {
@@ -41,4 +41,4 @@ class Tooltip extends React.PureComponent {
 
 Tooltip.displayName = 'Tooltip'
 
-export default Tooltip
+export default withStyles(styles)(Tooltip)

@@ -3,6 +3,7 @@ import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { fakeTextItem, fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import Tooltip from '~/ui/global/Tooltip'
 
 describe('PageHeader', () => {
   let wrapper, component, props
@@ -158,7 +159,7 @@ describe('PageHeader', () => {
       expect(wrapper.find('BackIcon').exists()).toBeTruthy()
       expect(
         wrapper
-          .find('Tooltip')
+          .find(Tooltip)
           .last()
           .props().title
       ).toMatch('go to master template')

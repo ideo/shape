@@ -1,36 +1,39 @@
 import { BreadcrumbItem } from '~/ui/layout/BreadcrumbItem'
-import { fakeTextItem } from '#/mocks/data'
-import { routingStore } from '~/stores'
 import {
   StyledMenu,
   StyledMenuButton,
   StyledMenuItem,
   StyledMenuWrapper,
 } from '~/ui/global/PopoutMenu'
+import Tooltip from '~/ui/global/Tooltip'
 
 jest.mock('../../../app/javascript/stores')
 jest.useFakeTimers()
 
-const props = {
-  item: { ...fakeTextItem, nested: 0 },
-  identifier: 'item_1',
-  index: 1,
-  numItems: 1,
-  restoreBreadcrumb: jest.fn(),
-}
-
-let wrapper
-
-const rerender = () => {
-  wrapper = shallow(<BreadcrumbItem {...props} />)
-}
+let wrapper, props, rerender
 
 describe('BreadcrumbItem', () => {
   let breadcrumbItem
 
   beforeEach(() => {
+    props = {
+      item: {
+        name: 'Home',
+        id: '1',
+        type: 'Collection',
+        breadcrumbDropDownRecords: [],
+      },
+      index: 1,
+      numItems: 1,
+      restoreBreadcrumb: jest.fn(),
+      onBreadcrumbDive: jest.fn(),
+      onBreadcrumbClick: jest.fn(),
+    }
+    rerender = () => {
+      wrapper = shallow(<BreadcrumbItem {...props} />)
+      breadcrumbItem = wrapper.find('StyledBreadcrumbItem').at(0)
+    }
     rerender()
-    breadcrumbItem = wrapper.find('StyledBreadcrumbItem').at(0)
   })
 
   describe('render()', () => {
@@ -38,9 +41,22 @@ describe('BreadcrumbItem', () => {
       expect(wrapper.find('StyledBreadcrumbItem').exists()).toBeTruthy()
     })
 
+    describe('with background color', () => {
+      beforeEach(() => {
+        props.backgroundColor = 'blue'
+        rerender()
+      })
+
+      it('should assign the background color on StyledBreadcrumbItem', () => {
+        expect(breadcrumbItem.props().backgroundColor).toEqual('blue')
+      })
+    })
+
     describe('with dropdown open', () => {
       beforeEach(() => {
-        wrapper.instance().dropdownOpen = true
+        wrapper.setState({
+          dropdownOpen: true,
+        })
         wrapper.instance().setInitialBaseRecords()
         wrapper.update()
       })
@@ -76,7 +92,7 @@ describe('BreadcrumbItem', () => {
         })
 
         it('should route to the item', () => {
-          expect(routingStore.routeTo).toHaveBeenCalled()
+          expect(props.onBreadcrumbClick).toHaveBeenCalled()
         })
       })
 
@@ -97,7 +113,7 @@ describe('BreadcrumbItem', () => {
 
         it('should render a tooltip on the breadcrumb name', () => {
           const menuButton = wrapper.find(StyledMenuButton).at(0)
-          expect(menuButton.find('Tooltip').exists()).toBeTruthy()
+          expect(menuButton.find(Tooltip).exists()).toBeTruthy()
         })
       })
 
@@ -140,14 +156,16 @@ describe('BreadcrumbItem', () => {
       let subMenuWrapper
 
       beforeEach(() => {
-        wrapper.instance().dropdownOpen = true
-        wrapper.instance().setInitialBaseRecords()
-        wrapper.instance().menuItemOpenId = 1
-        wrapper.instance().breadcrumbDropDownRecords = [
+        props.item.breadcrumbDropDownRecords = [
           { name: 'nested item 1', id: '10', has_children: true },
           { name: 'nested item 2', id: '11', has_children: false },
         ]
-        wrapper.update()
+        props.item.subMenuOpen = true
+        rerender()
+        wrapper.setState({
+          dropdownOpen: true,
+          menuItemOpenId: 1,
+        })
         parentMenuWrapper = wrapper.find(StyledMenuWrapper).at(0)
         subMenu = parentMenuWrapper.find(StyledMenu).at(0)
         subMenuWrapper = parentMenuWrapper.find(StyledMenuWrapper).at(1)
@@ -192,7 +210,7 @@ describe('BreadcrumbItem', () => {
       })
 
       it('renders a tooltip with the "switch to" location button', () => {
-        const tooltip = wrapper.find('Tooltip')
+        const tooltip = wrapper.find(Tooltip)
         expect(tooltip.props().title).toMatch(`switch to ${props.item.name}`)
         expect(tooltip.find('StyledRestoreButton').exists()).toBeTruthy()
       })
@@ -202,7 +220,7 @@ describe('BreadcrumbItem', () => {
   describe('onBreadcrumbHoverOver', () => {
     it('should open the dropdown', () => {
       breadcrumbItem.simulate('mouseover')
-      expect(wrapper.instance().dropdownOpen).toBe(true)
+      expect(wrapper.state().dropdownOpen).toBe(true)
     })
   })
 

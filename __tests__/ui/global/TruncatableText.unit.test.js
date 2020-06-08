@@ -1,7 +1,9 @@
 import TruncatableText from '~/ui/global/TruncatableText'
 import { rightClamp } from '~/utils/textUtils'
+import Tooltip from '~/ui/global/Tooltip'
 
 let wrapper, props
+
 describe('TruncatableText', () => {
   describe('with text greater than the max text to display', () => {
     beforeEach(() => {
@@ -24,7 +26,7 @@ describe('TruncatableText', () => {
 
       expect(
         wrapper
-          .find('Tooltip')
+          .find(Tooltip)
           .first()
           .props().title
       ).toMatch(props.text)

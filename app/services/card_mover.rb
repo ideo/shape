@@ -94,7 +94,7 @@ class CardMover < SimpleService
       @placement_row = @placement['row']
       @placement_col = @placement['col']
       # error case
-      return false unless @to_collection.is_a?(Collection::Board)
+      return false unless @to_collection.board_collection?
     else
       # @placement format not found
       return false
@@ -105,7 +105,7 @@ class CardMover < SimpleService
   end
 
   def move_cards_to_board
-    return unless @to_collection.is_a?(Collection::Board)
+    return unless @to_collection.board_collection?
 
     CollectionGrid::BoardPlacement.call(
       to_collection: @to_collection,

@@ -7,7 +7,7 @@ import { syncHistoryWithStore } from 'mobx-react-router'
 import { Router } from 'react-router-dom'
 import * as Sentry from '@sentry/browser'
 import { LocalizationProvider } from '@material-ui/pickers'
-import MomentUtils from '@material-ui/pickers/adapter/moment'
+import DateFnsUtils from '@material-ui/pickers/adapter/date-fns'
 
 import Routes from '~/ui/Routes'
 import stores, { routingStore } from '~/stores'
@@ -22,7 +22,7 @@ const history = syncHistoryWithStore(browserHistory, routingStore)
 const RenderApp = inner => {
   ReactDOM.render(
     <Provider {...stores}>
-      <LocalizationProvider dateAdapter={MomentUtils}>
+      <LocalizationProvider dateAdapter={DateFnsUtils}>
         <Router history={history}>{inner}</Router>
       </LocalizationProvider>
     </Provider>,

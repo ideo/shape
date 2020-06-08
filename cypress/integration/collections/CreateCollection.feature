@@ -16,3 +16,8 @@ Feature: Creating a Collection
     Then I should see "Hello World" in a "Breadcrumb"
     When I navigate to the collection named "Hello World" via the breadcrumb
     Then the URL should match the captured URL
+
+    # open the ActivityLog to see the CommentThread
+    When I click the "ActivityLogButton"
+    And I wait for "@apiGetCommentThread" to finish
+    Then I should see "Hello World" in a "CommentThreadHeaderName"

@@ -3,7 +3,8 @@ class SerializableDataItem < SerializableItem
 
   has_many :datasets do
     data do
-      @include.present? && @include.include?('datasets') ? @object.selected_datasets : []
+      # omitted on purpose to be filled in async
+      []
     end
   end
 end

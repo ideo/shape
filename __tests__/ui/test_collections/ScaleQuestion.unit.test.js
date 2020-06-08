@@ -2,7 +2,10 @@ import ScaleQuestion from '~/ui/test_collections/ScaleQuestion'
 import { fakeQuestionItem, fakeQuestionAnswer } from '#/mocks/data'
 import { shallowWithTheme } from '#/renderWithTheme'
 
+import Tooltip from '~/ui/global/Tooltip'
+
 let wrapper, props, theme
+
 const fakeEv = {
   preventDefault: jest.fn(),
 }
@@ -28,7 +31,7 @@ describe('ScaleQuestion', () => {
     })
 
     it('should render a tooltip for each emoji', () => {
-      expect(wrapper.find('Tooltip').length).toEqual(4)
+      expect(wrapper.find(Tooltip).length).toEqual(4)
     })
 
     it('should not render EditableInput', () => {

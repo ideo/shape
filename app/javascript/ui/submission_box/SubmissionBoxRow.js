@@ -1,4 +1,4 @@
-import { BctButton } from '~/ui/grid/shared'
+import BctButton from '~/ui/global/BctButton'
 import styled from 'styled-components'
 import _ from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
@@ -21,10 +21,12 @@ const SubmissionBoxRow = styled(Row)`
     background: ${v.colors.primaryLight};
   }
 `
+SubmissionBoxRow.displayName = 'SubmissionBoxRow'
 
 const SubmissionBoxRowText = styled(RowItemLeft)`
   padding-top: 0.75rem;
 `
+SubmissionBoxRowText.displayName = 'SubmissionBoxRowText'
 
 export const SubmissionBoxRowForItem = ({
   type,

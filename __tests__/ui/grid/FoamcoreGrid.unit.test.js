@@ -63,10 +63,6 @@ describe('FoamcoreGrid', () => {
       blankContentToolState: {},
       apiStore: fakeApiStore(),
       uiStore: fakeUiStore,
-      routingStore: {
-        routeTo: jest.fn(),
-        push: jest.fn(),
-      },
     }
     rerender = () => {
       props.collection.API_batchUpdateCardsWithUndo.mockClear()

@@ -33,9 +33,8 @@ import MuiTheme, { BillingMuiTheme } from '~/ui/theme'
 import captureGlobalKeypress, {
   handleMouseDownSelection,
 } from '~/utils/captureGlobalKeypress'
-import ScrollNearPageBoundsService from '~/utils/ScrollNearPageBoundsService'
+import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 
-const pageBoundsScroller = new ScrollNearPageBoundsService()
 const AppWrapper = styled.div`
   /* used by terms of use modal to blur the whole site */
   ${props =>
