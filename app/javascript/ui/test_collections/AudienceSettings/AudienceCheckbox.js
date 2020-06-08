@@ -64,7 +64,9 @@ const AudienceCheckbox = ({
           label={
             <div>
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-                <StyledLabelText>{name}</StyledLabelText>
+                <StyledLabelText>
+                  {name || audience.attributes.name}
+                </StyledLabelText>
                 {// FIXME: hardcode participant id
                 useChallengeAudienceSettings && id === '991' && (
                   <AssignReviewersLink

@@ -1,6 +1,5 @@
 import EditSubmissionBoxFormat from '~/ui/submission_box/EditSubmissionBoxFormat'
 import { submissionItemTypes } from '~/ui/submission_box/SubmissionBoxSettings'
-import { observable } from 'mobx'
 
 import { fakeCollection } from '#/mocks/data'
 import fakeUiStore from '#/mocks/fakeUiStore'

@@ -30,8 +30,9 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
       const audiencesForSettings = audiencesRequest.data
       const audienceSettingsMap = new Map()
       _.each(audiencesForSettings, audience => {
-        // FIXME: audiences are not datx models so this won't render names
-        // audience.name = `${collection.challenge_name} ${audience.name}`
+        // TODO: add collection.challenge_name to name
+        // audience.name = `${collection.challenge_name} ${audience.attributes.name}`
+        audience.name = `${audience.attributes.name}`
         audienceSettingsMap.set(audience.id, {
           selected: false,
           audience,
