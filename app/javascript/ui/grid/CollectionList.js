@@ -5,6 +5,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import ListCard, { Column } from './ListCard'
 import TextButton from '~/ui/global/TextButton'
+import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 class CollectionList extends React.Component {
@@ -15,6 +16,10 @@ class CollectionList extends React.Component {
   fetchCards({ sort } = {}) {
     const { collection } = this.props
     collection.API_fetchCards({ include: ['roles'] })
+  }
+
+  get insideChallenge() {
+    return true
   }
 
   get columns() {
@@ -32,14 +37,14 @@ class CollectionList extends React.Component {
         style: { width: '400px' },
         sortable: true,
       },
-      { displayName: 'Permissions', style: {} },
+      { displayName: 'Reviewers', style: {} },
       { displayName: '', style: { marginLeft: 'auto' } },
     ]
   }
 
   handleSort = column => {
     const { collection } = this.props
-    uiStore.update('collectionCardSortOrder', ev.target.value)
+    uiStore.update('collectionCardSortOrder', column)
     collection.API_sortCards()
   }
 
@@ -67,7 +72,7 @@ class CollectionList extends React.Component {
           ))}
         </Flex>
         {collection_cards.map(card => (
-          <ListCard card={card} />
+          <ListCard card={card} insideChallenge={this.insideChallenge} />
         ))}
       </div>
     )
