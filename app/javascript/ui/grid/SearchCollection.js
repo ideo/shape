@@ -8,6 +8,7 @@ import _ from 'lodash'
 
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import { DisplayText, DisplayTextCss } from '~/ui/global/styled/typography'
 import EditableName from '~/ui/pages/shared/EditableName'
 import PageSeparator from '~/ui/global/PageSeparator'
@@ -122,6 +123,7 @@ class SearchCollection extends React.Component {
           />
         </Flex>
         <div style={{ marginBottom: '12px', marginLeft: '2px' }}>
+          <CollectionViewToggle collection={collection} />
           <CollectionFilter
             inSearchCollection={true}
             collection={collection}
