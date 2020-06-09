@@ -38,6 +38,19 @@ const IconHolder = styled.div`
   }
 `
 
+export const highlightedCardCss = css`
+  background: #5698ae;
+  content: '';
+  height: 100%;
+  left: 0;
+  opacity: 0.45;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  z-index: 151;
+`
+
 export const StyledGridCard = styled.div`
   background: ${props => props.background || 'white'};
   box-shadow: ${props =>
@@ -60,16 +73,7 @@ export const StyledGridCard = styled.div`
     props.selected &&
     `
   &:before {
-    background: ${v.colors.primaryDark};
-    content: '';
-    height: 100%;
-    left: 0;
-    opacity: 0.45;
-    pointer-events: none;
-    position: absolute;
-    width: 100%;
-    top: 0;
-    z-index: ${v.zIndex.gridCardTop};
+    ${highlightedCardCss}
   }
   `};
   ${props =>

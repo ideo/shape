@@ -11,6 +11,7 @@ import CollectionTypeIcon, {
 } from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import FileIcon from '~/ui/grid/covers/FileIcon'
+import { highlightedCardCss } from '~/ui/grid/shared'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import ListCoverRenderer from '~/ui/grid/ListCoverRenderer'
 import RolesSummary from '~/ui/roles/RolesSummary'
@@ -41,6 +42,7 @@ const Row = styled.div`
   height: 50px;
   display: flex;
   margin-bottom: 8px;
+  position:relative;
 
   ${Column} > .show-on-hover {
     display: none;
@@ -55,6 +57,14 @@ const Row = styled.div`
   *::selection {
     background: transparent;
   }
+
+  ${props =>
+    props.selected &&
+    `
+  &:before {
+    ${highlightedCardCss}
+  }
+  `};
 `
 
 const ColumnLink = styled.button`
@@ -79,6 +89,11 @@ class ListCard extends React.Component {
   @computed
   get menuOpen() {
     return uiStore.actionMenuOpenForCard(this.props.card.id)
+  }
+
+  get isSelected() {
+    const { card } = this.props
+    return uiStore.isSelected(card.id)
   }
 
   @action
@@ -198,10 +213,12 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
+    console.log('remder', this.isSelected)
     return (
       <Row
         onClick={this.handleRowClick}
         onContextMenu={this.handleContextMenu}
+        selected={this.isSelected}
         ref={c => (this.cardRef = c)}
       >
         <Column width="50px">
