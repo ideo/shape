@@ -528,7 +528,7 @@ class PageHeader extends React.Component {
                 />
               )}
             </StyledTitleAndRoles>
-            {(record.isRegularCollection || record.isSubmissionsCollection) && (
+            {(record.isRegularCollection || record.isSubmissionsCollection || record.isBoard) && (
               <div style={{ marginBottom: '-16px', display: 'flex' }}>
                 <CollectionViewToggle collection={record} />
                 <CollectionFilter collection={record} canEdit={this.canEdit} />
