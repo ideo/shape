@@ -42,13 +42,15 @@ const Row = styled.div`
   height: 50px;
   display: flex;
   margin-bottom: 8px;
-  position:relative;
+  position: relative;
 
-  ${props => !props.selected && (`
+  ${props =>
+    !props.selected &&
+    `
     ${Column} > .show-on-hover {
       display: none;
     }
-  `)}
+  `}
 
   &:hover {
     ${Column} > .show-on-hover {
@@ -215,10 +217,7 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
-    const {
-      movingCardIds,
-      cardAction,
-    } = uiStore
+    const { movingCardIds, cardAction } = uiStore
     if (cardAction === 'move' && movingCardIds.includes(card.id)) return null
     return (
       <Row
