@@ -215,6 +215,11 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
+    const {
+      movingCardIds,
+      cardAction,
+    } = uiStore
+    if (cardAction === 'move' && movingCardIds.includes(card.id)) return null
     return (
       <Row
         onClick={this.handleRowClick}
