@@ -4,7 +4,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import ListCard, { Column } from './ListCard'
-import TextButton from '~/ui/global/TextButton'
+import { Heading3 } from '~/ui/global/styled/typography'
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
@@ -29,13 +29,11 @@ class CollectionList extends React.Component {
         displayName: 'Name',
         name: 'name',
         style: { width: '500px' },
-        sortable: true,
       },
       {
         displayName: 'Last updated',
         name: 'last_updated',
         style: { width: '400px' },
-        sortable: true,
       },
       { displayName: 'Permissions', style: {} },
       { displayName: '', style: { marginLeft: 'auto' } },
@@ -57,12 +55,7 @@ class CollectionList extends React.Component {
         <Flex mb={1}>
           {this.columns.map(column => (
             <Column {...column.style}>
-              <TextButton
-                color={v.colors.black}
-                onClick={() => this.handleSort(column)}
-              >
-                {column.displayName}
-              </TextButton>
+              <Heading3 color={v.colors.black}>{column.displayName}</Heading3>
               {column.sortable && (
                 <span style={{ width: '20px', height: '20px' }}>
                   <DropdownIcon />

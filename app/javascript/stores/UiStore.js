@@ -975,7 +975,7 @@ export default class UiStore {
     // Get cardIds that are between this card and the last selected card
     const cardIdsBetween = this.viewingCollection.cardIdsBetween(
       cardId,
-      lastSelectedCardId,
+      lastSelectedCardId
     )
 
     // Get unique cardIds selected

@@ -8,13 +8,13 @@ import GridIcon from '~/ui/icons/GridIcon'
 import v from '~/utils/variables'
 
 const IconHolder = styled.div`
-  color: ${props => props.active ? v.colors.black : v.colors.commonDark};
-  cursor: ${props => props.active ? 'default': 'pointer'};
+  color: ${props => (props.active ? v.colors.black : v.colors.commonDark)};
+  cursor: ${props => (props.active ? 'default' : 'pointer')};
   height: 32px;
   width: 32px;
 
   &:hover {
-    color: ${props => props.active ? v.colors.commonDark : v.colors.dark};
+    color: ${props => (props.active ? v.colors.commonDark : v.colors.dark)};
   }
 `
 IconHolder.defaultProps = {
