@@ -13,7 +13,7 @@ describe('ChallengeSubHeader', () => {
 
   it('should render the challenge navigation link with tooltip', () => {
     expect(wrapper.find('WithStyles(Tooltip)').props().title).toEqual(
-      'Go to challenge'
+      'go to challenge'
     )
     expect(wrapper.find('StyledSubHeaderLink').html()).toContain(
       'Open Innovation Sustainability Challenge'

@@ -1,14 +1,18 @@
 import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
+
 import { fakeCollection } from '#/mocks/data'
+
 let props, wrapper, rerender
 describe('ChallengeFixedHeader', () => {
   beforeEach(() => {
-    fakeCollection.collection_type = 'challenge'
     props = {
-      collection: fakeCollection,
-      challengeNavigationHandler: jest.fn(),
+      collection: {
+        ...fakeCollection,
+        name: 'Reusable Cup Challenge',
+        collection_type: 'challenge',
+      },
       handleShowSettings: jest.fn(),
-      handleReviewSubmissions: jest.fn(),
+      challengeNavigationHandler: jest.fn(),
     }
     rerender = () => {
       wrapper = shallow(<ChallengeFixedHeader {...props} />)
@@ -19,7 +23,7 @@ describe('ChallengeFixedHeader', () => {
   it('should render an inline EditableName with the chalenge name', () => {
     expect(wrapper.find('EditableName').props().inline).toEqual(true)
     expect(wrapper.find('EditableName').props().name).toEqual(
-      fakeCollection.name
+      'Reusable Cup Challenge'
     )
   })
 
@@ -31,20 +35,13 @@ describe('ChallengeFixedHeader', () => {
     expect(wrapper.find('ChallengeSubHeader').exists()).toEqual(false)
   })
 
-  it('should render TopRightChallengeButton', () => {
-    expect(wrapper.find('TopRightChallengeButton').exists()).toEqual(true)
-    expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
-      'Challenge Settings'
-    )
+  it('should render ChallengeSettingsButton', () => {
+    expect(wrapper.find('ChallengeSettingsButton').exists()).toEqual(true)
   })
 
   describe('collection is not a challenge', () => {
     beforeEach(() => {
-      fakeCollection.collection_type = 'phase'
-      props = {
-        collection: fakeCollection,
-        ...props,
-      }
+      props.collection.collection_type = 'phase'
       rerender()
     })
 
