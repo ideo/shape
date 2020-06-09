@@ -6,7 +6,7 @@ import { filter } from 'lodash'
 
 import Tooltip from '~/ui/global/Tooltip'
 import DateProgressBar from '~/ui/global/DateProgressBar'
-import { formatDateRange } from '~/ui/grid/CollectionDateRange'
+import { FormatDateRange } from '~/ui/grid/CollectionDateRange'
 import { SmallHelperText } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
@@ -66,7 +66,9 @@ const ChallengePhasesIcons = ({ collection }) => {
             <div style={{ textAlign: 'center' }}>
               <TooltipHeader color={v.colors.white}>{phase.name}</TooltipHeader>
               <SmallHelperText>
-                {formatDateRange([phase.start_date, phase.end_date])}
+                <FormatDateRange
+                  dateRange={[phase.start_date, phase.end_date]}
+                />
               </SmallHelperText>
             </div>
           }
