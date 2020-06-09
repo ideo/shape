@@ -2,7 +2,7 @@ import React from 'react'
 import { Flex } from 'reflexbox'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
-import ArrowIcon from '~/ui/icons/ArrowIcon'
+import DropdownIcon from '~/ui/icons/DropdownIcon'
 import ListCard, { Column } from './ListCard'
 import TextButton from '~/ui/global/TextButton'
 import { uiStore } from '~/stores'
@@ -64,8 +64,8 @@ class CollectionList extends React.Component {
                 {column.displayName}
               </TextButton>
               {column.sortable && (
-                <span style={{ width: '12px', height: '12px' }}>
-                  <ArrowIcon rotation={90} />
+                <span style={{ width: '20px', height: '20px' }}>
+                  <DropdownIcon />
                 </span>
               )}
             </Column>
