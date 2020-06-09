@@ -4,7 +4,7 @@ let props, wrapper
 describe('ChallengeSettingsButton', () => {
   beforeEach(() => {
     props = {
-      onSettingsClick: jest.fn(),
+      handleShowSettings: jest.fn(),
     }
 
     wrapper = shallow(<ChallengeSettingsButton {...props} />)
