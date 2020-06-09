@@ -168,6 +168,19 @@ class Collection
         .first
     end
 
+    def submission_template_test
+      return nil unless submission_template&.collection_cards&.any?
+
+      submission_template_test_card = submission_template.collection_cards.find { |cc| cc.record.type == 'Collection::TestCollection' }
+      submission_template_test_card&.record
+    end
+
+    def submission_template_test_audiences
+      return [] unless submission_template_test&.test_audiences&.any?
+
+      submission_template_test.test_audiences
+    end
+
     private
 
     def submission_template_is_a_master_template

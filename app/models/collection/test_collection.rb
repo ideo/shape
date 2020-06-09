@@ -102,6 +102,7 @@ class Collection
     after_create :add_test_tag
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
+    after_create :setup_challenge_test_audiences, unless: :collection_to_test
     after_update :touch_test_results_collection, if: :saved_change_to_test_status?
     after_update :update_ideas_collection, if: :saved_change_to_test_show_media?
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
@@ -459,6 +460,19 @@ class Collection
         audience_id: audience.id,
         status: :closed,
       )
+    end
+
+    def setup_challenge_test_audiences
+      return unless master_template.present? && parent_challenge.present?
+
+      challenge_audiences = Audience.where(audience_type: 'challenge')
+
+      challenge_audiences.each do |audience|
+        test_audiences.find_or_create_by(
+          audience_id: audience.id,
+          status: :closed,
+        )
+      end
     end
 
     def add_test_tag

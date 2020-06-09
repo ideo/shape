@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import Button from '~/ui/global/Button'
 
 import SubmissionBoxSettings from '~/ui/submission_box/SubmissionBoxSettings'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Panel from '~/ui/global/Panel'
+import { routingStore } from '~/stores'
 import _ from 'lodash'
 
 const SubmissionsSettings = ({ collection, closeModal }) => {
   const [submissionBoxes, setSubmissionBoxes] = useState([])
+  const [submissionTemplateTest, setSubmissionTemplateTest] = useState(null)
   const [audiences, setAudiences] = useState([])
   const [audienceSettings, setAudienceSettings] = useState(new Map())
   const [viewingSubmissionBoxId, setViewingSubmissionBoxId] = useState(null)
@@ -23,25 +26,29 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
       if (subBoxes.length > 0) {
         setViewingSubmissionBoxId(subBoxes[0].id)
 
-        const { submission_template_test } = subBoxes[0]
+        const {
+          submission_template_test,
+          submission_template_test_audiences,
+        } = subBoxes[0]
 
-        // FIXME: this will returns mock data at the moment
-        const audiencesRequest = await submission_template_test.API_fetchChallengeAudiences()
-        setAudiences(audiencesRequest.data)
+        if (submission_template_test) {
+          setSubmissionTemplateTest(submission_template_test)
+        }
 
-        const audiencesForSettings = audiencesRequest.data
-        const audienceSettingsMap = new Map()
-        _.each(audiencesForSettings, audience => {
-          audience.name = `${collection.challenge.name} ${audience.attributes.name}`
-          audienceSettingsMap.set(audience.id, {
-            selected: false,
-            audience,
-            displayCheckbox: true,
-            challenge: collection.challenge,
+        if (submission_template_test_audiences.length > 0) {
+          setAudiences(submission_template_test_audiences)
+
+          const audienceSettingsMap = new Map()
+          _.each(submission_template_test_audiences, audience => {
+            audienceSettingsMap.set(audience.id, {
+              selected: false,
+              audience,
+              displayCheckbox: true,
+            })
           })
-        })
 
-        setAudienceSettings(audienceSettingsMap)
+          setAudienceSettings(audienceSettingsMap)
+        }
       }
 
       setIsLoading(false)
@@ -75,7 +82,17 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
           afterAddAudience={() => {}}
           locked={false}
           useChallengeAudienceSettings={true}
+          challengeName={collection.challenge.name}
         />
+      )}
+      {submissionTemplateTest && (
+        <Button
+          onClick={() => {
+            routingStore.routeTo('collections', submissionTemplateTest.id)
+          }}
+        >
+          Go to Test Template
+        </Button>
       )}
     </div>
   )

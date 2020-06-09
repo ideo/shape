@@ -38,12 +38,13 @@ const AssignReviewersLink = styled.h3`
 const AudienceCheckbox = ({
   selected,
   audience,
+  audienceName,
   onToggleCheckbox,
   disabled,
   openAudienceMenu,
   useChallengeAudienceSettings,
 }) => {
-  const { id, name, global_default } = audience
+  const { id, global_default } = audience
   return (
     <StyledRowFlexParent>
       <StyledRowFlexItem>
@@ -64,20 +65,18 @@ const AudienceCheckbox = ({
           label={
             <div>
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-                <StyledLabelText>
-                  {name || audience.attributes.name}
-                </StyledLabelText>
-                {// FIXME: hardcode participant id
-                useChallengeAudienceSettings && id === '991' && (
-                  <AssignReviewersLink
-                    onClick={e => {
-                      e.preventDefault()
-                      console.log('handle assign reviewers')
-                    }}
-                  >
-                    ASSIGN REVIEWERS
-                  </AssignReviewersLink>
-                )}
+                <StyledLabelText>{audienceName}</StyledLabelText>
+                {useChallengeAudienceSettings &&
+                  audienceName.includes('Reviewers') && (
+                    <AssignReviewersLink
+                      onClick={e => {
+                        e.preventDefault()
+                        console.log('handle assign reviewers')
+                      }}
+                    >
+                      ASSIGN REVIEWERS
+                    </AssignReviewersLink>
+                  )}
               </div>
             </div>
           }
@@ -101,6 +100,7 @@ const AudienceCheckbox = ({
 AudienceCheckbox.propTypes = {
   selected: PropTypes.bool.isRequired,
   audience: MobxPropTypes.objectOrObservableObject.isRequired,
+  audienceName: PropTypes.string.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   openAudienceMenu: PropTypes.func.isRequired,

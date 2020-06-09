@@ -91,15 +91,43 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   get displayedAudiences() {
-    const { audiences, audienceSettings } = this.props
+    const {
+      audiences,
+      audienceSettings,
+      useChallengeAudienceSettings,
+    } = this.props
     const displayed = _.sortBy(
       _.filter(audiences, a => {
         const setting = audienceSettings.get(a.id)
-        return setting && setting.displayCheckbox
+        return setting && setting.displayCheckbox && !a.audience_type
       }),
       'order'
     )
-    return displayed
+    if (!useChallengeAudienceSettings) {
+      return displayed
+    }
+
+    const sortedChallengeAudiences = _.sortBy(
+      _.filter(audiences, a => {
+        const setting = audienceSettings.get(a.id)
+        return (
+          setting && setting.displayCheckbox && a.audience_type === 'challenge'
+        )
+      }),
+      'name'
+    )
+
+    if (sortedChallengeAudiences.length === 3) {
+      // NOTE: once challenge audiences are loaded, sort them, and then render in specific order [Reviewer, Admins, Participants]
+      return [
+        sortedChallengeAudiences[2],
+        sortedChallengeAudiences[0],
+        sortedChallengeAudiences[1],
+        ...displayed,
+      ]
+    }
+
+    return []
   }
 
   toggleAddAudienceMenu = e => {
@@ -231,17 +259,25 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   renderCheckbox(audience) {
-    const { onToggleCheckbox, useChallengeAudienceSettings } = this.props
-    return (
-      <AudienceCheckbox
-        audience={audience}
-        selected={this.isAudienceSelected(audience)}
-        onToggleCheckbox={onToggleCheckbox}
-        disabled={this.isAudienceLocked(audience)}
-        openAudienceMenu={this.openAudienceMenu}
-        useChallengeAudienceSettings={useChallengeAudienceSettings}
-      />
-    )
+    const {
+      onToggleCheckbox,
+      useChallengeAudienceSettings,
+      challengeName,
+    } = this.props
+    const audienceCheckboxProps = {
+      audience,
+      audienceName:
+        useChallengeAudienceSettings && audience.audience_type === 'challenge'
+          ? `${challengeName} ${audience.name}`
+          : audience.name,
+      selected: this.isAudienceSelected(audience),
+      onToggleCheckbox,
+      disabled: this.isAudienceLocked(audience),
+      openAudienceMenu: this.openAudienceMenu,
+      useChallengeAudienceSettings,
+    }
+
+    return <AudienceCheckbox {...audienceCheckboxProps} />
   }
 
   render() {
@@ -372,6 +408,7 @@ AudienceSettingsWidget.propTypes = {
   numPaidQuestions: PropTypes.number.isRequired,
   locked: PropTypes.bool,
   useChallengeAudienceSettings: PropTypes.bool,
+  challengeName: PropTypes.string,
 }
 
 AudienceSettingsWidget.wrappedComponent.propTypes = {
@@ -381,6 +418,7 @@ AudienceSettingsWidget.wrappedComponent.propTypes = {
 AudienceSettingsWidget.defaultProps = {
   locked: false,
   useChallengeAudienceSettings: false,
+  challengeName: '',
 }
 
 export default AudienceSettingsWidget

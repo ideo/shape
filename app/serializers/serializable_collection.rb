@@ -199,6 +199,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.try(:submission_template_test)
   end
 
+  has_many :submission_template_test_audiences, if: -> { @object.is_a?(Collection::SubmissionBox) } do
+    @object.try(:submission_template_test_audiences)
+  end
+
   has_one :restorable_parent do
     @object.try(:restorable_parent)
   end

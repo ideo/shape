@@ -20,4 +20,12 @@ class SerializableTestAudience < BaseJsonSerializer
   attribute :num_completed_responses do
     @object.survey_responses.completed.size
   end
+
+  attribute :name do
+    @object.audience.name
+  end
+
+  attribute :audience_type do
+    @object.audience.audience_type
+  end
 end

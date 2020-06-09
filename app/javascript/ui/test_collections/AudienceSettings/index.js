@@ -47,44 +47,31 @@ class AudienceSettings extends React.Component {
 
   @action
   async initAudienceSettings() {
-    const { testCollection, apiStore } = this.props
+    const { testCollection } = this.props
     const { audiences, audienceSettings } = this
     const { test_audiences } = testCollection
-    if (testCollection.isInsideAChallenge) {
-      // FIXME: sync fake audience data with audience settings
-      const fakeChallengeAudiences = await testCollection.API_fetchChallengeAudiences()
-      // A hack to convert json to a datX Model
-      apiStore.sync(fakeChallengeAudiences)
-      const challengeAudiences = [
-        apiStore.find('audiences', 990),
-        apiStore.find('audiences', 991),
-        apiStore.find('audiences', 992),
-      ]
-      _.each(challengeAudiences, challengeAudience => {
-        // append challenge name to audience name
-        challengeAudience.name = `${testCollection.name} ${challengeAudience.name}`
-        audienceSettings.set(challengeAudience.id, {
-          selected: false,
-          audience: challengeAudience,
-          displayCheckbox: true,
-          challenge: this.testCollection,
-        })
-      })
-    }
 
     _.each(audiences, audience => {
       const testAudience = test_audiences.find(
         testAudience => testAudience.audience_id === audience.id
       )
 
-      const { isLinkSharing } = audience
+      const { isLinkSharing, audience_type } = audience
       let selected = !!testAudience
       if (testAudience && isLinkSharing) {
         selected = testAudience.status === 'open'
-      } else {
-        // FIXME: skip org-wide audiences to render challenge audiences
+      } else if (testCollection.isInsideAChallenge) {
+        if (audience_type === 'challenge') {
+          audienceSettings.set(audience.id, {
+            selected: false,
+            audience: testAudience,
+            displayCheckbox: true,
+          })
+        }
+        // NOTE: return early to not display org-wide audiences
         return
       }
+
       const displayCheckbox =
         selected || isLinkSharing || (!this.locked && audience.order <= 6)
       audienceSettings.set(audience.id, {
@@ -250,6 +237,12 @@ class AudienceSettings extends React.Component {
     )
   }
 
+  get challengeName() {
+    const { testCollection } = this.props
+
+    return _.get(testCollection, 'challenge.name', 'Challenge')
+  }
+
   afterAddAudience = audience => {
     const { audienceSettings } = this
     runInAction(() => {
@@ -297,8 +290,8 @@ class AudienceSettings extends React.Component {
             audienceSettings={this.audienceSettings}
             afterAddAudience={this.afterAddAudience}
             locked={this.locked}
-            challengeName={testCollection.name}
             useChallengeAudienceSettings={testCollection.isInsideAChallenge}
+            challengeName={this.challengeName}
           />
         )}
         <FormButtonWrapper>

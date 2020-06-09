@@ -165,7 +165,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                              .select do |collection|
                                collection.can_view?(current_user)
                              end
-    include = Collection.default_relationships_for_api.concat([:submission_template_test])
+
+    include = Collection.default_relationships_for_api.concat(%i[submission_template_test submission_template_test_audiences])
     render jsonapi: collections,
            include: include
   end
