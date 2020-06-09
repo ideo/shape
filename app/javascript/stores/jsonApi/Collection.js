@@ -160,7 +160,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   cardIdsBetween(firstCardId, lastCardId) {
-    if (this.isBoard) {
+    if (this.isBoard && this.viewMode !== 'list') {
       return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
     }
     // For all other collection types, find cards by order
@@ -1057,11 +1057,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get sortedCards() {
-    return _.orderBy(
-      this.collection_cards,
-      ['pinned', 'order'],
-      ['desc', 'asc']
-    )
+    let orderList = ['pinned', 'order']
+    let order = ['desc', 'asc']
+    if (this.isBoard) {
+      orderList = ['row', 'col']
+      order = ['asc', 'asc']
+    }
+    return _.orderBy(this.collection_cards, orderList, order)
   }
 
   @computed

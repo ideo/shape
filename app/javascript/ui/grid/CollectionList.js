@@ -19,14 +19,14 @@ class CollectionList extends React.Component {
   }
 
   get insideChallenge() {
-    return true
+    return false
   }
 
   get columns() {
     return [
       { displayName: '', style: { width: '50px' } },
       {
-        displayName: 'Idea name',
+        displayName: 'Name',
         name: 'name',
         style: { width: '500px' },
         sortable: true,
@@ -37,7 +37,7 @@ class CollectionList extends React.Component {
         style: { width: '400px' },
         sortable: true,
       },
-      { displayName: 'Reviewers', style: {} },
+      { displayName: 'Permissions', style: {} },
       { displayName: '', style: { marginLeft: 'auto' } },
     ]
   }
