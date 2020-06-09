@@ -44,9 +44,11 @@ const Row = styled.div`
   margin-bottom: 8px;
   position: relative;
 
-  ${Column} > .show-on-hover {
-    display: none;
-  }
+  ${props => !props.selected && (`
+    ${Column} > .show-on-hover {
+      display: none;
+    }
+  `)}
 
   &:hover {
     ${Column} > .show-on-hover {
@@ -213,7 +215,6 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
-    console.log('remder', this.isSelected)
     return (
       <Row
         onClick={this.handleRowClick}
