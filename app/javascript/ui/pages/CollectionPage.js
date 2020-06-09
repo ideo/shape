@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
+import { Flex } from 'reflexbox'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
@@ -12,6 +13,7 @@ import CollectionCollaborationService from '~/utils/CollectionCollaborationServi
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import CollectionList from '~/ui/grid/CollectionList'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
@@ -432,33 +434,50 @@ class CollectionPage extends React.Component {
       return this.loader()
     }
 
+    const genericCollectionProps = {
+      collection: submissions_collection,
+      loadCollectionCards: this.loadSubmissionsCollectionCards,
+      trackCollectionUpdated: this.trackCollectionUpdated,
+      canEditCollection: false,
+      // Pass in cardProperties so grid will re-render when they change
+      cardProperties: submissions_collection.cardProperties,
+      // Pass in BCT state so grid will re-render when open/closed
+      blankContentToolState,
+      // to trigger a re-render
+      movingCardIds: [],
+    }
+
     return (
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
-        <CollectionFilter
-          collection={submissions_collection}
-          canEdit={collection.can_edit_content}
-          sortable
-        />
-        <CollectionGrid
-          {...gridSettings}
-          loadCollectionCards={this.loadSubmissionsCollectionCards}
-          trackCollectionUpdated={this.trackCollectionUpdated}
-          collection={submissions_collection}
-          canEditCollection={false}
-          // Pass in cardProperties so grid will re-render when they change
-          cardProperties={submissions_collection.cardProperties}
-          // Pass in BCT state so grid will re-render when open/closed
-          blankContentToolState={blankContentToolState}
-          submissionSettings={{
-            type: submission_box_type,
-            template: submission_template,
-            enabled: submissions_enabled,
-          }}
-          movingCardIds={[]}
-          sorting
-        />
-        {submissions_enabled && (
+        <Flex ml="auto" justify="flex-end">
+          <div style={{ display: 'inline-block', marginTop: '4px' }}>
+            <CollectionViewToggle collection={submissions_collection} />
+          </div>
+          <CollectionFilter
+            collection={submissions_collection}
+            canEdit={collection.can_edit_content}
+            sortable
+          />
+        </Flex>
+        {submissions_collection.viewMode === 'list' ? (
+          <CollectionList
+            {...genericCollectionProps}
+            cardsFetched={this.cardsFetched}
+          />
+        ) : (
+          <CollectionGrid
+            {...gridSettings}
+            {...genericCollectionProps}
+            submissionSettings={{
+              type: submission_box_type,
+              template: submission_template,
+              enabled: submissions_enabled,
+            }}
+            sorting
+          />
+        )}
+        {submissions_enabled && submissions_collection.viewMode !== 'list' && (
           <FloatingActionButton
             toolTip={`Add ${submissionTypeName}`}
             onClick={this.onAddSubmission}
