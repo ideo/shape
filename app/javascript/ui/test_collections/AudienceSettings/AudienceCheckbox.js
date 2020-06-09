@@ -42,7 +42,7 @@ const AudienceCheckbox = ({
   onToggleCheckbox,
   disabled,
   openAudienceMenu,
-  useChallengeAudienceSettings,
+  displayChallengeAudiences,
 }) => {
   const { id, global_default } = audience
   return (
@@ -66,7 +66,7 @@ const AudienceCheckbox = ({
             <div>
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
                 <StyledLabelText>{audienceName}</StyledLabelText>
-                {useChallengeAudienceSettings &&
+                {displayChallengeAudiences &&
                   audienceName.includes('Reviewers') && (
                     <AssignReviewersLink
                       onClick={e => {
@@ -90,7 +90,7 @@ const AudienceCheckbox = ({
           }}
           className="audienceLabel"
         >
-          {!useChallengeAudienceSettings && <InfoIcon />}
+          {!displayChallengeAudiences && <InfoIcon />}
         </StyledInfoIconWrapper>
       )}
     </StyledRowFlexParent>
@@ -104,12 +104,12 @@ AudienceCheckbox.propTypes = {
   onToggleCheckbox: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   openAudienceMenu: PropTypes.func.isRequired,
-  useChallengeAudienceSettings: PropTypes.bool,
+  displayChallengeAudiences: PropTypes.bool,
 }
 
 AudienceCheckbox.defaultProps = {
   disabled: false,
-  useChallengeAudienceSettings: false,
+  displayChallengeAudiences: false,
 }
 
 export default AudienceCheckbox

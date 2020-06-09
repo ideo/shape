@@ -290,7 +290,7 @@ class AudienceSettings extends React.Component {
             audienceSettings={this.audienceSettings}
             afterAddAudience={this.afterAddAudience}
             locked={this.locked}
-            useChallengeAudienceSettings={testCollection.isInsideAChallenge}
+            displayChallengeAudiences={testCollection.isInsideAChallenge}
             challengeName={this.challengeName}
           />
         )}

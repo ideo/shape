@@ -81,7 +81,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
           audienceSettings={audienceSettings}
           afterAddAudience={() => {}}
           locked={false}
-          useChallengeAudienceSettings={true}
+          displayChallengeAudiences={true}
           challengeName={collection.challenge.name}
         />
       )}
