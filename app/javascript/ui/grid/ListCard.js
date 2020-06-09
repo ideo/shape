@@ -6,7 +6,10 @@ import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
-import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon, {
+  collectionTypeToIcon,
+} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'
 import ListCoverRenderer from '~/ui/grid/ListCoverRenderer'
@@ -140,9 +143,30 @@ class ListCard extends React.Component {
     uiStore.update('rolesMenuOpen', record)
   }
 
+  get renderLabelSelector() {
+    const {
+      card: { record },
+    } = this.props
+
+    if (!record.allowsCollectionTypeSelector) {
+      return null
+    }
+
+    return (
+      <CollectionTypeSelector collection={record} location={'PageHeader'}>
+        <IconHolder>
+          {collectionTypeToIcon({
+            type: record.collection_type,
+            size: 'lg',
+          })}
+        </IconHolder>
+      </CollectionTypeSelector>
+    )
+  }
+
   get renderIcons() {
     const { card } = this.props
-    if (card.record.isCollection) {
+    if (card.record.isCollection && !card.record.allowsCollectionTypeSelector) {
       return (
         <Fragment>
           <IconHolder>
@@ -195,6 +219,7 @@ class ListCard extends React.Component {
               handleClick={this.handleRecordClick}
             />
             {card.record.name}
+            {this.renderLabelSelector}
             {this.renderIcons}
           </ColumnLink>
         </Column>
