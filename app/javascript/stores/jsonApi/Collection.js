@@ -59,6 +59,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   carouselIdx = 0
   // this stores the "virtual" search results collection
   searchResultsCollection = null
+  @observable
+  phaseCollections = []
 
   attributesForAPI = [
     'name',
@@ -129,6 +131,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.snoozedEditWarningsAt = Date.now()
     }
     this.uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+  }
+
+  @action
+  setPhaseCollections(value) {
+    this.phaseCollections = value
+    return this.phaseCollections
   }
 
   @action
@@ -871,6 +879,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  API_fetchBreadcrumbRecords() {
+    const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
+    return this.apiStore.request(apiPath)
+  }
+
   API_fetchChallengeSubmissionBoxCollections() {
     const apiPath = `collections/${this.id}/challenge_submission_boxes`
     return this.apiStore.request(apiPath)
@@ -881,10 +894,43 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath)
   }
 
-  API_fetchBreadcrumbRecords() {
-    const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
-    return this.apiStore.request(apiPath)
+  async loadPhaseCollections() {
+    const request = await this.API_fetchChallengePhaseCollections()
+    return this.setPhaseCollections(request.data)
   }
+
+  async createChildPhaseCollection(name) {
+    const attrs = {
+      collection_attributes: {
+        name,
+        collection_type: 'phase',
+      },
+      parent_id: this.id,
+    }
+    const card = new CollectionCard(attrs, this.apiStore)
+    card.parent = this
+    // TODO: add error handling
+    const savedCard = await card.API_create()
+    return savedCard.record
+  }
+
+  // Loads all submission boxes for this challenge collection,
+  // as well as any phases in each submission box
+  async loadSubmissionBoxesAndPhases() {
+    const request = await this.API_fetchChallengeSubmissionBoxCollections()
+    const submissionBoxes = request.data
+    if (submissionBoxes.length > 0) {
+      // Get phase collections for each submission box
+      const loadPhases = submissionBoxes.map(subBox => {
+        return new Promise(resolve => {
+          resolve(subBox.loadPhaseCollections())
+        })
+      })
+      await Promise.all(loadPhases)
+    }
+    return submissionBoxes
+  }
+
   /*
   Perform batch updates on multiple cards at once,
   and captures current cards state to undo to
