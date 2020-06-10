@@ -589,7 +589,14 @@ class CollectionPage extends React.Component {
       !apiStore.currentUserOrganization && collection.common_viewable
 
     let inner
-    if (collection.isBoard) {
+    if (collection.viewMode === 'list') {
+      inner = (
+        <CollectionList
+          {...genericCollectionProps}
+          cardsFetched={this.cardsFetched}
+        />
+      )
+    } else if (collection.isBoard) {
       inner = (
         <FoamcoreGrid
           {...genericCollectionProps}
@@ -602,13 +609,6 @@ class CollectionPage extends React.Component {
       inner = this.renderTestDesigner()
     } else if (collection.isSearchCollection) {
       inner = this.renderSearchCollection()
-    } else if (collection.viewMode === 'list') {
-      inner = (
-        <CollectionList
-          {...genericCollectionProps}
-          cardsFetched={this.cardsFetched}
-        />
-      )
     } else {
       inner = (
         <CollectionGrid
@@ -636,7 +636,7 @@ class CollectionPage extends React.Component {
             <ArchivedBanner />
             <OverdueBanner />
             <PageContainer
-              fullWidth={collection.isBoard && !collection.isFourWideBoard}
+              fullWidth={collection.isBoard && !collection.isFourWideBoard && collection.viewMode !== 'list'}
             >
               {this.renderEditorPill}
               {inner}
