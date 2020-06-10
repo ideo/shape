@@ -723,6 +723,9 @@ class ApiStore extends jsonapi(datxCollection) {
     }
 
     runInAction(() => {
+      // make sure the moved cards disappear from the fromCollection
+      fromCollection.removeCardIds(data.collection_card_ids)
+      // toCollection gets the new cards
       toCollection.mergeCards(res.data)
       if (undoing && !_.isEmpty(undoSnapshot)) {
         // revert data if undoing card move

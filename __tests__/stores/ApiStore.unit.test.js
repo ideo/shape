@@ -136,6 +136,15 @@ describe('ApiStore', () => {
       expect(collection.mergeCards).toHaveBeenCalledWith(res.data)
     })
 
+    it('should remove the moved cards from fromCollection', async () => {
+      await apiStore.moveCards(data)
+      // NOTE: because `collection` is the mock return value of apiStore.find
+      // it is the stand-in for both from/toCollection
+      expect(collection.removeCardIds).toHaveBeenCalledWith(
+        data.collection_card_ids
+      )
+    })
+
     it('should call API_fetchCardOrders if not a board collection', async () => {
       await apiStore.moveCards(data)
       expect(collection.API_fetchCardOrders).toHaveBeenCalled()
