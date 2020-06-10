@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import axios from 'axios'
-import { toJS, observable, action, runInAction } from 'mobx'
+import { toJS, observable, action } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
@@ -107,7 +106,6 @@ class PageBreadcrumb extends React.Component {
         identifier,
         nested: 0,
         icon: this.renderIcon(item),
-        breadcrumbDropDownRecords: [],
         path,
       })
     })
@@ -128,17 +126,10 @@ class PageBreadcrumb extends React.Component {
     }
   }
 
-  fetchBreadcrumbRecords = async (breadcrumbItem, rootItemId) => {
-    const breadcrumbRecordsReq = await axios.get(
-      `/api/v1/collections/${breadcrumbItem.id}/collection_cards/breadcrumb_records`
+  fetchBreadcrumbRecords = breadcrumbItem => {
+    return apiStore.requestJson(
+      `collections/${breadcrumbItem.id}/collection_cards/breadcrumb_records`
     )
-    const lookupId = !!rootItemId ? rootItemId : breadcrumbItem.id
-    runInAction(() => {
-      const item = this.items.find(i => i.id === lookupId)
-      if (item) {
-        item.breadcrumbDropDownRecords = breadcrumbRecordsReq.data
-      }
-    })
   }
 
   onBack = item => {
@@ -156,7 +147,11 @@ class PageBreadcrumb extends React.Component {
   }
 
   onBreadcrumbClick = itemId => {
-    routingStore.routeTo('collections', itemId)
+    if (itemId === apiStore.currentUserCollectionId) {
+      routingStore.routeTo('homepage')
+    } else {
+      routingStore.routeTo('collections', itemId)
+    }
   }
 
   renderIcon(menuItem) {
@@ -188,6 +183,7 @@ class PageBreadcrumb extends React.Component {
         onBack={this.onBack}
         onBreadcrumbClick={this.onBreadcrumbClick}
         onBreadcrumbDive={this.fetchBreadcrumbRecords}
+        onRestore={this.onRestore}
         showBackButton={!uiStore.isLargeBreakpoint}
         visiblyHidden={!renderItems}
         containerWidth={containerWidth}
