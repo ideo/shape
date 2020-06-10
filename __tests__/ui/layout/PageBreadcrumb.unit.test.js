@@ -1,10 +1,7 @@
-import axios from 'axios'
-
 import PageBreadcrumb from '~/ui/layout/PageBreadcrumb'
 import { fakeCollection } from '#/mocks/data'
 import { apiStore } from '~/stores'
 
-jest.mock('axios')
 jest.mock('../../../app/javascript/stores')
 
 apiStore.currentUserCollectionId = '123'
@@ -53,16 +50,12 @@ describe('PageBreadcrumb', () => {
   })
 
   describe('fetchBreadcrumbRecords()', () => {
-    let data
-
-    beforeEach(() => {
-      data = [{ id: 1, name: 'b1' }, { id: 2, name: 'b2' }]
-      axios.get.mockImplementationOnce(() => Promise.resolve(data))
-    })
-
-    it('should use axios to get the breadcrumb record', async () => {
-      component.fetchBreadcrumbRecords(1)
-      expect(axios.get).toHaveBeenCalled()
+    it('should call apiStore.requestJson to get the breadcrumb record', async () => {
+      const id = '1'
+      component.fetchBreadcrumbRecords({ id })
+      expect(apiStore.requestJson).toHaveBeenCalledWith(
+        `collections/${id}/collection_cards/breadcrumb_records`
+      )
     })
   })
 
