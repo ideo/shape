@@ -2,7 +2,7 @@
 import undoStore from '#/mocks/fakeUndoStore'
 import uiStore from '#/mocks/fakeUiStore'
 import routingStore from '#/mocks/fakeRoutingStore'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeThread } from '#/mocks/data'
 import ApiStore from '~/stores/ApiStore'
 import IdeoSSO from '~/utils/IdeoSSO'
 
@@ -99,6 +99,22 @@ describe('ApiStore', () => {
       await apiStore.setupCommentThreadAndMenusForPage(collection)
       expect(apiStore.findOrBuildCommentThread).not.toHaveBeenCalled()
       expect(uiStore.openOptionalMenus).toHaveBeenCalledWith(routingStore.query)
+    })
+  })
+
+  describe('#expandAndOpenThreadForRecord', () => {
+    beforeEach(() => {
+      apiStore.request = jest
+        .fn()
+        .mockReturnValue(Promise.resolve({ data: { ...fakeThread } }))
+      uiStore.viewingRecord = { id: '123' }
+      uiStore.expandAndOpenThread = jest.fn()
+    })
+
+    it('does shit', async () => {
+      await apiStore.expandAndOpenThreadForRecord(collection)
+      // this should have looked up the thread via request mocked above
+      expect(uiStore.expandAndOpenThread).toHaveBeenCalledWith(fakeThread.key)
     })
   })
 
