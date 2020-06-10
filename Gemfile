@@ -92,7 +92,7 @@ gem 'dalli', '~> 2.7'
 gem 'bootsnap', require: false
 
 # easy pagination
-gem 'kaminari', '~> 1.1'
+gem 'kaminari', '~> 1.2'
 
 # google auth + firestore
 gem 'google-cloud-firestore', '~> 0.21.0'
