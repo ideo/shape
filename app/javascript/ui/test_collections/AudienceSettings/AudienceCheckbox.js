@@ -67,7 +67,8 @@ const AudienceCheckbox = ({
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
                 <StyledLabelText>{audienceName}</StyledLabelText>
                 {displayChallengeAudiences &&
-                  audienceName.includes('Reviewers') && (
+                  audienceName.includes('Reviewers') &&
+                  !disabled && (
                     <AssignReviewersLink
                       onClick={e => {
                         e.preventDefault()

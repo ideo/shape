@@ -35,6 +35,7 @@ class TestAudience < ApplicationRecord
 
   delegate :name,
            :link_sharing?,
+           :audience_type,
            to: :audience
 
   validate :price_per_response_greater_than_minimum
@@ -100,6 +101,13 @@ class TestAudience < ApplicationRecord
   def update_price_per_response_from_audience!
     set_price_per_response_from_audience
     save
+  end
+
+  def duplicate!(assign_test_collection: test_collection)
+    ta = amoeba_dup
+    ta.test_collection = assign_test_collection
+    ta.save
+    ta
   end
 
   private

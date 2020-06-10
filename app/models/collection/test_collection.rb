@@ -339,6 +339,16 @@ class Collection
         # Prefix with 'Copy' if it isn't still within a template
         duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
+
+      if parent.submission_box_template? && duplicate.parent.templated? && parent_challenge.present?
+        # copy challenge audiences from submission box template test
+        test_audiences.each do |test_audience|
+          next if test_audience.audience_type != 'challenge'
+
+          test_audience.duplicate!(assign_test_collection: duplicate)
+        end
+      end
+
       duplicate.save
       duplicate.reorder_cards!
       duplicate
