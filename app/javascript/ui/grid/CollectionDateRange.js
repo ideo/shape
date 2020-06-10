@@ -39,11 +39,10 @@ FormatDateRange.propTypes = {
   dateRange: PropTypes.array.isRequired,
 }
 
-const CollectionDateRange = props => {
+const CollectionDateRange = ({ collection, hideEditIcon }) => {
   const dateDisplayRef = React.createRef()
   const wrapperRef = React.createRef()
 
-  const { collection } = props
   const [dateRange, setDateRange] = useState([
     collection.start_date,
     collection.end_date,
@@ -103,9 +102,11 @@ const CollectionDateRange = props => {
         className="date-range-wrapper"
       >
         <FormatDateRange dateRange={dateRange} />
-        <EditIcon>
-          <EditPencilIcon />
-        </EditIcon>
+        {!hideEditIcon && (
+          <EditIcon>
+            <EditPencilIcon />
+          </EditIcon>
+        )}
       </div>
       <InlineModal
         title={'Pick Dates'}
@@ -138,6 +139,11 @@ const CollectionDateRange = props => {
 
 CollectionDateRange.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  hideEditIcon: PropTypes.bool,
+}
+
+CollectionDateRange.defaultProps = {
+  hideEditIcon: false,
 }
 
 export default CollectionDateRange

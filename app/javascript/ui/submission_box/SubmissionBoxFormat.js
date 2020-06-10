@@ -4,7 +4,6 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
-import { apiStore, routingStore } from '~/stores'
 import {
   SubmissionBoxRowForTemplate,
   SubmissionBoxRowForItem,
@@ -64,12 +63,11 @@ const SubmissionBoxFormat = ({ collection, closeModal }) => {
     submissionFormat,
     submission_template_id,
     submission_box_type,
+    apiStore: { routingStore },
   } = collection
-  let template
+  const template = collection.submission_template
   let submissionType
-  if (submissionFormat === 'template') {
-    template = apiStore.find('collections', submission_template_id)
-  } else if (submissionFormat === 'item') {
+  if (submissionFormat === 'item') {
     submissionType = submissionTypeForName(submission_box_type)
   }
   useEffect(() => {

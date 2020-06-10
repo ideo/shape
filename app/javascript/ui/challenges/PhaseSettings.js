@@ -3,15 +3,10 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import { apiStore } from '~/stores'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Panel from '~/ui/global/Panel'
 import TextButton from '~/ui/global/TextButton'
-import {
-  PhaseCollectionRow,
-  EditPhaseCollectionRow,
-} from '~/ui/challenges/PhaseCollectionRow'
+import PhaseCollectionRow from '~/ui/challenges/PhaseCollectionRow'
 import v from '~/utils/variables'
 
 const Phases = styled.div`
@@ -37,12 +32,15 @@ const PhaseSettings = ({ collection, closeModal }) => {
     loadData()
   }, [collection])
 
-  const createPhaseCollection = async submissionBox => {
-    const phaseCollection = await submissionBox.createChildPhaseCollection(
-      `Phase ${submissionBox.phaseCollections.length}`
+  const createSubmissionTemplatePhaseCollection = async submissionBox => {
+    // Create phase collection in the submission template
+    const submissionBoxTemplate = submissionBox.submission_template
+    const phaseCollection = await submissionBoxTemplate.createChildPhaseCollection(
+      `Phase ${submissionBox.phaseSubCollections.length + 1}`
     )
-    submissionBox.setPhaseCollections([
-      ...submissionBox.phaseCollections,
+    // Update our UI with the new phase collection
+    submissionBox.setPhaseSubCollections([
+      ...submissionBox.phaseSubCollections,
       phaseCollection,
     ])
     setEditingPhaseCollectionId(phaseCollection.id)
@@ -58,23 +56,26 @@ const PhaseSettings = ({ collection, closeModal }) => {
           open={viewingSubmissionBoxId === submissionBox.id}
         >
           <Phases>
-            {submissionBox.phaseCollections.map(phase => {
-              return editingPhaseCollectionId === phase.id ? (
-                <EditPhaseCollectionRow
-                  collection={phase}
-                  onDone={() => setEditingPhaseCollectionId(null)}
-                />
-              ) : (
-                <PhaseCollectionRow collection={phase} />
-              )
-            })}
-            <TextButton
-              color={v.colors.black}
-              fontSizeEm={0.75}
-              onClick={() => createPhaseCollection(submissionBox)}
-            >
-              + Add Phase
-            </TextButton>
+            {submissionBox.phaseSubCollections.map(phase => (
+              <PhaseCollectionRow
+                collection={phase}
+                showEdit={editingPhaseCollectionId === phase.id}
+                onDoneEditing={() => setEditingPhaseCollectionId(null)}
+                closeModal={closeModal}
+                key={phase.id}
+              />
+            ))}
+            {submissionBox.submission_template && (
+              <TextButton
+                color={v.colors.black}
+                fontSizeEm={0.75}
+                onClick={() =>
+                  createSubmissionTemplatePhaseCollection(submissionBox)
+                }
+              >
+                + Add Phase
+              </TextButton>
+            )}
           </Phases>
         </Panel>
       ))}

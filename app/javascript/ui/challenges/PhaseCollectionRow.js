@@ -1,16 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import AutosizeInput from 'react-input-autosize'
 
+import EditableName from '~/ui/pages/shared/EditableName'
 import v from '~/utils/variables'
 import CollectionDateRange from '~/ui/grid/CollectionDateRange'
 import { ThumbnailHolder } from '~/ui/threads/CommentThumbnail'
-import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
-import { DisplayTextCss } from '~/ui/global/styled/typography'
-
+import PhaseIcon from '~/ui/icons/PhaseIcon'
+import { DisplayTextCss, DisplayText } from '~/ui/global/styled/typography'
 import { Row, RowItemLeft, RowItemRight } from '~/ui/global/styled/layout'
+import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
+import Tooltip from '~/ui/global/Tooltip'
+
+const EditIcon = styled.span`
+  margin-left: 50px;
+  width: 22px;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  svg {
+    width: 100%;
+  }
+`
 
 const PhaseRow = styled(Row)`
   font-family: ${v.fonts.sans};
@@ -20,12 +32,9 @@ PhaseRow.displayName = 'PhaseRow'
 
 const PhaseRowText = styled(RowItemLeft)`
   padding-top: 0.75rem;
-  .input__name {
-    ${DisplayTextCss}
-  }
 `
 
-const PhaseRowDates = styled(RowItemRight)`
+const PhaseRowRight = styled(RowItemRight)`
   padding-top: 0.75rem;
   align-item: right;
 `
@@ -36,7 +45,7 @@ const PhaseCollectionThumbnail = ({ collection }) => {
       {collection.cover.image_url && (
         <img src={collection.cover.image_url} alt={collection.name} />
       )}
-      {!collection.cover.image_url && <SubmissionBoxIconLg />}
+      {!collection.cover.image_url && <PhaseIcon />}
     </ThumbnailHolder>
   )
 }
@@ -44,58 +53,79 @@ PhaseCollectionThumbnail.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export const PhaseCollectionRow = ({ collection }) => {
+const PhaseCollectionRow = ({
+  collection,
+  closeModal,
+  showEdit,
+  onDoneEditing,
+}) => {
+  //const [name, setName] = useState(collection.name + '')
+  const nameKey = `phase-${collection.id}-name`
+  const { uiStore } = collection
+
+  const updateCollectionName = name => {
+    collection.name = name
+    collection.save()
+  }
+
+  useEffect(() => {
+    if (showEdit) {
+      uiStore.setEditingName(nameKey)
+    }
+  }, [showEdit])
+
   return (
     <PhaseRow>
       <PhaseCollectionThumbnail collection={collection} />
-      <PhaseRowText>{collection.name}</PhaseRowText>
-      <PhaseRowDates>
-        <CollectionDateRange collection={collection} />
-      </PhaseRowDates>
+      <PhaseRowText>
+        <EditableName
+          name={collection.name}
+          updateNameHandler={updateCollectionName}
+          onDoneEditing={onDoneEditing}
+          canEdit={true}
+          extraWidth={0}
+          fontSize={1}
+          editingMarginTop={'0'}
+          TypographyComponent={DisplayText}
+          typographyCss={DisplayTextCss}
+          fieldName={nameKey}
+          placeholder="Add name for phase"
+          editing={showEdit}
+        />
+      </PhaseRowText>
+      <PhaseRowRight>
+        <CollectionDateRange collection={collection} hideEditIcon />
+      </PhaseRowRight>
+      <PhaseRowRight>
+        <Tooltip
+          classes={{ tooltip: 'Tooltip' }}
+          title="Edit phase"
+          placement="top"
+        >
+          <EditIcon
+            onClick={() => {
+              closeModal()
+              collection.routingStore.routeTo('collections', collection.id)
+            }}
+          >
+            <EditPencilIconLarge />
+          </EditIcon>
+        </Tooltip>
+      </PhaseRowRight>
     </PhaseRow>
   )
 }
 
 PhaseCollectionRow.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  showEdit: PropTypes.bool,
+  onDoneEditing: PropTypes.func,
 }
 
-export const EditPhaseCollectionRow = ({ collection, onDone }) => {
-  const [name, setName] = useState(collection.name)
-
-  const onNameFieldKeypress = e => {
-    if (e.key === 'Enter') onDone()
-  }
-
-  useEffect(() => {
-    collection.name = name
-    collection.save()
-  }, [name])
-
-  return (
-    <PhaseRow>
-      <PhaseCollectionThumbnail collection={collection} />
-      <PhaseRowText>
-        <AutosizeInput
-          placeholder={'Add name for phase'}
-          maxLength={v.maxTitleLength}
-          className="input__name"
-          style={{ fontSize: 2.25 }}
-          value={name}
-          onChange={e => setName(e.target.value)}
-          onBlur={e => onDone()}
-          onKeyPress={onNameFieldKeypress}
-          data-cy="EditPhaseCollectionRowNameInput"
-        />
-      </PhaseRowText>
-      <PhaseRowDates>
-        <CollectionDateRange collection={collection} />
-      </PhaseRowDates>
-    </PhaseRow>
-  )
+PhaseCollectionRow.defaultProps = {
+  showEdit: false,
+  onDoneEditing: () => null,
 }
 
-EditPhaseCollectionRow.propTypes = {
-  collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  onDone: PropTypes.func.isRequired,
-}
+export default PhaseCollectionRow

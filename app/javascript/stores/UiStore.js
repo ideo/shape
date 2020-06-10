@@ -338,6 +338,12 @@ export default class UiStore {
   }
 
   @action
+  setEditingName(nameKey) {
+    if (this.editingName.includes(nameKey)) return
+    this.editingName.push(nameKey)
+  }
+
+  @action
   performPopupAction(message, actionType) {
     switch (actionType) {
       case POPUP_ACTION_TYPES.ALERT:

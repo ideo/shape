@@ -13,7 +13,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
 
   useEffect(() => {
     const fetchSubmissions = async () => {
-      const request = await collection.API_fetchChallengeSubmissionBoxCollections()
+      const request = await collection.API_fetchSubmissionBoxSubCollections()
       const subBoxes = request.data
       setSubmissionBoxes(subBoxes)
       if (subBoxes.length > 0) {

@@ -60,7 +60,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // this stores the "virtual" search results collection
   searchResultsCollection = null
   @observable
-  phaseCollections = []
+  phaseSubCollections = []
 
   attributesForAPI = [
     'name',
@@ -134,9 +134,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
-  setPhaseCollections(value) {
-    this.phaseCollections = value
-    return this.phaseCollections
+  setPhaseSubCollections(value) {
+    this.phaseSubCollections = value
+    return this.phaseSubCollections
   }
 
   @action
@@ -884,19 +884,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath)
   }
 
-  API_fetchChallengeSubmissionBoxCollections() {
-    const apiPath = `collections/${this.id}/challenge_submission_boxes`
-    return this.apiStore.request(apiPath)
-  }
-
+  // This is to fetch the phases that are displayed in the header for a challenge
   API_fetchChallengePhaseCollections() {
     const apiPath = `collections/${this.id}/challenge_phase_collections`
     return this.apiStore.request(apiPath)
   }
 
-  async loadPhaseCollections() {
-    const request = await this.API_fetchChallengePhaseCollections()
-    return this.setPhaseCollections(request.data)
+  // Fetch all children submission boxes of this collection
+  API_fetchSubmissionBoxSubCollections() {
+    const apiPath = `collections/${this.id}/submission_box_sub_collections`
+    return this.apiStore.request(apiPath)
+  }
+
+  // Fetch all children phase collections of this collection
+  API_fetchPhaseSubCollections() {
+    const apiPath = `collections/${this.id}/phase_sub_collections`
+    return this.apiStore.request(apiPath)
+  }
+
+  async loadPhaseSubCollections() {
+    const request = await this.API_fetchPhaseSubCollections()
+    return this.setPhaseSubCollections(request.data)
   }
 
   async createChildPhaseCollection(name) {
@@ -917,13 +925,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // Loads all submission boxes for this challenge collection,
   // as well as any phases in each submission box
   async loadSubmissionBoxesAndPhases() {
-    const request = await this.API_fetchChallengeSubmissionBoxCollections()
+    const request = await this.API_fetchSubmissionBoxSubCollections()
     const submissionBoxes = request.data
     if (submissionBoxes.length > 0) {
-      // Get phase collections for each submission box
-      const loadPhases = submissionBoxes.map(subBox => {
+      const subBoxesWithTemplates = submissionBoxes.filter(
+        subBox => !!subBox.submission_template
+      )
+      // Get phase collections for each submission box's template
+      const loadPhases = subBoxesWithTemplates.map(subBox => {
         return new Promise(resolve => {
-          resolve(subBox.loadPhaseCollections())
+          resolve(subBox.submission_template.loadPhaseSubCollections())
         })
       })
       await Promise.all(loadPhases)
