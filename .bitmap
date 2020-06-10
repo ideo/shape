@@ -13,24 +13,24 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "ideo-products.shared-components/components/breadcrumb-item@0.3.0": {
+    "ideo-products.shared-components/components/breadcrumb-item@0.4.2": {
         "files": [
             {
+                "name": "BreadcrumbItem.js",
                 "relativePath": "app/javascript/ui/layout/BreadcrumbItem.js",
-                "test": false,
-                "name": "BreadcrumbItem.js"
+                "test": false
             }
         ],
         "mainFile": "app/javascript/ui/layout/BreadcrumbItem.js",
         "origin": "AUTHORED",
         "exported": true
     },
-    "ideo-products.shared-components/components/breadcrumb@0.3.0": {
+    "ideo-products.shared-components/components/breadcrumb@0.5.1": {
         "files": [
             {
+                "name": "Breadcrumb.js",
                 "relativePath": "app/javascript/ui/layout/Breadcrumb.js",
-                "test": false,
-                "name": "Breadcrumb.js"
+                "test": false
             }
         ],
         "mainFile": "app/javascript/ui/layout/Breadcrumb.js",
@@ -49,12 +49,12 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "ideo-products.shared-components/components/popout-menu@0.3.0": {
+    "ideo-products.shared-components/components/popout-menu@0.5.0": {
         "files": [
             {
+                "name": "PopoutMenu.js",
                 "relativePath": "app/javascript/ui/global/PopoutMenu.js",
-                "test": false,
-                "name": "PopoutMenu.js"
+                "test": false
             }
         ],
         "mainFile": "app/javascript/ui/global/PopoutMenu.js",

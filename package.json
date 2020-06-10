@@ -222,7 +222,7 @@
   },
   "bit": {
     "env": {
-      "compiler": "bit.envs/bundlers/webpack@4.0.1"
+      "compiler": "ideo-products.shared-components/compilers/react@2.1.13"
     },
     "componentsDefaultDirectory": "app/javascript/ui/{name}",
     "packageManager": "yarn",

@@ -18,6 +18,7 @@ BreadcrumbPadding.displayName = 'BreadcrumbPadding'
 const StyledBreadcrumbWrapper = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
+  display: flex;
   white-space: nowrap;
   font-size: 1rem;
   font-family: ${v.fonts.sans};
@@ -246,18 +247,60 @@ class Breadcrumb extends React.Component {
 }
 
 Breadcrumb.propTypes = {
+  /**
+   * A list of breadcrumb items to display
+   */
   items: PropTypes.arrayOf(PropTypes.shape(breadcrumbItemPropType)).isRequired,
+  /**
+   * Another component to wrap the whole breacrumb
+   */
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
-  breadcrumbItemComponent: PropTypes.object,
+  /**
+   * A component to wrap each breadcrumb item
+   */
+  breadcrumbItemComponent: PropTypes.elementType,
+  /**
+   * The action to take when going back in the breadcrumb UI
+   */
   onBack: PropTypes.func.isRequired,
+  /**
+   * The action to take when diving into a sub breadcrumb
+   */
   onBreadcrumbDive: PropTypes.func,
+  /**
+   * The action to take when restoring a breadcrumb (Shape specific)
+   */
   onRestore: PropTypes.func,
+  /**
+   * The action to take when clicking on a breadcrumb, which is likely navigation
+   * of some sort
+   */
   onBreadcrumbClick: PropTypes.func,
+  /**
+   * The width of the parent container of the breadcrumb, used to limit it's size
+   */
   containerWidth: PropTypes.number,
+  /**
+   * The maximum depth a breadcrumb sub menu can go
+   */
   maxDepth: PropTypes.number,
+  /**
+   * Whether to show the back button at all
+   */
   showBackButton: PropTypes.bool,
+  /**
+   * Visible hide the breadcrumb but ensure it still takes up space
+   */
   visiblyHidden: PropTypes.bool,
+  /**
+   * Whether the current device is a touch device. Should be used to improve
+   * the user experience.
+   */
   isTouchDevice: PropTypes.bool,
+  /**
+   * Whether the current device is a phone size device. Should be used to improve
+   * the user experience.
+   */
   isSmallScreen: PropTypes.bool,
 }
 

@@ -45,6 +45,9 @@ const StyledBreadcrumbItem = styled.div`
   }
 `
 StyledBreadcrumbItem.displayName = 'StyledBreadcrumbItem'
+StyledBreadcrumbItem.defaultProps = {
+  backgroundColor: 'white',
+}
 
 const StyledRestoreButton = styled.button`
   height: 15px;
