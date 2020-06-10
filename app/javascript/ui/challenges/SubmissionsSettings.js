@@ -7,7 +7,7 @@ import SubmissionBoxSettings from '~/ui/submission_box/SubmissionBoxSettings'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Panel from '~/ui/global/Panel'
-import { routingStore } from '~/stores'
+import { routingStore, apiStore } from '~/stores'
 import _ from 'lodash'
 
 const SubmissionsSettings = ({ collection, closeModal }) => {
@@ -17,6 +17,25 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
   const [audienceSettings, setAudienceSettings] = useState(new Map())
   const [viewingSubmissionBoxId, setViewingSubmissionBoxId] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  // NOTE: these are the based on onToggleCheckbox and toggleTestAudience under AudienceSettings, modified to use hooks
+  const onToggleCheckbox = async e => {
+    const id = e.target.value
+    const setting = audienceSettings.get(id)
+    setting.selected = !setting.selected
+
+    // NOTE: see https://medium.com/swlh/using-es6-map-with-react-state-hooks-800b91eedd5f
+    setAudienceSettings(new Map(audienceSettings.set(id, setting)))
+    const { test_audience } = setting
+    toggleTestAudience(test_audience)
+  }
+
+  const toggleTestAudience = async testAudience => {
+    let open = testAudience.status === 'open'
+    testAudience.status = open ? 'closed' : 'open'
+    open = !open
+    await testAudience.patch()
+  }
 
   useEffect(() => {
     const initSubmissionSettings = async () => {
@@ -35,14 +54,34 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
           setSubmissionTemplateTest(submission_template_test)
         }
 
-        if (submission_template_test_audiences.length > 0) {
-          setAudiences(submission_template_test_audiences)
+        await apiStore.fetchOrganizationAudiences(
+          apiStore.currentUserOrganizationId
+        )
+
+        const challengeAudiences = _.filter(apiStore.audiences, audience => {
+          return (
+            audience.isLinkSharing || audience.audience_type === 'challenge'
+          )
+        })
+
+        if (!_.isEmpty(challengeAudiences)) {
+          setAudiences(challengeAudiences)
 
           const audienceSettingsMap = new Map()
-          _.each(submission_template_test_audiences, audience => {
+          _.each(challengeAudiences, audience => {
+            const testAudience = submission_template_test_audiences.find(
+              testAudience => testAudience.audience_id === audience.id
+            )
+
+            let selected = !!testAudience
+            if (testAudience) {
+              selected = testAudience.status === 'open'
+            }
+
             audienceSettingsMap.set(audience.id, {
-              selected: false,
+              selected,
               audience,
+              test_audience: testAudience,
               displayCheckbox: true,
             })
           })
@@ -73,7 +112,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
       ))}
       {audienceSettings.size > 0 && (
         <AudienceSettingsWidget
-          onToggleCheckbox={() => {}}
+          onToggleCheckbox={onToggleCheckbox}
           onInputChange={() => {}}
           totalPrice={''}
           audiences={audiences}

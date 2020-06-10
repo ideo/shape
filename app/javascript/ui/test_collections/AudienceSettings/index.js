@@ -49,31 +49,24 @@ class AudienceSettings extends React.Component {
   async initAudienceSettings() {
     const { testCollection } = this.props
     const { audiences, audienceSettings } = this
-    const { test_audiences } = testCollection
+    const { test_audiences, isInsideAChallenge } = testCollection
 
     _.each(audiences, audience => {
       const testAudience = test_audiences.find(
         testAudience => testAudience.audience_id === audience.id
       )
 
-      const { isLinkSharing, audience_type } = audience
+      const { isLinkSharing } = audience
       let selected = !!testAudience
-      if (testAudience && isLinkSharing) {
+      if ((testAudience && isLinkSharing) || isInsideAChallenge) {
         selected = testAudience.status === 'open'
-      } else if (testCollection.isInsideAChallenge) {
-        if (audience_type === 'challenge') {
-          audienceSettings.set(audience.id, {
-            selected: false,
-            audience: testAudience,
-            displayCheckbox: true,
-          })
-        }
-        // NOTE: return early to not display org-wide audiences
-        return
       }
 
       const displayCheckbox =
-        selected || isLinkSharing || (!this.locked && audience.order <= 6)
+        selected ||
+        isLinkSharing ||
+        isInsideAChallenge ||
+        (!this.locked && audience.order <= 6)
       audienceSettings.set(audience.id, {
         selected,
         sample_size: testAudience ? testAudience.sample_size : '0',
@@ -90,10 +83,19 @@ class AudienceSettings extends React.Component {
     return testCollection.isLiveTest || testCollection.isClosedTest
   }
 
-  @computed
   get audiences() {
-    const { apiStore } = this.props
-    return apiStore.findAll('audiences')
+    const { apiStore, testCollection } = this.props
+    const { audiences } = apiStore
+    if (testCollection.isInsideAChallenge) {
+      // only show link sharing and challenge audiences for tests inside challenges
+      return _.filter(audiences, audience => {
+        return audience.isLinkSharing || audience.audience_type === 'challenge'
+      })
+    }
+
+    return _.filter(audiences, audience => {
+      return !audience.audience_type
+    })
   }
 
   @computed
@@ -132,16 +134,20 @@ class AudienceSettings extends React.Component {
 
   onToggleCheckbox = async e => {
     const id = e.target.value
+    const { testCollection } = this.props
     const { audienceSettings } = this
     const setting = audienceSettings.get(id)
     this.updateAudienceSetting(id, 'selected', !setting.selected)
     const { audience, test_audience } = setting
-    if (audience.isLinkSharing) {
-      this.toggleLinkSharing(audience, test_audience)
+    if (
+      testCollection.isInsideAChallenge ||
+      (!testCollection.isInsideAChallenge && audience.isLinkSharing)
+    ) {
+      this.toggleTestAudience(audience, test_audience)
     }
   }
 
-  async toggleLinkSharing(audience, testAudience) {
+  async toggleTestAudience(audience, testAudience) {
     let open = testAudience.status === 'open'
     runInAction(() => {
       testAudience.status = open ? 'closed' : 'open'

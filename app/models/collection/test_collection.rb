@@ -468,9 +468,10 @@ class Collection
       challenge_audiences = Audience.where(audience_type: 'challenge')
 
       challenge_audiences.each do |audience|
+        status = audience.name == 'Reviewers' ? :open : :closed
         test_audiences.find_or_create_by(
           audience_id: audience.id,
-          status: :closed,
+          status: status,
         )
       end
     end
