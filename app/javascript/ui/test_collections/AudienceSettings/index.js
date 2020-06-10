@@ -1,10 +1,11 @@
 import _ from 'lodash'
-import React from 'react'
+import React, { Fragment } from 'react'
 import styled from 'styled-components'
 import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Button from '~/ui/global/Button'
+import AudienceHeading from '~/ui/test_collections/AudienceSettings/AudienceHeading'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
@@ -274,7 +275,7 @@ class AudienceSettings extends React.Component {
     const currentUserOrganization = currentUser.current_organization
 
     return (
-      <React.Fragment>
+      <Fragment>
         <FeedbackTermsModal
           open={!!this.termsModalOpen}
           onSubmit={this.acceptFeedbackTerms}
@@ -291,18 +292,21 @@ class AudienceSettings extends React.Component {
           testName={testCollection.name}
         />
         {this.showAudienceSettings && (
-          <AudienceSettingsWidget
-            onToggleCheckbox={this.onToggleCheckbox}
-            onInputChange={this.onInputChange}
-            totalPrice={this.totalPriceDollars}
-            audiences={this.audiences}
-            numPaidQuestions={numPaidQuestions}
-            audienceSettings={this.audienceSettings}
-            afterAddAudience={this.afterAddAudience}
-            locked={this.locked}
-            displayChallengeAudiences={testCollection.isInsideAChallenge}
-            challengeName={this.challengeName}
-          />
+          <Fragment>
+            <AudienceHeading />
+            <AudienceSettingsWidget
+              onToggleCheckbox={this.onToggleCheckbox}
+              onInputChange={this.onInputChange}
+              totalPrice={this.totalPriceDollars}
+              audiences={this.audiences}
+              numPaidQuestions={numPaidQuestions}
+              audienceSettings={this.audienceSettings}
+              afterAddAudience={this.afterAddAudience}
+              locked={this.locked}
+              displayChallengeAudiences={testCollection.isInsideAChallenge}
+              challengeName={this.challengeName}
+            />
+          </Fragment>
         )}
         <FormButtonWrapper>
           <Button
@@ -315,7 +319,7 @@ class AudienceSettings extends React.Component {
               : 'Get Feedback'}
           </Button>
         </FormButtonWrapper>
-      </React.Fragment>
+      </Fragment>
     )
   }
 }

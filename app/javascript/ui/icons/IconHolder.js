@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
 const IconHolder = styled.span`
-  color: ${v.colors.commonDark};
+  color: ${props => props.color};
   display: ${props => props.display};
   height: ${props => props.height}px;
   margin-top: ${props => props.marginTop}px;
@@ -21,6 +21,7 @@ const IconHolder = styled.span`
 
 IconHolder.propTypes = {
   display: PropTypes.string,
+  color: PropTypes.string,
   height: PropTypes.number,
   width: PropTypes.number,
   marginTop: PropTypes.number,
@@ -30,6 +31,7 @@ IconHolder.propTypes = {
 
 IconHolder.defaultProps = {
   display: 'block',
+  color: v.colors.commonDark,
   height: 32,
   width: 32,
   marginTop: 12,

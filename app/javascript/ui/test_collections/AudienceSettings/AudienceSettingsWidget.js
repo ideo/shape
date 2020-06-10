@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
-
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
@@ -12,11 +11,11 @@ import {
   AudienceRowCell,
   StyledRowFlexParent,
   StyledColumnFlexParent,
-} from './styled'
-import TableHeader from './TableHeader'
-import TableBody from './TableBody'
-import AudienceCheckbox from './AudienceCheckbox'
-import AddAudienceModal from './AddAudienceModal'
+} from '~/ui/test_collections/AudienceSettings/styled'
+import TableHeader from '~/ui/test_collections/AudienceSettings/TableHeader'
+import TableBody from '~/ui/test_collections/AudienceSettings/TableBody'
+import AudienceCheckbox from '~/ui/test_collections/AudienceSettings/AudienceCheckbox'
+import AddAudienceModal from '~/ui/test_collections/AudienceSettings/AddAudienceModal'
 import AdminAudienceModal from '~/ui/admin/AdminAudienceModal.js'
 import Button from '~shared/components/atoms/Button'
 import PlusIcon from '~/ui/icons/PlusIcon'
@@ -328,7 +327,6 @@ class AudienceSettingsWidget extends React.Component {
 
     return (
       <AudienceSettingsWrapper>
-        <h3 style={{ marginBottom: '0px' }}>Audience</h3>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <MobileWrapper>
             <StyledColumnFlexParent>

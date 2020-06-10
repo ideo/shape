@@ -1,14 +1,23 @@
-import { useState, useEffect } from 'react'
+import _ from 'lodash'
+import styled from 'styled-components'
 import PropTypes from 'prop-types'
+import { useState, useEffect } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
-import Button from '~/ui/global/Button'
-
+import { routingStore, apiStore, uiStore } from '~/stores'
 import SubmissionBoxSettings from '~/ui/submission_box/SubmissionBoxSettings'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
+import AudienceHeading from '~/ui/test_collections/AudienceSettings/AudienceHeading'
+import EditFeedbackButton from '~/ui/challenges/EditFeedbackButton'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Panel from '~/ui/global/Panel'
-import { routingStore, apiStore } from '~/stores'
-import _ from 'lodash'
+
+const AudienceHeadingWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  /* align with submission format */
+  width: 92%;
+  padding-top: 10px;
+`
 
 const SubmissionsSettings = ({ collection, closeModal }) => {
   const [submissionBoxes, setSubmissionBoxes] = useState([])
@@ -27,14 +36,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
     // NOTE: see https://medium.com/swlh/using-es6-map-with-react-state-hooks-800b91eedd5f
     setAudienceSettings(new Map(audienceSettings.set(id, setting)))
     const { test_audience } = setting
-    toggleTestAudience(test_audience)
-  }
-
-  const toggleTestAudience = async testAudience => {
-    let open = testAudience.status === 'open'
-    testAudience.status = open ? 'closed' : 'open'
-    open = !open
-    await testAudience.patch()
+    await test_audience.API_toggleAudienceStatus()
   }
 
   useEffect(() => {
@@ -111,27 +113,29 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
         </Panel>
       ))}
       {audienceSettings.size > 0 && (
-        <AudienceSettingsWidget
-          onToggleCheckbox={onToggleCheckbox}
-          onInputChange={() => {}}
-          totalPrice={''}
-          audiences={audiences}
-          numPaidQuestions={0}
-          audienceSettings={audienceSettings}
-          afterAddAudience={() => {}}
-          locked={false}
-          displayChallengeAudiences={true}
-          challengeName={collection.challenge.name}
-        />
-      )}
-      {submissionTemplateTest && (
-        <Button
-          onClick={() => {
-            routingStore.routeTo('collections', submissionTemplateTest.id)
-          }}
-        >
-          Go to Test Template
-        </Button>
+        <div>
+          <AudienceHeadingWrapper>
+            <AudienceHeading />
+            <EditFeedbackButton
+              onClick={() => {
+                uiStore.update('challengeSettingsOpen', false)
+                routingStore.routeTo('collections', submissionTemplateTest.id)
+              }}
+            />
+          </AudienceHeadingWrapper>
+          <AudienceSettingsWidget
+            onToggleCheckbox={onToggleCheckbox}
+            onInputChange={() => {}}
+            totalPrice={''}
+            audiences={audiences}
+            numPaidQuestions={0}
+            audienceSettings={audienceSettings}
+            afterAddAudience={() => {}}
+            locked={false}
+            displayChallengeAudiences={true}
+            challengeName={collection.challenge.name}
+          />
+        </div>
       )}
     </div>
   )

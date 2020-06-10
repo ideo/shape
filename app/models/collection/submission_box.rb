@@ -171,6 +171,7 @@ class Collection
     def submission_template_test
       return nil unless submission_template&.collection_cards&.any?
 
+      # FIXME: this will find the first TestCollection within a submission_template; will have issues if there are multiple TestCollections
       submission_template_test_card = submission_template.collection_cards.find { |cc| cc.record.type == 'Collection::TestCollection' }
       submission_template_test_card&.record
     end
