@@ -16,7 +16,7 @@ const SubmissionsSettings = ({ collection, closeModal }) => {
       const request = await collection.API_fetchSubmissionBoxSubCollections()
       const subBoxes = request.data
       setSubmissionBoxes(subBoxes)
-      if (subBoxes.length > 0) {
+      if (subBoxes.length === 1) {
         setViewingSubmissionBoxId(subBoxes[0].id)
       }
       setIsLoading(false)

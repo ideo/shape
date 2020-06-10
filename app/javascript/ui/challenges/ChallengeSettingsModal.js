@@ -41,7 +41,7 @@ const ChallengeSettingsModal = ({ collection, open, onClose }) => {
       }
       fetchChallenge()
     }
-  })
+  }, [collection])
 
   if (!challenge) return ''
 

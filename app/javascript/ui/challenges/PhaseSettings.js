@@ -22,7 +22,7 @@ const PhaseSettings = ({ collection, closeModal }) => {
   useEffect(() => {
     const loadData = async () => {
       const subBoxes = await collection.loadSubmissionBoxesAndPhases()
-      if (subBoxes.length > 0) {
+      if (subBoxes.length === 1) {
         setViewingSubmissionBoxId(subBoxes[0].id)
       }
       // Spread arrays/object so useState knows to update it
