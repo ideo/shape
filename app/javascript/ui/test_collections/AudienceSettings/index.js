@@ -80,7 +80,13 @@ class AudienceSettings extends React.Component {
   @computed
   get locked() {
     const { testCollection } = this.props
-    return testCollection.isLiveTest || testCollection.isClosedTest
+    const {
+      isLiveTest,
+      isClosedTest,
+      isInsideAChallenge,
+      isTemplated,
+    } = testCollection
+    return isLiveTest || isClosedTest || (isInsideAChallenge && isTemplated)
   }
 
   get audiences() {
