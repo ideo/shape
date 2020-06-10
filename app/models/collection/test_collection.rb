@@ -340,7 +340,7 @@ class Collection
         duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
 
-      if parent.submission_box_template? && duplicate.parent.templated? && parent_challenge.present?
+      if submission_box_template_test? && parent_challenge.present?
         # copy challenge audiences from submission box template test
         test_audiences.each do |test_audience|
           next if test_audience.audience_type != 'challenge'

@@ -196,6 +196,11 @@ Rails.application.routes.draw do
         end
       end
       resources :test_audiences, only: %i[create update destroy]
+      resources :test_audiences, shallow: true do
+        member do
+          patch 'toggle_status'
+        end
+      end
       scope :filestack do
         get 'token', to: 'filestack#token', as: :filestack_token
       end

@@ -154,13 +154,11 @@ class AudienceSettings extends React.Component {
   }
 
   async toggleTestAudience(audience, testAudience) {
-    let open = testAudience.status === 'open'
+    const open = testAudience.status === 'open'
     runInAction(() => {
-      testAudience.status = open ? 'closed' : 'open'
-      open = !open
-      this.updateAudienceSetting(audience.id, 'selected', open)
+      this.updateAudienceSetting(audience.id, 'selected', !open)
     })
-    await testAudience.patch()
+    await testAudience.API_toggleAudienceStatus()
   }
 
   onInputChange = (audienceId, value) => {
