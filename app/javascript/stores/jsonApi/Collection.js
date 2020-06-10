@@ -166,6 +166,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   // Find all cards that are between these two card ids,
   // using the card order
   cardIdsBetweenByOrder(firstCardId, lastCardId) {
+    console.log('by order')
     const firstIdx = this.cardIds.findIndex(id => id === firstCardId)
     const lastIdx = this.cardIds.findIndex(id => id === lastCardId)
     const cardIdsBetween = [...this.cardIds]
@@ -1058,7 +1059,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     let order = ['desc', 'asc']
     if (this.isBoard) {
       orderList = ['row', 'col']
-      order = ['asc', 'asc']
+      order = ['desc', 'desc']
     }
     return _.orderBy(this.collection_cards, orderList, order)
   }
