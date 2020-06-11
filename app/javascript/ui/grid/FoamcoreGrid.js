@@ -202,6 +202,11 @@ class FoamcoreGrid extends React.Component {
   componentDidMount() {
     const { collection, uiStore } = this.props
     uiStore.update('selectedAreaEnabled', true)
+    uiStore.determineZoomLevels(
+      this.maxCols,
+      window.innerWidth,
+      this.maxGridWidth()
+    )
     uiStore.adjustZoomLevel({ collection })
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
@@ -213,7 +218,13 @@ class FoamcoreGrid extends React.Component {
     this.updateSelectedArea()
     if (collection.id !== prevProps.collection.id) {
       uiStore.adjustZoomLevel({ collection })
+      uiStore.determineZoomLevels(
+        this.maxCols,
+        window.innerWidth,
+        this.maxGridWidth()
+      )
     }
+
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
       // e.g. if API_fetchCards has reset the loaded cards, we may want to
       // trigger this in case we are viewing further down the page
@@ -310,13 +321,8 @@ class FoamcoreGrid extends React.Component {
   // relativeZoomLevel is either the actual zoom level (if not all the way zoomed out),
   // or else returns the precise zoom ratio that will fit all cards on the screen
   get relativeZoomLevel() {
-    const { collection } = this.props
-    const { zoomLevel } = this
-    // this method only applies for the maxZoom level, return otherwise
-    if (zoomLevel !== collection.maxZoom) return zoomLevel
-    const gridWidth = this.maxGridWidth({ zoomLevel })
-    const relative = gridWidth / window.innerWidth
-    return _.max([relative, 1])
+    const { uiStore } = this.props
+    return uiStore.relativeZoomLevel
   }
 
   get showZoomControls() {

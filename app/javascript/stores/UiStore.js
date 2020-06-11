@@ -255,6 +255,7 @@ export default class UiStore {
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
   collaboratorColors = new Map()
+  zoomLevels = []
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -1338,13 +1339,13 @@ export default class UiStore {
   // Foamcore zoom functions
   @action
   adjustZoomLevel = ({ collection } = {}) => {
-    const { lastZoom, maxZoom } = collection
+    const { lastZoom } = collection
     if (lastZoom) {
       this.zoomLevel = lastZoom
     } else if (this.zoomLevel > 1) {
       // if we haven't marked specific zoom on this collection, zoom out if needed
       // and only store uiStore.zoomLevel, not the collection.lastZoom
-      this.zoomLevel = maxZoom
+      this.zoomLevel = this.zoomLevels.length
     }
   }
 
@@ -1359,7 +1360,33 @@ export default class UiStore {
   @action
   updateZoomLevel(val, collection = this.viewingCollection) {
     if (!collection || !collection.isBoard) return
-    this.zoomLevel = _.clamp(val, 1, collection.maxZoom)
+    this.zoomLevel = _.clamp(val, 1, this.zoomLevels.length)
     collection.lastZoom = this.zoomLevel
+  }
+
+  determineZoomLevels(maxCols, windowWidth, maxGridWidth) {
+    let possibleCols = [1, 2, 4, 6, 8, 16]
+    const widthPerCol = maxGridWidth / maxCols
+    possibleCols = _.filter(possibleCols, i => {
+      return i <= maxCols && widthPerCol * i >= windowWidth
+    })
+
+    this.zoomLevels = _.map(possibleCols, col => {
+      return {
+        col,
+        relativeZoomLevel: (widthPerCol * col) / windowWidth,
+      }
+    })
+    if (this.zoomLevels[0].relativeZoomLevel > 1) {
+      this.zoomLevels.unshift({
+        relativeZoomLevel: 1,
+      })
+    }
+  }
+
+  get relativeZoomLevel() {
+    // zoomLevels start at 1, so we subtract to get the array idx
+    const zoom = this.zoomLevels[this.zoomLevel - 1]
+    return zoom ? zoom.relativeZoomLevel : 1
   }
 }
