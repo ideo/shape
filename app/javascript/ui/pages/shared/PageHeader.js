@@ -73,8 +73,14 @@ const StyledButtonIconWrapper = styled.span`
     right: 6px;
   `}
 `
-
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
+
+const FixedRightContainer = styled(Flex)`
+  position: relative;
+  top: 22px;
+  right: 60px;
+  height: 33px;
+`
 
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
@@ -509,22 +515,17 @@ class PageHeader extends React.Component {
               </Flex>
 
               {record.show_language_selector && (
-                <Flex
-                  style={{
-                    position: 'relative',
-                    top: '22px',
-                    right: '60px',
-                    height: '33px',
-                  }}
-                >
+                <FixedRightContainer>
                   <LanguageSelector />
-                </Flex>
+                </FixedRightContainer>
               )}
 
               {record.isChallengeOrInsideChallenge && (
-                <ChallengeSettingsButton
-                  onSettingsClick={this.handleChallengeSettingsClick}
-                />
+                <FixedRightContainer>
+                  <ChallengeSettingsButton
+                    handleShowSettings={this.handleChallengeSettingsClick}
+                  />
+                </FixedRightContainer>
               )}
             </StyledTitleAndRoles>
             {(record.isRegularCollection || record.isSubmissionsCollection) && (

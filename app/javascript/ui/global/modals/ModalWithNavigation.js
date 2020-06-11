@@ -62,6 +62,7 @@ class ModalWithNavigation extends React.Component {
             <NavElement
               onClick={() => this.handleNavClick(element)}
               isActive={this.isActive(element)}
+              key={element.name}
             >
               {element.name}
             </NavElement>
@@ -78,10 +79,12 @@ ModalWithNavigation.propTypes = {
   /**
    * The navigation and contents of each navigation tab in the modal.
    */
-  contents: PropTypes.shape({
-    name: PropTypes.string,
-    component: PropTypes.node,
-  }).isRequired,
+  contents: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      component: PropTypes.node,
+    })
+  ).isRequired,
   /**
    * The state for when the modal should be open, must be set to true to display
    * the modal

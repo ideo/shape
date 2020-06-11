@@ -365,6 +365,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SubmissionsCollection'
   }
 
+  get submissionFormat() {
+    if (this.submission_template_id) return 'template'
+    if (this.submission_box_type && this.submission_box_type !== 'template')
+      return 'item'
+    return null
+  }
+
   get isSubmission() {
     return this.submission_attrs && this.submission_attrs.submission
   }
@@ -862,6 +869,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (maxCol > this.loadedCols) {
       this.loadedCols = maxCol
     }
+  }
+
+  API_fetchChallengeSubmissionBoxCollections() {
+    const apiPath = `collections/${this.id}/challenge_submission_boxes`
+    return this.apiStore.request(apiPath)
   }
 
   API_fetchBreadcrumbRecords() {

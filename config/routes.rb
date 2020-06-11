@@ -28,6 +28,7 @@ Rails.application.routes.draw do
         member do
           get 'in_my_collection'
           get 'direct_children_tag_list'
+          get 'challenge_submission_boxes'
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'

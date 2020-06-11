@@ -1,13 +1,18 @@
 import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
+
+import { fakeCollection } from '#/mocks/data'
+
 let props, wrapper, rerender
 describe('ChallengeFixedHeader', () => {
   beforeEach(() => {
     props = {
-      challengeName: 'Reusable Cup Challenge',
-      collectionName: 'Reusable Cup Challenge',
-      collectionType: 'challenge',
+      collection: {
+        ...fakeCollection,
+        name: 'Reusable Cup Challenge',
+        collection_type: 'challenge',
+      },
+      handleShowSettings: jest.fn(),
       challengeNavigationHandler: jest.fn(),
-      onSettingsClick: jest.fn(),
     }
     rerender = () => {
       wrapper = shallow(<ChallengeFixedHeader {...props} />)
@@ -36,7 +41,7 @@ describe('ChallengeFixedHeader', () => {
 
   describe('collection is not a challenge', () => {
     beforeEach(() => {
-      props.collectionType = 'phase'
+      props.collection.collection_type = 'phase'
       rerender()
     })
 

@@ -1,28 +1,27 @@
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
-import ChallengeSettingsModal from '~/ui/challenges/ChallengeSettingsModal'
+
+import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
+import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
 import IconHolder from '~/ui/icons/IconHolder'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
-import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
-import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
-import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const ChallengeFixedHeader = ({
-  challengeName,
-  collectionName,
-  collectionType,
-  onSettingsClick,
+  collection,
   challengeNavigationHandler,
+  handleShowSettings,
 }) => {
+  const { name, collection_type } = collection
   return (
     <MaxWidthContainer>
-      <ChallengeSettingsModal open={uiStore.challengeSettingsOpen} />
-      {collectionType !== 'challenge' && (
+      {/* Show subheader if a parent collection is a challenge */}
+      {collection_type !== 'challenge' && (
         <ChallengeSubHeader
-          challengeName={challengeName}
+          challengeName={name}
           challengeNavigationHandler={challengeNavigationHandler}
         />
       )}
@@ -33,7 +32,7 @@ const ChallengeFixedHeader = ({
       >
         <Box>
           <EditableName
-            name={collectionName}
+            name={name}
             updateNameHandler={e => e.preventDefault()}
             inline
           />
@@ -45,16 +44,18 @@ const ChallengeFixedHeader = ({
             marginLeft={10}
           >
             {collectionTypeToIcon({
-              type: collectionType,
+              type: collection_type,
               size: 'lg',
             })}
           </IconHolder>
         </Box>
 
-        <Box auto></Box>
-
-        <Box flex align="center" style={{ marginLeft: '8px' }}>
-          <ChallengeSettingsButton onSettingsClick={onSettingsClick} />
+        <Box
+          flex
+          align="center"
+          style={{ marginLeft: '8px', marginRight: '30px' }}
+        >
+          <ChallengeSettingsButton handleShowSettings={handleShowSettings} />
         </Box>
       </Flex>
     </MaxWidthContainer>
@@ -62,18 +63,12 @@ const ChallengeFixedHeader = ({
 }
 
 ChallengeFixedHeader.propTypes = {
-  challengeName: PropTypes.string,
-  collectionName: PropTypes.string,
-  collectionType: PropTypes.string,
-  onSettingsClick: PropTypes.func,
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  handleShowSettings: PropTypes.func.isRequired,
   challengeNavigationHandler: PropTypes.func,
 }
 
 ChallengeFixedHeader.defaultProps = {
-  challengeName: '',
-  collectionName: '',
-  collectionType: null,
-  onSettingsClick: () => {},
   challengeNavigationHandler: () => {},
 }
 

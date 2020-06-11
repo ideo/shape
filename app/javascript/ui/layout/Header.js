@@ -29,6 +29,7 @@ import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
 import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
+import ChallengeSettingsModal from '~/ui/challenges/ChallengeSettingsModal'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const BackIconContainer = styled.span`
@@ -116,9 +117,9 @@ class Header extends React.Component {
     this.props.uiStore.update('organizationMenuPage', null)
   }
 
-  handleChallengeSettingsClick = () => {
+  handleOpenChallengeSettings = ({ open = true }) => {
     const { uiStore } = this.props
-    uiStore.update('challengeSettingsOpen', true)
+    uiStore.update('challengeSettingsOpen', open)
   }
 
   get onArchivedPage() {
@@ -417,15 +418,22 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
+          {record && record.isChallengeOrInsideChallenge && (
+            <ChallengeSettingsModal
+              collection={record}
+              open={uiStore.challengeSettingsOpen}
+              onClose={() => this.handleOpenChallengeSettings({ open: false })}
+            />
+          )}
           {record &&
             record.isChallengeOrInsideChallenge &&
             shouldRenderFixedHeader && (
               <ChallengeFixedHeader
-                challengeName={record.challenge_name}
-                collectionName={record.name}
-                collectionType={record.collection_type}
-                onSettingsClick={this.handleChallengeSettingsClick}
-                isInsideAChallenge={record.isInsideAChallenge}
+                collection={record}
+                showSettingsModal={uiStore.challengeSettingsOpen}
+                handleShowSettings={() =>
+                  this.handleOpenChallengeSettings({ open: true })
+                }
                 challengeNavigationHandler={() => {
                   routingStore.routeTo('collections', record.challenge_id)
                 }}

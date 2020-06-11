@@ -2,14 +2,14 @@ import Button from '~/ui/global/Button'
 import PropTypes from 'prop-types'
 import v from '~/utils/variables'
 
-const ChallengeSettingsButton = ({ onSettingsClick }) => {
+const ChallengeSettingsButton = ({ handleShowSettings }) => {
   return (
     <Button
       style={{ marginLeft: '1rem' }}
       colorScheme={v.colors.primaryDarkest}
       size="sm"
       width={256}
-      onClick={onSettingsClick}
+      onClick={handleShowSettings}
     >
       Challenge Settings
     </Button>
@@ -17,7 +17,7 @@ const ChallengeSettingsButton = ({ onSettingsClick }) => {
 }
 
 ChallengeSettingsButton.propTypes = {
-  onSettingsClick: PropTypes.func.isRequired,
+  handleShowSettings: PropTypes.func.isRequired,
 }
 
 export default ChallengeSettingsButton
