@@ -40,6 +40,11 @@ class CollectionList extends React.Component {
     ]
   }
 
+  get sortedCards() {
+    const { collection } = this.props
+    return collection.sortedCards
+  }
+
   handleSort = column => {
     const { collection } = this.props
     uiStore.update('collectionCardSortOrder', column)
@@ -47,9 +52,6 @@ class CollectionList extends React.Component {
   }
 
   render() {
-    const {
-      collection: { collection_cards },
-    } = this.props
     return (
       <div>
         <Flex mb={1}>
@@ -64,7 +66,7 @@ class CollectionList extends React.Component {
             </Column>
           ))}
         </Flex>
-        {collection_cards.map(card => (
+        {this.sortedCards.map(card => (
           <ListCard card={card} insideChallenge={this.insideChallenge} />
         ))}
       </div>
