@@ -3,7 +3,7 @@ require_dependency "#{Rails.root}/lib/jsonapi_mappings"
 module JsonapiCache
   class CollectionCardRenderer < SimpleService
     # kick out old cached data
-    EXPIRY_TIME = 1.month
+    EXPIRY_TIME = 1.week
 
     def initialize(
       cards: [],
@@ -180,7 +180,7 @@ module JsonapiCache
 
     def resource_identifiers
       identifiers = CollectionCard
-                    .where(id: @cards.pluck(:id).compact)
+                    .where(id: @cards.reorder(nil).pluck(:id).compact)
                     .joins(
                       %(
                         LEFT JOIN items ON items.id = collection_cards.item_id

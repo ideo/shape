@@ -69,6 +69,23 @@ describe JsonapiCache::CollectionCardRenderer, type: :concern do
           expect(related_json[:attributes][:in_my_collection]).to eq false
         end
       end
+
+      context 'with public view access' do
+        let(:collection) { create(:collection, num_cards: 2, anyone_can_view: true) }
+        let!(:subcollection) { create(:collection, parent_collection: collection) }
+        let(:cards) do
+          CollectionCardFilter::ForPublic.call(
+            cards_scope: collection.collection_cards,
+          )
+        end
+
+        it 'gets public cards' do
+          subject.call
+          expect(json[:data].count).to eq 3
+          expect(first_result[:id]).to eq cards.first.id.to_s
+          expect(first_result[:attributes]).to match_json_schema('collection_card')
+        end
+      end
     end
 
     context 'with edit access' do
