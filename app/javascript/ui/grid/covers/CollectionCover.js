@@ -249,9 +249,10 @@ class CollectionCover extends React.Component {
   }
 
   get reviewSubmissionButton() {
-    const { inSubmissionsCollection, collection } = this.props
-    // TODO: add check if the user can review the submission
-    if (!inSubmissionsCollection || !collection.isLiveTest) return
+    const { inSubmissionsCollection, collection, isReviewable } = this.props
+    if (!inSubmissionsCollection || !collection.isLiveTest || !isReviewable) {
+      return null
+    }
 
     return (
       <Button
@@ -261,7 +262,7 @@ class CollectionCover extends React.Component {
         size="sm"
         width={172}
         onClick={() => {
-          console.log('handle review submission')
+          // FIXME: to be implemented in an upcoming story
         }}
       >
         Review
@@ -491,6 +492,7 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
+  isReviewable: PropTypes.bool,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -503,6 +505,7 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
+  isReviewable: false,
 }
 
 CollectionCover.displayName = 'CollectionCover'

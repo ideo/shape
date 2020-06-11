@@ -442,7 +442,7 @@ class PageHeader extends React.Component {
   }
 
   get renderTopRightButton() {
-    const { record } = this.props
+    const { record, apiStore } = this.props
 
     let buttonProps = {}
     if (!record.isSubmissionBox) {
@@ -451,10 +451,14 @@ class PageHeader extends React.Component {
         onClick: this.handleReviewSubmissionsClick,
       }
     } else {
-      // TODO: add check if the user can review the submission
-      const hidden = false
+      const { currentUser } = apiStore
+      // FIXME: User::API_fetchAllReviewableSubmissions is not implemented
+      const reviewableSubmissions = currentUser.API_fetchAllReviewableSubmissions(
+        record
+      )
+      const hidden = _.isEmpty(reviewableSubmissions)
       buttonProps = {
-        name: `Review Submissions (${record.countSubmissionLiveTests})`,
+        name: `Review Submissions (${reviewableSubmissions.length})`,
         color: `${v.colors.alert}`,
         onClick: this.handleReviewSubmissionsClick,
         hidden,

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import v from '~/utils/variables'
 
 const TopRightChallengeButton = ({ name, color, onClick, hidden }) => {
-  if (hidden) return
+  if (hidden) return null
 
   return (
     <Button

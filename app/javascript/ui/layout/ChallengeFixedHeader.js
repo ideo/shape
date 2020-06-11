@@ -15,6 +15,7 @@ const ChallengeFixedHeader = ({
   challengeNavigationHandler,
   handleShowSettings,
   handleReviewSubmissions,
+  currentUserHasReviewableCollections,
 }) => {
   const { name, collection_type } = collection
   let buttonProps = {}
@@ -24,8 +25,7 @@ const ChallengeFixedHeader = ({
       onClick: handleShowSettings,
     }
   } else {
-    // TODO: add check if the user can review the submission
-    const hidden = false
+    const hidden = !currentUserHasReviewableCollections
     buttonProps = {
       name: `Review Submissions (${collection.countSubmissionLiveTests})`,
       color: `${v.colors.alert}`,
@@ -80,14 +80,16 @@ const ChallengeFixedHeader = ({
 }
 
 ChallengeFixedHeader.propTypes = {
+  currentUser: MobxPropTypes.objectOrObservableObject.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   handleShowSettings: PropTypes.func.isRequired,
   handleReviewSubmissions: PropTypes.func.isRequired,
-  challengeNavigationHandler: PropTypes.func,
+  challengeNavigationHandler: PropTypes.func.isRequired,
+  currentUserHasReviewableCollections: PropTypes.bool,
 }
 
 ChallengeFixedHeader.defaultProps = {
-  challengeNavigationHandler: () => {},
+  currentUserHasReviewableCollections: false,
 }
 
 export default ChallengeFixedHeader
