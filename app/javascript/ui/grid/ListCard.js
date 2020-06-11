@@ -77,6 +77,15 @@ const ColumnLink = styled.button`
   display: flex;
 `
 
+const TruncatedName = styled.span`
+  display: inline-block;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 380px
+`
+
 const IconHolder = styled.div`
   color: ${v.colors.commonDark};
   display: flex;
@@ -240,7 +249,9 @@ class ListCard extends React.Component {
               height={1}
               handleClick={this.handleRecordClick}
             />
-            {card.record.name}
+            <TruncatedName>
+              {card.record.name}
+            </TruncatedName>
             {this.renderLabelSelector}
             {this.renderIcons}
           </ColumnLink>

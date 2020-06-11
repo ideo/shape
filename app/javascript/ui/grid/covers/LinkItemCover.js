@@ -74,7 +74,7 @@ class LinkItemCover extends React.Component {
   }
 
   render() {
-    const { item, cardHeight, uiStore } = this.props
+    const { item, cardHeight, listStyle, uiStore } = this.props
     const { url, thumbnail_url } = item
     const { truncatedName, truncatedContent } = coverTextClamp({
       name: item.name,
@@ -87,11 +87,13 @@ class LinkItemCover extends React.Component {
         <StyledImageCover url={thumbnail_url} bgColor={v.colors.black}>
           {!this.isImage && (
             <Flex className="inner" align="center" justify="center">
-              <Box style={{ width: '100%' }}>
-                <CardHeading className="name">{truncatedName}</CardHeading>
-                <p className="content">{truncatedContent}</p>
-                <GridCardIconWithName text={url} icon={this.icon} />
-              </Box>
+              {!listStyle && (
+                <Box style={{ width: '100%' }}>
+                  <CardHeading className="name">{truncatedName}</CardHeading>
+                  <p className="content">{truncatedContent}</p>
+                  <GridCardIconWithName text={url} icon={this.icon} />
+                </Box>
+              )}
             </Flex>
           )}
           <div className="overlay" />
@@ -104,10 +106,12 @@ class LinkItemCover extends React.Component {
 LinkItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   cardHeight: PropTypes.number,
+  listStyle: PropTypes.bool,
 }
 
 LinkItemCover.defaultProps = {
   cardHeight: 1,
+  listStyle: false,
 }
 
 LinkItemCover.wrappedComponent.propTypes = {

@@ -56,6 +56,7 @@ class ListCoverRenderer extends React.Component {
               item={record}
               cardHeight={card.height}
               dragging={dragging}
+              listStyle
             />
           )
         case ITEM_TYPES.DATA:
