@@ -48,6 +48,10 @@ class ModalWithNavigation extends React.Component {
     return this.state.currentPage.name === element.name
   }
 
+  handleNavClick = page => {
+    this.setState({ currentPage: page })
+  }
+
   render() {
     const { title, contents, open, onClose } = this.props
     const { currentPage } = this.state
@@ -56,7 +60,7 @@ class ModalWithNavigation extends React.Component {
         <NavigationContainer>
           {contents.map(element => (
             <NavElement
-              onClick={() => this.handleNavClick(element.name)}
+              onClick={() => this.handleNavClick(element)}
               isActive={this.isActive(element)}
               key={element.name}
             >
