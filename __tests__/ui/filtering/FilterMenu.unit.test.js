@@ -26,7 +26,7 @@ describe('FilterMenu', () => {
 
     it('should set the FilterIconButton to have 5px top margin', () => {
       const iconHolder = wrapper.find('FilterIconButton').dive()
-      expect(iconHolder).toHaveStyleRule('margin-top', '5px')
+      expect(iconHolder).toHaveStyleRule('margin-bottom', 'inherit')
     })
 
     describe('when margin top is not specified', () => {
@@ -37,7 +37,7 @@ describe('FilterMenu', () => {
 
       it('should set the FilterIconButton to default margin', () => {
         const iconHolder = wrapper.find('FilterIconButton').dive()
-        expect(iconHolder).toHaveStyleRule('margin-top', '-24px')
+        expect(iconHolder).toHaveStyleRule('margin-bottom', '24px')
       })
     })
 

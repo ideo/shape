@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
-import defaultTimeFormat from '~/utils/time'
+import { defaultTimeFormat } from '~/utils/time'
 
 const StyledDate = styled.span`
   color: ${props => props.color};
