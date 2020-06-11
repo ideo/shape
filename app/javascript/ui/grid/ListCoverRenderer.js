@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { routingStore, uiStore } from '~/stores'
+import FilestackUpload from '~/utils/FilestackUpload'
 import PlainLink from '~/ui/global/PlainLink'
 import LinkItemCover from '~/ui/grid/covers/LinkItemCover'
 import PdfFileItemCover from '~/ui/grid/covers/PdfFileItemCover'
@@ -9,7 +10,6 @@ import ImageItemCover from '~/ui/grid/covers/ImageItemCover'
 import VideoItemCover from '~/ui/grid/covers/VideoItemCover'
 import GenericFileItemCover from '~/ui/grid/covers/GenericFileItemCover'
 import { StyledCollectionCover } from '~/ui/grid/covers/CollectionCover'
-import DataItemCover from '~/ui/grid/covers/DataItemCover'
 import LegendItemCover from '~/ui/grid/covers/LegendItemCover'
 
 import v, { ITEM_TYPES } from '~/utils/variables'
@@ -62,12 +62,9 @@ class ListCoverRenderer extends React.Component {
           // We must pass in dataset length to trigger
           // re-render when new datasets are added
           return (
-            <DataItemCover
-              datasetLength={record.datasets ? record.datasets.length : 0}
-              height={1}
-              item={record}
-              card={card}
-            />
+            <StyledCollectionCover
+              backgroundColor={v.colors.commonDark}
+            ></StyledCollectionCover>
           )
 
         case ITEM_TYPES.LEGEND:
@@ -77,8 +74,19 @@ class ListCoverRenderer extends React.Component {
           return <div>{record.content}</div>
       }
     } else if (this.isCollection) {
+      const {
+        card: { record },
+      } = this.props
+      const { cover } = record
+      let url = cover.image_url
+      if (cover.image_handle) {
+        url = FilestackUpload.imageUrl({
+          handle: cover.image_handle,
+        })
+      }
       return (
         <StyledCollectionCover
+          url={url}
           backgroundColor={v.colors.commonDark}
         ></StyledCollectionCover>
       )
