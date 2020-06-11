@@ -165,8 +165,21 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                              .select do |collection|
                                collection.can_view?(current_user)
                              end
+
     render jsonapi: collections,
            include: Collection.default_relationships_for_api
+  end
+
+  def challenge_phase_collections
+    # This returns all phase collections that are children,
+    # or descendants of a parent challenge
+    collections = ChallengeRelevantPhaseCollections.call(
+      collection: @collection,
+      for_user: current_user,
+    )
+
+    # Only include collection data
+    render jsonapi: collections
   end
 
   def restore_permissions

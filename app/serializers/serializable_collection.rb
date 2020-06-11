@@ -29,7 +29,7 @@ class SerializableCollection < BaseJsonSerializer
     :cloned_from_id,
     :num_columns,
     :start_date,
-    :end_date
+    :end_date,
   )
 
   stringified_attributes(

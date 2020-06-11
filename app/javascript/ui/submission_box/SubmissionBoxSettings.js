@@ -1,6 +1,7 @@
 import { find } from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 
 import {
   Heading3,
@@ -10,12 +11,23 @@ import {
 import { Checkbox } from '~/ui/global/styled/forms'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import { Row, RowItemLeft } from '~/ui/global/styled/layout'
-import AlertIcon from '~/ui/icons/AlertIcon'
+import InfoIcon from '~/ui/icons/InfoIcon'
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import v from '~/utils/variables'
 import SubmissionBoxFormat from '~/ui/submission_box/SubmissionBoxFormat'
+
+const InfoIconWrapper = styled.span`
+  display: inline-block;
+  margin-top: 4px;
+  width: 16px;
+  height: 16px;
+  color: ${v.colors.commonMedium};
+  > .icon {
+    width: 16px;
+  }
+`
 
 export const submissionItemTypes = [
   { name: 'text', Icon: AddTextIcon },
@@ -47,16 +59,9 @@ class SubmissionBoxSettings extends React.Component {
     return (
       <React.Fragment>
         <Row>
-          <span
-            style={{
-              display: 'inline-block',
-              height: '25px',
-              width: '25px',
-              color: v.colors.commonMedium,
-            }}
-          >
-            <AlertIcon />
-          </span>
+          <InfoIconWrapper>
+            <InfoIcon />
+          </InfoIconWrapper>
           <RowItemLeft>
             <SmallHelperText>
               Anyone invited to this collection will be able to add their

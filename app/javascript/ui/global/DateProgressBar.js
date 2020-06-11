@@ -10,7 +10,7 @@ const unfilledBackgroundColor = color(v.colors.black)
   .string()
 
 const Progress = styled.div`
-  height: 15px;
+  height: ${props => (props.height ? props.height : 15)}px;
   width: 100%;
   background-color: ${unfilledBackgroundColor};
 `
@@ -36,9 +36,9 @@ export const percentOfDateRange = (start, end) => {
   return Math.round((nowDistance / totalDistance) * 100)
 }
 
-const DateProgressBar = ({ startDate, endDate } = {}) => {
+const DateProgressBar = ({ startDate, endDate, height } = {}) => {
   return (
-    <Progress>
+    <Progress height={height}>
       <ProgressBar
         width={percentOfDateRange(moment(startDate), moment(endDate))}
       />
@@ -49,11 +49,13 @@ const DateProgressBar = ({ startDate, endDate } = {}) => {
 DateProgressBar.propTypes = {
   startDate: PropTypes.string,
   endDate: PropTypes.string,
+  height: PropTypes.number,
 }
 
 DateProgressBar.defaultProps = {
   startDate: null,
   endDate: null,
+  height: null,
 }
 
 export default DateProgressBar
