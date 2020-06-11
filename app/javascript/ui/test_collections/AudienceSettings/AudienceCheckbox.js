@@ -72,7 +72,7 @@ const AudienceCheckbox = ({
                     <AssignReviewersLink
                       onClick={e => {
                         e.preventDefault()
-                        console.log('handle assign reviewers')
+                        // FIXME: to be implemented in an upcoming story
                       }}
                     >
                       ASSIGN REVIEWERS

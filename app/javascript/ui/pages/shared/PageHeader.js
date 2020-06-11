@@ -136,7 +136,7 @@ class PageHeader extends React.Component {
   }
 
   handleReviewSubmissionsClick = () => {
-    console.log('handle review submissions')
+    // FIXME: to be implemented in an upcoming story
   }
 
   openMoveMenuForTemplate = e => {

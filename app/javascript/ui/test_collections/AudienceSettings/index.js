@@ -373,4 +373,6 @@ AudienceSettings.wrappedComponent.propTypes = {
   routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+AudienceSettings.displayName = 'AudienceSettings'
+
 export default AudienceSettings

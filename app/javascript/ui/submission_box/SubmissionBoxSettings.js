@@ -40,7 +40,7 @@ export const submissionItemTypes = [
 export const submissionTypeForName = typeName =>
   _.find(submissionItemTypes, t => t.name === typeName)
 
-@inject('apiStore', 'routingStore')
+@inject('apiStore')
 @observer
 class SubmissionBoxSettings extends React.Component {
   @observable
@@ -151,7 +151,8 @@ SubmissionBoxSettings.propTypes = {
 }
 SubmissionBoxSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+
+SubmissionBoxSettings.displayName = 'SubmissionBoxSettings'
 
 export default SubmissionBoxSettings

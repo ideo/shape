@@ -123,7 +123,7 @@ class Header extends React.Component {
   }
 
   handleReviewSubmissions = () => {
-    console.log('handle review submissions')
+    // FIXME: to be implemented in an upcoming story
   }
 
   get onArchivedPage() {
