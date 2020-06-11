@@ -83,7 +83,7 @@ const TruncatedName = styled.span`
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 380px
+  max-width: 380px;
 `
 
 const IconHolder = styled.div`
@@ -249,9 +249,7 @@ class ListCard extends React.Component {
               height={1}
               handleClick={this.handleRecordClick}
             />
-            <TruncatedName>
-              {card.record.name}
-            </TruncatedName>
+            <TruncatedName>{card.record.name}</TruncatedName>
             {this.renderLabelSelector}
             {this.renderIcons}
           </ColumnLink>

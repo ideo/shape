@@ -92,6 +92,11 @@ const StyledButtonIconWrapper = styled.span`
 
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
 
+const CollectionPillHolder = styled.div`
+  margin-bottom: 8px;
+  width: 100%;
+`
+
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class PageHeader extends React.Component {
@@ -533,6 +538,7 @@ class PageHeader extends React.Component {
               </div>
             )}
           </div>
+          <CollectionPillHolder id="collectionFilterPortal" />
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal
           canEdit={this.canEdit}

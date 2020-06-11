@@ -1,4 +1,5 @@
 import { startCase, flatten, sortBy } from 'lodash'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -193,7 +194,7 @@ class MethodLibraryFilterBar extends React.Component {
     }
   }
 
-  render() {
+  renderBar() {
     const categories = ['subqualities', 'categories', 'types']
     return (
       <Fragment>
@@ -235,6 +236,12 @@ class MethodLibraryFilterBar extends React.Component {
         </ResponsiveFlex>
       </Fragment>
     )
+  }
+
+  render() {
+    const filterElement = document.getElementById('collectionFilterPortal')
+    if (!filterElement) return null
+    return ReactDOM.createPortal(this.renderBar(), filterElement)
   }
 }
 

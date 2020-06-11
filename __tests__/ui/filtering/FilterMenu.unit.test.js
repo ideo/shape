@@ -24,11 +24,6 @@ describe('FilterMenu', () => {
       expect(getPopoutMenu().props().menuOpen).toBe(false)
     })
 
-    it('should set the FilterIconButton to have 5px top margin', () => {
-      const iconHolder = wrapper.find('FilterIconButton').dive()
-      expect(iconHolder).toHaveStyleRule('margin-bottom', 'inherit')
-    })
-
     describe('when margin top is not specified', () => {
       beforeEach(() => {
         props.marginTop = undefined

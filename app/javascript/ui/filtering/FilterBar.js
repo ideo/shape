@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import ReactDOM from 'react-dom'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -34,7 +35,7 @@ class FilterBar extends React.Component {
     return _.some(filters, 'selected')
   }
 
-  render() {
+  renderBar() {
     const {
       onDelete,
       onShowAll,
@@ -68,6 +69,12 @@ class FilterBar extends React.Component {
           )}
       </Flex>
     )
+  }
+
+  render() {
+    const filterElement = document.getElementById('collectionFilterPortal')
+    if (!filterElement) return null
+    return ReactDOM.createPortal(this.renderBar(), filterElement)
   }
 }
 
