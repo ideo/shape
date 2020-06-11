@@ -5,7 +5,7 @@ import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Button from '~/ui/global/Button'
-import AudienceHeading from '~/ui/test_collections/AudienceSettings/AudienceHeading'
+import { Heading3 } from '~/ui/global/styled/typography'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
@@ -56,7 +56,7 @@ class AudienceSettings extends React.Component {
   }
 
   @action
-  async initAudienceSettings() {
+  initAudienceSettings() {
     const { testCollection } = this.props
     const { audiences, audienceSettings } = this
     const { test_audiences, isInsideAChallenge } = testCollection
@@ -298,7 +298,7 @@ class AudienceSettings extends React.Component {
 
     return (
       <AudienceHeadingWrapper>
-        <AudienceHeading />
+        <Heading3>Feedback Audience</Heading3>
         {testCollection.isInsideAChallenge && !viewingChallengeTest && (
           <EditFeedbackButton
             onClick={() => {

@@ -199,6 +199,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.try(:submission_template_tests)
   end
 
+  has_one :restorable_parent do
+    @object.try(:restorable_parent)
+  end
+
   attribute :serializer do
     'SerializableCollection'
   end

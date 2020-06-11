@@ -46,13 +46,6 @@ class SubmissionBoxSettings extends React.Component {
     }
   }
 
-  initializeTemplateAudiences = async () => {
-    const { apiStore } = this.props
-    await apiStore.fetchOrganizationAudiences(
-      apiStore.currentUserOrganizationId
-    )
-  }
-
   toggleHidden = ev => {
     ev.preventDefault()
     const { collection } = this.props
