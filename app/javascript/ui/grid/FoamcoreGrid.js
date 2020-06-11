@@ -326,8 +326,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   get showZoomControls() {
-    // always calculate the maxGridWidth of zoomLevel = 1
-    return this.maxGridWidth({ zoomLevel: 1 }) > window.innerWidth
+    const { uiStore } = this.props
+    return uiStore.zoomLevels.length > 1
   }
 
   // This returns the grid with (in pixels) for showing the full width of cards;
