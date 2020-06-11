@@ -7,7 +7,7 @@ import { filter } from 'lodash'
 import Tooltip from '~/ui/global/Tooltip'
 import DateProgressBar from '~/ui/global/DateProgressBar'
 import { FormatDateRange } from '~/ui/grid/CollectionDateRange'
-import { SmallHelperText } from '~/ui/global/styled/typography'
+import { SmallHelperText, TooltipHeader } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
 
 // Temporary Icons
@@ -24,15 +24,6 @@ const PhaseIcon = styled.div`
   }
 `
 PhaseIcon.displayName = 'PhaseIcon'
-
-// I couldn't find any similar-enough style in typography.js
-// So created a new style for this tooltip
-const TooltipHeader = styled.div`
-  font-family: ${v.fonts.sans};
-  font-size: 0.9rem;
-  color: ${v.colors.white};
-  font-weight: bold;
-`
 
 export const phaseIcons = [
   <BuildIcon />,
