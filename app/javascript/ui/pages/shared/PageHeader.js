@@ -443,16 +443,22 @@ class PageHeader extends React.Component {
   get renderTopRightButton() {
     const { record } = this.props
 
-    const buttonProps = !record.isSubmissionBox
-      ? {
-          name: 'Challenge Settings',
-          onClick: this.handleChallengeSettingsClick,
-        }
-      : {
-          name: 'Review Submissions',
-          color: `${v.colors.alert}`,
-          onClick: this.handleReviewSubmissionsClick,
-        }
+    let buttonProps = {}
+    if (!record.isSubmissionBox) {
+      buttonProps = {
+        name: 'Challenge Settings',
+        onClick: this.handleReviewSubmissionsClick,
+      }
+    } else {
+      // TODO: add check if the user can review the submission
+      const hidden = false
+      buttonProps = {
+        name: `Review Submissions (${record.countSubmissionLiveTests})`,
+        color: `${v.colors.alert}`,
+        onClick: this.handleReviewSubmissionsClick,
+        hidden,
+      }
+    }
     return <TopRightChallengeButton {...buttonProps} />
   }
 

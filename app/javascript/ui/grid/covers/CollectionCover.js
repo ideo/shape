@@ -248,6 +248,27 @@ class CollectionCover extends React.Component {
     )
   }
 
+  get reviewSubmissionButton() {
+    const { inSubmissionsCollection, collection } = this.props
+    // TODO: add check if the user can review the submission
+    if (!inSubmissionsCollection || !collection.isLiveTest) return
+
+    return (
+      <Button
+        style={{ marginLeft: '3.2rem' }}
+        className="cancelGridClick"
+        colorScheme={`${v.colors.alert}`}
+        size="sm"
+        width={172}
+        onClick={() => {
+          console.log('handle review submission')
+        }}
+      >
+        Review
+      </Button>
+    )
+  }
+
   get hasUseTemplateButton() {
     const { collection } = this.props
     return collection.isUsableTemplate
@@ -438,6 +459,7 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
+                  {this.reviewSubmissionButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (

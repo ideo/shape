@@ -90,13 +90,8 @@ class AudienceSettings extends React.Component {
   @computed
   get locked() {
     const { testCollection } = this.props
-    const {
-      isLiveTest,
-      isClosedTest,
-      isInsideAChallenge,
-      isTemplated,
-    } = testCollection
-    return isLiveTest || isClosedTest || (isInsideAChallenge && isTemplated)
+    const { isLiveTest, isClosedTest } = testCollection
+    return isLiveTest || isClosedTest
   }
 
   get audiences() {
@@ -312,9 +307,8 @@ class AudienceSettings extends React.Component {
   }
 
   render() {
-    const { uiStore, testCollection } = this.props
-    const { apiStore } = this.props
-    const { numPaidQuestions } = testCollection
+    const { uiStore, testCollection, apiStore } = this.props
+    const { numPaidQuestions, isInsideAChallenge } = testCollection
     const { currentUser } = apiStore
     const currentUserOrganization = currentUser.current_organization
 
@@ -347,7 +341,7 @@ class AudienceSettings extends React.Component {
               audienceSettings={this.audienceSettings}
               afterAddAudience={this.afterAddAudience}
               locked={this.locked}
-              displayChallengeAudiences={testCollection.isInsideAChallenge}
+              displayChallengeAudiences={isInsideAChallenge}
               challengeName={this.challengeName}
             />
           </Fragment>

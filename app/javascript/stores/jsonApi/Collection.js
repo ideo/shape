@@ -440,6 +440,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       : 0
   }
 
+  get countSubmissionLiveTests() {
+    if (this.countSubmissions === 0) return 0
+
+    const { submissions_collection } = this
+    const liveTests = _.filter(submissions_collection.collection_cards, cc => {
+      return cc.record.isLiveTest
+    })
+
+    return liveTests ? liveTests.length : 0
+  }
+
   get isTemplate() {
     // returns true for master and subtemplates
     return this.master_template

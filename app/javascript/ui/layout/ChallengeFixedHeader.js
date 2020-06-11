@@ -17,16 +17,22 @@ const ChallengeFixedHeader = ({
   handleReviewSubmissions,
 }) => {
   const { name, collection_type } = collection
-  const buttonProps = !collection.isSubmissionBox
-    ? {
-        name: 'Challenge Settings',
-        onClick: handleShowSettings,
-      }
-    : {
-        name: 'Review Submissions',
-        color: `${v.colors.alert}`,
-        onClick: handleReviewSubmissions,
-      }
+  let buttonProps = {}
+  if (!collection.isSubmissionBox) {
+    buttonProps = {
+      name: 'Challenge Settings',
+      onClick: handleShowSettings,
+    }
+  } else {
+    // TODO: add check if the user can review the submission
+    const hidden = false
+    buttonProps = {
+      name: `Review Submissions (${collection.countSubmissionLiveTests})`,
+      color: `${v.colors.alert}`,
+      onClick: handleReviewSubmissions,
+      hidden,
+    }
+  }
   return (
     <MaxWidthContainer>
       {/* Show subheader if a parent collection is a challenge */}
