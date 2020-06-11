@@ -614,7 +614,11 @@ class CollectionPage extends React.Component {
             <ArchivedBanner />
             <OverdueBanner />
             <PageContainer
-              fullWidth={collection.isBoard && !collection.isFourWideBoard && collection.viewMode !== 'list'}
+              fullWidth={
+                collection.isBoard &&
+                !collection.isFourWideBoard &&
+                collection.viewMode !== 'list'
+              }
             >
               {this.renderEditorPill}
               {inner}
