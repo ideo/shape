@@ -15,20 +15,41 @@ const Phases = styled.div`
   margin-bottom: 1rem;
 `
 
-const PhaseSettings = ({ collection, closeModal }) => {
-  const [submissionBoxes, setSubmissionBoxes] = useState([])
+const loadPhasesForSubmissionBoxes = async submissionBoxes => {
+  // Filter out any that don't have a submission template (can't assign phases)
+  // Or any that have phase sub-collections already loaded
+  const subBoxesWithTemplates = submissionBoxes.filter(
+    subBox =>
+      !!subBox.submission_template && subBox.phaseSubCollections.length === 0
+  )
+  // Get phase collections for each submission box's template
+  const loadPhases = subBoxesWithTemplates.map(subBox => {
+    return new Promise(resolve => {
+      resolve(subBox.submission_template.loadPhaseSubCollections())
+    }).then(phaseSubCollections => {
+      // Set phase collections directly on each submission box
+      subBox.setPhaseSubCollections(phaseSubCollections)
+    })
+  })
+  await Promise.all(loadPhases)
+  return submissionBoxes
+}
+
+const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
+  const [submissionBoxesWithPhases, setSubmissionBoxesWithPhases] = useState([])
   const [viewingSubmissionBoxId, setViewingSubmissionBoxId] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [editingPhaseCollectionId, setEditingPhaseCollectionId] = useState(null)
 
   useEffect(() => {
     const loadData = async () => {
-      const subBoxes = await collection.loadSubmissionBoxesAndPhases()
-      if (subBoxes.length === 1) {
-        setViewingSubmissionBoxId(subBoxes[0].id)
+      const subBoxesWithPhases = await loadPhasesForSubmissionBoxes(
+        submissionBoxes
+      )
+      if (subBoxesWithPhases.length === 1) {
+        setViewingSubmissionBoxId(subBoxesWithPhases[0].id)
       }
-      // Spread arrays/object so useState knows to update it
-      setSubmissionBoxes([...subBoxes])
+      setSubmissionBoxesWithPhases(subBoxesWithPhases)
       setIsLoading(false)
     }
     loadData()
@@ -51,7 +72,7 @@ const PhaseSettings = ({ collection, closeModal }) => {
   return (
     <div>
       {isLoading && <InlineLoader />}
-      {submissionBoxes.map(submissionBox => (
+      {submissionBoxesWithPhases.map(submissionBox => (
         <Panel
           key={submissionBox.id}
           title={submissionBox.name}
@@ -93,6 +114,7 @@ const PhaseSettings = ({ collection, closeModal }) => {
 
 PhaseSettings.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  submissionBoxes: MobxPropTypes.arrayOrObservableArray.isRequired,
   closeModal: PropTypes.func.isRequired,
 }
 

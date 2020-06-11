@@ -922,28 +922,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return savedCard.record
   }
 
-  // Loads all submission boxes for this challenge collection,
-  // as well as any phases in each submission box
-  async loadSubmissionBoxesAndPhases() {
-    const request = await this.API_fetchSubmissionBoxSubCollections()
-    const submissionBoxes = request.data
-    if (submissionBoxes.length > 0) {
-      const subBoxesWithTemplates = submissionBoxes.filter(
-        subBox => !!subBox.submission_template
-      )
-      // Get phase collections for each submission box's template
-      const loadPhases = subBoxesWithTemplates.map(subBox => {
-        return new Promise(resolve => {
-          resolve(subBox.submission_template.loadPhaseSubCollections())
-        }).then(phaseSubCollections => {
-          subBox.setPhaseSubCollections(phaseSubCollections)
-        })
-      })
-      await Promise.all(loadPhases)
-    }
-    return submissionBoxes
-  }
-
   /*
   Perform batch updates on multiple cards at once,
   and captures current cards state to undo to

@@ -94,6 +94,9 @@ ModalWithNavigation.propTypes = {
   onClose: PropTypes.func,
 }
 
-ModalWithNavigation.defaultProps = {}
+ModalWithNavigation.defaultProps = {
+  open: false,
+  onClose: () => null,
+}
 
 export default ModalWithNavigation
