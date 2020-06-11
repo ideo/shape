@@ -9,6 +9,7 @@ import AudienceHeading from '~/ui/test_collections/AudienceSettings/AudienceHead
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
+import EditFeedbackButton from '~/ui/challenges/EditFeedbackButton'
 import v from '~/utils/variables'
 
 const FormButtonWrapper = styled.div`
@@ -21,7 +22,15 @@ const FormButtonWrapper = styled.div`
   }
 `
 
-@inject('apiStore', 'uiStore')
+const AudienceHeadingWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  /* align with submission format */
+  width: 92%;
+  padding-top: 10px;
+`
+
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class AudienceSettings extends React.Component {
   @observable
@@ -248,10 +257,26 @@ class AudienceSettings extends React.Component {
     )
   }
 
+  get showLaunchButton() {
+    const { testCollection } = this.props
+
+    // show audience settings by default for feedback inside challenges
+    return (
+      !testCollection.isInsideAChallenge ||
+      (testCollection.isInsideAChallenge && this.viewingChallengeTest)
+    )
+  }
+
   get challengeName() {
     const { testCollection } = this.props
 
     return _.get(testCollection, 'challenge.name', 'Challenge')
+  }
+
+  get viewingChallengeTest() {
+    const { testCollection, uiStore } = this.props
+
+    return _.get(uiStore, 'viewingRecord.id') === testCollection.id
   }
 
   afterAddAudience = audience => {
@@ -265,6 +290,25 @@ class AudienceSettings extends React.Component {
         displayCheckbox: true,
       })
     })
+  }
+
+  renderAudienceHeading() {
+    const { uiStore, routingStore, testCollection } = this.props
+    const { viewingChallengeTest } = this
+
+    return (
+      <AudienceHeadingWrapper>
+        <AudienceHeading />
+        {testCollection.isInsideAChallenge && !viewingChallengeTest && (
+          <EditFeedbackButton
+            onClick={() => {
+              uiStore.update('challengeSettingsOpen', false)
+              routingStore.routeTo('collections', testCollection.id)
+            }}
+          />
+        )}
+      </AudienceHeadingWrapper>
+    )
   }
 
   render() {
@@ -293,7 +337,7 @@ class AudienceSettings extends React.Component {
         />
         {this.showAudienceSettings && (
           <Fragment>
-            <AudienceHeading />
+            {this.renderAudienceHeading()}
             <AudienceSettingsWidget
               onToggleCheckbox={this.onToggleCheckbox}
               onInputChange={this.onInputChange}
@@ -308,17 +352,19 @@ class AudienceSettings extends React.Component {
             />
           </Fragment>
         )}
-        <FormButtonWrapper>
-          <Button
-            data-cy="LaunchFormButton"
-            disabled={uiStore.launchButtonLoading || this.locked}
-            onClick={this.submitSettings}
-          >
-            {testCollection.is_submission_box_template_test
-              ? 'Launch Tests'
-              : 'Get Feedback'}
-          </Button>
-        </FormButtonWrapper>
+        {this.showLaunchButton && (
+          <FormButtonWrapper>
+            <Button
+              data-cy="LaunchFormButton"
+              disabled={uiStore.launchButtonLoading || this.locked}
+              onClick={this.submitSettings}
+            >
+              {testCollection.is_submission_box_template_test
+                ? 'Launch Tests'
+                : 'Get Feedback'}
+            </Button>
+          </FormButtonWrapper>
+        )}
       </Fragment>
     )
   }
@@ -330,6 +376,7 @@ AudienceSettings.propTypes = {
 AudienceSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default AudienceSettings

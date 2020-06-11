@@ -1,7 +1,7 @@
-import { find } from 'lodash'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
+import { observable, runInAction } from 'mobx'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import PropTypes from 'prop-types'
-
 import {
   Heading3,
   SmallHelperText,
@@ -16,6 +16,7 @@ import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
 import v from '~/utils/variables'
 import SubmissionBoxFormat from '~/ui/submission_box/SubmissionBoxFormat'
+import AudienceSettings from '~/ui/test_collections/AudienceSettings'
 
 export const submissionItemTypes = [
   { name: 'text', Icon: AddTextIcon },
@@ -24,9 +25,34 @@ export const submissionItemTypes = [
 ]
 
 export const submissionTypeForName = typeName =>
-  find(submissionItemTypes, t => t.name === typeName)
+  _.find(submissionItemTypes, t => t.name === typeName)
 
+@inject('apiStore', 'routingStore')
+@observer
 class SubmissionBoxSettings extends React.Component {
+  @observable
+  submissionTemplateTest = null
+
+  componentDidMount() {
+    const { collection } = this.props
+
+    const { submission_template_tests } = collection
+
+    if (!_.isEmpty(submission_template_tests)) {
+      // FIXME: use the first test for now
+      runInAction(() => {
+        this.submissionTemplateTest = submission_template_tests[0]
+      })
+    }
+  }
+
+  initializeTemplateAudiences = async () => {
+    const { apiStore } = this.props
+    await apiStore.fetchOrganizationAudiences(
+      apiStore.currentUserOrganizationId
+    )
+  }
+
   toggleHidden = ev => {
     ev.preventDefault()
     const { collection } = this.props
@@ -112,6 +138,9 @@ class SubmissionBoxSettings extends React.Component {
         </Row>
         <Heading3>Submission Format</Heading3>
         <SubmissionBoxFormat collection={collection} closeModal={closeModal} />
+        {this.submissionTemplateTest && (
+          <AudienceSettings testCollection={this.submissionTemplateTest} />
+        )}
       </React.Fragment>
     )
   }
@@ -120,6 +149,10 @@ class SubmissionBoxSettings extends React.Component {
 SubmissionBoxSettings.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   closeModal: PropTypes.func.isRequired,
+}
+SubmissionBoxSettings.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SubmissionBoxSettings

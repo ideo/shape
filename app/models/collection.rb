@@ -233,6 +233,7 @@ class Collection < ApplicationRecord
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
   scope :searchable, -> { where.not(type: unsearchable_types).or(not_custom_type) }
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(not_custom_type) }
+  scope :test_collection, -> { where(type: 'Collection::TestCollection') }
   scope :master_template, -> { where(master_template: true) }
 
   accepts_nested_attributes_for :collection_cards
