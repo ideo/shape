@@ -102,9 +102,9 @@ class User extends BaseRecord {
     return this.API_updateCurrentUser({ show_move_helper: false })
   }
 
-  API_fetchAllReviewableSubmissions(submissionBox) {
+  async API_fetchAllReviewableSubmissions(submissionBox) {
     // FIXME: to be implemented in an upcoming story
-    return []
+    return await Promise.resolve([])
   }
 
   API_canReviewSubmission(submission) {

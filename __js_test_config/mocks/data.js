@@ -543,6 +543,7 @@ export const fakeUserAttrs = {
   API_updateSurveyRespondent: jest.fn(),
   API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   API_updateUseTemplateSetting: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_fetchAllReviewableSubmissions: jest.fn().mockReturnValue(Promise.resolve([])),
   notify_through_email: true,
   show_move_modal: false,
 }
