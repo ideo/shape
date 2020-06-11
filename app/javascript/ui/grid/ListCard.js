@@ -42,7 +42,7 @@ const Row = styled.div`
   height: 50px;
   display: flex;
   margin-bottom: 8px;
-  position:relative;
+  position: relative;
 
   ${Column} > .show-on-hover {
     display: none;
