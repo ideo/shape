@@ -1030,4 +1030,30 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
   end
+
+  describe 'GET #challenge_phase_collections' do
+    let!(:challenge) do
+      create(
+        :collection,
+        num_cards: 2,
+        collection_type: :challenge,
+        record_type: :collection,
+        add_viewers: [user],
+      )
+    end
+    let!(:phases) do
+      challenge.collections.map do |collection|
+        collection.update(collection_type: :phase)
+        collection
+      end
+    end
+    let(:path) { "/api/v1/collections/#{challenge.id}/challenge_phase_collections" }
+
+    it 'returns immediate sub-collections that are phases' do
+      get(path)
+      expect(response.status).to eq(200)
+      expect(json['data'].size).to eq(2)
+      expect(json_ids.map(&:to_i)).to match_array(phases.map(&:id))
+    end
+  end
 end

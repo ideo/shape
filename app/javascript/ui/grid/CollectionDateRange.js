@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import PropTypes from 'prop-types'
 import { StaticDateRangePicker } from '@material-ui/pickers'
 import moment from 'moment-mini'
 import styled from 'styled-components'
@@ -21,8 +21,8 @@ const EditIcon = styled.span`
   }
 `
 
-export const DateRangeDisplay = props => {
-  const { dateRange } = props
+// dateRange is an array of [date, date]
+export const FormatDateRange = ({ dateRange } = {}) => {
   if (dateRange[0] === null && dateRange[1] === null) {
     return 'No dates selected'
   } else {
@@ -35,8 +35,7 @@ export const DateRangeDisplay = props => {
     )
   }
 }
-
-DateRangeDisplay.propTypes = {
+FormatDateRange.propTypes = {
   dateRange: PropTypes.array.isRequired,
 }
 
@@ -103,7 +102,7 @@ const CollectionDateRange = props => {
         ref={dateDisplayRef}
         className="date-range-wrapper"
       >
-        <DateRangeDisplay dateRange={dateRange} />
+        <FormatDateRange dateRange={dateRange} />
         <EditIcon>
           <EditPencilIcon />
         </EditIcon>

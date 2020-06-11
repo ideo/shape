@@ -32,6 +32,7 @@ import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
 import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
+import ChallengePhasesIcons from '~/ui/challenges/ChallengePhasesIcons'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -531,6 +532,9 @@ class PageHeader extends React.Component {
                   {this.collectionTypeOrInheritedTags}
                 </div>
                 <HeaderButtonContainer>
+                  {record.isChallengeOrInsideChallenge && (
+                    <ChallengePhasesIcons collection={record} />
+                  )}
                   {this.renderTemplateButton}
                   {this.renderRestoreButton}
                   {this.renderSubmissionSubmitButton}

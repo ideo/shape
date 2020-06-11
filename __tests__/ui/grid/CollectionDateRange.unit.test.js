@@ -1,14 +1,11 @@
 import CollectionDateRange, {
-  DateRangeDisplay,
+  FormatDateRange,
 } from '~/ui/grid/CollectionDateRange'
 
 import { fakeCollection } from '#/mocks/data'
 
-let props, wrapper
+let props, wrapper, rerender
 describe('CollectionDateRange', () => {
-  const rerender = () => {
-    wrapper = shallow(<CollectionDateRange {...props} />)
-  }
   beforeEach(() => {
     props = {
       collection: {
@@ -17,11 +14,14 @@ describe('CollectionDateRange', () => {
         end_date: '2025-06-26T20:25:02.962Z',
       },
     }
+    rerender = () => {
+      wrapper = shallow(<CollectionDateRange {...props} />)
+    }
     rerender()
   })
 
-  it('renders DateRangeDisplay with date props', () => {
-    expect(wrapper.find('DateRangeDisplay').props().dateRange).toEqual([
+  it('renders FormatDateRange with date props', () => {
+    expect(wrapper.find('FormatDateRange').props().dateRange).toEqual([
       props.collection.start_date,
       props.collection.end_date,
     ])
@@ -44,20 +44,19 @@ describe('CollectionDateRange', () => {
   })
 })
 
-describe('DateRangeDisplay', () => {
-  const rerender = () => {
-    wrapper = shallow(<DateRangeDisplay {...props} />)
-  }
+describe('FormatDateRange', () => {
   beforeEach(() => {
     props = {
       dateRange: ['2025-05-22T20:25:02.962Z', '2025-06-26T20:25:02.962Z'],
+    }
+    rerender = () => {
+      wrapper = shallow(<FormatDateRange {...props} />)
     }
     rerender()
   })
 
   it('renders dates', () => {
     expect(wrapper.text()).toMatch('5.22.25 to 6.26.25')
-    expect(wrapper.text()).not.toMatch('No dates selected')
   })
 
   describe('without dates selected', () => {
@@ -66,7 +65,7 @@ describe('DateRangeDisplay', () => {
       rerender()
     })
 
-    it('renders No dates selected', () => {
+    it('renders no dates selected', () => {
       expect(wrapper.text()).toMatch('No dates selected')
     })
   })

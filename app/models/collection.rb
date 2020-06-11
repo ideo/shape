@@ -176,6 +176,11 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
+  # all primary + link collection cards that contain this collection
+  has_many :parent_collection_cards,
+           class_name: 'CollectionCard',
+           inverse_of: :collection
+
   has_many :collection_cover_cards,
            -> { active.is_cover.ordered },
            class_name: 'CollectionCard::Primary',
@@ -935,15 +940,21 @@ class Collection < ApplicationRecord
   end
 
   def parent_submission_box
-    parents.find_by(type: 'Collection::SubmissionBox')
+    parents.where(type: 'Collection::SubmissionBox').last
   end
 
   def parent_submission
-    parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
+    parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").last
   end
 
   def parent_challenge
-    parents.find_by(collection_type: :challenge)
+    parents.where(collection_type: :challenge).last
+  end
+
+  def challenge_or_inside_challenge?
+    return true if collection_type == 'challenge'
+
+    parent_challenge.present?
   end
 
   def inside_getting_started?
@@ -957,7 +968,7 @@ class Collection < ApplicationRecord
       template_id = parent_submission_box&.submission_template_id
       return nil unless template_id.present?
 
-      parents.find_by(id: template_id)
+      parents.where(id: template_id).first
     end
   end
 
@@ -1009,7 +1020,7 @@ class Collection < ApplicationRecord
   def parent_application_collection
     return self if is_a?(Collection::ApplicationCollection)
 
-    parents.find_by(type: 'Collection::ApplicationCollection')
+    parents.where(type: 'Collection::ApplicationCollection').first
   end
 
   def inside_an_application_collection?
