@@ -586,9 +586,11 @@ describe('Collection', () => {
       expect(data.attributes.collection_cards_attributes).toEqual([
         { id: collectionCard_1.id, order: 0, row: 2, col: 3 },
       ])
-      expect(
-        apiStore.request
-      ).toHaveBeenCalledWith(`collections/${collection.id}`, 'PATCH', { data })
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}`,
+        'PATCH',
+        { data }
+      )
     })
 
     it('should reorder cards sequentially', async () => {
@@ -672,10 +674,7 @@ describe('Collection', () => {
 
   describe('API_fetchCardOrders', () => {
     const res = {
-      data: [
-        { id: '1', order: 2 },
-        { id: '2', order: 1 },
-      ],
+      data: [{ id: '1', order: 2 }, { id: '2', order: 1 }],
     }
     beforeEach(() => {
       collection.API_fetchAllCardIds = jest

@@ -9,7 +9,7 @@ describe Collection::Board, type: :model do
   end
 
   describe '#after_create' do
-    let(:collection) { create(:board_collection, num_columns: 4)}
+    let(:collection) { create(:board_collection, num_columns: 4) }
     it 'sets collection_type after creation' do
       expect(collection.collection_type).to eq('foamcore')
     end
