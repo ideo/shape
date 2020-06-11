@@ -161,7 +161,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def submission_box_sub_collections
     collections = @collection.all_child_collections
                              .where(type: 'Collection::SubmissionBox')
-                             .includes(:parent_collection_card)
+                             .includes(:submission_template)
                              .select do |collection|
                                collection.can_view?(current_user)
                              end
@@ -173,13 +173,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def phase_sub_collections
     collections = @collection.all_child_collections
                              .collection_type_phase
-                             .includes(:parent_collection_card)
                              .select do |collection|
                                collection.can_view?(current_user)
                              end
 
-    render jsonapi: collections,
-           include: Collection.default_relationships_for_api
+    render jsonapi: collections
   end
 
   def challenge_phase_collections

@@ -6,7 +6,9 @@ import styled from 'styled-components'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Panel from '~/ui/global/Panel'
 import TextButton from '~/ui/global/TextButton'
-import PhaseCollectionRow from '~/ui/challenges/PhaseCollectionRow'
+import PhaseCollectionRow, {
+  PhaseCollectionWithoutTemplateRow,
+} from '~/ui/challenges/PhaseCollectionRow'
 import v from '~/utils/variables'
 
 const Phases = styled.div`
@@ -56,16 +58,22 @@ const PhaseSettings = ({ collection, closeModal }) => {
           open={viewingSubmissionBoxId === submissionBox.id}
         >
           <Phases>
-            {submissionBox.phaseSubCollections.map(phase => (
-              <PhaseCollectionRow
-                collection={phase}
-                showEdit={editingPhaseCollectionId === phase.id}
-                onDoneEditing={() => setEditingPhaseCollectionId(null)}
-                closeModal={closeModal}
-                key={phase.id}
+            {submissionBox.submissionFormat === 'item' && (
+              <PhaseCollectionWithoutTemplateRow
+                formatType={`${submissionBox.submission_box_type} item`}
               />
-            ))}
-            {submissionBox.submission_template && (
+            )}
+            {submissionBox.submissionFormat === 'template' &&
+              submissionBox.phaseSubCollections.map(phase => (
+                <PhaseCollectionRow
+                  collection={phase}
+                  showEdit={editingPhaseCollectionId === phase.id}
+                  onDoneEditing={() => setEditingPhaseCollectionId(null)}
+                  closeModal={closeModal}
+                  key={phase.id}
+                />
+              ))}
+            {submissionBox.submissionFormat === 'template' && (
               <TextButton
                 color={v.colors.black}
                 fontSizeEm={0.75}

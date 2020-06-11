@@ -935,6 +935,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       const loadPhases = subBoxesWithTemplates.map(subBox => {
         return new Promise(resolve => {
           resolve(subBox.submission_template.loadPhaseSubCollections())
+        }).then(phaseSubCollections => {
+          subBox.setPhaseSubCollections(phaseSubCollections)
         })
       })
       await Promise.all(loadPhases)

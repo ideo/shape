@@ -8,7 +8,11 @@ import v from '~/utils/variables'
 import CollectionDateRange from '~/ui/grid/CollectionDateRange'
 import { ThumbnailHolder } from '~/ui/threads/CommentThumbnail'
 import PhaseIcon from '~/ui/icons/PhaseIcon'
-import { DisplayTextCss, DisplayText } from '~/ui/global/styled/typography'
+import {
+  DisplayTextCss,
+  DisplayText,
+  SmallHelperText,
+} from '~/ui/global/styled/typography'
 import { Row, RowItemLeft, RowItemRight } from '~/ui/global/styled/layout'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import Tooltip from '~/ui/global/Tooltip'
@@ -51,6 +55,21 @@ const PhaseCollectionThumbnail = ({ collection }) => {
 }
 PhaseCollectionThumbnail.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+export const PhaseCollectionWithoutTemplateRow = ({ formatType }) => {
+  return (
+    <PhaseRow>
+      <SmallHelperText color={v.colors.black}>
+        Phases can not be added to a {formatType}. Change this submission box to
+        use a submission template in the 'Submission Settings' tab above if you
+        want to add phases.
+      </SmallHelperText>
+    </PhaseRow>
+  )
+}
+PhaseCollectionWithoutTemplateRow.propTypes = {
+  formatType: PropTypes.string.isRequired,
 }
 
 const PhaseCollectionRow = ({
