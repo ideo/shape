@@ -1364,7 +1364,8 @@ export default class UiStore {
     collection.lastZoom = this.zoomLevel
   }
 
-  determineZoomLevels(maxCols, windowWidth, maxGridWidth) {
+  determineZoomLevels(maxCols, maxGridWidth) {
+    const { windowWidth } = this
     let possibleCols = [1, 2, 4, 6, 8, 16]
     const widthPerCol = maxGridWidth / maxCols
     possibleCols = _.filter(possibleCols, i => {
