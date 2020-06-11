@@ -586,11 +586,9 @@ describe('Collection', () => {
       expect(data.attributes.collection_cards_attributes).toEqual([
         { id: collectionCard_1.id, order: 0, row: 2, col: 3 },
       ])
-      expect(apiStore.request).toHaveBeenCalledWith(
-        `collections/${collection.id}`,
-        'PATCH',
-        { data }
-      )
+      expect(
+        apiStore.request
+      ).toHaveBeenCalledWith(`collections/${collection.id}`, 'PATCH', { data })
     })
 
     it('should reorder cards sequentially', async () => {
@@ -673,7 +671,12 @@ describe('Collection', () => {
   })
 
   describe('API_fetchCardOrders', () => {
-    const res = { data: [{ id: '1', order: 2 }, { id: '2', order: 1 }] }
+    const res = {
+      data: [
+        { id: '1', order: 2 },
+        { id: '2', order: 1 },
+      ],
+    }
     beforeEach(() => {
       collection.API_fetchAllCardIds = jest
         .fn()
@@ -766,6 +769,45 @@ describe('Collection', () => {
     it('returns true if collection.anyone_can_join is true', () => {
       collection.anyone_can_join = true
       expect(collection.isPublicJoinable).toEqual(true)
+    })
+  })
+
+  describe('allowsCollectionTypeSelector', () => {
+    describe('when regular collection or board collection', () => {
+      it('returns true', () => {
+        collection.type = 'Collection'
+        expect(collection.allowsCollectionTypeSelector).toEqual(true)
+        collection.type = 'Collection::Board'
+        expect(collection.allowsCollectionTypeSelector).toEqual(true)
+      })
+
+      describe('when profile template', () => {
+        it('returns false', () => {
+          collection.is_profile_template = true
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
+
+      describe('when profile collection', () => {
+        it('returns false', () => {
+          collection.is_profile_collection = true
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
+
+      describe('when shared collection', () => {
+        it('returns false', () => {
+          collection.type = 'Collection::SharedWithMeCollection'
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
+
+      describe('when system_required', () => {
+        it('returns false', () => {
+          collection.system_required = true
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
     })
   })
 })
