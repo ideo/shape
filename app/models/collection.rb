@@ -236,6 +236,7 @@ class Collection < ApplicationRecord
     method: 2,
     prototype: 3,
     profile: 4, # Different from UserProfile
+    foamcore: 7, # 5 and 6 are for phases/challenges
   }, _prefix: true
 
   # Searchkick Config

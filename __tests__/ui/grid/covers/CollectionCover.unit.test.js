@@ -133,4 +133,23 @@ describe('CollectionCover', () => {
       expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
     })
   })
+
+  describe('when collection or foamcore', () => {
+    it('does not render CollectionTypeSelector', () => {
+      props.collection.collection_type = 'collection'
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      expect(wrapper.find('CollectionTypeSelector').exists()).toBeFalsy()
+      props.collection.collection_type = 'collection'
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      expect(wrapper.find('CollectionTypeSelector').exists()).toBeFalsy()
+    })
+  })
+
+  describe('when not collection or foamcore', () => {
+    it('does not render CollectionTypeSelector', () => {
+      props.collection.collection_type = 'method'
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      expect(wrapper.find('CollectionTypeSelector').exists()).toBeTruthy()
+    })
+  })
 })
