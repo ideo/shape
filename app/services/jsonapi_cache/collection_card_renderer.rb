@@ -179,8 +179,10 @@ module JsonapiCache
     end
 
     def resource_identifiers
+      cards = @cards.respond_to?(:reorder) ? @cards.reorder(nil) : @cards
+      card_ids = cards.pluck(:id).compact
       identifiers = CollectionCard
-                    .where(id: @cards.reorder(nil).pluck(:id).compact)
+                    .where(id: card_ids)
                     .joins(
                       %(
                         LEFT JOIN items ON items.id = collection_cards.item_id
