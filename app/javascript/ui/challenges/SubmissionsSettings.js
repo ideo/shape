@@ -7,6 +7,7 @@ import Panel from '~/ui/global/Panel'
 const SubmissionsSettings = ({ collection, submissionBoxes, closeModal }) => {
   const viewingSubmissionBoxId =
     submissionBoxes.length === 1 ? submissionBoxes[0].id : null
+
   return (
     <div>
       {submissionBoxes.map(submissionBox => (

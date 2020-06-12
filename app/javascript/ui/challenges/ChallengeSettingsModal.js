@@ -6,7 +6,7 @@ import ModalWithNavigation from '~/ui/global/modals/ModalWithNavigation'
 import SubmissionsSettings from '~/ui/challenges/SubmissionsSettings'
 import PhaseSettings from '~/ui/challenges/PhaseSettings'
 
-const modalContents = ({ collection, submissionBoxes, onClose } = {}) => {
+const modalContents = ({ collection, submissionBoxes, onClose }) => {
   return [
     {
       name: 'Submission settings',
@@ -37,44 +37,43 @@ const modalContents = ({ collection, submissionBoxes, onClose } = {}) => {
 const ChallengeSettingsModal = ({ collection, open, onClose }) => {
   const [challenge, setChallenge] = useState(null)
   const [submissionBoxes, setSubmissionBoxes] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
+  // Load the challenge
   useEffect(() => {
-    if (!collection.challenge_id) return
-    // If the collection passed in is parent challenge, use that
-    if (collection.challenge_id === collection.id) {
-      setChallenge(collection)
-    } else {
-      const fetchChallenge = async () => {
-        // Otherwise we need to load the challenge colleciton
-        const res = await collection.apiStore.request(
-          `collections/${collection.challenge_id}`
-        )
-        if (res.data) setChallenge(res.data)
-      }
-      fetchChallenge()
+    if (!collection.challenge_id || !open) return
+    const fetchChallenge = async () => {
+      const result = await collection.challengeForCollection()
+      setChallenge(result)
     }
-  }, [collection])
+    fetchChallenge()
+  }, [collection, open])
 
+  // Load all submission boxes
   useEffect(() => {
-    if (!challenge) return
+    if (!challenge || !open) return
     const loadSubmissionBoxes = async () => {
       const request = await challenge.API_fetchSubmissionBoxSubCollections()
       setSubmissionBoxes(request.data)
+      setIsLoading(false)
     }
     loadSubmissionBoxes()
-  }, [challenge])
+  }, [challenge, open])
 
   if (!challenge) return ''
+
+  const contents = modalContents({
+    collection: challenge,
+    submissionBoxes,
+    onClose,
+  })
 
   return (
     <ModalWithNavigation
       title="Challenge settings"
-      contents={modalContents({
-        collection: challenge,
-        submissionBoxes,
-        onClose,
-      })}
+      contents={contents}
       open={open}
+      showLoader={isLoading}
       onClose={onClose}
     />
   )

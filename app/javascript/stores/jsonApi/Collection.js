@@ -902,6 +902,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath)
   }
 
+  async challengeForCollection() {
+    // If this is the parent challenge collection, return
+    if (this.challenge_id === this.id) {
+      return this
+    } else {
+      // Otherwise we need to load the challenge colleciton
+      const res = await this.apiStore.request(
+        `collections/${this.challenge_id}`
+      )
+      return res.data
+    }
+  }
+
   async loadPhaseSubCollections() {
     const request = await this.API_fetchPhaseSubCollections()
     return this.setPhaseSubCollections(request.data)
