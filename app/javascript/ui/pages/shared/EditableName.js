@@ -54,16 +54,18 @@ class EditableName extends React.Component {
   }
 
   componentDidMount() {
-    const { name } = this.props
+    const { name, editing } = this.props
     this.setName(name)
+    if (editing) this.startEditingName()
   }
 
   // navigating between collections may trigger this instead of didMount
   componentDidUpdate(prevProps) {
-    const { name } = this.props
+    const { name, editing } = this.props
     if (name !== prevProps.name) {
       this.setName(name)
     }
+    if (editing && !prevProps.editing) this.startEditingName()
   }
 
   @action
@@ -90,7 +92,7 @@ class EditableName extends React.Component {
 
   @action
   startEditingName = e => {
-    e.stopPropagation()
+    e && e.stopPropagation()
     const { fieldName, uiStore } = this.props
     if (uiStore.editingName.includes(fieldName)) return
     uiStore.editingName.push(fieldName)
@@ -105,8 +107,9 @@ class EditableName extends React.Component {
   stopEditingName = () => {
     // Ensure that save is called if user presses enter
     this.saveName.flush()
-    const { fieldName, uiStore } = this.props
+    const { fieldName, uiStore, onDoneEditing } = this.props
     uiStore.editingName.remove(fieldName)
+    onDoneEditing()
   }
 
   _saveName = () => {
@@ -210,6 +213,8 @@ EditableName.propTypes = {
   editingMarginTop: PropTypes.string,
   placeholder: PropTypes.string,
   inline: PropTypes.bool,
+  onDoneEditing: PropTypes.func,
+  editing: PropTypes.bool,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -226,6 +231,8 @@ EditableName.defaultProps = {
   fieldName: 'name',
   placeholder: '',
   inline: false,
+  onDoneEditing: () => null,
+  editing: false,
 }
 
 EditableName.displayName = 'EditableName'
