@@ -95,6 +95,9 @@ class AudienceSettings extends React.Component {
   get locked() {
     const { testCollection } = this.props
     const { isLiveTest, isClosedTest } = testCollection
+    if (testCollection.isInsideAChallenge) {
+      return testCollection.isTemplated
+    }
     return isLiveTest || isClosedTest
   }
 

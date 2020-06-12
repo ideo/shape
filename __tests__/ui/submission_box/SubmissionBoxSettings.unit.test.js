@@ -6,12 +6,16 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 let props, wrapper, instance, rerender
 describe('SubmissionBoxSettings', () => {
   beforeEach(() => {
+    const submissionTemplate = fakeCollection
+    submissionTemplate.submission_template_test_collections = [
+      fakeTestCollection,
+    ]
     props = {
       collection: {
         ...fakeCollection,
         submissions_enabled: true,
         hide_submissions: false,
-        submission_template_tests: [fakeTestCollection],
+        submission_template: submissionTemplate,
       },
       closeModal: jest.fn(),
       apiStore: fakeApiStore(),
