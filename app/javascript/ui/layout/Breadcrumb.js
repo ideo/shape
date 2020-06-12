@@ -113,7 +113,7 @@ class Breadcrumb extends React.Component {
     const { items, maxDepth } = this.props
     if (maxDepth === 1) {
       // if we are only showing 1 breadcrumbItem (e.g. mobile)
-      const subItems = this.transformToSubItems(items) //, copyItems[0])
+      const subItems = this.transformToSubItems(items)
       if (copyItems[0]) copyItems[0].subItems = subItems
       return copyItems
     }
@@ -157,7 +157,10 @@ class Breadcrumb extends React.Component {
     let charsLeftToTruncate = this.charsToTruncateForItems(copyItems)
 
     // If we are within allowable number of chars, return items
-    if (charsLeftToTruncate <= 0) return copyItems
+    if (charsLeftToTruncate <= 0) {
+      // this will still potentially add subItems to "My Collection"
+      return this.addSubItems([...copyItems])
+    }
 
     // Item names are still too long, show ... in place of their name
     // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
