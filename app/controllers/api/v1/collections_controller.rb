@@ -166,8 +166,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                                collection.can_view?(current_user)
                              end
 
+    # FIXME: needs to render test_audiences
     render jsonapi: collections,
-           include: Collection.default_relationships_for_api.concat([submission_template_tests: [:test_audiences]])
+           include: Collection.default_relationships_for_api.concat([submission_template: [:submission_template_test_collections]])
   end
 
   def phase_sub_collections

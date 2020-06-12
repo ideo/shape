@@ -66,6 +66,10 @@ class AudienceSettings extends React.Component {
         testAudience => testAudience.audience_id === audience.id
       )
 
+      if (!testAudience) {
+        return
+      }
+
       const { isLinkSharing } = audience
       let selected = !!testAudience
       if ((testAudience && isLinkSharing) || isInsideAChallenge) {

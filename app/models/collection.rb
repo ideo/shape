@@ -1129,6 +1129,12 @@ class Collection < ApplicationRecord
     participant_group.add_role(Role::VIEWER, self)
   end
 
+  def submission_template_test_collections
+    return [] unless master_template? && submission_box_template?
+
+    Collection.in_collection(id).test_collection.includes(:test_audiences)
+  end
+
   private
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)

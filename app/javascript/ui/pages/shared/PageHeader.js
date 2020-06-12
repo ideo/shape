@@ -448,7 +448,7 @@ class PageHeader extends React.Component {
     if (!record.isSubmissionBox) {
       buttonProps = {
         name: 'Challenge Settings',
-        onClick: this.handleReviewSubmissionsClick,
+        onClick: this.handleChallengeSettingsClick,
       }
     } else {
       const { currentUser } = apiStore

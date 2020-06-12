@@ -49,13 +49,17 @@ class SubmissionBoxSettings extends React.Component {
   componentDidMount() {
     const { collection } = this.props
 
-    const { submission_template_tests } = collection
+    const { submission_template } = collection
 
-    if (!_.isEmpty(submission_template_tests)) {
-      // FIXME: use the first test for now
-      runInAction(() => {
-        this.submissionTemplateTest = submission_template_tests[0]
-      })
+    if (submission_template) {
+      const { submission_template_test_collections } = submission_template
+
+      if (!_.isEmpty(submission_template_test_collections)) {
+        // FIXME: use the first test for now
+        runInAction(() => {
+          this.submissionTemplateTest = submission_template_test_collections[0]
+        })
+      }
     }
   }
 

@@ -168,12 +168,6 @@ class Collection
         .first
     end
 
-    def submission_template_tests
-      return [] unless submission_template_id.present?
-
-      Collection.in_collection(submission_template_id).test_collection.includes(:test_audiences)
-    end
-
     private
 
     def submission_template_is_a_master_template

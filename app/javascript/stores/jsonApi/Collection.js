@@ -915,7 +915,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   async challengeForCollection() {
     // If this is the parent challenge collection, return
-    if (this.challenge_id === this.id) {
+    if (this.challenge === this) {
       return this
     } else {
       // Otherwise we need to load the challenge colleciton

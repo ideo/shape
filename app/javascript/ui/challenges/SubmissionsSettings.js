@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import { useState, useEffect } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import SubmissionBoxSettings from '~/ui/submission_box/SubmissionBoxSettings'
 import Panel from '~/ui/global/Panel'
