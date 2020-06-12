@@ -8,9 +8,9 @@ describe Collection::Board, type: :model do
     end
   end
 
-  describe '#after_create' do
+  describe '#before_create' do
     let(:collection) { create(:board_collection, num_columns: 4) }
-    it 'sets collection_type after creation' do
+    it 'sets collection_type before creation' do
       expect(collection.collection_type).to eq('foamcore')
     end
   end

@@ -76,7 +76,7 @@ class Collection
              foreign_key: :parent_id,
              inverse_of: :parent
 
-    after_create :set_as_foamcore
+    before_create :set_as_foamcore
 
     def max_col_limit
       num_columns - 1
@@ -93,7 +93,7 @@ class Collection
     private
 
     def set_as_foamcore
-      update(collection_type: 'foamcore')
+      self.collection_type = :foamcore
     end
   end
 end
