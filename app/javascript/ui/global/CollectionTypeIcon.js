@@ -36,7 +36,7 @@ export const smallCollectionIconMap = {
   project: <ProjectIcon />,
   method: <MethodIcon />,
   prototype: <PrototypeIcon />,
-  foamcore: <FoamcoreBoardIconXs />, // Why do we have FoamcoreBoardIcon and FoamcoreBoardIconXs
+  foamcore: <FoamcoreBoardIconXs />,
 }
 
 export const collectionTypeToIcon = ({ type, size }) => {
