@@ -11,6 +11,10 @@ import v, {
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
+import { calculatePageMargins } from '~/utils/pageUtils'
+
+const MAX_COLS = 16
+const MAX_COLS_MOBILE = 8
 
 export default class UiStore {
   // store this for usage by other components
@@ -1389,5 +1393,30 @@ export default class UiStore {
     // zoomLevels start at 1, so we subtract to get the array idx
     const zoom = this.zoomLevels[this.zoomLevel - 1]
     return zoom ? zoom.relativeZoomLevel : 1
+  }
+
+  pageMargins(collection = this.viewingCollection) {
+    return {
+      ...calculatePageMargins({
+        fullWidth: collection.isFourWideBoard,
+      }),
+      top: v.headerHeight + 90,
+    }
+  }
+
+  maxCols(collection = this.viewingCollection) {
+    // NOTE: if we ever allow >16, this still limits max zoom level to show only 16
+    const max = this.isTouchDevice && this.isMobile ? MAX_COLS_MOBILE : MAX_COLS
+    return _.min([collection.num_columns, max])
+  }
+
+  // This returns the grid with (in pixels) for showing the full width of cards;
+  // for mobile this gets bumped down and may not include all 16 columns (only 8 for large board)
+  maxGridWidth({ pageMargins, maxCols }) {
+    const { gridW, gutter } = this.gridSettings
+    const gridWidth =
+      (gridW + gutter) * maxCols + pageMargins.left * 2 * this.zoomLevel
+    // only show zoom if the grid is wider than our window
+    return gridWidth
   }
 }

@@ -139,6 +139,13 @@ class Routes extends React.Component {
     uiStore.updateColumnsToFit(windowWidth)
     uiStore.updateActivityLogWidth(windowWidth)
     uiStore.update('windowWidth', windowWidth)
+    uiStore.determineZoomLevels(
+      uiStore.maxCols(),
+      uiStore.maxGridWidth({
+        pageMargins: uiStore.pageMargins(),
+        maxCols: uiStore.maxCols(),
+      })
+    )
   }
 
   handleMouseDownSelection = e => {

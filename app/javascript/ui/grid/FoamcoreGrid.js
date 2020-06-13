@@ -24,7 +24,6 @@ import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
-import { calculatePageMargins } from '~/utils/pageUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
@@ -137,8 +136,6 @@ function getMapKey({ col, row }) {
 
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
-const MAX_COLS = 16
-const MAX_COLS_MOBILE = 8
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'uiStore')
@@ -201,8 +198,14 @@ class FoamcoreGrid extends React.Component {
 
   componentDidMount() {
     const { collection, uiStore } = this.props
+    const { pageMargins } = this
+    const maxCols = uiStore.maxCols(collection)
+
     uiStore.update('selectedAreaEnabled', true)
-    uiStore.determineZoomLevels(this.maxCols, this.maxGridWidth())
+    uiStore.determineZoomLevels(
+      maxCols,
+      uiStore.maxGridWidth({ pageMargins, maxCols })
+    )
     uiStore.adjustZoomLevel({ collection })
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
@@ -213,7 +216,10 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
     this.updateSelectedArea()
     if (collection.id !== prevProps.collection.id) {
-      uiStore.determineZoomLevels(this.maxCols, this.maxGridWidth())
+      uiStore.determineZoomLevels(
+        uiStore.maxCols(collection),
+        uiStore.maxGridWidth()
+      )
       uiStore.adjustZoomLevel({ collection })
     }
 
@@ -294,20 +300,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   get pageMargins() {
-    const { collection } = this.props
-    return {
-      ...calculatePageMargins({ fullWidth: collection.isFourWideBoard }),
-      top: v.headerHeight + 90,
-    }
-  }
-
-  get maxCols() {
     const { collection, uiStore } = this.props
-
-    // NOTE: if we ever allow >16, this still limits max zoom level to show only 16
-    const max =
-      uiStore.isTouchDevice && uiStore.isMobile ? MAX_COLS_MOBILE : MAX_COLS
-    return _.min([collection.num_columns, max])
+    return uiStore.pageMargins(collection)
   }
 
   // relativeZoomLevel is either the actual zoom level (if not all the way zoomed out),
@@ -322,17 +316,6 @@ class FoamcoreGrid extends React.Component {
     return uiStore.zoomLevels.length > 1
   }
 
-  // This returns the grid with (in pixels) for showing the full width of cards;
-  // for mobile this gets bumped down and may not include all 16 columns (only 8 for large board)
-  maxGridWidth({ zoomLevel = 1 } = {}) {
-    const { maxCols, pageMargins } = this
-    const { gridW, gutter } = this.gridSettings
-    const gridWidth =
-      (gridW + gutter) * maxCols + pageMargins.left * 2 * zoomLevel
-    // only show zoom if the grid is wider than our window
-    return gridWidth
-  }
-
   get gridSettings() {
     // Foamcore doesn't change gridSettings based on browser size,
     // instead always refer to the defaults
@@ -343,8 +326,9 @@ class FoamcoreGrid extends React.Component {
   // one theory -- for mobile touch scrolling?
   get totalGridSize() {
     const { gridW, gridH, gutter } = this.gridSettings
-    const { relativeZoomLevel, maxCols } = this
-    const { collection } = this.props
+    const { relativeZoomLevel } = this
+    const { collection, uiStore } = this.props
+    const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
     // + 2x the visible number of rows
