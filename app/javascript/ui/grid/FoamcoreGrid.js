@@ -247,13 +247,19 @@ class FoamcoreGrid extends React.Component {
     return this.props.uiStore.zoomLevel
   }
 
+  get maxRow() {
+    // get the max of what's currently visible
+    const { collection_cards } = this.props.collection
+    return (_.maxBy(collection_cards, 'row') || { row: 0 }).row
+  }
+
   // Load more cards if we are approaching a boundary of what we have loaded
   loadAfterScroll = async () => {
     const { collection } = this.props
     // return if we're still loading a new page
     if (this.loadingRow || collection.loadedRows === 0) return
 
-    const { zoomLevel } = this
+    const { zoomLevel, maxRow } = this
     this.computeVisibleRows()
     this.computeVisibleCols()
 
@@ -266,9 +272,6 @@ class FoamcoreGrid extends React.Component {
     // Load more rows if currently loaded rows is less than
     // one full screen out of view
     if (collection.loadedRows < visRows.max + visRows.num) {
-      // get the max of what's currently visible
-      const maxRow = (_.maxBy(collection.collection_cards, 'row') || { row: 0 })
-        .row
       runInAction(() => {
         this.loadingRow = maxRow
       })
@@ -1481,18 +1484,18 @@ class FoamcoreGrid extends React.Component {
 
   renderHotspots() {
     const { collection } = this.props
-    const { num_columns } = collection
-    const { relativeZoomLevel, gridSettings } = this
+    const { isFourWideBoard } = collection
+    const { maxRow, relativeZoomLevel, gridSettings } = this
 
-    if (num_columns !== 4) return null
+    if (!isFourWideBoard) return null
 
-    const collectionMaxRow = collection.max_row_index
     const hotspots = []
     let { gridH, gutter } = gridSettings
     gutter = gutter / relativeZoomLevel
     gridH = gridH / relativeZoomLevel
 
-    _.times(collectionMaxRow, row => {
+    // rows start at 0, plus add an extra at the bottom
+    _.times(maxRow + 2, row => {
       hotspots.push(
         <FoamcoreHotspot
           key={`hotspot-${row}`}
