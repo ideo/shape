@@ -735,6 +735,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       ).to receive(:perform_async).with(
         contain_exactly(*collection_cards.map(&:id)),
         'cats',
+        nil,
         :add,
         user.id,
       )
@@ -763,6 +764,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       ).to receive(:perform_async).with(
         contain_exactly(*collection_cards.map(&:id)),
         'parrots',
+        nil,
         :remove,
         user.id,
       )

@@ -3,7 +3,7 @@ class CollectionCardsAddRemoveTagWorker
 
   # Possible actions are add and remove
 
-  def perform(collection_card_ids, tag, action, user_id)
+  def perform(collection_card_ids, tag, type, action, user_id)
     collection_cards = CollectionCard.where(id: collection_card_ids)
     action = action.to_sym
 
@@ -12,7 +12,12 @@ class CollectionCardsAddRemoveTagWorker
     ActiveRecord::Base.transaction do
       collection_cards.each do |card|
         record = card.record
-        record.tag_list.send(action, tag)
+        case type
+        when 'people'
+          record.people_list.send(action, tag)
+        else
+          record.tag_list.send(action, tag)
+        end
         # Collection needs to be called manually to set cached attributes
         record.update_cached_tag_lists if record.is_a?(Collection)
         record.save

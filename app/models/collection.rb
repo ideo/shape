@@ -134,6 +134,7 @@ class Collection < ApplicationRecord
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
   acts_as_taggable
+  acts_as_taggable_on :users
 
   translates_custom :translated_name,
                     confirmable: true,

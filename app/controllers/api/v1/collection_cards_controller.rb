@@ -139,6 +139,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionCardsAddRemoveTagWorker.perform_async(
       @collection_cards.map(&:id),
       json_api_params[:tag],
+      json_api_params[:type],
       :add,
       current_user.id,
     )
@@ -149,6 +150,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionCardsAddRemoveTagWorker.perform_async(
       @collection_cards.map(&:id),
       json_api_params[:tag],
+      json_api_params[:type],
       :remove,
       current_user.id,
     )

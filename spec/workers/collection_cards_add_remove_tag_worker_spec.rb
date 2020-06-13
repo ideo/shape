@@ -18,6 +18,7 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
       subject.perform(
         collection_cards.map(&:id),
         'cats',
+        nil,
         action,
         user.id,
       )
