@@ -1,33 +1,52 @@
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import {
   HotspotLine,
   StyledHotspot,
   StyledPlusIcon,
 } from '~/ui/grid/GridCardHotspot'
+import v from '~/utils/variables'
 
-@inject('uiStore')
-@observer
 class FoamcoreHotspot extends React.Component {
   render() {
-    const { row, top, onClick, uiStore } = this.props
-    const {
-      gridSettings: { gutter },
-    } = uiStore
+    const { row, col, horizontal, relativeZoomLevel, onClick } = this.props
+    let { gridH, gridW, gutter } = v.defaultGridSettings
+    gutter = gutter / relativeZoomLevel
+    gridH = gridH / relativeZoomLevel
+    gridW = gridW / relativeZoomLevel
 
-    const height = `${gutter}px`
+    let top = (gridH + gutter) * (row + 1) - gutter
+    let height = `${gutter}px`
+    let width = '100%'
+    let left = 0
+    if (!horizontal) {
+      // non-horizontal hotspots just fit in 1x1 gutter
+      width = `${gutter}px`
+      height = `${gridH}px`
+      top = (gridH + gutter) * row
+      left = (gridW + gutter) * col - 14 / relativeZoomLevel
+    }
+    const leftAdjust = 7 / relativeZoomLevel
     return (
       <StyledHotspot
         onClick={onClick}
         height={height}
+        width={width}
         top={`${top}px`}
-        width="100%"
+        left={`${left}px`}
         data-row={row}
+        data-col={col}
         style={{ zIndex: 0 }}
       >
-        <HotspotLine height={height} width="100%" />
-        <StyledPlusIcon left="calc(-50% + 12px)">+</StyledPlusIcon>
+        <HotspotLine
+          height={height}
+          left={0}
+          width={width}
+          style={{ position: horizontal ? 'relative' : 'absolute' }}
+        />
+        <StyledPlusIcon width="auto" left={`calc(-50% + ${leftAdjust}px)`}>
+          +
+        </StyledPlusIcon>
       </StyledHotspot>
     )
   }
@@ -35,11 +54,15 @@ class FoamcoreHotspot extends React.Component {
 
 FoamcoreHotspot.propTypes = {
   row: PropTypes.number.isRequired,
-  top: PropTypes.number.isRequired,
+  col: PropTypes.number,
+  // relativeZoomLevel is needed so that the hotspot can be scaled appropriately
+  relativeZoomLevel: PropTypes.number.isRequired,
+  // `horizontal` indicates that the hotspot spans the width of the grid
+  horizontal: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
 }
-FoamcoreHotspot.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+FoamcoreHotspot.defaultProps = {
+  col: null,
 }
 
 FoamcoreHotspot.displayName = 'FoamcoreHotspot'

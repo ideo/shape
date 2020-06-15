@@ -1484,29 +1484,51 @@ class FoamcoreGrid extends React.Component {
 
   renderHotspots() {
     const { collection } = this.props
-    const { isFourWideBoard } = collection
-    const { maxRow, relativeZoomLevel, gridSettings } = this
-
-    if (!isFourWideBoard) return null
-
-    const hotspots = []
-    let { gridH, gutter } = gridSettings
-    gutter = gutter / relativeZoomLevel
-    gridH = gridH / relativeZoomLevel
-
+    const { cardMatrix, num_columns, isFourWideBoard } = collection
+    const { relativeZoomLevel } = this
     // rows start at 0, plus add an extra at the bottom
-    _.times(maxRow + 2, row => {
-      hotspots.push(
-        <FoamcoreHotspot
-          key={`hotspot-${row}`}
-          row={row - 1}
-          cols={4}
-          top={(gridH + gutter) * row - gutter}
-          onClick={ev => this.handleInsertRowClick(ev, row - 1)}
-        />
-      )
+    const maxRow = this.maxRow + 1
+
+    const hotEdges = []
+    _.each(_.range(0, maxRow), row => {
+      _.each(_.range(0, num_columns), col => {
+        if (!cardMatrix[row] || !cardMatrix[row][col]) {
+          // continue iteration
+          return true
+        }
+        const twoCardsTogether =
+          col > 0 &&
+          cardMatrix[row][col - 1] &&
+          cardMatrix[row][col - 1] !== cardMatrix[row][col]
+        if (col === 0 || twoCardsTogether) {
+          hotEdges.push(
+            <FoamcoreHotspot
+              key={`hotspot-${row}:${col}`}
+              relativeZoomLevel={relativeZoomLevel}
+              row={row}
+              col={col}
+              horizontal={false}
+              onClick={this.handleBlankCardClick({ col, row })}
+            />
+          )
+        }
+      })
+
+      if (isFourWideBoard) {
+        // only 4WFC has horizontal hot edges in the row gutters
+        hotEdges.push(
+          <FoamcoreHotspot
+            key={`hotspot-${row}`}
+            relativeZoomLevel={relativeZoomLevel}
+            row={row}
+            onClick={ev => this.handleInsertRowClick(ev, row)}
+            horizontal
+          />
+        )
+      }
     })
-    return <div>{hotspots}</div>
+
+    return <div>{hotEdges}</div>
   }
 
   render() {
