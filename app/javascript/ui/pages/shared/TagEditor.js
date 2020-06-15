@@ -15,9 +15,14 @@ export const tagsInCommon = (records, tagField) => {
   records.forEach(record => {
     // Include records with and without tags,
     // because they are used to find if records share tags in common
-    // FIXME: refactor tagField logic to dynamically push by tag type
-    const _tags = _.concat(toJS(record['user_list']), toJS(record[tagField]))
-    tags.push(_tags)
+    // FIXME: adding user tags by default since there isn't a way to add it distinctively
+    const userTags = _.map(toJS(record['user_list']), t => {
+      return { label: t, type: 'user_list' }
+    })
+    const regularTags = _.map(toJS(record[tagField]), t => {
+      return { label: t, type: tagField }
+    })
+    tags.push([...userTags, ...regularTags])
   })
   // Intersection needs each array as separate arguments,
   // which is why apply is used
@@ -49,16 +54,18 @@ class TagEditor extends React.Component {
     this.initTags(tagsInCommon(records, tagField))
   }
 
-  createFormattedTag(label) {
-    const tag = {
+  createFormattedTag(tag) {
+    const { label, type } = tag
+    const _tag = {
       id: label,
       label,
       name: label,
+      type,
       onDelete: this.handleDelete(label),
       symbol: creativeDifferenceTagIcon(label),
       symbolSize: 18,
     }
-    return tag
+    return _tag
   }
 
   @action
@@ -71,8 +78,15 @@ class TagEditor extends React.Component {
   handleAddition = tagData => {
     const { validateTag, records, tagField, afterAddTag } = this.props
     tagData.name = tagData.name.trim()
-    const newTag = this.createFormattedTag(tagData.name)
+    // FIXME: handle user tagField
+    const newTag = this.createFormattedTag({
+      label: tagData.name,
+      type: tagField,
+    })
     this.error = ''
+
+    // FIXME: use once we can distinguish by tagFields/type
+    // _.find(this.tags, { label, type })
 
     // Return if tag is a duplicate
     if (
@@ -96,11 +110,16 @@ class TagEditor extends React.Component {
       // persist the tag locally on the Item/Collection
       record[tagField].push(newTag.name)
     })
-    afterAddTag(newTag.name)
+    const { label, type } = newTag
+    afterAddTag({ label, type })
   }
 
   handleDelete = label => e => {
     const { records, tagField, afterRemoveTag } = this.props
+
+    // FIXME: use once we can distinguish by tagFields/type
+    // _.find(this.tags, { label, type })
+
     const tag = _.find(this.tags, { label })
     if (tag) {
       runInAction(() => {
@@ -108,7 +127,8 @@ class TagEditor extends React.Component {
         records.forEach(record => {
           record[tagField].remove(tag.name)
         })
-        afterRemoveTag(tag.name)
+        const { label, type } = tag
+        afterRemoveTag({ label, type })
       })
     }
   }

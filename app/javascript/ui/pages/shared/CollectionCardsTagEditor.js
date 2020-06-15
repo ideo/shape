@@ -9,20 +9,22 @@ import TagEditor from './TagEditor'
 class CollectionCardsTagEditor extends React.Component {
   _apiAddRemoveTag = (action, data) => {
     const { cards, apiStore } = this.props
-    const { tag, type } = data
+    const { label, type } = data
+    // FIXME: type will be passed down once we figure out how to handle it
+    console.log({ type })
     apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
       card_ids: _.map(cards, 'id'),
-      tag,
-      type,
+      tag: label,
+      type: null,
     })
   }
 
-  addTag = (tag, type) => {
-    this._apiAddRemoveTag('add', { tag, type })
+  addTag = tag => {
+    this._apiAddRemoveTag('add', tag)
   }
 
-  removeTag = (tag, type = null) => {
-    this._apiAddRemoveTag('remove', { tag, type })
+  removeTag = tag => {
+    this._apiAddRemoveTag('remove', tag)
   }
 
   get records() {
