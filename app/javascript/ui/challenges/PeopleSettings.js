@@ -7,13 +7,12 @@ import { apiStore, uiStore } from '~/stores'
 
 class PeopleSettings extends React.Component {
   get groups() {
-    const { collection, closeModal } = this.props
+    const { collection } = this.props
     const onClickHandler = groupId => async () => {
       await apiStore.request(`groups/${groupId}`)
       uiStore.openOptionalMenus({
         manage_group_id: groupId,
       })
-      closeModal()
     }
     return [
       {
