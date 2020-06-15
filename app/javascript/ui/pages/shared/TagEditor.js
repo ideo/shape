@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { action, observable, runInAction } from 'mobx'
+import { action, observable, runInAction, toJS } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import _ from 'lodash'
@@ -15,7 +15,9 @@ export const tagsInCommon = (records, tagField) => {
   records.forEach(record => {
     // Include records with and without tags,
     // because they are used to find if records share tags in common
-    tags.push(record[tagField])
+    // FIXME: refactor tagField logic to dynamically push by tag type
+    const _tags = _.concat(toJS(record['user_list']), toJS(record[tagField]))
+    tags.push(_tags)
   })
   // Intersection needs each array as separate arguments,
   // which is why apply is used

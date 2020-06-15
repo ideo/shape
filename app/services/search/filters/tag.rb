@@ -8,7 +8,16 @@ class Search
         where = {}
         # `where` option is case-sensitive so we have to downcase the search
         # https://github.com/ankane/searchkick/issues/177#issuecomment-340422886
-        where[:tags] = { all: tags } if tags.count.positive?
+        # FIXME: should support 'and' & 'or' queries
+        where[:_or] = [{
+          tags: {
+            all: tags,
+          },
+        }, {
+          users: {
+            all: tags,
+          },
+        }]
         { where: where }
       end
 

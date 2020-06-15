@@ -66,6 +66,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.cached_tag_list || []
   end
 
+  attribute :user_list do
+    @object.cached_user_list || []
+  end
+
   attribute :inherited_tag_list do
     @object.cached_owned_tag_list || []
   end
