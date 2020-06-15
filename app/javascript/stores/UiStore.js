@@ -1344,6 +1344,7 @@ export default class UiStore {
   @action
   adjustZoomLevel = ({ collection } = {}) => {
     const { lastZoom } = collection
+
     if (lastZoom) {
       this.zoomLevel = lastZoom
     } else if (this.zoomLevel > 1) {
@@ -1382,7 +1383,8 @@ export default class UiStore {
         relativeZoomLevel: (widthPerCol * col) / windowWidth,
       }
     })
-    if (this.zoomLevels[0].relativeZoomLevel > 1) {
+
+    if (this.zoomLevels[0] && this.zoomLevels[0].relativeZoomLevel > 1) {
       this.zoomLevels.unshift({
         relativeZoomLevel: 1,
       })
