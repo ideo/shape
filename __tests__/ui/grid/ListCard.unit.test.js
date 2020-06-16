@@ -5,8 +5,10 @@ import { routingStore, uiStore } from '~/stores'
 import { fakeCollectionCard, fakeTextItem } from '#/mocks/data'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
+import { openContextMenu } from '~/utils/clickUtils'
 
 jest.mock('../../../app/javascript/stores')
+jest.mock('../../../app/javascript/utils/clickUtils')
 
 const card = fakeCollectionCard
 card.record = fakeTextItem
@@ -33,7 +35,10 @@ describe('ListCard', () => {
     it('should route to the record', () => {
       const link = wrapper.find('ColumnLink').first()
       link.simulate('click', fakeEv)
-      expect(routingStore.routeTo).toHaveBeenCalled()
+      expect(routingStore.routeTo).toHaveBeenCalledWith(
+        card.record.internalType,
+        card.record.id
+      )
     })
 
     it('should stop event propagation', () => {
@@ -48,7 +53,7 @@ describe('ListCard', () => {
       row.simulate('click', fakeEv)
     })
 
-    it('should caputre global keyboard grid click', () => {
+    it('should capture global keyboard grid click', () => {
       expect(uiStore.captureKeyboardGridClick).toHaveBeenCalled()
     })
 
@@ -68,8 +73,8 @@ describe('ListCard', () => {
       expect(fakeEv.preventDefault).toHaveBeenCalled()
     })
 
-    it('should open the context menu in ui store', () => {
-      // expect(uiStore.openContextMenu).toHaveBeenCalled()
+    it('should open the context menu via clickUtils', () => {
+      expect(openContextMenu).toHaveBeenCalled()
     })
   })
 
@@ -119,10 +124,9 @@ describe('ListCard', () => {
       expect(wrapper.find(CollectionTypeSelector).exists()).toBe(true)
     })
 
-    describe('when card is being moved', () => {
+    describe('when card is being moved (or should be hidden)', () => {
       beforeEach(() => {
-        uiStore.cardAction = 'move'
-        uiStore.movingCardIds = [card.id]
+        card.shouldHideFromUI = true
         render()
       })
 

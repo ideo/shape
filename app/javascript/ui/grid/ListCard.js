@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { action, computed, observable } from 'mobx'
@@ -71,7 +72,7 @@ const Row = styled.div`
   `};
 `
 
-const ColumnLink = styled.button`
+const ColumnLink = styled.div`
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -120,11 +121,16 @@ class ListCard extends React.Component {
     const { card } = this.props
     ev.preventDefault()
     ev.stopPropagation()
-    routingStore.routeTo('items', card.record.id)
+    if (uiStore.captureKeyboardGridClick(ev, card.id)) {
+      return
+    }
+    routingStore.routeTo(card.record.internalType, card.record.id)
   }
 
   handleRowClick = ev => {
     const { card } = this.props
+    ev.preventDefault()
+    ev.stopPropagation()
     if (uiStore.captureKeyboardGridClick(ev, card.id)) {
       return
     }
@@ -227,8 +233,10 @@ class ListCard extends React.Component {
 
   render() {
     const { card } = this.props
-    const { movingCardIds, cardAction } = uiStore
-    if (cardAction === 'move' && movingCardIds.includes(card.id)) return null
+    const { record } = card
+    if (card.shouldHideFromUI || _.isEmpty(card.record)) {
+      return null
+    }
     return (
       <Row
         onClick={this.handleRowClick}
@@ -238,7 +246,7 @@ class ListCard extends React.Component {
         data-cy="ListCardRow"
       >
         <Column width="50px">
-          <div className="show-on-hover">
+          <div className="show-on-hover" style={{ cursor: 'pointer' }}>
             <SelectionCircle cardId={card.id} />
           </div>
         </Column>
@@ -246,35 +254,34 @@ class ListCard extends React.Component {
           <ColumnLink onClick={this.handleRecordClick}>
             <ListCoverRenderer
               card={card}
-              cardType={card.record.internalType}
-              record={card.record}
-              height={1}
-              handleClick={this.handleRecordClick}
+              cardType={record.internalType}
+              record={record}
             />
-            <TruncatedName>{card.record.name}</TruncatedName>
+            <TruncatedName>{record.name}</TruncatedName>
             {this.renderLabelSelector}
             {this.renderIcons}
           </ColumnLink>
         </Column>
-        <Column width="400px">{defaultTimeFormat(card.updated_at)}</Column>
+        <Column width="400px">{defaultTimeFormat(record.updated_at)}</Column>
         <Column>
           <RolesSummary
             key="roles"
             handleClick={this.handleRolesClick}
-            roles={[...card.record.roles]}
-            canEdit={card.record.can_edit}
+            roles={[...record.roles]}
+            canEdit={record.can_edit}
             // convert observable to normal array to trigger render changes
-            collaborators={[...card.record.collaborators]}
+            collaborators={[...record.collaborators]}
             rolesMenuOpen={!!uiStore.rolesMenuOpen}
           />
         </Column>
-        <Column marginLeft="auto">
+        {/* stopPropagation so that ActionMenu overrides handleRowClick */}
+        <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
           <ActionMenu
             location="GridCard"
             card={card}
-            canView={card.record.can_view}
-            canEdit={card.record.can_edit}
-            canReplace={card.record.canReplace && !card.link}
+            canView={record.can_view}
+            canEdit={record.can_edit}
+            canReplace={record.canReplace && !card.link}
             menuOpen={this.menuOpen}
             onOpen={this.handleActionMenuClick}
             onLeave={this.handleCloseMenu}
