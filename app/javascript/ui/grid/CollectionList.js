@@ -15,7 +15,7 @@ class CollectionList extends React.Component {
 
   fetchCards({ sort } = {}) {
     const { collection } = this.props
-    collection.API_fetchCards({ include: ['roles'] })
+    collection.API_fetchCards()
   }
 
   get insideChallenge() {
@@ -24,7 +24,7 @@ class CollectionList extends React.Component {
 
   get columns() {
     return [
-      { displayName: '', style: { width: '50px' } },
+      { displayName: '', style: { width: '50px' }, name: 'select' },
       {
         displayName: 'Name',
         name: 'name',
@@ -35,8 +35,8 @@ class CollectionList extends React.Component {
         name: 'last_updated',
         style: { width: '400px' },
       },
-      { displayName: 'Permissions', style: {} },
-      { displayName: '', style: { marginLeft: 'auto' } },
+      { displayName: 'Permissions', style: {}, name: 'permissions' },
+      { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
   }
 
@@ -56,7 +56,7 @@ class CollectionList extends React.Component {
       <div>
         <Flex mb={1}>
           {this.columns.map(column => (
-            <Column {...column.style}>
+            <Column {...column.style} key={column.name} data-cy="ListColumn">
               <Heading3 color={v.colors.black}>{column.displayName}</Heading3>
               {column.sortable && (
                 <span style={{ width: '20px', height: '20px' }}>
@@ -67,7 +67,11 @@ class CollectionList extends React.Component {
           ))}
         </Flex>
         {this.sortedCards.map(card => (
-          <ListCard card={card} insideChallenge={this.insideChallenge} />
+          <ListCard
+            card={card}
+            insideChallenge={this.insideChallenge}
+            key={card.id}
+          />
         ))}
       </div>
     )

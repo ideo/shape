@@ -125,6 +125,9 @@ const fakeUiStore = {
   zoomIn: jest.fn(),
   zoomOut: jest.fn(),
   clearTextEditingItem: jest.fn(),
+  isSelected: jest.fn(),
+  toggleSelectedCardId: jest.fn(),
+  openContextMenu: jest.fn(),
 }
 
 export default fakeUiStore

@@ -52,6 +52,7 @@ export const fakeTextItemAttrs = {
   fullyLoaded: true,
   parent_collection_card: { ...fakeCollectionCard },
   API_fetchDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
+  roles: [],
 
 }
 

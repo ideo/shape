@@ -76,6 +76,7 @@ const ColumnLink = styled.button`
   cursor: pointer;
   display: flex;
 `
+ColumnLink.displayName = 'ColumnLink'
 
 const TruncatedName = styled.span`
   display: inline-block;
@@ -234,6 +235,7 @@ class ListCard extends React.Component {
         onContextMenu={this.handleContextMenu}
         selected={this.isSelected}
         ref={c => (this.cardRef = c)}
+        data-cy="ListCardRow"
       >
         <Column width="50px">
           <div className="show-on-hover">
