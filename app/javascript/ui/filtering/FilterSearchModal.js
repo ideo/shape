@@ -2,7 +2,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import ReactTags from 'react-tag-autocomplete'
 import { observable, runInAction } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { apiStore, uiStore } from '~/stores'
 import { SubduedText } from '~/ui/global/styled/typography'
@@ -12,6 +12,7 @@ import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 import { filtersToTags } from '~/ui/filtering/shared'
 
 @observer
+@inject('apiStore')
 class FilterSearchModal extends React.Component {
   @observable
   tags = []
@@ -24,7 +25,8 @@ class FilterSearchModal extends React.Component {
   }
 
   componentDidMount() {
-    this.getOrganizationTagList().then(tags => {
+    const { currentUserOrganization } = this.props.apiStore
+    currentUserOrganization.API_getOrganizationTagList().then(tags => {
       runInAction(() => {
         this.tags = tags
       })
@@ -44,18 +46,6 @@ class FilterSearchModal extends React.Component {
       onDelete: this.onRemoveTag,
       onSelect: this.onTagSelect,
     })
-  }
-
-  async getOrganizationTagList() {
-    const { currentUserOrganizationId } = apiStore
-    const apiPath = `organizations/${currentUserOrganizationId}/tags`
-    const result = await apiStore.requestJson(apiPath)
-    if (!result.data) return []
-    return result.data.map(tag => ({
-      id: tag.attributes.id,
-      name: tag.attributes.name,
-      type: tag.attributes.tag_type,
-    }))
   }
 
   _autocompleteTermSearch = async term => {
@@ -136,6 +126,10 @@ class FilterSearchModal extends React.Component {
       </Modal>
     )
   }
+}
+
+FilterSearchModal.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 
 FilterSearchModal.propTypes = {

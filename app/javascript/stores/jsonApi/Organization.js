@@ -29,6 +29,19 @@ class Organization extends BaseRecord {
     )
   }
 
+  async API_getOrganizationTagList() {
+    const { currentUserOrganizationId } = this.apiStore
+    const apiPath = `organizations/${currentUserOrganizationId}/tags`
+    const result = await this.apiStore.requestJson(apiPath)
+    // FIXME: also fetch user tags for the org
+    if (!result.data) return []
+    return result.data.map(tag => ({
+      id: tag.attributes.id,
+      name: tag.attributes.name,
+      type: tag.attributes.tag_type,
+    }))
+  }
+
   attributesForAPI = [
     'in_app_billing',
     'name',
