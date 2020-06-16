@@ -257,7 +257,7 @@ class CollectionCard extends BaseRecord {
     try {
       selectedCardIds = await apiStore.requestJson(
         `collections/${
-          this.parent.id
+          this.parent_id
         }/collection_cards/ids_in_direction?${queryString.stringify(params)}`
       )
       uiStore.selectCardIds(selectedCardIds)
