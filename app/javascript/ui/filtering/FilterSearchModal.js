@@ -14,7 +14,7 @@ import { filtersToTags } from '~/ui/filtering/shared'
 @observer
 class FilterSearchModal extends React.Component {
   @observable
-  tagNames = []
+  tags = []
   @observable
   searchResultCount = null
 
@@ -26,7 +26,7 @@ class FilterSearchModal extends React.Component {
   componentDidMount() {
     this.getOrganizationTagList().then(tags => {
       runInAction(() => {
-        this.tagNames = tags
+        this.tags = tags
       })
     })
   }
@@ -34,7 +34,7 @@ class FilterSearchModal extends React.Component {
   get formattedSuggestions() {
     const { filterType } = this.props
     if (filterType === 'Search Term') return []
-    return _.uniq(this.tagNames).map(tag => ({ id: null, name: tag }))
+    return this.tags
   }
 
   get filtersFormattedAsTags() {
@@ -51,7 +51,11 @@ class FilterSearchModal extends React.Component {
     const apiPath = `organizations/${currentUserOrganizationId}/tags`
     const result = await apiStore.requestJson(apiPath)
     if (!result.data) return []
-    return result.data.map(tag => tag.attributes.name)
+    return result.data.map(tag => ({
+      id: tag.attributes.id,
+      name: tag.attributes.name,
+      type: tag.attributes.tag_type,
+    }))
   }
 
   _autocompleteTermSearch = async term => {
@@ -68,6 +72,7 @@ class FilterSearchModal extends React.Component {
   }
 
   onNewTag = tag => {
+    console.log({ tag })
     this.props.onCreateTag(tag)
   }
 
@@ -98,6 +103,8 @@ class FilterSearchModal extends React.Component {
 
     const title = `Filter by ${filterType}`
     const placeholder = `enter ${filterType.toLowerCase()} here`
+
+    console.log(this.formattedSuggestions)
 
     return (
       <Modal

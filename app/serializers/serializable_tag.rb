@@ -1,4 +1,4 @@
 class SerializableTag < BaseJsonSerializer
   type 'tags'
-  attributes :name
+  attributes :name, :tag_type
 end
