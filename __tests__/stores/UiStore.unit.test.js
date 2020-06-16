@@ -174,10 +174,11 @@ describe('UiStore', () => {
         beforeEach(() => {
           collection.num_columns = 16
           uiStore.windowWidth = 1280
+          uiStore.setViewingRecord(collection)
         })
 
         it('sets zoomLevels based on maxGridWidth and maxCols', () => {
-          uiStore.determineZoomLevels(uiStore.maxCols(collection), 5420)
+          uiStore.determineZoomLevels()
           expect(uiStore.zoomLevels).toEqual(
             expect.arrayContaining([
               {
@@ -185,19 +186,19 @@ describe('UiStore', () => {
               },
               {
                 col: 4,
-                relativeZoomLevel: 1.05859375,
+                relativeZoomLevel: 1.05625,
               },
               {
                 col: 6,
-                relativeZoomLevel: 1.587890625,
+                relativeZoomLevel: 1.584375,
               },
               {
                 col: 8,
-                relativeZoomLevel: 2.1171875,
+                relativeZoomLevel: 2.1125,
               },
               {
                 col: 16,
-                relativeZoomLevel: 4.234375,
+                relativeZoomLevel: 4.225,
               },
             ])
           )
@@ -207,30 +208,31 @@ describe('UiStore', () => {
         beforeEach(() => {
           collection.num_columns = 8
           uiStore.windowWidth = 1280
+          uiStore.setViewingRecord(collection)
         })
 
         it('sets zoomLevels based on maxGridWidth and maxCols', () => {
-          uiStore.determineZoomLevels(uiStore.maxCols(collection), 5420)
+          uiStore.determineZoomLevels()
           expect(uiStore.zoomLevels).toEqual(
             expect.arrayContaining([
               {
                 relativeZoomLevel: 1,
               },
               {
-                col: 2,
-                relativeZoomLevel: 1.05859375,
-              },
-              {
                 col: 4,
-                relativeZoomLevel: 2.1171875,
+                relativeZoomLevel: 1.05625,
               },
               {
                 col: 6,
-                relativeZoomLevel: 3.17578125,
+                relativeZoomLevel: 1.584375,
               },
               {
                 col: 8,
-                relativeZoomLevel: 4.234375,
+                relativeZoomLevel: 2.1125,
+              },
+              {
+                col: 16,
+                relativeZoomLevel: 4.225,
               },
             ])
           )
@@ -240,26 +242,27 @@ describe('UiStore', () => {
         beforeEach(() => {
           collection.num_columns = 4
           uiStore.windowWidth = 1280
+          uiStore.setViewingRecord(collection)
         })
 
         it('sets zoomLevels based on maxGridWidth and maxCols', () => {
-          uiStore.determineZoomLevels(uiStore.maxCols(collection), 5420)
+          uiStore.determineZoomLevels()
           expect(uiStore.zoomLevels).toEqual(
             expect.arrayContaining([
               {
                 relativeZoomLevel: 1,
               },
               {
-                col: 1,
-                relativeZoomLevel: 1.05859375,
-              },
-              {
-                col: 2,
-                relativeZoomLevel: 2.1171875,
-              },
-              {
                 col: 4,
-                relativeZoomLevel: 4.234375,
+                relativeZoomLevel: 1.08125,
+              },
+              {
+                col: 6,
+                relativeZoomLevel: 1.621875,
+              },
+              {
+                col: 8,
+                relativeZoomLevel: 2.1625,
               },
             ])
           )

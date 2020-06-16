@@ -1369,8 +1369,12 @@ export default class UiStore {
     collection.lastZoom = this.zoomLevel
   }
 
-  determineZoomLevels(maxCols, maxGridWidth) {
+  determineZoomLevels(collection = this.viewingCollection) {
     const { windowWidth } = this
+    const maxCols = this.maxCols(collection)
+    const pageMargins = this.pageMargins(collection)
+    const maxGridWidth = this.maxGridWidth({ pageMargins, maxCols })
+
     let possibleCols = [1, 2, 4, 6, 8, 16]
     const widthPerCol = maxGridWidth / maxCols
     possibleCols = _.filter(possibleCols, i => {
@@ -1384,7 +1388,7 @@ export default class UiStore {
       }
     })
 
-    if (this.zoomLevels[0] && this.zoomLevels[0].relativeZoomLevel > 1) {
+    if (this.zoomLevels[0].relativeZoomLevel > 1) {
       this.zoomLevels.unshift({
         relativeZoomLevel: 1,
       })
