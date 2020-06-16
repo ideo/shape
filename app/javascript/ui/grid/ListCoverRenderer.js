@@ -134,29 +134,13 @@ ListCoverRenderer.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   cardType: PropTypes.string.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  isBoardCollection: PropTypes.bool,
-  isTestCollectionCard: PropTypes.bool,
   isCoverItem: PropTypes.bool,
-  height: PropTypes.number,
   dragging: PropTypes.bool,
-  searchResult: PropTypes.bool,
-  handleClick: PropTypes.func,
-  nestedTextItem: MobxPropTypes.objectOrObservableObject,
-  textItemHideReadMore: PropTypes.bool,
-  textItemUneditable: PropTypes.bool,
 }
 
 ListCoverRenderer.defaultProps = {
-  height: 1,
   dragging: false,
-  searchResult: false,
   isCoverItem: false,
-  isBoardCollection: false,
-  isTestCollectionCard: false,
-  handleClick: () => null,
-  nestedTextItem: null,
-  textItemHideReadMore: false,
-  textItemUneditable: false,
 }
 
 export default ListCoverRenderer
