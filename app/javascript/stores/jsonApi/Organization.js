@@ -1,4 +1,5 @@
 import { apiUrl } from '~/utils/url'
+import { runInAction, observable } from 'mobx'
 import { ReferenceType } from 'datx'
 
 import BaseRecord from './BaseRecord'
@@ -7,6 +8,9 @@ import Item from './Item'
 class Organization extends BaseRecord {
   static type = 'organizations'
   static endpoint = apiUrl('organizations')
+
+  @observable
+  organization_users = []
 
   API_createTermsTextItem() {
     return this.apiStore.request(
@@ -44,6 +48,13 @@ class Organization extends BaseRecord {
 
   async API_getOrganizationUsers() {
     return this.apiStore.request(`organizations/${this.id}/users`, 'GET')
+  }
+
+  async fetchOrganizationUsers() {
+    const orgUsers = await this.API_getOrganizationUsers()
+    runInAction(() => {
+      this.organization_users = orgUsers ? orgUsers.data : []
+    })
   }
 
   attributesForAPI = [

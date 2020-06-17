@@ -37,21 +37,7 @@ class TagEditor extends React.Component {
 
   constructor(props) {
     super(props)
-    // this.initTagFields(props.records, props.tagField)
   }
-
-  componentWillReceiveProps(nextProps) {
-    // this.initTagFields(nextProps.records, nextProps.tagField)
-  }
-
-  // initTagFields(records, tagField) {
-  //   records.forEach(record => {
-  // should be some kind of error if tagField doesn't exist
-  // if (!record[tagField]) record[tagField] = []
-  // })
-  // Init with tags that are shared across all records
-  // this.initTags(tagsInCommon(records, tagField))
-  // }
 
   @computed
   get formattedTags() {
@@ -71,12 +57,6 @@ class TagEditor extends React.Component {
     }
     return _tag
   }
-
-  // @action
-  // initTags = tagArray => {
-  //   // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-  //   this.tags = _.map([...tagArray], t => this.createFormattedTag(t))
-  // }
 
   @action
   handleAddition = tagData => {
@@ -110,10 +90,6 @@ class TagEditor extends React.Component {
       }
     }
     this.tags.push(newTag)
-    // records.forEach(record => {
-    // persist the tag locally on the Item/Collection
-    // record[tagField].push(newTag.name)
-    // })
     const { label, type } = newTag
     afterAddTag({ label, type })
   }
@@ -128,9 +104,6 @@ class TagEditor extends React.Component {
     if (tag) {
       runInAction(() => {
         this.tags.remove(tag)
-        // records.forEach(record => {
-        // record[tagField].remove(tag.name)
-        // })
         const { label, type } = tag
         afterRemoveTag({ label, type })
       })

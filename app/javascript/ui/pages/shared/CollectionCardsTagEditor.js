@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable, toJS } from 'mobx'
+import { toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
@@ -8,19 +8,17 @@ import TagEditor from './TagEditor'
 @inject('apiStore')
 @observer
 class CollectionCardsTagEditor extends React.Component {
-  @observable
-  selectedTags = []
-
   componentDidMount() {
-    this.initializeTags()
+    const { apiStore } = this.props
+    const { currentUserOrganization } = apiStore
+    currentUserOrganization.fetchOrganizationUsers()
   }
 
-  @action
-  initializeTags() {
-    this.selectedTags = this.filterSelectedTagsForRecords()
+  get selectedTags() {
+    return this.filterSelectedTagsForRecords()
   }
 
-  async filterSelectedTagsForRecords() {
+  filterSelectedTagsForRecords() {
     const { records } = this
     const selectedRecordTags = _.flatten(
       _.intersection(_.map(records, r => toJS(r['tag_list'])))
@@ -29,14 +27,15 @@ class CollectionCardsTagEditor extends React.Component {
     // TODO: combine with user tag list once implemented
     const { apiStore } = this.props
     const { currentUserOrganization } = apiStore
+    const { organization_users } = currentUserOrganization
     // This contains id, first_name, last_name, handle
-    const allUsers = await currentUserOrganization.API_getOrganizationUsers()
     const selectedRecordUserTags = _.flatten(
       _.intersection(_.map(records, r => toJS(r['user_list'])))
     )
 
-    const mappedUserTags = _.filter(allUsers, a =>
-      selectedRecordUserTags.includes(a.handle)
+    const mappedUserTags = _.filter(
+      organization_users,
+      a => a && selectedRecordUserTags.includes(a.handle)
     )
 
     return [...selectedRecordTags, ...mappedUserTags]
@@ -55,10 +54,19 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   addTag = tag => {
+    const { records } = this
+    records.forEach(record => {
+      // persist the tag locally on the Item/Collection
+      record['tag_list'].push(tag.label)
+    })
     this._apiAddRemoveTag('add', tag)
   }
 
   removeTag = tag => {
+    const { records } = this
+    records.forEach(record => {
+      record['tag_list'].remove(tag.label)
+    })
     this._apiAddRemoveTag('remove', tag)
   }
 
