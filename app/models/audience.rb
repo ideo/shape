@@ -3,7 +3,6 @@
 # Table name: audiences
 #
 #  id                     :bigint(8)        not null, primary key
-#  audience_type          :integer
 #  criteria               :string
 #  global_default         :integer
 #  min_price_per_response :decimal(10, 2)   default(0.0)

@@ -83,6 +83,7 @@ class Collection < ApplicationRecord
   include Commentable
   include Globalizable
   include CachedAttributes
+  include UserTaggable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -104,7 +105,7 @@ class Collection < ApplicationRecord
   store_accessor :cached_attributes,
                  :cached_cover,
                  :cached_tag_list,
-                 :cached_user_list,
+                 :cached_user_tag_list,
                  :cached_owned_tag_list,
                  :cached_card_count,
                  :cached_activity_count,
@@ -758,8 +759,8 @@ class Collection < ApplicationRecord
     self.cached_tag_list = tag_list
   end
 
-  def cache_user_list
-    self.cached_user_list = user_list
+  def cache_user_tag_list
+    self.cached_user_tag_list = user_tag_list
   end
 
   def cache_owned_tag_list
@@ -769,7 +770,7 @@ class Collection < ApplicationRecord
   # these all get called from CollectionUpdater
   def update_cached_tag_lists
     cache_tag_list if tag_list != cached_tag_list
-    cache_user_list if user_list != cached_user_list
+    cache_user_tag_list if user_tag_list != cached_user_tag_list
     cache_owned_tag_list if owned_tag_list != cached_owned_tag_list
   end
 

@@ -55,6 +55,7 @@ class Item < ApplicationRecord
   include Commentable
   include Globalizable
   include CachedAttributes
+  include UserTaggable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,

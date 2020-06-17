@@ -23,18 +23,3 @@ module CustomTaggingMethods
 end
 
 ActsAsTaggableOn::Tagging.send(:include, CustomTaggingMethods)
-
-module CustomTagMethods
-  extend ActiveSupport::Concern
-
-  included do
-    belongs_to :user, optional: true
-
-    enum tag_type: {
-      tag: 0,
-      user: 1,
-    }, _prefix: true
-  end
-end
-
-ActsAsTaggableOn::Tag.send(:include, CustomTagMethods)
