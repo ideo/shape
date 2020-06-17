@@ -843,6 +843,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  API_fetchCardRoles = () => {
+    const ids = _.compact(
+      _.map(this.collection_cards, cc => {
+        if (cc.record && _.isEmpty(cc.record.roles)) {
+          return cc.id
+        }
+      })
+    )
+    if (ids.length === 0) return
+    return this.apiStore.request(
+      `collections/${this.id}/collection_cards/roles?select_ids=${ids}`
+    )
+  }
+
   async API_fetchAndMergeCards(cardIds) {
     const { apiStore } = this
     const ids = cardIds.join(',')

@@ -45,6 +45,7 @@ Rails.application.routes.draw do
             get 'ids'
             get 'ids_in_direction'
             get 'breadcrumb_records'
+            get 'roles'
           end
         end
         resources :roles, only: %i[index create destroy] do

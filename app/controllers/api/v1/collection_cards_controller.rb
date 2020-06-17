@@ -4,10 +4,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   skip_before_action :check_api_authentication!, only: %i[index]
   before_action :load_and_authorize_parent_collection, only: %i[create replace update_card_filter]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction roles]
   before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   before_action :check_cache, only: %i[index ids breadcrumb_records]
-  before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
+  before_action :load_collection_cards, only: %i[index ids breadcrumb_records roles]
 
   def index
     render_collection_cards
@@ -52,6 +52,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       }
     end
     render json: card_data
+  end
+
+  def roles
+    render_collection_cards(include_roles: true)
   end
 
   def create
@@ -247,11 +251,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   private
 
-  def render_collection_cards(collection: @collection, collection_cards: @collection_cards)
+  def render_collection_cards(collection: @collection, collection_cards: @collection_cards, include_roles: false)
     json_data = JsonapiCache::CollectionCardRenderer.call(
       cards: collection_cards,
       collection: collection,
       user: current_user,
+      include_roles: include_roles,
     ).merge(
       links: jsonapi_pagination(collection_cards),
     )

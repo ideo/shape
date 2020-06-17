@@ -9,7 +9,8 @@ module JsonapiCache
       cards: [],
       user: nil,
       collection: nil,
-      search_records: nil
+      search_records: nil,
+      include_roles: false
     )
       @cards = cards
       @collection = collection
@@ -17,6 +18,7 @@ module JsonapiCache
       @current_ability = Ability.new(@user)
       @search_result = search_records.present?
       @search_records = search_records
+      @include_roles = include_roles
       @cached_data = {}
     end
 
@@ -42,37 +44,56 @@ module JsonapiCache
     private
 
     def cached_card_data(card)
-      cached = @cached_data[card.cache_key]
+      key = cache_key(card)
+      cached = @cached_data[key]
       if cached.present?
         return cached
       end
 
-      Rails.cache.fetch(card.cache_key, expires_in: EXPIRY_TIME) do
+      Rails.cache.fetch(key, expires_in: EXPIRY_TIME) do
         cache_card_json(card)
       end
     end
 
     def cache_card_json(card)
+      includes = CollectionCard.default_relationships_for_api
+      if @include_roles
+        includes = [
+          record: [roles: %i[pending_users users groups resource]],
+        ]
+      end
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         card,
         class: JsonapiMappings::ALL_MAPPINGS,
-        include: CollectionCard.default_relationships_for_api,
+        include: includes,
         expose: {
           inside_a_submission: inside_a_submission,
           inside_hidden_submission_box: inside_hidden_submission_box,
+          include_roles: @include_roles,
         },
       )
     end
 
     def fetch_multi_keys
       card_map = {}
+      cache_keys = []
       @cards.each do |card|
-        card_map[card.cache_key] = card
+        key = cache_key(card)
+        card_map[key] = card
+        cache_keys << key
       end
-      @cached_data = Rails.cache.fetch_multi(*@cards.map(&:cache_key), expires_in: EXPIRY_TIME) do |cache_key|
+      @cached_data = Rails.cache.fetch_multi(*cache_keys, expires_in: EXPIRY_TIME) do |cache_key|
         cache_card_json(card_map[cache_key])
       end
+    end
+
+    def cache_key(card)
+      key = card.cache_key
+      if @include_roles
+        key += '--roles'
+      end
+      key
     end
 
     def render_json_data
@@ -125,6 +146,12 @@ module JsonapiCache
       json[:data][:attributes][:can_edit_parent] = can_edit_parent
       if @search_result
         related_json[:attributes].merge!(breadcrumb_attributes(record))
+      end
+
+      if @include_roles && record.common_viewable && @user.current_organization_id != record.organization_id
+        remove_role_ids = related_json[:relationships][:roles][:data].map { |i| i[:id] }
+        related_json[:relationships][:roles][:data] = []
+        json[:included].reject! { |i| i[:type] == :roles && remove_role_ids.include?(i[:id]) }
       end
 
       if record.is_a?(Item::LegendItem)

@@ -15,7 +15,7 @@ class CollectionList extends React.Component {
 
   fetchCards({ sort } = {}) {
     const { collection } = this.props
-    collection.API_fetchCards()
+    collection.API_fetchCardRoles()
   }
 
   get insideChallenge() {
@@ -42,9 +42,13 @@ class CollectionList extends React.Component {
 
   get sortedCards() {
     const { collection } = this.props
+    if (collection.isSearchResultsCollection) {
+      return collection.collection_cards
+    }
     return collection.sortedCards
   }
 
+  // NOTE: not used yet.
   handleSort = column => {
     const { collection } = this.props
     uiStore.update('collectionCardSortOrder', column)
@@ -52,6 +56,8 @@ class CollectionList extends React.Component {
   }
 
   render() {
+    const { collection } = this.props
+
     return (
       <div>
         <Flex mb={1}>
@@ -70,6 +76,7 @@ class CollectionList extends React.Component {
           <ListCard
             card={card}
             insideChallenge={this.insideChallenge}
+            searchResult={collection.isSearchResultsCollection}
             key={card.id}
           />
         ))}
