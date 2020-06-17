@@ -9,12 +9,12 @@ import v from '~/utils/variables'
 
 const IconHolder = styled.div`
   color: ${props => (props.active ? v.colors.black : v.colors.commonDark)};
-  cursor: ${props => (props.active ? 'default' : 'pointer')};
+  cursor: pointer;
   height: 32px;
   width: 32px;
 
   &:hover {
-    color: ${props => (props.active ? v.colors.commonDark : v.colors.dark)};
+    color: ${v.colors.commonDarkest};
   }
 `
 IconHolder.defaultProps = {

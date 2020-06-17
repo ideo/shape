@@ -239,8 +239,13 @@ class MethodLibraryFilterBar extends React.Component {
   }
 
   render() {
+    if (!this.props.usePortal) {
+      return this.renderBar()
+    }
     const filterElement = document.getElementById('collectionFilterPortal')
-    if (!filterElement) return null
+    if (!filterElement) {
+      return null
+    }
     return ReactDOM.createPortal(this.renderBar(), filterElement)
   }
 }
@@ -248,6 +253,11 @@ class MethodLibraryFilterBar extends React.Component {
 MethodLibraryFilterBar.propTypes = {
   filters: MobxPropTypes.arrayOrObservableArray.isRequired,
   onSelect: PropTypes.func.isRequired,
+  // set usePortal=false mainly for unit testing
+  usePortal: PropTypes.bool,
+}
+MethodLibraryFilterBar.defaultProps = {
+  usePortal: true,
 }
 
 export default MethodLibraryFilterBar

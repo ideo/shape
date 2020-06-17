@@ -199,6 +199,15 @@ class ListCard extends React.Component {
     )
   }
 
+  get canEditCard() {
+    const { card, searchResult } = this.props
+    if (searchResult) return false
+    // you can always edit your link cards, regardless of record.can_edit
+    if (card.parentCollection && card.parentCollection.can_edit && card.link)
+      return true
+    return card.record.can_edit
+  }
+
   get renderIcons() {
     const { card } = this.props
     if (card.record.isCollection && !card.record.allowsCollectionTypeSelector) {
@@ -232,11 +241,12 @@ class ListCard extends React.Component {
   }
 
   render() {
-    const { card } = this.props
+    const { card, searchResult } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
     }
+
     return (
       <Row
         onClick={this.handleRowClick}
@@ -277,11 +287,11 @@ class ListCard extends React.Component {
         {/* stopPropagation so that ActionMenu overrides handleRowClick */}
         <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
           <ActionMenu
-            location="GridCard"
+            location={searchResult ? 'Search' : 'GridCard'}
             card={card}
             canView={record.can_view}
-            canEdit={record.can_edit}
-            canReplace={record.canReplace && !card.link}
+            canEdit={this.canEditCard}
+            canReplace={record.canReplace && !card.link && !searchResult}
             menuOpen={this.menuOpen}
             onOpen={this.handleActionMenuClick}
             onLeave={this.handleCloseMenu}
@@ -295,9 +305,11 @@ class ListCard extends React.Component {
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   insideChallenge: PropTypes.bool,
+  searchResult: PropTypes.bool,
 }
 ListCard.defaultProps = {
   insideChallenge: false,
+  searchResult: false,
 }
 
 export default ListCard

@@ -461,10 +461,7 @@ class CollectionPage extends React.Component {
           />
         </Flex>
         {submissions_collection.viewMode === 'list' ? (
-          <CollectionList
-            {...genericCollectionProps}
-            cardsFetched={this.cardsFetched}
-          />
+          <CollectionList collection={submissions_collection} />
         ) : (
           <CollectionGrid
             {...gridSettings}
@@ -567,13 +564,11 @@ class CollectionPage extends React.Component {
       !apiStore.currentUserOrganization && collection.common_viewable
 
     let inner
-    if (collection.viewMode === 'list') {
-      inner = (
-        <CollectionList
-          {...genericCollectionProps}
-          cardsFetched={this.cardsFetched}
-        />
-      )
+    if (collection.isSearchCollection) {
+      // do this first because SearchCollection + list viewMode is slightly different
+      inner = this.renderSearchCollection()
+    } else if (collection.viewMode === 'list') {
+      inner = <CollectionList collection={collection} />
     } else if (collection.isBoard) {
       inner = (
         <FoamcoreGrid
@@ -585,8 +580,6 @@ class CollectionPage extends React.Component {
       )
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
-    } else if (collection.isSearchCollection) {
-      inner = this.renderSearchCollection()
     } else {
       inner = (
         <CollectionGrid

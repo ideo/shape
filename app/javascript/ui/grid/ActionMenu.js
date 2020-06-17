@@ -257,8 +257,7 @@ class ActionMenu extends React.Component {
       items = _.reject(items, { name: 'Replace' })
       if (
         record &&
-        (record.is_submission_box_template ||
-          (record.parent && record.parent.isSearchCollection))
+        (record.is_submission_box_template || location === 'Search')
       ) {
         items = _.reject(items, { name: 'Delete' })
         items = _.reject(items, { name: 'Move' })
@@ -311,7 +310,11 @@ class ActionMenu extends React.Component {
       if (viewingCollection.isSearchCollection) {
         items = _.reject(items, { name: 'Move' })
       }
-      if (viewingCollection.isBoard && location === 'GridCard') {
+      if (
+        viewingCollection.isBoard &&
+        viewingCollection.viewMode !== 'list' &&
+        location === 'GridCard'
+      ) {
         const selectAllIndex = _.findIndex(items, { name: 'Select All' })
         const selectCardsBelow = {
           name: 'Select Cards Below',
