@@ -476,6 +476,7 @@ export const fakeCollection = {
   API_fetchCardOrders: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchChallengePhaseCollections: jest.fn().mockReturnValue(Promise.resolve({})),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
+  createSubmission: jest.fn(),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
@@ -496,6 +497,22 @@ export const fakeCollection = {
     },
   },
   ...fakeJsonApiAttrs,
+}
+fakeCollection.loadPhasesForSubmissionBoxes = submissionBoxes => {
+  submissionBoxes.map(submissionBox => {
+    // Append phase subcollections
+    if (submissionBox.submission_template) {
+      submissionBox.phaseSubCollections = [
+        {
+          ...fakeCollection,
+          id: '4560202',
+          name: 'Phase Collection',
+        },
+      ]
+    }
+  })
+  // Immediately resolve promise for the test
+  return Promise.resolve(submissionBoxes)
 }
 // also set parentCollection on fakeCard
 // TODO: fix circular reference!
