@@ -462,6 +462,11 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
+    const showFilters =
+      record.isRegularCollection ||
+      record.isSubmissionsCollection ||
+      record.isBoard
+
     return (
       <StyledHeader
         pageHeader
@@ -528,16 +533,14 @@ class PageHeader extends React.Component {
                 </Flex>
               )}
             </StyledTitleAndRoles>
-            {(record.isRegularCollection ||
-              record.isSubmissionsCollection ||
-              record.isBoard) && (
+            {showFilters && (
               <div style={{ marginBottom: '-16px', display: 'flex' }}>
                 <CollectionViewToggle collection={record} />
                 <CollectionFilter collection={record} canEdit={this.canEdit} />
               </div>
             )}
           </div>
-          <CollectionPillHolder id="collectionFilterPortal" />
+          {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal
           canEdit={this.canEdit}
