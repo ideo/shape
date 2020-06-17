@@ -487,6 +487,9 @@ export const fakeCollection = {
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',
+  phaseSubCollections: [],
+  loadPhaseSubCollections: jest.fn().mockReturnValue(Promise.resolve([])),
+  setPhaseSubCollections: jest.fn(),
   meta: {
     snapshot: {
       can_edit: false,
@@ -688,4 +691,25 @@ export const fakeCollaborator = {
   can_edit_collection: false,
   timestamp: '2020-04-30 11:34:50 -0700',
   color: 'Blue'
+}
+
+export const fakeSubmissionBoxWithTemplate = {
+  ...fakeCollection,
+  name: 'Submission Box with Template',
+  submission_template_id: 123,
+  submission_template: {
+    ...fakeCollection,
+    name: 'Submission Box Template'
+  },
+  submission_box_type: null,
+  submissionFormat: 'template'
+}
+
+export const fakeSubmissionBoxWithoutTemplate = {
+  ...fakeCollection,
+  name: 'Submission Box without Template',
+  submission_box_type: 'text',
+  submission_template_id: null,
+  submission_template: null,
+  submissionFormat: 'item'
 }

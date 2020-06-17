@@ -10,30 +10,11 @@ import PhaseCollectionRow, {
   PhaseCollectionWithoutTemplateRow,
 } from '~/ui/challenges/PhaseCollectionRow'
 import v from '~/utils/variables'
+import Collection from '~/stores/jsonApi/Collection'
 
 const Phases = styled.div`
   margin-bottom: 1rem;
 `
-
-const loadPhasesForSubmissionBoxes = async submissionBoxes => {
-  // Filter out any that don't have a submission template (can't assign phases)
-  // Or any that have phase sub-collections already loaded
-  const subBoxesWithTemplates = submissionBoxes.filter(
-    subBox =>
-      !!subBox.submission_template && subBox.phaseSubCollections.length === 0
-  )
-  // Get phase collections for each submission box's template
-  const loadPhases = subBoxesWithTemplates.map(subBox => {
-    return new Promise(resolve => {
-      resolve(subBox.submission_template.loadPhaseSubCollections())
-    }).then(phaseSubCollections => {
-      // Set phase collections directly on each submission box
-      subBox.setPhaseSubCollections(phaseSubCollections)
-    })
-  })
-  await Promise.all(loadPhases)
-  return submissionBoxes
-}
 
 const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
   const [submissionBoxesWithPhases, setSubmissionBoxesWithPhases] = useState([])
@@ -43,7 +24,7 @@ const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
 
   useEffect(() => {
     const loadData = async () => {
-      const subBoxesWithPhases = await loadPhasesForSubmissionBoxes(
+      const subBoxesWithPhases = await Collection.loadPhasesForSubmissionBoxes(
         submissionBoxes
       )
       if (subBoxesWithPhases.length === 1) {

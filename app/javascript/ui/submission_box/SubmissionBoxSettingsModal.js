@@ -46,7 +46,7 @@ const SubmissionBoxSettingsModal = ({ collection }) => {
     <Modal
       title={
         <StyledTitleContent>
-          <Heading2>Submission Box Settings</Heading2>
+          <Heading2 data-cy="modal-title">Submission Box Settings</Heading2>
         </StyledTitleContent>
       }
       onClose={() => closeSubmissionBoxSettings(collection)}

@@ -1,9 +1,7 @@
 import SubmissionBoxFormat from '~/ui/submission_box/SubmissionBoxFormat'
 import { fakeCollection } from '#/mocks/data'
 
-jest.mock('../../../app/javascript/stores')
-// Import mocked store so we can define .find method
-import { apiStore } from '~/stores'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 let props, wrapper, rerender, template
 describe('SubmissionBoxFormat', () => {
@@ -12,10 +10,11 @@ describe('SubmissionBoxFormat', () => {
       name: 'Template',
       ...fakeCollection,
     }
-    // Mock return when searching for template
-    apiStore.find = jest.fn().mockReturnValue(template)
     props = {
-      collection: fakeCollection,
+      collection: {
+        ...fakeCollection,
+        apiStore: fakeApiStore(),
+      },
       closeModal: jest.fn(),
     }
     rerender = () => {
@@ -41,14 +40,11 @@ describe('SubmissionBoxFormat', () => {
 
   describe('with submission template chosen', () => {
     beforeEach(() => {
+      props.collection.submission_template = template
       props.collection.submission_template_id = 1234
       props.collection.submission_box_type = null
       props.collection.submissionFormat = 'template'
       rerender()
-    })
-
-    it('loads template from apiStore', () => {
-      expect(apiStore.find).toHaveBeenCalledWith('collections', 1234)
     })
 
     it('renders SubmissionBoxRowForTemplate', () => {

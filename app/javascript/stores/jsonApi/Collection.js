@@ -1437,6 +1437,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     previousCover.is_cover = false
   }
 
+  // Load phase collections for given submission box collections
+  static async loadPhasesForSubmissionBoxes(submissionBoxes) {
+    // Filter out any that don't have a submission template (can't assign phases)
+    // Or any that have phase sub-collections already loaded
+    const subBoxesWithTemplates = submissionBoxes.filter(
+      subBox =>
+        !!subBox.submission_template && subBox.phaseSubCollections.length === 0
+    )
+    // Get phase collections for each submission box's template
+    const loadPhases = subBoxesWithTemplates.map(subBox => {
+      return new Promise(resolve => {
+        resolve(subBox.submission_template.loadPhaseSubCollections())
+      }).then(phaseSubCollections => {
+        // Set phase collections directly on each submission box
+        subBox.setPhaseSubCollections(phaseSubCollections)
+      })
+    })
+    await Promise.all(loadPhases)
+    return submissionBoxes
+  }
+
   static async fetchSubmissionsCollection(id, { order } = {}) {
     const res = await apiStore.request(`collections/${id}`)
     const collection = res.data

@@ -48,13 +48,7 @@ When('I close the first open text item', () => {
 })
 
 When('I choose a link item from the submission box', () => {
-  cy.locateDataOrClass('DialogContent')
-    .first()
-    .children()
-    .first()
-    .children()
-    .eq(3)
-    .click({ force: true })
+  cy.locate('submission-box-link-item').click({ force: true })
 })
 
 // ----------------------
