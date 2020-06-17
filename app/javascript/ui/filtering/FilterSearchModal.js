@@ -33,10 +33,19 @@ class FilterSearchModal extends React.Component {
     })
   }
 
+  get organizationUserTags() {
+    const { currentUserOrganization } = this.props.apiStore
+    return currentUserOrganization.map(u => u.handle)
+  }
+
+  get fullTagList() {
+    return [...this.tags, ...this.organizationUserTags]
+  }
+
   get formattedSuggestions() {
     const { filterType } = this.props
     if (filterType === 'Search Term') return []
-    return this.tags
+    return this.fullTagList
   }
 
   get filtersFormattedAsTags() {
@@ -93,8 +102,6 @@ class FilterSearchModal extends React.Component {
 
     const title = `Filter by ${filterType}`
     const placeholder = `enter ${filterType.toLowerCase()} here`
-
-    console.log(this.formattedSuggestions)
 
     return (
       <Modal
