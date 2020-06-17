@@ -152,7 +152,7 @@ class OrganizationSettings extends React.Component {
           Any new people added to {this.organization.name} without these email
           domains will be considered guests.
         </p>
-
+        // FIXME: will break when tags are used with organization domains...
         <TagEditor
           canEdit
           validateTag={this.validateDomainTag}

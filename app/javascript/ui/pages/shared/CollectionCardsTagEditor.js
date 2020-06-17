@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { action, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
@@ -7,6 +8,39 @@ import TagEditor from './TagEditor'
 @inject('apiStore')
 @observer
 class CollectionCardsTagEditor extends React.Component {
+  @observable
+  selectedTags = []
+
+  componentDidMount() {
+    this.initializeTags()
+  }
+
+  @action
+  initializeTags() {
+    this.selectedTags = this.filterSelectedTagsForRecords()
+  }
+
+  filterSelectedTagsForRecords() {
+    const { records } = this
+    const selectedRecordTags = _.flatten(
+      _.intersection(_.map(records, r => toJS(r['tag_list'])))
+    )
+
+    // TODO: combine with user tag list once implemented
+    const { apiStore } = this.props
+    const { currentUserOrganization } = apiStore
+    const allUserTags = currentUserOrganization.API_getOrganizationUserTagList()
+    const selectedRecordUserTags = _.flatten(
+      _.intersection(_.map(records, r => toJS(r['user_list'])))
+    )
+
+    const mappedUserTags = _.filter(allUserTags, a =>
+      selectedRecordUserTags.includes(a.handle)
+    )
+
+    return [...selectedRecordTags, ...mappedUserTags]
+  }
+
   _apiAddRemoveTag = (action, data) => {
     const { cards, apiStore } = this.props
     const { label, type } = data
@@ -34,10 +68,9 @@ class CollectionCardsTagEditor extends React.Component {
 
   render() {
     const { canEdit, placeholder, tagColor } = this.props
-
     return (
       <TagEditor
-        records={this.records}
+        recordTags={this.selectedTags}
         afterAddTag={this.addTag}
         afterRemoveTag={this.removeTag}
         canEdit={canEdit}

@@ -21,6 +21,8 @@ export const creativeDifferenceTagIcon = tagName => {
   return null
 }
 
+// TODO: add avatar icon here
+
 // adapted from https://raw.githubusercontent.com/i-like-robots/react-tags/master/example/styles.css
 export default styled.div`
   font-family: ${v.fonts.sans};

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
-import { action, observable, runInAction, toJS } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { action, observable, computed, runInAction } from 'mobx'
+import { observer } from 'mobx-react'
 
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
@@ -10,73 +10,77 @@ import StyledReactTags, {
   creativeDifferenceTagIcon,
 } from '~/ui/pages/shared/StyledReactTags'
 
-export const tagsInCommon = (records, tagField) => {
-  const tags = []
-  records.forEach(record => {
-    // Include records with and without tags,
-    // because they are used to find if records share tags in common
-    // FIXME: adding user tags by default since there isn't a way to add it distinctively
-    const userTags = _.map(toJS(record['user_list']), t => {
-      return { label: t, type: 'user_list' }
-    })
-    const regularTags = _.map(toJS(record[tagField]), t => {
-      return { label: t, type: tagField }
-    })
-    tags.push([...userTags, ...regularTags])
-  })
-  // Intersection needs each array as separate arguments,
-  // which is why apply is used
-  return _.intersection.apply(null, tags)
-}
+// FIXME: tagsInCommon is used in TagEditor.unit.test.js
+// export const tagsInCommon = (records, tagField) => {
+//   const tags = []
+//   records.forEach(record => {
+//     // Include records with and without tags,
+//     // because they are used to find if records share tags in common
+//     // FIXME: adding user tags by default since there isn't a way to add it distinctively
+//     const userTags = _.map(toJS(record['user_list']), t => {
+//       return { label: t, type: 'user_list' }
+//     })
+//     const regularTags = _.map(toJS(record[tagField]), t => {
+//       return { label: t, type: tagField }
+//     })
+//     tags.push([...userTags, ...regularTags])
+//   })
+//   // Intersection needs each array as separate arguments,
+//   // which is why apply is used
+//   return _.intersection.apply(null, tags)
+// }
 
 @observer
 class TagEditor extends React.Component {
-  @observable
-  tags = []
   @observable
   error = ''
 
   constructor(props) {
     super(props)
-    this.initTagFields(props.records, props.tagField)
+    // this.initTagFields(props.records, props.tagField)
   }
 
   componentWillReceiveProps(nextProps) {
-    this.initTagFields(nextProps.records, nextProps.tagField)
+    // this.initTagFields(nextProps.records, nextProps.tagField)
   }
 
-  initTagFields(records, tagField) {
-    records.forEach(record => {
-      // should be some kind of error if tagField doesn't exist
-      if (!record[tagField]) record[tagField] = []
-    })
-    // Init with tags that are shared across all records
-    this.initTags(tagsInCommon(records, tagField))
+  // initTagFields(records, tagField) {
+  //   records.forEach(record => {
+  // should be some kind of error if tagField doesn't exist
+  // if (!record[tagField]) record[tagField] = []
+  // })
+  // Init with tags that are shared across all records
+  // this.initTags(tagsInCommon(records, tagField))
+  // }
+
+  @computed
+  get formattedTags() {
+    const { recordTags } = this.props
+    return _.map(recordTags, t => this.createFormattedTag(t))
   }
 
   createFormattedTag(tag) {
-    const { label, type } = tag
     const _tag = {
-      id: label,
-      label,
-      name: label,
-      type,
-      onDelete: this.handleDelete(label),
-      symbol: creativeDifferenceTagIcon(label),
+      id: tag,
+      label: tag,
+      name: tag,
+      type: null,
+      onDelete: this.handleDelete(tag),
+      symbol: creativeDifferenceTagIcon(tag),
       symbolSize: 18,
     }
     return _tag
   }
 
-  @action
-  initTags = tagArray => {
-    // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
-    this.tags = _.map([...tagArray], t => this.createFormattedTag(t))
-  }
+  // @action
+  // initTags = tagArray => {
+  //   // `id` is used by react-tag-autocomplete, but otherwise doesn't hold any meaning
+  //   this.tags = _.map([...tagArray], t => this.createFormattedTag(t))
+  // }
 
   @action
   handleAddition = tagData => {
-    const { validateTag, records, tagField, afterAddTag } = this.props
+    const { validateTag, tagField, afterAddTag } = this.props
     tagData.name = tagData.name.trim()
     // FIXME: handle user tagField
     const newTag = this.createFormattedTag({
@@ -85,7 +89,7 @@ class TagEditor extends React.Component {
     })
     this.error = ''
 
-    // FIXME: use once we can distinguish by tagFields/type
+    // FIXME: use once we can distinguish by tagFields/type (for users)
     // _.find(this.tags, { label, type })
 
     // Return if tag is a duplicate
@@ -106,16 +110,16 @@ class TagEditor extends React.Component {
       }
     }
     this.tags.push(newTag)
-    records.forEach(record => {
-      // persist the tag locally on the Item/Collection
-      record[tagField].push(newTag.name)
-    })
+    // records.forEach(record => {
+    // persist the tag locally on the Item/Collection
+    // record[tagField].push(newTag.name)
+    // })
     const { label, type } = newTag
     afterAddTag({ label, type })
   }
 
   handleDelete = label => e => {
-    const { records, tagField, afterRemoveTag } = this.props
+    const { afterRemoveTag } = this.props
 
     // FIXME: use once we can distinguish by tagFields/type
     // _.find(this.tags, { label, type })
@@ -124,9 +128,9 @@ class TagEditor extends React.Component {
     if (tag) {
       runInAction(() => {
         this.tags.remove(tag)
-        records.forEach(record => {
-          record[tagField].remove(tag.name)
-        })
+        // records.forEach(record => {
+        // record[tagField].remove(tag.name)
+        // })
         const { label, type } = tag
         afterRemoveTag({ label, type })
       })
@@ -155,7 +159,7 @@ class TagEditor extends React.Component {
         {!canEdit && this.readonlyTags()}
         {canEdit && (
           <ReactTags
-            tags={[...this.tags]}
+            tags={[...this.formattedTags]}
             allowBackspace={false}
             delimiterChars={[',']}
             placeholder={placeholder}
@@ -174,7 +178,7 @@ class TagEditor extends React.Component {
 TagEditor.displayName = 'TagEditor'
 
 TagEditor.propTypes = {
-  records: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
+  recordTags: PropTypes.array.isRequired,
   afterAddTag: PropTypes.func.isRequired,
   afterRemoveTag: PropTypes.func.isRequired,
   tagField: PropTypes.string.isRequired,
