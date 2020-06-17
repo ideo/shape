@@ -170,7 +170,6 @@ class PageHeader extends React.Component {
       record.isProfileCollection,
       record.isSubmissionBox,
       record.launchableTestId,
-      record.isBoard,
     ]
 
     if (_.some(rightConditions, bool => bool)) {

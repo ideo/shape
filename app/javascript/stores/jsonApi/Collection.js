@@ -553,7 +553,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get allowsCollectionTypeSelector() {
     return _.every(
       [
-        this.isRegularCollection,
+        this.isRegularCollection || this.isBoard,
         !this.isSpecialCollection,
         !this.system_required,
       ],

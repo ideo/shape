@@ -18,8 +18,8 @@ module CollectionCardFilter
         .left_joins(:item, :collection)
         .select(*fields)
         .where(
-          "(item_id IS NOT NULL AND items.cached_attributes->'cached_inheritance'->>'private'='false') OR " \
-          "(collection_id IS NOT NULL AND collections.cached_attributes->'cached_inheritance'->>'private'='false')",
+          "(collection_cards.item_id IS NOT NULL AND items.cached_attributes->'cached_inheritance'->>'private'='false') OR " \
+          "(collection_cards.collection_id IS NOT NULL AND collections.cached_attributes->'cached_inheritance'->>'private'='false')",
         )
         .distinct
     end

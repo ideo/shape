@@ -18,6 +18,7 @@ import MethodIcon from '~/ui/icons/MethodIcon'
 import MethodIconLg from '~/ui/icons/MethodIconLg'
 import ProfileIconLg from '~/ui/icons/ProfileIconLg'
 import ProfileIconXs from '~/ui/icons/ProfileIconXs'
+import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
 
 // Only for use in collectionTitle, not menu
 export const largeCollectionIconMap = {
@@ -26,6 +27,7 @@ export const largeCollectionIconMap = {
   project: <ProjectIconLg />,
   method: <MethodIconLg />,
   prototype: <PrototypeIconLg />,
+  foamcore: <FoamcoreBoardIcon large />,
 }
 
 export const smallCollectionIconMap = {
@@ -34,6 +36,7 @@ export const smallCollectionIconMap = {
   project: <ProjectIcon />,
   method: <MethodIcon />,
   prototype: <PrototypeIcon />,
+  foamcore: <FoamcoreBoardIconXs />,
 }
 
 export const collectionTypeToIcon = ({ type, size }) => {
@@ -62,6 +65,7 @@ const CollectionTypeIcon = ({ record }) => {
   } else if (record.isBoard) {
     icon = <FoamcoreBoardIcon large />
   }
+
   if (icon) {
     return icon
   }
