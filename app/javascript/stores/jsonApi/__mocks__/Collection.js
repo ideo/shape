@@ -21,4 +21,6 @@ class Collection {
   }
 }
 
+Collection.createSubmission = jest.fn()
+
 export default Collection

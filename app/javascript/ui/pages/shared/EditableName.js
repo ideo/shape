@@ -109,7 +109,7 @@ class EditableName extends React.Component {
     this.saveName.flush()
     const { fieldName, uiStore, onDoneEditing } = this.props
     uiStore.editingName.remove(fieldName)
-    onDoneEditing()
+    onDoneEditing && onDoneEditing()
   }
 
   _saveName = () => {
