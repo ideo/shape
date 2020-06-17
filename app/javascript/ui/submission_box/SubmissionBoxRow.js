@@ -40,6 +40,7 @@ export const SubmissionBoxRowForItem = ({
       noSpacing
       clickable={!!onSelect}
       onClick={() => onSelect && onSelect(name)}
+      data-cy={`submission-box-${name}-item`}
     >
       <BctButton>
         <Icon />
