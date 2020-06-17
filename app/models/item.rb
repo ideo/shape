@@ -233,6 +233,7 @@ class Item < ApplicationRecord
     {
       name: name,
       tags: tags.map(&:name).map(&:downcase),
+      user_tags: user_tag_list.map(&:downcase),
       content: search_content,
       user_ids: search_user_ids,
       parent_id: parent&.id,

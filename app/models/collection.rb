@@ -308,7 +308,7 @@ class Collection < ApplicationRecord
       type: type,
       name: name,
       tags: all_tag_names,
-      users: user_list,
+      user_tags: user_tag_list.map(&:downcase),
       content: search_content,
       organization_id: organization_id,
       user_ids: search_user_ids,

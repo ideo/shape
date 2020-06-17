@@ -28,7 +28,7 @@ describe UserTaggable, type: :concern do
 
     it 'assigns users from their handle' do
       expect {
-        collection.user_tag_list = user_tag_list
+        collection.update(user_tag_list: user_tag_list)
       }.to change(UserTag, :count).by(3)
     end
 
@@ -59,7 +59,7 @@ describe UserTaggable, type: :concern do
 
       it 'removes users not included' do
         expect(UserTag.exists?(user_tag.id)).to be true
-        collection.user_tag_list = user_tag_list
+        collection.update(user_tag_list: user_tag_list)
         expect(UserTag.exists?(user_tag.id)).to be false
         expect(collection.reload.user_tag_list).to eq(user_tag_list)
       end

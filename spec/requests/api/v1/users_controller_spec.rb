@@ -16,6 +16,7 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
     context 'with user who has an organization' do
       let(:organization) { user.current_organization }
       let!(:org_users) { create_list(:user, 3, add_to_org: organization) }
+      let!(:path) { api_v1_organization_users_path(organization) }
 
       it 'returns all users in organization' do
         get(path)

@@ -42,9 +42,8 @@ class Organization extends BaseRecord {
     }))
   }
 
-  async API_getOrganizationUserTagList() {
-    // FIXME: unimplemented
-    return await Promise.resolve([])
+  async API_getOrganizationUsers() {
+    return this.apiStore.request(`organizations/${this.id}/users`, 'GET')
   }
 
   attributesForAPI = [

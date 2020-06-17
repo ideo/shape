@@ -672,6 +672,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       .map(filter => {
         if (filter.filter_type === 'tag') {
           return `#${filter.text.replace(spaces, '-')}`
+        } else if (filter.filter_type === 'user_tag') {
+          return `@${filter.text}`
         } else {
           return filter.text
         }

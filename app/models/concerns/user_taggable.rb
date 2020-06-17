@@ -4,7 +4,7 @@ module UserTaggable
   included do
     has_many :user_tags, as: :record, dependent: :destroy
     has_many :tagged_users, through: :user_tags, source: :user
-    after_create :assign_and_remove_user_tags
+    after_save :assign_and_remove_user_tags
   end
 
   def user_tag_list
@@ -27,8 +27,7 @@ module UserTaggable
 
       @user_tag_add_user_ids = assign_user_ids - tagged_user_ids
 
-      # Assign and remove immediately, otherwise do in after_create
-      assign_and_remove_user_tags if persisted?
+      # Tags will be assigned and removed in assign_and_remove_user_tags
     end
   end
 

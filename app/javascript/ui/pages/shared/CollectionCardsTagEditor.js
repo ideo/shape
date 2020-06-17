@@ -20,7 +20,7 @@ class CollectionCardsTagEditor extends React.Component {
     this.selectedTags = this.filterSelectedTagsForRecords()
   }
 
-  filterSelectedTagsForRecords() {
+  async filterSelectedTagsForRecords() {
     const { records } = this
     const selectedRecordTags = _.flatten(
       _.intersection(_.map(records, r => toJS(r['tag_list'])))
@@ -29,12 +29,13 @@ class CollectionCardsTagEditor extends React.Component {
     // TODO: combine with user tag list once implemented
     const { apiStore } = this.props
     const { currentUserOrganization } = apiStore
-    const allUserTags = currentUserOrganization.API_getOrganizationUserTagList()
+    // This contains id, first_name, last_name, handle
+    const allUsers = await currentUserOrganization.API_getOrganizationUsers()
     const selectedRecordUserTags = _.flatten(
       _.intersection(_.map(records, r => toJS(r['user_list'])))
     )
 
-    const mappedUserTags = _.filter(allUserTags, a =>
+    const mappedUserTags = _.filter(allUsers, a =>
       selectedRecordUserTags.includes(a.handle)
     )
 

@@ -1,3 +1,6 @@
+# Note: any user of an organization can load this data for all users in the organization
+# So we don't want to expose any personal details such as email
+
 class SerializableSimpleUser < BaseJsonSerializer
   type 'users'
   attributes :first_name, :last_name, :handle

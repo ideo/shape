@@ -28,7 +28,9 @@ class CollectionFilter extends React.Component {
 
   get tagFilters() {
     const { filterBarFilters } = this.props.collection
-    return filterBarFilters.filter(filter => filter.filter_type === 'tag')
+    return filterBarFilters.filter(filter =>
+      ['tag', 'user_tag'].includes(filter.filter_type)
+    )
   }
 
   get searchFilters() {
