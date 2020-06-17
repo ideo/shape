@@ -63,6 +63,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   attributesForAPI = [
     'name',
     'tag_list',
+    'user_tag_list',
     'submission_template_id',
     'submission_box_type',
     'collection_to_test_id',

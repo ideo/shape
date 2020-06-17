@@ -42,6 +42,10 @@ class SerializableItem < BaseJsonSerializer
     @object.cached_tag_list || []
   end
 
+  attribute :user_tag_list do
+    @object.cached_user_tag_list || []
+  end
+
   attribute :chart_data do
     @object.chart_data || {}
   end

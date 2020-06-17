@@ -114,13 +114,16 @@ class User < ApplicationRecord
   has_many :activity_subjects, as: :subject
   has_many :notifications
   has_many :survey_responses
-
   has_many :user_profiles,
            class_name: 'Collection::UserProfile',
            inverse_of: :created_by,
            foreign_key: :created_by_id
   has_one :application
   has_many :test_audience_invitations, dependent: :destroy
+  has_many :network_invitations
+  has_many :user_tags, dependent: :destroy
+  has_many :tagged_collections, through: :user_tags, source: :record, source_type: 'Collection'
+  has_many :tagged_items, through: :user_tags, source: :record, source_type: 'Item'
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -128,10 +131,6 @@ class User < ApplicationRecord
   belongs_to :current_user_collection,
              class_name: 'Collection',
              optional: true
-
-  has_many :test_audience_invitations
-  has_many :network_invitations
-  has_one :tag, dependent: :destroy
 
   validates :email,
             presence: true,
@@ -145,9 +144,7 @@ class User < ApplicationRecord
   after_save :update_shape_circle_subscription, if: :saved_change_to_shape_circle_member?
   after_save :update_products_mailing_list_subscription, if: :saved_change_to_mailing_list?
   after_create :update_shape_user_list_subscription, if: :active?
-  after_create :create_tag_from_handle, if: :active?
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
-  after_update :update_tag_after_update, if: :saved_change_to_handle?
   after_update :update_profile_locale, if: :should_update_network_user_locale?
 
   delegate :balance, to: :incentive_owed_account, prefix: true
@@ -638,14 +635,6 @@ class User < ApplicationRecord
         update_products_mailing_list_subscription(subscribed: false)
       end
     end
-  end
-
-  def create_tag_from_handle
-    ActsAsTaggableOn::Tag.create(name: handle, tag_type: 'user', user: self)
-  end
-
-  def update_tag_after_update
-    tag&.update(name: handle)
   end
 
   def after_role_update(role, _method)

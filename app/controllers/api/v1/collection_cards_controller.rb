@@ -547,12 +547,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         cover_type
         submissions_enabled
         test_show_media
-        tag_list
         search_term
         num_columns
         start_date
         end_date
-      ].concat(Collection.globalize_attribute_names),
+      ].concat(Collection.globalize_attribute_names, tag_list: [], user_tag_list: []),
       item_attributes: [
         :id,
         :type,
@@ -568,7 +567,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :legend_item_id,
         :legend_search_source,
-        :tag_list,
+        tag_list: [],
+        user_tag_list: [],
         data_content: {},
         style: {},
         filestack_file_attributes: [

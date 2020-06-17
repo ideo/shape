@@ -11,10 +11,19 @@ class Api::V1::UsersController < Api::V1::BaseController
     create_limited_user
   ]
 
-  before_action :require_application_bot!, only: %i[index]
-  before_action :load_and_filter_index, only: %i[index]
   def index
-    render jsonapi: @users
+    if current_user.application_bot?
+      load_and_filter_index
+      render jsonapi: @users
+    elsif current_organization.present?
+      users = current_organization.users.order(handle: :asc).limit(10_000)
+      render jsonapi: users,
+             class: {
+               User: SerializableSimpleUser,
+             }
+    else
+      head(:unauthorized)
+    end
   end
 
   load_and_authorize_resource only: %i[show]
