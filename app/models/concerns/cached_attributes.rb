@@ -2,6 +2,8 @@ module CachedAttributes
   extend ActiveSupport::Concern
 
   def cache_attributes!(fields, touch: true)
+    # always reload cached_attributes from DB to be more threadsafe
+    reload
     # not using the store_accessor directly here because of:
     # https://github.com/rails/rails/pull/32563
     self.cached_attributes ||= {}
