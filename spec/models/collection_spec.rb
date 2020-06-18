@@ -1002,8 +1002,9 @@ describe Collection, type: :model do
         collection.cache_card_count!
         expect(collection.cached_card_count).to eq 3
         expect(collection.cached_cover).not_to be nil
-        collection.update(submission_attrs: { submission: true })
+        collection.submission_attrs = { submission: true }
         collection.cache_card_count!
+        collection.save
         expect(collection.reload.submission?).to be true
       end
     end

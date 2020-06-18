@@ -292,9 +292,9 @@ class Group < ApplicationRecord
     return unless common_resource?
 
     if method == :add
-      resource.cache_attributes!(common_viewable: true)
+      resource.cache_attribute!(:common_viewable, true)
     elsif method == :remove
-      resource.cache_attributes!(common_viewable: false)
+      resource.cache_attribute!(:common_viewable, false)
     end
   end
 
