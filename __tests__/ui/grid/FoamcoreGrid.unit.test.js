@@ -575,10 +575,10 @@ describe('FoamcoreGrid', () => {
       props.collection.isFourWideBoard = true
       rerender()
     })
-    it('should call uiStore.adjustZoomLevel to ensure zoom is correct', () => {
-      expect(props.uiStore.adjustZoomLevel).toHaveBeenCalledWith({
-        collection: props.collection,
-      })
+    it('should call uiStore.determineZoomLevels to ensure zoom is correct', () => {
+      expect(props.uiStore.determineZoomLevels).toHaveBeenCalledWith(
+        props.collection
+      )
     })
   })
 })
