@@ -117,7 +117,7 @@ class AudienceSettingsWidget extends React.Component {
     )
 
     if (sortedChallengeAudiences.length === 3) {
-      // NOTE: once challenge audiences are loaded, sort them, and then render in specific order [Reviewer, Admins, Participants]
+      // NOTE: once challenge audiences are loaded, sort them, and then render in specific order [Reviewers, Admins, Participants]
       return [
         sortedChallengeAudiences[2],
         sortedChallengeAudiences[0],

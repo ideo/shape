@@ -42,4 +42,7 @@ end
 if Audience.count.zero?
   Audience.create(name: 'Share via Link', global_default: 1, min_price_per_response: 0)
   Audience.create(name: 'All People (No Filters)', global_default: 2, min_price_per_response: 3.75)
+  %w[Admins Reviewers Participants].each do |audience_name|
+    Audience.create(name: audience_name, audience_type: :challenge)
+  end
 end

@@ -93,6 +93,9 @@ class Collection
     has_many :paid_test_audiences,
              -> { paid },
              class_name: 'TestAudience'
+    has_many :challenge_audiences,
+             -> { challenge },
+             class_name: 'TestAudience'
 
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 

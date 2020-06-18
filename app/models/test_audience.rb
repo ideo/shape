@@ -56,7 +56,8 @@ class TestAudience < ApplicationRecord
   # this will only get set in PurchaseTestAudience
   attr_writer :network_payment_method
 
-  scope :link_sharing, -> { where(price_per_response: 0) }
+  scope :challenge, -> { where(price_per_response: 0) }
+  scope :link_sharing, -> { joins(:audience).where('price_per_response = 0 AND audiences.audience_type IS NULL') }
   scope :paid, -> { where('price_per_response > 0') }
 
   enum status: {

@@ -1132,7 +1132,7 @@ class Collection < ApplicationRecord
   def submission_template_test_collections
     return [] unless master_template? && submission_box_template?
 
-    Collection.in_collection(id).test_collection.includes(:test_audiences)
+    Collection.in_collection(id).test_collection.includes(challenge_audiences: [:audience])
   end
 
   private
