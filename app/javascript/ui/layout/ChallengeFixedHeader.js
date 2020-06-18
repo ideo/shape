@@ -3,7 +3,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
-import ChallengeSettingsButton from '~/ui/global/ChallengeSettingsButton'
+import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
 import IconHolder from '~/ui/icons/IconHolder'
@@ -14,8 +14,25 @@ const ChallengeFixedHeader = ({
   collection,
   challengeNavigationHandler,
   handleShowSettings,
+  handleReviewSubmissions,
+  currentUserHasReviewableCollections,
 }) => {
   const { name, collection_type } = collection
+  let buttonProps = {}
+  if (!collection.isSubmissionBox) {
+    buttonProps = {
+      name: 'Challenge Settings',
+      onClick: handleShowSettings,
+    }
+  } else {
+    const hidden = !currentUserHasReviewableCollections
+    buttonProps = {
+      name: `Review Submissions (${collection.countSubmissionLiveTests})`,
+      color: `${v.colors.alert}`,
+      onClick: handleReviewSubmissions,
+      hidden,
+    }
+  }
   return (
     <MaxWidthContainer>
       {/* Show subheader if a parent collection is a challenge */}
@@ -55,7 +72,7 @@ const ChallengeFixedHeader = ({
           align="center"
           style={{ marginLeft: '8px', marginRight: '30px' }}
         >
-          <ChallengeSettingsButton handleShowSettings={handleShowSettings} />
+          <TopRightChallengeButton {...buttonProps} />
         </Box>
       </Flex>
     </MaxWidthContainer>
@@ -63,13 +80,16 @@ const ChallengeFixedHeader = ({
 }
 
 ChallengeFixedHeader.propTypes = {
+  currentUser: MobxPropTypes.objectOrObservableObject.isRequired,
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   handleShowSettings: PropTypes.func.isRequired,
-  challengeNavigationHandler: PropTypes.func,
+  handleReviewSubmissions: PropTypes.func.isRequired,
+  challengeNavigationHandler: PropTypes.func.isRequired,
+  currentUserHasReviewableCollections: PropTypes.bool,
 }
 
 ChallengeFixedHeader.defaultProps = {
-  challengeNavigationHandler: () => {},
+  currentUserHasReviewableCollections: false,
 }
 
 export default ChallengeFixedHeader

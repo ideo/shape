@@ -9,6 +9,7 @@ class SerializableCollection < BaseJsonSerializer
     :updated_at,
     :master_template,
     :template_id,
+    :parent_challenge,
     :submission_box_type,
     :submission_box_id,
     :submission_template_id,
@@ -138,14 +139,6 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
-  attribute :challenge_name do
-    @object.parent_challenge&.name
-  end
-
-  attribute :challenge_id do
-    @object.parent_challenge&.id
-  end
-
   attribute :is_subtemplate_or_instance do
     @object.subtemplate? || @object.subtemplate_instance?
   end
@@ -200,6 +193,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :is_restorable do
     @object.try(:restorable?)
+  end
+
+  has_many :submission_template_test_collections, if: -> { @object.submission_box_template? } do
+    @object.try(:submission_template_test_collections)
   end
 
   has_one :restorable_parent do

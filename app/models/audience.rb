@@ -3,6 +3,7 @@
 # Table name: audiences
 #
 #  id                     :bigint(8)        not null, primary key
+#  audience_type          :integer
 #  criteria               :string
 #  global_default         :integer
 #  min_price_per_response :decimal(10, 2)   default(0.0)
@@ -26,6 +27,10 @@ class Audience < ApplicationRecord
     interests
     publications
   ].freeze
+
+  enum audience_type: {
+    challenge: 0,
+  }, _prefix: true
 
   acts_as_taggable_on(DEMOGRAPHIC_TAGS)
 

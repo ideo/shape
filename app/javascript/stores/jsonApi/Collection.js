@@ -448,6 +448,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       : 0
   }
 
+  get countSubmissionLiveTests() {
+    if (this.countSubmissions === 0) return 0
+
+    const { submissions_collection } = this
+    const liveTests = _.filter(submissions_collection.collection_cards, cc => {
+      return cc.record.isLiveTest
+    })
+
+    return liveTests ? liveTests.length : 0
+  }
+
   get isTemplate() {
     // returns true for master and subtemplates
     return this.master_template
@@ -904,7 +915,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   async challengeForCollection() {
     // If this is the parent challenge collection, return
-    if (this.challenge_id === this.id) {
+    if (this.challenge === this) {
       return this
     } else {
       // Otherwise we need to load the challenge colleciton
@@ -1136,11 +1147,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isInsideAChallenge() {
-    return !!this.challenge_id
+    return !!this.parent_challenge
   }
 
   get isChallengeOrInsideChallenge() {
     return this.collection_type === 'challenge' || this.isInsideAChallenge
+  }
+
+  get challenge() {
+    if (this.collection_type === 'challenge') return this
+    return this.parent_challenge
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order

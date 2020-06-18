@@ -12,7 +12,7 @@ import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
 import googleTagManager from '~/vendor/googleTagManager'
 import queryString from 'query-string'
 
-import { fakeRole } from '#/mocks/data'
+import { fakeRole, fakeCollection } from '#/mocks/data'
 jest.mock('../../../app/javascript/vendor/googleTagManager')
 
 let collectionCard_1, collectionCard_2, collectionCard_3
@@ -770,9 +770,33 @@ describe('Collection', () => {
   })
 
   describe('isInsideAChallenge', () => {
-    it('returns true when a parent collection id is present', () => {
-      collection.challenge_id = 999
+    it('returns true when a challenge is present', () => {
+      collection.parent_challenge = fakeCollection
       expect(collection.isInsideAChallenge).toEqual(true)
+    })
+  })
+
+  describe('countSubmissions', () => {
+    it('returns the count of submission live tests', () => {
+      collection.type = 'Collection::SubmissionBox'
+      collection.submissions_collection = fakeCollection
+      expect(collection.countSubmissions).toEqual(
+        collection.submissions_collection.collection_cards.length
+      )
+    })
+  })
+
+  describe('countSubmissionLiveTests', () => {
+    it('returns the count of submission live tests', () => {
+      collection.type = 'Collection::SubmissionBox'
+      fakeCollection.collection_cards.map(cc => {
+        cc.record.isLiveTest = true
+      })
+      collection.submissions_collection = fakeCollection
+
+      expect(collection.countSubmissionLiveTests).toEqual(
+        collection.submissions_collection.collection_cards.length
+      )
     })
   })
 })
