@@ -19,8 +19,6 @@ Feature: Pinning and Unpinning
 
   Scenario: Creating unpinned cards will enable moving cards in the instance
     Given I login and visit the Test Area
-
-    And I navigate to the collection named "Cypress Test Area" via the breadcrumb
     And I click the 'CollectionCoverFormButton'
     And I choose to place the template instance elsewhere from the template helper modal
     And I place a card to the bottom using the snackbar
