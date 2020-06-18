@@ -77,6 +77,7 @@ class ChallengeRelevantPhaseCollections < SimpleService
     all_collection_ids = Collection.in_collection(@collection.id).pluck(:id) + [@collection.id]
 
     @phase_collections = Collection.collection_type_phase
+                                   .active
                                    .joins(:parent_collection_cards)
                                    .merge(
                                      CollectionCard.visible.where(parent_id: all_collection_ids),

@@ -160,6 +160,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def submission_box_sub_collections
     collections = @collection.all_child_collections
+                             .active
                              .where(type: 'Collection::SubmissionBox')
                              .includes(:submission_template)
                              .select do |collection|
@@ -172,6 +173,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def phase_sub_collections
     collections = @collection.all_child_collections
+                             .active
                              .collection_type_phase
                              .select do |collection|
                                collection.can_view?(current_user)
