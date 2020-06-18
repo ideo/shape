@@ -136,10 +136,13 @@ class Routes extends React.Component {
   handleWindowResize = ({ windowWidth }) => {
     // NOTE: Routes should only interact with uiStore for global re-rendering changes like this
     const { uiStore } = this.props
+    const { viewingCollection } = uiStore
     uiStore.updateColumnsToFit(windowWidth)
     uiStore.updateActivityLogWidth(windowWidth)
     uiStore.update('windowWidth', windowWidth)
-    uiStore.determineZoomLevels()
+    if (viewingCollection && viewingCollection.isBoard) {
+      uiStore.determineZoomLevels(viewingCollection)
+    }
   }
 
   handleMouseDownSelection = e => {

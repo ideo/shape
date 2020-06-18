@@ -259,6 +259,7 @@ export default class UiStore {
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
   collaboratorColors = new Map()
+  @observable
   zoomLevels = []
 
   get routingStore() {
@@ -1369,39 +1370,56 @@ export default class UiStore {
     collection.lastZoom = this.zoomLevel
   }
 
-  determineZoomLevels(collection = this.viewingCollection) {
+  @action
+  determineZoomLevels(collection) {
     const { windowWidth } = this
     const maxCols = this.maxCols(collection)
     const pageMargins = this.pageMargins(collection)
-    const maxGridWidth = this.maxGridWidth({ pageMargins, maxCols })
+    const marginLeft = pageMargins.left
 
     let possibleCols = [1, 2, 4, 6, 8, 16]
-    const widthPerCol = maxGridWidth / maxCols
-    possibleCols = _.filter(possibleCols, i => {
-      return i <= maxCols && widthPerCol * i >= windowWidth
+    possibleCols = _.filter(possibleCols, col => {
+      return (
+        col <= maxCols &&
+        this.maxGridWidth({ marginLeft, maxCols: col }) >= windowWidth
+      )
     })
 
-    this.zoomLevels = _.map(possibleCols, col => {
-      return {
-        col,
-        relativeZoomLevel: (widthPerCol * col) / windowWidth,
+    const zoomLevels = _.map(possibleCols, col => ({
+      col,
+      relativeZoomLevel:
+        this.maxGridWidth({ marginLeft, maxCols: col }) / windowWidth,
+    }))
+
+    if (zoomLevels.length > 0) {
+      const firstZoom = zoomLevels[0]
+      if (
+        (firstZoom.col === 1 && firstZoom.relativeZoomLevel - 1 < 0.05) ||
+        (firstZoom.col > 1 && firstZoom.relativeZoomLevel - 1 < 0.25)
+      ) {
+        // adjust this to just be fully zoomed
+        zoomLevels[0].relativeZoomLevel = 1
       }
-    })
-
-    if (this.zoomLevels[0].relativeZoomLevel > 1) {
-      this.zoomLevels.unshift({
+    }
+    if (zoomLevels.length === 0 || zoomLevels[0].relativeZoomLevel > 1) {
+      zoomLevels.unshift({
         relativeZoomLevel: 1,
       })
     }
+    this.zoomLevels.replace(zoomLevels)
   }
 
   get relativeZoomLevel() {
+    if (this.zoomLevels.length < this.zoomLevel) {
+      // e.g. when first initializing the page, before determineZoomLevels
+      return 1
+    }
     // zoomLevels start at 1, so we subtract to get the array idx
     const zoom = this.zoomLevels[this.zoomLevel - 1]
     return zoom ? zoom.relativeZoomLevel : 1
   }
 
-  pageMargins(collection = this.viewingCollection) {
+  pageMargins(collection) {
     return {
       ...calculatePageMargins({
         fullWidth: collection.isFourWideBoard,
@@ -1410,7 +1428,7 @@ export default class UiStore {
     }
   }
 
-  maxCols(collection = this.viewingCollection) {
+  maxCols(collection) {
     // NOTE: if we ever allow >16, this still limits max zoom level to show only 16
     const max = this.isTouchDevice && this.isMobile ? MAX_COLS_MOBILE : MAX_COLS
     return _.min([collection.num_columns, max])
@@ -1418,11 +1436,15 @@ export default class UiStore {
 
   // This returns the grid with (in pixels) for showing the full width of cards;
   // for mobile this gets bumped down and may not include all 16 columns (only 8 for large board)
-  maxGridWidth({ pageMargins, maxCols }) {
-    const { gridW, gutter } = this.gridSettings
-    const gridWidth =
-      (gridW + gutter) * maxCols + pageMargins.left * 2 * this.zoomLevel
-    // only show zoom if the grid is wider than our window
+  maxGridWidth({ marginLeft, maxCols }) {
+    // always use full gridSettings for foamcore
+    const { windowWidth } = this
+    const { gridW, gutter } = v.defaultGridSettings
+    let gridWidth = (gridW + gutter) * maxCols + marginLeft
+
+    const zoomLevelEstimate = gridWidth / windowWidth
+    // we have to adjust since the margins and the scale of zoom will both factor into the actual width
+    gridWidth += marginLeft * _.max([0, zoomLevelEstimate - 1])
     return gridWidth
   }
 }

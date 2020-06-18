@@ -200,7 +200,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
 
     uiStore.update('selectedAreaEnabled', true)
-    uiStore.determineZoomLevels()
+    uiStore.determineZoomLevels(collection)
     uiStore.adjustZoomLevel({ collection })
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
@@ -211,7 +211,7 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
     this.updateSelectedArea()
     if (collection.id !== prevProps.collection.id) {
-      uiStore.determineZoomLevels()
+      uiStore.determineZoomLevels(collection)
       uiStore.adjustZoomLevel({ collection })
     }
 
