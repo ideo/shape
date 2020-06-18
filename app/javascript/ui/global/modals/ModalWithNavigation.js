@@ -5,6 +5,7 @@ import { Heading3 } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import styled from 'styled-components'
 import v from '~/utils/variables'
+import InlineLoader from '~/ui/layout/InlineLoader'
 
 const NavigationContainer = styled.div`
   display: flex;
@@ -41,26 +42,31 @@ class ModalWithNavigation extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state.currentPage = props.contents[0]
+    this.state.currentPage = props.contents[0].name
   }
 
   isActive(element) {
-    return this.state.currentPage.name === element.name
+    return this.state.currentPage === element.name
   }
 
-  handleNavClick = page => {
-    this.setState({ currentPage: page })
+  handleNavClick = pageName => {
+    this.setState({ currentPage: pageName })
+  }
+
+  get currentContents() {
+    const { contents } = this.props
+    const { currentPage } = this.state
+    return contents.find(page => page.name === currentPage)
   }
 
   render() {
-    const { title, contents, open, onClose } = this.props
-    const { currentPage } = this.state
+    const { title, contents, open, onClose, showLoader } = this.props
     return (
       <Modal title={title} open={open} onClose={onClose}>
         <NavigationContainer>
           {contents.map(element => (
             <NavElement
-              onClick={() => this.handleNavClick(element)}
+              onClick={() => this.handleNavClick(element.name)}
               isActive={this.isActive(element)}
               key={element.name}
             >
@@ -68,7 +74,8 @@ class ModalWithNavigation extends React.Component {
             </NavElement>
           ))}
         </NavigationContainer>
-        {currentPage.component}
+        {showLoader && <InlineLoader />}
+        {this.currentContents.component}
       </Modal>
     )
   }
@@ -92,8 +99,14 @@ ModalWithNavigation.propTypes = {
   open: PropTypes.bool,
   /** The close handler for when user closes the modal with the close button */
   onClose: PropTypes.func,
+  /** Pass true if you want to show loading indicator **/
+  showLoader: PropTypes.bool,
 }
 
-ModalWithNavigation.defaultProps = {}
+ModalWithNavigation.defaultProps = {
+  open: false,
+  onClose: () => null,
+  showLoader: false,
+}
 
 export default ModalWithNavigation

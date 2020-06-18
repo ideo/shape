@@ -30,7 +30,8 @@ class EditSubmissionBoxFormat extends React.Component {
 
   confirmSubmissionTemplateChange = ({ type, template } = {}, callback) => {
     const { uiStore, collection } = this.props
-    if (!collection.countSubmissions) callback()
+    if (!collection.countSubmissions || collection.countSubmissions === 0)
+      callback()
 
     uiStore.confirm({
       iconName: 'Alert',

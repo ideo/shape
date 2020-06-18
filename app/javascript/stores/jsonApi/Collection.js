@@ -59,6 +59,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   carouselIdx = 0
   // this stores the "virtual" search results collection
   searchResultsCollection = null
+  @observable
+  phaseSubCollections = []
 
   attributesForAPI = [
     'name',
@@ -129,6 +131,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.snoozedEditWarningsAt = Date.now()
     }
     this.uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+  }
+
+  @action
+  setPhaseSubCollections(value) {
+    this.phaseSubCollections = value
+    return this.phaseSubCollections
   }
 
   @action
@@ -871,20 +879,62 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  API_fetchChallengeSubmissionBoxCollections() {
-    const apiPath = `collections/${this.id}/challenge_submission_boxes`
+  API_fetchBreadcrumbRecords() {
+    const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
     return this.apiStore.request(apiPath)
   }
 
+  // This is to fetch the phases that are displayed in the header for a challenge
   API_fetchChallengePhaseCollections() {
     const apiPath = `collections/${this.id}/challenge_phase_collections`
     return this.apiStore.request(apiPath)
   }
 
-  API_fetchBreadcrumbRecords() {
-    const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
+  // Fetch all children submission boxes of this collection
+  API_fetchSubmissionBoxSubCollections() {
+    const apiPath = `collections/${this.id}/submission_box_sub_collections`
     return this.apiStore.request(apiPath)
   }
+
+  // Fetch all children phase collections of this collection
+  API_fetchPhaseSubCollections() {
+    const apiPath = `collections/${this.id}/phase_sub_collections`
+    return this.apiStore.request(apiPath)
+  }
+
+  async challengeForCollection() {
+    // If this is the parent challenge collection, return
+    if (this.challenge_id === this.id) {
+      return this
+    } else {
+      // Otherwise we need to load the challenge colleciton
+      const res = await this.apiStore.request(
+        `collections/${this.challenge_id}`
+      )
+      return res.data
+    }
+  }
+
+  async loadPhaseSubCollections() {
+    const request = await this.API_fetchPhaseSubCollections()
+    return this.setPhaseSubCollections(request.data)
+  }
+
+  async createChildPhaseCollection(name) {
+    const attrs = {
+      collection_attributes: {
+        name,
+        collection_type: 'phase',
+      },
+      parent_id: this.id,
+    }
+    const card = new CollectionCard(attrs, this.apiStore)
+    card.parent = this
+    // TODO: add error handling
+    const savedCard = await card.API_create()
+    return savedCard.record
+  }
+
   /*
   Perform batch updates on multiple cards at once,
   and captures current cards state to undo to
@@ -1369,6 +1419,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       .find(cc => cc.is_cover === true)
     if (!previousCover) return
     previousCover.is_cover = false
+  }
+
+  // Load phase collections for given submission box collections
+  static async loadPhasesForSubmissionBoxes(submissionBoxes) {
+    // Filter out any that don't have a submission template (can't assign phases)
+    // Or any that have phase sub-collections already loaded
+    const subBoxesWithTemplates = submissionBoxes.filter(
+      subBox =>
+        !!subBox.submission_template && subBox.phaseSubCollections.length === 0
+    )
+    // Get phase collections for each submission box's template
+    const loadPhases = subBoxesWithTemplates.map(subBox => {
+      return new Promise(resolve => {
+        resolve(subBox.submission_template.loadPhaseSubCollections())
+      }).then(phaseSubCollections => {
+        // Set phase collections directly on each submission box
+        subBox.setPhaseSubCollections(phaseSubCollections)
+      })
+    })
+    await Promise.all(loadPhases)
+    return submissionBoxes
   }
 
   static async fetchSubmissionsCollection(id, { order } = {}) {

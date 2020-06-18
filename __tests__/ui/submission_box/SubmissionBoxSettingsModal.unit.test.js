@@ -1,16 +1,18 @@
 import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSettingsModal'
 
 import { fakeCollection } from '#/mocks/data'
-import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
-jest.mock('../../../app/javascript/stores')
-
-let props, wrapper, rerender, uiStore, closeModal
+let props, wrapper, rerender, apiStore, closeModal
 describe('SubmissionBoxSettingsModal', () => {
   beforeEach(() => {
-    uiStore = fakeUiStore
+    apiStore = fakeApiStore()
     props = {
-      collection: fakeCollection,
+      collection: {
+        ...fakeCollection,
+        apiStore,
+        uiStore: apiStore.uiStore,
+      },
     }
     rerender = () => {
       wrapper = shallow(<SubmissionBoxSettingsModal {...props} />)
@@ -33,13 +35,13 @@ describe('SubmissionBoxSettingsModal', () => {
   describe('no submission format', () => {
     beforeEach(() => {
       props.collection.submissionFormat = null
-      uiStore.confirm.mockReset()
+      apiStore.uiStore.confirm.mockReset()
       rerender()
     })
 
     it('confirms if user does not choose format', () => {
       closeModal()
-      expect(uiStore.confirm).toHaveBeenCalledWith(
+      expect(apiStore.uiStore.confirm).toHaveBeenCalledWith(
         expect.objectContaining({
           prompt:
             'Closing the submission settings without choosing a submission format will delete this submission box.',
@@ -51,18 +53,18 @@ describe('SubmissionBoxSettingsModal', () => {
   describe('user chose format', () => {
     beforeEach(() => {
       props.collection.submissionFormat = 'item'
-      uiStore.confirm.mockReset()
+      apiStore.uiStore.confirm.mockReset()
       rerender()
     })
 
     it('does not confirm', () => {
       closeModal()
-      expect(uiStore.confirm).not.toHaveBeenCalled()
+      expect(apiStore.uiStore.confirm).not.toHaveBeenCalled()
     })
 
     it('closes dialog', () => {
       closeModal()
-      expect(uiStore.closeDialog).toHaveBeenCalled()
+      expect(apiStore.uiStore.closeDialog).toHaveBeenCalled()
     })
   })
 })

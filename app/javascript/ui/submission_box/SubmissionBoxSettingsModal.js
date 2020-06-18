@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { uiStore, routingStore, apiStore } from '~/stores'
 import { Heading2 } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import v from '~/utils/variables'
@@ -12,6 +11,8 @@ const StyledTitleContent = styled.div`
 `
 
 const closeSubmissionBoxSettings = collection => {
+  const { uiStore, apiStore } = collection
+  const { routingStore } = apiStore
   if (collection.submissionFormat) {
     uiStore.update('submissionBoxSettingsOpen', false)
     uiStore.closeDialog()
@@ -45,7 +46,7 @@ const SubmissionBoxSettingsModal = ({ collection }) => {
     <Modal
       title={
         <StyledTitleContent>
-          <Heading2>Submission Box Settings</Heading2>
+          <Heading2 data-cy="modal-title">Submission Box Settings</Heading2>
         </StyledTitleContent>
       }
       onClose={() => closeSubmissionBoxSettings(collection)}

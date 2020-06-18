@@ -476,6 +476,7 @@ export const fakeCollection = {
   API_fetchCardOrders: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchChallengePhaseCollections: jest.fn().mockReturnValue(Promise.resolve({})),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
+  createSubmission: jest.fn(),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
@@ -487,12 +488,31 @@ export const fakeCollection = {
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',
+  phaseSubCollections: [],
+  loadPhaseSubCollections: jest.fn().mockReturnValue(Promise.resolve([])),
+  setPhaseSubCollections: jest.fn(),
   meta: {
     snapshot: {
       can_edit: false,
     },
   },
   ...fakeJsonApiAttrs,
+}
+fakeCollection.loadPhasesForSubmissionBoxes = submissionBoxes => {
+  submissionBoxes.map(submissionBox => {
+    // Append phase subcollections
+    if (submissionBox.submission_template) {
+      submissionBox.phaseSubCollections = [
+        {
+          ...fakeCollection,
+          id: '4560202',
+          name: 'Phase Collection',
+        },
+      ]
+    }
+  })
+  // Immediately resolve promise for the test
+  return Promise.resolve(submissionBoxes)
 }
 // also set parentCollection on fakeCard
 // TODO: fix circular reference!
@@ -687,4 +707,25 @@ export const fakeCollaborator = {
   can_edit_collection: false,
   timestamp: '2020-04-30 11:34:50 -0700',
   color: 'Blue'
+}
+
+export const fakeSubmissionBoxWithTemplate = {
+  ...fakeCollection,
+  name: 'Submission Box with Template',
+  submission_template_id: 123,
+  submission_template: {
+    ...fakeCollection,
+    name: 'Submission Box Template'
+  },
+  submission_box_type: null,
+  submissionFormat: 'template'
+}
+
+export const fakeSubmissionBoxWithoutTemplate = {
+  ...fakeCollection,
+  name: 'Submission Box without Template',
+  submission_box_type: 'text',
+  submission_template_id: null,
+  submission_template: null,
+  submissionFormat: 'item'
 }
