@@ -319,11 +319,11 @@ describe('GridCard', () => {
 
   describe('with private card', () => {
     beforeEach(() => {
-      props.card.private_card = true
+      props.card.isPrivate = true
       rerender()
     })
     afterEach(() => {
-      props.card.private_card = false
+      props.card.isPrivate = false
     })
 
     it('only shows the GridCardPrivate with HiddenIcon', () => {

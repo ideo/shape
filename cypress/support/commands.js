@@ -94,53 +94,57 @@ Cypress.Commands.add(
   }
 )
 
-Cypress.Commands.add('createCard', cardType => {
-  switch (cardType) {
-    case 'textItem':
-      cy.selectBctType({ type: 'text', order: 'first' })
-      cy.wait('@apiCreateCollectionCard')
-      cy.get('.ql-editor')
-        .first()
-        .type('Testing')
-      cy.wait(300)
-      cy.locate('TextItemClose')
-        .first()
-        .click({ force: true })
-      cy.wait(50)
-      break
-    case 'data':
-      cy.selectPopoutTemplateBctType({
-        type: 'report',
-        order: 'first',
-        empty: true,
-      })
-      break
-    case 'submissionBox':
-      cy.selectPopoutTemplateBctType({
-        type: 'submissionBox',
-        order: 'first',
-        empty: false,
-      })
-      break
-    case 'template':
-      cy.selectPopoutTemplateBctType({
-        type: 'template',
-        order: 'first',
-        empty: false,
-      })
-      break
-    case 'searchCollection':
-      cy.selectPopoutTemplateBctType({
-        type: 'searchCollection',
-        order: 'first',
-        empty: false,
-      })
-      break
-    default:
-      cy.selectBctType({ type: cardType })
-      break
+Cypress.Commands.add(
+  'createCard',
+  (cardType, { content = 'Testing', row, col } = {}) => {
+    switch (cardType) {
+      case 'textItem':
+        cy.selectBctType({ type: 'text', order: 'first', row, col })
+        cy.wait('@apiCreateCollectionCard')
+        cy.wait(150)
+        cy.get('.ql-editor')
+          .first()
+          .type(content)
+        cy.wait(300)
+        cy.locate('TextItemClose')
+          .first()
+          .click({ force: true })
+        cy.wait(50)
+        break
+      case 'data':
+        cy.selectPopoutTemplateBctType({
+          type: 'report',
+          order: 'first',
+          empty: true,
+        })
+        break
+      case 'submissionBox':
+        cy.selectPopoutTemplateBctType({
+          type: 'submissionBox',
+          order: 'first',
+          empty: false,
+        })
+        break
+      case 'template':
+        cy.selectPopoutTemplateBctType({
+          type: 'template',
+          order: 'first',
+          empty: false,
+        })
+        break
+      case 'searchCollection':
+        cy.selectPopoutTemplateBctType({
+          type: 'searchCollection',
+          order: 'first',
+          empty: false,
+        })
+        break
+      default:
+        cy.selectBctType({ type: cardType })
+        break
+    }
   }
-})
+)
 
 Cypress.Commands.add('createTextItem', () => {
   cy.selectBctType({ type: 'text' })
@@ -199,9 +203,13 @@ Cypress.Commands.add('undo', () => {
 
 Cypress.Commands.add(
   'selectBctType',
-  ({ type, empty = false, order = 'last' }) => {
+  ({ type, empty = false, order = 'last', row = null, col = null }) => {
     if (!empty) {
-      cy.locateDataOrClass('.StyledHotspot')
+      let className = '.StyledHotspot'
+      if (row !== null && col !== null) {
+        className += `-${row}:${col}`
+      }
+      cy.locateDataOrClass(className)
         [order]()
         .click({ force: true })
     }

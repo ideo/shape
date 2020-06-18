@@ -123,9 +123,8 @@ class CollectionPage extends React.Component {
       collection.clearCollectionCards()
     }
     if (reloading) {
-      runInAction(() => {
-        collection.storedCacheKey = null
-      })
+      // make sure to get refetch the latest collection info as well
+      await collection.refetch()
     }
     return collection.API_fetchCards(params).then(() => {
       if (collection.id !== this.props.collection.id) {

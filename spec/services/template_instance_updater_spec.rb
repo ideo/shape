@@ -1,6 +1,8 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 RSpec.describe TemplateInstanceUpdater, type: :service do
+  include_context 'CollectionUpdateBroadcaster setup'
   let(:template_admin) { create(:user) }
   let(:user) { create(:user) }
   let(:template_instance_updater) {
@@ -54,6 +56,7 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
           synchronous: :first_level,
         )
       end
+
       it 'should update all pinned cards to match any height, width and order updates' do
         # Update master cards height, width and order
         first_template_card = template.collection_cards.find_by_id(updated_card_ids[0])
@@ -84,6 +87,20 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
         expect(template_instance.collection_cards[1].templated_from_id).to eq(
           first_template_card.id,
         )
+      end
+
+      it 'should not broadcast updates unless there are realtime viewers present' do
+        expect(CollectionUpdateBroadcaster).not_to receive(:new).with(template_instance)
+        template_instance_updater.call
+      end
+
+      context 'with realtime viewers' do
+        it 'should call CollectionUpdateBroadcaster on templated_collections' do
+          template_instance.started_viewing(user)
+          expect(CollectionUpdateBroadcaster).to receive(:new).with(template_instance)
+          expect(broadcaster_instance).to receive(:reload_cards)
+          template_instance_updater.call
+        end
       end
 
       context 'with updated text card from master template' do
@@ -198,6 +215,48 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
             source_type: 'Item',
           ).count,
         ).to eq(1)
+      end
+    end
+
+    context 'with a foamcore board' do
+      let!(:template) {
+        create(:board_collection,
+               master_template: true,
+               num_columns: 4,
+               num_cards: 3,
+               pin_cards: true,
+               created_by: template_admin,
+               add_editors: [template_admin])
+      }
+      let!(:template_instance) do
+        create(:board_collection,
+               num_columns: 4,
+               template: template,
+               created_by: user,
+               organization: organization)
+      end
+
+      context 'with only pinned cards' do
+        it 'does not call CollectionGrid::BoardPlacement' do
+          expect(CollectionGrid::BoardPlacement).not_to receive(:call)
+          template_instance_updater.call
+        end
+      end
+
+      context 'with unpinned cards' do
+        let!(:unpinned_master_card) do
+          create(:collection_card_text, parent: template, row: 2, col: 0, pinned: false)
+        end
+
+        it 'calls CollectionGrid::BoardPlacement to reposition unpinned cards' do
+          expect(CollectionGrid::BoardPlacement).to receive(:call).with(
+            to_collection: template_instance,
+            moving_cards: template_instance.collection_cards.where(pinned: false),
+            row: unpinned_master_card.row,
+            col: unpinned_master_card.col,
+          )
+          template_instance_updater.call
+        end
       end
     end
 

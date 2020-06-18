@@ -32,7 +32,9 @@ RSpec.describe RowInserter, type: :service do
   it 'inserts a row below the row passed in' do
     inserter.call
     cards.reload
+    # should not move
     expect(cards[1].row).to eq 1
+    # should move down
     expect(cards[3].row).to eq 3
     expect(cards[5].row).to eq 4
   end
@@ -60,6 +62,21 @@ RSpec.describe RowInserter, type: :service do
       cards.reload
       expect(cards[3].row).to eq 2
       expect(cards[5].row).to eq 3
+    end
+  end
+
+  context 'with a master template' do
+    before do
+      collection.update(master_template: true)
+    end
+
+    it 'calls UpdateTemplateInstancesWorker with the moved cards' do
+      expect(UpdateTemplateInstancesWorker).to receive(:perform_async).with(
+        collection.id,
+        [cards[3], cards[4], cards[5]].map(&:id),
+        :update_card_attributes,
+      )
+      inserter.call
     end
   end
 end

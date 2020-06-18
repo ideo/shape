@@ -39,6 +39,14 @@ describe('CollectionCreator', () => {
   })
 
   describe('createCollection', () => {
+    it('does not call createCard if state.inputText is blank', () => {
+      component.state = {
+        inputText: '',
+      }
+      component.createCollection(e)
+      expect(props.createCard).not.toHaveBeenCalled()
+    })
+
     it('calls createCard with input name', () => {
       component.state = {
         inputText: 'New Projects',
@@ -209,9 +217,25 @@ describe('CollectionCreator', () => {
         rerender()
       })
 
-      it('creates a template collection', () => {
+      it('creates a 4WFC template collection', () => {
+        component.state = {
+          inputText: 'My New Template',
+        }
         component.createCollection(e)
         expect(component.shouldCreateAsSubTemplate).toBeTruthy()
+        expect(props.createCard).toHaveBeenCalledWith(
+          {
+            collection_attributes: {
+              name: component.state.inputText,
+              master_template: true,
+              type: 'Collection::Board',
+              num_columns: 4,
+            },
+          },
+          {
+            afterCreate: component.afterCreate,
+          }
+        )
       })
     })
 
