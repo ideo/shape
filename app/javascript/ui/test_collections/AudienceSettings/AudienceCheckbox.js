@@ -53,7 +53,7 @@ const AudienceCheckbox = ({
           labelPlacement={'end'}
           control={
             <Checkbox
-              data-cy={`audienceCheckbox-${_.kebabCase(name)}`}
+              data-cy={`audienceCheckbox-${_.kebabCase(audienceName)}`}
               id={`audienceCheckbox-${id}`}
               checked={selected}
               onChange={onToggleCheckbox}
