@@ -46,6 +46,7 @@ class SelectionCircle extends React.Component {
       <StyledSelectionCircle
         className={this.isSelected ? 'selected' : 'show-on-hover'}
         onClick={this.toggleSelected}
+        data-cy="SelectionCircle"
         role="button"
       />
     )

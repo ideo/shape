@@ -74,12 +74,7 @@ const captureGlobalKeypress = e => {
       if (noCardsSelected) {
         return false
       }
-      card = apiStore.find('collection_cards', selectedCardIds[0])
-      if (card) {
-        // TODO: investigate... shouldn't need to reselect on move, but
-        // what if you select pinned cards? API will reject the move... ?
-        card.reselectOnlyMovableCards(selectedCardIds)
-      }
+      uiStore.reselectOnlyMovableCards(selectedCardIds)
       viewingCollection.confirmEdit({
         onConfirm: () => {
           uiStore.openMoveMenu({

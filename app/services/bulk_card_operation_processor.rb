@@ -49,6 +49,7 @@ class BulkCardOperationProcessor < SimpleService
 
     # bump cards out of the way as needed
     @placeholder.move_to_order(order)
+    true
   end
 
   def placeholder_message

@@ -25,6 +25,13 @@ When('I create a {word} card', itemType => {
   cy.createCard(itemType)
 })
 
+When(
+  'I create a textItem card at {int},{int} on the board with {string}',
+  (row, col, content) => {
+    cy.createCard('textItem', { content, row, col })
+  }
+)
+
 When('I add a link URL {string} and wait for {string}', (url, request) => {
   cy.locate('BctTextField').type(url, {
     force: true,
@@ -448,6 +455,19 @@ When('I click the {word} action for the index {int} card', (action, pos) => {
     .click({ force: true })
   cy.wait(100)
 })
+
+When(
+  'I click the {word} action for the card at {int},{int}',
+  (action, row, col) => {
+    const value = `PopoutMenu_${_.camelCase(action)}`
+    cy.get(
+      `[data-cy="GridCard"][data-row="${row}"][data-col="${col}"] [data-cy="${value}"]`
+    )
+      .first()
+      .click({ force: true })
+    cy.wait(100)
+  }
+)
 
 When('I click the {string} on the index {int} card', (action, pos) => {
   cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="${action}"]`)

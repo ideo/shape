@@ -148,6 +148,18 @@ RSpec.describe DefaultCollectionCover, type: :service do
       end
     end
 
+    context 'with a foamcore board' do
+      let!(:collection) { create(:board_collection, num_cards: 3) }
+      let!(:text_item) do
+        create(:collection_card_text, row: 0, col: 0, order: 99, parent: collection)
+      end
+
+      it 'gets the first text item by row/col, not order' do
+        expect(collection_cover['text']).to eq text_item.item.plain_content
+        expect(collection_cover['card_ids']).to include text_item.id
+      end
+    end
+
     context 'with a video but no image' do
       let!(:collection) { create(:collection) }
       let!(:text_item) { create(:collection_card_text, parent: collection) }

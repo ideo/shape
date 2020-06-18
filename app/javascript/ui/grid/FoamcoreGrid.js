@@ -88,9 +88,8 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   }
 
   ${props =>
-    props.type === 'unrendered'
-      ? ''
-      : `&:hover {
+    props.type !== 'unrendered' &&
+    `&:hover {
     background-color: ${v.colors.primaryLight} !important;
 
     .plus-icon {
@@ -1289,6 +1288,8 @@ class FoamcoreGrid extends React.Component {
         /* Why is this rendering on top of a collection? */
         blocked={this.hasDragCollision && isDrag}
         data-blank-type={type}
+        // this is to make it work the same as CollectionGrid BCT for cypress
+        className={`StyledHotspot-${row}:${col}-BCT`}
         data-empty-space-click
         draggedOn
       >

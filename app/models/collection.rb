@@ -608,6 +608,9 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
+    # no need to do this for boards
+    return if board_collection?
+
     CollectionCard.import(
       calculate_reordered_cards,
       validate: false,
@@ -1029,6 +1032,7 @@ class Collection < ApplicationRecord
 
   def should_pin_cards?(placement)
     return false unless master_template?
+    return false if board_collection?
 
     has_pinned_cards = collection_cards.pinned.any?
 
