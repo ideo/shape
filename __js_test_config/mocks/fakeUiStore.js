@@ -127,10 +127,16 @@ const fakeUiStore = {
   adjustZoomLevel: jest.fn(),
   zoomIn: jest.fn(),
   zoomOut: jest.fn(),
-  clearTextEditingItem: jest.fn(),
+  determineZoomLevels: jest.fn(),
+  maxCols: jest.fn(),
+  maxGridWidth: jest.fn().mockReturnValue(1384),
+  pageMargins: jest.fn().mockReturnValue({ left: 100, top: 50 }),
+  relativeZoomLevel: 2,
+  zoomLevels: [],
   isSelected: jest.fn(),
   toggleSelectedCardId: jest.fn(),
   openContextMenu: jest.fn(),
+  clearTextEditingItem: jest.fn(),
 }
 
 export default fakeUiStore

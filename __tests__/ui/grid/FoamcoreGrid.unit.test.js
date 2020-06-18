@@ -16,9 +16,6 @@ CollectionCard.mockImplementation((data, apiStore) => {
 let props, wrapper, component, rerender, cards, cardA, cardB, cardC
 let idCounter = 0
 
-// NOTE: jest window.innerWidth is 1024px
-const jestInnerWidth = 1024
-
 function createCard(data) {
   idCounter += 1
   const id = idCounter.toString()
@@ -550,55 +547,6 @@ describe('FoamcoreGrid', () => {
     })
   })
 
-  describe('maxCols', () => {
-    describe('on touchDevice', () => {
-      beforeEach(() => {
-        props.collection.num_columns = 16
-        props.uiStore.isTouchDevice = true
-        props.uiStore.isMobile = true
-        rerender()
-      })
-      it('should return the minimum of num_columns and 8', () => {
-        expect(component.maxCols).toEqual(8)
-      })
-    })
-    describe('on desktop', () => {
-      beforeEach(() => {
-        props.collection.num_columns = 4
-        props.uiStore.isTouchDevice = false
-        props.uiStore.isMobile = false
-        rerender()
-      })
-      it('should return the minimum of num_columns and 16', () => {
-        expect(component.maxCols).toEqual(4)
-      })
-    })
-  })
-
-  describe('relativeZoomLevel', () => {
-    beforeEach(() => {
-      props.collection.num_columns = 16
-      props.collection.maxZoom = 3
-      props.uiStore.zoomLevel = 3
-      rerender()
-    })
-    describe('when zoomed all the way out', () => {
-      it('should return the ratio that shows the entire grid by default', () => {
-        const maxGridWidth = 5472
-        expect(component.maxGridWidth({ zoomLevel: 3 })).toEqual(maxGridWidth)
-        expect(component.relativeZoomLevel).toEqual(
-          maxGridWidth / jestInnerWidth
-        )
-      })
-    })
-    describe('when zoomed in', () => {
-      it('should return the zoomLevel', () => {
-        props.uiStore.zoomLevel = 2
-        expect(component.relativeZoomLevel).toEqual(2)
-      })
-    })
-  })
-
   describe('handleZoomIn/Out', () => {
     it('should call the respective uiStore function', () => {
       const { uiStore } = props
@@ -613,13 +561,10 @@ describe('FoamcoreGrid', () => {
     beforeEach(() => {
       props.collection.num_columns = 4
       props.collection.isFourWideBoard = true
+      props.uiStore.zoomLevels = [4, 8]
       rerender()
     })
-    it('should return true if the innerWidth < maxGridWidth at zoomLevel 1', () => {
-      const maxGridWidth = 1384
-      expect(component.maxGridWidth({ zoomLevel: 1 })).toEqual(maxGridWidth)
-      expect(maxGridWidth > jestInnerWidth).toEqual(true)
-      // 1384 > 1024 so this will be true
+    it('should return true if there is more than one zoomLevel', () => {
       expect(component.showZoomControls).toEqual(true)
     })
   })
