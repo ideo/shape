@@ -4,6 +4,8 @@ module CachedAttributes
   def cache_attribute!(field, value, touch: true)
     # update locally
     send("#{field}=", value)
+    # while also clearing ActiveModel::Dirty
+    clear_changes_information
     # slightly convoluted way of writing a jsonb_set update on self (#update won't work here).
     # updates just the one sub-field without overwriting all of cached_attributes
     self.class.where(id: id).limit(1).update_all(%(
