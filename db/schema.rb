@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(version: 2020_06_16_222835) do
     t.datetime "updated_at", null: false
     t.decimal "min_price_per_response", precision: 10, scale: 2, default: "0.0"
     t.integer "global_default"
+    t.integer "audience_type"
     t.index ["global_default"], name: "index_audiences_on_global_default"
   end
 

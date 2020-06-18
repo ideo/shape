@@ -11,6 +11,18 @@ class Api::V1::TestAudiencesController < Api::V1::BaseController
     end
   end
 
+  def toggle_status
+    updater = TestAudienceStatusUpdater.new(
+      test_audience: @test_audience,
+      status: json_api_params[:status],
+    )
+
+    updater.call
+
+    @test_audience.reload
+    render_test_audience
+  end
+
   private
 
   def render_test_audience

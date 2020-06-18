@@ -14,6 +14,7 @@ describe('EditableName', () => {
         uiStore: fakeUiStore,
         fieldName: 'name',
         TypographyComponent: Heading2,
+        onDoneEditing: jest.fn(),
       }
       wrapper = shallow(<EditableName.wrappedComponent {...props} />)
     })
@@ -51,10 +52,12 @@ describe('EditableName', () => {
     })
 
     it('saves and returns to read-only name when enter is pressed in input', () => {
+      expect(props.onDoneEditing).not.toHaveBeenCalled()
       wrapper.find('AutosizeInput').simulate('keyPress', {
         key: 'Enter',
       })
       expect(props.uiStore.editingName).toEqual([])
+      expect(props.onDoneEditing).toHaveBeenCalled()
     })
 
     describe('with placeholder prop and empty name string', () => {

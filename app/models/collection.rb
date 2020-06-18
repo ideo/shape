@@ -241,6 +241,7 @@ class Collection < ApplicationRecord
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
   scope :searchable, -> { where.not(type: unsearchable_types).or(not_custom_type) }
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(not_custom_type) }
+  scope :test_collection, -> { where(type: 'Collection::TestCollection') }
   scope :master_template, -> { where(master_template: true) }
 
   accepts_nested_attributes_for :collection_cards
@@ -1118,6 +1119,11 @@ class Collection < ApplicationRecord
   def create_challenge_groups_and_assign_roles
     return if challenge_admin_group.present? && challenge_reviewer_group.present? && challenge_participant_group.present?
 
+    # collections that become a challenge gets their roles unanchored
+    if roles_anchor_collection_id.present?
+      unanchor_and_inherit_roles_from_anchor!
+    end
+
     admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
     reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
     participant_group = create_challenge_participant_group(name: "#{name} Participants", organization: organization)
@@ -1125,10 +1131,18 @@ class Collection < ApplicationRecord
     self.challenge_admin_group_id = admin_group.id
     self.challenge_reviewer_group_id = reviewer_group.id
     self.challenge_participant_group_id = participant_group.id
+    # NOTE: somehow unachoring changes collection_type back to 'collection', so re-set it to 'challenge'
+    self.collection_type = 'challenge'
 
     admin_group.add_role(Role::EDITOR, self)
     reviewer_group.add_role(Role::VIEWER, self)
     participant_group.add_role(Role::VIEWER, self)
+  end
+
+  def submission_template_test_collections
+    return [] unless master_template? && submission_box_template?
+
+    Collection.in_collection(id).test_collection.includes(challenge_audiences: [:audience])
   end
 
   private

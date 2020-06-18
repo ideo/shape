@@ -156,6 +156,22 @@ describe Collection, type: :model do
       end
     end
 
+    describe '#submission_template_test_collections' do
+      let(:organization) { create(:organization) }
+      let!(:submission_box) { create(:submission_box) }
+      let!(:template) { create(:collection, master_template: true, parent_collection: submission_box) }
+      let!(:test_collection) { create(:test_collection, parent_collection: template) }
+
+      before do
+        submission_box.update(submission_template_id: template.id)
+        submission_box.reload
+      end
+
+      it 'should submission template test collections with test_audiences' do
+        expect(template.submission_template_test_collections).to include(test_collection)
+      end
+    end
+
     describe '#rename_challenge_groups' do
       let(:admin_group) { create(:group, name: 'Collection Admins') }
       let(:reviewer_group) { create(:group, name: 'Collection Reviewers') }

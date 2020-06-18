@@ -93,6 +93,9 @@ class Collection
     has_many :paid_test_audiences,
              -> { paid },
              class_name: 'TestAudience'
+    has_many :challenge_audiences,
+             -> { challenge },
+             class_name: 'TestAudience'
 
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
@@ -102,6 +105,7 @@ class Collection
     after_create :add_test_tag
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
+    after_create :setup_challenge_test_audiences, unless: :collection_to_test
     after_update :touch_test_results_collection, if: :saved_change_to_test_status?
     after_update :update_ideas_collection, if: :saved_change_to_test_show_media?
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
@@ -338,6 +342,16 @@ class Collection
         # Prefix with 'Copy' if it isn't still within a template
         duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
+
+      if submission_box_template_test? && parent_challenge.present?
+        # copy challenge audiences from submission box template test
+        test_audiences.each do |test_audience|
+          next if test_audience.audience_type != 'challenge'
+
+          test_audience.duplicate!(assign_test_collection: duplicate)
+        end
+      end
+
       duplicate.save
       duplicate.reorder_cards!
       duplicate
@@ -459,6 +473,20 @@ class Collection
         audience_id: audience.id,
         status: :closed,
       )
+    end
+
+    def setup_challenge_test_audiences
+      return unless master_template.present? && parent_challenge.present?
+
+      challenge_audiences = Audience.where(audience_type: 'challenge')
+
+      challenge_audiences.each do |audience|
+        status = audience.name == 'Reviewers' ? :open : :closed
+        test_audiences.find_or_create_by(
+          audience_id: audience.id,
+          status: status,
+        )
+      end
     end
 
     def add_test_tag

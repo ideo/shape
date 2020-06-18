@@ -54,16 +54,18 @@ class EditableName extends React.Component {
   }
 
   componentDidMount() {
-    const { name } = this.props
+    const { name, editing } = this.props
     this.setName(name)
+    if (editing) this.startEditingName()
   }
 
   // navigating between collections may trigger this instead of didMount
   componentDidUpdate(prevProps) {
-    const { name } = this.props
+    const { name, editing } = this.props
     if (name !== prevProps.name) {
       this.setName(name)
     }
+    if (editing && !prevProps.editing) this.startEditingName()
   }
 
   @action
@@ -90,7 +92,7 @@ class EditableName extends React.Component {
 
   @action
   startEditingName = e => {
-    e.stopPropagation()
+    e && e.stopPropagation()
     const { fieldName, uiStore } = this.props
     if (uiStore.editingName.includes(fieldName)) return
     uiStore.editingName.push(fieldName)
@@ -105,8 +107,9 @@ class EditableName extends React.Component {
   stopEditingName = () => {
     // Ensure that save is called if user presses enter
     this.saveName.flush()
-    const { fieldName, uiStore } = this.props
+    const { fieldName, uiStore, onDoneEditing } = this.props
     uiStore.editingName.remove(fieldName)
+    onDoneEditing && onDoneEditing()
   }
 
   _saveName = () => {
@@ -144,7 +147,7 @@ class EditableName extends React.Component {
   render() {
     const {
       canEdit,
-      fontSize,
+      editFontSize,
       uiStore,
       TypographyComponent,
       typographyCss,
@@ -158,7 +161,7 @@ class EditableName extends React.Component {
         <StyledEditableName
           typographyCss={typographyCss}
           className="styled-name"
-          fontSize={fontSize}
+          fontSize={editFontSize}
           editingMarginTop={editingMarginTop}
         >
           <AutosizeInput
@@ -168,7 +171,7 @@ class EditableName extends React.Component {
             placeholder={placeholder}
             maxLength={v.maxTitleLength}
             className="input__name"
-            style={{ fontSize }}
+            style={{ fontSize: editFontSize }}
             value={this.name}
             onChange={this.onNameChange}
             onKeyPress={this.onNameFieldKeypress}
@@ -199,17 +202,32 @@ class EditableName extends React.Component {
 }
 
 EditableName.propTypes = {
+  /** The name string to be edited */
   name: PropTypes.string.isRequired,
+  /** The function that will be called, that can handle persisting the name change */
   updateNameHandler: PropTypes.func.isRequired,
+  /** If true, allows user to click to edit the name */
   canEdit: PropTypes.bool,
-  fontSize: PropTypes.number,
+  /** Adds extra margin when calculating truncation of the name while displaying */
   extraWidth: PropTypes.number,
+  /** Font size for the input that is shown when editing */
+  editFontSize: PropTypes.number,
+  /** The component that displays the name when uneditable */
   TypographyComponent: PropTypes.object,
+  /** Custom css that is used for styling the input text */
   typographyCss: PropTypes.array,
+  /** The key that is used in the uiStore.editingName array to mark this field as currently editing */
   fieldName: PropTypes.string,
+  /** Margin added to the top of the input while editing */
   editingMarginTop: PropTypes.string,
+  /** Placeholder text to show if user clears out input */
   placeholder: PropTypes.string,
+  /** Whether to use display: inline for the uneditable name */
   inline: PropTypes.bool,
+  /** Function called when editing has completed (user presses enter or blurs the input) */
+  onDoneEditing: PropTypes.func,
+  /** If true, starts in editing mode */
+  editing: PropTypes.bool,
 }
 
 EditableName.wrappedComponent.propTypes = {
@@ -218,7 +236,7 @@ EditableName.wrappedComponent.propTypes = {
 
 EditableName.defaultProps = {
   canEdit: false,
-  fontSize: 2.25,
+  editFontSize: 2.25,
   extraWidth: 0,
   editingMarginTop: '0.5rem',
   TypographyComponent: Heading1,
@@ -226,6 +244,8 @@ EditableName.defaultProps = {
   fieldName: 'name',
   placeholder: '',
   inline: false,
+  onDoneEditing: () => null,
+  editing: false,
 }
 
 EditableName.displayName = 'EditableName'

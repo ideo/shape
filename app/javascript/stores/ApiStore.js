@@ -175,6 +175,11 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.currentUserOrganization.slug
   }
 
+  @computed
+  get audiences() {
+    return this.findAll('audiences')
+  }
+
   findOrganizationById(id) {
     return _.first(this.currentUser.organizations.filter(org => org.id === id))
   }

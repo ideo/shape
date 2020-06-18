@@ -122,6 +122,10 @@ class Header extends React.Component {
     uiStore.update('challengeSettingsOpen', open)
   }
 
+  handleReviewSubmissions = () => {
+    // FIXME: to be implemented in an upcoming story
+  }
+
   get onArchivedPage() {
     const { record } = this
     const { routingStore } = this.props
@@ -274,11 +278,41 @@ class Header extends React.Component {
     )
   }
 
+  renderChallengeFixedHeader() {
+    const { uiStore, routingStore, apiStore } = this.props
+    const { record } = this
+    const { shouldRenderFixedHeader } = uiStore
+    const { currentUser } = apiStore
+    const { reviewable_collections } = currentUser
+
+    return (
+      record &&
+      record.isChallengeOrInsideChallenge &&
+      shouldRenderFixedHeader && (
+        <ChallengeFixedHeader
+          collection={record}
+          showSettingsModal={uiStore.challengeSettingsOpen}
+          handleShowSettings={() =>
+            this.handleOpenChallengeSettings({ open: true })
+          }
+          handleReviewSubmissions={() => {
+            this.handleReviewSubmissions()
+          }}
+          challengeNavigationHandler={() => {
+            routingStore.routeTo('collections', record.challenge.id)
+          }}
+          currentUserHasReviewableCollections={
+            !_.isEmpty(reviewable_collections)
+          }
+        />
+      )
+    )
+  }
+
   render() {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
     const { currentUser, currentUserOrganization } = apiStore
-    const { shouldRenderFixedHeader } = uiStore
 
     if (!currentUser) {
       // user is not logged in, or:
@@ -425,20 +459,7 @@ class Header extends React.Component {
               onClose={() => this.handleOpenChallengeSettings({ open: false })}
             />
           )}
-          {record &&
-            record.isChallengeOrInsideChallenge &&
-            shouldRenderFixedHeader && (
-              <ChallengeFixedHeader
-                collection={record}
-                showSettingsModal={uiStore.challengeSettingsOpen}
-                handleShowSettings={() =>
-                  this.handleOpenChallengeSettings({ open: true })
-                }
-                challengeNavigationHandler={() => {
-                  routingStore.routeTo('collections', record.challenge_id)
-                }}
-              />
-            )}
+          {this.renderChallengeFixedHeader()}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>

@@ -248,6 +248,28 @@ class CollectionCover extends React.Component {
     )
   }
 
+  get reviewSubmissionButton() {
+    const { inSubmissionsCollection, collection, isReviewable } = this.props
+    if (!inSubmissionsCollection || !collection.isLiveTest || !isReviewable) {
+      return null
+    }
+
+    return (
+      <Button
+        style={{ marginLeft: '3.2rem' }}
+        className="cancelGridClick"
+        colorScheme={`${v.colors.alert}`}
+        size="sm"
+        width={172}
+        onClick={() => {
+          // FIXME: to be implemented in an upcoming story
+        }}
+      >
+        Review
+      </Button>
+    )
+  }
+
   get hasUseTemplateButton() {
     const { collection } = this.props
     return collection.isUsableTemplate
@@ -438,6 +460,7 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
+                  {this.reviewSubmissionButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (
@@ -469,6 +492,7 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
+  isReviewable: PropTypes.bool,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -481,6 +505,7 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
+  isReviewable: false,
 }
 
 CollectionCover.displayName = 'CollectionCover'
