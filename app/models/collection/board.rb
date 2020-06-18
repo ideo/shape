@@ -76,6 +76,13 @@ class Collection
              foreign_key: :parent_id,
              inverse_of: :parent
 
+    # also re-declared here to make use of new scope defined above
+    has_many :items_and_linked_items,
+             through: :collection_cards,
+             source: :item
+
+    before_create :set_as_foamcore
+
     def max_col_limit
       num_columns - 1
     end
@@ -86,6 +93,12 @@ class Collection
 
     def max_col_index
       collection_cards.maximum(:col) || 0
+    end
+
+    private
+
+    def set_as_foamcore
+      self.collection_type = :foamcore
     end
   end
 end

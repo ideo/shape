@@ -15,7 +15,7 @@
 #
 
 class CollectionFilter < ApplicationRecord
-  belongs_to :collection
+  belongs_to :collection, touch: true
   has_many :user_collection_filters,
            dependent: :destroy
 

@@ -18,6 +18,7 @@ import CollectionCoverTitle, {
   IconHolder,
 } from '~/ui/grid/covers/CollectionCoverTitle'
 import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 
 const LaunchButton = styled(Button)`
   font-size: 0.9rem;
@@ -36,7 +37,7 @@ const CardButtonWrapper = styled.div`
 `
 CardButtonWrapper.displayName = 'CardButtonWrapper'
 
-const StyledCollectionCover = styled.div`
+export const StyledCollectionCover = styled.div`
   width: 100%;
   height: 100%;
   background: ${props => props.backgroundColor};
@@ -352,12 +353,15 @@ class CollectionCover extends React.Component {
     } = this.props
     const { subtitle } = collection
     const { gridW, gutter } = uiStore.gridSettings
+    // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collectionIcon =
       collection.collection_type !== 'collection' &&
+      collection.collection_type !== 'foamcore' &&
       collectionTypeToIcon({
         type: collection.collection_type,
         size: 'lg',
       })
+
     return (
       <StyledCollectionCover
         data-cy="CollectionCover"
@@ -416,8 +420,14 @@ class CollectionCover extends React.Component {
                           useTextBackground={this.useTextBackground}
                         />
                       </PlainLink>
+                      {/* Swap for collection type selector */}
                       {collectionIcon && (
-                        <IconHolder>{collectionIcon}</IconHolder>
+                        <CollectionTypeSelector
+                          location={'CollectionCover'}
+                          collection={collection}
+                        >
+                          <IconHolder>{collectionIcon}</IconHolder>
+                        </CollectionTypeSelector>
                       )}
                     </Dotdotdot>
                     {this.button}

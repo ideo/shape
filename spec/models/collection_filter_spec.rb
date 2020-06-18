@@ -1,6 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe CollectionFilter, type: :model do
+  context 'associations' do
+    it { should belong_to(:collection).touch(true) }
+    it { should have_many(:user_collection_filters).dependent(:destroy) }
+  end
+
   describe '#duplicate!' do
     let!(:collection_filter) { create(:collection_filter) }
     let(:collection) { collection_filter.collection }

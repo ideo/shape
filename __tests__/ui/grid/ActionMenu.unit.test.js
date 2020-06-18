@@ -37,10 +37,10 @@ describe('ActionMenu', () => {
       actions = _.without(allActions, 'Replace')
       props.card.isPinnedAndLocked = false
       props.card.record.can_edit = true
-      props.card.reselectOnlyMovableCards = jest.fn()
-      props.card.reselectOnlyEditableRecords = jest.fn()
       wrapper = shallow(<ActionMenu.wrappedComponent {...props} canEdit />)
       component = wrapper.instance()
+      props.uiStore.reselectOnlyMovableCards.mockClear()
+      props.uiStore.reselectOnlyEditableRecords.mockClear()
       props.uiStore.selectCardId.mockClear()
       props.uiStore.openMoveMenu.mockClear()
     })
@@ -76,7 +76,7 @@ describe('ActionMenu', () => {
     describe('assuming confirmEdit warning disabled', () => {
       it('calls selectCardId, reselectOnlyMovableCards and openMoveMenu on move action', () => {
         component.openMoveMenu('move')
-        expect(props.card.reselectOnlyMovableCards).toHaveBeenCalled()
+        expect(props.uiStore.reselectOnlyMovableCards).toHaveBeenCalled()
         expect(props.uiStore.selectCardId).toHaveBeenCalledWith(card.id)
         expect(props.uiStore.openMoveMenu).toHaveBeenCalledWith({
           from: props.uiStore.viewingCollection,
@@ -105,7 +105,7 @@ describe('ActionMenu', () => {
 
     it('calls reselectOnlyEditableRecords on showTags action', () => {
       component.showTags()
-      expect(props.card.reselectOnlyEditableRecords).toHaveBeenCalled()
+      expect(props.uiStore.reselectOnlyEditableRecords).toHaveBeenCalled()
       expect(props.uiStore.update).toHaveBeenCalledWith(
         'tagsModalOpenId',
         props.card.id

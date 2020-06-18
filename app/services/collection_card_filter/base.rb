@@ -64,9 +64,51 @@ module CollectionCardFilter
     end
 
     def initialize_cards
-      if @ids_only
+      # ensure per_page is between 50 and 200
+      per_page = [@filters[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
+      per_page = [per_page, 200].min
+
+      if @ids_only || @select_ids.present?
         # start with all_collection_cards to unscope the order, and `active` will be applied below
         @cards = @collection.all_collection_cards.not_placeholder
+        if @select_ids.present?
+          cards_scope = @cards.where(id: @select_ids)
+          if @collection.is_a?(Collection::SearchCollection)
+            cards_scope = CollectionCard.where(id: @select_ids)
+          end
+          @cards = CollectionCardFilter::ForUser.call(
+            cards_scope: cards_scope,
+            user: @user,
+          )
+        end
+      elsif @filters[:q].present?
+        where_clause = {
+          archived: false,
+          _or: [
+            {
+              _type: 'item',
+              _id: @collection.items_and_linked_items.pluck(:id),
+            },
+            {
+              _type: 'collection',
+              _id: @collection.collections_and_linked_collections.pluck(:id),
+            },
+          ],
+        }
+        results = Search.new(
+          index_name: [Item, Collection],
+          where: where_clause,
+          per_page: per_page,
+          page: @filters[:page],
+        ).search(@filters[:q])
+        item_ids = results.results.select(&:item?).map(&:id)
+        collection_ids = results.results.select(&:collection?).map(&:id)
+        cc = CollectionCard.arel_table
+        @cards = @collection.collection_cards.where(
+          cc[:collection_id].in(collection_ids).or(
+            cc[:item_id].in(item_ids),
+          ),
+        )
       elsif @collection.is_a?(Collection::Board)
         # Defaults to 16x16 since we default to a fully zoomed-out view
         rows = @filters[:rows].is_a?(Array) ? @filters[:rows] : [0, 16]
@@ -79,43 +121,10 @@ module CollectionCardFilter
           cols: cols,
         )
       else
-        # ensure per_page is between 50 and 200
-        per_page = [@filters[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
-        per_page = [per_page, 200].min
-        if @filters[:q].present?
-          where_clause = {
-            archived: false,
-            _or: [
-              {
-                _type: 'item',
-                _id: @collection.items_and_linked_items.map(&:id),
-              },
-              {
-                _type: 'collection',
-                _id: @collection.collections_and_linked_collections.map(&:id),
-              },
-            ],
-          }
-          results = Search.new(
-            index_name: [Item, Collection],
-            where: where_clause,
-            per_page: per_page,
-            page: @filters[:page],
-          ).search(@filters[:q])
-          item_ids = results.results.select(&:item?).map(&:id)
-          collection_ids = results.results.select(&:collection?).map(&:id)
-          cc = CollectionCard.arel_table
-          @cards = @collection.collection_cards.where(
-            cc[:collection_id].in(collection_ids).or(
-              cc[:item_id].in(item_ids),
-            ),
-          )
-        else
-          @cards = @collection.collection_cards_by_page(
-            page: @filters[:page],
-            per_page: per_page,
-          )
-        end
+        @cards = @collection.collection_cards_by_page(
+          page: @filters[:page],
+          per_page: per_page,
+        )
       end
 
       if @collection.archived? && @collection.archive_batch.present?
@@ -126,10 +135,6 @@ module CollectionCardFilter
         ).or(@cards.active)
       else
         @cards = @cards.active
-      end
-
-      if @select_ids.present?
-        @cards = @cards.where(id: @select_ids)
       end
 
       return @cards if @ids_only

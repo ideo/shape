@@ -11,6 +11,7 @@ describe JsonapiCache::CollectionCardRenderer, type: :concern do
     json[:included].select { |r| r[:id] == related[:id] && r[:type] == related[:type] }.first
   end
   let(:search_records) { nil }
+  let(:include_roles) { nil }
 
   subject do
     JsonapiCache::CollectionCardRenderer.new(
@@ -18,6 +19,7 @@ describe JsonapiCache::CollectionCardRenderer, type: :concern do
       user: user,
       collection: collection,
       search_records: search_records,
+      include_roles: include_roles,
     )
   end
 
@@ -183,6 +185,46 @@ describe JsonapiCache::CollectionCardRenderer, type: :concern do
           }.to change(card, :cache_key)
           json = subject.render_cached_card(card)
           expect(json[:data][:attributes][:class_type]).to eq 'CollectionCard::Primary'
+        end
+      end
+
+      context 'with include_roles = true' do
+        let(:include_roles) { true }
+
+        it 'includes the record roles' do
+          expect(related_json[:relationships][:roles][:data].first[:id]).to eq(
+            collection.roles.first.id.to_s,
+          )
+        end
+
+        it 'uses a different cache_key' do
+          subject.render_cached_card(card)
+          # should not be stored in the default cache_key
+          expect(cache.exist?(card.cache_key)).to be false
+          roles_cache_key = "#{card.cache_key}--roles"
+          expect(cache.exist?(roles_cache_key)).to be true
+        end
+
+        context 'with a common_viewable collection, viewing on a different org' do
+          before do
+            collection.update(common_viewable: true)
+          end
+
+          it 'should not return the roles' do
+            expect(user.current_organization_id).not_to eq(collection.organization_id)
+            expect(related_json[:relationships][:roles][:data]).to be_empty
+          end
+        end
+
+        context 'with a common_viewable collection, same org' do
+          before do
+            collection.update(common_viewable: true, organization_id: user.current_organization_id)
+          end
+
+          it 'should not return the roles' do
+            expect(user.current_organization_id).to eq(collection.organization_id)
+            expect(related_json[:relationships][:roles][:data]).not_to be_empty
+          end
         end
       end
     end

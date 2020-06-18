@@ -1,4 +1,5 @@
 import { runInAction } from 'mobx'
+import fakeApiStore from '#/mocks/fakeApiStore'
 import UiStore from '~/stores/UiStore'
 
 let uiStore
@@ -109,6 +110,42 @@ describe('UiStore', () => {
       expect(uiStore.movingIntoCollection).toEqual(null)
       expect(uiStore.movingFromCollectionId).toEqual(null)
       expect(uiStore.draggingFromMDL).toEqual(false)
+    })
+  })
+
+  describe('reselectOnlyEditableRecords', () => {
+    beforeEach(() => {
+      uiStore.apiStore = fakeApiStore()
+      uiStore.apiStore.findAll = jest
+        .fn()
+        .mockReturnValue([
+          { id: '10', link: false, record: { can_edit: false } },
+          { id: '11', link: true, record: { can_edit: false } },
+          { id: '12', link: false, record: { can_edit: true } },
+        ])
+    })
+
+    it('rejects non-links where the record is not editable', () => {
+      uiStore.reselectOnlyEditableRecords(['10', '11', '12'])
+      expect(uiStore.selectedCardIds).toEqual(['11', '12'])
+    })
+  })
+
+  describe('reselectOnlyMovableCards', () => {
+    beforeEach(() => {
+      uiStore.apiStore = fakeApiStore()
+      uiStore.apiStore.findAll = jest
+        .fn()
+        .mockReturnValue([
+          { id: '10', canMove: true },
+          { id: '11', canMove: false },
+          { id: '12', canMove: true },
+        ])
+    })
+
+    it('rejects non-links where the record is not editable', () => {
+      uiStore.reselectOnlyMovableCards(['10', '11', '12'])
+      expect(uiStore.selectedCardIds).toEqual(['10', '12'])
     })
   })
 

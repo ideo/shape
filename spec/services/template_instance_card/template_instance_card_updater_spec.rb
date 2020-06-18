@@ -15,7 +15,7 @@ RSpec.describe TemplateInstanceCard::TemplateInstanceCardUpdater, type: :service
       }
 
       it 'should call copy_card_attributes' do
-        expect(instance_card).to receive(:copy_card_attributes!).with(
+        expect(instance_card).to receive(:copy_master_card_attributes!).with(
           master_card,
         )
         service.call

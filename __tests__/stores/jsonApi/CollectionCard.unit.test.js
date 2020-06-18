@@ -119,40 +119,4 @@ describe('CollectionCard', () => {
       })
     })
   })
-
-  describe('reselectOnlyEditableRecords', () => {
-    beforeEach(() => {
-      apiStore.findAll = jest
-        .fn()
-        .mockReturnValue([
-          { id: '10', link: false, record: { can_edit: false } },
-          { id: '11', link: true, record: { can_edit: false } },
-          { id: '12', link: false, record: { can_edit: true } },
-        ])
-      collectionCard = new CollectionCard(collectionCardAttributes, apiStore)
-    })
-
-    it('rejects non-links where the record is not editable', () => {
-      collectionCard.reselectOnlyEditableRecords(['10', '11', '12'])
-      expect(uiStore.reselectCardIds).toHaveBeenCalledWith(['11', '12'])
-    })
-  })
-
-  describe('reselectOnlyMovableCards', () => {
-    beforeEach(() => {
-      apiStore.findAll = jest
-        .fn()
-        .mockReturnValue([
-          { id: '10', canMove: true },
-          { id: '11', canMove: false },
-          { id: '12', canMove: true },
-        ])
-      collectionCard = new CollectionCard(collectionCardAttributes, apiStore)
-    })
-
-    it('rejects cards that are not movable', () => {
-      collectionCard.reselectOnlyMovableCards(['10', '11', '12'])
-      expect(uiStore.reselectCardIds).toHaveBeenCalledWith(['10', '12'])
-    })
-  })
 })

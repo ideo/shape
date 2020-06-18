@@ -300,13 +300,8 @@ module Resourceable
   end
 
   def mark_as_private!(value = true)
-    # slightly convoluted way of writing a jsonb_set update on self (#update won't work here)
     settings = { 'private': value, 'updated_at': Time.current }
-    self.class.where(id: id).update_all(%(
-      cached_attributes = jsonb_set(
-        cached_attributes, '{cached_inheritance}', '#{settings.to_json}'::jsonb
-      )
-    ))
+    cache_attribute!(:cached_inheritance, settings)
     # mark update_at and bust cache
     touch if value
     # make sure to set this in memory as well (saves having to do a `reload`)

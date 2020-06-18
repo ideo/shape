@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
 import pluralize from 'pluralize'
+import { Flex } from 'reflexbox'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
@@ -11,6 +12,8 @@ import ChannelManager from '~/utils/ChannelManager'
 import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionList from '~/ui/grid/CollectionList'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import FloatingActionButton from '~/ui/global/FloatingActionButton'
 import Loader from '~/ui/layout/Loader'
@@ -123,9 +126,8 @@ class CollectionPage extends React.Component {
       collection.clearCollectionCards()
     }
     if (reloading) {
-      runInAction(() => {
-        collection.storedCacheKey = null
-      })
+      // make sure to get refetch the latest collection info as well
+      await collection.refetch()
     }
     return collection.API_fetchCards(params).then(() => {
       if (collection.id !== this.props.collection.id) {
@@ -431,33 +433,47 @@ class CollectionPage extends React.Component {
       return this.loader()
     }
 
+    const genericCollectionProps = {
+      collection: submissions_collection,
+      loadCollectionCards: this.loadSubmissionsCollectionCards,
+      trackCollectionUpdated: this.trackCollectionUpdated,
+      canEditCollection: false,
+      // Pass in cardProperties so grid will re-render when they change
+      cardProperties: submissions_collection.cardProperties,
+      // Pass in BCT state so grid will re-render when open/closed
+      blankContentToolState,
+      // to trigger a re-render
+      movingCardIds: [],
+    }
+
     return (
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
-        <CollectionFilter
-          collection={submissions_collection}
-          canEdit={collection.can_edit_content}
-          sortable
-        />
-        <CollectionGrid
-          {...gridSettings}
-          loadCollectionCards={this.loadSubmissionsCollectionCards}
-          trackCollectionUpdated={this.trackCollectionUpdated}
-          collection={submissions_collection}
-          canEditCollection={false}
-          // Pass in cardProperties so grid will re-render when they change
-          cardProperties={submissions_collection.cardProperties}
-          // Pass in BCT state so grid will re-render when open/closed
-          blankContentToolState={blankContentToolState}
-          submissionSettings={{
-            type: submission_box_type,
-            template: submission_template,
-            enabled: submissions_enabled,
-          }}
-          movingCardIds={[]}
-          sorting
-        />
-        {submissions_enabled && (
+        <Flex ml="auto" justify="flex-end">
+          <div style={{ display: 'inline-block', marginTop: '4px' }}>
+            <CollectionViewToggle collection={submissions_collection} />
+          </div>
+          <CollectionFilter
+            collection={submissions_collection}
+            canEdit={collection.can_edit_content}
+            sortable
+          />
+        </Flex>
+        {submissions_collection.viewMode === 'list' ? (
+          <CollectionList collection={submissions_collection} />
+        ) : (
+          <CollectionGrid
+            {...gridSettings}
+            {...genericCollectionProps}
+            submissionSettings={{
+              type: submission_box_type,
+              template: submission_template,
+              enabled: submissions_enabled,
+            }}
+            sorting
+          />
+        )}
+        {submissions_enabled && submissions_collection.viewMode !== 'list' && (
           <FloatingActionButton
             toolTip={`Add ${submissionTypeName}`}
             onClick={this.onAddSubmission}
@@ -547,7 +563,12 @@ class CollectionPage extends React.Component {
       !apiStore.currentUserOrganization && collection.common_viewable
 
     let inner
-    if (collection.isBoard) {
+    if (collection.isSearchCollection) {
+      // do this first because SearchCollection + list viewMode is slightly different
+      inner = this.renderSearchCollection()
+    } else if (collection.viewMode === 'list') {
+      inner = <CollectionList collection={collection} />
+    } else if (collection.isBoard) {
       inner = (
         <FoamcoreGrid
           {...genericCollectionProps}
@@ -558,8 +579,6 @@ class CollectionPage extends React.Component {
       )
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
-    } else if (collection.isSearchCollection) {
-      inner = this.renderSearchCollection()
     } else {
       inner = (
         <CollectionGrid
@@ -587,7 +606,11 @@ class CollectionPage extends React.Component {
             <ArchivedBanner />
             <OverdueBanner />
             <PageContainer
-              fullWidth={collection.isBoard && !collection.isFourWideBoard}
+              fullWidth={
+                collection.isBoard &&
+                !collection.isFourWideBoard &&
+                collection.viewMode !== 'list'
+              }
             >
               {this.renderEditorPill}
               {inner}

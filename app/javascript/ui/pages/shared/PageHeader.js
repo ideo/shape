@@ -27,6 +27,7 @@ import v from '~/utils/variables'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 
@@ -90,6 +91,11 @@ const StyledButtonIconWrapper = styled.span`
 `
 
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
+
+const CollectionPillHolder = styled.div`
+  margin-bottom: 8px;
+  width: 100%;
+`
 
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
@@ -164,7 +170,6 @@ class PageHeader extends React.Component {
       record.isProfileCollection,
       record.isSubmissionBox,
       record.launchableTestId,
-      record.isBoard,
     ]
 
     if (_.some(rightConditions, bool => bool)) {
@@ -457,6 +462,13 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
+    const showFilters =
+      !uiStore.isMobileXs &&
+      (record.isRegularCollection ||
+        record.isSubmissionsCollection ||
+        // FoamcoreGrid displays its own fixed CollectionViewToggle
+        (record.isBoard && record.viewMode === 'list'))
+
     return (
       <StyledHeader
         pageHeader
@@ -465,7 +477,7 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          <div style={{ minHeight: '72px' }}>
+          <div style={{ minHeight: '72px', display: 'flex' }}>
             <StyledTitleAndRoles
               data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -523,10 +535,20 @@ class PageHeader extends React.Component {
                 </Flex>
               )}
             </StyledTitleAndRoles>
-            {(record.isRegularCollection || record.isSubmissionsCollection) && (
-              <CollectionFilter collection={record} canEdit={this.canEdit} />
+            {showFilters && (
+              <div style={{ marginBottom: '-16px', display: 'flex' }}>
+                <CollectionViewToggle collection={record} />
+                {/* CollectionFilter will be enabled for Board in the follow-up story */}
+                {!record.isBoard && (
+                  <CollectionFilter
+                    collection={record}
+                    canEdit={this.canEdit}
+                  />
+                )}
+              </div>
             )}
           </div>
+          {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal
           canEdit={this.canEdit}

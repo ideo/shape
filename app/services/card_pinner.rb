@@ -11,8 +11,12 @@ class CardPinner < SimpleService
   def reorder_cards!
     template = @card.parent
 
-    next_to_last_pinned_order = (template.collection_cards.pinned&.last&.order || -1) + 1
-    @card.update(pinned: @pinning, order: next_to_last_pinned_order)
+    next_order = nil
+    unless template.board_collection?
+      # next to last pinned
+      next_order = (template.collection_cards.pinned&.last&.order || -1) + 1
+    end
+    @card.update(pinned: @pinning, order: next_order)
 
     # we just pinned a template card, so update the instances
     template.queue_update_template_instances(

@@ -890,6 +890,36 @@ export default class UiStore {
     this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
   }
 
+  reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
+    const filteredCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card =>
+        _.includes(cardIds, card.id) &&
+        (card.link || (card.record && card.record.can_edit))
+    )
+    const filteredCardIds = _.map(filteredCards, 'id')
+    const removedCount = this.selectedCardIds.length - filteredCardIds.length
+    this.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
+  reselectOnlyMovableCards(cardIds = this.selectedCardIds) {
+    // NOTE: this will only *reject* ones that we know we can't move
+    const rejectCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card => _.includes(cardIds, card.id) && !card.canMove
+    )
+    if (rejectCards.length === 0) return
+
+    const rejectCardIds = _.map(rejectCards, 'id')
+    const filteredCardIds = _.reject(cardIds, id =>
+      _.includes(rejectCardIds, id)
+    )
+    const removedCount = rejectCardIds.length
+    this.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
   @action
   async selectAll({ location, card = null } = {}) {
     const { viewingCollection } = this

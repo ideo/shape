@@ -21,6 +21,7 @@ import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
@@ -86,9 +87,8 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   }
 
   ${props =>
-    props.type === 'unrendered'
-      ? ''
-      : `&:hover {
+    props.type !== 'unrendered' &&
+    `&:hover {
     background-color: ${v.colors.primaryLight} !important;
 
     .plus-icon {
@@ -129,6 +129,13 @@ const RightBlankActions = styled.div`
   top: calc(50% - 36px);
 `
 RightBlankActions.displayName = 'RightBlankActions'
+
+const CollectionFilterWrapper = styled.div`
+  position: fixed;
+  z-index: ${v.zIndex.zoomControls};
+  top: ${v.headerHeight + 26}px;
+  right: 32px;
+`
 
 function getMapKey({ col, row }) {
   return `${col},${row}`
@@ -1255,6 +1262,8 @@ class FoamcoreGrid extends React.Component {
         /* Why is this rendering on top of a collection? */
         blocked={this.hasDragCollision && isDrag}
         data-blank-type={type}
+        // this is to make it work the same as CollectionGrid BCT for cypress
+        className={`StyledHotspot-${row}:${col}-BCT`}
         data-empty-space-click
         draggedOn
       >
@@ -1497,6 +1506,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
+    const { uiStore } = this.props
+
     const gridSize = this.totalGridSize
     return (
       <Grid
@@ -1513,6 +1524,11 @@ class FoamcoreGrid extends React.Component {
             onZoomIn={this.handleZoomIn}
             onZoomOut={this.handleZoomOut}
           />
+        )}
+        {!uiStore.isMobileXs && (
+          <CollectionFilterWrapper>
+            <CollectionViewToggle collection={this.props.collection} />
+          </CollectionFilterWrapper>
         )}
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}

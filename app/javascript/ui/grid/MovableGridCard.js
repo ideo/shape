@@ -181,6 +181,7 @@ class MovableGridCard extends React.Component {
 
     if (!this.state.dragging) {
       uiStore.closeBlankContentTool()
+      uiStore.reselectOnlyMovableCards()
       uiStore.startDragging(card.id)
       this.setState(
         {
@@ -688,7 +689,7 @@ class MovableGridCard extends React.Component {
 
 MovableGridCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
-  cardType: PropTypes.string.isRequired,
+  cardType: PropTypes.string,
   position: PropTypes.shape(propShapes.position).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -710,6 +711,7 @@ MovableGridCard.propTypes = {
 }
 
 MovableGridCard.defaultProps = {
+  cardType: '',
   canEditCollection: false,
   isUserCollection: false,
   isSharedCollection: false,

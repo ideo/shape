@@ -236,6 +236,7 @@ class Collection < ApplicationRecord
     method: 2,
     prototype: 3,
     profile: 4, # Different from UserProfile
+    foamcore: 7, # 5 and 6 are for phases/challenges
   }, _prefix: true
 
   # Searchkick Config
@@ -607,6 +608,9 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
+    # no need to do this for boards
+    return if board_collection?
+
     CollectionCard.import(
       calculate_reordered_cards,
       validate: false,
@@ -739,8 +743,9 @@ class Collection < ApplicationRecord
   end
 
   def cache_card_count!
-    cache_attributes!(
-      cached_card_count: collection_cards.visible.count,
+    cache_attribute!(
+      :cached_card_count,
+      collection_cards.visible.count,
     )
   end
 
@@ -1027,6 +1032,7 @@ class Collection < ApplicationRecord
 
   def should_pin_cards?(placement)
     return false unless master_template?
+    return false if board_collection?
 
     has_pinned_cards = collection_cards.pinned.any?
 
