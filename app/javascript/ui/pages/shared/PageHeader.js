@@ -463,10 +463,11 @@ class PageHeader extends React.Component {
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     const showFilters =
-      record.isRegularCollection ||
-      record.isSubmissionsCollection ||
-      // FoamcoreGrid displays its own fixed CollectionViewToggle
-      (record.isBoard && record.viewMode === 'list')
+      !uiStore.isMobileXs &&
+      (record.isRegularCollection ||
+        record.isSubmissionsCollection ||
+        // FoamcoreGrid displays its own fixed CollectionViewToggle
+        (record.isBoard && record.viewMode === 'list'))
 
     return (
       <StyledHeader

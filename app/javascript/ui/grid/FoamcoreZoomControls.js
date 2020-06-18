@@ -5,14 +5,15 @@ import PlusCircleIcon from '~/ui/icons/PlusCircleIcon'
 import MinusCircleIcon from '~/ui/icons/MinusCircleIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import hexToRgba from '~/utils/hexToRgba'
+import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const ZoomIconWrapper = styled.div`
   position: fixed;
   border-radius: 27px;
   height: 27px;
-  bottom: 36px;
-  right: 62px;
+  bottom: 30px;
+  right: ${props => (uiStore.isMobileXs ? 62 : 34)}px;
   background-color: ${hexToRgba(v.colors.commonLight, v.navOpacity)};
   z-index: ${v.zIndex.zoomControls};
   .zoom-icon {
