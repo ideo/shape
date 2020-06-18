@@ -480,6 +480,7 @@ export const fakeCollection = {
   toJsonApiWithCards: jest.fn(),
   mergeCards: jest.fn(),
   revertToSnapshot: jest.fn(),
+  removeCardIds: jest.fn(),
   setCarouselIdx: jest.fn(),
   cardProperties: [],
   internalType: 'collections',

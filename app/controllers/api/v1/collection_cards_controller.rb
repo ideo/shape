@@ -38,14 +38,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def breadcrumb_records
     card_data = @collection_cards
-                .select { |card| card.record.is_a?(Collection) }
-                .map do |card|
+                .where.not(collection_id: nil)
+                .map(&:collection)
+                .compact
+                .uniq
+                .map do |collection|
       {
-        id: card.record.id,
-        type: card.record.class.base_class.name.downcase.pluralize,
-        collection_type: card.record.class.name,
-        name: card.record.name,
-        has_children: card.record.has_child_collections?,
+        id: collection.id,
+        type: collection.class.base_class.name.downcase.pluralize,
+        collection_type: collection.class.name,
+        name: collection.name,
+        has_children: collection.has_child_collections?,
       }
     end
     render json: card_data

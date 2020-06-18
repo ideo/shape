@@ -20,6 +20,39 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
   let(:dup_template) { dup_template_card.collection }
 
   describe '#call' do
+    context 'with errors' do
+      let(:result) { template_setter.call }
+      let(:error_message) { ['Unable to use template'] }
+
+      context 'because template is nil' do
+        let(:template_card) { create(:collection_card) }
+
+        it 'returns errors' do
+          expect(result).to be false
+          expect(template_setter.errors).to eq error_message
+        end
+      end
+
+      context 'because template is an unsupported type' do
+        let(:template) { create(:search_collection, master_template: true, add_viewers: [user]) }
+
+        it 'returns errors' do
+          expect(result).to be false
+          expect(template_setter.errors).to eq error_message
+        end
+      end
+
+      context 'because template contains a submission box' do
+        let!(:subcollection) { create(:collection, parent_collection: template) }
+        let!(:sub_submission_box) { create(:submission_box, parent_collection: subcollection) }
+
+        it 'returns errors' do
+          expect(result).to be false
+          expect(template_setter.errors).to eq error_message
+        end
+      end
+    end
+
     it 'should duplicate the template card into the submission box' do
       expect do
         template_setter.call

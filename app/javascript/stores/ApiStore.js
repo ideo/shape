@@ -456,7 +456,7 @@ class ApiStore extends jsonapi(datxCollection) {
     }
   }
 
-  expandAndOpenThreadForRecord(record) {
+  async expandAndOpenThreadForRecord(record) {
     const { uiStore } = this
     const { viewingRecord } = uiStore
     if (!viewingRecord) return
@@ -465,7 +465,7 @@ class ApiStore extends jsonapi(datxCollection) {
       uiStore.setCommentingOnRecord(null)
       return
     }
-    const thread = this.findThreadForRecord(viewingRecord)
+    const thread = await this.findOrBuildCommentThread(viewingRecord)
     uiStore.expandAndOpenThread(thread.key)
   }
 
@@ -723,6 +723,9 @@ class ApiStore extends jsonapi(datxCollection) {
     }
 
     runInAction(() => {
+      // make sure the moved cards disappear from the fromCollection
+      fromCollection.removeCardIds(data.collection_card_ids)
+      // toCollection gets the new cards
       toCollection.mergeCards(res.data)
       if (undoing && !_.isEmpty(undoSnapshot)) {
         // revert data if undoing card move

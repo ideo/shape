@@ -92,7 +92,7 @@ gem 'dalli', '~> 2.7'
 gem 'bootsnap', require: false
 
 # easy pagination
-gem 'kaminari', '~> 1.1'
+gem 'kaminari', '~> 1.2'
 
 # google auth + firestore
 gem 'google-cloud-firestore', '~> 0.21.0'
@@ -109,9 +109,6 @@ gem 'gibbon', '~> 3.2'
 # distributed mutex
 gem 'redis-mutex', '~> 4.0.1'
 
-# performance tuning
-# gem 'tunemygc'
-gem 'barnes'
 gem 'oj'
 gem 'scout_apm'
 
@@ -203,6 +200,9 @@ group :production do
   gem 'heroku-deflater', github: 'ideo/heroku-deflater'
   # https://devcenter.heroku.com/articles/rails-autoscale
   gem 'rails_autoscale_agent'
+  # performance tuning
+  gem 'tunemygc'
+  gem 'barnes'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
