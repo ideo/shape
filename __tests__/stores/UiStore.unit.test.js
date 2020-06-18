@@ -154,7 +154,6 @@ describe('UiStore', () => {
     beforeEach(() => {
       collection.isBoard = true
       collection.maxZoom = 3
-      uiStore.update('zoomLevel', 2)
       // this is used by zoomIn/Out
       uiStore.setViewingRecord(collection)
       uiStore.determineZoomLevels(
@@ -164,16 +163,17 @@ describe('UiStore', () => {
           maxCols: uiStore.maxCols(collection),
         })
       )
+      uiStore.update('zoomLevel', 2)
     })
 
     describe('#adjustZoomLevel', () => {
       it('when zoomed out, should adjust to collection.maxZoom', () => {
-        uiStore.adjustZoomLevel({ collection })
+        uiStore.adjustZoomLevel(collection)
         expect(uiStore.zoomLevel).toEqual(7) // because of #determineZoomLevels
       })
 
       it('should use collection.lastZoom if available', () => {
-        uiStore.adjustZoomLevel({ collection: { ...collection, lastZoom: 2 } })
+        uiStore.adjustZoomLevel({ ...collection, lastZoom: 2 })
         expect(uiStore.zoomLevel).toEqual(2)
       })
     })
@@ -190,6 +190,7 @@ describe('UiStore', () => {
 
     describe('#zoomOut', () => {
       it('increase zoom number until it reaches maxZoom', () => {
+        uiStore.adjustZoomLevel({ ...collection, lastZoom: 2 })
         expect(uiStore.zoomLevel).toEqual(2)
         uiStore.zoomOut()
         expect(uiStore.zoomLevel).toEqual(3)
@@ -247,7 +248,8 @@ describe('UiStore', () => {
         it('sets zoomLevels based on maxGridWidth and maxCols', () => {
           uiStore.determineZoomLevels(collection)
           expect(uiStore.zoomLevels).toEqual([
-            { col: 2, relativeZoomLevel: 1 },
+            { relativeZoomLevel: 1 },
+            { col: 2, relativeZoomLevel: 1.1221227887617067 },
             { col: 4, relativeZoomLevel: 2.2415816857440167 },
           ])
         })

@@ -1372,19 +1372,6 @@ export default class UiStore {
 
   // -----------------------
   // Foamcore zoom functions
-  @action
-  adjustZoomLevel = ({ collection } = {}) => {
-    const { lastZoom } = collection
-
-    if (lastZoom) {
-      this.zoomLevel = lastZoom
-    } else if (this.zoomLevel > 1) {
-      // if we haven't marked specific zoom on this collection, zoom out if needed
-      // and only store uiStore.zoomLevel, not the collection.lastZoom
-      this.zoomLevel = this.zoomLevels.length
-    }
-  }
-
   zoomOut() {
     this.updateZoomLevel(this.zoomLevel + 1)
   }
@@ -1423,10 +1410,8 @@ export default class UiStore {
 
     if (zoomLevels.length > 0) {
       const firstZoom = zoomLevels[0]
-      if (
-        (firstZoom.col === 1 && firstZoom.relativeZoomLevel - 1 < 0.05) ||
-        (firstZoom.col > 1 && firstZoom.relativeZoomLevel - 1 < 0.25)
-      ) {
+      const diff = firstZoom.relativeZoomLevel - 1
+      if (diff < 0.05 || (zoomLevels.length > 1 && diff < 0.1)) {
         // adjust this to just be fully zoomed
         zoomLevels[0].relativeZoomLevel = 1
       }
@@ -1437,6 +1422,21 @@ export default class UiStore {
       })
     }
     this.zoomLevels.replace(zoomLevels)
+    this.adjustZoomLevel(collection)
+  }
+
+  @action
+  adjustZoomLevel = collection => {
+    const { lastZoom } = collection
+    // console.trace({ lastZoom, z: this.zoomLevel, n: collection.name })
+
+    if (lastZoom) {
+      this.zoomLevel = _.clamp(lastZoom, 1, this.zoomLevels.length)
+    } else {
+      // if we haven't marked specific zoom on this collection, zoom out if needed
+      // and only store uiStore.zoomLevel, not the collection.lastZoom
+      this.zoomLevel = this.zoomLevels.length
+    }
   }
 
   get relativeZoomLevel() {
