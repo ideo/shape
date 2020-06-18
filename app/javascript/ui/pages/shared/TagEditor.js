@@ -1,6 +1,5 @@
+import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { action, observable, computed, runInAction } from 'mobx'
-import { observer } from 'mobx-react'
 
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
@@ -10,72 +9,52 @@ import StyledReactTags, {
   creativeDifferenceTagIcon,
 } from '~/ui/pages/shared/StyledReactTags'
 
-// FIXME: tagsInCommon is used in TagEditor.unit.test.js
-// export const tagsInCommon = (records, tagField) => {
-//   const tags = []
-//   records.forEach(record => {
-//     // Include records with and without tags,
-//     // because they are used to find if records share tags in common
-//     // FIXME: adding user tags by default since there isn't a way to add it distinctively
-//     const userTags = _.map(toJS(record['user_list']), t => {
-//       return { label: t, type: 'user_list' }
-//     })
-//     const regularTags = _.map(toJS(record[tagField]), t => {
-//       return { label: t, type: tagField }
-//     })
-//     tags.push([...userTags, ...regularTags])
-//   })
-//   // Intersection needs each array as separate arguments,
-//   // which is why apply is used
-//   return _.intersection.apply(null, tags)
-// }
+const TagEditor = ({
+  recordTags,
+  afterAddTag,
+  afterRemoveTag,
+  tagField,
+  canEdit,
+  tagColor,
+  placeholder,
+  validateTag,
+}) => {
+  const [error, setError] = useState('')
+  const [formattedTags, setFormattedTags] = useState([])
 
-@observer
-class TagEditor extends React.Component {
-  @observable
-  error = ''
+  const getFormattedTag = ({ label, type }) => ({
+    id: label,
+    label,
+    name: label,
+    type,
+    onDelete: () => {
+      handleDelete({ label, type })
+    },
+    symbol: creativeDifferenceTagIcon(label),
+    symbolSize: 18,
+  })
 
-  constructor(props) {
-    super(props)
-  }
-
-  @computed
-  get formattedTags() {
-    const { recordTags } = this.props
-    return _.map(recordTags, t => this.createFormattedTag(t))
-  }
-
-  createFormattedTag(tag) {
-    const _tag = {
-      id: tag,
-      label: tag,
-      name: tag,
-      type: null,
-      onDelete: this.handleDelete(tag),
-      symbol: creativeDifferenceTagIcon(tag),
-      symbolSize: 18,
+  const handleDelete = ({ label, type }) => {
+    const tagToDelete = _.find(formattedTags, { label, type })
+    if (tagToDelete) {
+      setFormattedTags(_.without(formattedTags, tagToDelete))
+      afterRemoveTag({ label, type })
     }
-    return _tag
   }
 
-  @action
-  handleAddition = tagData => {
-    const { validateTag, tagField, afterAddTag } = this.props
+  const handleAddition = tagData => {
     tagData.name = tagData.name.trim()
-    // FIXME: handle user tagField
-    const newTag = this.createFormattedTag({
+
+    const newTag = getFormattedTag({
       label: tagData.name,
       type: tagField,
     })
-    this.error = ''
 
-    // FIXME: use once we can distinguish by tagFields/type (for users)
-    // _.find(this.tags, { label, type })
-
-    // Return if tag is a duplicate
-    if (
-      _.find(this.tags, t => t.name.toUpperCase() === newTag.name.toUpperCase())
-    ) {
+    const duplicateTag = _.find(formattedTags, t => {
+      t.name.toUpperCase() === newTag.name.toUpperCase() && t.type === tagField
+    })
+    // Return if duplicate tag is found
+    if (duplicateTag) {
       return
     }
 
@@ -83,69 +62,55 @@ class TagEditor extends React.Component {
     if (validateTag) {
       const { tag, error } = validateTag(newTag.name)
       if (error) {
-        this.error = error
+        setError(error)
         return
       } else {
         newTag.name = tag
       }
     }
-    this.tags.push(newTag)
+
+    formattedTags.push(newTag)
     const { label, type } = newTag
     afterAddTag({ label, type })
   }
 
-  handleDelete = label => e => {
-    const { afterRemoveTag } = this.props
+  useEffect(() => {
+    setFormattedTags(
+      _.map(recordTags, ({ label, type }) => getFormattedTag({ label, type }))
+    )
+  }, [recordTags])
 
-    // FIXME: use once we can distinguish by tagFields/type
-    // _.find(this.tags, { label, type })
-
-    const tag = _.find(this.tags, { label })
-    if (tag) {
-      runInAction(() => {
-        this.tags.remove(tag)
-        const { label, type } = tag
-        afterRemoveTag({ label, type })
-      })
-    }
-  }
-
-  // This is displayed instead of the tag input if the user cannot edit the tags
-  readonlyTags = () => {
-    if (this.tags.length === 0) {
+  const readonlyTags = () => {
+    if (formattedTags.length === 0) {
       return 'No tags added.'
     }
     return (
       <div className="react-tags__selected">
-        {this.tags.map(tag => (
+        {formattedTags.map(tag => (
           <Pill key={tag.id} tag={tag} />
         ))}
       </div>
     )
   }
 
-  render() {
-    const { canEdit, placeholder, tagColor } = this.props
-
-    return (
-      <StyledReactTags tagColor={tagColor}>
-        {!canEdit && this.readonlyTags()}
-        {canEdit && (
-          <ReactTags
-            tags={[...this.formattedTags]}
-            allowBackspace={false}
-            delimiterChars={[',']}
-            placeholder={placeholder}
-            handleAddition={this.handleAddition}
-            handleDelete={this.handleDelete}
-            tagComponent={Pill}
-            allowNew
-          />
-        )}
-        {this.error && <div className="error">{this.error}</div>}
-      </StyledReactTags>
-    )
-  }
+  return (
+    <StyledReactTags tagColor={tagColor}>
+      {!canEdit && readonlyTags()}
+      {canEdit && (
+        <ReactTags
+          tags={formattedTags}
+          allowBackspace={false}
+          delimiterChars={[',']}
+          placeholder={placeholder}
+          handleAddition={handleAddition}
+          handleDelete={handleDelete}
+          tagComponent={Pill}
+          allowNew
+        />
+      )}
+      {error && <div className="error">{error}</div>}
+    </StyledReactTags>
+  )
 }
 
 TagEditor.displayName = 'TagEditor'

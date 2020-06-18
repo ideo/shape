@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { toJS } from 'mobx'
+import { toJS, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
@@ -30,44 +30,49 @@ class CollectionCardsTagEditor extends React.Component {
     const { organization_users } = currentUserOrganization
     // This contains id, first_name, last_name, handle
     const selectedRecordUserTags = _.flatten(
-      _.intersection(_.map(records, r => toJS(r['user_list'])))
+      _.intersection(_.map(records, r => toJS(r['user_tag_list'])))
     )
 
     const mappedUserTags = _.filter(
       organization_users,
       a => a && selectedRecordUserTags.includes(a.handle)
     )
-
-    return [...selectedRecordTags, ...mappedUserTags]
+    const combinedTagList = [...selectedRecordTags, ...mappedUserTags]
+    return combinedTagList
   }
 
-  _apiAddRemoveTag = (action, data) => {
-    const { cards, apiStore } = this.props
-    const { label, type } = data
-    // FIXME: type will be passed down once we figure out how to handle it
-    console.log({ type })
-    apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
-      card_ids: _.map(cards, 'id'),
-      tag: label,
-      type: null,
-    })
-  }
+  // FIXME: endpoint CollectionCardsAddRemoveTagWorker, see if we can deprecate
+  // _apiAddRemoveTag = (action, data) => {
+  //   const { cards, apiStore } = this.props
+  //   const { label, type } = data
+  //   apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
+  //     card_ids: _.map(cards, 'id'),
+  //     tag: label,
+  //     type: null,
+  //   })
+  // }
 
-  addTag = tag => {
+  @action
+  addTag = ({ label, type }) => {
     const { records } = this
     records.forEach(record => {
-      // persist the tag locally on the Item/Collection
-      record['tag_list'].push(tag.label)
+      // FIXME: does not work at the moment; check how deserializable collection can handle custom tags?
+      record[type].push({ type, label })
+      record.save()
     })
-    this._apiAddRemoveTag('add', tag)
   }
 
-  removeTag = tag => {
+  @action
+  removeTag = ({ label, type }) => {
     const { records } = this
     records.forEach(record => {
-      record['tag_list'].remove(tag.label)
+      // FIXME: does not work at the moment; check how deserializable collection can handle custom tags?
+      record[type] = _.filter(
+        toJS(record[type]),
+        t => t.label !== label && t.type !== type
+      )
+      record.save()
     })
-    this._apiAddRemoveTag('remove', tag)
   }
 
   get records() {
