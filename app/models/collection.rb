@@ -743,8 +743,9 @@ class Collection < ApplicationRecord
   end
 
   def cache_card_count!
-    cache_attributes!(
-      cached_card_count: collection_cards.visible.count,
+    cache_attribute!(
+      :cached_card_count,
+      collection_cards.visible.count,
     )
   end
 

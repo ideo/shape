@@ -16,7 +16,8 @@ class CollectionTypeSelector extends React.Component {
   showPopoutMenu = false
 
   @action
-  openPopoutMenu = () => {
+  openPopoutMenu = ev => {
+    ev.stopPropagation()
     this.showPopoutMenu = true
   }
 

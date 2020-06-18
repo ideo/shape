@@ -39,6 +39,7 @@ import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
 import { linkOffsite } from '~/utils/url'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
+import { openContextMenu } from '~/utils/clickUtils'
 
 const CardLoader = () => {
   return (
@@ -245,7 +246,7 @@ class GridCard extends React.Component {
     })
   }
 
-  openContextMenu = ev => {
+  handleContextMenu = ev => {
     ev.preventDefault()
     const { menuItemCount, props } = this
     const { card } = props
@@ -255,20 +256,11 @@ class GridCard extends React.Component {
     // for some reason, Android treats long-press as right click
     if (uiStore.isAndroid) return false
 
-    const rect = this.gridCardRef.getBoundingClientRect()
-    const x = ev.clientX - rect.left - rect.width * 0.95
-    const y = ev.clientY - rect.top - 15
-
-    ev.persist()
-    let delay = 0
-    if (card.record.isText) {
-      // delay so that contextMenu can determine whether you right-clicked and selected text
-      delay = 200
-    }
-    setTimeout(() => {
-      uiStore.openContextMenu(ev, { x, y, card, menuItemCount })
-    }, delay)
-    return false
+    return openContextMenu(ev, card, {
+      targetRef: this.gridCardRef,
+      onOpenMenu: uiStore.openContextMenu,
+      menuItemCount,
+    })
   }
 
   closeMenu = () => {
@@ -618,7 +610,7 @@ class GridCard extends React.Component {
         data-col={card.col}
         data-row={card.row}
         data-cy="GridCard"
-        onContextMenu={this.openContextMenu}
+        onContextMenu={this.handleContextMenu}
         ref={c => (this.gridCardRef = c)}
         onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}

@@ -50,6 +50,7 @@ export const fakeTextItemAttrs = {
   fullyLoaded: true,
   parent_collection_card: { ...fakeCollectionCard },
   API_fetchDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
+  roles: [],
 
 }
 
@@ -458,6 +459,7 @@ export const fakeCollection = {
   API_clearCollectionCover: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCard: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_fetchCardRoles: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   API_createCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
   API_destroyCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),

@@ -693,6 +693,30 @@ describe('Collection', () => {
     })
   })
 
+  describe('API_fetchCardRoles', () => {
+    beforeEach(() => {
+      apiStore.request = jest.fn()
+      runInAction(() => {
+        collection.collection_cards = [
+          collectionCard_1,
+          collectionCard_2,
+          collectionCard_3,
+        ]
+      })
+    })
+
+    it('should call apiStore to fetch any missing card roles', async () => {
+      collection.collection_cards[0].record = { id: '11', roles: ['something'] }
+      collection.collection_cards[1].record = { id: '12' }
+      collection.collection_cards[2].record = { id: '13' }
+      expect(_.map(collection.collection_cards, 'id')).toEqual(['1', '2', '3'])
+      await collection.API_fetchCardRoles()
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}/collection_cards/roles?select_ids=2,3`
+      )
+    })
+  })
+
   describe('mergeCards', () => {
     beforeEach(() => {
       runInAction(() => {
