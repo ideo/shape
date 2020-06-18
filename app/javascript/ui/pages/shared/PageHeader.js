@@ -465,7 +465,8 @@ class PageHeader extends React.Component {
     const showFilters =
       record.isRegularCollection ||
       record.isSubmissionsCollection ||
-      record.isBoard
+      // FoamcoreGrid displays its own fixed CollectionViewToggle
+      (record.isBoard && record.viewMode === 'list')
 
     return (
       <StyledHeader
@@ -536,7 +537,13 @@ class PageHeader extends React.Component {
             {showFilters && (
               <div style={{ marginBottom: '-16px', display: 'flex' }}>
                 <CollectionViewToggle collection={record} />
-                <CollectionFilter collection={record} canEdit={this.canEdit} />
+                {/* CollectionFilter will be enabled for Board in the follow-up story */}
+                {!record.isBoard && (
+                  <CollectionFilter
+                    collection={record}
+                    canEdit={this.canEdit}
+                  />
+                )}
               </div>
             )}
           </div>

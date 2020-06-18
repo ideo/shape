@@ -11,7 +11,7 @@ const ZoomIconWrapper = styled.div`
   position: fixed;
   border-radius: 27px;
   height: 27px;
-  top: ${v.headerHeight + 18}px;
+  bottom: 36px;
   right: 62px;
   background-color: ${hexToRgba(v.colors.commonLight, v.navOpacity)};
   z-index: ${v.zIndex.zoomControls};

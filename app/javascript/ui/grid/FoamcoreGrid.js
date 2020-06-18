@@ -21,6 +21,7 @@ import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
@@ -130,6 +131,13 @@ const RightBlankActions = styled.div`
   top: calc(50% - 36px);
 `
 RightBlankActions.displayName = 'RightBlankActions'
+
+const CollectionFilterWrapper = styled.div`
+  position: fixed;
+  z-index: ${v.zIndex.zoomControls};
+  top: ${v.headerHeight + 26}px;
+  right: 32px;
+`
 
 function getMapKey({ col, row }) {
   return `${col},${row}`
@@ -1540,6 +1548,9 @@ class FoamcoreGrid extends React.Component {
             onZoomOut={this.handleZoomOut}
           />
         )}
+        <CollectionFilterWrapper>
+          <CollectionViewToggle collection={this.props.collection} />
+        </CollectionFilterWrapper>
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}
         {this.renderMdlPlaceholder()}
