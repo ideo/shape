@@ -3,12 +3,14 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 import styled from 'styled-components'
 
+import Tooltip from '~/ui/global/Tooltip'
 import ListIcon from '~/ui/icons/ListIcon'
 import GridIcon from '~/ui/icons/GridIcon'
 import v from '~/utils/variables'
 
 const IconHolder = styled.div`
-  color: ${props => (props.active ? v.colors.black : v.colors.commonDark)};
+  color: ${v.colors.black};
+  display: ${props => (props.show ? 'block' : 'none')};
   cursor: pointer;
   height: 32px;
   width: 32px;
@@ -17,6 +19,7 @@ const IconHolder = styled.div`
     color: ${v.colors.commonDarkest};
   }
 `
+IconHolder.displayName = 'IconHolder'
 IconHolder.defaultProps = {
   active: false,
 }
@@ -42,12 +45,16 @@ class CollectionViewToggle extends React.Component {
     const { isCurrentlyListMode } = this
     return (
       <Flex align="center">
-        <IconHolder onClick={this.onGridClick} active={!isCurrentlyListMode}>
-          <GridIcon />
-        </IconHolder>
-        <IconHolder onClick={this.onListClick} active={isCurrentlyListMode}>
-          <ListIcon />
-        </IconHolder>
+        <Tooltip classes={{ tooltip: 'Tooltip' }} title="Grid view">
+          <IconHolder onClick={this.onGridClick} show={isCurrentlyListMode}>
+            <GridIcon />
+          </IconHolder>
+        </Tooltip>
+        <Tooltip classes={{ tooltip: 'Tooltip' }} title="List view">
+          <IconHolder onClick={this.onListClick} show={!isCurrentlyListMode}>
+            <ListIcon />
+          </IconHolder>
+        </Tooltip>
       </Flex>
     )
   }
