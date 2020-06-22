@@ -165,8 +165,7 @@ const ChartAxisProps = ({
   }
 
   const tickLabelStyleProps = tickLabelStyle(isSmallChartStyle)
-  return datasetValues.length > 1 ||
-    (secondaryValues && secondaryValues.length > 1)
+  return dateValues.length > 1
     ? {
         ...axisProps,
         tickFormat: isSmallChartStyle ? fullDate : datasetXAxisText,
