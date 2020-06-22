@@ -43,5 +43,9 @@ module UserSpecificFields
     attribute :cache_key, if: -> { @object == @current_record && @object.is_a?(Collection) } do
       Digest::MD5.hexdigest(@object.cache_key(@card_order || 'order', @current_user&.id))
     end
+
+    attribute :submission_reviewer_status, if: -> { @object.is_a?(Collection) && @object.submission? } do
+      @object.submission_reviewer_status(user: @current_user)
+    end
   end
 end

@@ -882,6 +882,64 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#submission_reviewer_status' do
+    let(:collection) { create(:collection) }
+    let(:user) { create(:user) }
+
+    it 'returns nil if not a submission' do
+      expect(collection.submission_reviewer_status(user: user)).to be_nil
+    end
+
+    context 'as a submission' do
+      let(:submission_box) { create(:submission_box) }
+      let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
+      # Take a shortcut - just create test collection to be used directly in submission
+      let!(:test_collection) do
+        create(:test_collection, :completed, parent_collection: submission_template)
+      end
+      let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+      before do
+        submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
+      end
+
+      it 'returns :unstarted if no survey responses' do
+        expect(submission.submission_reviewer_status(user: user)).to eq(:unstarted)
+      end
+
+      context 'with an incomplete survey response' do
+        let!(:survey_response) { create(:survey_response, test_collection: test_collection, user: user) }
+
+        it 'returns :in_progress' do
+          expect(submission.submission_reviewer_status(user: user)).to eq(:in_progress)
+        end
+      end
+
+      context 'with a complete survey response' do
+        let!(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection, user: user) }
+
+        it 'returns :completed' do
+          expect(submission.submission_reviewer_status(user: user)).to eq(:completed)
+        end
+      end
+    end
+  end
+
+  describe '#add_challenge_reviewer' do
+    it 'adds collection filter with user handle' do
+
+    end
+
+    it 'creates user collection filter for user so they are selected' do
+
+    end
+  end
+
+  describe '#remove_challenge_reviewer' do
+    it 'destroys collection filter with user handle' do
+
+    end
+  end
+
   describe 'child of a master template' do
     let(:parent) { create(:collection, master_template: true) }
     let(:child) { create(:collection, parent_collection: parent) }

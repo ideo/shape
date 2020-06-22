@@ -36,12 +36,37 @@ module UserTaggable
   def assign_and_remove_user_tags
     if @user_tag_remove_user_ids.present?
       user_tags.where(user_id: @user_tag_remove_user_ids).delete_all
+      after_remove_tagged_user_ids(@user_tag_remove_user_ids)
+      @user_tag_remove_user_ids = nil
     end
 
     return if @user_tag_add_user_ids.blank?
 
     @user_tag_add_user_ids.each do |user_id|
       user_tags.create(user_id: user_id)
+    end
+
+    after_add_tagged_user_ids(@user_tag_add_user_ids)
+
+    @user_tag_add_user_ids = nil
+  end
+
+  def after_remove_tagged_user_ids(user_ids)
+    return unless submission? && parent_challenge.present?
+
+    # Remove the challenge collection filter for these user(s)
+    User.where(id: user_ids).each do |user|
+      remove_challenge_reviewer(user)
+    end
+  end
+
+  def after_add_tagged_user_ids(user_ids)
+    # If a user is tagged on a submission within a challenge,
+    # add them to the selectable collection filters if not already
+    return unless submission? && parent_challenge.present?
+
+    User.where(id: user_ids).each do |user|
+      add_challenge_reviewer(user)
     end
   end
 end
