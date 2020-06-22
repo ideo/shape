@@ -63,22 +63,12 @@ class SerializableCollection < BaseJsonSerializer
     @object.system_required?
   end
 
-  attribute :tag_list, if: -> { @object.try(:tag_list).present? } do
-    tag_list = []
-    @object.cached_tag_list.each do |tag|
-      tag_list << { label: tag, type: 'tag_list' }
-    end
-
-    tag_list
+  attribute :tag_list do
+    @object.tag_list.any? ? @object.tag_list.compact : []
   end
 
-  attribute :user_tag_list, if: -> { @object.try(:user_tag_list).present? } do
-    user_tag_list = []
-    @object.cached_user_tag_list.each do |tag|
-      user_tag_list << { label: tag, type: 'user_tag_list' }
-    end
-
-    user_tag_list
+  attribute :user_tag_list do
+    @object.user_tag_list.any? ? @object.user_tag_list.compact : []
   end
 
   attribute :inherited_tag_list do

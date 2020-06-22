@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { toJS, action } from 'mobx'
+import { toJS, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
@@ -14,25 +14,34 @@ class CollectionCardsTagEditor extends React.Component {
     currentUserOrganization.fetchOrganizationUsers()
   }
 
+  @computed
+  // takes all tags for all selected records and formats them by type
+  // for the <ReactTags/> to determine which tagComponent to render
   get selectedTags() {
-    return this.filterSelectedTagsForRecords()
-  }
-
-  filterSelectedTagsForRecords() {
     const { records } = this
-    const selectedRecordTags = _.flatten(
-      _.intersection(_.map(records, r => toJS(r['tag_list'])))
+    const selectedRecordTags = _.map(
+      _.flatten(_.intersection(_.map(records, r => toJS(r['tag_list'])))),
+      tag => ({
+        label: tag,
+        type: 'tag_list',
+      })
     )
 
-    // TODO: combine with user tag list once implemented
     const { apiStore } = this.props
     const { currentUserOrganization } = apiStore
     const { organization_users } = currentUserOrganization
     // This contains id, first_name, last_name, handle
-    const selectedRecordUserTags = _.flatten(
-      _.intersection(_.map(records, r => toJS(r['user_tag_list'])))
+    const selectedRecordUserTags = _.map(
+      _.flatten(
+        _.intersection(_.filter(records, r => !!toJS(r['user_tag_list'])))
+      ),
+      tag => ({
+        label: tag,
+        type: 'user_tag_list',
+      })
     )
 
+    // TODO: test this
     const mappedUserTags = _.filter(
       organization_users,
       a => a && selectedRecordUserTags.includes(a.handle)
@@ -56,8 +65,9 @@ class CollectionCardsTagEditor extends React.Component {
   addTag = ({ label, type }) => {
     const { records } = this
     records.forEach(record => {
-      // FIXME: does not work at the moment; check how deserializable collection can handle custom tags?
-      record[type].push({ type, label })
+      const tagList = record[type]
+      tagList.push(label)
+      record[type] = _.join(tagList, ',')
       record.save()
     })
   }
@@ -66,11 +76,9 @@ class CollectionCardsTagEditor extends React.Component {
   removeTag = ({ label, type }) => {
     const { records } = this
     records.forEach(record => {
-      // FIXME: does not work at the moment; check how deserializable collection can handle custom tags?
-      record[type] = _.filter(
-        toJS(record[type]),
-        t => t.label !== label && t.type !== type
-      )
+      // FIXME: does not delete right after adding, may be some issue with rerendering after adding
+      const withoutTag = _.filter(record[type], tag => tag !== label)
+      record[type] = _.join(withoutTag, ',')
       record.save()
     })
   }
