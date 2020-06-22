@@ -13,9 +13,9 @@ class CollectionCardsAddRemoveTagWorker
       collection_cards.each do |card|
         record = card.record
         case type
-        when 'people'
+        when 'user_tag_list'
           record.people_list.send(action, tag)
-        else
+        when 'tag_list'
           record.tag_list.send(action, tag)
         end
         # Collection needs to be called manually to set cached attributes

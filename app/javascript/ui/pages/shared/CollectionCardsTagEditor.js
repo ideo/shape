@@ -50,37 +50,37 @@ class CollectionCardsTagEditor extends React.Component {
     return combinedTagList
   }
 
-  // FIXME: endpoint CollectionCardsAddRemoveTagWorker, see if we can deprecate
-  // _apiAddRemoveTag = (action, data) => {
-  //   const { cards, apiStore } = this.props
-  //   const { label, type } = data
-  //   apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
-  //     card_ids: _.map(cards, 'id'),
-  //     tag: label,
-  //     type: null,
-  //   })
-  // }
+  // NOTE: this is used to bulk-update and cache bust tags for selected cards
+  _apiAddRemoveTag = (action, data) => {
+    const { cards, apiStore } = this.props
+    const { label, type } = data
+    apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
+      card_ids: _.map(cards, 'id'),
+      tag: label,
+      type,
+    })
+  }
 
   @action
   addTag = ({ label, type }) => {
     const { records } = this
+    // update frontend model tags
     records.forEach(record => {
-      const tagList = record[type]
-      tagList.push(label)
-      record[type] = _.join(tagList, ',')
-      record.save()
+      record[type].push(label)
     })
+
+    this._apiAddRemoveTag('add', { label, type })
   }
 
   @action
   removeTag = ({ label, type }) => {
     const { records } = this
     records.forEach(record => {
-      // FIXME: does not delete right after adding, may be some issue with rerendering after adding
-      const withoutTag = _.filter(record[type], tag => tag !== label)
-      record[type] = _.join(withoutTag, ',')
-      record.save()
+      // update frontend model tags
+      _.pull(record[type], label)
     })
+
+    this._apiAddRemoveTag('remove', { label, type })
   }
 
   get records() {
