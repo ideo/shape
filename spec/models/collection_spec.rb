@@ -864,10 +864,9 @@ describe Collection, type: :model do
 
   describe '#submit_submission' do
     let(:submission_box) { create(:submission_box) }
+    before { submission_box.setup_submissions_collection! }
     let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
-
     before do
-      submission_box.setup_submissions_collection!
       submission.submission_attrs['hidden'] = true
       submission.save
     end
@@ -924,19 +923,55 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#add_challenge_reviewer' do
-    it 'adds collection filter with user handle' do
+  context 'with submission in challenge' do
+    let(:user) { create(:user) }
+    let!(:parent_challenge) do
+      create(
+        :collection,
+        num_cards: 1,
+        record_type: :collection,
+        add_viewers: [user],
+        collection_type: :challenge,
+      )
+    end
+    let(:submission_box) { create(:submission_box, parent_collection: parent_challenge) }
+    before { submission_box.setup_submissions_collection! }
+    let!(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+    let(:reviewer) { create(:user) }
+    # before do
+    #   [submission_box, submission_box.submissions_collection, submission].each(&:recalculate_breadcrumb!)
+    # end
 
+    describe '#add_challenge_reviewer' do
+      it 'adds collection filter with user handle' do
+        expect do
+          submission.add_challenge_reviewer(reviewer)
+        end.to change(CollectionFilter.user_tag, :count).by(1)
+      end
+
+      it 'creates user collection filter for user so they are selected' do
+        expect do
+          submission.add_challenge_reviewer(reviewer)
+        end.to change(UserCollectionFilter, :count).by(1)
+        collection_filter = submission.parent_challenge.collection_filters.last
+        expect(
+          collection_filter.user_collection_filters.find_by(user_id: reviewer.id),
+        ).not_to be_nil
+      end
     end
 
-    it 'creates user collection filter for user so they are selected' do
+    describe '#remove_challenge_reviewer' do
+      before do
+        submission.add_challenge_reviewer(reviewer)
+      end
 
-    end
-  end
-
-  describe '#remove_challenge_reviewer' do
-    it 'destroys collection filter with user handle' do
-
+      it 'destroys collection filter with user handle' do
+        collection_filter_id = submission.parent_challenge.collection_filters.last.id
+        expect do
+          submission.remove_challenge_reviewer(reviewer)
+        end.to change(CollectionFilter.user_tag, :count).by(-1)
+        expect(CollectionFilter.exists?(collection_filter_id)).to be false
+      end
     end
   end
 

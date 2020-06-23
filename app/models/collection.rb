@@ -904,7 +904,7 @@ class Collection < ApplicationRecord
 
     User.where(
       User.arel_table[:handle].lower.in(
-        parent_challenge.collection_filters.tagged_with_user.pluck(:text),
+        parent_challenge.collection_filters.user_tag.pluck(:text),
       )
     )
   end
@@ -912,19 +912,21 @@ class Collection < ApplicationRecord
   def add_challenge_reviewer(user)
     return unless parent_challenge.present?
 
-    filter_for_user = parent_challenge.collection_filters.tagged_with_user(user).first
-    filter_for_user ||= parent_challenge.collections_filters.create(
+    filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
+    filter_for_user ||= parent_challenge.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
     )
     # Find or create the filter for this user
-    filter_for_user.user_collection_filters.where(user_id: user.id).find_or_create
+    filter_for_user.user_collection_filters.find_or_create_by(
+      user_id: user.id,
+    )
   end
 
   def remove_challenge_reviewer(user)
     return unless parent_challenge.present?
 
-    parent_challenge.collection_filters.tagged_with_user(user).first&.destroy
+    parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
 
   def submission_reviewer_status(user:)
