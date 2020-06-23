@@ -4,48 +4,35 @@ import ReactTags from 'react-tag-autocomplete'
 import { observable, runInAction } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { apiStore, uiStore } from '~/stores'
 import { SubduedText } from '~/ui/global/styled/typography'
 import Modal from '~/ui/global/modals/Modal'
 import Pill from '~/ui/global/Pill'
 import StyledReactTags from '~/ui/pages/shared/StyledReactTags'
 import { filtersToTags } from '~/ui/filtering/shared'
 
+@inject('apiStore', 'uiStore')
 @observer
-@inject('apiStore')
 class FilterSearchModal extends React.Component {
   @observable
-  tags = []
-  @observable
   searchResultCount = null
+  @observable
+  suggestions = []
 
   constructor(props) {
     super(props)
     this.debouncedTermSearch = _.debounce(this._autocompleteTermSearch, 400)
-  }
-
-  componentDidMount() {
-    const { currentUserOrganization } = this.props.apiStore
-    currentUserOrganization.API_getOrganizationTagList().then(tags => {
-      runInAction(() => {
-        this.tags = tags
-      })
-    })
-  }
-
-  get organizationUserTags() {
-    const { currentUserOrganization } = this.props.apiStore
-    return currentUserOrganization.map(u => u.handle)
-  }
-
-  get fullTagList() {
-    return [...this.tags, ...this.organizationUserTags]
+    this.debouncedFilterSuggestions = _.debounce(
+      this._searchFilterSuggestions,
+      400
+    )
   }
 
   get formattedSuggestions() {
     const { filterType } = this.props
     if (filterType === 'Search Term') return []
-    return this.fullTagList
+    const { currentOrganization } = this.props.apiStore
+    const { tagsAndUsers } = currentOrganization
+    return tagsAndUsers
   }
 
   get filtersFormattedAsTags() {
@@ -58,11 +45,19 @@ class FilterSearchModal extends React.Component {
   }
 
   _autocompleteTermSearch = async term => {
-    const { viewingCollection } = uiStore
+    const { viewingCollection } = this.props.uiStore
     const apiPath = `collections/${viewingCollection.id}/collection_cards?q=${term}`
-    const result = await apiStore.request(apiPath)
+    const result = await this.props.apiStore.request(apiPath)
     runInAction(() => {
       this.searchResultCount = result.data.length
+    })
+  }
+
+  _searchFilterSuggestions = async query => {
+    const { currentOrganization } = this.props.apiStore
+    const tagsAndUsers = await currentOrganization.searchTagsAndUsers(query)
+    runInAction(() => {
+      this.suggestions = tagsAndUsers
     })
   }
 
@@ -71,7 +66,6 @@ class FilterSearchModal extends React.Component {
   }
 
   onNewTag = tag => {
-    console.log({ tag })
     this.props.onCreateTag(tag)
   }
 
@@ -87,12 +81,12 @@ class FilterSearchModal extends React.Component {
     const { filterType } = this.props
     if (filterType === 'Search Term') {
       if (text.length < 4) {
-        runInAction(() => {
-          this.searchResultCount = null
-        })
+        this.searchResultCount = null
       } else {
         return this.debouncedTermSearch(text)
       }
+    } else {
+      this.debouncedFilterSuggestions(text)
     }
   }
 
@@ -114,7 +108,7 @@ class FilterSearchModal extends React.Component {
           <StyledReactTags>
             <ReactTags
               tags={this.filtersFormattedAsTags}
-              suggestions={this.formattedSuggestions}
+              suggestions={this.suggestions}
               allowBackspace={false}
               delimiterChars={[',']}
               placeholder={placeholder}
@@ -137,6 +131,7 @@ class FilterSearchModal extends React.Component {
 
 FilterSearchModal.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.arrayOrObservableArray.isRequired,
+  uiStore: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 
 FilterSearchModal.propTypes = {

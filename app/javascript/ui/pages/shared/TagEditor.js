@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
@@ -8,16 +9,18 @@ import Pill from '~/ui/global/Pill'
 import StyledReactTags, {
   creativeDifferenceTagIcon,
 } from '~/ui/pages/shared/StyledReactTags'
+import Avatar from '~/ui/global/Avatar'
 
 const TagEditor = ({
   recordTags,
   afterAddTag,
   afterRemoveTag,
-  tagField,
+  suggestions,
   canEdit,
   tagColor,
   placeholder,
   validateTag,
+  handleInputChange,
 }) => {
   const [error, setError] = useState('')
   const [formattedTags, setFormattedTags] = useState([])
@@ -30,7 +33,12 @@ const TagEditor = ({
     onDelete: () => {
       handleDelete({ label, type })
     },
-    symbol: creativeDifferenceTagIcon(label),
+    symbol:
+      type !== 'user_tag_list' ? (
+        creativeDifferenceTagIcon(label)
+      ) : (
+        <Avatar size={18} />
+      ),
     symbolSize: 18,
   })
 
@@ -44,6 +52,9 @@ const TagEditor = ({
 
   const handleAddition = tagData => {
     tagData.name = tagData.name.trim()
+
+    // FIXME: hardcode tag_field for now; figure out how we can determine which tag type is getting added
+    const tagField = 'tag_list'
 
     const newTag = getFormattedTag({
       label: tagData.name,
@@ -78,7 +89,7 @@ const TagEditor = ({
     setFormattedTags(
       _.map(recordTags, ({ label, type }) => getFormattedTag({ label, type }))
     )
-  }, [recordTags])
+  }, [recordTags.length])
 
   const readonlyTags = () => {
     if (formattedTags.length === 0) {
@@ -100,10 +111,12 @@ const TagEditor = ({
         <ReactTags
           tags={formattedTags}
           allowBackspace={false}
+          suggestions={suggestions}
           delimiterChars={[',']}
           placeholder={placeholder}
           handleAddition={handleAddition}
           handleDelete={handleDelete}
+          handleInputChange={handleInputChange}
           tagComponent={Pill}
           allowNew
         />
@@ -119,11 +132,12 @@ TagEditor.propTypes = {
   recordTags: PropTypes.array.isRequired,
   afterAddTag: PropTypes.func.isRequired,
   afterRemoveTag: PropTypes.func.isRequired,
-  tagField: PropTypes.string.isRequired,
   canEdit: PropTypes.bool,
   tagColor: PropTypes.string,
   placeholder: PropTypes.string,
   validateTag: PropTypes.func,
+  suggestions: MobxPropTypes.arrayOrObservableArray.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
 }
 
 TagEditor.defaultProps = {
