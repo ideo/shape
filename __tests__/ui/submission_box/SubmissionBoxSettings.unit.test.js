@@ -1,22 +1,27 @@
 import SubmissionBoxSettings from '~/ui/submission_box/SubmissionBoxSettings'
 
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeTestCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 
 let props, wrapper, instance, rerender
 describe('SubmissionBoxSettings', () => {
   beforeEach(() => {
+    const submissionTemplate = fakeCollection
+    submissionTemplate.submission_template_test_collections = [
+      fakeTestCollection,
+    ]
     props = {
       collection: {
         ...fakeCollection,
         submissions_enabled: true,
         hide_submissions: false,
+        submission_template: submissionTemplate,
       },
       closeModal: jest.fn(),
       apiStore: fakeApiStore(),
     }
     rerender = () => {
-      wrapper = shallow(<SubmissionBoxSettings {...props} />)
+      wrapper = shallow(<SubmissionBoxSettings.wrappedComponent {...props} />)
       instance = wrapper.instance()
     }
     rerender()
@@ -40,5 +45,9 @@ describe('SubmissionBoxSettings', () => {
     expect(wrapper.find('SubmissionBoxFormat').props().collection).toEqual(
       props.collection
     )
+  })
+
+  it('renders audience settings', () => {
+    expect(wrapper.find('AudienceSettings').exists()).toEqual(true)
   })
 })

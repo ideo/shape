@@ -13,6 +13,7 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
+#  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
@@ -20,6 +21,7 @@
 #  processing_status              :integer
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
+#  start_date                     :datetime
 #  submission_box_type            :integer
 #  submissions_enabled            :boolean          default(TRUE)
 #  test_closed_at                 :datetime
@@ -47,50 +49,6 @@
 #  survey_response_id             :integer
 #  template_id                    :integer
 #  test_collection_id             :bigint(8)
-#  id                         :bigint(8)        not null, primary key
-#  anyone_can_join            :boolean          default(FALSE)
-#  anyone_can_view            :boolean          default(FALSE)
-#  archive_batch              :string
-#  archived                   :boolean          default(FALSE)
-#  archived_at                :datetime
-#  breadcrumb                 :jsonb
-#  cached_attributes          :jsonb
-#  cached_test_scores         :jsonb
-#  collection_type            :integer          default("collection")
-#  cover_type                 :integer          default("cover_type_default")
-#  end_date                   :datetime
-#  hide_submissions           :boolean          default(FALSE)
-#  master_template            :boolean          default(FALSE)
-#  name                       :string
-#  num_columns                :integer
-#  processing_status          :integer
-#  search_term                :string
-#  shared_with_organization   :boolean          default(FALSE)
-#  start_date                 :datetime
-#  submission_box_type        :integer
-#  submissions_enabled        :boolean          default(TRUE)
-#  test_closed_at             :datetime
-#  test_launched_at           :datetime
-#  test_show_media            :boolean          default(TRUE)
-#  test_status                :integer
-#  type                       :string
-#  unarchived_at              :datetime
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  cloned_from_id             :bigint(8)
-#  collection_to_test_id      :bigint(8)
-#  created_by_id              :integer
-#  default_group_id           :integer
-#  idea_id                    :integer
-#  joinable_group_id          :bigint(8)
-#  organization_id            :bigint(8)
-#  question_item_id           :integer
-#  roles_anchor_collection_id :bigint(8)
-#  submission_box_id          :bigint(8)
-#  submission_template_id     :integer
-#  survey_response_id         :integer
-#  template_id                :integer
-#  test_collection_id         :bigint(8)
 #
 # Indexes
 #
@@ -135,6 +93,9 @@ class Collection
     has_many :paid_test_audiences,
              -> { paid },
              class_name: 'TestAudience'
+    has_many :challenge_audiences,
+             -> { challenge },
+             class_name: 'TestAudience'
 
     belongs_to :collection_to_test, class_name: 'Collection', optional: true
 
@@ -144,6 +105,7 @@ class Collection
     after_create :add_test_tag
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
+    after_create :setup_challenge_test_audiences, unless: :collection_to_test
     after_update :touch_test_results_collection, if: :saved_change_to_test_status?
     after_update :update_ideas_collection, if: :saved_change_to_test_show_media?
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
@@ -380,6 +342,16 @@ class Collection
         # Prefix with 'Copy' if it isn't still within a template
         duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
+
+      if submission_box_template_test? && parent_challenge.present?
+        # copy challenge audiences from submission box template test
+        test_audiences.each do |test_audience|
+          next if test_audience.audience_type != 'challenge'
+
+          test_audience.duplicate!(assign_test_collection: duplicate)
+        end
+      end
+
       duplicate.save
       duplicate.reorder_cards!
       duplicate
@@ -501,6 +473,20 @@ class Collection
         audience_id: audience.id,
         status: :closed,
       )
+    end
+
+    def setup_challenge_test_audiences
+      return unless master_template.present? && parent_challenge.present?
+
+      challenge_audiences = Audience.where(audience_type: 'challenge')
+
+      challenge_audiences.each do |audience|
+        status = audience.name == 'Reviewers' ? :open : :closed
+        test_audiences.find_or_create_by(
+          audience_id: audience.id,
+          status: status,
+        )
+      end
     end
 
     def add_test_tag

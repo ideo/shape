@@ -13,6 +13,7 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
+#  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
@@ -20,6 +21,7 @@
 #  processing_status              :integer
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
+#  start_date                     :datetime
 #  submission_box_type            :integer
 #  submissions_enabled            :boolean          default(TRUE)
 #  test_closed_at                 :datetime
@@ -47,50 +49,6 @@
 #  survey_response_id             :integer
 #  template_id                    :integer
 #  test_collection_id             :bigint(8)
-#  id                         :bigint(8)        not null, primary key
-#  anyone_can_join            :boolean          default(FALSE)
-#  anyone_can_view            :boolean          default(FALSE)
-#  archive_batch              :string
-#  archived                   :boolean          default(FALSE)
-#  archived_at                :datetime
-#  breadcrumb                 :jsonb
-#  cached_attributes          :jsonb
-#  cached_test_scores         :jsonb
-#  collection_type            :integer          default("collection")
-#  cover_type                 :integer          default("cover_type_default")
-#  end_date                   :datetime
-#  hide_submissions           :boolean          default(FALSE)
-#  master_template            :boolean          default(FALSE)
-#  name                       :string
-#  num_columns                :integer
-#  processing_status          :integer
-#  search_term                :string
-#  shared_with_organization   :boolean          default(FALSE)
-#  start_date                 :datetime
-#  submission_box_type        :integer
-#  submissions_enabled        :boolean          default(TRUE)
-#  test_closed_at             :datetime
-#  test_launched_at           :datetime
-#  test_show_media            :boolean          default(TRUE)
-#  test_status                :integer
-#  type                       :string
-#  unarchived_at              :datetime
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  cloned_from_id             :bigint(8)
-#  collection_to_test_id      :bigint(8)
-#  created_by_id              :integer
-#  default_group_id           :integer
-#  idea_id                    :integer
-#  joinable_group_id          :bigint(8)
-#  organization_id            :bigint(8)
-#  question_item_id           :integer
-#  roles_anchor_collection_id :bigint(8)
-#  submission_box_id          :bigint(8)
-#  submission_template_id     :integer
-#  survey_response_id         :integer
-#  template_id                :integer
-#  test_collection_id         :bigint(8)
 #
 # Indexes
 #

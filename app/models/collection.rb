@@ -13,6 +13,7 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
+#  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
@@ -20,6 +21,7 @@
 #  processing_status              :integer
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
+#  start_date                     :datetime
 #  submission_box_type            :integer
 #  submissions_enabled            :boolean          default(TRUE)
 #  test_closed_at                 :datetime
@@ -47,50 +49,6 @@
 #  survey_response_id             :integer
 #  template_id                    :integer
 #  test_collection_id             :bigint(8)
-#  id                         :bigint(8)        not null, primary key
-#  anyone_can_join            :boolean          default(FALSE)
-#  anyone_can_view            :boolean          default(FALSE)
-#  archive_batch              :string
-#  archived                   :boolean          default(FALSE)
-#  archived_at                :datetime
-#  breadcrumb                 :jsonb
-#  cached_attributes          :jsonb
-#  cached_test_scores         :jsonb
-#  collection_type            :integer          default("collection")
-#  cover_type                 :integer          default("cover_type_default")
-#  end_date                   :datetime
-#  hide_submissions           :boolean          default(FALSE)
-#  master_template            :boolean          default(FALSE)
-#  name                       :string
-#  num_columns                :integer
-#  processing_status          :integer
-#  search_term                :string
-#  shared_with_organization   :boolean          default(FALSE)
-#  start_date                 :datetime
-#  submission_box_type        :integer
-#  submissions_enabled        :boolean          default(TRUE)
-#  test_closed_at             :datetime
-#  test_launched_at           :datetime
-#  test_show_media            :boolean          default(TRUE)
-#  test_status                :integer
-#  type                       :string
-#  unarchived_at              :datetime
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  cloned_from_id             :bigint(8)
-#  collection_to_test_id      :bigint(8)
-#  created_by_id              :integer
-#  default_group_id           :integer
-#  idea_id                    :integer
-#  joinable_group_id          :bigint(8)
-#  organization_id            :bigint(8)
-#  question_item_id           :integer
-#  roles_anchor_collection_id :bigint(8)
-#  submission_box_id          :bigint(8)
-#  submission_template_id     :integer
-#  survey_response_id         :integer
-#  template_id                :integer
-#  test_collection_id         :bigint(8)
 #
 # Indexes
 #
@@ -280,6 +238,7 @@ class Collection < ApplicationRecord
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
   scope :searchable, -> { where.not(type: unsearchable_types).or(not_custom_type) }
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(not_custom_type) }
+  scope :test_collection, -> { where(type: 'Collection::TestCollection') }
   scope :master_template, -> { where(master_template: true) }
 
   accepts_nested_attributes_for :collection_cards
@@ -1150,6 +1109,11 @@ class Collection < ApplicationRecord
   def create_challenge_groups_and_assign_roles
     return if challenge_admin_group.present? && challenge_reviewer_group.present? && challenge_participant_group.present?
 
+    # collections that become a challenge gets their roles unanchored
+    if roles_anchor_collection_id.present?
+      unanchor_and_inherit_roles_from_anchor!
+    end
+
     admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
     reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
     participant_group = create_challenge_participant_group(name: "#{name} Participants", organization: organization)
@@ -1157,10 +1121,18 @@ class Collection < ApplicationRecord
     self.challenge_admin_group_id = admin_group.id
     self.challenge_reviewer_group_id = reviewer_group.id
     self.challenge_participant_group_id = participant_group.id
+    # NOTE: somehow unachoring changes collection_type back to 'collection', so re-set it to 'challenge'
+    self.collection_type = 'challenge'
 
     admin_group.add_role(Role::EDITOR, self)
     reviewer_group.add_role(Role::VIEWER, self)
     participant_group.add_role(Role::VIEWER, self)
+  end
+
+  def submission_template_test_collections
+    return [] unless master_template? && submission_box_template?
+
+    Collection.in_collection(id).test_collection.includes(challenge_audiences: [:audience])
   end
 
   private

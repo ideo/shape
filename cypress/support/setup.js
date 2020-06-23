@@ -66,6 +66,9 @@ const createNamedRoutes = () => {
   )
 
   cy.route('PATCH', '/api/v1/test_audiences/*').as('apiUpdateTestAudience')
+  cy.route('PATCH', '/api/v1/test_audiences/*/toggle_status').as(
+    'apiToggleAudienceStatus'
+  )
   cy.route('PATCH', '/api/v1/datasets/*').as('apiUpdateDataset')
 
   cy.route('POST', '/api/v1/users/create_limited_user').as(

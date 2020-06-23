@@ -110,6 +110,7 @@ class CoverRenderer extends React.Component {
           return <div>{record.content}</div>
       }
     } else if (this.isCollection) {
+      const { isReviewable } = this.props
       return (
         <CollectionCover
           cardId={card.id}
@@ -125,6 +126,7 @@ class CoverRenderer extends React.Component {
             card.parentCollection.isSubmissionsCollection
           }
           textItem={nestedTextItem}
+          isReviewable={isReviewable}
         />
       )
     }
@@ -169,6 +171,7 @@ CoverRenderer.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   isBoardCollection: PropTypes.bool,
   isTestCollectionCard: PropTypes.bool,
+  isReviewable: PropTypes.bool,
   isCoverItem: PropTypes.bool,
   height: PropTypes.number,
   dragging: PropTypes.bool,
@@ -186,6 +189,7 @@ CoverRenderer.defaultProps = {
   isCoverItem: false,
   isBoardCollection: false,
   isTestCollectionCard: false,
+  isReviewable: false,
   handleClick: () => null,
   nestedTextItem: null,
   textItemHideReadMore: false,
