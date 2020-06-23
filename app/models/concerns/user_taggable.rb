@@ -7,17 +7,45 @@ module UserTaggable
     after_save :assign_and_remove_user_tags
   end
 
-  def user_tag_list
-    tagged_users.pluck(:handle)
+  class UserTagList < ActsAsTaggableOn::TagList
+    # Override TagList implementation to skip downcasing,
+    # as well as validate handles are user handles
+    # https://github.com/mbleigh/acts-as-taggable-on/blob/master/lib/acts_as_taggable_on/tag_list.rb
+    def clean!
+      reject!(&:blank?)
+      map!(&:to_s)
+      map!(&:strip)
+      # Ensure they are valid user handle
+      valid_handles = User.where(handle: self).pluck(:handle)
+      reject! { |handle| !valid_handles.include?(handle) }
+      self
+    end
   end
 
-  def user_tag_list=(assign_user_handles)
-    if assign_user_handles.blank?
+  def user_tag_list
+    @user_tag_list ||= UserTagList.new(tagged_users.pluck(:handle))
+  end
+
+  def user_tag_list=(*assign_user_handles)
+    @user_tag_list = UserTagList.new(assign_user_handles)
+  end
+
+  def reload(*args)
+    @user_tag_list = nil
+    super(*args)
+  end
+
+  private
+
+  def assign_and_remove_user_tags
+    @user_tag_add_user_ids = []
+    @user_tag_remove_user_ids = []
+
+    if @user_tag_list.blank?
       # If they are clearing it out, remove all tagged users
       @user_tag_remove_user_ids = tagged_user_ids
     else
-      assign_user_ids = User.where(handle: assign_user_handles).pluck(:id)
-      @user_tag_remove_user_ids = []
+      assign_user_ids = User.where(handle: @user_tag_list).pluck(:id)
 
       tagged_user_ids.each do |tagged_user_id|
         unless assign_user_ids.include?(tagged_user_id)
@@ -26,22 +54,29 @@ module UserTaggable
       end
 
       @user_tag_add_user_ids = assign_user_ids - tagged_user_ids
-
-      # Tags will be assigned and removed in assign_and_remove_user_tags
-    end
-  end
-
-  private
-
-  def assign_and_remove_user_tags
-    if @user_tag_remove_user_ids.present?
-      user_tags.where(user_id: @user_tag_remove_user_ids).delete_all
     end
 
-    return if @user_tag_add_user_ids.blank?
+    if @user_tag_remove_user_ids.present? && persisted?
+      UserTag.where(
+        record_id: id,
+        record_type: self.class.base_class.name,
+        user_id: @user_tag_remove_user_ids,
+      ).destroy_all
+    end
 
     @user_tag_add_user_ids.each do |user_id|
-      user_tags.create(user_id: user_id)
+      UserTag.create(
+        record_id: id,
+        record_type: self.class.base_class.name,
+        user_id: user_id,
+      )
     end
+
+    # Reload so relationship isn't cached if assigning in-memory object instance
+    tagged_users.reload if @user_tag_add_user_ids.present?
+
+    # Set to nil so it is reloaded when accessed again,
+    # so any invalid handles aren't preserved
+    @user_tag_list = nil
   end
 end

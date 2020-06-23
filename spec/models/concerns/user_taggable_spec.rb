@@ -18,7 +18,29 @@ describe UserTaggable, type: :concern do
       let!(:user_tag) { create(:user_tag, record: collection) }
 
       it 'returns array of user handles' do
-        expect(collection.user_tag_list).to eq([user_tag.user.handle])
+        expect(collection.reload.user_tag_list).to eq([user_tag.user.handle])
+      end
+    end
+
+    describe '#add' do
+      it 'adds tag' do
+        collection.user_tag_list.add(users[0].handle)
+        expect { collection.save }.to change(UserTag, :count).by(1)
+        collection.reload
+        expect(collection.user_tag_list).to eq([users[0].handle])
+      end
+    end
+
+    describe '#remove' do
+      before do
+        collection.update(user_tag_list: [users[0].handle, users[1].handle])
+      end
+
+      it 'removes tag' do
+        collection.user_tag_list.remove(users[0].handle)
+        expect { collection.save }.to change(UserTag, :count).by(-1)
+        collection.reload
+        expect(collection.user_tag_list).to eq([users[1].handle])
       end
     end
   end
@@ -49,7 +71,7 @@ describe UserTaggable, type: :concern do
 
       it 'does not assign anything' do
         expect {
-          collection.user_tag_list = user_tag_list
+          collection.update(user_tag_list: user_tag_list)
         }.not_to change(UserTag, :count)
       end
     end
@@ -59,6 +81,7 @@ describe UserTaggable, type: :concern do
 
       it 'removes users not included' do
         expect(UserTag.exists?(user_tag.id)).to be true
+        expect(collection.reload.user_tag_list).to eq([user_tag.user.handle])
         collection.update(user_tag_list: user_tag_list)
         expect(UserTag.exists?(user_tag.id)).to be false
         expect(collection.reload.user_tag_list).to eq(user_tag_list)
