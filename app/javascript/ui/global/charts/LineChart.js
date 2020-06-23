@@ -28,11 +28,17 @@ const chartStyle = (style, order) => {
 const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
   const { measure, timeframe, style, dataWithDates } = dataset
   let tooltipFn
+
   const values = formatValuesForVictory({
     values: dataWithDates || [],
     addStartDate: dataWithDates[0].date ? null : domain.x[0],
     addEndDate: dataWithDates[0].date ? null : domain.x[1],
   })
+  if (dataset.data.length === 1) {
+    // If theres only one data point, we want the line chart to span whole chart
+    values[0].date = domain.x[0]
+    values[1].date = domain.x[1]
+  }
   if (simpleDateTooltip) {
     tooltipFn = datum => dateTooltipText(datum, dataset.name)
   } else {
