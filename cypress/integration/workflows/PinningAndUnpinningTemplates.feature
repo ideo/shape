@@ -9,7 +9,10 @@ Feature: Pinning and Unpinning
     And I create a textItem card at 1,2 on the board with "Pin me too!"
 
     And I click the "CardAction-Pin to Template" on the index 0 card
+    And I wait for "@apiTogglePin" to finish
     And I click the "CardAction-Pin to Template" on the index 3 card
+    And I wait for "@apiTogglePin" to finish
+    And I wait for 1 second
 
     # check that the buttons have changed
     Then I should see a "CardAction-Unpin from Template" in the card at 0,0
@@ -24,7 +27,7 @@ Feature: Pinning and Unpinning
     And I place a card to the bottom using the snackbar
     And I wait for '@apiCreateTemplate' to finish
     And I navigate to the collection named "My Test Template" via the "CollectionCover"
-    And I wait for 1 seconds
+    And I wait for 1 second
     Then I should see a "PinnedIcon" in the card at 0,0
     Then I should not see a "PinnedIcon" in the card at 0,1
     Then I should not see a "PinnedIcon" in the card at 1,1

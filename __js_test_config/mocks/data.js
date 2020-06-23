@@ -484,6 +484,7 @@ export const fakeCollection = {
   revertToSnapshot: jest.fn(),
   removeCardIds: jest.fn(),
   setCarouselIdx: jest.fn(),
+  setViewMode: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',

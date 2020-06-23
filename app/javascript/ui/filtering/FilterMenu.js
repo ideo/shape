@@ -4,12 +4,17 @@ import styled from 'styled-components'
 
 import FilterIcon from '~/ui/icons/FilterIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
+import v from '~/utils/variables'
 
 export const FilterIconButton = styled.button`
   height: 40px;
   margin-right: 10px;
   margin-bottom: ${props => props.marginBottom}px;
   width: 35px;
+
+  &:hover {
+    color: ${v.colors.commonDarkest};
+  }
 `
 FilterIconButton.displayName = 'FilterIconButton'
 
