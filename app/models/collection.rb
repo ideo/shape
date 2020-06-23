@@ -929,10 +929,20 @@ class Collection < ApplicationRecord
     parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
 
-  def submission_reviewer_status(user:)
+  def challenge_reviewer?(user)
+    return false if parent_challenge.blank?
+
+    parent_challenge.collection_filters
+                    .tagged_with_user_handle(user.handle)
+                    .count
+                    .positive?
+  end
+
+  def submission_reviewer_status(user)
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
-                  submission_attrs['launchable_test_id'].present?
+                  submission_attrs['launchable_test_id'].present? &&
+                  challenge_reviewer?(user)
 
     response = SurveyResponse.find_by(
       test_collection_id: submission_attrs['launchable_test_id'],

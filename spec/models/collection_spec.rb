@@ -881,49 +881,7 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#submission_reviewer_status' do
-    let(:collection) { create(:collection) }
-    let(:user) { create(:user) }
-
-    it 'returns nil if not a submission' do
-      expect(collection.submission_reviewer_status(user: user)).to be_nil
-    end
-
-    context 'as a submission' do
-      let(:submission_box) { create(:submission_box) }
-      let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
-      # Take a shortcut - just create test collection to be used directly in submission
-      let!(:test_collection) do
-        create(:test_collection, :completed, parent_collection: submission_template)
-      end
-      let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
-      before do
-        submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
-      end
-
-      it 'returns :unstarted if no survey responses' do
-        expect(submission.submission_reviewer_status(user: user)).to eq(:unstarted)
-      end
-
-      context 'with an incomplete survey response' do
-        let!(:survey_response) { create(:survey_response, test_collection: test_collection, user: user) }
-
-        it 'returns :in_progress' do
-          expect(submission.submission_reviewer_status(user: user)).to eq(:in_progress)
-        end
-      end
-
-      context 'with a complete survey response' do
-        let!(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection, user: user) }
-
-        it 'returns :completed' do
-          expect(submission.submission_reviewer_status(user: user)).to eq(:completed)
-        end
-      end
-    end
-  end
-
-  context 'with submission in challenge' do
+  context 'challenge with submission' do
     let(:user) { create(:user) }
     let!(:parent_challenge) do
       create(
@@ -936,8 +894,61 @@ describe Collection, type: :model do
     end
     let(:submission_box) { create(:submission_box, parent_collection: parent_challenge) }
     before { submission_box.setup_submissions_collection! }
+    let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
+    # Take a shortcut - just create test collection to be used directly in submission
+    let!(:test_collection) do
+      create(:test_collection, :completed, parent_collection: submission_template)
+    end
     let!(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
     let(:reviewer) { create(:user) }
+    before do
+      submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
+    end
+
+    describe '#submission_reviewer_status' do
+      context 'if not a submission' do
+        before do
+          submission.update(submission_attrs: {})
+        end
+
+        it 'returns nil' do
+          expect(submission.submission?).to be false
+          expect(submission.submission_reviewer_status(reviewer)).to be_nil
+        end
+      end
+
+      context 'if user is not assigned as a reviewer' do
+        it 'returns nil' do
+          expect(submission.submission_reviewer_status(reviewer)).to be_nil
+        end
+      end
+
+      context 'if user is assigned as a reviewer' do
+        before do
+          submission.add_challenge_reviewer(reviewer)
+        end
+
+        it 'returns :unstarted if no survey responses' do
+          expect(submission.submission_reviewer_status(reviewer)).to eq(:unstarted)
+        end
+
+        context 'with an incomplete survey response' do
+          let!(:survey_response) { create(:survey_response, test_collection: test_collection, user: reviewer) }
+
+          it 'returns :in_progress' do
+            expect(submission.submission_reviewer_status(reviewer)).to eq(:in_progress)
+          end
+        end
+
+        context 'with a complete survey response' do
+          let!(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection, user: reviewer) }
+
+          it 'returns :completed' do
+            expect(submission.submission_reviewer_status(reviewer)).to eq(:completed)
+          end
+        end
+      end
+    end
 
     describe '#add_challenge_reviewer' do
       it 'adds collection filter with user handle' do

@@ -45,7 +45,7 @@ module UserSpecificFields
     end
 
     attribute :submission_reviewer_status, if: -> { @object.is_a?(Collection) && @object.submission? } do
-      @object.submission_reviewer_status(user: @current_user)
+      @object.submission_reviewer_status(@current_user)
     end
   end
 end
