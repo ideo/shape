@@ -156,8 +156,8 @@ const ChartAxisProps = ({
     tickCount,
   }
 
-  let overOne = datasetValues.length > 1 ||
-    (secondaryValues && secondaryValues.length > 1)
+  let overOne =
+    datasetValues.length > 1 || (secondaryValues && secondaryValues.length > 1)
   if (dateValues) {
     axisProps.tickValues = dateValues
     axisProps.tickCount = null
