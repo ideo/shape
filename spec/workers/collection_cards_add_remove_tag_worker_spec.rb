@@ -69,8 +69,9 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
       end
 
       context 'with user' do
+        let!(:user_dkaplan) { create(:user, handle: 'dkaplan') }
         let!(:type) { 'user_tag_list' }
-        let!(:tag) { 'dkaplan' }
+        let!(:tag) { user_dkaplan.handle }
 
         context 'with the add action' do
           let!(:action) { 'add' }
@@ -78,7 +79,7 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
           it 'adds tags to all card records' do
             perform
             records.each do |record|
-              expect(record.reload.user_list).to eq(['dkaplan'])
+              expect(record.reload.user_tag_list).to eq(['dkaplan'])
             end
           end
 
@@ -89,18 +90,27 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
         end
 
         context 'with the remove action' do
+          let(:user_tags) { %w[nlistana jschwartzman msegreto] }
+          let!(:users) do
+            user_tags.map do |handle|
+              create(:user, handle: handle)
+            end
+          end
           let!(:action) { 'remove' }
 
           before do
             records.each do |record|
-              record.update(user_list: 'nlistana, jschwartzman, msegreto')
+              record.update(user_tag_list: user_tags + [tag])
             end
           end
 
           it 'removes tags on all card records' do
-            perform
             records.each do |record|
-              expect(record.reload.user_list).to eq(%w[nlistana jschwartzman msegreto])
+              expect(record.reload.user_tag_list).to match_array(user_tags + [tag])
+            end
+            expect { perform }.to change(UserTag, :count).by(-records.size)
+            records.each do |record|
+              expect(record.reload.user_tag_list).to match_array(user_tags)
             end
           end
 

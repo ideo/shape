@@ -14,7 +14,7 @@ class CollectionCardsAddRemoveTagWorker
         record = card.record
         case type
         when 'user_tag_list'
-          record.user_list.send(action, tag)
+          record.user_tag_list.send(action, tag)
         when 'tag_list'
           record.tag_list.send(action, tag)
         end
