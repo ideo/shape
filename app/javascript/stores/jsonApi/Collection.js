@@ -62,7 +62,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @observable
   phaseSubCollections = []
   @observable
-  collectionTags = []
+  tags = []
 
   attributesForAPI = [
     'name',
@@ -110,12 +110,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.currentPage + 1
   }
 
-  initializeCollectionTags = async () => {
+  initializeTags = async () => {
     const { organization } = this
 
     const userTagsWithUsers = await Promise.all(
       _.map(this.user_tag_list, async tag => {
-        // FIXME: can probably just be a simple api call that returns the organization for handle
+        // FIXME: use another api call that fetches user by handle
         const searchRequest = await organization.API_getOrganizationUserTag(tag)
         const user = searchRequest.data[0] || null
         return { label: tag, type: 'user_tag_list', user }
@@ -130,7 +130,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
 
     runInAction(() => {
-      this.collectionTags = [...userTagsWithUsers, ...tagList]
+      this.tags = [...userTagsWithUsers, ...tagList]
     })
   }
 

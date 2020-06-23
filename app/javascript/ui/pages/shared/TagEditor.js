@@ -14,6 +14,7 @@ const TagEditor = ({
   recordTags,
   afterAddTag,
   afterRemoveTag,
+  suggestions,
   tagField,
   canEdit,
   tagColor,
@@ -106,6 +107,7 @@ const TagEditor = ({
         <ReactTags
           tags={formattedTags}
           allowBackspace={false}
+          suggestions={suggestions}
           delimiterChars={[',']}
           placeholder={placeholder}
           handleAddition={handleAddition}
@@ -125,6 +127,7 @@ TagEditor.propTypes = {
   recordTags: PropTypes.array.isRequired,
   afterAddTag: PropTypes.func.isRequired,
   afterRemoveTag: PropTypes.func.isRequired,
+  suggestions: PropTypes.array.isRequired,
   tagField: PropTypes.string.isRequired,
   canEdit: PropTypes.bool,
   tagColor: PropTypes.string,

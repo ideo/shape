@@ -15,8 +15,6 @@ import { filtersToTags } from '~/ui/filtering/shared'
 @inject('apiStore')
 class FilterSearchModal extends React.Component {
   @observable
-  tags = []
-  @observable
   searchResultCount = null
 
   constructor(props) {
@@ -25,27 +23,26 @@ class FilterSearchModal extends React.Component {
   }
 
   componentDidMount() {
-    const { currentUserOrganization } = this.props.apiStore
-    currentUserOrganization.API_getOrganizationTagList().then(tags => {
-      runInAction(() => {
-        this.tags = tags
-      })
-    })
+    this.initializeSuggestions()
   }
 
-  get organizationUserTags() {
-    const { currentUserOrganization } = this.props.apiStore
-    return currentUserOrganization.map(u => u.handle)
+  componentDidUpdate(prevProps) {
+    if (prevProps.modalOpen != this.props.modalOpen) {
+      this.initializeSuggestions()
+    }
   }
 
-  get fullTagList() {
-    return [...this.tags, ...this.organizationUserTags]
+  async initializeSuggestions() {
+    const { currentUserOrganization } = this.props.apiStore
+    await currentUserOrganization.initializeTags()
   }
 
   get formattedSuggestions() {
     const { filterType } = this.props
     if (filterType === 'Search Term') return []
-    return this.fullTagList
+    const { currentOrganization } = this.props.apiStore
+    const { tags } = currentOrganization
+    return tags
   }
 
   get filtersFormattedAsTags() {
@@ -71,7 +68,6 @@ class FilterSearchModal extends React.Component {
   }
 
   onNewTag = tag => {
-    console.log({ tag })
     this.props.onCreateTag(tag)
   }
 

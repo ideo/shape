@@ -8,8 +8,8 @@ import TagEditor from './TagEditor'
 @inject('apiStore')
 @observer
 class CollectionCardsTagEditor extends React.Component {
-  async componentDidMount() {
-    await this.initializeSelectedRecordsTags()
+  componentDidMount() {
+    this.initializeSelectedRecordsTags()
   }
 
   componentDidUpdate(prevProps) {
@@ -24,7 +24,7 @@ class CollectionCardsTagEditor extends React.Component {
     // attach userTags to record
     await Promise.all(
       _.map(records, async r => {
-        return await r.initializeCollectionTags()
+        return await r.initializeTags()
       })
     )
   }
@@ -34,8 +34,8 @@ class CollectionCardsTagEditor extends React.Component {
     const { records } = this.props
     // TODO: check uniqueness and sort
     const recordTags = _.flatMap(records, r => {
-      const { collectionTags } = r
-      return toJS(collectionTags)
+      const { tags } = r
+      return toJS(tags)
     })
     return recordTags
   }
@@ -60,7 +60,7 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   render() {
-    const { canEdit, placeholder, tagColor } = this.props
+    const { canEdit, placeholder, tagColor, suggestions } = this.props
     // FIXME: will support user_tag_list in the next story
     const tagField = 'tag_list'
     return (
@@ -71,6 +71,7 @@ class CollectionCardsTagEditor extends React.Component {
         canEdit={canEdit}
         placeholder={placeholder}
         tagColor={tagColor}
+        suggestions={suggestions}
         tagField={tagField}
       />
     )
@@ -87,6 +88,7 @@ CollectionCardsTagEditor.propTypes = {
   canEdit: PropTypes.bool,
   placeholder: PropTypes.string,
   tagColor: PropTypes.string,
+  suggestions: PropTypes.array.isRequired,
 }
 
 CollectionCardsTagEditor.defaultProps = {

@@ -13,9 +13,24 @@ const StyledDisplayText = styled(DisplayText)`
   margin-bottom: 0.15rem;
 `
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class CollectionCardsTagEditorModal extends React.Component {
+  componentDidMount() {
+    this.initializeSuggestions()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.open != this.props.open) {
+      this.initializeSuggestions()
+    }
+  }
+
+  async initializeSuggestions() {
+    const { currentUserOrganization } = this.props.apiStore
+    await currentUserOrganization.initializeTags()
+  }
+
   get title() {
     const { cards } = this.props
     return (
@@ -38,6 +53,12 @@ class CollectionCardsTagEditorModal extends React.Component {
     return cards ? _.map(cards, 'id') : []
   }
 
+  get editorSuggestions() {
+    const { currentUserOrganization } = this.props.apiStore
+    const { tags } = currentUserOrganization
+    return tags
+  }
+
   render() {
     const { canEdit, uiStore, open } = this.props
 
@@ -53,6 +74,7 @@ class CollectionCardsTagEditorModal extends React.Component {
           canEdit={canEdit}
           placeholder="Add new tags, separated by comma or pressing enter."
           tagField="tag_list"
+          suggestions={this.editorSuggestions}
         />
       </Modal>
     )
@@ -66,6 +88,7 @@ CollectionCardsTagEditorModal.propTypes = {
 }
 CollectionCardsTagEditorModal.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 CollectionCardsTagEditorModal.defaultProps = {
   canEdit: false,
