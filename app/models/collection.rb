@@ -1190,10 +1190,10 @@ class Collection < ApplicationRecord
     Collection.in_collection(id).test_collection.includes(challenge_audiences: [:audience])
   end
 
-  def reload
+  def reload(*args)
     # Reset all memoized data
     @parent_challenge = @parent_submission_box_template = nil
-    super
+    super(*args)
   end
 
   private
