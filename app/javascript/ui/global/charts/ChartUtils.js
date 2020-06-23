@@ -207,7 +207,10 @@ export const addDuplicateValueIfSingleValue = (
     valuesWithDupe[0].date = addStartDate
 
   // Add a duplicate value
-  const duplicateValue = { ...valuesWithDupe[0], isDuplicate: true }
+  const duplicateValue = {
+    ...valuesWithDupe[0],
+    isDuplicate: true,
+  }
   // Set given date
   if (duplicateValue.date && addEndDate) {
     duplicateValue.date = addEndDate
