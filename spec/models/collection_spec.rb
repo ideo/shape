@@ -938,9 +938,6 @@ describe Collection, type: :model do
     before { submission_box.setup_submissions_collection! }
     let!(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
     let(:reviewer) { create(:user) }
-    # before do
-    #   [submission_box, submission_box.submissions_collection, submission].each(&:recalculate_breadcrumb!)
-    # end
 
     describe '#add_challenge_reviewer' do
       it 'adds collection filter with user handle' do
