@@ -57,6 +57,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   lastZoom = null
   @observable
   carouselIdx = 0
+  @observable
+  viewMode = 'grid'
   // this stores the "virtual" search results collection
   searchResultsCollection = null
   @observable
@@ -173,6 +175,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.carouselIdx = value
   }
 
+  @action
+  setViewMode(mode) {
+    this.viewMode = mode
+  }
+
   get currentCarouselRecord() {
     if (_.isEmpty(this.collection_cover_items)) {
       return
@@ -181,7 +188,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   cardIdsBetween(firstCardId, lastCardId) {
-    if (this.isBoard) {
+    if (this.isBoard && this.viewMode !== 'list') {
       return this.cardIdsBetweenByColRow(firstCardId, lastCardId)
     }
     // For all other collection types, find cards by order
@@ -596,7 +603,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get allowsCollectionTypeSelector() {
     return _.every(
       [
-        this.isRegularCollection,
+        this.isRegularCollection || this.isBoard,
         !this.isSpecialCollection,
         !this.system_required,
       ],
@@ -892,6 +899,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     })
   }
 
+  API_fetchCardRoles = () => {
+    const ids = _.compact(
+      _.map(this.collection_cards, cc => {
+        if (cc.record && _.isEmpty(cc.record.roles)) {
+          return cc.id
+        }
+      })
+    )
+    if (ids.length === 0) return
+    return this.apiStore.request(
+      `collections/${this.id}/collection_cards/roles?select_ids=${ids}`
+    )
+  }
+
   async API_fetchAndMergeCards(cardIds) {
     const { apiStore } = this
     const ids = cardIds.join(',')
@@ -1155,11 +1176,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   @computed
   get sortedCards() {
-    return _.orderBy(
-      this.collection_cards,
-      ['pinned', 'order'],
-      ['desc', 'asc']
-    )
+    let orderList = ['pinned', 'order']
+    let order = ['desc', 'asc']
+    if (this.isBoard) {
+      orderList = ['row', 'col']
+      order = ['asc', 'asc']
+    }
+    return _.orderBy(this.collection_cards, orderList, order)
   }
 
   @computed

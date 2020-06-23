@@ -79,7 +79,7 @@ export default class CardMoveService {
       let newCardIds
       switch (cardAction) {
         case 'move':
-          if (movingWithinCollection) {
+          if (movingWithinCollection && !toCollection.isBoard) {
             const order =
               placement === 'beginning'
                 ? 0

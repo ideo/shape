@@ -267,6 +267,26 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'GET #roles' do
+    let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
+    let(:items) { collection.items }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/roles" }
+    before do
+      items.first.reload.unanchor_and_inherit_roles_from_anchor!
+    end
+
+    it 'returns cards with their related roles' do
+      get(path)
+      expect(response.status).to eq(200)
+      expect(json['data'].length).to eq(5)
+      expect(json['data'].first['relationships']['record']['data']['id']).to eq(
+        items.first.id.to_s,
+      )
+      # 1 role for the collection, 1 for the unanchored item
+      expect(json['included'].select { |i| i['type'] == 'roles' }.count).to eq 2
+    end
+  end
+
   describe 'GET #ids_in_direction' do
     let!(:collection) { create(:board_collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids_in_direction" }

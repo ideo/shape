@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 export const StyledTitleAndRoles = styled(Flex)`
+  flex-grow: 1;
   @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
     padding-top: 4px;
   }

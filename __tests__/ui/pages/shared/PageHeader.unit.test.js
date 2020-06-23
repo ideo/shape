@@ -256,4 +256,22 @@ describe('PageHeader', () => {
       })
     })
   })
+
+  describe('rightIcon', () => {
+    describe('when collection is a board', () => {
+      it('returns an icon', () => {
+        props.record.type = 'Collection::Board'
+        expect(component.rightIcon).toEqual(null)
+      })
+    })
+  })
+
+  describe('leftIcon', () => {
+    describe('when collection is a board', () => {
+      it('returns an icon', () => {
+        props.record.type = 'Collection::Board'
+        expect(component.leftIcon).toEqual(null)
+      })
+    })
+  })
 })

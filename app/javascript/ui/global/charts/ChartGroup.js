@@ -282,8 +282,9 @@ class ChartGroup extends React.Component {
         datasetTimeframe: timeframe,
         domain: this.chartDomain,
         isSmallChartStyle: this.isSmallChartStyle,
-        dateValues: this.isSmallChartStyle ? dates : null,
+        dateValues: this.isSmallChartStyle ? dates.sort() : null,
       })
+
       return axisProps
     }
   }

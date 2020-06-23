@@ -2,7 +2,7 @@
 import undoStore from '#/mocks/fakeUndoStore'
 import uiStore from '#/mocks/fakeUiStore'
 import routingStore from '#/mocks/fakeRoutingStore'
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeThread } from '#/mocks/data'
 import ApiStore from '~/stores/ApiStore'
 import IdeoSSO from '~/utils/IdeoSSO'
 
@@ -102,6 +102,22 @@ describe('ApiStore', () => {
     })
   })
 
+  describe('#expandAndOpenThreadForRecord', () => {
+    beforeEach(() => {
+      apiStore.request = jest
+        .fn()
+        .mockReturnValue(Promise.resolve({ data: { ...fakeThread } }))
+      uiStore.viewingRecord = { id: '123' }
+      uiStore.expandAndOpenThread = jest.fn()
+    })
+
+    it('does shit', async () => {
+      await apiStore.expandAndOpenThreadForRecord(collection)
+      // this should have looked up the thread via request mocked above
+      expect(uiStore.expandAndOpenThread).toHaveBeenCalledWith(fakeThread.key)
+    })
+  })
+
   describe('#moveCards', () => {
     let data
     const res = {
@@ -134,6 +150,15 @@ describe('ApiStore', () => {
     it('should merge the resulting cards', async () => {
       await apiStore.moveCards(data)
       expect(collection.mergeCards).toHaveBeenCalledWith(res.data)
+    })
+
+    it('should remove the moved cards from fromCollection', async () => {
+      await apiStore.moveCards(data)
+      // NOTE: because `collection` is the mock return value of apiStore.find
+      // it is the stand-in for both from/toCollection
+      expect(collection.removeCardIds).toHaveBeenCalledWith(
+        data.collection_card_ids
+      )
     })
 
     it('should call API_fetchCardOrders if not a board collection', async () => {

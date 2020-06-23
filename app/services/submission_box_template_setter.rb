@@ -36,12 +36,7 @@ class SubmissionBoxTemplateSetter < SimpleService
 
   def duplicate_template_card
     original_template = @template_card.collection
-    if original_template.nil?
-      @errors << 'Unable to use template'
-      return false
-    end
-    # only allow "normal" and Board collections to be the top level template
-    unless [nil, 'Collection::Board'].include? original_template.type
+    if invalid_template?(original_template)
       @errors << 'Unable to use template'
       return false
     end
@@ -69,6 +64,20 @@ class SubmissionBoxTemplateSetter < SimpleService
       name: "#{@submission_box.name} #{template.name}",
     )
     template.add_submission_box_tag
+  end
+
+  def invalid_template?(original_template)
+    original_template.nil? ||
+      # only allow "normal" and Board collections to be the top level template
+      [nil, 'Collection::Board'].exclude?(original_template.type) ||
+      contains_submission_box?(original_template)
+  end
+
+  def contains_submission_box?(original_template)
+    Collection
+      .in_collection(original_template)
+      .where(type: 'Collection::SubmissionBox')
+      .any?
   end
 
   def set_template

@@ -137,12 +137,8 @@ class Header extends React.Component {
   }
 
   get backgroundColor() {
-    const { record } = this
     if (this.onArchivedPage) {
       return v.colors.commonMediumTint
-    } else if (record && record.isFourWideBoard) {
-      // NOTE: temporary to indicate prototype feature
-      return v.colors.prototype
     } else {
       return v.colors.commonLight
     }

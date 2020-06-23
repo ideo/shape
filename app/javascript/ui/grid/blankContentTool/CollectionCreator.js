@@ -75,6 +75,7 @@ class CollectionCreator extends React.Component {
         return 'Collection::TestCollection'
         break
       case 'foamcoreBoard':
+      case 'template':
         return 'Collection::Board'
         break
       case 'search':
@@ -91,7 +92,10 @@ class CollectionCreator extends React.Component {
     const { type, parentIsFourWide } = this.props
     if (type === 'foamcoreBoard') {
       return 16
-    } else if (parentIsFourWide && type === 'collection') {
+    } else if (
+      type === 'template' ||
+      (parentIsFourWide && type === 'collection')
+    ) {
       return 4
     }
     return null

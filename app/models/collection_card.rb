@@ -507,15 +507,22 @@ class CollectionCard < ApplicationRecord
     record.cloned_from&.parent_collection_card&.id
   end
 
-  def copy_card_attributes!(copy)
-    update(
-      height: copy.height,
-      width: copy.width,
-      col: copy.col,
-      row: copy.row,
-      order: copy.order,
-      pinned: copy.pinned,
-    )
+  def copy_master_card_attributes!(master)
+    # the created_at check is rather arbitrary, however the point is to preserve
+    # updates to cards that the master template editor is in the process of creating
+    if master.pinned? || master.created_at > 2.minutes.ago
+      update(
+        height: master.height,
+        width: master.width,
+        col: master.col,
+        row: master.row,
+        order: master.order,
+        pinned: master.pinned,
+      )
+    else
+      # from an unpinned master_card we only copy the unpinned attr
+      update(pinned: false)
+    end
   end
 
   def cache_key

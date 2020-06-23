@@ -143,13 +143,29 @@ describe('MovableGridCard', () => {
       wrapper = shallow(<MovableGridCard {...props} />)
       component = wrapper.instance()
     })
-    it('should drag', () => {
+
+    it('should initiate uiStore.drag, but not call other drag functions until >10 px movement', () => {
       const pageX = 0
       const pageY = 10
       const e = { pageX, pageY }
       const data = { x: 0, y: 0 }
       component.handleDrag(e, data)
       expect(uiStore.drag).toHaveBeenCalledWith({ x: pageX, y: pageY })
+      expect(uiStore.startDragging).not.toHaveBeenCalled()
+    })
+
+    describe('with >10 px movement', () => {
+      it('should initiate uiStore.drag, but not call other drag functions until >10 px movement', () => {
+        const pageX = 0
+        const pageY = 10
+        const e = { pageX, pageY }
+        const data = { x: 15, y: 25 }
+        component.handleDrag(e, data)
+        expect(uiStore.drag).toHaveBeenCalledWith({ x: pageX, y: pageY })
+        expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
+        expect(uiStore.reselectOnlyMovableCards).toHaveBeenCalled()
+        expect(uiStore.startDragging).toHaveBeenCalledWith(props.card.id)
+      })
     })
   })
 })

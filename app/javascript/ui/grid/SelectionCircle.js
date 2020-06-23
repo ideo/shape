@@ -29,6 +29,7 @@ StyledSelectionCircle.displayName = 'StyledSelectionCircle'
 class SelectionCircle extends React.Component {
   toggleSelected = e => {
     const { cardId, uiStore } = this.props
+    e.stopPropagation()
     if (uiStore.captureKeyboardGridClick(e, cardId)) {
       return
     }
@@ -45,6 +46,7 @@ class SelectionCircle extends React.Component {
       <StyledSelectionCircle
         className={this.isSelected ? 'selected' : 'show-on-hover'}
         onClick={this.toggleSelected}
+        data-cy="SelectionCircle"
         role="button"
       />
     )
