@@ -1,6 +1,5 @@
 import { apiUrl } from '~/utils/url'
 import { ReferenceType } from 'datx'
-import { observable, runInAction } from 'mobx'
 import _ from 'lodash'
 
 import BaseRecord from './BaseRecord'
@@ -9,9 +8,6 @@ import Item from './Item'
 class Organization extends BaseRecord {
   static type = 'organizations'
   static endpoint = apiUrl('organizations')
-
-  @observable
-  tags = []
 
   API_createTermsTextItem() {
     return this.apiStore.request(
@@ -34,36 +30,41 @@ class Organization extends BaseRecord {
     )
   }
 
-  async API_getOrganizationUserTag(handle) {
-    // FIXME: should return tag for handle
+  async API_searchTagsAndUsers(tag) {
     return this.apiStore.request(
-      `organizations/${this.id}/users?query=${handle}`,
+      `organizations/${this.id}/search_users_and_tags?query=${tag}`,
       'GET'
     )
   }
 
-  async API_getOrganizationTags() {
-    return this.apiStore.request(`organizations/${this.id}/tags`, 'GET')
+  async API_getOrganizationUserTag(handle) {
+    // FIXME: should return tag for tag
+    await Promise.resolve(null)
   }
 
   // NOTE: Initializes tag suggestions for react tags
-  async initializeTags() {
-    const organizationTags = await this.API_getOrganizationTags()
+  async searchTagsAndUsers(handle) {
+    const organizationTags = await this.API_searchTagsAndUsers(handle)
     const { data } = organizationTags
 
-    const allTags = []
+    const allTagsAndUsers = []
     if (data) {
-      _.each(organizationTags.data, (tag, index) => {
-        allTags.push({
-          id: index,
-          name: tag.name,
-        })
+      _.each(data, (tagOrUser, index) => {
+        const { internalType } = tagOrUser
+
+        let name = ''
+        let user = null
+        if (internalType === 'users') {
+          name = tagOrUser.handle
+          user = tagOrUser
+        } else if (internalType === 'tags') {
+          name = tagOrUser.name
+        }
+        allTagsAndUsers.push({ id: index, name, user })
       })
     }
 
-    runInAction(() => {
-      this.tags = allTags
-    })
+    return allTagsAndUsers
   }
 
   attributesForAPI = [

@@ -60,9 +60,13 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   render() {
-    const { canEdit, placeholder, tagColor, suggestions } = this.props
-    // FIXME: will support user_tag_list in the next story
-    const tagField = 'tag_list'
+    const {
+      canEdit,
+      placeholder,
+      tagColor,
+      suggestions,
+      handleInputChange,
+    } = this.props
     return (
       <TagEditor
         recordTags={this.selectedRecordTags}
@@ -72,7 +76,7 @@ class CollectionCardsTagEditor extends React.Component {
         placeholder={placeholder}
         tagColor={tagColor}
         suggestions={suggestions}
-        tagField={tagField}
+        handleInputChange={handleInputChange}
       />
     )
   }
@@ -84,11 +88,12 @@ CollectionCardsTagEditor.wrappedComponent.propTypes = {
 
 CollectionCardsTagEditor.propTypes = {
   records: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
-  cardIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+  cardIds: PropTypes.array.isRequired,
   canEdit: PropTypes.bool,
   placeholder: PropTypes.string,
   tagColor: PropTypes.string,
-  suggestions: PropTypes.array.isRequired,
+  suggestions: MobxPropTypes.arrayOrObservableArray.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
 }
 
 CollectionCardsTagEditor.defaultProps = {

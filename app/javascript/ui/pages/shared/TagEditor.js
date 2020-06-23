@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
@@ -15,11 +16,11 @@ const TagEditor = ({
   afterAddTag,
   afterRemoveTag,
   suggestions,
-  tagField,
   canEdit,
   tagColor,
   placeholder,
   validateTag,
+  handleInputChange,
 }) => {
   const [error, setError] = useState('')
   const [formattedTags, setFormattedTags] = useState([])
@@ -51,6 +52,9 @@ const TagEditor = ({
 
   const handleAddition = tagData => {
     tagData.name = tagData.name.trim()
+
+    // FIXME: hardcode tag_field for now; figure out how we can determine which tag type is getting added
+    const tagField = 'tag_list'
 
     const newTag = getFormattedTag({
       label: tagData.name,
@@ -112,6 +116,7 @@ const TagEditor = ({
           placeholder={placeholder}
           handleAddition={handleAddition}
           handleDelete={handleDelete}
+          handleInputChange={handleInputChange}
           tagComponent={Pill}
           allowNew
         />
@@ -127,12 +132,12 @@ TagEditor.propTypes = {
   recordTags: PropTypes.array.isRequired,
   afterAddTag: PropTypes.func.isRequired,
   afterRemoveTag: PropTypes.func.isRequired,
-  suggestions: PropTypes.array.isRequired,
-  tagField: PropTypes.string.isRequired,
   canEdit: PropTypes.bool,
   tagColor: PropTypes.string,
   placeholder: PropTypes.string,
   validateTag: PropTypes.func,
+  suggestions: MobxPropTypes.arrayOrObservableArray.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
 }
 
 TagEditor.defaultProps = {

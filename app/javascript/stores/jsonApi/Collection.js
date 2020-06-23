@@ -112,12 +112,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   initializeTags = async () => {
     const { organization } = this
-
     const userTagsWithUsers = await Promise.all(
       _.map(this.user_tag_list, async tag => {
-        // FIXME: use another api call that fetches user by handle
         const searchRequest = await organization.API_getOrganizationUserTag(tag)
-        const user = searchRequest.data[0] || null
+        const user = (searchRequest && searchRequest.data) || null
         return { label: tag, type: 'user_tag_list', user }
       })
     )
@@ -128,7 +126,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         type: 'tag_list',
       }
     })
-
     runInAction(() => {
       this.tags = [...userTagsWithUsers, ...tagList]
     })

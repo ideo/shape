@@ -38,6 +38,7 @@ import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
 import QuestionChoice from './jsonApi/QuestionChoice'
+import Tag from './jsonApi/Tag'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -972,6 +973,7 @@ ApiStore.types = [
   QuestionChoice,
   Role,
   SurveyResponse,
+  Tag,
   TestAudience,
   User,
   UsersThread,

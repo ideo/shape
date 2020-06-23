@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 import _ from 'lodash'
 
@@ -16,19 +17,27 @@ const StyledDisplayText = styled(DisplayText)`
 @inject('uiStore', 'apiStore')
 @observer
 class CollectionCardsTagEditorModal extends React.Component {
-  componentDidMount() {
-    this.initializeSuggestions()
+  @observable
+  suggestions = []
+
+  constructor(props) {
+    super(props)
+    this.debouncedFilterSuggestions = _.debounce(
+      this._searchFilterSuggestions,
+      400
+    )
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.open != this.props.open) {
-      this.initializeSuggestions()
-    }
+  onInputChange = query => {
+    this.debouncedFilterSuggestions(query)
   }
 
-  async initializeSuggestions() {
-    const { currentUserOrganization } = this.props.apiStore
-    await currentUserOrganization.initializeTags()
+  _searchFilterSuggestions = async query => {
+    const { currentOrganization } = this.props.apiStore
+    const tagsAndUsers = await currentOrganization.searchTagsAndUsers(query)
+    runInAction(() => {
+      this.suggestions = tagsAndUsers
+    })
   }
 
   get title() {
@@ -53,12 +62,6 @@ class CollectionCardsTagEditorModal extends React.Component {
     return cards ? _.map(cards, 'id') : []
   }
 
-  get editorSuggestions() {
-    const { currentUserOrganization } = this.props.apiStore
-    const { tags } = currentUserOrganization
-    return tags
-  }
-
   render() {
     const { canEdit, uiStore, open } = this.props
 
@@ -74,7 +77,8 @@ class CollectionCardsTagEditorModal extends React.Component {
           canEdit={canEdit}
           placeholder="Add new tags, separated by comma or pressing enter."
           tagField="tag_list"
-          suggestions={this.editorSuggestions}
+          handleInputChange={this.onInputChange}
+          suggestions={this.suggestions}
         />
       </Modal>
     )
