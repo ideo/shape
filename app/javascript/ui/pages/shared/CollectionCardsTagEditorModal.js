@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import _ from 'lodash'
 
 import CollectionCardsTagEditor from '~/ui/pages/shared/CollectionCardsTagEditor'
 import Modal from '~/ui/global/modals/Modal'
@@ -27,8 +28,18 @@ class CollectionCardsTagEditorModal extends React.Component {
     )
   }
 
+  get records() {
+    const { cards } = this.props
+    return _.compact(_.map(cards, 'record'))
+  }
+
+  get cardIds() {
+    const { cards } = this.props
+    return cards ? _.map(cards, 'id') : []
+  }
+
   render() {
-    const { cards, canEdit, uiStore, open } = this.props
+    const { canEdit, uiStore, open } = this.props
 
     return (
       <Modal
@@ -37,7 +48,8 @@ class CollectionCardsTagEditorModal extends React.Component {
         open={open}
       >
         <CollectionCardsTagEditor
-          cards={cards}
+          records={this.records}
+          cardIds={this.cardIds}
           canEdit={canEdit}
           placeholder="Add new tags, separated by comma or pressing enter."
           tagField="tag_list"

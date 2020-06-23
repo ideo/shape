@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { toJS, action, computed } from 'mobx'
+import { toJS, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
@@ -8,97 +8,70 @@ import TagEditor from './TagEditor'
 @inject('apiStore')
 @observer
 class CollectionCardsTagEditor extends React.Component {
-  componentDidMount() {
-    const { apiStore } = this.props
-    const { currentUserOrganization } = apiStore
-    currentUserOrganization.fetchOrganizationUsers()
+  async componentDidMount() {
+    await this.initializeSelectedRecordsTags()
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.cardIds.length != this.props.cardIds.length) {
+      this.initializeSelectedRecordsTags()
+    }
+  }
+
+  async initializeSelectedRecordsTags() {
+    const { records } = this.props
+
+    // attach userTags to record
+    await Promise.all(
+      _.map(records, async r => {
+        return await r.initializeCollectionTags()
+      })
+    )
   }
 
   @computed
-  // takes all tags for all selected records and formats them by type
-  // for the <ReactTags/> to determine which tagComponent to render
-  get selectedTags() {
-    const { records } = this
-    const selectedRecordTags = _.map(
-      _.flatten(_.intersection(_.map(records, r => toJS(r['tag_list'])))),
-      tag => ({
-        label: tag,
-        type: 'tag_list',
-      })
-    )
-
-    const { apiStore } = this.props
-    const { currentUserOrganization } = apiStore
-    const { organization_users } = currentUserOrganization
-    // This contains id, first_name, last_name, handle
-    const selectedRecordUserTags = _.map(
-      _.flatten(
-        _.intersection(_.filter(records, r => !!toJS(r['user_tag_list'])))
-      ),
-      tag => ({
-        label: tag,
-        type: 'user_tag_list',
-      })
-    )
-
-    // TODO: test this
-    const mappedUserTags = _.filter(
-      organization_users,
-      a => a && selectedRecordUserTags.includes(a.handle)
-    )
-    const combinedTagList = [...selectedRecordTags, ...mappedUserTags]
-    return combinedTagList
+  get selectedRecordTags() {
+    const { records } = this.props
+    // TODO: check uniqueness and sort
+    const recordTags = _.flatMap(records, r => {
+      const { collectionTags } = r
+      return toJS(collectionTags)
+    })
+    return recordTags
   }
 
   // NOTE: this is used to bulk-update and cache bust tags for selected cards
   _apiAddRemoveTag = (action, data) => {
-    const { cards, apiStore } = this.props
+    const { cardIds, apiStore } = this.props
     const { label, type } = data
     apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
-      card_ids: _.map(cards, 'id'),
+      card_ids: cardIds,
       tag: label,
       type,
     })
   }
 
-  @action
   addTag = ({ label, type }) => {
-    const { records } = this
-    // update frontend model tags
-    records.forEach(record => {
-      record[type].push(label)
-    })
-
     this._apiAddRemoveTag('add', { label, type })
   }
 
-  @action
   removeTag = ({ label, type }) => {
-    const { records } = this
-    records.forEach(record => {
-      // update frontend model tags
-      _.pull(record[type], label)
-    })
-
     this._apiAddRemoveTag('remove', { label, type })
-  }
-
-  get records() {
-    const { cards } = this.props
-    return _.compact(_.map(cards, 'record'))
   }
 
   render() {
     const { canEdit, placeholder, tagColor } = this.props
+    // FIXME: will support user_tag_list in the next story
+    const tagField = 'tag_list'
     return (
       <TagEditor
-        recordTags={this.selectedTags}
+        recordTags={this.selectedRecordTags}
         afterAddTag={this.addTag}
         afterRemoveTag={this.removeTag}
         canEdit={canEdit}
         placeholder={placeholder}
         tagColor={tagColor}
-        tagField="tag_list"
+        tagField={tagField}
       />
     )
   }
@@ -109,7 +82,8 @@ CollectionCardsTagEditor.wrappedComponent.propTypes = {
 }
 
 CollectionCardsTagEditor.propTypes = {
-  cards: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
+  records: PropTypes.arrayOf(MobxPropTypes.objectOrObservableObject).isRequired,
+  cardIds: PropTypes.arrayOf(PropTypes.number).isRequired,
   canEdit: PropTypes.bool,
   placeholder: PropTypes.string,
   tagColor: PropTypes.string,

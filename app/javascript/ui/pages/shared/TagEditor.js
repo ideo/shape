@@ -8,6 +8,7 @@ import Pill from '~/ui/global/Pill'
 import StyledReactTags, {
   creativeDifferenceTagIcon,
 } from '~/ui/pages/shared/StyledReactTags'
+import Avatar from '~/ui/global/Avatar'
 
 const TagEditor = ({
   recordTags,
@@ -30,7 +31,12 @@ const TagEditor = ({
     onDelete: () => {
       handleDelete({ label, type })
     },
-    symbol: creativeDifferenceTagIcon(label),
+    symbol:
+      type !== 'user_tag_list' ? (
+        creativeDifferenceTagIcon(label)
+      ) : (
+        <Avatar size={18} />
+      ),
     symbolSize: 18,
   })
 
@@ -78,7 +84,7 @@ const TagEditor = ({
     setFormattedTags(
       _.map(recordTags, ({ label, type }) => getFormattedTag({ label, type }))
     )
-  }, [recordTags])
+  }, [recordTags.length])
 
   const readonlyTags = () => {
     if (formattedTags.length === 0) {
