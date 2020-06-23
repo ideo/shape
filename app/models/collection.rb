@@ -909,6 +909,8 @@ class Collection < ApplicationRecord
     )
   end
 
+  # This method is called when a user tag is added to a submission collection
+  # in the UserTaggable concern
   def add_challenge_reviewer(user)
     return unless parent_challenge.present?
 
@@ -923,6 +925,8 @@ class Collection < ApplicationRecord
     )
   end
 
+  # This method is called when a user tag is removed from a submission collection
+  # in the UserTaggable concern
   def remove_challenge_reviewer(user)
     return unless parent_challenge.present?
 
