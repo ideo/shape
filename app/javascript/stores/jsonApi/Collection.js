@@ -65,6 +65,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   phaseSubCollections = []
   @observable
   tags = []
+  @observable
+  parentChallenge = null
+  @observable
+  challengeReviewers = null
 
   attributesForAPI = [
     'name',
@@ -965,17 +969,26 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.challenge === this) {
       return this
     } else {
+      if (this.parentChallenge) return this.parentChallenge
       // Otherwise we need to load the challenge colleciton
       const res = await this.apiStore.request(
         `collections/${this.challenge_id}`
       )
+      this.parentChallenge = res.data
       return res.data
     }
   }
 
   async loadPhaseSubCollections() {
-    const request = await this.API_fetchPhaseSubCollections()
-    return this.setPhaseSubCollections(request.data)
+    return this.API_fetchPhaseSubCollections()
+  }
+
+  async fetchChallengeReviewers() {
+    if (this.challengeReviewers) return this.challengeReviewers
+    if (!this.challengeForCollection) return []
+    const res = this.challengeForCollection.API_fetchChallengeReviewers()
+    this.challengeReviewers = res.data
+    return this.challengeReviewers
   }
 
   async createChildPhaseCollection(name) {
@@ -1744,6 +1757,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       console.warn(e)
       uiStore.defaultAlertError()
     }
+  }
+
+  API_fetchChallengeReviewers() {
+    return this.apiStore.request(`collections/${this.id}/challenge_reviewers`)
   }
 
   @action

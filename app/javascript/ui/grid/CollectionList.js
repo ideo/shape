@@ -19,7 +19,8 @@ class CollectionList extends React.Component {
   }
 
   get insideChallenge() {
-    return false
+    const { collection } = this.props
+    return collection.isChallengeOrInsideChallenge
   }
 
   get columns() {
@@ -35,7 +36,11 @@ class CollectionList extends React.Component {
         name: 'last_updated',
         style: { width: '400px' },
       },
-      { displayName: 'Permissions', style: {}, name: 'permissions' },
+      {
+        displayName: this.insideChallenge ? 'Reviewers' : 'Permissions',
+        style: {},
+        name: this.insideChallenge ? 'reviewers' : 'permissions',
+      },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
   }
