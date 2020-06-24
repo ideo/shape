@@ -67,10 +67,16 @@ class CollectionCardBuilder
       @parent_collection.lock! if @parent_collection.board_collection?
 
       if @parent_collection.board_collection? && !@collection_card.board_placement_is_valid?
+        # first capture these, row/col are allowed to be nil for BoardPlacement
+        row = @collection_card.row
+        col = @collection_card.col
+        # but we still want to assign the card a row/col of 0,0 so that the calculations don't break
+        @collection_card.row ||= 0
+        @collection_card.col ||= 0
         # valid row/col will get applied to the card here for later saving
         CollectionGrid::BoardPlacement.call(
-          row: @collection_card.row,
-          col: @collection_card.col,
+          row: row,
+          col: col,
           to_collection: @parent_collection,
           moving_cards: [@collection_card],
         )
