@@ -38,7 +38,7 @@ class Organization extends BaseRecord {
   }
 
   async API_getOrganizationUserTag(handle) {
-    // FIXME: should return tag for tag
+    // FIXME: should return user for handle
     await Promise.resolve(null)
   }
 
@@ -60,7 +60,7 @@ class Organization extends BaseRecord {
         } else if (internalType === 'tags') {
           name = tagOrUser.name
         }
-        allTagsAndUsers.push({ id: index, name, user })
+        allTagsAndUsers.push({ id: index, name, user, internalType })
       })
     }
 

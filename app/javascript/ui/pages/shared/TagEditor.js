@@ -25,27 +25,11 @@ const TagEditor = ({
   const [error, setError] = useState('')
   const [formattedTags, setFormattedTags] = useState([])
 
-  const getFormattedTag = ({ label, type }) => ({
-    id: label,
-    label,
-    name: label,
-    type,
-    onDelete: () => {
-      handleDelete({ label, type })
-    },
-    symbol:
-      type !== 'user_tag_list' ? (
-        creativeDifferenceTagIcon(label)
-      ) : (
-        <Avatar size={18} />
-      ),
-    symbolSize: 18,
-  })
-
   const handleDelete = ({ label, type }) => {
-    const tagToDelete = _.find(formattedTags, { label, type })
+    const tagToDelete = _.find(formattedTags, t => {
+      return t.label.toUpperCase() === label.toUpperCase() && t.type === type
+    })
     if (tagToDelete) {
-      setFormattedTags(_.without(formattedTags, tagToDelete))
       afterRemoveTag({ label, type })
     }
   }
@@ -53,17 +37,23 @@ const TagEditor = ({
   const handleAddition = tagData => {
     tagData.name = tagData.name.trim()
 
-    // FIXME: hardcode tag_field for now; figure out how we can determine which tag type is getting added
-    const tagField = 'tag_list'
+    const { name, internalType } = tagData
+
+    // user_list and tag_list are record fields used for saving tags; add to tag_list by default
+    const tagType = internalType === 'users' ? 'user_tag_list' : 'tag_list'
 
     const newTag = getFormattedTag({
-      label: tagData.name,
-      type: tagField,
+      label: name,
+      type: tagType,
     })
 
     const duplicateTag = _.find(formattedTags, t => {
-      t.name.toUpperCase() === newTag.name.toUpperCase() && t.type === tagField
+      return (
+        t.label.toUpperCase() === newTag.label.toUpperCase() &&
+        t.type === newTag.type
+      )
     })
+
     // Return if duplicate tag is found
     if (duplicateTag) {
       return
@@ -80,16 +70,47 @@ const TagEditor = ({
       }
     }
 
-    formattedTags.push(newTag)
     const { label, type } = newTag
     afterAddTag({ label, type })
   }
 
+  const getFormattedTag = ({ label, type }) => ({
+    id: label,
+    label,
+    name: label,
+    type,
+    symbol:
+      type !== 'user_tag_list' ? (
+        creativeDifferenceTagIcon(label)
+      ) : (
+        <Avatar size={18} />
+      ),
+    symbolSize: 18,
+  })
+
+  _.each(formattedTags, t =>
+    _.assign(t, {
+      onDelete: () => {
+        handleDelete({ label: t.label, type: t.type })
+      },
+    })
+  )
+
   useEffect(() => {
-    setFormattedTags(
-      _.map(recordTags, ({ label, type }) => getFormattedTag({ label, type }))
+    const _formattedTags = _.map(recordTags, ({ label, type }) =>
+      getFormattedTag({ label, type })
     )
-  }, [recordTags.length])
+
+    // set onDelete once formatted tags are initialized since it uses formatted tags within the context
+    _.each(_formattedTags, t =>
+      _.assign(t, {
+        onDelete: () => {
+          handleDelete({ label: t.label, type: t.type })
+        },
+      })
+    )
+    setFormattedTags(_formattedTags)
+  }, [recordTags])
 
   const readonlyTags = () => {
     if (formattedTags.length === 0) {

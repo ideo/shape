@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { toJS, computed } from 'mobx'
+import { toJS, computed, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
@@ -51,11 +51,25 @@ class CollectionCardsTagEditor extends React.Component {
     })
   }
 
+  @action
   addTag = ({ label, type }) => {
+    const { records } = this.props
+    // update frontend model tags observable to rerender TagEditor
+    _.each(records, r => {
+      r.tags.push({ label, type })
+    })
     this._apiAddRemoveTag('add', { label, type })
   }
 
+  @action
   removeTag = ({ label, type }) => {
+    const { records } = this.props
+    // update frontend model tags observable to rerender TagEditor
+    _.each(records, r => {
+      _.remove(r.tags, t => {
+        return t.label === label && t.type === type
+      })
+    })
     this._apiAddRemoveTag('remove', { label, type })
   }
 

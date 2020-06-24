@@ -116,6 +116,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       _.map(this.user_tag_list, async tag => {
         const searchRequest = await organization.API_getOrganizationUserTag(tag)
         const user = (searchRequest && searchRequest.data) || null
+        // FIXME: user is null for now; we can add it later to add pic_url to pill avatar
         return { label: tag, type: 'user_tag_list', user }
       })
     )
