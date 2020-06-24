@@ -11,6 +11,7 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
         filters: filters,
         application: application,
         ids_only: ids_only,
+        select_ids: select_ids,
       )
     end
 
@@ -152,6 +153,27 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
             { id: cc.id.to_s, order: cc.order }
           end
           expect(subject).to match_array(data)
+        end
+      end
+
+      context 'with select_ids setting' do
+        let(:select_ids) { [visible_card_1.id] }
+
+        it 'limits selection to the selected card id' do
+          expect(subject).to match_array(
+            [visible_card_1],
+          )
+        end
+
+        context 'with invalid card ids' do
+          let(:other_card) { create(:collection_card_text) }
+          let(:select_ids) { [visible_card_1.id, other_card.id] }
+
+          it 'ignores card ids from other collections' do
+            expect(subject).to match_array(
+              [visible_card_1],
+            )
+          end
         end
       end
     end

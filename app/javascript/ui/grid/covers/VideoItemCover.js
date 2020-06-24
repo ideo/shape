@@ -98,7 +98,7 @@ class VideoItemCover extends React.Component {
   }
 
   render() {
-    const { item } = this.props
+    const { item, unPlayable } = this.props
     const thumbnail = item.thumbnail_url
     const showPlayer = !thumbnail
 
@@ -127,16 +127,18 @@ class VideoItemCover extends React.Component {
             url={thumbnail}
             bgColor={v.colors.commonDark}
           >
-            <Flex className="inner" align="center" justify="center">
-              <Box>
-                <VideoPlayButton
-                  className="cancelGridClick"
-                  onClick={this.playVideo}
-                >
-                  &#9658;
-                </VideoPlayButton>
-              </Box>
-            </Flex>
+            {!unPlayable && (
+              <Flex className="inner" align="center" justify="center">
+                <Box>
+                  <VideoPlayButton
+                    className="cancelGridClick"
+                    onClick={this.playVideo}
+                  >
+                    &#9658;
+                  </VideoPlayButton>
+                </Box>
+              </Flex>
+            )}
             <div className="overlay" />
           </StyledImageCover>
         )}
@@ -166,6 +168,10 @@ class VideoItemCover extends React.Component {
 VideoItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
   dragging: PropTypes.bool.isRequired,
+  unPlayable: PropTypes.bool,
+}
+VideoItemCover.defaultProps = {
+  unPlayable: false,
 }
 
 export default VideoItemCover

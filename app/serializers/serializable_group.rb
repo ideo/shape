@@ -16,7 +16,7 @@ class SerializableGroup < BaseJsonSerializer
   attribute :filestack_file_url do
     @object.avatar_url
   end
-  attribute :can_edit do
+  attribute :can_edit, if: -> { @current_user.present? } do
     # we do not use the ability here because this should work before
     # the terms have been accepted, to have conditional messaging on
     # the front end

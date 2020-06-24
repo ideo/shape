@@ -27,7 +27,7 @@ class Api::V1::CollectionFiltersController < Api::V1::BaseController
   end
 
   def select
-    if @user_collection_filter.update_attribute(:selected, true)
+    if @user_collection_filter.update(selected: true)
       render jsonapi: @collection_filter,
              expose: { current_user: current_user }
     else
@@ -36,7 +36,7 @@ class Api::V1::CollectionFiltersController < Api::V1::BaseController
   end
 
   def unselect
-    if @user_collection_filter.update_attribute(:selected, false)
+    if @user_collection_filter.update(selected: false)
       render jsonapi: @collection_filter,
              expose: { current_user: current_user }
     else

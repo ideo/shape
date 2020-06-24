@@ -71,7 +71,7 @@ module Roles
       @groups.each do |group|
         next unless existing_group_ids.include?(group.id)
 
-        role.groups.destroy(group)
+        group.remove_role(role.name, role.resource)
         next unless @fully_remove
 
         ActivityAndNotificationBuilder.call(

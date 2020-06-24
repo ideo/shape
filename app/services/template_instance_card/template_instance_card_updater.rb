@@ -7,7 +7,7 @@ module TemplateInstanceCard
     end
 
     def call
-      @instance_card.copy_card_attributes!(@master_card)
+      @instance_card.copy_master_card_attributes!(@master_card)
 
       if @master_template.is_a?(Collection::TestCollection) && @master_template.inside_a_submission_box_template?
         TemplateInstanceCard::TemplateInstanceQuestionCardUpdater.call(

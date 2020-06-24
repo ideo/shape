@@ -28,6 +28,7 @@ RSpec.shared_context 'CollectionCardFilter setup' do
   let(:private_card) { cards[3] }
   let!(:archived_card) { cards[4] }
   let(:ids_only) { false }
+  let(:select_ids) { nil }
   before do
     # And group to collection
     group.add_role(Role::VIEWER, collection)

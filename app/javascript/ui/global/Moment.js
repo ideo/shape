@@ -1,20 +1,7 @@
-import moment from 'moment-mini'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 
-function defaultFormat(time) {
-  const now = moment()
-  const m = moment(time)
-  if (now.diff(m, 'h') < 24) {
-    // 4:32pm
-    return 'LT'
-  } else if (now.diff(m, 'h') >= 24 && now.diff(m, 'days') < 365) {
-    // Nov 28th
-    return 'MMM Do'
-  }
-  // Nov 28th, 2017
-  return 'MMM Do, YYYY'
-}
+import { defaultTimeFormat } from '~/utils/time'
 
 const StyledDate = styled.span`
   color: ${props => props.color};
@@ -25,7 +12,7 @@ const StyledDate = styled.span`
 `
 
 const Moment = ({ date } = {}) => (
-  <StyledDate>{moment(date).format(defaultFormat(date))}</StyledDate>
+  <StyledDate>{defaultTimeFormat(date)}</StyledDate>
 )
 
 export default Moment

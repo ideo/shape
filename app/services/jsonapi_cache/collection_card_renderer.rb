@@ -3,20 +3,22 @@ require_dependency "#{Rails.root}/lib/jsonapi_mappings"
 module JsonapiCache
   class CollectionCardRenderer < SimpleService
     # kick out old cached data
-    EXPIRY_TIME = 1.month
+    EXPIRY_TIME = 1.week
 
     def initialize(
       cards: [],
       user: nil,
       collection: nil,
-      search_records: nil
+      search_records: nil,
+      include_roles: false
     )
-      @cards = cards.to_a
+      @cards = cards
       @collection = collection
       @user = user
       @current_ability = Ability.new(@user)
       @search_result = search_records.present?
       @search_records = search_records
+      @include_roles = include_roles
       @cached_data = {}
     end
 
@@ -42,37 +44,56 @@ module JsonapiCache
     private
 
     def cached_card_data(card)
-      cached = @cached_data[card.cache_key]
+      key = cache_key(card)
+      cached = @cached_data[key]
       if cached.present?
         return cached
       end
 
-      Rails.cache.fetch(card.cache_key, expires_in: EXPIRY_TIME) do
+      Rails.cache.fetch(key, expires_in: EXPIRY_TIME) do
         cache_card_json(card)
       end
     end
 
     def cache_card_json(card)
+      includes = CollectionCard.default_relationships_for_api
+      if @include_roles
+        includes = [
+          record: [roles: %i[pending_users users groups resource]],
+        ]
+      end
       renderer = JSONAPI::Serializable::Renderer.new
       renderer.render(
         card,
         class: JsonapiMappings::ALL_MAPPINGS,
-        include: CollectionCard.default_relationships_for_api,
+        include: includes,
         expose: {
           inside_a_submission: inside_a_submission,
           inside_hidden_submission_box: inside_hidden_submission_box,
+          include_roles: @include_roles,
         },
       )
     end
 
     def fetch_multi_keys
       card_map = {}
+      cache_keys = []
       @cards.each do |card|
-        card_map[card.cache_key] = card
+        key = cache_key(card)
+        card_map[key] = card
+        cache_keys << key
       end
-      @cached_data = Rails.cache.fetch_multi(*@cards.map(&:cache_key), expires_in: EXPIRY_TIME) do |cache_key|
+      @cached_data = Rails.cache.fetch_multi(*cache_keys, expires_in: EXPIRY_TIME) do |cache_key|
         cache_card_json(card_map[cache_key])
       end
+    end
+
+    def cache_key(card)
+      key = card.cache_key
+      if @include_roles
+        key += '--roles'
+      end
+      key
     end
 
     def render_json_data
@@ -127,6 +148,12 @@ module JsonapiCache
         related_json[:attributes].merge!(breadcrumb_attributes(record))
       end
 
+      if @include_roles && record.common_viewable && @user.current_organization_id != record.organization_id
+        remove_role_ids = related_json[:relationships][:roles][:data].map { |i| i[:id] }
+        related_json[:relationships][:roles][:data] = []
+        json[:included].reject! { |i| i[:type] == :roles && remove_role_ids.include?(i[:id]) }
+      end
+
       if record.is_a?(Item::LegendItem)
         # probably no way around doing this query here since it is user-specific...
         viewable_dataset_ids = record.datasets_viewable_by(@user).pluck(:id).compact.map(&:to_s)
@@ -179,8 +206,10 @@ module JsonapiCache
     end
 
     def resource_identifiers
+      cards = @cards.respond_to?(:reorder) ? @cards.reorder(nil) : @cards
+      card_ids = cards.pluck(:id).compact
       identifiers = CollectionCard
-                    .where(id: @cards.pluck(:id).compact)
+                    .where(id: card_ids)
                     .joins(
                       %(
                         LEFT JOIN items ON items.id = collection_cards.item_id

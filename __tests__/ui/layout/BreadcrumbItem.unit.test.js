@@ -10,7 +10,7 @@ import Tooltip from '~/ui/global/Tooltip'
 jest.mock('../../../app/javascript/stores')
 jest.useFakeTimers()
 
-let wrapper, props, rerender
+let wrapper, props, rerender, component
 
 describe('BreadcrumbItem', () => {
   let breadcrumbItem
@@ -21,7 +21,6 @@ describe('BreadcrumbItem', () => {
         name: 'Home',
         id: '1',
         type: 'Collection',
-        breadcrumbDropDownRecords: [],
       },
       index: 1,
       numItems: 1,
@@ -31,6 +30,7 @@ describe('BreadcrumbItem', () => {
     }
     rerender = () => {
       wrapper = shallow(<BreadcrumbItem {...props} />)
+      component = wrapper.instance()
       breadcrumbItem = wrapper.find('StyledBreadcrumbItem').at(0)
     }
     rerender()
@@ -57,7 +57,7 @@ describe('BreadcrumbItem', () => {
         wrapper.setState({
           dropdownOpen: true,
         })
-        wrapper.instance().setInitialBaseRecords()
+        component.setInitialBaseRecords()
         wrapper.update()
       })
 
@@ -75,7 +75,7 @@ describe('BreadcrumbItem', () => {
             item: { ...props.item, has_children: true },
           }
           wrapper.setProps(newProps)
-          wrapper.instance().setInitialBaseRecords()
+          component.setInitialBaseRecords()
           wrapper.update()
         })
 
@@ -107,7 +107,7 @@ describe('BreadcrumbItem', () => {
               name: 'This is a really long name longer than 20',
             },
           })
-          wrapper.instance().setInitialBaseRecords()
+          component.setInitialBaseRecords()
           wrapper.update()
         })
 
@@ -136,7 +136,7 @@ describe('BreadcrumbItem', () => {
             ],
           }
           wrapper.setProps(props)
-          wrapper.instance().setInitialBaseRecords()
+          component.setInitialBaseRecords()
         })
 
         it('should render a menu item for each sub item', () => {
@@ -156,15 +156,16 @@ describe('BreadcrumbItem', () => {
       let subMenuWrapper
 
       beforeEach(() => {
-        props.item.breadcrumbDropDownRecords = [
-          { name: 'nested item 1', id: '10', has_children: true },
-          { name: 'nested item 2', id: '11', has_children: false },
-        ]
         props.item.subMenuOpen = true
         rerender()
+
         wrapper.setState({
           dropdownOpen: true,
           menuItemOpenId: 1,
+          breadcrumbDropDownRecords: [
+            { name: 'nested item 1', id: '10', has_children: true },
+            { name: 'nested item 2', id: '11', has_children: false },
+          ],
         })
         parentMenuWrapper = wrapper.find(StyledMenuWrapper).at(0)
         subMenu = parentMenuWrapper.find(StyledMenu).at(0)
@@ -181,9 +182,9 @@ describe('BreadcrumbItem', () => {
 
       describe('with a nested position set', () => {
         beforeEach(() => {
-          wrapper.instance().nestedMenuX = 10
-          wrapper.instance().nestedMenuY = 50
-          wrapper.instance().forceUpdate()
+          component.nestedMenuX = 10
+          component.nestedMenuY = 50
+          component.forceUpdate()
           // Have to refind these or they won't be updated
           parentMenuWrapper = wrapper.find(StyledMenuWrapper).at(0)
           subMenuWrapper = parentMenuWrapper.find(StyledMenuWrapper).at(1)
@@ -227,10 +228,7 @@ describe('BreadcrumbItem', () => {
   describe('onBreadcrumbHoverOut', () => {
     it('should close the dropdown after a certain amount of time', () => {
       breadcrumbItem.simulate('mouseout')
-      expect(setTimeout).toHaveBeenLastCalledWith(
-        wrapper.instance().closeDropdown,
-        50
-      )
+      expect(setTimeout).toHaveBeenLastCalledWith(component.closeDropdown, 50)
     })
   })
 })

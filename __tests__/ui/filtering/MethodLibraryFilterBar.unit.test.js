@@ -20,7 +20,7 @@ describe('MethodLibraryFilterBar', () => {
       onSelect: jest.fn(),
     }
     rerender = function() {
-      wrapper = shallow(<MethodLibraryFilterBar {...props} />)
+      wrapper = shallow(<MethodLibraryFilterBar {...props} usePortal={false} />)
       return wrapper
     }
     rerender()

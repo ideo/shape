@@ -673,7 +673,9 @@ describe('Collection', () => {
   })
 
   describe('API_fetchCardOrders', () => {
-    const res = { data: [{ id: '1', order: 2 }, { id: '2', order: 1 }] }
+    const res = {
+      data: [{ id: '1', order: 2 }, { id: '2', order: 1 }],
+    }
     beforeEach(() => {
       collection.API_fetchAllCardIds = jest
         .fn()
@@ -688,6 +690,30 @@ describe('Collection', () => {
       expect(_.map(collection.collection_cards, 'id')).toEqual(['1', '2'])
       await collection.API_fetchCardOrders()
       expect(_.map(collection.collection_cards, 'id')).toEqual(['2', '1'])
+    })
+  })
+
+  describe('API_fetchCardRoles', () => {
+    beforeEach(() => {
+      apiStore.request = jest.fn()
+      runInAction(() => {
+        collection.collection_cards = [
+          collectionCard_1,
+          collectionCard_2,
+          collectionCard_3,
+        ]
+      })
+    })
+
+    it('should call apiStore to fetch any missing card roles', async () => {
+      collection.collection_cards[0].record = { id: '11', roles: ['something'] }
+      collection.collection_cards[1].record = { id: '12' }
+      collection.collection_cards[2].record = { id: '13' }
+      expect(_.map(collection.collection_cards, 'id')).toEqual(['1', '2', '3'])
+      await collection.API_fetchCardRoles()
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}/collection_cards/roles?select_ids=2,3`
+      )
     })
   })
 
@@ -797,6 +823,45 @@ describe('Collection', () => {
       expect(collection.countSubmissionLiveTests).toEqual(
         collection.submissions_collection.collection_cards.length
       )
+    })
+  })
+
+  describe('allowsCollectionTypeSelector', () => {
+    describe('when regular collection or board collection', () => {
+      it('returns true', () => {
+        collection.type = 'Collection'
+        expect(collection.allowsCollectionTypeSelector).toEqual(true)
+        collection.type = 'Collection::Board'
+        expect(collection.allowsCollectionTypeSelector).toEqual(true)
+      })
+
+      describe('when profile template', () => {
+        it('returns false', () => {
+          collection.is_profile_template = true
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
+
+      describe('when profile collection', () => {
+        it('returns false', () => {
+          collection.is_profile_collection = true
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
+
+      describe('when shared collection', () => {
+        it('returns false', () => {
+          collection.type = 'Collection::SharedWithMeCollection'
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
+
+      describe('when system_required', () => {
+        it('returns false', () => {
+          collection.system_required = true
+          expect(collection.allowsCollectionTypeSelector).toEqual(false)
+        })
+      })
     })
   })
 })

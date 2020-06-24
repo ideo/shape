@@ -33,6 +33,14 @@ class TemplateInstanceUpdater
       return
     end
 
+    # NOTE: this service is already in a bg job (UpdateTemplateInstancesWorker)
+    #  which is why we don't mind running through each instance yet again
+    templated_collections.find_each do |c|
+      next if c.num_viewers.zero?
+
+      CollectionUpdateBroadcaster.new(c).reload_cards
+    end
+
     return unless @master_template.submission_box_template_test?
 
     # method in test_collection to update all submissions
@@ -73,8 +81,7 @@ class TemplateInstanceUpdater
       )
     end
 
-    instance.reorder_cards!
-    instance.touch
+    update_instance_card_orders_and_placement!(instance)
   end
 
   def update_instance_card_attributes_by_templated_from_ids(templated_from_ids, instance)
@@ -84,10 +91,27 @@ class TemplateInstanceUpdater
 
       next if master_card.blank? || card_within_instance.blank?
 
-      card_within_instance.copy_card_attributes!(master_card)
+      card_within_instance.copy_master_card_attributes!(master_card)
     end
 
-    instance.reorder_cards!
+    update_instance_card_orders_and_placement!(instance)
+  end
+
+  def update_instance_card_orders_and_placement!(instance)
+    unpinned_instance_cards = instance.collection_cards.where(pinned: false)
+    if instance.board_collection? && unpinned_instance_cards.any?
+      # make sure all unpinned cards are in a valid placement now
+      first_card = unpinned_instance_cards.first
+      CollectionGrid::BoardPlacement.call(
+        to_collection: instance,
+        moving_cards: unpinned_instance_cards,
+        row: first_card.row,
+        col: first_card.col,
+      )
+      unpinned_instance_cards.each(&:save)
+    else
+      instance.reorder_cards!
+    end
     instance.touch
   end
 
@@ -122,7 +146,7 @@ class TemplateInstanceUpdater
       master_card = @master_template.collection_cards.find { |master_cards| master_cards.id == id }
       # ABORT: should not allow duplicating a template instance in this manner;
       # this could lead to infinite loops. (similar to note above)
-      next if master_card.record.try(:templated?)
+      next if master_card.nil? || master_card.record.try(:templated?)
 
       cards_to_add.push(master_card)
     end
@@ -190,14 +214,28 @@ class TemplateInstanceUpdater
     return deleted_from_template_collection if deleted_from_template_collection.present?
 
     # add deleted_from_template_collection to the end of the collection
-    last_card = instance.collection_cards.last
-    last_card_order = last_card.present? ? last_card.order + 1 : 0
+    order = nil
+    row = 0
+    col = 0
+    if instance.board_collection?
+      # CollectionCardBuilder will call BoardPlacement to pick an appropriate col
+      row = instance.max_row_index
+    else
+      last_card = instance.collection_cards.last
+      order = last_card.present? ? last_card.order + 1 : 0
+    end
 
     builder = CollectionCardBuilder.new(
       params: {
-        order: last_card_order,
+        order: order,
+        row: row,
+        col: col,
+        width: 1,
+        height: 1,
         collection_attributes: {
           name: 'Deleted From Template',
+          type: instance.board_collection? ? 'Collection::Board' : nil,
+          num_columns: instance.board_collection? ? 4 : nil,
         },
         pinned: false,
       },

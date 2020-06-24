@@ -235,7 +235,6 @@ export default {
     primaryLightest: '#f0f4f6',
     primaryMedium: '#9ec1cc',
     primaryMediumDark: '#86b2b7',
-    prototype: '#eae3ce',
     respondentBannerBackground: '#41d3bd',
     respondentBannerText: '#305d6c',
     secondaryDark: '#3f526a',

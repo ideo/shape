@@ -50,6 +50,14 @@ class CollectionCard extends BaseRecord {
   @observable
   maxHeight = this.height
 
+  constructor(...args) {
+    super(...args)
+    if (!this.record) {
+      // mainly for private cards which have no record
+      this.record = {}
+    }
+  }
+
   @action
   setMaxWidth(w) {
     this.maxWidth = w
@@ -88,6 +96,10 @@ class CollectionCard extends BaseRecord {
 
   get isPinnedInTemplate() {
     return this.pinned && !this.pinned_and_locked
+  }
+
+  get isPrivate() {
+    return this.private_card
   }
 
   get isPinnedAndLocked() {
@@ -257,7 +269,7 @@ class CollectionCard extends BaseRecord {
     try {
       selectedCardIds = await apiStore.requestJson(
         `collections/${
-          this.parent.id
+          this.parent_id
         }/collection_cards/ids_in_direction?${queryString.stringify(params)}`
       )
       uiStore.selectCardIds(selectedCardIds)
@@ -266,38 +278,6 @@ class CollectionCard extends BaseRecord {
       uiStore.defaultAlertError()
     }
     return selectedCardIds
-  }
-
-  reselectOnlyEditableRecords(cardIds = this.uiStore.selectedCardIds) {
-    const { uiStore } = this
-    const filteredCards = _.filter(
-      this.apiStore.findAll('collection_cards'),
-      card =>
-        _.includes(cardIds, card.id) &&
-        (card.link || (card.record && card.record.can_edit))
-    )
-    const filteredCardIds = _.map(filteredCards, 'id')
-    const removedCount = uiStore.selectedCardIds.length - filteredCardIds.length
-    uiStore.reselectCardIds(filteredCardIds)
-    return removedCount
-  }
-
-  reselectOnlyMovableCards(cardIds = this.uiStore.selectedCardIds) {
-    // NOTE: this will only *reject* ones that we know we can't move
-    const { uiStore } = this
-    const rejectCards = _.filter(
-      this.apiStore.findAll('collection_cards'),
-      card => _.includes(cardIds, card.id) && !card.canMove
-    )
-    if (rejectCards.length === 0) return
-
-    const rejectCardIds = _.map(rejectCards, 'id')
-    const filteredCardIds = _.reject(cardIds, id =>
-      _.includes(rejectCardIds, id)
-    )
-    const removedCount = rejectCardIds.length
-    uiStore.reselectCardIds(filteredCardIds)
-    return removedCount
   }
 
   // Only show archive popup if this is a collection that has cards
@@ -407,32 +387,40 @@ class CollectionCard extends BaseRecord {
         let iconName = 'Trash'
         let snoozeChecked = null
         let onToggleSnoozeDialog = null
+
+        const removedCount = uiStore.reselectOnlyEditableRecords(
+          selectedCardIds
+        )
+
+        if (selectedCardIds.length === 0) {
+          prompt = 'Insuficcient permission to delete.'
+          if (collection.isTemplated && removedCount > 0) {
+            iconName = 'Template'
+            prompt = 'Pinned cards in a template instance can not be deleted.'
+          }
+          this.uiStore.alert(prompt, iconName)
+          return
+        }
+
         if (collection.isTemplate && collection.shouldShowEditWarning) {
           ;({
             snoozeChecked,
             prompt,
             onToggleSnoozeDialog,
           } = collection.confirmEditOptions)
-        } else if (selectedCardIds.length > 1) {
-          // check if multiple cards were selected
-          const removedCount = this.reselectOnlyEditableRecords(selectedCardIds)
+        } else {
           prompt = 'Are you sure you want to delete '
           if (selectedCardIds.length > 1) {
             prompt += `these ${selectedCardIds.length} objects?`
           } else {
             prompt += 'this?'
+            if (this.link) {
+              iconName = 'Link'
+              prompt = 'this link?'
+            } else if (this.isTestCollection) {
+              prompt = 'this test? It will close your feedback.'
+            }
           }
-          if (removedCount) {
-            prompt += ` ${removedCount} object${
-              removedCount > 1 ? 's were' : ' was'
-            } not selected due to insufficient permissions.`
-          }
-        } else if (this.link) {
-          iconName = 'Link'
-          prompt = 'Are you sure you want to delete this link?'
-        } else if (this.isTestCollection) {
-          prompt = 'Are you sure you want to delete this test design?'
-          prompt += ' It will close your feedback.'
         }
         this.uiStore.confirm({
           prompt,

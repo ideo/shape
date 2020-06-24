@@ -27,6 +27,7 @@ import v from '~/utils/variables'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
 } from '~/ui/global/CollectionTypeIcon'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
@@ -83,17 +84,17 @@ const FixedRightContainer = styled(Flex)`
   height: 33px;
 `
 
+const CollectionPillHolder = styled.div`
+  margin-bottom: 8px;
+  width: 100%;
+`
+
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class PageHeader extends React.Component {
   @observable
   iconAndTagsWidth = 0
   templateButtonRef = null
-
-  get canEdit() {
-    const { record } = this.props
-    return record.can_edit_content && !record.system_required
-  }
 
   @action
   updateIconAndTagsWidth(ref) {
@@ -165,7 +166,6 @@ class PageHeader extends React.Component {
       record.isProfileCollection,
       record.isSubmissionBox,
       record.launchableTestId,
-      record.isBoard,
     ]
 
     if (_.some(rightConditions, bool => bool)) {
@@ -484,6 +484,17 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
+    const showFilters =
+      !uiStore.isMobileXs &&
+      (record.isRegularCollection ||
+        record.isSubmissionsCollection ||
+        record.isBoard)
+
+    const showFilterControls =
+      showFilters &&
+      // FoamcoreGrid displays its own fixed controls at the top
+      (!record.isBoard || record.viewMode === 'list')
+
     return (
       <StyledHeader
         pageHeader
@@ -500,7 +511,7 @@ class PageHeader extends React.Component {
               }}
             />
           )}
-          <div style={{ minHeight: '72px' }}>
+          <div style={{ minHeight: '72px', display: 'flex' }}>
             <StyledTitleAndRoles
               data-empty-space-click
               className={record.isCurrentUserProfile ? 'user-profile' : ''}
@@ -516,7 +527,7 @@ class PageHeader extends React.Component {
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
-                  canEdit={this.canEdit}
+                  canEdit={record.canEdit}
                   extraWidth={this.iconAndTagsWidth}
                   fieldName="recordName"
                 />
@@ -560,13 +571,20 @@ class PageHeader extends React.Component {
                 </FixedRightContainer>
               )}
             </StyledTitleAndRoles>
-            {(record.isRegularCollection || record.isSubmissionsCollection) && (
-              <CollectionFilter collection={record} canEdit={this.canEdit} />
+            {showFilterControls && (
+              <div style={{ marginBottom: '-16px', display: 'flex' }}>
+                <CollectionViewToggle collection={record} />
+                <CollectionFilter
+                  collection={record}
+                  canEdit={record.canEdit}
+                />
+              </div>
             )}
           </div>
+          {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal
-          canEdit={this.canEdit}
+          canEdit={record.canEdit}
           cards={this.cardsForTagging}
           open={tagEditorOpen}
         />

@@ -91,7 +91,11 @@ class CollectionUpdater < SimpleService
     # remove any card_ids that are not valid from our attrs array
     # e.g. if they have been archived they will not show up in @collection.collection_cards
     @card_ids = @attributes[:collection_cards_attributes].map { |c| c[:id] }
-    found_ids = @collection.collection_cards.where(id: @card_ids).pluck(:id)
+    found_cards = @collection.collection_cards.where(id: @card_ids).select(:id, :pinned, :parent_id)
+    found_ids = found_cards.map do |cc|
+      # don't allow changing attributes of pinned/locked cards in template instance
+      cc.id unless cc.pinned_and_locked?
+    end.compact
     @attributes[:collection_cards_attributes].select! do |card_attr|
       found_ids.include?(card_attr[:id].to_i)
     end
