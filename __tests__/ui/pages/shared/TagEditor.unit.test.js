@@ -16,6 +16,8 @@ describe('TagEditor', () => {
         afterRemoveTag,
         canEdit: true,
         tagField: 'tag_list',
+        suggestions: [],
+        handleInputChange: jest.fn(),
       }
       wrapper = shallow(<TagEditor {...props} />)
     })
@@ -42,6 +44,8 @@ describe('TagEditor', () => {
         afterRemoveTag,
         canEdit: true,
         tagField: 'tag_list',
+        suggestions: [],
+        handleInputChange: jest.fn(),
       }
       wrapper = shallow(<TagEditor {...props} />)
     })
@@ -54,7 +58,7 @@ describe('TagEditor', () => {
       expect(wrapper.find('ReactTags').props().tags[0].name).toEqual(
         recordTags[0].label
       )
-      expect(wrapper.find('ReactTags').props().symbol).toBeTruthy()
+      expect(wrapper.find('ReactTags').props().tags[0].symbol).toBeTruthy()
     })
   })
 })

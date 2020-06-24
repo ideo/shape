@@ -5,6 +5,15 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
 
+export const formatRecordTags = records => {
+  // TODO: check uniqueness and sort
+  const recordTags = _.flatMap(records, r => {
+    const { tags } = r
+    return toJS(tags)
+  })
+  return recordTags
+}
+
 @inject('apiStore')
 @observer
 class CollectionCardsTagEditor extends React.Component {
@@ -32,12 +41,7 @@ class CollectionCardsTagEditor extends React.Component {
   @computed
   get selectedRecordTags() {
     const { records } = this.props
-    // TODO: check uniqueness and sort
-    const recordTags = _.flatMap(records, r => {
-      const { tags } = r
-      return toJS(tags)
-    })
-    return recordTags
+    return (!_.isEmpty(records) && formatRecordTags(records)) || []
   }
 
   // NOTE: this is used to bulk-update and cache bust tags for selected cards
@@ -115,5 +119,7 @@ CollectionCardsTagEditor.defaultProps = {
   tagColor: null,
   placeholder: null,
 }
+
+CollectionCardsTagEditor.displayName = 'CollectionCardsTagEditor'
 
 export default CollectionCardsTagEditor
