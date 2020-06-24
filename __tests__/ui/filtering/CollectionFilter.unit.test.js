@@ -236,7 +236,7 @@ describe('CollectionFilter', () => {
       })
 
       it('should call API_toggleSelected with selected desired state', () => {
-        expect(filter.API_toggleSelected).toHaveBeenCalledWith(true)
+        expect(filter.API_toggleSelected).toHaveBeenCalledWith(collection, true)
       })
 
       it('should refetch collection cards', () => {
@@ -258,8 +258,14 @@ describe('CollectionFilter', () => {
 
     it('should de-select all the current filters', () => {
       filters.forEach(filter => {
-        expect(filter.API_toggleSelected).toHaveBeenCalledWith(false)
-        expect(filter.API_toggleSelected).toHaveBeenCalledWith(false)
+        expect(filter.API_toggleSelected).toHaveBeenCalledWith(
+          collection,
+          false
+        )
+        expect(filter.API_toggleSelected).toHaveBeenCalledWith(
+          collection,
+          false
+        )
       })
     })
 

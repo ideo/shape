@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
 import { Fragment } from 'react'
-import { observable, runInAction } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
@@ -17,14 +17,19 @@ const SortContainer = styled.div`
   top: ${props => (props.top ? props.top : 0)}px;
 `
 
-const GrowFlex = styled(Flex)`
-  flex-grow: 1;
-`
-
 @observer
 class CollectionFilter extends React.Component {
   @observable
   currentFilterLookupType = null
+  @observable
+  rendered = false
+
+  @action
+  componentDidMount() {
+    // update this observable because FilterBar uses a portal (with a DOM id)
+    // so we want to make sure this has rendered before trying to render FilterBar
+    this.rendered = true
+  }
 
   get tagFilters() {
     const { filterBarFilters } = this.props.collection
@@ -47,11 +52,7 @@ class CollectionFilter extends React.Component {
     try {
       const result = await fn()
       const { collection } = this.props
-      // Refetch the cards now that the filters have changed
-      runInAction(() => {
-        collection.storedCacheKey = null
-      })
-      await collection.API_fetchCards({ page: 1 })
+      await collection.API_fetchCards()
       return result
     } catch (e) {
       throw e
@@ -101,17 +102,22 @@ class CollectionFilter extends React.Component {
   onSelectFilter = async tag => {
     return this.onFilterChange(async () => {
       const filter = apiStore.find('collection_filters', tag.id)
-      return filter.API_toggleSelected(!tag.selected)
+      const { collection } = this.props
+      if (collection.isBoard && collection.viewMode !== 'list') {
+        collection.setViewMode('list')
+      }
+      return filter.API_toggleSelected(collection, !tag.selected)
     })
   }
 
   onShowAll = ev => {
     return this.onFilterChange(() => {
-      const {
-        collection: { collection_filters },
-      } = this.props
+      const { collection } = this.props
+      const { collection_filters } = collection
       return Promise.all(
-        collection_filters.map(filter => filter.API_toggleSelected(false))
+        collection_filters.map(filter =>
+          filter.API_toggleSelected(collection, false)
+        )
       )
     })
   }
@@ -126,7 +132,6 @@ class CollectionFilter extends React.Component {
     const {
       collection,
       collection: {
-        collection_filters,
         isParentMethodLibrary,
         filterBarFilters,
         methodLibraryFilters,
@@ -136,40 +141,44 @@ class CollectionFilter extends React.Component {
       inSearchCollection,
     } = this.props
     const isFilterBarActive =
-      (filterBarFilters && filterBarFilters.length > 0) ||
-      collection.isSearchCollection
+      this.rendered &&
+      ((filterBarFilters && filterBarFilters.length > 0) ||
+        collection.isSearchCollection)
 
-    let filterMenuMarginTop
+    let totalResults = !uiStore.isLoading
+      ? collection.collection_cards.length
+      : 0
+
+    let filterMenuMarginBottom
     if (inSearchCollection) {
-      filterMenuMarginTop = collection_filters.length > 0 ? -90 : -40
+      filterMenuMarginBottom = 0
+      totalResults = collection.searchResultsCollection.collection_cards.length
     } else {
-      filterMenuMarginTop = isFilterBarActive || sortable ? 5 : -24
+      filterMenuMarginBottom = 24
     }
     return (
       <Fragment>
-        {isParentMethodLibrary && (
+        {this.rendered && isParentMethodLibrary && (
           <MethodLibraryFilterBar
             filters={methodLibraryFilters}
             onSelect={this.onSelectFilter}
           />
         )}
-        <GrowFlex align="flex-end">
+        <Flex align="flex-end">
           {isFilterBarActive && (
             <FilterBar
               filters={filterBarFilters}
-              totalResults={
-                !uiStore.isLoading && collection.collection_cards.length
-              }
+              totalResults={totalResults}
               onDelete={this.onDeleteFilter}
               onSelect={this.onSelectFilter}
               onShowAll={this.onShowAll}
-              showIcon={inSearchCollection || isParentMethodLibrary}
+              showIcon={isParentMethodLibrary}
             />
           )}
           <Flex align="flex-end" ml="auto">
             {canEdit && (
               <FilterMenu
-                marginTop={filterMenuMarginTop}
+                marginBottom={filterMenuMarginBottom}
                 onFilterByTag={this.openSearchModal('Tags')}
                 onFilterBySearch={this.openSearchModal('Search Term')}
               />
@@ -198,7 +207,7 @@ class CollectionFilter extends React.Component {
               />
             )}
           </Flex>
-        </GrowFlex>
+        </Flex>
       </Fragment>
     )
   }

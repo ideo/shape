@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types'
 import Icon from './Icon'
 
-const FoamcoreBoardIconXs = ({ large }) => (
+// this icon is circled e.g. for Collection Type selector and breadcrumb
+const FoamcoreBoardIconXs = () => (
   <Icon fill>
     <svg
       version="1.1"
@@ -31,13 +31,5 @@ const FoamcoreBoardIconXs = ({ large }) => (
     </svg>
   </Icon>
 )
-
-FoamcoreBoardIconXs.propTypes = {
-  large: PropTypes.bool,
-}
-
-FoamcoreBoardIconXs.defaultProps = {
-  large: false,
-}
 
 export default FoamcoreBoardIconXs

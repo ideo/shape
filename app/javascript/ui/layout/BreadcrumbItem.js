@@ -45,6 +45,9 @@ const StyledBreadcrumbItem = styled.div`
   }
 `
 StyledBreadcrumbItem.displayName = 'StyledBreadcrumbItem'
+StyledBreadcrumbItem.defaultProps = {
+  backgroundColor: 'white',
+}
 
 const StyledRestoreButton = styled.button`
   height: 15px;
@@ -143,6 +146,7 @@ export class BreadcrumbItem extends React.Component {
       dropdownOpen: false,
       menuItemOpenId: null,
       baseDropDownRecords: [],
+      breadcrumbDropDownRecords: [],
       hoverTimer: null,
     })
     this.nestedMenuX = 0
@@ -152,6 +156,7 @@ export class BreadcrumbItem extends React.Component {
   closeNestedMenu = () => {
     this.setState({
       menuItemOpenId: null,
+      breadcrumbDropDownRecords: [],
     })
     this.nestedMenuY = 0
   }
@@ -165,12 +170,11 @@ export class BreadcrumbItem extends React.Component {
   }
 
   async breadcrumbDive(diveItem) {
-    const { item, onBreadcrumbDive } = this.props
-    const { menuItemOpenId } = this.state
-
+    const { onBreadcrumbDive } = this.props
     if (!onBreadcrumbDive) return
-    await onBreadcrumbDive(diveItem, menuItemOpenId && item.id)
+    const breadcrumbDropDownRecords = await onBreadcrumbDive(diveItem)
     this.setState({
+      breadcrumbDropDownRecords,
       menuItemOpenId: diveItem.id,
     })
   }
@@ -194,6 +198,10 @@ export class BreadcrumbItem extends React.Component {
     if (isTouchDevice && !isSmallScreen) {
       ev.stopPropagation()
       this.openBreadcrumb()
+    } else {
+      const { item } = this.props
+      ev.preventDefault()
+      this.props.onBreadcrumbClick(item.id)
     }
   }
 
@@ -325,8 +333,13 @@ export class BreadcrumbItem extends React.Component {
   }
 
   renderDropdown() {
-    const { baseDropDownRecords, dropdownOpen, menuItemOpenId } = this.state
-    const { item } = this.props
+    const {
+      breadcrumbDropDownRecords,
+      baseDropDownRecords,
+      dropdownOpen,
+      menuItemOpenId,
+    } = this.state
+    // const { item } = this.props
     if (!dropdownOpen) return null
     const itemWidth = '90%'
 
@@ -368,7 +381,7 @@ export class BreadcrumbItem extends React.Component {
               onMouseOver={this.onNestedMenuHoverOver}
               onMouseOut={this.onNestedMenuHoverOut}
             >
-              {item.breadcrumbDropDownRecords.map(menuItem => (
+              {breadcrumbDropDownRecords.map(menuItem => (
                 <StyledMenuItem key={menuItem.id} style={{ width: itemWidth }}>
                   <StyledMenuButton
                     onClick={() => this.onDropdownBreadcrumbClick(menuItem)}
@@ -446,7 +459,6 @@ export const breadcrumbItemPropType = {
   can_edit_content: PropTypes.bool,
   ellipses: PropTypes.bool,
   has_children: PropTypes.bool,
-  breadcrumbDropDownRecords: PropTypes.array,
   subMenuOpen: PropTypes.bool,
   icon: PropTypes.element,
 }

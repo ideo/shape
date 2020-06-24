@@ -54,6 +54,7 @@ const PinnedIcon = ({ className, locked, pinnedFromMasterTemplate }) => (
     className={className}
     locked={locked}
     pinnedFromMasterTemplate={pinnedFromMasterTemplate}
+    data-cy="PinnedIcon"
   >
     <PinnedInnerIcon />
   </PinIconHolder>

@@ -16,7 +16,8 @@ class CollectionTypeSelector extends React.Component {
   showPopoutMenu = false
 
   @action
-  openPopoutMenu = () => {
+  openPopoutMenu = ev => {
+    ev.stopPropagation()
     this.showPopoutMenu = true
   }
 
@@ -41,9 +42,16 @@ class CollectionTypeSelector extends React.Component {
     this.updateCollectionType(collectionType)
   }
 
+  get baseCollectionType() {
+    const { collection } = this.props
+    if (collection.isBoard) return 'foamcore'
+
+    return 'collection'
+  }
+
   get collectionTypeMenuItems() {
     const collectionTypes = [
-      'collection',
+      this.baseCollectionType,
       'project',
       'method',
       'phase',

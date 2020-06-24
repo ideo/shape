@@ -5,6 +5,8 @@ class SerializableItem < BaseJsonSerializer
   type 'items'
   attributes(
     :name,
+    :updated_at,
+    :created_at,
     :content,
     :quill_data,
     :version,

@@ -11,6 +11,10 @@ import v, {
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
+import { calculatePageMargins } from '~/utils/pageUtils'
+
+const MAX_COLS = 16
+const MAX_COLS_MOBILE = 8
 
 export default class UiStore {
   // store this for usage by other components
@@ -259,6 +263,8 @@ export default class UiStore {
   collaboratorColors = new Map()
   @observable
   challengeSettingsOpen = false
+  @observable
+  zoomLevels = []
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -894,6 +900,36 @@ export default class UiStore {
     this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
   }
 
+  reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
+    const filteredCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card =>
+        _.includes(cardIds, card.id) &&
+        (card.link || (card.record && card.record.can_edit))
+    )
+    const filteredCardIds = _.map(filteredCards, 'id')
+    const removedCount = this.selectedCardIds.length - filteredCardIds.length
+    this.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
+  reselectOnlyMovableCards(cardIds = this.selectedCardIds) {
+    // NOTE: this will only *reject* ones that we know we can't move
+    const rejectCards = _.filter(
+      this.apiStore.findAll('collection_cards'),
+      card => _.includes(cardIds, card.id) && !card.canMove
+    )
+    if (rejectCards.length === 0) return
+
+    const rejectCardIds = _.map(rejectCards, 'id')
+    const filteredCardIds = _.reject(cardIds, id =>
+      _.includes(rejectCardIds, id)
+    )
+    const removedCount = rejectCardIds.length
+    this.reselectCardIds(filteredCardIds)
+    return removedCount
+  }
+
   @action
   async selectAll({ location, card = null } = {}) {
     const { viewingCollection } = this
@@ -1346,18 +1382,6 @@ export default class UiStore {
 
   // -----------------------
   // Foamcore zoom functions
-  @action
-  adjustZoomLevel = ({ collection } = {}) => {
-    const { lastZoom, maxZoom } = collection
-    if (lastZoom) {
-      this.zoomLevel = lastZoom
-    } else if (this.zoomLevel > 1) {
-      // if we haven't marked specific zoom on this collection, zoom out if needed
-      // and only store uiStore.zoomLevel, not the collection.lastZoom
-      this.zoomLevel = maxZoom
-    }
-  }
-
   zoomOut() {
     this.updateZoomLevel(this.zoomLevel + 1)
   }
@@ -1369,7 +1393,98 @@ export default class UiStore {
   @action
   updateZoomLevel(val, collection = this.viewingCollection) {
     if (!collection || !collection.isBoard) return
-    this.zoomLevel = _.clamp(val, 1, collection.maxZoom)
+    this.zoomLevel = _.clamp(val, 1, this.zoomLevels.length)
     collection.lastZoom = this.zoomLevel
+  }
+
+  @action
+  determineZoomLevels(collection) {
+    const { windowWidth } = this
+    const maxCols = this.maxCols(collection)
+    const pageMargins = this.pageMargins(collection)
+    const marginLeft = pageMargins.left
+
+    let possibleCols = [1, 2, 4, 6, 8, 16]
+    possibleCols = _.filter(possibleCols, col => {
+      return (
+        col <= maxCols &&
+        this.maxGridWidth({ marginLeft, maxCols: col }) >= windowWidth
+      )
+    })
+
+    const zoomLevels = _.map(possibleCols, col => ({
+      col,
+      relativeZoomLevel:
+        this.maxGridWidth({ marginLeft, maxCols: col }) / windowWidth,
+    }))
+
+    if (zoomLevels.length > 0) {
+      const firstZoom = zoomLevels[0]
+      const diff = firstZoom.relativeZoomLevel - 1
+      if (diff < 0.05 || (zoomLevels.length > 1 && diff < 0.1)) {
+        // adjust this to just be fully zoomed
+        zoomLevels[0].relativeZoomLevel = 1
+      }
+    }
+    if (zoomLevels.length === 0 || zoomLevels[0].relativeZoomLevel > 1) {
+      zoomLevels.unshift({
+        relativeZoomLevel: 1,
+      })
+    }
+    this.zoomLevels.replace(zoomLevels)
+    this.adjustZoomLevel(collection)
+  }
+
+  @action
+  adjustZoomLevel = collection => {
+    const { lastZoom } = collection
+    // console.trace({ lastZoom, z: this.zoomLevel, n: collection.name })
+
+    if (lastZoom) {
+      this.zoomLevel = _.clamp(lastZoom, 1, this.zoomLevels.length)
+    } else {
+      // if we haven't marked specific zoom on this collection, zoom out if needed
+      // and only store uiStore.zoomLevel, not the collection.lastZoom
+      this.zoomLevel = this.zoomLevels.length
+    }
+  }
+
+  get relativeZoomLevel() {
+    if (this.zoomLevels.length < this.zoomLevel) {
+      // e.g. when first initializing the page, before determineZoomLevels
+      return 1
+    }
+    // zoomLevels start at 1, so we subtract to get the array idx
+    const zoom = this.zoomLevels[this.zoomLevel - 1]
+    return zoom ? zoom.relativeZoomLevel : 1
+  }
+
+  pageMargins(collection) {
+    return {
+      ...calculatePageMargins({
+        fullWidth: collection.isFourWideBoard,
+      }),
+      top: v.headerHeight + 90,
+    }
+  }
+
+  maxCols(collection) {
+    // NOTE: if we ever allow >16, this still limits max zoom level to show only 16
+    const max = this.isTouchDevice && this.isMobile ? MAX_COLS_MOBILE : MAX_COLS
+    return _.min([collection.num_columns, max])
+  }
+
+  // This returns the grid with (in pixels) for showing the full width of cards;
+  // for mobile this gets bumped down and may not include all 16 columns (only 8 for large board)
+  maxGridWidth({ marginLeft, maxCols }) {
+    // always use full gridSettings for foamcore
+    const { windowWidth } = this
+    const { gridW, gutter } = v.defaultGridSettings
+    let gridWidth = (gridW + gutter) * maxCols + marginLeft
+
+    const zoomLevelEstimate = gridWidth / windowWidth
+    // we have to adjust since the margins and the scale of zoom will both factor into the actual width
+    gridWidth += marginLeft * _.max([0, zoomLevelEstimate - 1])
+    return gridWidth
   }
 }

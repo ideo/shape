@@ -16,7 +16,10 @@
 #
 
 class UserCollectionFilter < ApplicationRecord
-  belongs_to :collection_filter
+  # NOTE: this `touch` is somewhat unnecessary if we thought of a different way to do this.
+  # We use this to touch collection (busting the cache), even though it really only needs to be
+  # busted for this particular user. Otherwise it is a pretty minor tradeoff.
+  belongs_to :collection_filter, touch: true
   belongs_to :user
 
   has_one :collection,

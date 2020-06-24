@@ -195,6 +195,17 @@ RSpec.describe Group, type: :model do
         expect(group.members[:users]).to match_array(members)
       end
     end
+
+    context 'with common_resource Group' do
+      let(:collection) { create(:collection) }
+      let!(:common_resource_group) { create(:global_group, :common_resource) }
+
+      it 'should set common_viewable on the collection when added' do
+        expect(collection.common_viewable?).to be false
+        common_resource_group.add_role(Role::VIEWER, collection)
+        expect(collection.reload.common_viewable?).to be true
+      end
+    end
   end
 
   describe '.viewable_in_org' do

@@ -96,9 +96,18 @@ class RoutingStore extends RouterStore {
   }
 
   routeTo = (type, id = null, params = {}) => {
-    this.setRoutingTo(type, id)
     const { uiStore } = this
+    const { viewingRecord } = uiStore
+    if (
+      viewingRecord &&
+      viewingRecord.id === id &&
+      viewingRecord.internalType === type
+    ) {
+      // no need to route if we're already on the page
+      return
+    }
 
+    this.setRoutingTo(type, id)
     // prevent accidental route changes while you are dragging/moving into collection
     if (uiStore.movingIntoCollection) {
       return
