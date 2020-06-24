@@ -15,7 +15,6 @@ describe('TagEditor', () => {
         afterAddTag,
         afterRemoveTag,
         canEdit: true,
-        tagField: 'tag_list',
         suggestions: [],
         handleInputChange: jest.fn(),
       }
@@ -43,7 +42,6 @@ describe('TagEditor', () => {
         afterAddTag,
         afterRemoveTag,
         canEdit: true,
-        tagField: 'tag_list',
         suggestions: [],
         handleInputChange: jest.fn(),
       }

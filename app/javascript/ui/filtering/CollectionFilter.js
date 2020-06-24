@@ -83,7 +83,7 @@ class CollectionFilter extends React.Component {
       .toLowerCase()
       .split(' ')[0]
     const filter = {
-      text: tag.name,
+      text: tag.label,
       filter_type: backendFilterType,
       selected: false,
     }

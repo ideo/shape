@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { observable, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
 import _ from 'lodash'
 
@@ -76,9 +76,8 @@ class CollectionCardsTagEditorModal extends React.Component {
           cardIds={this.cardIds}
           canEdit={canEdit}
           placeholder="Add new tags, separated by comma or pressing enter."
-          tagField="tag_list"
           handleInputChange={this.onInputChange}
-          suggestions={this.suggestions}
+          suggestions={toJS(this.suggestions)}
         />
       </Modal>
     )

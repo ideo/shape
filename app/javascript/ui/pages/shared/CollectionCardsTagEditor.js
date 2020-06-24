@@ -56,17 +56,17 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   @action
-  addTag = ({ label, type }) => {
+  addTag = ({ label, type, user }) => {
     const { records } = this.props
     // update frontend model tags observable to rerender TagEditor
     _.each(records, r => {
-      r.tags.push({ label, type })
+      r.tags.push({ label, type, user })
     })
     this._apiAddRemoveTag('add', { label, type })
   }
 
   @action
-  removeTag = ({ label, type }) => {
+  removeTag = ({ label, type, user }) => {
     const { records } = this.props
     // update frontend model tags observable to rerender TagEditor
     _.each(records, r => {
@@ -110,7 +110,7 @@ CollectionCardsTagEditor.propTypes = {
   canEdit: PropTypes.bool,
   placeholder: PropTypes.string,
   tagColor: PropTypes.string,
-  suggestions: MobxPropTypes.arrayOrObservableArray.isRequired,
+  suggestions: PropTypes.array.isRequired,
   handleInputChange: PropTypes.func.isRequired,
 }
 

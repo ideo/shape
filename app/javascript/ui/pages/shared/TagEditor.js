@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
@@ -35,23 +34,11 @@ const TagEditor = ({
   }
 
   const handleAddition = tagData => {
-    tagData.name = tagData.name.trim()
-
-    const { name, internalType } = tagData
-
-    // user_list and tag_list are record fields used for saving tags; add to tag_list by default
-    const tagType = internalType === 'users' ? 'user_tag_list' : 'tag_list'
-
-    const newTag = getFormattedTag({
-      label: name,
-      type: tagType,
-    })
+    const { label, internalType, user } = tagData
+    const type = internalType === 'users' ? 'user_tag_list' : 'tag_list'
 
     const duplicateTag = _.find(formattedTags, t => {
-      return (
-        t.label.toUpperCase() === newTag.label.toUpperCase() &&
-        t.type === newTag.type
-      )
+      return t.label.toUpperCase() === label.toUpperCase() && t.type === type
     })
 
     // Return if duplicate tag is found
@@ -61,32 +48,37 @@ const TagEditor = ({
 
     // If a validateTag function is provided, validate tag
     if (validateTag) {
-      const { tag, error } = validateTag(newTag.name)
+      const { tag, error } = validateTag(label)
       if (error) {
         setError(error)
         return
       } else {
-        newTag.name = tag
+        label = tag
       }
     }
 
-    const { label, type } = newTag
-    afterAddTag({ label, type })
+    afterAddTag({ label, type, user })
   }
 
-  const getFormattedTag = ({ label, type }) => ({
-    id: label,
-    label,
-    name: label,
-    type,
-    symbol:
-      type !== 'user_tag_list' ? (
-        creativeDifferenceTagIcon(label)
-      ) : (
-        <Avatar size={18} />
-      ),
-    symbolSize: 18,
-  })
+  const getReactTagProps = ({ index, label, type, user }) => {
+    let symbol = null
+
+    if (type === 'user_tag_list') {
+      const { pic_url_square } = user
+      symbol = <Avatar size={18} url={pic_url_square} />
+    } else {
+      symbol = creativeDifferenceTagIcon(label)
+    }
+
+    return {
+      id: index,
+      label,
+      name: label,
+      type,
+      symbol,
+      symbolSize: 18,
+    }
+  }
 
   _.each(formattedTags, t =>
     _.assign(t, {
@@ -97,8 +89,8 @@ const TagEditor = ({
   )
 
   useEffect(() => {
-    const _formattedTags = _.map(recordTags, ({ label, type }) =>
-      getFormattedTag({ label, type })
+    const _formattedTags = _.map(recordTags, ({ label, type, user }, index) =>
+      getReactTagProps({ index, label, type, user })
     )
 
     // set onDelete once formatted tags are initialized since it uses formatted tags within the context
@@ -157,7 +149,7 @@ TagEditor.propTypes = {
   tagColor: PropTypes.string,
   placeholder: PropTypes.string,
   validateTag: PropTypes.func,
-  suggestions: MobxPropTypes.arrayOrObservableArray.isRequired,
+  suggestions: PropTypes.array.isRequired,
   handleInputChange: PropTypes.func.isRequired,
 }
 

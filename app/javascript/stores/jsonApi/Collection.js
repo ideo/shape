@@ -113,13 +113,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   initializeTags = async () => {
-    const { organization } = this
     const userTagsWithUsers = await Promise.all(
       _.map(this.user_tag_list, async tag => {
-        const searchRequest = await organization.API_getOrganizationUserTag(tag)
-        const user = (searchRequest && searchRequest.data) || null
-        // FIXME: user is null for now; we can add it later to add pic_url to pill avatar
-        return { label: tag, type: 'user_tag_list', user }
+        const userSearch = await this.apiStore.searchUsers({ query: tag })
+        // NOTE: assumes that the first search result is the user described in the tag
+        const user = _.get(userSearch, 'data[0]')
+        return {
+          label: tag,
+          type: 'user_tag_list',
+          user: user.toJSON(), // how do we not use .toJSON() here
+        }
       })
     )
 
