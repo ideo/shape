@@ -55,7 +55,7 @@ class Organization extends BaseRecord {
         let name = ''
         let user = null
         if (internalType === 'users') {
-          name = tagOrUser.handle
+          name = `${tagOrUser.first_name} ${tagOrUser.last_name} ${tagOrUser.handle}`
           user = tagOrUser
         } else if (internalType === 'tags') {
           name = tagOrUser.name
