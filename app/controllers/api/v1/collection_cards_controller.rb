@@ -559,7 +559,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         num_columns
         start_date
         end_date
-      ].concat(Collection.globalize_attribute_names, tag_list: [], user_tag_list: []),
+      ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
         :type,

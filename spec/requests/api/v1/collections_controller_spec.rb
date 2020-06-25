@@ -583,13 +583,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection.reload.name).to eq('Who let the dogs out?')
     end
 
-    it 'updates the user_tag_list and cached_user_tag_list' do
-      expect(collection.user_tag_list).to be_empty
-      patch(path, params: params)
-      expect(collection.reload.user_tag_list).to eq([tagged_user.handle])
-      expect(collection.cached_user_tag_list).to eq([tagged_user.handle])
-    end
-
     it 'updates the collection_card' do
       expect(collection_card.width).not_to eq(3)
       expect(collection_card.order).not_to eq(1)
