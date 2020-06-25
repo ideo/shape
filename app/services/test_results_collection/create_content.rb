@@ -251,9 +251,13 @@ module TestResultsCollection
 
     def move_legend_item_to_third_spot
       legend_card = @legend_item.parent_collection_card
-      return if legend_card.order == 2
+      legend_card.update(
+        row: 0,
+        col: 3,
+      )
+      # return if legend_card.order == 2
 
-      legend_card.move_to_order(2)
+      # legend_card.move_to_order(2)
     end
 
     def idea_items
