@@ -243,7 +243,10 @@ Rails.application.routes.draw do
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
+    require 'sidekiq/api'
     mount Sidekiq::Web => '/sidekiq'
+    match 'queue-status' => proc { [200, {'Content-Type' => 'text/plain'}, [Sidekiq::Queue.new.size < 100 ? 'OK' : 'UHOH']] }, via: :get
+    match 'queue-latency' => proc { [200, {'Content-Type' => 'text/plain'}, [Sidekiq::Queue.new.latency < 30 ? 'OK' : 'UHOH']] }, via: :get
   end
 
   namespace :callbacks do
