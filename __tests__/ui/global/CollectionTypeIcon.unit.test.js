@@ -1,7 +1,7 @@
 import CollectionTypeIcon, {
-  collectionTypeToIcon,
-  smallCollectionIconMap,
-  largeCollectionIconMap,
+  collectionIcon,
+  smallCollectionTypeIconMap,
+  largeCollectionTypeIconMap,
 } from '~/ui/global/CollectionTypeIcon'
 import { fakeCollection } from '#/mocks/data'
 
@@ -120,21 +120,21 @@ describe('CollectionTypeIcon', () => {
   })
 })
 
-describe('collectionTypeToIcon', () => {
-  for (const icon of Object.keys(smallCollectionIconMap)) {
+describe('collectionIcon', () => {
+  for (const icon of Object.keys(smallCollectionTypeIconMap)) {
     describe('when is phase type', () => {
       it('returns the icon', () => {
-        expect(collectionTypeToIcon({ type: icon })).toEqual(
-          smallCollectionIconMap[icon]
+        expect(collectionIcon({ collectionType: icon })).toEqual(
+          smallCollectionTypeIconMap[icon]
         )
       })
     })
   }
-  for (const icon of Object.keys(largeCollectionIconMap)) {
+  for (const icon of Object.keys(largeCollectionTypeIconMap)) {
     describe('when is phase type', () => {
       it('returns the large icon when size requested', () => {
-        expect(collectionTypeToIcon({ type: icon, size: 'lg' })).toEqual(
-          largeCollectionIconMap[icon]
+        expect(collectionIcon({ collectionType: icon, size: 'lg' })).toEqual(
+          largeCollectionTypeIconMap[icon]
         )
       })
     })

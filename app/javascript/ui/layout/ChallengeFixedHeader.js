@@ -4,7 +4,7 @@ import { Flex, Box } from 'reflexbox'
 
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
 import IconHolder from '~/ui/icons/IconHolder'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -17,7 +17,7 @@ const ChallengeFixedHeader = ({
   handleReviewSubmissions,
   currentUserHasReviewableCollections,
 }) => {
-  const { name, collection_type } = collection
+  const { name, collection_type, custom_icon } = collection
   let buttonProps = {}
   if (!collection.isSubmissionBox) {
     buttonProps = {
@@ -60,10 +60,7 @@ const ChallengeFixedHeader = ({
             marginTop={8}
             marginLeft={10}
           >
-            {collectionTypeToIcon({
-              type: collection_type,
-              size: 'lg',
-            })}
+            <CollectionIcon type={custom_icon} size="lg" />
           </IconHolder>
         </Box>
 

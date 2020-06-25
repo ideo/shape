@@ -25,7 +25,13 @@ class InlineModal extends React.PureComponent {
   }
 
   render() {
-    const { children, open, leftButton, anchorElement } = this.props
+    const {
+      children,
+      open,
+      leftButton,
+      anchorElement,
+      hideButtons,
+    } = this.props
     return (
       <Popover
         open={open}
@@ -39,32 +45,34 @@ class InlineModal extends React.PureComponent {
             {children}
           </Grid>
         </Grid>
-        <ButtonsWrapper>
-          <Grid container spacing={0}>
-            <Grid item xs={4}>
-              {leftButton}
+        {!hideButtons && (
+          <ButtonsWrapper>
+            <Grid container spacing={0}>
+              <Grid item xs={4}>
+                {leftButton}
+              </Grid>
+              <Grid item xs={8} style={{ textAlign: 'right' }}>
+                <TextButton
+                  onClick={this.handleCancel}
+                  fontSizeEm={0.75}
+                  color={v.colors.black}
+                  style={{ marginRight: '2em' }}
+                  className="cancel-button"
+                >
+                  Cancel
+                </TextButton>
+                <TextButton
+                  onClick={this.handleConfirm}
+                  fontSizeEm={0.75}
+                  color={v.colors.black}
+                  className="ok-button"
+                >
+                  OK
+                </TextButton>
+              </Grid>
             </Grid>
-            <Grid item xs={8} style={{ textAlign: 'right' }}>
-              <TextButton
-                onClick={this.handleCancel}
-                fontSizeEm={0.75}
-                color={v.colors.black}
-                style={{ marginRight: '2em' }}
-                className="cancel-button"
-              >
-                Cancel
-              </TextButton>
-              <TextButton
-                onClick={this.handleConfirm}
-                fontSizeEm={0.75}
-                color={v.colors.black}
-                className="ok-button"
-              >
-                OK
-              </TextButton>
-            </Grid>
-          </Grid>
-        </ButtonsWrapper>
+          </ButtonsWrapper>
+        )}
       </Popover>
     )
   }
@@ -77,6 +85,7 @@ InlineModal.propTypes = {
   onCancel: PropTypes.func,
   leftButton: PropTypes.node,
   anchorElement: PropTypes.node,
+  hideButtons: PropTypes.bool,
 }
 
 InlineModal.defaultProps = {
@@ -85,6 +94,7 @@ InlineModal.defaultProps = {
   onCancel: null,
   leftButton: null,
   anchorElement: null,
+  hideButtons: false,
 }
 
 export default InlineModal

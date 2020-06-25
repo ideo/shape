@@ -376,6 +376,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :collection_type,
       :start_date,
       :end_date,
+      :custom_icon,
+      :show_icon_on_cover,
       collection_cards_attributes: %i[id order width height row col pinned],
     ].concat(Collection.globalize_attribute_names)
   end

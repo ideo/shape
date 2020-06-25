@@ -1,5 +1,5 @@
 import Tooltip from '~/ui/global/Tooltip'
-import ChallengeIcon from '~/ui/icons/ChallengeIcon'
+import ChallengeIcon from '~/ui/icons/collection_icons/ChallengeIcon'
 import { Heading2 } from '~/ui/global/styled/typography'
 import IconHolder from '~/ui/icons/IconHolder'
 import v from '~/utils/variables'

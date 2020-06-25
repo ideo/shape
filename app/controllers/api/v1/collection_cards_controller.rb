@@ -559,6 +559,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         start_date
         end_date
         collection_type
+        custom_icon
+        show_icon_on_cover
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,

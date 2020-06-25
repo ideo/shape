@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import _ from 'lodash'
 
 import RequiredCollectionIcon from '~/ui/icons/RequiredCollectionIcon'
-import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
+import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import LinkedCollectionIcon from '~/ui/icons/LinkedCollectionIcon'
 import LinkIcon from '~/ui/icons/LinkIcon'

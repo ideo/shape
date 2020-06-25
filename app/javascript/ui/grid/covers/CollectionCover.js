@@ -17,7 +17,7 @@ import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
   IconHolder,
 } from '~/ui/grid/covers/CollectionCoverTitle'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CollectionDateRange from '~/ui/grid/CollectionDateRange'
 import DateProgressBar from '~/ui/global/DateProgressBar'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
@@ -375,16 +375,13 @@ class CollectionCover extends React.Component {
       cardId,
       fontColor,
     } = this.props
-    const { subtitle, collection_type } = collection
+    const { subtitle, collection_type, custom_icon } = collection
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
-    const collectionIcon =
-      collection_type !== 'collection' &&
-      collection_type !== 'foamcore' &&
-      collectionTypeToIcon({
-        type: collection_type,
-        size: 'lg',
-      })
+    const collIcon = collection_type !== 'collection' &&
+      collection_type !== 'foamcore' && (
+        <CollectionIcon type={custom_icon} size="lg" />
+      )
 
     return (
       <StyledCollectionCover
@@ -453,12 +450,12 @@ class CollectionCover extends React.Component {
                         />
                       </PlainLink>
                       {/* Swap for collection type selector */}
-                      {collectionIcon && (
+                      {collIcon && (
                         <CollectionTypeSelector
                           location={'CollectionCover'}
                           collection={collection}
                         >
-                          <IconHolder>{collectionIcon}</IconHolder>
+                          <IconHolder>{collIcon}</IconHolder>
                         </CollectionTypeSelector>
                       )}
                     </Dotdotdot>

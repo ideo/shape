@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import Icon from './Icon'
+import Icon from '../Icon'
 
 const XsIcon = (
   <Icon fill>
@@ -70,14 +70,20 @@ c0.6-0.2,1.1-0.6,1.4-1.1c0.3-0.6,0.4-1.2,0.3-1.8l0,0c1.4-0.8,3.1-0.1,4,0.4C27.7,
   </Icon>
 )
 
-const ChallengeIcon = ({ large }) => (large ? LargeIcon : XsIcon)
+const XxlIcon = () => <Icon fill></Icon>
+
+const ChallengeIcon = ({ size }) => {
+  if (size === 'lg') return LargeIcon
+  else if (size === 'xxl') return XxlIcon
+  return XsIcon
+}
 
 ChallengeIcon.propTypes = {
-  large: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 ChallengeIcon.defaultProps = {
-  large: false,
+  size: 'xs',
 }
 
 export default ChallengeIcon

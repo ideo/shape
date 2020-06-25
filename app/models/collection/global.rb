@@ -13,6 +13,7 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
+#  custom_icon                    :string
 #  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
 #  master_template                :boolean          default(FALSE)
@@ -21,6 +22,7 @@
 #  processing_status              :integer
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
+#  show_icon_on_cover             :boolean
 #  start_date                     :datetime
 #  submission_box_type            :integer
 #  submissions_enabled            :boolean          default(TRUE)

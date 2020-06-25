@@ -4,52 +4,9 @@ import ProfileIcon from '~/ui/icons/ProfileIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import SystemIcon from '~/ui/icons/SystemIcon'
 import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
-import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
-import SubmissionBoxIconLg from '~/ui/icons/SubmissionBoxIconLg'
+import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
+import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
-
-import CollectionIconXs from '~/ui/icons/CollectionIconXs'
-import CollectionIconLg from '~/ui/icons/CollectionIconLg'
-import ProjectIcon from '~/ui/icons/ProjectIcon'
-import ProjectIconLg from '~/ui/icons/ProjectIconLg'
-import PrototypeIconLg from '~/ui/icons/PrototypeIconLg'
-import PrototypeIcon from '~/ui/icons/PrototypeIcon'
-import MethodIcon from '~/ui/icons/MethodIcon'
-import MethodIconLg from '~/ui/icons/MethodIconLg'
-import ProfileIconLg from '~/ui/icons/ProfileIconLg'
-import ProfileIconXs from '~/ui/icons/ProfileIconXs'
-import PhaseIcon from '~/ui/icons/PhaseIcon'
-import ChallengeIcon from '~/ui/icons/ChallengeIcon'
-import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
-
-// Only for use in collectionTitle, not menu
-export const largeCollectionIconMap = {
-  collection: <CollectionIconLg />,
-  profile: <ProfileIconLg />,
-  project: <ProjectIconLg />,
-  method: <MethodIconLg />,
-  prototype: <PrototypeIconLg />,
-  phase: <PhaseIcon large />,
-  challenge: <ChallengeIcon large />,
-  foamcore: <FoamcoreBoardIcon large />,
-}
-
-export const smallCollectionIconMap = {
-  collection: <CollectionIconXs />,
-  profile: <ProfileIconXs />,
-  project: <ProjectIcon />,
-  method: <MethodIcon />,
-  prototype: <PrototypeIcon />,
-  phase: <PhaseIcon />,
-  challenge: <ChallengeIcon />,
-  foamcore: <FoamcoreBoardIconXs />,
-}
-
-export const collectionTypeToIcon = ({ type, size }) => {
-  return size == 'lg'
-    ? largeCollectionIconMap[type]
-    : smallCollectionIconMap[type]
-}
 
 const CollectionTypeIcon = ({ record }) => {
   let icon = ''
@@ -65,11 +22,11 @@ const CollectionTypeIcon = ({ record }) => {
   } else if (record.isMasterTemplate) {
     icon = <TemplateIcon circled filled />
   } else if (record.isSubmissionBox) {
-    icon = <SubmissionBoxIconLg />
+    icon = <SubmissionBoxIcon size="lg" />
   } else if (record.launchableTestId || record.isTestCollectionOrResults) {
     icon = <TestCollectionIcon />
   } else if (record.isBoard) {
-    icon = <FoamcoreBoardIcon large />
+    icon = <FoamcoreBoardIcon size="lg" />
   }
 
   if (icon) {
