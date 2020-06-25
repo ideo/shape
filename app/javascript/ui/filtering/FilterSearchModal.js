@@ -151,4 +151,6 @@ FilterSearchModal.defaultProps = {
   modalOpen: false,
 }
 
+FilterSearchModal.displayName = 'FilterSearchModal'
+
 export default FilterSearchModal

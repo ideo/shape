@@ -36,7 +36,13 @@ describe('TagEditor', () => {
     beforeEach(() => {
       afterAddTag = jest.fn()
       afterRemoveTag = jest.fn()
-      recordTags = [{ label: 'msegreto', type: 'user_tag_list' }]
+      recordTags = [
+        {
+          label: 'marcosegreto',
+          type: 'user_tag_list',
+          user: { pic_url_square: 'http://foo.com/' },
+        },
+      ]
       props = {
         recordTags,
         afterAddTag,

@@ -77,11 +77,20 @@ class CollectionFilter extends React.Component {
 
   onCreateFilter = async tag => {
     const { collection } = this.props
-    if (!this.currentFilterLookupType) return
-    const backendFilterType = pluralize
-      .singular(this.currentFilterLookupType)
+    const { currentFilterLookupType } = this
+    if (!currentFilterLookupType) return
+    let backendFilterType = pluralize
+      .singular(currentFilterLookupType)
       .toLowerCase()
       .split(' ')[0]
+
+    if (backendFilterType === 'tag') {
+      const { internalType } = tag
+      // NOTE: internalType is set under Organization::searchTagsAndUsers
+      if (internalType === 'users') {
+        backendFilterType = 'user_tag'
+      }
+    }
     const filter = {
       text: tag.label,
       filter_type: backendFilterType,

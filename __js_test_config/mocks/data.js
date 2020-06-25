@@ -551,7 +551,7 @@ export const fakeOrganizationAttrs = {
 }
 export const fakeOrganization = {
   ...fakeOrganizationAttrs,
-  searchTagsAndUsers: jest.fn(),
+  searchTagsAndUsers: jest.fn().mockReturnValue(Promise.resolve({})),
   rawAttributes: jest.fn().mockReturnValue(fakeOrganizationAttrs),
   getRecordType: jest.fn().mockReturnValue('organization'),
 }
