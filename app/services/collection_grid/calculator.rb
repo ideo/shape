@@ -176,7 +176,7 @@ module CollectionGrid
       moving_cards:
     )
       master_card = nil
-      if from_collection.is_a?(Collection::Board)
+      if from_collection.board_collection?
         master_card = top_left_card(moving_cards)
       else
         # important to do this first to assign row/col onto the cards

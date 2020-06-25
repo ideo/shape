@@ -6,7 +6,7 @@ class CollectionCardBuilder
     @params = params
     @parent_collection = parent_collection
     @params[:order] ||= next_card_order
-    unless parent_collection.is_a? Collection::Board
+    unless parent_collection.board_collection?
       # row and col can come from GridCardHotspot, but we nullify for non-Boards
       @params.delete :row
       @params.delete :col

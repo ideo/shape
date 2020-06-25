@@ -173,11 +173,11 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :max_row_index do
-    @object.is_a?(Collection::Board) ? @object.max_row_index : nil
+    @object.board_collection? ? @object.max_row_index : nil
   end
 
   attribute :max_col_index do
-    @object.is_a?(Collection::Board) ? @object.max_col_index : nil
+    @object.board_collection? ? @object.max_col_index : nil
   end
 
   attribute :is_test_locked do

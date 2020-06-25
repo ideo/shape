@@ -867,7 +867,7 @@ class Collection < ApplicationRecord
   end
 
   def board_collection?
-    type == 'Collection::Board'
+    num_columns.present?
   end
 
   def global_collection?
@@ -1053,6 +1053,19 @@ class Collection < ApplicationRecord
     left_of_first_moving_card_index = first_moving_card_index - 1
 
     collection_cards[left_of_first_moving_card_index].pinned?
+  end
+
+  # Ported from Collection::Board for 4WFC
+  def max_col_limit
+    num_columns - 1
+  end
+
+  def max_row_index
+    collection_cards.maximum(:row) || 0
+  end
+
+  def max_col_index
+    collection_cards.maximum(:col) || 0
   end
 
   private

@@ -69,5 +69,13 @@
 class Collection
   class TestOpenResponses < Collection
     belongs_to :question_item, class_name: 'Item::QuestionItem'
+
+    before_create :default_to_4_columns
+
+    private
+
+    def default_to_4_columns
+      self.num_columns = 4
+    end
   end
 end

@@ -109,7 +109,7 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
 
       it 'should create an instance of the foamcore master template' do
         expect(foamcore_instance.templated?).to be true
-        expect(foamcore_instance.is_a?(Collection::Board)).to be true
+        expect(foamcore_instance.board_collection?).to be true
       end
     end
 
