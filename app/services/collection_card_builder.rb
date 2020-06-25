@@ -73,6 +73,10 @@ class CollectionCardBuilder
         # but we still want to assign the card a row/col of 0,0 so that the calculations don't break
         @collection_card.row ||= 0
         @collection_card.col ||= 0
+        # moving_cards is coming through with width/height of nil
+        # Need it for CollectionGrid::Calculator#find_closest_open_spot to work
+        @collection_card.height ||= 1
+        @collection_card.width ||= 1
         # valid row/col will get applied to the card here for later saving
         CollectionGrid::BoardPlacement.call(
           row: row,
