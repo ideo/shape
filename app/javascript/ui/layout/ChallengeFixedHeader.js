@@ -17,7 +17,7 @@ const ChallengeFixedHeader = ({
   handleReviewSubmissions,
   currentUserHasReviewableCollections,
 }) => {
-  const { name, collection_type, custom_icon } = collection
+  const { name, collection_type, icon } = collection
   let buttonProps = {}
   if (!collection.isSubmissionBox) {
     buttonProps = {
@@ -60,7 +60,7 @@ const ChallengeFixedHeader = ({
             marginTop={8}
             marginLeft={10}
           >
-            <CollectionIcon type={custom_icon} size="lg" />
+            <CollectionIcon type={icon} size="lg" />
           </IconHolder>
         </Box>
 

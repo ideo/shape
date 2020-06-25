@@ -371,7 +371,7 @@ class CardCoverEditor extends React.Component {
     const {
       card: { record },
     } = this.props
-    record.custom_icon = iconName
+    record.icon = iconName
     record.save()
   }
 
@@ -453,7 +453,7 @@ class CardCoverEditor extends React.Component {
               <h3>Icon</h3>
               <CustomIconSelector
                 selectedIcon={
-                  <CollectionIcon type={record.custom_icon} size="lg" />
+                  <CollectionIcon type={record.icon} size="lg" />
                 }
                 onSelectIcon={this.onCustomIconSelect}
               />

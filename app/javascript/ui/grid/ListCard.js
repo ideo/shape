@@ -188,7 +188,7 @@ class ListCard extends React.Component {
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
         <IconHolder>
-          <CollectionIcon type={record.custom_icon} size="lg" />
+          <CollectionIcon type={record.icon} size="lg" />
         </IconHolder>
       </CollectionTypeSelector>
     )

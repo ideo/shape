@@ -73,7 +73,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'test_show_media',
     'collection_type',
     'search_term',
-    'custom_icon',
+    'icon',
   ]
 
   constructor(...args) {

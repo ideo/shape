@@ -213,7 +213,7 @@ ActiveRecord::Schema.define(version: 2020_06_24_153202) do
     t.integer "challenge_admin_group_id"
     t.integer "challenge_reviewer_group_id"
     t.integer "challenge_participant_group_id"
-    t.string "custom_icon"
+    t.string "icon"
     t.boolean "show_icon_on_cover"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin

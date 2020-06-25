@@ -375,12 +375,12 @@ class CollectionCover extends React.Component {
       cardId,
       fontColor,
     } = this.props
-    const { subtitle, collection_type, custom_icon } = collection
+    const { subtitle, collection_type, icon } = collection
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collIcon = collection_type !== 'collection' &&
       collection_type !== 'foamcore' && (
-        <CollectionIcon type={custom_icon} size="lg" />
+        <CollectionIcon type={icon} size="lg" />
       )
 
     return (
