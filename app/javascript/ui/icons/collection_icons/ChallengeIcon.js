@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import Icon from '../Icon'
 
-const XsIcon = (
+const XsIcon = () => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
       <path
@@ -34,7 +34,7 @@ const XsIcon = (
   </Icon>
 )
 
-const LargeIcon = (
+const LargeIcon = () => (
   <Icon fill>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
       <path
@@ -82,9 +82,9 @@ const XxlIcon = () => (
 )
 
 const ChallengeIcon = ({ size }) => {
-  if (size === 'lg') return LargeIcon
-  else if (size === 'xxl') return XxlIcon
-  return XsIcon
+  if (size === 'lg') return <LargeIcon />
+  else if (size === 'xxl') return <XxlIcon />
+  return <XsIcon />
 }
 
 ChallengeIcon.propTypes = {

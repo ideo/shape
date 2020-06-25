@@ -80,9 +80,9 @@ const XxlIcon = () => (
 )
 
 const PrototypeIcon = ({ size }) => {
-  if (size === 'lg') return LgIcon
-  if (size === 'xxl') return XxlIcon
-  return MdIcon
+  if (size === 'lg') return <LgIcon />
+  if (size === 'xxl') return <XxlIcon />
+  return <MdIcon />
 }
 
 PrototypeIcon.propTypes = {

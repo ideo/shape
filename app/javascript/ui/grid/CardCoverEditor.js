@@ -8,7 +8,7 @@ import styled from 'styled-components'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
-import CustomIconSelector from '~/ui/grid/CustomIconSelector'
+import CollectionIconSelector from '~/ui/grid/CollectionIconSelector'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
@@ -451,10 +451,8 @@ class CardCoverEditor extends React.Component {
               />
               <MediumBreak />
               <h3>Icon</h3>
-              <CustomIconSelector
-                selectedIcon={
-                  <CollectionIcon type={record.icon} size="lg" />
-                }
+              <CollectionIconSelector
+                selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
                 onSelectIcon={this.onCustomIconSelect}
               />
               <LabelContainer

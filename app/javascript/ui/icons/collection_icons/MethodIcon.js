@@ -49,9 +49,9 @@ const XsIcon = () => (
 )
 
 const MethodIcon = ({ size }) => {
-  if (size === 'lg') return LgIcon
-  if (size === 'xxl') return XxlIcon
-  return XsIcon
+  if (size === 'lg') return <LgIcon />
+  if (size === 'xxl') return <XxlIcon />
+  return <XsIcon />
 }
 
 MethodIcon.propTypes = {
