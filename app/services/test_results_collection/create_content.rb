@@ -131,7 +131,7 @@ module TestResultsCollection
           width: 1,
           height: 2,
           identifier: 'first-idea-media',
-          order: @order += 1,
+          # order: @order += 1,
         ),
       )
     end
@@ -140,7 +140,7 @@ module TestResultsCollection
       TestResultsCollection::CreateItemLink.call!(
         default_attrs.merge(
           item: card.item,
-          order: @order += 1,
+          # order: @order += 1,
           width: 2,
           height: 2,
         ),
@@ -153,7 +153,7 @@ module TestResultsCollection
           .except(:parent_collection)
           .merge(
             test_results_collection: test_results_collection,
-            order: @order += 1,
+            # order: @order += 1,
           ),
       )
     end
@@ -164,7 +164,7 @@ module TestResultsCollection
           .merge(
             idea_item: idea,
             num_idea: 1,
-            order: @order += 1,
+            # order: @order += 1,
           ),
       )
       @order = result.order
@@ -174,7 +174,7 @@ module TestResultsCollection
       create_card(
         params: {
           identifier: CardIdentifier.call(survey_response, 'OpenResponses'),
-          order: @order += 1,
+          # order: @order += 1,
           collection_attributes: {
             name: "#{survey_response.respondent_alias} Responses",
           },
@@ -190,7 +190,7 @@ module TestResultsCollection
         test_collection: test_collection,
         created_by: created_by,
         idea: idea,
-        order: @order += 1,
+        # order: @order += 1,
       )
     end
 
@@ -198,7 +198,7 @@ module TestResultsCollection
       TestResultsCollection::CreateOpenResponseCollection.call!(
         default_attrs.merge(
           question_item: card.item,
-          order: @order += 1,
+          # order: @order += 1,
         ),
       )
     end
@@ -207,7 +207,7 @@ module TestResultsCollection
       result = TestResultsCollection::CreateResponseGraph.call!(
         default_attrs.merge(
           item: card.item,
-          order: @order += 1,
+          # order: @order += 1,
           legend_item: @legend_item,
           survey_response: survey_response,
           idea: idea,
