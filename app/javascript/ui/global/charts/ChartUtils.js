@@ -104,7 +104,7 @@ export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
     minXDomain = minBy(values, 'date').date
     maxXDomain = maxBy(values, 'date').date
     const allDates = values.map(v => v.date)
-    if (allDates.every(d => allDates.every(d => isEqual(d, allDates[0])))) {
+    if (allDates.every(d => isEqual(d, allDates[0]))) {
       maxXDomain = new Date()
     }
   } else {
