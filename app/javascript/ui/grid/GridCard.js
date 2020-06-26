@@ -437,7 +437,6 @@ class GridCard extends React.Component {
       searchResult,
       isBoardCollection,
       testCollectionCard,
-      isReviewable,
     } = this.props
     let { record, cardType } = this.props
     const { coverItem, collection_cover_text_items } = record
@@ -473,7 +472,6 @@ class GridCard extends React.Component {
         handleClick={this.defaultHandleClick}
         isBoardCollection={isBoardCollection}
         isTestCollectionCard={testCollectionCard}
-        isReviewable={isReviewable}
         nestedTextItem={nestedTextItem}
       />
     )
@@ -632,7 +630,6 @@ GridCard.propTypes = {
   canEditCollection: PropTypes.bool,
   isSharedCollection: PropTypes.bool,
   isBoardCollection: PropTypes.bool,
-  isReviewable: PropTypes.bool,
   dragging: PropTypes.bool,
   hoveringOver: PropTypes.bool,
   lastPinnedCard: PropTypes.bool,
@@ -649,7 +646,6 @@ GridCard.defaultProps = {
   canEditCollection: false,
   isSharedCollection: false,
   isBoardCollection: false,
-  isReviewable: false,
   dragging: false,
   hoveringOver: false,
   lastPinnedCard: false,

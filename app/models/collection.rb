@@ -910,7 +910,7 @@ class Collection < ApplicationRecord
     User.where(
       User.arel_table[:handle].lower.in(
         parent_challenge.collection_filters.user_tag.pluck(:text),
-      )
+      ),
     )
   end
 
@@ -919,11 +919,12 @@ class Collection < ApplicationRecord
   def add_challenge_reviewer(user)
     return unless parent_challenge.present?
 
-    filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
+    filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user&.handle).first
     filter_for_user ||= parent_challenge.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
     )
+
     # Find or create the filter for this user
     filter_for_user.user_collection_filters.find_or_create_by(
       user_id: user.id,
@@ -935,14 +936,14 @@ class Collection < ApplicationRecord
   def remove_challenge_reviewer(user)
     return unless parent_challenge.present?
 
-    parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
+    parent_challenge.collection_filters.tagged_with_user_handle(user&.handle).destroy_all
   end
 
   def challenge_reviewer?(user)
     return false if parent_challenge.blank?
 
     parent_challenge.collection_filters
-                    .tagged_with_user_handle(user.handle)
+                    .tagged_with_user_handle(user&.handle)
                     .count
                     .positive?
   end
@@ -950,11 +951,11 @@ class Collection < ApplicationRecord
   def submission_reviewer_status(user)
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
-                  submission_attrs['launchable_test_id'].present? &&
+                  launchable_test_id.present? &&
                   challenge_reviewer?(user)
 
     response = SurveyResponse.find_by(
-      test_collection_id: submission_attrs['launchable_test_id'],
+      test_collection_id: launchable_test_id,
       user_id: user.id,
     )
 
@@ -1083,7 +1084,11 @@ class Collection < ApplicationRecord
   def submission_test?
     return unless inside_a_submission?
 
-    parent_submission.submission_attrs['launchable_test_id'] == id
+    parent_submission.launchable_test_id == id
+  end
+
+  def launchable_test_id
+    submission_attrs.present? ? submission_attrs['launchable_test_id'] : nil
   end
 
   # check for template instances anywhere in the entire collection tree

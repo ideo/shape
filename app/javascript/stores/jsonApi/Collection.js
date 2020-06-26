@@ -1710,6 +1710,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return collection_cover_items[0]
   }
 
+  get isReviewable() {
+    const status = _.get(this, 'submission_reviewer_status')
+    return this.isSubmission && status && status !== 'completed'
+  }
+
+  get reviewableCards() {
+    const submissionCards = this.isSubmissionBox
+      ? _.get(this, 'submissions_collection.collection_cards')
+      : []
+    return _.filter(submissionCards, cc => {
+      return _.get(cc, 'record.isReviewable')
+    })
+  }
+
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
   API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
