@@ -38,30 +38,10 @@ module UserTaggable
   private
 
   def assign_and_remove_user_tags
-    @user_tag_add_user_ids = []
-    @user_tag_remove_user_ids = []
-
-    if @user_tag_list.blank?
-      # If they are clearing it out, remove all tagged users
-      @user_tag_remove_user_ids = tagged_user_ids
-    else
-      assign_user_ids = User.where(handle: @user_tag_list).pluck(:id)
-
-      tagged_user_ids.each do |tagged_user_id|
-        unless assign_user_ids.include?(tagged_user_id)
-          @user_tag_remove_user_ids << tagged_user_id
-        end
-      end
-
-      @user_tag_add_user_ids = assign_user_ids - tagged_user_ids
-    end
-
-    if @user_tag_remove_user_ids.present? && persisted?
-      UserTag.where(
-        record_id: id,
-        record_type: self.class.base_class.name,
-        user_id: @user_tag_remove_user_ids,
-      ).destroy_all
+    if @user_tag_remove_user_ids.present?
+      user_tags.where(user_id: @user_tag_remove_user_ids).delete_all
+      after_remove_tagged_user_ids(@user_tag_remove_user_ids)
+      @user_tag_remove_user_ids = nil
     end
 
     @user_tag_add_user_ids.each do |user_id|
@@ -78,5 +58,27 @@ module UserTaggable
     # Set to nil so it is reloaded when accessed again,
     # so any invalid handles aren't preserved
     @user_tag_list = nil
+    after_add_tagged_user_ids(@user_tag_add_user_ids)
+
+    @user_tag_add_user_ids = nil
+  end
+
+  def after_remove_tagged_user_ids(user_ids)
+    return unless submission? && parent_challenge.present?
+
+    # Remove the challenge collection filter for these user(s)
+    User.where(id: user_ids).each do |user|
+      remove_challenge_reviewer(user)
+    end
+  end
+
+  def after_add_tagged_user_ids(user_ids)
+    # If a user is tagged on a submission within a challenge,
+    # add them to the selectable collection filters if not already
+    return unless submission? && parent_challenge.present?
+
+    User.where(id: user_ids).each do |user|
+      add_challenge_reviewer(user)
+    end
   end
 end

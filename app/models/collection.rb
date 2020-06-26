@@ -904,6 +904,65 @@ class Collection < ApplicationRecord
     result
   end
 
+  def challenge_reviewers
+    return [] unless parent_challenge.present?
+
+    User.where(
+      User.arel_table[:handle].lower.in(
+        parent_challenge.collection_filters.user_tag.pluck(:text),
+      )
+    )
+  end
+
+  # This method is called when a user tag is added to a submission collection
+  # in the UserTaggable concern
+  def add_challenge_reviewer(user)
+    return unless parent_challenge.present?
+
+    filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
+    filter_for_user ||= parent_challenge.collection_filters.create(
+      text: user.handle,
+      filter_type: :user_tag,
+    )
+    # Find or create the filter for this user
+    filter_for_user.user_collection_filters.find_or_create_by(
+      user_id: user.id,
+    )
+  end
+
+  # This method is called when a user tag is removed from a submission collection
+  # in the UserTaggable concern
+  def remove_challenge_reviewer(user)
+    return unless parent_challenge.present?
+
+    parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
+  end
+
+  def challenge_reviewer?(user)
+    return false if parent_challenge.blank?
+
+    parent_challenge.collection_filters
+                    .tagged_with_user_handle(user.handle)
+                    .count
+                    .positive?
+  end
+
+  def submission_reviewer_status(user)
+    # Return unless it is a submission that the user has been added as a reviewer for
+    return unless submission? &&
+                  submission_attrs['launchable_test_id'].present? &&
+                  challenge_reviewer?(user)
+
+    response = SurveyResponse.find_by(
+      test_collection_id: submission_attrs['launchable_test_id'],
+      user_id: user.id,
+    )
+
+    return :unstarted if response.blank?
+
+    response.completed? ? :completed : :in_progress
+  end
+
   def default_group_id
     return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
@@ -963,7 +1022,7 @@ class Collection < ApplicationRecord
   end
 
   def parent_challenge
-    parents.where(collection_type: :challenge).last
+    @parent_challenge ||= parents.where(collection_type: :challenge).last
   end
 
   def challenge_or_inside_challenge?
@@ -1149,6 +1208,12 @@ class Collection < ApplicationRecord
     return [] unless master_template? && submission_box_template?
 
     Collection.in_collection(id).test_collection.includes(challenge_audiences: [:audience])
+  end
+
+  def reload(*args)
+    # Reset all memoized data
+    @parent_challenge = @parent_submission_box_template = nil
+    super(*args)
   end
 
   private
