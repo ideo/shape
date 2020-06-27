@@ -242,6 +242,25 @@ describe('PageHeader', () => {
     })
   })
 
+  describe('with a submission box collection', () => {
+    beforeEach(() => {
+      props.record.isSubmissionBox = true
+      props.record.isChallengeOrInsideChallenge = true
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+    })
+
+    it('should render the ChallengeSubHeader', () => {
+      expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
+    })
+
+    it('should render the TopRightChallengeButton', () => {
+      expect(wrapper.find('TopRightChallengeButton').exists()).toBe(true)
+      expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
+        'Review Submissions'
+      )
+    })
+  })
+
   describe('with a phase collection type inside a challenge', () => {
     beforeEach(() => {
       props.record = fakeCollection

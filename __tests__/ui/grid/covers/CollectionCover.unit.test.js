@@ -152,4 +152,19 @@ describe('CollectionCover', () => {
       expect(wrapper.find('CollectionTypeSelector').exists()).toBeTruthy()
     })
   })
+
+  describe('reviewable collection', () => {
+    beforeEach(() => {
+      props.collection.isLiveTest = true
+      props.inSubmissionsCollection = true
+      props.isReviewable = true
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('renders the submissions reviewer button', () => {
+      expect(wrapper.find('Button').exists()).toBe(true)
+      expect(wrapper.find('Button').html()).toContain('Review')
+    })
+  })
 })

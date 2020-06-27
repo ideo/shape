@@ -454,7 +454,7 @@ class PageHeader extends React.Component {
       const { reviewableCards } = record
       const hidden = _.isEmpty(reviewableCards)
       buttonProps = {
-        name: `Review Submissions (${reviewableCards.length})`,
+        name: `Review Submissions`,
         color: `${v.colors.alert}`,
         onClick: this.handleReviewSubmissionsClick,
         hidden,
