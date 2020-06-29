@@ -1,14 +1,14 @@
-import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
+import NamedButton from '~/ui/global/NamedButton'
 
 let props, wrapper
-describe('TopRightChallengeButton', () => {
+describe('NamedButton', () => {
   beforeEach(() => {
     props = {
       name: 'Challenge Settings',
       onClick: jest.fn(),
     }
 
-    wrapper = shallow(<TopRightChallengeButton {...props} />)
+    wrapper = shallow(<NamedButton {...props} />)
   })
 
   it('should render a Button', () => {

@@ -1711,15 +1711,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isReviewable() {
-    const status = _.get(this, 'submission_reviewer_status')
-    return this.isSubmission && status && status !== 'completed'
+    const unreviewed = _.get(this, 'submission_reviewer_status') !== 'completed'
+    return this.isLiveTest && unreviewed
   }
 
   get reviewableCards() {
-    const submissionCards = this.isSubmissionBox
-      ? _.get(this, 'submissions_collection.collection_cards')
-      : []
-    return _.filter(submissionCards, cc => {
+    if (!this.isSubmissionsCollection) return []
+    return _.filter(this.collection_cards, cc => {
       return _.get(cc, 'record.isReviewable')
     })
   }

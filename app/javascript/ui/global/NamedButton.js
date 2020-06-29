@@ -2,9 +2,7 @@ import Button from '~/ui/global/Button'
 import PropTypes from 'prop-types'
 import v from '~/utils/variables'
 
-const TopRightChallengeButton = ({ name, color, onClick, hidden }) => {
-  if (hidden) return null
-
+const NamedButton = ({ name, color, onClick, disabled }) => {
   return (
     <Button
       style={{ marginLeft: '1rem' }}
@@ -12,22 +10,23 @@ const TopRightChallengeButton = ({ name, color, onClick, hidden }) => {
       size="sm"
       width={256}
       onClick={onClick}
+      disabled={disabled}
     >
       {name}
     </Button>
   )
 }
 
-TopRightChallengeButton.propTypes = {
+NamedButton.propTypes = {
   name: PropTypes.string.isRequired,
   color: PropTypes.string,
   onClick: PropTypes.func.isRequired,
-  hidden: PropTypes.bool,
+  disabled: PropTypes.bool,
 }
 
-TopRightChallengeButton.defaultProps = {
+NamedButton.defaultProps = {
   color: v.colors.primaryDarkest,
-  hidden: false,
+  disabled: false,
 }
 
-export default TopRightChallengeButton
+export default NamedButton

@@ -830,12 +830,18 @@ describe('Collection', () => {
 
   describe('reviewableCards', () => {
     beforeEach(() => {
-      collection.type = 'Collection::SubmissionBox'
-      const submissionsCollection = fakeCollection
-      submissionsCollection.collection_cards.map(cc => {
-        cc.record.isReviewable = true
+      const reviewableCardAttrs = [
+        {
+          section_type: 'intro',
+          card_question_type: 'question_open',
+          record: { isReviewable: true },
+        },
+      ]
+      collection.type = 'Collection::SubmissionsCollection'
+      collection.addReference('collection_cards', reviewableCardAttrs, {
+        model: CollectionCard,
+        type: ReferenceType.TO_MANY,
       })
-      collection.submissions_collection = submissionsCollection
     })
 
     it('returns reviewableCards', () => {
@@ -847,6 +853,7 @@ describe('Collection', () => {
     beforeEach(() => {
       collection.submission_attrs = {
         submission: true,
+        test_status: 'live',
       }
       collection.submission_reviewer_status = 'in_progress'
     })

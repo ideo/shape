@@ -31,7 +31,7 @@ import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
-import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
+import NamedButton from '~/ui/global/NamedButton'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 import ChallengePhasesIcons from '~/ui/challenges/ChallengePhasesIcons'
 
@@ -88,6 +88,33 @@ const CollectionPillHolder = styled.div`
   margin-bottom: 8px;
   width: 100%;
 `
+
+export const renderChallengeButton = (
+  record,
+  handleChallengeSettingsClick,
+  handleReviewSubmissionsClick
+) => {
+  let buttonProps = {}
+  if (!record.isSubmissionBox) {
+    buttonProps = {
+      name: 'Challenge Settings',
+      onClick: handleChallengeSettingsClick,
+    }
+  } else {
+    const { submissions_collection } = record
+    const { reviewableCards } = submissions_collection
+    const hasReviewableSubmissions = !_.isEmpty(reviewableCards)
+    buttonProps = {
+      name: hasReviewableSubmissions
+        ? `Review Submissions`
+        : `No Reviewable Submissions`,
+      color: `${v.colors.alert}`,
+      disabled: !hasReviewableSubmissions,
+      onClick: handleReviewSubmissionsClick,
+    }
+  }
+  return <NamedButton {...buttonProps} />
+}
 
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
@@ -441,28 +468,6 @@ class PageHeader extends React.Component {
     return null
   }
 
-  get renderTopRightButton() {
-    const { record } = this.props
-
-    let buttonProps = {}
-    if (!record.isSubmissionBox) {
-      buttonProps = {
-        name: 'Challenge Settings',
-        onClick: this.handleChallengeSettingsClick,
-      }
-    } else {
-      const { reviewableCards } = record
-      const hidden = _.isEmpty(reviewableCards)
-      buttonProps = {
-        name: `Review Submissions`,
-        color: `${v.colors.alert}`,
-        onClick: this.handleReviewSubmissionsClick,
-        hidden,
-      }
-    }
-    return <TopRightChallengeButton {...buttonProps} />
-  }
-
   get cardsForTagging() {
     const { apiStore, record } = this.props
     if (apiStore.selectedCards.length > 0) {
@@ -563,7 +568,11 @@ class PageHeader extends React.Component {
 
               {record.isChallengeOrInsideChallenge && (
                 <FixedRightContainer>
-                  {this.renderTopRightButton}
+                  {renderChallengeButton(
+                    record,
+                    this.handleChallengeSettingsClick,
+                    this.handleReviewSubmissionsClick
+                  )}
                 </FixedRightContainer>
               )}
             </StyledTitleAndRoles>

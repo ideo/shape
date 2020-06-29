@@ -234,17 +234,19 @@ describe('PageHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
     })
 
-    it('should render the TopRightChallengeButton', () => {
-      expect(wrapper.find('TopRightChallengeButton').exists()).toBe(true)
-      expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
+    it('should render the NamedButton', () => {
+      expect(wrapper.find('NamedButton').exists()).toBe(true)
+      expect(wrapper.find('NamedButton').props().name).toEqual(
         'Challenge Settings'
       )
     })
   })
 
   describe('with a submission box collection', () => {
+    const submissionsCollection = fakeCollection
     beforeEach(() => {
       props.record.isSubmissionBox = true
+      props.record.submissions_collection = submissionsCollection
       props.record.isChallengeOrInsideChallenge = true
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
@@ -253,11 +255,27 @@ describe('PageHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
     })
 
-    it('should render the TopRightChallengeButton', () => {
-      expect(wrapper.find('TopRightChallengeButton').exists()).toBe(true)
-      expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
-        'Review Submissions'
+    it('should render the NamedButton', () => {
+      expect(wrapper.find('NamedButton').exists()).toBe(true)
+    })
+
+    it('should render the button with no reviewable submissions', () => {
+      expect(wrapper.find('NamedButton').props().name).toEqual(
+        'No Reviewable Submissions'
       )
+    })
+
+    describe('with reviewable submissions', () => {
+      beforeEach(() => {
+        submissionsCollection.reviewableCards = [fakeCollectionCard]
+        props.record.submissions_collection = submissionsCollection
+        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      })
+      it('should render the button with reviewable submissions', () => {
+        expect(wrapper.find('NamedButton').props().name).toEqual(
+          'Review Submissions'
+        )
+      })
     })
   })
 

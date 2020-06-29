@@ -1,6 +1,6 @@
 import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 
-import { fakeCollection } from '#/mocks/data'
+import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 let props, wrapper, rerender
 describe('ChallengeFixedHeader', () => {
@@ -41,21 +41,42 @@ describe('ChallengeFixedHeader', () => {
     })
 
     it('should render a Challenge Settings Button', () => {
-      const challengeButton = wrapper.find('TopRightChallengeButton')
+      const challengeButton = wrapper.find('NamedButton')
       expect(challengeButton.exists()).toEqual(true)
       expect(challengeButton.props().name).toEqual('Challenge Settings')
     })
 
     describe('inside a submission box', () => {
+      const submissionsCollection = fakeCollection
       beforeEach(() => {
         props.collection.isSubmissionBox = true
+        props.collection.submissions_collection = submissionsCollection
+        props.collection.isChallengeOrInsideChallenge = true
         rerender()
       })
 
       it('should render a Challenge Settings Button', () => {
-        const challengeButton = wrapper.find('TopRightChallengeButton')
+        const challengeButton = wrapper.find('NamedButton')
         expect(challengeButton.exists()).toEqual(true)
-        expect(challengeButton.props().name).toContain('Review Submissions')
+      })
+
+      it('should render the button with no reviewable submissions', () => {
+        expect(wrapper.find('NamedButton').props().name).toEqual(
+          'No Reviewable Submissions'
+        )
+      })
+
+      describe('with reviewable submissions', () => {
+        beforeEach(() => {
+          submissionsCollection.reviewableCards = [fakeCollectionCard]
+          props.collection.submissions_collection = submissionsCollection
+          rerender()
+        })
+        it('should render the button with reviewable submissions', () => {
+          expect(wrapper.find('NamedButton').props().name).toEqual(
+            'Review Submissions'
+          )
+        })
       })
     })
   })

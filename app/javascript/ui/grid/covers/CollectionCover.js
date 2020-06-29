@@ -250,8 +250,8 @@ class CollectionCover extends React.Component {
   }
 
   get reviewSubmissionButton() {
-    const { inSubmissionsCollection, collection, isReviewable } = this.props
-    if (!inSubmissionsCollection || !collection.isLiveTest || !isReviewable) {
+    const { inSubmissionsCollection, isReviewable } = this.props
+    if (!inSubmissionsCollection || !isReviewable) {
       return null
     }
 
