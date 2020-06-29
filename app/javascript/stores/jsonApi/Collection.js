@@ -74,6 +74,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'collection_type',
     'search_term',
     'icon',
+    'show_icon_on_cover',
   ]
 
   constructor(...args) {

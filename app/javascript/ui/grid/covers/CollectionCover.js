@@ -148,6 +148,24 @@ const StyledCardContent = styled.div`
     left: 40%;
     padding-right: 2rem;
   `};
+
+  .iconBg {
+    position: absolute;
+    left: 0px;
+    ${props =>
+      props.height > 1
+        ? `
+      top: 10%;
+      height: 80%;
+    `
+        : `top: 0; height: 100%;`};
+    color: ${v.colors.commonMedium};
+    overflow-x: hidden;
+    .icon {
+      width: 100%;
+      left: -30%;
+    }
+  }
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
@@ -375,11 +393,11 @@ class CollectionCover extends React.Component {
       cardId,
       fontColor,
     } = this.props
-    const { subtitle, collection_type, icon } = collection
+    const { subtitle, collection_type, icon, show_icon_on_cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collIcon = collection_type !== 'collection' &&
-      collection_type !== 'foamcore' && <CollectionIcon type={icon} size="md" />
+      collection_type !== 'foamcore' && <CollectionIcon type={icon} />
 
     return (
       <StyledCollectionCover
@@ -407,6 +425,11 @@ class CollectionCover extends React.Component {
             useTextBackground={this.useTextBackground}
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
+            {show_icon_on_cover && (
+              <div className="iconBg">
+                <CollectionIcon type={icon} size="xxl" />
+              </div>
+            )}
             {collection.isPhaseOrProject &&
               collection.start_date &&
               collection.end_date && (
@@ -447,7 +470,6 @@ class CollectionCover extends React.Component {
                           useTextBackground={this.useTextBackground}
                         />
                       </PlainLink>
-                      {/* Swap for collection type selector */}
                       {collIcon && (
                         <CollectionTypeSelector
                           location={'CollectionCover'}

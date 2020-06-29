@@ -6,7 +6,6 @@ import InlineModal from '~/ui/global/modals/InlineModal'
 import { allIcons } from '~/ui/icons/CollectionIcon'
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import v from '~/utils/variables'
-
 const IconWrapper = styled.div`
   display: inline-block;
   ${props => (props.noMargin ? '' : 'margin: 5px;')}
@@ -22,37 +21,43 @@ const IconSelectorWrapper = styled.div`
   cursor: pointer;
   background-color: ${v.colors.white};
   display: inline-block;
+  padding-left: 2px;
 `
 
 const CollectionIconSelector = ({ selectedIcon, onSelectIcon }) => {
-  const [open, setOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
   const selectRef = useRef(null)
 
   const handleSelectIcon = iconName => {
-    setOpen(false)
+    setModalOpen(false)
     onSelectIcon(iconName)
   }
 
   return (
     <div>
-      <IconSelectorWrapper onClick={() => setOpen(true)} ref={selectRef}>
+      <IconSelectorWrapper onClick={() => setModalOpen(true)} ref={selectRef}>
         <IconWrapper noMargin>{selectedIcon}</IconWrapper>{' '}
         <IconWrapper>
           <DropdownIcon />
         </IconWrapper>
-        <InlineModal open={open} anchorElement={selectRef} hideButtons>
-          <div style={{ width: '160px', minHeight: '160px' }}>
-            {Object.keys(allIcons).map(iconName => {
-              const Icon = allIcons[iconName]
-              return (
-                <IconWrapper onClick={() => handleSelectIcon(iconName)}>
-                  <Icon size={'lg'} />
-                </IconWrapper>
-              )
-            })}
-          </div>
-        </InlineModal>
       </IconSelectorWrapper>
+      <InlineModal
+        open={modalOpen}
+        anchorElement={selectRef && selectRef.current}
+        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+        hideButtons
+      >
+        <div style={{ width: '160px', minHeight: '160px' }}>
+          {Object.keys(allIcons).map(iconName => {
+            const Icon = allIcons[iconName]
+            return (
+              <IconWrapper onClick={() => handleSelectIcon(iconName)}>
+                <Icon size={'lg'} />
+              </IconWrapper>
+            )
+          })}
+        </div>
+      </InlineModal>
     </div>
   )
 }

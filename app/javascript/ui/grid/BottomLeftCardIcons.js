@@ -103,7 +103,7 @@ class BottomLeftCardIcons extends React.Component {
       } else if (!record.isCreativeDifferenceChartCover) {
         icons.push(
           <StyledIconWrapper>
-            <CollectionIcon />
+            <CollectionIcon size="md" />
           </StyledIconWrapper>
         )
       }

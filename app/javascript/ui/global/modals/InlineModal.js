@@ -24,22 +24,24 @@ class InlineModal extends React.PureComponent {
     onConfirm && onConfirm()
   }
 
-  render() {
-    const {
-      children,
+  get popoverProps() {
+    const { anchorElement, open, anchorOrigin } = this.props
+    const popProps = {
+      anchorOrigin,
       open,
-      leftButton,
-      anchorElement,
-      hideButtons,
-    } = this.props
+      onClose: this.handleCancel,
+    }
+    if (anchorElement) {
+      popProps.anchorEl = anchorElement
+      popProps.anchorReference = 'anchorEl'
+    }
+    return popProps
+  }
+
+  render() {
+    const { children, leftButton, hideButtons } = this.props
     return (
-      <Popover
-        open={open}
-        onClose={this.handleCancel}
-        anchorOrigin={{ horizontal: 'center', vertical: 'center' }}
-        anchorEl={anchorElement}
-        anchorReference="anchorEl"
-      >
+      <Popover {...this.popoverProps}>
         <Grid container spacing={2}>
           <Grid item xs={4}>
             {children}
@@ -86,6 +88,10 @@ InlineModal.propTypes = {
   leftButton: PropTypes.node,
   anchorElement: PropTypes.node,
   hideButtons: PropTypes.bool,
+  anchorOrigin: PropTypes.shape({
+    horizontal: PropTypes.string,
+    vertical: PropTypes.string,
+  }),
 }
 
 InlineModal.defaultProps = {
@@ -95,6 +101,7 @@ InlineModal.defaultProps = {
   leftButton: null,
   anchorElement: null,
   hideButtons: false,
+  anchorOrigin: { horizontal: 'center', vertical: 'center' },
 }
 
 export default InlineModal

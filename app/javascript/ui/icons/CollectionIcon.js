@@ -64,9 +64,9 @@ export const allIcons = {
   submit: SubmitIcon,
 }
 
-const CollectionIcon = ({ type, size }) => {
+const CollectionIcon = ({ type, ...iconProps }) => {
   const Icon = allIcons[type]
-  return <Icon size={size} />
+  return <Icon {...iconProps} />
 }
 
 CollectionIcon.propTypes = {
@@ -74,11 +74,14 @@ CollectionIcon.propTypes = {
   type: PropTypes.string,
   /** size is one of xs, md, lg, xl, xxl */
   size: PropTypes.string,
+  /** viewbox - supported on some icons */
+  viewBox: PropTypes.string,
 }
 
 CollectionIcon.defaultProps = {
   type: 'collection',
   size: 'xs',
+  viewBox: undefined,
 }
 
 export default CollectionIcon

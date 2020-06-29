@@ -7,6 +7,7 @@ import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import FilledProfileIcon from '~/ui/icons/FilledProfileIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 
 const CollectionTypeIcon = ({ record }) => {
   let icon = ''
@@ -27,6 +28,8 @@ const CollectionTypeIcon = ({ record }) => {
     icon = <TestCollectionIcon />
   } else if (record.isBoard) {
     icon = <FoamcoreBoardIcon size="lg" />
+  } else {
+    icon = <CollectionIcon icon={record.icon} />
   }
 
   if (icon) {

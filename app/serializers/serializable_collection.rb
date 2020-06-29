@@ -31,6 +31,8 @@ class SerializableCollection < BaseJsonSerializer
     :num_columns,
     :start_date,
     :end_date,
+    :icon,
+    :show_icon_on_cover,
   )
 
   stringified_attributes(
