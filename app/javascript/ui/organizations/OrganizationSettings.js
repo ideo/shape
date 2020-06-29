@@ -152,13 +152,12 @@ class OrganizationSettings extends React.Component {
           Any new people added to {this.organization.name} without these email
           domains will be considered guests.
         </p>
-
+        // FIXME: will break when tags are used with organization domains...
         <TagEditor
           canEdit
           validateTag={this.validateDomainTag}
           placeholder="Please enter domains with the following format: domain.com"
           records={[this.organization]}
-          tagField="domain_whitelist"
           tagColor="white"
           afterAddTag={this.afterAddRemoveDomainTag}
           afterRemoveTag={this.afterAddRemoveDomainTag}

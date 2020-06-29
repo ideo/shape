@@ -9,7 +9,8 @@ class Api::V1::TagsController < Api::V1::BaseController
   private
 
   def load_tags
-    @tags = ActsAsTaggableOn::Tag.order(taggings_count: :desc).limit(1000)
+    # FIXME: deal with caching later so we don't add a limit
+    @tags = ActsAsTaggableOn::Tag.order(taggings_count: :desc).limit(10_000)
     return @tags if @organization.blank?
 
     @tags = @tags.where(

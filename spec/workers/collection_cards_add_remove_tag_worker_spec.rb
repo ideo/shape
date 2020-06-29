@@ -14,50 +14,111 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
       allow(CollectionUpdateBroadcaster).to receive(:call).and_call_original
     end
     let(:action) { nil }
+    let(:tag) { nil }
+    let(:type) { nil }
     let(:perform) do
       subject.perform(
         collection_cards.map(&:id),
-        'cats',
+        tag,
+        type,
         action,
         user.id,
       )
     end
 
-    context 'with the add action' do
-      let!(:action) { 'add' }
+    context 'with tag_list' do
+      let!(:type) { 'tag_list' }
+      let!(:tag) { 'cats' }
 
-      it 'adds tags to all card records' do
-        perform
-        records.each do |record|
-          expect(record.reload.tag_list).to eq(['cats'])
+      context 'with the add action' do
+        let!(:action) { 'add' }
+
+        it 'adds tags to all card records' do
+          perform
+          records.each do |record|
+            expect(record.reload.tag_list).to eq(['cats'])
+          end
+        end
+
+        it 'calls collection update broadcaster' do
+          expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+          perform
         end
       end
 
-      it 'calls collection update broadcaster' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
-        perform
-      end
-    end
+      context 'with the remove action' do
+        let!(:action) { 'remove' }
 
-    context 'with the remove action' do
-      let!(:action) { 'remove' }
+        before do
+          records.each do |record|
+            record.update(tag_list: 'cats, birds')
+          end
+        end
 
-      before do
-        records.each do |record|
-          record.update(tag_list: 'cats, birds')
+        it 'removes tags on all card records' do
+          perform
+          records.each do |record|
+            expect(record.reload.tag_list).to eq(['birds'])
+          end
+        end
+
+        it 'calls collection update broadcaster' do
+          expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+          perform
         end
       end
 
-      it 'removes tags on all card records' do
-        perform
-        records.each do |record|
-          expect(record.reload.tag_list).to eq(['birds'])
-        end
-      end
+      context 'with user' do
+        let!(:user_dkaplan) { create(:user, handle: 'dkaplan') }
+        let!(:type) { 'user_tag_list' }
+        let!(:tag) { user_dkaplan.handle }
 
-      it 'calls collection update broadcaster' do
-        expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
-        perform
+        context 'with the add action' do
+          let!(:action) { 'add' }
+
+          it 'adds tags to all card records' do
+            perform
+            records.each do |record|
+              expect(record.reload.user_tag_list).to eq(['dkaplan'])
+            end
+          end
+
+          it 'calls collection update broadcaster' do
+            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            perform
+          end
+        end
+
+        context 'with the remove action' do
+          let(:user_tags) { %w[nlistana jschwartzman msegreto] }
+          let!(:users) do
+            user_tags.map do |handle|
+              create(:user, handle: handle)
+            end
+          end
+          let!(:action) { 'remove' }
+
+          before do
+            records.each do |record|
+              record.update(user_tag_list: user_tags + [tag])
+            end
+          end
+
+          it 'removes tags on all card records' do
+            records.each do |record|
+              expect(record.reload.user_tag_list).to match_array(user_tags + [tag])
+            end
+            expect { perform }.to change(UserTag, :count).by(-records.size)
+            records.each do |record|
+              expect(record.reload.user_tag_list).to match_array(user_tags)
+            end
+          end
+
+          it 'calls collection update broadcaster' do
+            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            perform
+          end
+        end
       end
     end
   end

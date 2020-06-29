@@ -29,6 +29,7 @@ class CollectionFilter < ApplicationRecord
   enum filter_type: {
     tag: 0,
     search: 1,
+    user_tag: 2,
   }
 
   amoeba do

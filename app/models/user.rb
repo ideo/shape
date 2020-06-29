@@ -114,13 +114,16 @@ class User < ApplicationRecord
   has_many :activity_subjects, as: :subject
   has_many :notifications
   has_many :survey_responses
-
   has_many :user_profiles,
            class_name: 'Collection::UserProfile',
            inverse_of: :created_by,
            foreign_key: :created_by_id
   has_one :application
   has_many :test_audience_invitations, dependent: :destroy
+  has_many :network_invitations
+  has_many :user_tags, dependent: :destroy
+  has_many :tagged_collections, through: :user_tags, source: :record, source_type: 'Collection'
+  has_many :tagged_items, through: :user_tags, source: :record, source_type: 'Item'
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -128,9 +131,6 @@ class User < ApplicationRecord
   belongs_to :current_user_collection,
              class_name: 'Collection',
              optional: true
-
-  has_many :test_audience_invitations
-  has_many :network_invitations
 
   validates :email,
             presence: true,
@@ -199,6 +199,7 @@ class User < ApplicationRecord
       email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
+      taggings_count: user_tags.count,
       application_bot: application_bot?,
     }
   end

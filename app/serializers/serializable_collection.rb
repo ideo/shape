@@ -70,7 +70,11 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :tag_list do
-    @object.cached_tag_list || []
+    @object.tag_list.any? ? @object.tag_list.compact : []
+  end
+
+  attribute :user_tag_list do
+    @object.user_tag_list.any? ? @object.user_tag_list.compact : []
   end
 
   attribute :inherited_tag_list do
