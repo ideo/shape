@@ -140,19 +140,6 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
         end
       end
 
-      context 'searching by user tag' do
-        let(:tagged_user) { create(:user) }
-        before do
-          find_collection.update(user_tag_list: [tagged_user.handle])
-        end
-
-        it 'finds matching records' do
-          get(path, params: { query: "@#{tagged_user.handle}" })
-          expect(json['data'].size).to eq(1)
-          expect(first_record_id).to eq(find_collection.id)
-        end
-      end
-
       context 'with a per_page param set' do
         let!(:collections) do
           create_list(

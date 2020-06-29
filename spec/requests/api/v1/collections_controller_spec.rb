@@ -503,7 +503,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       {
         id: collection.id,
         name: 'Who let the dogs out?',
-        user_tag_list: [tagged_user.handle],
         collection_cards_attributes: [
           {
             id: collection_card.id,
