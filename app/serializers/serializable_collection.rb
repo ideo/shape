@@ -31,6 +31,9 @@ class SerializableCollection < BaseJsonSerializer
     :num_columns,
     :start_date,
     :end_date,
+    :challenge_reviewer_group_id,
+    :challenge_admin_group_id,
+    :challenge_participant_group_id,
   )
 
   stringified_attributes(
@@ -45,6 +48,9 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :organization
   belongs_to :created_by
   belongs_to :template
+  belongs_to :challenge_review_group
+  belongs_to :challenge_admin_group
+  belongs_to :challenge_participant_group
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import ModalWithNavigation from '~/ui/global/modals/ModalWithNavigation'
+import PeopleSettings from '~/ui/challenges/PeopleSettings'
 import SubmissionsSettings from '~/ui/challenges/SubmissionsSettings'
 import PhaseSettings from '~/ui/challenges/PhaseSettings'
 
@@ -28,7 +29,12 @@ const modalContents = ({ collection, submissionBoxes, onClose }) => {
         />
       ),
     },
-    { name: 'People', component: <div></div> },
+    {
+      name: 'People',
+      component: (
+        <PeopleSettings collection={collection} closeModal={onClose} />
+      ),
+    },
     { name: 'Topics', component: <div></div> },
     { name: 'Styles', component: <div></div> },
   ]
