@@ -31,7 +31,6 @@ import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
-import NamedButton from '~/ui/global/NamedButton'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 import ChallengePhasesIcons from '~/ui/challenges/ChallengePhasesIcons'
 
@@ -94,26 +93,30 @@ export const renderChallengeButton = (
   handleChallengeSettingsClick,
   handleReviewSubmissionsClick
 ) => {
-  let buttonProps = {}
+  const buttonProps = { width: 256, size: 'sm', style: { marginLeft: '1rem' } }
+  let name = null
   if (!record.isSubmissionBox) {
-    buttonProps = {
-      name: 'Challenge Settings',
+    name = 'Challenge Settings'
+    _.merge(buttonProps, {
+      colorScheme: `${v.colors.primaryDark}`,
       onClick: handleChallengeSettingsClick,
-    }
+    })
   } else {
-    const { submissions_collection } = record
-    const { reviewableCards } = submissions_collection
+    const reviewableCards = _.get(
+      record,
+      'submissions_collection.reviewableCards'
+    )
     const hasReviewableSubmissions = !_.isEmpty(reviewableCards)
-    buttonProps = {
-      name: hasReviewableSubmissions
-        ? `Review Submissions`
-        : `No Reviewable Submissions`,
-      color: `${v.colors.alert}`,
+    name = hasReviewableSubmissions
+      ? `Review Submissions`
+      : `No Reviewable Submissions`
+    _.merge(buttonProps, {
+      colorScheme: `${v.colors.alert}`,
       disabled: !hasReviewableSubmissions,
       onClick: handleReviewSubmissionsClick,
-    }
+    })
   }
-  return <NamedButton {...buttonProps} />
+  return <Button {...buttonProps}>{name}</Button>
 }
 
 @inject('uiStore', 'apiStore', 'routingStore')
@@ -163,9 +166,7 @@ class PageHeader extends React.Component {
     uiStore.update('challengeSettingsOpen', true)
   }
 
-  handleReviewSubmissionsClick = () => {
-    // FIXME: to be implemented in an upcoming story
-  }
+  handleReviewSubmissionsClick = () => {}
 
   openMoveMenuForTemplate = e => {
     const { record } = this.props

@@ -249,28 +249,6 @@ class CollectionCover extends React.Component {
     )
   }
 
-  get reviewSubmissionButton() {
-    const { inSubmissionsCollection, isReviewable } = this.props
-    if (!inSubmissionsCollection || !isReviewable) {
-      return null
-    }
-
-    return (
-      <Button
-        style={{ marginLeft: '3.2rem' }}
-        className="cancelGridClick"
-        colorScheme={`${v.colors.alert}`}
-        size="sm"
-        width={172}
-        onClick={() => {
-          // FIXME: to be implemented in an upcoming story
-        }}
-      >
-        Review
-      </Button>
-    )
-  }
-
   get hasUseTemplateButton() {
     const { collection } = this.props
     return collection.isUsableTemplate
@@ -374,6 +352,8 @@ class CollectionCover extends React.Component {
       textItem,
       cardId,
       fontColor,
+      inSubmissionsCollection,
+      isReviewable,
     } = this.props
     const { subtitle, collection_type } = collection
     const { gridW, gutter } = uiStore.gridSettings
@@ -470,7 +450,23 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
-                  {this.reviewSubmissionButton}
+                  {inSubmissionsCollection && isReviewable && (
+                    <Button
+                      style={{ marginLeft: '3.2rem' }}
+                      className="cancelGridClick"
+                      colorScheme={`${v.colors.alert}`}
+                      size="sm"
+                      width={172}
+                      onClick={() => {
+                        routingStore.routeTo(
+                          'tests',
+                          collection.launchableTestId
+                        )
+                      }}
+                    >
+                      Review
+                    </Button>
+                  )}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (
