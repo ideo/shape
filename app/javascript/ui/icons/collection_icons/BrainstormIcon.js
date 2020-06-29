@@ -21,7 +21,7 @@ const BrainstormIcon = ({ size }) => (
 )
 
 BrainstormIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 BrainstormIcon.defaultProps = {

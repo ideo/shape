@@ -17,7 +17,7 @@ const PlanningIcon = ({ size }) => (
 )
 
 PlanningIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 PlanningIcon.defaultProps = {

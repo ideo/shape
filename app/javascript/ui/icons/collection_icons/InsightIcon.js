@@ -21,7 +21,7 @@ const InsightIcon = ({ size }) => (
 )
 
 InsightIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 InsightIcon.defaultProps = {

@@ -151,19 +151,22 @@ const StyledCardContent = styled.div`
 
   .iconBg {
     position: absolute;
-    left: 0px;
-    ${props =>
-      props.height > 1
-        ? `
-      top: 10%;
-      height: 80%;
-    `
-        : `top: 0; height: 100%;`};
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: ${props => v.defaultGridSettings.gridH * props.height}px;
     color: ${v.colors.commonMedium};
-    overflow-x: hidden;
+    overflow: hidden;
     .icon {
-      width: 100%;
-      left: -30%;
+      left: -20%;
+      ${props =>
+        props.height > 1
+          ? `
+        height: 70%;
+        width: 70%;
+        top: 15%;
+      `
+          : `height: 130%; width: 130%; top: -15%`}
     }
   }
 `
@@ -397,7 +400,9 @@ class CollectionCover extends React.Component {
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collIcon = collection_type !== 'collection' &&
-      collection_type !== 'foamcore' && <CollectionIcon type={icon} />
+      collection_type !== 'foamcore' && (
+        <CollectionIcon type={collection_type} />
+      )
 
     return (
       <StyledCollectionCover

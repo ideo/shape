@@ -17,7 +17,7 @@ const CelebrateIcon = ({ size }) => (
 )
 
 CelebrateIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 CelebrateIcon.defaultProps = {

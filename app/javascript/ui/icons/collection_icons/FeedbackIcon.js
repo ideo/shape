@@ -20,7 +20,7 @@ const FeedbackIcon = ({ size }) => (
 )
 
 FeedbackIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 FeedbackIcon.defaultProps = {

@@ -19,7 +19,7 @@ const AcceleratorIcon = ({ size }) => (
 )
 
 AcceleratorIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 AcceleratorIcon.defaultProps = {

@@ -19,7 +19,7 @@ const ClipboardIcon = ({ size }) => (
 )
 
 ClipboardIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 ClipboardIcon.defaultProps = {

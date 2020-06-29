@@ -63,7 +63,7 @@ class CollectionTypeSelector extends React.Component {
     return collectionTypes.map(collectionType => {
       return {
         name: collectionType,
-        iconRight: <CollectionIcon type={collectionType} size="sm" />,
+        iconRight: <CollectionIcon type={collectionType} size="xs" />,
         onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
         withAvatar: false,

@@ -19,7 +19,7 @@ const LightbulbIcon = ({ size }) => (
 )
 
 LightbulbIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 LightbulbIcon.defaultProps = {

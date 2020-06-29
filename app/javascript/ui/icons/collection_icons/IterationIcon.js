@@ -17,7 +17,7 @@ const IterationIcon = ({ size }) => (
 )
 
 IterationIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 IterationIcon.defaultProps = {

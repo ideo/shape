@@ -23,7 +23,7 @@ const BusinessModelIcon = ({ size }) => (
 )
 
 BusinessModelIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 BusinessModelIcon.defaultProps = {

@@ -65,7 +65,7 @@ export const allIcons = {
 }
 
 const CollectionIcon = ({ type, ...iconProps }) => {
-  const Icon = allIcons[type]
+  const Icon = allIcons[type] ? allIcons[type] : allIcons.collection
   return <Icon {...iconProps} />
 }
 

@@ -17,7 +17,7 @@ const PitchIcon = ({ size }) => (
 )
 
 PitchIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 PitchIcon.defaultProps = {

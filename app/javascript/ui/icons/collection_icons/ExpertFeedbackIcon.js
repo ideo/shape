@@ -19,7 +19,7 @@ const ExpertFeedbackIcon = ({ size }) => (
 )
 
 ExpertFeedbackIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 ExpertFeedbackIcon.defaultProps = {

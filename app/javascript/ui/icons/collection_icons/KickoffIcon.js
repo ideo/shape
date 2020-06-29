@@ -19,7 +19,7 @@ const KickoffIcon = ({ size }) => (
 )
 
 KickoffIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 KickoffIcon.defaultProps = {

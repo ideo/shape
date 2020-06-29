@@ -19,7 +19,7 @@ const SpreadsheetIcon = ({ size }) => (
 )
 
 SpreadsheetIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 SpreadsheetIcon.defaultProps = {

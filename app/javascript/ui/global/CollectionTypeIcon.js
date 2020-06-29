@@ -28,7 +28,7 @@ const CollectionTypeIcon = ({ record }) => {
     icon = <TestCollectionIcon />
   } else if (record.isBoard) {
     icon = <FoamcoreBoardIcon size="lg" />
-  } else {
+  } else if (record.collection_type) {
     icon = <CollectionIcon icon={record.icon} />
   }
 

@@ -20,7 +20,7 @@ const PresentationIcon = ({ size }) => (
 )
 
 PresentationIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 PresentationIcon.defaultProps = {

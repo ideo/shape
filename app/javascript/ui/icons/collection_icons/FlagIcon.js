@@ -17,7 +17,7 @@ const FlagIcon = ({ size }) => (
 )
 
 FlagIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 FlagIcon.defaultProps = {

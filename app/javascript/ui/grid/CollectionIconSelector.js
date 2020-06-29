@@ -43,6 +43,7 @@ const CollectionIconSelector = ({ selectedIcon, onSelectIcon }) => {
       </IconSelectorWrapper>
       <InlineModal
         open={modalOpen}
+        onCancel={() => setModalOpen(false)}
         anchorElement={selectRef && selectRef.current}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
         hideButtons

@@ -19,7 +19,7 @@ const PrototypingIcon = ({ size }) => (
 )
 
 PrototypingIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 PrototypingIcon.defaultProps = {

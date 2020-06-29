@@ -22,7 +22,7 @@ const ImplementationIcon = ({ size }) => (
 )
 
 ImplementationIcon.propTypes = {
-  size: PropTypes.bool,
+  size: PropTypes.string,
 }
 
 ImplementationIcon.defaultProps = {
