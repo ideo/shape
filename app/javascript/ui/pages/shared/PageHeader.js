@@ -161,12 +161,17 @@ class PageHeader extends React.Component {
     ev.preventDefault()
   }
 
-  handleChallengeSettingsClick = () => {
+  handleChallengeSettingsClick = ({ open = true }) => {
     const { uiStore } = this.props
-    uiStore.update('challengeSettingsOpen', true)
+    uiStore.update('challengeSettingsOpen', open)
   }
 
-  handleReviewSubmissionsClick = () => {}
+  handleReviewSubmissionsClick = async () => {
+    const { record, routingStore } = this.props
+    await record.API_getNextAvailableTest()
+    const { nextAvailableTestPath } = record
+    routingStore.routeTo(nextAvailableTestPath)
+  }
 
   openMoveMenuForTemplate = e => {
     const { record } = this.props

@@ -122,8 +122,11 @@ class Header extends React.Component {
     uiStore.update('challengeSettingsOpen', open)
   }
 
-  handleReviewSubmissions = () => {
-    // FIXME: to be implemented in an upcoming story
+  handleReviewSubmissions = async () => {
+    const { record, routingStore } = this
+    await record.API_getNextAvailableTest()
+    const { nextAvailableTestPath } = record
+    routingStore.routeTo(nextAvailableTestPath)
   }
 
   get onArchivedPage() {
