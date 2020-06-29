@@ -9,9 +9,9 @@ import { apiStore } from '~/stores'
 
 @observer
 class AddReviewersPopover extends React.Component {
-  componedDidMount() {
+  componentDidMount() {
     const { record } = this.props
-    record.fetchChallengeReviewers()
+    record.fetchChallengeReviewersGroup()
   }
 
   isReviewerSelected(potentialReviewer) {
@@ -21,34 +21,40 @@ class AddReviewersPopover extends React.Component {
     )
   }
 
-  handlePotentialReviewer = reviewer => {
+  handlePotentialReviewer = (reviewer, ev) => {
     const { record } = this.props
-    const action = this.isReviewerSelected(reviewer) ? 'remove' : 'add'
-    apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
-      card_ids: [record.parent.id],
-      tag: reviewer.handle,
-      type: 'users',
-    })
+    ev.preventDefault()
+    ev.stopPropagation()
+    const action = this.isReviewerSelected(reviewer) ? 'removeTag' : 'addTag'
+    console.log('handle reviewr', action, record.parentChallenge)
+    record[action](reviewer.handle, 'user_tag_list', reviewer)
+    return false
   }
 
   get potentialReviewers() {
     const { record } = this.props
-    return record.challengeReviewers || []
+    if (!record.challengeReviewerGroup) return []
+    const members = record.challengeReviewerGroup.roles.find(
+      r => r.label === 'member'
+    ).users
+    return members
   }
 
   get currentReviewers() {
     const { record } = this.props
-    return record.user_list || []
+    if (!record.user_tag_list) return []
+    return record.user_tag_list.map(t => t.user)
   }
 
   render() {
     const { onClose, open, wrapperRef } = this.props
+    console.log('render', [...this.currentReviewers])
     return (
       <InlineModal
         title=""
         onCancel={onClose}
         open={open}
-        anchorElement={wrapperRef}
+        anchorElement={wrapperRef.current}
         anchorOrigin={{ horizontal: 'left', vertical: 'center' }}
         noButtons
       >
@@ -57,7 +63,9 @@ class AddReviewersPopover extends React.Component {
             <Checkbox
               color="primary"
               checked={this.isReviewerSelected(potentialReviewer)}
-              onChange={ev => this.handlePotentialReviewer(potentialReviewer)}
+              onChange={ev =>
+                this.handlePotentialReviewer(potentialReviewer, ev)
+              }
               value="yes"
             />
             <EntityAvatarAndName entity={potentialReviewer} />

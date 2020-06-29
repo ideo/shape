@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import queryString from 'query-string'
 
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
@@ -15,6 +15,8 @@ const SharedRecordMixin = superclass =>
     @observable
     collaborators = []
     highlightedRange = null
+    @observable
+    challengeReviewerGroup = null
 
     @action
     disableMenu() {
@@ -154,6 +156,45 @@ const SharedRecordMixin = superclass =>
         'GET'
       )
       return res.__response.data
+    }
+
+    API_addRemoveTag = (action, data) => {
+      const { apiStore } = this
+      const { label, type } = data
+      apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
+        card_ids: [this.parent_collection_card.id],
+        tag: label,
+        type,
+      })
+    }
+
+    @action
+    addTag(label, type, user) {
+      this[type].push({ label, type, user })
+      this.API_addRemoveTag('add', { label, type })
+    }
+
+    @action
+    removeTag(label, type, user) {
+      _.remove(this[type], t => {
+        return t.label === label && t.type === type
+      })
+      this.API_addRemoveTag('remove', { label, type })
+    }
+
+    async fetchChallengeReviewersGroup() {
+      if (this.challengeReviewers) return this.challengeReviewers
+      if (!this.challengeForCollection) return []
+      const challenge = await this.challengeForCollection()
+      if (!challenge) return []
+      const res = await this.apiStore.request(
+        `/groups/${challenge.challenge_reviewer_group_id}`,
+        'GET'
+      )
+      runInAction(() => {
+        this.challengeReviewerGroup = res.data
+      })
+      return this.challengeReviewerGroup
     }
 
     async restore() {

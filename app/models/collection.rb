@@ -1025,6 +1025,10 @@ class Collection < ApplicationRecord
     @parent_challenge ||= parents.where(collection_type: :challenge).last
   end
 
+  def parent_challenge_id
+    parent_challenge&.id
+  end
+
   def challenge_or_inside_challenge?
     return true if collection_type == 'challenge'
 

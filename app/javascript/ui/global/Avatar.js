@@ -135,7 +135,7 @@ class Avatar extends React.Component {
   }
 }
 
-Avatar.propTypes = {
+export const AvatarPropTypes = {
   title: PropTypes.string,
   url: PropTypes.string,
   size: PropTypes.number,
@@ -145,6 +145,8 @@ Avatar.propTypes = {
   responsive: PropTypes.bool,
   clickable: PropTypes.bool,
 }
+
+Avatar.propTypes = AvatarPropTypes
 Avatar.defaultProps = {
   url:
     'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg',
