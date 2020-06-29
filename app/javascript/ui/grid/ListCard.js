@@ -7,6 +7,7 @@ import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
+import AvatarList from '~/ui/users/AvatarList'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
@@ -199,6 +200,14 @@ class ListCard extends React.Component {
     })
   }
 
+  get taggedUsers() {
+    const {
+      card: { record },
+    } = this.props
+    if (!record.user_tag_list) return []
+    return _.compact(record.user_tag_list.map(t => t.user))
+  }
+
   get renderLabelSelector() {
     const {
       card: { record },
@@ -294,17 +303,24 @@ class ListCard extends React.Component {
           </ColumnLink>
         </Column>
         <Column width="400px">{defaultTimeFormat(record.updated_at)}</Column>
-        <Column>
-          <div ref={this.rolesWrapperRef}>
-            <RolesSummary
-              key="roles"
-              handleClick={this.handleRolesClick}
-              roles={[...record.roles]}
-              canEdit={record.can_edit}
-              // convert observable to normal array to trigger render changes
-              collaborators={[...record.collaborators]}
-              rolesMenuOpen={!!uiStore.rolesMenuOpen}
-            />
+        <Column width="250px">
+          <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
+            {insideChallenge ? (
+              <AvatarList
+                avatars={this.taggedUsers}
+                onAdd={this.handleRolesClick}
+              />
+            ) : (
+              <RolesSummary
+                key="roles"
+                handleClick={this.handleRolesClick}
+                roles={[...record.roles]}
+                canEdit={record.can_edit}
+                // convert observable to normal array to trigger render changes
+                collaborators={[...record.collaborators]}
+                rolesMenuOpen={!!uiStore.rolesMenuOpen}
+              />
+            )}
             {insideChallenge && (
               <AddReviewersPopover
                 record={record}

@@ -143,7 +143,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def add_tag
-    CollectionCardsAddRemoveTagWorker.perform_async(
+    CollectionCardsAddRemoveTagWorker.new.perform(
       @collection_cards.map(&:id),
       json_api_params[:tag],
       json_api_params[:type],
@@ -154,7 +154,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def remove_tag
-    CollectionCardsAddRemoveTagWorker.perform_async(
+    CollectionCardsAddRemoveTagWorker.new.perform(
       @collection_cards.map(&:id),
       json_api_params[:tag],
       json_api_params[:type],

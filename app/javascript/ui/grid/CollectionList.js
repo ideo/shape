@@ -38,8 +38,8 @@ class CollectionList extends React.Component {
       },
       {
         displayName: this.insideChallenge ? 'Reviewers' : 'Permissions',
-        style: {},
         name: this.insideChallenge ? 'reviewers' : 'permissions',
+        style: { width: '250px' },
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
