@@ -995,7 +995,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     } else {
       // Otherwise we need to load the challenge colleciton
       const res = await this.apiStore.request(
-        `collections/${this.challenge_id}`
+        `collections/${this.challenge.id}`
       )
       return res.data
     }
