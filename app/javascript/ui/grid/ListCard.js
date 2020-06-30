@@ -1,11 +1,12 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { action, computed, observable } from 'mobx'
+import { action, computed, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
+import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
@@ -100,6 +101,13 @@ const IconHolder = styled.div`
 class ListCard extends React.Component {
   @observable
   menuItemCount = 1
+  @observable
+  isReviewersOpen = false
+
+  constructor(props) {
+    super(props)
+    this.rolesWrapperRef = React.createRef()
+  }
 
   @computed
   get menuOpen() {
@@ -173,9 +181,22 @@ class ListCard extends React.Component {
   handleRolesClick = ev => {
     const {
       card: { record },
+      insideChallenge,
     } = this.props
     ev.stopPropagation()
+    if (insideChallenge) {
+      runInAction(() => {
+        this.isReviewersOpen = true
+      })
+      return
+    }
     uiStore.update('rolesMenuOpen', record)
+  }
+
+  handleCloseReviewers = ev => {
+    runInAction(() => {
+      this.isReviewersOpen = false
+    })
   }
 
   get renderLabelSelector() {
@@ -241,7 +262,7 @@ class ListCard extends React.Component {
   }
 
   render() {
-    const { card, searchResult } = this.props
+    const { card, insideChallenge, searchResult } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
@@ -274,15 +295,25 @@ class ListCard extends React.Component {
         </Column>
         <Column width="400px">{defaultTimeFormat(record.updated_at)}</Column>
         <Column>
-          <RolesSummary
-            key="roles"
-            handleClick={this.handleRolesClick}
-            roles={[...record.roles]}
-            canEdit={record.can_edit}
-            // convert observable to normal array to trigger render changes
-            collaborators={[...record.collaborators]}
-            rolesMenuOpen={!!uiStore.rolesMenuOpen}
-          />
+          <div ref={this.rolesWrapperRef}>
+            <RolesSummary
+              key="roles"
+              handleClick={this.handleRolesClick}
+              roles={[...record.roles]}
+              canEdit={record.can_edit}
+              // convert observable to normal array to trigger render changes
+              collaborators={[...record.collaborators]}
+              rolesMenuOpen={!!uiStore.rolesMenuOpen}
+            />
+            {insideChallenge && (
+              <AddReviewersPopover
+                record={record}
+                onClose={this.handleCloseReviewers}
+                wrapperRef={this.rolesWrapperRef}
+                open={this.isReviewersOpen}
+              />
+            )}
+          </div>
         </Column>
         {/* stopPropagation so that ActionMenu overrides handleRowClick */}
         <Column marginLeft="auto" onClick={e => e.stopPropagation()}>

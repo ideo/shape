@@ -66,6 +66,8 @@ module UserTaggable
       @user_tag_remove_user_ids = nil
     end
 
+    return if @user_tag_add_user_ids.blank?
+
     @user_tag_add_user_ids.each do |user_id|
       UserTag.create(
         record_id: id,
