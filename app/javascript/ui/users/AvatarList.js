@@ -19,6 +19,7 @@ const AvatarList = ({ avatars, onAdd }) => {
                 key={`${avatar.internalType}_${avatar.id}`}
                 title={avatar.nameWithHints || avatar.name}
                 url={avatar.pic_url_square || avatar.filestack_file_url}
+                className="viewer"
                 // user_profile_collection_id will be null if its a group
                 linkToCollectionId={avatar.user_profile_collection_id}
               />
