@@ -28,9 +28,10 @@ Rails.application.routes.draw do
         member do
           get 'in_my_collection'
           get 'direct_children_tag_list'
-          get 'submission_box_sub_collections'
+          get 'challenge_submission_boxes'
           get 'phase_sub_collections'
           get 'challenge_phase_collections'
+          get 'challenge_reviewers'
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'
@@ -150,7 +151,7 @@ Rails.application.routes.draw do
         end
 
         get 'search', to: 'search#search'
-        get 'search_users_and_tags', to: 'search#search_users_and_tags' 
+        get 'search_users_and_tags', to: 'search#search_users_and_tags'
         get 'search_collection_cards', to: 'search#search_collection_cards'
         resources :tags, only: %i[index]
         resources :collections, only: %i[create]

@@ -10,6 +10,8 @@ class SerializableCollection < BaseJsonSerializer
     :master_template,
     :template_id,
     :parent_challenge,
+    :parent_challenge_id,
+    :challenge_reviewer_group_id,
     :submission_box_type,
     :submission_box_id,
     :submission_template_id,
