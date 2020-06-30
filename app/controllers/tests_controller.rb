@@ -75,7 +75,7 @@ class TestsController < ApplicationController
                               .random_next_submission_test(
                                 for_user: current_user,
                                 omit_id: @collection.id,
-                              )
+                              ).first
     end
   end
 

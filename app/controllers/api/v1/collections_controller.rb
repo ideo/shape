@@ -174,6 +174,18 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                               )
   end
 
+  def next_available_challenge_test
+    test = @collection.next_available_tagged_submission_test(
+      for_user: current_user,
+      omit_id: nil,
+    ).first
+    if test.present? && test.collection_to_test.present?
+      render jsonapi: test.collection_to_test
+    else
+      render json: nil
+    end
+  end
+
   def phase_sub_collections
     collections = @collection.all_child_collections
                              .active

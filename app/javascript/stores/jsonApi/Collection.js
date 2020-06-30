@@ -1500,6 +1500,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
 
+  async API_getNextAvailableChallengeTest() {
+    runInAction(() => {
+      this.nextAvailableTestPath = null
+    })
+    const res = await this.apiStore.request(
+      `collections/${this.id}/next_available_challenge_test`
+    )
+    if (!res.data) return
+    const path = this.routingStore.pathTo('collections', res.data.id)
+
+    this.setNextAvailableTestPath(`${path}?open=tests`)
+  }
+
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path

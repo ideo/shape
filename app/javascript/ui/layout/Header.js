@@ -124,9 +124,11 @@ class Header extends React.Component {
 
   handleReviewSubmissions = async () => {
     const { record, routingStore } = this
-    await record.API_getNextAvailableTest()
+    await record.API_getNextAvailableChallengeTest()
     const { nextAvailableTestPath } = record
-    routingStore.routeTo(nextAvailableTestPath)
+    if (nextAvailableTestPath) {
+      routingStore.routeTo(nextAvailableTestPath)
+    }
   }
 
   get onArchivedPage() {

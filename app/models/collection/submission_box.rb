@@ -159,13 +159,12 @@ class Collection
     def random_next_submission_test(for_user:, omit_id: nil)
       # will be nil if none are available
       available = available_submission_tests(for_user: for_user, omit_id: omit_id)
-      return nil if available.empty?
+      return Collection.none if available.empty?
 
       # need to use inner query to combine `order` + `distinct`
       Collection::TestCollection
         .from(available, :collections)
         .order(Arel.sql('RANDOM()'))
-        .first
     end
 
     private

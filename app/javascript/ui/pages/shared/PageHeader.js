@@ -167,10 +167,12 @@ class PageHeader extends React.Component {
   }
 
   handleReviewSubmissionsClick = async () => {
-    const { record, routingStore } = this.props
-    await record.API_getNextAvailableTest()
+    const { record, routingStore } = this
+    await record.API_getNextAvailableChallengeTest()
     const { nextAvailableTestPath } = record
-    routingStore.routeTo(nextAvailableTestPath)
+    if (nextAvailableTestPath) {
+      routingStore.routeTo(nextAvailableTestPath)
+    }
   }
 
   openMoveMenuForTemplate = e => {
