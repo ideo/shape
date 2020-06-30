@@ -16,8 +16,14 @@ class AddReviewersPopover extends React.Component {
   isReviewerSelected(potentialReviewer) {
     const { currentReviewers } = this
     return !!currentReviewers.find(
-      reviewer => reviewer.id === potentialReviewer.id
+      reviewer => reviewer === potentialReviewer.handle
     )
+  }
+
+  handleClick = ev => {
+    ev.preventDefault()
+    ev.stopPropagation()
+    return false
   }
 
   handlePotentialReviewer = (reviewer, ev) => {
@@ -25,9 +31,7 @@ class AddReviewersPopover extends React.Component {
     ev.preventDefault()
     ev.stopPropagation()
     const action = this.isReviewerSelected(reviewer) ? 'removeTag' : 'addTag'
-    console.log('handle reviewr', action, record.parentChallenge)
     record[action](reviewer.handle, 'user_tag_list', reviewer)
-    return false
   }
 
   get potentialReviewers() {
@@ -42,12 +46,11 @@ class AddReviewersPopover extends React.Component {
   get currentReviewers() {
     const { record } = this.props
     if (!record.user_tag_list) return []
-    return record.user_tag_list.map(t => t.user)
+    return record.user_tag_list
   }
 
   render() {
     const { onClose, open, wrapperRef } = this.props
-    console.log('render', [...this.currentReviewers])
     return (
       <InlineModal
         title=""
@@ -57,19 +60,21 @@ class AddReviewersPopover extends React.Component {
         anchorOrigin={{ horizontal: 'left', vertical: 'center' }}
         noButtons
       >
-        {this.potentialReviewers.map(potentialReviewer => (
-          <Flex>
-            <Checkbox
-              color="primary"
-              checked={this.isReviewerSelected(potentialReviewer)}
-              onChange={ev =>
-                this.handlePotentialReviewer(potentialReviewer, ev)
-              }
-              value="yes"
-            />
-            <EntityAvatarAndName entity={potentialReviewer} />
-          </Flex>
-        ))}
+        <div onClick={this.handleClick}>
+          {this.potentialReviewers.map(potentialReviewer => (
+            <Flex>
+              <Checkbox
+                color="primary"
+                checked={this.isReviewerSelected(potentialReviewer)}
+                onChange={ev =>
+                  this.handlePotentialReviewer(potentialReviewer, ev)
+                }
+                value="yes"
+              />
+              <EntityAvatarAndName entity={potentialReviewer} />
+            </Flex>
+          ))}
+        </div>
       </InlineModal>
     )
   }

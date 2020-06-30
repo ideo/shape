@@ -134,6 +134,7 @@ class CollectionCard < ApplicationRecord
         :parent_collection_card,
         :question_choices,
         :collection_cover_text_items,
+        :tagged_users,
         collection_cover_items: :datasets,
       ],
     ]

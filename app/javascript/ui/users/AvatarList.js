@@ -1,26 +1,38 @@
 import PropTypes from 'prop-types'
 
+import { AddButton } from '~/ui/global/styled/buttons'
 import Avatar, { AvatarPropTypes } from '~/ui/global/Avatar'
 import AvatarGroup from '~/ui/global/AvatarGroup'
+import { StyledRolesSummary } from '~/ui/roles/RolesSummary'
 
-const AvatarList = ({ avatars }) => {
+const AvatarList = ({ avatars, onAdd }) => {
   return (
-    <AvatarGroup placeholderTitle="...and more viewers">
-      {avatars.map(avatar => (
-        <Avatar
-          key={`${avatar.internalType}_${avatar.id}`}
-          title={avatar.nameWithHints || avatar.name}
-          url={avatar.pic_url_square || avatar.filestack_file_url}
-          // user_profile_collection_id will be null if its a group
-          linkToCollectionId={avatar.user_profile_collection_id}
-        />
-      ))}
-    </AvatarGroup>
+    <StyledRolesSummary>
+      <div className="roles-summary--inner">
+        <AvatarGroup
+          placeholderTitle="...and more"
+          avatarCount={avatars.length}
+        >
+          {avatars.map(avatar => (
+            <Avatar
+              key={`${avatar.internalType}_${avatar.id}`}
+              title={avatar.nameWithHints || avatar.name}
+              url={avatar.pic_url_square || avatar.filestack_file_url}
+              className="avatar viewer"
+              // user_profile_collection_id will be null if its a group
+              linkToCollectionId={avatar.user_profile_collection_id}
+            />
+          ))}
+        </AvatarGroup>
+        <AddButton onClick={onAdd}>+</AddButton>
+      </div>
+    </StyledRolesSummary>
   )
 }
 
 AvatarList.propTypes = {
-  avatars: PropTypes.arrayOf(PropTypes.shape(AvatarPropTypes)),
+  avatars: PropTypes.arrayOf(PropTypes.shape(AvatarPropTypes)).isRequired,
+  onAdd: PropTypes.func.isRequired,
 }
 
 export default AvatarList

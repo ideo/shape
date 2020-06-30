@@ -7,6 +7,7 @@ import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
+import AvatarList from '~/ui/users/AvatarList'
 import CollectionIconXs from '~/ui/icons/CollectionIconXs'
 import CollectionTypeIcon, {
   collectionTypeToIcon,
@@ -20,7 +21,6 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
-import { ReviewButton } from '~/ui/global/challenge/shared'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { routingStore, uiStore } from '~/stores'
@@ -200,6 +200,14 @@ class ListCard extends React.Component {
     })
   }
 
+  get taggedUsers() {
+    const {
+      card: { record },
+    } = this.props
+    if (!record.tagged_users) return []
+    return record.tagged_users
+  }
+
   get renderLabelSelector() {
     const {
       card: { record },
@@ -262,53 +270,8 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
-  get challengeSubmission() {
-    const { insideChallenge, card } = this.props
-    return insideChallenge && _.get(card, 'record.isSubmission')
-  }
-
-  get renderActions() {
-    const { card, searchResult } = this.props
-    const { record } = card
-
-    if (!this.challengeSubmission) {
-      return (
-        <ActionMenu
-          location={searchResult ? 'Search' : 'GridCard'}
-          card={card}
-          canView={record.can_view}
-          canEdit={this.canEditCard}
-          canReplace={record.canReplace && !card.link && !searchResult}
-          menuOpen={this.menuOpen}
-          onOpen={this.handleActionMenuClick}
-          onLeave={this.handleCloseMenu}
-          menuItemsCount={this.getMenuItemsCount}
-        />
-      )
-    }
-
-    const {
-      submission_reviewer_status,
-      launchableTestId,
-      isReviewable,
-    } = record
-
-    if (submission_reviewer_status && launchableTestId && isReviewable) {
-      return (
-        <ReviewButton
-          reviewerStatus={submission_reviewer_status}
-          onClick={() => {
-            routingStore.routeTo('tests', launchableTestId)
-          }}
-        />
-      )
-    }
-
-    return null
-  }
-
   render() {
-    const { card, insideChallenge } = this.props
+    const { card, insideChallenge, searchResult } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
@@ -342,17 +305,24 @@ class ListCard extends React.Component {
         <Column width={!this.challengeSubmission ? '400px' : '300px'}>
           {defaultTimeFormat(record.updated_at)}
         </Column>
-        <Column>
-          <div ref={this.rolesWrapperRef}>
-            <RolesSummary
-              key="roles"
-              handleClick={this.handleRolesClick}
-              roles={[...record.roles]}
-              canEdit={record.can_edit}
-              // convert observable to normal array to trigger render changes
-              collaborators={[...record.collaborators]}
-              rolesMenuOpen={!!uiStore.rolesMenuOpen}
-            />
+        <Column width="250px">
+          <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
+            {insideChallenge ? (
+              <AvatarList
+                avatars={this.taggedUsers}
+                onAdd={this.handleRolesClick}
+              />
+            ) : (
+              <RolesSummary
+                key="roles"
+                handleClick={this.handleRolesClick}
+                roles={[...record.roles]}
+                canEdit={record.can_edit}
+                // convert observable to normal array to trigger render changes
+                collaborators={[...record.collaborators]}
+                rolesMenuOpen={!!uiStore.rolesMenuOpen}
+              />
+            )}
             {insideChallenge && (
               <AddReviewersPopover
                 record={record}
@@ -365,7 +335,17 @@ class ListCard extends React.Component {
         </Column>
         {/* stopPropagation so that ActionMenu overrides handleRowClick */}
         <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
-          {this.renderActions}
+          <ActionMenu
+            location={searchResult ? 'Search' : 'GridCard'}
+            card={card}
+            canView={record.can_view}
+            canEdit={this.canEditCard}
+            canReplace={record.canReplace && !card.link && !searchResult}
+            menuOpen={this.menuOpen}
+            onOpen={this.handleActionMenuClick}
+            onLeave={this.handleCloseMenu}
+            menuItemsCount={this.getMenuItemsCount}
+          />
         </Column>
       </Row>
     )
