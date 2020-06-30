@@ -477,6 +477,8 @@ RSpec.describe CollectionCardBuilder, type: :service do
                add_editors: [user])
       end
       let!(:overlapping_card) { create(:collection_card_text, row: 1, col: 1, parent: parent) }
+      let(:row) { 1 }
+      let(:col) { 1 }
       let(:builder) do
         CollectionCardBuilder.new(
           params: params.merge(
@@ -486,8 +488,8 @@ RSpec.describe CollectionCardBuilder, type: :service do
               data_content: { ops: [] },
               type: 'Item::TextItem',
             },
-            row: 1,
-            col: 1,
+            row: row,
+            col: col,
           ),
           parent_collection: parent,
           user: user,
@@ -500,6 +502,20 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(card.row).to eq 1
         # should put it in the next column over
         expect(card.col).to eq 2
+      end
+
+      context 'with no row/col specified' do
+        let!(:overlapping_card) { create(:collection_card_text, row: 0, col: 0, width: 3, parent: parent) }
+        let(:row) { nil }
+        let(:col) { nil }
+
+        it 'should create the card in the next open spot (reading order)' do
+          expect(builder.create).to be true
+          card = builder.collection_card
+          expect(card.row).to eq 0
+          # should put it in the next open spot (L->R)
+          expect(card.col).to eq 3
+        end
       end
     end
   end

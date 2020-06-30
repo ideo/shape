@@ -109,6 +109,7 @@ Cypress.Commands.add(
         cy.locate('TextItemClose')
           .first()
           .click({ force: true })
+        cy.wait('@apiUpdateItem')
         cy.wait(50)
         break
       case 'data':

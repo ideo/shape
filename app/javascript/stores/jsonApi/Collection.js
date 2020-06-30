@@ -143,9 +143,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.carouselIdx = value
   }
 
-  @action
   setViewMode(mode) {
-    this.viewMode = mode
+    this.uiStore.update('isTransparentLoading', true)
+    // this timeout gives the transparentLoader time to appear, because the viewMode change
+    // will then cause an immediate re-render which can take your browser a few seconds
+    setTimeout(() => {
+      runInAction(() => {
+        this.viewMode = mode
+        this.uiStore.update('isTransparentLoading', false)
+      })
+    }, 1)
   }
 
   get currentCarouselRecord() {
@@ -354,6 +361,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isSearchResultsCollection() {
     return this.type === 'SearchResultsCollection'
+  }
+
+  get canEdit() {
+    // used e.g. by PageHeader
+    return this.can_edit_content && !this.system_required
   }
 
   get canSetACover() {
@@ -658,25 +670,37 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
-  get collectionFilterQuery() {
+  get activeFilters() {
     let { collection_filters } = this
     if (this.isSearchResultsCollection) {
       collection_filters = this.collection.collection_filters
     } else if (this.isSearchCollection) {
-      return {}
+      return []
     }
-    const spaces = /\s+/
-    const activeFilters = collection_filters
-      .filter(filter => filter.selected)
-      .map(filter => {
-        if (filter.filter_type === 'tag') {
-          return `#${filter.text.replace(spaces, '-')}`
-        } else {
-          return filter.text
-        }
+    return collection_filters.filter(filter => filter.selected)
+  }
+
+  API_disableActiveFilters() {
+    return Promise.all(
+      this.activeFilters.map(filter => {
+        return filter.API_toggleSelected(this, false)
       })
+    )
+  }
+
+  get collectionFilterQuery() {
+    const { activeFilters } = this
     if (activeFilters.length === 0) return {}
-    return { q: activeFilters.join(' ') }
+    const spaces = /\s+/
+    const filterQuery = activeFilters.map(filter => {
+      if (filter.filter_type === 'tag') {
+        return `#${filter.text.replace(spaces, '-')}`
+      } else {
+        return filter.text
+      }
+    })
+
+    return { q: filterQuery.join(' ') }
   }
 
   get isParentMethodLibrary() {

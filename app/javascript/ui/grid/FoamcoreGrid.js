@@ -22,6 +22,7 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
+import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
@@ -131,9 +132,11 @@ const RightBlankActions = styled.div`
 RightBlankActions.displayName = 'RightBlankActions'
 
 const CollectionFilterWrapper = styled.div`
+  display: flex;
   position: fixed;
   z-index: ${v.zIndex.zoomControls};
-  top: ${v.headerHeight + 26}px;
+  top: ${v.headerHeight}px;
+  height: 86px;
   right: 32px;
 `
 
@@ -1504,7 +1507,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { uiStore, collection } = this.props
 
     const gridSize = this.totalGridSize
     return (
@@ -1525,7 +1528,11 @@ class FoamcoreGrid extends React.Component {
         )}
         {!uiStore.isMobileXs && (
           <CollectionFilterWrapper>
-            <CollectionViewToggle collection={this.props.collection} />
+            <CollectionViewToggle collection={collection} />
+            <CollectionFilter
+              collection={collection}
+              canEdit={collection.canEdit}
+            />
           </CollectionFilterWrapper>
         )}
         {this.renderDragSpots()}

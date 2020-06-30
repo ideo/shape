@@ -107,7 +107,7 @@ Pill.propTypes = {
   symbolSize: PropTypes.number,
   onDelete: PropTypes.func,
   deleteIcon: PropTypes.node,
-  tag: PropTypes.node,
+  tag: PropTypes.object,
   selectable: PropTypes.bool,
   selected: PropTypes.bool,
   onSelect: PropTypes.func,

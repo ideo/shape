@@ -12488,10 +12488,10 @@ react-svg-loader@^2.1.0:
     loader-utils "^1.1.0"
     react-svg-core "^2.1.0"
 
-react-tag-autocomplete@^5.5.1:
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/react-tag-autocomplete/-/react-tag-autocomplete-5.5.1.tgz#6b3f253d3d69eb546925118cdf43138a9aafe113"
-  integrity sha512-/x6izH2OUySduXfJ9pgb3B2IirkE8w9+JEC1TF4QyPvyLTQ2tDFf4hlvTmK7iGEo+ll7oRZbtEHScLDI5YvvEQ==
+react-tag-autocomplete@^5.13.1:
+  version "5.13.1"
+  resolved "https://registry.yarnpkg.com/react-tag-autocomplete/-/react-tag-autocomplete-5.13.1.tgz#9d3376cbbf66ce8901a62355ca35fd68a58abfc8"
+  integrity sha512-ECcQnizAxw8VnEDUfCKuA2ZDQ0Fyxds3kVtE4NVAhJvBYOMMgkRNAM3UwyEXAQ0h7nnCwmIA+czJiwso07Mrqw==
 
 react-test-renderer@^16.0.0-0, react-test-renderer@^16.8.0:
   version "16.9.0"
