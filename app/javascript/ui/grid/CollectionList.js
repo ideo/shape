@@ -24,6 +24,8 @@ class CollectionList extends React.Component {
   }
 
   get columns() {
+    const { collection } = this.props
+
     return [
       { displayName: '', style: { width: '50px' }, name: 'select' },
       {
@@ -34,7 +36,11 @@ class CollectionList extends React.Component {
       {
         displayName: 'Last updated',
         name: 'last_updated',
-        style: { width: '400px' },
+        style: {
+          width: !(this.insideChallenge && collection.isSubmissionBox)
+            ? '400px'
+            : '300px',
+        },
       },
       {
         displayName: this.insideChallenge ? 'Reviewers' : 'Permissions',

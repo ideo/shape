@@ -262,11 +262,16 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
+  get challengeSubmission() {
+    const { insideChallenge, card } = this.props
+    return insideChallenge && _.get(card, 'record.isSubmission')
+  }
+
   get renderActions() {
-    const { card, insideChallenge, searchResult } = this.props
+    const { card, searchResult } = this.props
     const { record } = card
 
-    if (!insideChallenge) {
+    if (!this.challengeSubmission) {
       return (
         <ActionMenu
           location={searchResult ? 'Search' : 'GridCard'}
@@ -334,7 +339,9 @@ class ListCard extends React.Component {
             {this.renderIcons}
           </ColumnLink>
         </Column>
-        <Column width="400px">{defaultTimeFormat(record.updated_at)}</Column>
+        <Column width={!this.challengeSubmission ? '400px' : '300px'}>
+          {defaultTimeFormat(record.updated_at)}
+        </Column>
         <Column>
           <div ref={this.rolesWrapperRef}>
             <RolesSummary
