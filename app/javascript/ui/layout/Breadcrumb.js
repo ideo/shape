@@ -18,6 +18,7 @@ BreadcrumbPadding.displayName = 'BreadcrumbPadding'
 const StyledBreadcrumbWrapper = styled.div`
   margin-top: 0.5rem;
   height: 1.2rem;
+  display: flex;
   white-space: nowrap;
   font-size: 1rem;
   font-family: ${v.fonts.sans};
@@ -88,40 +89,55 @@ class Breadcrumb extends React.Component {
   }
 
   transformToSubItems(items, firstItem = {}, lastItem = {}) {
+    // if no firstItem is passed in, we include all subitems
+    let includeSubItem = _.isEmpty(firstItem)
     const subItems = items.map((item, idx) => {
-      const subItem = { ...item }
-      if (item.ellipses && item.id !== firstItem.id) item.remove = true
-      if (lastItem && item.id === lastItem.id) subItem.isEllipsesLink = true
-      subItem.nested = idx
-      return subItem
+      // if a firstItem was used, we don't include any items until that one is found
+      includeSubItem = includeSubItem || item.id == firstItem.id
+      if (includeSubItem) {
+        const subItem = { ...item }
+        if (item.ellipses && lastItem.id && item.id !== lastItem.id) {
+          // all ellipsesItems are removed except the last one, which acts as the link
+          item.remove = true
+        }
+        // nested val allows it to show the icon for how nested it is
+        subItem.nested = idx
+        return subItem
+      }
     })
-    return subItems
+    // get rid of nulls
+    return _.compact(subItems)
   }
 
   addSubItems(copyItems) {
     const { items, maxDepth } = this.props
     if (maxDepth === 1) {
-      const subItems = this.transformToSubItems(items, copyItems[0])
+      // if we are only showing 1 breadcrumbItem (e.g. mobile)
+      const subItems = this.transformToSubItems(items)
       if (copyItems[0]) copyItems[0].subItems = subItems
+      return copyItems
     }
 
     const ellipsesItems = copyItems.filter(item => item.ellipses)
+
     let subItems
     if (ellipsesItems.length) {
       const firstEllipsesItem = ellipsesItems.shift()
-      const lastEllipsesItem = ellipsesItems.pop()
+      // in the case that there is 1 ellipsesItem, first == last
+      const lastEllipsesItem = ellipsesItems.pop() || firstEllipsesItem
       subItems = this.transformToSubItems(
         copyItems,
         firstEllipsesItem,
         lastEllipsesItem
       )
-      firstEllipsesItem.subItems = subItems
+      lastEllipsesItem.subItems = subItems
     } else {
       subItems = this.transformToSubItems(copyItems)
     }
 
     if (copyItems[0] && copyItems[0].identifier === 'homepage') {
-      copyItems[0].subItems = subItems
+      // My Collection link includes all subItems
+      copyItems[0].subItems = this.transformToSubItems(copyItems)
     }
     return copyItems
   }
@@ -141,7 +157,10 @@ class Breadcrumb extends React.Component {
     let charsLeftToTruncate = this.charsToTruncateForItems(copyItems)
 
     // If we are within allowable number of chars, return items
-    if (charsLeftToTruncate <= 0) return copyItems
+    if (charsLeftToTruncate <= 0) {
+      // this will still potentially add subItems to "My Collection"
+      return this.addSubItems([...copyItems])
+    }
 
     // Item names are still too long, show ... in place of their name
     // Start at the midpoint, floor-ing to favor adding ellipses farther up the breadcrumb
@@ -210,6 +229,7 @@ class Breadcrumb extends React.Component {
     // Tried using innerRef on styled component but it isn't available on mount
 
     const BreadcrumbItemComponent = breadcrumbItemComponent || BreadcrumbItem
+
     return (
       <div ref={this.breadcrumbWrapper}>
         {!renderItems && <BreadcrumbPadding />}
@@ -242,18 +262,60 @@ class Breadcrumb extends React.Component {
 }
 
 Breadcrumb.propTypes = {
+  /**
+   * A list of breadcrumb items to display
+   */
   items: PropTypes.arrayOf(PropTypes.shape(breadcrumbItemPropType)).isRequired,
+  /**
+   * Another component to wrap the whole breacrumb
+   */
   breadcrumbWrapper: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
-  breadcrumbItemComponent: PropTypes.object,
+  /**
+   * A component to wrap each breadcrumb item
+   */
+  breadcrumbItemComponent: PropTypes.elementType,
+  /**
+   * The action to take when going back in the breadcrumb UI
+   */
   onBack: PropTypes.func.isRequired,
+  /**
+   * The action to take when diving into a sub breadcrumb
+   */
   onBreadcrumbDive: PropTypes.func,
+  /**
+   * The action to take when restoring a breadcrumb (Shape specific)
+   */
   onRestore: PropTypes.func,
+  /**
+   * The action to take when clicking on a breadcrumb, which is likely navigation
+   * of some sort
+   */
   onBreadcrumbClick: PropTypes.func,
+  /**
+   * The width of the parent container of the breadcrumb, used to limit it's size
+   */
   containerWidth: PropTypes.number,
+  /**
+   * The maximum depth a breadcrumb sub menu can go
+   */
   maxDepth: PropTypes.number,
+  /**
+   * Whether to show the back button at all
+   */
   showBackButton: PropTypes.bool,
+  /**
+   * Visible hide the breadcrumb but ensure it still takes up space
+   */
   visiblyHidden: PropTypes.bool,
+  /**
+   * Whether the current device is a touch device. Should be used to improve
+   * the user experience.
+   */
   isTouchDevice: PropTypes.bool,
+  /**
+   * Whether the current device is a phone size device. Should be used to improve
+   * the user experience.
+   */
   isSmallScreen: PropTypes.bool,
 }
 

@@ -201,6 +201,7 @@ class User < ApplicationRecord
       email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
+      taggings_count: user_tags.count,
       application_bot: application_bot?,
     }
   end

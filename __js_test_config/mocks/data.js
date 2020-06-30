@@ -25,8 +25,6 @@ export const fakeCollectionCard = {
   image_contain: false,
   section_type: null,
   beginReplacing: jest.fn(),
-  reselectOnlyEditableRecords: jest.fn(),
-  reselectOnlyMovableCards: jest.fn(),
   API_create: jest.fn(),
   API_archive: jest.fn(),
   API_linkToMyCollection: jest.fn(),
@@ -52,6 +50,7 @@ export const fakeTextItemAttrs = {
   fullyLoaded: true,
   parent_collection_card: { ...fakeCollectionCard },
   API_fetchDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
+  roles: [],
 
 }
 
@@ -453,6 +452,11 @@ export const fakeCollection = {
   addCard: jest.fn(),
   setCollaborators: jest.fn(),
   collaborators: [],
+  tags: [
+    {label: 'llamas', type: 'tag_list'},
+    {label: 'pajamas', type: 'tag_list'},
+    {label: 'shape-test-user', type: 'user_tag_list', user: null}
+  ],
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
@@ -460,6 +464,7 @@ export const fakeCollection = {
   API_clearCollectionCover: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCard: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_fetchCardRoles: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   API_createCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
   API_destroyCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
@@ -475,6 +480,7 @@ export const fakeCollection = {
   API_manipulateRow: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCardOrders: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchChallengePhaseCollections: jest.fn().mockReturnValue(Promise.resolve({})),
+  initializeTags: jest.fn(),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
   createSubmission: jest.fn(),
   checkCurrentOrg: jest.fn(),
@@ -484,7 +490,9 @@ export const fakeCollection = {
   toJsonApiWithCards: jest.fn(),
   mergeCards: jest.fn(),
   revertToSnapshot: jest.fn(),
+  removeCardIds: jest.fn(),
   setCarouselIdx: jest.fn(),
+  setViewMode: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',
@@ -543,6 +551,7 @@ export const fakeOrganizationAttrs = {
 }
 export const fakeOrganization = {
   ...fakeOrganizationAttrs,
+  searchTagsAndUsers: jest.fn().mockReturnValue(Promise.resolve({})),
   rawAttributes: jest.fn().mockReturnValue(fakeOrganizationAttrs),
   getRecordType: jest.fn().mockReturnValue('organization'),
 }

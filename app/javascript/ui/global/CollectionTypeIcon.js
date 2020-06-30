@@ -20,6 +20,7 @@ import ProfileIconLg from '~/ui/icons/ProfileIconLg'
 import ProfileIconXs from '~/ui/icons/ProfileIconXs'
 import PhaseIcon from '~/ui/icons/PhaseIcon'
 import ChallengeIcon from '~/ui/icons/ChallengeIcon'
+import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
 
 // Only for use in collectionTitle, not menu
 export const largeCollectionIconMap = {
@@ -30,6 +31,7 @@ export const largeCollectionIconMap = {
   prototype: <PrototypeIconLg />,
   phase: <PhaseIcon large />,
   challenge: <ChallengeIcon large />,
+  foamcore: <FoamcoreBoardIcon large />,
 }
 
 export const smallCollectionIconMap = {
@@ -40,6 +42,7 @@ export const smallCollectionIconMap = {
   prototype: <PrototypeIcon />,
   phase: <PhaseIcon />,
   challenge: <ChallengeIcon />,
+  foamcore: <FoamcoreBoardIconXs />,
 }
 
 export const collectionTypeToIcon = ({ type, size }) => {
@@ -68,6 +71,7 @@ const CollectionTypeIcon = ({ record }) => {
   } else if (record.isBoard) {
     icon = <FoamcoreBoardIcon large />
   }
+
   if (icon) {
     return icon
   }

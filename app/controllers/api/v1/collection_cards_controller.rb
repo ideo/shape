@@ -4,10 +4,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   skip_before_action :check_api_authentication!, only: %i[index]
   before_action :load_and_authorize_parent_collection, only: %i[create replace update_card_filter]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction roles]
   before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   before_action :check_cache, only: %i[index ids breadcrumb_records]
-  before_action :load_collection_cards, only: %i[index ids breadcrumb_records]
+  before_action :load_collection_cards, only: %i[index ids breadcrumb_records roles]
 
   def index
     render_collection_cards
@@ -38,17 +38,24 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def breadcrumb_records
     card_data = @collection_cards
-                .select { |card| card.record.is_a?(Collection) }
-                .map do |card|
+                .where.not(collection_id: nil)
+                .map(&:collection)
+                .compact
+                .uniq
+                .map do |collection|
       {
-        id: card.record.id,
-        type: card.record.class.base_class.name.downcase.pluralize,
-        collection_type: card.record.class.name,
-        name: card.record.name,
-        has_children: card.record.has_child_collections?,
+        id: collection.id,
+        type: collection.class.base_class.name.downcase.pluralize,
+        collection_type: collection.class.name,
+        name: collection.name,
+        has_children: collection.has_child_collections?,
       }
     end
     render json: card_data
+  end
+
+  def roles
+    render_collection_cards(include_roles: true)
   end
 
   def create
@@ -246,11 +253,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   private
 
-  def render_collection_cards(collection: @collection, collection_cards: @collection_cards)
+  def render_collection_cards(collection: @collection, collection_cards: @collection_cards, include_roles: false)
     json_data = JsonapiCache::CollectionCardRenderer.call(
       cards: collection_cards,
       collection: collection,
       user: current_user,
+      include_roles: include_roles,
     ).merge(
       links: jsonapi_pagination(collection_cards),
     )
@@ -551,7 +559,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         num_columns
         start_date
         end_date
-      ].concat(Collection.globalize_attribute_names, tag_list: [], user_tag_list: []),
+      ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
         :type,

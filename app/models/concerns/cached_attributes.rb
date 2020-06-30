@@ -1,20 +1,20 @@
 module CachedAttributes
   extend ActiveSupport::Concern
 
-  def cache_attributes!(fields, touch: true)
-    # not using the store_accessor directly here because of:
-    # https://github.com/rails/rails/pull/32563
-    self.cached_attributes ||= {}
-    fields.each do |field, val|
-      self.cached_attributes[field.to_s] = val
-    end
-    # update without callbacks
-    return unless changes.present?
+  def cache_attribute!(field, value, touch: true)
+    # update locally
+    send("#{field}=", value)
+    # while also clearing ActiveModel::Dirty
+    clear_changes_information
+    # slightly convoluted way of writing a jsonb_set update on self (#update won't work here).
+    # updates just the one sub-field without overwriting all of cached_attributes
+    self.class.where(id: id).limit(1).update_all(%(
+      cached_attributes = jsonb_set(
+        cached_attributes, '{#{field}}', '#{value.to_json}'::jsonb
+      )
+    ))
+    return unless touch
 
-    attrs = { cached_attributes: cached_attributes }
-    if touch
-      attrs[:updated_at] = Time.current
-    end
-    update_columns attrs
+    update_columns(updated_at: Time.current)
   end
 end

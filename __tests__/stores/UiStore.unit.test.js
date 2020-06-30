@@ -1,4 +1,5 @@
 import { runInAction } from 'mobx'
+import fakeApiStore from '#/mocks/fakeApiStore'
 import UiStore from '~/stores/UiStore'
 
 let uiStore
@@ -112,24 +113,67 @@ describe('UiStore', () => {
     })
   })
 
+  describe('reselectOnlyEditableRecords', () => {
+    beforeEach(() => {
+      uiStore.apiStore = fakeApiStore()
+      uiStore.apiStore.findAll = jest
+        .fn()
+        .mockReturnValue([
+          { id: '10', link: false, record: { can_edit: false } },
+          { id: '11', link: true, record: { can_edit: false } },
+          { id: '12', link: false, record: { can_edit: true } },
+        ])
+    })
+
+    it('rejects non-links where the record is not editable', () => {
+      uiStore.reselectOnlyEditableRecords(['10', '11', '12'])
+      expect(uiStore.selectedCardIds).toEqual(['11', '12'])
+    })
+  })
+
+  describe('reselectOnlyMovableCards', () => {
+    beforeEach(() => {
+      uiStore.apiStore = fakeApiStore()
+      uiStore.apiStore.findAll = jest
+        .fn()
+        .mockReturnValue([
+          { id: '10', canMove: true },
+          { id: '11', canMove: false },
+          { id: '12', canMove: true },
+        ])
+    })
+
+    it('rejects non-links where the record is not editable', () => {
+      uiStore.reselectOnlyMovableCards(['10', '11', '12'])
+      expect(uiStore.selectedCardIds).toEqual(['10', '12'])
+    })
+  })
+
   describe('zoom functions', () => {
     const collection = fakeCollection
     beforeEach(() => {
       collection.isBoard = true
       collection.maxZoom = 3
-      uiStore.update('zoomLevel', 2)
       // this is used by zoomIn/Out
       uiStore.setViewingRecord(collection)
+      uiStore.determineZoomLevels(
+        uiStore.maxCols(collection),
+        uiStore.maxGridWidth({
+          pageMargins: uiStore.pageMargins(collection),
+          maxCols: uiStore.maxCols(collection),
+        })
+      )
+      uiStore.update('zoomLevel', 2)
     })
 
     describe('#adjustZoomLevel', () => {
       it('when zoomed out, should adjust to collection.maxZoom', () => {
-        uiStore.adjustZoomLevel({ collection })
-        expect(uiStore.zoomLevel).toEqual(3)
+        uiStore.adjustZoomLevel(collection)
+        expect(uiStore.zoomLevel).toEqual(7) // because of #determineZoomLevels
       })
 
       it('should use collection.lastZoom if available', () => {
-        uiStore.adjustZoomLevel({ collection: { ...collection, lastZoom: 2 } })
+        uiStore.adjustZoomLevel({ ...collection, lastZoom: 2 })
         expect(uiStore.zoomLevel).toEqual(2)
       })
     })
@@ -144,13 +188,94 @@ describe('UiStore', () => {
       })
     })
 
-    describe('#zoomIn', () => {
+    describe('#zoomOut', () => {
       it('increase zoom number until it reaches maxZoom', () => {
+        uiStore.adjustZoomLevel({ ...collection, lastZoom: 2 })
         expect(uiStore.zoomLevel).toEqual(2)
         uiStore.zoomOut()
         expect(uiStore.zoomLevel).toEqual(3)
         uiStore.zoomOut()
+        expect(uiStore.zoomLevel).toEqual(4)
+      })
+    })
+
+    describe('#updateZoomLevel', () => {
+      it('sets UiStore#zoomLevel and collection#lastZoom to given value', () => {
+        uiStore.updateZoomLevel(3, collection)
+        expect(collection.lastZoom).toEqual(3)
         expect(uiStore.zoomLevel).toEqual(3)
+      })
+    })
+
+    describe('#determineZoomLevels', () => {
+      describe('when 16 columns', () => {
+        beforeEach(() => {
+          collection.num_columns = 16
+          uiStore.windowWidth = 1400
+        })
+
+        it('sets zoomLevels based on maxGridWidth and maxCols', () => {
+          uiStore.determineZoomLevels(collection)
+          expect(uiStore.zoomLevels).toEqual([
+            { relativeZoomLevel: 1 },
+            { col: 6, relativeZoomLevel: 1.4471346938775511 },
+            { col: 8, relativeZoomLevel: 1.9293387755102043 },
+            { col: 16, relativeZoomLevel: 3.8581551020408162 },
+          ])
+        })
+      })
+      describe('when 8 columns', () => {
+        beforeEach(() => {
+          collection.num_columns = 8
+          uiStore.windowWidth = 1280
+        })
+
+        it('sets zoomLevels based on maxGridWidth and maxCols', () => {
+          uiStore.determineZoomLevels(collection)
+          expect(uiStore.zoomLevels).toEqual([
+            { col: 4, relativeZoomLevel: 1 },
+            { col: 6, relativeZoomLevel: 1.586171875 },
+            { col: 8, relativeZoomLevel: 2.1146875 },
+          ])
+        })
+      })
+      describe('when 4 columns', () => {
+        beforeEach(() => {
+          collection.num_columns = 4
+          uiStore.windowWidth = 620
+        })
+
+        it('sets zoomLevels based on maxGridWidth and maxCols', () => {
+          uiStore.determineZoomLevels(collection)
+          expect(uiStore.zoomLevels).toEqual([
+            { relativeZoomLevel: 1 },
+            { col: 2, relativeZoomLevel: 1.1221227887617067 },
+            { col: 4, relativeZoomLevel: 2.2415816857440167 },
+          ])
+        })
+      })
+    })
+
+    describe('#maxCols', () => {
+      describe('on touchDevice', () => {
+        beforeEach(() => {
+          collection.num_columns = 16
+          uiStore.isTouchDevice = true
+          uiStore.windowWidth = 720
+        })
+        it('should return the minimum of num_columns and 8', () => {
+          expect(uiStore.maxCols(collection)).toEqual(8)
+        })
+      })
+      describe('on desktop', () => {
+        beforeEach(() => {
+          collection.num_columns = 4
+          uiStore.isTouchDevice = false
+          uiStore.windowWidth = 1280 // Can't set isMobile because it is computed
+        })
+        it('should return the minimum of num_columns and 16', () => {
+          expect(uiStore.maxCols(collection)).toEqual(4)
+        })
       })
     })
   })

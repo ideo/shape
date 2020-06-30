@@ -21,10 +21,11 @@ import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
+import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
+import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
-import { calculatePageMargins } from '~/utils/pageUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
@@ -87,9 +88,8 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
   }
 
   ${props =>
-    props.type === 'unrendered'
-      ? ''
-      : `&:hover {
+    props.type !== 'unrendered' &&
+    `&:hover {
     background-color: ${v.colors.primaryLight} !important;
 
     .plus-icon {
@@ -131,14 +131,21 @@ const RightBlankActions = styled.div`
 `
 RightBlankActions.displayName = 'RightBlankActions'
 
+const CollectionFilterWrapper = styled.div`
+  display: flex;
+  position: fixed;
+  z-index: ${v.zIndex.zoomControls};
+  top: ${v.headerHeight}px;
+  height: 86px;
+  right: 32px;
+`
+
 function getMapKey({ col, row }) {
   return `${col},${row}`
 }
 
 const MAX_CARD_W = 4
 const MAX_CARD_H = 2
-const MAX_COLS = 16
-const MAX_COLS_MOBILE = 8
 
 // needs to be an observer to observe changes to the collection + items
 @inject('apiStore', 'uiStore')
@@ -201,8 +208,9 @@ class FoamcoreGrid extends React.Component {
 
   componentDidMount() {
     const { collection, uiStore } = this.props
+
     uiStore.update('selectedAreaEnabled', true)
-    uiStore.adjustZoomLevel({ collection })
+    uiStore.determineZoomLevels(collection)
     this.updateCollectionScrollBottom()
     this.loadAfterScroll()
     window.addEventListener('scroll', this.handleScroll)
@@ -212,8 +220,9 @@ class FoamcoreGrid extends React.Component {
     const { collection, uiStore } = this.props
     this.updateSelectedArea()
     if (collection.id !== prevProps.collection.id) {
-      uiStore.adjustZoomLevel({ collection })
+      uiStore.determineZoomLevels(collection)
     }
+
     if (!objectsEqual(this.props.cardProperties, prevProps.cardProperties)) {
       // e.g. if API_fetchCards has reset the loaded cards, we may want to
       // trigger this in case we are viewing further down the page
@@ -291,48 +300,20 @@ class FoamcoreGrid extends React.Component {
   }
 
   get pageMargins() {
-    const { collection } = this.props
-    return {
-      ...calculatePageMargins({ fullWidth: collection.isFourWideBoard }),
-      top: v.headerHeight + 90,
-    }
-  }
-
-  get maxCols() {
     const { collection, uiStore } = this.props
-
-    // NOTE: if we ever allow >16, this still limits max zoom level to show only 16
-    const max =
-      uiStore.isTouchDevice && uiStore.isMobile ? MAX_COLS_MOBILE : MAX_COLS
-    return _.min([collection.num_columns, max])
+    return uiStore.pageMargins(collection)
   }
 
   // relativeZoomLevel is either the actual zoom level (if not all the way zoomed out),
   // or else returns the precise zoom ratio that will fit all cards on the screen
   get relativeZoomLevel() {
-    const { collection } = this.props
-    const { zoomLevel } = this
-    // this method only applies for the maxZoom level, return otherwise
-    if (zoomLevel !== collection.maxZoom) return zoomLevel
-    const gridWidth = this.maxGridWidth({ zoomLevel })
-    const relative = gridWidth / window.innerWidth
-    return _.max([relative, 1])
+    const { uiStore } = this.props
+    return uiStore.relativeZoomLevel
   }
 
   get showZoomControls() {
-    // always calculate the maxGridWidth of zoomLevel = 1
-    return this.maxGridWidth({ zoomLevel: 1 }) > window.innerWidth
-  }
-
-  // This returns the grid with (in pixels) for showing the full width of cards;
-  // for mobile this gets bumped down and may not include all 16 columns (only 8 for large board)
-  maxGridWidth({ zoomLevel = 1 } = {}) {
-    const { maxCols, pageMargins } = this
-    const { gridW, gutter } = this.gridSettings
-    const gridWidth =
-      (gridW + gutter) * maxCols + pageMargins.left * 2 * zoomLevel
-    // only show zoom if the grid is wider than our window
-    return gridWidth
+    const { uiStore } = this.props
+    return uiStore.zoomLevels.length > 1
   }
 
   get gridSettings() {
@@ -345,8 +326,9 @@ class FoamcoreGrid extends React.Component {
   // one theory -- for mobile touch scrolling?
   get totalGridSize() {
     const { gridW, gridH, gutter } = this.gridSettings
-    const { relativeZoomLevel, maxCols } = this
-    const { collection } = this.props
+    const { relativeZoomLevel } = this
+    const { collection, uiStore } = this.props
+    const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
     // + 2x the visible number of rows
@@ -1281,6 +1263,8 @@ class FoamcoreGrid extends React.Component {
         /* Why is this rendering on top of a collection? */
         blocked={this.hasDragCollision && isDrag}
         data-blank-type={type}
+        // this is to make it work the same as CollectionGrid BCT for cypress
+        className={`StyledHotspot-${row}:${col}-BCT`}
         data-empty-space-click
         draggedOn
       >
@@ -1523,6 +1507,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
+    const { uiStore, collection } = this.props
+
     const gridSize = this.totalGridSize
     return (
       <Grid
@@ -1539,6 +1525,15 @@ class FoamcoreGrid extends React.Component {
             onZoomIn={this.handleZoomIn}
             onZoomOut={this.handleZoomOut}
           />
+        )}
+        {!uiStore.isMobileXs && (
+          <CollectionFilterWrapper>
+            <CollectionViewToggle collection={collection} />
+            <CollectionFilter
+              collection={collection}
+              canEdit={collection.canEdit}
+            />
+          </CollectionFilterWrapper>
         )}
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}

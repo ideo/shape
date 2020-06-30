@@ -158,7 +158,6 @@ class OrganizationSettings extends React.Component {
           validateTag={this.validateDomainTag}
           placeholder="Please enter domains with the following format: domain.com"
           records={[this.organization]}
-          tagField="domain_whitelist"
           tagColor="white"
           afterAddTag={this.afterAddRemoveDomainTag}
           afterRemoveTag={this.afterAddRemoveDomainTag}

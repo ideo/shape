@@ -2,7 +2,7 @@ module UserSpecificFields
   extend ActiveSupport::Concern
 
   included do
-    has_many :roles, if: -> { @current_user && @object == @current_record} do
+    has_many :roles, if: -> { @include_roles || (@current_user && @object == @current_record) } do
       data do
         @object.anchored_roles(viewing_organization_id: @current_user&.current_organization_id)
       end

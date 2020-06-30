@@ -57,25 +57,58 @@ describe('Breadcrumb', () => {
     })
   })
 
-  describe('truncate()', () => {
+  describe('truncatedItems()', () => {
     describe('multiple items that have to be truncated', () => {
       beforeEach(() => {
         props.items = [
-          { name: 'Home' },
-          { name: 'Workspace problem' },
-          { name: 'A Great solution' },
-          { name: 'Solution123456781235' },
-          { name: 'IdeoProejct12123456789' },
+          { name: 'Home', id: '1' },
+          { name: 'Workspace problem', id: '2' },
+          { name: 'A Great solution', id: '3' },
+          { name: 'Solution123456781235', id: '5' },
+          { name: 'IdeoProject12123456789', id: '10' },
         ] // Total chars is 79
         props.containerWidth = 625 // 50 max chars
         render()
       })
 
-      it('do ellipses for the middle items until it has enough chars', () => {
-        expect(component.truncatedItems[0].ellipses).toBeFalsy()
-        expect(component.truncatedItems[1].ellipses).toBe(true)
-        expect(component.truncatedItems[2].ellipses).toBe(true)
-        expect(component.truncatedItems[3].ellipses).toBeFalsy()
+      it('marks ellipses for the middle items until it has enough chars', () => {
+        const { truncatedItems } = component
+        expect(truncatedItems[0].ellipses).toBeFalsy()
+        expect(truncatedItems[1].ellipses).toBe(true)
+        expect(truncatedItems[1].remove).toBe(true)
+        expect(truncatedItems[2].ellipses).toBe(true)
+        expect(truncatedItems[2].subItems.length).toEqual(4)
+        expect(truncatedItems[3].ellipses).toBeFalsy()
+        expect(truncatedItems[4].ellipses).toBeFalsy()
+      })
+    })
+
+    describe('ellipses starts in the middle', () => {
+      beforeEach(() => {
+        props.items = [
+          { name: 'Home', id: '1' },
+          { name: 'Workspace', id: '2' },
+          { name: 'Solution', id: '3' },
+          { name: 'Foamcore Project', id: '5' },
+          { name: 'Inside Ideo Project', id: '10' },
+        ]
+        props.containerWidth = 625 // 50 max chars
+        render()
+      })
+
+      it('marks ellipses for the middle items and creates subItems menu', () => {
+        const { truncatedItems } = component
+        expect(truncatedItems[0].ellipses).toBeFalsy()
+        expect(truncatedItems[1].ellipses).toBeFalsy()
+        expect(truncatedItems[2].ellipses).toBe(true)
+        const subItemNames = truncatedItems[2].subItems.map(i => i.name)
+        expect(subItemNames).toEqual([
+          'Solution',
+          'Foamcore Project',
+          'Inside Ideo Project',
+        ])
+        expect(truncatedItems[3].ellipses).toBeFalsy()
+        expect(truncatedItems[4].ellipses).toBeFalsy()
       })
     })
   })

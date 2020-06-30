@@ -62,6 +62,7 @@ module.exports = {
       {
         argsIgnorePattern: '^_',
         args: 'none',
+        varsIgnorePattern: '^React$'
       },
     ],
     'no-var': 'error',

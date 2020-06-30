@@ -1,4 +1,5 @@
 import { startCase, flatten, sortBy } from 'lodash'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -193,7 +194,7 @@ class MethodLibraryFilterBar extends React.Component {
     }
   }
 
-  render() {
+  renderBar() {
     const categories = ['subqualities', 'categories', 'types']
     return (
       <Fragment>
@@ -236,11 +237,27 @@ class MethodLibraryFilterBar extends React.Component {
       </Fragment>
     )
   }
+
+  render() {
+    if (!this.props.usePortal) {
+      return this.renderBar()
+    }
+    const filterElement = document.getElementById('collectionFilterPortal')
+    if (!filterElement) {
+      return null
+    }
+    return ReactDOM.createPortal(this.renderBar(), filterElement)
+  }
 }
 
 MethodLibraryFilterBar.propTypes = {
   filters: MobxPropTypes.arrayOrObservableArray.isRequired,
   onSelect: PropTypes.func.isRequired,
+  // set usePortal=false mainly for unit testing
+  usePortal: PropTypes.bool,
+}
+MethodLibraryFilterBar.defaultProps = {
+  usePortal: true,
 }
 
 export default MethodLibraryFilterBar

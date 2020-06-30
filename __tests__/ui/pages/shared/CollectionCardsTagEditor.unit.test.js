@@ -1,16 +1,25 @@
-import CollectionCardsTagEditor from '~/ui/pages/shared/CollectionCardsTagEditor'
+import CollectionCardsTagEditor, {
+  formatRecordTags,
+} from '~/ui/pages/shared/CollectionCardsTagEditor'
 import TagEditor from '~/ui/pages/shared/TagEditor.js'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
 
-let wrapper, props, collection, component, apiStore
+let wrapper, props, records, cardIds, component, apiStore
 describe('CollectionCardsTagEditor', () => {
   beforeEach(() => {
-    collection = fakeCollection
-    const cards = [fakeCollectionCard]
-    cards[0].record = collection
+    records = [fakeCollection]
+    fakeCollectionCard.record = fakeCollection
+    cardIds = [fakeCollectionCard.id]
     apiStore = fakeApiStore()
-    props = { cards, apiStore, canEdit: true }
+    props = {
+      records,
+      apiStore,
+      canEdit: true,
+      cardIds,
+      suggestions: [],
+      handleInputChange: jest.fn(),
+    }
 
     wrapper = shallow(<CollectionCardsTagEditor.wrappedComponent {...props} />)
     component = wrapper.instance()
@@ -20,19 +29,22 @@ describe('CollectionCardsTagEditor', () => {
     expect(wrapper.find(TagEditor).exists()).toBe(true)
   })
 
-  it('passes collection card records to tag editor', () => {
-    expect(wrapper.find(TagEditor).props().records).toEqual([collection])
+  it('passes record tags to tag editor', () => {
+    expect(wrapper.find(TagEditor).props().recordTags).toEqual(
+      formatRecordTags(records)
+    )
   })
 
   describe('addTag', () => {
     it('requests collection_cards/add_tag', () => {
-      component.addTag('llamas')
+      component.addTag({ label: 'llamas', type: 'tag_list' })
       expect(apiStore.request).toHaveBeenCalledWith(
         'collection_cards/add_tag',
         'PATCH',
         {
-          card_ids: [fakeCollectionCard.id],
+          card_ids: cardIds,
           tag: 'llamas',
+          type: 'tag_list',
         }
       )
     })
@@ -40,13 +52,14 @@ describe('CollectionCardsTagEditor', () => {
 
   describe('removeTag', () => {
     it('requests collection_cards/remove_tag', () => {
-      component.removeTag('pajamas')
+      component.removeTag({ label: 'pajamas', type: 'tag_list' })
       expect(apiStore.request).toHaveBeenCalledWith(
         'collection_cards/remove_tag',
         'PATCH',
         {
-          card_ids: [fakeCollectionCard.id],
+          card_ids: cardIds,
           tag: 'pajamas',
+          type: 'tag_list',
         }
       )
     })

@@ -34,7 +34,7 @@ module Breadcrumb
           ),
         )
         .order(Arel.sql("position(collections.id::text in '#{ids.join(',')}')"))
-        .select(:id, :name)
+        .select(:id, :name, :type)
     end
 
     # Transforms collection ids into breadcrumb with collection names
