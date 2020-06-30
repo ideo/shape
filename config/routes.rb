@@ -28,7 +28,7 @@ Rails.application.routes.draw do
         member do
           get 'in_my_collection'
           get 'direct_children_tag_list'
-          get 'submission_box_sub_collections'
+          get 'challenge_submission_boxes'
           get 'phase_sub_collections'
           get 'challenge_phase_collections'
           post 'clear_collection_cover'
