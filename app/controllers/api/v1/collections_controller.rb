@@ -20,7 +20,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
-    render_collection
+    render_collection(
+      include: Collection.default_relationships_for_api + [:tagged_users],
+    )
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]

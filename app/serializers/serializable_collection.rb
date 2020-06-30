@@ -58,6 +58,7 @@ class SerializableCollection < BaseJsonSerializer
   has_many :collection_cover_text_items
   has_many :test_audiences
   has_many :collection_filters
+  has_many :tagged_users
 
   has_many :collection_cover_items do
     data do

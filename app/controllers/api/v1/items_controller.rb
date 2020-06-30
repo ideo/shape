@@ -14,7 +14,14 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def show
     log_item_activity(:viewed) if log_activity?
     render jsonapi: @item,
-           include: [:filestack_file, :parent, :parent_collection_card, :restorable_parent, roles: %i[users groups resource]],
+           include: [
+             :filestack_file,
+             :parent,
+             :parent_collection_card,
+             :restorable_parent,
+             :tagged_users,
+             roles: %i[users groups resource],
+           ],
            expose: { current_record: @item }
   end
 
