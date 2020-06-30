@@ -503,7 +503,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       {
         id: collection.id,
         name: 'Who let the dogs out?',
-        user_tag_list: [tagged_user.handle],
         collection_cards_attributes: [
           {
             id: collection_card.id,
@@ -581,13 +580,6 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(collection.name).not_to eq('Who let the dogs out?')
       patch(path, params: params)
       expect(collection.reload.name).to eq('Who let the dogs out?')
-    end
-
-    it 'updates the user_tag_list and cached_user_tag_list' do
-      expect(collection.user_tag_list).to be_empty
-      patch(path, params: params)
-      expect(collection.reload.user_tag_list).to eq([tagged_user.handle])
-      expect(collection.cached_user_tag_list).to eq([tagged_user.handle])
     end
 
     it 'updates the collection_card' do

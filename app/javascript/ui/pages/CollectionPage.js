@@ -54,6 +54,7 @@ class CollectionPage extends React.Component {
     this.setEditor = _.throttle(this._setEditor, 4000)
   }
 
+  @action
   componentDidMount() {
     const { collection, apiStore, routingStore } = this.props
     if (!apiStore.currentUser && !collection.anyone_can_view) {
@@ -67,6 +68,7 @@ class CollectionPage extends React.Component {
     this.subscribeToChannel(collection.id)
   }
 
+  @action
   componentDidUpdate(prevProps) {
     const { collection, routingStore } = this.props
     const previousId = prevProps.collection.id
@@ -121,6 +123,10 @@ class CollectionPage extends React.Component {
     let params = { page, per_page }
     if (collection.isBoard) {
       params = { rows }
+      // ensure that boards with filters are in list view
+      if (collection.activeFilters.length > 0) {
+        collection.setViewMode('list')
+      }
     }
     if (undoStore.actionAfterRoute) {
       // clear this out before we fetch, so that any undo/redo actions don't flash a previous state of the cards
@@ -154,7 +160,8 @@ class CollectionPage extends React.Component {
     })
   }
 
-  async onAPILoad() {
+  @action
+  onAPILoad() {
     const {
       collection,
       apiStore,

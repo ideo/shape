@@ -41,6 +41,11 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return sanitized.replace(/(?:\r\n|\r|\n)/g, '')
   }
 
+  get canEdit() {
+    // used e.g. by PageHeader
+    return this.can_edit_content
+  }
+
   get canReplace() {
     if (!this.can_edit_content) return false
     return _.includes(

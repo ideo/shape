@@ -1,9 +1,18 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { toJS, computed } from 'mobx'
+import { toJS, computed, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import TagEditor from './TagEditor'
+
+export const formatRecordTags = records => {
+  // TODO: check uniqueness and sort
+  const recordTags = _.flatMap(records, r => {
+    const { tags } = r
+    return toJS(tags)
+  })
+  return recordTags
+}
 
 @inject('apiStore')
 @observer
@@ -32,12 +41,7 @@ class CollectionCardsTagEditor extends React.Component {
   @computed
   get selectedRecordTags() {
     const { records } = this.props
-    // TODO: check uniqueness and sort
-    const recordTags = _.flatMap(records, r => {
-      const { tags } = r
-      return toJS(tags)
-    })
-    return recordTags
+    return (!_.isEmpty(records) && formatRecordTags(records)) || []
   }
 
   // NOTE: this is used to bulk-update and cache bust tags for selected cards
@@ -51,11 +55,25 @@ class CollectionCardsTagEditor extends React.Component {
     })
   }
 
-  addTag = ({ label, type }) => {
+  @action
+  addTag = ({ label, type, user }) => {
+    const { records } = this.props
+    // update frontend model tags observable to rerender TagEditor
+    _.each(records, r => {
+      r.tags.push({ label, type, user })
+    })
     this._apiAddRemoveTag('add', { label, type })
   }
 
-  removeTag = ({ label, type }) => {
+  @action
+  removeTag = ({ label, type, user }) => {
+    const { records } = this.props
+    // update frontend model tags observable to rerender TagEditor
+    _.each(records, r => {
+      _.remove(r.tags, t => {
+        return t.label === label && t.type === type
+      })
+    })
     this._apiAddRemoveTag('remove', { label, type })
   }
 
@@ -92,7 +110,7 @@ CollectionCardsTagEditor.propTypes = {
   canEdit: PropTypes.bool,
   placeholder: PropTypes.string,
   tagColor: PropTypes.string,
-  suggestions: MobxPropTypes.arrayOrObservableArray.isRequired,
+  suggestions: PropTypes.array.isRequired,
   handleInputChange: PropTypes.func.isRequired,
 }
 
@@ -101,5 +119,7 @@ CollectionCardsTagEditor.defaultProps = {
   tagColor: null,
   placeholder: null,
 }
+
+CollectionCardsTagEditor.displayName = 'CollectionCardsTagEditor'
 
 export default CollectionCardsTagEditor

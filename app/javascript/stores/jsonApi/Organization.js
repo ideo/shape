@@ -38,7 +38,7 @@ class Organization extends BaseRecord {
   }
 
   async API_getOrganizationUserTag(handle) {
-    // FIXME: should return tag for tag
+    // FIXME: should return user for handle
     await Promise.resolve(null)
   }
 
@@ -54,13 +54,16 @@ class Organization extends BaseRecord {
 
         let name = ''
         let user = null
+        let label = ''
         if (internalType === 'users') {
-          name = tagOrUser.handle
-          user = tagOrUser
+          label = tagOrUser.handle
+          user = tagOrUser.toJSON() // how do we not use .toJSON() here
+          name = `${tagOrUser.first_name} ${tagOrUser.last_name} ${tagOrUser.handle}`
         } else if (internalType === 'tags') {
-          name = tagOrUser.name
+          label = name = tagOrUser.name.trim()
         }
-        allTagsAndUsers.push({ id: index, name, user })
+        // NOTE: label is used for adding/removing tags, name is used for displaying react tag suggestions
+        allTagsAndUsers.push({ id: index, name, label, user, internalType })
       })
     }
 

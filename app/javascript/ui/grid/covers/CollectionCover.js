@@ -379,8 +379,8 @@ class CollectionCover extends React.Component {
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collectionIcon =
-      collection.collection_type !== 'collection' &&
-      collection.collection_type !== 'foamcore' &&
+      collection_type !== 'collection' &&
+      collection_type !== 'foamcore' &&
       collectionTypeToIcon({
         type: collection_type,
         size: 'lg',

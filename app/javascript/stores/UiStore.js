@@ -263,6 +263,7 @@ export default class UiStore {
   collaboratorColors = new Map()
   @observable
   challengeSettingsOpen = false
+  @observable
   zoomLevels = []
 
   get routingStore() {

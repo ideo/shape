@@ -240,20 +240,20 @@ describe('PageHeader', () => {
         'Challenge Settings'
       )
     })
+  })
 
-    describe('with a phase collection type inside a challenge', () => {
-      beforeEach(() => {
-        props.record = fakeCollection
-        props.record.isInsideAChallenge = true
-        props.record.challenge = fakeCollection
-        props.record.collection_type = 'phase'
-        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
-        component = wrapper.instance()
-      })
+  describe('with a phase collection type inside a challenge', () => {
+    beforeEach(() => {
+      props.record = fakeCollection
+      props.record.isInsideAChallenge = true
+      props.record.challenge = fakeCollection
+      props.record.collection_type = 'phase'
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
 
-      it('should render the ChallengeSubHeader', () => {
-        expect(wrapper.find('ChallengeSubHeader').exists()).toBe(true)
-      })
+    it('should render the ChallengeSubHeader', () => {
+      expect(wrapper.find('ChallengeSubHeader').exists()).toBe(true)
     })
   })
 
@@ -262,6 +262,10 @@ describe('PageHeader', () => {
       it('returns an icon', () => {
         props.record.type = 'Collection::Board'
         expect(component.rightIcon).toEqual(null)
+      })
+
+      it('should render the ChallengeSubHeader', () => {
+        expect(wrapper.find('ChallengeSubHeader').exists()).toBe(true)
       })
     })
   })

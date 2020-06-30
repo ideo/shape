@@ -83,6 +83,7 @@ const FixedRightContainer = styled(Flex)`
   right: 60px;
   height: 33px;
 `
+
 const CollectionPillHolder = styled.div`
   margin-bottom: 8px;
   width: 100%;
@@ -94,11 +95,6 @@ class PageHeader extends React.Component {
   @observable
   iconAndTagsWidth = 0
   templateButtonRef = null
-
-  get canEdit() {
-    const { record } = this.props
-    return record.can_edit_content && !record.system_required
-  }
 
   @action
   updateIconAndTagsWidth(ref) {
@@ -492,8 +488,12 @@ class PageHeader extends React.Component {
       !uiStore.isMobileXs &&
       (record.isRegularCollection ||
         record.isSubmissionsCollection ||
-        // FoamcoreGrid displays its own fixed CollectionViewToggle
-        (record.isBoard && record.viewMode === 'list'))
+        record.isBoard)
+
+    const showFilterControls =
+      showFilters &&
+      // FoamcoreGrid displays its own fixed controls at the top
+      (!record.isBoard || record.viewMode === 'list')
 
     return (
       <StyledHeader
@@ -527,7 +527,7 @@ class PageHeader extends React.Component {
                 <EditableName
                   name={record.name}
                   updateNameHandler={this.updateRecordName}
-                  canEdit={this.canEdit}
+                  canEdit={record.canEdit}
                   extraWidth={this.iconAndTagsWidth}
                   fieldName="recordName"
                 />
@@ -571,23 +571,20 @@ class PageHeader extends React.Component {
                 </FixedRightContainer>
               )}
             </StyledTitleAndRoles>
-            {showFilters && (
+            {showFilterControls && (
               <div style={{ marginBottom: '-16px', display: 'flex' }}>
                 <CollectionViewToggle collection={record} />
-                {/* CollectionFilter will be enabled for Board in the follow-up story */}
-                {!record.isBoard && (
-                  <CollectionFilter
-                    collection={record}
-                    canEdit={this.canEdit}
-                  />
-                )}
+                <CollectionFilter
+                  collection={record}
+                  canEdit={record.canEdit}
+                />
               </div>
             )}
           </div>
           {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal
-          canEdit={this.canEdit}
+          canEdit={record.canEdit}
           cards={this.cardsForTagging}
           open={tagEditorOpen}
         />

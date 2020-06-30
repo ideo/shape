@@ -15,7 +15,8 @@ describe('TagEditor', () => {
         afterAddTag,
         afterRemoveTag,
         canEdit: true,
-        tagField: 'tag_list',
+        suggestions: [],
+        handleInputChange: jest.fn(),
       }
       wrapper = shallow(<TagEditor {...props} />)
     })
@@ -35,13 +36,20 @@ describe('TagEditor', () => {
     beforeEach(() => {
       afterAddTag = jest.fn()
       afterRemoveTag = jest.fn()
-      recordTags = [{ label: 'msegreto', type: 'user_tag_list' }]
+      recordTags = [
+        {
+          label: 'marcosegreto',
+          type: 'user_tag_list',
+          user: { pic_url_square: 'http://foo.com/' },
+        },
+      ]
       props = {
         recordTags,
         afterAddTag,
         afterRemoveTag,
         canEdit: true,
-        tagField: 'tag_list',
+        suggestions: [],
+        handleInputChange: jest.fn(),
       }
       wrapper = shallow(<TagEditor {...props} />)
     })
@@ -54,7 +62,7 @@ describe('TagEditor', () => {
       expect(wrapper.find('ReactTags').props().tags[0].name).toEqual(
         recordTags[0].label
       )
-      expect(wrapper.find('ReactTags').props().symbol).toBeTruthy()
+      expect(wrapper.find('ReactTags').props().tags[0].symbol).toBeTruthy()
     })
   })
 })

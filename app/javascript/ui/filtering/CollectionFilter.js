@@ -54,11 +54,7 @@ class CollectionFilter extends React.Component {
     try {
       const result = await fn()
       const { collection } = this.props
-      // Refetch the cards now that the filters have changed
-      runInAction(() => {
-        collection.storedCacheKey = null
-      })
-      await collection.API_fetchCards({ page: 1 })
+      await collection.API_fetchCards()
       return result
     } catch (e) {
       throw e
@@ -81,13 +77,22 @@ class CollectionFilter extends React.Component {
 
   onCreateFilter = async tag => {
     const { collection } = this.props
-    if (!this.currentFilterLookupType) return
-    const backendFilterType = pluralize
-      .singular(this.currentFilterLookupType)
+    const { currentFilterLookupType } = this
+    if (!currentFilterLookupType) return
+    let backendFilterType = pluralize
+      .singular(currentFilterLookupType)
       .toLowerCase()
       .split(' ')[0]
+
+    if (backendFilterType === 'tag') {
+      const { internalType } = tag
+      // NOTE: internalType is set under Organization::searchTagsAndUsers
+      if (internalType === 'users') {
+        backendFilterType = 'user_tag'
+      }
+    }
     const filter = {
-      text: tag.name,
+      text: tag.label,
       filter_type: backendFilterType,
       selected: false,
     }
@@ -108,17 +113,22 @@ class CollectionFilter extends React.Component {
   onSelectFilter = async tag => {
     return this.onFilterChange(async () => {
       const filter = apiStore.find('collection_filters', tag.id)
-      return filter.API_toggleSelected(!tag.selected)
+      const { collection } = this.props
+      if (collection.isBoard && collection.viewMode !== 'list') {
+        collection.setViewMode('list')
+      }
+      return filter.API_toggleSelected(collection, !tag.selected)
     })
   }
 
   onShowAll = ev => {
     return this.onFilterChange(() => {
-      const {
-        collection: { collection_filters },
-      } = this.props
+      const { collection } = this.props
+      const { collection_filters } = collection
       return Promise.all(
-        collection_filters.map(filter => filter.API_toggleSelected(false))
+        collection_filters.map(filter =>
+          filter.API_toggleSelected(collection, false)
+        )
       )
     })
   }

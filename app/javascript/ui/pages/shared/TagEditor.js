@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import _ from 'lodash'
 import ReactTags from 'react-tag-autocomplete'
@@ -25,45 +24,23 @@ const TagEditor = ({
   const [error, setError] = useState('')
   const [formattedTags, setFormattedTags] = useState([])
 
-  const getFormattedTag = ({ label, type }) => ({
-    id: label,
-    label,
-    name: label,
-    type,
-    onDelete: () => {
-      handleDelete({ label, type })
-    },
-    symbol:
-      type !== 'user_tag_list' ? (
-        creativeDifferenceTagIcon(label)
-      ) : (
-        <Avatar size={18} />
-      ),
-    symbolSize: 18,
-  })
-
   const handleDelete = ({ label, type }) => {
-    const tagToDelete = _.find(formattedTags, { label, type })
+    const tagToDelete = _.find(formattedTags, t => {
+      return t.label.toUpperCase() === label.toUpperCase() && t.type === type
+    })
     if (tagToDelete) {
-      setFormattedTags(_.without(formattedTags, tagToDelete))
       afterRemoveTag({ label, type })
     }
   }
 
   const handleAddition = tagData => {
-    tagData.name = tagData.name.trim()
-
-    // FIXME: hardcode tag_field for now; figure out how we can determine which tag type is getting added
-    const tagField = 'tag_list'
-
-    const newTag = getFormattedTag({
-      label: tagData.name,
-      type: tagField,
-    })
+    const { label, internalType, user } = tagData
+    const type = internalType === 'users' ? 'user_tag_list' : 'tag_list'
 
     const duplicateTag = _.find(formattedTags, t => {
-      t.name.toUpperCase() === newTag.name.toUpperCase() && t.type === tagField
+      return t.label.toUpperCase() === label.toUpperCase() && t.type === type
     })
+
     // Return if duplicate tag is found
     if (duplicateTag) {
       return
@@ -71,25 +48,61 @@ const TagEditor = ({
 
     // If a validateTag function is provided, validate tag
     if (validateTag) {
-      const { tag, error } = validateTag(newTag.name)
+      const { tag, error } = validateTag(label)
       if (error) {
         setError(error)
         return
       } else {
-        newTag.name = tag
+        label = tag
       }
     }
 
-    formattedTags.push(newTag)
-    const { label, type } = newTag
-    afterAddTag({ label, type })
+    afterAddTag({ label, type, user })
   }
 
+  const getReactTagProps = ({ index, label, type, user }) => {
+    let symbol = null
+
+    if (type === 'user_tag_list') {
+      const { pic_url_square } = user
+      symbol = <Avatar size={18} url={pic_url_square} />
+    } else {
+      symbol = creativeDifferenceTagIcon(label)
+    }
+
+    return {
+      id: index,
+      label,
+      name: label,
+      type,
+      symbol,
+      symbolSize: 18,
+    }
+  }
+
+  _.each(formattedTags, t =>
+    _.assign(t, {
+      onDelete: () => {
+        handleDelete({ label: t.label, type: t.type })
+      },
+    })
+  )
+
   useEffect(() => {
-    setFormattedTags(
-      _.map(recordTags, ({ label, type }) => getFormattedTag({ label, type }))
+    const _formattedTags = _.map(recordTags, ({ label, type, user }, index) =>
+      getReactTagProps({ index, label, type, user })
     )
-  }, [recordTags.length])
+
+    // set onDelete once formatted tags are initialized since it uses formatted tags within the context
+    _.each(_formattedTags, t =>
+      _.assign(t, {
+        onDelete: () => {
+          handleDelete({ label: t.label, type: t.type })
+        },
+      })
+    )
+    setFormattedTags(_formattedTags)
+  }, [recordTags])
 
   const readonlyTags = () => {
     if (formattedTags.length === 0) {
@@ -136,7 +149,7 @@ TagEditor.propTypes = {
   tagColor: PropTypes.string,
   placeholder: PropTypes.string,
   validateTag: PropTypes.func,
-  suggestions: MobxPropTypes.arrayOrObservableArray.isRequired,
+  suggestions: PropTypes.array.isRequired,
   handleInputChange: PropTypes.func.isRequired,
 }
 

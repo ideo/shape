@@ -204,7 +204,7 @@ describe User, type: :model do
             picture: 'http://new.img.url',
             picture_large: 'http://new.img.url/large',
             locale: 'es',
-            username: 'bob-smith'
+            username: 'bob-smith',
           }
         end
 
@@ -274,15 +274,15 @@ describe User, type: :model do
           email: Faker::Internet.unique.email,
           first_name: Faker::Name.first_name,
           last_name: Faker::Name.last_name,
-          image: 'http://pic.url.net'
+          image: 'http://pic.url.net',
         },
         extra: {
           raw_info: {
             picture: 'http://pic.url.net',
             picture_medium: 'http://pic.url.net/med',
             picture_large: 'http://pic.url.net/lg',
-            locale: 'es'
-          }
+            locale: 'es',
+          },
         },
       )
     end
@@ -324,7 +324,7 @@ describe User, type: :model do
           provider: 'ideo',
           uid: '123',
           info: {
-            email: Faker::Internet.unique.email
+            email: Faker::Internet.unique.email,
           },
           extra: {
             raw_info: {
@@ -332,8 +332,8 @@ describe User, type: :model do
               type: 'User::Limited',
               picture: 'http://pic.url.net',
               picture_medium: 'http://pic.url.net/med',
-              picture_large: 'http://pic.url.net/lg'
-            }
+              picture_large: 'http://pic.url.net/lg',
+            },
           },
         )
       end
@@ -389,6 +389,7 @@ describe User, type: :model do
         status: user.status,
         organization_ids: [],
         application_bot: false,
+        taggings_count: 0,
       )
     end
 
