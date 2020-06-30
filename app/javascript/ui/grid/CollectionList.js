@@ -18,9 +18,9 @@ class CollectionList extends React.Component {
     collection.API_fetchCardRoles()
   }
 
-  get insideChallenge() {
+  get submissionBoxInsideChallenge() {
     const { collection } = this.props
-    return collection.isChallengeOrInsideChallenge
+    return collection.isSubmissionBox && collection.isChallengeOrInsideChallenge
   }
 
   get columns() {
@@ -37,8 +37,8 @@ class CollectionList extends React.Component {
         style: { width: '400px' },
       },
       {
-        displayName: this.insideChallenge ? 'Reviewers' : 'Permissions',
-        name: this.insideChallenge ? 'reviewers' : 'permissions',
+        displayName: this.submissionBoxInsideChallenge ? 'Reviewers' : 'Permissions',
+        name: this.submissionBoxInsideChallenge ? 'reviewers' : 'permissions',
         style: { width: '250px' },
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
@@ -80,7 +80,7 @@ class CollectionList extends React.Component {
         {this.sortedCards.map(card => (
           <ListCard
             card={card}
-            insideChallenge={this.insideChallenge}
+            insideChallenge={this.submissionBoxInsideChallenge}
             searchResult={collection.isSearchResultsCollection}
             key={card.id}
           />
