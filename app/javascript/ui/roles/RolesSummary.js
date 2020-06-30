@@ -11,7 +11,7 @@ import v from '~/utils/variables'
 import { AddButton } from '~/ui/global/styled/buttons'
 import { objectsEqual } from '~/utils/objectUtils'
 
-const StyledRolesSummary = styled.div`
+export const StyledRolesSummary = styled.div`
   position: relative;
   top: 5px;
   @media only screen and (max-width: ${v.responsive.medBreakpoint - 1}px) {
@@ -158,7 +158,6 @@ class RolesSummary extends React.Component {
 
     return (
       <AvatarGroup
-        align="right"
         avatarCount={editorCount}
         placeholderTitle="...and more editors"
       >
