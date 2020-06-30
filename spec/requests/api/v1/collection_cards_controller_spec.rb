@@ -256,12 +256,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let!(:collection) { create(:collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids" }
 
-    it 'returns id and order collection.collection_cards' do
+    it 'returns id, order, row, col of collection.collection_cards' do
       get(path)
       expect(response.status).to eq(200)
       expect(json.length).to eq(5)
       data = collection.collection_cards.map do |cc|
-        { order: cc.order, id: cc.id.to_s }
+        {
+          id: cc.id.to_s,
+          order: cc.order,
+          row: cc.row,
+          col: cc.col,
+        }
       end
       expect(json).to eq data.as_json
     end
