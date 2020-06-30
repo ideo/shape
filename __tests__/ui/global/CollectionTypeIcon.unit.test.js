@@ -119,24 +119,3 @@ describe('CollectionTypeIcon', () => {
     })
   })
 })
-
-describe('collectionIcon', () => {
-  for (const icon of Object.keys(smallCollectionTypeIconMap)) {
-    describe('when is phase type', () => {
-      it('returns the icon', () => {
-        expect(collectionIcon({ collectionType: icon })).toEqual(
-          smallCollectionTypeIconMap[icon]
-        )
-      })
-    })
-  }
-  for (const icon of Object.keys(largeCollectionTypeIconMap)) {
-    describe('when is phase type', () => {
-      it('returns the large icon when size requested', () => {
-        expect(collectionIcon({ collectionType: icon, size: 'lg' })).toEqual(
-          largeCollectionTypeIconMap[icon]
-        )
-      })
-    })
-  }
-})

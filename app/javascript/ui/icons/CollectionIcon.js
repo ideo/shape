@@ -80,7 +80,7 @@ CollectionIcon.propTypes = {
 
 CollectionIcon.defaultProps = {
   type: 'collection',
-  size: 'xs',
+  size: undefined, // Each icon defines its default size, as not all icons have all sizes
   viewBox: undefined,
 }
 
