@@ -16,6 +16,7 @@
 #  image_contain     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
+#  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
 #  section_type      :integer
@@ -313,6 +314,10 @@ class CollectionCard < ApplicationRecord
 
   def pinned_and_locked?
     pinned? && !master_template_card?
+  end
+
+  def bct_placeholder?
+    is_a?(CollectionCard::Placeholder) && parent_snapshot.present?
   end
 
   def copy_into_new_link_card

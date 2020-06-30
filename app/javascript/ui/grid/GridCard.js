@@ -527,10 +527,16 @@ class GridCard extends React.Component {
     const showRestore = searchResult && record.isRestorable
 
     let contents
-    if (card.isPrivate || _.isEmpty(record)) {
+    if (card.isPrivate) {
       contents = (
         <StyledGridCardPrivate>
           <HiddenIcon />
+        </StyledGridCardPrivate>
+      )
+    } else if (_.isEmpty(record)) {
+      contents = (
+        <StyledGridCardPrivate>
+          <CardLoader />
         </StyledGridCardPrivate>
       )
     } else {

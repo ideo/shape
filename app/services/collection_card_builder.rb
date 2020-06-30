@@ -64,22 +64,34 @@ class CollectionCardBuilder
       # NOTE: Have to lock board collections for collision detection race conditions.
       #  This means that uploading 6 files at once for example will be threadsafe,
       #  but it will slow down each concurrent API request while it waits for the lock
-      @parent_collection.lock! if @parent_collection.board_collection?
+      if @parent_collection.board_collection?
+        @parent_collection.lock!
 
-      if @parent_collection.board_collection? && !@collection_card.board_placement_is_valid?
-        # first capture these, row/col are allowed to be nil for BoardPlacement
-        row = @collection_card.row
-        col = @collection_card.col
-        # but we still want to assign the card a row/col of 0,0 so that the calculations don't break
-        @collection_card.row ||= 0
-        @collection_card.col ||= 0
-        # valid row/col will get applied to the card here for later saving
-        CollectionGrid::BoardPlacement.call(
-          row: row,
-          col: col,
-          to_collection: @parent_collection,
-          moving_cards: [@collection_card],
+        placeholder = @parent_collection.bct_placeholder_at(
+          row: @collection_card.row,
+          col: @collection_card.col,
         )
+        if placeholder.present?
+          # take over its identity
+          placeholder.destroy
+          @collection_card.id = placeholder.id
+        end
+
+        unless @collection_card.board_placement_is_valid?
+          # first capture these, row/col are allowed to be nil for BoardPlacement
+          row = @collection_card.row
+          col = @collection_card.col
+          # but we still want to assign the card a row/col of 0,0 so that the calculations don't break
+          @collection_card.row ||= 0
+          @collection_card.col ||= 0
+          # valid row/col will get applied to the card here for later saving
+          CollectionGrid::BoardPlacement.call(
+            row: row,
+            col: col,
+            to_collection: @parent_collection,
+            moving_cards: [@collection_card],
+          )
+        end
       end
 
       @collection_card.save.tap do |result|

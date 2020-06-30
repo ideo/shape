@@ -30,6 +30,7 @@ export default class UiStore {
     emptyCollection: false,
     collectionId: null,
     blankType: null,
+    placeholderCard: null,
   }
   defaultCardMenuState = {
     id: null,
@@ -750,23 +751,28 @@ export default class UiStore {
 
   // --- BCT + GridCard properties
   @action
-  openBlankContentTool(options = {}) {
+  async openBlankContentTool(options = {}) {
     const { viewingCollection } = this
-    this.deselectCards()
-    this.closeCardMenu()
-    this.clearTextEditingItem()
-    this.blankContentToolState = {
-      ...this.defaultBCTState,
-      order: 0,
-      width: 1,
-      height: 1,
-      emptyCollection:
-        viewingCollection &&
-        viewingCollection.isEmpty &&
-        !viewingCollection.isBoard,
-      collectionId: viewingCollection && viewingCollection.id,
-      ...options,
+    if (this.blankContentToolState.placeholderCard) {
+      await this.closeBlankContentTool()
     }
+    runInAction(() => {
+      this.deselectCards()
+      this.closeCardMenu()
+      this.clearTextEditingItem()
+      this.blankContentToolState = {
+        ...this.defaultBCTState,
+        order: 0,
+        width: 1,
+        height: 1,
+        emptyCollection:
+          viewingCollection &&
+          viewingCollection.isEmpty &&
+          !viewingCollection.isBoard,
+        collectionId: viewingCollection && viewingCollection.id,
+        ...options,
+      }
+    })
   }
 
   @computed
@@ -794,7 +800,7 @@ export default class UiStore {
   }
 
   @action
-  closeBlankContentTool({ force = false } = {}) {
+  async closeBlankContentTool({ force = false } = {}) {
     const { viewingCollection } = this
     if (
       !force &&
@@ -806,11 +812,23 @@ export default class UiStore {
       // -- also helps with the setup of SubmissionBox where you can close the bottom BCT
       this.openBlankContentTool()
     } else {
+      const { placeholderCard } = this.blankContentToolState
+      // TODO: ..... any other BCT cleanup?
+      if (placeholderCard) {
+        await placeholderCard.API_destroy()
+      }
       // don't over-eagerly set this observable if it's already closed
       if (this.blankContentToolIsOpen) {
-        this.blankContentToolState = { ...this.defaultBCTState }
+        runInAction(() => {
+          this.blankContentToolState = { ...this.defaultBCTState }
+        })
       }
     }
+  }
+
+  @action
+  setBctPlaceholderCard(card) {
+    this.blankContentToolState.placeholderCard = card
   }
 
   @action

@@ -384,7 +384,14 @@ class GridCardBlank extends React.Component {
       apiStore,
       uiStore,
     } = this.props
-    const { order, row, col, width, height } = uiStore.blankContentToolState
+    const {
+      order,
+      row,
+      col,
+      width,
+      height,
+      placeholderCard,
+    } = uiStore.blankContentToolState
     const isReplacing = !!replacingId
     const attrs = {
       order,
@@ -430,6 +437,12 @@ class GridCardBlank extends React.Component {
       if (isReplacing) {
         newCard = await card.API_replace({ replacingId })
       } else {
+        if (placeholderCard) {
+          // const res = await placeholderCard.patch(attrs)
+          // newCard = res.data
+          uiStore.setBctPlaceholderCard(null)
+        }
+
         newCard = await card.API_create()
       }
       // afterCreate can come passed down from props

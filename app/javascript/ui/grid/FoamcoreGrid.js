@@ -550,19 +550,30 @@ class FoamcoreGrid extends React.Component {
     uiStore.reselectCardIds(selectedCardIds)
   }
 
-  handleBlankCardClick = ({ row, col }) => e => {
-    const { selectedAreaMinX } = this.props
+  handleBlankCardClick = ({ row, col, create = false }) => e => {
+    const { apiStore, uiStore, collection, selectedAreaMinX } = this.props
 
     // If user is selecting an area, don't trigger blank card click
     if (selectedAreaMinX) {
       return
     }
 
-    const { uiStore } = this.props
     uiStore.openBlankContentTool({
       row,
       col,
     })
+
+    if (create) {
+      const placeholder = new CollectionCard(
+        {
+          row,
+          col,
+          parent_id: collection.id,
+        },
+        apiStore
+      )
+      placeholder.API_createBct()
+    }
   }
 
   @action
@@ -1496,8 +1507,10 @@ class FoamcoreGrid extends React.Component {
           // continue iteration
           return true
         }
+        // find two cards together UNLESS the card on the right isPinnedAndLocked
         const twoCardsTogether =
           col > 0 &&
+          !cardMatrix[row][col].isPinnedAndLocked &&
           cardMatrix[row][col - 1] &&
           cardMatrix[row][col - 1] !== cardMatrix[row][col]
         if (col === 0 || twoCardsTogether) {
@@ -1508,7 +1521,7 @@ class FoamcoreGrid extends React.Component {
               row={row}
               col={col}
               horizontal={false}
-              onClick={this.handleBlankCardClick({ col, row })}
+              onClick={this.handleBlankCardClick({ col, row, create: true })}
             />
           )
         }

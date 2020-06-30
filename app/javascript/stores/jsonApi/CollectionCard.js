@@ -194,6 +194,19 @@ class CollectionCard extends BaseRecord {
     }
   }
 
+  async API_createBct() {
+    const { uiStore } = this
+    try {
+      await this.create('/create_bct')
+      // `this` is now set to the newly created placeholder card
+      uiStore.setBctPlaceholderCard(this)
+    } catch (e) {
+      uiStore.closeBlankContentTool({ force: true })
+      uiStore.defaultAlertError()
+      return false
+    }
+  }
+
   async API_replace({ replacingId = null, replacingCard = null }) {
     const { uiStore } = this
     try {
@@ -393,7 +406,7 @@ class CollectionCard extends BaseRecord {
         )
 
         if (selectedCardIds.length === 0) {
-          prompt = 'Insuficcient permission to delete.'
+          prompt = 'Insufficient permission to delete.'
           if (collection.isTemplated && removedCount > 0) {
             iconName = 'Template'
             prompt = 'Pinned cards in a template instance can not be deleted.'
