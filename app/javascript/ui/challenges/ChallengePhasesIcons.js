@@ -54,7 +54,7 @@ const ChallengePhasesIcons = ({ collection }) => {
           placement="top"
         >
           <PhaseIconWrapper>
-            <CollectionIcon type={phase.icon} />
+            <CollectionIcon type={phase.icon} size="lg" />
             <DateProgressBar
               height={4}
               startDate={phase.start_date}
