@@ -204,7 +204,6 @@ class ListCard extends React.Component {
     const {
       card: { record },
     } = this.props
-    console.log('tagged users', record.tagged_users)
     if (!record.tagged_users) return []
     return record.tagged_users
   }

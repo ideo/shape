@@ -172,6 +172,9 @@ const SharedRecordMixin = superclass =>
     addTag(label, type, user) {
       this[type].push({ label, type, user })
       this.API_addRemoveTag('add', { label, type })
+      if (type === 'user_tag_list') {
+        this.tagged_users.push(user)
+      }
     }
 
     @action
@@ -180,6 +183,11 @@ const SharedRecordMixin = superclass =>
         return t.label === label && t.type === type
       })
       this.API_addRemoveTag('remove', { label, type })
+      if (type === 'user_tag_list') {
+        _.remove(this.tagged_users, u => {
+          return u.handle === label
+        })
+      }
     }
 
     async fetchChallengeReviewersGroup() {

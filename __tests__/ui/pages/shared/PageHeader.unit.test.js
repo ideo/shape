@@ -263,10 +263,6 @@ describe('PageHeader', () => {
         props.record.type = 'Collection::Board'
         expect(component.rightIcon).toEqual(null)
       })
-
-      it('should render the ChallengeSubHeader', () => {
-        expect(wrapper.find('ChallengeSubHeader').exists()).toBe(true)
-      })
     })
   })
 

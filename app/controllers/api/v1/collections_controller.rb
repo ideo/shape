@@ -203,10 +203,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     render jsonapi: collections
   end
 
-  def challenge_reviewers
-    render jsonapi: @collection.challenge_reviewers
-  end
-
   def restore_permissions
     RestorePermission.call(
       object: @collection,
