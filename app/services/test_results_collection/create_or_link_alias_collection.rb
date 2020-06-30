@@ -83,9 +83,12 @@ module TestResultsCollection
     def link_alias_collection(parent)
       alias_collection = find_or_create_alias_collection
 
-      CollectionCard::Link.find_or_create_by(
-        parent: parent,
-        collection_id: alias_collection.id,
+      create_card(
+        parent_collection: parent,
+        type: 'link',
+        params: {
+          collection_id: alias_collection.id
+        }
       )
     end
 

@@ -2,6 +2,9 @@
 
 module CollectionCardBuilderHelpers
   def create_card(params:, parent_collection:, created_by: nil, type: 'primary')
+    if params[:collection_attributes]
+      params[:collection_attributes][:num_columns] = 4
+    end
     builder = CollectionCardBuilder.new(
       params: params,
       parent_collection: parent_collection,

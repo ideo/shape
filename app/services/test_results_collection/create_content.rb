@@ -29,6 +29,9 @@ module TestResultsCollection
     end
 
     def call
+      # place this first before other cards figure out where to go
+      move_legend_item_to_third_spot if @legend_item.present?
+
       if question_card.present?
         create_content_for_item_card(question_card)
         # also call for each idea
@@ -78,12 +81,11 @@ module TestResultsCollection
             created_by: created_by,
           )
         end
-        move_test_design_to_end
       end
 
       test_collection.cache_cover!
       test_results_collection.reorder_cards!
-      move_legend_item_to_third_spot if @legend_item.present?
+      move_test_design_to_end
 
       test_results_collection.update(loading_content: false)
     end
@@ -131,7 +133,6 @@ module TestResultsCollection
           width: 1,
           height: 2,
           identifier: 'first-idea-media',
-          # order: @order += 1,
         ),
       )
     end
@@ -140,7 +141,6 @@ module TestResultsCollection
       TestResultsCollection::CreateItemLink.call!(
         default_attrs.merge(
           item: card.item,
-          # order: @order += 1,
           width: 2,
           height: 2,
         ),
@@ -153,7 +153,6 @@ module TestResultsCollection
           .except(:parent_collection)
           .merge(
             test_results_collection: test_results_collection,
-            # order: @order += 1,
           ),
       )
     end
@@ -164,7 +163,6 @@ module TestResultsCollection
           .merge(
             idea_item: idea,
             num_idea: 1,
-            # order: @order += 1,
           ),
       )
       @order = result.order
@@ -174,7 +172,6 @@ module TestResultsCollection
       create_card(
         params: {
           identifier: CardIdentifier.call(survey_response, 'OpenResponses'),
-          # order: @order += 1,
           collection_attributes: {
             name: "#{survey_response.respondent_alias} Responses",
           },
@@ -190,7 +187,6 @@ module TestResultsCollection
         test_collection: test_collection,
         created_by: created_by,
         idea: idea,
-        # order: @order += 1,
       )
     end
 
@@ -198,7 +194,6 @@ module TestResultsCollection
       TestResultsCollection::CreateOpenResponseCollection.call!(
         default_attrs.merge(
           question_item: card.item,
-          # order: @order += 1,
         ),
       )
     end
@@ -207,7 +202,6 @@ module TestResultsCollection
       result = TestResultsCollection::CreateResponseGraph.call!(
         default_attrs.merge(
           item: card.item,
-          # order: @order += 1,
           legend_item: @legend_item,
           survey_response: survey_response,
           idea: idea,
@@ -255,9 +249,6 @@ module TestResultsCollection
         row: 0,
         col: 3,
       )
-      # return if legend_card.order == 2
-
-      # legend_card.move_to_order(2)
     end
 
     def idea_items
@@ -273,11 +264,61 @@ module TestResultsCollection
     end
 
     def move_test_design_to_end
-      # Move feedback design to the end
-      test_collection
-        .reload
-        .parent_collection_card
-        .move_to_order(max_order + 1)
+      if master_results_collection?
+        update_test_collection_name
+        move_test_collection_inside_test_results
+        move_roles_to_results_collection if move_roles?
+      end
+    end
+
+    def move_roles_to_results_collection
+      test_collection.roles.each do |role|
+        role.update(resource: test_results_collection)
+      end
+      # reload to re-associate the roles
+      reload_collections
+      # reanchor the test collection and children to test_results_collection
+      test_collection.reanchor!(parent: test_results_collection, propagate: true)
+    end
+
+    def update_test_collection_name
+      test_collection.update(
+        name: "#{test_collection.name}#{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}",
+      )
+    end
+
+    def move_test_collection_inside_test_results
+      p "MOVING TEST COLLECTION INSIDE TEST RESULTS" * 100
+      test_collection.parent_collection_card.update(
+        collection_id: test_results_collection.id,
+      )
+
+      # pick up parent_collection_card relationship
+      reload_collections
+
+      create_card(
+        params: {
+          collection_id: test_collection.id,
+          width: 1,
+          height: 1,
+        },
+        parent_collection: test_results_collection,
+        created_by: created_by,
+      )
+    end
+
+    def reload_collections
+      test_collection.reload
+      test_results_collection.reload
+    end
+
+    def test_results_roles_anchor
+      # anchor the test results to whatever the test collection was anchored to (could be nil for itself)
+      test_collection.roles_anchor_collection
+    end
+
+    def move_roles?
+      test_results_roles_anchor.blank?
     end
   end
 end
