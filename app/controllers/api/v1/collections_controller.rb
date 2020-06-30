@@ -158,15 +158,16 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  # TODO: figure out permission level
   def submission_box_sub_collections
-    collections = @collection.all_child_collections
-                             .active
-                             .where(type: 'Collection::SubmissionBox')
-                             .includes(:submission_template)
-                             .select do |collection|
-                               collection.can_view?(current_user)
-                             end
-
+    challenge_collection = @collection.collection_type == 'challenge' ? @collection : @collection.parent_challenge
+    collections = challenge_collection.all_child_collections
+                                      .active
+                                      .where(type: 'Collection::SubmissionBox')
+                                      .includes(:submission_template)
+                                      .select do |collection|
+      collection.can_view?(current_user)
+    end
     submission_box_relationships = [submission_template: [:submission_template_test_collections,
                                                           submission_template_test_collections: [:test_audiences]]]
 
