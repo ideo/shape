@@ -6,6 +6,7 @@ import ModalWithNavigation from '~/ui/global/modals/ModalWithNavigation'
 import PeopleSettings from '~/ui/challenges/PeopleSettings'
 import SubmissionsSettings from '~/ui/challenges/SubmissionsSettings'
 import PhaseSettings from '~/ui/challenges/PhaseSettings'
+import ChallengeTopics from '~/ui/challenges/ChallengeTopics'
 
 const modalContents = ({ collection, submissionBoxes, onClose }) => {
   return [
@@ -35,7 +36,12 @@ const modalContents = ({ collection, submissionBoxes, onClose }) => {
         <PeopleSettings collection={collection} closeModal={onClose} />
       ),
     },
-    { name: 'Topics', component: <div></div> },
+    {
+      name: 'Topics',
+      component: (
+        <ChallengeTopics collection={collection} closeModal={onClose} />
+      ),
+    },
     { name: 'Styles', component: <div></div> },
   ]
 }

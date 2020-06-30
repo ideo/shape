@@ -126,12 +126,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     )
 
-    const tagList = _.map(this.tag_list, tag => {
-      return {
-        label: tag,
-        type: 'tag_list',
-      }
+    const tagList = []
+    _.each(['tag_list', 'topic_list'], tagType => {
+      _.each(this[tagType], tag => {
+        tagList.push({
+          label: tag,
+          type: tagType,
+        })
+      })
     })
+
     runInAction(() => {
       this.tags = [...userTagsWithUsers, ...tagList]
     })
