@@ -31,6 +31,17 @@ class CollectionList extends React.Component {
     const statuses = await collection.API_fetchCardReviewerStatues()
     runInAction(() => {
       this.reviewerStatuses = statuses
+      statuses.each(status => {
+        const card = collection.collection_cards.find(
+          card => card.record.id === status.record_id
+        )
+        if (card) {
+          const taggedUser = card.record.taggedUsers.find(
+            u => u.id === status.user_id
+          )
+          taggedUser.color = v.statusColor[status.status]
+        }
+      })
     })
   }
 

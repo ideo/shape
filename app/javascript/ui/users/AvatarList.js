@@ -6,6 +6,7 @@ import AvatarGroup from '~/ui/global/AvatarGroup'
 import { StyledRolesSummary } from '~/ui/roles/RolesSummary'
 
 const AvatarList = ({ avatars, onAdd }) => {
+  console.log('avatars', [...avatars])
   return (
     <StyledRolesSummary>
       <div className="roles-summary--inner">
