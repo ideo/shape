@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import Banner from '~/ui/layout/Banner'
 import PillList from '~/ui/global/PillList'
@@ -6,7 +8,13 @@ import v from '~/utils/variables'
 import { Heading3 } from '~/ui/global/styled/typography'
 import CloseIcon from '~/ui/icons/CloseIcon'
 
-const formatTags = ({ tags, suggestions, onSelect }) => {
+const CloseTagWrapper = styled.div`
+  width: 15px;
+  cursor: pointer;
+  float: right;
+`
+
+const formatSuggestedTags = ({ suggestions, existingTags, onSelect }) => {
   return suggestions.map((suggestion, idx) => {
     const formattedTag = {
       id: idx,
@@ -14,7 +22,7 @@ const formatTags = ({ tags, suggestions, onSelect }) => {
       name: suggestion,
       label: suggestion,
       selectable: true,
-      selected: tags.includes(suggestion),
+      selected: existingTags.includes(suggestion),
     }
     formattedTag.onSelect = () => onSelect && onSelect(suggestion)
     return formattedTag
@@ -22,13 +30,23 @@ const formatTags = ({ tags, suggestions, onSelect }) => {
 }
 
 const SuggestedTagsBanner = ({ collection, suggestions }) => {
+  const [formattedTags, setFormattedTags] = useState([])
+
+  useEffect(() => {
+    setFormattedTags(
+      formatSuggestedTags({
+        suggestions,
+        existingTags: collection.tag_list,
+        onSelect,
+      })
+    )
+  }, [collection.tag_list.join(',')])
+
   const onSelect = tag => {
     if (collection.tag_list.includes(tag)) {
-      console.log('onSelect - add tag')
-      collection.addTag(tag, 'tag_list')
-    } else {
-      console.log('onSelect - remove tag')
       collection.removeTag(tag, 'tag_list')
+    } else {
+      collection.addTag(tag, 'tag_list')
     }
   }
 
@@ -44,19 +62,13 @@ const SuggestedTagsBanner = ({ collection, suggestions }) => {
           <Heading3 color={v.colors.white} style={{ marginRight: '20px' }}>
             Add Tags To Your Idea
           </Heading3>
-          <PillList
-            itemList={formatTags({
-              tags: collection.tag_list,
-              suggestions,
-              onSelect,
-            })}
-          />
+          <PillList itemList={formattedTags} />
         </React.Fragment>
       }
       rightComponent={
-        <div onClick={hideBanner} style={{ width: '20px', cursor: 'pointer' }}>
+        <CloseTagWrapper onClick={hideBanner}>
           <CloseIcon />
-        </div>
+        </CloseTagWrapper>
       }
     />
   )
