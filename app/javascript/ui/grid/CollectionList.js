@@ -1,6 +1,7 @@
 import React from 'react'
+import { observable, runInAction } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import ListCard, { Column } from './ListCard'
@@ -8,14 +9,29 @@ import { Heading3 } from '~/ui/global/styled/typography'
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
+@observer
 class CollectionList extends React.Component {
+  @observable
+  reviewerStatuses = []
+
   componentDidMount() {
     this.fetchCards()
+    if (this.insideChallenge) {
+      this.fetchReviewerStatuses()
+    }
   }
 
   fetchCards({ sort } = {}) {
     const { collection } = this.props
     collection.API_fetchCardRoles()
+  }
+
+  async fetchReviewerStatuses() {
+    const { collection } = this.props
+    const statuses = await collection.API_fetchCardReviewerStatues()
+    runInAction(() => {
+      this.reviewerStatuses = statuses
+    })
   }
 
   get insideChallenge() {
