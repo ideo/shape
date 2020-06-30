@@ -204,8 +204,9 @@ class ListCard extends React.Component {
     const {
       card: { record },
     } = this.props
-    if (!record.user_tag_list) return []
-    return _.compact(record.user_tag_list.map(t => t.user))
+    console.log('tagged users', record.tagged_users)
+    if (!record.tagged_users) return []
+    return record.tagged_users
   }
 
   get renderLabelSelector() {

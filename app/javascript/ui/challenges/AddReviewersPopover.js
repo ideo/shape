@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -6,7 +5,6 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Checkbox } from '~/ui/global/styled/forms'
 import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import InlineModal from '~/ui/global/modals/InlineModal'
-import { apiStore } from '~/stores'
 
 @observer
 class AddReviewersPopover extends React.Component {
@@ -53,7 +51,6 @@ class AddReviewersPopover extends React.Component {
 
   render() {
     const { onClose, open, wrapperRef } = this.props
-    console.log('render', [...this.currentReviewers])
     return (
       <InlineModal
         title=""
