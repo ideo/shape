@@ -980,7 +980,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   // Fetch all children submission boxes of this collection
   API_fetchSubmissionBoxSubCollections() {
-    const apiPath = `collections/${this.id}/submission_box_sub_collections`
+    const apiPath = `collections/${this.id}/challenge_submission_boxes`
     return this.apiStore.request(apiPath)
   }
 

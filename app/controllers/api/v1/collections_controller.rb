@@ -20,7 +20,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
-    render_collection
+    render_collection(
+      include: Collection.default_relationships_for_api + [:tagged_users],
+    )
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
@@ -158,19 +160,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
-  def submission_box_sub_collections
-    collections = @collection.all_child_collections
-                             .active
-                             .where(type: 'Collection::SubmissionBox')
-                             .includes(:submission_template)
-                             .select do |collection|
-                               collection.can_view?(current_user)
-                             end
-
+  def challenge_submission_boxes
+    challenge_submission_boxes = @collection.challenge_submission_boxes.select do |collection|
+      collection.can_view?(current_user)
+    end
     submission_box_relationships = [submission_template: [:submission_template_test_collections,
                                                           submission_template_test_collections: [:test_audiences]]]
 
-    render jsonapi: collections,
+    render jsonapi: challenge_submission_boxes,
            include: Collection.default_relationships_for_api
                               .concat(
                                 submission_box_relationships,
