@@ -1149,6 +1149,10 @@ class Collection < ApplicationRecord
     # NOTE: somehow unachoring changes collection_type back to 'collection', so re-set it to 'challenge'
     self.collection_type = 'challenge'
 
+    created_by.add_role(Role::ADMIN, admin_group)
+    created_by.add_role(Role::ADMIN, reviewer_group)
+    created_by.add_role(Role::ADMIN, participant_group)
+
     admin_group.add_role(Role::EDITOR, self)
     reviewer_group.add_role(Role::VIEWER, self)
     participant_group.add_role(Role::VIEWER, self)

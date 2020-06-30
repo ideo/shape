@@ -143,16 +143,27 @@ describe Collection, type: :model do
 
     describe '#create_challenge_groups_and_assign_roles' do
       let(:organization) { create(:organization) }
-      let!(:collection) { create(:collection, organization: organization, collection_type: 'project') }
+      let (:current_user) { create(:user) }
+      let!(:collection) { create(:collection, organization: organization, collection_type: 'project', created_by: current_user) }
+
+      before do
+        collection.update(collection_type: 'challenge')
+      end
 
       it 'should create a challenge admin group, participant group, and reviewer group' do
-        expect(collection.challenge_admin_group_id.present?).to be false
-        expect(collection.challenge_participant_group_id.present?).to be false
-        expect(collection.challenge_reviewer_group_id.present?).to be false
-        collection.update(collection_type: 'challenge')
-        expect(collection.challenge_admin_group_id.present?).to be true
-        expect(collection.challenge_participant_group_id.present?).to be true
-        expect(collection.challenge_reviewer_group_id.present?).to be true
+        # expect(collection.challenge_admin_group_id.present?).to be false
+        # expect(collection.challenge_participant_group_id.present?).to be false
+        # expect(collection.challenge_reviewer_group_id.present?).to be false
+        # collection.update(collection_type: 'challenge')
+        admin_group = collection.challenge_admin_group
+        reviewer_group = collection.challenge_reviewer_group
+        participant_group = collection.challenge_participant_group
+        expect(admin_group.present?).to be true
+        expect(reviewer_group.present?).to be true
+        expect(reviewer_group.present?).to be true
+        expect(admin_group.can_edit?(current_user)).to be true
+        expect(reviewer_group.can_edit?(current_user)).to be true
+        expect(participant_group.can_edit?(current_user)).to be true
       end
     end
 
