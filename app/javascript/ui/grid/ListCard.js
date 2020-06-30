@@ -20,6 +20,7 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
+import { ReviewButton } from '~/ui/global/challenge/shared'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { routingStore, uiStore } from '~/stores'
@@ -261,8 +262,48 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
-  render() {
+  get renderActions() {
     const { card, insideChallenge, searchResult } = this.props
+    const { record } = card
+
+    if (!insideChallenge) {
+      return (
+        <ActionMenu
+          location={searchResult ? 'Search' : 'GridCard'}
+          card={card}
+          canView={record.can_view}
+          canEdit={this.canEditCard}
+          canReplace={record.canReplace && !card.link && !searchResult}
+          menuOpen={this.menuOpen}
+          onOpen={this.handleActionMenuClick}
+          onLeave={this.handleCloseMenu}
+          menuItemsCount={this.getMenuItemsCount}
+        />
+      )
+    }
+
+    const {
+      submission_reviewer_status,
+      launchableTestId,
+      isReviewable,
+    } = record
+
+    if (submission_reviewer_status && launchableTestId && isReviewable) {
+      return (
+        <ReviewButton
+          reviewerStatus={submission_reviewer_status}
+          onClick={() => {
+            routingStore.routeTo('tests', launchableTestId)
+          }}
+        />
+      )
+    }
+
+    return null
+  }
+
+  render() {
+    const { card, insideChallenge } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
@@ -317,17 +358,7 @@ class ListCard extends React.Component {
         </Column>
         {/* stopPropagation so that ActionMenu overrides handleRowClick */}
         <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
-          <ActionMenu
-            location={searchResult ? 'Search' : 'GridCard'}
-            card={card}
-            canView={record.can_view}
-            canEdit={this.canEditCard}
-            canReplace={record.canReplace && !card.link && !searchResult}
-            menuOpen={this.menuOpen}
-            onOpen={this.handleActionMenuClick}
-            onLeave={this.handleCloseMenu}
-            menuItemsCount={this.getMenuItemsCount}
-          />
+          {this.renderActions}
         </Column>
       </Row>
     )

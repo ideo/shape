@@ -12,6 +12,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import CarouselCover from '~/ui/grid/covers/CarouselCover'
 import Button from '~/ui/global/Button'
+import { ReviewButton } from '~/ui/global/challenge/shared'
 import { RoundPill } from '~/ui/global/styled/forms'
 import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
@@ -296,33 +297,6 @@ class CollectionCover extends React.Component {
     return cover.image_url
   }
 
-  get renderChallengeButton() {
-    const { collection } = this.props
-    const { submission_reviewer_status } = collection
-
-    let name
-    if (submission_reviewer_status === 'completed') {
-      name = 'Revisit'
-    } else {
-      name = 'Review'
-    }
-
-    return (
-      <Button
-        style={{ marginLeft: '3.2rem' }}
-        className="cancelGridClick"
-        colorScheme={`${v.colors.alert}`}
-        size="sm"
-        width={172}
-        onClick={() => {
-          routingStore.routeTo('tests', collection.launchableTestId)
-        }}
-      >
-        {name}
-      </Button>
-    )
-  }
-
   @action
   setEmptyCarousel = () => {
     this.hasEmptyCarousel = true
@@ -477,9 +451,17 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
-                  {inSubmissionsCollection &&
-                    isReviewable &&
-                    this.renderChallengeButton}
+                  {inSubmissionsCollection && isReviewable && (
+                    <ReviewButton
+                      reviewerStatus={collection.submission_reviewer_status}
+                      onClick={() => {
+                        routingStore.routeTo(
+                          'tests',
+                          collection.launchableTestId
+                        )
+                      }}
+                    />
+                  )}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (
