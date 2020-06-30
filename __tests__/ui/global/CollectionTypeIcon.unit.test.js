@@ -1,8 +1,4 @@
-import CollectionTypeIcon, {
-  collectionIcon,
-  smallCollectionTypeIconMap,
-  largeCollectionTypeIconMap,
-} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import { fakeCollection } from '#/mocks/data'
 
 const props = {

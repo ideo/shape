@@ -14,7 +14,7 @@ class Search
       end
 
       def modify_query
-        remove_regexp
+        remove_regexp&.strip
       end
     end
   end

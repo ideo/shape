@@ -146,6 +146,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionCardsAddRemoveTagWorker.perform_async(
       @collection_cards.map(&:id),
       json_api_params[:tag],
+      json_api_params[:type],
       :add,
       current_user.id,
     )
@@ -156,6 +157,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionCardsAddRemoveTagWorker.perform_async(
       @collection_cards.map(&:id),
       json_api_params[:tag],
+      json_api_params[:type],
       :remove,
       current_user.id,
     )
@@ -553,7 +555,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         cover_type
         submissions_enabled
         test_show_media
-        tag_list
         search_term
         num_columns
         start_date
@@ -577,7 +578,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :legend_item_id,
         :legend_search_source,
-        :tag_list,
+        tag_list: [],
+        user_tag_list: [],
         data_content: {},
         style: {},
         filestack_file_attributes: [

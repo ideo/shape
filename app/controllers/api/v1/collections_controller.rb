@@ -20,7 +20,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
-    render_collection
+    render_collection(
+      include: Collection.default_relationships_for_api + [:tagged_users],
+    )
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
@@ -158,15 +160,16 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  # TODO: figure out permission level
   def submission_box_sub_collections
-    collections = @collection.all_child_collections
-                             .active
-                             .where(type: 'Collection::SubmissionBox')
-                             .includes(:submission_template)
-                             .select do |collection|
-                               collection.can_view?(current_user)
-                             end
-
+    challenge_collection = @collection.collection_type == 'challenge' ? @collection : @collection.parent_challenge
+    collections = challenge_collection.all_child_collections
+                                      .active
+                                      .where(type: 'Collection::SubmissionBox')
+                                      .includes(:submission_template)
+                                      .select do |collection|
+      collection.can_view?(current_user)
+    end
     submission_box_relationships = [submission_template: [:submission_template_test_collections,
                                                           submission_template_test_collections: [:test_audiences]]]
 
@@ -378,6 +381,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :end_date,
       :icon,
       :show_icon_on_cover,
+      user_tag_list: [],
       collection_cards_attributes: %i[id order width height row col pinned],
     ].concat(Collection.globalize_attribute_names)
   end

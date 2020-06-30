@@ -63,10 +63,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   searchResultsCollection = null
   @observable
   phaseSubCollections = []
+  @observable
+  tags = []
 
   attributesForAPI = [
     'name',
     'tag_list',
+    'user_tag_list',
     'submission_template_id',
     'submission_box_type',
     'collection_to_test_id',
@@ -109,6 +112,31 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @computed
   get nextPage() {
     return this.currentPage + 1
+  }
+
+  initializeTags = async () => {
+    const userTagsWithUsers = await Promise.all(
+      _.map(this.user_tag_list, async tag => {
+        const userSearch = await this.apiStore.searchUsers({ query: tag })
+        // NOTE: assumes that the first search result is the user described in the tag
+        const user = _.get(userSearch, 'data[0]')
+        return {
+          label: tag,
+          type: 'user_tag_list',
+          user: user.toJSON(), // how do we not use .toJSON() here
+        }
+      })
+    )
+
+    const tagList = _.map(this.tag_list, tag => {
+      return {
+        label: tag,
+        type: 'tag_list',
+      }
+    })
+    runInAction(() => {
+      this.tags = [...userTagsWithUsers, ...tagList]
+    })
   }
 
   @action
@@ -723,6 +751,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const filterQuery = activeFilters.map(filter => {
       if (filter.filter_type === 'tag') {
         return `#${filter.text.replace(spaces, '-')}`
+      } else if (filter.filter_type === 'user_tag') {
+        return `@${filter.text}`
       } else {
         return filter.text
       }
@@ -967,7 +997,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     } else {
       // Otherwise we need to load the challenge colleciton
       const res = await this.apiStore.request(
-        `collections/${this.challenge_id}`
+        `collections/${this.challenge.id}`
       )
       return res.data
     }

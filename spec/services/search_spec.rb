@@ -8,6 +8,7 @@ RSpec.describe Search do
         'name^50',
         'handle^50',
         'tags^20',
+        'user_tags^20',
         'content',
       ],
       boost_by: { activity_count: { factor: 0.2, missing: 0 } },
@@ -55,12 +56,13 @@ RSpec.describe Search do
     end
 
     it 'applies and combines filters' do
-      search.apply_filters('#case-study within:123456')
+      search.apply_filters('#case-study within:123456 @someone')
       expect(
         search.options[:where],
       ).to eq(
         parent_ids: { all: [123_456] },
         tags: { all: ['case study'] },
+        user_tags: { all: ['someone'] }
       )
     end
   end
