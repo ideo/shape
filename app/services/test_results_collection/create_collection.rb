@@ -71,8 +71,7 @@ module TestResultsCollection
         idea: idea,
         loading_content: true,
       )
-      p "CREATING MASTER COLLECTION" * 100
-      p collection
+
       return collection if collection.persisted?
 
       context.fail!(

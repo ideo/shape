@@ -264,11 +264,11 @@ module TestResultsCollection
     end
 
     def move_test_design_to_end
-      if master_results_collection?
-        update_test_collection_name
-        move_test_collection_inside_test_results
-        move_roles_to_results_collection if move_roles?
-      end
+      return unless master_results_collection?
+
+      update_test_collection_name
+      move_test_collection_inside_test_results
+      move_roles_to_results_collection if move_roles?
     end
 
     def move_roles_to_results_collection
@@ -288,7 +288,6 @@ module TestResultsCollection
     end
 
     def move_test_collection_inside_test_results
-      p "MOVING TEST COLLECTION INSIDE TEST RESULTS" * 100
       test_collection.parent_collection_card.update(
         collection_id: test_results_collection.id,
       )

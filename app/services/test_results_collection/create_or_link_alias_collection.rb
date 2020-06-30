@@ -87,8 +87,8 @@ module TestResultsCollection
         parent_collection: parent,
         type: 'link',
         params: {
-          collection_id: alias_collection.id
-        }
+          collection_id: alias_collection.id,
+        },
       )
     end
 

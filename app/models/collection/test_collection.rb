@@ -769,7 +769,6 @@ class Collection
         created_by: initiated_by || created_by,
       )
       return test_results_collection if result.success?
-      p "CREATE RESULTS COLLECTION SUCCESSS" * 100
 
       errors.add(:base, result.message)
       false

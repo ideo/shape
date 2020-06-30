@@ -245,8 +245,8 @@ Rails.application.routes.draw do
     require 'sidekiq-scheduler/web'
     require 'sidekiq/api'
     mount Sidekiq::Web => '/sidekiq'
-    match 'queue-status' => proc { [200, {'Content-Type' => 'text/plain'}, [Sidekiq::Queue.new.size < 100 ? 'OK' : 'UHOH']] }, via: :get
-    match 'queue-latency' => proc { [200, {'Content-Type' => 'text/plain'}, [Sidekiq::Queue.new.latency < 30 ? 'OK' : 'UHOH']] }, via: :get
+    match 'queue-status' => proc { [200, { 'Content-Type' => 'text/plain' }, [Sidekiq::Queue.new.size < 100 ? 'OK' : 'UHOH']] }, via: :get
+    match 'queue-latency' => proc { [200, { 'Content-Type' => 'text/plain' }, [Sidekiq::Queue.new.latency < 30 ? 'OK' : 'UHOH']] }, via: :get
   end
 
   namespace :callbacks do
