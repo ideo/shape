@@ -9,28 +9,16 @@ import DateProgressBar from '~/ui/global/DateProgressBar'
 import { FormatDateRange } from '~/ui/grid/CollectionDateRange'
 import { SmallHelperText, TooltipHeader } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 
-// Temporary Icons
-import BuildIcon from '~/ui/icons/challenge_phases/BuildIcon'
-import FeedbackIcon from '~/ui/icons/challenge_phases/FeedbackIcon'
-import ResearchIcon from '~/ui/icons/challenge_phases/ResearchIcon'
-import SelectionIcon from '~/ui/icons/challenge_phases/SelectionIcon'
-
-const PhaseIcon = styled.div`
+const PhaseIconWrapper = styled.div`
   width: 32px;
   margin-right: 5px;
   .icon {
     max-height: 30px;
   }
 `
-PhaseIcon.displayName = 'PhaseIcon'
-
-export const phaseIcons = [
-  <BuildIcon />,
-  <FeedbackIcon />,
-  <ResearchIcon />,
-  <SelectionIcon />,
-]
+PhaseIconWrapper.displayName = 'PhaseIconWrapper'
 
 const ChallengePhasesIcons = ({ collection }) => {
   const [phases, setPhases] = useState([])
@@ -65,14 +53,14 @@ const ChallengePhasesIcons = ({ collection }) => {
           }
           placement="top"
         >
-          <PhaseIcon>
-            {phaseIcons[i % 4]}
+          <PhaseIconWrapper>
+            <CollectionIcon type={phase.icon} />
             <DateProgressBar
               height={4}
               startDate={phase.start_date}
               endDate={phase.end_date}
             />
-          </PhaseIcon>
+          </PhaseIconWrapper>
         </Tooltip>
       ))}
     </Flex>
