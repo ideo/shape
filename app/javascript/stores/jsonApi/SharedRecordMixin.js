@@ -195,6 +195,8 @@ const SharedRecordMixin = superclass =>
       if (!this.challengeForCollection) return []
       const challenge = await this.challengeForCollection()
       if (!challenge) return []
+
+      // NOTE: assumes that the reviewer group are the reviewers
       const res = await this.apiStore.request(
         `/groups/${challenge.challenge_reviewer_group_id}`,
         'GET'

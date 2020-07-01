@@ -35,6 +35,8 @@ class TestsController < ApplicationController
       look_up_test_audience
       # if you're invited to a test audience it'll set to `invalid` if that audience is closed
       @invalid = @test_audience.nil? || @test_audience.closed?
+    elsif @collection.challenge_or_inside_challenge?
+      look_up_challenge_test_audience
     elsif !@collection.link_sharing_enabled?
       # if no test audience param, then you can only view the test if link_sharing_enabled
       @invalid = true
@@ -55,6 +57,21 @@ class TestsController < ApplicationController
         @test_audience = invitation.test_audience
       end
     end
+  end
+
+  def look_up_challenge_test_audience
+    return unless user_signed_in? && current_user.present?
+
+    reviewer_group = @collection&.parent_challenge&.challenge_reviewer_group
+
+    return unless reviewer_group.present? && reviewer_group.user_ids.include?(current_user.id)
+
+    # use master template test audience
+    test_audiences = @collection.template.test_audiences
+    return unless test_audiences.present?
+
+    # tests will share the same submission template reviewer test audience
+    @test_audience = test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
   end
 
   def redirect_to_test
