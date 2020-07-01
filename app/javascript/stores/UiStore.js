@@ -909,12 +909,15 @@ export default class UiStore {
   }
 
   reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
-    const filteredCards = _.filter(
-      this.apiStore.findAll('collection_cards'),
-      card =>
-        _.includes(cardIds, card.id) &&
-        (card.link || (card.record && card.record.can_edit))
-    )
+    const filteredCards = this.apiStore
+      .findAll('collection_cards')
+      .filter(
+        card =>
+          _.includes(cardIds, card.id) &&
+          (card.link ||
+            (card.record && card.record.can_edit) ||
+            (card.isBctPlaceholder && card.can_edit_parent))
+      )
     const filteredCardIds = _.map(filteredCards, 'id')
     const removedCount = this.selectedCardIds.length - filteredCardIds.length
     this.reselectCardIds(filteredCardIds)

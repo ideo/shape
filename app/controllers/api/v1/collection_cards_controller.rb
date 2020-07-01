@@ -94,12 +94,17 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     card_params = collection_card_params
     # CollectionCardBuilder type expects 'primary' or 'link'
     card_type = card_params.delete(:card_type) || 'primary'
+    placeholder = nil
+    placeholder_card_id = json_api_params[:data][:placeholder_card_id]
+    if placeholder_card_id.present?
+      placeholder = CollectionCard::Placeholder.find_by_id(placeholder_card_id)
+    end
 
     builder = CollectionCardBuilder.new(params: card_params,
                                         type: card_type,
                                         parent_collection: @collection,
-                                        user: current_user)
-
+                                        user: current_user,
+                                        placeholder: placeholder)
     if builder.create
       @collection_card = builder.collection_card
       # reload the user's roles

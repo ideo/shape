@@ -118,7 +118,11 @@ module JsonapiCache
           next if @search_result
 
           # private_card allows frontend to hide or display "private" as needed
-          json[:data][:attributes][:private_card] = true unless card.is_a?(CollectionCard::Placeholder)
+          if card.is_a?(CollectionCard::Placeholder)
+            json[:data][:attributes][:can_edit_parent] = can_edit_parent
+          else
+            json[:data][:attributes][:private_card] = true
+          end
           # massage json api relationships to indicate this record is not included
           json[:data][:relationships][:record] = { meta: { included: false } }
         end

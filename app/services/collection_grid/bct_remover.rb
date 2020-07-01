@@ -15,8 +15,10 @@ module CollectionGrid
 
     def move_cards_back
       # use this service so that template updates also flow through
-      CollectionUpdater.call(@collection, snapshot)
-      broadcaster.card_attrs_updated(snapshot[:collection_cards_attributes])
+      moved = CollectionUpdater.call(@collection, collection_cards_attributes: prev_collection_cards_attributes)
+      return unless moved
+
+      broadcaster.card_attrs_updated(prev_collection_cards_attributes)
     end
 
     def broadcast_updates
@@ -25,6 +27,27 @@ module CollectionGrid
 
     def snapshot
       @placeholder_card.parent_snapshot.deep_symbolize_keys
+    end
+
+    def prev_collection_cards_attributes
+      @prev_collection_cards_attributes ||= begin
+        card_ids = snapshot[:collection_cards_attributes].pluck(:id)
+        attrs = []
+        ids = @collection.collection_cards
+                         .where(id: card_ids)
+                         .pluck(:id, :row, :col)
+        ids.each do |id, row, col|
+          snap = snapshot[:collection_cards_attributes].select { |i| i[:id] == id }.first
+          next if snap[:row] != row || snap[:col] != col
+
+          attrs << {
+            id: snap[:id],
+            row: snap[:row_was],
+            col: snap[:col_was],
+          }
+        end
+        attrs
+      end
     end
 
     def broadcaster

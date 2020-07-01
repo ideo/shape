@@ -51,24 +51,28 @@ module CollectionGrid
       moving_cards = moving_cards.select(&:changed?)
       return if moving_cards.none?
 
+      parent_snapshot = {collection_cards_attributes: []}
+
       moving_cards.each do |cc|
-        puts "*** moving #{cc.id} from #{cc.row_was},#{cc.col_was} -> #{cc.row},#{cc.col}"
-        @card_attributes_was << {
-          id: cc.id,
-          row: cc.row_was,
-          col: cc.col_was,
-        }
+        # @card_attributes_was << {
+        #   id: cc.id,
+        #   row: cc.row_was,
+        #   col: cc.col_was,
+        # }
         @card_attributes << {
           id: cc.id,
           row: cc.row,
           col: cc.col,
         }
+        parent_snapshot[:collection_cards_attributes] << {
+          id: cc.id,
+          row: cc.row,
+          col: cc.col,
+          row_was: cc.row_was,
+          col_was: cc.col_was,
+        }
       end
-      @placeholder.update(
-        parent_snapshot: {
-          collection_cards_attributes: @card_attributes_was,
-        },
-      )
+      @placeholder.update(parent_snapshot: parent_snapshot)
       # use this service so that template updates also flow through
       CollectionUpdater.call(@collection, collection_cards_attributes: @card_attributes)
       broadcaster.card_attrs_updated(@card_attributes)

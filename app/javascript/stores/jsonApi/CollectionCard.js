@@ -46,9 +46,9 @@ class CollectionCard extends BaseRecord {
   ]
 
   @observable
-  maxWidth = this.width
+  maxWidth = this.width || 1
   @observable
-  maxHeight = this.height
+  maxHeight = this.height || 1
 
   constructor(...args) {
     super(...args)
@@ -110,6 +110,10 @@ class CollectionCard extends BaseRecord {
 
   get isLoadingPlaceholder() {
     return this.type === COLLECTION_CARD_TYPES.PLACEHOLDER
+  }
+
+  get isBctPlaceholder() {
+    return this.isLoadingPlaceholder && _.isEmpty(this.record)
   }
 
   get parentCollection() {
@@ -174,10 +178,18 @@ class CollectionCard extends BaseRecord {
 
   async API_create() {
     const { uiStore } = this
+    const { placeholderCard } = uiStore.blankContentToolState
+
     try {
+      const data = this.toJsonApi()
+      if (placeholderCard) {
+        data.placeholder_card_id = placeholderCard.id
+      }
       const res = await this.apiStore.request('collection_cards', 'POST', {
-        data: this.toJsonApi(),
+        data,
       })
+      // unset this so it does not call placeholderCard.API_destroy() when closing BCT
+      uiStore.setBctPlaceholderCard(null)
       // important to close BCT before adding the new card so that the grid reflows properly
       uiStore.closeBlankContentTool({ force: true })
       const { record } = res.data
@@ -239,6 +251,10 @@ class CollectionCard extends BaseRecord {
 
   async API_destroy() {
     const { uiStore } = this
+    if (!this.isBctPlaceholder && !this.parentCollection.isTestCollection) {
+      // these are the only types that should actually call destroy
+      return
+    }
     try {
       this.destroy()
       this.parentCollection.removeCard(this)

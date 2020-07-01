@@ -31,11 +31,11 @@ RSpec.describe CollectionGrid::BctInserter, type: :service do
         cards[2].update(row: 1, col: 1, width: 2)
       end
 
-      it 'saves the prior snapshot of the moved cards' do
+      it 'saves the previous and current location snapshot of the moved cards' do
         expect(placeholder.parent_snapshot).to eq({
           collection_cards_attributes: [
-            { id: cards[1].id, row: 0, col: 2 },
-            { id: cards[2].id, row: 1, col: 1 },
+            { id: cards[1].id, row: 1, col: 0, row_was: 0, col_was: 2 },
+            { id: cards[2].id, row: 1, col: 2, row_was: 1, col_was: 1 },
           ],
         }.as_json)
       end

@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observable, computed, action } from 'mobx'
@@ -533,7 +532,7 @@ class GridCard extends React.Component {
           <HiddenIcon />
         </StyledGridCardPrivate>
       )
-    } else if (_.isEmpty(record)) {
+    } else if (card.isBctPlaceholder) {
       contents = (
         <StyledGridCardPrivate>
           <CardLoader />
