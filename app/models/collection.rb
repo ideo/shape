@@ -948,44 +948,6 @@ class Collection < ApplicationRecord
                     .positive?
   end
 
-  # This assumes the submissions have tagged_users eager-loaded
-  def self.submission_reviewer_statuses(challenge:, submissions:)
-    reviewer_ids = User.where(handle: parent_challenge.user_tag.pluck(:text)).pluck(:id)
-    test_ids = submission_collections.map do |submission|
-      submission.submission_attrs['launchable_test_id']
-    end
-    survey_responses_by_test_id = SurveyResponse.where(
-      test_collection_id: test_ids,
-      user_id: reviewer_ids,
-    ).each_with_object({}) do |sr, h|
-      h[sr.test_collection_id] ||= []
-      h[sr.test_collection_id] << sr
-    end
-
-    data = []
-
-    submissions.each do |submission|
-      test_id = submission.submission_attrs['launchable_test_id']
-      submission.tagged_users.each do |user|
-        survey_response = survey_responses_by_test_id[test_id]&.find { |sr| sr.user_id == user.id }
-        status = if survey_response.blank
-                   :unstarted
-                 elsif survey_response.completed?
-                   :completed
-                 else
-                   :in_progress
-                 end
-        data.push(
-          user_id: user.id,
-          status: status,
-          record_id: submission.id,
-        )
-      end
-    end
-
-    data
-  end
-
   def submission_reviewer_status(user)
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
