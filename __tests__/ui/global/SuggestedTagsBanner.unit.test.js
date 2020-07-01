@@ -11,6 +11,7 @@ describe('SuggestedTagsBanner', () => {
       collection: {
         ...fakeCollection,
         submissionTypeName: 'Workplace Idea',
+        API_hideSubmissionTopicSuggestions: jest.fn(),
       },
     }
     // mount so we can easily access left and right components
@@ -24,10 +25,12 @@ describe('SuggestedTagsBanner', () => {
     )
   })
 
-  // TODO: add test once hiding functionality is completed
-  // it('dismisses banner when x is clicked', () => {
-  //   wrapper.find('CloseTagWrapper').simulate('click', {})
-  // })
+  it('dismisses banner when x is clicked', () => {
+    wrapper.find('CloseTagWrapper').simulate('click')
+    expect(
+      props.collection.API_hideSubmissionTopicSuggestions
+    ).toHaveBeenCalled()
+  })
 })
 
 describe('formatSuggestedTags', () => {

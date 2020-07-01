@@ -57,7 +57,7 @@ const SuggestedTagsBanner = ({ collection, suggestions }) => {
   }
 
   const hideBanner = () => {
-    console.log('hide banner')
+    collection.API_hideSubmissionTopicSuggestions()
   }
 
   return (

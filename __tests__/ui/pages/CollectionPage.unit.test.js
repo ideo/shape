@@ -359,8 +359,7 @@ describe('CollectionPage', () => {
       wrapper.setProps({
         collection: {
           ...collection,
-          isInsideAChallenge: true,
-          isSubmission: true,
+          showSubmissionTopicSuggestions: true,
           parent_challenge: {
             ...collection,
             topic_list: ['apples', 'bananas'],

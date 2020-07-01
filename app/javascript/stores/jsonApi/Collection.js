@@ -451,6 +451,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get showSubmissionTopicSuggestions() {
+    const isSubmissionInChallenge =
+      this.isInsideAChallenge && this.isSubmission && this.createdByCurrentUser
+
+    return (
+      isSubmissionInChallenge &&
+      (!this.submission_attrs || !this.submission_attrs.hide_topic_suggestions)
+    )
+  }
+
   get isTestCollection() {
     return this.type === 'Collection::TestCollection'
   }
@@ -655,6 +665,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isEmpty() {
     return this.collection_cards.length === 0
+  }
+
+  get createdByCurrentUser() {
+    const { currentUser } = this.apiStore
+    if (!currentUser) return false
+    return currentUser.id === this.created_by_id
   }
 
   get numPaidQuestions() {
@@ -994,6 +1010,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   API_fetchPhaseSubCollections() {
     const apiPath = `collections/${this.id}/phase_sub_collections`
     return this.apiStore.request(apiPath)
+  }
+
+  API_hideSubmissionTopicSuggestions() {
+    if (!this.submission_attrs) return false
+    this.submission_attrs.hide_topic_suggestions = true
+    this.save()
   }
 
   async challengeForCollection() {
