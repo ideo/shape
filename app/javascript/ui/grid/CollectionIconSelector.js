@@ -46,7 +46,7 @@ const CollectionIconSelector = ({ selectedIcon, onSelectIcon }) => {
         onCancel={() => setModalOpen(false)}
         anchorElement={selectRef && selectRef.current}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-        hideButtons
+        noButtons
       >
         <div style={{ width: '160px', minHeight: '160px' }}>
           {Object.keys(allIcons).map(iconName => {
