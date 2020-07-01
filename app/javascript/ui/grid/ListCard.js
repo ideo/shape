@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { action, computed, observable, runInAction } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -22,9 +22,9 @@ import VideoIcon from '~/ui/icons/VideoIcon'
 import { ReviewButton } from '~/ui/global/challenge/shared'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
-import { routingStore, uiStore } from '~/stores'
 import { openContextMenu } from '~/utils/clickUtils'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 
 export const Column = styled.div`
   ${DisplayTextCss}
@@ -97,6 +97,7 @@ const IconHolder = styled.div`
   width: 16px;
 `
 
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class ListCard extends React.Component {
   @observable
@@ -111,11 +112,12 @@ class ListCard extends React.Component {
 
   @computed
   get menuOpen() {
+    const { uiStore } = this.props
     return uiStore.actionMenuOpenForCard(this.props.card.id)
   }
 
   get isSelected() {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     return uiStore.isSelected(card.id)
   }
 
@@ -126,7 +128,7 @@ class ListCard extends React.Component {
   }
 
   handleRecordClick = ev => {
-    const { card } = this.props
+    const { card, uiStore, routingStore } = this.props
     ev.preventDefault()
     ev.stopPropagation()
     if (uiStore.captureKeyboardGridClick(ev, card.id)) {
@@ -136,7 +138,7 @@ class ListCard extends React.Component {
   }
 
   handleRowClick = ev => {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     ev.preventDefault()
     ev.stopPropagation()
     if (uiStore.captureKeyboardGridClick(ev, card.id)) {
@@ -147,7 +149,7 @@ class ListCard extends React.Component {
 
   handleContextMenu = ev => {
     const { menuItemCount, props } = this
-    const { card } = props
+    const { card, uiStore } = props
 
     ev.preventDefault()
     if (uiStore.isAndroid) return false
@@ -160,7 +162,7 @@ class ListCard extends React.Component {
   }
 
   handleActionMenuClick = ev => {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     ev.stopPropagation()
 
     uiStore.openContextMenu(ev, {
@@ -169,6 +171,7 @@ class ListCard extends React.Component {
   }
 
   handleCloseMenu = () => {
+    const { uiStore } = this.props
     // this happens when you mouse off the ActionMenu
     if (this.menuOpen) {
       // if we right-clicked, keep the menu open
@@ -180,6 +183,7 @@ class ListCard extends React.Component {
 
   handleRolesClick = ev => {
     const {
+      uiStore,
       card: { record },
       insideChallenge,
     } = this.props
@@ -205,6 +209,16 @@ class ListCard extends React.Component {
     } = this.props
     if (!record.tagged_users) return []
     return record.tagged_users
+  }
+
+  get cardsForTagging() {
+    const { apiStore } = this.props
+    if (apiStore.selectedCards.length > 0) {
+      return apiStore.selectedCards
+    } else {
+      const { card } = this.props
+      return [card]
+    }
   }
 
   get renderLabelSelector() {
@@ -267,22 +281,31 @@ class ListCard extends React.Component {
   }
 
   get renderActions() {
-    const { card, searchResult, insideChallenge } = this.props
+    const { card, insideChallenge } = this.props
     const { record } = card
 
     if (!insideChallenge) {
+      const { uiStore, searchResult } = this.props
+      const tagEditorOpen = uiStore.tagsModalOpenId === card.id
       return (
-        <ActionMenu
-          location={searchResult ? 'Search' : 'GridCard'}
-          card={card}
-          canView={record.can_view}
-          canEdit={this.canEditCard}
-          canReplace={record.canReplace && !card.link && !searchResult}
-          menuOpen={this.menuOpen}
-          onOpen={this.handleActionMenuClick}
-          onLeave={this.handleCloseMenu}
-          menuItemsCount={this.getMenuItemsCount}
-        />
+        <Fragment>
+          <ActionMenu
+            location={searchResult ? 'Search' : 'GridCard'}
+            card={card}
+            canView={record.can_view}
+            canEdit={this.canEditCard}
+            canReplace={record.canReplace && !card.link && !searchResult}
+            menuOpen={this.menuOpen}
+            onOpen={this.handleActionMenuClick}
+            onLeave={this.handleCloseMenu}
+            menuItemsCount={this.getMenuItemsCount}
+          />
+          <CollectionCardsTagEditorModal
+            cards={this.cardsForTagging}
+            canEdit={this.canEditCard}
+            open={tagEditorOpen}
+          />
+        </Fragment>
       )
     }
 
@@ -309,7 +332,7 @@ class ListCard extends React.Component {
   }
 
   render() {
-    const { card, insideChallenge } = this.props
+    const { card, insideChallenge, uiStore } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
@@ -379,6 +402,12 @@ class ListCard extends React.Component {
     )
   }
 }
+ListCard.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   insideChallenge: PropTypes.bool,

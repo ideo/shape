@@ -1,29 +1,11 @@
 import PropTypes from 'prop-types'
 import Icon from '~/ui/icons/Icon'
 
-/*
-Previously-defined style on large icon
-<style>
-  .st0{fill:none;stroke:#000;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10}
-</style>
-*/
-
 const LargeIcon = () => (
   <Icon>
-    <svg
-      version="1.1"
-      id="Layer_1"
-      xmlns="http://www.w3.org/2000/svg"
-      x="0"
-      y="0"
-      viewBox="0 0 32 32"
-      xmlSpace="preserve"
-    >
-      <path
-        className="st0"
-        d="M16.013 3.361v10.441M20.409 9.777l-4.421 4.413-4.413-4.413M18.624 14.644h3.907l2.543 6.316H18.16a2.163 2.163 0 11-4.328 0H6.919l2.543-6.316h3.941"
-      />
-      <path className="st0" d="M25.023 20.96v4.547H7.003V20.96" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+      <path d="M15.5 14.6c.1.1.3.2.5.2s.3-.1.5-.2l4.4-4.4c.3-.3.3-.7 0-.9-.3-.3-.7-.3-.9 0l-3.3 3.3V3.4c0-.4-.3-.6-.6-.6s-.7.2-.7.6v9.3L12 9.3c-.3-.3-.7-.3-.9 0-.3.3-.3.7 0 .9l4.4 4.4z" />
+      <path d="M25.7 20.7l-2.5-6.3c-.2-.2-.4-.4-.7-.4h-3.9c-.4 0-.7.3-.7.6s.3.6.7.6h3.5l2 5h-6c-.4 0-.7.3-.7.7 0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5c0-.4-.3-.7-.6-.7h-6l2-5h3.5c.4 0 .6-.3.6-.6s-.1-.6-.5-.6H9.5c-.3 0-.5.2-.6.4l-2.5 6.3c-.1.2 0 .4 0 .5v4.3c0 .4.3.7.6.7h18c.4 0 .7-.3.7-.7v-4.3-.5zm-18 4.2v-3.2h5.6c.3 1.2 1.4 2.2 2.7 2.2s2.4-.9 2.7-2.2h5.6v3.2H7.7z" />
     </svg>
   </Icon>
 )

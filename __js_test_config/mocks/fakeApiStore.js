@@ -71,6 +71,7 @@ const fakeApiStore = ({
     alwaysShowCurrentThread: jest.fn(),
     updateModelId: jest.fn().mockImplementation((obj, id) => (obj.id = id)),
     unreadActivityCount: 0,
+    selectedCards: [],
 
     usersThreadPagesToLoad: 1,
     loadingThreads: false,
