@@ -13,8 +13,13 @@ const CloseTagWrapper = styled.div`
   cursor: pointer;
   float: right;
 `
+CloseTagWrapper.displayName = 'CloseTagWrapper'
 
-const formatSuggestedTags = ({ suggestions, existingTags, onSelect }) => {
+export const formatSuggestedTags = ({
+  suggestions,
+  existingTags,
+  onSelect,
+}) => {
   return suggestions.map((suggestion, idx) => {
     const formattedTag = {
       id: idx,
@@ -31,6 +36,7 @@ const formatSuggestedTags = ({ suggestions, existingTags, onSelect }) => {
 
 const SuggestedTagsBanner = ({ collection, suggestions }) => {
   const [formattedTags, setFormattedTags] = useState([])
+  const { submissionTypeName } = collection
 
   useEffect(() => {
     setFormattedTags(
@@ -51,7 +57,7 @@ const SuggestedTagsBanner = ({ collection, suggestions }) => {
   }
 
   const hideBanner = () => {
-    console.log('hide banner')
+    collection.API_hideSubmissionTopicSuggestions()
   }
 
   return (
@@ -60,7 +66,7 @@ const SuggestedTagsBanner = ({ collection, suggestions }) => {
       leftComponent={
         <React.Fragment>
           <Heading3 color={v.colors.white} style={{ marginRight: '20px' }}>
-            Add Tags To Your Idea
+            Add Tags To Your {submissionTypeName || 'Idea'}
           </Heading3>
           <PillList itemList={formattedTags} />
         </React.Fragment>

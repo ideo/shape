@@ -623,14 +623,12 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Helmet title={collection.pageTitle} />
-        {!isLoading &&
-          collection.isInsideAChallenge &&
-          collection.isSubmission && (
-            <SuggestedTagsBanner
-              collection={collection}
-              suggestions={collection.parent_challenge.topic_list}
-            />
-          )}
+        {!isLoading && collection.showSubmissionTopicSuggestions && (
+          <SuggestedTagsBanner
+            collection={collection}
+            suggestions={collection.parent_challenge.topic_list}
+          />
+        )}
         {this.renderPageHeader()}
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal

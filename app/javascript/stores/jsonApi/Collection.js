@@ -451,6 +451,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get showSubmissionTopicSuggestions() {
+    const isSubmissionInChallenge =
+      this.isInsideAChallenge && this.isSubmission && this.canEdit
+
+    if (!isSubmissionInChallenge) return false
+
+    const hasTopics =
+      this.parent_challenge.topic_list &&
+      this.parent_challenge.topic_list.length > 0
+
+    return (
+      hasTopics &&
+      (!this.submission_attrs || !this.submission_attrs.hide_topic_suggestions)
+    )
+  }
+
   get isTestCollection() {
     return this.type === 'Collection::TestCollection'
   }
@@ -994,6 +1010,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   API_fetchPhaseSubCollections() {
     const apiPath = `collections/${this.id}/phase_sub_collections`
     return this.apiStore.request(apiPath)
+  }
+
+  API_hideSubmissionTopicSuggestions() {
+    if (!this.submission_attrs) return false
+    this.submission_attrs.hide_topic_suggestions = true
+    this.save()
   }
 
   async challengeForCollection() {
