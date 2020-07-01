@@ -42,7 +42,6 @@ const modalContents = ({ collection, submissionBoxes, onClose }) => {
         <ChallengeTopics collection={collection} closeModal={onClose} />
       ),
     },
-    { name: 'Styles', component: <div></div> },
   ]
 }
 
