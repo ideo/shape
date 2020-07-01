@@ -491,9 +491,10 @@ class CollectionCover extends React.Component {
                       <ReviewButton
                         reviewerStatus={submission_reviewer_status}
                         onClick={() => {
-                          routingStore.routeTo(
-                            'tests',
-                            collection.launchableTestId
+                          collection.navigateToNextAvailableInCollectionTestOrTest(
+                            {
+                              submissionCollection: collection,
+                            }
                           )
                         }}
                       />

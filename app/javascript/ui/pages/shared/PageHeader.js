@@ -165,13 +165,9 @@ class PageHeader extends React.Component {
     uiStore.update('challengeSettingsOpen', open)
   }
 
-  handleReviewSubmissionsClick = async () => {
-    const { record, routingStore } = this
-    await record.API_getNextAvailableChallengeTest()
-    const { nextAvailableTestPath } = record
-    if (nextAvailableTestPath) {
-      routingStore.routeTo(nextAvailableTestPath)
-    }
+  handleReviewSubmissionsClick = () => {
+    const { record } = this
+    record.navigateToNextAvailableInCollectionTestOrTest()
   }
 
   openMoveMenuForTemplate = e => {

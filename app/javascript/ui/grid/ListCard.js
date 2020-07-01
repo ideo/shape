@@ -297,7 +297,9 @@ class ListCard extends React.Component {
         <ReviewButton
           reviewerStatus={submission_reviewer_status}
           onClick={() => {
-            routingStore.routeTo('tests', launchableTestId)
+            record.navigateToNextAvailableInCollectionTestOrTest({
+              submissionCollection: record,
+            })
           }}
         />
       )

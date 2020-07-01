@@ -1522,6 +1522,32 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
 
+  async navigateToNextAvailableInCollectionTestOrTest({
+    submissionCollection = null,
+  }) {
+    const submissionBoxOrSubmission = submissionCollection
+      ? submissionCollection
+      : this
+
+    if (submissionBoxOrSubmission.collection_to_test_id) {
+      // must-be an in-collection test
+      await submissionBoxOrSubmission.API_getNextAvailableChallengeTest()
+      if (submissionBoxOrSubmission.nextAvailableTestPath) {
+        return submissionBoxOrSubmission.routingStore.routeTo(
+          submissionBoxOrSubmission.nextAvailableTestPath
+        )
+      }
+    }
+
+    if (submissionBoxOrSubmission.launchableTestId) {
+      window.location.href = submissionBoxOrSubmission.publicTestURL
+      return
+    }
+
+    // not able to find collection_to_test_id or launchableTestId
+    return null
+  }
+
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path

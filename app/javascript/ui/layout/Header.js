@@ -122,13 +122,9 @@ class Header extends React.Component {
     uiStore.update('challengeSettingsOpen', open)
   }
 
-  handleReviewSubmissions = async () => {
-    const { record, routingStore } = this
-    await record.API_getNextAvailableChallengeTest()
-    const { nextAvailableTestPath } = record
-    if (nextAvailableTestPath) {
-      routingStore.routeTo(nextAvailableTestPath)
-    }
+  handleReviewSubmissions = () => {
+    const { record } = this
+    record.navigateToNextAvailableInCollectionTestOrTest()
   }
 
   get onArchivedPage() {
