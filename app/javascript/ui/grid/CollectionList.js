@@ -16,7 +16,7 @@ class CollectionList extends React.Component {
 
   componentDidMount() {
     this.fetchCards()
-    if (this.insideChallenge) {
+    if (this.submissionBoxInsideChallenge) {
       this.fetchReviewerStatuses()
     }
   }
@@ -28,17 +28,20 @@ class CollectionList extends React.Component {
 
   async fetchReviewerStatuses() {
     const { collection } = this.props
-    const statuses = await collection.API_fetchCardReviewerStatues()
+    const res = await collection.API_fetchCardReviewerStatues()
+    const statuses = res.data
+    if (!statuses) return
     runInAction(() => {
       this.reviewerStatuses = statuses
-      statuses.each(status => {
+      statuses.forEach(status => {
         const card = collection.collection_cards.find(
-          card => card.record.id === status.record_id
+          card => parseInt(card.record.id) === parseInt(status.record_id)
         )
         if (card) {
-          const taggedUser = card.record.taggedUsers.find(
-            u => u.id === status.user_id
+          const taggedUser = card.record.tagged_users.find(
+            u => parseInt(u.id) === parseInt(status.user_id)
           )
+          if (!taggedUser) return
           taggedUser.color = v.statusColor[status.status]
         }
       })
@@ -47,7 +50,10 @@ class CollectionList extends React.Component {
 
   get submissionBoxInsideChallenge() {
     const { collection } = this.props
-    return collection.isSubmissionBox && collection.isChallengeOrInsideChallenge
+    return (
+      collection.isSubmissionsCollection &&
+      collection.isChallengeOrInsideChallenge
+    )
   }
 
   get columns() {
