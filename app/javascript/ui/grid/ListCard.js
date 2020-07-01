@@ -229,6 +229,14 @@ class ListCard extends React.Component {
     )
   }
 
+  get showReviewers() {
+    const {
+      card: { record },
+      insideChallenge,
+    } = this.props
+    return insideChallenge && record.internalType !== 'items'
+  }
+
   get canEditCard() {
     const { card, searchResult } = this.props
     if (searchResult) return false
@@ -271,7 +279,7 @@ class ListCard extends React.Component {
   }
 
   render() {
-    const { card, insideChallenge, searchResult } = this.props
+    const { card, searchResult } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
@@ -305,7 +313,7 @@ class ListCard extends React.Component {
         <Column width="400px">{defaultTimeFormat(record.updated_at)}</Column>
         <Column width="250px">
           <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
-            {insideChallenge ? (
+            {this.showReviewers ? (
               <AvatarList
                 avatars={this.taggedUsers}
                 onAdd={this.handleRolesClick}
@@ -321,7 +329,7 @@ class ListCard extends React.Component {
                 rolesMenuOpen={!!uiStore.rolesMenuOpen}
               />
             )}
-            {insideChallenge && (
+            {this.showReviewers && (
               <AddReviewersPopover
                 record={record}
                 onClose={this.handleCloseReviewers}

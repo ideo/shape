@@ -20,7 +20,11 @@ class CollectionList extends React.Component {
 
   get insideChallenge() {
     const { collection } = this.props
-    return collection.isChallengeOrInsideChallenge
+    return (
+      collection.isChallengeOrInsideChallenge &&
+      collection.isSubmissionsCollection &&
+      collection.submissionFormat === 'template'
+    )
   }
 
   get columns() {
