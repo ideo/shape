@@ -629,6 +629,12 @@ class CollectionPage extends React.Component {
             suggestions={collection.parent_challenge.topic_list}
           />
         )}
+        {!isLoading && (
+          <Fragment>
+            <ArchivedBanner />
+            <OverdueBanner />
+          </Fragment>
+        )}
         {this.renderPageHeader()}
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
@@ -637,8 +643,6 @@ class CollectionPage extends React.Component {
         )}
         {!isLoading && (
           <Fragment>
-            <ArchivedBanner />
-            <OverdueBanner />
             <PageContainer
               fullWidth={
                 collection.isBoard &&
