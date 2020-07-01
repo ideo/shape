@@ -34,11 +34,16 @@ const TagEditor = ({
   }
 
   const handleAddition = tagData => {
+    // If tag is created from a suggestion it has the right data, otherwise we need to add a label property
+    if (!tagData.label && tagData.name) tagData.label = tagData.name
     const { label, internalType, user } = tagData
     const type = internalType === 'users' ? 'user_tag_list' : 'tag_list'
 
-    const duplicateTag = _.find(formattedTags, t => {
-      return t.label.toUpperCase() === label.toUpperCase() && t.type === type
+    const duplicateTag = _.find(formattedTags, existingTag => {
+      return (
+        existingTag.label.toUpperCase() === label.toUpperCase() &&
+        existingTag.type === type
+      )
     })
 
     // Return if duplicate tag is found
