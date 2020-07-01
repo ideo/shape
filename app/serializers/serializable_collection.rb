@@ -44,7 +44,6 @@ class SerializableCollection < BaseJsonSerializer
     :organization_id,
     :joinable_group_id,
     :default_group_id,
-    :created_by_id,
   )
 
   belongs_to :submissions_collection
