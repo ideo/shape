@@ -1,7 +1,7 @@
 class TestsController < ApplicationController
   include ApplicationHelper
   include IdeoSsoHelper
-  before_action :load_test_collection, only: %i[show token_auth num_submissions_to_review]
+  before_action :load_test_collection, only: %i[show token_auth]
   before_action :load_test_audience_into_session, only: %i[show]
   before_action :redirect_to_test, only: %i[show]
 
@@ -17,13 +17,6 @@ class TestsController < ApplicationController
   before_action :look_up_test_audience_invitation, only: :token_auth
   def token_auth
     redirect_to ideo_sso_token_auth_url(@user_token)
-  end
-
-  def num_submissions_to_review
-    num_submissions = @collection.parent_submission_box
-                                 .available_submission_tests(for_user: current_user)
-                                 .size
-    render json: { num_submissions: num_submissions }
   end
 
   private

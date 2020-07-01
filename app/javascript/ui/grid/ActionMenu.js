@@ -14,7 +14,7 @@ import CommentIcon from '~/ui/icons/CommentIcon'
 import PrintIcon from '~/ui/icons/PrintIcon'
 import SelectAllIcon from '~/ui/icons/SelectAllIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
-import SubmissionBoxIconSm from '~/ui/icons/SubmissionBoxIconSm'
+import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import TagIcon from '~/ui/icons/TagIcon'
 import TrashIconXl from '~/ui/icons/TrashIconXl'
@@ -248,7 +248,7 @@ class ActionMenu extends React.Component {
     if (submissionBox) {
       items.unshift({
         name: 'Sub. Box Settings',
-        iconRight: <SubmissionBoxIconSm />,
+        iconRight: <SubmissionBoxIcon size="sm" />,
         onClick: this.openSubmissionBoxSettings,
       })
     }

@@ -3,7 +3,7 @@ import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
 
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import EditableName from '~/ui/pages/shared/EditableName'
 import IconHolder from '~/ui/icons/IconHolder'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
@@ -16,7 +16,7 @@ const ChallengeFixedHeader = ({
   handleShowSettings,
   handleReviewSubmissions,
 }) => {
-  const { name, collection_type } = collection
+  const { name, collection_type, icon } = collection
   return (
     <MaxWidthContainer>
       {/* Show subheader if a parent collection is a challenge */}
@@ -40,10 +40,7 @@ const ChallengeFixedHeader = ({
             marginTop={8}
             marginLeft={10}
           >
-            {collectionTypeToIcon({
-              type: collection_type,
-              size: 'lg',
-            })}
+            <CollectionIcon type={icon} size="lg" />
           </IconHolder>
         </Box>
 

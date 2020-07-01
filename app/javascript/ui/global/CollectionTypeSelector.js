@@ -3,7 +3,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action } from 'mobx'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import { capitalize } from 'lodash'
 import { Fragment } from 'react'
@@ -63,7 +63,7 @@ class CollectionTypeSelector extends React.Component {
     return collectionTypes.map(collectionType => {
       return {
         name: collectionType,
-        iconRight: collectionTypeToIcon({ type: collectionType, size: 'sm' }),
+        iconRight: <CollectionIcon type={collectionType} size="xs" />,
         onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
         withAvatar: false,

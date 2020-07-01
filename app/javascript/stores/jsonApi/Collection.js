@@ -78,6 +78,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'test_show_media',
     'collection_type',
     'search_term',
+    'icon',
+    'show_icon_on_cover',
   ]
 
   constructor(...args) {
@@ -128,12 +130,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     )
 
-    const tagList = _.map(this.tag_list, tag => {
-      return {
-        label: tag,
-        type: 'tag_list',
-      }
+    const tagList = []
+    _.each(['tag_list', 'topic_list'], tagType => {
+      _.each(this[tagType], tag => {
+        tagList.push({
+          label: tag,
+          type: tagType,
+        })
+      })
     })
+
     runInAction(() => {
       this.tags = [...userTagsWithUsers, ...tagList]
     })
@@ -1000,13 +1006,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       const res = await this.apiStore.request(
         `collections/${this.parent_challenge_id}`
       )
-      this.parentChallenge = res.data
+      runInAction(() => {
+        this.parentChallenge = res.data
+      })
       return res.data
     }
   }
 
   async loadPhaseSubCollections() {
-    return this.API_fetchPhaseSubCollections()
+    const request = await this.API_fetchPhaseSubCollections()
+    return request.data
   }
 
   async createChildPhaseCollection(name) {

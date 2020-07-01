@@ -29,23 +29,24 @@ class InlineModal extends React.PureComponent {
     onConfirm && onConfirm()
   }
 
-  render() {
-    const {
-      children,
-      open,
-      leftButton,
-      noButtons,
-      anchorElement,
+  get popoverProps() {
+    const { anchorElement, open, anchorOrigin } = this.props
+    const popProps = {
       anchorOrigin,
-    } = this.props
+      open,
+      onClose: this.handleCancel,
+    }
+    if (anchorElement) {
+      popProps.anchorEl = anchorElement
+      popProps.anchorReference = 'anchorEl'
+    }
+    return popProps
+  }
+
+  render() {
+    const { children, leftButton, noButtons } = this.props
     return (
-      <Popover
-        open={open}
-        onClose={this.handleCancel}
-        anchorOrigin={anchorOrigin}
-        anchorEl={anchorElement}
-        anchorReference="anchorEl"
-      >
+      <Popover {...this.popoverProps}>
         {noButtons ? (
           <NoGridWrapper>{children}</NoGridWrapper>
         ) : (

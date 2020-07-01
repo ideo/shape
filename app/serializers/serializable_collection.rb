@@ -36,6 +36,8 @@ class SerializableCollection < BaseJsonSerializer
     :challenge_reviewer_group_id,
     :challenge_admin_group_id,
     :challenge_participant_group_id,
+    :icon,
+    :show_icon_on_cover,
   )
 
   stringified_attributes(
@@ -73,15 +75,19 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :tag_list do
-    @object.tag_list.any? ? @object.tag_list.compact : []
+    @object.cached_tag_list.presence || []
+  end
+
+  attribute :topic_list do
+    @object.cached_topic_list.presence || []
   end
 
   attribute :user_tag_list do
-    @object.cached_user_tag_list.present? && @object.cached_user_tag_list.any? ? @object.cached_user_tag_list.compact : []
+    @object.cached_user_tag_list.presence || []
   end
 
   attribute :inherited_tag_list do
-    @object.cached_owned_tag_list || []
+    @object.cached_owned_tag_list.presence || []
   end
 
   attribute :cover do

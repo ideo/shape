@@ -38,6 +38,11 @@ const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
     // If theres only one data point, we want the line chart to span whole chart
     values[0].date = domain.x[0]
     values[1].date = domain.x[1]
+    // If the whole chart only has one date, we still want line chart to span
+    // the whole chart.
+    if (domain.x[0] === domain.x[1]) {
+      values[1].date = new Date()
+    }
   }
   if (simpleDateTooltip) {
     tooltipFn = datum => dateTooltipText(datum, dataset.name)

@@ -6,12 +6,10 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
 import AvatarList from '~/ui/users/AvatarList'
-import CollectionIconXs from '~/ui/icons/CollectionIconXs'
-import CollectionTypeIcon, {
-  collectionTypeToIcon,
-} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import { highlightedCardCss } from '~/ui/grid/shared'
@@ -220,10 +218,7 @@ class ListCard extends React.Component {
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
         <IconHolder>
-          {collectionTypeToIcon({
-            type: record.collection_type,
-            size: 'lg',
-          })}
+          <CollectionIcon type={record.icon} size="lg" />
         </IconHolder>
       </CollectionTypeSelector>
     )
@@ -244,7 +239,7 @@ class ListCard extends React.Component {
       return (
         <Fragment>
           <IconHolder>
-            <CollectionIconXs />
+            <CollectionIcon size="xs" />
           </IconHolder>
           <IconHolder>
             <CollectionTypeIcon record={card.record} />

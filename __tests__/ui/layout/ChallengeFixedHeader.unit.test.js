@@ -9,6 +9,7 @@ describe('ChallengeFixedHeader', () => {
       collection: {
         ...fakeCollection,
         name: 'Reusable Cup Challenge',
+        icon: 'challenge',
       },
       handleShowSettings: jest.fn(),
       handleReviewSubmissions: jest.fn(),
@@ -33,7 +34,7 @@ describe('ChallengeFixedHeader', () => {
     })
 
     it('should render a challenge icon', () => {
-      expect(wrapper.find('ChallengeIcon').exists()).toEqual(true)
+      expect(wrapper.find('CollectionIcon').props().type).toEqual('challenge')
     })
 
     it('should not render challenge ChallengeSubHeader', () => {

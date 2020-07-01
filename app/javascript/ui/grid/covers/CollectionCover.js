@@ -18,7 +18,7 @@ import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
   IconHolder,
 } from '~/ui/grid/covers/CollectionCoverTitle'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CollectionDateRange from '~/ui/grid/CollectionDateRange'
 import DateProgressBar from '~/ui/global/DateProgressBar'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
@@ -107,6 +107,11 @@ const calcTopAndBottom = props => {
   }
 }
 
+const CoverIconWrapper = styled.div`
+  position: relative; /* Need a style rule for it to work */
+`
+CoverIconWrapper.displayName = 'CoverIconWrapper'
+
 const StyledCardContent = styled.div`
   .top,
   .bottom {
@@ -149,6 +154,27 @@ const StyledCardContent = styled.div`
     left: 40%;
     padding-right: 2rem;
   `};
+
+  ${CoverIconWrapper} {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: ${props => v.defaultGridSettings.gridH * props.height}px;
+    color: ${v.colors.commonMedium};
+    overflow: hidden;
+    .icon {
+      left: -20%;
+      ${props =>
+        props.height > 1
+          ? `
+        height: 70%;
+        width: 70%;
+        top: 15%;
+      `
+          : `height: 130%; width: 130%; top: -15%`}
+    }
+  }
 `
 StyledCardContent.displayName = 'StyledCardContent'
 
@@ -356,16 +382,13 @@ class CollectionCover extends React.Component {
       inSubmissionsCollection,
       isReviewable,
     } = this.props
-    const { subtitle, collection_type } = collection
+    const { subtitle, collection_type, icon, show_icon_on_cover } = collection
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
-    const collectionIcon =
-      collection_type !== 'collection' &&
-      collection_type !== 'foamcore' &&
-      collectionTypeToIcon({
-        type: collection_type,
-        size: 'lg',
-      })
+    const collIcon = collection_type !== 'collection' &&
+      collection_type !== 'foamcore' && (
+        <CollectionIcon type={collection_type} />
+      )
 
     return (
       <StyledCollectionCover
@@ -393,6 +416,11 @@ class CollectionCover extends React.Component {
             useTextBackground={this.useTextBackground}
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
+            {show_icon_on_cover && (
+              <CoverIconWrapper>
+                <CollectionIcon type={icon} size="xxl" />
+              </CoverIconWrapper>
+            )}
             {collection.isPhaseOrProject &&
               collection.start_date &&
               collection.end_date && (
@@ -433,13 +461,12 @@ class CollectionCover extends React.Component {
                           useTextBackground={this.useTextBackground}
                         />
                       </PlainLink>
-                      {/* Swap for collection type selector */}
-                      {collectionIcon && (
+                      {collIcon && (
                         <CollectionTypeSelector
                           location={'CollectionCover'}
                           collection={collection}
                         >
-                          <IconHolder>{collectionIcon}</IconHolder>
+                          <IconHolder>{collIcon}</IconHolder>
                         </CollectionTypeSelector>
                       )}
                     </Dotdotdot>
