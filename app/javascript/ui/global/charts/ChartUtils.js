@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import color from 'color'
-import { maxBy, minBy } from 'lodash'
+import { isEqual, maxBy, minBy } from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import moment from 'moment-mini'
 import styled from 'styled-components'
@@ -103,6 +103,10 @@ export const chartDomainForDatasetValues = ({ values, maxYDomain }) => {
   if (numValuesWithDates > 0) {
     minXDomain = minBy(values, 'date').date
     maxXDomain = maxBy(values, 'date').date
+    const allDates = values.map(v => v.date)
+    if (allDates.every(d => isEqual(d, allDates[0]))) {
+      maxXDomain = new Date()
+    }
   } else {
     minXDomain = 1
     maxXDomain = values.length
@@ -151,7 +155,8 @@ export const tierTooltipLabel = ({ tiers, datum, dataset }) => {
 
 export const dateTooltipText = (datum, datasetName = null) => {
   if (!datum.date) return datum.value
-  const text = `${datum.value} on ${utcMoment(datum.date).format('l')}`
+  const dateToShow = datum.tooltipDate || datum.date
+  const text = `${datum.value} on ${utcMoment(dateToShow).format('l')}`
   if (!datasetName) return text
   return `${datasetName}\n${text}`
 }
@@ -210,6 +215,10 @@ export const addDuplicateValueIfSingleValue = (
   const duplicateValue = {
     ...valuesWithDupe[0],
     isDuplicate: true,
+  }
+
+  if (isEqual(addStartDate, addEndDate)) {
+    duplicateValue.tooltipDate = valuesWithDupe[0].date
   }
   // Set given date
   if (duplicateValue.date && addEndDate) {
