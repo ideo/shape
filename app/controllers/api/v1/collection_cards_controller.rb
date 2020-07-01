@@ -59,13 +59,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def reviewer_statuses
-    statuses = @collection_cards.map do |card|
-      card.record.tagged_users.map do |user|
-        status = card.record&.submission_reviewer_status(user) || :unstarted
-        { user_id: user.id, status: status, record_id: card.record.id }
-      end
-    end
-    render json: statuses.compact.flatten
+    submissions = @collection_cards.map(&:record)
+    parent_challenge = submissions.first&.parent_challenge
+    result = SubmissionReviewerStatuses.call(
+      challenge: parent_challenge,
+      submissions: submissions,
+    )
+    render json: result.data
   end
 
   def create
