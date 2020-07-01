@@ -472,11 +472,18 @@ class PageHeader extends React.Component {
     }
   }
 
+  get tagsEditorOpen() {
+    const {
+      record: { parent_collection_card },
+      uiStore: { tagsModalOpenId },
+    } = this.props
+    return (
+      parent_collection_card && tagsModalOpenId === parent_collection_card.id
+    )
+  }
+
   render() {
     const { record, uiStore, routingStore } = this.props
-    const tagEditorOpen =
-      record.parent_collection_card &&
-      uiStore.tagsModalOpenId === record.parent_collection_card.id
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
@@ -582,7 +589,7 @@ class PageHeader extends React.Component {
         <CollectionCardsTagEditorModal
           canEdit={record.canEdit}
           cards={this.cardsForTagging}
-          open={tagEditorOpen}
+          open={this.tagsEditorOpen}
         />
       </StyledHeader>
     )
