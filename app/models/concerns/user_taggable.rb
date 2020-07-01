@@ -63,28 +63,26 @@ module UserTaggable
         user_id: @user_tag_remove_user_ids,
       ).destroy_all
       after_remove_tagged_user_ids(@user_tag_remove_user_ids)
-      @user_tag_remove_user_ids = nil
     end
 
-    return if @user_tag_add_user_ids.blank?
+    if @user_tag_add_user_ids.present?
+      @user_tag_add_user_ids.each do |user_id|
+        UserTag.create(
+          record_id: id,
+          record_type: self.class.base_class.name,
+          user_id: user_id,
+        )
+      end
 
-    @user_tag_add_user_ids.each do |user_id|
-      UserTag.create(
-        record_id: id,
-        record_type: self.class.base_class.name,
-        user_id: user_id,
-      )
+      after_add_tagged_user_ids(@user_tag_add_user_ids)
     end
 
     # Reload so relationship isn't cached if assigning in-memory object instance
-    tagged_users.reload if @user_tag_add_user_ids.present?
+    tagged_users.reload if @user_tag_remove_user_ids || @user_tag_add_user_ids.present?
 
     # Set to nil so it is reloaded when accessed again,
     # so any invalid handles aren't preserved
     @user_tag_list = nil
-    after_add_tagged_user_ids(@user_tag_add_user_ids)
-
-    @user_tag_add_user_ids = nil
   end
 
   def after_remove_tagged_user_ids(user_ids)

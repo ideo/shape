@@ -175,12 +175,13 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def next_available_challenge_test
-    test = @collection.next_available_tagged_submission_test(
+    test = @collection.next_available_challenge_test(
       for_user: current_user,
       omit_id: nil,
-    ).first
-    if test.present? && test.collection_to_test.present?
-      render jsonapi: test.collection_to_test
+    )
+    # FIXME: need to handle in-collection tests
+    if test.present?
+      render jsonapi: test
     else
       render json: nil
     end

@@ -382,7 +382,14 @@ class CollectionCover extends React.Component {
       inSubmissionsCollection,
       isReviewable,
     } = this.props
-    const { subtitle, collection_type, icon, show_icon_on_cover } = collection
+    const {
+      subtitle,
+      collection_type,
+      icon,
+      show_icon_on_cover,
+      submission_reviewer_status,
+    } = collection
+
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collIcon = collection_type !== 'collection' &&
@@ -478,17 +485,19 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
-                  {inSubmissionsCollection && isReviewable && (
-                    <ReviewButton
-                      reviewerStatus={collection.submission_reviewer_status}
-                      onClick={() => {
-                        routingStore.routeTo(
-                          'tests',
-                          collection.launchableTestId
-                        )
-                      }}
-                    />
-                  )}
+                  {inSubmissionsCollection &&
+                    isReviewable &&
+                    submission_reviewer_status && (
+                      <ReviewButton
+                        reviewerStatus={submission_reviewer_status}
+                        onClick={() => {
+                          routingStore.routeTo(
+                            'tests',
+                            collection.launchableTestId
+                          )
+                        }}
+                      />
+                    )}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (

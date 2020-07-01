@@ -133,8 +133,15 @@ class Collection
       # none are available if the editor has not launched
       return [] if sub_attrs.blank? || sub_attrs['test_status'] != 'live'
 
-      test_ids = submissions.map do |submission|
-        submission.submission_attrs['launchable_test_id']
+      test_ids = []
+
+      submissions.each do |submission|
+        # disclude from available tests if submission is inside a challenge
+        next if parent_challenge.present? &&
+                submission.cached_user_tag_list.exclude?(for_user&.handle) &&
+                submission_reviewer_status(for_user) == :completed
+
+        test_ids << submission.submission_attrs['launchable_test_id']
       end
       if for_user.present?
         user_responses = SurveyResponse.where(

@@ -20,12 +20,13 @@ class CollectionList extends React.Component {
 
   get submissionBoxInsideChallenge() {
     const { collection } = this.props
-    return collection.isSubmissionBox && collection.isChallengeOrInsideChallenge
+    return (
+      collection.isSubmissionsCollection &&
+      collection.isChallengeOrInsideChallenge
+    )
   }
 
   get columns() {
-    const { collection } = this.props
-
     return [
       { displayName: '', style: { width: '50px' }, name: 'select' },
       {
@@ -37,9 +38,7 @@ class CollectionList extends React.Component {
         displayName: 'Last updated',
         name: 'last_updated',
         style: {
-          width: !(this.insideChallenge && collection.isSubmissionBox)
-            ? '400px'
-            : '300px',
+          width: !this.submissionBoxInsideChallenge ? '400px' : '300px',
         },
       },
       {

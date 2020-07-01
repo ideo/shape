@@ -974,14 +974,16 @@ class Collection < ApplicationRecord
     response.completed? ? :completed : :in_progress
   end
 
-  def next_available_tagged_submission_test(for_user:, omit_id: nil)
+  def next_available_challenge_test(for_user:, omit_id: nil)
     return nil unless challenge_submission_boxes.any?
 
-    challenge_submission_boxes.each do |_submission_box|
-      next_test = random_next_submission_test(for_user: for_user, omit_id: omit_id)
-                  .joins(:user_tags).where(user_tags: { user_id: for_user.id }).first
-      return next_test if next_test.present?
+    # can probably filter out submission boxes within a phase that has ended
+    next_test = nil
+    challenge_submission_boxes.each do |sb|
+      next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
+      break if next_test.present?
     end
+    next_test
   end
 
   def default_group_id
