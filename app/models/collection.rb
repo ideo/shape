@@ -13,6 +13,7 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
+#  icon                    :string
 #  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
 #  master_template                :boolean          default(FALSE)
@@ -21,6 +22,7 @@
 #  processing_status              :integer
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
+#  show_icon_on_cover             :boolean
 #  start_date                     :datetime
 #  submission_box_type            :integer
 #  submissions_enabled            :boolean          default(TRUE)
@@ -124,6 +126,7 @@ class Collection < ApplicationRecord
   # callbacks
   before_validation :inherit_parent_organization_id, on: :create
   before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
+  before_validation :set_icon_from_collection_type, if: :collection_type_changed?
   before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
   before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
@@ -1309,5 +1312,15 @@ class Collection < ApplicationRecord
 
   def will_become_a_challenge?
     will_save_change_to_collection_type? && collection_type_in_database != 'challenge' && collection_type == 'challenge'
+  end
+
+  def set_icon_from_collection_type
+    return unless collection_type.present?
+
+    if new_record?
+      self.icon ||= collection_type
+    else
+      self.icon = collection_type
+    end
   end
 end

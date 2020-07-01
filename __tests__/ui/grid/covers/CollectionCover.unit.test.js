@@ -16,7 +16,7 @@ const fakeEvent = {
   metaKey: null,
 }
 
-let wrapper, component
+let wrapper, component, rerender
 describe('CollectionCover', () => {
   beforeEach(() => {
     fakeCollection.subtitle = cover.text
@@ -24,8 +24,11 @@ describe('CollectionCover', () => {
       ...fakeCollection,
       is_inside_a_submission: false,
     }
-    wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
-    component = wrapper.instance()
+    rerender = () => {
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
+    rerender()
   })
 
   it('renders the cover image_url', () => {
@@ -60,11 +63,21 @@ describe('CollectionCover', () => {
     expect(wrapper.find('CardButtonWrapper').exists()).toBeFalsy()
   })
 
+  it('does not render xxl icon if show_icon_on_cover is false', () => {
+    expect(props.collection.show_icon_on_cover).toEqual(false)
+    expect(
+      wrapper
+        .find('CoverIconWrapper')
+        .find('CollectionIcon')
+        .exists()
+    ).toBe(false)
+  })
+
   describe('with a carousel collection with items', () => {
     beforeEach(() => {
       props.collection.isCarousel = true
       props.collection.collection_cover_items = [fakeTextItem]
-      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      rerender()
     })
 
     it('should render the CarouselCover', () => {
@@ -82,7 +95,7 @@ describe('CollectionCover', () => {
         launchable: true,
         collection_to_test_id: '123',
       }
-      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      rerender()
     })
 
     // Note: we temporarily disabled launching from collection cover unless there is a collection_to_test
@@ -109,8 +122,7 @@ describe('CollectionCover', () => {
   describe('with template', () => {
     beforeEach(() => {
       props.collection.isUsableTemplate = true
-      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
-      component = wrapper.instance()
+      rerender()
     })
 
     it('shows the use template button for master templates', () => {
@@ -125,8 +137,7 @@ describe('CollectionCover', () => {
   describe('with unusable template (e.g. child of a master template)', () => {
     beforeEach(() => {
       props.collection.isUsableTemplate = false
-      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
-      component = wrapper.instance()
+      rerender()
     })
 
     it('does not show use template button', () => {
@@ -150,6 +161,18 @@ describe('CollectionCover', () => {
       props.collection.collection_type = 'method'
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
       expect(wrapper.find('CollectionTypeSelector').exists()).toBeTruthy()
+    })
+  })
+
+  describe('when show_icon_on_cover is true', () => {
+    beforeEach(() => {
+      props.collection.show_icon_on_cover = true
+      rerender()
+    })
+
+    it('renders xxl icon', () => {
+      const icon = wrapper.find('CoverIconWrapper').find('CollectionIcon')
+      expect(icon.props().size).toEqual('xxl')
     })
   })
 })

@@ -8,7 +8,7 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 import AddTextIcon from '~/ui/icons/AddTextIcon'
 import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
-import AddSearchCollectionIcon from '~/ui/icons/AddSearchCollectionIcon'
+import SearchCollectionIcon from '~/ui/icons/SearchCollectionIcon'
 import AddFileIcon from '~/ui/icons/AddFileIcon'
 import AddVideoIcon from '~/ui/icons/AddVideoIcon'
 import AddLinkIcon from '~/ui/icons/AddLinkIcon'
@@ -16,7 +16,7 @@ import ReportIcon from '~/ui/icons/ReportIcon'
 import TemplateIcon from '~/ui/icons/TemplateIcon'
 import TestCollectionIconSm from '~/ui/icons/TestCollectionIconSm'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
-import FoamcoreBoardIcon from '~/ui/icons/FoamcoreBoardIcon'
+import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
 import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
 import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/shared'
@@ -724,7 +724,7 @@ class GridCardBlank extends React.Component {
                 },
                 {
                   name: 'Create Search Collection',
-                  iconLeft: <AddSearchCollectionIcon />,
+                  iconLeft: <SearchCollectionIcon size="xs" />,
                   onClick: this.startCreating('search'),
                 },
                 {

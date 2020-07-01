@@ -36,6 +36,8 @@ class SerializableCollection < BaseJsonSerializer
     :challenge_reviewer_group_id,
     :challenge_admin_group_id,
     :challenge_participant_group_id,
+    :icon,
+    :show_icon_on_cover,
   )
 
   stringified_attributes(

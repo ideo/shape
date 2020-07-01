@@ -7,7 +7,7 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import v from '~/utils/variables'
 import CollectionDateRange from '~/ui/grid/CollectionDateRange'
 import { ThumbnailHolder } from '~/ui/threads/CommentThumbnail'
-import PhaseIcon from '~/ui/icons/PhaseIcon'
+import PhaseIcon from '~/ui/icons/collection_icons/PhaseIcon'
 import {
   DisplayTextCss,
   DisplayText,

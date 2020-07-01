@@ -24,9 +24,8 @@ import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import TruncatableText from '~/ui/global/TruncatableText'
 import v from '~/utils/variables'
-import CollectionTypeIcon, {
-  collectionTypeToIcon,
-} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
@@ -188,10 +187,7 @@ class PageHeader extends React.Component {
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
         <IconHolder marginRight={12}>
-          {collectionTypeToIcon({
-            type: record.collection_type,
-            size: 'lg',
-          })}
+          <CollectionIcon type={record.icon} size="lg" />
         </IconHolder>
       </CollectionTypeSelector>
     )
