@@ -106,7 +106,9 @@ const calcTopAndBottom = props => {
   }
 }
 
-const CoverIconWrapper = styled.div
+const CoverIconWrapper = styled.div`
+  position: relative; /* Need a style rule for it to work */
+`
 CoverIconWrapper.displayName = 'CoverIconWrapper'
 
 const StyledCardContent = styled.div`

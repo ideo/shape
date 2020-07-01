@@ -76,7 +76,7 @@ describe('CollectionTypeIcon', () => {
 
     it('renders the FoamcoreBoardIcon', () => {
       expect(wrapper.find('FoamcoreBoardIcon').exists()).toBeTruthy()
-      expect(wrapper.find('FoamcoreBoardIcon').props().large).toBeTruthy()
+      expect(wrapper.find('FoamcoreBoardIcon').props().size).toEqual('lg')
     })
   })
 
