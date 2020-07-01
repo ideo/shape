@@ -1,6 +1,7 @@
 import React from 'react'
+import { observable, runInAction } from 'mobx'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import ListCard, { Column } from './ListCard'
@@ -8,9 +9,16 @@ import { Heading3 } from '~/ui/global/styled/typography'
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
+@observer
 class CollectionList extends React.Component {
+  @observable
+  reviewerStatuses = []
+
   componentDidMount() {
     this.fetchCards()
+    if (this.submissionBoxInsideChallenge) {
+      this.fetchReviewerStatuses()
+    }
   }
 
   fetchCards({ sort } = {}) {
@@ -18,7 +26,29 @@ class CollectionList extends React.Component {
     collection.API_fetchCardRoles()
   }
 
-  get insideChallenge() {
+  async fetchReviewerStatuses() {
+    const { collection } = this.props
+    const res = await collection.API_fetchCardReviewerStatues()
+    const statuses = res.data
+    if (!statuses) return
+    runInAction(() => {
+      this.reviewerStatuses = statuses
+      statuses.forEach(status => {
+        const card = collection.collection_cards.find(
+          card => parseInt(card.record.id) === parseInt(status.record_id)
+        )
+        if (card) {
+          const taggedUser = card.record.tagged_users.find(
+            u => parseInt(u.id) === parseInt(status.user_id)
+          )
+          if (!taggedUser) return
+          taggedUser.color = v.statusColor[status.status]
+        }
+      })
+    })
+  }
+
+  get submissionBoxInsideChallenge() {
     const { collection } = this.props
     return (
       collection.isChallengeOrInsideChallenge &&
@@ -41,8 +71,10 @@ class CollectionList extends React.Component {
         style: { width: '400px' },
       },
       {
-        displayName: this.insideChallenge ? 'Reviewers' : 'Permissions',
-        name: this.insideChallenge ? 'reviewers' : 'permissions',
+        displayName: this.submissionBoxInsideChallenge
+          ? 'Reviewers'
+          : 'Permissions',
+        name: this.submissionBoxInsideChallenge ? 'reviewers' : 'permissions',
         style: { width: '250px' },
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
@@ -84,7 +116,7 @@ class CollectionList extends React.Component {
         {this.sortedCards.map(card => (
           <ListCard
             card={card}
-            insideChallenge={this.insideChallenge}
+            insideChallenge={this.submissionBoxInsideChallenge}
             searchResult={collection.isSearchResultsCollection}
             key={card.id}
           />

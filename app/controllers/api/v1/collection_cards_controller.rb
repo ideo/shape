@@ -4,10 +4,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   skip_before_action :check_api_authentication!, only: %i[index]
   before_action :load_and_authorize_parent_collection, only: %i[create replace update_card_filter]
   before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction roles]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction roles reviewer_statuses]
   before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   before_action :check_cache, only: %i[index ids breadcrumb_records]
-  before_action :load_collection_cards, only: %i[index ids breadcrumb_records roles]
+  before_action :load_collection_cards, only: %i[index ids breadcrumb_records roles reviewer_statuses]
 
   def index
     render_collection_cards
@@ -56,6 +56,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def roles
     render_collection_cards(include_roles: true)
+  end
+
+  def reviewer_statuses
+    submissions = @collection_cards.map(&:record)
+    parent_challenge = submissions.first&.parent_challenge
+    result = SubmissionReviewerStatuses.call(
+      challenge: parent_challenge,
+      submissions: submissions,
+    )
+    render json: result.data
   end
 
   def create

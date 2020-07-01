@@ -943,6 +943,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  API_fetchCardReviewerStatues = () => {
+    const ids = _.compact(
+      _.map(this.collection_cards, cc => {
+        if (cc.record && cc.record.user_tag_list) {
+          return cc.id
+        }
+      })
+    )
+    if (ids.length === 0) return
+    const basePath = '/api/v1'
+    return axios.get(
+      `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
+    )
+  }
+
   async API_fetchAndMergeCards(cardIds) {
     const { apiStore } = this
     const ids = cardIds.join(',')
@@ -980,7 +995,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   // Fetch all children submission boxes of this collection
   API_fetchSubmissionBoxSubCollections() {
-    const apiPath = `collections/${this.id}/submission_box_sub_collections`
+    const apiPath = `collections/${this.id}/challenge_submission_boxes`
     return this.apiStore.request(apiPath)
   }
 
@@ -1000,7 +1015,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       const res = await this.apiStore.request(
         `collections/${this.parent_challenge_id}`
       )
-      this.parentChallenge = res.data
+      runInAction(() => {
+        this.parentChallenge = res.data
+      })
       return res.data
     }
   }
