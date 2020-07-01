@@ -1000,7 +1000,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       const res = await this.apiStore.request(
         `collections/${this.parent_challenge_id}`
       )
-      this.parentChallenge = res.data
+      runInAction(() => {
+        this.parentChallenge = res.data
+      })
       return res.data
     }
   }

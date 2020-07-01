@@ -37,7 +37,9 @@ class CollectionList extends React.Component {
         style: { width: '400px' },
       },
       {
-        displayName: this.submissionBoxInsideChallenge ? 'Reviewers' : 'Permissions',
+        displayName: this.submissionBoxInsideChallenge
+          ? 'Reviewers'
+          : 'Permissions',
         name: this.submissionBoxInsideChallenge ? 'reviewers' : 'permissions',
         style: { width: '250px' },
       },
