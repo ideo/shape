@@ -56,8 +56,8 @@ RSpec.describe TestResultsCollection::CreateAndLinkOpenResponse, type: :service 
           :type,
           :row,
           :col,
-        )
-      ).to match_array([["CollectionCard::Link", 0, 0]])
+        ),
+      ).to match_array([['CollectionCard::Link', 0, 0]])
     end
   end
 

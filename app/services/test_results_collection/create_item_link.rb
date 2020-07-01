@@ -66,7 +66,7 @@ module TestResultsCollection
           identifier: identifier,
           row: row,
           col: col,
-        }
+        },
       )
       # link = CollectionCard::Link.create(
       #   parent: parent_collection,
