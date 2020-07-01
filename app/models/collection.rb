@@ -927,9 +927,9 @@ class Collection < ApplicationRecord
   # This method is called when a user tag is added to a submission collection
   # in the UserTaggable concern
   def add_challenge_reviewer(user)
-    return unless parent_challenge.present?
+    return unless parent_challenge.present? && user&.handle.present?
 
-    filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user&.handle).first
+    filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
     filter_for_user ||= parent_challenge.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
@@ -944,16 +944,16 @@ class Collection < ApplicationRecord
   # This method is called when a user tag is removed from a submission collection
   # in the UserTaggable concern
   def remove_challenge_reviewer(user)
-    return unless parent_challenge.present?
+    return unless parent_challenge.present? && user&.handle.present?
 
-    parent_challenge.collection_filters.tagged_with_user_handle(user&.handle).destroy_all
+    parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
 
   def challenge_reviewer?(user)
-    return false if parent_challenge.blank?
+    return false if parent_challenge.blank? || user&.handle.blank?
 
     parent_challenge.collection_filters
-                    .tagged_with_user_handle(user&.handle)
+                    .tagged_with_user_handle(user.handle)
                     .count
                     .positive?
   end
@@ -978,12 +978,10 @@ class Collection < ApplicationRecord
     return nil unless challenge_submission_boxes.any?
 
     # can probably filter out submission boxes within a phase that has ended
-    next_test = nil
     challenge_submission_boxes.each do |sb|
       next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
-      break if next_test.present?
+      return next_test if next_test.present?
     end
-    next_test
   end
 
   def default_group_id

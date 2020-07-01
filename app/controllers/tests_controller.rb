@@ -34,11 +34,14 @@ class TestsController < ApplicationController
     if params[:ta].present? || params[:token].present?
       look_up_test_audience
       # if you're invited to a test audience it'll set to `invalid` if that audience is closed
-      @invalid = @test_audience.nil? || @test_audience.closed?
-    elsif @collection.challenge_or_inside_challenge?
+    elsif @collection.challenge_or_inside_challenge? && !@collection.submission_box_template_test?
       look_up_challenge_test_audience
-    elsif !@collection.link_sharing_enabled?
-      # if no test audience param, then you can only view the test if link_sharing_enabled
+    end
+
+    # if no test audience param, then you can only view the test if link_sharing_enabled
+    if @test_audience.present? && @test_audience.open? || @collection.link_sharing_enabled?
+      @invalid = false
+    else
       @invalid = true
     end
     # will reset to nil if no test_audience
@@ -67,7 +70,7 @@ class TestsController < ApplicationController
     return unless reviewer_group.present? && reviewer_group.user_ids.include?(current_user.id)
 
     # use master template test audience
-    test_audiences = @collection.template.test_audiences
+    test_audiences = @collection&.template&.test_audiences
     return unless test_audiences.present?
 
     # tests will share the same submission template reviewer test audience
@@ -75,8 +78,10 @@ class TestsController < ApplicationController
   end
 
   def redirect_to_test
-    if @collection.submission_box_template_test?
-      redirect_to_submission_box_test
+    if @collection.challenge_or_inside_challenge? && !@collection.submission_box_template_test?
+      @collection
+    elsif @collection.submission_box_template_test?
+      redirect_to "/tests/#{next_test.id}"
     elsif @collection.collection_to_test.present?
       redirect_to_collection_to_test(@collection.collection_to_test)
     elsif @collection.submission_test?
