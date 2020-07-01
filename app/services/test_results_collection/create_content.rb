@@ -29,9 +29,6 @@ module TestResultsCollection
     end
 
     def call
-      # place this first before other cards figure out where to go
-      move_legend_item_to_third_spot if @legend_item.present?
-
       if question_card.present?
         create_content_for_item_card(question_card)
         # also call for each idea
@@ -207,7 +204,11 @@ module TestResultsCollection
           idea: idea,
         ),
       )
-      @legend_item ||= result.legend_item
+      if @legend_item.nil?
+        @legend_item ||= result.legend_item
+        move_legend_item_to_third_spot
+      end
+
       result
     end
 
@@ -245,10 +246,10 @@ module TestResultsCollection
 
     def move_legend_item_to_third_spot
       legend_card = @legend_item.parent_collection_card
-      legend_card.update(
-        row: 0,
-        col: 3,
-      )
+      legend_card.row = 0
+      legend_card.col = 3
+      # Let legend card go where it will if [0, 3] is filled
+      legend_card.save if legend_card.board_placement_is_valid?
     end
 
     def idea_items

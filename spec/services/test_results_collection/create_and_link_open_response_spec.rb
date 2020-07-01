@@ -34,6 +34,8 @@ RSpec.describe TestResultsCollection::CreateAndLinkOpenResponse, type: :service 
         )
       end
     }.to change(Item::TextItem, :count).by(test_collection.question_items.size)
+    # Test if cards are not on top of each other
+    # Test positioning of cards
     expect(
       survey_response.question_answers.all? do |answer|
         answer.open_response_item.present?

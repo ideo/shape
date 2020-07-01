@@ -50,14 +50,19 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     )
     expect(subject).to be_a_success
     # now it should be first
-    expect(test_results_collection.collection_cards.first.identifier).to eq 'first-idea-media'
+    expect(test_results_collection.collection_cards.where(row: 0, col: 0).first.identifier).to eq 'first-idea-media'
+    # TODO: not sure how to guarantee this
   end
 
   it 'places the legend in the 3rd spot' do
     expect(subject).to be_a_success
     expect(
-      test_results_collection.collection_cards.third.record,
+      test_results_collection.collection_cards.where(
+        row: 0,
+        col: 3,
+      ).first,
     ).to be_instance_of(Item::LegendItem)
+    # TODO: Might not be 0,3 -- check against test output and check row/col for legend
   end
 
   it 'creates response graphs for all scale questions' do
@@ -202,7 +207,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       )
       expect(subject).to be_a_success
       # now it should be first
-      expect(test_results_collection.collection_cards.first.identifier).to eq 'first-idea-media'
+      expect(test_results_collection.collection_cards.where(row: 0, col: 0).first.identifier).to eq 'first-idea-media'
     end
 
     it 'does not call TestResultsCollection::CreateCollection on any subcollections' do
@@ -274,38 +279,34 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     it 'should create all test results cards, correctly ordered' do
       expect(subject).to be_a_success
       # legend item should be in the 3rd spot (order == 2)
-      expect(legend_item.parent_collection_card.order).to eq 2
+      expect(legend_item.parent_collection_card.row).to eq 0
+      expect(legend_item.parent_collection_card.col).to eq 3
       results_cards = test_results_collection.collection_cards.reload
 
       expect(
         results_cards.map { |card| card.record.class.name },
       ).to eq(
         [
-          'Item::VideoItem',
-          'Item::DataItem',
-          'Item::LegendItem',
-          # ideas collection
-          'Collection',
-          # all the default questions
-          'Item::DataItem',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Collection::TestOpenResponses',
-          'Collection::TestOpenResponses',
-          # 2 additional scaled
-          'Item::DataItem',
-          'Item::DataItem',
-          # all responses
-          'Collection',
-          # idea results
-          'Collection::TestResultsCollection',
-          # original test collection (feedback design)
-          'Collection::TestCollection',
+          "Item::VideoItem",
+          "Item::DataItem",
+          "Item::LegendItem",
+          "Collection",
+          "Item::DataItem",
+          "Item::DataItem",
+          "Item::DataItem",
+          "Collection::TestOpenResponses",
+          "Collection::TestOpenResponses",
+          "Item::DataItem",
+          "Item::DataItem",
+          "Collection",
+          "Collection::TestResultsCollection",
+          "Collection::TestCollection"
         ],
       )
       expect(
-        results_cards.map(&:order),
-      ).to eq(0.upto(13).to_a)
+        results_cards.map { |card| [card.row, card.col] },
+        # Test to handle rows and columns
+      ).to eq([0.upto(13).to_a, 0.upto(13).to_a])
     end
   end
 end

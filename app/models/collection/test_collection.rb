@@ -423,6 +423,10 @@ class Collection
           if question_type == :ideas_collection
             primary_collection_cards.build(
               order: order += 1,
+              row: order += 1,
+              col: order += 1,
+              height: 1,
+              width: 1,
               section_type: section_type,
               pinned: master_template?,
               record: Collection.build_ideas_collection,
@@ -430,6 +434,10 @@ class Collection
           else
             primary_collection_cards.build(
               order: order += 1,
+              row: order += 1,
+              col: order += 1,
+              height: 1,
+              width: 1,
               section_type: section_type,
               pinned: master_template?,
               record: Item::QuestionItem.new(

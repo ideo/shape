@@ -278,6 +278,12 @@ module CollectionGrid
       span = max_col - min_col
 
       last_card = collection.collection_cards.ordered.last || Mashie.new(row: 0, col: 0, width: 0)
+      # byebug
+      if last_card.row.nil? || last_card.col.nil?
+        p "BAD ROW/COL here"
+        p last_card.attributes.values_at("id", "row", "col", "width", "height")
+        p "^^^^^" * 8
+      end
       last_row_open_width = collection.num_columns - (last_card.col + last_card.width)
 
       if last_card.col < 6 && last_row_open_width >= span || (last_row_open_width.positive? && span > collection.num_columns)

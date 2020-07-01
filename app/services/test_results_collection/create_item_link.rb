@@ -2,25 +2,37 @@ module TestResultsCollection
   class CreateItemLink
     include Interactor
     include Interactor::Schema
+    include CollectionCardBuilderHelpers
 
     schema :parent_collection,
            :item,
            :order,
            :width,
            :height,
+           :row,
+           :col,
            :created_by,
            :identifier,
            :message
 
     require_in_context :parent_collection, :item
 
-    delegate :parent_collection, :item, :width, :height, :order, :identifier,
+    delegate :parent_collection,
+             :item,
+             :width,
+             :height,
+             :order,
+             :identifier,
+             :row,
+             :col,
              to: :context
 
     before do
       context.width = 1 if width.nil?
       context.height = 2 if height.nil?
       context.order = 0 if order.nil?
+      context.row = 0 if row.nil?
+      context.col = 0 if col.nil?
     end
 
     def call
@@ -42,14 +54,30 @@ module TestResultsCollection
     end
 
     def link_item
-      link = CollectionCard::Link.create(
-        parent: parent_collection,
-        item_id: item.id,
-        width: width,
-        height: height,
-        order: order,
-        identifier: identifier,
+      # Should this use CollectionCardBuilder?
+      link = create_card(
+        type: 'link',
+        parent_collection: parent_collection,
+        params: {
+          item_id: item.id,
+          width: width,
+          height: height,
+          order: order,
+          identifier: identifier,
+          row: row,
+          col: col,
+        }
       )
+      # link = CollectionCard::Link.create(
+      #   parent: parent_collection,
+      #   item_id: item.id,
+      #   width: width,
+      #   height: height,
+      #   order: order,
+      #   identifier: identifier,
+      #   row: row,
+      #   col: col,
+      # )
 
       return link if link.persisted?
 
