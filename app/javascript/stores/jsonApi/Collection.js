@@ -455,12 +455,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const isSubmissionInChallenge =
       this.isInsideAChallenge && this.isSubmission && this.canEdit
 
+    if (!isSubmissionInChallenge) return false
+
     const hasTopics =
       this.parent_challenge.topic_list &&
       this.parent_challenge.topic_list.length > 0
 
     return (
-      isSubmissionInChallenge &&
       hasTopics &&
       (!this.submission_attrs || !this.submission_attrs.hide_topic_suggestions)
     )
