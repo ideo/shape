@@ -243,6 +243,7 @@ class Collection < ApplicationRecord
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(not_custom_type) }
   scope :test_collection, -> { where(type: 'Collection::TestCollection') }
   scope :master_template, -> { where(master_template: true) }
+  scope :submission_box, -> { where(type: 'Collection::SubmissionBox') }
 
   accepts_nested_attributes_for :collection_cards
 
@@ -1033,6 +1034,14 @@ class Collection < ApplicationRecord
     return true if collection_type == 'challenge'
 
     parent_challenge.present?
+  end
+
+  def challenge_submission_boxes
+    challenge_collection = collection_type == 'challenge' ? self : parent_challenge
+    challenge_collection.all_child_collections
+                        .active
+                        .submission_box
+                        .includes(:submission_template)
   end
 
   def inside_getting_started?
