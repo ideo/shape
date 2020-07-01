@@ -150,7 +150,7 @@ TagEditor.propTypes = {
   placeholder: PropTypes.string,
   validateTag: PropTypes.func,
   suggestions: PropTypes.array.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
+  handleInputChange: PropTypes.func,
 }
 
 TagEditor.defaultProps = {
@@ -158,6 +158,7 @@ TagEditor.defaultProps = {
   tagColor: 'gray',
   placeholder: 'Add new tags, separated by comma or pressing enter.',
   validateTag: null,
+  handleInputChange: undefined,
 }
 
 export default TagEditor

@@ -65,6 +65,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   phaseSubCollections = []
   @observable
   tags = []
+  @observable
+  parentChallenge = null
 
   attributesForAPI = [
     'name',
@@ -76,6 +78,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'test_show_media',
     'collection_type',
     'search_term',
+    'icon',
+    'show_icon_on_cover',
   ]
 
   constructor(...args) {
@@ -126,12 +130,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     )
 
-    const tagList = _.map(this.tag_list, tag => {
-      return {
-        label: tag,
-        type: 'tag_list',
-      }
+    const tagList = []
+    _.each(['tag_list', 'topic_list'], tagType => {
+      _.each(this[tagType], tag => {
+        tagList.push({
+          label: tag,
+          type: tagType,
+        })
+      })
     })
+
     runInAction(() => {
       this.tags = [...userTagsWithUsers, ...tagList]
     })
@@ -993,17 +1001,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.challenge === this) {
       return this
     } else {
+      if (this.parentChallenge) return this.parentChallenge
       // Otherwise we need to load the challenge colleciton
       const res = await this.apiStore.request(
-        `collections/${this.challenge.id}`
+        `collections/${this.parent_challenge_id}`
       )
+      runInAction(() => {
+        this.parentChallenge = res.data
+      })
       return res.data
     }
   }
 
   async loadPhaseSubCollections() {
     const request = await this.API_fetchPhaseSubCollections()
-    return this.setPhaseSubCollections(request.data)
+    return request.data
   }
 
   async createChildPhaseCollection(name) {

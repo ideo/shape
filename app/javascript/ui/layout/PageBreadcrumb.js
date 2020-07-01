@@ -5,9 +5,9 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Breadcrumb from '~/ui/layout/Breadcrumb'
 import BreadcrumbWithDropping from '~/ui/layout/BreadcrumbWithDropping'
-import CollectionIconXs from '~/ui/icons/CollectionIconXs'
-import FoamcoreBoardIconXs from '~/ui/icons/FoamcoreBoardIconXs'
-import SubmissionBoxIconXs from '~/ui/icons/SubmissionBoxIconXs'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
+import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
+import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import styled from 'styled-components'
 import { apiStore, uiStore, routingStore } from '~/stores'
 import v from '~/utils/variables'
@@ -158,13 +158,13 @@ class PageBreadcrumb extends React.Component {
     let icon
     switch (menuItem.collection_type) {
       case 'Collection':
-        icon = <CollectionIconXs />
+        icon = <CollectionIcon size="xs" />
         break
       case 'Collection::Board':
-        icon = <FoamcoreBoardIconXs />
+        icon = <FoamcoreBoardIcon size="xs" />
         break
       case 'Collection::SubmissionBox':
-        icon = <SubmissionBoxIconXs />
+        icon = <SubmissionBoxIcon size="xs" />
         break
     }
     return <IconHolder>{icon}</IconHolder>

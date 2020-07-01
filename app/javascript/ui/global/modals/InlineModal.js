@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import styled from 'styled-components'
 import { Popover, Grid } from '@material-ui/core'
 
@@ -7,6 +8,10 @@ import TextButton from '~/ui/global/TextButton'
 
 const ButtonsWrapper = styled.div`
   padding: 20px 30px 15px 30px;
+`
+
+const NoGridWrapper = styled.div`
+  padding: 5px;
 `
 
 class InlineModal extends React.PureComponent {
@@ -24,47 +29,61 @@ class InlineModal extends React.PureComponent {
     onConfirm && onConfirm()
   }
 
+  get popoverProps() {
+    const { anchorElement, open, anchorOrigin } = this.props
+    const popProps = {
+      anchorOrigin,
+      open,
+      onClose: this.handleCancel,
+    }
+    if (anchorElement) {
+      popProps.anchorEl = anchorElement
+      popProps.anchorReference = 'anchorEl'
+    }
+    return popProps
+  }
+
   render() {
-    const { children, open, leftButton, anchorElement } = this.props
+    const { children, leftButton, noButtons } = this.props
     return (
-      <Popover
-        open={open}
-        onClose={this.handleCancel}
-        anchorOrigin={{ horizontal: 'center', vertical: 'center' }}
-        anchorEl={anchorElement}
-        anchorReference="anchorEl"
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            {children}
-          </Grid>
-        </Grid>
-        <ButtonsWrapper>
-          <Grid container spacing={0}>
-            <Grid item xs={4}>
-              {leftButton}
+      <Popover {...this.popoverProps}>
+        {noButtons ? (
+          <NoGridWrapper>{children}</NoGridWrapper>
+        ) : (
+          <Fragment>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                {children}
+              </Grid>
             </Grid>
-            <Grid item xs={8} style={{ textAlign: 'right' }}>
-              <TextButton
-                onClick={this.handleCancel}
-                fontSizeEm={0.75}
-                color={v.colors.black}
-                style={{ marginRight: '2em' }}
-                className="cancel-button"
-              >
-                Cancel
-              </TextButton>
-              <TextButton
-                onClick={this.handleConfirm}
-                fontSizeEm={0.75}
-                color={v.colors.black}
-                className="ok-button"
-              >
-                OK
-              </TextButton>
-            </Grid>
-          </Grid>
-        </ButtonsWrapper>
+            <ButtonsWrapper>
+              <Grid container spacing={0}>
+                <Grid item xs={4}>
+                  {leftButton}
+                </Grid>
+                <Grid item xs={8} style={{ textAlign: 'right' }}>
+                  <TextButton
+                    onClick={this.handleCancel}
+                    fontSizeEm={0.75}
+                    color={v.colors.black}
+                    style={{ marginRight: '2em' }}
+                    className="cancel-button"
+                  >
+                    Cancel
+                  </TextButton>
+                  <TextButton
+                    onClick={this.handleConfirm}
+                    fontSizeEm={0.75}
+                    color={v.colors.black}
+                    className="ok-button"
+                  >
+                    OK
+                  </TextButton>
+                </Grid>
+              </Grid>
+            </ButtonsWrapper>
+          </Fragment>
+        )}
       </Popover>
     )
   }
@@ -77,6 +96,11 @@ InlineModal.propTypes = {
   onCancel: PropTypes.func,
   leftButton: PropTypes.node,
   anchorElement: PropTypes.node,
+  noButtons: PropTypes.bool,
+  anchorOrigin: PropTypes.shape({
+    horizontal: PropTypes.string,
+    vertical: PropTypes.string,
+  }),
 }
 
 InlineModal.defaultProps = {
@@ -85,6 +109,8 @@ InlineModal.defaultProps = {
   onCancel: null,
   leftButton: null,
   anchorElement: null,
+  noButtons: false,
+  anchorOrigin: { horizontal: 'center', vertical: 'center' },
 }
 
 export default InlineModal
