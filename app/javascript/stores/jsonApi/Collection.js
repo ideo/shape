@@ -1014,7 +1014,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   async loadPhaseSubCollections() {
-    return this.API_fetchPhaseSubCollections()
+    const request = await this.API_fetchPhaseSubCollections()
+    return request.data
   }
 
   async createChildPhaseCollection(name) {
