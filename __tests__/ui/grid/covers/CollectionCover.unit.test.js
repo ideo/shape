@@ -67,7 +67,7 @@ describe('CollectionCover', () => {
     expect(props.collection.show_icon_on_cover).toEqual(false)
     expect(
       wrapper
-        .find('[className="iconBg"]')
+        .find('CoverIconWrapper')
         .find('CollectionIcon')
         .exists()
     ).toBe(false)
@@ -171,7 +171,7 @@ describe('CollectionCover', () => {
     })
 
     it('renders xxl icon', () => {
-      const icon = wrapper.find('[className="iconBg"]').find('CollectionIcon')
+      const icon = wrapper.find('CoverIconWrapper').find('CollectionIcon')
       expect(icon.props().size).toEqual('xxl')
     })
   })

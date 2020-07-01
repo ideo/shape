@@ -106,6 +106,9 @@ const calcTopAndBottom = props => {
   }
 }
 
+const CoverIconWrapper = styled.div
+CoverIconWrapper.displayName = 'CoverIconWrapper'
+
 const StyledCardContent = styled.div`
   .top,
   .bottom {
@@ -149,7 +152,7 @@ const StyledCardContent = styled.div`
     padding-right: 2rem;
   `};
 
-  .iconBg {
+  ${CoverIconWrapper} {
     position: absolute;
     left: 0;
     top: 0;
@@ -431,9 +434,9 @@ class CollectionCover extends React.Component {
           >
             <div className={this.requiresOverlay ? 'overlay' : ''} />
             {show_icon_on_cover && (
-              <div className="iconBg">
+              <CoverIconWrapper>
                 <CollectionIcon type={icon} size="xxl" />
-              </div>
+              </CoverIconWrapper>
             )}
             {collection.isPhaseOrProject &&
               collection.start_date &&
