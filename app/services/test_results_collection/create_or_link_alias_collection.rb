@@ -43,7 +43,6 @@ module TestResultsCollection
       existing_card = CollectionCard.identifier(identifier).first
       return existing_card.record if existing_card.present?
 
-      # TODO: refactor this to also use TestResultsCollection::CreateCollection?
       context.alias_test_results_collection = create_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
@@ -83,7 +82,7 @@ module TestResultsCollection
     def link_alias_collection(parent)
       alias_collection = find_or_create_alias_collection
 
-      create_card(
+      find_or_create_card(
         parent_collection: parent,
         type: 'link',
         params: {

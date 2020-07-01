@@ -56,8 +56,7 @@ module TestResultsCollection
     def link_open_response_item
       return if answer_text.blank?
 
-      # TODO: these used to be find or create, do we need to address that?
-      create_card(
+      find_or_create_card(
         params: {
           item_id: open_response_item.id,
           width: 2,
@@ -67,7 +66,7 @@ module TestResultsCollection
       )
 
       idea_items.each do |idea_item|
-        create_card(
+        find_or_create_card(
           params: {
             item_id: open_response_item.id,
             width: 2,
