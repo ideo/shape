@@ -23,7 +23,7 @@ class CollectionList extends React.Component {
     return (
       collection.isChallengeOrInsideChallenge &&
       collection.isSubmissionsCollection &&
-      collection.submissionFormat === 'template'
+      collection.submission_box_type === 'template'
     )
   }
 
