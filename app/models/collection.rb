@@ -920,20 +920,21 @@ class Collection < ApplicationRecord
     User.where(
       User.arel_table[:handle].lower.in(
         parent_challenge.collection_filters.user_tag.pluck(:text),
-      )
+      ),
     )
   end
 
   # This method is called when a user tag is added to a submission collection
   # in the UserTaggable concern
   def add_challenge_reviewer(user)
-    return unless parent_challenge.present?
+    return unless parent_challenge.present? && user&.handle.present?
 
     filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
     filter_for_user ||= parent_challenge.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
     )
+
     # Find or create the filter for this user
     filter_for_user.user_collection_filters.find_or_create_by(
       user_id: user.id,
@@ -943,13 +944,13 @@ class Collection < ApplicationRecord
   # This method is called when a user tag is removed from a submission collection
   # in the UserTaggable concern
   def remove_challenge_reviewer(user)
-    return unless parent_challenge.present?
+    return unless parent_challenge.present? && user&.handle.present?
 
     parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
 
   def challenge_reviewer?(user)
-    return false if parent_challenge.blank?
+    return false if parent_challenge.blank? || user&.handle.blank?
 
     parent_challenge.collection_filters
                     .tagged_with_user_handle(user.handle)
@@ -960,17 +961,27 @@ class Collection < ApplicationRecord
   def submission_reviewer_status(user)
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
-                  submission_attrs['launchable_test_id'].present? &&
+                  launchable_test_id.present? &&
                   challenge_reviewer?(user)
 
     response = SurveyResponse.find_by(
-      test_collection_id: submission_attrs['launchable_test_id'],
+      test_collection_id: launchable_test_id,
       user_id: user.id,
     )
 
     return :unstarted if response.blank?
 
     response.completed? ? :completed : :in_progress
+  end
+
+  def next_available_challenge_test(for_user:, omit_id: nil)
+    return nil unless challenge_submission_boxes.any?
+
+    # can probably filter out submission boxes within a phase that has ended
+    challenge_submission_boxes.each do |sb|
+      next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
+      return next_test if next_test.present?
+    end
   end
 
   def default_group_id
@@ -1105,7 +1116,11 @@ class Collection < ApplicationRecord
   def submission_test?
     return unless inside_a_submission?
 
-    parent_submission.submission_attrs['launchable_test_id'] == id
+    parent_submission.launchable_test_id == id
+  end
+
+  def launchable_test_id
+    submission_attrs.present? ? submission_attrs['launchable_test_id'] : nil
   end
 
   # check for template instances anywhere in the entire collection tree

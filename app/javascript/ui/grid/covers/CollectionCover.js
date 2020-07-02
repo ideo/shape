@@ -12,6 +12,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import CarouselCover from '~/ui/grid/covers/CarouselCover'
 import Button from '~/ui/global/Button'
+import { ReviewButton } from '~/ui/global/challenge/shared'
 import { RoundPill } from '~/ui/global/styled/forms'
 import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
@@ -275,28 +276,6 @@ class CollectionCover extends React.Component {
     )
   }
 
-  get reviewSubmissionButton() {
-    const { inSubmissionsCollection, collection, isReviewable } = this.props
-    if (!inSubmissionsCollection || !collection.isLiveTest || !isReviewable) {
-      return null
-    }
-
-    return (
-      <Button
-        style={{ marginLeft: '3.2rem' }}
-        className="cancelGridClick"
-        colorScheme={`${v.colors.alert}`}
-        size="sm"
-        width={172}
-        onClick={() => {
-          // FIXME: to be implemented in an upcoming story
-        }}
-      >
-        Review
-      </Button>
-    )
-  }
-
   get hasUseTemplateButton() {
     const { collection } = this.props
     return collection.isUsableTemplate
@@ -400,8 +379,17 @@ class CollectionCover extends React.Component {
       textItem,
       cardId,
       fontColor,
+      inSubmissionsCollection,
+      isReviewable,
     } = this.props
-    const { subtitle, collection_type, icon, show_icon_on_cover } = collection
+    const {
+      subtitle,
+      collection_type,
+      icon,
+      show_icon_on_cover,
+      submission_reviewer_status,
+    } = collection
+
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
     const collIcon = collection_type !== 'collection' &&
@@ -497,7 +485,20 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
-                  {this.reviewSubmissionButton}
+                  {inSubmissionsCollection &&
+                    isReviewable &&
+                    submission_reviewer_status && (
+                      <ReviewButton
+                        reviewerStatus={submission_reviewer_status}
+                        onClick={() => {
+                          collection.navigateToNextAvailableInCollectionTestOrTest(
+                            {
+                              submissionCollection: collection,
+                            }
+                          )
+                        }}
+                      />
+                    )}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (

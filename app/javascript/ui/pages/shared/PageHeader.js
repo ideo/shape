@@ -30,9 +30,9 @@ import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
-import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 import ChallengePhasesIcons from '~/ui/challenges/ChallengePhasesIcons'
+import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -128,15 +128,6 @@ class PageHeader extends React.Component {
 
   handleFilterClick = ev => {
     ev.preventDefault()
-  }
-
-  handleChallengeSettingsClick = () => {
-    const { uiStore } = this.props
-    uiStore.update('challengeSettingsOpen', true)
-  }
-
-  handleReviewSubmissionsClick = () => {
-    // FIXME: to be implemented in an upcoming story
   }
 
   openMoveMenuForTemplate = e => {
@@ -437,35 +428,6 @@ class PageHeader extends React.Component {
     return null
   }
 
-  get renderTopRightButton() {
-    const { record, apiStore } = this.props
-
-    let buttonProps
-    if (!record.isSubmissionBox && record.canEdit) {
-      buttonProps = {
-        name: 'Challenge Settings',
-        onClick: this.handleChallengeSettingsClick,
-      }
-    } else {
-      const { currentUser } = apiStore
-      // FIXME: User::API_fetchAllReviewableSubmissions is not implemented
-      const reviewableSubmissions = currentUser.API_fetchAllReviewableSubmissions(
-        record
-      )
-      const hidden = _.isEmpty(reviewableSubmissions)
-      buttonProps = {
-        name: `Review Submissions${
-          reviewableSubmissions ? `(${reviewableSubmissions.length})` : ''
-        }`,
-        color: `${v.colors.alert}`,
-        onClick: this.handleReviewSubmissionsClick,
-        hidden,
-      }
-    }
-    if (buttonProps) return <TopRightChallengeButton {...buttonProps} />
-    return null
-  }
-
   get cardsForTagging() {
     const { apiStore, record } = this.props
     if (apiStore.selectedCards.length > 0) {
@@ -573,7 +535,7 @@ class PageHeader extends React.Component {
 
               {record.isChallengeOrInsideChallenge && (
                 <FixedRightContainer>
-                  {this.renderTopRightButton}
+                  <ChallengeHeaderButton record={record} />
                 </FixedRightContainer>
               )}
             </StyledTitleAndRoles>

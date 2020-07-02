@@ -6,7 +6,7 @@ import { fakeTextItem, fakeCollection, fakeCollectionCard } from '#/mocks/data'
 import Tooltip from '~/ui/global/Tooltip'
 
 describe('PageHeader', () => {
-  let wrapper, component, props
+  let wrapper, component, props, rerender
 
   beforeEach(() => {
     const uiStore = fakeUiStore
@@ -22,19 +22,23 @@ describe('PageHeader', () => {
       routingStore,
     }
 
-    wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
-    component = wrapper.instance()
+    rerender = () => {
+      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
+
+    rerender()
   })
 
   describe('render', () => {
     describe('on the homepage', () => {
       beforeEach(() => {
         props.isHomepage = true
-        wrapper.setProps(props)
+        rerender()
       })
 
       it('should render an EditableName with the record.name', () => {
-        expect(wrapper.find('EditableName').props().name).toEqual(
+        expect(wrapper.find('EditableName').props().name).toContain(
           props.record.name
         )
       })
@@ -42,18 +46,20 @@ describe('PageHeader', () => {
 
     describe('for an editable item', () => {
       beforeEach(() => {
-        fakeTextItem.can_edit = true
-        props.record = fakeTextItem
-        wrapper.setProps(props)
+        const textItem = fakeTextItem
+        textItem.can_edit = true
+        props.record = textItem
+        rerender()
       })
     })
 
     describe('for a private item', () => {
       beforeEach(() => {
-        fakeTextItem.can_edit = true
-        fakeTextItem.is_private = true
-        props.record = fakeTextItem
-        wrapper.setProps(props)
+        const privateItem = fakeTextItem
+        privateItem.can_edit = true
+        privateItem.is_private = true
+        props.record = privateItem
+        rerender()
       })
 
       it('should render the HiddenIconButton', () => {
@@ -63,12 +69,13 @@ describe('PageHeader', () => {
 
     describe('for a publicly joinable collection', () => {
       beforeEach(() => {
-        props.record = fakeCollection
-        props.record.isPublicJoinable = true
-        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+        const joinableCollection = fakeCollection
+        joinableCollection.isPublicJoinable = true
+        props.record = joinableCollection
+        rerender()
       })
       it('should render the JoinCollectionButton', () => {
-        expect(wrapper.find('Button').html()).toContain('Join')
+        expect(wrapper.find('Button').text()).toContain('Join')
       })
     })
 
@@ -82,9 +89,11 @@ describe('PageHeader', () => {
 
     describe('for a user collection', () => {
       beforeEach(() => {
-        props.record.isNormalCollection = false
-        props.record.isUserCollection = true
-        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+        const userCollection = fakeCollection
+        userCollection.isNormalCollection = false
+        userCollection.isUserCollection = true
+        props.record = userCollection
+        rerender()
       })
 
       it('should not render roles', () => {
@@ -109,11 +118,12 @@ describe('PageHeader', () => {
 
   describe('with a MasterTemplate collection', () => {
     beforeEach(() => {
-      props.record = fakeCollection
-      props.record.isMasterTemplate = true
-      props.record.isUsableTemplate = true
-      props.record.inherited_tag_list = ['template']
-      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      const masterTemplate = fakeCollection
+      masterTemplate.isMasterTemplate = true
+      masterTemplate.isUsableTemplate = true
+      masterTemplate.inherited_tag_list = ['template']
+      props.record = masterTemplate
+      rerender()
     })
 
     it('should show the template tag and icon', () => {
@@ -138,13 +148,14 @@ describe('PageHeader', () => {
 
   describe('with a template instance collection', () => {
     beforeEach(() => {
-      props.record = fakeCollection
-      props.record.isUsableTemplate = false
-      props.record.isMasterTemplate = false
-      props.record.isTestCollection = false
-      props.record.isTemplated = true
+      const instanceCollection = fakeCollection
+      instanceCollection.isUsableTemplate = false
+      instanceCollection.isMasterTemplate = false
+      instanceCollection.isTestCollection = false
+      instanceCollection.isTemplated = true
       props.template = fakeCollection
-      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      props.record = instanceCollection
+      rerender()
     })
 
     it('should show the template instance icon', () => {
@@ -167,9 +178,11 @@ describe('PageHeader', () => {
 
     describe('when the instance has no access to the master template', () => {
       beforeEach(() => {
-        props.template.can_view = false
-        props.template.anyone_can_view = false
-        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+        const template = fakeCollection
+        template.can_view = false
+        template.anyone_can_view = false
+        props.template = template
+        rerender()
       })
 
       it('should not show master template navigate back button', () => {
@@ -180,10 +193,11 @@ describe('PageHeader', () => {
 
   describe('with template whose a child of a master template', () => {
     beforeEach(() => {
-      props.record = fakeCollection
-      props.record.isMasterTemplate = false
-      props.record.isUsableTemplate = false
-      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      const masterTemplate = fakeCollection
+      masterTemplate.isMasterTemplate = false
+      masterTemplate.isUsableTemplate = false
+      props.record = masterTemplate
+      rerender()
     })
 
     it('should not show the template icon', () => {
@@ -193,22 +207,23 @@ describe('PageHeader', () => {
 
   describe('with a TestCollection', () => {
     beforeEach(() => {
-      props.record = fakeCollection
-      props.record.launchableTestId = 99
-      props.record.isUsableTemplate = false
-      props.record.inherited_tag_list = ['test']
-      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      const collectionWithlaunchableTest = fakeCollection
+      collectionWithlaunchableTest.launchableTestId = 99
+      collectionWithlaunchableTest.isUsableTemplate = false
+      collectionWithlaunchableTest.inherited_tag_list = ['test']
+      props.record = collectionWithlaunchableTest
+      rerender()
     })
   })
 
   describe('with an archived collection', () => {
     beforeEach(() => {
-      props.record = fakeCollection
-      props.record.archived = true
-      props.record.is_restorable = true
-      props.record.can_edit = true
-      props.record.isTemplated = false
-      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      const archivedCollection = fakeCollection
+      archivedCollection.archived = true
+      archivedCollection.is_restorable = true
+      archivedCollection.can_edit = true
+      props.record = archivedCollection
+      rerender()
     })
 
     it('should render the restore button', () => {
@@ -222,70 +237,104 @@ describe('PageHeader', () => {
     })
   })
 
+  describe('left and right icons', () => {
+    describe('when collection is a board', () => {
+      beforeEach(() => {
+        const boardCollection = fakeCollection
+        boardCollection.type = 'Collection::Board'
+        props.record = boardCollection
+        rerender()
+      })
+      it('returns a rightIcon', () => {
+        expect(component.rightIcon).toEqual(null)
+      })
+      it('returns an leftIcon', () => {
+        expect(component.leftIcon).toEqual(null)
+      })
+    })
+  })
+
   describe('with a challenge collection type', () => {
     beforeEach(() => {
-      props.record = fakeCollection
-      props.record.isChallengeOrInsideChallenge = true
-      props.record.collection_type = 'challenge'
-      props.record.canEdit = true
-      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      const challengeCollection = fakeCollection
+      challengeCollection.isChallengeOrInsideChallenge = true
+      challengeCollection.collection_type = 'challenge'
+      props.record = challengeCollection
+      rerender()
+    })
+
+    it('renders the ChallengeSubHeader', () => {
+      expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
+    })
+
+    it('renders the ChallengeHeaderButton', () => {
+      expect(wrapper.find('ChallengeHeaderButton').exists()).toBe(true)
+    })
+  })
+
+  describe('with a submission box collection', () => {
+    beforeEach(() => {
+      const submissionsBoxCollection = fakeCollection
+      submissionsBoxCollection.isSubmissionBox = true
+      submissionsBoxCollection.isChallengeOrInsideChallenge = true
+      submissionsBoxCollection.submissions_collection = fakeCollection
+      props.record = submissionsBoxCollection
+      rerender()
     })
 
     it('should render the ChallengeSubHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
     })
 
-    it('renders the TopRightChallengeButton', () => {
-      expect(wrapper.find('TopRightChallengeButton').exists()).toBe(true)
-      expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
-        'Challenge Settings'
-      )
+    it('should render the Button', () => {
+      expect(wrapper.find('Button').exists()).toBe(true)
     })
 
-    describe('if user cannot edit content', () => {
-      beforeEach(() => {
-        props.record.canEdit = false
-        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
-      })
+    it('should render the button with no reviewable submissions', () => {
+      expect(
+        wrapper
+          .find('Button')
+          .children()
+          .last()
+          .text()
+      ).toContain('No Reviewable Submissions')
+    })
 
-      it('hides the TopRightChallengeButton', () => {
-        expect(wrapper.find('TopRightChallengeButton').props().hidden).toBe(
-          true
-        )
+    describe('with reviewable submissions', () => {
+      beforeEach(() => {
+        const submissionsBoxCollection = fakeCollection
+        submissionsBoxCollection.isSubmissionBox = true
+        submissionsBoxCollection.isChallengeOrInsideChallenge = true
+        const submissionsCollection = fakeCollection
+        submissionsCollection.reviewableCards = [fakeCollectionCard]
+        submissionsBoxCollection.submissions_collection = submissionsCollection
+        props.record = submissionsBoxCollection
+        rerender()
+      })
+      it('should render the button with reviewable submissions', () => {
+        expect(
+          wrapper
+            .find('Button')
+            .children()
+            .last()
+            .text()
+        ).toContain('Review Submissions')
       })
     })
   })
 
   describe('with a phase collection type inside a challenge', () => {
     beforeEach(() => {
-      props.record = fakeCollection
-      props.record.isInsideAChallenge = true
-      props.record.challenge = fakeCollection
-      props.record.collection_type = 'phase'
-      wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
-      component = wrapper.instance()
+      const phaseCollection = fakeCollection
+      phaseCollection.isInsideAChallenge = true
+      phaseCollection.challenge = fakeCollection
+      phaseCollection.collection_type = 'phase'
+      props.record = phaseCollection
+      rerender()
     })
 
     it('should render the ChallengeSubHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toBe(true)
-    })
-  })
-
-  describe('rightIcon', () => {
-    describe('when collection is a board', () => {
-      it('returns an icon', () => {
-        props.record.type = 'Collection::Board'
-        expect(component.rightIcon).toEqual(null)
-      })
-    })
-  })
-
-  describe('leftIcon', () => {
-    describe('when collection is a board', () => {
-      it('returns an icon', () => {
-        props.record.type = 'Collection::Board'
-        expect(component.leftIcon).toEqual(null)
-      })
     })
   })
 })

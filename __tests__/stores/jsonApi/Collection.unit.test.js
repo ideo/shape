@@ -813,16 +813,63 @@ describe('Collection', () => {
   })
 
   describe('countSubmissionLiveTests', () => {
-    it('returns the count of submission live tests', () => {
+    beforeEach(() => {
       collection.type = 'Collection::SubmissionBox'
       fakeCollection.collection_cards.map(cc => {
         cc.record.isLiveTest = true
       })
       collection.submissions_collection = fakeCollection
+    })
 
+    it('returns the count of submission live tests', () => {
       expect(collection.countSubmissionLiveTests).toEqual(
         collection.submissions_collection.collection_cards.length
       )
+    })
+  })
+
+  describe('reviewableCards', () => {
+    beforeEach(() => {
+      const reviewableCardAttrs = [
+        {
+          section_type: 'intro',
+          card_question_type: 'question_open',
+          record: { isReviewable: true },
+        },
+      ]
+      collection.type = 'Collection::SubmissionsCollection'
+      collection.addReference('collection_cards', reviewableCardAttrs, {
+        model: CollectionCard,
+        type: ReferenceType.TO_MANY,
+      })
+    })
+
+    it('returns reviewableCards', () => {
+      expect(_.isEmpty(collection.reviewableCards)).toBe(false)
+    })
+  })
+
+  describe('isReviewable', () => {
+    beforeEach(() => {
+      collection.submission_attrs = {
+        submission: true,
+        test_status: 'live',
+      }
+      collection.submission_reviewer_status = 'in_progress'
+    })
+
+    it('should be reviewable if status is in progress', () => {
+      expect(collection.isReviewable).toBe(true)
+    })
+
+    it('should be reviewable if status is unstarted', () => {
+      collection.submission_reviewer_status = 'unstarted'
+      expect(collection.isReviewable).toBe(true)
+    })
+
+    it('should not be reviewable if status is completed', () => {
+      collection.submission_reviewer_status = 'completed'
+      expect(collection.isReviewable).toBe(false)
     })
   })
 

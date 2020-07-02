@@ -19,7 +19,7 @@ class CollectionFilter < ApplicationRecord
   has_many :user_collection_filters,
            dependent: :destroy
 
-  scope :tagged_with_user_handle, ->(handle) { user_tag.where(arel_table[:text].lower.eq(handle.downcase)) }
+  scope :tagged_with_user_handle, ->(handle) { user_tag.where(arel_table[:text].lower.eq(handle&.downcase)) }
 
   validates :text,
             presence: true,

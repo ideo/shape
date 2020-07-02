@@ -32,7 +32,7 @@ describe('ChallengeFixedHeader', () => {
     })
     it('should render an inline EditableName with the challenge name', () => {
       expect(wrapper.find('EditableName').props().inline).toEqual(true)
-      expect(wrapper.find('EditableName').props().name).toEqual(
+      expect(wrapper.find('EditableName').props().name).toContain(
         'Reusable Cup Challenge'
       )
     })
@@ -45,36 +45,8 @@ describe('ChallengeFixedHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toEqual(false)
     })
 
-    it('renders the Challenge Settings Button', () => {
-      const buttonProps = wrapper.find('TopRightChallengeButton').props()
-      expect(buttonProps.name).toEqual('Challenge Settings')
-      expect(buttonProps.hidden).toEqual(false)
-    })
-
-    describe('if user cannot edit challenge and is not a reviewer', () => {
-      beforeEach(() => {
-        props.collection.canEdit = false
-        rerender()
-      })
-
-      it('renders hidden button', () => {
-        expect(wrapper.find('TopRightChallengeButton').props().hidden).toEqual(
-          true
-        )
-      })
-    })
-
-    describe('inside a submission box', () => {
-      beforeEach(() => {
-        props.collection.isSubmissionBox = true
-        rerender()
-      })
-
-      it('should render a Challenge Settings Button', () => {
-        const challengeButton = wrapper.find('TopRightChallengeButton')
-        expect(challengeButton.exists()).toEqual(true)
-        expect(challengeButton.props().name).toContain('Review Submissions')
-      })
+    it('renders the ChallengeHeaderButton', () => {
+      expect(wrapper.find('ChallengeHeaderButton').exists()).toEqual(true)
     })
   })
 
