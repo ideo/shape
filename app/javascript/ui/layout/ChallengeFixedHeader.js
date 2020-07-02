@@ -8,7 +8,7 @@ import EditableName from '~/ui/pages/shared/EditableName'
 import IconHolder from '~/ui/icons/IconHolder'
 import { MaxWidthContainer } from '~/ui/global/styled/layout'
 import v from '~/utils/variables'
-import { renderChallengeButton } from '~/ui/pages/shared/PageHeader'
+import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
 
 const ChallengeFixedHeader = ({
   collection,
@@ -53,11 +53,7 @@ const ChallengeFixedHeader = ({
             justifyContent: 'flex-end',
           }}
         >
-          {renderChallengeButton(
-            collection,
-            handleShowSettings,
-            handleReviewSubmissions
-          )}
+          <ChallengeHeaderButton record={collection} />
         </Box>
       </Flex>
     </MaxWidthContainer>

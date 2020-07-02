@@ -263,19 +263,12 @@ describe('PageHeader', () => {
       rerender()
     })
 
-    it('should render the ChallengeSubHeader', () => {
+    it('renders the ChallengeSubHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
     })
 
-    it('should render the Button', () => {
-      expect(wrapper.find('Button').exists()).toBe(true)
-      expect(
-        wrapper
-          .find('Button')
-          .children()
-          .last()
-          .text()
-      ).toContain('Challenge Settings')
+    it('renders the ChallengeHeaderButton', () => {
+      expect(wrapper.find('ChallengeHeaderButton').exists()).toBe(true)
     })
   })
 

@@ -1,6 +1,6 @@
 import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 
-import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import { fakeCollection } from '#/mocks/data'
 
 let props, wrapper, rerender
 describe('ChallengeFixedHeader', () => {
@@ -24,9 +24,13 @@ describe('ChallengeFixedHeader', () => {
   describe('inside a challenge collection', () => {
     beforeEach(() => {
       props.collection.collection_type = 'challenge'
+      props.collection.canEdit = true
+      props.collection.API_fetchAllReviewableSubmissions = jest
+        .fn()
+        .mockReturnValue(Promise.resolve([]))
       rerender()
     })
-    it('should render an inline EditableName with the chalenge name', () => {
+    it('should render an inline EditableName with the challenge name', () => {
       expect(wrapper.find('EditableName').props().inline).toEqual(true)
       expect(wrapper.find('EditableName').props().name).toContain(
         'Reusable Cup Challenge'
@@ -41,42 +45,8 @@ describe('ChallengeFixedHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toEqual(false)
     })
 
-    it('should render a Challenge Settings Button', () => {
-      const challengeButton = wrapper.find('Button')
-      expect(challengeButton.exists()).toEqual(true)
-      expect(challengeButton.text()).toContain('Challenge Settings')
-    })
-
-    describe('inside a submission box', () => {
-      const submissionsCollection = fakeCollection
-      beforeEach(() => {
-        props.collection.isSubmissionBox = true
-        props.collection.submissions_collection = submissionsCollection
-        props.collection.isChallengeOrInsideChallenge = true
-        rerender()
-      })
-
-      it('should render a Challenge Settings Button', () => {
-        const challengeButton = wrapper.find('Button')
-        expect(challengeButton.exists()).toEqual(true)
-      })
-
-      it('should render the button with no reviewable submissions', () => {
-        expect(wrapper.find('Button').text()).toContain(
-          'No Reviewable Submissions'
-        )
-      })
-
-      describe('with reviewable submissions', () => {
-        beforeEach(() => {
-          submissionsCollection.reviewableCards = [fakeCollectionCard]
-          props.collection.submissions_collection = submissionsCollection
-          rerender()
-        })
-        it('should render the button with reviewable submissions', () => {
-          expect(wrapper.find('Button').text()).toContain('Review Submissions')
-        })
-      })
+    it('renders the ChallengeHeaderButton', () => {
+      expect(wrapper.find('ChallengeHeaderButton').exists()).toEqual(true)
     })
   })
 

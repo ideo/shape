@@ -32,6 +32,7 @@ import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 import ChallengePhasesIcons from '~/ui/challenges/ChallengePhasesIcons'
+import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -87,37 +88,6 @@ const CollectionPillHolder = styled.div`
   width: 100%;
 `
 
-export const renderChallengeButton = (
-  record,
-  handleChallengeSettingsClick,
-  handleReviewSubmissionsClick
-) => {
-  const buttonProps = { width: 256, size: 'sm', style: { marginLeft: '1rem' } }
-  let name = null
-  if (!record.isSubmissionBox) {
-    name = 'Challenge Settings'
-    _.merge(buttonProps, {
-      colorScheme: `${v.colors.primaryDark}`,
-      onClick: handleChallengeSettingsClick,
-    })
-  } else {
-    const reviewableCards = _.get(
-      record,
-      'submissions_collection.reviewableCards'
-    )
-    const hasReviewableSubmissions = !_.isEmpty(reviewableCards)
-    name = hasReviewableSubmissions
-      ? `Review Submissions`
-      : `No Reviewable Submissions`
-    _.merge(buttonProps, {
-      colorScheme: `${v.colors.alert}`,
-      disabled: !hasReviewableSubmissions,
-      onClick: handleReviewSubmissionsClick,
-    })
-  }
-  return <Button {...buttonProps}>{name}</Button>
-}
-
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class PageHeader extends React.Component {
@@ -158,16 +128,6 @@ class PageHeader extends React.Component {
 
   handleFilterClick = ev => {
     ev.preventDefault()
-  }
-
-  handleChallengeSettingsClick = ({ open = true }) => {
-    const { uiStore } = this.props
-    uiStore.update('challengeSettingsOpen', open)
-  }
-
-  handleReviewSubmissionsClick = () => {
-    const { record } = this
-    record.navigateToNextAvailableInCollectionTestOrTest()
   }
 
   openMoveMenuForTemplate = e => {
@@ -575,11 +535,7 @@ class PageHeader extends React.Component {
 
               {record.isChallengeOrInsideChallenge && (
                 <FixedRightContainer>
-                  {renderChallengeButton(
-                    record,
-                    this.handleChallengeSettingsClick,
-                    this.handleReviewSubmissionsClick
-                  )}
+                  <ChallengeHeaderButton record={record} />
                 </FixedRightContainer>
               )}
             </StyledTitleAndRoles>
