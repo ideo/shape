@@ -1,8 +1,4 @@
-import CollectionTypeIcon, {
-  collectionTypeToIcon,
-  smallCollectionIconMap,
-  largeCollectionIconMap,
-} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import { fakeCollection } from '#/mocks/data'
 
 const props = {
@@ -80,7 +76,7 @@ describe('CollectionTypeIcon', () => {
 
     it('renders the FoamcoreBoardIcon', () => {
       expect(wrapper.find('FoamcoreBoardIcon').exists()).toBeTruthy()
-      expect(wrapper.find('FoamcoreBoardIcon').props().large).toBeTruthy()
+      expect(wrapper.find('FoamcoreBoardIcon').props().size).toEqual('lg')
     })
   })
 
@@ -118,25 +114,4 @@ describe('CollectionTypeIcon', () => {
       expect(wrapper.find('SystemIcon').exists()).toBeTruthy()
     })
   })
-})
-
-describe('collectionTypeToIcon', () => {
-  for (const icon of Object.keys(smallCollectionIconMap)) {
-    describe('when is phase type', () => {
-      it('returns the icon', () => {
-        expect(collectionTypeToIcon({ type: icon })).toEqual(
-          smallCollectionIconMap[icon]
-        )
-      })
-    })
-  }
-  for (const icon of Object.keys(largeCollectionIconMap)) {
-    describe('when is phase type', () => {
-      it('returns the large icon when size requested', () => {
-        expect(collectionTypeToIcon({ type: icon, size: 'lg' })).toEqual(
-          largeCollectionIconMap[icon]
-        )
-      })
-    })
-  }
 })

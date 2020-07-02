@@ -46,12 +46,15 @@ class CollectionCardsTagEditor extends React.Component {
 
   // NOTE: this is used to bulk-update and cache bust tags for selected cards
   _apiAddRemoveTag = (action, data) => {
-    const { cardIds, apiStore } = this.props
+    const { cardIds, apiStore, overrideTagType } = this.props
     const { label, type } = data
+    let tagType = type
+    // Override to set a tag type - rather than using the type from this tag
+    if (overrideTagType) tagType = overrideTagType
     apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
       card_ids: cardIds,
       tag: label,
-      type,
+      type: tagType,
     })
   }
 
@@ -110,14 +113,19 @@ CollectionCardsTagEditor.propTypes = {
   canEdit: PropTypes.bool,
   placeholder: PropTypes.string,
   tagColor: PropTypes.string,
-  suggestions: PropTypes.array.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
+  suggestions: PropTypes.array,
+  handleInputChange: PropTypes.func,
+  overrideTagType: PropTypes.string,
 }
 
 CollectionCardsTagEditor.defaultProps = {
   canEdit: false,
   tagColor: null,
   placeholder: null,
+  suggestions: [],
+  handleInputChange: undefined,
+  placeholder: 'Add new tags, separated by comma or pressing enter.',
+  overrideTagType: null,
 }
 
 CollectionCardsTagEditor.displayName = 'CollectionCardsTagEditor'

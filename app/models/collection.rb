@@ -13,6 +13,7 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
+#  icon                    :string
 #  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
 #  master_template                :boolean          default(FALSE)
@@ -21,6 +22,7 @@
 #  processing_status              :integer
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
+#  show_icon_on_cover             :boolean
 #  start_date                     :datetime
 #  submission_box_type            :integer
 #  submissions_enabled            :boolean          default(TRUE)
@@ -92,8 +94,8 @@ class Collection < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
-  acts_as_taggable
-  acts_as_taggable_on :users
+
+  acts_as_taggable_on :tags, :topics
 
   translates_custom :translated_name,
                     confirmable: true,
@@ -106,6 +108,7 @@ class Collection < ApplicationRecord
                  :cached_cover,
                  :cached_tag_list,
                  :cached_user_tag_list,
+                 :cached_topic_list,
                  :cached_owned_tag_list,
                  :cached_card_count,
                  :cached_activity_count,
@@ -123,6 +126,7 @@ class Collection < ApplicationRecord
   # callbacks
   before_validation :inherit_parent_organization_id, on: :create
   before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
+  before_validation :set_icon_from_collection_type, if: :collection_type_changed?
   before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
   before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
@@ -284,7 +288,7 @@ class Collection < ApplicationRecord
           ],
         },
         :tags,
-        :users,
+        :tagged_users,
       ],
     )
   end
@@ -769,6 +773,10 @@ class Collection < ApplicationRecord
     self.cached_user_tag_list = user_tag_list
   end
 
+  def cache_topic_list
+    self.cached_topic_list = topic_list
+  end
+
   def cache_owned_tag_list
     self.cached_owned_tag_list = owned_tag_list
   end
@@ -776,6 +784,7 @@ class Collection < ApplicationRecord
   # these all get called from CollectionUpdater
   def update_cached_tag_lists
     cache_tag_list if tag_list != cached_tag_list
+    cache_topic_list if topic_list != cached_topic_list
     cache_user_tag_list if user_tag_list != cached_user_tag_list
     cache_owned_tag_list if owned_tag_list != cached_owned_tag_list
   end
@@ -911,20 +920,21 @@ class Collection < ApplicationRecord
     User.where(
       User.arel_table[:handle].lower.in(
         parent_challenge.collection_filters.user_tag.pluck(:text),
-      )
+      ),
     )
   end
 
   # This method is called when a user tag is added to a submission collection
   # in the UserTaggable concern
   def add_challenge_reviewer(user)
-    return unless parent_challenge.present?
+    return unless parent_challenge.present? && user&.handle.present?
 
     filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
     filter_for_user ||= parent_challenge.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
     )
+
     # Find or create the filter for this user
     filter_for_user.user_collection_filters.find_or_create_by(
       user_id: user.id,
@@ -934,13 +944,13 @@ class Collection < ApplicationRecord
   # This method is called when a user tag is removed from a submission collection
   # in the UserTaggable concern
   def remove_challenge_reviewer(user)
-    return unless parent_challenge.present?
+    return unless parent_challenge.present? && user&.handle.present?
 
     parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
 
   def challenge_reviewer?(user)
-    return false if parent_challenge.blank?
+    return false if parent_challenge.blank? || user&.handle.blank?
 
     parent_challenge.collection_filters
                     .tagged_with_user_handle(user.handle)
@@ -951,17 +961,27 @@ class Collection < ApplicationRecord
   def submission_reviewer_status(user)
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
-                  submission_attrs['launchable_test_id'].present? &&
+                  launchable_test_id.present? &&
                   challenge_reviewer?(user)
 
     response = SurveyResponse.find_by(
-      test_collection_id: submission_attrs['launchable_test_id'],
+      test_collection_id: launchable_test_id,
       user_id: user.id,
     )
 
     return :unstarted if response.blank?
 
     response.completed? ? :completed : :in_progress
+  end
+
+  def next_available_challenge_test(for_user:, omit_id: nil)
+    return nil unless challenge_submission_boxes.any?
+
+    # can probably filter out submission boxes within a phase that has ended
+    challenge_submission_boxes.each do |sb|
+      next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
+      return next_test if next_test.present?
+    end
   end
 
   def default_group_id
@@ -1096,7 +1116,11 @@ class Collection < ApplicationRecord
   def submission_test?
     return unless inside_a_submission?
 
-    parent_submission.submission_attrs['launchable_test_id'] == id
+    parent_submission.launchable_test_id == id
+  end
+
+  def launchable_test_id
+    submission_attrs.present? ? submission_attrs['launchable_test_id'] : nil
   end
 
   # check for template instances anywhere in the entire collection tree
@@ -1212,6 +1236,10 @@ class Collection < ApplicationRecord
     # NOTE: somehow unachoring changes collection_type back to 'collection', so re-set it to 'challenge'
     self.collection_type = 'challenge'
 
+    created_by.add_role(Role::ADMIN, admin_group)
+    created_by.add_role(Role::ADMIN, reviewer_group)
+    created_by.add_role(Role::ADMIN, participant_group)
+
     admin_group.add_role(Role::EDITOR, self)
     reviewer_group.add_role(Role::VIEWER, self)
     participant_group.add_role(Role::VIEWER, self)
@@ -1303,5 +1331,15 @@ class Collection < ApplicationRecord
 
   def will_become_a_challenge?
     will_save_change_to_collection_type? && collection_type_in_database != 'challenge' && collection_type == 'challenge'
+  end
+
+  def set_icon_from_collection_type
+    return unless collection_type.present?
+
+    if new_record?
+      self.icon ||= collection_type
+    else
+      self.icon = collection_type
+    end
   end
 end

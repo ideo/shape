@@ -110,7 +110,7 @@ class CoverRenderer extends React.Component {
           return <div>{record.content}</div>
       }
     } else if (this.isCollection) {
-      const { isReviewable } = this.props
+      const isReviewable = _.get(card, 'record.isReviewable')
       return (
         <CollectionCover
           cardId={card.id}

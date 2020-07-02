@@ -68,7 +68,9 @@ class CollectionList extends React.Component {
       {
         displayName: 'Last updated',
         name: 'last_updated',
-        style: { width: '400px' },
+        style: {
+          width: !this.submissionBoxInsideChallenge ? '400px' : '300px',
+        },
       },
       {
         displayName: this.submissionBoxInsideChallenge

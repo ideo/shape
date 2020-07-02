@@ -172,15 +172,15 @@ const SharedRecordMixin = superclass =>
     addTag(label, type, user) {
       this[type].push(label)
       this.API_addRemoveTag('add', { label, type })
-      if (type === 'user_tag_list') {
+      if (type === 'user_tag_list' && user) {
         this.tagged_users.push(user)
       }
     }
 
     @action
     removeTag(label, type, user) {
-      _.remove(this[type], t => {
-        return t === label && t.type === type
+      _.remove(this[type], tag => {
+        return tag === label
       })
       this.API_addRemoveTag('remove', { label, type })
       if (type === 'user_tag_list') {
@@ -195,6 +195,8 @@ const SharedRecordMixin = superclass =>
       if (!this.challengeForCollection) return []
       const challenge = await this.challengeForCollection()
       if (!challenge) return []
+
+      // NOTE: assumes that the reviewer group are the reviewers
       const res = await this.apiStore.request(
         `/groups/${challenge.challenge_reviewer_group_id}`,
         'GET'

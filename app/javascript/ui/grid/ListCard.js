@@ -2,16 +2,14 @@ import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { action, computed, observable, runInAction } from 'mobx'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
 import AvatarList from '~/ui/users/AvatarList'
-import CollectionIconXs from '~/ui/icons/CollectionIconXs'
-import CollectionTypeIcon, {
-  collectionTypeToIcon,
-} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import FileIcon from '~/ui/grid/covers/FileIcon'
 import { highlightedCardCss } from '~/ui/grid/shared'
@@ -21,11 +19,12 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
+import { ReviewButton } from '~/ui/global/challenge/shared'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
-import { routingStore, uiStore } from '~/stores'
 import { openContextMenu } from '~/utils/clickUtils'
 import v, { ITEM_TYPES } from '~/utils/variables'
+import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 
 export const Column = styled.div`
   ${DisplayTextCss}
@@ -98,6 +97,7 @@ const IconHolder = styled.div`
   width: 16px;
 `
 
+@inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class ListCard extends React.Component {
   @observable
@@ -112,11 +112,12 @@ class ListCard extends React.Component {
 
   @computed
   get menuOpen() {
+    const { uiStore } = this.props
     return uiStore.actionMenuOpenForCard(this.props.card.id)
   }
 
   get isSelected() {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     return uiStore.isSelected(card.id)
   }
 
@@ -127,7 +128,7 @@ class ListCard extends React.Component {
   }
 
   handleRecordClick = ev => {
-    const { card } = this.props
+    const { card, uiStore, routingStore } = this.props
     ev.preventDefault()
     ev.stopPropagation()
     if (uiStore.captureKeyboardGridClick(ev, card.id)) {
@@ -137,7 +138,7 @@ class ListCard extends React.Component {
   }
 
   handleRowClick = ev => {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     ev.preventDefault()
     ev.stopPropagation()
     if (uiStore.captureKeyboardGridClick(ev, card.id)) {
@@ -148,7 +149,7 @@ class ListCard extends React.Component {
 
   handleContextMenu = ev => {
     const { menuItemCount, props } = this
-    const { card } = props
+    const { card, uiStore } = props
 
     ev.preventDefault()
     if (uiStore.isAndroid) return false
@@ -161,7 +162,7 @@ class ListCard extends React.Component {
   }
 
   handleActionMenuClick = ev => {
-    const { card } = this.props
+    const { card, uiStore } = this.props
     ev.stopPropagation()
 
     uiStore.openContextMenu(ev, {
@@ -170,6 +171,7 @@ class ListCard extends React.Component {
   }
 
   handleCloseMenu = () => {
+    const { uiStore } = this.props
     // this happens when you mouse off the ActionMenu
     if (this.menuOpen) {
       // if we right-clicked, keep the menu open
@@ -181,6 +183,7 @@ class ListCard extends React.Component {
 
   handleRolesClick = ev => {
     const {
+      uiStore,
       card: { record },
       insideChallenge,
     } = this.props
@@ -208,6 +211,16 @@ class ListCard extends React.Component {
     return record.tagged_users
   }
 
+  get cardsForTagging() {
+    const { apiStore } = this.props
+    if (apiStore.selectedCards.length > 0) {
+      return apiStore.selectedCards
+    } else {
+      const { card } = this.props
+      return [card]
+    }
+  }
+
   get renderLabelSelector() {
     const {
       card: { record },
@@ -220,10 +233,7 @@ class ListCard extends React.Component {
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
         <IconHolder>
-          {collectionTypeToIcon({
-            type: record.collection_type,
-            size: 'lg',
-          })}
+          <CollectionIcon type={record.icon} size="lg" />
         </IconHolder>
       </CollectionTypeSelector>
     )
@@ -252,7 +262,7 @@ class ListCard extends React.Component {
       return (
         <Fragment>
           <IconHolder>
-            <CollectionIconXs />
+            <CollectionIcon size="xs" />
           </IconHolder>
           <IconHolder>
             <CollectionTypeIcon record={card.record} />
@@ -278,8 +288,59 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
+  get renderActions() {
+    const { card, insideChallenge } = this.props
+    const { record } = card
+
+    if (!insideChallenge) {
+      const { uiStore, searchResult } = this.props
+      const tagEditorOpen = uiStore.tagsModalOpenId === card.id
+      return (
+        <Fragment>
+          <ActionMenu
+            location={searchResult ? 'Search' : 'GridCard'}
+            card={card}
+            canView={record.can_view}
+            canEdit={this.canEditCard}
+            canReplace={record.canReplace && !card.link && !searchResult}
+            menuOpen={this.menuOpen}
+            onOpen={this.handleActionMenuClick}
+            onLeave={this.handleCloseMenu}
+            menuItemsCount={this.getMenuItemsCount}
+          />
+          <CollectionCardsTagEditorModal
+            cards={this.cardsForTagging}
+            canEdit={this.canEditCard}
+            open={tagEditorOpen}
+          />
+        </Fragment>
+      )
+    }
+
+    const {
+      submission_reviewer_status,
+      launchableTestId,
+      isReviewable,
+    } = record
+
+    if (submission_reviewer_status && launchableTestId && isReviewable) {
+      return (
+        <ReviewButton
+          reviewerStatus={submission_reviewer_status}
+          onClick={() => {
+            record.navigateToNextAvailableInCollectionTestOrTest({
+              submissionCollection: record,
+            })
+          }}
+        />
+      )
+    }
+
+    return null
+  }
+
   render() {
-    const { card, searchResult } = this.props
+    const { card, insideChallenge, uiStore } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
@@ -310,7 +371,9 @@ class ListCard extends React.Component {
             {this.renderIcons}
           </ColumnLink>
         </Column>
-        <Column width="400px">{defaultTimeFormat(record.updated_at)}</Column>
+        <Column width={!insideChallenge ? '400px' : '300px'}>
+          {defaultTimeFormat(record.updated_at)}
+        </Column>
         <Column width="250px">
           <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
             {this.showReviewers ? (
@@ -341,22 +404,18 @@ class ListCard extends React.Component {
         </Column>
         {/* stopPropagation so that ActionMenu overrides handleRowClick */}
         <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
-          <ActionMenu
-            location={searchResult ? 'Search' : 'GridCard'}
-            card={card}
-            canView={record.can_view}
-            canEdit={this.canEditCard}
-            canReplace={record.canReplace && !card.link && !searchResult}
-            menuOpen={this.menuOpen}
-            onOpen={this.handleActionMenuClick}
-            onLeave={this.handleCloseMenu}
-            menuItemsCount={this.getMenuItemsCount}
-          />
+          {this.renderActions}
         </Column>
       </Row>
     )
   }
 }
+ListCard.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   insideChallenge: PropTypes.bool,

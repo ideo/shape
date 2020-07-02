@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 
 import { Checkbox } from '~/ui/global/styled/forms'
 import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
@@ -36,11 +37,10 @@ class AddReviewersPopover extends React.Component {
 
   get potentialReviewers() {
     const { record } = this.props
-    if (!record.challengeReviewerGroup) return []
-    const members = record.challengeReviewerGroup.roles.find(
-      r => r.label === 'member'
-    ).users
-    return members
+    const challengeRoles = _.get(record, 'challengeReviewerGroup.roles')
+    if (_.isEmpty(challengeRoles)) return []
+    const memberRole = challengeRoles.find(r => r.label === 'member')
+    return _.get(memberRole, 'users', [])
   }
 
   get currentReviewers() {

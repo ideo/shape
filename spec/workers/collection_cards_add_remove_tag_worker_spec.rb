@@ -120,6 +120,49 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
           end
         end
       end
+
+      context 'with topic_list' do
+        let!(:type) { 'topic_list' }
+        let!(:tag) { 'cats' }
+
+        context 'with the add action' do
+          let!(:action) { 'add' }
+
+          it 'adds tags to all card records' do
+            perform
+            records.each do |record|
+              expect(record.reload.topic_list).to eq(['cats'])
+            end
+          end
+
+          it 'calls collection update broadcaster' do
+            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            perform
+          end
+        end
+
+        context 'with the remove action' do
+          let!(:action) { 'remove' }
+
+          before do
+            records.each do |record|
+              record.update(topic_list: 'cats, birds')
+            end
+          end
+
+          it 'removes tags on all card records' do
+            perform
+            records.each do |record|
+              expect(record.reload.topic_list).to eq(['birds'])
+            end
+          end
+
+          it 'calls collection update broadcaster' do
+            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            perform
+          end
+        end
+      end
     end
   end
 end

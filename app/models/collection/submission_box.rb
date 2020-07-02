@@ -13,6 +13,7 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
+#  icon                    :string
 #  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
 #  master_template                :boolean          default(FALSE)
@@ -21,6 +22,7 @@
 #  processing_status              :integer
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
+#  show_icon_on_cover             :boolean
 #  start_date                     :datetime
 #  submission_box_type            :integer
 #  submissions_enabled            :boolean          default(TRUE)
@@ -131,8 +133,15 @@ class Collection
       # none are available if the editor has not launched
       return [] if sub_attrs.blank? || sub_attrs['test_status'] != 'live'
 
-      test_ids = submissions.map do |submission|
-        submission.submission_attrs['launchable_test_id']
+      test_ids = []
+
+      submissions.each do |submission|
+        # disclude from available tests if submission is inside a challenge
+        next if parent_challenge.present? &&
+                submission.cached_user_tag_list.exclude?(for_user&.handle) &&
+                submission_reviewer_status(for_user) == :completed
+
+        test_ids << submission.submission_attrs['launchable_test_id']
       end
       if for_user.present?
         user_responses = SurveyResponse.where(
@@ -159,13 +168,12 @@ class Collection
     def random_next_submission_test(for_user:, omit_id: nil)
       # will be nil if none are available
       available = available_submission_tests(for_user: for_user, omit_id: omit_id)
-      return nil if available.empty?
+      return Collection.none if available.empty?
 
       # need to use inner query to combine `order` + `distinct`
       Collection::TestCollection
         .from(available, :collections)
         .order(Arel.sql('RANDOM()'))
-        .first
     end
 
     private

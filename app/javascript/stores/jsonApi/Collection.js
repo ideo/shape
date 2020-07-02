@@ -78,6 +78,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     'test_show_media',
     'collection_type',
     'search_term',
+    'icon',
+    'show_icon_on_cover',
   ]
 
   constructor(...args) {
@@ -128,12 +130,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     )
 
-    const tagList = _.map(this.tag_list, tag => {
-      return {
-        label: tag,
-        type: 'tag_list',
-      }
+    const tagList = []
+    _.each(['tag_list', 'topic_list'], tagType => {
+      _.each(this[tagType], tag => {
+        tagList.push({
+          label: tag,
+          type: tagType,
+        })
+      })
     })
+
     runInAction(() => {
       this.tags = [...userTagsWithUsers, ...tagList]
     })
@@ -442,6 +448,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return (
       this.is_submission_box_template ||
       (this.submission_attrs && this.submission_attrs.template)
+    )
+  }
+
+  get showSubmissionTopicSuggestions() {
+    const isSubmissionInChallenge =
+      this.isInsideAChallenge && this.isSubmission && this.canEdit
+
+    if (!isSubmissionInChallenge) return false
+
+    const hasTopics =
+      this.parent_challenge.topic_list &&
+      this.parent_challenge.topic_list.length > 0
+
+    return (
+      hasTopics &&
+      (!this.submission_attrs || !this.submission_attrs.hide_topic_suggestions)
     )
   }
 
@@ -1005,6 +1027,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.apiStore.request(apiPath)
   }
 
+  API_hideSubmissionTopicSuggestions() {
+    if (!this.submission_attrs) return false
+    this.submission_attrs.hide_topic_suggestions = true
+    this.save()
+  }
+
   async challengeForCollection() {
     // If this is the parent challenge collection, return
     if (this.challenge === this) {
@@ -1023,7 +1051,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   async loadPhaseSubCollections() {
-    return this.API_fetchPhaseSubCollections()
+    const request = await this.API_fetchPhaseSubCollections()
+    return request.data
   }
 
   async createChildPhaseCollection(name) {
@@ -1517,6 +1546,45 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
 
+  async API_getNextAvailableChallengeTest() {
+    runInAction(() => {
+      this.nextAvailableTestPath = null
+    })
+    const res = await this.apiStore.request(
+      `collections/${this.id}/next_available_challenge_test`
+    )
+    if (!res.data) return
+    const path = this.routingStore.pathTo('collections', res.data.id)
+
+    this.setNextAvailableTestPath(`${path}?open=tests`)
+  }
+
+  async navigateToNextAvailableInCollectionTestOrTest({
+    submissionCollection = null,
+  }) {
+    const submissionBoxOrSubmission = submissionCollection
+      ? submissionCollection
+      : this
+
+    if (submissionBoxOrSubmission.collection_to_test_id) {
+      // must-be an in-collection test
+      await submissionBoxOrSubmission.API_getNextAvailableChallengeTest()
+      if (submissionBoxOrSubmission.nextAvailableTestPath) {
+        return submissionBoxOrSubmission.routingStore.routeTo(
+          submissionBoxOrSubmission.nextAvailableTestPath
+        )
+      }
+    }
+
+    if (submissionBoxOrSubmission.launchableTestId) {
+      window.location.href = submissionBoxOrSubmission.publicTestURL
+      return
+    }
+
+    // not able to find collection_to_test_id or launchableTestId
+    return null
+  }
+
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path
@@ -1728,6 +1796,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (!collection_cover_items || collection_cover_items.length === 0)
       return null
     return collection_cover_items[0]
+  }
+
+  get isReviewable() {
+    const unreviewed = _.get(this, 'submission_reviewer_status') !== 'completed'
+    return this.isLiveTest && unreviewed
+  }
+
+  get reviewableCards() {
+    if (!this.isSubmissionsCollection) return []
+    return _.filter(this.collection_cards, cc => {
+      return _.get(cc, 'record.isReviewable')
+    })
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing

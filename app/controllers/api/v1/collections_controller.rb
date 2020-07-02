@@ -174,6 +174,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                               )
   end
 
+  def next_available_challenge_test
+    test = @collection.next_available_challenge_test(
+      for_user: current_user,
+      omit_id: nil,
+    )
+    # FIXME: need to handle in-collection tests
+    if test.present?
+      render jsonapi: test
+    else
+      render json: nil
+    end
+  end
+
   def phase_sub_collections
     collections = @collection.all_child_collections
                              .active
@@ -373,6 +386,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :collection_type,
       :start_date,
       :end_date,
+      :icon,
+      :show_icon_on_cover,
+      submission_attrs: {},
       user_tag_list: [],
       collection_cards_attributes: %i[id order width height row col pinned],
     ].concat(Collection.globalize_attribute_names)
