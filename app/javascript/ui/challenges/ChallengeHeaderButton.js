@@ -12,6 +12,8 @@ const buttonStyleProps = {
 }
 
 const ChallengeHeaderButton = ({ record }) => {
+  if (!record.isChallengeOrInsideChallenge) return null
+
   if (!record.isSubmissionBox && record.canEdit) {
     return (
       <Button

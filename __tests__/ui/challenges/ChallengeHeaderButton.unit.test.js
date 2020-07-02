@@ -1,4 +1,4 @@
-import ChallengeHeaderButton from '~/ui/challenges/ChallengePhasesIcons'
+import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
 
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
@@ -9,6 +9,7 @@ describe('ChallengeHeaderButton', () => {
       record: {
         ...fakeCollection,
         collection_type: 'challenge',
+        isChallengeOrInsideChallenge: true,
         API_fetchAllReviewableSubmissions: jest
           .fn()
           .mockReturnValue(Promise.resolve([])),
@@ -23,37 +24,53 @@ describe('ChallengeHeaderButton', () => {
     rerender()
   })
 
-  // TODO: add test that it renders challenge settings button only if user can canEdit on collection
-  // TODO: add test that it only renders review submissions button if user is in reviewer group
+  describe('if user cannot edit collection and is not in reviewer group', () => {
+    it('does not render button', () => {
+      expect(wrapper.find('Button').exists()).toBe(false)
+    })
+  })
+
+  describe('if user can edit collection', () => {
+    beforeEach(() => {
+      props.record.canEdit = true
+      rerender()
+    })
+
+    it('renders Challenge Settings button', () => {
+      expect(wrapper.find('Button').exists()).toBe(true)
+      expect(wrapper.find('Button').text()).toEqual('Challenge Settings')
+    })
+  })
 
   describe('inside a submission box', () => {
     const submissionsCollection = fakeCollection
     beforeEach(() => {
-      props.collection.isSubmissionBox = true
-      props.collection.submissions_collection = submissionsCollection
-      props.collection.isChallengeOrInsideChallenge = true
+      props.record.isSubmissionBox = true
+      props.record.submissions_collection = submissionsCollection
       rerender()
     })
 
-    it('should render a Challenge Settings Button', () => {
-      const challengeButton = wrapper.find('Button')
-      expect(challengeButton.exists()).toEqual(true)
-    })
-
-    it('should render the button with no reviewable submissions', () => {
-      expect(wrapper.find('Button').text()).toContain(
-        'No Reviewable Submissions'
-      )
-    })
-
-    describe('with reviewable submissions', () => {
+    describe('if user is in reviewer group', () => {
       beforeEach(() => {
-        submissionsCollection.reviewableCards = [fakeCollectionCard]
-        props.collection.submissions_collection = submissionsCollection
-        rerender()
+        // TODO: setup user in reviewer group
       })
-      it('should render the button with reviewable submissions', () => {
-        expect(wrapper.find('Button').text()).toContain('Review Submissions')
+
+      it('renders the button with no reviewable submissions', () => {
+        expect(wrapper.find('Button').text()).toContain(
+          'No Reviewable Submissions'
+        )
+      })
+
+      describe('with reviewable submissions', () => {
+        beforeEach(() => {
+          submissionsCollection.reviewableCards = [fakeCollectionCard]
+          props.record.submissions_collection = submissionsCollection
+          rerender()
+        })
+
+        it('renders the button with reviewable submissions', () => {
+          expect(wrapper.find('Button').text()).toContain('Review Submissions')
+        })
       })
     })
   })
