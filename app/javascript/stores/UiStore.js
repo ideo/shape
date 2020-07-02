@@ -813,7 +813,6 @@ export default class UiStore {
       this.openBlankContentTool()
     } else {
       const { placeholderCard } = this.blankContentToolState
-      // TODO: ..... any other BCT cleanup?
       if (placeholderCard) {
         await placeholderCard.API_destroy()
       }
@@ -870,7 +869,7 @@ export default class UiStore {
 
   get isEditingText() {
     const { textEditingItem, viewingItem } = this
-    return textEditingItem || (viewingItem && viewingItem.isText)
+    return !!(textEditingItem || (viewingItem && viewingItem.isText))
   }
 
   get isViewingHomepage() {
