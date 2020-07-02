@@ -318,6 +318,7 @@ class AudienceSettings extends React.Component {
     const { numPaidQuestions, isInsideAChallenge } = testCollection
     const { currentUser } = apiStore
     const currentUserOrganization = currentUser.current_organization
+    const { isLiveTest, isClosedTest } = testCollection
 
     return (
       <Fragment>
@@ -357,7 +358,9 @@ class AudienceSettings extends React.Component {
           <FormButtonWrapper>
             <Button
               data-cy="LaunchFormButton"
-              disabled={uiStore.launchButtonLoading || this.locked}
+              disabled={
+                uiStore.launchButtonLoading || isLiveTest || isClosedTest
+              }
               onClick={this.submitSettings}
             >
               {testCollection.is_submission_box_template_test

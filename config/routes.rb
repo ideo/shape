@@ -29,6 +29,7 @@ Rails.application.routes.draw do
           get 'in_my_collection'
           get 'direct_children_tag_list'
           get 'challenge_submission_boxes'
+          get 'next_available_challenge_test'
           get 'phase_sub_collections'
           get 'challenge_phase_collections'
           get 'challenge_reviewers'

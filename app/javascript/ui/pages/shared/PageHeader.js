@@ -30,7 +30,6 @@ import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
 import IconHolder from '~/ui/icons/IconHolder'
-import TopRightChallengeButton from '~/ui/global/TopRightChallengeButton'
 import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
 import ChallengePhasesIcons from '~/ui/challenges/ChallengePhasesIcons'
 
@@ -88,6 +87,37 @@ const CollectionPillHolder = styled.div`
   width: 100%;
 `
 
+export const renderChallengeButton = (
+  record,
+  handleChallengeSettingsClick,
+  handleReviewSubmissionsClick
+) => {
+  const buttonProps = { width: 256, size: 'sm', style: { marginLeft: '1rem' } }
+  let name = null
+  if (!record.isSubmissionBox) {
+    name = 'Challenge Settings'
+    _.merge(buttonProps, {
+      colorScheme: `${v.colors.primaryDark}`,
+      onClick: handleChallengeSettingsClick,
+    })
+  } else {
+    const reviewableCards = _.get(
+      record,
+      'submissions_collection.reviewableCards'
+    )
+    const hasReviewableSubmissions = !_.isEmpty(reviewableCards)
+    name = hasReviewableSubmissions
+      ? `Review Submissions`
+      : `No Reviewable Submissions`
+    _.merge(buttonProps, {
+      colorScheme: `${v.colors.alert}`,
+      disabled: !hasReviewableSubmissions,
+      onClick: handleReviewSubmissionsClick,
+    })
+  }
+  return <Button {...buttonProps}>{name}</Button>
+}
+
 @inject('uiStore', 'apiStore', 'routingStore')
 @observer
 class PageHeader extends React.Component {
@@ -130,13 +160,14 @@ class PageHeader extends React.Component {
     ev.preventDefault()
   }
 
-  handleChallengeSettingsClick = () => {
+  handleChallengeSettingsClick = ({ open = true }) => {
     const { uiStore } = this.props
-    uiStore.update('challengeSettingsOpen', true)
+    uiStore.update('challengeSettingsOpen', open)
   }
 
   handleReviewSubmissionsClick = () => {
-    // FIXME: to be implemented in an upcoming story
+    const { record } = this
+    record.navigateToNextAvailableInCollectionTestOrTest()
   }
 
   openMoveMenuForTemplate = e => {
@@ -437,32 +468,6 @@ class PageHeader extends React.Component {
     return null
   }
 
-  get renderTopRightButton() {
-    const { record, apiStore } = this.props
-
-    let buttonProps = {}
-    if (!record.isSubmissionBox) {
-      buttonProps = {
-        name: 'Challenge Settings',
-        onClick: this.handleChallengeSettingsClick,
-      }
-    } else {
-      const { currentUser } = apiStore
-      // FIXME: User::API_fetchAllReviewableSubmissions is not implemented
-      const reviewableSubmissions = currentUser.API_fetchAllReviewableSubmissions(
-        record
-      )
-      const hidden = _.isEmpty(reviewableSubmissions)
-      buttonProps = {
-        name: `Review Submissions (${reviewableSubmissions.length})`,
-        color: `${v.colors.alert}`,
-        onClick: this.handleReviewSubmissionsClick,
-        hidden,
-      }
-    }
-    return <TopRightChallengeButton {...buttonProps} />
-  }
-
   get cardsForTagging() {
     const { apiStore, record } = this.props
     if (apiStore.selectedCards.length > 0) {
@@ -570,7 +575,11 @@ class PageHeader extends React.Component {
 
               {record.isChallengeOrInsideChallenge && (
                 <FixedRightContainer>
-                  {this.renderTopRightButton}
+                  {renderChallengeButton(
+                    record,
+                    this.handleChallengeSettingsClick,
+                    this.handleReviewSubmissionsClick
+                  )}
                 </FixedRightContainer>
               )}
             </StyledTitleAndRoles>

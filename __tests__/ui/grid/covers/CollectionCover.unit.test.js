@@ -164,6 +164,21 @@ describe('CollectionCover', () => {
     })
   })
 
+  describe('reviewable collection', () => {
+    beforeEach(() => {
+      props.collection.isLiveTest = true
+      props.inSubmissionsCollection = true
+      props.isReviewable = true
+      wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    })
+
+    it('renders the submissions reviewer button', () => {
+      expect(wrapper.find('Button').exists()).toBe(true)
+      expect(wrapper.find('Button').html()).toContain('Review')
+    })
+  })
+
   describe('when show_icon_on_cover is true', () => {
     beforeEach(() => {
       props.collection.show_icon_on_cover = true

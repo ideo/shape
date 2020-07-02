@@ -123,7 +123,8 @@ class Header extends React.Component {
   }
 
   handleReviewSubmissions = () => {
-    // FIXME: to be implemented in an upcoming story
+    const { record } = this
+    record.navigateToNextAvailableInCollectionTestOrTest()
   }
 
   get onArchivedPage() {

@@ -417,22 +417,6 @@ class CollectionGrid extends React.Component {
     uiStore.setHoveringOver(val)
   }
 
-  isCardReviewable(card) {
-    const { apiStore, collection } = this.props
-    const { currentUser } = apiStore
-
-    // FIXME: User::API_fetchAllReviewableSubmissions is not implemented
-    const reviewableSubmissions = currentUser.API_fetchAllReviewableSubmissions(
-      collection
-    )
-
-    if (_.isEmpty(reviewableSubmissions)) {
-      return false
-    }
-
-    _.contains(reviewableSubmissions, card.record)
-  }
-
   cancelDrag() {
     const { uiStore } = this.props
     uiStore.setMovingCards([])
@@ -994,7 +978,6 @@ class CollectionGrid extends React.Component {
           isUserCollection={collection.isUserCollection}
           isSharedCollection={collection.isSharedCollection}
           isBoardCollection={false}
-          isReviewable={this.isCardReviewable(card)}
           position={card.position}
           dragOffset={calculatePageMargins()}
           record={record}

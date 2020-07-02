@@ -741,6 +741,10 @@ class Collection
       )
     end
 
+    def live_challenge_submission_test?
+      challenge_or_inside_challenge? && !submission_box_template_test? && live?
+    end
+
     private
 
     def question_items_from_sections(section_names)

@@ -19,6 +19,7 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
+import { ReviewButton } from '~/ui/global/challenge/shared'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { openContextMenu } from '~/utils/clickUtils'
@@ -279,13 +280,63 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
+  get renderActions() {
+    const { card, insideChallenge } = this.props
+    const { record } = card
+
+    if (!insideChallenge) {
+      const { uiStore, searchResult } = this.props
+      const tagEditorOpen = uiStore.tagsModalOpenId === card.id
+      return (
+        <Fragment>
+          <ActionMenu
+            location={searchResult ? 'Search' : 'GridCard'}
+            card={card}
+            canView={record.can_view}
+            canEdit={this.canEditCard}
+            canReplace={record.canReplace && !card.link && !searchResult}
+            menuOpen={this.menuOpen}
+            onOpen={this.handleActionMenuClick}
+            onLeave={this.handleCloseMenu}
+            menuItemsCount={this.getMenuItemsCount}
+          />
+          <CollectionCardsTagEditorModal
+            cards={this.cardsForTagging}
+            canEdit={this.canEditCard}
+            open={tagEditorOpen}
+          />
+        </Fragment>
+      )
+    }
+
+    const {
+      submission_reviewer_status,
+      launchableTestId,
+      isReviewable,
+    } = record
+
+    if (submission_reviewer_status && launchableTestId && isReviewable) {
+      return (
+        <ReviewButton
+          reviewerStatus={submission_reviewer_status}
+          onClick={() => {
+            record.navigateToNextAvailableInCollectionTestOrTest({
+              submissionCollection: record,
+            })
+          }}
+        />
+      )
+    }
+
+    return null
+  }
+
   render() {
-    const { card, insideChallenge, searchResult, uiStore } = this.props
+    const { card, insideChallenge, uiStore } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
     }
-    const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
     return (
       <Row
@@ -312,7 +363,9 @@ class ListCard extends React.Component {
             {this.renderIcons}
           </ColumnLink>
         </Column>
-        <Column width="400px">{defaultTimeFormat(record.updated_at)}</Column>
+        <Column width={!insideChallenge ? '400px' : '300px'}>
+          {defaultTimeFormat(record.updated_at)}
+        </Column>
         <Column width="250px">
           <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
             {insideChallenge ? (
@@ -343,22 +396,7 @@ class ListCard extends React.Component {
         </Column>
         {/* stopPropagation so that ActionMenu overrides handleRowClick */}
         <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
-          <ActionMenu
-            location={searchResult ? 'Search' : 'GridCard'}
-            card={card}
-            canView={record.can_view}
-            canEdit={this.canEditCard}
-            canReplace={record.canReplace && !card.link && !searchResult}
-            menuOpen={this.menuOpen}
-            onOpen={this.handleActionMenuClick}
-            onLeave={this.handleCloseMenu}
-            menuItemsCount={this.getMenuItemsCount}
-          />
-          <CollectionCardsTagEditorModal
-            cards={this.cardsForTagging}
-            canEdit={this.canEditCard}
-            open={tagEditorOpen}
-          />
+          {this.renderActions}
         </Column>
       </Row>
     )

@@ -481,6 +481,10 @@ class Item < ApplicationRecord
     false
   end
 
+  def submission?
+    false
+  end
+
   private
 
   def missing_value_by_question_type

@@ -1531,6 +1531,45 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
 
+  async API_getNextAvailableChallengeTest() {
+    runInAction(() => {
+      this.nextAvailableTestPath = null
+    })
+    const res = await this.apiStore.request(
+      `collections/${this.id}/next_available_challenge_test`
+    )
+    if (!res.data) return
+    const path = this.routingStore.pathTo('collections', res.data.id)
+
+    this.setNextAvailableTestPath(`${path}?open=tests`)
+  }
+
+  async navigateToNextAvailableInCollectionTestOrTest({
+    submissionCollection = null,
+  }) {
+    const submissionBoxOrSubmission = submissionCollection
+      ? submissionCollection
+      : this
+
+    if (submissionBoxOrSubmission.collection_to_test_id) {
+      // must-be an in-collection test
+      await submissionBoxOrSubmission.API_getNextAvailableChallengeTest()
+      if (submissionBoxOrSubmission.nextAvailableTestPath) {
+        return submissionBoxOrSubmission.routingStore.routeTo(
+          submissionBoxOrSubmission.nextAvailableTestPath
+        )
+      }
+    }
+
+    if (submissionBoxOrSubmission.launchableTestId) {
+      window.location.href = submissionBoxOrSubmission.publicTestURL
+      return
+    }
+
+    // not able to find collection_to_test_id or launchableTestId
+    return null
+  }
+
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path
@@ -1742,6 +1781,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (!collection_cover_items || collection_cover_items.length === 0)
       return null
     return collection_cover_items[0]
+  }
+
+  get isReviewable() {
+    const unreviewed = _.get(this, 'submission_reviewer_status') !== 'completed'
+    return this.isLiveTest && unreviewed
+  }
+
+  get reviewableCards() {
+    if (!this.isSubmissionsCollection) return []
+    return _.filter(this.collection_cards, cc => {
+      return _.get(cc, 'record.isReviewable')
+    })
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
