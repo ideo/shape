@@ -8,7 +8,7 @@ module CollectionCardBuilderHelpers
     builder = CollectionCardBuilder.new(
       params: params,
       parent_collection: parent_collection,
-      user: created_by || parent_collection.created_by,
+      user: created_by || parent_collection&.created_by,
       type: type,
     )
 
