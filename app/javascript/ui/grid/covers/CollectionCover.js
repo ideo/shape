@@ -491,11 +491,7 @@ class CollectionCover extends React.Component {
                       <ReviewButton
                         reviewerStatus={submission_reviewer_status}
                         onClick={() => {
-                          collection.navigateToNextAvailableInCollectionTestOrTest(
-                            {
-                              submissionCollection: collection,
-                            }
-                          )
+                          collection.navigateToNextAvailableTest()
                         }}
                       />
                     )}

@@ -166,8 +166,8 @@ class PageHeader extends React.Component {
   }
 
   handleReviewSubmissionsClick = () => {
-    const { record } = this
-    record.navigateToNextAvailableInCollectionTestOrTest()
+    const { record } = this.props
+    record.navigateToNextAvailableTest()
   }
 
   openMoveMenuForTemplate = e => {
