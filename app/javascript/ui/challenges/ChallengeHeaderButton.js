@@ -58,7 +58,7 @@ class ChallengeHeaderButton extends React.Component {
           {...buttonStyleProps}
           colorScheme={v.colors.alert}
           disabled={!hasReviewableSubmissions}
-          onClick={() => record.navigateToNextAvailableInCollectionTestOrTest()}
+          onClick={() => record.navigateToNextAvailableTest()}
         >
           {hasReviewableSubmissions
             ? `Review Submissions`

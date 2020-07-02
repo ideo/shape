@@ -1533,56 +1533,51 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
   }
 
-  async API_getNextAvailableTest() {
-    runInAction(() => {
-      this.nextAvailableTestPath = null
-    })
-    const res = await this.apiStore.request(
-      `test_collections/${this.id}/next_available`
-    )
+  async API_getNextAvailableTest({ challenge = false }) {
+    this.setNextAvailableTestPath(null)
+    const nextTestPath = !challenge
+      ? 'test_collections/${this.id}/next_available'
+      : 'collections/${this.id}/next_available_challenge_test'
+    const res = await this.apiStore.request(nextTestPath)
     if (!res.data) return
     const path = this.routingStore.pathTo('collections', res.data.id)
 
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
 
-  async API_getNextAvailableChallengeTest() {
-    runInAction(() => {
-      this.nextAvailableTestPath = null
-    })
-    const res = await this.apiStore.request(
-      `collections/${this.id}/next_available_challenge_test`
-    )
-    if (!res.data) return
-    const path = this.routingStore.pathTo('collections', res.data.id)
+  async navigateToNextInCollectionTest() {
+    // FIXME: add later when in-collection tests are supported
+    if (this.isSubmission) {
+      await this.API_getNextAvailableTest()
+    } else if (this.isSubmissionBox) {
+      await this.API_getNextAvailableTest({ challenge: true })
+    }
+    if (!this.nextAvailableTestPath) return
 
-    this.setNextAvailableTestPath(`${path}?open=tests`)
+    return this.routingStore.routeTo(this.nextAvailableTestPath)
   }
 
-  async navigateToNextAvailableInCollectionTestOrTest({
-    submissionCollection = null,
-  }) {
-    const submissionBoxOrSubmission = submissionCollection
-      ? submissionCollection
-      : this
+  async navigateToNextAvailableTest() {
+    let testUrl = null
+    if (this.isSubmission && this.launchableTestId) {
+      testUrl = this.publicTestURL
+    } else if (this.isSubmissionBox) {
+      const res = await this.apiStore.request(
+        `collections/${this.id}/next_available_challenge_test`
+      )
 
-    if (submissionBoxOrSubmission.collection_to_test_id) {
-      // must-be an in-collection test
-      await submissionBoxOrSubmission.API_getNextAvailableChallengeTest()
-      if (submissionBoxOrSubmission.nextAvailableTestPath) {
-        return submissionBoxOrSubmission.routingStore.routeTo(
-          submissionBoxOrSubmission.nextAvailableTestPath
-        )
-      }
+      if (!res.data) return
+
+      testUrl = res.data.publicTestURL
     }
 
-    if (submissionBoxOrSubmission.launchableTestId) {
-      window.location.href = submissionBoxOrSubmission.publicTestURL
-      return
-    }
+    console.log({ testUrl })
 
-    // not able to find collection_to_test_id or launchableTestId
-    return null
+    if (!testUrl) return
+
+    window.location.href = testUrl
+
+    return
   }
 
   @action

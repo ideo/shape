@@ -328,9 +328,7 @@ class ListCard extends React.Component {
         <ReviewButton
           reviewerStatus={submission_reviewer_status}
           onClick={() => {
-            record.navigateToNextAvailableInCollectionTestOrTest({
-              submissionCollection: record,
-            })
+            record.navigateToNextAvailableTest()
           }}
         />
       )
