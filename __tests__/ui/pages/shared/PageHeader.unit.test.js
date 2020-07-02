@@ -227,6 +227,7 @@ describe('PageHeader', () => {
       props.record = fakeCollection
       props.record.isChallengeOrInsideChallenge = true
       props.record.collection_type = 'challenge'
+      props.record.canEdit = true
       wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
     })
 
@@ -234,11 +235,24 @@ describe('PageHeader', () => {
       expect(wrapper.find('ChallengeSubHeader').exists()).toBe(false)
     })
 
-    it('should render the TopRightChallengeButton', () => {
+    it('renders the TopRightChallengeButton', () => {
       expect(wrapper.find('TopRightChallengeButton').exists()).toBe(true)
       expect(wrapper.find('TopRightChallengeButton').props().name).toEqual(
         'Challenge Settings'
       )
+    })
+
+    describe('if user cannot edit content', () => {
+      beforeEach(() => {
+        props.record.canEdit = false
+        wrapper = shallow(<PageHeader.wrappedComponent {...props} />)
+      })
+
+      it('hides the TopRightChallengeButton', () => {
+        expect(wrapper.find('TopRightChallengeButton').props().hidden).toBe(
+          true
+        )
+      })
     })
   })
 

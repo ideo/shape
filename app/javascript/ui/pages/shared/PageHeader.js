@@ -440,8 +440,8 @@ class PageHeader extends React.Component {
   get renderTopRightButton() {
     const { record, apiStore } = this.props
 
-    let buttonProps = {}
-    if (!record.isSubmissionBox) {
+    let buttonProps
+    if (!record.isSubmissionBox && record.canEdit) {
       buttonProps = {
         name: 'Challenge Settings',
         onClick: this.handleChallengeSettingsClick,
@@ -454,13 +454,16 @@ class PageHeader extends React.Component {
       )
       const hidden = _.isEmpty(reviewableSubmissions)
       buttonProps = {
-        name: `Review Submissions (${reviewableSubmissions.length})`,
+        name: `Review Submissions${
+          reviewableSubmissions ? `(${reviewableSubmissions.length})` : ''
+        }`,
         color: `${v.colors.alert}`,
         onClick: this.handleReviewSubmissionsClick,
         hidden,
       }
     }
-    return <TopRightChallengeButton {...buttonProps} />
+    if (buttonProps) return <TopRightChallengeButton {...buttonProps} />
+    return null
   }
 
   get cardsForTagging() {

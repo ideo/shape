@@ -19,7 +19,7 @@ const ChallengeFixedHeader = ({
 }) => {
   const { name, collection_type, icon } = collection
   let buttonProps = {}
-  if (!collection.isSubmissionBox) {
+  if (!collection.isSubmissionBox && collection.canEdit) {
     buttonProps = {
       name: 'Challenge Settings',
       onClick: handleShowSettings,
