@@ -34,7 +34,7 @@ class TestsController < ApplicationController
     if params[:ta].present? || params[:token].present?
       look_up_test_audience
       # if you're invited to a test audience it'll set to `invalid` if that audience is closed
-    elsif @collection.challenge_or_inside_challenge? && !@collection.submission_box_template_test?
+    elsif @collection.live_challenge_submission_test?
       look_up_challenge_test_audience
     end
 
