@@ -1,6 +1,12 @@
 import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
-
-import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
+import fakeApiStore from '#/mocks/fakeApiStore'
+import {
+  fakeCollection,
+  fakeCollectionCard,
+  fakeGroup,
+  fakeRole,
+  fakeUser,
+} from '#/mocks/data'
 
 let props, wrapper, rerender
 describe('ChallengeHeaderButton', () => {
@@ -13,12 +19,14 @@ describe('ChallengeHeaderButton', () => {
         API_fetchAllReviewableSubmissions: jest
           .fn()
           .mockReturnValue(Promise.resolve([])),
+        fetchChallengeReviewersGroup: jest.fn(),
         canEdit: false,
       },
+      apiStore: fakeApiStore(),
     }
 
     rerender = () => {
-      wrapper = shallow(<ChallengeHeaderButton {...props} />)
+      wrapper = shallow(<ChallengeHeaderButton.wrappedComponent {...props} />)
     }
 
     rerender()
@@ -46,16 +54,28 @@ describe('ChallengeHeaderButton', () => {
     const submissionsCollection = fakeCollection
     beforeEach(() => {
       props.record.isSubmissionBox = true
+      props.record.isChallengeOrInsideChallenge = true
       props.record.submissions_collection = submissionsCollection
       rerender()
     })
 
+    it('should not render a challenge button', () => {
+      expect(wrapper.find('Button').exists()).toBe(false)
+    })
+
     describe('if user is in reviewer group', () => {
       beforeEach(() => {
-        // TODO: setup user in reviewer group
+        const reviewerGroup = fakeGroup
+        const memberRole = fakeRole
+        memberRole.label = 'member'
+        memberRole.users = [fakeUser]
+        reviewerGroup.roles = [memberRole]
+        props.apiStore.currentUser = fakeUser
+        props.record.challengeReviewerGroup = reviewerGroup
+        rerender()
       })
 
-      it('renders the button with no reviewable submissions', () => {
+      it('should render the button with no reviewable submissions', () => {
         expect(wrapper.find('Button').text()).toContain(
           'No Reviewable Submissions'
         )
@@ -64,7 +84,6 @@ describe('ChallengeHeaderButton', () => {
       describe('with reviewable submissions', () => {
         beforeEach(() => {
           submissionsCollection.reviewableCards = [fakeCollectionCard]
-          props.record.submissions_collection = submissionsCollection
           rerender()
         })
 

@@ -287,39 +287,7 @@ describe('PageHeader', () => {
     })
 
     it('should render the Button', () => {
-      expect(wrapper.find('Button').exists()).toBe(true)
-    })
-
-    it('should render the button with no reviewable submissions', () => {
-      expect(
-        wrapper
-          .find('Button')
-          .children()
-          .last()
-          .text()
-      ).toContain('No Reviewable Submissions')
-    })
-
-    describe('with reviewable submissions', () => {
-      beforeEach(() => {
-        const submissionsBoxCollection = fakeCollection
-        submissionsBoxCollection.isSubmissionBox = true
-        submissionsBoxCollection.isChallengeOrInsideChallenge = true
-        const submissionsCollection = fakeCollection
-        submissionsCollection.reviewableCards = [fakeCollectionCard]
-        submissionsBoxCollection.submissions_collection = submissionsCollection
-        props.record = submissionsBoxCollection
-        rerender()
-      })
-      it('should render the button with reviewable submissions', () => {
-        expect(
-          wrapper
-            .find('Button')
-            .children()
-            .last()
-            .text()
-        ).toContain('Review Submissions')
-      })
+      expect(wrapper.find('ChallengeHeaderButton').exists()).toBe(true)
     })
   })
 

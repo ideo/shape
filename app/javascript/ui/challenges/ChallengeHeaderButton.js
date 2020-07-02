@@ -74,4 +74,6 @@ ChallengeHeaderButton.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
+ChallengeHeaderButton.displayName = 'ChallengeHeaderButton'
+
 export default ChallengeHeaderButton
