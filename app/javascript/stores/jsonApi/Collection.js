@@ -965,6 +965,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  API_fetchCardReviewerStatues = () => {
+    const ids = _.compact(
+      _.map(this.collection_cards, cc => {
+        if (cc.record && cc.record.user_tag_list) {
+          return cc.id
+        }
+      })
+    )
+    if (ids.length === 0) return
+    const basePath = '/api/v1'
+    return axios.get(
+      `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
+    )
+  }
+
   async API_fetchAndMergeCards(cardIds) {
     const { apiStore } = this
     const ids = cardIds.join(',')
