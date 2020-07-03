@@ -51,14 +51,8 @@ module CollectionGrid
       moving_cards = moving_cards.select(&:changed?)
       return if moving_cards.none?
 
-      parent_snapshot = {collection_cards_attributes: []}
-
+      parent_snapshot = { collection_cards_attributes: [] }
       moving_cards.each do |cc|
-        # @card_attributes_was << {
-        #   id: cc.id,
-        #   row: cc.row_was,
-        #   col: cc.col_was,
-        # }
         @card_attributes << {
           id: cc.id,
           row: cc.row,

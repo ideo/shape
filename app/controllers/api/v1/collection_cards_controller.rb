@@ -94,17 +94,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     card_params = collection_card_params
     # CollectionCardBuilder type expects 'primary' or 'link'
     card_type = card_params.delete(:card_type) || 'primary'
-    placeholder = nil
-    placeholder_card_id = json_api_params[:data][:placeholder_card_id]
-    if placeholder_card_id.present?
-      placeholder = CollectionCard::Placeholder.find_by_id(placeholder_card_id)
-    end
-
     builder = CollectionCardBuilder.new(params: card_params,
                                         type: card_type,
                                         parent_collection: @collection,
                                         user: current_user,
-                                        placeholder: placeholder)
+                                        placeholder: find_placeholder_card)
     if builder.create
       @collection_card = builder.collection_card
       # reload the user's roles
@@ -137,15 +131,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render_collection_card
   end
 
+  before_action :authorize_card_for_destroy, only: %i[destroy]
   def destroy
     if @collection_card.destroy
       if @collection_card.bct_placeholder?
         CollectionGrid::BctRemover.call(
           placeholder_card: @collection_card,
         )
-      else
-        @collection_card.parent.reorder_cards!
       end
+      @collection_card.parent.reorder_cards!
       head :no_content
     else
       render_api_errors @collection_card.errors
@@ -373,6 +367,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
   end
 
+  def find_placeholder_card
+    placeholder_card_id = json_api_params[:data][:placeholder_card_id]
+    return unless placeholder_card_id.present?
+
+    CollectionCard::Placeholder.find_by(
+      id: placeholder_card_id,
+      parent: @collection,
+    )
+  end
+
   def load_and_authorize_parent_collection_for_index
     @collection = Collection.find(
       params[:collection_id].presence || params[:filter][:collection_id],
@@ -466,6 +470,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       # - link cards authorize edit via the parent collection
       authorize! :edit, card
     end
+  end
+
+  def authorize_card_for_destroy
+    if @collection_card.bct_placeholder? || @collection_card&.parent&.test_collection?
+      return
+    end
+
+    head :unauthorized
   end
 
   def prevent_moving_into_test_collection

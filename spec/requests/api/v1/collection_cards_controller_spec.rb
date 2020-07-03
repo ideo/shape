@@ -421,6 +421,25 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         end
       end
 
+      context 'with placeholder_card_id and board_collection' do
+        let(:collection) do
+          create(:board_collection, add_editors: [user], organization: organization)
+        end
+        let!(:placeholder) { create(:collection_card_bct_placeholder, parent: collection) }
+        let(:params) do
+          json_api_params('collection_cards', raw_params, placeholder_card_id: placeholder.id)
+        end
+
+        it 'creates record, utilizing placeholder' do
+          expect do
+            post(path, params: params)
+          end.to change(CollectionCard::Placeholder, :count).by(-1)
+          card = CollectionCard.find(json['data']['id'])
+          expect(card.id).to eq placeholder.id
+          expect(card.is_a?(CollectionCard::Primary)).to be true
+        end
+      end
+
       context 'with a link card' do
         let!(:linked_collection) { create(:collection) }
         let(:raw_params) do
@@ -595,6 +614,66 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         item = Item.find(json_item['id'])
         expect(item.translated_name_es).to eq('Algo genial')
         expect(item.translated_content_es).to eq('¿No es este un widget genial?')
+      end
+    end
+  end
+
+  describe 'POST #create_bct' do
+    let(:path) { '/api/v1/collection_cards/create_bct' }
+    let(:raw_params) do
+      {
+        row: 0,
+        col: 2,
+        parent_id: collection.id,
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+    let(:bad_params) do
+      json_api_params('collection_cards', parent_id: collection.id)
+    end
+
+    before do
+      allow(CollectionGrid::BctInserter).to receive(:new).and_call_original
+    end
+
+    context 'without content editor access' do
+      let(:user) { create(:user) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with errors' do
+      it 'returns a 422 bad request' do
+        post(path, params: bad_params)
+        expect(response.status).to eq(422)
+      end
+    end
+
+    context 'success' do
+      let(:collection) { create(:board_collection, add_editors: [user]) }
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates a placeholder' do
+        expect(CollectionGrid::BctInserter).to receive(:new).with(
+          row: 0,
+          col: 2,
+          collection: collection,
+        )
+        expect {
+          post(path, params: params)
+        }.to change(CollectionCard::Placeholder, :count).by(1)
+        expect(json['data']['attributes']).to match_json_schema('collection_card')
+        expect(json['data']['attributes']['row']).to eq 0
+        expect(json['data']['attributes']['col']).to eq 2
+        expect(json['data']['attributes']['private_card']).to be nil
+        expect(json['data']['attributes']['class_type']).to eq 'CollectionCard::Placeholder'
       end
     end
   end
@@ -1592,7 +1671,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  describe '#POST toggle_pin' do
+  describe 'POST #toggle_pin' do
     let(:master) {
       create(:collection,
              master_template: true,
@@ -1641,62 +1720,46 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  describe '#POST create_bct' do
-    let(:path) { '/api/v1/collection_cards/create_bct' }
-    let(:raw_params) do
-      {
-        row: 0,
-        col: 2,
-        parent_id: collection.id,
-      }
-    end
-    let(:params) { json_api_params('collection_cards', raw_params) }
-    let(:bad_params) do
-      json_api_params('collection_cards', parent_id: collection.id)
-    end
+  describe 'DELETE #destroy' do
+    let(:collection_card) { create(:collection_card_collection, parent: collection) }
+    let(:path) { "/api/v1/collection_cards/#{collection_card.id}" }
 
-    before do
-      allow(CollectionGrid::BctInserter).to receive(:new).and_call_original
-    end
-
-    context 'without content editor access' do
-      let(:user) { create(:user) }
+    context 'without editor access' do
+      let(:collection) do
+        create(:collection, add_viewers: [user], organization: organization)
+      end
 
       it 'returns a 401' do
-        post(path, params: params)
+        delete(path)
         expect(response.status).to eq(401)
       end
     end
 
-    context 'with errors' do
-      it 'returns a 422 bad request' do
-        post(path, params: bad_params)
-        expect(response.status).to eq(422)
-      end
-    end
-
-    context 'success' do
-      let(:collection) { create(:board_collection, add_editors: [user]) }
-
-      it 'returns a 200' do
-        post(path, params: params)
-        expect(response.status).to eq(200)
+    context 'with editor access' do
+      it 'returns a 401 unless it is a test collection card' do
+        delete(path)
+        expect(response.status).to eq(401)
       end
 
-      it 'creates a placeholder' do
-        expect(CollectionGrid::BctInserter).to receive(:new).with(
-          row: 0,
-          col: 2,
-          collection: collection,
-        )
-        expect {
-          post(path, params: params)
-        }.to change(CollectionCard::Placeholder, :count).by(1)
-        expect(json['data']['attributes']).to match_json_schema('collection_card')
-        expect(json['data']['attributes']['row']).to eq 0
-        expect(json['data']['attributes']['col']).to eq 2
-        expect(json['data']['attributes']['private_card']).to be nil
-        expect(json['data']['attributes']['class_type']).to eq 'CollectionCard::Placeholder'
+      context 'with a test collection card' do
+        let(:collection) { create(:test_collection, add_editors: [user]) }
+        let(:collection_card) { collection.collection_cards.first }
+
+        it 'returns a 204' do
+          delete(path)
+          expect(response.status).to eq(204)
+        end
+      end
+
+      context 'with a bct_placeholder' do
+        let(:collection_card) { create(:collection_card_bct_placeholder, parent: collection) }
+
+        it 'calls CollectionGrid::BctRemover' do
+          expect(CollectionGrid::BctRemover).to receive(:call).with(
+            placeholder_card: collection_card,
+          )
+          delete(path)
+        end
       end
     end
   end
