@@ -609,7 +609,11 @@ class Collection < ApplicationRecord
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     # no need to do this for boards
-    return if board_collection?
+    if board_collection?
+      collection_cards.update_all(order: 0)
+      # There is a non-null constraint
+      return
+    end
 
     CollectionCard.import(
       calculate_reordered_cards,

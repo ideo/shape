@@ -9,8 +9,6 @@ module TestResultsCollection
            :order,
            :width,
            :height,
-           :row,
-           :col,
            :created_by,
            :identifier,
            :message
@@ -23,24 +21,18 @@ module TestResultsCollection
              :height,
              :order,
              :identifier,
-             :row,
-             :col,
              to: :context
 
     before do
       context.width = 1 if width.nil?
       context.height = 2 if height.nil?
       context.order = 0 if order.nil?
-      context.row = 0 if row.nil?
-      context.col = 0 if col.nil?
     end
 
     def call
-      if existing_card.present?
-        existing_card.update(order: order) unless existing_card.order == order
-      else
-        link_item
-      end
+      return existing_card if existing_card.present?
+
+      link_item
     end
 
     private
@@ -62,22 +54,9 @@ module TestResultsCollection
           item_id: item.id,
           width: width,
           height: height,
-          order: order,
           identifier: identifier,
-          row: row,
-          col: col,
         },
       )
-      # link = CollectionCard::Link.create(
-      #   parent: parent_collection,
-      #   item_id: item.id,
-      #   width: width,
-      #   height: height,
-      #   order: order,
-      #   identifier: identifier,
-      #   row: row,
-      #   col: col,
-      # )
 
       return link if link.persisted?
 

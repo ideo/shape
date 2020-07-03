@@ -275,6 +275,12 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
   context 'with more scaled questions' do
     let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
     let(:legend_item) { test_results_collection.legend_item }
+    before do
+      scale_questions.each do |question|
+        question.parent_collection_card.update(order: 99)
+        # put the questions at the end
+      end
+    end
 
     it 'should create all test results cards, correctly ordered' do
       expect(subject).to be_a_success
@@ -284,29 +290,25 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       results_cards = test_results_collection.collection_cards.reload
 
       expect(
-        results_cards.map { |card| card.record.class.name },
+        results_cards.map { |card| [card.record.class.name, card.row, card.col] },
       ).to eq(
         [
-          'Item::VideoItem',
-          'Item::DataItem',
-          'Item::LegendItem',
-          'Collection',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Collection::TestOpenResponses',
-          'Collection::TestOpenResponses',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Collection',
-          'Collection::TestResultsCollection',
-          'Collection::TestCollection',
-        ],
+          ['Item::VideoItem', 0, 0],
+          ['Item::DataItem', 0, 1],
+          ['Item::LegendItem', 0, 3],
+          ['Collection', 2, 0],
+          ['Item::DataItem', 2, 2],
+          ['Item::DataItem', 4, 0],
+          ['Item::DataItem', 4, 2],
+          ['Collection::TestOpenResponses', 6, 0],
+          ['Collection::TestOpenResponses', 6, 2],
+          ['Item::DataItem', 7, 0],
+          ['Item::DataItem', 7, 2],
+          ['Collection', 9, 0],
+          ['Collection::TestResultsCollection', 9, 1],
+          ['Collection::TestCollection', 9, 2],
+        ]
       )
-      expect(
-        results_cards.map { |card| [card.row, card.col] },
-        # Test to handle rows and columns
-      ).to eq([0.upto(13).to_a, 0.upto(13).to_a])
     end
   end
 
@@ -328,6 +330,8 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       let(:editor) { create(:user) }
       before do
         test_collection.unanchor_and_inherit_roles_from_anchor!
+        # Test Results Collection already created in outer before block
+        test_results_collection.update(roles_anchor_collection: nil)
         editor.add_role(Role::EDITOR, test_collection)
       end
 
