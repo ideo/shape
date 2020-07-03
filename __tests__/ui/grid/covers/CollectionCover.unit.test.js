@@ -169,14 +169,14 @@ describe('CollectionCover', () => {
       props.collection.isLiveTest = true
       props.collection.submission_reviewer_status = 'in_progress'
       props.inSubmissionsCollection = true
-      props.isReviewable = true
+      props.collection.isReviewableByCurrentUser = true
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
       component = wrapper.instance()
     })
 
     it('renders the submissions reviewer button', () => {
-      expect(wrapper.find('ReviewButton').exists()).toBe(true)
-      expect(wrapper.find('ReviewButton').text()).toContain('Review')
+      expect(wrapper.find('ChallengeReviewButton').exists()).toBe(true)
+      expect(wrapper.find('ChallengeReviewButton').text()).toContain('Review')
     })
   })
 

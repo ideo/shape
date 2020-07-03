@@ -962,6 +962,7 @@ class Collection < ApplicationRecord
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
                   launchable_test_id.present? &&
+                  user.present? &&
                   challenge_reviewer?(user)
 
     response = SurveyResponse.find_by(

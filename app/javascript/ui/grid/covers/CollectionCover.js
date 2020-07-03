@@ -12,7 +12,7 @@ import { CardHeading } from '~/ui/global/styled/typography'
 import TextItemCover from '~/ui/grid/covers/TextItemCover'
 import CarouselCover from '~/ui/grid/covers/CarouselCover'
 import Button from '~/ui/global/Button'
-import { ReviewButton } from '~/ui/global/challenge/shared'
+import ChallengeReviewButton from '~/ui/challenges/ChallengeReviewButton'
 import { RoundPill } from '~/ui/global/styled/forms'
 import { routingStore } from '~/stores'
 import CollectionCoverTitle, {
@@ -379,8 +379,6 @@ class CollectionCover extends React.Component {
       textItem,
       cardId,
       fontColor,
-      inSubmissionsCollection,
-      isReviewable,
     } = this.props
     const {
       subtitle,
@@ -388,6 +386,7 @@ class CollectionCover extends React.Component {
       icon,
       show_icon_on_cover,
       submission_reviewer_status,
+      isReviewableByCurrentUser,
     } = collection
 
     const { gridW, gutter } = uiStore.gridSettings
@@ -485,16 +484,14 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
-                  {inSubmissionsCollection &&
-                    isReviewable &&
-                    submission_reviewer_status && (
-                      <ReviewButton
-                        reviewerStatus={submission_reviewer_status}
-                        onClick={() => {
-                          collection.navigateToNextAvailableTest()
-                        }}
-                      />
-                    )}
+                  {isReviewableByCurrentUser && submission_reviewer_status && (
+                    <ChallengeReviewButton
+                      reviewerStatus={submission_reviewer_status}
+                      onClick={() => {
+                        collection.navigateToNextAvailableTest()
+                      }}
+                    />
+                  )}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (
@@ -526,7 +523,6 @@ CollectionCover.propTypes = {
   searchResult: PropTypes.bool,
   textItem: MobxPropTypes.objectOrObservableObject,
   fontColor: PropTypes.string,
-  isReviewable: PropTypes.bool,
 }
 CollectionCover.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -539,7 +535,6 @@ CollectionCover.defaultProps = {
   searchResult: false,
   textItem: null,
   fontColor: v.colors.white,
-  isReviewable: false,
 }
 
 CollectionCover.displayName = 'CollectionCover'

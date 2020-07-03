@@ -451,11 +451,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  get showSubmissionTopicSuggestions() {
-    const isSubmissionInChallenge =
-      this.isInsideAChallenge && this.isSubmission && this.canEdit
+  get isSubmissionInChallenge() {
+    return this.isInsideAChallenge && this.isSubmission
+  }
 
-    if (!isSubmissionInChallenge) return false
+  get showSubmissionTopicSuggestions() {
+    const canEditSubmissionInChallenge =
+      this.isSubmissionInChallenge && this.canEdit
+
+    if (!canEditSubmissionInChallenge) return false
 
     const hasTopics =
       this.parent_challenge.topic_list &&
@@ -1285,6 +1289,44 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.parent_challenge
   }
 
+  get currentReviewerHandles() {
+    if (!this.isSubmissionInChallenge) return []
+    return _.get(this, 'user_tag_list', [])
+  }
+
+  get isReviewableByCurrentUser() {
+    if (
+      !this.isSubmissionInChallenge ||
+      !this.isLiveTest ||
+      !this.currentReviewerHandles
+    ) {
+      return false
+    }
+
+    const { apiStore } = this
+    const { currentUser } = apiStore
+
+    const currentUserIsAReviewer =
+      this.currentReviewerHandles.findIndex(
+        handle => handle === _.get(currentUser, 'handle')
+      ) > -1
+    return currentUserIsAReviewer
+  }
+
+  get currentUserHasSubmissionsToReview() {
+    if (!this.isInsideAChallenge || !this.isSubmissionBox) return false
+    const reviewableCards = _.get(
+      this,
+      'submissions_collection.reviewableCards'
+    )
+    if (_.isEmpty(reviewableCards)) return false
+
+    const cardsReviewableByCurrentUser = _.filter(reviewableCards, rc => {
+      return _.get(rc, 'record.isReviewableByCurrentUser')
+    })
+    return !_.isEmpty(cardsReviewableByCurrentUser)
+  }
+
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
@@ -1571,8 +1613,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       testUrl = res.data.publicTestURL
     }
 
-    console.log({ testUrl })
-
     if (!testUrl) return
 
     window.location.href = testUrl
@@ -1793,15 +1833,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return collection_cover_items[0]
   }
 
-  get isReviewable() {
-    const unreviewed = _.get(this, 'submission_reviewer_status') !== 'completed'
-    return this.isLiveTest && unreviewed
-  }
-
   get reviewableCards() {
     if (!this.isSubmissionsCollection) return []
     return _.filter(this.collection_cards, cc => {
-      return _.get(cc, 'record.isReviewable')
+      return _.get(cc, 'record.isLiveTest')
     })
   }
 

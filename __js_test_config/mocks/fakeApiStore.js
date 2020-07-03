@@ -87,6 +87,7 @@ const fakeApiStore = ({
       },
       organizations: [{ name: 'Acme Inc 1', filestack_file_url: 'test.jpg' }],
       name: 'Johnny Appleseed',
+      handle: 'jappleseed',
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
       terms_accepted: true,

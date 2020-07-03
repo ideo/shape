@@ -285,6 +285,11 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
+
+      if (collection.isInsideAChallenge) {
+        // load reviwers group to for rendering review buttons and assign reviewers
+        collection.fetchChallengeReviewersGroup()
+      }
     }
   }
 

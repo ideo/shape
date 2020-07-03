@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { uiStore } from '~/stores'
@@ -14,22 +13,8 @@ const buttonStyleProps = {
 @inject('apiStore')
 @observer
 class ChallengeHeaderButton extends React.Component {
-  componentDidMount() {
-    const { record } = this.props
-    record.fetchChallengeReviewersGroup()
-  }
-
-  // TODO combine this logic with AddReviewersPopover
-  get potentialReviewers() {
-    const { record } = this.props
-    const challengeRoles = _.get(record, 'challengeReviewerGroup.roles')
-    if (_.isEmpty(challengeRoles)) return []
-    const memberRole = challengeRoles.find(r => r.label === 'member')
-    return _.get(memberRole, 'users', [])
-  }
-
   render() {
-    const { apiStore, record } = this.props
+    const { record } = this.props
 
     if (!record.isChallengeOrInsideChallenge) return null
 
@@ -44,23 +29,15 @@ class ChallengeHeaderButton extends React.Component {
         </Button>
       )
     } else {
-      const isChallengeReviewer = this.potentialReviewers.find(
-        r => r.id === apiStore.currentUser.id
-      )
-      if (!isChallengeReviewer) return null
-      const reviewableCards = _.get(
-        record,
-        'submissions_collection.reviewableCards'
-      )
-      const hasReviewableSubmissions = !_.isEmpty(reviewableCards)
+      const { currentUserHasSubmissionsToReview } = record
       return (
         <Button
           {...buttonStyleProps}
           colorScheme={v.colors.alert}
-          disabled={!hasReviewableSubmissions}
+          disabled={!currentUserHasSubmissionsToReview}
           onClick={() => record.navigateToNextAvailableTest()}
         >
-          {hasReviewableSubmissions
+          {currentUserHasSubmissionsToReview
             ? `Review Submissions`
             : `No Reviewable Submissions`}
         </Button>

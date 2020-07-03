@@ -207,6 +207,28 @@ const SharedRecordMixin = superclass =>
       return this.challengeReviewerGroup
     }
 
+    get potentialReviewers() {
+      if (!this.isSubmission) return []
+
+      const challangeReviewerRoles = _.get(this, 'challengeReviewerGroup.roles')
+      if (_.isEmpty(challangeReviewerRoles)) return []
+
+      const potentialReviewerList = []
+      _.each(['admin', 'member'], roleLabel => {
+        const role = challangeReviewerRoles.find(r => r.label === roleLabel)
+        const users = _.get(role, 'users', [])
+        _.each(users, user => {
+          potentialReviewerList.push(user)
+        })
+      })
+      return potentialReviewerList
+    }
+
+    get isCurrentUserAPotentialReviewer() {
+      const { currentUserId } = this.apiStore
+      return this.potentialReviewers.findIndex(r => r.id === currentUserId) > -1
+    }
+
     async restore() {
       const { routingStore, uiStore } = this
       uiStore.update('isLoading', true)

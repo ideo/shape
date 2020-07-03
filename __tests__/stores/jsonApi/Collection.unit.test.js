@@ -7,6 +7,7 @@ import { ReferenceType, updateModelId } from 'datx'
 import { apiStore } from '~/stores'
 import Collection, { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import Organization from '~/stores/jsonApi/Organization'
+import User from '~/stores/jsonApi/User'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
 import googleTagManager from '~/vendor/googleTagManager'
@@ -834,7 +835,7 @@ describe('Collection', () => {
         {
           section_type: 'intro',
           card_question_type: 'question_open',
-          record: { isReviewable: true },
+          record: { isLiveTest: true },
         },
       ]
       collection.type = 'Collection::SubmissionsCollection'
@@ -849,27 +850,51 @@ describe('Collection', () => {
     })
   })
 
-  describe('isReviewable', () => {
+  describe('isReviewableByCurrentUser', () => {
+    const handle = 'jappleseed'
     beforeEach(() => {
-      collection.submission_attrs = {
-        submission: true,
-        test_status: 'live',
-      }
-      collection.submission_reviewer_status = 'in_progress'
+      collection = new Collection(
+        {
+          name: 'fakeCollection',
+          roles: [fakeRole],
+          organization_id: '1',
+          parent: { name: 'Some Collection' },
+          submission_attrs: {
+            submission: true,
+            test_status: 'live',
+          },
+          type: 'Collection::SubmissionsCollection',
+          parent_challenge: {},
+          user_tag_list: [handle],
+          submission_reviewer_status: 'in_progress',
+        },
+        apiStore
+      )
+      const user = new User(
+        {
+          handle,
+        },
+        apiStore
+      )
+      updateModelId(user, '1')
+      runInAction(() => {
+        apiStore.currentUserId = '1'
+      })
+      apiStore.add(user, 'users')
     })
 
     it('should be reviewable if status is in progress', () => {
-      expect(collection.isReviewable).toBe(true)
+      expect(collection.isReviewableByCurrentUser).toBe(true)
     })
 
     it('should be reviewable if status is unstarted', () => {
       collection.submission_reviewer_status = 'unstarted'
-      expect(collection.isReviewable).toBe(true)
+      expect(collection.isReviewableByCurrentUser).toBe(true)
     })
 
     it('should not be reviewable if status is completed', () => {
       collection.submission_reviewer_status = 'completed'
-      expect(collection.isReviewable).toBe(false)
+      expect(collection.isReviewableByCurrentUser).toBe(false)
     })
   })
 

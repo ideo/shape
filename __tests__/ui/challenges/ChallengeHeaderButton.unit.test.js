@@ -1,12 +1,6 @@
 import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
 import fakeApiStore from '#/mocks/fakeApiStore'
-import {
-  fakeCollection,
-  fakeCollectionCard,
-  fakeGroup,
-  fakeRole,
-  fakeUser,
-} from '#/mocks/data'
+import { fakeCollection } from '#/mocks/data'
 
 let props, wrapper, rerender
 describe('ChallengeHeaderButton', () => {
@@ -34,7 +28,7 @@ describe('ChallengeHeaderButton', () => {
 
   describe('if user cannot edit collection and is not in reviewer group', () => {
     it('does not render button', () => {
-      expect(wrapper.find('Button').exists()).toBe(false)
+      expect(wrapper.find('ChallengeHeaderButton').exists()).toBe(false)
     })
   })
 
@@ -51,27 +45,20 @@ describe('ChallengeHeaderButton', () => {
   })
 
   describe('inside a submission box', () => {
-    const submissionsCollection = fakeCollection
     beforeEach(() => {
       props.record.isSubmissionBox = true
       props.record.isChallengeOrInsideChallenge = true
-      props.record.submissions_collection = submissionsCollection
+      props.record.canEdit = true
       rerender()
     })
 
-    it('should not render a challenge button', () => {
-      expect(wrapper.find('Button').exists()).toBe(false)
+    it('should render a review button', () => {
+      expect(wrapper.find('Button').exists()).toBe(true)
     })
 
-    describe('if user is in reviewer group', () => {
+    describe('if user has no submissions to review', () => {
       beforeEach(() => {
-        const reviewerGroup = fakeGroup
-        const memberRole = fakeRole
-        memberRole.label = 'member'
-        memberRole.users = [fakeUser]
-        reviewerGroup.roles = [memberRole]
-        props.apiStore.currentUser = fakeUser
-        props.record.challengeReviewerGroup = reviewerGroup
+        props.record.currentUserHasSubmissionsToReview = false
         rerender()
       })
 
@@ -80,16 +67,16 @@ describe('ChallengeHeaderButton', () => {
           'No Reviewable Submissions'
         )
       })
+    })
 
-      describe('with reviewable submissions', () => {
-        beforeEach(() => {
-          submissionsCollection.reviewableCards = [fakeCollectionCard]
-          rerender()
-        })
+    describe('with reviewable submissions', () => {
+      beforeEach(() => {
+        props.record.currentUserHasSubmissionsToReview = true
+        rerender()
+      })
 
-        it('renders the button with reviewable submissions', () => {
-          expect(wrapper.find('Button').text()).toContain('Review Submissions')
-        })
+      it('renders the button with reviewable submissions', () => {
+        expect(wrapper.find('Button').text()).toContain('Review Submissions')
       })
     })
   })

@@ -19,7 +19,7 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
-import { ReviewButton } from '~/ui/global/challenge/shared'
+import ChallengeReviewButton from '~/ui/challenges/ChallengeReviewButton'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { openContextMenu } from '~/utils/clickUtils'
@@ -317,15 +317,11 @@ class ListCard extends React.Component {
       )
     }
 
-    const {
-      submission_reviewer_status,
-      launchableTestId,
-      isReviewable,
-    } = record
+    const { isReviewableByCurrentUser, submission_reviewer_status } = record
 
-    if (submission_reviewer_status && launchableTestId && isReviewable) {
+    if (isReviewableByCurrentUser && submission_reviewer_status) {
       return (
-        <ReviewButton
+        <ChallengeReviewButton
           reviewerStatus={submission_reviewer_status}
           onClick={() => {
             record.navigateToNextAvailableTest()

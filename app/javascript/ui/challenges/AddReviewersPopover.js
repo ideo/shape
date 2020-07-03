@@ -15,9 +15,13 @@ class AddReviewersPopover extends React.Component {
   }
 
   isReviewerSelected(potentialReviewer) {
-    const { currentReviewers } = this
-    return !!currentReviewers.find(
-      reviewer => reviewer === potentialReviewer.handle
+    const { record } = this.props
+    const { currentReviewerHandles } = record
+    if (_.isEmpty(currentReviewerHandles)) return false
+    return (
+      currentReviewerHandles.findIndex(
+        handle => handle === _.get(potentialReviewer, 'handle')
+      ) > -1
     )
   }
 
@@ -28,19 +32,14 @@ class AddReviewersPopover extends React.Component {
   }
 
   handlePotentialReviewer = (reviewer, ev) => {
-    const { record } = this.props
     ev.preventDefault()
     ev.stopPropagation()
-    const action = this.isReviewerSelected(reviewer) ? 'removeTag' : 'addTag'
-    record[action](reviewer.handle, 'user_tag_list', reviewer)
-  }
-
-  get potentialReviewers() {
     const { record } = this.props
-    const challengeRoles = _.get(record, 'challengeReviewerGroup.roles')
-    if (_.isEmpty(challengeRoles)) return []
-    const memberRole = challengeRoles.find(r => r.label === 'member')
-    return _.get(memberRole, 'users', [])
+    if (!reviewer) return
+    const { handle } = reviewer
+    if (!handle) return
+    const action = this.isReviewerSelected(reviewer) ? 'removeTag' : 'addTag'
+    record[action](handle, 'user_tag_list', reviewer)
   }
 
   get currentReviewers() {
@@ -50,7 +49,8 @@ class AddReviewersPopover extends React.Component {
   }
 
   render() {
-    const { onClose, open, wrapperRef } = this.props
+    const { onClose, open, wrapperRef, record } = this.props
+    const { potentialReviewers } = record
     return (
       <InlineModal
         title=""
@@ -61,7 +61,7 @@ class AddReviewersPopover extends React.Component {
         noButtons
       >
         <div onClick={this.handleClick}>
-          {this.potentialReviewers.map(potentialReviewer => (
+          {potentialReviewers.map(potentialReviewer => (
             <Flex>
               <Checkbox
                 color="primary"
