@@ -452,7 +452,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isSubmissionInChallenge() {
-    return this.isInsideAChallenge && this.isSubmission
+    return this.is_inside_a_challenge && this.isSubmission
   }
 
   get showSubmissionTopicSuggestions() {
@@ -1276,12 +1276,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  get isInsideAChallenge() {
-    return !!this.parent_challenge
-  }
-
   get isChallengeOrInsideChallenge() {
-    return this.collection_type === 'challenge' || this.isInsideAChallenge
+    return this.collection_type === 'challenge' || this.is_inside_a_challenge
   }
 
   get challenge() {
@@ -1314,7 +1310,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get currentUserHasSubmissionsToReview() {
-    if (!this.isInsideAChallenge || !this.isSubmissionBox) return false
+    if (!this.is_inside_a_challenge || !this.isSubmissionBox) return false
     const reviewableCards = _.get(
       this,
       'submissions_collection.reviewableCards'

@@ -34,7 +34,7 @@ class ChallengeRelevantPhaseCollections < SimpleService
       # (e.g. they have different parent collections),
       # return no phase collections
       []
-    elsif !challenge? && @parent_challenge.present?
+    elsif !challenge? && @collection.inside_a_challenge?
       # If no children phase collections are present, look for a parent challenge, and find it's phases
       ChallengeRelevantPhaseCollections.call(
         collection: @parent_challenge,

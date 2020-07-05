@@ -846,7 +846,7 @@ class Collection < ApplicationRecord
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
     end
 
-    if parent_challenge.present?
+    if inside_a_challenge?
       challenge_details = "parent_challenge_id=#{parent_challenge.id}"
     end
 
@@ -915,7 +915,7 @@ class Collection < ApplicationRecord
   end
 
   def challenge_reviewers
-    return [] unless parent_challenge.present?
+    return [] unless inside_a_challenge?
 
     User.where(
       User.arel_table[:handle].lower.in(
@@ -927,7 +927,7 @@ class Collection < ApplicationRecord
   # This method is called when a user tag is added to a submission collection
   # in the UserTaggable concern
   def add_challenge_reviewer(user)
-    return unless parent_challenge.present? && user&.handle.present?
+    return unless inside_a_challenge? && user&.handle.present?
 
     filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
     filter_for_user ||= parent_challenge.collection_filters.create(
@@ -944,7 +944,7 @@ class Collection < ApplicationRecord
   # This method is called when a user tag is removed from a submission collection
   # in the UserTaggable concern
   def remove_challenge_reviewer(user)
-    return unless parent_challenge.present? && user&.handle.present?
+    return unless inside_a_challenge? && user&.handle.present?
 
     parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
@@ -1057,7 +1057,7 @@ class Collection < ApplicationRecord
   def challenge_or_inside_challenge?
     return true if collection_type == 'challenge'
 
-    parent_challenge.present?
+    inside_a_challenge?
   end
 
   def challenge_submission_boxes
@@ -1115,6 +1115,10 @@ class Collection < ApplicationRecord
 
   def inside_a_submission?
     parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").any?
+  end
+
+  def inside_a_challenge?
+    parent_challenge.present?
   end
 
   def submission_test?

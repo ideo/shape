@@ -345,7 +345,7 @@ class Collection
         duplicate.name = "Copy of #{name}".gsub(FEEDBACK_DESIGN_SUFFIX, '')
       end
 
-      if submission_box_template_test? && parent_challenge.present?
+      if submission_box_template_test? && inside_a_challenge?
         # copy challenge audiences from submission box template test
         test_audiences.each do |test_audience|
           next if test_audience.audience_type != 'challenge'
@@ -478,7 +478,7 @@ class Collection
     end
 
     def setup_challenge_test_audiences
-      return unless master_template.present? && parent_challenge.present?
+      return unless master_template.present? && inside_a_challenge?
 
       challenge_audiences = Audience.where(audience_type: 'challenge')
 
