@@ -994,6 +994,20 @@ describe Collection, type: :model do
     end
   end
 
+  describe 'challenge_reviewer?' do
+    let(:parent_challenge) { create(:collection, collection_type: 'challenge') }
+    let!(:collection) { create(:collection, parent_collection: parent_challenge) }
+    let(:user) { create(:user, handle: 'challenge-reviewer') }
+
+    before do
+      collection.update(user_tag_list: user.handle)
+    end
+
+    it 'returns true when user_tag_list includes the user handle' do
+      expect(collection.challenge_reviewer?(user)).to be true
+    end
+  end
+
   describe 'child of a master template' do
     let(:parent) { create(:collection, master_template: true) }
     let(:child) { create(:collection, parent_collection: parent) }
