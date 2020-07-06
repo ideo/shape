@@ -11,7 +11,7 @@ export const formatRecordTags = records => {
     const { tags } = r
     return toJS(tags)
   })
-  return recordTags
+  return _.uniqBy(recordTags, tag => tag.label)
 }
 
 @inject('apiStore')
