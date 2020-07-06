@@ -53,6 +53,9 @@ class SubmissionBoxTemplateSetter < SimpleService
     if @dup.nil?
       @errors << 'Unable to use template'
       return false
+    else
+      # Submission template does not show up in submission box header
+      @dup.update(hidden: true)
     end
     template = @dup.collection
     template.remove_all_viewer_roles!

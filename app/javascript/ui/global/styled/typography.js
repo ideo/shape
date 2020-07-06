@@ -268,6 +268,14 @@ export const TextItemHeading1Css = css`
   }
 `
 
+// A bold font that can be used as a 'header' in a tooltip
+export const TooltipHeader = styled.div`
+  font-family: ${v.fonts.sans};
+  font-size: 0.9rem;
+  color: ${v.colors.white};
+  font-weight: bold;
+`
+
 export const HugeNumber = styled(Heading1)`
   font-size: 4.5rem;
   font-weight: ${v.weights.book};

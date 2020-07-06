@@ -140,6 +140,72 @@ describe Collection, type: :model do
         expect(collection.joinable_group_id).to eq guest_group.id
       end
     end
+
+    describe '#create_challenge_groups_and_assign_roles' do
+      let(:organization) { create(:organization) }
+      let (:current_user) { create(:user) }
+      let!(:collection) { create(:collection, organization: organization, collection_type: 'project', created_by: current_user) }
+
+      before do
+        collection.update(collection_type: 'challenge')
+      end
+
+      it 'should create a challenge admin group, participant group, and reviewer group' do
+        # expect(collection.challenge_admin_group_id.present?).to be false
+        # expect(collection.challenge_participant_group_id.present?).to be false
+        # expect(collection.challenge_reviewer_group_id.present?).to be false
+        # collection.update(collection_type: 'challenge')
+        admin_group = collection.challenge_admin_group
+        reviewer_group = collection.challenge_reviewer_group
+        participant_group = collection.challenge_participant_group
+        expect(admin_group.present?).to be true
+        expect(reviewer_group.present?).to be true
+        expect(reviewer_group.present?).to be true
+        expect(admin_group.can_edit?(current_user)).to be true
+        expect(reviewer_group.can_edit?(current_user)).to be true
+        expect(participant_group.can_edit?(current_user)).to be true
+      end
+    end
+
+    describe '#submission_template_test_collections' do
+      let(:organization) { create(:organization) }
+      let!(:submission_box) { create(:submission_box) }
+      let!(:template) { create(:collection, master_template: true, parent_collection: submission_box) }
+      let!(:test_collection) { create(:test_collection, parent_collection: template) }
+
+      before do
+        submission_box.update(submission_template_id: template.id)
+        submission_box.reload
+      end
+
+      it 'should submission template test collections with test_audiences' do
+        expect(template.submission_template_test_collections).to include(test_collection)
+      end
+    end
+
+    describe '#rename_challenge_groups' do
+      let(:admin_group) { create(:group, name: 'Collection Admins') }
+      let(:reviewer_group) { create(:group, name: 'Collection Reviewers') }
+      let(:participant_group) { create(:group, name: 'Collection Participants') }
+      let!(:collection) {
+        create(:collection,
+               name: 'Collection',
+               collection_type: 'challenge',
+               challenge_admin_group_id: admin_group.id,
+               challenge_reviewer_group_id: reviewer_group.id,
+               challenge_participant_group_id: participant_group.id)
+      }
+
+      it 'should create a challenge admin group, participant group, and reviewer group' do
+        expect(collection.challenge_admin_group.name).to eq 'Collection Admins'
+        expect(collection.challenge_reviewer_group.name).to eq 'Collection Reviewers'
+        expect(collection.challenge_participant_group.name).to eq 'Collection Participants'
+        collection.update(name: 'Challenge')
+        expect(collection.challenge_admin_group.name).to eq 'Challenge Admins'
+        expect(collection.challenge_reviewer_group.name).to eq 'Challenge Reviewers'
+        expect(collection.challenge_participant_group.name).to eq 'Challenge Participants'
+      end
+    end
   end
 
   describe '#inherit_parent_organization_id' do
@@ -809,10 +875,9 @@ describe Collection, type: :model do
 
   describe '#submit_submission' do
     let(:submission_box) { create(:submission_box) }
+    before { submission_box.setup_submissions_collection! }
     let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
-
     before do
-      submission_box.setup_submissions_collection!
       submission.submission_attrs['hidden'] = true
       submission.save
     end
@@ -824,6 +889,122 @@ describe Collection, type: :model do
       )
       submission.submit_submission!
       expect(submission.submission_attrs['hidden']).to be false
+    end
+  end
+
+  context 'challenge with submission' do
+    let(:user) { create(:user) }
+    let!(:parent_challenge) do
+      create(
+        :collection,
+        num_cards: 1,
+        record_type: :collection,
+        add_viewers: [user],
+        collection_type: :challenge,
+      )
+    end
+    let(:submission_box) { create(:submission_box, parent_collection: parent_challenge) }
+    before { submission_box.setup_submissions_collection! }
+    let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
+    # Take a shortcut - just create test collection to be used directly in submission
+    let!(:test_collection) do
+      create(:test_collection, :completed, parent_collection: submission_template)
+    end
+    let!(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+    let(:reviewer) { create(:user) }
+    before do
+      submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
+    end
+
+    describe '#submission_reviewer_status' do
+      context 'if not a submission' do
+        before do
+          submission.update(submission_attrs: {})
+        end
+
+        it 'returns nil' do
+          expect(submission.submission?).to be false
+          expect(submission.submission_reviewer_status(reviewer)).to be_nil
+        end
+      end
+
+      context 'if user is not assigned as a reviewer' do
+        it 'returns nil' do
+          expect(submission.submission_reviewer_status(reviewer)).to be_nil
+        end
+      end
+
+      context 'if user is assigned as a reviewer' do
+        before do
+          submission.update(user_tag_list: [reviewer.handle])
+        end
+
+        it 'returns :unstarted if no survey responses' do
+          expect(submission.submission_reviewer_status(reviewer)).to eq(:unstarted)
+        end
+
+        context 'with an incomplete survey response' do
+          let!(:survey_response) { create(:survey_response, test_collection: test_collection, user: reviewer) }
+
+          it 'returns :in_progress' do
+            expect(submission.submission_reviewer_status(reviewer)).to eq(:in_progress)
+          end
+        end
+
+        context 'with a complete survey response' do
+          let!(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection, user: reviewer) }
+
+          it 'returns :completed' do
+            expect(submission.submission_reviewer_status(reviewer)).to eq(:completed)
+          end
+        end
+      end
+    end
+
+    describe '#add_challenge_reviewer_filter_to_submission_box' do
+      it 'adds collection filter with user handle' do
+        expect do
+          submission.add_challenge_reviewer_filter_to_submission_box(reviewer)
+        end.to change(CollectionFilter.user_tag, :count).by(1)
+      end
+
+      it 'creates user collection filter for user so they are selected' do
+        expect do
+          submission.add_challenge_reviewer_filter_to_submission_box(reviewer)
+        end.to change(UserCollectionFilter, :count).by(1)
+        collection_filter = submission_box.submissions_collection.collection_filters.last
+        expect(
+          collection_filter.user_collection_filters.find_by(user_id: reviewer.id),
+        ).not_to be_nil
+      end
+    end
+
+    describe '#remove_challenge_reviewer_filter_from_submission_box' do
+      before do
+        submission.add_challenge_reviewer_filter_to_submission_box(reviewer)
+      end
+
+      it 'destroys collection filter with user handle' do
+        collection_filter_id = submission_box.submissions_collection.collection_filters.last.id
+        expect do
+          submission.remove_challenge_reviewer_filter_from_submission_box(reviewer)
+        end.to change(CollectionFilter.user_tag, :count).by(-1)
+        expect(CollectionFilter.exists?(collection_filter_id)).to be false
+      end
+    end
+  end
+
+  describe 'challenge_reviewer?' do
+    let(:parent_challenge) { create(:collection, collection_type: 'challenge') }
+    let!(:collection) { create(:collection, parent_collection: parent_challenge) }
+    let(:user) { create(:user, handle: 'challenge-reviewer') }
+
+    before do
+      collection.update(user_tag_list: user.handle)
+    end
+
+    it 'returns true when user_tag_list includes the user handle' do
+      expect(collection.challenge_reviewer?(user)).to be true
     end
   end
 
@@ -1012,5 +1193,15 @@ describe Collection, type: :model do
       end
     end
     # <- end Caching methods
+  end
+
+  context 'with a subcollection that\'s inside a challenge' do
+    let(:parent_collection) { create(:collection, collection_type: 'challenge') }
+    let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: parent_collection) }
+    let!(:inner_subcollection) { create(:collection, num_cards: 2, parent_collection: subcollection) }
+
+    it 'the collection inside the subcollection should have a reference to its parent challenge' do
+      expect(inner_subcollection.parent_challenge).to eq parent_collection
+    end
   end
 end

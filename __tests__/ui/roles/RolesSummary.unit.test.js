@@ -30,6 +30,7 @@ describe('RolesSummary', () => {
       ...emptyProps,
       roles: [viewerRole],
       collaborators: [{ ...fakeCollaborator }],
+      usersAndGroupsLength: 1,
     }
     beforeEach(() => {
       wrapper = shallow(<RolesSummary {...emptyProps} />)
@@ -51,6 +52,19 @@ describe('RolesSummary', () => {
       wrapper.setProps({
         ...updateProps,
         roles: [viewerRole, editorRole],
+      })
+      expect(instance.initEditorsAndViewers).toHaveBeenCalled()
+    })
+
+    it('should initEditorsAndViewers when usersAndGroupsLength changed', () => {
+      instance.initEditorsAndViewers.mockClear()
+      // now call again, with same roles
+      wrapper.setProps(updateProps)
+      expect(instance.initEditorsAndViewers).not.toHaveBeenCalled()
+      // now call again, with new roles
+      wrapper.setProps({
+        ...updateProps,
+        usersAndGroupsLength: 3,
       })
       expect(instance.initEditorsAndViewers).toHaveBeenCalled()
     })

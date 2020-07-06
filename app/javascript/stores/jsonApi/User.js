@@ -101,6 +101,16 @@ class User extends BaseRecord {
     this.show_move_helper = false
     return this.API_updateCurrentUser({ show_move_helper: false })
   }
+
+  async API_fetchAllReviewableSubmissions(submissionBox) {
+    // FIXME: to be implemented in an upcoming story
+    return await Promise.resolve([])
+  }
+
+  API_canReviewSubmission(submission) {
+    // FIXME: to be implemented in an upcoming story
+    return true
+  }
 }
 
 export default User

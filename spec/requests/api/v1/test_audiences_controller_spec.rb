@@ -70,4 +70,35 @@ describe Api::V1::TestAudiencesController, type: :request, json: true, auth: tru
       end
     end
   end
+
+  describe 'toggle_status' do
+    let(:status) { :open }
+    let(:test_audience) do
+      # link sharing gets created after_create
+      test_collection.link_sharing_audience
+    end
+    let(:params) do
+      json_api_params(
+        'test_audiences',
+        status: status,
+      )
+    end
+    let(:service) do
+      CollectionUpdater.new(
+        collection,
+        attributes,
+        unarchiving: unarchiving,
+      )
+    end
+    let(:path) { "/api/v1/test_audiences/#{test_audience.id}/toggle_status" }
+    let(:updater_double) { double('TestAudienceStatusUpdater') }
+
+    context 'toggling status' do
+      it 'returns a 200' do
+        patch(path, params: params)
+        allow(TestAudienceStatusUpdater).to receive(:new).and_return(updater_double)
+        expect(response.status).to eq(200)
+      end
+    end
+  end
 end

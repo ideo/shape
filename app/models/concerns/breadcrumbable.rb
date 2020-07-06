@@ -58,7 +58,8 @@ module Breadcrumbable
   end
 
   def parents
-    Collection.where(id: breadcrumb)
+    # Returns collections in the same order as the breadcrumb
+    Collection.where_ids_ordered(breadcrumb)
   end
 
   # Override this method in any classes to restrict

@@ -29,14 +29,22 @@ const StyledInfoIconWrapper = styled.span`
   }
 `
 
+const AssignReviewersLink = styled.h3`
+  display: inline-block;
+  color: #00a6ff;
+  font-size: 12px;
+`
+
 const AudienceCheckbox = ({
   selected,
   audience,
+  audienceName,
   onToggleCheckbox,
   disabled,
   openAudienceMenu,
+  displayChallengeAudiences,
 }) => {
-  const { id, name, global_default } = audience
+  const { id, global_default } = audience
   return (
     <StyledRowFlexParent>
       <StyledRowFlexItem>
@@ -45,7 +53,7 @@ const AudienceCheckbox = ({
           labelPlacement={'end'}
           control={
             <Checkbox
-              data-cy={`audienceCheckbox-${_.kebabCase(name)}`}
+              data-cy={`audienceCheckbox-${_.kebabCase(audienceName)}`}
               id={`audienceCheckbox-${id}`}
               checked={selected}
               onChange={onToggleCheckbox}
@@ -57,7 +65,19 @@ const AudienceCheckbox = ({
           label={
             <div>
               <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
-                <StyledLabelText>{name}</StyledLabelText>
+                <StyledLabelText>{audienceName}</StyledLabelText>
+                {displayChallengeAudiences &&
+                  audienceName.includes('Reviewers') &&
+                  !disabled && (
+                    <AssignReviewersLink
+                      onClick={e => {
+                        e.preventDefault()
+                        // FIXME: to be implemented in an upcoming story
+                      }}
+                    >
+                      ASSIGN REVIEWERS
+                    </AssignReviewersLink>
+                  )}
               </div>
             </div>
           }
@@ -71,7 +91,7 @@ const AudienceCheckbox = ({
           }}
           className="audienceLabel"
         >
-          <InfoIcon />
+          {!displayChallengeAudiences && <InfoIcon />}
         </StyledInfoIconWrapper>
       )}
     </StyledRowFlexParent>
@@ -81,13 +101,16 @@ const AudienceCheckbox = ({
 AudienceCheckbox.propTypes = {
   selected: PropTypes.bool.isRequired,
   audience: MobxPropTypes.objectOrObservableObject.isRequired,
+  audienceName: PropTypes.string.isRequired,
   onToggleCheckbox: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
   openAudienceMenu: PropTypes.func.isRequired,
+  displayChallengeAudiences: PropTypes.bool,
 }
 
 AudienceCheckbox.defaultProps = {
   disabled: false,
+  displayChallengeAudiences: false,
 }
 
 export default AudienceCheckbox

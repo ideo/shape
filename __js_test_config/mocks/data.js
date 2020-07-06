@@ -426,6 +426,8 @@ export const fakeCollection = {
   num_survey_responses: 0,
   anyone_can_view: false,
   anyone_can_join: false,
+  show_icon_on_cover: false,
+  icon: null,
   recordsPerPage: 50,
   searchRecordsPerPage: 20,
   updated_at: "2019-11-22T18:57:12.863Z",
@@ -452,6 +454,11 @@ export const fakeCollection = {
   addCard: jest.fn(),
   setCollaborators: jest.fn(),
   collaborators: [],
+  tags: [
+    {label: 'llamas', type: 'tag_list'},
+    {label: 'pajamas', type: 'tag_list'},
+    {label: 'shape-test-user', type: 'user_tag_list', user: null}
+  ],
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
@@ -474,7 +481,10 @@ export const fakeCollection = {
   API_selectCollectionType: jest.fn().mockReturnValue(Promise.resolve({})),
   API_manipulateRow: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCardOrders: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_fetchChallengePhaseCollections: jest.fn().mockReturnValue(Promise.resolve({})),
+  initializeTags: jest.fn(),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
+  createSubmission: jest.fn(),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
@@ -488,12 +498,31 @@ export const fakeCollection = {
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',
+  phaseSubCollections: [],
+  loadPhaseSubCollections: jest.fn().mockReturnValue(Promise.resolve([])),
+  setPhaseSubCollections: jest.fn(),
   meta: {
     snapshot: {
       can_edit: false,
     },
   },
   ...fakeJsonApiAttrs,
+}
+fakeCollection.loadPhasesForSubmissionBoxes = submissionBoxes => {
+  submissionBoxes.map(submissionBox => {
+    // Append phase subcollections
+    if (submissionBox.submission_template) {
+      submissionBox.phaseSubCollections = [
+        {
+          ...fakeCollection,
+          id: '4560202',
+          name: 'Phase Collection',
+        },
+      ]
+    }
+  })
+  // Immediately resolve promise for the test
+  return Promise.resolve(submissionBoxes)
 }
 // also set parentCollection on fakeCard
 // TODO: fix circular reference!
@@ -524,6 +553,7 @@ export const fakeOrganizationAttrs = {
 }
 export const fakeOrganization = {
   ...fakeOrganizationAttrs,
+  searchTagsAndUsers: jest.fn().mockReturnValue(Promise.resolve({})),
   rawAttributes: jest.fn().mockReturnValue(fakeOrganizationAttrs),
   getRecordType: jest.fn().mockReturnValue('organization'),
 }
@@ -544,6 +574,7 @@ export const fakeUserAttrs = {
   API_updateSurveyRespondent: jest.fn(),
   API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   API_updateUseTemplateSetting: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_fetchAllReviewableSubmissions: jest.fn().mockReturnValue(Promise.resolve([])),
   notify_through_email: true,
   show_move_modal: false,
 }
@@ -688,4 +719,25 @@ export const fakeCollaborator = {
   can_edit_collection: false,
   timestamp: '2020-04-30 11:34:50 -0700',
   color: 'Blue'
+}
+
+export const fakeSubmissionBoxWithTemplate = {
+  ...fakeCollection,
+  name: 'Submission Box with Template',
+  submission_template_id: 123,
+  submission_template: {
+    ...fakeCollection,
+    name: 'Submission Box Template'
+  },
+  submission_box_type: null,
+  submissionFormat: 'template'
+}
+
+export const fakeSubmissionBoxWithoutTemplate = {
+  ...fakeCollection,
+  name: 'Submission Box without Template',
+  submission_box_type: 'text',
+  submission_template_id: null,
+  submission_template: null,
+  submissionFormat: 'item'
 }

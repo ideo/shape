@@ -39,6 +39,7 @@ class SerializableItem < BaseJsonSerializer
   belongs_to :data_source
   belongs_to :filestack_file
   has_many :comments
+  has_many :tagged_users
 
   attribute :tag_list do
     @object.cached_tag_list || []

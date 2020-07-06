@@ -1,50 +1,68 @@
-import TagEditor, { tagsInCommon } from '~/ui/pages/shared/TagEditor'
-import { fakeCollection } from '#/mocks/data'
+import TagEditor from '~/ui/pages/shared/TagEditor'
 
-let wrapper, props, records, afterAddTag, afterRemoveTag
+let wrapper, props, recordTags, afterAddTag, afterRemoveTag
 describe('TagEditor', () => {
-  beforeEach(() => {
-    records = [fakeCollection]
-    afterAddTag = jest.fn()
-    afterRemoveTag = jest.fn()
-    props = {
-      records,
-      afterAddTag,
-      afterRemoveTag,
-      canEdit: true,
-      tagField: 'tag_list',
-    }
-    wrapper = shallow(<TagEditor {...props} />)
-  })
-
-  it('renders ReactTags with records[tagField]', () => {
-    expect(wrapper.find('ReactTags').exists()).toBe(true)
-    expect(wrapper.find('ReactTags').props().tags.length).toEqual(
-      records[0].tag_list.length
-    )
-    expect(wrapper.find('ReactTags').props().tags[0].name).toEqual(
-      records[0].tag_list[0]
-    )
-  })
-
-  describe('tagsInCommon', () => {
-    let records
+  describe('with tag list', () => {
     beforeEach(() => {
-      records = [
-        { tag_list: ['bananas', 'apples'] },
-        { tag_list: ['peaches', 'bananas'] },
+      afterAddTag = jest.fn()
+      afterRemoveTag = jest.fn()
+      recordTags = [
+        { label: 'paper', type: 'tag_list' },
+        { label: 'box', type: 'tag_list' },
       ]
+      props = {
+        recordTags,
+        afterAddTag,
+        afterRemoveTag,
+        canEdit: true,
+        suggestions: [],
+        handleInputChange: jest.fn(),
+      }
+      wrapper = shallow(<TagEditor {...props} />)
     })
 
-    it('returns tags in common across records', () => {
-      expect(tagsInCommon(records, 'tag_list')).toEqual(
-        expect.arrayContaining(['bananas'])
+    it('renders ReactTags with tags', () => {
+      expect(wrapper.find('ReactTags').exists()).toBe(true)
+      expect(wrapper.find('ReactTags').props().tags.length).toEqual(
+        recordTags.length
+      )
+      expect(wrapper.find('ReactTags').props().tags[0].name).toEqual(
+        recordTags[0].label
       )
     })
+  })
 
-    it('returns no intersection if a record has no tags', () => {
-      records[0].tag_list = []
-      expect(tagsInCommon(records, 'tag_list')).toEqual([])
+  describe('with user tag list', () => {
+    beforeEach(() => {
+      afterAddTag = jest.fn()
+      afterRemoveTag = jest.fn()
+      recordTags = [
+        {
+          label: 'marcosegreto',
+          type: 'user_tag_list',
+          user: { pic_url_square: 'http://foo.com/' },
+        },
+      ]
+      props = {
+        recordTags,
+        afterAddTag,
+        afterRemoveTag,
+        canEdit: true,
+        suggestions: [],
+        handleInputChange: jest.fn(),
+      }
+      wrapper = shallow(<TagEditor {...props} />)
+    })
+
+    it('renders ReactTags with tags and avatar', () => {
+      expect(wrapper.find('ReactTags').exists()).toBe(true)
+      expect(wrapper.find('ReactTags').props().tags.length).toEqual(
+        recordTags.length
+      )
+      expect(wrapper.find('ReactTags').props().tags[0].name).toEqual(
+        recordTags[0].label
+      )
+      expect(wrapper.find('ReactTags').props().tags[0].symbol).toBeTruthy()
     })
   })
 })

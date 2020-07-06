@@ -35,7 +35,7 @@ class Ability
       end
 
       can :create, Collection
-      can :read, Collection do |collection|
+      can %i[read challenge_phase_collections], Collection do |collection|
         collection.can_view?(user)
       end
       can :duplicate, Collection do |collection|

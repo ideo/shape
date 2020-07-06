@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
+import CollectionIconSelector from '~/ui/grid/CollectionIconSelector'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
@@ -20,6 +21,7 @@ import TextareaAutosize from 'react-autosize-textarea'
 import { CloseButton, NamedActionButton } from '~/ui/global/styled/buttons'
 import PropTypes from 'prop-types'
 import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import parseURLMeta from '~/utils/parseURLMeta'
 
 const removeOption = {
@@ -365,6 +367,22 @@ class CardCoverEditor extends React.Component {
     await card.API_updateCardFilter(option.type)
   }
 
+  onCustomIconSelect = iconName => {
+    const {
+      card: { record },
+    } = this.props
+    record.icon = iconName
+    record.save()
+  }
+
+  onToggleShowIconOnCoverCheckbox = () => {
+    const {
+      card: { record },
+    } = this.props
+    record.show_icon_on_cover = !record.show_icon_on_cover
+    record.save()
+  }
+
   get showFilters() {
     const { record } = this.props.card
     const { thumbnail_url, isLink } = record
@@ -426,13 +444,33 @@ class CardCoverEditor extends React.Component {
                 {this.renderEditTitleInput()}
               </StyledEditTitle>
               <MediumBreak />
-              <h3>Cover Image</h3>
+              <h3>Cover</h3>
               <QuickOptionSelector
                 options={toJS(this.imageOptions)}
                 onSelect={this.onImageOptionSelect}
               />
               <MediumBreak />
-              <h3>Cover effects</h3>
+              <h3>Icon</h3>
+              <CollectionIconSelector
+                selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
+                onSelectIcon={this.onCustomIconSelect}
+              />
+              <LabelContainer
+                labelPlacement={'end'}
+                control={
+                  <Checkbox
+                    onChange={this.onToggleShowIconOnCoverCheckbox}
+                    checked={record.show_icon_on_cover}
+                  />
+                }
+                label={
+                  <div style={{ maxWidth: '582px', paddingTop: '9px' }}>
+                    Show icon on cover
+                  </div>
+                }
+              ></LabelContainer>
+              <MediumBreak />
+              <h3>Cover Effects</h3>
               {this.showFilters && (
                 <QuickOptionSelector
                   options={filterOptions}
@@ -455,7 +493,7 @@ class CardCoverEditor extends React.Component {
                       />
                     }
                     label={
-                      <div style={{ maxWidth: '582px', paddingTop: '15px' }}>
+                      <div style={{ maxWidth: '582px', paddingTop: '9px' }}>
                         Hide subtitle
                       </div>
                     }

@@ -31,7 +31,7 @@ class ArchivedBanner extends React.Component {
     )
     return (
       restorable_parent && (
-        <Grid container spacing={16} justify="flex-end">
+        <Grid container spacing={2} justify="flex-end">
           <Grid item>
             Go to{' '}
             <Link to={restorableParentPath}>{restorable_parent.name}</Link> to

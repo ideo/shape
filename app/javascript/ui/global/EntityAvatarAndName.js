@@ -35,13 +35,18 @@ class EntityAvatarAndName extends React.Component {
   }
 
   handleClick = () => {
-    const { user_profile_collection_id } = this.props.entity
+    const { user_profile_collection_id, onClick } = this.props.entity
+    if (onClick) return onClick()
     if (!user_profile_collection_id) return false
     return routingStore.routeTo('collections', user_profile_collection_id)
   }
 
   render() {
     const { entity, isJoinableGroup } = this.props
+    const cursorStyle =
+      entity.onClick || entity.user_profile_collection_id
+        ? 'pointer'
+        : 'inherit'
     return (
       <Flex
         align="center"
@@ -51,7 +56,7 @@ class EntityAvatarAndName extends React.Component {
         <Avatar key={entity.id} url={this.avatarUrl} />
         {entity.name && entity.name.trim().length > 0 && (
           <Flex ml={10} column>
-            <DisplayText>
+            <DisplayText style={{ cursor: cursorStyle }}>
               <Flex align="center">
                 {this.renderName}
                 {isJoinableGroup && (
