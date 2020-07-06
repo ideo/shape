@@ -84,15 +84,19 @@ class CollectionFilter extends React.Component {
       .toLowerCase()
       .split(' ')[0]
 
+    let filterText = tag.name
+
     if (backendFilterType === 'tag') {
+      // tags can be tags or user tags
       const { internalType } = tag
       // NOTE: internalType is set under Organization::searchTagsAndUsers
       if (internalType === 'users') {
         backendFilterType = 'user_tag'
+        filterText = tag.label
       }
     }
     const filter = {
-      text: tag.label,
+      text: filterText,
       filter_type: backendFilterType,
       selected: false,
     }
