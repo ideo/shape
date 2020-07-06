@@ -489,7 +489,7 @@ class CollectionPage extends React.Component {
         )}
         {submissions_enabled && submissions_collection.viewMode !== 'list' && (
           <FloatingActionButton
-            toolTip={`Add ${submissionTypeName}`}
+            toolTip={`Create New Submission`}
             onClick={this.onAddSubmission}
             icon={<PlusIcon />}
           />
