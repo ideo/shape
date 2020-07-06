@@ -81,7 +81,9 @@ class FilterSearchModal extends React.Component {
     const { filterType } = this.props
     if (filterType === 'Search Term') {
       if (text.length < 4) {
-        this.searchResultCount = null
+        runInAction(() => {
+          this.searchResultCount = null
+        })
       } else {
         return this.debouncedTermSearch(text)
       }
