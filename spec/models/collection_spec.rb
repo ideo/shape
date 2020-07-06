@@ -936,7 +936,7 @@ describe Collection, type: :model do
 
       context 'if user is assigned as a reviewer' do
         before do
-          submission.add_challenge_reviewer(reviewer)
+          submission.update(user_tag_list: [reviewer.handle])
         end
 
         it 'returns :unstarted if no survey responses' do
@@ -961,33 +961,33 @@ describe Collection, type: :model do
       end
     end
 
-    describe '#add_challenge_reviewer' do
+    describe '#add_challenge_reviewer_filter_to_submission_box' do
       it 'adds collection filter with user handle' do
         expect do
-          submission.add_challenge_reviewer(reviewer)
+          submission.add_challenge_reviewer_filter_to_submission_box(reviewer)
         end.to change(CollectionFilter.user_tag, :count).by(1)
       end
 
       it 'creates user collection filter for user so they are selected' do
         expect do
-          submission.add_challenge_reviewer(reviewer)
+          submission.add_challenge_reviewer_filter_to_submission_box(reviewer)
         end.to change(UserCollectionFilter, :count).by(1)
-        collection_filter = submission.parent_challenge.collection_filters.last
+        collection_filter = submission_box.submissions_collection.collection_filters.last
         expect(
           collection_filter.user_collection_filters.find_by(user_id: reviewer.id),
         ).not_to be_nil
       end
     end
 
-    describe '#remove_challenge_reviewer' do
+    describe '#remove_challenge_reviewer_filter_from_submission_box' do
       before do
-        submission.add_challenge_reviewer(reviewer)
+        submission.add_challenge_reviewer_filter_to_submission_box(reviewer)
       end
 
       it 'destroys collection filter with user handle' do
-        collection_filter_id = submission.parent_challenge.collection_filters.last.id
+        collection_filter_id = submission_box.submissions_collection.collection_filters.last.id
         expect do
-          submission.remove_challenge_reviewer(reviewer)
+          submission.remove_challenge_reviewer_filter_from_submission_box(reviewer)
         end.to change(CollectionFilter.user_tag, :count).by(-1)
         expect(CollectionFilter.exists?(collection_filter_id)).to be false
       end
