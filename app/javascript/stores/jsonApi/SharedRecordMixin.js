@@ -19,7 +19,6 @@ const SharedRecordMixin = superclass =>
     challengeReviewerGroup = null
     tags = []
     @observable
-
     @action
     disableMenu() {
       this.forceMenuDisabled = true

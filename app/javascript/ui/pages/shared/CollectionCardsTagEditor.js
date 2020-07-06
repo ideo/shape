@@ -66,6 +66,7 @@ class CollectionCardsTagEditor extends React.Component {
     // update frontend model tags observable to rerender TagEditor
     _.each(records, r => {
       r.tags.push({ label, type, user })
+      r[type] && r[type].push(label)
     })
     this._apiAddRemoveTag('add', { label, type })
   }
