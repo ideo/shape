@@ -18,7 +18,11 @@ class ChallengeHeaderButton extends React.Component {
 
     if (!record.isChallengeOrInsideChallenge) return null
 
-    if (!record.isSubmissionBox && record.canEdit) {
+    if (
+      !record.isSubmissionBox &&
+      record.challenge &&
+      record.challenge.canEdit
+    ) {
       return (
         <Button
           {...buttonStyleProps}

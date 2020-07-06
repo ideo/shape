@@ -926,11 +926,13 @@ class Collection < ApplicationRecord
 
   # This method is called when a user tag is added to a submission collection
   # in the UserTaggable concern
-  def add_challenge_reviewer(user)
-    return unless inside_a_challenge? && user&.handle.present?
+  def add_challenge_reviewer_filter_to_submission_box(user)
+    sub_collection = parent_submission_box&.submissions_collection
 
-    filter_for_user = parent_challenge.collection_filters.tagged_with_user_handle(user.handle).first
-    filter_for_user ||= parent_challenge.collection_filters.create(
+    return unless inside_a_challenge? && sub_collection.present? && user&.handle.present?
+
+    filter_for_user = sub_collection.collection_filters.tagged_with_user_handle(user.handle).first
+    filter_for_user ||= sub_collection.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
     )
@@ -943,16 +945,18 @@ class Collection < ApplicationRecord
 
   # This method is called when a user tag is removed from a submission collection
   # in the UserTaggable concern
-  def remove_challenge_reviewer(user)
-    return unless inside_a_challenge? && user&.handle.present?
+  def remove_challenge_reviewer_filter_from_submission_box(user)
+    sub_collection = parent_submission_box&.submissions_collection
 
-    parent_challenge.collection_filters.tagged_with_user_handle(user.handle).destroy_all
+    return unless inside_a_challenge? && sub_collection.present? && user&.handle.present?
+
+    sub_collection.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
 
   def challenge_reviewer?(user)
     return false if parent_challenge.blank? || user&.handle.blank? || user_tag_list.empty?
 
-    user_tag_list.include? user.handle
+    user_tag_list.include?(user.handle)
   end
 
   def submission_reviewer_status(user)
