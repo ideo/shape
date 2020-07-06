@@ -31,19 +31,6 @@ describe('PageHeader', () => {
   })
 
   describe('render', () => {
-    describe('on the homepage', () => {
-      beforeEach(() => {
-        props.isHomepage = true
-        rerender()
-      })
-
-      it('should render an EditableName with the record.name', () => {
-        expect(wrapper.find('EditableName').props().name).toContain(
-          props.record.name
-        )
-      })
-    })
-
     describe('for an editable item', () => {
       beforeEach(() => {
         const textItem = fakeTextItem
@@ -80,19 +67,36 @@ describe('PageHeader', () => {
     })
 
     describe('for a normal collection', () => {
+      beforeEach(() => {
+        props.record = {
+          ...fakeCollection,
+          isRegularCollection: true,
+          canEdit: true,
+        }
+        rerender()
+      })
+
       it('passes canEdit through to EditableName', () => {
         expect(wrapper.find('EditableName').props().canEdit).toEqual(
-          props.record.can_edit
+          props.record.canEdit
         )
+      })
+
+      it('renders CollectionViewToggle and CollectionFilter', () => {
+        expect(wrapper.find('CollectionViewToggle').exists()).toBeTruthy()
+        expect(wrapper.find('CollectionFilter').exists()).toBeTruthy()
+        expect(wrapper.find('CollectionFilter').props().canEdit).toBeTruthy()
       })
     })
 
     describe('for a user collection', () => {
       beforeEach(() => {
-        const userCollection = fakeCollection
-        userCollection.isNormalCollection = false
-        userCollection.isUserCollection = true
-        props.record = userCollection
+        props.record = {
+          ...fakeCollection,
+          isNormalCollection: false,
+          isUserCollection: true,
+          canEdit: false,
+        }
         rerender()
       })
 
@@ -102,6 +106,16 @@ describe('PageHeader', () => {
 
       it('should not render the card menu', () => {
         expect(wrapper.find('ActionMenu').exists()).toBeFalsy()
+      })
+
+      it('should not allow name editing', () => {
+        expect(wrapper.find('EditableName').props().canEdit).toBeFalsy()
+      })
+
+      it('renders CollectionViewToggle and CollectionFilter', () => {
+        expect(wrapper.find('CollectionViewToggle').exists()).toBeTruthy()
+        expect(wrapper.find('CollectionFilter').exists()).toBeTruthy()
+        expect(wrapper.find('CollectionFilter').props().canEdit).toBeTruthy()
       })
     })
   })
