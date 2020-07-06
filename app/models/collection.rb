@@ -950,12 +950,9 @@ class Collection < ApplicationRecord
   end
 
   def challenge_reviewer?(user)
-    return false if parent_challenge.blank? || user&.handle.blank?
+    return false if parent_challenge.blank? || user&.handle.blank? || user_tag_list.empty?
 
-    parent_challenge.collection_filters
-                    .tagged_with_user_handle(user.handle)
-                    .count
-                    .positive?
+    user_tag_list.include? user.handle
   end
 
   def submission_reviewer_status(user)
