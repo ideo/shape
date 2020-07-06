@@ -7,11 +7,13 @@ import TagEditor from './TagEditor'
 
 export const formatRecordTags = records => {
   // TODO: check uniqueness and sort
-  const recordTags = _.flatMap(records, r => {
-    const { tags } = r
-    return toJS(tags)
-  })
-  return _.uniqBy(recordTags, tag => tag.label)
+  const recordTags = _.compact(
+    _.flatMap(records, r => {
+      const { tags } = r
+      return toJS(tags)
+    })
+  )
+  return _.uniqBy(recordTags, tag => tag.label && tag.type)
 }
 
 @inject('apiStore')

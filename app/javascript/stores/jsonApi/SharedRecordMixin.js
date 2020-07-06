@@ -17,6 +17,8 @@ const SharedRecordMixin = superclass =>
     highlightedRange = null
     @observable
     challengeReviewerGroup = null
+    tags = []
+    @observable
 
     @action
     disableMenu() {
@@ -61,6 +63,35 @@ const SharedRecordMixin = superclass =>
         return this.routingStore.pathTo(type, id)
       }
       return this.routingStore.pathTo('homepage')
+    }
+
+    initializeTags = async () => {
+      const userTagsWithUsers = await Promise.all(
+        _.map(this.user_tag_list, async tag => {
+          const userSearch = await this.apiStore.searchUsers({ query: tag })
+          // NOTE: assumes that the first search result is the user described in the tag
+          const user = _.get(userSearch, 'data[0]')
+          return {
+            label: tag,
+            type: 'user_tag_list',
+            user: user.toJSON(), // how do we not use .toJSON() here
+          }
+        })
+      )
+
+      const tagList = []
+      _.each(['tag_list', 'topic_list'], tagType => {
+        _.each(this[tagType], tag => {
+          tagList.push({
+            label: tag,
+            type: tagType,
+          })
+        })
+      })
+
+      runInAction(() => {
+        this.tags = [...userTagsWithUsers, ...tagList]
+      })
     }
 
     @action
