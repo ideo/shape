@@ -937,6 +937,7 @@ describe Collection, type: :model do
       context 'if user is assigned as a reviewer' do
         before do
           submission.update(user_tag_list: [reviewer.handle])
+          submission.add_challenge_reviewer(reviewer)
         end
 
         it 'returns :unstarted if no survey responses' do

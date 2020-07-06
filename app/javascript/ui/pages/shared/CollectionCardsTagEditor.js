@@ -6,7 +6,6 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import TagEditor from './TagEditor'
 
 export const formatRecordTags = records => {
-  // TODO: check uniqueness and sort
   const recordTags = _.flatMap(records, r => {
     const { tags } = r
     return toJS(tags)
