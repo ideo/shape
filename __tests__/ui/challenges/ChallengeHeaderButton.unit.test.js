@@ -8,13 +8,17 @@ describe('ChallengeHeaderButton', () => {
     props = {
       record: {
         ...fakeCollection,
-        collection_type: 'challenge',
         isChallengeOrInsideChallenge: true,
         API_fetchAllReviewableSubmissions: jest
           .fn()
           .mockReturnValue(Promise.resolve([])),
         fetchChallengeReviewersGroup: jest.fn(),
         canEdit: false,
+        challenge: {
+          ...fakeCollection,
+          canEdit: false,
+          collection_type: 'challenge',
+        },
       },
       apiStore: fakeApiStore(),
     }
@@ -34,7 +38,7 @@ describe('ChallengeHeaderButton', () => {
 
   describe('if user can edit collection', () => {
     beforeEach(() => {
-      props.record.canEdit = true
+      props.record.challenge.canEdit = true
       rerender()
     })
 
@@ -48,7 +52,7 @@ describe('ChallengeHeaderButton', () => {
     beforeEach(() => {
       props.record.isSubmissionBox = true
       props.record.isChallengeOrInsideChallenge = true
-      props.record.canEdit = true
+      props.record.challenge.canEdit = true
       rerender()
     })
 
