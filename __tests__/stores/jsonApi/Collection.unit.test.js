@@ -796,13 +796,6 @@ describe('Collection', () => {
     })
   })
 
-  describe('isInsideAChallenge', () => {
-    it('returns true when a challenge is present', () => {
-      collection.parent_challenge = fakeCollection
-      expect(collection.isInsideAChallenge).toEqual(true)
-    })
-  })
-
   describe('countSubmissions', () => {
     it('returns the count of submission live tests', () => {
       collection.type = 'Collection::SubmissionBox'
@@ -867,6 +860,7 @@ describe('Collection', () => {
           parent_challenge: {},
           user_tag_list: [handle],
           submission_reviewer_status: 'in_progress',
+          is_inside_a_challenge: true,
         },
         apiStore
       )
