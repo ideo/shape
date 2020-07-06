@@ -17,8 +17,9 @@ const SharedRecordMixin = superclass =>
     highlightedRange = null
     @observable
     challengeReviewerGroup = null
-    tags = []
     @observable
+    tags = []
+
     @action
     disableMenu() {
       this.forceMenuDisabled = true
@@ -326,6 +327,38 @@ const SharedRecordMixin = superclass =>
         collaborator.color = collaboratorColors.get(collaborator.id)
       })
       this.collaborators.replace(sorted)
+    }
+
+    initializeTags = async () => {
+      const userTagsWithUsers = await Promise.all(
+        _.map(this.user_tag_list, async tag => {
+          const userSearch = await this.apiStore.searchUsers({ query: tag })
+          // NOTE: assumes that the first search result is the user described in the tag
+          const user = _.get(userSearch, 'data[0]')
+          return {
+            label: tag,
+            type: 'user_tag_list',
+            user: user.toJSON(), // how do we not use .toJSON() here
+          }
+        })
+      )
+
+      const tagList = []
+      const tagListKeys = _.get(this, 'isChallengeOrInsideChallenge')
+        ? ['tag_list', 'topic_list']
+        : ['tag_list']
+      _.each([tagListKeys], tagType => {
+        _.each(this[tagType], tag => {
+          tagList.push({
+            label: tag,
+            type: tagType,
+          })
+        })
+      })
+
+      runInAction(() => {
+        this.tags = [...userTagsWithUsers, ...tagList]
+      })
     }
   }
 

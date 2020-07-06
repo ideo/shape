@@ -90,7 +90,7 @@ module UserTaggable
 
     # Remove the challenge collection filter for these user(s)
     User.where(id: user_ids).each do |user|
-      remove_challenge_reviewer(user)
+      remove_challenge_reviewer_filter_from_submission_box(user)
     end
   end
 
@@ -100,7 +100,7 @@ module UserTaggable
     return unless submission? && inside_a_challenge?
 
     User.where(id: user_ids).each do |user|
-      add_challenge_reviewer(user)
+      add_challenge_reviewer_filter_to_submission_box(user)
     end
   end
 end

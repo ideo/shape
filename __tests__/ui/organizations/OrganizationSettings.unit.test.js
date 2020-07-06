@@ -38,12 +38,13 @@ describe('OrganizationSettings', () => {
   describe('with edit capabilities', () => {
     beforeEach(() => {
       organization.primary_group.can_edit = true
+      organization.domain_whitelist = ['ideo.com']
       rerender()
     })
 
     it('renders the page with TagEditor for domain whitelist', () => {
       const tagEditor = wrapper.find(TagEditor)
-      expect(tagEditor.props().records).toEqual([organization])
+      expect(tagEditor.props().recordTags).toEqual([{ label: 'ideo.com' }])
     })
 
     it('should render a checkbox to add custom terms', () => {
@@ -52,8 +53,14 @@ describe('OrganizationSettings', () => {
   })
 
   describe('afterAddRemoveDomainTag', () => {
+    beforeEach(() => {
+      organization.primary_group.can_edit = true
+      organization.domain_whitelist = ['ideo.com']
+      rerender()
+    })
+
     it('calls organization.patch', () => {
-      component.afterAddRemoveDomainTag()
+      component.addTag({ label: 'ideo.org' })
       expect(props.apiStore.currentUserOrganization.patch).toHaveBeenCalled()
     })
   })
