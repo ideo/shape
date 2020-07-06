@@ -1290,7 +1290,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return _.get(this, 'user_tag_list', [])
   }
 
-  get isReviewableByCurrentUser() {
+  get isCurrentUserAReviewer() {
     if (
       !this.isSubmissionInChallenge ||
       !this.isLiveTest ||
@@ -1318,7 +1318,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (_.isEmpty(reviewableCards)) return false
 
     const cardsReviewableByCurrentUser = _.filter(reviewableCards, rc => {
-      return _.get(rc, 'record.isReviewableByCurrentUser')
+      return _.get(rc, 'record.isCurrentUserAReviewer')
     })
     return !_.isEmpty(cardsReviewableByCurrentUser)
   }

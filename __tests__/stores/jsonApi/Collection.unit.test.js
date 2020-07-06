@@ -843,7 +843,7 @@ describe('Collection', () => {
     })
   })
 
-  describe('isReviewableByCurrentUser', () => {
+  describe('isCurrentUserAReviewer', () => {
     const handle = 'jappleseed'
     beforeEach(() => {
       collection = new Collection(
@@ -859,7 +859,6 @@ describe('Collection', () => {
           type: 'Collection::SubmissionsCollection',
           parent_challenge: {},
           user_tag_list: [handle],
-          submission_reviewer_status: 'in_progress',
           is_inside_a_challenge: true,
         },
         apiStore
@@ -877,18 +876,8 @@ describe('Collection', () => {
       apiStore.add(user, 'users')
     })
 
-    it('should be reviewable if status is in progress', () => {
-      expect(collection.isReviewableByCurrentUser).toBe(true)
-    })
-
-    it('should be reviewable if status is unstarted', () => {
-      collection.submission_reviewer_status = 'unstarted'
-      expect(collection.isReviewableByCurrentUser).toBe(true)
-    })
-
-    it('should not be reviewable if status is completed', () => {
-      collection.submission_reviewer_status = 'completed'
-      expect(collection.isReviewableByCurrentUser).toBe(false)
+    it('should be true if inside a challenge', () => {
+      expect(collection.isCurrentUserAReviewer).toBe(true)
     })
   })
 
