@@ -471,7 +471,7 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          {record.isInsideAChallenge && (
+          {record.is_inside_a_challenge && (
             <ChallengeSubHeader
               challengeName={record.challenge.name}
               challengeNavigationHandler={() => {

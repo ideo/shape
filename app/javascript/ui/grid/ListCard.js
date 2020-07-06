@@ -317,9 +317,9 @@ class ListCard extends React.Component {
       )
     }
 
-    const { isReviewableByCurrentUser, submission_reviewer_status } = record
+    const { isCurrentUserAReviewer, submission_reviewer_status } = record
 
-    if (isReviewableByCurrentUser && submission_reviewer_status) {
+    if (isCurrentUserAReviewer && submission_reviewer_status) {
       return (
         <ChallengeReviewButton
           reviewerStatus={submission_reviewer_status}

@@ -137,7 +137,7 @@ class Collection
 
       submissions.each do |submission|
         # disclude from available tests if submission is inside a challenge
-        next if parent_challenge.present? &&
+        next if inside_a_challenge? &&
                 submission.cached_user_tag_list.exclude?(for_user&.handle) &&
                 submission_reviewer_status(for_user) == :completed
 

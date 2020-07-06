@@ -386,7 +386,7 @@ class CollectionCover extends React.Component {
       icon,
       show_icon_on_cover,
       submission_reviewer_status,
-      isReviewableByCurrentUser,
+      isCurrentUserAReviewer,
     } = collection
 
     const { gridW, gutter } = uiStore.gridSettings
@@ -484,7 +484,7 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
-                  {isReviewableByCurrentUser && submission_reviewer_status && (
+                  {isCurrentUserAReviewer && submission_reviewer_status && (
                     <ChallengeReviewButton
                       reviewerStatus={submission_reviewer_status}
                       onClick={() => {
