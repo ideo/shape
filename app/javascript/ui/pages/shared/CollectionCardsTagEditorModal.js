@@ -70,6 +70,7 @@ class CollectionCardsTagEditorModal extends React.Component {
         onClose={() => uiStore.update('tagsModalOpenId', null)}
         title={this.title}
         open={open}
+        scrollVisible
       >
         <CollectionCardsTagEditor
           records={this.records}

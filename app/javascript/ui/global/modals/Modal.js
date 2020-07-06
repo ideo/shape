@@ -19,8 +19,6 @@ const StyledDialog = styled(Dialog)`
     border-left: 17px solid ${v.colors.black};
     max-width: 760px;
     width: 100%;
-    /* this overflow-y setting allows elements like tag suggestions to be visible */
-    overflow-y: visible;
 
     @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
       border-left: 0px;
