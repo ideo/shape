@@ -59,7 +59,7 @@ class AudienceSettings extends React.Component {
   initAudienceSettings() {
     const { testCollection } = this.props
     const { audiences, audienceSettings } = this
-    const { test_audiences, isInsideAChallenge } = testCollection
+    const { test_audiences, is_inside_a_challenge } = testCollection
 
     _.each(audiences, audience => {
       const testAudience = test_audiences.find(
@@ -72,14 +72,14 @@ class AudienceSettings extends React.Component {
 
       const { isLinkSharing } = audience
       let selected = !!testAudience
-      if ((testAudience && isLinkSharing) || isInsideAChallenge) {
+      if ((testAudience && isLinkSharing) || is_inside_a_challenge) {
         selected = testAudience.status === 'open'
       }
 
       const displayCheckbox =
         selected ||
         isLinkSharing ||
-        isInsideAChallenge ||
+        is_inside_a_challenge ||
         (!this.locked && audience.order <= 6)
       audienceSettings.set(audience.id, {
         selected,
@@ -95,7 +95,7 @@ class AudienceSettings extends React.Component {
   get locked() {
     const { testCollection } = this.props
     const { isLiveTest, isClosedTest } = testCollection
-    if (testCollection.isInsideAChallenge) {
+    if (testCollection.is_inside_a_challenge) {
       return testCollection.isTemplated
     }
     return isLiveTest || isClosedTest
@@ -104,7 +104,7 @@ class AudienceSettings extends React.Component {
   get audiences() {
     const { apiStore, testCollection } = this.props
     const { audiences } = apiStore
-    if (testCollection.isInsideAChallenge) {
+    if (testCollection.is_inside_a_challenge) {
       // only show link sharing and challenge audiences for tests inside challenges
       return _.filter(audiences, audience => {
         return audience.isLinkSharing || audience.audience_type === 'challenge'
@@ -158,8 +158,8 @@ class AudienceSettings extends React.Component {
     this.updateAudienceSetting(id, 'selected', !setting.selected)
     const { audience, test_audience } = setting
     if (
-      testCollection.isInsideAChallenge ||
-      (!testCollection.isInsideAChallenge && audience.isLinkSharing)
+      testCollection.is_inside_a_challenge ||
+      (!testCollection.is_inside_a_challenge && audience.isLinkSharing)
     ) {
       this.toggleTestAudience(audience, test_audience)
     }
@@ -253,7 +253,7 @@ class AudienceSettings extends React.Component {
 
     // show audience settings by default for feedback inside challenges
     return (
-      testCollection.isInsideAChallenge ||
+      testCollection.is_inside_a_challenge ||
       (!testCollection.collection_to_test_id &&
         !testCollection.is_submission_box_template_test)
     )
@@ -264,8 +264,8 @@ class AudienceSettings extends React.Component {
 
     // show audience settings by default for feedback inside challenges
     return (
-      !testCollection.isInsideAChallenge ||
-      (testCollection.isInsideAChallenge && this.viewingChallengeTest)
+      !testCollection.is_inside_a_challenge ||
+      (testCollection.is_inside_a_challenge && this.viewingChallengeTest)
     )
   }
 
@@ -301,7 +301,7 @@ class AudienceSettings extends React.Component {
     return (
       <AudienceHeadingWrapper>
         <Heading3>Feedback Audience</Heading3>
-        {testCollection.isInsideAChallenge && !viewingChallengeTest && (
+        {testCollection.is_inside_a_challenge && !viewingChallengeTest && (
           <EditFeedbackButton
             onClick={() => {
               uiStore.update('challengeSettingsOpen', false)
@@ -315,7 +315,7 @@ class AudienceSettings extends React.Component {
 
   render() {
     const { uiStore, testCollection, apiStore } = this.props
-    const { numPaidQuestions, isInsideAChallenge } = testCollection
+    const { numPaidQuestions, is_inside_a_challenge } = testCollection
     const { currentUser } = apiStore
     const currentUserOrganization = currentUser.current_organization
     const { isLiveTest, isClosedTest } = testCollection
@@ -349,7 +349,7 @@ class AudienceSettings extends React.Component {
               audienceSettings={this.audienceSettings}
               afterAddAudience={this.afterAddAudience}
               locked={this.locked}
-              displayChallengeAudiences={isInsideAChallenge}
+              displayChallengeAudiences={is_inside_a_challenge}
               challengeName={this.challengeName}
             />
           </Fragment>

@@ -79,7 +79,12 @@ class TestsController < ApplicationController
 
   def redirect_to_test
     if @collection.challenge_or_inside_challenge? && !@collection.submission_box_template_test?
-      @collection
+      @next_submission_test = @collection
+                              .parent_challenge
+                              .next_available_challenge_test(
+                                for_user: current_user,
+                                omit_id: @collection.id,
+                              )
     elsif @collection.submission_box_template_test?
       redirect_to "/tests/#{next_test.id}"
     elsif @collection.collection_to_test.present?
@@ -100,7 +105,7 @@ class TestsController < ApplicationController
 
   def redirect_to_submission_box_test
     # first we have to determine if any tests are available for the user
-    next_test = @collection.parent_submission_box.random_next_submission_test(for_user: current_user)
+    next_test = @collection.parent_submission_box.random_next_submission_test(for_user: current_user).first
     if next_test.present?
       # then it depends if it's an in-collection test, or standalone
       if next_test.collection_to_test.present?

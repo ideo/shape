@@ -158,6 +158,10 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
+  attribute :is_inside_a_challenge do
+    @object.inside_a_challenge?
+  end
+
   attribute :is_subtemplate_or_instance do
     @object.subtemplate? || @object.subtemplate_instance?
   end

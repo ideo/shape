@@ -269,7 +269,7 @@ class TestQuestion extends React.Component {
 }
 
 TestQuestion.propTypes = {
-  // parent is the parent collection
+  // parent is the parent test collection
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   editing: PropTypes.bool.isRequired,

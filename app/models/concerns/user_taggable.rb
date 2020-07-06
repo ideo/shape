@@ -86,7 +86,7 @@ module UserTaggable
   end
 
   def after_remove_tagged_user_ids(user_ids)
-    return unless submission? && parent_challenge.present?
+    return unless submission? && inside_a_challenge?
 
     # Remove the challenge collection filter for these user(s)
     User.where(id: user_ids).each do |user|
@@ -97,7 +97,7 @@ module UserTaggable
   def after_add_tagged_user_ids(user_ids)
     # If a user is tagged on a submission within a challenge,
     # add them to the selectable collection filters if not already
-    return unless submission? && parent_challenge.present?
+    return unless submission? && inside_a_challenge?
 
     User.where(id: user_ids).each do |user|
       add_challenge_reviewer(user)
