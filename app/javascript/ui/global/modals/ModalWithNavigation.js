@@ -62,7 +62,7 @@ class ModalWithNavigation extends React.Component {
   render() {
     const { title, contents, open, onClose, showLoader } = this.props
     return (
-      <Modal title={title} open={open} onClose={onClose}>
+      <Modal title={title} open={open} onClose={onClose} scrollVisible>
         <NavigationContainer>
           {contents.map(element => (
             <NavElement

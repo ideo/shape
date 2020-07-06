@@ -40,8 +40,8 @@ FormatDateRange.propTypes = {
 }
 
 const CollectionDateRange = ({ collection, hideEditIcon }) => {
-  const dateDisplayRef = React.createRef()
-  const wrapperRef = React.createRef()
+  const dateDisplayRef = React.useRef()
+  const wrapperRef = React.useRef()
 
   const [dateRange, setDateRange] = useState([
     collection.start_date,
