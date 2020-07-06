@@ -436,7 +436,6 @@ class CollectionPage extends React.Component {
     const { collection, uiStore } = this.props
     const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
     const {
-      submissionTypeName,
       submissions_collection,
       submission_box_type,
       submission_template,
