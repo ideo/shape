@@ -7,12 +7,13 @@ import { ReferenceType, updateModelId } from 'datx'
 import { apiStore } from '~/stores'
 import Collection, { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import Organization from '~/stores/jsonApi/Organization'
+import User from '~/stores/jsonApi/User'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
 import googleTagManager from '~/vendor/googleTagManager'
 import queryString from 'query-string'
 
-import { fakeRole } from '#/mocks/data'
+import { fakeRole, fakeCollection } from '#/mocks/data'
 jest.mock('../../../app/javascript/vendor/googleTagManager')
 
 let collectionCard_1, collectionCard_2, collectionCard_3
@@ -792,6 +793,91 @@ describe('Collection', () => {
     it('returns true if collection.anyone_can_join is true', () => {
       collection.anyone_can_join = true
       expect(collection.isPublicJoinable).toEqual(true)
+    })
+  })
+
+  describe('countSubmissions', () => {
+    it('returns the count of submission live tests', () => {
+      collection.type = 'Collection::SubmissionBox'
+      collection.submissions_collection = fakeCollection
+      expect(collection.countSubmissions).toEqual(
+        collection.submissions_collection.collection_cards.length
+      )
+    })
+  })
+
+  describe('countSubmissionLiveTests', () => {
+    beforeEach(() => {
+      collection.type = 'Collection::SubmissionBox'
+      fakeCollection.collection_cards.map(cc => {
+        cc.record.isLiveTest = true
+      })
+      collection.submissions_collection = fakeCollection
+    })
+
+    it('returns the count of submission live tests', () => {
+      expect(collection.countSubmissionLiveTests).toEqual(
+        collection.submissions_collection.collection_cards.length
+      )
+    })
+  })
+
+  describe('reviewableCards', () => {
+    beforeEach(() => {
+      const reviewableCardAttrs = [
+        {
+          section_type: 'intro',
+          card_question_type: 'question_open',
+          record: { isLiveTest: true },
+        },
+      ]
+      collection.type = 'Collection::SubmissionsCollection'
+      collection.addReference('collection_cards', reviewableCardAttrs, {
+        model: CollectionCard,
+        type: ReferenceType.TO_MANY,
+      })
+    })
+
+    it('returns reviewableCards', () => {
+      expect(_.isEmpty(collection.reviewableCards)).toBe(false)
+    })
+  })
+
+  describe('isCurrentUserAReviewer', () => {
+    const handle = 'jappleseed'
+    beforeEach(() => {
+      collection = new Collection(
+        {
+          name: 'fakeCollection',
+          roles: [fakeRole],
+          organization_id: '1',
+          parent: { name: 'Some Collection' },
+          submission_attrs: {
+            submission: true,
+            test_status: 'live',
+          },
+          type: 'Collection::SubmissionsCollection',
+          parent_challenge: {},
+          user_tag_list: [handle],
+          is_inside_a_challenge: true,
+        },
+        apiStore
+      )
+      const user = new User(
+        {
+          handle,
+        },
+        apiStore
+      )
+      updateModelId(user, '1')
+      runInAction(() => {
+        apiStore.currentUserId = '1'
+      })
+      apiStore.add(user, 'users')
+    })
+
+    it('should be true if inside a challenge', () => {
+      expect(collection.isCurrentUserAReviewer).toBe(true)
     })
   })
 

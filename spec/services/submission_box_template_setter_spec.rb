@@ -78,6 +78,11 @@ RSpec.describe SubmissionBoxTemplateSetter, type: :service do
       expect(dup_template.name).to eq "#{submission_box.name} #{template_card.collection.name}"
     end
 
+    it 'should set card to be hidden so template is not visible in submission header' do
+      template_setter.call
+      expect(dup_template_card.hidden).to be true
+    end
+
     it 'should set the duplicate template card size to match the original' do
       template_setter.call
       expect(dup_template_card.width).to eq 2

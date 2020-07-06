@@ -169,8 +169,8 @@ class ItemPage extends React.Component {
     return (
       <Fragment>
         <Helmet title={item.pageTitle} />
-        <PageHeader record={item} />
         <ArchivedBanner />
+        <PageHeader record={item} />
         <ItemPageContainer onContextMenu={this.openContextMenu}>
           <PageContainer {...containerProps}>
             {item.parent_collection_card && (

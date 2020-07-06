@@ -39,6 +39,12 @@ FactoryBot.define do
       after(:create, &:mark_as_private!)
     end
 
+    trait :phase do
+      collection_type { :phase }
+      start_date { 5.days.ago }
+      end_date { 10.days.from_now }
+    end
+
     trait :submission do
       after(:create) do |collection|
         # needed for `inside_a_submission?` check

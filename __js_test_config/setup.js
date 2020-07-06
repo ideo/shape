@@ -3,6 +3,7 @@ import React from 'react'
 import Adapter from 'enzyme-adapter-react-16'
 import 'jest-styled-components'
 import dotenv from 'dotenv'
+import enableHooks from 'jest-react-hooks-shallow'
 
 // provide React globally in tests without having to "import"
 global.React = React
@@ -24,6 +25,9 @@ jest.mock('mobx', () => ({
   ...require.requireActual('mobx'),
   observe: jest.fn(),
 }))
+
+// so that we can use react hooks with jest
+enableHooks(jest)
 
 window.CONFIG = {
   stripeApiKey: '',

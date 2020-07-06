@@ -1,13 +1,14 @@
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import ListCard from '~/ui/grid/ListCard'
 import { ITEM_TYPES } from '~/utils/variables'
-import { routingStore, uiStore } from '~/stores'
+import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 import { fakeCollectionCard, fakeTextItem } from '#/mocks/data'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
 import { openContextMenu } from '~/utils/clickUtils'
 
-jest.mock('../../../app/javascript/stores')
 jest.mock('../../../app/javascript/utils/clickUtils')
 
 const card = fakeCollectionCard
@@ -23,9 +24,12 @@ describe('ListCard', () => {
   beforeEach(() => {
     props = {
       card,
+      uiStore: fakeUiStore,
+      apiStore: fakeApiStore(),
+      routingStore: fakeRoutingStore,
     }
     render = () => {
-      wrapper = shallow(<ListCard {...props} />)
+      wrapper = shallow(<ListCard.wrappedComponent {...props} />)
       component = wrapper.instance()
     }
     render()
@@ -35,7 +39,7 @@ describe('ListCard', () => {
     it('should route to the record', () => {
       const link = wrapper.find('ColumnLink').first()
       link.simulate('click', fakeEv)
-      expect(routingStore.routeTo).toHaveBeenCalledWith(
+      expect(props.routingStore.routeTo).toHaveBeenCalledWith(
         card.record.internalType,
         card.record.id
       )
@@ -54,12 +58,12 @@ describe('ListCard', () => {
     })
 
     it('should capture global keyboard grid click', () => {
-      expect(uiStore.captureKeyboardGridClick).toHaveBeenCalled()
+      expect(props.uiStore.captureKeyboardGridClick).toHaveBeenCalled()
     })
 
     it('should toggle selected card in uiStore', () => {
-      expect(uiStore.toggleSelectedCardId).toHaveBeenCalled()
-      expect(uiStore.toggleSelectedCardId).toHaveBeenCalledWith(card.id)
+      expect(props.uiStore.toggleSelectedCardId).toHaveBeenCalled()
+      expect(props.uiStore.toggleSelectedCardId).toHaveBeenCalledWith(card.id)
     })
   })
 
@@ -88,7 +92,7 @@ describe('ListCard', () => {
     })
 
     it('should open the context menu in ui store', () => {
-      expect(uiStore.openContextMenu).toHaveBeenCalled()
+      expect(props.uiStore.openContextMenu).toHaveBeenCalled()
     })
   })
 
@@ -102,8 +106,11 @@ describe('ListCard', () => {
     })
 
     it('should open the context menu in ui store', () => {
-      expect(uiStore.update).toHaveBeenCalled()
-      expect(uiStore.update).toHaveBeenCalledWith('rolesMenuOpen', card.record)
+      expect(props.uiStore.update).toHaveBeenCalled()
+      expect(props.uiStore.update).toHaveBeenCalledWith(
+        'rolesMenuOpen',
+        card.record
+      )
     })
   })
 

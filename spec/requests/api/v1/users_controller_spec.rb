@@ -6,9 +6,29 @@ describe Api::V1::UsersController, type: :request, json: true, auth: true, creat
   describe 'GET #index' do
     let(:path) { api_v1_users_path }
 
-    it 'returns 401' do
-      get(path)
-      expect(response.status).to eq(401)
+    context 'with no user', auth: false do
+      it 'returns 401' do
+        get(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with user who has an organization' do
+      let(:organization) { user.current_organization }
+      let!(:org_users) { create_list(:user, 3, add_to_org: organization) }
+      let!(:path) { api_v1_organization_users_path(organization) }
+
+      it 'returns all users in organization' do
+        get(path)
+        expect(json['data'].size).to eq(organization.users.count)
+        handles = json['data'].map { |user| user['attributes']['handle'] }
+        expect(handles).to match_array(org_users.map(&:handle) + [user.handle])
+      end
+
+      it 'uses simple serializer' do
+        get(path)
+        expect(json['data'].first['attributes']).to match_json_schema('simple_user')
+      end
     end
 
     context 'with Application API Token', auth: false, create_org: false do

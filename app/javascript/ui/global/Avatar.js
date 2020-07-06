@@ -32,7 +32,7 @@ const StyledAvatar = styled(MuiAvatar)`
     /* thicker outline */
     box-shadow: 0 0 0 4px;
     /* box-shadow will use the color property by default */
-    color: ${v.colors.commonLight};
+    color: ${props => props.color};
   }
   /* not the cleanest way to do this but it works; see note above about color */
   &.outline-Blue {
@@ -103,6 +103,7 @@ class Avatar extends React.Component {
       linkToCollectionId,
       responsive,
       clickable,
+      color,
     } = this.props
 
     const renderAvatar = (
@@ -117,6 +118,7 @@ class Avatar extends React.Component {
           linkToCollectionId || displayName || clickable ? 'pointer' : 'initial'
         }
         responsive={responsive ? 1 : 0}
+        color={color}
       />
     )
     let content = renderAvatar
@@ -135,7 +137,7 @@ class Avatar extends React.Component {
   }
 }
 
-Avatar.propTypes = {
+export const AvatarPropTypes = {
   title: PropTypes.string,
   url: PropTypes.string,
   size: PropTypes.number,
@@ -144,7 +146,10 @@ Avatar.propTypes = {
   linkToCollectionId: PropTypes.string,
   responsive: PropTypes.bool,
   clickable: PropTypes.bool,
+  color: PropTypes.string,
 }
+
+Avatar.propTypes = AvatarPropTypes
 Avatar.defaultProps = {
   url:
     'https://d3none3dlnlrde.cloudfront.net/assets/users/avatars/missing/square.jpg',
@@ -155,6 +160,7 @@ Avatar.defaultProps = {
   linkToCollectionId: null,
   responsive: true,
   clickable: false,
+  color: v.colors.commonLight,
 }
 
 export default Avatar

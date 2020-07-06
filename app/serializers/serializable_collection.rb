@@ -9,6 +9,9 @@ class SerializableCollection < BaseJsonSerializer
     :updated_at,
     :master_template,
     :template_id,
+    :parent_challenge,
+    :parent_challenge_id,
+    :challenge_reviewer_group_id,
     :submission_box_type,
     :submission_box_id,
     :submission_template_id,
@@ -28,6 +31,13 @@ class SerializableCollection < BaseJsonSerializer
     :collection_type,
     :cloned_from_id,
     :num_columns,
+    :start_date,
+    :end_date,
+    :challenge_reviewer_group_id,
+    :challenge_admin_group_id,
+    :challenge_participant_group_id,
+    :icon,
+    :show_icon_on_cover,
   )
 
   stringified_attributes(
@@ -42,6 +52,9 @@ class SerializableCollection < BaseJsonSerializer
   belongs_to :organization
   belongs_to :created_by
   belongs_to :template
+  belongs_to :challenge_review_group
+  belongs_to :challenge_admin_group
+  belongs_to :challenge_participant_group
   has_one :parent_collection_card
   has_one :parent
   has_one :live_test_collection
@@ -49,6 +62,7 @@ class SerializableCollection < BaseJsonSerializer
   has_many :collection_cover_text_items
   has_many :test_audiences
   has_many :collection_filters
+  has_many :tagged_users
 
   has_many :collection_cover_items do
     data do
@@ -61,11 +75,19 @@ class SerializableCollection < BaseJsonSerializer
   end
 
   attribute :tag_list do
-    @object.cached_tag_list || []
+    @object.cached_tag_list.presence || []
+  end
+
+  attribute :topic_list do
+    @object.cached_topic_list.presence || []
+  end
+
+  attribute :user_tag_list do
+    @object.cached_user_tag_list.presence || []
   end
 
   attribute :inherited_tag_list do
-    @object.cached_owned_tag_list || []
+    @object.cached_owned_tag_list.presence || []
   end
 
   attribute :cover do
@@ -136,6 +158,10 @@ class SerializableCollection < BaseJsonSerializer
       @inside_a_submission
   end
 
+  attribute :is_inside_a_challenge do
+    @object.inside_a_challenge?
+  end
+
   attribute :is_subtemplate_or_instance do
     @object.subtemplate? || @object.subtemplate_instance?
   end
@@ -190,6 +216,10 @@ class SerializableCollection < BaseJsonSerializer
 
   attribute :is_restorable do
     @object.try(:restorable?)
+  end
+
+  has_many :submission_template_test_collections, if: -> { @object.submission_box_template? } do
+    @object.try(:submission_template_test_collections)
   end
 
   has_one :restorable_parent do

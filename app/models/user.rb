@@ -114,13 +114,16 @@ class User < ApplicationRecord
   has_many :activity_subjects, as: :subject
   has_many :notifications
   has_many :survey_responses
-
   has_many :user_profiles,
            class_name: 'Collection::UserProfile',
            inverse_of: :created_by,
            foreign_key: :created_by_id
   has_one :application
   has_many :test_audience_invitations, dependent: :destroy
+  has_many :network_invitations
+  has_many :user_tags, dependent: :destroy
+  has_many :tagged_collections, through: :user_tags, source: :record, source_type: 'Collection'
+  has_many :tagged_items, through: :user_tags, source: :record, source_type: 'Item'
 
   belongs_to :current_organization,
              class_name: 'Organization',
@@ -128,9 +131,6 @@ class User < ApplicationRecord
   belongs_to :current_user_collection,
              class_name: 'Collection',
              optional: true
-
-  has_many :test_audience_invitations
-  has_many :network_invitations
 
   validates :email,
             presence: true,
@@ -146,6 +146,8 @@ class User < ApplicationRecord
   after_create :update_shape_user_list_subscription, if: :active?
   after_update :update_shape_user_list_subscription_after_update, if: :saved_change_to_status?
   after_update :update_profile_locale, if: :should_update_network_user_locale?
+  before_update :update_collection_filters, if: :handle_changed?
+  after_destroy :delete_collection_filters
 
   delegate :balance, to: :incentive_owed_account, prefix: true
   delegate :balance, to: :incentive_paid_account, prefix: true
@@ -199,6 +201,7 @@ class User < ApplicationRecord
       email: email_search_tokens,
       status: status,
       organization_ids: organization_ids,
+      taggings_count: user_tags.count,
       application_bot: application_bot?,
     }
   end
@@ -681,5 +684,19 @@ class User < ApplicationRecord
       remove_network_admin(group.organization.id)
       add_role(Role::MEMBER, group.organization.primary_group)
     end
+  end
+
+  def update_collection_filters
+    CollectionFilter
+      .tagged_with_user_handle(handle_was)
+      .update_all(
+        text: handle,
+      )
+  end
+
+  def delete_collection_filters
+    CollectionFilter
+      .tagged_with_user_handle(handle_was)
+      .destroy_all
   end
 end

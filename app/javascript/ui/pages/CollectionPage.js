@@ -6,6 +6,7 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 import { Helmet } from 'react-helmet'
+import VisibilitySensor from 'react-visibility-sensor'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
@@ -31,6 +32,7 @@ import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
+import SuggestedTagsBanner from '~/ui/global/SuggestedTagsBanner'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -283,6 +285,11 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
+
+      if (collection.is_inside_a_challenge) {
+        // load reviwers group to for rendering review buttons and assign reviewers
+        collection.fetchChallengeReviewersGroup()
+      }
     }
   }
 
@@ -482,7 +489,7 @@ class CollectionPage extends React.Component {
         )}
         {submissions_enabled && submissions_collection.viewMode !== 'list' && (
           <FloatingActionButton
-            toolTip={`Add ${submissionTypeName}`}
+            toolTip={`Create New Submission`}
             onClick={this.onAddSubmission}
             icon={<PlusIcon />}
           />
@@ -502,6 +509,25 @@ class CollectionPage extends React.Component {
 
   renderTestDesigner() {
     return <TestDesigner collection={this.props.collection} />
+  }
+
+  renderPageHeader() {
+    const { collection } = this.props
+
+    return (
+      <VisibilitySensor onChange={this.handleHeaderVisibility}>
+        {({ isVisible }) => {
+          return (
+            <PageHeader record={collection} template={collection.template} />
+          )
+        }}
+      </VisibilitySensor>
+    )
+  }
+
+  handleHeaderVisibility = isVisible => {
+    const { uiStore } = this.props
+    uiStore.update('shouldRenderFixedHeader', !isVisible)
   }
 
   loader = () => (
@@ -602,7 +628,19 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Helmet title={collection.pageTitle} />
-        <PageHeader record={collection} template={collection.template} />
+        {!isLoading && collection.showSubmissionTopicSuggestions && (
+          <SuggestedTagsBanner
+            collection={collection}
+            suggestions={collection.parent_challenge.topic_list}
+          />
+        )}
+        {!isLoading && (
+          <Fragment>
+            <ArchivedBanner />
+            <OverdueBanner />
+          </Fragment>
+        )}
+        {this.renderPageHeader()}
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
           // pop up over the CollectionGrid
@@ -610,8 +648,6 @@ class CollectionPage extends React.Component {
         )}
         {!isLoading && (
           <Fragment>
-            <ArchivedBanner />
-            <OverdueBanner />
             <PageContainer
               fullWidth={
                 collection.isBoard &&

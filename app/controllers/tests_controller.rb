@@ -34,9 +34,14 @@ class TestsController < ApplicationController
     if params[:ta].present? || params[:token].present?
       look_up_test_audience
       # if you're invited to a test audience it'll set to `invalid` if that audience is closed
-      @invalid = @test_audience.nil? || @test_audience.closed?
-    elsif !@collection.link_sharing_enabled?
-      # if no test audience param, then you can only view the test if link_sharing_enabled
+    elsif @collection.live_challenge_submission_test?
+      look_up_challenge_test_audience
+    end
+
+    # if no test audience param, then you can only view the test if link_sharing_enabled
+    if @test_audience.present? && @test_audience.open? || @collection.link_sharing_enabled?
+      @invalid = false
+    else
       @invalid = true
     end
     # will reset to nil if no test_audience
@@ -57,9 +62,31 @@ class TestsController < ApplicationController
     end
   end
 
+  def look_up_challenge_test_audience
+    return unless user_signed_in? && current_user.present?
+
+    reviewer_group = @collection&.parent_challenge&.challenge_reviewer_group
+
+    return unless reviewer_group.present? && reviewer_group.user_ids.include?(current_user.id)
+
+    # use master template test audience
+    test_audiences = @collection&.template&.test_audiences
+    return unless test_audiences.present?
+
+    # tests will share the same submission template reviewer test audience
+    @test_audience = test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
+  end
+
   def redirect_to_test
-    if @collection.submission_box_template_test?
-      redirect_to_submission_box_test
+    if @collection.challenge_or_inside_challenge? && !@collection.submission_box_template_test?
+      @next_submission_test = @collection
+                              .parent_challenge
+                              .next_available_challenge_test(
+                                for_user: current_user,
+                                omit_id: @collection.id,
+                              )
+    elsif @collection.submission_box_template_test?
+      redirect_to "/tests/#{next_test.id}"
     elsif @collection.collection_to_test.present?
       redirect_to_collection_to_test(@collection.collection_to_test)
     elsif @collection.submission_test?
@@ -68,7 +95,7 @@ class TestsController < ApplicationController
                               .random_next_submission_test(
                                 for_user: current_user,
                                 omit_id: @collection.id,
-                              )
+                              ).first
     end
   end
 
@@ -78,7 +105,7 @@ class TestsController < ApplicationController
 
   def redirect_to_submission_box_test
     # first we have to determine if any tests are available for the user
-    next_test = @collection.parent_submission_box.random_next_submission_test(for_user: current_user)
+    next_test = @collection.parent_submission_box.random_next_submission_test(for_user: current_user).first
     if next_test.present?
       # then it depends if it's an in-collection test, or standalone
       if next_test.collection_to_test.present?

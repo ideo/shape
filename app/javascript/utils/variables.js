@@ -245,6 +245,7 @@ export default {
     tertiaryMedium: '#de8f74',
     transparent: 'transparent',
     white: '#ffffff',
+    // TODO these aren't primary colors, lets moving them under collaboratorColor hash
     collaboratorPrimaryBlue: '#5473A6',
     collaboratorSecondaryBlue: '#C2CBD9',
     collaboratorPrimaryYellow: '#e8c547',
@@ -265,6 +266,12 @@ export default {
     collaboratorSecondarySlate: '#D5D8D6',
     collaboratorPrimaryGrey: '#738091',
     collaboratorSecondaryGrey: '#CCCFD2',
+  },
+
+  statusColor: {
+    unstarted: '#E34744',
+    in_progress: '#FF7A00',
+    completed: '#00C59B',
   },
 
   collaboratorColorNames: [

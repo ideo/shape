@@ -38,14 +38,14 @@ RSpec.describe Audience, type: :model, seed: true do
       Audience.viewable_by_user_in_org(user: user, organization: organization)
     end
 
-    it 'should only return audiences in the organization (2), global (1), and global defaults (2)' do
-      expect(viewable_by_org.size).to eq 5
+    it 'should only return audiences in the organization (2), global (1), challenges(3), and global defaults (2)' do
+      expect(viewable_by_org.size).to eq 8
       # should not include 2 Audiences outside the org
-      expect(Audience.count).to eq 7
+      expect(Audience.count).to eq 10
     end
 
     it 'should return the same count for .viewable_by_user_in_org' do
-      expect(viewable_by_user_in_org.to_a.size).to eq 5
+      expect(viewable_by_user_in_org.to_a.size).to eq 8
     end
   end
 

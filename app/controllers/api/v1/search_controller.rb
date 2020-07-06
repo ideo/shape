@@ -1,8 +1,8 @@
 class Api::V1::SearchController < Api::V1::BaseController
   before_action :capture_query_params
   before_action :load_and_authorize_organization_from_slug, only: %i[search]
-  load_and_authorize_resource :organization, only: %i[search_collection_cards]
-  before_action :switch_to_organization, only: %i[search search_collection_cards]
+  load_and_authorize_resource :organization, only: %i[search_collection_cards search_users_and_tags]
+  before_action :switch_to_organization, only: %i[search search_collection_cards search_users_and_tags]
 
   def search
     render json: cached_card_json(search_records)
@@ -39,6 +39,25 @@ class Api::V1::SearchController < Api::V1::BaseController
               .order('LOWER(name) ASC')
               .limit(10)
     render jsonapi: results, include: %i[primary_group]
+  end
+
+  def search_users_and_tags
+    # Searches both users and tags
+    render jsonapi: Searchkick.search(
+      params[:query],
+      where: {
+        organization_ids: [@organization.id],
+      },
+      index_name: [User, ActsAsTaggableOn::Tag],
+      per_page: per_page(50),
+      page: @page,
+      fields: [
+        'name^30',
+        'handle^50',
+      ],
+      match: :word_start,
+      boost_by: { taggings_count: { factor: 0.2 } },
+    )
   end
 
   private

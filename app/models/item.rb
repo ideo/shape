@@ -40,8 +40,6 @@
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
 #  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
-#  index_items_on_transcoding_uuid                     (((cached_attributes ->> 'pending_transcoding_uuid'::text)))
-#  index_items_on_type                                 (type)
 #
 
 class Item < ApplicationRecord
@@ -55,6 +53,7 @@ class Item < ApplicationRecord
   include Commentable
   include Globalizable
   include CachedAttributes
+  include UserTaggable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -232,6 +231,7 @@ class Item < ApplicationRecord
     {
       name: name,
       tags: tags.map(&:name).map(&:downcase),
+      user_tags: user_tag_list.map(&:downcase),
       content: search_content,
       user_ids: search_user_ids,
       parent_id: parent&.id,
@@ -478,6 +478,10 @@ class Item < ApplicationRecord
   end
 
   def has_child_collections?
+    false
+  end
+
+  def submission?
     false
   end
 
