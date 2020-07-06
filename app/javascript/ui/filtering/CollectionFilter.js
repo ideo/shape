@@ -17,6 +17,11 @@ const SortContainer = styled.div`
   top: ${props => (props.top ? props.top : 0)}px;
 `
 
+export const CollectionPillHolder = styled.div`
+  margin-bottom: 8px;
+  width: 100%;
+`
+
 @observer
 class CollectionFilter extends React.Component {
   @observable
@@ -171,6 +176,7 @@ class CollectionFilter extends React.Component {
     } else {
       filterMenuMarginBottom = 24
     }
+
     return (
       <Fragment>
         {this.rendered && isParentMethodLibrary && (

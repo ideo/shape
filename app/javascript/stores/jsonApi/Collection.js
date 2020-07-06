@@ -721,6 +721,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  get showFilters() {
+    return (
+      !this.uiStore.isMobileXs &&
+      (this.isRegularCollection || this.isSubmissionsCollection || this.isBoard)
+    )
+  }
+
   get activeFilters() {
     let { collection_filters } = this
     if (this.isSearchResultsCollection) {

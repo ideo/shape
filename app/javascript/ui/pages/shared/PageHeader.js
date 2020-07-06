@@ -9,7 +9,9 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
 import Tooltip from '~/ui/global/Tooltip'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionFilter, {
+  CollectionPillHolder,
+} from '~/ui/filtering/CollectionFilter'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BackIcon from '~/ui/icons/BackIcon'
@@ -81,11 +83,6 @@ const FixedRightContainer = styled(Flex)`
   top: 22px;
   right: 60px;
   height: 33px;
-`
-
-const CollectionPillHolder = styled.div`
-  margin-bottom: 8px;
-  width: 100%;
 `
 
 @inject('uiStore', 'apiStore', 'routingStore')
@@ -452,14 +449,8 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
-    const showFilters =
-      !uiStore.isMobileXs &&
-      (record.isRegularCollection ||
-        record.isSubmissionsCollection ||
-        record.isBoard)
-
     const showFilterControls =
-      showFilters &&
+      record.showFilters &&
       // FoamcoreGrid displays its own fixed controls at the top
       (!record.isBoard || record.viewMode === 'list')
 
@@ -549,7 +540,9 @@ class PageHeader extends React.Component {
               </div>
             )}
           </div>
-          {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
+          {record.showFilters && (
+            <CollectionPillHolder id="collectionFilterPortal" />
+          )}
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal
           canEdit={record.canEdit}
