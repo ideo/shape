@@ -149,6 +149,8 @@ module JsonapiCache
       related_json[:attributes][:can_view] = true
       related_json[:attributes][:can_edit] = @current_ability.can?(:edit, record)
       related_json[:attributes][:can_edit_content] = record.active? && @current_ability.can?(:edit_content, record)
+      related_json[:attributes][:submission_reviewer_status] =
+        record.present? && record.submission? && @user.present? ? record.submission_reviewer_status(@user) : nil
       if @search_result
         related_json[:attributes].merge!(breadcrumb_attributes(record))
       end

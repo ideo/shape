@@ -2,48 +2,55 @@
 #
 # Table name: collections
 #
-#  id                         :bigint(8)        not null, primary key
-#  anyone_can_join            :boolean          default(FALSE)
-#  anyone_can_view            :boolean          default(FALSE)
-#  archive_batch              :string
-#  archived                   :boolean          default(FALSE)
-#  archived_at                :datetime
-#  breadcrumb                 :jsonb
-#  cached_attributes          :jsonb
-#  cached_test_scores         :jsonb
-#  collection_type            :integer          default("collection")
-#  cover_type                 :integer          default("cover_type_default")
-#  hide_submissions           :boolean          default(FALSE)
-#  master_template            :boolean          default(FALSE)
-#  name                       :string
-#  num_columns                :integer
-#  processing_status          :integer
-#  search_term                :string
-#  shared_with_organization   :boolean          default(FALSE)
-#  submission_box_type        :integer
-#  submissions_enabled        :boolean          default(TRUE)
-#  test_closed_at             :datetime
-#  test_launched_at           :datetime
-#  test_show_media            :boolean          default(TRUE)
-#  test_status                :integer
-#  type                       :string
-#  unarchived_at              :datetime
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  cloned_from_id             :bigint(8)
-#  collection_to_test_id      :bigint(8)
-#  created_by_id              :integer
-#  default_group_id           :integer
-#  idea_id                    :integer
-#  joinable_group_id          :bigint(8)
-#  organization_id            :bigint(8)
-#  question_item_id           :integer
-#  roles_anchor_collection_id :bigint(8)
-#  submission_box_id          :bigint(8)
-#  submission_template_id     :integer
-#  survey_response_id         :integer
-#  template_id                :integer
-#  test_collection_id         :bigint(8)
+#  id                             :bigint(8)        not null, primary key
+#  anyone_can_join                :boolean          default(FALSE)
+#  anyone_can_view                :boolean          default(FALSE)
+#  archive_batch                  :string
+#  archived                       :boolean          default(FALSE)
+#  archived_at                    :datetime
+#  breadcrumb                     :jsonb
+#  cached_attributes              :jsonb
+#  cached_test_scores             :jsonb
+#  collection_type                :integer          default("collection")
+#  cover_type                     :integer          default("cover_type_default")
+#  icon                    :string
+#  end_date                       :datetime
+#  hide_submissions               :boolean          default(FALSE)
+#  master_template                :boolean          default(FALSE)
+#  name                           :string
+#  num_columns                    :integer
+#  processing_status              :integer
+#  search_term                    :string
+#  shared_with_organization       :boolean          default(FALSE)
+#  show_icon_on_cover             :boolean
+#  start_date                     :datetime
+#  submission_box_type            :integer
+#  submissions_enabled            :boolean          default(TRUE)
+#  test_closed_at                 :datetime
+#  test_launched_at               :datetime
+#  test_show_media                :boolean          default(TRUE)
+#  test_status                    :integer
+#  type                           :string
+#  unarchived_at                  :datetime
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  challenge_admin_group_id       :integer
+#  challenge_participant_group_id :integer
+#  challenge_reviewer_group_id    :integer
+#  cloned_from_id                 :bigint(8)
+#  collection_to_test_id          :bigint(8)
+#  created_by_id                  :integer
+#  default_group_id               :integer
+#  idea_id                        :integer
+#  joinable_group_id              :bigint(8)
+#  organization_id                :bigint(8)
+#  question_item_id               :integer
+#  roles_anchor_collection_id     :bigint(8)
+#  submission_box_id              :bigint(8)
+#  submission_template_id         :integer
+#  survey_response_id             :integer
+#  template_id                    :integer
+#  test_collection_id             :bigint(8)
 #
 # Indexes
 #
@@ -78,6 +85,7 @@ class Collection < ApplicationRecord
   include Commentable
   include Globalizable
   include CachedAttributes
+  include UserTaggable
 
   resourceable roles: [Role::EDITOR, Role::CONTENT_EDITOR, Role::VIEWER],
                edit_role: Role::EDITOR,
@@ -86,7 +94,8 @@ class Collection < ApplicationRecord
 
   archivable as: :parent_collection_card,
              with: %i[collection_cards cards_linked_to_this_collection]
-  acts_as_taggable
+
+  acts_as_taggable_on :tags, :topics
 
   translates_custom :translated_name,
                     confirmable: true,
@@ -98,6 +107,8 @@ class Collection < ApplicationRecord
   store_accessor :cached_attributes,
                  :cached_cover,
                  :cached_tag_list,
+                 :cached_user_tag_list,
+                 :cached_topic_list,
                  :cached_owned_tag_list,
                  :cached_card_count,
                  :cached_activity_count,
@@ -115,9 +126,12 @@ class Collection < ApplicationRecord
   # callbacks
   before_validation :inherit_parent_organization_id, on: :create
   before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
+  before_validation :set_icon_from_collection_type, if: :collection_type_changed?
   before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
+  before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
+  after_commit :rename_challenge_groups, if: :saved_change_to_name?, unless: :destroyed?
   after_commit :reindex_sync, on: :create
   after_commit :reindex_after_archive, if: :saved_change_to_archived?
   after_save :pin_all_primary_cards, if: :now_master_template?
@@ -169,6 +183,11 @@ class Collection < ApplicationRecord
           inverse_of: :collection,
           dependent: :destroy
 
+  # all primary + link collection cards that contain this collection
+  has_many :parent_collection_cards,
+           class_name: 'CollectionCard',
+           inverse_of: :collection
+
   has_many :collection_cover_cards,
            -> { active.is_cover.ordered },
            class_name: 'CollectionCard::Primary',
@@ -206,6 +225,18 @@ class Collection < ApplicationRecord
   belongs_to :created_by, class_name: 'User', optional: true
   belongs_to :question_item, class_name: 'Item::QuestionItem', optional: true
   belongs_to :joinable_group, class_name: 'Group', optional: true
+  belongs_to :challenge_admin_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
+  belongs_to :challenge_reviewer_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
+  belongs_to :challenge_participant_group,
+             class_name: 'Group',
+             dependent: :destroy,
+             optional: true
 
   scope :root, -> { where('jsonb_array_length(breadcrumb) = 1') }
   scope :not_custom_type, -> { where(type: nil) }
@@ -214,7 +245,9 @@ class Collection < ApplicationRecord
   scope :shared_with_me, -> { where(type: 'Collection::SharedWithMeCollection') }
   scope :searchable, -> { where.not(type: unsearchable_types).or(not_custom_type) }
   scope :data_collectable, -> { where.not(type: uncollectable_types).or(not_custom_type) }
+  scope :test_collection, -> { where(type: 'Collection::TestCollection') }
   scope :master_template, -> { where(master_template: true) }
+  scope :submission_box, -> { where(type: 'Collection::SubmissionBox') }
 
   accepts_nested_attributes_for :collection_cards
 
@@ -236,6 +269,8 @@ class Collection < ApplicationRecord
     method: 2,
     prototype: 3,
     profile: 4, # Different from UserProfile
+    phase: 5,
+    challenge: 6,
     foamcore: 7, # 5 and 6 are for phases/challenges
   }, _prefix: true
 
@@ -253,6 +288,7 @@ class Collection < ApplicationRecord
           ],
         },
         :tags,
+        :tagged_users,
       ],
     )
   end
@@ -279,6 +315,7 @@ class Collection < ApplicationRecord
       type: type,
       name: name,
       tags: all_tag_names,
+      user_tags: user_tag_list.map(&:downcase),
       content: search_content,
       organization_id: organization_id,
       user_ids: search_user_ids,
@@ -710,12 +747,34 @@ class Collection < ApplicationRecord
     cards_linked_to_this_collection.update_all(updated_at: updated_at)
   end
 
+  def rename_challenge_groups
+    if challenge_admin_group.present?
+      challenge_admin_group.update(name: "#{name} Admins")
+    end
+
+    if challenge_reviewer_group.present?
+      challenge_reviewer_group.update(name: "#{name} Reviewers")
+    end
+
+    return unless challenge_participant_group.present?
+
+    challenge_participant_group.update(name: "#{name} Participants")
+  end
+
   def owned_tag_list
     all_tags_list - tag_list
   end
 
   def cache_tag_list
     self.cached_tag_list = tag_list
+  end
+
+  def cache_user_tag_list
+    self.cached_user_tag_list = user_tag_list
+  end
+
+  def cache_topic_list
+    self.cached_topic_list = topic_list
   end
 
   def cache_owned_tag_list
@@ -725,6 +784,8 @@ class Collection < ApplicationRecord
   # these all get called from CollectionUpdater
   def update_cached_tag_lists
     cache_tag_list if tag_list != cached_tag_list
+    cache_topic_list if topic_list != cached_topic_list
+    cache_user_tag_list if user_tag_list != cached_user_tag_list
     cache_owned_tag_list if owned_tag_list != cached_owned_tag_list
   end
 
@@ -779,9 +840,14 @@ class Collection < ApplicationRecord
 
   def cache_key(card_order = 'order', user_id = nil)
     test_details = ''
+    challenge_details = ''
     if test_or_test_results_collection?
       # make sure these details factor into caching
       test_details = "launchable=#{launchable?}&can_reopen=#{can_reopen?}"
+    end
+
+    if inside_a_challenge?
+      challenge_details = "parent_challenge_id=#{parent_challenge.id}"
     end
 
     %(#{jsonapi_cache_key}
@@ -790,8 +856,9 @@ class Collection < ApplicationRecord
       /order_#{card_order}
       /cards_#{collection_cards.maximum(:updated_at).to_i}
       /#{test_details}
+      /#{challenge_details}
       /gs_#{getting_started_shell}
-      /org_#{organization.updated_at}
+        /org_#{organization.updated_at}
       /user_id_#{user_id}
       /locale_#{I18n.locale}
       /roles_#{anchored_roles.maximum(:updated_at).to_i}
@@ -847,6 +914,81 @@ class Collection < ApplicationRecord
     result
   end
 
+  def challenge_reviewers
+    return [] unless inside_a_challenge?
+
+    User.where(
+      User.arel_table[:handle].lower.in(
+        parent_challenge.collection_filters.user_tag.pluck(:text),
+      ),
+    )
+  end
+
+  # This method is called when a user tag is added to a submission collection
+  # in the UserTaggable concern
+  def add_challenge_reviewer_filter_to_submission_box(user)
+    sub_collection = parent_submission_box&.submissions_collection
+
+    return unless inside_a_challenge? && sub_collection.present? && user&.handle.present?
+
+    filter_for_user = sub_collection.collection_filters.tagged_with_user_handle(user.handle).first
+    filter_for_user ||= sub_collection.collection_filters.create(
+      text: user.handle,
+      filter_type: :user_tag,
+    )
+
+    # Find or create the filter for this user
+    filter_for_user.user_collection_filters.find_or_create_by(
+      user_id: user.id,
+    )
+  end
+
+  # This method is called when a user tag is removed from a submission collection
+  # in the UserTaggable concern
+  def remove_challenge_reviewer_filter_from_submission_box(user)
+    sub_collection = parent_submission_box&.submissions_collection
+
+    return unless inside_a_challenge? && sub_collection.present? && user&.handle.present?
+
+    sub_collection.collection_filters.tagged_with_user_handle(user.handle).destroy_all
+  end
+
+  def challenge_reviewer?(user)
+    return false if parent_challenge.blank? || user&.handle.blank? || user_tag_list.empty?
+
+    user_tag_list.include?(user.handle)
+  end
+
+  def submission_reviewer_status(user)
+    # Return unless it is a submission that the user has been added as a reviewer for
+    return unless submission? &&
+                  launchable_test_id.present? &&
+                  user.present? &&
+                  challenge_reviewer?(user)
+
+    response = SurveyResponse.find_by(
+      test_collection_id: launchable_test_id,
+      user_id: user.id,
+    )
+
+    return :unstarted if response.blank?
+
+    response.completed? ? :completed : :in_progress
+  end
+
+  def next_available_challenge_test(for_user:, omit_id: nil)
+    return nil unless challenge_submission_boxes.any?
+
+    # next test to review from the list of submission boxes in the challenge
+    next_test = nil
+    challenge_submission_boxes.each do |sb|
+      next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
+      # break early since it already found the next test
+      break if next_test.present?
+    end
+    next_test
+  end
+
   def default_group_id
     return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
@@ -898,11 +1040,33 @@ class Collection < ApplicationRecord
   end
 
   def parent_submission_box
-    parents.find_by(type: 'Collection::SubmissionBox')
+    parents.where(type: 'Collection::SubmissionBox').last
   end
 
   def parent_submission
-    parents.find_by("cached_attributes->'submission_attrs'->>'submission' = 'true'")
+    parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").last
+  end
+
+  def parent_challenge
+    @parent_challenge ||= parents.where(collection_type: :challenge).last
+  end
+
+  def parent_challenge_id
+    parent_challenge&.id
+  end
+
+  def challenge_or_inside_challenge?
+    return true if collection_type == 'challenge'
+
+    inside_a_challenge?
+  end
+
+  def challenge_submission_boxes
+    challenge_collection = collection_type == 'challenge' ? self : parent_challenge
+    challenge_collection.all_child_collections
+                        .active
+                        .submission_box
+                        .includes(:submission_template)
   end
 
   def inside_getting_started?
@@ -916,7 +1080,7 @@ class Collection < ApplicationRecord
       template_id = parent_submission_box&.submission_template_id
       return nil unless template_id.present?
 
-      parents.find_by(id: template_id)
+      parents.where(id: template_id).first
     end
   end
 
@@ -954,10 +1118,18 @@ class Collection < ApplicationRecord
     parents.where("cached_attributes->'submission_attrs'->>'submission' = 'true'").any?
   end
 
+  def inside_a_challenge?
+    parent_challenge.present?
+  end
+
   def submission_test?
     return unless inside_a_submission?
 
-    parent_submission.submission_attrs['launchable_test_id'] == id
+    parent_submission.launchable_test_id == id
+  end
+
+  def launchable_test_id
+    submission_attrs.present? ? submission_attrs['launchable_test_id'] : nil
   end
 
   # check for template instances anywhere in the entire collection tree
@@ -968,7 +1140,7 @@ class Collection < ApplicationRecord
   def parent_application_collection
     return self if is_a?(Collection::ApplicationCollection)
 
-    parents.find_by(type: 'Collection::ApplicationCollection')
+    parents.where(type: 'Collection::ApplicationCollection').first
   end
 
   def inside_an_application_collection?
@@ -1066,6 +1238,45 @@ class Collection < ApplicationRecord
       )
   end
 
+  def create_challenge_groups_and_assign_roles
+    return if challenge_admin_group.present? && challenge_reviewer_group.present? && challenge_participant_group.present?
+
+    # collections that become a challenge gets their roles unanchored
+    if roles_anchor_collection_id.present?
+      unanchor_and_inherit_roles_from_anchor!
+    end
+
+    admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
+    reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
+    participant_group = create_challenge_participant_group(name: "#{name} Participants", organization: organization)
+
+    self.challenge_admin_group_id = admin_group.id
+    self.challenge_reviewer_group_id = reviewer_group.id
+    self.challenge_participant_group_id = participant_group.id
+    # NOTE: somehow unachoring changes collection_type back to 'collection', so re-set it to 'challenge'
+    self.collection_type = 'challenge'
+
+    created_by.add_role(Role::ADMIN, admin_group)
+    created_by.add_role(Role::ADMIN, reviewer_group)
+    created_by.add_role(Role::ADMIN, participant_group)
+
+    admin_group.add_role(Role::EDITOR, self)
+    reviewer_group.add_role(Role::VIEWER, self)
+    participant_group.add_role(Role::VIEWER, self)
+  end
+
+  def submission_template_test_collections
+    return [] unless master_template? && submission_box_template?
+
+    Collection.in_collection(id).test_collection.includes(challenge_audiences: [:audience])
+  end
+
+  def reload(*args)
+    # Reset all memoized data
+    @parent_challenge = @parent_submission_box_template = nil
+    super(*args)
+  end
+
   private
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)
@@ -1136,5 +1347,19 @@ class Collection < ApplicationRecord
     return unless templated? && inside_a_master_template?
 
     errors.add(:base, "can't be an instance inside a template")
+  end
+
+  def will_become_a_challenge?
+    will_save_change_to_collection_type? && collection_type_in_database != 'challenge' && collection_type == 'challenge'
+  end
+
+  def set_icon_from_collection_type
+    return unless collection_type.present?
+
+    if new_record?
+      self.icon ||= collection_type
+    else
+      self.icon = collection_type
+    end
   end
 end

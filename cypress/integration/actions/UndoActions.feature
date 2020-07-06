@@ -60,13 +60,13 @@ Feature: Undo actions
 
     When I undo with CTRL+Z
     # NOTE: these snackbar content tests were inconsistent/problematic on Codeship
-    # Then I should see "Card resize undone" in a ".MuiSnackbarContent-message"
+    # Then I should see "Card resize undone" in a "snackbar-message"
     And I wait for "@apiUpdateCollection" to finish
     Then I should see the first of 3 cards as 1x1
     And I close the snackbar
 
     When I undo with CTRL+Z
-    # Then I should see "Card move undone" in a ".MuiSnackbarContent-message"
+    # Then I should see "Card move undone" in a "snackbar-message"
     And I wait for "@apiUpdateCollection" to finish
     Then I should see a "TextItemCover" in the first card
     And I close the snackbar
@@ -80,7 +80,7 @@ Feature: Undo actions
     And I wait for the collection to finish loading
     # should navigate me back
     Then the URL should match the captured URL
-    # Then I should see "Card resize undone" in a ".MuiSnackbarContent-message"
+    # Then I should see "Card resize undone" in a "snackbar-message"
     And I close the snackbar
     Then I should see the last of 3 cards as 1x1
 
@@ -90,11 +90,11 @@ Feature: Undo actions
     And I click the action menu for the index 0 card
     And I click the move action for the index 0 card
     And I close the move helper modal
-    # Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
+    # Then I should see "2 in transit" in a "snackbar-message"
 
     When I navigate to the collection named "Inner Collection" via the "CollectionCover"
     And I wait for 1 second
-    # Then I should see "2 in transit" in a ".MuiSnackbarContent-message"
+    # Then I should see "2 in transit" in a "snackbar-message"
 
     When I click the down arrow on the MDL snackbar
     And I wait for "@apiMoveCollectionCards" to finish
@@ -122,4 +122,4 @@ Feature: Undo actions
 # empty stack
 # When I close the snackbar
 # And I undo with CTRL+Z
-# Then I should not see a ".MuiSnackbarContent-message"
+# Then I should not see a "snackbar-message"

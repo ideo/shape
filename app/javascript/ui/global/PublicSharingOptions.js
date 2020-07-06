@@ -84,6 +84,7 @@ class PublicSharingOptions extends React.Component {
   constructor(props) {
     super(props)
     this.debouncedGroupSearch = _.debounce(this._groupSearch, 350)
+    this.state.sharingOptionsVisible = props.startMenuOpen
   }
 
   componentDidMount() {
@@ -351,10 +352,12 @@ PublicSharingOptions.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   canEdit: PropTypes.bool.isRequired,
   reloadGroups: PropTypes.func.isRequired,
+  startMenuOpen: PropTypes.bool,
 }
 
 PublicSharingOptions.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  startMenuOpen: false,
 }
 
 export default PublicSharingOptions

@@ -38,6 +38,7 @@ import TestAudience from './jsonApi/TestAudience'
 import User from './jsonApi/User'
 import UsersThread from './jsonApi/UsersThread'
 import QuestionChoice from './jsonApi/QuestionChoice'
+import Tag from './jsonApi/Tag'
 
 class ApiStore extends jsonapi(datxCollection) {
   @observable
@@ -173,6 +174,11 @@ class ApiStore extends jsonapi(datxCollection) {
   get currentOrgSlug() {
     if (!this.currentUserOrganization) return ''
     return this.currentUserOrganization.slug
+  }
+
+  @computed
+  get audiences() {
+    return this.findAll('audiences')
   }
 
   findOrganizationById(id) {
@@ -970,6 +976,7 @@ ApiStore.types = [
   QuestionChoice,
   Role,
   SurveyResponse,
+  Tag,
   TestAudience,
   User,
   UsersThread,

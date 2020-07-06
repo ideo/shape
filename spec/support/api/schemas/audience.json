@@ -13,6 +13,7 @@
     "publication_list": { "type": "array" },
     "order": { "type": ["number", "null"] },
     "global": { "type": ["boolean", "null"] },
-    "global_default": { "type": ["boolean", "null"] }
+    "global_default": { "type": ["boolean", "null"] },
+    "audience_type": { "type": ["number", "null"] }
   }
 }

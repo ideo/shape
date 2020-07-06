@@ -52,7 +52,7 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       for_user: current_user,
       # don't want to re-get the same test again
       omit_id: @test_collection.id,
-    )
+    ).first
     if test.present? && test.collection_to_test.present?
       render jsonapi: test.collection_to_test
     else

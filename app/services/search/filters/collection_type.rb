@@ -1,7 +1,7 @@
 class Search
   module Filters
     class CollectionType < Base
-      REGEXP = /type:(method|project|prototype|profile)?/.freeze
+      REGEXP = /type:(method|project|prototype|profile|phase|challenge)?/.freeze
 
       def options
         collection_type = @query.scan(REGEXP).flatten.first

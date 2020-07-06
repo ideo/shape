@@ -19,6 +19,8 @@ class CollectionFilter < ApplicationRecord
   has_many :user_collection_filters,
            dependent: :destroy
 
+  scope :tagged_with_user_handle, ->(handle) { user_tag.where(arel_table[:text].lower.eq(handle&.downcase)) }
+
   validates :text,
             presence: true,
             uniqueness: {
@@ -29,6 +31,7 @@ class CollectionFilter < ApplicationRecord
   enum filter_type: {
     tag: 0,
     search: 1,
+    user_tag: 2,
   }
 
   amoeba do

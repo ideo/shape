@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
-
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
@@ -12,11 +11,11 @@ import {
   AudienceRowCell,
   StyledRowFlexParent,
   StyledColumnFlexParent,
-} from './styled'
-import TableHeader from './TableHeader'
-import TableBody from './TableBody'
-import AudienceCheckbox from './AudienceCheckbox'
-import AddAudienceModal from './AddAudienceModal'
+} from '~/ui/test_collections/AudienceSettings/styled'
+import TableHeader from '~/ui/test_collections/AudienceSettings/TableHeader'
+import TableBody from '~/ui/test_collections/AudienceSettings/TableBody'
+import AudienceCheckbox from '~/ui/test_collections/AudienceSettings/AudienceCheckbox'
+import AddAudienceModal from '~/ui/test_collections/AudienceSettings/AddAudienceModal'
 import AdminAudienceModal from '~/ui/admin/AdminAudienceModal.js'
 import Button from '~shared/components/atoms/Button'
 import PlusIcon from '~/ui/icons/PlusIcon'
@@ -91,14 +90,43 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   get displayedAudiences() {
-    const { audiences, audienceSettings } = this.props
-    return _.sortBy(
+    const {
+      audiences,
+      audienceSettings,
+      displayChallengeAudiences,
+    } = this.props
+    const displayed = _.sortBy(
       _.filter(audiences, a => {
         const setting = audienceSettings.get(a.id)
-        return setting && setting.displayCheckbox
+        return setting && setting.displayCheckbox && !a.audience_type
       }),
       'order'
     )
+    if (!displayChallengeAudiences) {
+      return displayed
+    }
+
+    const sortedChallengeAudiences = _.sortBy(
+      _.filter(audiences, a => {
+        const setting = audienceSettings.get(a.id)
+        return (
+          setting && setting.displayCheckbox && a.audience_type === 'challenge'
+        )
+      }),
+      'name'
+    )
+
+    if (sortedChallengeAudiences.length === 3) {
+      // NOTE: once challenge audiences are loaded, sort them, and then render in specific order [Reviewers, Admins, Participants]
+      return [
+        sortedChallengeAudiences[2],
+        sortedChallengeAudiences[0],
+        sortedChallengeAudiences[1],
+        ...displayed,
+      ]
+    }
+
+    return []
   }
 
   toggleAddAudienceMenu = e => {
@@ -199,8 +227,11 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   isAudienceLocked(audience) {
-    const { locked } = this.props
-    return !audience.isLinkSharing && locked
+    const { locked, displayChallengeAudiences } = this.props
+    return (
+      (!audience.isLinkSharing && locked) ||
+      (displayChallengeAudiences && locked)
+    )
   }
 
   selectedAudienceHasCheckbox() {
@@ -224,23 +255,36 @@ class AudienceSettingsWidget extends React.Component {
   }
 
   renderCheckbox(audience) {
-    const { onToggleCheckbox } = this.props
-    return (
-      <AudienceCheckbox
-        audience={audience}
-        selected={this.isAudienceSelected(audience)}
-        onToggleCheckbox={onToggleCheckbox}
-        disabled={this.isAudienceLocked(audience)}
-        openAudienceMenu={this.openAudienceMenu}
-      />
-    )
+    const {
+      onToggleCheckbox,
+      displayChallengeAudiences,
+      challengeName,
+    } = this.props
+    const audienceCheckboxProps = {
+      audience,
+      audienceName:
+        displayChallengeAudiences && audience.audience_type === 'challenge'
+          ? `${challengeName} ${audience.name}`
+          : audience.name,
+      selected: this.isAudienceSelected(audience),
+      onToggleCheckbox,
+      disabled: this.isAudienceLocked(audience),
+      openAudienceMenu: this.openAudienceMenu,
+      displayChallengeAudiences,
+    }
+
+    return <AudienceCheckbox {...audienceCheckboxProps} />
   }
 
   render() {
-    const { totalPrice, locked } = this.props
+    const {
+      uiStore,
+      totalPrice,
+      locked,
+      displayChallengeAudiences,
+    } = this.props
     const { displayedAudiences } = this
     const { addAudienceMenuOpen, popoutMenuOffsetPosition } = this.state
-    const { uiStore } = this.props
 
     let newAudienceButton = (
       <Flex align="center">
@@ -283,7 +327,6 @@ class AudienceSettingsWidget extends React.Component {
 
     return (
       <AudienceSettingsWrapper>
-        <h3 style={{ marginBottom: '0px' }}>Audience</h3>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <MobileWrapper>
             <StyledColumnFlexParent>
@@ -291,16 +334,19 @@ class AudienceSettingsWidget extends React.Component {
                 return (
                   <StyledColumnFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
-                    <TableHeader />
-                    {this.renderTableBody(audience)}
+                    {!displayChallengeAudiences && <TableHeader />}
+                    {!displayChallengeAudiences &&
+                      this.renderTableBody(audience)}
                   </StyledColumnFlexParent>
                 )
               })}
-              <StyledRowFlexParent style={{ marginTop: '15px' }}>
-                {newAudienceButton}
-                <AudienceRowCell />
-                {totalPriceDisplay}
-              </StyledRowFlexParent>
+              {!displayChallengeAudiences && (
+                <StyledRowFlexParent style={{ marginTop: '15px' }}>
+                  {newAudienceButton}
+                  <AudienceRowCell />
+                  {totalPriceDisplay}
+                </StyledRowFlexParent>
+              )}
             </StyledColumnFlexParent>
           </MobileWrapper>
 
@@ -308,21 +354,24 @@ class AudienceSettingsWidget extends React.Component {
             <StyledRowFlexParent column>
               <StyledRowFlexParent>
                 <StyledRowFlexItem />
-                <TableHeader />
+                {!displayChallengeAudiences && <TableHeader />}
               </StyledRowFlexParent>
               {displayedAudiences.map(audience => {
                 return (
                   <StyledRowFlexParent key={audience.id}>
                     {this.renderCheckbox(audience)}
-                    {this.renderTableBody(audience)}
+                    {!displayChallengeAudiences &&
+                      this.renderTableBody(audience)}
                   </StyledRowFlexParent>
                 )
               })}
-              <StyledRowFlexParent>
-                {newAudienceButton}
-                <AudienceRowCell />
-                {totalPriceDisplay}
-              </StyledRowFlexParent>
+              {!displayChallengeAudiences && (
+                <StyledRowFlexParent>
+                  {newAudienceButton}
+                  <AudienceRowCell />
+                  {totalPriceDisplay}
+                </StyledRowFlexParent>
+              )}
             </StyledRowFlexParent>
           </DesktopWrapper>
 
@@ -355,6 +404,8 @@ AudienceSettingsWidget.propTypes = {
   totalPrice: PropTypes.string.isRequired,
   numPaidQuestions: PropTypes.number.isRequired,
   locked: PropTypes.bool,
+  displayChallengeAudiences: PropTypes.bool,
+  challengeName: PropTypes.string,
 }
 
 AudienceSettingsWidget.wrappedComponent.propTypes = {
@@ -363,6 +414,8 @@ AudienceSettingsWidget.wrappedComponent.propTypes = {
 
 AudienceSettingsWidget.defaultProps = {
   locked: false,
+  displayChallengeAudiences: false,
+  challengeName: '',
 }
 
 export default AudienceSettingsWidget

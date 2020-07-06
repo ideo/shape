@@ -71,6 +71,7 @@ const fakeApiStore = ({
     alwaysShowCurrentThread: jest.fn(),
     updateModelId: jest.fn().mockImplementation((obj, id) => (obj.id = id)),
     unreadActivityCount: 0,
+    selectedCards: [],
 
     usersThreadPagesToLoad: 1,
     loadingThreads: false,
@@ -86,11 +87,13 @@ const fakeApiStore = ({
       },
       organizations: [{ name: 'Acme Inc 1', filestack_file_url: 'test.jpg' }],
       name: 'Johnny Appleseed',
+      handle: 'jappleseed',
       pic_url_square: 'https://s3.amazonaws.com/pic.png',
       groups: [],
       terms_accepted: true,
       API_hideHelper: jest.fn(),
       API_updateUseTemplateSetting: jest.fn(),
+      API_fetchAllReviewableSubmissions: jest.fn(),
     },
     // NOTE: important that this matches currentUserOrganization.slug
     currentOrgSlug: 'org-slug',

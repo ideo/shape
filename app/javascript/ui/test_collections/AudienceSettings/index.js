@@ -1,13 +1,15 @@
 import _ from 'lodash'
-import React from 'react'
+import React, { Fragment } from 'react'
 import styled from 'styled-components'
 import { runInAction, observable, action, computed } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Button from '~/ui/global/Button'
+import { Heading3 } from '~/ui/global/styled/typography'
 import AudienceSettingsWidget from '~/ui/test_collections/AudienceSettings/AudienceSettingsWidget'
 import FeedbackTermsModal from '~/ui/test_collections/FeedbackTermsModal'
 import ConfirmPriceModal from '~/ui/test_collections/ConfirmPriceModal'
+import EditFeedbackButton from '~/ui/challenges/EditFeedbackButton'
 import v from '~/utils/variables'
 
 const FormButtonWrapper = styled.div`
@@ -20,7 +22,15 @@ const FormButtonWrapper = styled.div`
   }
 `
 
-@inject('apiStore', 'uiStore')
+const AudienceHeadingWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  /* align with submission format */
+  width: 92%;
+  padding-top: 10px;
+`
+
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class AudienceSettings extends React.Component {
   @observable
@@ -49,17 +59,28 @@ class AudienceSettings extends React.Component {
   initAudienceSettings() {
     const { testCollection } = this.props
     const { audiences, audienceSettings } = this
+    const { test_audiences, is_inside_a_challenge } = testCollection
+
     _.each(audiences, audience => {
-      const testAudience = testCollection.test_audiences.find(
+      const testAudience = test_audiences.find(
         testAudience => testAudience.audience_id === audience.id
       )
+
+      if (!testAudience) {
+        return
+      }
+
       const { isLinkSharing } = audience
       let selected = !!testAudience
-      if (testAudience && isLinkSharing) {
+      if ((testAudience && isLinkSharing) || is_inside_a_challenge) {
         selected = testAudience.status === 'open'
       }
+
       const displayCheckbox =
-        selected || isLinkSharing || (!this.locked && audience.order <= 6)
+        selected ||
+        isLinkSharing ||
+        is_inside_a_challenge ||
+        (!this.locked && audience.order <= 6)
       audienceSettings.set(audience.id, {
         selected,
         sample_size: testAudience ? testAudience.sample_size : '0',
@@ -73,13 +94,26 @@ class AudienceSettings extends React.Component {
   @computed
   get locked() {
     const { testCollection } = this.props
-    return testCollection.isLiveTest || testCollection.isClosedTest
+    const { isLiveTest, isClosedTest } = testCollection
+    if (testCollection.is_inside_a_challenge) {
+      return testCollection.isTemplated
+    }
+    return isLiveTest || isClosedTest
   }
 
-  @computed
   get audiences() {
-    const { apiStore } = this.props
-    return apiStore.findAll('audiences')
+    const { apiStore, testCollection } = this.props
+    const { audiences } = apiStore
+    if (testCollection.is_inside_a_challenge) {
+      // only show link sharing and challenge audiences for tests inside challenges
+      return _.filter(audiences, audience => {
+        return audience.isLinkSharing || audience.audience_type === 'challenge'
+      })
+    }
+
+    return _.filter(audiences, audience => {
+      return !audience.audience_type
+    })
   }
 
   @computed
@@ -118,23 +152,25 @@ class AudienceSettings extends React.Component {
 
   onToggleCheckbox = async e => {
     const id = e.target.value
+    const { testCollection } = this.props
     const { audienceSettings } = this
     const setting = audienceSettings.get(id)
     this.updateAudienceSetting(id, 'selected', !setting.selected)
     const { audience, test_audience } = setting
-    if (audience.isLinkSharing) {
-      this.toggleLinkSharing(audience, test_audience)
+    if (
+      testCollection.is_inside_a_challenge ||
+      (!testCollection.is_inside_a_challenge && audience.isLinkSharing)
+    ) {
+      this.toggleTestAudience(audience, test_audience)
     }
   }
 
-  async toggleLinkSharing(audience, testAudience) {
-    let open = testAudience.status === 'open'
+  async toggleTestAudience(audience, testAudience) {
+    const open = testAudience.status === 'open'
     runInAction(() => {
-      testAudience.status = open ? 'closed' : 'open'
-      open = !open
-      this.updateAudienceSetting(audience.id, 'selected', open)
+      this.updateAudienceSetting(audience.id, 'selected', !open)
     })
-    await testAudience.patch()
+    await testAudience.API_toggleAudienceStatus()
   }
 
   onInputChange = (audienceId, value) => {
@@ -214,10 +250,35 @@ class AudienceSettings extends React.Component {
 
   get showAudienceSettings() {
     const { testCollection } = this.props
+
+    // show audience settings by default for feedback inside challenges
     return (
-      !testCollection.collection_to_test_id &&
-      !testCollection.is_submission_box_template_test
+      testCollection.is_inside_a_challenge ||
+      (!testCollection.collection_to_test_id &&
+        !testCollection.is_submission_box_template_test)
     )
+  }
+
+  get showLaunchButton() {
+    const { testCollection } = this.props
+
+    // show audience settings by default for feedback inside challenges
+    return (
+      !testCollection.is_inside_a_challenge ||
+      (testCollection.is_inside_a_challenge && this.viewingChallengeTest)
+    )
+  }
+
+  get challengeName() {
+    const { testCollection } = this.props
+
+    return _.get(testCollection, 'challenge.name', 'Challenge')
+  }
+
+  get viewingChallengeTest() {
+    const { testCollection, uiStore } = this.props
+
+    return _.get(uiStore, 'viewingRecord.id') === testCollection.id
   }
 
   afterAddAudience = audience => {
@@ -233,15 +294,34 @@ class AudienceSettings extends React.Component {
     })
   }
 
-  render() {
-    const { uiStore, testCollection } = this.props
-    const { apiStore } = this.props
-    const { numPaidQuestions } = testCollection
-    const { currentUser } = apiStore
-    const currentUserOrganization = currentUser.current_organization
+  renderAudienceHeading() {
+    const { uiStore, routingStore, testCollection } = this.props
+    const { viewingChallengeTest } = this
 
     return (
-      <React.Fragment>
+      <AudienceHeadingWrapper>
+        <Heading3>Feedback Audience</Heading3>
+        {testCollection.is_inside_a_challenge && !viewingChallengeTest && (
+          <EditFeedbackButton
+            onClick={() => {
+              uiStore.update('challengeSettingsOpen', false)
+              routingStore.routeTo('collections', testCollection.id)
+            }}
+          />
+        )}
+      </AudienceHeadingWrapper>
+    )
+  }
+
+  render() {
+    const { uiStore, testCollection, apiStore } = this.props
+    const { numPaidQuestions, is_inside_a_challenge } = testCollection
+    const { currentUser } = apiStore
+    const currentUserOrganization = currentUser.current_organization
+    const { isLiveTest, isClosedTest } = testCollection
+
+    return (
+      <Fragment>
         <FeedbackTermsModal
           open={!!this.termsModalOpen}
           onSubmit={this.acceptFeedbackTerms}
@@ -258,29 +338,38 @@ class AudienceSettings extends React.Component {
           testName={testCollection.name}
         />
         {this.showAudienceSettings && (
-          <AudienceSettingsWidget
-            onToggleCheckbox={this.onToggleCheckbox}
-            onInputChange={this.onInputChange}
-            totalPrice={this.totalPriceDollars}
-            audiences={this.audiences}
-            numPaidQuestions={numPaidQuestions}
-            audienceSettings={this.audienceSettings}
-            afterAddAudience={this.afterAddAudience}
-            locked={this.locked}
-          />
+          <Fragment>
+            {this.renderAudienceHeading()}
+            <AudienceSettingsWidget
+              onToggleCheckbox={this.onToggleCheckbox}
+              onInputChange={this.onInputChange}
+              totalPrice={this.totalPriceDollars}
+              audiences={this.audiences}
+              numPaidQuestions={numPaidQuestions}
+              audienceSettings={this.audienceSettings}
+              afterAddAudience={this.afterAddAudience}
+              locked={this.locked}
+              displayChallengeAudiences={is_inside_a_challenge}
+              challengeName={this.challengeName}
+            />
+          </Fragment>
         )}
-        <FormButtonWrapper>
-          <Button
-            data-cy="LaunchFormButton"
-            disabled={uiStore.launchButtonLoading || this.locked}
-            onClick={this.submitSettings}
-          >
-            {testCollection.is_submission_box_template_test
-              ? 'Launch Tests'
-              : 'Get Feedback'}
-          </Button>
-        </FormButtonWrapper>
-      </React.Fragment>
+        {this.showLaunchButton && (
+          <FormButtonWrapper>
+            <Button
+              data-cy="LaunchFormButton"
+              disabled={
+                uiStore.launchButtonLoading || isLiveTest || isClosedTest
+              }
+              onClick={this.submitSettings}
+            >
+              {testCollection.is_submission_box_template_test
+                ? 'Launch Tests'
+                : 'Get Feedback'}
+            </Button>
+          </FormButtonWrapper>
+        )}
+      </Fragment>
     )
   }
 }
@@ -291,6 +380,9 @@ AudienceSettings.propTypes = {
 AudienceSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
+
+AudienceSettings.displayName = 'AudienceSettings'
 
 export default AudienceSettings

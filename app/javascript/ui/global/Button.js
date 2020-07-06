@@ -27,7 +27,7 @@ const Button = styled.button`
   min-width: ${({ minWidth }) => minWidth}px;
   text-transform: uppercase;
   transition: all 0.3s;
-  width: 183px;
+  width: ${({ width }) => (width ? width : 183)}px;
 
   &:hover,
   &:focus {

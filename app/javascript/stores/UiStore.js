@@ -231,6 +231,8 @@ export default class UiStore {
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
+  @observable
+  shouldRenderFixedHeader = false
   hoveringOverDefaults = {
     order: null,
     direction: null,
@@ -260,6 +262,8 @@ export default class UiStore {
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
   collaboratorColors = new Map()
+  @observable
+  challengeSettingsOpen = false
   @observable
   zoomLevels = []
 
@@ -338,6 +342,12 @@ export default class UiStore {
   setSelectedArea(selectedArea, { shifted = false } = {}) {
     this.selectedArea = selectedArea
     this.selectedAreaShifted = shifted
+  }
+
+  @action
+  setEditingName(nameKey) {
+    if (this.editingName.includes(nameKey)) return
+    this.editingName.push(nameKey)
   }
 
   @action

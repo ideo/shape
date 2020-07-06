@@ -27,6 +27,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     ids
     breadcrumb_records
     ids_in_direction
+    reviewer_statuses
     roles
   ]
   before_action :check_cache, only: %i[
@@ -38,6 +39,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     index
     ids
     breadcrumb_records
+    reviewer_statuses
     roles
   ]
 
@@ -88,6 +90,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def roles
     render_collection_cards(include_roles: true)
+  end
+
+  def reviewer_statuses
+    submissions = @collection_cards.map(&:record)
+    parent_challenge = submissions.first&.parent_challenge
+    result = SubmissionReviewerStatuses.call(
+      challenge: parent_challenge,
+      submissions: submissions,
+    )
+    render json: result.data
   end
 
   def create
@@ -204,6 +216,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionCardsAddRemoveTagWorker.perform_async(
       @collection_cards.map(&:id),
       json_api_params[:tag],
+      json_api_params[:type],
       :add,
       current_user.id,
     )
@@ -214,6 +227,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     CollectionCardsAddRemoveTagWorker.perform_async(
       @collection_cards.map(&:id),
       json_api_params[:tag],
+      json_api_params[:type],
       :remove,
       current_user.id,
     )
@@ -629,9 +643,13 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         cover_type
         submissions_enabled
         test_show_media
-        tag_list
         search_term
         num_columns
+        start_date
+        end_date
+        collection_type
+        icon
+        show_icon_on_cover
       ].concat(Collection.globalize_attribute_names),
       item_attributes: [
         :id,
@@ -648,7 +666,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
         :content,
         :legend_item_id,
         :legend_search_source,
-        :tag_list,
+        tag_list: [],
+        user_tag_list: [],
         data_content: {},
         style: {},
         filestack_file_attributes: [
