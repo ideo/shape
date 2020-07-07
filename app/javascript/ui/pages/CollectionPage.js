@@ -204,7 +204,7 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
     if (collection.isChallengeOrInsideChallenge) {
-      collection.initializeParentChallengeForCollection()
+      this.initializeChallenges()
     }
     uiStore.update('dragTargets', [])
   }
@@ -290,6 +290,15 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
+    }
+  }
+
+  async initializeChallenges() {
+    const { collection } = this.props
+    await collection.initializeParentChallengeForCollection()
+    if (collection.isSubmissionInChallenge) {
+      await collection.API_fetchCardRoles()
+      await collection.API_fetchCardReviewerStatuses()
     }
   }
 

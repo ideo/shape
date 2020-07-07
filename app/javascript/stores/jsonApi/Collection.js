@@ -940,7 +940,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  API_fetchCardReviewerStatues = () => {
+  API_fetchCardReviewerStatuses = () => {
     const ids = _.compact(
       _.map(this.collection_cards, cc => {
         if (cc.record && cc.record.user_tag_list) {

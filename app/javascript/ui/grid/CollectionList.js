@@ -62,7 +62,7 @@ class CollectionList extends React.Component {
 
   async fetchReviewerStatuses() {
     const { collection } = this.props
-    const res = await collection.API_fetchCardReviewerStatues()
+    const res = await collection.API_fetchCardReviewerStatuses()
     const statuses = res.data
     if (!statuses) return
     runInAction(() => {
