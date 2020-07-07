@@ -56,7 +56,7 @@ class AddReviewersPopover extends React.Component {
       >
         <div onClick={this.handleClick}>
           {potentialReviewers.map(potentialReviewer => (
-            <Flex>
+            <Flex key={potentialReviewer.handle}>
               <Checkbox
                 color="primary"
                 checked={this.isReviewerSelected(potentialReviewer)}
@@ -65,6 +65,7 @@ class AddReviewersPopover extends React.Component {
                 }
                 value="yes"
                 key={potentialReviewer.handle}
+                data-cy="ReviewerCheckbox"
               />
               <EntityAvatarAndName entity={potentialReviewer} />
             </Flex>
@@ -78,7 +79,7 @@ class AddReviewersPopover extends React.Component {
 AddReviewersPopover.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   onClose: PropTypes.func.isRequired,
-  wrapperRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
+  wrapperRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }).isRequired,
   open: PropTypes.bool,
   potentialReviewers: PropTypes.array.isRequired,
 }
