@@ -6,11 +6,15 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import TagEditor from './TagEditor'
 
 export const formatRecordTags = records => {
-  const recordTags = _.flatMap(records, r => {
-    const { tags } = r
-    return toJS(tags)
-  })
-  return _.uniqBy(recordTags, tag => tag.label)
+  const recordTags = _.compact(
+    _.flatMap(records, r => {
+      const { tags } = r
+      return toJS(tags)
+    })
+  )
+
+  // SEE: https://stackoverflow.com/a/37318539
+  return _.uniqBy(recordTags, tag => JSON.stringify([tag.label, tag.type]))
 }
 
 @inject('apiStore')
@@ -21,7 +25,7 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (!_.isEqual(prevProps.cardIds.sort(), this.props.cardIds.sort())) {
+    if (prevProps.cardIds.length != this.props.cardIds.length) {
       this.initializeSelectedRecordsTags()
     }
   }
@@ -63,6 +67,7 @@ class CollectionCardsTagEditor extends React.Component {
     // update frontend model tags observable to rerender TagEditor
     _.each(records, r => {
       r.tags.push({ label, type, user })
+      r[type] && r[type].push(label)
     })
     this._apiAddRemoveTag('add', { label, type })
   }
