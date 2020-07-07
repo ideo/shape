@@ -318,7 +318,7 @@ const SharedRecordMixin = superclass =>
       const tagListKeys = _.get(this, 'isChallengeOrInsideChallenge')
         ? ['tag_list', 'topic_list']
         : ['tag_list']
-      _.each([tagListKeys], tagType => {
+      _.each(tagListKeys, tagType => {
         _.each(this[tagType], tag => {
           tagList.push({
             label: tag,

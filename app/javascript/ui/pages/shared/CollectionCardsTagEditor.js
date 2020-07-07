@@ -21,7 +21,7 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.cardIds.length != this.props.cardIds.length) {
+    if (!_.isEqual(prevProps.cardIds.sort(), this.props.cardIds.sort())) {
       this.initializeSelectedRecordsTags()
     }
   }
@@ -40,6 +40,7 @@ class CollectionCardsTagEditor extends React.Component {
   @computed
   get selectedRecordTags() {
     const { records } = this.props
+    console.log('formatRecordTags', formatRecordTags(records))
     return (!_.isEmpty(records) && formatRecordTags(records)) || []
   }
 
