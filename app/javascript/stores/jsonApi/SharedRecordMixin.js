@@ -16,9 +16,9 @@ const SharedRecordMixin = superclass =>
     collaborators = []
     highlightedRange = null
     @observable
-    challengeReviewerGroup = null
-    @observable
     tags = []
+    @observable
+    parentChallenge = null
 
     @action
     disableMenu() {
@@ -63,35 +63,6 @@ const SharedRecordMixin = superclass =>
         return this.routingStore.pathTo(type, id)
       }
       return this.routingStore.pathTo('homepage')
-    }
-
-    initializeTags = async () => {
-      const userTagsWithUsers = await Promise.all(
-        _.map(this.user_tag_list, async tag => {
-          const userSearch = await this.apiStore.searchUsers({ query: tag })
-          // NOTE: assumes that the first search result is the user described in the tag
-          const user = _.get(userSearch, 'data[0]')
-          return {
-            label: tag,
-            type: 'user_tag_list',
-            user: user.toJSON(), // how do we not use .toJSON() here
-          }
-        })
-      )
-
-      const tagList = []
-      _.each(['tag_list', 'topic_list'], tagType => {
-        _.each(this[tagType], tag => {
-          tagList.push({
-            label: tag,
-            type: tagType,
-          })
-        })
-      })
-
-      runInAction(() => {
-        this.tags = [...userTagsWithUsers, ...tagList]
-      })
     }
 
     @action
@@ -221,38 +192,31 @@ const SharedRecordMixin = superclass =>
       }
     }
 
-    async fetchChallengeReviewersGroup() {
-      if (this.challengeReviewers) return this.challengeReviewers
-      if (!this.challengeForCollection) return []
-      const challenge = await this.challengeForCollection()
-      if (!challenge) return []
-
-      // NOTE: assumes that the reviewer group are the reviewers
-      const res = await this.apiStore.request(
-        `/groups/${challenge.challenge_reviewer_group_id}`,
-        'GET'
-      )
-      runInAction(() => {
-        this.challengeReviewerGroup = res.data
-      })
-      return this.challengeReviewerGroup
+    async initializeParentChallengeForCollection() {
+      let challenge = null
+      if (this.isCollection && this.collection_type === 'challenge') {
+        challenge = this
+      } else {
+        const challengeForCollection = await this.fetchChallengeForCollection()
+        if (challengeForCollection.data) {
+          challenge = challengeForCollection.data
+        }
+      }
+      if (challenge) {
+        runInAction(() => {
+          this.parentChallenge = challenge
+        })
+      }
     }
 
-    get potentialReviewers() {
-      if (!this.isSubmission) return []
-
-      const challangeReviewerRoles = _.get(this, 'challengeReviewerGroup.roles')
-      if (_.isEmpty(challangeReviewerRoles)) return []
-
-      const potentialReviewerList = []
-      _.each(['admin', 'member'], roleLabel => {
-        const role = challangeReviewerRoles.find(r => r.label === roleLabel)
-        const users = _.get(role, 'users', [])
-        _.each(users, user => {
-          potentialReviewerList.push(user)
-        })
-      })
-      return potentialReviewerList
+    // NOTE: use this method instead of the challenge attribute to ensure that the right associations are included, ie: roles
+    async fetchChallengeForCollection() {
+      // return cached parent collection
+      if (this.parentChallenge) return this.parentChallenge
+      // Otherwise we need to load the challenge collection
+      return await this.apiStore.request(
+        `collections/${this.parent_challenge_id}`
+      )
     }
 
     get isCurrentUserAPotentialReviewer() {

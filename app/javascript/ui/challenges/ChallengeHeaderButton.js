@@ -16,13 +16,11 @@ class ChallengeHeaderButton extends React.Component {
   render() {
     const { record } = this.props
 
-    if (!record.isChallengeOrInsideChallenge) return null
+    if (!record.isChallengeOrInsideChallenge || !record.parentChallenge) {
+      return null
+    }
 
-    if (
-      !record.isSubmissionBox &&
-      record.challenge &&
-      record.challenge.canEdit
-    ) {
+    if (!record.isSubmissionBox && record.parentChallenge.canEdit) {
       return (
         <Button
           {...buttonStyleProps}
@@ -32,7 +30,7 @@ class ChallengeHeaderButton extends React.Component {
           Challenge Settings
         </Button>
       )
-    } else {
+    } else if (record.isSubmissionBox) {
       const { currentUserHasSubmissionsToReview } = record
       return (
         <Button

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
+import { runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
@@ -9,11 +10,6 @@ import InlineModal from '~/ui/global/modals/InlineModal'
 
 @observer
 class AddReviewersPopover extends React.Component {
-  componentDidMount() {
-    const { record } = this.props
-    record.fetchChallengeReviewersGroup()
-  }
-
   isReviewerSelected(potentialReviewer) {
     const { record } = this.props
     const { currentReviewerHandles } = record
@@ -49,8 +45,7 @@ class AddReviewersPopover extends React.Component {
   }
 
   render() {
-    const { onClose, open, wrapperRef, record } = this.props
-    const { potentialReviewers } = record
+    const { onClose, open, wrapperRef, potentialReviewers } = this.props
     return (
       <InlineModal
         title=""
@@ -85,6 +80,7 @@ AddReviewersPopover.propTypes = {
   onClose: PropTypes.func.isRequired,
   wrapperRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
   open: PropTypes.bool,
+  potentialReviewers: PropTypes.array.isRequired,
 }
 
 AddReviewersPopover.defaultProps = {

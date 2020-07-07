@@ -470,9 +470,9 @@ class PageHeader extends React.Component {
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           {record.is_inside_a_challenge && (
             <ChallengeSubHeader
-              challengeName={record.challenge.name}
+              challengeName={_.get(record, 'parentChallenge.name', '')}
               challengeNavigationHandler={() => {
-                routingStore.routeTo('collections', record.challenge.id)
+                routingStore.routeTo('collections', record.parentChallenge.id)
               }}
             />
           )}

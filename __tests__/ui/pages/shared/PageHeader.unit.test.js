@@ -295,7 +295,7 @@ describe('PageHeader', () => {
     beforeEach(() => {
       const phaseCollection = fakeCollection
       phaseCollection.is_inside_a_challenge = true
-      phaseCollection.challenge = fakeCollection
+      phaseCollection.parentChallenge = fakeCollection
       phaseCollection.collection_type = 'phase'
       props.record = phaseCollection
       rerender()

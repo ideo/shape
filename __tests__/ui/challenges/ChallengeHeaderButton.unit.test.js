@@ -38,7 +38,10 @@ describe('ChallengeHeaderButton', () => {
 
   describe('if user can edit collection', () => {
     beforeEach(() => {
-      props.record.challenge.canEdit = true
+      const parentChallenge = fakeCollection
+      parentChallenge.id = 999
+      parentChallenge.canEdit = true
+      props.record.parentChallenge = parentChallenge
       rerender()
     })
 
@@ -50,9 +53,13 @@ describe('ChallengeHeaderButton', () => {
 
   describe('inside a submission box', () => {
     beforeEach(() => {
+      const parentChallenge = fakeCollection
+      parentChallenge.id = 999
+      parentChallenge.canEdit = true
+
       props.record.isSubmissionBox = true
       props.record.isChallengeOrInsideChallenge = true
-      props.record.challenge.canEdit = true
+      props.record.parentChallenge = parentChallenge
       rerender()
     })
 

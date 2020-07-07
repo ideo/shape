@@ -203,6 +203,9 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
+    if (collection.isChallengeOrInsideChallenge) {
+      collection.initializeParentChallengeForCollection()
+    }
     uiStore.update('dragTargets', [])
   }
 
@@ -287,11 +290,6 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
-
-      if (collection.is_inside_a_challenge) {
-        // load reviwers group to for rendering review buttons and assign reviewers
-        collection.fetchChallengeReviewersGroup()
-      }
     }
   }
 
@@ -633,7 +631,7 @@ class CollectionPage extends React.Component {
         {!isLoading && collection.showSubmissionTopicSuggestions && (
           <SuggestedTagsBanner
             collection={collection}
-            suggestions={collection.parent_challenge.topic_list}
+            suggestions={_.get(collection, 'parentChallenge.topic_list', [])}
           />
         )}
         {!isLoading && (
