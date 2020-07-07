@@ -175,7 +175,10 @@ const SharedRecordMixin = superclass =>
       this[type].push(label)
       this.API_addRemoveTag('add', { label, type })
       if (type === 'user_tag_list' && user) {
-        this.tagged_users.push(user)
+        const { tagged_users } = this
+        if (tagged_users) {
+          tagged_users.push(user)
+        }
       }
     }
 
@@ -186,9 +189,12 @@ const SharedRecordMixin = superclass =>
       })
       this.API_addRemoveTag('remove', { label, type })
       if (type === 'user_tag_list') {
-        _.remove(this.tagged_users, u => {
-          return u.handle === label
-        })
+        const { tagged_users } = this
+        if (tagged_users) {
+          _.remove(this.tagged_users, u => {
+            return u.handle === label
+          })
+        }
       }
     }
 

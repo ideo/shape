@@ -30,7 +30,6 @@ class AddReviewersPopover extends React.Component {
     ev.preventDefault()
     ev.stopPropagation()
     const { record } = this.props
-    // FIXME: will need to fetch the record to add/remove potential reviewer
     if (!record || !reviewer) return
     const { handle } = reviewer
     if (!handle) return
