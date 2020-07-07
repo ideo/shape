@@ -24,7 +24,7 @@ class CollectionFilter < ApplicationRecord
   validates :text,
             presence: true,
             uniqueness: {
-              scope: :collection_id,
+              scope: %i[collection_id filter_type],
               message: 'should not have duplicate filters in a collection',
             }
 
