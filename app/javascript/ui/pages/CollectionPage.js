@@ -12,7 +12,9 @@ import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionFilter, {
+  CollectionPillHolder,
+} from '~/ui/filtering/CollectionFilter'
 import CollectionList from '~/ui/grid/CollectionList'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
@@ -463,6 +465,7 @@ class CollectionPage extends React.Component {
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
         <Flex ml="auto" justify="flex-end">
+          <CollectionPillHolder id="collectionFilterPortal" />
           <div style={{ display: 'inline-block', marginTop: '4px' }}>
             <CollectionViewToggle collection={submissions_collection} />
           </div>
