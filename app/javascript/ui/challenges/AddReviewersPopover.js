@@ -79,7 +79,8 @@ class AddReviewersPopover extends React.Component {
 AddReviewersPopover.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   onClose: PropTypes.func.isRequired,
-  wrapperRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) }).isRequired,
+  wrapperRef: PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+    .isRequired,
   open: PropTypes.bool,
   potentialReviewers: PropTypes.array.isRequired,
 }
