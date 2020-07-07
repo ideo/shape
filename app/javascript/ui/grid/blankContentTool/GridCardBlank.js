@@ -767,7 +767,10 @@ class GridCardBlank extends React.Component {
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
         {showCloseButton && (
-          <CloseButton onClick={this.closeBlankContentTool} />
+          <CloseButton
+            onClick={this.closeBlankContentTool}
+            data-cy="BCT-closeButton"
+          />
         )}
       </StyledGridCardBlank>
     )
