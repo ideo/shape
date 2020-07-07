@@ -40,7 +40,6 @@ class CollectionCardsTagEditor extends React.Component {
   @computed
   get selectedRecordTags() {
     const { records } = this.props
-    console.log('formatRecordTags', formatRecordTags(records))
     return (!_.isEmpty(records) && formatRecordTags(records)) || []
   }
 
