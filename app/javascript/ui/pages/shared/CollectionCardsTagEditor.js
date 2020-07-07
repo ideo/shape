@@ -12,7 +12,9 @@ export const formatRecordTags = records => {
       return toJS(tags)
     })
   )
-  return _.uniqBy(recordTags, tag => tag.label && tag.type)
+
+  // SEE: https://stackoverflow.com/a/37318539
+  return _.uniqBy(recordTags, tag => JSON.stringify([tag.label, tag.type]))
 }
 
 @inject('apiStore')
@@ -23,7 +25,7 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (!_.isEqual(prevProps.cardIds.sort(), this.props.cardIds.sort())) {
+    if (prevProps.cardIds.length != this.props.cardIds.length) {
       this.initializeSelectedRecordsTags()
     }
   }
