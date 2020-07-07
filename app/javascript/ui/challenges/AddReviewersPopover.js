@@ -31,7 +31,7 @@ class AddReviewersPopover extends React.Component {
     return false
   }
 
-  handlePotentialReviewer = async (reviewer, ev) => {
+  handlePotentialReviewer = (reviewer, ev) => {
     ev.preventDefault()
     ev.stopPropagation()
     const { record } = this.props
@@ -66,10 +66,11 @@ class AddReviewersPopover extends React.Component {
               <Checkbox
                 color="primary"
                 checked={this.isReviewerSelected(potentialReviewer)}
-                onChange={ev =>
+                onClick={ev =>
                   this.handlePotentialReviewer(potentialReviewer, ev)
                 }
                 value="yes"
+                key={potentialReviewer.handle}
               />
               <EntityAvatarAndName entity={potentialReviewer} />
             </Flex>
