@@ -64,7 +64,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @observable
   phaseSubCollections = []
   @observable
-  parentChallenge = null
+  challengeReviewerGroup = null
 
   attributesForAPI = [
     'name',
@@ -430,9 +430,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
     if (!canEditSubmissionInChallenge) return false
 
+    if (!this.parentChallenge) return null
+
     const hasTopics =
-      this.parent_challenge.topic_list &&
-      this.parent_challenge.topic_list.length > 0
+      this.parentChallenge.topic_list &&
+      this.parentChallenge.topic_list.length > 0
 
     return (
       hasTopics &&
@@ -1006,23 +1008,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.save()
   }
 
-  async challengeForCollection() {
-    // If this is the parent challenge collection, return
-    if (this.challenge === this) {
-      return this
-    } else {
-      if (this.parentChallenge) return this.parentChallenge
-      // Otherwise we need to load the challenge colleciton
-      const res = await this.apiStore.request(
-        `collections/${this.parent_challenge_id}`
-      )
-      runInAction(() => {
-        this.parentChallenge = res.data
-      })
-      return res.data
-    }
-  }
-
   async loadPhaseSubCollections() {
     const request = await this.API_fetchPhaseSubCollections()
     return request.data
@@ -1247,11 +1232,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get isChallengeOrInsideChallenge() {
     return this.collection_type === 'challenge' || this.is_inside_a_challenge
-  }
-
-  get challenge() {
-    if (this.collection_type === 'challenge') return this
-    return this.parent_challenge
   }
 
   get currentReviewerHandles() {
@@ -1540,6 +1520,20 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
   }
 
+  async API_fetchChallengeReviewersGroup() {
+    if (!this.parentChallenge) return
+
+    // NOTE: assumes that the reviewer group are the reviewers
+    const challengeReviewerGroup = await this.apiStore.request(
+      `/groups/${this.parentChallenge.challenge_reviewer_group_id}`,
+      'GET'
+    )
+
+    if (challengeReviewerGroup && challengeReviewerGroup.data) {
+      this.setChallengeReviewerGroup(challengeReviewerGroup.data)
+    }
+  }
+
   async API_getNextAvailableTest({ challenge = false }) {
     this.setNextAvailableTestPath(null)
     const nextTestPath = !challenge
@@ -1589,6 +1583,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path
   }
+
+  @action
+  setChallengeReviewerGroup(group) {
+    this.challengeReviewerGroup = group
+  }
+
   @action
   updateScrollBottom(y) {
     this.scrollBottom = y

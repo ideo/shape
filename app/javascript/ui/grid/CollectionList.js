@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React from 'react'
 import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -17,8 +18,41 @@ class CollectionList extends React.Component {
   componentDidMount() {
     this.fetchCards()
     if (this.submissionBoxInsideChallenge) {
+      this.initializeReviewerGroup()
       this.fetchReviewerStatuses()
     }
+  }
+
+  async initializeReviewerGroup() {
+    const { collection } = this.props
+    // intialize parent challenge if it's not already intialized during initial load, ie: switching viewMode
+    if (!collection.parentChallenge) {
+      await collection.initializeParentChallengeForCollection()
+    }
+
+    await collection.API_fetchChallengeReviewersGroup()
+  }
+
+  get potentialReviewers() {
+    const { collection } = this.props
+    if (!collection.isSubmissionsCollection) return []
+
+    const challengeReviewerRoles = _.get(
+      collection,
+      'challengeReviewerGroup.roles'
+    )
+
+    if (_.isEmpty(challengeReviewerRoles)) return []
+
+    const potentialReviewerList = []
+    _.each(['admin', 'member'], roleLabel => {
+      const role = challengeReviewerRoles.find(r => r.label === roleLabel)
+      const users = _.get(role, 'users', [])
+      _.each(users, user => {
+        potentialReviewerList.push(user)
+      })
+    })
+    return potentialReviewerList
   }
 
   fetchCards({ sort } = {}) {
@@ -121,6 +155,8 @@ class CollectionList extends React.Component {
             insideChallenge={this.submissionBoxInsideChallenge}
             searchResult={collection.isSearchResultsCollection}
             key={card.id}
+            record={card.record}
+            potentialReviewers={this.potentialReviewers}
           />
         ))}
       </div>

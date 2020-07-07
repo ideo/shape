@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex, Box } from 'reflexbox'
@@ -22,7 +23,7 @@ const ChallengeFixedHeader = ({
       {/* Show subheader if a parent collection is a challenge */}
       {collection_type !== 'challenge' && (
         <ChallengeSubHeader
-          challengeName={name}
+          challengeName={_.get(collection, 'parentChallenge.name', '')}
           challengeNavigationHandler={challengeNavigationHandler}
         />
       )}
@@ -48,7 +49,7 @@ const ChallengeFixedHeader = ({
           flex
           style={{
             marginLeft: '8px',
-            marginRight: '30px',
+            marginRight: '60px',
             flexGrow: '1',
             justifyContent: 'flex-end',
           }}

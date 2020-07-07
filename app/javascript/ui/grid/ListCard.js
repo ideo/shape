@@ -334,7 +334,7 @@ class ListCard extends React.Component {
   }
 
   render() {
-    const { card, insideChallenge, uiStore } = this.props
+    const { card, insideChallenge, uiStore, potentialReviewers } = this.props
     const { record } = card
     if (card.shouldHideFromUI || _.isEmpty(card.record)) {
       return null
@@ -386,9 +386,10 @@ class ListCard extends React.Component {
                 rolesMenuOpen={!!uiStore.rolesMenuOpen}
               />
             )}
-            {this.showReviewers && (
+            {this.showReviewers && !_.isEmpty(potentialReviewers) && (
               <AddReviewersPopover
-                record={record}
+                record={card.record}
+                potentialReviewers={potentialReviewers}
                 onClose={this.handleCloseReviewers}
                 wrapperRef={this.rolesWrapperRef}
                 open={this.isReviewersOpen}
@@ -414,10 +415,12 @@ ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   insideChallenge: PropTypes.bool,
   searchResult: PropTypes.bool,
+  potentialReviewers: MobxPropTypes.arrayOrObservableArray,
 }
 ListCard.defaultProps = {
   insideChallenge: false,
   searchResult: false,
+  potentialReviewers: [],
 }
 
 export default ListCard
