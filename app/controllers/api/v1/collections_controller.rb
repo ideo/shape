@@ -192,6 +192,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     collections = @collection.all_child_collections
                              .active
                              .collection_type_phase
+                             .order(start_date: :asc)
                              .select do |collection|
                                collection.can_view?(current_user)
                              end
