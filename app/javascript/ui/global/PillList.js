@@ -69,7 +69,7 @@ class PillList extends React.Component {
           }
           return (
             <Pill
-              key={identifier}
+              key={`${item.type}-${identifier}`}
               tag={tag}
               symbol={avatar}
               symbolSize={symbolSize}

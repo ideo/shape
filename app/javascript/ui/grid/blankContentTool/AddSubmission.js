@@ -79,7 +79,7 @@ class AddSubmission extends React.Component {
 
     return (
       <StyledBlankCreationTool>
-        <h3>Add a new {viewingCollection.submissionTypeName}</h3>
+        <h3>Create New Submission</h3>
         {this.state.loading && <InlineLoader />}
         <SubmissionButton
           disabled={this.loading}

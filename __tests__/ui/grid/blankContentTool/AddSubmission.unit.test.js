@@ -27,12 +27,6 @@ describe('GridCardBlank', () => {
   })
 
   describe('render()', () => {
-    it('should say the submission type name', () => {
-      expect(wrapper.find('StyledBlankCreationTool h3').text()).toEqual(
-        'Add a new text'
-      )
-    })
-
     it('should render a submission button', () => {
       expect(wrapper.find('SubmissionButton').exists()).toBe(true)
     })

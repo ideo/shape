@@ -17,6 +17,11 @@ const SortContainer = styled.div`
   top: ${props => (props.top ? props.top : 0)}px;
 `
 
+export const CollectionPillHolder = styled.div`
+  margin-bottom: 8px;
+  width: 100%;
+`
+
 @observer
 class CollectionFilter extends React.Component {
   @observable
@@ -84,15 +89,19 @@ class CollectionFilter extends React.Component {
       .toLowerCase()
       .split(' ')[0]
 
+    let filterText = tag.name
+
     if (backendFilterType === 'tag') {
+      // tags can be tags or user tags
       const { internalType } = tag
       // NOTE: internalType is set under Organization::searchTagsAndUsers
       if (internalType === 'users') {
         backendFilterType = 'user_tag'
+        filterText = tag.label
       }
     }
     const filter = {
-      text: tag.label,
+      text: filterText,
       filter_type: backendFilterType,
       selected: false,
     }
@@ -167,6 +176,7 @@ class CollectionFilter extends React.Component {
     } else {
       filterMenuMarginBottom = 24
     }
+
     return (
       <Fragment>
         {this.rendered && isParentMethodLibrary && (
