@@ -449,8 +449,14 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
+    const showFilters =
+      !uiStore.isMobileXs &&
+      (record.isRegularCollection ||
+        record.isSubmissionsCollection ||
+        record.isBoard)
+
     const showFilterControls =
-      record.showFilters &&
+      showFilters &&
       // FoamcoreGrid displays its own fixed controls at the top
       (!record.isBoard || record.viewMode === 'list')
 
@@ -540,9 +546,7 @@ class PageHeader extends React.Component {
               </div>
             )}
           </div>
-          {record.showFilters && (
-            <CollectionPillHolder id="collectionFilterPortal" />
-          )}
+          {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
         </MaxWidthContainer>
         <CollectionCardsTagEditorModal
           canEdit={record.canEdit}

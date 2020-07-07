@@ -465,9 +465,7 @@ class CollectionPage extends React.Component {
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
         <Flex ml="auto" justify="flex-end">
-          {submissions_collection.showFilters && (
-            <CollectionPillHolder id="collectionFilterPortal" />
-          )}
+          <CollectionPillHolder id="collectionFilterPortal" />
           <div style={{ display: 'inline-block', marginTop: '4px' }}>
             <CollectionViewToggle collection={submissions_collection} />
           </div>
