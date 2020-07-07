@@ -9,11 +9,6 @@ import InlineModal from '~/ui/global/modals/InlineModal'
 
 @observer
 class AddReviewersPopover extends React.Component {
-  async componentDidMount() {
-    const { record } = this.props
-
-    await record.API_fetchCardRoles()
-  }
   isReviewerSelected(potentialReviewer) {
     const { record } = this.props
     const { currentReviewerHandles } = record
@@ -35,10 +30,9 @@ class AddReviewersPopover extends React.Component {
     ev.preventDefault()
     ev.stopPropagation()
     const { record } = this.props
-    if (!reviewer) return
+    if (!record || !reviewer) return
     const { handle } = reviewer
     if (!handle) return
-    // fetch reviewers first
     const action = this.isReviewerSelected(reviewer) ? 'removeTag' : 'addTag'
     record[action](handle, 'user_tag_list', reviewer)
   }
