@@ -23,6 +23,14 @@ RSpec.describe Item::FileItem, type: :model do
     let(:filestack_file) { create(:filestack_file) }
     let(:item) { create(:file_item, filestack_file: filestack_file) }
 
+    before do
+      # ensure a consistent response here
+      allow(FilestackFile).to receive(:security_token).and_return(
+        policy: 'abc1xyz1abc1',
+        signature: 'xyz123xyz',
+      )
+    end
+
     context 'video file is already an mp4' do
       let(:filestack_file) { create(:filestack_file, mimetype: 'video/mp4') }
 

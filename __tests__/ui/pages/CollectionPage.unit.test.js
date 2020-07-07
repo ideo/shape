@@ -360,7 +360,7 @@ describe('CollectionPage', () => {
         collection: {
           ...collection,
           showSubmissionTopicSuggestions: true,
-          parent_challenge: {
+          parentChallenge: {
             ...collection,
             topic_list: ['apples', 'bananas'],
           },

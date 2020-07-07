@@ -12,7 +12,9 @@ import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionFilter, {
+  CollectionPillHolder,
+} from '~/ui/filtering/CollectionFilter'
 import CollectionList from '~/ui/grid/CollectionList'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
@@ -201,6 +203,9 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
+    if (collection.isChallengeOrInsideChallenge) {
+      collection.initializeParentChallengeForCollection()
+    }
     uiStore.update('dragTargets', [])
   }
 
@@ -285,11 +290,6 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
-
-      if (collection.is_inside_a_challenge) {
-        // load reviwers group to for rendering review buttons and assign reviewers
-        collection.fetchChallengeReviewersGroup()
-      }
     }
   }
 
@@ -436,7 +436,6 @@ class CollectionPage extends React.Component {
     const { collection, uiStore } = this.props
     const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
     const {
-      submissionTypeName,
       submissions_collection,
       submission_box_type,
       submission_template,
@@ -464,6 +463,7 @@ class CollectionPage extends React.Component {
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
         <Flex ml="auto" justify="flex-end">
+          <CollectionPillHolder id="collectionFilterPortal" />
           <div style={{ display: 'inline-block', marginTop: '4px' }}>
             <CollectionViewToggle collection={submissions_collection} />
           </div>
@@ -631,7 +631,7 @@ class CollectionPage extends React.Component {
         {!isLoading && collection.showSubmissionTopicSuggestions && (
           <SuggestedTagsBanner
             collection={collection}
-            suggestions={collection.parent_challenge.topic_list}
+            suggestions={_.get(collection, 'parentChallenge.topic_list', [])}
           />
         )}
         {!isLoading && (

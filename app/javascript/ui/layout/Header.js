@@ -296,7 +296,7 @@ class Header extends React.Component {
             this.handleReviewSubmissions()
           }}
           challengeNavigationHandler={() => {
-            routingStore.routeTo('collections', record.challenge.id)
+            routingStore.routeTo('collections', record.parentChallenge.id)
           }}
           currentUserHasReviewableCollections={
             !_.isEmpty(reviewable_collections)

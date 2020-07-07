@@ -857,7 +857,7 @@ describe('Collection', () => {
             test_status: 'live',
           },
           type: 'Collection::SubmissionsCollection',
-          parent_challenge: {},
+          parentChallenge: {},
           user_tag_list: [handle],
           is_inside_a_challenge: true,
         },

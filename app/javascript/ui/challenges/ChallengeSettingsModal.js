@@ -52,9 +52,9 @@ const ChallengeSettingsModal = ({ collection, open, onClose }) => {
 
   // Load the challenge
   useEffect(() => {
-    if (!collection.challenge || !open) return
+    if (!collection.parentChallenge || !open) return
     const fetchChallenge = async () => {
-      const result = await collection.challengeForCollection()
+      const result = await collection.fetchChallengeForCollection()
       setChallenge(result)
     }
     fetchChallenge()

@@ -9,7 +9,9 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
 import Tooltip from '~/ui/global/Tooltip'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionFilter, {
+  CollectionPillHolder,
+} from '~/ui/filtering/CollectionFilter'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BackIcon from '~/ui/icons/BackIcon'
@@ -81,11 +83,6 @@ const FixedRightContainer = styled(Flex)`
   top: 22px;
   right: 60px;
   height: 33px;
-`
-
-const CollectionPillHolder = styled.div`
-  margin-bottom: 8px;
-  width: 100%;
 `
 
 @inject('uiStore', 'apiStore', 'routingStore')
@@ -473,9 +470,9 @@ class PageHeader extends React.Component {
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
           {record.is_inside_a_challenge && (
             <ChallengeSubHeader
-              challengeName={record.challenge.name}
+              challengeName={_.get(record, 'parentChallenge.name', '')}
               challengeNavigationHandler={() => {
-                routingStore.routeTo('collections', record.challenge.id)
+                routingStore.routeTo('collections', record.parentChallenge.id)
               }}
             />
           )}
