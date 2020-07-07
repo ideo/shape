@@ -159,7 +159,7 @@ class SearchCollection extends React.Component {
               <CollectionFilter
                 inSearchCollection
                 collection={collection}
-                canEdit={collection.can_edit_content}
+                canEdit={collection.canEdit}
               />
             </Flex>
           )}

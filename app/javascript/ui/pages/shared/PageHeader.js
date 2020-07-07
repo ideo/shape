@@ -452,6 +452,7 @@ class PageHeader extends React.Component {
     const showFilters =
       !uiStore.isMobileXs &&
       (record.isRegularCollection ||
+        record.isUserCollection ||
         record.isSubmissionsCollection ||
         record.isBoard)
 
@@ -541,7 +542,9 @@ class PageHeader extends React.Component {
                 <CollectionViewToggle collection={record} />
                 <CollectionFilter
                   collection={record}
-                  canEdit={record.canEdit}
+                  // this is the one case where UserCollection breaks from
+                  // other system_required / canEdit restrictions
+                  canEdit={record.canEdit || record.isUserCollection}
                 />
               </div>
             )}
