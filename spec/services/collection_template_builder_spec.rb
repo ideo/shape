@@ -95,6 +95,23 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       end
     end
 
+    context 'with hardcoded cover settings on the template' do
+      before do
+        template.update(
+          cached_cover: {
+            hardcoded_subtitle: 'This is my subtitle.',
+            subtitle_hidden: true,
+          },
+        )
+      end
+
+      it 'should copy the cover settings' do
+        expect(instance.cached_cover['hardcoded_subtitle']).to eq 'This is my subtitle.'
+        expect(instance.cached_cover['subtitle_hidden']).to be true
+        expect(instance.cached_cover['card_ids'].first). to eq instance.collection_card_ids.first
+      end
+    end
+
     context 'when parent is a master_template' do
       let(:parent) { create(:collection, master_template: true) }
 
