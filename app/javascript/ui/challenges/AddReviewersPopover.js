@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import { Flex } from 'reflexbox'
-import { runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
