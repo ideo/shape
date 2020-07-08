@@ -275,13 +275,41 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
-  get renderActions() {
-    const { card, record, insideChallenge } = this.props
+  get columnContent() {
+    const { uiStore, searchResult } = this.props
+    const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
-    if (!insideChallenge) {
-      const { uiStore, searchResult } = this.props
-      const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-      return (
+    return [
+      (
+        <div className="show-on-hover" style={{ cursor: 'pointer' }}>
+          <SelectionCircle cardId={card.id} />
+        </div>
+      ),
+      (
+        <ColumnLink onClick={this.handleRecordClick}>
+          <ListCoverRenderer
+            card={card}
+            cardType={record.internalType}
+            record={record}
+          />
+          <TruncatedName>{record.name}</TruncatedName>
+          {this.renderLabelSelector}
+          {this.renderIcons}
+        </ColumnLink>
+      ),
+      (defaultTimeFormat(record.updated_at)),
+      (
+        <RolesSummary
+          key="roles"
+          handleClick={this.handleRolesClick}
+          roles={[...record.roles]}
+          canEdit={record.can_edit}
+          // convert observable to normal array to trigger render changes
+          collaborators={[...record.collaborators]}
+          rolesMenuOpen={!!uiStore.rolesMenuOpen}
+        />
+      ),
+      (
         <Fragment>
           <ActionMenu
             location={searchResult ? 'Search' : 'GridCard'}
@@ -300,28 +328,29 @@ class ListCard extends React.Component {
             open={tagEditorOpen}
           />
         </Fragment>
-      )
-    }
+      ),
+    ]
+  }
 
-    const { isCurrentUserAReviewer, submission_reviewer_status } = record
-
-    if (isCurrentUserAReviewer && submission_reviewer_status) {
-      return (
-        <ChallengeReviewButton
-          reviewerStatus={submission_reviewer_status}
-          onClick={() => {
-            record.navigateToNextAvailableTest()
-          }}
-        />
-      )
-    }
-
-    return null
+  renderCols {
+    const {
+      card,
+      columns,
+      record,
+      uiStore,
+    } = this.props
+    // <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
+    return this.columns.map((col, idx) => {
+      <Column {...col.style}>
+        {column.overrideContent ? column.overrideContent : this.columnContent[idx]}
+      </Column>
+    })
   }
 
   render() {
     const {
       card,
+      columns,
       record,
       insideChallenge,
       uiStore,
@@ -338,59 +367,7 @@ class ListCard extends React.Component {
         ref={c => (this.cardRef = c)}
         data-cy="ListCardRow"
       >
-        <Column width="50px">
-          <div className="show-on-hover" style={{ cursor: 'pointer' }}>
-            <SelectionCircle cardId={card.id} />
-          </div>
-        </Column>
-        <Column width="500px">
-          <ColumnLink onClick={this.handleRecordClick}>
-            <ListCoverRenderer
-              card={card}
-              cardType={record.internalType}
-              record={record}
-            />
-            <TruncatedName>{record.name}</TruncatedName>
-            {this.renderLabelSelector}
-            {this.renderIcons}
-          </ColumnLink>
-        </Column>
-        <Column width={!insideChallenge ? '400px' : '300px'}>
-          {defaultTimeFormat(record.updated_at)}
-        </Column>
-        <Column width="250px">
-          <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
-            {this.showReviewers ? (
-              <AvatarList
-                avatars={record.taggedUsersWithStatuses}
-                onAdd={this.handleRolesClick}
-              />
-            ) : (
-              <RolesSummary
-                key="roles"
-                handleClick={this.handleRolesClick}
-                roles={[...record.roles]}
-                canEdit={record.can_edit}
-                // convert observable to normal array to trigger render changes
-                collaborators={[...record.collaborators]}
-                rolesMenuOpen={!!uiStore.rolesMenuOpen}
-              />
-            )}
-            {this.showReviewers && !_.isEmpty(record.potentialReviewers) && (
-              <AddReviewersPopover
-                record={record}
-                potentialReviewers={record.potentialReviewers}
-                onClose={this.handleCloseReviewers}
-                wrapperRef={this.rolesWrapperRef}
-                open={this.isReviewersOpen}
-              />
-            )}
-          </div>
-        </Column>
-        {/* stopPropagation so that ActionMenu overrides handleRowClick */}
-        <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
-          {this.renderActions}
-        </Column>
+        {this.renderCols}
       </Row>
     )
   }

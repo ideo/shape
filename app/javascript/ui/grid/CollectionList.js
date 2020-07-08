@@ -27,7 +27,7 @@ class CollectionList extends React.Component {
   }
 
   get columns() {
-    return [
+    const cols = [
       { displayName: '', style: { width: '50px' }, name: 'select' },
       {
         displayName: 'Name',
@@ -38,18 +38,18 @@ class CollectionList extends React.Component {
         displayName: 'Last updated',
         name: 'last_updated',
         style: {
-          width: !this.submissionBoxInsideChallenge ? '400px' : '300px',
+          width: '300px',
         },
       },
       {
-        displayName: this.submissionBoxInsideChallenge
-          ? 'Reviewers'
-          : 'Permissions',
-        name: this.submissionBoxInsideChallenge ? 'reviewers' : 'permissions',
+        displayName: 'Permissions',
+        name: 'permissions',
         style: { width: '250px' },
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
+    if (this.submissionBoxInsideChallenge) return transformColumnsForChallenge(cols)
+    return cols
   }
 
   get sortedCards() {
@@ -98,15 +98,18 @@ class CollectionList extends React.Component {
             </Column>
           ))}
         </Flex>
-        {this.sortedCards.map(card => (
-          <ListCard
-            card={card}
-            insideChallenge={this.submissionBoxInsideChallenge}
-            searchResult={collection.isSearchResultsCollection}
-            key={card.id}
-            record={card.record}
-          />
-        ))}
+        {this.sortedCards.map(card => {
+          const mainProps = {
+            card,
+            columns: this.columns,
+            record: card.record,
+            searchResult: collection.isSearchResultsCollection,
+            key: card.id,
+          }
+          return this.submissionBoxInsideChallenge ?
+            <ChallengeListCard {...mainProps} /> :
+            <ListCard {...mainProps} />
+        })}
       </div>
     )
   }
