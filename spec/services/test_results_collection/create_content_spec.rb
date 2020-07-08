@@ -60,9 +60,8 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       test_results_collection.collection_cards.where(
         row: 0,
         col: 3,
-      ).first,
+      ).first.record,
     ).to be_instance_of(Item::LegendItem)
-    # TODO: Might not be 0,3 -- check against test output and check row/col for legend
   end
 
   it 'creates response graphs for all scale questions' do
