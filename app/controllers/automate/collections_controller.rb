@@ -55,11 +55,13 @@ class Automate::CollectionsController < ActionController::Base
       )
     end
     # Add people to the reviewers group
-    challenge_reviewers_group = challenge_collection.challenge_reviewers_group
+    challenge_reviewer_group = challenge_collection.challenge_reviewer_group
     User.first(10).each do |user|
-      user.add_role(Role::MEMBER, challenge_reviewers_group)
+      user.add_role(Role::MEMBER, challenge_reviewer_group)
     end
     # Add reviewers to submissions
+
+    head :ok
   end
 
   private
@@ -126,6 +128,11 @@ class Automate::CollectionsController < ActionController::Base
       submission_box_type: :template,
       user: current_user,
     ).call
+    submission_box.submission_template.update(
+      submission_attrs: {
+        launchable_test_id: template_card.collection.submission_attrs['launchable_test_id'],
+      },
+    )
     submission_box.reload
   end
 
