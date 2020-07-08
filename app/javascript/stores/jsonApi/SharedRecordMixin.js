@@ -299,6 +299,22 @@ const SharedRecordMixin = superclass =>
       this.collaborators.replace(sorted)
     }
 
+    @computed
+    get taggedUsersWithStatuses() {
+      if (!this.tagged_users) return []
+      if (this.reviewerStatuses) return this.tagged_users
+      return this.tagged_users.map(taggedUser => {
+        const statusForUser = _.find(this.reviewerStatuses, status =>
+          parseInt(status.user_id) === parseInt(taggedUser.id)
+        ).status
+        return {
+          ...taggedUser,
+          status: statusForUser,
+          color: v.statusColor[statusForUser],
+        }
+      })
+    }
+
     initializeTags = async () => {
       const userTagsWithUsers = await Promise.all(
         _.map(this.user_tag_list, async tag => {

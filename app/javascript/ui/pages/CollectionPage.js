@@ -300,6 +300,7 @@ class CollectionPage extends React.Component {
     await collection.initializeParentChallengeForCollection()
     if (collection.isSubmissionInChallenge) {
       await collection.API_fetchCardRoles()
+      await collection.API_fetchChallengeReviewersGroup()
       await collection.API_fetchCardReviewerStatuses()
     }
   }

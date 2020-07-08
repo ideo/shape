@@ -12,61 +12,9 @@ import v from '~/utils/variables'
 
 @observer
 class CollectionList extends React.Component {
-  @observable
-  submissionsReviewerStatuses = []
-
-  componentDidMount() {
-    this.fetchCards()
-    if (this.submissionBoxInsideChallenge) {
-      this.initializeReviewerGroup()
-      this.fetchReviewerStatuses()
-    }
-  }
-
-  async initializeReviewerGroup() {
-    const { collection } = this.props
-    // intialize parent challenge if it's not already intialized during initial load, ie: switching viewMode
-    if (!collection.parentChallenge) {
-      await collection.initializeParentChallengeForCollection()
-    }
-
-    await collection.API_fetchChallengeReviewersGroup()
-  }
-
-  get potentialReviewers() {
-    const { collection } = this.props
-    if (!collection.isSubmissionsCollection) return []
-
-    const challengeReviewerRoles = _.get(
-      collection,
-      'challengeReviewerGroup.roles'
-    )
-
-    if (_.isEmpty(challengeReviewerRoles)) return []
-
-    const potentialReviewerList = []
-    _.each(['admin', 'member'], roleLabel => {
-      const role = challengeReviewerRoles.find(r => r.label === roleLabel)
-      const users = _.get(role, 'users', [])
-      _.each(users, user => {
-        potentialReviewerList.push(user)
-      })
-    })
-    return potentialReviewerList
-  }
-
   fetchCards({ sort } = {}) {
     const { collection } = this.props
     collection.API_fetchCardRoles()
-  }
-
-  async fetchReviewerStatuses() {
-    const { collection } = this.props
-    const res = await collection.API_fetchCardReviewerStatuses()
-    if (!res || !res.data) return
-    runInAction(() => {
-      this.submissionsReviewerStatuses = res.data
-    })
   }
 
   get submissionBoxInsideChallenge() {
@@ -153,12 +101,10 @@ class CollectionList extends React.Component {
         {this.sortedCards.map(card => (
           <ListCard
             card={card}
-            reviewerStatuses={this.statusesForSubmission(card.record)}
             insideChallenge={this.submissionBoxInsideChallenge}
             searchResult={collection.isSearchResultsCollection}
             key={card.id}
             record={card.record}
-            potentialReviewers={this.potentialReviewers}
           />
         ))}
       </div>

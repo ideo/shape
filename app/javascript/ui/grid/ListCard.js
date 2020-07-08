@@ -203,12 +203,6 @@ class ListCard extends React.Component {
     })
   }
 
-  get taggedUsers() {
-    const { record } = this.props
-    if (!record.tagged_users) return []
-    return record.tagged_users
-  }
-
   get cardsForTagging() {
     const { apiStore } = this.props
     if (apiStore.selectedCards.length > 0) {
@@ -331,8 +325,6 @@ class ListCard extends React.Component {
       record,
       insideChallenge,
       uiStore,
-      potentialReviewers,
-      reviewerStatuses,
     } = this.props
     if (card.shouldHideFromUI || _.isEmpty(record)) {
       return null
@@ -370,9 +362,8 @@ class ListCard extends React.Component {
           <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
             {this.showReviewers ? (
               <AvatarList
-                avatars={this.taggedUsers}
+                avatars={record.taggedUsersWithStatuses}
                 onAdd={this.handleRolesClick}
-                reviewerStatuses={reviewerStatuses}
               />
             ) : (
               <RolesSummary
@@ -385,10 +376,10 @@ class ListCard extends React.Component {
                 rolesMenuOpen={!!uiStore.rolesMenuOpen}
               />
             )}
-            {this.showReviewers && !_.isEmpty(potentialReviewers) && (
+            {this.showReviewers && !_.isEmpty(record.potentialReviewers) && (
               <AddReviewersPopover
                 record={record}
-                potentialReviewers={potentialReviewers}
+                potentialReviewers={record.potentialReviewers}
                 onClose={this.handleCloseReviewers}
                 wrapperRef={this.rolesWrapperRef}
                 open={this.isReviewersOpen}
@@ -415,14 +406,10 @@ ListCard.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   insideChallenge: PropTypes.bool,
   searchResult: PropTypes.bool,
-  potentialReviewers: MobxPropTypes.arrayOrObservableArray,
-  reviewerStatuses: MobxPropTypes.arrayOrObservableArray,
 }
 ListCard.defaultProps = {
   insideChallenge: false,
   searchResult: false,
-  potentialReviewers: [],
-  reviewerStatuses: [],
 }
 
 export default ListCard

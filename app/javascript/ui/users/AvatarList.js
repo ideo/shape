@@ -7,7 +7,7 @@ import AvatarGroup from '~/ui/global/AvatarGroup'
 import { StyledRolesSummary } from '~/ui/roles/RolesSummary'
 import v from '~/utils/variables'
 
-const AvatarList = ({ avatars, onAdd, reviewerStatuses }) => {
+const AvatarList = ({ avatars, onAdd }) => {
   return (
     <StyledRolesSummary>
       <div className="roles-summary--inner">
@@ -15,26 +15,18 @@ const AvatarList = ({ avatars, onAdd, reviewerStatuses }) => {
           placeholderTitle="...and more"
           avatarCount={avatars.length}
         >
-          {avatars.map(avatar => {
-            const statusForUser = _.find(reviewerStatuses, status => {
-              return parseInt(status.user_id) === parseInt(avatar.id)
-            })
-            return (
+          {avatars.map(avatar => (
               <Avatar
                 key={`${avatar.internalType}_${avatar.id}`}
                 title={avatar.nameWithHints || avatar.name}
                 url={avatar.pic_url_square || avatar.filestack_file_url}
-                color={
-                  statusForUser
-                    ? v.statusColor[statusForUser.status]
-                    : 'transparent'
-                }
+                color={avatar.color}
                 className="avatar viewer bordered outlined"
                 // user_profile_collection_id will be null if its a group
                 linkToCollectionId={avatar.user_profile_collection_id}
               />
             )
-          })}
+          )}
         </AvatarGroup>
         <AddButton onClick={onAdd}>+</AddButton>
       </div>
@@ -45,11 +37,6 @@ const AvatarList = ({ avatars, onAdd, reviewerStatuses }) => {
 AvatarList.propTypes = {
   avatars: PropTypes.arrayOf(PropTypes.shape(AvatarPropTypes)).isRequired,
   onAdd: PropTypes.func.isRequired,
-  reviewerStatuses: PropTypes.arrayOrObservableArray,
-}
-
-AvatarList.defaultProps = {
-  reviewerStatuses: [],
 }
 
 export default AvatarList

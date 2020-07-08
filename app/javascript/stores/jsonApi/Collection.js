@@ -65,6 +65,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   phaseSubCollections = []
   @observable
   challengeReviewerGroup = null
+  @observable
+  reviewerStatuses = []
 
   attributesForAPI = [
     'name',
@@ -950,9 +952,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
     if (ids.length === 0) return
     const basePath = '/api/v1'
-    return axios.get(
+    const res = axios.get(
       `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
     )
+    const statuses = res.data
+    statues.forEach(status => {
+      // TODO change this to allow for item types too
+      record = apiStore.find('collections', status.record_id)
+      // TODO this has to do some duplicate checking for when fetch called
+      // more than once
+      record.reviewerStatuses.push(status)
+    })
+    return res
   }
 
   async API_fetchAndMergeCards(cardIds) {
@@ -1532,6 +1543,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (challengeReviewerGroup && challengeReviewerGroup.data) {
       this.setChallengeReviewerGroup(challengeReviewerGroup.data)
     }
+  }
+
+  @computed
+  get potentialReviewers() {
+    if (!this.isSubmissionsCollection) return []
+
+    const challengeReviewerRoles = _.get(
+      this,
+      'challengeReviewerGroup.roles'
+    )
+
+    if (_.isEmpty(challengeReviewerRoles)) return []
+
+    const potentialReviewerList = []
+    _.each(['admin', 'member'], roleLabel => {
+      const role = challengeReviewerRoles.find(r => r.label === roleLabel)
+      const users = _.get(role, 'users', [])
+      _.each(users, user => {
+        potentialReviewerList.push(user)
+      })
+    })
+    return potentialReviewerList
   }
 
   async API_getNextAvailableTest({ challenge = false }) {
