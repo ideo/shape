@@ -42,6 +42,11 @@ class Automate::CollectionsController < ActionController::Base
         template_card: template_card,
         user: current_user,
       )
+      submission_box.update(
+        submission_attrs: {
+          launchable_test_id: template_card.collection.submission_attrs['launchable_test_id'],
+        },
+      )
       submissions_collection = submission_box.submissions_collection
       create_submission(
         submissions_collection: submissions_collection,
