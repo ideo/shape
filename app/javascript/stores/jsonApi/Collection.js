@@ -1544,9 +1544,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       : 'collections/${this.id}/next_available_challenge_test'
     const res = await this.apiStore.request(nextTestPath)
     if (!res.data) return
-    const path = this.routingStore.pathTo('collections', res.data.id)
-
-    this.setNextAvailableTestPath(`${path}?open=tests`)
+    const path = `${this.routingStore.pathTo(
+      'collections',
+      res.data.id
+    )}?open=tests`
+    this.setNextAvailableTestPath(path)
+    return path
   }
 
   async navigateToNextInCollectionTest() {
