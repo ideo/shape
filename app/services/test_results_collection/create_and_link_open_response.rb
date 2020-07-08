@@ -48,6 +48,7 @@ module TestResultsCollection
         parent_collection: alias_open_responses_collection,
         created_by: question.test_open_responses_collection&.created_by,
       )
+
       item = card.record
       context.open_response_item = item
       question_answer.update(open_response_item: item)
