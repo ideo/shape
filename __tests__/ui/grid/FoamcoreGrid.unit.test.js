@@ -41,6 +41,11 @@ describe('FoamcoreGrid', () => {
     collection.cardMatrix[1][1] = cardB
     collection.cardMatrix[2][0] = cardC
     collection.cardMatrix[2][1] = cardC
+    /*
+      [ x B x x x x ... ]
+      [ x B x x x A ... ]
+      [ C C x x x x ... ]
+     */
 
     collection.collection_cards = [cardA, cardB, cardC]
     collection.confirmEdit = jest.fn()
@@ -197,6 +202,42 @@ describe('FoamcoreGrid', () => {
       )
       const blankCardComponent = mount(blankCard)
       expect(blankCardComponent.find('RightBlankActions').exists()).toBe(true)
+    })
+  })
+
+  describe('renderHotspots', () => {
+    describe('with one card at the beginning of a row and none touching', () => {
+      it('should have hotspots at the beginning of every row', () => {
+        // default cardMatrix only has card C at the beginning of the row
+        expect(wrapper.find('FoamcoreHotspot').length).toEqual(1)
+      })
+    })
+
+    describe('with two cards at the beginning of a row and two touching', () => {
+      beforeEach(() => {
+        props.collection.cardMatrix[1][0] = cardA
+        rerender()
+      })
+
+      it('should have hotspots at the beginning of every row', () => {
+        // cardA now is at the beginning of the row AND bumps into cardB (+2)
+        expect(wrapper.find('FoamcoreHotspot').length).toEqual(3)
+      })
+    })
+
+    describe('with two cards at the beginning of a row and two touching', () => {
+      beforeEach(() => {
+        props.collection.isFourWideBoard = true
+        rerender()
+      })
+
+      it('should have horizontal hotspots between rows', () => {
+        expect(wrapper.find('FoamcoreHotspot').length).toEqual(4)
+        const hotspotProps = wrapper.find('FoamcoreHotspot').map(h => h.props())
+        // 1 vertical edge and 3 row hotspots
+        expect(hotspotProps.filter(p => p.horizontal).length).toEqual(3)
+        expect(hotspotProps.filter(p => !p.horizontal).length).toEqual(1)
+      })
     })
   })
 
@@ -414,10 +455,6 @@ describe('FoamcoreGrid', () => {
       collection.cardMatrix[1][9] = cardC
 
       props.collection.collection_cards = [cardA, cardB, cardC]
-    })
-
-    afterEach(() => {
-      props.collection.cardMatrix = [[], [], [], []]
     })
 
     describe('with a card that has no cards around it', () => {

@@ -32,6 +32,14 @@ When(
   }
 )
 
+When(
+  'I create a textItem card using the foamcore hotspot with {string}',
+  content => {
+    // `empty` being equivalent to "BCT is already open"
+    cy.createCard('textItem', { content, empty: true })
+  }
+)
+
 When('I add a link URL {string} and wait for {string}', (url, request) => {
   cy.locate('BctTextField').type(url, {
     force: true,

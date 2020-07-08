@@ -1133,6 +1133,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   revertToSnapshot(snapshot) {
     const updates = []
+    if (!snapshot || !snapshot.collection_cards_attributes) {
+      return
+    }
     snapshot.collection_cards_attributes.forEach(cardData => {
       const update = _.pick(cardData, [
         'order',

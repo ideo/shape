@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe RowInserter, type: :service do
+RSpec.describe CollectionGrid::RowInserter, type: :service do
   let(:num_cards) { 6 }
   let(:user) { create(:user) }
   let(:collection) { create(:board_collection, num_cards: num_cards, add_viewers: [user]) }
@@ -8,7 +8,7 @@ RSpec.describe RowInserter, type: :service do
   let(:action) { :insert_row }
   let(:row) { 1 }
   let(:inserter) do
-    RowInserter.new(
+    CollectionGrid::RowInserter.new(
       row: row,
       collection: collection,
       action: action,

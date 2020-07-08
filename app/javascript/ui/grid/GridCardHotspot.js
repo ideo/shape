@@ -11,11 +11,11 @@ export const StyledHotspot = styled.div`
   justify-content: center;
   position: absolute;
   opacity: 0;
-  ${({ top }) => top && `top: ${top};`}
   transition: all 100ms;
   /* e.g. "left: -27px;" */
-  ${props => `${props.position}: -27px;`}
-  ${props => props.position && `right: -27px;`}
+  ${props => props.position && `${props.position}: -27px;`}
+  ${({ top }) => top && `top: ${top};`}
+  ${({ left }) => left && `left: ${left};`}
   width: ${props => props.width};
   z-index: 100;
 
@@ -58,13 +58,14 @@ HotspotLine.displayName = 'HotspotLine'
 export const StyledPlusIcon = styled.div`
   position: relative;
   left: ${props => props.left};
-  width: 12px;
+  width: ${props => props.width};
   color: ${v.colors.secondaryMedium};
   font-size: 1.5rem;
   cursor: pointer;
 `
 StyledPlusIcon.defaultProps = {
   left: '0px',
+  width: '12px',
 }
 StyledPlusIcon.displayName = 'StyledPlusIcon'
 

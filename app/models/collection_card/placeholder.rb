@@ -16,6 +16,7 @@
 #  image_contain     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
+#  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
 #  section_type      :integer
@@ -44,5 +45,16 @@
 
 class CollectionCard
   class Placeholder < CollectionCard
+
+    # overrides for placeholder cards with no record
+    def can_edit?(*args)
+      return super unless record.nil?
+      parent.can_edit_content?(*args)
+    end
+
+    def can_view?(*args)
+      return super unless record.nil?
+      parent.can_view?(*args)
+    end
   end
 end

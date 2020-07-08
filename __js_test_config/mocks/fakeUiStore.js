@@ -18,6 +18,7 @@ const fakeUiStore = {
     width: null,
     height: null,
     replacingId: null,
+    placeholderCard: null,
   },
   dialogConfig: {
     open: null,
@@ -46,6 +47,7 @@ const fakeUiStore = {
   },
   openBlankContentTool: jest.fn(),
   closeBlankContentTool: jest.fn(),
+  setBctPlaceholderCard: jest.fn(),
   closeCardMenu: jest.fn(),
   openCardMenu: jest.fn(),
   closeMoveMenu: jest.fn(),

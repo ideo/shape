@@ -1,13 +1,47 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
-  deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[create update replace update_card_filter]
-  load_and_authorize_resource except: %i[index move replace update_card_filter]
-  skip_before_action :check_api_authentication!, only: %i[index]
-  before_action :load_and_authorize_parent_collection, only: %i[create replace update_card_filter]
-  before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
-  before_action :load_and_authorize_parent_collection_for_index, only: %i[index ids breadcrumb_records ids_in_direction roles reviewer_statuses]
-  before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
-  before_action :check_cache, only: %i[index ids breadcrumb_records]
-  before_action :load_collection_cards, only: %i[index ids breadcrumb_records roles reviewer_statuses]
+  deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[
+    create
+    create_bct
+    update
+    replace
+    update_card_filter
+  ]
+  load_and_authorize_resource except: %i[
+    index
+    move
+    replace
+    update_card_filter
+  ]
+  # this is skipped to enable viewable_by_anyone public capability, permissions are still checked via cancan
+  skip_before_action :check_api_authentication!, only: %i[
+    index
+  ]
+  before_action :load_and_authorize_parent_collection, only: %i[
+    create
+    create_bct
+    replace
+    update_card_filter
+  ]
+  before_action :load_and_authorize_parent_collection_for_index, only: %i[
+    index
+    ids
+    breadcrumb_records
+    ids_in_direction
+    reviewer_statuses
+    roles
+  ]
+  before_action :check_cache, only: %i[
+    index
+    ids
+    breadcrumb_records
+  ]
+  before_action :load_collection_cards, only: %i[
+    index
+    ids
+    breadcrumb_records
+    reviewer_statuses
+    roles
+  ]
 
   def index
     render_collection_cards
@@ -72,12 +106,11 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     card_params = collection_card_params
     # CollectionCardBuilder type expects 'primary' or 'link'
     card_type = card_params.delete(:card_type) || 'primary'
-
     builder = CollectionCardBuilder.new(params: card_params,
                                         type: card_type,
                                         parent_collection: @collection,
-                                        user: current_user)
-
+                                        user: current_user,
+                                        placeholder: find_placeholder_card)
     if builder.create
       @collection_card = builder.collection_card
       # reload the user's roles
@@ -91,8 +124,33 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  def create_bct
+    row = collection_card_params[:row]
+    col = collection_card_params[:col]
+    if row.nil? || col.nil?
+      head :unprocessable_entity
+      return
+    end
+
+    service = CollectionGrid::BctInserter.new(
+      row: row,
+      col: col,
+      collection: @collection,
+    )
+    service.call
+    # render the placeholder card
+    @collection_card = service.placeholder
+    render_collection_card
+  end
+
+  before_action :authorize_card_for_destroy, only: %i[destroy]
   def destroy
     if @collection_card.destroy
+      if @collection_card.bct_placeholder?
+        CollectionGrid::BctRemover.call(
+          placeholder_card: @collection_card,
+        )
+      end
       @collection_card.parent.reorder_cards!
       head :no_content
     else
@@ -100,6 +158,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_parent_collection_for_update, only: %i[update]
   def update
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
@@ -115,6 +174,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
+  before_action :load_and_authorize_collection_card_update, only: %i[update_card_filter]
   def update_card_filter
     updated = CollectionCardUpdater.call(@collection_card, collection_card_update_params)
     if updated
@@ -321,6 +381,16 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     )
   end
 
+  def find_placeholder_card
+    placeholder_card_id = json_api_params[:data][:placeholder_card_id]
+    return unless placeholder_card_id.present?
+
+    CollectionCard::Placeholder.find_by(
+      id: placeholder_card_id,
+      parent: @collection,
+    )
+  end
+
   def load_and_authorize_parent_collection_for_index
     @collection = Collection.find(
       params[:collection_id].presence || params[:filter][:collection_id],
@@ -414,6 +484,14 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       # - link cards authorize edit via the parent collection
       authorize! :edit, card
     end
+  end
+
+  def authorize_card_for_destroy
+    if @collection_card.bct_placeholder? || @collection_card&.parent&.test_collection?
+      return
+    end
+
+    head :unauthorized
   end
 
   def prevent_moving_into_test_collection

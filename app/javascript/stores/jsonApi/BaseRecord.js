@@ -98,11 +98,15 @@ class BaseRecord extends jsonapi(Model) {
     this.apiStore.fetch(this.internalType, this.id, true)
   }
 
-  async create() {
+  async create(extraPath = '') {
     // similar to datx save but using our toJsonApi() to scrub the data
-    const res = await this.apiStore.request(`${this.internalType}`, 'POST', {
-      data: this.toJsonApi(),
-    })
+    const res = await this.apiStore.request(
+      `${this.internalType}${extraPath}`,
+      'POST',
+      {
+        data: this.toJsonApi(),
+      }
+    )
     setModelMetaKey(this, DATX_PERSISTED_KEY, true)
     res.replaceData(this)
     return res
