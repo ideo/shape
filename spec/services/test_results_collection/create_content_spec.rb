@@ -338,6 +338,8 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       it 'moves roles to results collection' do
         role = test_collection.roles.first
         expect(subject).to be_a_success
+
+        test_collection.reload
         expect(test_results_collection.roles).to eq([role])
         expect(test_collection.roles.reload).to be_empty
         expect(test_collection.roles_anchor).to eq(test_results_collection)
@@ -345,7 +347,9 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
 
       it 'correctly anchors the children (items and ideas collection)' do
         expect(subject).to be_a_success
-        expect(test_collection.children.all? { |child| child.roles_anchor == test_results_collection }).to be true
+        expect(
+          test_collection.children.all? { |child| child.roles_anchor == test_results_collection }
+        ).to be true
       end
     end
 
