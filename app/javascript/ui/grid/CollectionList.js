@@ -13,7 +13,7 @@ import v from '~/utils/variables'
 @observer
 class CollectionList extends React.Component {
   @observable
-  reviewerStatuses = []
+  submissionsReviewerStatuses = []
 
   componentDidMount() {
     this.fetchCards()
@@ -63,22 +63,9 @@ class CollectionList extends React.Component {
   async fetchReviewerStatuses() {
     const { collection } = this.props
     const res = await collection.API_fetchCardReviewerStatuses()
-    const statuses = res.data
-    if (!statuses) return
+    if (!res || !res.data) return
     runInAction(() => {
-      this.reviewerStatuses = statuses
-      statuses.forEach(status => {
-        const card = collection.collection_cards.find(
-          card => parseInt(card.record.id) === parseInt(status.record_id)
-        )
-        if (card) {
-          const taggedUser = card.record.tagged_users.find(
-            u => parseInt(u.id) === parseInt(status.user_id)
-          )
-          if (!taggedUser) return
-          taggedUser.color = v.statusColor[status.status]
-        }
-      })
+      this.submissionsReviewerStatuses = res.data
     })
   }
 
@@ -125,6 +112,20 @@ class CollectionList extends React.Component {
     return collection.sortedCards
   }
 
+  statusesForSubmission(record) {
+    if (_.isEmpty(this.submissionsReviewerStatuses) || !record) return []
+    if (!record.isSubmission) {
+      return []
+    }
+
+    // filter for each status object for each submission in a submissions collection
+    const statuses = _.filter(this.submissionsReviewerStatuses, status => {
+      return parseInt(status.record_id) === parseInt(record.id)
+    })
+
+    return statuses
+  }
+
   // NOTE: not used yet.
   handleSort = column => {
     const { collection } = this.props
@@ -152,6 +153,7 @@ class CollectionList extends React.Component {
         {this.sortedCards.map(card => (
           <ListCard
             card={card}
+            reviewerStatuses={this.statusesForSubmission(card.record)}
             insideChallenge={this.submissionBoxInsideChallenge}
             searchResult={collection.isSearchResultsCollection}
             key={card.id}

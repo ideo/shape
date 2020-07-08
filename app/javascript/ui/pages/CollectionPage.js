@@ -74,8 +74,10 @@ class CollectionPage extends React.Component {
   @action
   componentDidUpdate(prevProps) {
     const { collection, routingStore } = this.props
-    const previousId = prevProps.collection.id
-    const currentId = collection.id
+    const {
+      collection: { id: previousId },
+    } = prevProps
+    const { id: currentId } = collection
     if (currentId !== previousId) {
       runInAction(() => {
         this.cardsFetched = false
