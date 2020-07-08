@@ -182,11 +182,7 @@ class ListCard extends React.Component {
   }
 
   handleRolesClick = ev => {
-    const {
-      uiStore,
-      card: { record },
-      insideChallenge,
-    } = this.props
+    const { uiStore, record, insideChallenge } = this.props
     ev.stopPropagation()
     if (insideChallenge) {
       runInAction(() => {

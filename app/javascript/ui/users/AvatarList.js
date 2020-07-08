@@ -5,6 +5,7 @@ import { AddButton } from '~/ui/global/styled/buttons'
 import Avatar, { AvatarPropTypes } from '~/ui/global/Avatar'
 import AvatarGroup from '~/ui/global/AvatarGroup'
 import { StyledRolesSummary } from '~/ui/roles/RolesSummary'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import v from '~/utils/variables'
 
 const AvatarList = ({ avatars, onAdd }) => {

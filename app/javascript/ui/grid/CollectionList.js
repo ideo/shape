@@ -61,7 +61,7 @@ class CollectionList extends React.Component {
   }
 
   statusesForSubmission(record) {
-    if (_.isEmpty(this.submissionsReviewerStatuses) || !record) return []
+    if (_.isEmpty(this.submissionsReviewerStatuses)) return []
     if (!record.isSubmission) {
       return []
     }
