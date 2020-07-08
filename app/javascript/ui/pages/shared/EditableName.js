@@ -123,7 +123,7 @@ class EditableName extends React.Component {
     const screenWidth = Math.min(uiStore.windowWidth - 64, v.maxWidth)
     // Estimation of width based on current font size
     const fontSizeMultiplier =
-      screenWidth > v.responsive.smallBreakpoint ? 25 : 10
+      screenWidth > v.responsive.smallBreakpoint ? 25 : 15
     const marginRightPadding = 30 + (extraWidth || 0)
     let width = this.name.length * fontSizeMultiplier
     // NOTE: this isn't really doing anything yet, but could be used to
