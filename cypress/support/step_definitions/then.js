@@ -58,6 +58,18 @@ Then('I should see a {string} in the card at {int},{int}', (el, row, col) => {
 })
 
 Then(
+  'I should see the text {string} in the card at {int},{int}',
+  (text, row, col) => {
+    cy.contains(
+      `[data-cy="GridCard"][data-row="${row}"][data-col="${col}"]`,
+      text
+    )
+      .first()
+      .should('be.visible')
+  }
+)
+
+Then(
   'I should not see a {string} in the card at {int},{int}',
   (el, row, col) => {
     cy.get(`[data-cy="GridCard"][data-row="${row}"][data-col="${col}"]`)

@@ -917,7 +917,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'should call row inserter' do
-      expect(RowInserter).to receive(:call).with(
+      expect(CollectionGrid::RowInserter).to receive(:call).with(
         collection: collection,
         row: 1,
         action: action,
@@ -963,7 +963,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'should call row inserter with remove action' do
-      expect(RowInserter).to receive(:call).with(
+      expect(CollectionGrid::RowInserter).to receive(:call).with(
         collection: collection,
         row: 1,
         action: action,

@@ -1227,6 +1227,17 @@ class Collection < ApplicationRecord
     collection_cards[left_of_first_moving_card_index].pinned?
   end
 
+  def bct_placeholder_at(row:, col:)
+    collection_cards
+      .find_by(
+        type: 'CollectionCard::Placeholder',
+        item_id: nil,
+        collection_id: nil,
+        row: row,
+        col: col,
+      )
+  end
+
   def create_challenge_groups_and_assign_roles
     return if challenge_admin_group.present? && challenge_reviewer_group.present? && challenge_participant_group.present?
 

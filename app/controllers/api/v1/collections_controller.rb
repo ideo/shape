@@ -234,7 +234,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   private
 
   def manipulate_row
-    RowInserter.call(
+    CollectionGrid::RowInserter.call(
       row: json_api_params[:row],
       collection: @collection,
       action: @action,

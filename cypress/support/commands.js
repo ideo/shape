@@ -96,10 +96,10 @@ Cypress.Commands.add(
 
 Cypress.Commands.add(
   'createCard',
-  (cardType, { content = 'Testing', row, col } = {}) => {
+  (cardType, { content = 'Testing', row, col, empty = false } = {}) => {
     switch (cardType) {
       case 'textItem':
-        cy.selectBctType({ type: 'text', order: 'first', row, col })
+        cy.selectBctType({ type: 'text', order: 'first', row, col, empty })
         cy.wait('@apiCreateCollectionCard')
         cy.wait(150)
         cy.get('.ql-editor')
