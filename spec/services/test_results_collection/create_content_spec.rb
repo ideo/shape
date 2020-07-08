@@ -43,15 +43,14 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     expect(TestResultsCollection::CreateItemLink).to receive(:call!).with(
       hash_including(
         item: idea,
+        width: 1,
+        height: 2,
         identifier: 'first-idea-media',
-        # it gets put at order 1 until the TestCollection gets moved to the end
-        order: 1,
       ),
     )
     expect(subject).to be_a_success
     # now it should be first
     expect(test_results_collection.collection_cards.where(row: 0, col: 0).first.identifier).to eq 'first-idea-media'
-    # TODO: not sure how to guarantee this
   end
 
   it 'places the legend in the 3rd spot' do
