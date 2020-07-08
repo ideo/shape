@@ -12,18 +12,18 @@ RSpec.describe TestResultsCollection::CreateAndLinkOpenResponse, type: :service 
   end
   let(:create_and_link_open_responses) do
     test_collection.question_items.map do |question|
-        question_answer = create(
-          :question_answer,
-          survey_response: survey_response,
-          question: question,
-        )
-        TestResultsCollection::CreateAndLinkOpenResponse.call(
-          test_collection: test_collection,
-          question_answer: question_answer,
-        )
-      end
-      survey_response.update(status: 'completed')
+      question_answer = create(
+        :question_answer,
+        survey_response: survey_response,
+        question: question,
+      )
+      TestResultsCollection::CreateAndLinkOpenResponse.call(
+        test_collection: test_collection,
+        question_answer: question_answer,
+      )
     end
+    survey_response.update(status: 'completed')
+  end
 
   before do
     test_collection.question_items.question_open.map do |question_item|
@@ -100,7 +100,7 @@ RSpec.describe TestResultsCollection::CreateAndLinkOpenResponse, type: :service 
     end
   end
 
-  context "QuestionAnswer callbacks" do
+  context 'QuestionAnswer callbacks' do
     let(:question_answer) { survey_response.question_answers.first.reload }
     before { create_and_link_open_responses }
 
@@ -130,11 +130,11 @@ RSpec.describe TestResultsCollection::CreateAndLinkOpenResponse, type: :service 
 
         it 'creates a new open response item' do
           question_answer.reload.update(
-            answer_text: 'What a jolly prototype'
+            answer_text: 'What a jolly prototype',
           )
           expect(question_answer.reload.open_response_item.present?).to be true
           expect(question_answer.open_response_item.content).to include(
-            'What a jolly prototype'
+            'What a jolly prototype',
           )
         end
       end
