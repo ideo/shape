@@ -30,7 +30,7 @@ class AddReviewersPopover extends React.Component {
     ev.preventDefault()
     ev.stopPropagation()
     const { record } = this.props
-    if (!record || !reviewer) return
+    if (!reviewer) return
     const { handle } = reviewer
     if (!handle) return
     const action = this.isReviewerSelected(reviewer) ? 'removeTag' : 'addTag'

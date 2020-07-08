@@ -1,10 +1,12 @@
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
+import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
+import AvatarList from '~/ui/users/AvatarList'
 import ListCard from '~/ui/grid/ListCard'
 import { ITEM_TYPES } from '~/utils/variables'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import { fakeCollectionCard, fakeTextItem } from '#/mocks/data'
+import { fakeCollectionCard, fakeTextItem, fakeUser } from '#/mocks/data'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
 import { openContextMenu } from '~/utils/clickUtils'
@@ -12,18 +14,19 @@ import { openContextMenu } from '~/utils/clickUtils'
 jest.mock('../../../app/javascript/utils/clickUtils')
 
 const card = fakeCollectionCard
-card.record = fakeTextItem
 const fakeEv = {
   preventDefault: jest.fn(),
   stopPropagation: jest.fn(),
   persist: jest.fn(),
 }
-let wrapper, component, props, render
+let wrapper, component, props, render, record
 
 describe('ListCard', () => {
   beforeEach(() => {
+    record = fakeTextItem
     props = {
       card,
+      record,
       uiStore: fakeUiStore,
       apiStore: fakeApiStore(),
       routingStore: fakeRoutingStore,
@@ -40,8 +43,8 @@ describe('ListCard', () => {
       const link = wrapper.find('ColumnLink').first()
       link.simulate('click', fakeEv)
       expect(props.routingStore.routeTo).toHaveBeenCalledWith(
-        card.record.internalType,
-        card.record.id
+        record.internalType,
+        record.id
       )
     })
 
@@ -107,28 +110,49 @@ describe('ListCard', () => {
 
     it('should open the context menu in ui store', () => {
       expect(props.uiStore.update).toHaveBeenCalled()
-      expect(props.uiStore.update).toHaveBeenCalledWith(
-        'rolesMenuOpen',
-        card.record
-      )
+      expect(props.uiStore.update).toHaveBeenCalledWith('rolesMenuOpen', record)
     })
   })
 
   describe('render()', () => {
-    it('should render the correct icon', () => {
-      card.record.type = ITEM_TYPES.TEXT
-      render()
-      expect(wrapper.find(TextIconXs).exists()).toBe(true)
+    describe('when rendering card', () => {
+      it('should render the correct icon', () => {
+        record.type = ITEM_TYPES.TEXT
+        render()
+        expect(wrapper.find(TextIconXs).exists()).toBe(true)
 
-      card.record.type = ITEM_TYPES.VIDEO
-      render()
-      expect(wrapper.find(VideoIcon).exists()).toBe(true)
+        record.type = ITEM_TYPES.VIDEO
+        render()
+        expect(wrapper.find(VideoIcon).exists()).toBe(true)
+      })
+
+      it('should render the collectionTypeSelector if collection', () => {
+        record.allowsCollectionTypeSelector = true
+        render()
+        expect(wrapper.find(CollectionTypeSelector).exists()).toBe(true)
+      })
     })
 
-    it('should render the collectionTypeSelector if collection', () => {
-      card.record.allowsCollectionTypeSelector = true
-      render()
-      expect(wrapper.find(CollectionTypeSelector).exists()).toBe(true)
+    describe('when a card is inside a challenge', () => {
+      beforeEach(() => {
+        props.insideChallenge = true
+        record.internalType = 'collections'
+        render()
+      })
+
+      it('should render AddReviewersPopover', () => {
+        expect(wrapper.find(AvatarList).exists()).toBe(true)
+      })
+
+      describe('when a card has potential reviewers', () => {
+        beforeEach(() => {
+          props.potentialReviewers = [fakeUser]
+          render()
+        })
+        it('should render AddReviewersPopover', () => {
+          expect(wrapper.find(AddReviewersPopover).exists()).toBe(true)
+        })
+      })
     })
 
     describe('when card is being moved (or should be hidden)', () => {

@@ -5,6 +5,7 @@ import { AddButton } from '~/ui/global/styled/buttons'
 import Avatar, { AvatarPropTypes } from '~/ui/global/Avatar'
 import AvatarGroup from '~/ui/global/AvatarGroup'
 import { StyledRolesSummary } from '~/ui/roles/RolesSummary'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import v from '~/utils/variables'
 
 const AvatarList = ({ avatars, onAdd, reviewerStatuses }) => {
@@ -45,7 +46,7 @@ const AvatarList = ({ avatars, onAdd, reviewerStatuses }) => {
 AvatarList.propTypes = {
   avatars: PropTypes.arrayOf(PropTypes.shape(AvatarPropTypes)).isRequired,
   onAdd: PropTypes.func.isRequired,
-  reviewerStatuses: PropTypes.arrayOrObservableArray,
+  reviewerStatuses: MobxPropTypes.arrayOrObservableArray.isRequired,
 }
 
 AvatarList.defaultProps = {
