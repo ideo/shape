@@ -548,6 +548,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return undefined
   }
 
+  get collectionToTestId() {
+    if (this.isTestCollection) {
+      return this.collection_to_test_id
+    } else if (this.submission_attrs) {
+      return this.submission_attrs.launchable_test_collection_to_test_id
+    }
+    return undefined
+  }
+
   get isCarousel() {
     return this.cover_type === 'cover_type_carousel'
   }
@@ -1539,47 +1548,91 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   async API_getNextAvailableTest({ challenge = false }) {
     this.setNextAvailableTestPath(null)
-    const nextTestPath = !challenge
-      ? `test_collections/${this.id}/next_available`
-      : `collections/${this.id}/next_available_challenge_test`
-    const res = await this.apiStore.request(nextTestPath)
-    if (!res.data) return
-    const path = this.routingStore.pathTo('collections', res.data.id)
-
-    this.setNextAvailableTestPath(`${path}?open=tests`)
-  }
-
-  async navigateToNextInCollectionTest() {
-    // FIXME: add later when in-collection tests are supported
-    if (this.isSubmission) {
-      await this.API_getNextAvailableTest({ challenge: false })
-    } else if (this.isSubmissionBox) {
-      await this.API_getNextAvailableTest({ challenge: true })
-    }
-    if (!this.nextAvailableTestPath) return
-
-    return this.routingStore.routeTo(this.nextAvailableTestPath)
-  }
-
-  async navigateToNextAvailableTest() {
-    let testUrl = null
-    if (this.isSubmission && this.launchableTestId) {
-      testUrl = this.publicTestURL
-    } else if (this.isSubmissionBox) {
+    let nextCollectionToTestId = null
+    if (challenge) {
+      nextCollectionToTestId = await this.nextAvailableCollectionToTestId()
+    } else {
       const res = await this.apiStore.request(
-        `collections/${this.id}/next_available_challenge_test`
+        `test_collections/${this.id}/next_available`
       )
-
       if (!res.data) return
-
-      testUrl = res.data.publicTestURL
+      nextCollectionToTestId = res.data.id
     }
 
-    if (!testUrl) return
+    if (!nextCollectionToTestId) return
 
-    window.location.href = testUrl
+    const nextTestPath = this.routingStore.pathTo(
+      'collections',
+      nextCollectionToTestId
+    )
+    this.setNextAvailableTestPath(`${nextTestPath}?open=tests`)
+  }
 
-    return
+  async API_getNextAvailableChallengeTest() {
+    const nextTest = await this.apiStore.request(
+      `collections/${this.id}/next_available_challenge_test`
+    )
+
+    if (!nextTest.data) return null
+
+    return nextTest.data
+  }
+
+  async nextAvailableCollectionToTestId() {
+    const nextTest = await this.API_getNextAvailableChallengeTest()
+
+    if (!nextTest) return null
+
+    const { collectionToTestId } = nextTest
+    return collectionToTestId
+  }
+
+  async navigateToNextInlineTest() {
+    let nextTestPath = null
+    if (this.isSubmission && this.collectionToTestId) {
+      nextTestPath = this.routingStore.pathTo(
+        'collections',
+        this.collectionToTestId
+      )
+    } else if (this.isSubmissionBox) {
+      const nextCollectionToTestId = await this.nextAvailableCollectionToTestId()
+      if (!nextCollectionToTestId) return
+
+      nextTestPath = this.routingStore.pathTo(
+        'collections',
+        nextCollectionToTestId
+      )
+    }
+
+    if (!nextTestPath) return
+
+    return this.routingStore.routeTo(`${nextTestPath}?open=tests`)
+  }
+
+  async navigateToNextIdeaTest() {
+    if (!this.launchableTestId) return
+
+    let nextTestPath = null
+    if (this.isSubmission) {
+      nextTestPath = this.publicTestURL
+    } else if (this.isSubmissionBox) {
+      const nextTest = await this.API_getNextAvailableChallengeTest()
+      if (!nextTest) {
+        nextTestPath = nextTest.data.publicTestURL
+      }
+    }
+
+    if (!nextTestPath) return
+
+    window.location.href = nextTestPath
+  }
+
+  navigateToNextAvailableChallengeTest() {
+    if (this.collectionToTestId) {
+      this.navigateToNextInlineTest()
+    } else {
+      this.navigateToNextIdeaTest()
+    }
   }
 
   @action

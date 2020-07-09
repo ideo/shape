@@ -488,7 +488,7 @@ class CollectionCover extends React.Component {
                     <ChallengeReviewButton
                       reviewerStatus={submission_reviewer_status}
                       onClick={() => {
-                        collection.navigateToNextAvailableTest()
+                        collection.navigateToNextAvailableChallengeTest()
                       }}
                     />
                   )}

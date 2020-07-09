@@ -245,6 +245,7 @@ class Collection
           submission: true,
           template_test_id: id,
           launchable_test_id: launchable_test.id,
+          launchable_test_collection_to_test_id: launchable_test.collection_to_test_id,
           test_status: launchable_test.test_status,
         },
       )
@@ -782,6 +783,7 @@ class Collection
           submission_attrs: {
             template: true,
             launchable_test_id: id,
+            launchable_test_collection_to_test_id: collection_to_test_id,
             test_status: test_status,
           },
         )

@@ -324,7 +324,7 @@ class ListCard extends React.Component {
         <ChallengeReviewButton
           reviewerStatus={submission_reviewer_status}
           onClick={() => {
-            record.navigateToNextAvailableTest()
+            record.navigateToNextAvailableChallengeTest()
           }}
         />
       )

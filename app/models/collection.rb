@@ -1132,6 +1132,10 @@ class Collection < ApplicationRecord
     submission_attrs.present? ? submission_attrs['launchable_test_id'] : nil
   end
 
+  def launchable_collection_to_test_id
+    submission_attrs.present? ? submission_attrs['launchable_collection_to_test_id'] : nil
+  end
+
   # check for template instances anywhere in the entire collection tree
   def any_template_instance_children?
     Collection.in_collection(id).where.not(template_id: nil).any?

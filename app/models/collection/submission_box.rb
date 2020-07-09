@@ -157,7 +157,7 @@ class Collection
 
       possible_tests = Collection::TestCollection.where(id: test_ids, test_status: 'live')
       master_test = Collection::TestCollection.find sub_attrs['launchable_test_id']
-      if master_test.collection_to_test.present?
+      if master_test.collection_to_test.present? && !inside_a_challenge?
         return [] unless for_user
 
         return possible_tests.viewable_by(for_user, organization)
