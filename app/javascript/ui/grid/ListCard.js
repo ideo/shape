@@ -128,13 +128,13 @@ class ListCard extends React.Component {
   }
 
   handleRecordClick = ev => {
-    const { card, uiStore, routingStore } = this.props
+    const { card, record, uiStore, routingStore } = this.props
     ev.preventDefault()
     ev.stopPropagation()
     if (uiStore.captureKeyboardGridClick(ev, card.id)) {
       return
     }
-    routingStore.routeTo(card.record.internalType, card.record.id)
+    routingStore.routeTo(record.internalType, record.id)
   }
 
   handleRowClick = ev => {
@@ -182,11 +182,7 @@ class ListCard extends React.Component {
   }
 
   handleRolesClick = ev => {
-    const {
-      uiStore,
-      card: { record },
-      insideChallenge,
-    } = this.props
+    const { uiStore, record, insideChallenge } = this.props
     ev.stopPropagation()
     if (insideChallenge) {
       runInAction(() => {
@@ -204,9 +200,7 @@ class ListCard extends React.Component {
   }
 
   get taggedUsers() {
-    const {
-      card: { record },
-    } = this.props
+    const { record } = this.props
     if (!record.tagged_users) return []
     return record.tagged_users
   }
@@ -222,9 +216,7 @@ class ListCard extends React.Component {
   }
 
   get renderLabelSelector() {
-    const {
-      card: { record },
-    } = this.props
+    const { record } = this.props
 
     if (!record.allowsCollectionTypeSelector) {
       return null
@@ -240,43 +232,40 @@ class ListCard extends React.Component {
   }
 
   get showReviewers() {
-    const {
-      card: { record },
-      insideChallenge,
-    } = this.props
+    const { record, insideChallenge } = this.props
     return insideChallenge && record.internalType !== 'items'
   }
 
   get canEditCard() {
-    const { card, searchResult } = this.props
+    const { card, record, searchResult } = this.props
     if (searchResult) return false
     // you can always edit your link cards, regardless of record.can_edit
     if (card.parentCollection && card.parentCollection.can_edit && card.link)
       return true
-    return card.record.can_edit
+    return record.can_edit
   }
 
   get renderIcons() {
-    const { card } = this.props
-    if (card.record.isCollection && !card.record.allowsCollectionTypeSelector) {
+    const { record } = this.props
+    if (record.isCollection && !record.allowsCollectionTypeSelector) {
       return (
         <Fragment>
           <IconHolder>
             <CollectionIcon size="xs" />
           </IconHolder>
           <IconHolder>
-            <CollectionTypeIcon record={card.record} />
+            <CollectionTypeIcon record={record} />
           </IconHolder>
         </Fragment>
       )
     }
     let icon = null
-    switch (card.record.type) {
+    switch (record.type) {
       case ITEM_TYPES.TEXT:
         icon = <TextIconXs />
         break
       case ITEM_TYPES.FILE:
-        icon = <FileIcon mimeType={card.record.filestack_file.mimetype} />
+        icon = <FileIcon mimeType={record.filestack_file.mimetype} />
         break
       case ITEM_TYPES.VIDEO:
         icon = <VideoIcon />
@@ -289,8 +278,7 @@ class ListCard extends React.Component {
   }
 
   get renderActions() {
-    const { card, insideChallenge } = this.props
-    const { record } = card
+    const { card, record, insideChallenge } = this.props
 
     if (!insideChallenge) {
       const { uiStore, searchResult } = this.props
@@ -334,9 +322,15 @@ class ListCard extends React.Component {
   }
 
   render() {
-    const { card, insideChallenge, uiStore, potentialReviewers } = this.props
-    const { record } = card
-    if (card.shouldHideFromUI || _.isEmpty(card.record)) {
+    const {
+      card,
+      record,
+      insideChallenge,
+      uiStore,
+      potentialReviewers,
+      reviewerStatuses,
+    } = this.props
+    if (card.shouldHideFromUI || _.isEmpty(record)) {
       return null
     }
 
@@ -374,6 +368,7 @@ class ListCard extends React.Component {
               <AvatarList
                 avatars={this.taggedUsers}
                 onAdd={this.handleRolesClick}
+                reviewerStatuses={reviewerStatuses}
               />
             ) : (
               <RolesSummary
@@ -388,7 +383,7 @@ class ListCard extends React.Component {
             )}
             {this.showReviewers && !_.isEmpty(potentialReviewers) && (
               <AddReviewersPopover
-                record={card.record}
+                record={record}
                 potentialReviewers={potentialReviewers}
                 onClose={this.handleCloseReviewers}
                 wrapperRef={this.rolesWrapperRef}
@@ -413,14 +408,17 @@ ListCard.wrappedComponent.propTypes = {
 
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
   insideChallenge: PropTypes.bool,
   searchResult: PropTypes.bool,
   potentialReviewers: MobxPropTypes.arrayOrObservableArray,
+  reviewerStatuses: MobxPropTypes.arrayOrObservableArray,
 }
 ListCard.defaultProps = {
   insideChallenge: false,
   searchResult: false,
   potentialReviewers: [],
+  reviewerStatuses: [],
 }
 
 export default ListCard
