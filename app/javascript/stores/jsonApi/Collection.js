@@ -422,6 +422,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  get isSubmissionBoxInsideChallenge() {
+    return (
+      this.isChallengeOrInsideChallenge &&
+      this.isSubmissionsCollection &&
+      this.submission_box_type === 'template'
+    )
+  }
+
   get isSubmissionInChallenge() {
     return this.is_inside_a_challenge && this.isSubmission
   }
@@ -956,12 +964,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
     )
     const statuses = res.data
-    statuses.forEach(status => {
-      // TODO change this to allow for item types too
+    const statusesByRecord = _.groupBy(statuses, 'record_id')
+    Object.entries(statusesByRecord).forEach(([record_id, recordStatuses]) => {
       const record = this.apiStore.find('collections', status.record_id)
-      // TODO this has to do some duplicate checking for when fetch called
-      // more than once
-      record.reviewerStatuses.push(status)
+      runInAction(() => {
+        record.reviewerStatuses = recordStatuses
+      })
     })
     return res
   }

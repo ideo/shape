@@ -107,6 +107,10 @@ class ListCard extends React.Component {
     this.rolesWrapperRef = React.createRef()
   }
 
+  componentDidUpdate() {
+    console.log('list card prop change')
+  }
+
   @computed
   get menuOpen() {
     const { uiStore } = this.props
@@ -308,6 +312,7 @@ class ListCard extends React.Component {
 
   get renderCols() {
     const { columns } = this.props
+    console.log('render list card', columns)
     return columns.map((column, idx) => (
       <Column {...column.style}>
         {column.overrideContent
@@ -344,6 +349,7 @@ ListCard.wrappedComponent.propTypes = {
 
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  columns: MobxPropTypes.arrayOrObservableArray.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   searchResult: PropTypes.bool,
 }

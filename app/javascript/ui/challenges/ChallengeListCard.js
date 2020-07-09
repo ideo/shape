@@ -1,6 +1,5 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { observable, runInAction } from 'mobx'
+import { computed, observable, runInAction } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
@@ -54,29 +53,33 @@ class ChallengeListCard extends React.Component {
     return record.internalType !== 'items'
   }
 
+  @computed
   get columnsWithChallengeContent() {
     const { columns, record } = this.props
     const { isCurrentUserAReviewer, submission_reviewer_status } = record
-    columns[4].overrideContent = (
-      <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
+    columns[3].overrideContent = (
+      <div
+        ref={this.rolesWrapperRef}
+        style={{ width: '100%' }}
+        key={`col-${this.isReviewersOpen}`}
+      >
         <AvatarList
           avatars={record.taggedUsersWithStatuses}
           onAdd={this.handleRolesClick}
         />
-        {!_.isEmpty(record.potentialReviewers) && (
-          <AddReviewersPopover
-            record={record}
-            potentialReviewers={record.potentialReviewers}
-            onClose={this.handleCloseReviewers}
-            wrapperRef={this.rolesWrapperRef}
-            open={this.isReviewersOpen}
-          />
-        )}
+        <AddReviewersPopover
+          record={record}
+          potentialReviewers={record.potentialReviewers}
+          onClose={this.handleCloseReviewers}
+          wrapperRef={this.rolesWrapperRef}
+          open={this.isReviewersOpen}
+        />
       </div>
     )
-    columns[5].overrideContent = isCurrentUserAReviewer &&
+    columns[4].overrideContent = isCurrentUserAReviewer &&
       submission_reviewer_status && (
         <ChallengeReviewButton
+          key="column3"
           reviewerStatus={submission_reviewer_status}
           onClick={() => {
             record.navigateToNextAvailableTest()
@@ -88,6 +91,7 @@ class ChallengeListCard extends React.Component {
   }
 
   render() {
+    console.log('render challenge list card', this.isReviewersOpen)
     return (
       <ListCard {...this.props} columns={this.columnsWithChallengeContent} />
     )
@@ -114,4 +118,4 @@ ChallengeListCard.defaultProps = {
   searchResult: false,
 }
 
-export default ListCard
+export default ChallengeListCard

@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import React from 'react'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
@@ -19,16 +18,8 @@ class CollectionList extends React.Component {
     collection.API_fetchCardRoles()
   }
 
-  get submissionBoxInsideChallenge() {
-    const { collection } = this.props
-    return (
-      collection.isChallengeOrInsideChallenge &&
-      collection.isSubmissionsCollection &&
-      collection.submission_box_type === 'template'
-    )
-  }
-
   get columns() {
+    const { collection } = this.props
     const cols = [
       { displayName: '', style: { width: '50px' }, name: 'select' },
       {
@@ -50,7 +41,7 @@ class CollectionList extends React.Component {
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
-    if (this.submissionBoxInsideChallenge) {
+    if (collection.isSubmissionBoxInsideChallenge) {
       return transformColumnsForChallenge(cols)
     }
     return cols
@@ -64,20 +55,6 @@ class CollectionList extends React.Component {
     return collection.sortedCards
   }
 
-  statusesForSubmission(record) {
-    if (_.isEmpty(this.submissionsReviewerStatuses)) return []
-    if (!record.isSubmission) {
-      return []
-    }
-
-    // filter for each status object for each submission in a submissions collection
-    const statuses = _.filter(this.submissionsReviewerStatuses, status => {
-      return parseInt(status.record_id) === parseInt(record.id)
-    })
-
-    return statuses
-  }
-
   // NOTE: not used yet.
   handleSort = column => {
     const { collection } = this.props
@@ -87,7 +64,6 @@ class CollectionList extends React.Component {
 
   render() {
     const { collection } = this.props
-
     return (
       <div>
         <Flex mb={1}>
@@ -110,7 +86,7 @@ class CollectionList extends React.Component {
             searchResult: collection.isSearchResultsCollection,
             key: card.id,
           }
-          return this.submissionBoxInsideChallenge ? (
+          return collection.isSubmissionBoxInsideChallenge ? (
             <ChallengeListCard {...mainProps} />
           ) : (
             <ListCard {...mainProps} />
