@@ -59,7 +59,10 @@ module JsonapiCache
       includes = CollectionCard.default_relationships_for_api
       if @include_roles
         includes = [
-          record: [roles: %i[pending_users users groups resource]],
+          record: [
+            :tagged_users,
+            roles: %i[pending_users users groups resource],
+          ],
         ]
       end
       renderer = JSONAPI::Serializable::Renderer.new
