@@ -107,8 +107,7 @@ class ListCard extends React.Component {
     this.rolesWrapperRef = React.createRef()
   }
 
-  componentDidUpdate() {
-  }
+  componentDidUpdate() {}
 
   @computed
   get menuOpen() {
