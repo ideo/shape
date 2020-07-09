@@ -958,7 +958,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  API_fetchCardReviewerStatuses = () => {
+  API_fetchCardReviewerStatuses = async () => {
     const ids = _.compact(
       _.map(this.collection_cards, cc => {
         if (cc.record && cc.record.user_tag_list) {
@@ -968,13 +968,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
     if (ids.length === 0) return
     const basePath = '/api/v1'
-    const res = axios.get(
+    const res = await axios.get(
       `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
     )
     const statuses = res.data
     const statusesByRecord = _.groupBy(statuses, 'record_id')
     Object.entries(statusesByRecord).forEach(([record_id, recordStatuses]) => {
-      const record = this.apiStore.find('collections', status.record_id)
+      const record = this.apiStore.find('collections', record_id.toString())
       runInAction(() => {
         record.reviewerStatuses = recordStatuses
       })

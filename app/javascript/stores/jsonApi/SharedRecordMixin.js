@@ -305,14 +305,13 @@ const SharedRecordMixin = superclass =>
     @computed
     get taggedUsersWithStatuses() {
       if (!this.tagged_users) return []
-      if (this.reviewerStatuses) return this.tagged_users
       return this.tagged_users.map(taggedUser => {
         const statusForUser = _.find(
           this.reviewerStatuses,
           status => parseInt(status.user_id) === parseInt(taggedUser.id)
         ).status
         return {
-          ...taggedUser,
+          ...taggedUser.rawAttributes(),
           status: statusForUser,
           color: v.statusColor[statusForUser],
         }
