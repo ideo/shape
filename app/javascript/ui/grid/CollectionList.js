@@ -5,7 +5,8 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
 import DropdownIcon from '~/ui/icons/DropdownIcon'
-import ListCard, { Column } from './ListCard'
+import GridCardPagination from '~/ui/grid/GridCardPagination'
+import ListCard, { Column } from '~/ui/grid/ListCard'
 import { Heading3 } from '~/ui/global/styled/typography'
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
@@ -92,7 +93,7 @@ class CollectionList extends React.Component {
   }
 
   get columns() {
-    return [
+    let columnData = [
       { displayName: '', style: { width: '50px' }, name: 'select' },
       {
         displayName: 'Name',
@@ -115,6 +116,13 @@ class CollectionList extends React.Component {
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
+    if (uiStore.isMobile) {
+      columnData = _.reject(columnData, column =>
+        _.includes(['last_updated', 'permissions'], column.name)
+      )
+    }
+
+    return columnData
   }
 
   get sortedCards() {
@@ -156,6 +164,7 @@ class CollectionList extends React.Component {
             searchResult={collection.isSearchResultsCollection}
             key={card.id}
             record={card.record}
+            columns={_.map(this.columns, 'name')}
             potentialReviewers={this.potentialReviewers}
           />
         ))}

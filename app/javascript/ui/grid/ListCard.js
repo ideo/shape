@@ -54,7 +54,8 @@ const Row = styled.div`
     }
   `}
 
-  &:hover {
+  &:hover,
+  &.touch-device {
     ${Column} > .show-on-hover {
       display: flex;
     }
@@ -333,10 +334,66 @@ class ListCard extends React.Component {
     return null
   }
 
-  render() {
-    const { card, insideChallenge, uiStore, potentialReviewers } = this.props
+  renderUpdatedAtColumn() {
+    const { card, columns, insideChallenge } = this.props
     const { record } = card
-    if (card.shouldHideFromUI || _.isEmpty(card.record)) {
+
+    if (!_.includes(columns, 'updated_at')) {
+      return null
+    }
+
+    return (
+      <Column width={!insideChallenge ? '400px' : '300px'}>
+        {defaultTimeFormat(record.updated_at)}
+      </Column>
+    )
+  }
+
+  renderRolesColumn() {
+    const { card, columns, uiStore, potentialReviewers } = this.props
+    const { record } = card
+
+    if (_.isEmpty(_.intersection(columns, ['reviewers', 'permissions']))) {
+      return null
+    }
+
+    return (
+      <Column width="250px">
+        <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
+          {this.showReviewers ? (
+            <AvatarList
+              avatars={this.taggedUsers}
+              onAdd={this.handleRolesClick}
+            />
+          ) : (
+            <RolesSummary
+              key="roles"
+              handleClick={this.handleRolesClick}
+              roles={[...record.roles]}
+              canEdit={record.can_edit}
+              // convert observable to normal array to trigger render changes
+              collaborators={[...record.collaborators]}
+              rolesMenuOpen={!!uiStore.rolesMenuOpen}
+            />
+          )}
+          {this.showReviewers && !_.isEmpty(potentialReviewers) && (
+            <AddReviewersPopover
+              record={record}
+              potentialReviewers={potentialReviewers}
+              onClose={this.handleCloseReviewers}
+              wrapperRef={this.rolesWrapperRef}
+              open={this.isReviewersOpen}
+            />
+          )}
+        </div>
+      </Column>
+    )
+  }
+
+  render() {
+    const { card, uiStore } = this.props
+    const { record } = card
+    if (card.shouldHideFromUI || _.isEmpty(record)) {
       return null
     }
 
@@ -347,6 +404,7 @@ class ListCard extends React.Component {
         selected={this.isSelected}
         ref={c => (this.cardRef = c)}
         data-cy="ListCardRow"
+        className={uiStore.isTouchDevice ? 'touch-device' : ''}
       >
         <Column width="50px">
           <div className="show-on-hover" style={{ cursor: 'pointer' }}>
@@ -365,38 +423,8 @@ class ListCard extends React.Component {
             {this.renderIcons}
           </ColumnLink>
         </Column>
-        <Column width={!insideChallenge ? '400px' : '300px'}>
-          {defaultTimeFormat(record.updated_at)}
-        </Column>
-        <Column width="250px">
-          <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
-            {this.showReviewers ? (
-              <AvatarList
-                avatars={this.taggedUsers}
-                onAdd={this.handleRolesClick}
-              />
-            ) : (
-              <RolesSummary
-                key="roles"
-                handleClick={this.handleRolesClick}
-                roles={[...record.roles]}
-                canEdit={record.can_edit}
-                // convert observable to normal array to trigger render changes
-                collaborators={[...record.collaborators]}
-                rolesMenuOpen={!!uiStore.rolesMenuOpen}
-              />
-            )}
-            {this.showReviewers && !_.isEmpty(potentialReviewers) && (
-              <AddReviewersPopover
-                record={card.record}
-                potentialReviewers={potentialReviewers}
-                onClose={this.handleCloseReviewers}
-                wrapperRef={this.rolesWrapperRef}
-                open={this.isReviewersOpen}
-              />
-            )}
-          </div>
-        </Column>
+        {this.renderUpdatedAtColumn()}
+        {this.renderRolesColumn()}
         {/* stopPropagation so that ActionMenu overrides handleRowClick */}
         <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
           {this.renderActions}
@@ -416,6 +444,7 @@ ListCard.propTypes = {
   insideChallenge: PropTypes.bool,
   searchResult: PropTypes.bool,
   potentialReviewers: MobxPropTypes.arrayOrObservableArray,
+  columns: PropTypes.array.isRequired,
 }
 ListCard.defaultProps = {
   insideChallenge: false,

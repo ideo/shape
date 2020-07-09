@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import axios from 'axios'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType, updateModelId } from 'datx'
 import pluralize from 'pluralize'
@@ -949,9 +948,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
     )
     if (ids.length === 0) return
-    const basePath = '/api/v1'
-    return axios.get(
-      `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
+    return this.apiStore.requestJson(
+      `collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
     )
   }
 
@@ -1477,7 +1475,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_fetchAllCardIds() {
-    return axios.get(`/api/v1/collections/${this.id}/collection_cards/ids`)
+    return apiStore.requestJson(`collections/${this.id}/collection_cards/ids`)
   }
 
   async API_setSubmissionBoxTemplate(data) {
