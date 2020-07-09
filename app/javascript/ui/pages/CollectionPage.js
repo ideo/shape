@@ -474,7 +474,10 @@ class CollectionPage extends React.Component {
           />
         </Flex>
         {submissions_collection.viewMode === 'list' ? (
-          <CollectionList collection={submissions_collection} />
+          <CollectionList
+            collection={submissions_collection}
+            loadCollectionCards={this.loadSubmissionsCollectionCards}
+          />
         ) : (
           <CollectionGrid
             {...gridSettings}
@@ -600,7 +603,12 @@ class CollectionPage extends React.Component {
       // do this first because SearchCollection + list viewMode is slightly different
       inner = this.renderSearchCollection()
     } else if (collection.viewMode === 'list') {
-      inner = <CollectionList collection={collection} />
+      inner = (
+        <CollectionList
+          collection={collection}
+          loadCollectionCards={this.loadCollectionCards}
+        />
+      )
     } else if (collection.isBoard) {
       inner = (
         <FoamcoreGrid

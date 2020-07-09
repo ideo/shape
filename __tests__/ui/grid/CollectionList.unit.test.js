@@ -13,6 +13,7 @@ describe('CollectionList', () => {
   beforeEach(() => {
     props = {
       collection,
+      loadCollectionCards: jest.fn(),
     }
     render = () => {
       // make sortedCards different from collection.collection_cards for tests below
@@ -55,6 +56,25 @@ describe('CollectionList', () => {
       const cards = wrapper.find(ListCard)
       expect(cards.length).toEqual(collection.sortedCards.length)
       expect(cards.map(c => c.props().card)).toEqual(collection.sortedCards)
+    })
+
+    it('should not render GridCardPagination by default', () => {
+      expect(wrapper.find('GridCardPagination').exists()).toBe(false)
+    })
+
+    describe('when collection.hasMore', () => {
+      beforeEach(() => {
+        props.collection.hasMore = true
+        props.collection.nextPage = 2
+        render()
+      })
+
+      it('renders GridCardPagination', () => {
+        expect(wrapper.find('GridCardPagination').exists()).toBe(true)
+        expect(
+          wrapper.find('GridCardPagination').props().loadCollectionCards
+        ).toEqual(props.loadCollectionCards)
+      })
     })
 
     describe('with a searchResultsCollection', () => {

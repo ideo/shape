@@ -161,7 +161,7 @@ module JsonapiCache
         json[:included].reject! { |i| i[:type] == :roles && remove_role_ids.include?(i[:id]) }
       end
 
-      if record.is_a?(Item::LegendItem)
+      if record.is_a?(Item::LegendItem) && related_json[:relationships][:datasets].try(:[], :data)
         # probably no way around doing this query here since it is user-specific...
         viewable_dataset_ids = record.datasets_viewable_by(@user).pluck(:id).compact.map(&:to_s)
         related_json[:relationships][:datasets][:data].select! { |i| viewable_dataset_ids.include? i[:id] }

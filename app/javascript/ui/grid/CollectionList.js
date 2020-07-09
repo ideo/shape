@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import React from 'react'
+import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
@@ -133,7 +133,7 @@ class CollectionList extends React.Component {
   }
 
   render() {
-    const { collection } = this.props
+    const { collection, loadCollectionCards } = this.props
 
     return (
       <div>
@@ -159,12 +159,20 @@ class CollectionList extends React.Component {
             potentialReviewers={this.potentialReviewers}
           />
         ))}
+        {collection.hasMore && (
+          <GridCardPagination
+            collection={collection}
+            loadCollectionCards={loadCollectionCards}
+            nextPage={collection.nextPage}
+          />
+        )}
       </div>
     )
   }
 }
 CollectionList.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  loadCollectionCards: PropTypes.func.isRequired,
 }
 
 export default CollectionList
