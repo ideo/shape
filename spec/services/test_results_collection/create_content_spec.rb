@@ -285,6 +285,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       # legend item should be in the 3rd spot (order == 2)
       expect(legend_item.parent_collection_card.row).to eq 0
       expect(legend_item.parent_collection_card.col).to eq 3
+
       results_cards = test_results_collection.collection_cards.reload
 
       expect(
@@ -312,6 +313,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
 
   it 'appends feedback design to the test collection name' do
     prev_name = test_collection.name
+
     expect(subject).to be_a_success
     expect(test_collection.reload.name).to eq(
       prev_name + Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX,
@@ -319,8 +321,12 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
   end
 
   it 'moves test collection to be inside results collection' do
+    original_parent_card = test_collection.parent_collection_card
+
     expect(subject).to be_a_success
     expect(test_results_collection.collections).to include(test_collection)
+    expect(test_collection.reload.parent).to eq test_results_collection
+    expect(original_parent_card.reload.collection).to eq test_results_collection
   end
 
   context 'updating roles' do
