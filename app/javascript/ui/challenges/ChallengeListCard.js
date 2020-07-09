@@ -55,7 +55,7 @@ class ChallengeListCard extends React.Component {
 
   @computed
   get columnsWithChallengeContent() {
-    const { columns, record } = this.props
+    const { columns, record, submissionsCollection } = this.props
     const { isCurrentUserAReviewer, submission_reviewer_status } = record
     columns[3].overrideContent = (
       <div
@@ -69,7 +69,7 @@ class ChallengeListCard extends React.Component {
         />
         <AddReviewersPopover
           record={record}
-          potentialReviewers={record.potentialReviewers}
+          potentialReviewers={submissionsCollection.potentialReviewers}
           onClose={this.handleCloseReviewers}
           wrapperRef={this.rolesWrapperRef}
           open={this.isReviewersOpen}
@@ -109,6 +109,7 @@ ChallengeListCard.wrappedComponent.propTypes = {
 
 ChallengeListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  submissionsCollection: MobxPropTypes.objectOrObservableObject.isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape(ColumnPropType)).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   searchResult: PropTypes.bool,

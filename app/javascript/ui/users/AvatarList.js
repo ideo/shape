@@ -15,7 +15,7 @@ const AvatarList = ({ avatars, onAdd }) => {
         >
           {avatars.map(avatar => (
             <Avatar
-              key={`${avatar.internalType}_${avatar.id}`}
+              key={`${avatar.pic_url_square}`}
               title={avatar.nameWithHints || avatar.name}
               url={avatar.pic_url_square || avatar.filestack_file_url}
               color={avatar.color}

@@ -91,7 +91,10 @@ class CollectionList extends React.Component {
             key: card.id,
           }
           return collection.isSubmissionsCollectionInsideChallenge ? (
-            <ChallengeListCard {...mainProps} />
+            <ChallengeListCard
+              {...mainProps}
+              submissionsCollection={collection}
+            />
           ) : (
             <ListCard {...mainProps} />
           )
