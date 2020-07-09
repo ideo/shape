@@ -1261,20 +1261,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return currentUserIsAReviewer
   }
 
-  get currentUserHasSubmissionsToReview() {
-    if (!this.is_inside_a_challenge || !this.isSubmissionBox) return false
-    const reviewableCards = _.get(
-      this,
-      'submissions_collection.reviewableCards'
-    )
-    if (_.isEmpty(reviewableCards)) return false
-
-    const cardsReviewableByCurrentUser = _.filter(reviewableCards, rc => {
-      return _.get(rc, 'record.isCurrentUserAReviewer')
-    })
-    return !_.isEmpty(cardsReviewableByCurrentUser)
-  }
-
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {

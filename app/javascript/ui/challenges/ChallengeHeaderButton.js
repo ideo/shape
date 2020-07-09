@@ -29,7 +29,7 @@ ChallengeSettingsButton.propTypes = {
 
 ChallengeSettingsButton.displayName = 'ChallengeSettingsButton'
 
-const ReviewSubmissionsButton = ({ record }) => {
+export const ReviewSubmissionsButton = ({ record }) => {
   const [nextAvailableTestPath, setNextAvailableTestPath] = useState(null)
 
   useEffect(() => {
