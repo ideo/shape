@@ -800,7 +800,7 @@ describe('Collection', () => {
       it('returns true', () => {
         collection.type = 'Collection'
         expect(collection.allowsCollectionTypeSelector).toEqual(true)
-        collection.type = 'Collection::Board'
+        collection.num_columns = 4
         expect(collection.allowsCollectionTypeSelector).toEqual(true)
       })
 
