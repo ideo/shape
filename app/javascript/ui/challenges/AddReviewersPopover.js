@@ -45,7 +45,6 @@ class AddReviewersPopover extends React.Component {
 
   render() {
     const { onClose, open, wrapperRef, potentialReviewers } = this.props
-    console.log('reviewer popover', open)
     return (
       <InlineModal
         title=""

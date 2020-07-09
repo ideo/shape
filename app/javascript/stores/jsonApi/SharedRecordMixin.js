@@ -211,6 +211,9 @@ const SharedRecordMixin = superclass =>
       if (challenge) {
         runInAction(() => {
           this.parentChallenge = challenge
+          if (this.isSubmissionBox && this.submissions_collection) {
+            this.submissions_collection.parentChallenge = challenge
+          }
         })
       }
     }

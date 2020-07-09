@@ -13,7 +13,11 @@ import v from '~/utils/variables'
 
 @observer
 class CollectionList extends React.Component {
-  fetchCards({ sort } = {}) {
+  componentDidMount() {
+    this.fetchRoles()
+  }
+
+  fetchRoles() {
     const { collection } = this.props
     collection.API_fetchCardRoles()
   }
@@ -41,7 +45,7 @@ class CollectionList extends React.Component {
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
-    if (collection.isSubmissionBoxInsideChallenge) {
+    if (collection.isSubmissionsCollectionInsideChallenge) {
       return transformColumnsForChallenge(cols)
     }
     return cols
@@ -86,7 +90,7 @@ class CollectionList extends React.Component {
             searchResult: collection.isSearchResultsCollection,
             key: card.id,
           }
-          return collection.isSubmissionBoxInsideChallenge ? (
+          return collection.isSubmissionsCollectionInsideChallenge ? (
             <ChallengeListCard {...mainProps} />
           ) : (
             <ListCard {...mainProps} />

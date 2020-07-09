@@ -425,6 +425,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get isSubmissionBoxInsideChallenge() {
     return (
       this.isChallengeOrInsideChallenge &&
+      this.isSubmissionBox &&
+      this.submission_box_type === 'template'
+    )
+  }
+
+  get isSubmissionsCollectionInsideChallenge() {
+    return (
+      this.isChallengeOrInsideChallenge &&
       this.isSubmissionsCollection &&
       this.submission_box_type === 'template'
     )
@@ -1625,6 +1633,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setChallengeReviewerGroup(group) {
     this.challengeReviewerGroup = group
+    if (this.isSubmissionBox && this.submissions_collection) {
+      this.submissions_collection.challengeReviewerGroup = group
+    }
   }
 
   @action

@@ -108,7 +108,6 @@ class ListCard extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log('list card prop change')
   }
 
   @computed
@@ -312,7 +311,6 @@ class ListCard extends React.Component {
 
   get renderCols() {
     const { columns } = this.props
-    console.log('render list card', columns)
     return columns.map((column, idx) => (
       <Column {...column.style}>
         {column.overrideContent

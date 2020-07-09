@@ -91,7 +91,6 @@ class ChallengeListCard extends React.Component {
   }
 
   render() {
-    console.log('render challenge list card', this.isReviewersOpen)
     return (
       <ListCard {...this.props} columns={this.columnsWithChallengeContent} />
     )
