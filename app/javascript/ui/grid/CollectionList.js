@@ -1,12 +1,14 @@
 import _ from 'lodash'
 import React from 'react'
-import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
 import DropdownIcon from '~/ui/icons/DropdownIcon'
 import ListCard, { Column } from './ListCard'
 import { Heading3 } from '~/ui/global/styled/typography'
+import ChallengeListCard, {
+  transformColumnsForChallenge,
+} from '~/ui/challenges/ChallengeListCard'
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
@@ -48,7 +50,9 @@ class CollectionList extends React.Component {
       },
       { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
     ]
-    if (this.submissionBoxInsideChallenge) return transformColumnsForChallenge(cols)
+    if (this.submissionBoxInsideChallenge) {
+      return transformColumnsForChallenge(cols)
+    }
     return cols
   }
 
@@ -106,9 +110,11 @@ class CollectionList extends React.Component {
             searchResult: collection.isSearchResultsCollection,
             key: card.id,
           }
-          return this.submissionBoxInsideChallenge ?
-            <ChallengeListCard {...mainProps} /> :
+          return this.submissionBoxInsideChallenge ? (
+            <ChallengeListCard {...mainProps} />
+          ) : (
             <ListCard {...mainProps} />
+          )
         })}
       </div>
     )

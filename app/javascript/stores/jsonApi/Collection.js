@@ -956,9 +956,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
     )
     const statuses = res.data
-    statues.forEach(status => {
+    statuses.forEach(status => {
       // TODO change this to allow for item types too
-      record = apiStore.find('collections', status.record_id)
+      const record = this.apiStore.find('collections', status.record_id)
       // TODO this has to do some duplicate checking for when fetch called
       // more than once
       record.reviewerStatuses.push(status)
@@ -1549,10 +1549,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get potentialReviewers() {
     if (!this.isSubmissionsCollection) return []
 
-    const challengeReviewerRoles = _.get(
-      this,
-      'challengeReviewerGroup.roles'
-    )
+    const challengeReviewerRoles = _.get(this, 'challengeReviewerGroup.roles')
 
     if (_.isEmpty(challengeReviewerRoles)) return []
 

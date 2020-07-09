@@ -1,19 +1,21 @@
 import _ from 'lodash'
-import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { action, computed, observable, runInAction } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
 
+import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
+import AvatarList from '~/ui/users/AvatarList'
+import ChallengeReviewButton from '~/ui/challenges/ChallengeReviewButton'
 import ListCard from '~/ui/grid/ListCard'
 
-export const transformColumnsForChallenge(columns) {
+export const transformColumnsForChallenge = columns => {
   columns[2].style.width = '400px'
   columns[3].displayName = 'Reviewers'
   columns[3].name = 'reviewers'
   return columns
 }
 
+@inject('apiStore')
 @observer
 class ChallengeListCard extends React.Component {
   @observable
@@ -48,24 +50,13 @@ class ChallengeListCard extends React.Component {
   }
 
   get showReviewers() {
-    const { record, insideChallenge } = this.props
-    return insideChallenge && record.internalType !== 'items'
-  }
-
-  get renderActions() {
-    if (isCurrentUserAReviewer && submission_reviewer_status) {
-      return (
-      )
-    }
-
-    return null
+    const { record } = this.props
+    return record.internalType !== 'items'
   }
 
   get columnsWithChallengeContent() {
-    const {
-      columns,
-      record,
-    } = this.props
+    const { columns, record } = this.props
+    const { isCurrentUserAReviewer, submission_reviewer_status } = record
     columns[4].overrideContent = (
       <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
         <AvatarList
@@ -83,33 +74,39 @@ class ChallengeListCard extends React.Component {
         )}
       </div>
     )
-    columns[5].overrideContent = isCurrentUserAReviewer && submission_reviewer_status && (
-      <ChallengeReviewButton
-        reviewerStatus={submission_reviewer_status}
-        onClick={() => {
-          record.navigateToNextAvailableTest()
-        }}
-      />
-    )
+    columns[5].overrideContent = isCurrentUserAReviewer &&
+      submission_reviewer_status && (
+        <ChallengeReviewButton
+          reviewerStatus={submission_reviewer_status}
+          onClick={() => {
+            record.navigateToNextAvailableTest()
+          }}
+        />
+      )
 
     return columns
   }
 
   render() {
-    const {
-      record,
-    } = this.props
-    const { isCurrentUserAReviewer, submission_reviewer_status } = record
-
     return (
-      <ListCard
-        columns={this.columnsWithChallengeContent}
-      />
+      <ListCard {...this.props} columns={this.columnsWithChallengeContent} />
     )
   }
 }
+
+const ColumnPropType = {
+  name: PropTypes.string,
+  displayName: PropTypes.string,
+  style: PropTypes.object,
+}
+
+ChallengeListCard.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 ChallengeListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  columns: PropTypes.arrayOf(PropTypes.shape(ColumnPropType)).isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
   searchResult: PropTypes.bool,
 }

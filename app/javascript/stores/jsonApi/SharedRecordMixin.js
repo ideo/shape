@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, runInAction, observable } from 'mobx'
+import { action, computed, runInAction, observable } from 'mobx'
 import queryString from 'query-string'
 
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
@@ -304,8 +304,9 @@ const SharedRecordMixin = superclass =>
       if (!this.tagged_users) return []
       if (this.reviewerStatuses) return this.tagged_users
       return this.tagged_users.map(taggedUser => {
-        const statusForUser = _.find(this.reviewerStatuses, status =>
-          parseInt(status.user_id) === parseInt(taggedUser.id)
+        const statusForUser = _.find(
+          this.reviewerStatuses,
+          status => parseInt(status.user_id) === parseInt(taggedUser.id)
         ).status
         return {
           ...taggedUser,
