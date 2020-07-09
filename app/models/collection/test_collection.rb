@@ -107,7 +107,7 @@ class Collection
     after_create :add_test_tag
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
-    after_create :setup_challenge_test_audiences, unless: :collection_to_test
+    after_create :setup_challenge_test_audiences
     after_update :touch_test_results_collection, if: :saved_change_to_test_status?
     after_update :update_ideas_collection, if: :saved_change_to_test_show_media?
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?

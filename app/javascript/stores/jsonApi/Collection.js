@@ -1540,8 +1540,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   async API_getNextAvailableTest({ challenge = false }) {
     this.setNextAvailableTestPath(null)
     const nextTestPath = !challenge
-      ? 'test_collections/${this.id}/next_available'
-      : 'collections/${this.id}/next_available_challenge_test'
+      ? `test_collections/${this.id}/next_available`
+      : `collections/${this.id}/next_available_challenge_test`
     const res = await this.apiStore.request(nextTestPath)
     if (!res.data) return
     const path = this.routingStore.pathTo('collections', res.data.id)
@@ -1552,7 +1552,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   async navigateToNextInCollectionTest() {
     // FIXME: add later when in-collection tests are supported
     if (this.isSubmission) {
-      await this.API_getNextAvailableTest()
+      await this.API_getNextAvailableTest({ challenge: false })
     } else if (this.isSubmissionBox) {
       await this.API_getNextAvailableTest({ challenge: true })
     }

@@ -52,7 +52,9 @@ class InlineCollectionTest extends React.Component {
     if (testCollection.is_submission_test) {
       // don't need to `await` this, can happen async
       // this will also set nextAvailableTestPath on the testCollection
-      testCollection.API_getNextAvailableTest()
+      testCollection.API_getNextAvailableTest({
+        challenge: testCollection.is_inside_a_challenge,
+      })
     }
   }
 
