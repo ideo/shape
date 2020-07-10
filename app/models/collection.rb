@@ -1281,6 +1281,16 @@ class Collection < ApplicationRecord
     super(*args)
   end
 
+  def in_reviewer_group?(current_user)
+    return false unless inside_a_challenge?
+
+    reviewer_ids = parent_challenge&.challenge_reviewer_group&.user_ids
+
+    return false unless reviewer_ids.present?
+
+    reviewer_ids.include?(current_user.id)
+  end
+
   private
 
   def calculate_reordered_cards(order: { pinned: :desc, order: :asc }, joins: nil)
