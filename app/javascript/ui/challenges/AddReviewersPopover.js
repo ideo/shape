@@ -45,6 +45,7 @@ class AddReviewersPopover extends React.Component {
 
   render() {
     const { onClose, open, wrapperRef, potentialReviewers } = this.props
+    console.log('AddReviewersPopover render', wrapperRef.current)
     return (
       <InlineModal
         title=""
@@ -56,7 +57,7 @@ class AddReviewersPopover extends React.Component {
       >
         <div onClick={this.handleClick}>
           {potentialReviewers.map(potentialReviewer => (
-            <Flex>
+            <Flex key={potentialReviewer.handle}>
               <Checkbox
                 color="primary"
                 checked={this.isReviewerSelected(potentialReviewer)}

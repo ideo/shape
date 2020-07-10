@@ -311,7 +311,7 @@ class ListCard extends React.Component {
   get renderCols() {
     const { columns } = this.props
     return columns.map((column, idx) => (
-      <Column {...column.style}>
+      <Column {...column.style} key={column.name}>
         {column.overrideContent
           ? column.overrideContent
           : this.columnContent[idx]}

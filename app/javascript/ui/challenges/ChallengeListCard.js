@@ -87,7 +87,7 @@ class ChallengeListCard extends React.Component {
         />
       )
 
-    return columns
+    return [...columns]
   }
 
   render() {
