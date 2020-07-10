@@ -57,26 +57,25 @@ class ChallengeListCard extends React.Component {
   get columnsWithChallengeContent() {
     const { columns, record, submissionsCollection } = this.props
     const { isCurrentUserAReviewer, submission_reviewer_status } = record
-    columns[3].overrideContent = (
-      <div
-        ref={this.rolesWrapperRef}
-        style={{ width: '100%' }}
-        key={`col-${this.isReviewersOpen}`}
-      >
-        <AvatarList
-          avatars={record.taggedUsersWithStatuses}
-          onAdd={this.handleRolesClick}
-        />
-        <AddReviewersPopover
-          record={record}
-          potentialReviewers={submissionsCollection.potentialReviewers}
-          onClose={this.handleCloseReviewers}
-          wrapperRef={this.rolesWrapperRef}
-          open={this.isReviewersOpen}
-        />
-      </div>
-    )
-    columns[4].overrideContent = isCurrentUserAReviewer &&
+    columns[3].overrideContent = columnRef => {
+      return (
+        <div style={{ width: '100%' }} key={`col-${this.isReviewersOpen}`}>
+          <AvatarList
+            avatars={record.taggedUsersWithStatuses}
+            onAdd={this.handleRolesClick}
+          />
+          <AddReviewersPopover
+            record={record}
+            potentialReviewers={submissionsCollection.potentialReviewers}
+            onClose={this.handleCloseReviewers}
+            wrapperRef={columnRef}
+            open={this.isReviewersOpen}
+          />
+        </div>
+      )
+    }
+    columns[4].overrideContent = () =>
+      isCurrentUserAReviewer &&
       submission_reviewer_status && (
         <ChallengeReviewButton
           key="column3"

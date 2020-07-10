@@ -45,14 +45,13 @@ class AddReviewersPopover extends React.Component {
 
   render() {
     const { onClose, open, wrapperRef, potentialReviewers } = this.props
-    console.log('AddReviewersPopover render', wrapperRef.current)
     return (
       <InlineModal
         title=""
         onCancel={onClose}
         open={open}
         anchorElement={wrapperRef.current}
-        anchorOrigin={{ horizontal: 'left', vertical: 'center' }}
+        anchorOrigin={{ horizontal: 'center', vertical: 'center' }}
         noButtons
       >
         <div onClick={this.handleClick}>

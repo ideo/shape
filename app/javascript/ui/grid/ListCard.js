@@ -105,6 +105,7 @@ class ListCard extends React.Component {
   constructor(props) {
     super(props)
     this.rolesWrapperRef = React.createRef()
+    this.columnRefs = props.columns.map(() => React.createRef())
   }
 
   componentDidUpdate() {}
@@ -312,9 +313,11 @@ class ListCard extends React.Component {
     const { columns } = this.props
     return columns.map((column, idx) => (
       <Column {...column.style} key={column.name}>
-        {column.overrideContent
-          ? column.overrideContent
-          : this.columnContent[idx]}
+        <div ref={this.columnRefs[idx]}>
+          {column.overrideContent
+            ? column.overrideContent(this.columnRefs[idx])
+            : this.columnContent[idx]}
+        </div>
       </Column>
     ))
   }
