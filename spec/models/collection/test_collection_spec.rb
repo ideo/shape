@@ -696,12 +696,14 @@ describe Collection::TestCollection, type: :model, seed: true do
           'template' => true,
           'test_status' => 'live',
           'launchable_test_id' => test_collection.id,
+          'launchable_test_collection_to_test_id' => test_collection.collection_to_test_id,
         )
         expect(submission.submission_attrs).to eq(
           'submission' => true,
           'test_status' => 'draft',
           'template_test_id' => test_collection.id,
           'launchable_test_id' => submission_test.id,
+          'launchable_test_collection_to_test_id' => submission_test.collection_to_test_id,
         )
       end
 
