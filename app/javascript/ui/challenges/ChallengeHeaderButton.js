@@ -1,6 +1,6 @@
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { useState, useEffect } from 'react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
-import { uiStore } from '~/stores'
 import Button from '~/ui/global/Button'
 import v from '~/utils/variables'
 
@@ -10,47 +10,78 @@ const buttonStyleProps = {
   style: { marginLeft: '1rem' },
 }
 
-@inject('apiStore')
-@observer
-class ChallengeHeaderButton extends React.Component {
-  render() {
-    const { record } = this.props
+const ChallengeSettingsButton = ({ record }) => {
+  const { uiStore } = record.apiStore
+  return (
+    <Button
+      {...buttonStyleProps}
+      colorScheme={v.colors.primaryDark}
+      onClick={() => uiStore.update('challengeSettingsOpen', true)}
+    >
+      Challenge Settings
+    </Button>
+  )
+}
 
-    if (!record.isChallengeOrInsideChallenge || !record.parentChallenge) {
-      return null
-    }
+ChallengeSettingsButton.propTypes = {
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
+}
 
-    if (!record.isSubmissionBox && record.parentChallenge.canEdit) {
-      return (
-        <Button
-          {...buttonStyleProps}
-          colorScheme={v.colors.primaryDark}
-          onClick={() => uiStore.update('challengeSettingsOpen', true)}
-        >
-          Challenge Settings
-        </Button>
-      )
-    } else if (record.isSubmissionBox) {
-      const { currentUserHasSubmissionsToReview } = record
-      return (
-        <Button
-          {...buttonStyleProps}
-          colorScheme={v.colors.alert}
-          disabled={!currentUserHasSubmissionsToReview}
-          onClick={() => record.navigateToNextAvailableChallengeTest()}
-        >
-          {currentUserHasSubmissionsToReview
-            ? `Review Submissions`
-            : `No Reviewable Submissions`}
-        </Button>
-      )
+ChallengeSettingsButton.displayName = 'ChallengeSettingsButton'
+
+export const ReviewSubmissionsButton = ({ record }) => {
+  const [nextAvailableTestPath, setNextAvailableTestPath] = useState(null)
+
+  useEffect(() => {
+    const loadNextAvailableTest = async () => {
+      const path = await record.API_getNextAvailableTest({ challenge: true })
+      setNextAvailableTestPath(path)
     }
+    loadNextAvailableTest()
+  }, [record])
+
+  return (
+    <Button
+      {...buttonStyleProps}
+      colorScheme={v.colors.alert}
+      disabled={!nextAvailableTestPath}
+      onClick={() =>
+        nextAvailableTestPath &&
+        record.routingStore.routeTo(nextAvailableTestPath)
+      }
+    >
+      {nextAvailableTestPath
+        ? `Review Submissions`
+        : `No Reviewable Submissions`}
+    </Button>
+  )
+}
+
+ReviewSubmissionsButton.propTypes = {
+  record: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+ReviewSubmissionsButton.displayName = 'ReviewSubmissionsButton'
+
+const ChallengeHeaderButton = ({ record, parentChallenge }) => {
+  if (!record.isChallengeOrInsideChallenge || !parentChallenge) {
     return null
   }
+  if (parentChallenge.canEdit) {
+    return <ChallengeSettingsButton record={record} />
+  } else if (record.in_reviewer_group) {
+    return <ReviewSubmissionsButton record={record} />
+  }
+  return null
 }
 
 ChallengeHeaderButton.propTypes = {
   record: MobxPropTypes.objectOrObservableObject.isRequired,
+  parentChallenge: MobxPropTypes.objectOrObservableObject,
+}
+
+ChallengeHeaderButton.defaultProps = {
+  parentChallenge: null,
 }
 
 ChallengeHeaderButton.displayName = 'ChallengeHeaderButton'

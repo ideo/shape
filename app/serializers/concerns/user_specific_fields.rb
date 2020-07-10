@@ -47,5 +47,9 @@ module UserSpecificFields
     attribute :submission_reviewer_status, if: -> { @object.is_a?(Collection) && @object.submission? } do
       @object.submission_reviewer_status(@current_user)
     end
+
+    attribute :in_reviewer_group, if: -> { @current_user && @object.is_a?(Collection) && @object.inside_a_challenge? } do
+      @object.parent_challenge&.challenge_reviewer_group&.user_ids&.include?(@current_user.id) || false
+    end
   end
 end
