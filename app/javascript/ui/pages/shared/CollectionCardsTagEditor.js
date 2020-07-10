@@ -25,7 +25,7 @@ class CollectionCardsTagEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.cardIds.length != this.props.cardIds.length) {
+    if (!_.isEqual(prevProps.cardIds.sort(), this.props.cardIds.sort())) {
       this.initializeSelectedRecordsTags()
     }
   }

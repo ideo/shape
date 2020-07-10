@@ -94,6 +94,7 @@ module CollectionGrid
     )
       return [] if collection.collection_cards.none? && drag_positions.empty?
 
+      # TODO: memoize?
       # omit moving cards from our matrix
       cards = collection
               .collection_cards
@@ -235,6 +236,7 @@ module CollectionGrid
         open_spot = find_closest_open_spot(
           position,
           open_spot_matrix,
+          num_columns: collection.num_columns,
         )
         # not really sure how it couldn't find a spot since it should always find an empty row at the bottom...
         next unless open_spot.present?
@@ -298,11 +300,12 @@ module CollectionGrid
       placement
     end
 
-    def self.find_closest_open_spot(position, open_spot_matrix)
+    def self.find_closest_open_spot(position, open_spot_matrix, num_columns: 16)
       row = position.row
       col = position.col
       width = position.width
       height = position.height
+      reflow = num_columns == 4
 
       possibilities = []
       exact_fit = false
@@ -347,6 +350,12 @@ module CollectionGrid
               col_diff *= 0.99
             end
             distance = Math.sqrt(row_diff * row_diff + col_diff * col_diff)
+
+            if reflow && row_diff.positive?
+              # reflow treats everything flowing "off to the right" so closest means "next in snake order"
+              distance = ((row_idx * num_columns + col_idx) - (row * num_columns + col)).abs
+            end
+
             exact_fit = distance.zero?
             possibilities.push(
               Mashie.new(

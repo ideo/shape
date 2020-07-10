@@ -61,5 +61,8 @@ FactoryBot.define do
     end
 
     factory :collection_card_placeholder, class: 'CollectionCard::Placeholder'
+    factory :collection_card_bct_placeholder, class: 'CollectionCard::Placeholder' do
+      parent_snapshot { { collection_cards_attributes: [] } }
+    end
   end
 end

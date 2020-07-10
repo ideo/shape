@@ -247,13 +247,19 @@ class FoamcoreGrid extends React.Component {
     return this.props.uiStore.zoomLevel
   }
 
+  get maxRow() {
+    // get the max of what's currently visible
+    const { collection_cards } = this.props.collection
+    return (_.maxBy(collection_cards, 'row') || { row: 0 }).row
+  }
+
   // Load more cards if we are approaching a boundary of what we have loaded
   loadAfterScroll = async () => {
     const { collection } = this.props
     // return if we're still loading a new page
     if (this.loadingRow || collection.loadedRows === 0) return
 
-    const { zoomLevel } = this
+    const { zoomLevel, maxRow } = this
     this.computeVisibleRows()
     this.computeVisibleCols()
 
@@ -266,9 +272,6 @@ class FoamcoreGrid extends React.Component {
     // Load more rows if currently loaded rows is less than
     // one full screen out of view
     if (collection.loadedRows < visRows.max + visRows.num) {
-      // get the max of what's currently visible
-      const maxRow = (_.maxBy(collection.collection_cards, 'row') || { row: 0 })
-        .row
       runInAction(() => {
         this.loadingRow = maxRow
       })
@@ -547,19 +550,30 @@ class FoamcoreGrid extends React.Component {
     uiStore.reselectCardIds(selectedCardIds)
   }
 
-  handleBlankCardClick = ({ row, col }) => e => {
-    const { selectedAreaMinX } = this.props
+  handleBlankCardClick = ({ row, col, create = false }) => e => {
+    const { apiStore, uiStore, collection, selectedAreaMinX } = this.props
 
     // If user is selecting an area, don't trigger blank card click
     if (selectedAreaMinX) {
       return
     }
 
-    const { uiStore } = this.props
     uiStore.openBlankContentTool({
       row,
       col,
     })
+
+    if (create) {
+      const placeholder = new CollectionCard(
+        {
+          row,
+          col,
+          parent_id: collection.id,
+        },
+        apiStore
+      )
+      placeholder.API_createBct()
+    }
   }
 
   @action
@@ -1481,29 +1495,53 @@ class FoamcoreGrid extends React.Component {
 
   renderHotspots() {
     const { collection } = this.props
-    const { num_columns } = collection
-    const { relativeZoomLevel, gridSettings } = this
+    const { cardMatrix, num_columns, isFourWideBoard } = collection
+    const { relativeZoomLevel } = this
+    // rows start at 0, plus add an extra at the bottom
+    const maxRow = this.maxRow + 1
 
-    if (num_columns !== 4) return null
+    const hotEdges = []
+    _.each(_.range(0, maxRow), row => {
+      _.each(_.range(0, num_columns), col => {
+        if (!cardMatrix[row] || !cardMatrix[row][col]) {
+          // continue iteration
+          return true
+        }
+        // find two cards together UNLESS the card on the right isPinnedAndLocked
+        const twoCardsTogether =
+          col > 0 &&
+          !cardMatrix[row][col].isPinnedAndLocked &&
+          cardMatrix[row][col - 1] &&
+          cardMatrix[row][col - 1] !== cardMatrix[row][col]
+        if (col === 0 || twoCardsTogether) {
+          hotEdges.push(
+            <FoamcoreHotspot
+              key={`hotspot-${row}:${col}`}
+              relativeZoomLevel={relativeZoomLevel}
+              row={row}
+              col={col}
+              horizontal={false}
+              onClick={this.handleBlankCardClick({ col, row, create: true })}
+            />
+          )
+        }
+      })
 
-    const collectionMaxRow = collection.max_row_index
-    const hotspots = []
-    let { gridH, gutter } = gridSettings
-    gutter = gutter / relativeZoomLevel
-    gridH = gridH / relativeZoomLevel
-
-    _.times(collectionMaxRow, row => {
-      hotspots.push(
-        <FoamcoreHotspot
-          key={`hotspot-${row}`}
-          row={row - 1}
-          cols={4}
-          top={(gridH + gutter) * row - gutter}
-          onClick={ev => this.handleInsertRowClick(ev, row - 1)}
-        />
-      )
+      if (isFourWideBoard) {
+        // only 4WFC has horizontal hot edges in the row gutters
+        hotEdges.push(
+          <FoamcoreHotspot
+            key={`hotspot-${row}`}
+            relativeZoomLevel={relativeZoomLevel}
+            row={row}
+            onClick={ev => this.handleInsertRowClick(ev, row)}
+            horizontal
+          />
+        )
+      }
     })
-    return <div>{hotspots}</div>
+
+    return <div>{hotEdges}</div>
   }
 
   render() {

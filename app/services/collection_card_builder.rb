@@ -1,7 +1,13 @@
 class CollectionCardBuilder
   attr_reader :collection_card, :errors
 
-  def initialize(params:, parent_collection:, user: nil, type: 'primary')
+  def initialize(
+    params:,
+    parent_collection:,
+    user: nil,
+    type: 'primary',
+    placeholder: nil
+  )
     @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
     @parent_collection = parent_collection
@@ -14,6 +20,7 @@ class CollectionCardBuilder
     @collection_card = build_collection_card(type.to_s)
     @errors = @collection_card.errors
     @user = user
+    @placeholder = placeholder
   end
 
   def self.call(*args)
@@ -61,25 +68,13 @@ class CollectionCardBuilder
     # NOTE: cards created inside a master_template are unpinned by default unless it's being created within a pinned area
     @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
     @parent_collection.transaction do
-      # NOTE: Have to lock board collections for collision detection race conditions.
-      #  This means that uploading 6 files at once for example will be threadsafe,
-      #  but it will slow down each concurrent API request while it waits for the lock
-      @parent_collection.lock! if @parent_collection.board_collection?
 
-      if @parent_collection.board_collection? && !@collection_card.board_placement_is_valid?
-        # first capture these, row/col are allowed to be nil for BoardPlacement
-        row = @collection_card.row
-        col = @collection_card.col
-        # but we still want to assign the card a row/col of 0,0 so that the calculations don't break
-        @collection_card.row ||= 0
-        @collection_card.col ||= 0
-        # valid row/col will get applied to the card here for later saving
-        CollectionGrid::BoardPlacement.call(
-          row: row,
-          col: col,
-          to_collection: @parent_collection,
-          moving_cards: [@collection_card],
-        )
+      if @parent_collection.board_collection?
+        # NOTE: Have to lock board collections for collision detection race conditions.
+        #  This means that uploading 6 files at once for example will be threadsafe,
+        #  but it will slow down each concurrent API request while it waits for the lock
+        @parent_collection.lock!
+        adjust_card_properties_for_board
       end
 
       @collection_card.save.tap do |result|
@@ -101,6 +96,34 @@ class CollectionCardBuilder
         create_datasets if @datasets_params.present?
       end
     end
+  end
+
+  def adjust_card_properties_for_board
+    @placeholder ||= @parent_collection.bct_placeholder_at(
+      row: @collection_card.row,
+      col: @collection_card.col,
+    )
+    if @placeholder.present?
+      # take over its identity
+      @placeholder.destroy
+      @collection_card.id = @placeholder.id
+    end
+
+    return if @collection_card.board_placement_is_valid?
+
+    # first capture these, row/col are allowed to be nil for BoardPlacement
+    row = @collection_card.row
+    col = @collection_card.col
+    # but we still want to assign the card a row/col of 0,0 so that the calculations don't break
+    @collection_card.row ||= 0
+    @collection_card.col ||= 0
+    # valid row/col will get applied to the card here for later saving
+    CollectionGrid::BoardPlacement.call(
+      row: row,
+      col: col,
+      to_collection: @parent_collection,
+      moving_cards: [@collection_card],
+    )
   end
 
   def post_creation_record_update

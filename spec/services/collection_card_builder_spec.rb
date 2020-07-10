@@ -189,11 +189,91 @@ RSpec.describe CollectionCardBuilder, type: :service do
                  organization: organization,
                  add_editors: [user])
         end
+        let(:row) { 2 }
+        let(:col) { 1 }
+        let(:overlapping_card) { nil }
+        let(:placeholder) { nil }
+        let(:builder) do
+          CollectionCardBuilder.new(
+            params: params.merge(
+              item_attributes: {
+                name: 'My item name',
+                content: 'My Text Content goes here',
+                data_content: { ops: [] },
+                type: 'Item::TextItem',
+              },
+              row: row,
+              col: col,
+            ),
+            parent_collection: parent,
+            user: user,
+            placeholder: placeholder,
+          )
+        end
 
         it 'should save the row and col values' do
           expect(builder.create).to be true
-          expect(builder.collection_card.row).to eq 3
-          expect(builder.collection_card.col).to eq 2
+          expect(builder.collection_card.row).to eq 2
+          expect(builder.collection_card.col).to eq 1
+        end
+
+        context 'creating an overlapping card on foamcore' do
+          let!(:overlapping_card) { create(:collection_card_text, row: row, col: col, parent: parent) }
+
+          it 'should create the card in an open spot' do
+            expect(builder.create).to be true
+            card = builder.collection_card
+            expect(card.row).to eq 2
+            # should put it in the next column over
+            expect(card.col).to eq 2
+          end
+
+          context 'with no row/col specified' do
+            let!(:overlapping_card) { create(:collection_card_text, row: 0, col: 0, width: 3, parent: parent) }
+            let(:row) { nil }
+            let(:col) { nil }
+
+            it 'should create the card in the next open spot (reading order)' do
+              expect(builder.create).to be true
+              card = builder.collection_card
+              expect(card.row).to eq 0
+              # should put it in the next open spot (L->R)
+              expect(card.col).to eq 3
+            end
+          end
+        end
+
+        context 'with a bct placeholder' do
+          let!(:placeholder) { create(:collection_card_bct_placeholder, parent: parent, row: row, col: col) }
+
+          it 'should destroy the placeholder and put the new primary card in its place' do
+            expect {
+              builder.create
+            }.to change(CollectionCard::Placeholder, :count).by(-1)
+
+            new_card = builder.collection_card
+            expect(new_card.id).to eq(placeholder.id)
+            expect(new_card.is_a?(CollectionCard::Primary)).to be true
+            expect(new_card.row).to eq row
+            expect(new_card.col).to eq col
+          end
+        end
+
+        context 'with no placeholder specified, but one existing at row/col' do
+          let(:placeholder) { nil }
+          let!(:existing_placeholder) { create(:collection_card_bct_placeholder, parent: parent, row: row, col: col) }
+
+          it 'should destroy the placeholder and put the new primary card in its place' do
+            expect {
+              builder.create
+            }.to change(CollectionCard::Placeholder, :count).by(-1)
+
+            new_card = builder.collection_card
+            expect(new_card.id).to eq(existing_placeholder.id)
+            expect(new_card.is_a?(CollectionCard::Primary)).to be true
+            expect(new_card.row).to eq row
+            expect(new_card.col).to eq col
+          end
         end
       end
 
@@ -219,11 +299,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
         end
       end
 
-      context "when inside a Creative Difference collection" do
+      context 'when inside a Creative Difference collection' do
         let!(:parent) do
           create(:collection,
-          organization: organization,
-          add_editors: [user])
+                 organization: organization,
+                 add_editors: [user])
         end
 
         before do
@@ -237,11 +317,11 @@ RSpec.describe CollectionCardBuilder, type: :service do
         end
       end
 
-      context "when inside an application collection" do
+      context 'when inside an application collection' do
         let(:parent) do
           create(:application_collection,
-          organization: organization,
-          add_editors: [user])
+                 organization: organization,
+                 add_editors: [user])
         end
 
         before { builder.create }
@@ -467,55 +547,6 @@ RSpec.describe CollectionCardBuilder, type: :service do
 
       it 'should display errors' do
         expect(builder.errors.full_messages.first).to eq 'Only one of Item or Collection can be assigned'
-      end
-    end
-
-    context 'creating an overlapping card on foamcore' do
-      let(:parent) do
-        create(:board_collection,
-               organization: organization,
-               add_editors: [user])
-      end
-      let!(:overlapping_card) { create(:collection_card_text, row: 1, col: 1, parent: parent) }
-      let(:row) { 1 }
-      let(:col) { 1 }
-      let(:builder) do
-        CollectionCardBuilder.new(
-          params: params.merge(
-            item_attributes: {
-              name: 'My item name',
-              content: 'My Text Content goes here',
-              data_content: { ops: [] },
-              type: 'Item::TextItem',
-            },
-            row: row,
-            col: col,
-          ),
-          parent_collection: parent,
-          user: user,
-        )
-      end
-
-      it 'should create the card in an open spot' do
-        expect(builder.create).to be true
-        card = builder.collection_card
-        expect(card.row).to eq 1
-        # should put it in the next column over
-        expect(card.col).to eq 2
-      end
-
-      context 'with no row/col specified' do
-        let!(:overlapping_card) { create(:collection_card_text, row: 0, col: 0, width: 3, parent: parent) }
-        let(:row) { nil }
-        let(:col) { nil }
-
-        it 'should create the card in the next open spot (reading order)' do
-          expect(builder.create).to be true
-          card = builder.collection_card
-          expect(card.row).to eq 0
-          # should put it in the next open spot (L->R)
-          expect(card.col).to eq 3
-        end
       end
     end
   end

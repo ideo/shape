@@ -8,10 +8,88 @@ const fakeCollection = {
   internalType: 'collections',
   parent_collection_card: {},
 }
+const fakeEvent = {
+  target: { closest: jest.fn() },
+}
 describe('UiStore', () => {
   beforeEach(() => {
     // reset every time
     uiStore = new UiStore()
+  })
+
+  describe('BCT functions', () => {
+    beforeEach(() => {
+      runInAction(() => {
+        uiStore.openContextMenu(fakeEvent, { card: { id: '1' } })
+        uiStore.textEditingItem = { id: '1' }
+        uiStore.reselectCardIds([1, 2, 3])
+      })
+    })
+
+    describe('#openBlankContentTool', () => {
+      it('should deselect cards, close menus, close textEditingItem', () => {
+        expect(uiStore.actionMenuOpenForCard('1')).toBe(true)
+        expect(uiStore.isEditingText).toBe(true)
+        expect(uiStore.selectedCardIds.length).toEqual(3)
+        uiStore.openBlankContentTool()
+        expect(uiStore.actionMenuOpenForCard('1')).toBe(false)
+        expect(uiStore.isEditingText).toBe(false)
+        expect(uiStore.selectedCardIds.length).toEqual(0)
+      })
+
+      it('should assign fields to blankContentToolState', () => {
+        let { blankContentToolState } = uiStore
+        expect(blankContentToolState.order).toBe(null)
+        expect(blankContentToolState.row).toBe(null)
+        expect(blankContentToolState.col).toBe(null)
+        uiStore.openBlankContentTool({
+          order: 2,
+          row: 3,
+          col: 4,
+        })
+        blankContentToolState = uiStore.blankContentToolState
+        expect(blankContentToolState.order).toBe(2)
+        expect(blankContentToolState.row).toBe(3)
+        expect(blankContentToolState.col).toBe(4)
+      })
+
+      describe('with placeholderCard', () => {
+        beforeEach(() => {
+          uiStore.setBctPlaceholderCard({ id: '99' })
+          uiStore.closeBlankContentTool = jest.fn()
+        })
+        it('should call closeBlankContentTool to clear the card', () => {
+          uiStore.openBlankContentTool()
+          expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
+        })
+      })
+    })
+
+    describe('#closeBlankContentTool', () => {
+      it('should set blankContentToolState back to the defaults', () => {
+        uiStore.openBlankContentTool({
+          order: 2,
+          row: 3,
+          col: 4,
+        })
+        uiStore.closeBlankContentTool()
+        const { blankContentToolState } = uiStore
+        expect(blankContentToolState.order).toBe(null)
+        expect(blankContentToolState.row).toBe(null)
+        expect(blankContentToolState.col).toBe(null)
+      })
+
+      describe('with placeholderCard', () => {
+        const card = { id: '99', API_destroy: jest.fn() }
+        beforeEach(() => {
+          uiStore.setBctPlaceholderCard(card)
+        })
+        it('should call API_destroy to clear the placeholder', () => {
+          uiStore.closeBlankContentTool()
+          expect(card.API_destroy).toHaveBeenCalled()
+        })
+      })
+    })
   })
 
   describe('#startDragging', () => {

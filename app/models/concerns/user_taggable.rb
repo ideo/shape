@@ -41,11 +41,11 @@ module UserTaggable
     @user_tag_add_user_ids = []
     @user_tag_remove_user_ids = []
 
-    if @user_tag_list.blank?
+    if user_tag_list.blank?
       # If they are clearing it out, remove all tagged users
       @user_tag_remove_user_ids = tagged_user_ids
     else
-      assign_user_ids = User.where(handle: @user_tag_list).pluck(:id)
+      assign_user_ids = User.where(handle: user_tag_list).pluck(:id)
 
       tagged_user_ids.each do |tagged_user_id|
         unless assign_user_ids.include?(tagged_user_id)

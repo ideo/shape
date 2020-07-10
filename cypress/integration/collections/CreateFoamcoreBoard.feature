@@ -8,4 +8,24 @@ Feature: Creating a FoamcoreBoard Collection
     Then I should see "Mural" in a "EditableNameHeading-recordName"
     Then I should see a "zoom-control"
 
-    # TODO: test creating cards on the board
+    When I click the "foamcoreZoomIn"
+    And I create a textItem card at 0,0 on the board with "Welcome!"
+    And I create a textItem card at 0,1 on the board with "To my board."
+    And I create a textItem card at 1,1 on the board with "Hello."
+    When I click the "FoamcoreHotspot-0:1"
+
+    # should move the card out of the way
+    Then I should see the text "To my board." in the card at 0,2
+    # closing it should move back
+    When I wait for 1 second
+    And I click the "BCT-closeButton"
+    Then I should see the text "To my board." in the card at 0,1
+
+    # There should be a hotspot to the left of the 0,0 card
+    When I click the "FoamcoreHotspot-0:0"
+    And I create a textItem card using the foamcore hotspot with "Inserted!"
+    # should move both row 0 cards out of the way
+    Then I should see the text "Inserted!" in the card at 0,0
+    Then I should see the text "Welcome!" in the card at 0,1
+    Then I should see the text "To my board." in the card at 0,2
+    Then I should see the text "Hello." in the card at 1,1
