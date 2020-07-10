@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, observable } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import queryString from 'query-string'
 
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
@@ -15,6 +15,10 @@ const SharedRecordMixin = superclass =>
     @observable
     collaborators = []
     highlightedRange = null
+    @observable
+    tags = []
+    @observable
+    parentChallenge = null
 
     @action
     disableMenu() {
@@ -156,6 +160,76 @@ const SharedRecordMixin = superclass =>
       return res.__response.data
     }
 
+    API_addRemoveTag = (action, data) => {
+      const { apiStore } = this
+      const { label, type } = data
+      apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
+        card_ids: [this.parent_collection_card.id],
+        tag: label,
+        type,
+      })
+    }
+
+    @action
+    addTag(label, type, user) {
+      this[type].push(label)
+      this.API_addRemoveTag('add', { label, type })
+      if (type === 'user_tag_list' && user) {
+        const { tagged_users } = this
+        if (tagged_users) {
+          tagged_users.push(user)
+        }
+      }
+    }
+
+    @action
+    removeTag(label, type, user) {
+      _.remove(this[type], tag => {
+        return tag === label
+      })
+      this.API_addRemoveTag('remove', { label, type })
+      if (type === 'user_tag_list') {
+        const { tagged_users } = this
+        if (tagged_users) {
+          _.remove(this.tagged_users, u => {
+            return u.handle === label
+          })
+        }
+      }
+    }
+
+    async initializeParentChallengeForCollection() {
+      let challenge = null
+      if (this.isCollection && this.collection_type === 'challenge') {
+        challenge = this
+      } else {
+        const challengeForCollection = await this.fetchChallengeForCollection()
+        if (challengeForCollection.data) {
+          challenge = challengeForCollection.data
+        }
+      }
+      if (challenge) {
+        runInAction(() => {
+          this.parentChallenge = challenge
+        })
+      }
+    }
+
+    // NOTE: use this method instead of the challenge attribute to ensure that the right associations are included, ie: roles
+    async fetchChallengeForCollection() {
+      // return cached parent collection
+      if (this.parentChallenge) return this.parentChallenge
+      // Otherwise we need to load the challenge collection
+      return await this.apiStore.request(
+        `collections/${this.parent_challenge_id}`
+      )
+    }
+
+    get isCurrentUserAPotentialReviewer() {
+      const { currentUserId } = this.apiStore
+      return this.potentialReviewers.findIndex(r => r.id === currentUserId) > -1
+    }
+
     async restore() {
       const { routingStore, uiStore } = this
       uiStore.update('isLoading', true)
@@ -223,6 +297,38 @@ const SharedRecordMixin = superclass =>
         collaborator.color = collaboratorColors.get(collaborator.id)
       })
       this.collaborators.replace(sorted)
+    }
+
+    initializeTags = async () => {
+      const userTagsWithUsers = await Promise.all(
+        _.map(this.user_tag_list, async tag => {
+          const userSearch = await this.apiStore.searchUsers({ query: tag })
+          // NOTE: assumes that the first search result is the user described in the tag
+          const user = _.get(userSearch, 'data[0]')
+          return {
+            label: tag,
+            type: 'user_tag_list',
+            user: user.toJSON(), // how do we not use .toJSON() here
+          }
+        })
+      )
+
+      const tagList = []
+      const tagListKeys = _.get(this, 'isChallengeOrInsideChallenge')
+        ? ['tag_list', 'topic_list']
+        : ['tag_list']
+      _.each(tagListKeys, tagType => {
+        _.each(this[tagType], tag => {
+          tagList.push({
+            label: tag,
+            type: tagType,
+          })
+        })
+      })
+
+      runInAction(() => {
+        this.tags = [...userTagsWithUsers, ...tagList]
+      })
     }
   }
 

@@ -14,7 +14,14 @@ class Api::V1::ItemsController < Api::V1::BaseController
   def show
     log_item_activity(:viewed) if log_activity?
     render jsonapi: @item,
-           include: [:filestack_file, :parent, :parent_collection_card, :restorable_parent, roles: %i[users groups resource]],
+           include: [
+             :filestack_file,
+             :parent,
+             :parent_collection_card,
+             :restorable_parent,
+             :tagged_users,
+             roles: %i[users groups resource],
+           ],
            expose: { current_record: @item }
   end
 
@@ -138,12 +145,13 @@ class Api::V1::ItemsController < Api::V1::BaseController
         :url,
         :image,
         :archived,
-        :tag_list,
         :thumbnail_url,
         :legend_item_id,
         :legend_search_source,
         :style,
         :subtitle_hidden,
+        tag_list: [],
+        user_tag_list: [],
         filestack_file_attributes: Item.filestack_file_attributes_whitelist,
       ].concat(Item.globalize_attribute_names),
     )

@@ -74,6 +74,7 @@ class CollectionTemplateBuilder < SimpleService
   end
 
   def collection_params
+    cached_cover = (@template.cached_cover || {}).symbolize_keys
     {
       name: created_template_name,
       organization_id: @parent.organization.id,
@@ -82,6 +83,7 @@ class CollectionTemplateBuilder < SimpleService
       tag_list: @template.tag_list,
       collection_type: @template.collection_type,
       num_columns: @template.num_columns,
+      cached_cover: DefaultCollectionCover.defaults.merge(cached_cover),
     }.merge(@raw_collection_params)
   end
 

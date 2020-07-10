@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observable, computed, action } from 'mobx'
@@ -527,10 +526,16 @@ class GridCard extends React.Component {
     const showRestore = searchResult && record.isRestorable
 
     let contents
-    if (card.isPrivate || _.isEmpty(record)) {
+    if (card.isPrivate) {
       contents = (
         <StyledGridCardPrivate>
           <HiddenIcon />
+        </StyledGridCardPrivate>
+      )
+    } else if (card.isBctPlaceholder) {
+      contents = (
+        <StyledGridCardPrivate>
+          <CardLoader />
         </StyledGridCardPrivate>
       )
     } else {

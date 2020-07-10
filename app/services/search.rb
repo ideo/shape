@@ -7,6 +7,7 @@ class Search
         'name^50',
         'handle^50',
         'tags^20',
+        'user_tags^20',
         'content',
       ],
       # `missing` just means this field is allowed to be missing
@@ -47,6 +48,7 @@ class Search
     [
       Filters::TestAnswer,
       Filters::Tag,
+      Filters::UserTag,
       Filters::WithinCollection,
       Filters::ActivityDateRange,
       Filters::TypeCollection,

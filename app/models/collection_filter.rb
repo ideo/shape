@@ -19,16 +19,19 @@ class CollectionFilter < ApplicationRecord
   has_many :user_collection_filters,
            dependent: :destroy
 
+  scope :tagged_with_user_handle, ->(handle) { user_tag.where(arel_table[:text].lower.eq(handle&.downcase)) }
+
   validates :text,
             presence: true,
             uniqueness: {
-              scope: :collection_id,
+              scope: %i[collection_id filter_type],
               message: 'should not have duplicate filters in a collection',
             }
 
   enum filter_type: {
     tag: 0,
     search: 1,
+    user_tag: 2,
   }
 
   amoeba do

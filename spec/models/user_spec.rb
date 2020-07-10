@@ -76,6 +76,27 @@ describe User, type: :model do
       end
     end
 
+    context 'with user collection filters' do
+      let!(:collection_filter_not_user) { create(:collection_filter, text: user.handle) }
+      let!(:collection_filter) { create(:collection_filter, filter_type: :user_tag, text: user.handle) }
+
+      describe '#update_collection_filters' do
+        it 'updates any collection filters with new handle' do
+          old_handle = user.handle
+          user.update(handle: 'my-new-fancy-handle')
+          expect(collection_filter.reload.text).to eq('my-new-fancy-handle')
+          expect(collection_filter_not_user.reload.text).to eq(old_handle)
+        end
+      end
+
+      describe '#delete_collection_filters' do
+        it 'deletes any collection filters with handle' do
+          expect { user.destroy }.to change(CollectionFilter, :count).by(-1)
+          expect(CollectionFilter.exists?(collection_filter.id)).to be false
+        end
+      end
+    end
+
     describe '#update_profile_names' do
       let!(:profile) { create(:user_profile, created_by: user, name: 'My Profile') }
 
@@ -183,7 +204,7 @@ describe User, type: :model do
             picture: 'http://new.img.url',
             picture_large: 'http://new.img.url/large',
             locale: 'es',
-            username: 'bob-smith'
+            username: 'bob-smith',
           }
         end
 
@@ -253,15 +274,15 @@ describe User, type: :model do
           email: Faker::Internet.unique.email,
           first_name: Faker::Name.first_name,
           last_name: Faker::Name.last_name,
-          image: 'http://pic.url.net'
+          image: 'http://pic.url.net',
         },
         extra: {
           raw_info: {
             picture: 'http://pic.url.net',
             picture_medium: 'http://pic.url.net/med',
             picture_large: 'http://pic.url.net/lg',
-            locale: 'es'
-          }
+            locale: 'es',
+          },
         },
       )
     end
@@ -303,7 +324,7 @@ describe User, type: :model do
           provider: 'ideo',
           uid: '123',
           info: {
-            email: Faker::Internet.unique.email
+            email: Faker::Internet.unique.email,
           },
           extra: {
             raw_info: {
@@ -311,8 +332,8 @@ describe User, type: :model do
               type: 'User::Limited',
               picture: 'http://pic.url.net',
               picture_medium: 'http://pic.url.net/med',
-              picture_large: 'http://pic.url.net/lg'
-            }
+              picture_large: 'http://pic.url.net/lg',
+            },
           },
         )
       end
@@ -368,6 +389,7 @@ describe User, type: :model do
         status: user.status,
         organization_ids: [],
         application_bot: false,
+        taggings_count: 0,
       )
     end
 

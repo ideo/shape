@@ -22,4 +22,21 @@ module CustomTaggingMethods
   end
 end
 
+module CustomTagMethods
+  extend ActiveSupport::Concern
+
+  included do
+    searchkick word_start: %i[name]
+  end
+
+  def search_data
+    {
+      name: name&.downcase,
+      organization_ids: organization_ids,
+      taggings_count: taggings_count,
+    }
+  end
+end
+
 ActsAsTaggableOn::Tagging.send(:include, CustomTaggingMethods)
+ActsAsTaggableOn::Tag.send(:include, CustomTagMethods)

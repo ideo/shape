@@ -17,7 +17,7 @@ Feature: Template Instance
     # the template from the scenario above still exists, click "Use Template"
     When I click the 'CollectionCoverFormButton'
     And I choose to place the template instance elsewhere from the template helper modal
-    Then I should see 'Test Template in transit' in a '.MuiSnackbarContent-message'
+    Then I should see 'Test Template in transit' in a 'snackbar-message'
 
     When I place a card to the bottom using the snackbar
     And I wait for '@apiCreateTemplate' to finish

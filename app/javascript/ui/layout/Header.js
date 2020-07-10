@@ -28,6 +28,8 @@ import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
+import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
+import ChallengeSettingsModal from '~/ui/challenges/ChallengeSettingsModal'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const BackIconContainer = styled.span`
@@ -77,6 +79,20 @@ class Header extends React.Component {
     uiStore.update('rolesMenuOpen', record)
   }
 
+  getUsersAndGroupsLength = () => {
+    const { record } = this
+
+    const flattenUsersAndGroupsForRole = role => {
+      return _.flatten([_.map(role.users, 'id'), _.map(role.groups, 'id')])
+    }
+    const usersAndGroupsIds = _.flatMap(
+      record.roles,
+      flattenUsersAndGroupsForRole
+    )
+
+    return usersAndGroupsIds.length
+  }
+
   openMenu = ev => {
     const { uiStore } = this.props
     uiStore.update('pageMenuOpen', true)
@@ -99,6 +115,16 @@ class Header extends React.Component {
 
   closeOrgMenu = () => {
     this.props.uiStore.update('organizationMenuPage', null)
+  }
+
+  handleOpenChallengeSettings = ({ open = true }) => {
+    const { uiStore } = this.props
+    uiStore.update('challengeSettingsOpen', open)
+  }
+
+  handleReviewSubmissions = () => {
+    const { record } = this
+    record.navigateToNextAvailableTest()
   }
 
   get onArchivedPage() {
@@ -175,6 +201,7 @@ class Header extends React.Component {
         // convert observable to normal array to trigger render changes
         collaborators={[...record.collaborators]}
         rolesMenuOpen={!!uiStore.rolesMenuOpen}
+        usersAndGroupsLength={this.getUsersAndGroupsLength()}
       />
     )
   }
@@ -245,6 +272,37 @@ class Header extends React.Component {
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>
+    )
+  }
+
+  renderChallengeFixedHeader() {
+    const { uiStore, routingStore, apiStore } = this.props
+    const { record } = this
+    const { shouldRenderFixedHeader } = uiStore
+    const { currentUser } = apiStore
+    const { reviewable_collections } = currentUser
+
+    return (
+      record &&
+      record.isChallengeOrInsideChallenge &&
+      shouldRenderFixedHeader && (
+        <ChallengeFixedHeader
+          collection={record}
+          showSettingsModal={uiStore.challengeSettingsOpen}
+          handleShowSettings={() =>
+            this.handleOpenChallengeSettings({ open: true })
+          }
+          handleReviewSubmissions={() => {
+            this.handleReviewSubmissions()
+          }}
+          challengeNavigationHandler={() => {
+            routingStore.routeTo('collections', record.parentChallenge.id)
+          }}
+          currentUserHasReviewableCollections={
+            !_.isEmpty(reviewable_collections)
+          }
+        />
+      )
     )
   }
 
@@ -391,6 +449,14 @@ class Header extends React.Component {
               </Box>
             </Flex>
           </MaxWidthContainer>
+          {record && record.isChallengeOrInsideChallenge && (
+            <ChallengeSettingsModal
+              collection={record}
+              open={uiStore.challengeSettingsOpen}
+              onClose={() => this.handleOpenChallengeSettings({ open: false })}
+            />
+          )}
+          {this.renderChallengeFixedHeader()}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>

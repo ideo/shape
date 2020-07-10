@@ -46,6 +46,8 @@ module CollectionCardFilter
           {
             id: cc.id.to_s,
             order: cc.order,
+            row: cc.row,
+            col: cc.col,
           }
         end
       end
@@ -188,7 +190,12 @@ module CollectionCardFilter
 
     def fields
       if @ids_only
-        arr = ['collection_cards.id', 'collection_cards.order']
+        arr = [
+          'collection_cards.id',
+          'collection_cards.order',
+          'collection_cards.row',
+          'collection_cards.col',
+        ]
       else
         arr = ['collection_cards.*']
       end

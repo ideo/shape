@@ -59,7 +59,10 @@ module JsonapiCache
       includes = CollectionCard.default_relationships_for_api
       if @include_roles
         includes = [
-          record: [roles: %i[pending_users users groups resource]],
+          record: [
+            :tagged_users,
+            roles: %i[pending_users users groups resource],
+          ],
         ]
       end
       renderer = JSONAPI::Serializable::Renderer.new
@@ -109,9 +112,8 @@ module JsonapiCache
       @cards.each do |card|
         json = cached_card_data(card)
         record = card.record
-        record.common_viewable = common_viewable if @collection.present?
-
-        if @current_ability.can?(:read, record)
+        if record && @current_ability.can?(:read, record)
+          record.common_viewable = common_viewable if @collection.present?
           json = cached_card_with_user_fields(json, record)
           json_data = merge_included_data(json_data, json)
         else
@@ -119,7 +121,11 @@ module JsonapiCache
           next if @search_result
 
           # private_card allows frontend to hide or display "private" as needed
-          json[:data][:attributes][:private_card] = true
+          if card.is_a?(CollectionCard::Placeholder)
+            json[:data][:attributes][:can_edit_parent] = can_edit_parent
+          else
+            json[:data][:attributes][:private_card] = true
+          end
           # massage json api relationships to indicate this record is not included
           json[:data][:relationships][:record] = { meta: { included: false } }
         end
@@ -138,12 +144,16 @@ module JsonapiCache
     end
 
     def cached_card_with_user_fields(json, record)
+      json[:data][:attributes][:can_edit_parent] = can_edit_parent
       related = json[:data][:relationships][:record][:data]
+      return json if json[:included].nil?
+
       related_json = json[:included].select { |r| r[:id] == related[:id] && r[:type] == related[:type] }.first
       related_json[:attributes][:can_view] = true
       related_json[:attributes][:can_edit] = @current_ability.can?(:edit, record)
       related_json[:attributes][:can_edit_content] = record.active? && @current_ability.can?(:edit_content, record)
-      json[:data][:attributes][:can_edit_parent] = can_edit_parent
+      related_json[:attributes][:submission_reviewer_status] =
+        record.present? && record.submission? && @user.present? ? record.submission_reviewer_status(@user) : nil
       if @search_result
         related_json[:attributes].merge!(breadcrumb_attributes(record))
       end

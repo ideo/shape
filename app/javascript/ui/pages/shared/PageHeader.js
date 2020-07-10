@@ -9,7 +9,9 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import EditableName from '~/ui/pages/shared/EditableName'
 import RolesModal from '~/ui/roles/RolesModal'
 import Tooltip from '~/ui/global/Tooltip'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionFilter, {
+  CollectionPillHolder,
+} from '~/ui/filtering/CollectionFilter'
 import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BackIcon from '~/ui/icons/BackIcon'
@@ -24,30 +26,15 @@ import { StyledTitleAndRoles } from '~/ui/pages/shared/styled'
 import LanguageSelector from '~/ui/layout/LanguageSelector'
 import TruncatableText from '~/ui/global/TruncatableText'
 import v from '~/utils/variables'
-import CollectionTypeIcon, {
-  collectionTypeToIcon,
-} from '~/ui/global/CollectionTypeIcon'
+import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import IdeoSSO from '~/utils/IdeoSSO'
-
-const IconHolder = styled.span`
-  color: ${v.colors.commonDark};
-  display: block;
-  height: 32px;
-  ${props =>
-    props.align === 'left'
-      ? 'margin-right: 12px;'
-      : 'margin-left: 6px;'} margin-top: 12px;
-  overflow: hidden;
-  width: 32px;
-
-  @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-    height: 36px;
-    margin-top: 8px;
-    width: 20px;
-  }
-`
+import IconHolder from '~/ui/icons/IconHolder'
+import ChallengeSubHeader from '~/ui/layout/ChallengeSubHeader'
+import ChallengePhasesIcons from '~/ui/challenges/ChallengePhasesIcons'
+import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
 
 const LiveTestIndicator = styled.span`
   display: inline-block;
@@ -89,12 +76,13 @@ const StyledButtonIconWrapper = styled.span`
     right: 6px;
   `}
 `
-
 StyledButtonIconWrapper.displayName = 'StyledButtonIconWrapper'
 
-const CollectionPillHolder = styled.div`
-  margin-bottom: 8px;
-  width: 100%;
+const FixedRightContainer = styled(Flex)`
+  position: relative;
+  top: 22px;
+  right: 60px;
+  height: 33px;
 `
 
 @inject('uiStore', 'apiStore', 'routingStore')
@@ -150,7 +138,7 @@ class PageHeader extends React.Component {
 
     if (_.some(leftConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -169,7 +157,7 @@ class PageHeader extends React.Component {
 
     if (_.some(rightConditions, bool => bool)) {
       return (
-        <IconHolder align="right">
+        <IconHolder marginRight={12}>
           <CollectionTypeIcon record={record} />
         </IconHolder>
       )
@@ -186,11 +174,8 @@ class PageHeader extends React.Component {
 
     return (
       <CollectionTypeSelector collection={record} location={'PageHeader'}>
-        <IconHolder align="right">
-          {collectionTypeToIcon({
-            type: record.collection_type,
-            size: 'lg',
-          })}
+        <IconHolder marginRight={12}>
+          <CollectionIcon type={record.icon} size="lg" />
         </IconHolder>
       </CollectionTypeSelector>
     )
@@ -206,7 +191,7 @@ class PageHeader extends React.Component {
           size="lg"
           record={record}
           IconWrapper={({ children }) => (
-            <IconHolder align="right">{children}</IconHolder>
+            <IconHolder marginRight={12}>{children}</IconHolder>
           )}
         />
       )
@@ -449,17 +434,25 @@ class PageHeader extends React.Component {
     }
   }
 
+  get tagsEditorOpen() {
+    const {
+      record: { parent_collection_card },
+      uiStore: { tagsModalOpenId },
+    } = this.props
+    return (
+      parent_collection_card && tagsModalOpenId === parent_collection_card.id
+    )
+  }
+
   render() {
-    const { record, uiStore } = this.props
-    const tagEditorOpen =
-      record.parent_collection_card &&
-      uiStore.tagsModalOpenId === record.parent_collection_card.id
+    const { record, uiStore, routingStore } = this.props
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
     const showFilters =
       !uiStore.isMobileXs &&
       (record.isRegularCollection ||
+        record.isUserCollection ||
         record.isSubmissionsCollection ||
         record.isBoard)
 
@@ -476,6 +469,14 @@ class PageHeader extends React.Component {
       >
         <MaxWidthContainer>
           <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
+          {record.is_inside_a_challenge && (
+            <ChallengeSubHeader
+              challengeName={_.get(record, 'parentChallenge.name', '')}
+              challengeNavigationHandler={() => {
+                routingStore.routeTo('collections', record.parentChallenge.id)
+              }}
+            />
+          )}
           <div style={{ minHeight: '72px', display: 'flex' }}>
             <StyledTitleAndRoles
               data-empty-space-click
@@ -512,6 +513,9 @@ class PageHeader extends React.Component {
                   {this.collectionTypeOrInheritedTags}
                 </div>
                 <HeaderButtonContainer>
+                  {record.isChallengeOrInsideChallenge && (
+                    <ChallengePhasesIcons collection={record} />
+                  )}
                   {this.renderTemplateButton}
                   {this.renderRestoreButton}
                   {this.renderSubmissionSubmitButton}
@@ -522,16 +526,15 @@ class PageHeader extends React.Component {
               </Flex>
 
               {record.show_language_selector && (
-                <Flex
-                  style={{
-                    position: 'relative',
-                    top: '22px',
-                    right: '60px',
-                    height: '33px',
-                  }}
-                >
+                <FixedRightContainer>
                   <LanguageSelector />
-                </Flex>
+                </FixedRightContainer>
+              )}
+
+              {record.isChallengeOrInsideChallenge && (
+                <FixedRightContainer>
+                  <ChallengeHeaderButton record={record} />
+                </FixedRightContainer>
               )}
             </StyledTitleAndRoles>
             {showFilterControls && (
@@ -539,7 +542,9 @@ class PageHeader extends React.Component {
                 <CollectionViewToggle collection={record} />
                 <CollectionFilter
                   collection={record}
-                  canEdit={record.canEdit}
+                  // this is the one case where UserCollection breaks from
+                  // other system_required / canEdit restrictions
+                  canEdit={record.canEdit || record.isUserCollection}
                 />
               </div>
             )}
@@ -549,7 +554,7 @@ class PageHeader extends React.Component {
         <CollectionCardsTagEditorModal
           canEdit={record.canEdit}
           cards={this.cardsForTagging}
-          open={tagEditorOpen}
+          open={this.tagsEditorOpen}
         />
       </StyledHeader>
     )

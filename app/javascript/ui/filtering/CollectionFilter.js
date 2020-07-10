@@ -17,6 +17,11 @@ const SortContainer = styled.div`
   top: ${props => (props.top ? props.top : 0)}px;
 `
 
+export const CollectionPillHolder = styled.div`
+  margin-bottom: 8px;
+  width: 100%;
+`
+
 @observer
 class CollectionFilter extends React.Component {
   @observable
@@ -33,7 +38,9 @@ class CollectionFilter extends React.Component {
 
   get tagFilters() {
     const { filterBarFilters } = this.props.collection
-    return filterBarFilters.filter(filter => filter.filter_type === 'tag')
+    return filterBarFilters.filter(filter =>
+      ['tag', 'user_tag'].includes(filter.filter_type)
+    )
   }
 
   get searchFilters() {
@@ -75,13 +82,26 @@ class CollectionFilter extends React.Component {
 
   onCreateFilter = async tag => {
     const { collection } = this.props
-    if (!this.currentFilterLookupType) return
-    const backendFilterType = pluralize
-      .singular(this.currentFilterLookupType)
+    const { currentFilterLookupType } = this
+    if (!currentFilterLookupType) return
+    let backendFilterType = pluralize
+      .singular(currentFilterLookupType)
       .toLowerCase()
       .split(' ')[0]
+
+    let filterText = tag.name
+
+    if (backendFilterType === 'tag') {
+      // tags can be tags or user tags
+      const { internalType } = tag
+      // NOTE: internalType is set under Organization::searchTagsAndUsers
+      if (internalType === 'users') {
+        backendFilterType = 'user_tag'
+        filterText = tag.label
+      }
+    }
     const filter = {
-      text: tag.name,
+      text: filterText,
       filter_type: backendFilterType,
       selected: false,
     }
@@ -156,6 +176,7 @@ class CollectionFilter extends React.Component {
     } else {
       filterMenuMarginBottom = 24
     }
+
     return (
       <Fragment>
         {this.rendered && isParentMethodLibrary && (

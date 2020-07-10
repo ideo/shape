@@ -1,7 +1,7 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
+  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover next_available_challenge_test]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
@@ -20,7 +20,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
-    render_collection
+    render_collection(
+      include: Collection.default_relationships_for_api + [:tagged_users],
+    )
   end
 
   before_action :load_and_authorize_template_and_parent, only: %i[create_template]
@@ -158,6 +160,58 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     end
   end
 
+  def challenge_submission_boxes
+    challenge_submission_boxes = @collection.challenge_submission_boxes.select do |collection|
+      collection.can_view?(current_user)
+    end
+    submission_box_relationships = [submission_template: [:submission_template_test_collections,
+                                                          submission_template_test_collections: [:test_audiences]]]
+
+    render jsonapi: challenge_submission_boxes,
+           include: Collection.default_relationships_for_api
+                              .concat(
+                                submission_box_relationships,
+                              )
+  end
+
+  before_action :load_and_authorize_next_available_challenge_test, only: %i[next_available_challenge_test]
+  def next_available_challenge_test
+    test = @collection.next_available_challenge_test(
+      for_user: current_user,
+      omit_id: nil,
+    )
+    # FIXME: need to handle in-collection tests
+    if test.present?
+      render jsonapi: test
+    else
+      render json: nil
+    end
+  end
+
+  def phase_sub_collections
+    collections = @collection.all_child_collections
+                             .active
+                             .collection_type_phase
+                             .order(start_date: :asc)
+                             .select do |collection|
+                               collection.can_view?(current_user)
+                             end
+
+    render jsonapi: collections
+  end
+
+  def challenge_phase_collections
+    # This returns all phase collections that are children,
+    # or descendants of a parent challenge
+    collections = ChallengeRelevantPhaseCollections.call(
+      collection: @collection,
+      for_user: current_user,
+    )
+
+    # Only include collection data
+    render jsonapi: collections
+  end
+
   def restore_permissions
     RestorePermission.call(
       object: @collection,
@@ -180,7 +234,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   private
 
   def manipulate_row
-    RowInserter.call(
+    CollectionGrid::RowInserter.call(
       row: json_api_params[:row],
       collection: @collection,
       action: @action,
@@ -289,6 +343,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
   end
 
+  def load_and_authorize_next_available_challenge_test
+    @collection = Collection.find(params[:id])
+    authorize! :read, @collection
+  end
+
   def collection_params
     params.require(:collection).permit(permitted_collection_params)
   end
@@ -332,6 +391,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :test_show_media,
       :search_term,
       :collection_type,
+      :start_date,
+      :end_date,
+      :icon,
+      :show_icon_on_cover,
+      submission_attrs: {},
+      user_tag_list: [],
       collection_cards_attributes: %i[id order width height row col pinned],
     ].concat(Collection.globalize_attribute_names)
   end

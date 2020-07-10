@@ -4,11 +4,11 @@ import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import fakeRoutingStore from '#/mocks/fakeRoutingStore'
 
-import { fakeCollection, fakeGroup, fakeTextItem } from '#/mocks/data'
+import { fakeCollection, fakeGroup, fakeTextItem, fakeRole } from '#/mocks/data'
 
 const group = fakeGroup
 
-let wrapper, component, props
+let wrapper, component, props, instance
 
 describe('Header', () => {
   beforeEach(() => {
@@ -149,6 +149,35 @@ describe('Header', () => {
 
     it('renders the BasicHeader', () => {
       expect(wrapper.find('BasicHeader').exists()).toBe(true)
+    })
+  })
+
+  describe('getUsersAndGroupsLength', () => {
+    beforeEach(() => {
+      fakeCollection.roles = [fakeRole]
+      props.uiStore.viewingRecord = fakeCollection
+      wrapper = shallow(<Header.wrappedComponent {...props} />)
+      instance = wrapper.instance()
+    })
+
+    it('should return the total amount of groups and users per role', () => {
+      expect(instance.getUsersAndGroupsLength()).toEqual(
+        fakeRole.users.length + fakeRole.groups.length
+      )
+    })
+  })
+
+  describe('with a challenge collection type', () => {
+    beforeEach(() => {
+      fakeCollection.collection_type = 'challenge'
+      fakeCollection.isChallengeOrInsideChallenge = true
+      props.uiStore.viewingRecord = fakeCollection
+      props.uiStore.shouldRenderFixedHeader = true
+      render()
+    })
+
+    it('should render the ChallengeFixedHeader', () => {
+      expect(wrapper.find('ChallengeFixedHeader').exists()).toBe(true)
     })
   })
 })

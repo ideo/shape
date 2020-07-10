@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_17_163307) do
+ActiveRecord::Schema.define(version: 2020_06_26_174631) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(version: 2020_04_17_163307) do
     t.datetime "updated_at", null: false
     t.decimal "min_price_per_response", precision: 10, scale: 2, default: "0.0"
     t.integer "global_default"
+    t.integer "audience_type"
     t.index ["global_default"], name: "index_audiences_on_global_default"
   end
 
@@ -135,6 +136,7 @@ ActiveRecord::Schema.define(version: 2020_04_17_163307) do
     t.string "identifier"
     t.string "font_color"
     t.boolean "font_background", default: false
+    t.jsonb "parent_snapshot"
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
@@ -207,6 +209,13 @@ ActiveRecord::Schema.define(version: 2020_04_17_163307) do
     t.string "search_term"
     t.integer "collection_type", default: 0
     t.integer "num_columns"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer "challenge_admin_group_id"
+    t.integer "challenge_reviewer_group_id"
+    t.integer "challenge_participant_group_id"
+    t.string "icon"
+    t.boolean "show_icon_on_cover"
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
@@ -644,6 +653,8 @@ ActiveRecord::Schema.define(version: 2020_04_17_163307) do
     t.string "name"
     t.integer "taggings_count", default: 0
     t.jsonb "organization_ids", default: []
+    t.integer "tag_type", default: 0
+    t.bigint "user_id"
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
@@ -681,6 +692,15 @@ ActiveRecord::Schema.define(version: 2020_04_17_163307) do
     t.datetime "updated_at", null: false
     t.index ["collection_filter_id"], name: "index_user_collection_filters_on_collection_filter_id"
     t.index ["user_id"], name: "index_user_collection_filters_on_user_id"
+  end
+
+  create_table "user_tags", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "record_type"
+    t.bigint "record_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "record_id", "record_type"], name: "index_user_tags_on_user_id_and_record_id_and_record_type", unique: true
   end
 
   create_table "users", force: :cascade do |t|

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Collection::TestCollection, type: :model do
+describe Collection::TestCollection, type: :model, seed: true do
   let(:user) { create(:user) }
   let(:test_parent) { create(:collection, add_editors: [user]) }
   let(:test_collection) do
@@ -114,6 +114,28 @@ describe Collection::TestCollection, type: :model do
 
       it 'returns gives_incentive_for test_audience = false' do
         expect(test_collection.gives_incentive_for?(test_audience.id)).to be false
+      end
+    end
+
+    describe '#setup_challenge_test_audiences' do
+      let!(:challenge_test_audience) { create(:audience, min_price_per_response: 0, audience_type: :challenge) }
+      let(:template) { create(:collection, master_template: true, collection_type: 'challenge') }
+      let!(:test_collection) { create(:test_collection, parent_collection: template) }
+      let!(:admin_audience) { Audience.find_by(name: 'Admins') }
+      let!(:reviewer_audience) { Audience.find_by(name: 'Reviewers') }
+      let!(:participant_audience) { Audience.find_by(name: 'Participants') }
+
+      it 'should add the test_audiences"' do
+        expect(test_collection.challenge_audiences.any?).to be(true)
+        audiences = test_collection.challenge_audiences.map(&:audience)
+        expect(audiences).to include(admin_audience)
+        expect(audiences).to include(reviewer_audience)
+        expect(audiences).to include(participant_audience)
+      end
+
+      it 'should set Reviwer test audience to open' do
+        reviewer_test_audience = test_collection.challenge_audiences.find { |ca| ca.audience.name == 'Reviewers' }
+        expect(reviewer_test_audience.open?).to be(true)
       end
     end
 

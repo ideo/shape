@@ -330,4 +330,50 @@ describe('CollectionPage', () => {
       )
     })
   })
+
+  describe('renderPageHeader', () => {
+    beforeEach(() => {
+      wrapper = shallow(
+        <CollectionPage.wrappedComponent
+          {...props}
+          collection={{
+            ...fakeCollection,
+            isSearchCollection: true,
+          }}
+          uiStore={{
+            ...uiStore,
+            loadedSubmissions: true,
+          }}
+        />
+      )
+      component = wrapper.instance()
+    })
+
+    it('should render VisibilitySensor', () => {
+      expect(wrapper.find('VisibilitySensor').exists()).toBeTruthy()
+    })
+  })
+
+  describe('with challenge submission', () => {
+    beforeEach(() => {
+      wrapper.setProps({
+        collection: {
+          ...collection,
+          showSubmissionTopicSuggestions: true,
+          parentChallenge: {
+            ...collection,
+            topic_list: ['apples', 'bananas'],
+          },
+        },
+      })
+    })
+
+    it('shows suggested tags banner', () => {
+      expect(wrapper.find('SuggestedTagsBanner').exists()).toBe(true)
+      expect(wrapper.find('SuggestedTagsBanner').props().suggestions).toEqual([
+        'apples',
+        'bananas',
+      ])
+    })
+  })
 })

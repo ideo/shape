@@ -37,7 +37,11 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
 
     ta_id = session[:test_audience_id] || json_api_params['data']['attributes']['test_audience_id']
     if ta_id
-      test_audience = @collection.test_audiences.find_by(id: ta_id)
+      if @collection.live_challenge_submission_test?
+        test_audience = @collection.template.test_audiences.find_by(id: ta_id)
+      else
+        test_audience = @collection.test_audiences.find_by(id: ta_id)
+      end
     else
       test_audience = @collection.link_sharing_audience
     end

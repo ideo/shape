@@ -52,7 +52,7 @@ Feature: Creating a Test Collection
     And I add an open response question with "Any questions or concerns?"
     And I click the "audienceCheckbox-share-via-link"
     # Share Via Link makes an API call to "open" when you check the checkbox
-    And I wait for "@apiUpdateTestAudience" to finish
+    And I wait for "@apiToggleAudienceStatus" to finish
     When I click the "LaunchFormButton" containing "Get Feedback"
 
     # NOTE: seemingly no way to test clipboard copying in cypress (i.e. "Get Link")

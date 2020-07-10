@@ -1,5 +1,4 @@
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
-
 import { apiStore } from '~/stores'
 import { fakeCollection, fakeCollectionFilter } from '#/mocks/data'
 
@@ -115,16 +114,20 @@ describe('CollectionFilter', () => {
   })
 
   describe('onCreateFilter()', () => {
-    const fireEvent = (filterLookupType, tagText) => {
+    const fireEvent = (filterLookupType, tag) => {
+      const { label, internalType, user, name } = tag
       wrapper.instance().currentFilterLookupType = filterLookupType
       wrapper.instance().onCreateFilter({
-        name: tagText,
+        label,
+        internalType,
+        user,
+        name,
       })
     }
 
     describe('with the filter type set to search', () => {
       beforeEach(() => {
-        fireEvent('Search Term', 'animals')
+        fireEvent('Search Term', { name: 'animals' })
       })
 
       it('should call API_createCollectionFilter with transformed filter', () => {
@@ -138,9 +141,9 @@ describe('CollectionFilter', () => {
       })
     })
 
-    describe('with the filter type set to tags', () => {
+    describe('with the filter type set to tags with internalType tags', () => {
       beforeEach(() => {
-        fireEvent('Tags', 'dogs')
+        fireEvent('Tags', { name: 'dogs', internalType: 'tags' })
       })
 
       it('should call API_createCollectionFilter with transformed filter', () => {
@@ -154,11 +157,27 @@ describe('CollectionFilter', () => {
       })
     })
 
+    describe('with the filter type set to tags with internalType users', () => {
+      beforeEach(() => {
+        fireEvent('Tags', { label: 'shape-test-user', internalType: 'users' })
+      })
+
+      it('should call API_createCollectionFilter with transformed filter', () => {
+        expect(
+          props.collection.API_createCollectionFilter
+        ).toHaveBeenCalledWith({
+          text: 'shape-test-user',
+          filter_type: 'user_tag',
+          selected: false,
+        })
+      })
+    })
+
     describe('adding duplicate tag', () => {
       beforeEach(() => {
         props.collection.API_createCollectionFilter.mockClear()
         props.collection.collection_filters = [fakeCollectionFilter]
-        fireEvent('Tags', fakeCollectionFilter.text)
+        fireEvent('Tags', { name: fakeCollectionFilter.text })
       })
 
       it('does not call API_createCollectionFilter if filter is dupe', () => {
@@ -171,7 +190,7 @@ describe('CollectionFilter', () => {
     describe('with the filter type set to null', () => {
       beforeEach(() => {
         props.collection.API_createCollectionFilter.mockClear()
-        fireEvent(null, 'dogs')
+        fireEvent(null, { name: 'dogs' })
       })
 
       it('should not do anything', () => {

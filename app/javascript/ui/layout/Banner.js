@@ -39,7 +39,7 @@ class Banner extends React.Component {
               xs={12}
               md={8}
               container
-              spacing={16}
+              spacing={2}
               alignItems="flex-end"
             >
               {this.props.leftComponent}

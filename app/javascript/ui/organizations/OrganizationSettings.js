@@ -140,8 +140,30 @@ class OrganizationSettings extends React.Component {
     }
   }
 
-  afterAddRemoveDomainTag = () => {
+  @action
+  addTag = ({ label }) => {
+    const { domain_whitelist } = this.organization
+    if (_.indexOf(domain_whitelist, label) < 0) {
+      domain_whitelist.push(label)
+      this.organization.patch()
+    }
+  }
+
+  @action
+  removeTag = ({ label }) => {
+    _.pull(this.organization.domain_whitelist, label)
     this.organization.patch()
+  }
+
+  get domainWhiteListFormattedTags() {
+    const { organization } = this
+    const { domain_whitelist } = organization
+
+    return _.map(domain_whitelist, label => {
+      return {
+        label,
+      }
+    })
   }
 
   render() {
@@ -152,16 +174,13 @@ class OrganizationSettings extends React.Component {
           Any new people added to {this.organization.name} without these email
           domains will be considered guests.
         </p>
-
         <TagEditor
+          recordTags={this.domainWhiteListFormattedTags}
+          afterAddTag={this.addTag}
+          afterRemoveTag={this.removeTag}
           canEdit
-          validateTag={this.validateDomainTag}
           placeholder="Please enter domains with the following format: domain.com"
-          records={[this.organization]}
-          tagField="domain_whitelist"
           tagColor="white"
-          afterAddTag={this.afterAddRemoveDomainTag}
-          afterRemoveTag={this.afterAddRemoveDomainTag}
         />
         <br />
         <Heading2>Terms of Use</Heading2>

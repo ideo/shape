@@ -6,12 +6,15 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 import { Helmet } from 'react-helmet'
+import VisibilitySensor from 'react-visibility-sensor'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
 import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
+import CollectionFilter, {
+  CollectionPillHolder,
+} from '~/ui/filtering/CollectionFilter'
 import CollectionList from '~/ui/grid/CollectionList'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
@@ -31,6 +34,7 @@ import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
+import SuggestedTagsBanner from '~/ui/global/SuggestedTagsBanner'
 
 // more global way to do this?
 pluralize.addPluralRule(/canvas$/i, 'canvases')
@@ -70,8 +74,10 @@ class CollectionPage extends React.Component {
   @action
   componentDidUpdate(prevProps) {
     const { collection, routingStore } = this.props
-    const previousId = prevProps.collection.id
-    const currentId = collection.id
+    const {
+      collection: { id: previousId },
+    } = prevProps
+    const { id: currentId } = collection
     if (currentId !== previousId) {
       runInAction(() => {
         this.cardsFetched = false
@@ -199,6 +205,9 @@ class CollectionPage extends React.Component {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
     }
+    if (collection.isChallengeOrInsideChallenge) {
+      this.initializeChallenges()
+    }
     uiStore.update('dragTargets', [])
   }
 
@@ -283,6 +292,15 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
+    }
+  }
+
+  async initializeChallenges() {
+    const { collection } = this.props
+    await collection.initializeParentChallengeForCollection()
+    if (collection.isSubmissionInChallenge) {
+      await collection.API_fetchCardRoles()
+      await collection.API_fetchCardReviewerStatuses()
     }
   }
 
@@ -429,7 +447,6 @@ class CollectionPage extends React.Component {
     const { collection, uiStore } = this.props
     const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
     const {
-      submissionTypeName,
       submissions_collection,
       submission_box_type,
       submission_template,
@@ -457,6 +474,7 @@ class CollectionPage extends React.Component {
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
         <Flex ml="auto" justify="flex-end">
+          <CollectionPillHolder id="collectionFilterPortal" />
           <div style={{ display: 'inline-block', marginTop: '4px' }}>
             <CollectionViewToggle collection={submissions_collection} />
           </div>
@@ -482,7 +500,7 @@ class CollectionPage extends React.Component {
         )}
         {submissions_enabled && submissions_collection.viewMode !== 'list' && (
           <FloatingActionButton
-            toolTip={`Add ${submissionTypeName}`}
+            toolTip={`Create New Submission`}
             onClick={this.onAddSubmission}
             icon={<PlusIcon />}
           />
@@ -502,6 +520,25 @@ class CollectionPage extends React.Component {
 
   renderTestDesigner() {
     return <TestDesigner collection={this.props.collection} />
+  }
+
+  renderPageHeader() {
+    const { collection } = this.props
+
+    return (
+      <VisibilitySensor onChange={this.handleHeaderVisibility}>
+        {({ isVisible }) => {
+          return (
+            <PageHeader record={collection} template={collection.template} />
+          )
+        }}
+      </VisibilitySensor>
+    )
+  }
+
+  handleHeaderVisibility = isVisible => {
+    const { uiStore } = this.props
+    uiStore.update('shouldRenderFixedHeader', !isVisible)
   }
 
   loader = () => (
@@ -602,7 +639,19 @@ class CollectionPage extends React.Component {
     return (
       <Fragment>
         <Helmet title={collection.pageTitle} />
-        <PageHeader record={collection} template={collection.template} />
+        {!isLoading && collection.showSubmissionTopicSuggestions && (
+          <SuggestedTagsBanner
+            collection={collection}
+            suggestions={_.get(collection, 'parentChallenge.topic_list', [])}
+          />
+        )}
+        {!isLoading && (
+          <Fragment>
+            <ArchivedBanner />
+            <OverdueBanner />
+          </Fragment>
+        )}
+        {this.renderPageHeader()}
         {userRequiresOrg && (
           // for new user's trying to add a common resource, they'll see the Create Org modal
           // pop up over the CollectionGrid
@@ -610,8 +659,6 @@ class CollectionPage extends React.Component {
         )}
         {!isLoading && (
           <Fragment>
-            <ArchivedBanner />
-            <OverdueBanner />
             <PageContainer
               fullWidth={
                 collection.isBoard &&

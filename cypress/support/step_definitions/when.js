@@ -32,6 +32,14 @@ When(
   }
 )
 
+When(
+  'I create a textItem card using the foamcore hotspot with {string}',
+  content => {
+    // `empty` being equivalent to "BCT is already open"
+    cy.createCard('textItem', { content, empty: true })
+  }
+)
+
 When('I add a link URL {string} and wait for {string}', (url, request) => {
   cy.locate('BctTextField').type(url, {
     force: true,
@@ -55,13 +63,7 @@ When('I close the first open text item', () => {
 })
 
 When('I choose a link item from the submission box', () => {
-  cy.locateDataOrClass('DialogContent')
-    .first()
-    .children()
-    .first()
-    .children()
-    .eq(3)
-    .click({ force: true })
+  cy.locate('submission-box-link-item').click({ force: true })
 })
 
 // ----------------------
@@ -140,10 +142,7 @@ When('I close the snackbar', () => {
 
 When('I place a card to the bottom using the snackbar', () => {
   // NOTE: snackbar tests have proven fickle, so instead we just wait a bit for it
-  cy.locateDataOrClass('.MuiSnackbarContent-action')
-    .find('button')
-    .first()
-    .click({ force: true })
+  cy.locateDataOrClass('MoveSnackbarArrow-down').click({ force: true })
   // allow it to disappear
   cy.wait(300)
 })

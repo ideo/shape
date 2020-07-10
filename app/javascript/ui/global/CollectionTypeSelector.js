@@ -3,7 +3,7 @@ import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action } from 'mobx'
 
 import PopoutMenu from '~/ui/global/PopoutMenu'
-import { collectionTypeToIcon } from '~/ui/global/CollectionTypeIcon'
+import CollectionIcon from '~/ui/icons/CollectionIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import { capitalize } from 'lodash'
 import { Fragment } from 'react'
@@ -29,6 +29,7 @@ class CollectionTypeSelector extends React.Component {
   updateCollectionType = async collectionType => {
     const { collection } = this.props
     await collection.API_selectCollectionType(collectionType)
+
     // TODO: Do we want error handling?
     // If so, I think this needs a try/catch block?
     this.hidePopoutMenu()
@@ -53,14 +54,16 @@ class CollectionTypeSelector extends React.Component {
       this.baseCollectionType,
       'project',
       'method',
+      'phase',
       'prototype',
       'profile',
+      'challenge',
     ]
 
     return collectionTypes.map(collectionType => {
       return {
         name: collectionType,
-        iconRight: collectionTypeToIcon({ type: collectionType, size: 'sm' }),
+        iconRight: <CollectionIcon type={collectionType} size="xs" />,
         onClick: e => this.handleMenuItemClick(e, collectionType),
         noBorder: true,
         withAvatar: false,

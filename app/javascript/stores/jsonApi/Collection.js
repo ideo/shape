@@ -61,16 +61,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   viewMode = 'grid'
   // this stores the "virtual" search results collection
   searchResultsCollection = null
+  @observable
+  phaseSubCollections = []
+  @observable
+  challengeReviewerGroup = null
 
   attributesForAPI = [
     'name',
     'tag_list',
+    'user_tag_list',
     'submission_template_id',
     'submission_box_type',
     'collection_to_test_id',
     'test_show_media',
     'collection_type',
     'search_term',
+    'icon',
+    'show_icon_on_cover',
   ]
 
   constructor(...args) {
@@ -131,6 +138,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.snoozedEditWarningsAt = Date.now()
     }
     this.uiStore.setSnoozeChecked(!!this.snoozedEditWarningsAt)
+  }
+
+  @action
+  setPhaseSubCollections(value) {
+    this.phaseSubCollections = value
+    return this.phaseSubCollections
   }
 
   @action
@@ -384,6 +397,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::SubmissionsCollection'
   }
 
+  get submissionFormat() {
+    if (this.submission_template_id) return 'template'
+    if (this.submission_box_type && this.submission_box_type !== 'template')
+      return 'item'
+    return null
+  }
+
   get isSubmission() {
     return this.submission_attrs && this.submission_attrs.submission
   }
@@ -397,6 +417,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return (
       this.is_submission_box_template ||
       (this.submission_attrs && this.submission_attrs.template)
+    )
+  }
+
+  get isSubmissionInChallenge() {
+    return this.is_inside_a_challenge && this.isSubmission
+  }
+
+  get showSubmissionTopicSuggestions() {
+    const canEditSubmissionInChallenge =
+      this.isSubmissionInChallenge && this.canEdit
+
+    if (!canEditSubmissionInChallenge) return false
+
+    if (!this.parentChallenge) return null
+
+    const hasTopics =
+      this.parentChallenge.topic_list &&
+      this.parentChallenge.topic_list.length > 0
+
+    return (
+      hasTopics &&
+      (!this.submission_attrs || !this.submission_attrs.hide_topic_suggestions)
     )
   }
 
@@ -450,6 +492,17 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return submissions_collection
       ? submissions_collection.collection_cards.length
       : 0
+  }
+
+  get countSubmissionLiveTests() {
+    if (this.countSubmissions === 0) return 0
+
+    const { submissions_collection } = this
+    const liveTests = _.filter(submissions_collection.collection_cards, cc => {
+      return cc.record.isLiveTest
+    })
+
+    return liveTests ? liveTests.length : 0
   }
 
   get isTemplate() {
@@ -695,6 +748,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const filterQuery = activeFilters.map(filter => {
       if (filter.filter_type === 'tag') {
         return `#${filter.text.replace(spaces, '-')}`
+      } else if (filter.filter_type === 'user_tag') {
+        return `@${filter.text}`
       } else {
         return filter.text
       }
@@ -709,6 +764,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.parent.name &&
       this.parent.name.match(/method\s+library/i) !== null
     )
+  }
+
+  get isPhaseOrProject() {
+    return ['phase', 'project'].includes(this.collection_type)
   }
 
   @computed
@@ -881,6 +940,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  API_fetchCardReviewerStatuses = () => {
+    const ids = _.compact(
+      _.map(this.collection_cards, cc => {
+        if (cc.record && cc.record.user_tag_list) {
+          return cc.id
+        }
+      })
+    )
+    if (ids.length === 0) return
+    const basePath = '/api/v1'
+    return axios.get(
+      `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
+    )
+  }
+
   async API_fetchAndMergeCards(cardIds) {
     const { apiStore } = this
     const ids = cardIds.join(',')
@@ -909,6 +983,51 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const apiPath = `collections/${this.id}/collection_cards/breadcrumb_records`
     return this.apiStore.request(apiPath)
   }
+
+  // This is to fetch the phases that are displayed in the header for a challenge
+  API_fetchChallengePhaseCollections() {
+    const apiPath = `collections/${this.id}/challenge_phase_collections`
+    return this.apiStore.request(apiPath)
+  }
+
+  // Fetch all children submission boxes of this collection
+  API_fetchSubmissionBoxSubCollections() {
+    const apiPath = `collections/${this.id}/challenge_submission_boxes`
+    return this.apiStore.request(apiPath)
+  }
+
+  // Fetch all children phase collections of this collection
+  API_fetchPhaseSubCollections() {
+    const apiPath = `collections/${this.id}/phase_sub_collections`
+    return this.apiStore.request(apiPath)
+  }
+
+  API_hideSubmissionTopicSuggestions() {
+    if (!this.submission_attrs) return false
+    this.submission_attrs.hide_topic_suggestions = true
+    this.save()
+  }
+
+  async loadPhaseSubCollections() {
+    const request = await this.API_fetchPhaseSubCollections()
+    return request.data
+  }
+
+  async createChildPhaseCollection(name) {
+    const attrs = {
+      collection_attributes: {
+        name,
+        collection_type: 'phase',
+      },
+      parent_id: this.id,
+    }
+    const card = new CollectionCard(attrs, this.apiStore)
+    card.parent = this
+    // TODO: add error handling
+    const savedCard = await card.API_create()
+    return savedCard.record
+  }
+
   /*
   Perform batch updates on multiple cards at once,
   and captures current cards state to undo to
@@ -1014,6 +1133,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   revertToSnapshot(snapshot) {
     const updates = []
+    if (!snapshot || !snapshot.collection_cards_attributes) {
+      return
+    }
     snapshot.collection_cards_attributes.forEach(cardData => {
       const update = _.pick(cardData, [
         'order',
@@ -1109,6 +1231,48 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       ['hidden', 'order'],
       ['desc', 'asc']
     )
+  }
+
+  get isChallengeOrInsideChallenge() {
+    return this.collection_type === 'challenge' || this.is_inside_a_challenge
+  }
+
+  get currentReviewerHandles() {
+    if (!this.isSubmissionInChallenge) return []
+    return _.get(this, 'user_tag_list', [])
+  }
+
+  get isCurrentUserAReviewer() {
+    if (
+      !this.isSubmissionInChallenge ||
+      !this.isLiveTest ||
+      !this.currentReviewerHandles
+    ) {
+      return false
+    }
+
+    const { apiStore } = this
+    const { currentUser } = apiStore
+
+    const currentUserIsAReviewer =
+      this.currentReviewerHandles.findIndex(
+        handle => handle === _.get(currentUser, 'handle')
+      ) > -1
+    return currentUserIsAReviewer
+  }
+
+  get currentUserHasSubmissionsToReview() {
+    if (!this.is_inside_a_challenge || !this.isSubmissionBox) return false
+    const reviewableCards = _.get(
+      this,
+      'submissions_collection.reviewableCards'
+    )
+    if (_.isEmpty(reviewableCards)) return false
+
+    const cardsReviewableByCurrentUser = _.filter(reviewableCards, rc => {
+      return _.get(rc, 'record.isCurrentUserAReviewer')
+    })
+    return !_.isEmpty(cardsReviewableByCurrentUser)
   }
 
   // after we reorder a single card, we want to make sure everything goes into sequential order
@@ -1359,23 +1523,75 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
   }
 
-  async API_getNextAvailableTest() {
-    runInAction(() => {
-      this.nextAvailableTestPath = null
-    })
-    const res = await this.apiStore.request(
-      `test_collections/${this.id}/next_available`
+  async API_fetchChallengeReviewersGroup() {
+    if (!this.parentChallenge) return
+
+    // NOTE: assumes that the reviewer group are the reviewers
+    const challengeReviewerGroup = await this.apiStore.request(
+      `/groups/${this.parentChallenge.challenge_reviewer_group_id}`,
+      'GET'
     )
+
+    if (challengeReviewerGroup && challengeReviewerGroup.data) {
+      this.setChallengeReviewerGroup(challengeReviewerGroup.data)
+    }
+  }
+
+  async API_getNextAvailableTest({ challenge = false }) {
+    this.setNextAvailableTestPath(null)
+    const nextTestPath = !challenge
+      ? 'test_collections/${this.id}/next_available'
+      : 'collections/${this.id}/next_available_challenge_test'
+    const res = await this.apiStore.request(nextTestPath)
     if (!res.data) return
     const path = this.routingStore.pathTo('collections', res.data.id)
 
     this.setNextAvailableTestPath(`${path}?open=tests`)
   }
 
+  async navigateToNextInCollectionTest() {
+    // FIXME: add later when in-collection tests are supported
+    if (this.isSubmission) {
+      await this.API_getNextAvailableTest()
+    } else if (this.isSubmissionBox) {
+      await this.API_getNextAvailableTest({ challenge: true })
+    }
+    if (!this.nextAvailableTestPath) return
+
+    return this.routingStore.routeTo(this.nextAvailableTestPath)
+  }
+
+  async navigateToNextAvailableTest() {
+    let testUrl = null
+    if (this.isSubmission && this.launchableTestId) {
+      testUrl = this.publicTestURL
+    } else if (this.isSubmissionBox) {
+      const res = await this.apiStore.request(
+        `collections/${this.id}/next_available_challenge_test`
+      )
+
+      if (!res.data) return
+
+      testUrl = res.data.publicTestURL
+    }
+
+    if (!testUrl) return
+
+    window.location.href = testUrl
+
+    return
+  }
+
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path
   }
+
+  @action
+  setChallengeReviewerGroup(group) {
+    this.challengeReviewerGroup = group
+  }
+
   @action
   updateScrollBottom(y) {
     this.scrollBottom = y
@@ -1387,6 +1603,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       .find(cc => cc.is_cover === true)
     if (!previousCover) return
     previousCover.is_cover = false
+  }
+
+  // Load phase collections for given submission box collections
+  static async loadPhasesForSubmissionBoxes(submissionBoxes) {
+    // Filter out any that don't have a submission template (can't assign phases)
+    // Or any that have phase sub-collections already loaded
+    const subBoxesWithTemplates = submissionBoxes.filter(
+      subBox =>
+        !!subBox.submission_template && subBox.phaseSubCollections.length === 0
+    )
+    // Get phase collections for each submission box's template
+    const loadPhases = subBoxesWithTemplates.map(subBox => {
+      return new Promise(resolve => {
+        resolve(subBox.submission_template.loadPhaseSubCollections())
+      }).then(phaseSubCollections => {
+        // Set phase collections directly on each submission box
+        subBox.setPhaseSubCollections(phaseSubCollections)
+      })
+    })
+    await Promise.all(loadPhases)
+    return submissionBoxes
   }
 
   static async fetchSubmissionsCollection(id, { order } = {}) {
@@ -1562,6 +1799,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (!collection_cover_items || collection_cover_items.length === 0)
       return null
     return collection_cover_items[0]
+  }
+
+  get reviewableCards() {
+    if (!this.isSubmissionsCollection) return []
+    return _.filter(this.collection_cards, cc => {
+      return _.get(cc, 'record.isLiveTest')
+    })
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing

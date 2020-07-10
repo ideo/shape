@@ -16,6 +16,7 @@
 #  image_contain     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
+#  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
 #  section_type      :integer
@@ -134,6 +135,7 @@ class CollectionCard < ApplicationRecord
         :parent_collection_card,
         :question_choices,
         :collection_cover_text_items,
+        :tagged_users,
         collection_cover_items: :datasets,
       ],
     ]
@@ -141,9 +143,10 @@ class CollectionCard < ApplicationRecord
 
   def self.default_includes_for_api
     {
-      collection: [:collection_cover_items],
+      collection: [:collection_cover_items, :tagged_users],
       item: [
         :filestack_file,
+        :tagged_users,
         data_items_datasets: [:dataset],
       ],
     }
@@ -313,6 +316,10 @@ class CollectionCard < ApplicationRecord
 
   def pinned_and_locked?
     pinned? && !master_template_card?
+  end
+
+  def bct_placeholder?
+    is_a?(CollectionCard::Placeholder) && parent_snapshot.present?
   end
 
   def copy_into_new_link_card

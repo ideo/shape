@@ -75,6 +75,8 @@ class RoutingStore extends RouterStore {
         return `/${slug}/collections/${id}`
       case 'items':
         return `/${slug}/items/${id}`
+      case 'tests':
+        return `/tests/${id}`
       case 'search':
         // `id` means query in this case
         const path = `/${slug}/search`

@@ -167,7 +167,7 @@ describe Collection::SubmissionBox, type: :model do
       describe '#random_next_submission_test' do
         it 'should find one of the tests you have access to' do
           # only one available, so not "random", but just checking that the function works
-          expect(submission_box.random_next_submission_test(for_user: user))
+          expect(submission_box.random_next_submission_test(for_user: user).first)
             .to eq(submission_test)
         end
       end

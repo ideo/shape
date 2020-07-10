@@ -91,7 +91,7 @@ FilterBar.propTypes = {
 
 FilterBar.defaultProps = {
   hideTotalResults: false,
-  showIcon: PropTypes.bool,
+  showIcon: false,
 }
 
 export default FilterBar

@@ -16,6 +16,7 @@
 #  image_contain     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
+#  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
 #  section_type      :integer

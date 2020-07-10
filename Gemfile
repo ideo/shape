@@ -147,7 +147,7 @@ gem 'faker', '~> 1.9.5'
 # Anycable for more performant ActionCable
 # Note: you must `brew install anycable-go` if you want to run it locally
 # See: https://docs.anycable.io/#/using_with_rails
-gem 'anycable-rails', '>= 0.6.2'
+gem 'anycable-rails', '~> 1.0', groups: %i[development production]
 
 gem 'rails_same_site_cookie'
 
