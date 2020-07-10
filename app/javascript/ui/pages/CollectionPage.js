@@ -298,7 +298,10 @@ class CollectionPage extends React.Component {
   async initializeChallenges() {
     const { collection } = this.props
     await collection.initializeParentChallengeForCollection()
-    if (collection.isSubmissionInChallenge) {
+    if (
+      collection.is_inside_a_challenge &&
+      collection.isSubmissionsCollection
+    ) {
       await collection.API_fetchCardRoles()
       await collection.API_fetchCardReviewerStatuses()
     }

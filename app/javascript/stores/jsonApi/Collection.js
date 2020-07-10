@@ -1610,16 +1610,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   async navigateToNextIdeaTest() {
-    if (!this.launchableTestId) return
-
     let nextTestPath = null
     if (this.isSubmission) {
       nextTestPath = this.publicTestURL
     } else if (this.isSubmissionBox) {
       const nextTest = await this.API_getNextAvailableChallengeTest()
-      if (!nextTest) {
-        nextTestPath = nextTest.data.publicTestURL
-      }
+
+      if (!nextTest || !nextTest.launchableTestId) return
+
+      nextTestPath = nextTest.publicTestURL
     }
 
     if (!nextTestPath) return
@@ -1628,7 +1627,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   navigateToNextAvailableChallengeTest() {
-    if (this.collectionToTestId) {
+    if (!this.isSubmissionBox && !this.isSubmission) return
+
+    let collectionToTestId = null
+    if (this.isSubmission) {
+      collectionToTestId = this.collectionToTestId
+    } else if (this.isSubmissionBox) {
+      const { submission_template } = this
+      if (submission_template) {
+        collectionToTestId = submission_template.collectionToTestId
+      }
+    }
+
+    if (collectionToTestId) {
       this.navigateToNextInlineTest()
     } else {
       this.navigateToNextIdeaTest()
