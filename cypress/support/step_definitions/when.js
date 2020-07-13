@@ -561,3 +561,9 @@ When('I click the new query button for the first audience', index => {
     .click()
   cy.wait(100)
 })
+
+// scrolling
+When('I scroll down by {int} pixels', pixels => {
+  // scrollTo(x, y)
+  cy.scrollTo(0, pixels)
+})

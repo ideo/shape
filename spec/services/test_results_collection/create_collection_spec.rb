@@ -29,19 +29,6 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
     expect(subject).to be_a_success
   end
 
-  it 'changes the test collection name to feedback design' do
-    prev_name = test_collection.name
-    expect(subject).to be_a_success
-    expect(test_collection.reload.name).to eq(
-      prev_name + Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX,
-    )
-  end
-
-  it 'moves test collection to be inside results collection' do
-    expect(subject).to be_a_success
-    expect(test_results_collection.collections).to include(test_collection)
-  end
-
   context 'if idea provided' do
     before do
       # Create primary test results collection
@@ -55,40 +42,6 @@ RSpec.describe TestResultsCollection::CreateCollection, type: :service do
     it 'creates results collection linked to idea' do
       expect(subject).to be_a_success
       expect(idea.test_results_collection).to be_instance_of(Collection::TestResultsCollection)
-    end
-  end
-
-  context 'updating roles' do
-    context 'with roles on test collection' do
-      let(:editor) { create(:user) }
-      before do
-        test_collection.unanchor_and_inherit_roles_from_anchor!
-        editor.add_role(Role::EDITOR, test_collection)
-      end
-
-      it 'moves roles to results collection' do
-        role = test_collection.roles.first
-        expect(subject).to be_a_success
-        expect(test_results_collection.roles).to eq([role])
-        expect(test_collection.roles.reload).to be_empty
-        expect(test_collection.roles_anchor).to eq(test_results_collection)
-      end
-
-      it 'correctly anchors the children (items and ideas collection)' do
-        expect(subject).to be_a_success
-        expect(test_collection.children.all? { |child| child.roles_anchor == test_results_collection }).to be true
-      end
-    end
-
-    context 'with test collection anchored to another collection' do
-      let(:parent) { test_collection.parent }
-
-      it 'keeps everything anchored to the original roles anchor' do
-        expect(test_collection.roles_anchor).to eq parent
-        expect(subject).to be_a_success
-        collections = [test_results_collection] + [test_collection] + test_collection.children
-        expect(collections.all? { |c| c.roles_anchor == parent }).to be true
-      end
     end
   end
 end

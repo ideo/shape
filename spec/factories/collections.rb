@@ -17,7 +17,7 @@ FactoryBot.define do
     created_by factory: :user
 
     factory :board_collection, class: Collection::Board do
-      num_columns 16
+      num_columns 16 # TODO: Should this be 4?
     end
     factory :user_collection, class: Collection::UserCollection
     factory :application_collection, class: Collection::ApplicationCollection

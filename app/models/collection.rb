@@ -646,7 +646,11 @@ class Collection < ApplicationRecord
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     # no need to do this for boards
-    return if board_collection?
+    if board_collection?
+      collection_cards.update_all(order: 0)
+      # There is a non-null constraint
+      return
+    end
 
     CollectionCard.import(
       calculate_reordered_cards,
@@ -1009,7 +1013,7 @@ class Collection < ApplicationRecord
   end
 
   def board_collection?
-    type == 'Collection::Board'
+    num_columns.present?
   end
 
   def global_collection?
@@ -1225,6 +1229,18 @@ class Collection < ApplicationRecord
     left_of_first_moving_card_index = first_moving_card_index - 1
 
     collection_cards[left_of_first_moving_card_index].pinned?
+  end
+
+  def max_col_limit
+    num_columns - 1
+  end
+
+  def max_row_index
+    collection_cards.maximum(:row) || 0
+  end
+
+  def max_col_index
+    collection_cards.maximum(:col) || 0
   end
 
   def bct_placeholder_at(row:, col:)

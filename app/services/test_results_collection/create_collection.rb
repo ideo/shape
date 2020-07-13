@@ -31,11 +31,7 @@ module TestResultsCollection
         # (either master, or per idea)
         if test_results_collection.blank?
           context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
-          if master_results_collection?
-            update_test_collection_name
-            move_test_collection_inside_test_results
-            move_roles_to_results_collection if move_roles?
-          end
+          reload_collections
         end
 
       rescue Interactor::Failure => e
@@ -60,6 +56,11 @@ module TestResultsCollection
       idea.blank?
     end
 
+    def reload_collections
+      test_collection.reload
+      test_results_collection.reload
+    end
+
     def create_master_collection
       collection = Collection::TestResultsCollection.create(
         name: test_collection.name,
@@ -70,6 +71,7 @@ module TestResultsCollection
         idea: idea,
         loading_content: true,
       )
+
       return collection if collection.persisted?
 
       context.fail!(
@@ -95,51 +97,9 @@ module TestResultsCollection
       collection
     end
 
-    def update_test_collection_name
-      test_collection.update(
-        name: "#{test_collection.name}#{Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX}",
-      )
-    end
-
-    def move_roles_to_results_collection
-      test_collection.roles.each do |role|
-        role.update(resource: test_results_collection)
-      end
-      # reload to re-associate the roles
-      reload_collections
-      # reanchor the test collection and children to test_results_collection
-      test_collection.reanchor!(parent: test_results_collection, propagate: true)
-    end
-
-    def move_test_collection_inside_test_results
-      test_collection.parent_collection_card.update(
-        collection_id: test_results_collection.id,
-      )
-
-      # pick up parent_collection_card relationship
-      reload_collections
-
-      create_card(
-        params: {
-          collection_id: test_collection.id,
-        },
-        parent_collection: test_results_collection,
-        created_by: created_by,
-      )
-    end
-
-    def reload_collections
-      test_collection.reload
-      test_results_collection.reload
-    end
-
     def test_results_roles_anchor
       # anchor the test results to whatever the test collection was anchored to (could be nil for itself)
       test_collection.roles_anchor_collection
-    end
-
-    def move_roles?
-      test_results_roles_anchor.blank?
     end
   end
 end

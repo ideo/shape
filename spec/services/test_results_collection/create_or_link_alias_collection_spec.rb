@@ -17,6 +17,7 @@ RSpec.describe TestResultsCollection::CreateOrLinkAliasCollection, type: :servic
   let(:context) { subject.context }
 
   before do
+    allow(TestResultsCollection::CreateAndLinkOpenResponse).to receive(:call)
     TestResultsCollection::CreateContent.call(
       test_results_collection: test_results_collection,
     )
@@ -31,6 +32,18 @@ RSpec.describe TestResultsCollection::CreateOrLinkAliasCollection, type: :servic
       survey_response: survey_response,
       created_by: created_by,
     )
+  end
+
+  it 'calls CreateAndLinkOpenResponse with expected params' do
+    survey_response.question_answers.each do |question_answer|
+      next unless question_answer.question.question_open?
+
+      expect(TestResultsCollection::CreateAndLinkOpenResponse).to receive(:call).with(
+        test_collection: test_collection,
+        question_answer: question_answer,
+      )
+    end
+    subject.call
   end
 
   it 'creates the test results collection for the survey response' do
@@ -48,15 +61,13 @@ RSpec.describe TestResultsCollection::CreateOrLinkAliasCollection, type: :servic
     expect(alias_collection.collections.count).to eq 2
     responses = alias_collection.collections.last
     expect(responses.name).to eq "#{survey_response.respondent_alias} Responses"
-    # two open responses
-    expect(responses.items.count).to eq 2
   end
 
   context 're-calling the worker, which would call the service again' do
     it 'should not create any new collections' do
       expect {
         subject.call
-      }.to change(CollectionCard, :count).by(16)
+      }.to change(CollectionCard, :count).by(12)
       expect {
         subject.call
         # everything should be find_or_create at this point

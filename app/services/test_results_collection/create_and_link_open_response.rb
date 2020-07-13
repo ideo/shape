@@ -48,6 +48,7 @@ module TestResultsCollection
         parent_collection: alias_open_responses_collection,
         created_by: question.test_open_responses_collection&.created_by,
       )
+
       item = card.record
       context.open_response_item = item
       question_answer.update(open_response_item: item)
@@ -56,17 +57,23 @@ module TestResultsCollection
     def link_open_response_item
       return if answer_text.blank?
 
-      CollectionCard::Link.find_or_create_by(
-        parent: question_open_responses_collection,
-        item_id: open_response_item.id,
-        width: 2,
+      find_or_create_card(
+        params: {
+          item_id: open_response_item.id,
+          width: 2,
+        },
+        parent_collection: question_open_responses_collection,
+        type: 'link',
       )
 
       idea_items.each do |idea_item|
-        CollectionCard::Link.find_or_create_by(
-          parent: question_idea_open_responses_collection(idea_item),
-          item_id: open_response_item.id,
-          width: 2,
+        find_or_create_card(
+          params: {
+            item_id: open_response_item.id,
+            width: 2,
+          },
+          parent_collection: question_idea_open_responses_collection(idea_item),
+          type: 'link',
         )
       end
     end

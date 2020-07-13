@@ -19,7 +19,7 @@ module CollectionGrid
     end
 
     def call
-      return false unless @to_collection.is_a?(Collection::Board)
+      return false unless @to_collection.board_collection?
 
       CollectionGrid::Calculator.place_cards_on_board(
         row: @row,

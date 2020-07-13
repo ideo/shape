@@ -72,7 +72,7 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
 
       context 'with board collection' do
         before do
-          collection.update(type: 'Collection::Board')
+          collection.update(num_columns: 4)
 
           cards.each_with_index do |card, i|
             card.update(
@@ -91,7 +91,7 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
         it 'filters by row/col' do
           # Must re-instantiate subject so we can cast board to right class
           cc_filter = CollectionCardFilter::Base.call(
-            collection: collection.becomes(Collection::Board),
+            collection: collection,
             user: user,
             filters: filters,
           )

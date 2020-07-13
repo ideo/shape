@@ -90,18 +90,6 @@ class Collection
 
     before_create :set_as_foamcore
 
-    def max_col_limit
-      num_columns - 1
-    end
-
-    def max_row_index
-      collection_cards.maximum(:row) || 0
-    end
-
-    def max_col_index
-      collection_cards.maximum(:col) || 0
-    end
-
     private
 
     def set_as_foamcore
