@@ -121,7 +121,7 @@ class CardMover < SimpleService
   end
 
   def move_cards_to_collection
-    return [] if @to_collection.is_a? Collection::Board
+    return [] if @to_collection.board_collection?
 
     pin_moving_cards = @to_collection.should_pin_cards?(@placement)
 

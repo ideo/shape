@@ -177,7 +177,7 @@ module CollectionGrid
       moving_cards:
     )
       master_card = nil
-      if from_collection.is_a?(Collection::Board)
+      if from_collection.board_collection?
         master_card = top_left_card(moving_cards)
       else
         # important to do this first to assign row/col onto the cards
@@ -280,6 +280,7 @@ module CollectionGrid
       span = max_col - min_col
 
       last_card = collection.collection_cards.ordered.last || Mashie.new(row: 0, col: 0, width: 0)
+
       last_row_open_width = collection.num_columns - (last_card.col + last_card.width)
 
       if last_card.col < 6 && last_row_open_width >= span || (last_row_open_width.positive? && span > collection.num_columns)

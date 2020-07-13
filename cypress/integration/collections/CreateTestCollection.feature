@@ -66,9 +66,14 @@ Feature: Creating a Test Collection
     And I wait for "@apiGetCollectionCards" to finish
     # for some reason CI wouldn't wait for the 3rd... ?
     And I wait for 2 calls to "@apiGetItemDataset" to finish
-
     Then I should see "Usefulness" in a "DataItemCover"
-    # assuming the collection cover is not truncated...
+
+    # need to scroll down to load more cards on the board
+    And I scroll down by 1800 pixels
+    # loading extra cards + open response collections
+    And I wait for 3 calls to "@apiGetCollectionCards" to finish
+    When I wait for 3 seconds
+
     Then I should see a collection card named "Test Prototype Feedback Design"
     Then I should see "Test Prototype" in a "LegendItemCover"
     Then I should see "CypressTest Organization" in a "LegendItemCover"

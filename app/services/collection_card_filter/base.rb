@@ -111,7 +111,7 @@ module CollectionCardFilter
             cc[:item_id].in(item_ids),
           ),
         )
-      elsif @collection.is_a?(Collection::Board)
+      elsif @collection.board_collection?
         # Defaults to 16x16 since we default to a fully zoomed-out view
         rows = @filters[:rows].is_a?(Array) ? @filters[:rows] : [0, 16]
         # make sure it's getting at least 4 rows

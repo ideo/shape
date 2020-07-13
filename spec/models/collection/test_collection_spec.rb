@@ -356,15 +356,13 @@ describe Collection::TestCollection, type: :model, seed: true do
         context 'with valid draft collection (default status)' do
           it 'should create a TestResults collection and move itself into it' do
             expect(test_collection.test_results_collection.present?).to be false
+            expect(TestResultsCollection::CreateCollection).to receive(:call).and_call_original
             # call launch!
-            original_parent_card = test_collection.parent_collection_card
             expect(test_collection.launch!(initiated_by: user)).to be true
             test_results_collection = test_collection.test_results_collection
             expect(test_results_collection.present?).to be true
             expect(test_results_collection.created_by).to eq user
             # should have moved itself into the TRC
-            expect(original_parent_card.collection).to eq test_results_collection
-            expect(test_collection.reload.parent).to eq test_results_collection
           end
 
           it 'should update the status to "live"' do
@@ -837,34 +835,6 @@ describe Collection::TestCollection, type: :model, seed: true do
         'Please add your open response to question 7',
         'Question items are invalid',
       ])
-    end
-  end
-
-  context 'creating a test in a collection with its own roles' do
-    let(:my_collection) { create(:user_collection, add_editors: [user]) }
-    let(:test_collection) do
-      create(:test_collection, :completed, parent_collection: my_collection, add_editors: [user])
-    end
-    let(:test_results_collection) { test_collection.test_results_collection }
-    let(:launch) do
-      test_collection.launch!(initiated_by: user)
-    end
-
-    it 'assigns its roles to the test results collection' do
-      expect {
-        launch
-      }.to change(test_collection.roles, :count).by(-1)
-      expect(test_collection.roles).to be_empty
-      expect(test_results_collection.roles).not_to be_empty
-    end
-
-    it 'anchors itself to the test results collection' do
-      expect {
-        launch
-      }.to change(test_collection, :roles_anchor_collection_id)
-      expect(test_collection.roles_anchor).to eq test_results_collection
-      expect(test_collection.can_edit?(user)).to be true
-      expect(test_results_collection.can_edit?(user)).to be true
     end
   end
 end

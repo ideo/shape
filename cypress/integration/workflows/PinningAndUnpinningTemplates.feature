@@ -33,10 +33,7 @@ Feature: Pinning and Unpinning
     Then I should not see a "PinnedIcon" in the card at 1,1
     Then I should see a "PinnedIcon" in the card at 1,2
 
-    When I select the index 0 text card
-    When I select the index 1 text card
-    When I select the index 2 text card
-    When I select the index 3 text card
+    When I click the selectAll action for the card at 0,0
     And I click the move action for the card at 1,1
     And I close the move helper modal
     And I click the down arrow on the MDL snackbar
