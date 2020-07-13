@@ -743,7 +743,7 @@ class Collection
     end
 
     def live_challenge_submission_test?
-      challenge_or_inside_challenge? && !submission_box_template_test? && live?
+      challenge_or_inside_challenge? && submission_test? && !submission_box_template_test? && live?
     end
 
     private

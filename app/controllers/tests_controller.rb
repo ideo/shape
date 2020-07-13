@@ -35,7 +35,7 @@ class TestsController < ApplicationController
       look_up_test_audience
       # if you're invited to a test audience it'll set to `invalid` if that audience is closed
     elsif @collection.live_challenge_submission_test?
-      look_up_challenge_test_audience
+      lookup_challenge_test_audience
     end
 
     # if no test audience param, then you can only view the test if link_sharing_enabled
@@ -62,7 +62,7 @@ class TestsController < ApplicationController
     end
   end
 
-  def look_up_challenge_test_audience
+  def lookup_challenge_test_audience
     return unless user_signed_in? && current_user.present?
 
     challenge_test_audience = @collection.look_up_reviewer_audience_for_current_user(current_user)

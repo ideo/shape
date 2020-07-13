@@ -1261,20 +1261,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return currentUserIsAReviewer
   }
 
-  get currentUserHasSubmissionsToReview() {
-    if (!this.is_inside_a_challenge || !this.isSubmissionBox) return false
-    const reviewableCards = _.get(
-      this,
-      'submissions_collection.reviewableCards'
-    )
-    if (_.isEmpty(reviewableCards)) return false
-
-    const cardsReviewableByCurrentUser = _.filter(reviewableCards, rc => {
-      return _.get(rc, 'record.isCurrentUserAReviewer')
-    })
-    return !_.isEmpty(cardsReviewableByCurrentUser)
-  }
-
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {
@@ -1537,22 +1523,21 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  async API_getNextAvailableTest() {
+  async API_getNextAvailableTest({ forSubmissionBox = false }) {
     this.setNextAvailableTestPath(null)
-    let nextCollectionToTestId = null
-    const res = await this.apiStore.request(
-      `test_collections/${this.id}/next_available`
-    )
-    if (!res.data) return
-    nextCollectionToTestId = res.data.id
+    const nextTestPath = !forSubmissionBox
+      ? `test_collections/${this.id}/next_available`
+      : `collections/${this.id}/next_available_submission_test`
+    const res = await this.apiStore.request(nextTestPath)
+    const { data: nextTest } = res
+    if (!nextTest) return
+    let path = `${this.routingStore.pathTo('collections', nextTest.id)}`
 
-    if (!nextCollectionToTestId) return
-
-    const nextTestPath = this.routingStore.pathTo(
-      'collections',
-      nextCollectionToTestId
-    )
-    this.setNextAvailableTestPath(`${nextTestPath}?open=tests`)
+    if (nextTest.collection_to_test_id) {
+      path += '?open=tests'
+    }
+    this.setNextAvailableTestPath(path)
+    return path
   }
 
   async navigateToNextAvailableChallengeTest() {

@@ -1,6 +1,6 @@
 class Api::V1::TestCollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_test_collection, only: %i[validate_launch launch close reopen add_comparison csv_report]
-  before_action :load_test_collection, only: %i[show next_available add_comparison remove_comparison]
+  before_action :load_test_collection, only: %i[show add_comparison remove_comparison]
   before_action :load_submission_box_test_collection, only: %i[next_available]
   before_action :load_comparison_collection, only: %i[add_comparison remove_comparison]
 
@@ -121,7 +121,13 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
   end
 
   def load_submission_box_test_collection
-    @submission_box = @test_collection.parent_submission_box
+    @submission_box = Collection::SubmissionBox.find_by(id: params[:id])
+
+    unless @submission_box.present?
+      load_test_collection
+      @test_collection.parent_submission_box
+    end
+
     unless @submission_box.present?
       head(404)
       return false
