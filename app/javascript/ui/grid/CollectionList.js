@@ -11,6 +11,28 @@ import ChallengeListCard, {
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
+export const DEFAULT_COLUMNS = [
+  { displayName: '', style: { width: '50px' }, name: 'select' },
+  {
+    displayName: 'Name',
+    name: 'name',
+    style: { width: '500px' },
+  },
+  {
+    displayName: 'Last updated',
+    name: 'last_updated',
+    style: {
+      width: '300px',
+    },
+  },
+  {
+    displayName: 'Permissions',
+    name: 'permissions',
+    style: { width: '250px' },
+  },
+  { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
+]
+
 @observer
 class CollectionList extends React.Component {
   componentDidMount() {
@@ -24,27 +46,7 @@ class CollectionList extends React.Component {
 
   get columns() {
     const { collection } = this.props
-    const cols = [
-      { displayName: '', style: { width: '50px' }, name: 'select' },
-      {
-        displayName: 'Name',
-        name: 'name',
-        style: { width: '500px' },
-      },
-      {
-        displayName: 'Last updated',
-        name: 'last_updated',
-        style: {
-          width: '300px',
-        },
-      },
-      {
-        displayName: 'Permissions',
-        name: 'permissions',
-        style: { width: '250px' },
-      },
-      { displayName: '', style: { marginLeft: 'auto' }, name: 'actions' },
-    ]
+    const cols = DEFAULT_COLUMNS
     if (collection.isSubmissionsCollectionInsideChallenge) {
       return transformColumnsForChallenge(cols)
     }

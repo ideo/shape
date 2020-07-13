@@ -72,10 +72,9 @@ describe('CollectionList', () => {
       })
     })
 
-    describe('if inside a submission box inside a challenge', () => {
+    describe('if a submissions collection inside a challenge', () => {
       beforeEach(() => {
-        props.collection.isChallengeOrInsideChallenge = true
-        props.collection.isSubmissionsCollection = true
+        props.collection.isSubmissionsCollectionInsideChallenge = true
         props.collection.submission_box_type = 'template'
         render()
       })
