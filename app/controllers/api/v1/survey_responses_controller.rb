@@ -35,13 +35,15 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
   def load_test_audience
     return unless @collection.test_audiences.present?
 
+    if @collection.inside_a_challenge?
+      load_challenge_test_audience
+    end
+
+    return unless @test_audience_id.nil?
+
     ta_id = session[:test_audience_id] || json_api_params['data']['attributes']['test_audience_id']
     if ta_id
-      if @collection.live_challenge_submission_test?
-        test_audience = @collection.template.test_audiences.find_by(id: ta_id)
-      else
-        test_audience = @collection.test_audiences.find_by(id: ta_id)
-      end
+      test_audience = @collection.test_audiences.find_by(id: ta_id)
     else
       test_audience = @collection.link_sharing_audience
     end
@@ -64,5 +66,12 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
       return false
     end
     true
+  end
+
+  def load_challenge_test_audience
+    return unless @collection.live_challenge_submission_test? || @collection.collection_to_test.present?
+
+    test_audience = @collection.look_up_reviewer_audience_for_current_user(current_user)
+    @test_audience_id = test_audience&.id
   end
 end

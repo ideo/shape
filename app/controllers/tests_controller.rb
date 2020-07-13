@@ -45,7 +45,7 @@ class TestsController < ApplicationController
       @invalid = true
     end
     # will reset to nil if no test_audience
-    session[:test_audience_id] = @test_audience&.id
+    session[:test_audience_id] = @test_audience&.id unless @collection.live_challenge_submission_test?
   end
 
   def look_up_test_audience
@@ -65,16 +65,10 @@ class TestsController < ApplicationController
   def look_up_challenge_test_audience
     return unless user_signed_in? && current_user.present?
 
-    reviewer_group = @collection&.parent_challenge&.challenge_reviewer_group
-
-    return unless reviewer_group.present? && reviewer_group.user_ids.include?(current_user.id)
-
-    # use master template test audience
-    test_audiences = @collection&.template&.test_audiences
-    return unless test_audiences.present?
+    challenge_test_audience = @collection.look_up_reviewer_audience_for_current_user(current_user)
 
     # tests will share the same submission template reviewer test audience
-    @test_audience = test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
+    @test_audience = challenge_test_audience
   end
 
   def redirect_to_test

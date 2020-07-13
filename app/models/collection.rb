@@ -1281,6 +1281,17 @@ class Collection < ApplicationRecord
     super(*args)
   end
 
+  def look_up_reviewer_audience_for_current_user(current_user)
+    return nil unless current_user.present? && in_reviewer_group?(current_user)
+
+    # use master template test audience
+    test_audiences = template&.test_audiences
+
+    return nil unless test_audiences.present?
+
+    test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
+  end
+
   def in_reviewer_group?(current_user)
     return false unless inside_a_challenge?
 
