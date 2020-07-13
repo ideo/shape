@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe TestsController, type: :request do
   include IdeoSsoHelper
-  let(:test_collection) { create(:test_collection) }
+  let(:user) { @user }
 
   before do
     # NOTE: not doing any normal rendering of the index page because we defer to Cypress for those,
@@ -11,11 +11,107 @@ describe TestsController, type: :request do
   end
 
   describe 'GET #show' do
+    let(:test_audiences) { test_collection.test_audiences }
     let(:path) { "/tests/#{test_collection.id}" }
 
-    it 'returns a 200' do
-      get(path)
-      expect(response.status).to eq 200
+    context 'with a closed test' do
+      let(:test_collection) { create(:test_collection, test_status: :closed) }
+
+      it 'sets invalid = true' do
+        get(path)
+        expect(response.status).to eq 200
+        expect(assigns(:invalid)).to be true
+      end
+    end
+
+    context 'with a normal open test (link sharing enabled by default)' do
+      let(:test_collection) { create(:test_collection, :launched) }
+
+      it 'sets invalid = false' do
+        get(path)
+        expect(response.status).to eq 200
+        expect(assigns(:invalid)).to be false
+      end
+    end
+
+    context 'with a ta param for test audience' do
+      let(:test_collection) { create(:test_collection, :launched, :with_test_audience) }
+      let(:test_audience) { test_collection.test_audiences.paid.first }
+      let(:path) { "/tests/#{test_collection.id}?ta=#{test_audience.id}" }
+      before do
+        test_audiences.link_sharing.first.update(status: :closed)
+      end
+
+      context 'when test audience is open' do
+        it 'sets test_audience; invalid = false' do
+          get(path)
+          expect(response.status).to eq 200
+          expect(assigns(:test_audience)).to eq test_audience
+          expect(assigns(:invalid)).to be false
+        end
+      end
+
+      context 'when test audience is closed' do
+        before do
+          test_audience.update(status: :closed)
+        end
+
+        it 'sets test_audience = nil; invalid = true' do
+          get(path)
+          expect(response.status).to eq 200
+          expect(assigns(:test_audience)).to be nil
+          expect(assigns(:invalid)).to be true
+        end
+      end
+    end
+
+    context 'inside a challenge', auth: true do
+      let(:test_collection) { create(:test_collection, :launched) }
+      let!(:challenge) do
+        create(:collection,
+               name: 'Challenge',
+               collection_type: 'challenge')
+      end
+
+      context 'with link sharing not enabled' do
+        before do
+          test_audiences.first.update(status: :closed)
+        end
+
+        it 'sets invalid = true' do
+          get(path)
+          expect(response.status).to eq 200
+          expect(assigns(:invalid)).to be true
+        end
+
+        context 'with a valid test audience' do
+          let(:template) { create(:test_collection) }
+          let(:test_collection) do
+            create(:test_collection, :launched, template: template, parent_collection: challenge)
+          end
+          let!(:audience) { create(:audience, audience_type: :challenge, name: 'Reviewers') }
+          let!(:test_audience) do
+            create(:test_audience, test_collection: template, price_per_response: 0, audience: audience)
+          end
+          before do
+            user.add_role(Role::MEMBER, challenge.challenge_reviewer_group)
+          end
+
+          it 'sets invalid = false' do
+            get(path)
+            expect(response.status).to eq 200
+            expect(assigns(:invalid)).to be false
+          end
+        end
+      end
+
+      context 'with link sharing enabled' do
+        it 'sets invalid = false' do
+          get(path)
+          expect(response.status).to eq 200
+          expect(assigns(:invalid)).to be false
+        end
+      end
     end
   end
 
