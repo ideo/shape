@@ -548,15 +548,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return undefined
   }
 
-  get collectionToTestId() {
-    if (this.isTestCollection) {
-      return this.collection_to_test_id
-    } else if (this.submission_attrs) {
-      return this.submission_attrs.launchable_test_collection_to_test_id
-    }
-    return undefined
-  }
-
   get isCarousel() {
     return this.cover_type === 'cover_type_carousel'
   }
@@ -1546,18 +1537,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
-  async API_getNextAvailableTest({ challenge = false }) {
+  async API_getNextAvailableTest() {
     this.setNextAvailableTestPath(null)
     let nextCollectionToTestId = null
-    if (challenge) {
-      nextCollectionToTestId = await this.nextAvailableCollectionToTestId()
-    } else {
-      const res = await this.apiStore.request(
-        `test_collections/${this.id}/next_available`
-      )
-      if (!res.data) return
-      nextCollectionToTestId = res.data.id
-    }
+    const res = await this.apiStore.request(
+      `test_collections/${this.id}/next_available`
+    )
+    if (!res.data) return
+    nextCollectionToTestId = res.data.id
 
     if (!nextCollectionToTestId) return
 
@@ -1568,53 +1555,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     this.setNextAvailableTestPath(`${nextTestPath}?open=tests`)
   }
 
-  async API_getNextAvailableChallengeTest() {
-    const nextTest = await this.apiStore.request(
-      `collections/${this.id}/next_available_challenge_test`
-    )
+  async navigateToNextAvailableChallengeTest() {
+    if (!this.isSubmissionBox && !this.isSubmission) return
 
-    if (!nextTest.data) return null
-
-    return nextTest.data
-  }
-
-  async nextAvailableCollectionToTestId() {
-    const nextTest = await this.API_getNextAvailableChallengeTest()
-
-    if (!nextTest) return null
-
-    const { collectionToTestId } = nextTest
-    return collectionToTestId
-  }
-
-  async navigateToNextInlineTest() {
-    let nextTestPath = null
-    if (this.isSubmission && this.collectionToTestId) {
-      nextTestPath = this.routingStore.pathTo(
-        'collections',
-        this.collectionToTestId
-      )
-    } else if (this.isSubmissionBox) {
-      const nextCollectionToTestId = await this.nextAvailableCollectionToTestId()
-      if (!nextCollectionToTestId) return
-
-      nextTestPath = this.routingStore.pathTo(
-        'collections',
-        nextCollectionToTestId
-      )
-    }
-
-    if (!nextTestPath) return
-
-    return this.routingStore.routeTo(`${nextTestPath}?open=tests`)
-  }
-
-  async navigateToNextIdeaTest() {
     let nextTestPath = null
     if (this.isSubmission) {
       nextTestPath = this.publicTestURL
     } else if (this.isSubmissionBox) {
-      const nextTest = await this.API_getNextAvailableChallengeTest()
+      const nextTest = await this.API_getNextAvailableTest()
 
       if (!nextTest || !nextTest.launchableTestId) return
 
@@ -1624,26 +1572,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (!nextTestPath) return
 
     window.location.href = nextTestPath
-  }
-
-  navigateToNextAvailableChallengeTest() {
-    if (!this.isSubmissionBox && !this.isSubmission) return
-
-    let collectionToTestId = null
-    if (this.isSubmission) {
-      collectionToTestId = this.collectionToTestId
-    } else if (this.isSubmissionBox) {
-      const { submission_template } = this
-      if (submission_template) {
-        collectionToTestId = submission_template.collectionToTestId
-      }
-    }
-
-    if (collectionToTestId) {
-      this.navigateToNextInlineTest()
-    } else {
-      this.navigateToNextIdeaTest()
-    }
   }
 
   @action

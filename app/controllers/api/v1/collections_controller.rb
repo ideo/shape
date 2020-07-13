@@ -1,7 +1,7 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover next_available_challenge_test]
+  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
@@ -174,20 +174,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                               )
   end
 
-  before_action :load_and_authorize_next_available_challenge_test, only: %i[next_available_challenge_test]
-  def next_available_challenge_test
-    test = @collection.next_available_challenge_test(
-      for_user: current_user,
-      omit_id: nil,
-    )
-    # FIXME: need to handle in-collection tests
-    if test.present?
-      render jsonapi: test
-    else
-      render json: nil
-    end
-  end
-
   def phase_sub_collections
     collections = @collection.all_child_collections
                              .active
@@ -341,11 +327,6 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       [Role::VIEWER, Role::CONTENT_EDITOR, Role::EDITOR],
       resources: ([@collection] + Collection.where(id: @collection.breadcrumb)),
     )
-  end
-
-  def load_and_authorize_next_available_challenge_test
-    @collection = Collection.find(params[:id])
-    authorize! :read, @collection
   end
 
   def collection_params

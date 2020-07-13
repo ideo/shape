@@ -976,19 +976,6 @@ class Collection < ApplicationRecord
     response.completed? ? :completed : :in_progress
   end
 
-  def next_available_challenge_test(for_user:, omit_id: nil)
-    return nil unless challenge_submission_boxes.any?
-
-    # next test to review from the list of submission boxes in the challenge
-    next_test = nil
-    challenge_submission_boxes.each do |sb|
-      next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
-      # break early since it already found the next test
-      break if next_test.present?
-    end
-    next_test
-  end
-
   def default_group_id
     return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
@@ -1130,10 +1117,6 @@ class Collection < ApplicationRecord
 
   def launchable_test_id
     submission_attrs.present? ? submission_attrs['launchable_test_id'] : nil
-  end
-
-  def launchable_collection_to_test_id
-    submission_attrs.present? ? submission_attrs['launchable_collection_to_test_id'] : nil
   end
 
   # check for template instances anywhere in the entire collection tree
