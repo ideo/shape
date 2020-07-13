@@ -899,15 +899,14 @@ describe Collection, type: :model do
         collection_type: :challenge,
       )
     end
-    let(:submission_box) { create(:submission_box, parent_collection: parent_challenge) }
-    before { submission_box.setup_submissions_collection! }
+    let(:submission_box) { create(:submission_box, :with_submissions_collection, parent_collection: parent_challenge) }
     let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
     # Take a shortcut - just create test collection to be used directly in submission
     let!(:test_collection) do
       create(:test_collection, :completed, parent_collection: submission_template)
     end
     let!(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
-    let(:reviewer) { create(:user) }
+    let(:reviewer) { create(:user, handle: 'test_user') }
     before do
       submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
     end
@@ -987,6 +986,25 @@ describe Collection, type: :model do
           submission.remove_challenge_reviewer_filter_from_submission_box(reviewer)
         end.to change(CollectionFilter.user_tag, :count).by(-1)
         expect(CollectionFilter.exists?(collection_filter_id)).to be false
+      end
+    end
+
+    describe 'with reviewer added to challenge reviewer group' do
+      let!(:master_test) do
+        create(:test_collection, :with_reviewers_audience, parent_collection: submission_template, master_template: true)
+      end
+      let!(:test_collection) do
+        create(:test_collection, :completed, parent_collection: submission_template, template_id: master_test.id)
+      end
+      before do
+        reviewer.add_role(Role::MEMBER, parent_challenge.challenge_reviewer_group)
+      end
+      it 'should lookup reviewer audience' do
+        expect(test_collection
+          .lookup_reviewer_audience_for_current_user(reviewer)).to eq(master_test
+                                                                      .test_audiences
+                                                                      .joins(:audience)
+                                                                      .find_by(audiences: { name: 'Reviewers' }))
       end
     end
   end

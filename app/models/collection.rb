@@ -1280,7 +1280,7 @@ class Collection < ApplicationRecord
     super(*args)
   end
 
-  def look_up_reviewer_audience_for_current_user(current_user)
+  def lookup_reviewer_audience_for_current_user(current_user)
     return nil unless current_user.present? && in_reviewer_group?(current_user)
 
     # use master template test audience

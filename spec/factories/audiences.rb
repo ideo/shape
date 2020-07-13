@@ -16,5 +16,11 @@ FactoryBot.define do
       min_price_per_response 0
       global_default 1
     end
+
+    trait :challenge do
+      min_price_per_response 0
+      global_default 1
+      audience_type 0
+    end
   end
 end

@@ -23,5 +23,12 @@ FactoryBot.define do
     trait :link_sharing do
       audience factory: %i[audience link_sharing]
     end
+
+    trait :reviewers do
+      audience factory: %i[audience challenge]
+      after(:create) do |test_audience|
+        test_audience.audience.update(name: 'Reviewers')
+      end
+    end
   end
 end
