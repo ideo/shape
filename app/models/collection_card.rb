@@ -89,7 +89,7 @@ class CollectionCard < ApplicationRecord
            to: :record,
            allow_nil: true
 
-  scope :ordered, -> { order(order: :asc) }
+  scope :ordered, -> { order(order: :asc, row: :asc, col: :asc) }
   scope :ordered_row_col, -> { reorder(row: :asc, col: :asc) }
   scope :pinned, -> { where(pinned: true) }
   scope :unpinned, -> { where(pinned: false) }

@@ -1,5 +1,6 @@
-import ChallengeHeaderButton from '~/ui/challenges/ChallengeHeaderButton'
-import fakeApiStore from '#/mocks/fakeApiStore'
+import ChallengeHeaderButton, {
+  ReviewSubmissionsButton,
+} from '~/ui/challenges/ChallengeHeaderButton'
 import { fakeCollection } from '#/mocks/data'
 
 let props, wrapper, rerender
@@ -9,86 +10,98 @@ describe('ChallengeHeaderButton', () => {
       record: {
         ...fakeCollection,
         isChallengeOrInsideChallenge: true,
-        API_fetchAllReviewableSubmissions: jest
-          .fn()
-          .mockReturnValue(Promise.resolve([])),
-        fetchChallengeReviewersGroup: jest.fn(),
         canEdit: false,
-        challenge: {
-          ...fakeCollection,
-          canEdit: false,
-          collection_type: 'challenge',
-        },
+        in_reviewer_group: false,
       },
-      apiStore: fakeApiStore(),
+      parentChallenge: null,
     }
-
     rerender = () => {
-      wrapper = shallow(<ChallengeHeaderButton.wrappedComponent {...props} />)
+      wrapper = shallow(<ChallengeHeaderButton {...props} />)
     }
-
     rerender()
   })
 
   describe('if user cannot edit collection and is not in reviewer group', () => {
-    it('does not render button', () => {
-      expect(wrapper.find('ChallengeHeaderButton').exists()).toBe(false)
+    it('does not render a button', () => {
+      expect(wrapper.find('ChallengeSettingsButton').exists()).toBe(false)
+      expect(wrapper.find('ReviewSubmissionsButton').exists()).toBe(false)
     })
   })
 
   describe('if user can edit collection', () => {
     beforeEach(() => {
-      const parentChallenge = fakeCollection
-      parentChallenge.id = 999
-      parentChallenge.canEdit = true
-      props.record.parentChallenge = parentChallenge
+      props.parentChallenge = {
+        ...fakeCollection,
+        id: 999,
+        canEdit: true,
+      }
       rerender()
     })
 
-    it('renders Challenge Settings button', () => {
-      expect(wrapper.find('Button').exists()).toBe(true)
-      expect(wrapper.find('Button').text()).toEqual('Challenge Settings')
+    it('renders challenge settings button', () => {
+      expect(wrapper.find('ChallengeSettingsButton').exists()).toBe(true)
     })
   })
 
-  describe('inside a submission box', () => {
+  describe('if user is in the reviewer group and not a challenge editor', () => {
     beforeEach(() => {
-      const parentChallenge = fakeCollection
-      parentChallenge.id = 999
-      parentChallenge.canEdit = true
-
-      props.record.isSubmissionBox = true
-      props.record.isChallengeOrInsideChallenge = true
-      props.record.parentChallenge = parentChallenge
+      props.parentChallenge = {
+        ...fakeCollection,
+        id: 999,
+        canEdit: false,
+      }
+      props.record.in_reviewer_group = true
       rerender()
     })
 
-    it('should render a review button', () => {
-      expect(wrapper.find('Button').exists()).toBe(true)
+    it('renders review submissions button', () => {
+      expect(wrapper.find('ReviewSubmissionsButton').exists()).toBe(true)
+    })
+  })
+})
+
+describe('ReviewSubmissionsButton', () => {
+  beforeEach(() => {
+    props = {
+      record: fakeCollection,
+    }
+    rerender = () => {
+      wrapper = shallow(<ReviewSubmissionsButton {...props} />)
+    }
+  })
+
+  it('calls API_getNextAvailableTest to see if there are any tests to review', () => {
+    rerender()
+    expect(props.record.API_getNextAvailableTest).toHaveBeenCalledWith({
+      challenge: true,
+    })
+  })
+
+  describe('if user has no submissions to review', () => {
+    beforeEach(() => {
+      props.record.API_getNextAvailableTest = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(null))
+      rerender()
     })
 
-    describe('if user has no submissions to review', () => {
-      beforeEach(() => {
-        props.record.currentUserHasSubmissionsToReview = false
-        rerender()
-      })
+    it('should render the button with no reviewable submissions', () => {
+      expect(wrapper.find('Button').text()).toContain(
+        'No Reviewable Submissions'
+      )
+    })
+  })
 
-      it('should render the button with no reviewable submissions', () => {
-        expect(wrapper.find('Button').text()).toContain(
-          'No Reviewable Submissions'
-        )
-      })
+  describe('with reviewable submissions', () => {
+    beforeEach(() => {
+      props.record.API_getNextAvailableTest = jest
+        .fn()
+        .mockReturnValue(Promise.resolve('/collections/999?open=tests'))
+      rerender()
     })
 
-    describe('with reviewable submissions', () => {
-      beforeEach(() => {
-        props.record.currentUserHasSubmissionsToReview = true
-        rerender()
-      })
-
-      it('renders the button with reviewable submissions', () => {
-        expect(wrapper.find('Button').text()).toContain('Review Submissions')
-      })
+    it('renders the button with reviewable submissions', () => {
+      expect(wrapper.find('Button').text()).toContain('Review Submissions')
     })
   })
 })

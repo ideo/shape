@@ -13,9 +13,9 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
-#  icon                    :string
 #  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
+#  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
 #  num_columns                    :integer
@@ -76,5 +76,13 @@
 class Collection
   class TestOpenResponses < Collection
     belongs_to :question_item, class_name: 'Item::QuestionItem'
+
+    before_create :default_to_4_columns
+
+    private
+
+    def default_to_4_columns
+      self.num_columns = 4
+    end
   end
 end

@@ -323,13 +323,16 @@ describe Api::V1::SearchController, type: :request, json: true, auth: true, sear
           test_audience: test_audience,
         )
       end
-      let(:survey_response_alias_collection) { survey_response.test_results_collection }
-      before do
-        # create all content which will create the survey_response_alias_collection
-        TestResultsCollection::CreateContent.call(
-          test_results_collection: test_collection.test_results_collection,
-          created_by: current_user,
+      let!(:survey_response_alias_collection) do
+        create(
+          :test_results_collection,
+          test_collection: test_collection,
+          survey_response: survey_response,
+          organization: organization,
+          add_editors: [current_user],
         )
+      end
+      before do
         survey_response.reload
         batch_reindex(Collection)
       end

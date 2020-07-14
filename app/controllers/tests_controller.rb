@@ -31,19 +31,19 @@ class TestsController < ApplicationController
   # stored so that the saved survey_response is tied to the correct test_audience
   def load_test_audience_into_session
     @test_audience = nil
+    @invalid = false
     if params[:ta].present? || params[:token].present?
       look_up_test_audience
       # if you're invited to a test audience it'll set to `invalid` if that audience is closed
+      @invalid = true unless @test_audience&.open?
     elsif @collection.live_challenge_submission_test?
       look_up_challenge_test_audience
-    end
-
-    # if no test audience param, then you can only view the test if link_sharing_enabled
-    if @test_audience.present? && @test_audience.open? || @collection.link_sharing_enabled?
-      @invalid = false
-    else
+      @invalid = true unless @test_audience&.open? || @collection.link_sharing_enabled?
+    elsif !@collection.link_sharing_enabled?
+      # if no test audience param, then you can only view the test if link_sharing_enabled
       @invalid = true
     end
+
     # will reset to nil if no test_audience
     session[:test_audience_id] = @test_audience&.id
   end
@@ -52,7 +52,7 @@ class TestsController < ApplicationController
     test_audiences = @collection.test_audiences
     # ta is used when we are sourcing people for a test (a manual url param we use)
     if params[:ta].present?
-      @test_audience = test_audiences.find_by(id: params[:ta])
+      @test_audience = test_audiences.find_by(id: params[:ta], status: :open)
     # token is when we have explicitly invited an audience member to take a test
     elsif params[:token].present?
       invitation = TestAudienceInvitation.valid.find_by_invitation_token(params[:token])

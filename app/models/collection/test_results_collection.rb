@@ -13,9 +13,9 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
-#  icon                    :string
 #  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
+#  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
 #  num_columns                    :integer
@@ -109,6 +109,7 @@ class Collection
 
     # TODO: revisit what should happen when you archive results or the test
     # after_commit :close_test, if: :archived_on_previous_save?
+    before_create :default_to_4_columns
 
     def duplicate!(**args)
       # TODO: double check is the right thing to do here...
@@ -133,6 +134,10 @@ class Collection
 
     def close_test
       test_collection.close! if test_collection.live?
+    end
+
+    def default_to_4_columns
+      self.num_columns = 4
     end
   end
 end

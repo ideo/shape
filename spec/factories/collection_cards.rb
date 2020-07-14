@@ -38,6 +38,11 @@ FactoryBot.define do
       item nil
     end
 
+    factory :collection_card_board_collection do
+      collection factory: :board_collection, strategy: :build
+      item nil
+    end
+
     factory :collection_card_link, class: 'CollectionCard::Link' do
       factory :collection_card_link_image do
         item factory: :file_item, strategy: :build

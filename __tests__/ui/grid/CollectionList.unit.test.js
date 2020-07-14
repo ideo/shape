@@ -91,5 +91,24 @@ describe('CollectionList', () => {
         )
       })
     })
+
+    describe('if a submissions collection inside a challenge', () => {
+      beforeEach(() => {
+        props.collection.isSubmissionsCollectionInsideChallenge = true
+        props.collection.submission_box_type = 'template'
+        render()
+      })
+      it('should render the columns', () => {
+        const columns = wrapper.find('[data-cy="ListColumn"]')
+        expect(columns.length).toEqual(5)
+        expect(component.columns.map(c => c.name)).toEqual([
+          'select',
+          'name',
+          'last_updated',
+          'reviewers',
+          'actions',
+        ])
+      })
+    })
   })
 })

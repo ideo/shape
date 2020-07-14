@@ -54,7 +54,10 @@ const ChallengeFixedHeader = ({
             justifyContent: 'flex-end',
           }}
         >
-          <ChallengeHeaderButton record={collection} />
+          <ChallengeHeaderButton
+            record={collection}
+            parentChallenge={collection.parentChallenge}
+          />
         </Box>
       </Flex>
     </MaxWidthContainer>

@@ -718,6 +718,30 @@ describe('Collection', () => {
     })
   })
 
+  describe('API_fetchCardReviewerStatuses', () => {
+    beforeEach(() => {
+      apiStore.requestJson = jest
+        .fn()
+        .mockImplementation(() =>
+          Promise.resolve([
+            { user_id: '1', status: 'in_progress', record_id: '101' },
+            { user_id: '2', status: 'in_progress', record_id: '101' },
+          ])
+        )
+      runInAction(() => {
+        collection.collection_cards = [collectionCard_1, collectionCard_2]
+        collection.collection_cards[1].record.user_tag_list = ['something']
+      })
+    })
+
+    it('calls reviewer_statuses endpoint', async () => {
+      await collection.API_fetchCardReviewerStatuses()
+      expect(apiStore.requestJson).toHaveBeenCalledWith(
+        `collections/${collection.id}/collection_cards/reviewer_statuses?select_ids=${collectionCard_2.id}`
+      )
+    })
+  })
+
   describe('mergeCards', () => {
     beforeEach(() => {
       runInAction(() => {
@@ -886,7 +910,7 @@ describe('Collection', () => {
       it('returns true', () => {
         collection.type = 'Collection'
         expect(collection.allowsCollectionTypeSelector).toEqual(true)
-        collection.type = 'Collection::Board'
+        collection.num_columns = 4
         expect(collection.allowsCollectionTypeSelector).toEqual(true)
       })
 

@@ -11,8 +11,11 @@ class CollectionCardBuilder
     @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
     @parent_collection = parent_collection
-    @params[:order] ||= next_card_order
-    unless parent_collection.is_a? Collection::Board
+    if parent_collection.board_collection?
+      # Required to satisfy non-null DB constraint
+      @params[:order] = 0
+    else
+      @params[:order] ||= next_card_order
       # row and col can come from GridCardHotspot, but we nullify for non-Boards
       @params.delete :row
       @params.delete :col
@@ -117,6 +120,10 @@ class CollectionCardBuilder
     # but we still want to assign the card a row/col of 0,0 so that the calculations don't break
     @collection_card.row ||= 0
     @collection_card.col ||= 0
+    # moving_cards is coming through with width/height of nil
+    # Need it for CollectionGrid::Calculator#find_closest_open_spot to work
+    @collection_card.height ||= 1
+    @collection_card.width ||= 1
     # valid row/col will get applied to the card here for later saving
     CollectionGrid::BoardPlacement.call(
       row: row,

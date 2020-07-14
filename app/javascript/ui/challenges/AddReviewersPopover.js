@@ -51,19 +51,20 @@ class AddReviewersPopover extends React.Component {
         onCancel={onClose}
         open={open}
         anchorElement={wrapperRef.current}
-        anchorOrigin={{ horizontal: 'left', vertical: 'center' }}
+        anchorOrigin={{ horizontal: 'center', vertical: 'center' }}
         noButtons
       >
         <div onClick={this.handleClick}>
           {potentialReviewers.map(potentialReviewer => (
-            <Flex>
+            <Flex key={potentialReviewer.handle}>
               <Checkbox
                 color="primary"
                 checked={this.isReviewerSelected(potentialReviewer)}
-                onChange={ev =>
+                onClick={ev =>
                   this.handlePotentialReviewer(potentialReviewer, ev)
                 }
                 value="yes"
+                key={potentialReviewer.handle}
               />
               <EntityAvatarAndName entity={potentialReviewer} />
             </Flex>

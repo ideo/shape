@@ -74,8 +74,10 @@ class CollectionPage extends React.Component {
   @action
   componentDidUpdate(prevProps) {
     const { collection, routingStore } = this.props
-    const previousId = prevProps.collection.id
-    const currentId = collection.id
+    const {
+      collection: { id: previousId },
+    } = prevProps
+    const { id: currentId } = collection
     if (currentId !== previousId) {
       runInAction(() => {
         this.cardsFetched = false
@@ -204,7 +206,7 @@ class CollectionPage extends React.Component {
       uiStore.popupSnackbar({ message })
     }
     if (collection.isChallengeOrInsideChallenge) {
-      collection.initializeParentChallengeForCollection()
+      this.initializeChallenges()
     }
     uiStore.update('dragTargets', [])
   }
@@ -290,6 +292,18 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
+    }
+  }
+
+  async initializeChallenges() {
+    const { collection } = this.props
+    await collection.initializeParentChallengeForCollection()
+    if (
+      collection.isSubmissionInChallenge ||
+      collection.isSubmissionBoxInsideChallenge
+    ) {
+      await collection.API_fetchChallengeReviewersGroup()
+      await collection.submissions_collection.API_fetchCardReviewerStatuses()
     }
   }
 

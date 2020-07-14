@@ -32,7 +32,7 @@ class BulkCardOperationWorker
   end
 
   def common_params
-    if @to_collection.is_a?(Collection::Board)
+    if @to_collection.board_collection?
       placement = { 'row' => @placeholder.row, 'col' => @placeholder.col }
     else
       placement = @placeholder.order

@@ -143,7 +143,7 @@ describe Collection, type: :model do
 
     describe '#create_challenge_groups_and_assign_roles' do
       let(:organization) { create(:organization) }
-      let (:current_user) { create(:user) }
+      let(:current_user) { create(:user) }
       let!(:collection) { create(:collection, organization: organization, collection_type: 'project', created_by: current_user) }
 
       before do
@@ -151,10 +151,6 @@ describe Collection, type: :model do
       end
 
       it 'should create a challenge admin group, participant group, and reviewer group' do
-        # expect(collection.challenge_admin_group_id.present?).to be false
-        # expect(collection.challenge_participant_group_id.present?).to be false
-        # expect(collection.challenge_reviewer_group_id.present?).to be false
-        # collection.update(collection_type: 'challenge')
         admin_group = collection.challenge_admin_group
         reviewer_group = collection.challenge_reviewer_group
         participant_group = collection.challenge_participant_group

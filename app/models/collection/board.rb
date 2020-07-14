@@ -13,9 +13,9 @@
 #  cached_test_scores             :jsonb
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
-#  icon                    :string
 #  end_date                       :datetime
 #  hide_submissions               :boolean          default(FALSE)
+#  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
 #  num_columns                    :integer
@@ -89,18 +89,6 @@ class Collection
              source: :item
 
     before_create :set_as_foamcore
-
-    def max_col_limit
-      num_columns - 1
-    end
-
-    def max_row_index
-      collection_cards.maximum(:row) || 0
-    end
-
-    def max_col_index
-      collection_cards.maximum(:col) || 0
-    end
 
     private
 

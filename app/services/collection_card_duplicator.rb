@@ -72,7 +72,7 @@ class CollectionCardDuplicator < SimpleService
       @col = @placement.try(:[], 'col')
     end
     # now make room for these cards (unless we're at the end)
-    return if @placement == 'end' || @to_collection.is_a?(Collection::Board)
+    return if @placement == 'end' || @to_collection.board_collection?
 
     @to_collection.increment_card_orders_at(@order, amount: @cards.count)
   end
@@ -184,7 +184,7 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def moving_to_board?
-    @to_collection.is_a? Collection::Board
+    @to_collection.board_collection?
   end
 
   def from_collection

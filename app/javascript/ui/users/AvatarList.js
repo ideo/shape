@@ -13,19 +13,17 @@ const AvatarList = ({ avatars, onAdd }) => {
           placeholderTitle="...and more"
           avatarCount={avatars.length}
         >
-          {avatars.map(avatar => {
-            return (
-              <Avatar
-                key={`${avatar.internalType}_${avatar.id}`}
-                title={avatar.nameWithHints || avatar.name}
-                url={avatar.pic_url_square || avatar.filestack_file_url}
-                color={avatar.color}
-                className="avatar viewer bordered outlined"
-                // user_profile_collection_id will be null if its a group
-                linkToCollectionId={avatar.user_profile_collection_id}
-              />
-            )
-          })}
+          {avatars.map(avatar => (
+            <Avatar
+              key={`${avatar.pic_url_square}`}
+              title={avatar.nameWithHints || avatar.name}
+              url={avatar.pic_url_square || avatar.filestack_file_url}
+              color={avatar.color}
+              className="avatar viewer bordered outlined"
+              // user_profile_collection_id will be null if its a group
+              linkToCollectionId={avatar.user_profile_collection_id}
+            />
+          ))}
         </AvatarGroup>
         <AddButton onClick={onAdd}>+</AddButton>
       </div>

@@ -532,7 +532,10 @@ class PageHeader extends React.Component {
 
               {record.isChallengeOrInsideChallenge && (
                 <FixedRightContainer>
-                  <ChallengeHeaderButton record={record} />
+                  <ChallengeHeaderButton
+                    record={record}
+                    parentChallenge={record.parentChallenge}
+                  />
                 </FixedRightContainer>
               )}
             </StyledTitleAndRoles>

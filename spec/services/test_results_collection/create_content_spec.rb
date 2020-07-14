@@ -43,20 +43,23 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
     expect(TestResultsCollection::CreateItemLink).to receive(:call!).with(
       hash_including(
         item: idea,
+        width: 1,
+        height: 2,
         identifier: 'first-idea-media',
-        # it gets put at order 1 until the TestCollection gets moved to the end
-        order: 1,
       ),
     )
     expect(subject).to be_a_success
     # now it should be first
-    expect(test_results_collection.collection_cards.first.identifier).to eq 'first-idea-media'
+    expect(test_results_collection.collection_cards.where(row: 0, col: 0).first.identifier).to eq 'first-idea-media'
   end
 
   it 'places the legend in the 3rd spot' do
     expect(subject).to be_a_success
     expect(
-      test_results_collection.collection_cards.third.record,
+      test_results_collection.collection_cards.where(
+        row: 0,
+        col: 3,
+      ).first.record,
     ).to be_instance_of(Item::LegendItem)
   end
 
@@ -202,7 +205,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
       )
       expect(subject).to be_a_success
       # now it should be first
-      expect(test_results_collection.collection_cards.first.identifier).to eq 'first-idea-media'
+      expect(test_results_collection.collection_cards.where(row: 0, col: 0).first.identifier).to eq 'first-idea-media'
     end
 
     it 'does not call TestResultsCollection::CreateCollection on any subcollections' do
@@ -270,42 +273,99 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
   context 'with more scaled questions' do
     let!(:scale_questions) { create_list(:question_item, 2, parent_collection: test_collection) }
     let(:legend_item) { test_results_collection.legend_item }
+    before do
+      scale_questions.each do |question|
+        question.parent_collection_card.update(order: 99)
+        # put the questions at the end
+      end
+    end
 
     it 'should create all test results cards, correctly ordered' do
       expect(subject).to be_a_success
       # legend item should be in the 3rd spot (order == 2)
-      expect(legend_item.parent_collection_card.order).to eq 2
+      expect(legend_item.parent_collection_card.row).to eq 0
+      expect(legend_item.parent_collection_card.col).to eq 3
+
       results_cards = test_results_collection.collection_cards.reload
 
       expect(
-        results_cards.map { |card| card.record.class.name },
+        results_cards.map { |card| [card.record.class.name, card.row, card.col] },
       ).to eq(
         [
-          'Item::VideoItem',
-          'Item::DataItem',
-          'Item::LegendItem',
-          # ideas collection
-          'Collection',
-          # all the default questions
-          'Item::DataItem',
-          'Item::DataItem',
-          'Item::DataItem',
-          'Collection::TestOpenResponses',
-          'Collection::TestOpenResponses',
-          # 2 additional scaled
-          'Item::DataItem',
-          'Item::DataItem',
-          # all responses
-          'Collection',
-          # idea results
-          'Collection::TestResultsCollection',
-          # original test collection (feedback design)
-          'Collection::TestCollection',
+          ['Item::VideoItem', 0, 0],
+          ['Item::DataItem', 0, 1],
+          ['Item::LegendItem', 0, 3],
+          ['Collection', 2, 0],
+          ['Item::DataItem', 2, 2],
+          ['Item::DataItem', 4, 0],
+          ['Item::DataItem', 4, 2],
+          ['Collection::TestOpenResponses', 6, 0],
+          ['Collection::TestOpenResponses', 6, 2],
+          ['Item::DataItem', 7, 0],
+          ['Item::DataItem', 7, 2],
+          ['Collection', 9, 0],
+          ['Collection::TestResultsCollection', 9, 1],
+          ['Collection::TestCollection', 9, 2],
         ],
       )
-      expect(
-        results_cards.map(&:order),
-      ).to eq(0.upto(13).to_a)
+    end
+  end
+
+  it 'appends feedback design to the test collection name' do
+    prev_name = test_collection.name
+
+    expect(subject).to be_a_success
+    expect(test_collection.reload.name).to eq(
+      prev_name + Collection::TestCollection::FEEDBACK_DESIGN_SUFFIX,
+    )
+  end
+
+  it 'moves test collection to be inside results collection' do
+    original_parent_card = test_collection.parent_collection_card
+
+    expect(subject).to be_a_success
+    expect(test_results_collection.collections).to include(test_collection)
+    expect(test_collection.reload.parent).to eq test_results_collection
+    expect(original_parent_card.reload.collection).to eq test_results_collection
+  end
+
+  context 'updating roles' do
+    context 'with roles on test collection' do
+      let(:editor) { create(:user) }
+      before do
+        test_collection.unanchor_and_inherit_roles_from_anchor!
+        # Test Results Collection already created in outer before block
+        test_results_collection.update(roles_anchor_collection: nil)
+        editor.add_role(Role::EDITOR, test_collection)
+      end
+
+      it 'moves roles to results collection' do
+        role = test_collection.roles.first
+        expect(subject).to be_a_success
+
+        test_collection.reload
+        expect(test_results_collection.roles).to eq([role])
+        expect(test_collection.roles.reload).to be_empty
+        expect(test_collection.roles_anchor).to eq(test_results_collection)
+      end
+
+      it 'correctly anchors the children (items and ideas collection)' do
+        expect(subject).to be_a_success
+        expect(
+          test_collection.children.all? { |child| child.roles_anchor == test_results_collection },
+        ).to be true
+      end
+    end
+
+    context 'with test collection anchored to another collection' do
+      let(:parent) { test_collection.parent }
+
+      it 'keeps everything anchored to the original roles anchor' do
+        expect(test_collection.roles_anchor).to eq parent
+        expect(subject).to be_a_success
+        collections = [test_results_collection] + [test_collection] + test_collection.children
+        expect(collections.all? { |c| c.roles_anchor == parent }).to be true
+      end
     end
   end
 end

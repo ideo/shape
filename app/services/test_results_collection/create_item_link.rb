@@ -2,6 +2,7 @@ module TestResultsCollection
   class CreateItemLink
     include Interactor
     include Interactor::Schema
+    include CollectionCardBuilderHelpers
 
     schema :parent_collection,
            :item,
@@ -14,7 +15,12 @@ module TestResultsCollection
 
     require_in_context :parent_collection, :item
 
-    delegate :parent_collection, :item, :width, :height, :order, :identifier,
+    delegate :parent_collection,
+             :item,
+             :width,
+             :height,
+             :order,
+             :identifier,
              to: :context
 
     before do
@@ -24,11 +30,9 @@ module TestResultsCollection
     end
 
     def call
-      if existing_card.present?
-        existing_card.update(order: order) unless existing_card.order == order
-      else
-        link_item
-      end
+      return existing_card if existing_card.present?
+
+      link_item
     end
 
     private
@@ -42,13 +46,16 @@ module TestResultsCollection
     end
 
     def link_item
-      link = CollectionCard::Link.create(
-        parent: parent_collection,
-        item_id: item.id,
-        width: width,
-        height: height,
-        order: order,
-        identifier: identifier,
+      # Should this use CollectionCardBuilder?
+      link = create_card(
+        type: 'link',
+        parent_collection: parent_collection,
+        params: {
+          item_id: item.id,
+          width: width,
+          height: height,
+          identifier: identifier,
+        },
       )
 
       return link if link.persisted?

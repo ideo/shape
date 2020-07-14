@@ -26,6 +26,7 @@ RSpec.describe CreateSurveyResponseAliasCollectionWorker, type: :worker do
     end
 
     before do
+      allow(TestResultsCollection::CreateAndLinkOpenResponse).to receive(:call)
       TestResultsCollection::CreateContent.call(
         test_results_collection: test_collection.test_results_collection,
       )
