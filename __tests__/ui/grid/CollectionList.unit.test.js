@@ -98,6 +98,7 @@ describe('CollectionList', () => {
         props.collection.submission_box_type = 'template'
         render()
       })
+
       it('should render the columns', () => {
         const columns = wrapper.find('[data-cy="ListColumn"]')
         expect(columns.length).toEqual(5)
@@ -106,6 +107,23 @@ describe('CollectionList', () => {
           'name',
           'last_updated',
           'reviewers',
+          'actions',
+        ])
+      })
+    })
+
+    describe('on mobile', () => {
+      beforeEach(() => {
+        uiStore.isMobile = true
+        render()
+      })
+
+      it('should render only the mobile columns', () => {
+        const columns = wrapper.find('[data-cy="ListColumn"]')
+        expect(columns.length).toEqual(3)
+        expect(component.columns.map(c => c.name)).toEqual([
+          'select',
+          'name',
           'actions',
         ])
       })

@@ -48,12 +48,12 @@ class CollectionList extends React.Component {
 
   get columns() {
     const { collection } = this.props
-    const cols = DEFAULT_COLUMNS
+    let cols = DEFAULT_COLUMNS
     if (collection.isSubmissionsCollectionInsideChallenge) {
-      return transformColumnsForChallenge(cols)
+      cols = transformColumnsForChallenge(cols)
     }
     if (uiStore.isMobile) {
-      return _.reject(cols, column =>
+      cols = _.reject(cols, column =>
         _.includes(['last_updated', 'permissions', 'reviewers'], column.name)
       )
     }

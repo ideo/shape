@@ -8,12 +8,17 @@ import AvatarList from '~/ui/users/AvatarList'
 import ChallengeReviewButton from '~/ui/challenges/ChallengeReviewButton'
 import ListCard from '~/ui/grid/ListCard'
 
-export const transformColumnsForChallenge = columns => {
-  columns[2].style.width = '400px'
-  columns[3].displayName = 'Reviewers'
-  columns[3].name = 'reviewers'
-  return columns
-}
+export const transformColumnsForChallenge = columns =>
+  _.map(columns, col => {
+    if (col.name === 'last_updated') {
+      col.style.width = '400px'
+    }
+    if (col.name === 'permissions') {
+      col.displayName = 'Reviewers'
+      col.name = 'reviewers'
+    }
+    return col
+  })
 
 @inject('apiStore')
 @observer
@@ -59,10 +64,9 @@ class ChallengeListCard extends React.Component {
     const { columns, record, submissionsCollection } = this.props
     const { isCurrentUserAReviewer, submission_reviewer_status } = record
 
-    const reviewersCol = _.find(columns, { name: 'reviewers' })
-    if (reviewersCol) {
-      reviewersCol.overrideContent = columnRef => {
-        return (
+    return _.map(columns, column => {
+      if (column.name === 'reviewers') {
+        column.overrideContent = columnRef => (
           <div
             style={{ width: '100%' }}
             key={`col-${this.state.isReviewersOpen}`}
@@ -81,23 +85,21 @@ class ChallengeListCard extends React.Component {
           </div>
         )
       }
-    }
-    const actionsCol = _.find(columns, { name: 'actions' })
-    if (actionsCol) {
-      actionsCol.overrideContent = () =>
-        isCurrentUserAReviewer &&
-        submission_reviewer_status && (
-          <ChallengeReviewButton
-            key="column3"
-            reviewerStatus={submission_reviewer_status}
-            onClick={() => {
-              record.navigateToNextAvailableTest()
-            }}
-          />
-        )
-    }
-
-    return [...columns]
+      if (column.name === 'actions') {
+        column.overrideContent = () =>
+          isCurrentUserAReviewer &&
+          submission_reviewer_status && (
+            <ChallengeReviewButton
+              key="column3"
+              reviewerStatus={submission_reviewer_status}
+              onClick={() => {
+                record.navigateToNextAvailableTest()
+              }}
+            />
+          )
+      }
+      return column
+    })
   }
 
   render() {
