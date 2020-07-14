@@ -7,8 +7,6 @@ import styled from 'styled-components'
 
 import ActionMenu from '~/ui/grid/ActionMenu'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
-import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
-import AvatarList from '~/ui/users/AvatarList'
 import CollectionTypeIcon from '~/ui/global/CollectionTypeIcon'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import FileIcon from '~/ui/grid/covers/FileIcon'
@@ -19,7 +17,6 @@ import RolesSummary from '~/ui/roles/RolesSummary'
 import SelectionCircle from '~/ui/grid/SelectionCircle'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
-import ChallengeReviewButton from '~/ui/challenges/ChallengeReviewButton'
 import { defaultTimeFormat } from '~/utils/time'
 import { DisplayTextCss } from '~/ui/global/styled/typography'
 import { openContextMenu } from '~/utils/clickUtils'
@@ -108,7 +105,10 @@ class ListCard extends React.Component {
   constructor(props) {
     super(props)
     this.rolesWrapperRef = React.createRef()
+    this.columnRefs = props.columns.map(() => React.createRef())
   }
+
+  componentDidUpdate() {}
 
   @computed
   get menuOpen() {
@@ -182,14 +182,8 @@ class ListCard extends React.Component {
   }
 
   handleRolesClick = ev => {
-    const { uiStore, record, insideChallenge } = this.props
+    const { uiStore, record } = this.props
     ev.stopPropagation()
-    if (insideChallenge) {
-      runInAction(() => {
-        this.isReviewersOpen = true
-      })
-      return
-    }
     uiStore.update('rolesMenuOpen', record)
   }
 
@@ -197,12 +191,6 @@ class ListCard extends React.Component {
     runInAction(() => {
       this.isReviewersOpen = false
     })
-  }
-
-  get taggedUsers() {
-    const { record } = this.props
-    if (!record.tagged_users) return []
-    return record.tagged_users
   }
 
   get cardsForTagging() {
@@ -229,11 +217,6 @@ class ListCard extends React.Component {
         </IconHolder>
       </CollectionTypeSelector>
     )
-  }
-
-  get showReviewers() {
-    const { record, insideChallenge } = this.props
-    return insideChallenge && record.internalType !== 'items'
   }
 
   get canEditCard() {
@@ -277,59 +260,70 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
-  get renderActions() {
-    const { card, record, insideChallenge } = this.props
+  get columnContent() {
+    const { card, record, uiStore, searchResult } = this.props
+    const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
-    if (!insideChallenge) {
-      const { uiStore, searchResult } = this.props
-      const tagEditorOpen = uiStore.tagsModalOpenId === card.id
-      return (
-        <Fragment>
-          <ActionMenu
-            location={searchResult ? 'Search' : 'GridCard'}
-            card={card}
-            canView={record.can_view}
-            canEdit={this.canEditCard}
-            canReplace={record.canReplace && !card.link && !searchResult}
-            menuOpen={this.menuOpen}
-            onOpen={this.handleActionMenuClick}
-            onLeave={this.handleCloseMenu}
-            menuItemsCount={this.getMenuItemsCount}
-          />
-          <CollectionCardsTagEditorModal
-            cards={this.cardsForTagging}
-            canEdit={this.canEditCard}
-            open={tagEditorOpen}
-          />
-        </Fragment>
-      )
-    }
-
-    const { isCurrentUserAReviewer, submission_reviewer_status } = record
-
-    if (isCurrentUserAReviewer && submission_reviewer_status) {
-      return (
-        <ChallengeReviewButton
-          reviewerStatus={submission_reviewer_status}
-          onClick={() => {
-            record.navigateToNextAvailableTest()
-          }}
+    return [
+      <div className="show-on-hover" style={{ cursor: 'pointer' }}>
+        <SelectionCircle cardId={card.id} />
+      </div>,
+      <ColumnLink onClick={this.handleRecordClick}>
+        <ListCoverRenderer
+          card={card}
+          cardType={record.internalType}
+          record={record}
         />
-      )
-    }
+        <TruncatedName>{record.name}</TruncatedName>
+        {this.renderLabelSelector}
+        {this.renderIcons}
+      </ColumnLink>,
+      defaultTimeFormat(record.updated_at),
+      <RolesSummary
+        key="roles"
+        handleClick={this.handleRolesClick}
+        roles={[...record.roles]}
+        canEdit={record.can_edit}
+        // convert observable to normal array to trigger render changes
+        collaborators={[...record.collaborators]}
+        rolesMenuOpen={!!uiStore.rolesMenuOpen}
+      />,
+      <Fragment>
+        <ActionMenu
+          location={searchResult ? 'Search' : 'GridCard'}
+          card={card}
+          canView={record.can_view}
+          canEdit={this.canEditCard}
+          canReplace={record.canReplace && !card.link && !searchResult}
+          menuOpen={this.menuOpen}
+          onOpen={this.handleActionMenuClick}
+          onLeave={this.handleCloseMenu}
+          menuItemsCount={this.getMenuItemsCount}
+        />
+        <CollectionCardsTagEditorModal
+          cards={this.cardsForTagging}
+          canEdit={this.canEditCard}
+          open={tagEditorOpen}
+        />
+      </Fragment>,
+    ]
+  }
 
-    return null
+  get renderCols() {
+    const { columns } = this.props
+    return columns.map((column, idx) => (
+      <Column {...column.style} key={column.name}>
+        <div ref={this.columnRefs[idx]}>
+          {column.overrideContent
+            ? column.overrideContent(this.columnRefs[idx])
+            : this.columnContent[idx]}
+        </div>
+      </Column>
+    ))
   }
 
   render() {
-    const {
-      card,
-      record,
-      insideChallenge,
-      uiStore,
-      potentialReviewers,
-      reviewerStatuses,
-    } = this.props
+    const { card, record } = this.props
     if (card.shouldHideFromUI || _.isEmpty(record)) {
       return null
     }
@@ -342,60 +336,7 @@ class ListCard extends React.Component {
         ref={c => (this.cardRef = c)}
         data-cy="ListCardRow"
       >
-        <Column width="50px">
-          <div className="show-on-hover" style={{ cursor: 'pointer' }}>
-            <SelectionCircle cardId={card.id} />
-          </div>
-        </Column>
-        <Column width="500px">
-          <ColumnLink onClick={this.handleRecordClick}>
-            <ListCoverRenderer
-              card={card}
-              cardType={record.internalType}
-              record={record}
-            />
-            <TruncatedName>{record.name}</TruncatedName>
-            {this.renderLabelSelector}
-            {this.renderIcons}
-          </ColumnLink>
-        </Column>
-        <Column width={!insideChallenge ? '400px' : '300px'}>
-          {defaultTimeFormat(record.updated_at)}
-        </Column>
-        <Column width="250px">
-          <div ref={this.rolesWrapperRef} style={{ width: '100%' }}>
-            {this.showReviewers ? (
-              <AvatarList
-                avatars={this.taggedUsers}
-                onAdd={this.handleRolesClick}
-                reviewerStatuses={reviewerStatuses}
-              />
-            ) : (
-              <RolesSummary
-                key="roles"
-                handleClick={this.handleRolesClick}
-                roles={[...record.roles]}
-                canEdit={record.can_edit}
-                // convert observable to normal array to trigger render changes
-                collaborators={[...record.collaborators]}
-                rolesMenuOpen={!!uiStore.rolesMenuOpen}
-              />
-            )}
-            {this.showReviewers && !_.isEmpty(potentialReviewers) && (
-              <AddReviewersPopover
-                record={record}
-                potentialReviewers={potentialReviewers}
-                onClose={this.handleCloseReviewers}
-                wrapperRef={this.rolesWrapperRef}
-                open={this.isReviewersOpen}
-              />
-            )}
-          </div>
-        </Column>
-        {/* stopPropagation so that ActionMenu overrides handleRowClick */}
-        <Column marginLeft="auto" onClick={e => e.stopPropagation()}>
-          {this.renderActions}
-        </Column>
+        {this.renderCols}
       </Row>
     )
   }
@@ -408,17 +349,12 @@ ListCard.wrappedComponent.propTypes = {
 
 ListCard.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  columns: MobxPropTypes.arrayOrObservableArray.isRequired,
   record: MobxPropTypes.objectOrObservableObject.isRequired,
-  insideChallenge: PropTypes.bool,
   searchResult: PropTypes.bool,
-  potentialReviewers: MobxPropTypes.arrayOrObservableArray,
-  reviewerStatuses: MobxPropTypes.arrayOrObservableArray,
 }
 ListCard.defaultProps = {
-  insideChallenge: false,
   searchResult: false,
-  potentialReviewers: [],
-  reviewerStatuses: [],
 }
 
 export default ListCard

@@ -1,15 +1,15 @@
-import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
-import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
-import AvatarList from '~/ui/users/AvatarList'
 import ListCard from '~/ui/grid/ListCard'
+import { DEFAULT_COLUMNS } from '~/ui/grid/CollectionList'
+import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import { ITEM_TYPES } from '~/utils/variables'
-import fakeUiStore from '#/mocks/fakeUiStore'
-import fakeApiStore from '#/mocks/fakeApiStore'
-import fakeRoutingStore from '#/mocks/fakeRoutingStore'
-import { fakeCollectionCard, fakeTextItem, fakeUser } from '#/mocks/data'
 import TextIconXs from '~/ui/icons/TextIconXs'
 import VideoIcon from '~/ui/icons/VideoIcon'
 import { openContextMenu } from '~/utils/clickUtils'
+
+import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
+import fakeRoutingStore from '#/mocks/fakeRoutingStore'
+import { fakeCollectionCard, fakeTextItem } from '#/mocks/data'
 
 jest.mock('../../../app/javascript/utils/clickUtils')
 
@@ -26,6 +26,7 @@ describe('ListCard', () => {
     record = fakeTextItem
     props = {
       card,
+      columns: [...DEFAULT_COLUMNS],
       record,
       uiStore: fakeUiStore,
       apiStore: fakeApiStore(),
@@ -130,28 +131,6 @@ describe('ListCard', () => {
         record.allowsCollectionTypeSelector = true
         render()
         expect(wrapper.find(CollectionTypeSelector).exists()).toBe(true)
-      })
-    })
-
-    describe('when a card is inside a challenge', () => {
-      beforeEach(() => {
-        props.insideChallenge = true
-        record.internalType = 'collections'
-        render()
-      })
-
-      it('should render AddReviewersPopover', () => {
-        expect(wrapper.find(AvatarList).exists()).toBe(true)
-      })
-
-      describe('when a card has potential reviewers', () => {
-        beforeEach(() => {
-          props.potentialReviewers = [fakeUser]
-          render()
-        })
-        it('should render AddReviewersPopover', () => {
-          expect(wrapper.find(AddReviewersPopover).exists()).toBe(true)
-        })
       })
     })
 

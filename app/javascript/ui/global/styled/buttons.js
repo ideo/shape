@@ -21,22 +21,21 @@ export const TopRightButton = styled.button`
 `
 TopRightButton.displayName = 'TopRightButton'
 
-export const CloseButton = ({
-  onClick,
-  size,
-  color,
-  position,
-  ...otherProps
-}) => (
-  <TopRightButton
-    onClick={onClick}
-    size={size}
-    color={color}
-    position={position}
-    {...otherProps}
-  >
-    <CloseIcon />
-  </TopRightButton>
+// need to use forwardRef in order to be wrapped by MUI tooltip
+// https://material-ui.com/components/tooltips/#custom-child-element
+export const CloseButton = React.forwardRef(
+  ({ onClick, size, color, position, ...otherProps }, ref) => (
+    <TopRightButton
+      onClick={onClick}
+      size={size}
+      color={color}
+      position={position}
+      ref={ref}
+      {...otherProps}
+    >
+      <CloseIcon />
+    </TopRightButton>
+  )
 )
 CloseButton.propTypes = {
   size: PropTypes.oneOf(['sm', 'lg']),
@@ -49,6 +48,7 @@ CloseButton.defaultProps = {
   color: v.colors.commonDark,
   position: 'absolute',
 }
+CloseButton.displayName = 'CloseButton'
 
 export const CircledIcon = styled.button`
   align-items: center;
