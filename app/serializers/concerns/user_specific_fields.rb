@@ -4,7 +4,11 @@ module UserSpecificFields
   included do
     has_many :roles, if: -> { @include_roles || (@current_user && @object == @current_record) } do
       data do
-        @object.anchored_roles(viewing_organization_id: @current_user&.current_organization_id)
+        if @include_roles
+          @object.anchored_roles
+        else
+          @object.anchored_roles(viewing_organization_id: @current_user&.current_organization_id)
+        end
       end
     end
 
