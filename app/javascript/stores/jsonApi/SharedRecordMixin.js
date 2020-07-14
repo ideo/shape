@@ -19,6 +19,8 @@ const SharedRecordMixin = superclass =>
     tags = []
     @observable
     parentChallenge = null
+    @observable
+    reviewerStatuses = []
 
     @action
     disableMenu() {
@@ -305,6 +307,7 @@ const SharedRecordMixin = superclass =>
     @computed
     get taggedUsersWithStatuses() {
       if (!this.tagged_users) return []
+      if (!this.reviewerStatuses) return []
       return this.tagged_users.map(taggedUser => {
         const statusForUser = _.find(
           this.reviewerStatuses,

@@ -65,8 +65,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   phaseSubCollections = []
   @observable
   challengeReviewerGroup = null
-  @observable
-  reviewerStatuses = []
 
   attributesForAPI = [
     'name',
