@@ -104,6 +104,8 @@ module CollectionGrid
         cards += drag_positions.values
       end
 
+      # reject erroneous cards
+      cards = cards.reject { |card| card.row.nil? || card.col.nil? }
       max_row = cards.map { |card| card_max_row(card) }.max || 0
       matrix = Array.new(max_row + 1) { Array.new(collection.num_columns) }
 

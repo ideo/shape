@@ -652,6 +652,32 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
+    context 'bad collection' do
+      let(:collection) { create(:board_collection, num_cards: 2, add_editors: [user]) }
+      let(:raw_params) do
+        {
+          row: 0,
+          col: 0,
+          parent_id: collection.id,
+        }
+      end
+
+      before do
+        # replicating an issue that we encountered in prod
+        collection.collection_cards.first.update(row: nil, col: nil)
+      end
+
+      it 'returns a 200' do
+        expect(CollectionGrid::BctInserter).to receive(:new).with(
+          row: 0,
+          col: 0,
+          collection: collection,
+        )
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
     context 'success' do
       let(:collection) { create(:board_collection, add_editors: [user]) }
 

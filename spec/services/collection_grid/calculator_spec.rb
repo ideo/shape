@@ -125,6 +125,26 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
         # drag_map = [[0, 0], [0, 1], [0, 3], [1, 0]]
       end
 
+      context 'with bad card (no row or col)' do
+        before do
+          collection.collection_cards.first.update(row: nil)
+        end
+
+        let(:placement) do
+          { row: 0, col: 0 }
+        end
+
+        it 'does not blow up; still calculates proper move' do
+          calculate
+          expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+            [0, 0, collection.id],
+            [0, 1, collection.id],
+            [0, 3, collection.id],
+            [3, 0, collection.id],
+          ])
+        end
+      end
+
       context 'at placement row: 0, col: 0, moving to empty collection' do
         before do
           # clear out the collection
