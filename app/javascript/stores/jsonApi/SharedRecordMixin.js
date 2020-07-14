@@ -309,8 +309,7 @@ const SharedRecordMixin = superclass =>
       if (!this.tagged_users) return []
       if (!this.reviewerStatuses) return []
       return this.tagged_users.map(taggedUser => {
-        const statusForUser = _.find(
-          this.reviewerStatuses,
+        const statusForUser = this.reviewerStatuses.find(
           status => parseInt(status.user_id) === parseInt(taggedUser.id)
         ).status
         return {
