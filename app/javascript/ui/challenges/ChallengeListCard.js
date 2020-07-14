@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { computed, observable, runInAction } from 'mobx'
+import { computed } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
@@ -17,24 +17,24 @@ export const transformColumnsForChallenge = columns => {
 @inject('apiStore')
 @observer
 class ChallengeListCard extends React.Component {
-  @observable
-  isReviewersOpen = false
-
   constructor(props) {
     super(props)
     this.rolesWrapperRef = React.createRef()
+    this.state = {
+      isReviewersOpen: false,
+    }
   }
 
   handleRolesClick = ev => {
     ev.stopPropagation()
-    runInAction(() => {
-      this.isReviewersOpen = true
+    this.setState({
+      isReviewersOpen: true,
     })
   }
 
   handleCloseReviewers = ev => {
-    runInAction(() => {
-      this.isReviewersOpen = false
+    this.setState({
+      isReviewersOpen: false,
     })
   }
 
@@ -59,7 +59,10 @@ class ChallengeListCard extends React.Component {
     const { isCurrentUserAReviewer, submission_reviewer_status } = record
     columns[3].overrideContent = columnRef => {
       return (
-        <div style={{ width: '100%' }} key={`col-${this.isReviewersOpen}`}>
+        <div
+          style={{ width: '100%' }}
+          key={`col-${this.state.isReviewersOpen}`}
+        >
           <AvatarList
             avatars={record.taggedUsersWithStatuses}
             onAdd={this.handleRolesClick}
@@ -69,7 +72,7 @@ class ChallengeListCard extends React.Component {
             potentialReviewers={submissionsCollection.potentialReviewers}
             onClose={this.handleCloseReviewers}
             wrapperRef={columnRef}
-            open={this.isReviewersOpen}
+            open={this.state.isReviewersOpen}
           />
         </div>
       )
