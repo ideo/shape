@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { action, runInAction, observable } from 'mobx'
+import { action, computed, runInAction, observable } from 'mobx'
 import queryString from 'query-string'
 
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
@@ -211,6 +211,9 @@ const SharedRecordMixin = superclass =>
       if (challenge) {
         runInAction(() => {
           this.parentChallenge = challenge
+          if (this.isSubmissionBox && this.submissions_collection) {
+            this.submissions_collection.parentChallenge = challenge
+          }
         })
       }
     }
@@ -297,6 +300,22 @@ const SharedRecordMixin = superclass =>
         collaborator.color = collaboratorColors.get(collaborator.id)
       })
       this.collaborators.replace(sorted)
+    }
+
+    @computed
+    get taggedUsersWithStatuses() {
+      if (!this.tagged_users) return []
+      return this.tagged_users.map(taggedUser => {
+        const statusForUser = _.find(
+          this.reviewerStatuses,
+          status => parseInt(status.user_id) === parseInt(taggedUser.id)
+        ).status
+        return {
+          ...taggedUser.rawAttributes(),
+          status: statusForUser,
+          color: v.statusColor[statusForUser],
+        }
+      })
     }
 
     initializeTags = async () => {

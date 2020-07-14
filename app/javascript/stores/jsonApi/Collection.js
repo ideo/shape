@@ -65,6 +65,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   phaseSubCollections = []
   @observable
   challengeReviewerGroup = null
+  @observable
+  reviewerStatuses = []
 
   attributesForAPI = [
     'name',
@@ -417,6 +419,22 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return (
       this.is_submission_box_template ||
       (this.submission_attrs && this.submission_attrs.template)
+    )
+  }
+
+  get isSubmissionBoxInsideChallenge() {
+    return (
+      this.isChallengeOrInsideChallenge &&
+      this.isSubmissionBox &&
+      this.submission_box_type === 'template'
+    )
+  }
+
+  get isSubmissionsCollectionInsideChallenge() {
+    return (
+      this.isChallengeOrInsideChallenge &&
+      this.isSubmissionsCollection &&
+      this.submission_box_type === 'template'
     )
   }
 
@@ -940,7 +958,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  API_fetchCardReviewerStatuses = () => {
+  API_fetchCardReviewerStatuses = async () => {
     const ids = _.compact(
       _.map(this.collection_cards, cc => {
         if (cc.record && cc.record.user_tag_list) {
@@ -950,9 +968,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
     if (ids.length === 0) return
     const basePath = '/api/v1'
-    return axios.get(
+    const res = await axios.get(
       `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
     )
+    const statuses = res.data
+    const statusesByRecord = _.groupBy(statuses, 'record_id')
+    Object.entries(statusesByRecord).forEach(([record_id, recordStatuses]) => {
+      const record = this.apiStore.find('collections', record_id.toString())
+      runInAction(() => {
+        record.reviewerStatuses = recordStatuses
+      })
+    })
+    return res
   }
 
   async API_fetchAndMergeCards(cardIds) {
@@ -1523,6 +1550,25 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
   }
 
+  @computed
+  get potentialReviewers() {
+    if (!this.isSubmissionsCollection) return []
+
+    const challengeReviewerRoles = _.get(this, 'challengeReviewerGroup.roles')
+
+    if (_.isEmpty(challengeReviewerRoles)) return []
+
+    const potentialReviewerList = []
+    _.each(['admin', 'member'], roleLabel => {
+      const role = challengeReviewerRoles.find(r => r.label === roleLabel)
+      const users = _.get(role, 'users', [])
+      _.each(users, user => {
+        potentialReviewerList.push(user)
+      })
+    })
+    return potentialReviewerList
+  }
+
   async API_getNextAvailableTest({ forSubmissionBox = false }) {
     this.setNextAvailableTestPath(null)
     const nextTestPath = !forSubmissionBox
@@ -1567,6 +1613,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setChallengeReviewerGroup(group) {
     this.challengeReviewerGroup = group
+    if (this.isSubmissionBox && this.submissions_collection) {
+      this.submissions_collection.challengeReviewerGroup = group
+    }
   }
 
   @action

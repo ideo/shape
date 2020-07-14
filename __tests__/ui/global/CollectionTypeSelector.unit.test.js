@@ -5,8 +5,6 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import { fakeCollection } from '#/mocks/data'
 
 const props = {
-  handleMenuItemClick: jest.fn(),
-  openPopoutMenu: jest.fn(),
   children: <CollectionIcon />,
   collection: fakeCollection,
   location: 'CollectionCover',
@@ -24,7 +22,7 @@ const types = [
 
 describe('CollectionTypeSelector', () => {
   beforeEach(() => {
-    wrapper = mount(<CollectionTypeSelector {...props} />)
+    wrapper = shallow(<CollectionTypeSelector {...props} />)
   })
 
   it('renders the collection type options and selects one', () => {

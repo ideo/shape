@@ -299,11 +299,11 @@ class CollectionPage extends React.Component {
     const { collection } = this.props
     await collection.initializeParentChallengeForCollection()
     if (
-      collection.is_inside_a_challenge &&
-      collection.isSubmissionsCollection
+      collection.isSubmissionInChallenge ||
+      collection.isSubmissionBoxInsideChallenge
     ) {
-      await collection.API_fetchCardRoles()
-      await collection.API_fetchCardReviewerStatuses()
+      await collection.API_fetchChallengeReviewersGroup()
+      await collection.submissions_collection.API_fetchCardReviewerStatuses()
     }
   }
 
