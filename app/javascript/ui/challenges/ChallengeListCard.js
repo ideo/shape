@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { computed, observable, runInAction } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -57,34 +58,41 @@ class ChallengeListCard extends React.Component {
   get columnsWithChallengeContent() {
     const { columns, record, submissionsCollection } = this.props
     const { isCurrentUserAReviewer, submission_reviewer_status } = record
-    columns[3].overrideContent = columnRef => {
-      return (
-        <div style={{ width: '100%' }} key={`col-${this.isReviewersOpen}`}>
-          <AvatarList
-            avatars={record.taggedUsersWithStatuses}
-            onAdd={this.handleRolesClick}
-          />
-          <AddReviewersPopover
-            record={record}
-            potentialReviewers={submissionsCollection.potentialReviewers}
-            onClose={this.handleCloseReviewers}
-            wrapperRef={columnRef}
-            open={this.isReviewersOpen}
-          />
-        </div>
-      )
+
+    const reviewersCol = _.find(columns, { name: 'reviewers' })
+    if (reviewersCol) {
+      reviewersCol.overrideContent = columnRef => {
+        return (
+          <div style={{ width: '100%' }} key={`col-${this.isReviewersOpen}`}>
+            <AvatarList
+              avatars={record.taggedUsersWithStatuses}
+              onAdd={this.handleRolesClick}
+            />
+            <AddReviewersPopover
+              record={record}
+              potentialReviewers={submissionsCollection.potentialReviewers}
+              onClose={this.handleCloseReviewers}
+              wrapperRef={columnRef}
+              open={this.isReviewersOpen}
+            />
+          </div>
+        )
+      }
     }
-    columns[4].overrideContent = () =>
-      isCurrentUserAReviewer &&
-      submission_reviewer_status && (
-        <ChallengeReviewButton
-          key="column3"
-          reviewerStatus={submission_reviewer_status}
-          onClick={() => {
-            record.navigateToNextAvailableTest()
-          }}
-        />
-      )
+    const actionsCol = _.find(columns, { name: 'actions' })
+    if (actionsCol) {
+      actionsCol.overrideContent = () =>
+        isCurrentUserAReviewer &&
+        submission_reviewer_status && (
+          <ChallengeReviewButton
+            key="column3"
+            reviewerStatus={submission_reviewer_status}
+            onClick={() => {
+              record.navigateToNextAvailableTest()
+            }}
+          />
+        )
+    }
 
     return [...columns]
   }

@@ -1,4 +1,6 @@
-import ChallengeListCard from '~/ui/challenges/ChallengeListCard'
+import ChallengeListCard, {
+  transformColumnsForChallenge,
+} from '~/ui/challenges/ChallengeListCard'
 import ListCard from '~/ui/grid/ListCard'
 
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
@@ -19,7 +21,7 @@ describe('ListCard', () => {
     props = {
       card,
       submissionsCollection: { ...fakeCollection, potentialReviewers: [] },
-      columns: [...DEFAULT_COLUMNS],
+      columns: transformColumnsForChallenge(DEFAULT_COLUMNS),
       record,
       apiStore: fakeApiStore(),
     }
