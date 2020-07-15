@@ -3,6 +3,7 @@ class Automate::CollectionsController < ActionController::Base
 
   def create_challenge
     # Create collection with challenge type
+    logger.info '-- Creating challenge'
     challenge_collection_card = create_card(
       params: {
         collection_attributes: {
@@ -15,7 +16,7 @@ class Automate::CollectionsController < ActionController::Base
     )
     # Set challenge topic
     challenge_collection = challenge_collection_card.collection
-    challenge_collection.topic_list = ['main', 'automated']
+    challenge_collection.topic_list = %w[main automated]
     challenge_collection.save
 
     template_card = create_template_with_test(
@@ -24,14 +25,16 @@ class Automate::CollectionsController < ActionController::Base
     )
 
     # Create collection with phase type x 3
-    # # Set collection icons for phase collections
-    (0..2).each do |idx|
+    # Set collection icons for phase collections
+    3.times do |idx|
+      num = idx + 1
+      logger.info "-- Creating Phase #{num}"
       phase_card = create_card(
         params: {
           collection_attributes: {
             collection_type: :phase,
             icon: 'phase',
-            name: "Phase #{idx}",
+            name: "Phase #{num}",
           },
         },
         parent_collection: challenge_collection,
@@ -48,6 +51,7 @@ class Automate::CollectionsController < ActionController::Base
         },
       )
       submissions_collection = submission_box.submissions_collection
+      logger.info "-- Creating submission for Phase #{num}"
       create_submission(
         submissions_collection: submissions_collection,
         template: template_card.collection,
@@ -55,6 +59,7 @@ class Automate::CollectionsController < ActionController::Base
       )
     end
     # Add people to the reviewers group
+    logger.info "-- Adding users to reviewers group"
     challenge_reviewer_group = challenge_collection.challenge_reviewer_group
     User.first(10).each do |user|
       user.add_role(Role::MEMBER, challenge_reviewer_group)
