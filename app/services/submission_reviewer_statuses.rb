@@ -12,8 +12,15 @@ class SubmissionReviewerStatuses
     return if submissions.blank? || challenge.blank?
 
     submissions.each do |submission|
-      test_id = submission.submission_attrs['launchable_test_id']
+      next unless submission.present?
+
+      test_id = submission.launchable_test_id
+
+      next unless test_id.present?
+
       submission.tagged_users.each do |user|
+        next unless user.present?
+
         data.push(
           user_id: user.id,
           status: status_for_test_user(test_id: test_id, user_id: user.id),

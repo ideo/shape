@@ -70,6 +70,7 @@ class CollectionCardBuilder
   def create_collection_card
     # NOTE: cards created inside a master_template are unpinned by default unless it's being created within a pinned area
     @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
+    @collection_card.record.created_by = @user unless @collection_card.record.is_a?(Item)
     @parent_collection.transaction do
 
       if @parent_collection.board_collection?

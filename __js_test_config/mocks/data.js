@@ -459,6 +459,8 @@ export const fakeCollection = {
     {label: 'pajamas', type: 'tag_list'},
     {label: 'shape-test-user', type: 'user_tag_list', user: null}
   ],
+  addTag: jest.fn(),
+  removeTag: jest.fn(),
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
