@@ -13,7 +13,7 @@ import ChallengeListCard, {
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
-export const DEFAULT_COLUMNS = [
+export const defaultColumns = () => [
   { displayName: '', style: { width: '50px' }, name: 'select' },
   {
     displayName: 'Name',
@@ -43,12 +43,15 @@ class CollectionList extends React.Component {
 
   fetchRoles() {
     const { collection } = this.props
-    collection.API_fetchCardRoles()
+    // submission collection inside challenge separately loads card reviewer statuses instead of roles
+    if (!collection.isSubmissionsCollectionInsideChallenge) {
+      collection.API_fetchCardRoles()
+    }
   }
 
   get columns() {
     const { collection } = this.props
-    let cols = DEFAULT_COLUMNS
+    let cols = defaultColumns()
     if (collection.isSubmissionsCollectionInsideChallenge) {
       cols = transformColumnsForChallenge(cols)
     }

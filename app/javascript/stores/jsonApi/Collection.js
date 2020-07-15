@@ -958,7 +958,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   API_fetchCardReviewerStatuses = async () => {
     const ids = _.compact(
       _.map(this.collection_cards, cc => {
-        if (cc.record && cc.record.user_tag_list) {
+        if (
+          cc.record &&
+          cc.record.user_tag_list &&
+          _.isEmpty(cc.record.reviewerStatuses)
+        ) {
           return cc.id
         }
       })
@@ -1538,7 +1542,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
     // NOTE: assumes that the reviewer group are the reviewers
     const challengeReviewerGroup = await this.apiStore.request(
-      `/groups/${this.parentChallenge.challenge_reviewer_group_id}`,
+      `groups/${this.parentChallenge.challenge_reviewer_group_id}`,
       'GET'
     )
 
@@ -1664,7 +1668,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   static async fetchSubmissionsCollection(id, { order } = {}) {
     const res = await apiStore.request(`collections/${id}`)
     const collection = res.data
-    collection.API_fetchCards({ order })
+    await collection.API_fetchCards({ order })
     return collection
   }
 

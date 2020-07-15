@@ -157,16 +157,20 @@ class CollectionPage extends React.Component {
 
   loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
     const { collection } = this.props
-    return collection.submissions_collection.API_fetchCards({
+    await collection.submissions_collection.API_fetchCards({
       page,
       per_page,
       rows,
       cols,
     })
+    if (collection.isSubmissionBoxInsideChallenge) {
+      // fetch card reviewer statuses for the new page of cards
+      collection.submissions_collection.API_fetchCardReviewerStatuses()
+    }
   }
 
   @action
-  onAPILoad() {
+  async onAPILoad() {
     const {
       collection,
       apiStore,
@@ -196,7 +200,7 @@ class CollectionPage extends React.Component {
       apiStore.checkJoinableGroup(collection.joinable_group_id)
     }
     if (collection.isNormalCollection) {
-      this.checkSubmissionBox()
+      await this.checkSubmissionBox()
     } else {
       apiStore.clearUnpersistedThreads()
     }
@@ -204,6 +208,9 @@ class CollectionPage extends React.Component {
     if (collection.processing_status) {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
+    }
+    if (collection.viewMode === 'list') {
+      collection.API_fetchCardRoles()
     }
     if (collection.isChallengeOrInsideChallenge) {
       this.initializeChallenges()
@@ -293,6 +300,7 @@ class CollectionPage extends React.Component {
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
     }
+    return true
   }
 
   async initializeChallenges() {

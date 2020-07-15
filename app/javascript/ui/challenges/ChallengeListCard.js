@@ -44,16 +44,6 @@ class ChallengeListCard extends React.Component {
     })
   }
 
-  get cardsForTagging() {
-    const { apiStore } = this.props
-    if (apiStore.selectedCards.length > 0) {
-      return apiStore.selectedCards
-    } else {
-      const { card } = this.props
-      return [card]
-    }
-  }
-
   get showReviewers() {
     const { record } = this.props
     return record.internalType !== 'items'
@@ -66,28 +56,29 @@ class ChallengeListCard extends React.Component {
 
     return _.map(columns, column => {
       if (column.name === 'reviewers') {
-        column.overrideContent = columnRef => (
-          <div
-            style={{ width: '100%' }}
-            key={`col-${this.state.isReviewersOpen}`}
-          >
-            <AvatarList
-              avatars={record.taggedUsersWithStatuses}
-              onAdd={this.handleRolesClick}
-            />
-            <AddReviewersPopover
-              record={record}
-              potentialReviewers={submissionsCollection.potentialReviewers}
-              onClose={this.handleCloseReviewers}
-              wrapperRef={columnRef}
-              open={this.state.isReviewersOpen}
-            />
-          </div>
-        )
+        column.overrideContent = columnRef => {
+          return (
+            <div
+              style={{ width: '100%' }}
+              key={`col-${this.state.isReviewersOpen}`}
+            >
+              <AvatarList
+                avatars={record.taggedUsersWithStatuses}
+                onAdd={this.handleRolesClick}
+              />
+              <AddReviewersPopover
+                record={record}
+                potentialReviewers={submissionsCollection.potentialReviewers}
+                onClose={this.handleCloseReviewers}
+                wrapperRef={columnRef}
+                open={this.state.isReviewersOpen}
+              />
+            </div>
+          )
+        }
       }
-      if (column.name === 'actions') {
+      if (column.name === 'actions' && isCurrentUserAReviewer) {
         column.overrideContent = () =>
-          isCurrentUserAReviewer &&
           submission_reviewer_status && (
             <ChallengeReviewButton
               key="column3"
