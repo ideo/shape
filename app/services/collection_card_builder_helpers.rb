@@ -1,10 +1,6 @@
 # These methods are intended to be used in interactors
-
 module CollectionCardBuilderHelpers
   def create_card(params:, parent_collection:, created_by: nil, type: 'primary')
-    if params[:collection_attributes]
-      params[:collection_attributes][:num_columns] = 4
-    end
     builder = CollectionCardBuilder.new(
       params: params,
       parent_collection: parent_collection,
@@ -22,6 +18,13 @@ module CollectionCardBuilderHelpers
     )
   end
 
+  def create_board_card(*args)
+    if args.first.try(:[], :params).try(:[], :collection_attributes)
+      args.first[:params][:collection_attributes][:num_columns] = 4
+    end
+    create_card(*args)
+  end
+
   def find_or_create_card(params:, parent_collection:, created_by: nil, type: 'primary')
     klass = type == 'primary' ? CollectionCard::Primary : CollectionCard::Link
     found_card = klass.find_by(
@@ -35,7 +38,7 @@ module CollectionCardBuilderHelpers
       params: params,
       parent_collection: parent_collection,
       created_by: created_by,
-      type: type
+      type: type,
     )
   end
 end
