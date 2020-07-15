@@ -567,3 +567,13 @@ When('I scroll down by {int} pixels', pixels => {
   // scrollTo(x, y)
   cy.scrollTo(0, pixels)
 })
+
+// ----------------------
+// Challenges
+// ----------------------
+When('I open the challenge settings', () => {
+  cy.locate('ChallengeSettingsButton')
+    .first()
+    .click()
+  cy.wait(100)
+})

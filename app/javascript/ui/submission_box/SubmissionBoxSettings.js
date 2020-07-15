@@ -96,6 +96,7 @@ class SubmissionBoxSettings extends React.Component {
             <FormControlLabel
               style={{ marginLeft: '-42px' }}
               classes={{ label: 'form-control' }}
+              data-cy="SubmissionSettings-AcceptNew"
               control={
                 <Checkbox
                   checked={submissions_enabled}
@@ -105,7 +106,7 @@ class SubmissionBoxSettings extends React.Component {
               }
               label={
                 <div style={{ marginLeft: '-4px' }}>
-                  <DisplayText>
+                  <DisplayText data-cy="SubmissionSettings-AcceptNewText">
                     Accept new submissions ({submissions_enabled ? 'ON' : 'OFF'}
                     )
                   </DisplayText>
@@ -120,6 +121,7 @@ class SubmissionBoxSettings extends React.Component {
             <FormControlLabel
               style={{ marginLeft: '-42px' }}
               classes={{ label: 'form-control' }}
+              data-cy="SubmissionSettings-HideNew"
               control={
                 <Checkbox
                   checked={hide_submissions}

@@ -17,6 +17,7 @@ const ChallengeSettingsButton = ({ record }) => {
       {...buttonStyleProps}
       colorScheme={v.colors.primaryDark}
       onClick={() => uiStore.update('challengeSettingsOpen', true)}
+      data-cy="ChallengeSettingsButton"
     >
       Challenge Settings
     </Button>

@@ -1,4 +1,5 @@
 class Automate::CollectionsController < ActionController::Base
+  include ApplicationHelper
   include CollectionCardBuilderHelpers
 
   def create_challenge
@@ -61,7 +62,9 @@ class Automate::CollectionsController < ActionController::Base
     end
     # Add reviewers to submissions
 
-    head :ok
+    # Redirect to the current user collection where challenge was created
+    # redirect_to root_path
+    redirect_to "#{frontend_url_for(challenge_collection)}"
   end
 
   private
