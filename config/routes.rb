@@ -253,6 +253,12 @@ Rails.application.routes.draw do
     root to: 'dashboard#index'
   end
 
+  if Rails.env.development? || Rails.env.test?
+    namespace :automate do
+      get 'create_challenge' => 'collections#create_challenge'
+    end
+  end
+
   authenticate :user, ->(u) { Rails.env.development? || u.has_cached_role?(Role::SUPER_ADMIN) } do
     require 'sidekiq/web'
     require 'sidekiq-scheduler/web'
