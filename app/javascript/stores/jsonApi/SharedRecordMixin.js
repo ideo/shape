@@ -151,18 +151,16 @@ const SharedRecordMixin = superclass =>
       return this.apiStore.request(apiPath, 'PATCH')
     }
 
-    async API_willBecomePrivate({ removing, roleName }) {
+    API_willBecomePrivate({ removing, roleName }) {
       const apiPath = `${this.baseApiPath}/roles/will_become_private`
       const remove_identifiers = [`${removing.className}_${removing.id}`]
       const params = {
         role_name: roleName,
         remove_identifiers,
       }
-      const res = await this.apiStore.request(
-        `${apiPath}?${queryString.stringify(params)}`,
-        'GET'
+      return this.apiStore.requestJson(
+        `${apiPath}?${queryString.stringify(params)}`
       )
-      return res.__response.data
     }
 
     API_addRemoveTag = (action, data) => {
