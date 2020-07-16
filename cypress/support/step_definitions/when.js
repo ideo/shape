@@ -545,6 +545,13 @@ When('I select to invite a new user', () => {
     .click({ force: true })
 })
 
+When('I close the modal', () => {
+  cy.locate('ModalClose')
+    .last()
+    .click()
+  cy.wait(100)
+})
+
 // ----------------------
 // Admin (Test Collection Feedback)
 // ----------------------
@@ -576,4 +583,11 @@ When('I open the challenge settings', () => {
     .first()
     .click()
   cy.wait(100)
+})
+
+When('I type in a topic', () => {
+  cy.get('[role="combobox"]')
+    .first()
+    .type('sales')
+  cy.wait(50)
 })

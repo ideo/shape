@@ -23,3 +23,7 @@ Feature: Challenge settings
 
     When I click the "EntityAvatarAndName"
     Then I should see a modal
+
+    When I close the modal
+    And I click the "ChallengeSettings-TopicsNav"
+    And I type in a topic
