@@ -126,6 +126,12 @@ Then('I should see an svg on the report item', () => {
     .should('exist')
 })
 
+Then('I should see a modal', () => {
+  cy.get('[role="dialog"]')
+    .first()
+    .should('exist')
+})
+
 Then('I should see the {string} modal', modalTitle => {
   cy.get(`[role="dialog"][aria-labelledby="${modalTitle}"]`)
     .first()
