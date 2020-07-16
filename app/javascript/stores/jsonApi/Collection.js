@@ -820,8 +820,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     cols,
     searchTerm,
   } = {}) {
+    let orderChanged = false
     runInAction(() => {
-      if (order) this.currentOrder = order
+      if (order && this.currentOrder !== order) {
+        orderChanged = true
+        this.currentOrder = order
+      }
     })
     const params = {
       page,
@@ -882,7 +886,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||
           data.length === 0 ||
-          searchTerm)
+          searchTerm ||
+          orderChanged)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
@@ -960,7 +965,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       _.map(this.collection_cards, cc => {
         if (
           cc.record &&
-          cc.record.user_tag_list &&
+          !_.isEmpty(cc.record.user_tag_list) &&
           _.isEmpty(cc.record.reviewerStatuses)
         ) {
           return cc.id
@@ -1244,6 +1249,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get sortedCards() {
     let orderList = ['pinned', 'order']
     let order = ['desc', 'asc']
+    if (this.currentOrder !== 'order') {
+      orderList = [this.currentOrder]
+      order = ['desc']
+    }
     if (this.isBoard) {
       orderList = ['row', 'col']
       order = ['asc', 'asc']

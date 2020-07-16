@@ -17,6 +17,9 @@ const SharedRecordMixin = superclass =>
     highlightedRange = null
     @observable
     tags = []
+    // have to default `tagged_users` to an empty array so it can always be pushed to
+    @observable
+    tagged_users = []
     @observable
     parentChallenge = null
     @observable
@@ -176,16 +179,13 @@ const SharedRecordMixin = superclass =>
     addTag(label, type, user) {
       this[type].push(label)
       if (type === 'user_tag_list' && user) {
-        const { tagged_users } = this
-        if (tagged_users) {
-          tagged_users.push(user)
-          // assume / push the 'unstarted' status for the user that was added
-          this.reviewerStatuses.push({
-            record_id: this.id,
-            status: 'unstarted',
-            user_id: user.id,
-          })
-        }
+        this.tagged_users.push(user)
+        // assume / push the 'unstarted' status for the user
+        this.reviewerStatuses.push({
+          record_id: this.id,
+          status: 'unstarted',
+          user_id: user.id,
+        })
       }
       this.API_addRemoveTag('add', { label, type })
     }

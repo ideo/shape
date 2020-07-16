@@ -757,6 +757,53 @@ describe('Collection', () => {
     })
   })
 
+  describe('sortedCards', () => {
+    beforeEach(() => {
+      runInAction(() => {
+        collection.collection_cards = [
+          collectionCard_1,
+          collectionCard_2,
+          collectionCard_3,
+        ]
+        _.assign(collection.collection_cards[0], {
+          order: 3,
+          row: 0,
+          updated_at: 1,
+        })
+        _.assign(collection.collection_cards[1], {
+          order: 1,
+          row: 1,
+          updated_at: 2,
+        })
+        _.assign(collection.collection_cards[2], {
+          order: 2,
+          row: 2,
+          updated_at: 3,
+        })
+      })
+    })
+
+    it('should sort by order (if normal collection)', () => {
+      expect(_.map(collection.sortedCards, 'id')).toEqual(['2', '3', '1'])
+    })
+
+    it('should sort by row/col (if board collection)', () => {
+      collection.num_columns = 4
+      expect(_.map(collection.sortedCards, 'id')).toEqual(['1', '2', '3'])
+      collection.num_columns = null
+    })
+
+    it('should sort by date (if currentOrder is set)', () => {
+      runInAction(() => {
+        collection.currentOrder = 'updated_at'
+      })
+      expect(_.map(collection.sortedCards, 'id')).toEqual(['3', '2', '1'])
+      runInAction(() => {
+        collection.currentOrder = 'order'
+      })
+    })
+  })
+
   describe('filter bar methods', () => {
     beforeEach(() => {
       collection.addReference(
