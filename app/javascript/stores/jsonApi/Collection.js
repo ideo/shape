@@ -934,9 +934,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_fetchCardOrders = async () => {
-    const res = await this.API_fetchAllCardIds()
+    const cardOrders = await this.API_fetchAllCardIds()
     runInAction(() => {
-      _.each(res.data, orderData => {
+      _.each(cardOrders, orderData => {
         const card = this.collection_cards.find(cc => cc.id === orderData.id)
         if (card) {
           card.order = orderData.order
