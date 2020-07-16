@@ -18,7 +18,7 @@ const SearchIconContainer = styled.span`
   left: 5px;
   position: absolute;
   width: 14px;
-  top: 14px;
+  top: 11px;
 
   .icon {
     width: 22px;
@@ -215,6 +215,8 @@ const styles = theme => ({
     backgroundColor: 'white',
     flexGrow: 1,
     height: 30,
+    paddingTop: '14px',
+    paddingBottom: '14px',
     width: '100%',
   },
   chip: {
