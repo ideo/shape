@@ -156,16 +156,16 @@ class CollectionPage extends React.Component {
   }
 
   loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
-    const { collection } = this.props
-    await collection.submissions_collection.API_fetchCards({
+    const { submissions_collection } = this.props.collection
+    await submissions_collection.API_fetchCards({
       page,
       per_page,
       rows,
       cols,
     })
-    if (collection.isSubmissionBoxInsideChallenge) {
+    if (submissions_collection.isSubmissionsCollectionInsideChallenge) {
       // fetch card reviewer statuses for the new page of cards
-      collection.submissions_collection.API_fetchCardReviewerStatuses()
+      submissions_collection.API_fetchCardReviewerStatuses()
     }
   }
 

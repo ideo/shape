@@ -281,6 +281,16 @@ describe('CollectionPage', () => {
   })
 
   describe('with SubmissionBox and submissions', () => {
+    const submissions_collection = {
+      id: 100,
+      collection_cards: [],
+      cardProperties: [],
+      isSubmissionsCollectionInsideChallenge: true,
+      API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
+      API_fetchCardReviewerStatuses: jest
+        .fn()
+        .mockReturnValue(Promise.resolve({})),
+    }
     beforeEach(() => {
       wrapper = shallow(
         <CollectionPage.wrappedComponent
@@ -292,11 +302,7 @@ describe('CollectionPage', () => {
             submission_box_type: 'template',
             submissions_enabled: true,
             submission_template: { id: '123' },
-            submissions_collection: {
-              id: 100,
-              collection_cards: [],
-              cardProperties: [],
-            },
+            submissions_collection,
           }}
           uiStore={{
             ...uiStore,
@@ -328,6 +334,15 @@ describe('CollectionPage', () => {
       expect(submissionsGrid.props.loadCollectionCards).toEqual(
         component.loadSubmissionsCollectionCards
       )
+    })
+
+    it('should call API_fetchCardReviewerStatuses if inside challenge', async () => {
+      const params = { page: 1, per_page: 10 }
+      await component.loadSubmissionsCollectionCards(params)
+      expect(submissions_collection.API_fetchCards).toHaveBeenCalledWith(params)
+      expect(
+        submissions_collection.API_fetchCardReviewerStatuses
+      ).toHaveBeenCalled()
     })
   })
 
