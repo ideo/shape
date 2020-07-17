@@ -1,6 +1,9 @@
 require 'rails_helper'
+require './spec/services/collection_broadcaster_shared_setup'
 
 RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
+  include_context 'CollectionUpdateBroadcaster setup'
+
   let(:collection) { create(:collection) }
   let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }
   let(:records) { collection_cards.map(&:record) }
@@ -10,9 +13,6 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
   end
 
   describe '#perform' do
-    before do
-      allow(CollectionUpdateBroadcaster).to receive(:call).and_call_original
-    end
     let(:action) { nil }
     let(:tag) { nil }
     let(:type) { nil }
@@ -41,7 +41,10 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
         end
 
         it 'calls collection update broadcaster' do
-          expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+          expect(CollectionUpdateBroadcaster).to receive(:new).with(collection, user)
+          expect(broadcaster_instance).to receive(:cards_updated).with(
+            collection_cards.map(&:id),
+          )
           perform
         end
       end
@@ -63,7 +66,9 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
         end
 
         it 'calls collection update broadcaster' do
-          expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+          expect(broadcaster_instance).to receive(:cards_updated).with(
+            collection_cards.map(&:id),
+          )
           perform
         end
       end
@@ -84,7 +89,9 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
           end
 
           it 'calls collection update broadcaster' do
-            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            expect(broadcaster_instance).to receive(:cards_updated).with(
+              collection_cards.map(&:id),
+            )
             perform
           end
         end
@@ -115,7 +122,9 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
           end
 
           it 'calls collection update broadcaster' do
-            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            expect(broadcaster_instance).to receive(:cards_updated).with(
+              collection_cards.map(&:id),
+            )
             perform
           end
         end
@@ -136,7 +145,9 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
           end
 
           it 'calls collection update broadcaster' do
-            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            expect(broadcaster_instance).to receive(:cards_updated).with(
+              collection_cards.map(&:id),
+            )
             perform
           end
         end
@@ -158,7 +169,9 @@ RSpec.describe CollectionCardsAddRemoveTagWorker, type: :worker do
           end
 
           it 'calls collection update broadcaster' do
-            expect(CollectionUpdateBroadcaster).to receive(:call).with(collection, user)
+            expect(broadcaster_instance).to receive(:cards_updated).with(
+              collection_cards.map(&:id),
+            )
             perform
           end
         end

@@ -13,6 +13,7 @@ describe('CollectionList', () => {
   beforeEach(() => {
     props = {
       collection,
+      loadCollectionCards: jest.fn(),
     }
     render = () => {
       // make sortedCards different from collection.collection_cards for tests below
@@ -57,6 +58,25 @@ describe('CollectionList', () => {
       expect(cards.map(c => c.props().card)).toEqual(collection.sortedCards)
     })
 
+    it('should not render GridCardPagination by default', () => {
+      expect(wrapper.find('GridCardPagination').exists()).toBe(false)
+    })
+
+    describe('when collection.hasMore', () => {
+      beforeEach(() => {
+        props.collection.hasMore = true
+        props.collection.nextPage = 2
+        render()
+      })
+
+      it('renders GridCardPagination', () => {
+        expect(wrapper.find('GridCardPagination').exists()).toBe(true)
+        expect(
+          wrapper.find('GridCardPagination').props().loadCollectionCards
+        ).toEqual(props.loadCollectionCards)
+      })
+    })
+
     describe('with a searchResultsCollection', () => {
       beforeEach(() => {
         props.collection.isSearchResultsCollection = true
@@ -78,6 +98,7 @@ describe('CollectionList', () => {
         props.collection.submission_box_type = 'template'
         render()
       })
+
       it('should render the columns', () => {
         const columns = wrapper.find('[data-cy="ListColumn"]')
         expect(columns.length).toEqual(5)
@@ -86,6 +107,23 @@ describe('CollectionList', () => {
           'name',
           'last_updated',
           'reviewers',
+          'actions',
+        ])
+      })
+    })
+
+    describe('on mobile', () => {
+      beforeEach(() => {
+        uiStore.isMobile = true
+        render()
+      })
+
+      it('should render only the mobile columns', () => {
+        const columns = wrapper.find('[data-cy="ListColumn"]')
+        expect(columns.length).toEqual(3)
+        expect(component.columns.map(c => c.name)).toEqual([
+          'select',
+          'name',
           'actions',
         ])
       })

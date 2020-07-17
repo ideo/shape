@@ -1545,7 +1545,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { uiStore, collection } = this.props
+    const { collection } = this.props
 
     const gridSize = this.totalGridSize
     return (
@@ -1564,15 +1564,13 @@ class FoamcoreGrid extends React.Component {
             onZoomOut={this.handleZoomOut}
           />
         )}
-        {!uiStore.isMobileXs && (
-          <CollectionFilterWrapper>
-            <CollectionViewToggle collection={collection} />
-            <CollectionFilter
-              collection={collection}
-              canEdit={collection.canEdit}
-            />
-          </CollectionFilterWrapper>
-        )}
+        <CollectionFilterWrapper>
+          <CollectionViewToggle collection={collection} />
+          <CollectionFilter
+            collection={collection}
+            canEdit={collection.canEdit}
+          />
+        </CollectionFilterWrapper>
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}
         {this.renderMdlPlaceholder()}

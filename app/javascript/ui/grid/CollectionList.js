@@ -1,9 +1,11 @@
-import React from 'react'
+import _ from 'lodash'
+import PropTypes from 'prop-types'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
 
 import DropdownIcon from '~/ui/icons/DropdownIcon'
-import ListCard, { Column } from './ListCard'
+import GridCardPagination from '~/ui/grid/GridCardPagination'
+import ListCard, { Column } from '~/ui/grid/ListCard'
 import { Heading3 } from '~/ui/global/styled/typography'
 import ChallengeListCard, {
   transformColumnsForChallenge,
@@ -11,7 +13,7 @@ import ChallengeListCard, {
 import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
-export const DEFAULT_COLUMNS = [
+export const defaultColumns = () => [
   { displayName: '', style: { width: '50px' }, name: 'select' },
   {
     displayName: 'Name',
@@ -41,14 +43,22 @@ class CollectionList extends React.Component {
 
   fetchRoles() {
     const { collection } = this.props
-    collection.API_fetchCardRoles()
+    // submission collection inside challenge separately loads card reviewer statuses instead of roles
+    if (!collection.isSubmissionsCollectionInsideChallenge) {
+      collection.API_fetchCardRoles()
+    }
   }
 
   get columns() {
     const { collection } = this.props
-    const cols = DEFAULT_COLUMNS
+    let cols = defaultColumns()
     if (collection.isSubmissionsCollectionInsideChallenge) {
-      return transformColumnsForChallenge(cols)
+      cols = transformColumnsForChallenge(cols)
+    }
+    if (uiStore.isMobile) {
+      cols = _.reject(cols, column =>
+        _.includes(['last_updated', 'permissions', 'reviewers'], column.name)
+      )
     }
     return cols
   }
@@ -69,7 +79,8 @@ class CollectionList extends React.Component {
   }
 
   render() {
-    const { collection } = this.props
+    const { collection, loadCollectionCards } = this.props
+
     return (
       <div>
         <Flex mb={1}>
@@ -101,12 +112,20 @@ class CollectionList extends React.Component {
             <ListCard {...mainProps} />
           )
         })}
+        {collection.hasMore && (
+          <GridCardPagination
+            collection={collection}
+            loadCollectionCards={loadCollectionCards}
+            nextPage={collection.nextPage}
+          />
+        )}
       </div>
     )
   }
 }
 CollectionList.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  loadCollectionCards: PropTypes.func.isRequired,
 }
 
 export default CollectionList

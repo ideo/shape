@@ -459,6 +459,8 @@ export const fakeCollection = {
     {label: 'pajamas', type: 'tag_list'},
     {label: 'shape-test-user', type: 'user_tag_list', user: null}
   ],
+  addTag: jest.fn(),
+  removeTag: jest.fn(),
   API_archive: jest.fn(),
   API_updateCard: jest.fn(),
   API_updateNameAndCover: jest.fn(),
@@ -482,6 +484,7 @@ export const fakeCollection = {
   API_manipulateRow: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCardOrders: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchChallengePhaseCollections: jest.fn().mockReturnValue(Promise.resolve({})),
+  refetch: jest.fn(),
   initializeTags: jest.fn(),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
   createSubmission: jest.fn(),

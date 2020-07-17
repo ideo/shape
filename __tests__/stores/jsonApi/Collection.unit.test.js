@@ -674,13 +674,11 @@ describe('Collection', () => {
   })
 
   describe('API_fetchCardOrders', () => {
-    const res = {
-      data: [{ id: '1', order: 2 }, { id: '2', order: 1 }],
-    }
+    const data = [{ id: '1', order: 2 }, { id: '2', order: 1 }]
     beforeEach(() => {
       collection.API_fetchAllCardIds = jest
         .fn()
-        .mockReturnValue(Promise.resolve(res))
+        .mockReturnValue(Promise.resolve(data))
 
       runInAction(() => {
         collection.collection_cards = [collectionCard_1, collectionCard_2]
@@ -718,6 +716,30 @@ describe('Collection', () => {
     })
   })
 
+  describe('API_fetchCardReviewerStatuses', () => {
+    beforeEach(() => {
+      apiStore.requestJson = jest
+        .fn()
+        .mockImplementation(() =>
+          Promise.resolve([
+            { user_id: '1', status: 'in_progress', record_id: '101' },
+            { user_id: '2', status: 'in_progress', record_id: '101' },
+          ])
+        )
+      runInAction(() => {
+        collection.collection_cards = [collectionCard_1, collectionCard_2]
+        collection.collection_cards[1].record.user_tag_list = ['something']
+      })
+    })
+
+    it('calls reviewer_statuses endpoint', async () => {
+      await collection.API_fetchCardReviewerStatuses()
+      expect(apiStore.requestJson).toHaveBeenCalledWith(
+        `collections/${collection.id}/collection_cards/reviewer_statuses?select_ids=${collectionCard_2.id}`
+      )
+    })
+  })
+
   describe('mergeCards', () => {
     beforeEach(() => {
       runInAction(() => {
@@ -730,6 +752,53 @@ describe('Collection', () => {
       collection.mergeCards(data)
       expect(collection.collection_cards.length).toEqual(3)
       expect(_.map(collection.collection_cards, 'id')).toEqual(['1', '3', '2'])
+    })
+  })
+
+  describe('sortedCards', () => {
+    beforeEach(() => {
+      runInAction(() => {
+        collection.collection_cards = [
+          collectionCard_1,
+          collectionCard_2,
+          collectionCard_3,
+        ]
+        _.assign(collection.collection_cards[0], {
+          order: 3,
+          row: 0,
+          updated_at: 1,
+        })
+        _.assign(collection.collection_cards[1], {
+          order: 1,
+          row: 1,
+          updated_at: 2,
+        })
+        _.assign(collection.collection_cards[2], {
+          order: 2,
+          row: 2,
+          updated_at: 3,
+        })
+      })
+    })
+
+    it('should sort by order (if normal collection)', () => {
+      expect(_.map(collection.sortedCards, 'id')).toEqual(['2', '3', '1'])
+    })
+
+    it('should sort by row/col (if board collection)', () => {
+      collection.num_columns = 4
+      expect(_.map(collection.sortedCards, 'id')).toEqual(['1', '2', '3'])
+      collection.num_columns = null
+    })
+
+    it('should sort by date (if currentOrder is set)', () => {
+      runInAction(() => {
+        collection.currentOrder = 'updated_at'
+      })
+      expect(_.map(collection.sortedCards, 'id')).toEqual(['3', '2', '1'])
+      runInAction(() => {
+        collection.currentOrder = 'order'
+      })
     })
   })
 

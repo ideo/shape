@@ -43,7 +43,7 @@ module TestResultsCollection
       existing_card = CollectionCard.identifier(identifier).first
       return existing_card.record if existing_card.present?
 
-      context.alias_test_results_collection = create_card(
+      context.alias_test_results_collection = create_board_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
             name: "#{test_collection.base_name} - #{survey_response.respondent_alias}",

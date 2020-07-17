@@ -54,7 +54,7 @@ module TestResultsCollection
     end
 
     def create_all_responses_collection
-      create_card(
+      create_board_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
             name: 'All Responses',
@@ -87,7 +87,7 @@ module TestResultsCollection
     end
 
     def create_audience_collection(test_audience)
-      create_card(
+      create_board_card(
         params: {
           collection_attributes: default_collection_attrs.merge(
             name: "#{test_collection.base_name} - #{test_audience.audience_name}",

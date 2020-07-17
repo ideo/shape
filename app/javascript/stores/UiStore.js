@@ -963,12 +963,15 @@ export default class UiStore {
       // select the submissions instead
       collection = viewingCollection.submissions_collection
     }
-    let all_collection_card_ids = _.map(collection.collection_cards, 'id')
-    this.reselectCardIds(all_collection_card_ids)
+    const allCardIds = _.map(collection.collection_cards, 'id')
+    this.reselectCardIds(allCardIds)
     try {
-      const res = await collection.API_fetchAllCardIds()
-      all_collection_card_ids = _.map(res.data, 'id')
-      this.reselectCardIds(all_collection_card_ids)
+      const cardIds = await collection.API_fetchAllCardIds()
+      const newIds = _.difference(_.map(cardIds, 'id'), allCardIds)
+      if (newIds.length > 0) {
+        // now additionally select any new card ids (that weren't on screen)
+        this.selectCardIds(newIds)
+      }
       // if the user had already initiated a move action, move the newly selected cards into the move action
       if (this.movingCardIds.length) {
         runInAction(() => {
@@ -1458,8 +1461,6 @@ export default class UiStore {
   @action
   adjustZoomLevel = collection => {
     const { lastZoom } = collection
-    // console.trace({ lastZoom, z: this.zoomLevel, n: collection.name })
-
     if (lastZoom) {
       this.zoomLevel = _.clamp(lastZoom, 1, this.zoomLevels.length)
     } else {

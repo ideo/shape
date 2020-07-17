@@ -160,6 +160,8 @@ describe Collection, type: :model do
         expect(admin_group.can_edit?(current_user)).to be true
         expect(reviewer_group.can_edit?(current_user)).to be true
         expect(participant_group.can_edit?(current_user)).to be true
+        expect(reviewer_group.can_edit?(admin_group)).to be true
+        expect(participant_group.can_edit?(admin_group)).to be true
       end
     end
 

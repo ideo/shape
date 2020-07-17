@@ -61,7 +61,7 @@ module TestResultsCollection
     end
 
     def create_ideas_collection_card
-      create_card(
+      create_board_card(
         params: ideas_collection_card_attrs,
         parent_collection: test_results_collection,
         created_by: created_by,

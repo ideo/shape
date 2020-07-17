@@ -166,7 +166,7 @@ module TestResultsCollection
     end
 
     def create_alias_open_response_collection
-      create_card(
+      create_board_card(
         params: {
           identifier: CardIdentifier.call(survey_response, 'OpenResponses'),
           collection_attributes: {

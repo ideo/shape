@@ -23,6 +23,9 @@ class CollectionCardsAddRemoveTagWorker
     parent_collection = collection_cards.first.parent
     parent_collection.touch
     # Notify other people collection has updated
-    CollectionUpdateBroadcaster.call(parent_collection, User.find(user_id))
+    user = User.find_by_id(user_id)
+    CollectionUpdateBroadcaster.new(parent_collection, user).cards_updated(
+      collection_card_ids,
+    )
   end
 end

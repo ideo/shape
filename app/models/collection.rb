@@ -1263,6 +1263,9 @@ class Collection < ApplicationRecord
     created_by.add_role(Role::ADMIN, reviewer_group)
     created_by.add_role(Role::ADMIN, participant_group)
 
+    admin_group.add_role(Role::ADMIN, reviewer_group)
+    admin_group.add_role(Role::ADMIN, participant_group)
+
     admin_group.add_role(Role::EDITOR, self)
     reviewer_group.add_role(Role::VIEWER, self)
     participant_group.add_role(Role::VIEWER, self)

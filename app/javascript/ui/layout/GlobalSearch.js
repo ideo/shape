@@ -21,6 +21,7 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 @inject('routingStore', 'uiStore') // needed for routeTo method
 @observer
 class GlobalSearch extends React.Component {
+  disposers = {}
   @observable
   searchArchived = false
   @observable
@@ -37,7 +38,6 @@ class GlobalSearch extends React.Component {
         this.searchArchived = true
     })
 
-    this.disposers = {}
     this.disposers.isSearch = observe(
       props.routingStore,
       'isSearch',
@@ -47,6 +47,10 @@ class GlobalSearch extends React.Component {
         })
       }
     )
+  }
+
+  componentWillUnmount() {
+    _.each(this.disposers, disposer => disposer())
   }
 
   get searchText() {
