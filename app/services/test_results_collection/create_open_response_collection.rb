@@ -27,7 +27,7 @@ module TestResultsCollection
         # update name if you had changed the text of the open response question
         existing_card.collection.update(name: open_response_collection_name)
       else
-        create_card(
+        create_board_card(
           params: open_response_collection_card_attrs(question_item),
           parent_collection: parent_collection,
           created_by: created_by,

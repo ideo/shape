@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { computed } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -7,12 +8,17 @@ import AvatarList from '~/ui/users/AvatarList'
 import ChallengeReviewButton from '~/ui/challenges/ChallengeReviewButton'
 import ListCard from '~/ui/grid/ListCard'
 
-export const transformColumnsForChallenge = columns => {
-  columns[2].style.width = '400px'
-  columns[3].displayName = 'Reviewers'
-  columns[3].name = 'reviewers'
-  return columns
-}
+export const transformColumnsForChallenge = columns =>
+  _.map(columns, col => {
+    if (col.name === 'last_updated') {
+      col.style.width = '400px'
+    }
+    if (col.name === 'permissions') {
+      col.displayName = 'Reviewers'
+      col.name = 'reviewers'
+    }
+    return col
+  })
 
 @inject('apiStore')
 @observer
@@ -38,16 +44,6 @@ class ChallengeListCard extends React.Component {
     })
   }
 
-  get cardsForTagging() {
-    const { apiStore } = this.props
-    if (apiStore.selectedCards.length > 0) {
-      return apiStore.selectedCards
-    } else {
-      const { card } = this.props
-      return [card]
-    }
-  }
-
   get showReviewers() {
     const { record } = this.props
     return record.internalType !== 'items'
@@ -57,39 +53,44 @@ class ChallengeListCard extends React.Component {
   get columnsWithChallengeContent() {
     const { columns, record, submissionsCollection } = this.props
     const { isCurrentUserAReviewer, submission_reviewer_status } = record
-    columns[3].overrideContent = columnRef => {
-      return (
-        <div
-          style={{ width: '100%' }}
-          key={`col-${this.state.isReviewersOpen}`}
-        >
-          <AvatarList
-            avatars={record.taggedUsersWithStatuses}
-            onAdd={this.handleRolesClick}
-          />
-          <AddReviewersPopover
-            record={record}
-            potentialReviewers={submissionsCollection.potentialReviewers}
-            onClose={this.handleCloseReviewers}
-            wrapperRef={columnRef}
-            open={this.state.isReviewersOpen}
-          />
-        </div>
-      )
-    }
-    columns[4].overrideContent = () =>
-      isCurrentUserAReviewer &&
-      submission_reviewer_status && (
-        <ChallengeReviewButton
-          key="column3"
-          reviewerStatus={submission_reviewer_status}
-          onClick={() => {
-            record.navigateToNextAvailableTest()
-          }}
-        />
-      )
 
-    return [...columns]
+    return _.map(columns, column => {
+      if (column.name === 'reviewers') {
+        column.overrideContent = columnRef => {
+          return (
+            <div
+              style={{ width: '100%' }}
+              key={`col-${this.state.isReviewersOpen}`}
+            >
+              <AvatarList
+                avatars={record.taggedUsersWithStatuses}
+                onAdd={this.handleRolesClick}
+              />
+              <AddReviewersPopover
+                record={record}
+                potentialReviewers={submissionsCollection.potentialReviewers}
+                onClose={this.handleCloseReviewers}
+                wrapperRef={columnRef}
+                open={this.state.isReviewersOpen}
+              />
+            </div>
+          )
+        }
+      }
+      if (column.name === 'actions' && isCurrentUserAReviewer) {
+        column.overrideContent = () =>
+          submission_reviewer_status && (
+            <ChallengeReviewButton
+              key="column3"
+              reviewerStatus={submission_reviewer_status}
+              onClick={() => {
+                record.navigateToNextAvailableTest()
+              }}
+            />
+          )
+      }
+      return column
+    })
   }
 
   render() {

@@ -156,17 +156,21 @@ class CollectionPage extends React.Component {
   }
 
   loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
-    const { collection } = this.props
-    return collection.submissions_collection.API_fetchCards({
+    const { submissions_collection } = this.props.collection
+    await submissions_collection.API_fetchCards({
       page,
       per_page,
       rows,
       cols,
     })
+    if (submissions_collection.isSubmissionsCollectionInsideChallenge) {
+      // fetch card reviewer statuses for the new page of cards
+      submissions_collection.API_fetchCardReviewerStatuses()
+    }
   }
 
   @action
-  onAPILoad() {
+  async onAPILoad() {
     const {
       collection,
       apiStore,
@@ -196,7 +200,7 @@ class CollectionPage extends React.Component {
       apiStore.checkJoinableGroup(collection.joinable_group_id)
     }
     if (collection.isNormalCollection) {
-      this.checkSubmissionBox()
+      await this.checkSubmissionBox()
     } else {
       apiStore.clearUnpersistedThreads()
     }
@@ -204,6 +208,9 @@ class CollectionPage extends React.Component {
     if (collection.processing_status) {
       const message = `${collection.processing_status}...`
       uiStore.popupSnackbar({ message })
+    }
+    if (collection.viewMode === 'list') {
+      collection.API_fetchCardRoles()
     }
     if (collection.isChallengeOrInsideChallenge) {
       this.initializeChallenges()
@@ -293,6 +300,7 @@ class CollectionPage extends React.Component {
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
     }
+    return true
   }
 
   async initializeChallenges() {
@@ -488,7 +496,10 @@ class CollectionPage extends React.Component {
           />
         </Flex>
         {submissions_collection.viewMode === 'list' ? (
-          <CollectionList collection={submissions_collection} />
+          <CollectionList
+            collection={submissions_collection}
+            loadCollectionCards={this.loadSubmissionsCollectionCards}
+          />
         ) : (
           <CollectionGrid
             {...gridSettings}
@@ -614,7 +625,12 @@ class CollectionPage extends React.Component {
       // do this first because SearchCollection + list viewMode is slightly different
       inner = this.renderSearchCollection()
     } else if (collection.viewMode === 'list') {
-      inner = <CollectionList collection={collection} />
+      inner = (
+        <CollectionList
+          collection={collection}
+          loadCollectionCards={this.loadCollectionCards}
+        />
+      )
     } else if (collection.isBoard) {
       inner = (
         <FoamcoreGrid

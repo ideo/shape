@@ -20,10 +20,10 @@ class CollectionCardBuilder
       @params.delete :row
       @params.delete :col
     end
-    @collection_card = build_collection_card(type.to_s)
-    @errors = @collection_card.errors
     @user = user
     @placeholder = placeholder
+    @collection_card = build_collection_card(type.to_s)
+    @errors = @collection_card.errors
   end
 
   def self.call(*args)
@@ -70,9 +70,8 @@ class CollectionCardBuilder
   def create_collection_card
     # NOTE: cards created inside a master_template are unpinned by default unless it's being created within a pinned area
     @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
-    @collection_card.record.created_by = @user unless @collection_card.record.is_a?(Item)
+    @collection_card.collection&.created_by = @user if @user.present?
     @parent_collection.transaction do
-
       if @parent_collection.board_collection?
         # NOTE: Have to lock board collections for collision detection race conditions.
         #  This means that uploading 6 files at once for example will be threadsafe,
@@ -142,9 +141,6 @@ class CollectionCardBuilder
       # this will change the roles_anchor, which will get re-cached later
       record.enable_org_view_access_if_allowed
       update_params = {}
-      if @user.present?
-        update_params[:created_by] = @user
-      end
       if record.parent.anyone_can_view?
         update_params[:anyone_can_view] = true
       end

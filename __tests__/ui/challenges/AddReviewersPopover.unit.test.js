@@ -1,3 +1,4 @@
+import { createRef } from 'react'
 import AddReviewersPopover from '~/ui/challenges/AddReviewersPopover'
 import { fakeCollection } from '#/mocks/data'
 import { Checkbox } from '~/ui/global/styled/forms'
@@ -22,7 +23,7 @@ describe('AddReviewersPopover', () => {
       onClose: jest.fn(),
       open: true,
       potentialReviewers,
-      wrapperRef: { current: <div /> },
+      wrapperRef: createRef(),
     }
     render = () => {
       wrapper = shallow(<AddReviewersPopover {...props} />)

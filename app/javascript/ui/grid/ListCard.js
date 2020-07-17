@@ -46,13 +46,14 @@ const Row = styled.div`
   ${props =>
     !props.selected &&
     `
-    ${Column} > .show-on-hover {
+    ${Column} .show-on-hover {
       display: none;
     }
   `}
 
-  &:hover {
-    ${Column} > .show-on-hover {
+  &:hover,
+  &.touch-device {
+    ${Column} .show-on-hover {
       display: flex;
     }
   }
@@ -105,7 +106,10 @@ class ListCard extends React.Component {
   constructor(props) {
     super(props)
     this.rolesWrapperRef = React.createRef()
-    this.columnRefs = props.columns.map(() => React.createRef())
+    this.columnRefs = {}
+    _.each(props.columns, column => {
+      this.columnRefs[column.name] = React.createRef()
+    })
   }
 
   componentDidUpdate() {}
@@ -260,70 +264,83 @@ class ListCard extends React.Component {
     return <IconHolder>{icon}</IconHolder>
   }
 
-  get columnContent() {
+  columnContent(columnName) {
     const { card, record, uiStore, searchResult } = this.props
     const tagEditorOpen = uiStore.tagsModalOpenId === card.id
 
-    return [
-      <div className="show-on-hover" style={{ cursor: 'pointer' }}>
-        <SelectionCircle cardId={card.id} />
-      </div>,
-      <ColumnLink onClick={this.handleRecordClick}>
-        <ListCoverRenderer
-          card={card}
-          cardType={record.internalType}
-          record={record}
-        />
-        <TruncatedName>{record.name}</TruncatedName>
-        {this.renderLabelSelector}
-        {this.renderIcons}
-      </ColumnLink>,
-      defaultTimeFormat(record.updated_at),
-      <RolesSummary
-        key="roles"
-        handleClick={this.handleRolesClick}
-        roles={[...record.roles]}
-        canEdit={record.can_edit}
-        // convert observable to normal array to trigger render changes
-        collaborators={[...record.collaborators]}
-        rolesMenuOpen={!!uiStore.rolesMenuOpen}
-      />,
-      <Fragment>
-        <ActionMenu
-          location={searchResult ? 'Search' : 'GridCard'}
-          card={card}
-          canView={record.can_view}
-          canEdit={this.canEditCard}
-          canReplace={record.canReplace && !card.link && !searchResult}
-          menuOpen={this.menuOpen}
-          onOpen={this.handleActionMenuClick}
-          onLeave={this.handleCloseMenu}
-          menuItemsCount={this.getMenuItemsCount}
-        />
-        <CollectionCardsTagEditorModal
-          cards={this.cardsForTagging}
-          canEdit={this.canEditCard}
-          open={tagEditorOpen}
-        />
-      </Fragment>,
-    ]
+    switch (columnName) {
+      case 'select':
+        return (
+          <div className="show-on-hover" style={{ cursor: 'pointer' }}>
+            <SelectionCircle cardId={card.id} />
+          </div>
+        )
+      case 'name':
+        return (
+          <ColumnLink onClick={this.handleRecordClick}>
+            <ListCoverRenderer
+              card={card}
+              cardType={record.internalType}
+              record={record}
+            />
+            <TruncatedName>{record.name}</TruncatedName>
+            {this.renderLabelSelector}
+            {this.renderIcons}
+          </ColumnLink>
+        )
+      case 'last_updated':
+        return defaultTimeFormat(record.updated_at)
+      case 'permissions':
+        return (
+          <RolesSummary
+            key="roles"
+            handleClick={this.handleRolesClick}
+            roles={[...record.roles]}
+            canEdit={record.can_edit}
+            // convert observable to normal array to trigger render changes
+            collaborators={[...record.collaborators]}
+            rolesMenuOpen={!!uiStore.rolesMenuOpen}
+          />
+        )
+      case 'actions':
+        return (
+          <Fragment>
+            <ActionMenu
+              location={searchResult ? 'Search' : 'GridCard'}
+              card={card}
+              canView={record.can_view}
+              canEdit={this.canEditCard}
+              canReplace={record.canReplace && !card.link && !searchResult}
+              menuOpen={this.menuOpen}
+              onOpen={this.handleActionMenuClick}
+              onLeave={this.handleCloseMenu}
+              menuItemsCount={this.getMenuItemsCount}
+            />
+            <CollectionCardsTagEditorModal
+              cards={this.cardsForTagging}
+              canEdit={this.canEditCard}
+              open={tagEditorOpen}
+            />
+          </Fragment>
+        )
+    }
   }
 
   get renderCols() {
     const { columns } = this.props
-    return columns.map((column, idx) => (
+    return columns.map(column => (
       <Column {...column.style} key={column.name}>
-        <div ref={this.columnRefs[idx]}>
+        <div ref={this.columnRefs[column.name]}>
           {column.overrideContent
-            ? column.overrideContent(this.columnRefs[idx])
-            : this.columnContent[idx]}
+            ? column.overrideContent(this.columnRefs[column.name])
+            : this.columnContent(column.name)}
         </div>
       </Column>
     ))
   }
 
   render() {
-    const { card, record } = this.props
+    const { card, record, uiStore } = this.props
     if (card.shouldHideFromUI || _.isEmpty(record)) {
       return null
     }
@@ -335,6 +352,7 @@ class ListCard extends React.Component {
         selected={this.isSelected}
         ref={c => (this.cardRef = c)}
         data-cy="ListCardRow"
+        className={uiStore.isTouchDevice ? 'touch-device' : ''}
       >
         {this.renderCols}
       </Row>

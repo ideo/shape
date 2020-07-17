@@ -36,7 +36,7 @@ class FoamcoreHotspot extends React.Component {
         left={`${left}px`}
         data-row={row}
         data-col={col}
-        style={{ zIndex: 0 }}
+        zIndex={0}
         data-cy={`FoamcoreHotspot-${row}:${col}`}
       >
         <HotspotLine
