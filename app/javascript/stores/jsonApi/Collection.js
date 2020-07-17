@@ -473,6 +473,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type == 'Collection::Board' || !!this.num_columns
   }
 
+  get isBigBoard() {
+    return this.isBoard && this.num_columns > 4
+  }
+
   get isFourWideBoard() {
     return this.isBoard && this.num_columns === 4
   }
