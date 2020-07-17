@@ -674,13 +674,11 @@ describe('Collection', () => {
   })
 
   describe('API_fetchCardOrders', () => {
-    const res = {
-      data: [{ id: '1', order: 2 }, { id: '2', order: 1 }],
-    }
+    const data = [{ id: '1', order: 2 }, { id: '2', order: 1 }]
     beforeEach(() => {
       collection.API_fetchAllCardIds = jest
         .fn()
-        .mockReturnValue(Promise.resolve(res))
+        .mockReturnValue(Promise.resolve(data))
 
       runInAction(() => {
         collection.collection_cards = [collectionCard_1, collectionCard_2]
