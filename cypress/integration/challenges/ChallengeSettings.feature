@@ -26,4 +26,6 @@ Feature: Challenge settings
 
     When I close the modal
     And I click the "ChallengeSettings-TopicsNav"
-    And I type in a topic
+    And I type in a topic "bitcoin"
+    And I press enter
+    Then I should see "bitcoin" in a "Pill"

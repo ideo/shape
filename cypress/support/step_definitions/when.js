@@ -585,9 +585,16 @@ When('I open the challenge settings', () => {
   cy.wait(100)
 })
 
-When('I type in a topic', () => {
+When('I type in a topic {string}', topic => {
   cy.get('[role="combobox"]')
     .first()
-    .type('sales')
+    .type(topic)
+  cy.wait(50)
+})
+
+When('I press enter', () => {
+  cy.get('[role="combobox"]')
+    .first()
+    .type('{enter}')
   cy.wait(50)
 })
