@@ -645,10 +645,9 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
-    # no need to do this for boards
     if board_collection?
+      # There is a non-null constraint, but we want to effectively nullify orders
       collection_cards.update_all(order: 0)
-      # There is a non-null constraint
       return
     end
 
