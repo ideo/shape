@@ -128,7 +128,7 @@
     "jest-styled-components": "7.0.0-2",
     "js-cookie": "^2.2.1",
     "linkifyjs": "^2.1.8",
-    "lodash": "~4.17.4",
+    "lodash": "~4.17.19",
     "mime-types": "^2.1.19",
     "mobx": "^4.4.0",
     "mobx-localstorage": "^1.0.0",
