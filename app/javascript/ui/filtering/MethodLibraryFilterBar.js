@@ -120,6 +120,7 @@ class MethodLibraryFilterBar extends React.Component {
       isChecked: tag.selected,
       iconLeft: <TagIcon />,
       onClick: () => this.selectFilter(tag),
+      padding: '0px 0px 0px 12px',
     }
   }
 
