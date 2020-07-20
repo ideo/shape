@@ -137,6 +137,7 @@ class MethodLibraryFilterBar extends React.Component {
           borderColor: v.colors.black,
           TextComponent: CreativeQualityTypography,
           onClick: () => null,
+          padding: '0px 0px 0px 12px',
         })
         // Add subqualities for this quality from filters
         const subqualityFilters = filters.filter(filter =>
