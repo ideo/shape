@@ -17,6 +17,9 @@ const SharedRecordMixin = superclass =>
     highlightedRange = null
     @observable
     tags = []
+    // have to default `tagged_users` to an empty array so it can always be pushed to
+    @observable
+    tagged_users = []
     @observable
     parentChallenge = null
     @observable
@@ -148,24 +151,22 @@ const SharedRecordMixin = superclass =>
       return this.apiStore.request(apiPath, 'PATCH')
     }
 
-    async API_willBecomePrivate({ removing, roleName }) {
+    API_willBecomePrivate({ removing, roleName }) {
       const apiPath = `${this.baseApiPath}/roles/will_become_private`
       const remove_identifiers = [`${removing.className}_${removing.id}`]
       const params = {
         role_name: roleName,
         remove_identifiers,
       }
-      const res = await this.apiStore.request(
-        `${apiPath}?${queryString.stringify(params)}`,
-        'GET'
+      return this.apiStore.requestJson(
+        `${apiPath}?${queryString.stringify(params)}`
       )
-      return res.__response.data
     }
 
     API_addRemoveTag = (action, data) => {
       const { apiStore } = this
       const { label, type } = data
-      apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
+      return apiStore.request(`collection_cards/${action}_tag`, 'PATCH', {
         card_ids: [this.parent_collection_card.id],
         tag: label,
         type,
@@ -175,13 +176,16 @@ const SharedRecordMixin = superclass =>
     @action
     addTag(label, type, user) {
       this[type].push(label)
-      this.API_addRemoveTag('add', { label, type })
       if (type === 'user_tag_list' && user) {
-        const { tagged_users } = this
-        if (tagged_users) {
-          tagged_users.push(user)
-        }
+        this.tagged_users.push(user)
+        // assume / push the 'unstarted' status for the user
+        this.reviewerStatuses.push({
+          record_id: this.id,
+          status: 'unstarted',
+          user_id: user.id,
+        })
       }
+      this.API_addRemoveTag('add', { label, type })
     }
 
     @action
@@ -189,7 +193,6 @@ const SharedRecordMixin = superclass =>
       _.remove(this[type], tag => {
         return tag === label
       })
-      this.API_addRemoveTag('remove', { label, type })
       if (type === 'user_tag_list') {
         const { tagged_users } = this
         if (tagged_users) {
@@ -198,6 +201,7 @@ const SharedRecordMixin = superclass =>
           })
         }
       }
+      this.API_addRemoveTag('remove', { label, type })
     }
 
     async initializeParentChallengeForCollection() {
@@ -306,18 +310,21 @@ const SharedRecordMixin = superclass =>
 
     @computed
     get taggedUsersWithStatuses() {
-      if (!this.tagged_users) return []
-      if (!this.reviewerStatuses) return []
-      return this.tagged_users.map(taggedUser => {
+      if (_.isEmpty(this.tagged_users)) return []
+      if (_.isEmpty(this.reviewerStatuses)) return []
+      const taggedUsers = this.tagged_users.map(taggedUser => {
         const statusForUser = this.reviewerStatuses.find(
           status => parseInt(status.user_id) === parseInt(taggedUser.id)
-        ).status
-        return {
-          ...taggedUser.rawAttributes(),
-          status: statusForUser,
-          color: v.statusColor[statusForUser],
+        )
+        if (statusForUser) {
+          return {
+            ...taggedUser.rawAttributes(),
+            status: statusForUser.status,
+            color: v.statusColor[statusForUser.status],
+          }
         }
       })
+      return _.compact(taggedUsers)
     }
 
     initializeTags = async () => {

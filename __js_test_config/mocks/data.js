@@ -484,6 +484,7 @@ export const fakeCollection = {
   API_manipulateRow: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCardOrders: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchChallengePhaseCollections: jest.fn().mockReturnValue(Promise.resolve({})),
+  refetch: jest.fn(),
   initializeTags: jest.fn(),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
   createSubmission: jest.fn(),

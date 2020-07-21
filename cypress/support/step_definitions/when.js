@@ -66,6 +66,13 @@ When('I choose a link item from the submission box', () => {
   cy.locate('submission-box-link-item').click({ force: true })
 })
 
+When('I click on the first card', () => {
+  cy.get('[data-cy="GridCard"][data-order="0"]')
+    .first()
+    .click()
+  cy.wait(1000)
+})
+
 // ----------------------
 // Sharing collections
 // ----------------------
@@ -546,9 +553,7 @@ When('I select to invite a new user', () => {
 })
 
 When('I close the modal', () => {
-  cy.locate('ModalClose')
-    .last()
-    .click()
+  cy.get('.MuiDialog-container').click(1, 1, { force: true })
   cy.wait(100)
 })
 
@@ -597,4 +602,28 @@ When('I press enter', () => {
     .first()
     .type('{enter}')
   cy.wait(50)
+})
+When('I click on the first available date in the datepicker', () => {
+  cy.get('.MuiPickersDateRangeDay-rangeIntervalDay button')
+    .first()
+    .click()
+  cy.wait(25)
+})
+When('I click on the last date in the datepicker', () => {
+  cy.get('.MuiPickersDateRangeDay-rangeIntervalDay button')
+    .last()
+    .click()
+  cy.wait(25)
+})
+When('I click on the first checkbox', () => {
+  cy.get('input[type="checkbox"]')
+    .first()
+    .click()
+  cy.wait(25)
+})
+When('I escape', () => {
+  cy.get('body')
+    .first()
+    .type('{esc}')
+  cy.wait(25)
 })

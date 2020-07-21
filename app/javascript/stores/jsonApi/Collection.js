@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import axios from 'axios'
 import { observable, computed, action, runInAction } from 'mobx'
 import { ReferenceType, updateModelId } from 'datx'
 import pluralize from 'pluralize'
@@ -821,8 +820,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     cols,
     searchTerm,
   } = {}) {
+    let orderChanged = false
     runInAction(() => {
-      if (order) this.currentOrder = order
+      if (order && this.currentOrder !== order) {
+        orderChanged = true
+        this.currentOrder = order
+      }
     })
     const params = {
       page,
@@ -883,7 +886,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||
           data.length === 0 ||
-          searchTerm)
+          searchTerm ||
+          orderChanged)
       ) {
         this.storedCacheKey = this.cache_key
         this.collection_cards.replace(data)
@@ -930,9 +934,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_fetchCardOrders = async () => {
-    const res = await this.API_fetchAllCardIds()
+    const cardOrders = await this.API_fetchAllCardIds()
     runInAction(() => {
-      _.each(res.data, orderData => {
+      _.each(cardOrders, orderData => {
         const card = this.collection_cards.find(cc => cc.id === orderData.id)
         if (card) {
           card.order = orderData.order
@@ -959,25 +963,29 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   API_fetchCardReviewerStatuses = async () => {
     const ids = _.compact(
       _.map(this.collection_cards, cc => {
-        if (cc.record && cc.record.user_tag_list) {
+        if (
+          cc.record &&
+          !_.isEmpty(cc.record.user_tag_list) &&
+          _.isEmpty(cc.record.reviewerStatuses)
+        ) {
           return cc.id
         }
       })
     )
     if (ids.length === 0) return
-    const basePath = '/api/v1'
-    const res = await axios.get(
-      `${basePath}/collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
+    const statuses = await this.apiStore.requestJson(
+      `collections/${this.id}/collection_cards/reviewer_statuses?select_ids=${ids}`
     )
-    const statuses = res.data
     const statusesByRecord = _.groupBy(statuses, 'record_id')
-    Object.entries(statusesByRecord).forEach(([record_id, recordStatuses]) => {
+    _.each(statusesByRecord, (recordStatuses, record_id) => {
       const record = this.apiStore.find('collections', record_id.toString())
-      runInAction(() => {
-        record.reviewerStatuses = recordStatuses
-      })
+      if (record) {
+        runInAction(() => {
+          record.reviewerStatuses = recordStatuses
+        })
+      }
     })
-    return res
+    return statuses
   }
 
   async API_fetchAndMergeCards(cardIds) {
@@ -1241,6 +1249,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get sortedCards() {
     let orderList = ['pinned', 'order']
     let order = ['desc', 'asc']
+    if (this.currentOrder !== 'order') {
+      orderList = [this.currentOrder]
+      order = ['desc']
+    }
     if (this.isBoard) {
       orderList = ['row', 'col']
       order = ['asc', 'asc']
@@ -1488,7 +1500,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_fetchAllCardIds() {
-    return axios.get(`/api/v1/collections/${this.id}/collection_cards/ids`)
+    return apiStore.requestJson(`collections/${this.id}/collection_cards/ids`)
   }
 
   async API_setSubmissionBoxTemplate(data) {
@@ -1539,7 +1551,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
     // NOTE: assumes that the reviewer group are the reviewers
     const challengeReviewerGroup = await this.apiStore.request(
-      `/groups/${this.parentChallenge.challenge_reviewer_group_id}`,
+      `groups/${this.parentChallenge.challenge_reviewer_group_id}`,
       'GET'
     )
 
@@ -1665,7 +1677,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   static async fetchSubmissionsCollection(id, { order } = {}) {
     const res = await apiStore.request(`collections/${id}`)
     const collection = res.data
-    collection.API_fetchCards({ order })
+    await collection.API_fetchCards({ order })
     return collection
   }
 

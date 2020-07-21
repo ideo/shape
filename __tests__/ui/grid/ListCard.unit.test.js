@@ -1,5 +1,5 @@
 import ListCard from '~/ui/grid/ListCard'
-import { DEFAULT_COLUMNS } from '~/ui/grid/CollectionList'
+import { defaultColumns } from '~/ui/grid/CollectionList'
 import CollectionTypeSelector from '~/ui/global/CollectionTypeSelector'
 import { ITEM_TYPES } from '~/utils/variables'
 import TextIconXs from '~/ui/icons/TextIconXs'
@@ -26,7 +26,7 @@ describe('ListCard', () => {
     record = fakeTextItem
     props = {
       card,
-      columns: [...DEFAULT_COLUMNS],
+      columns: defaultColumns(),
       record,
       uiStore: fakeUiStore,
       apiStore: fakeApiStore(),

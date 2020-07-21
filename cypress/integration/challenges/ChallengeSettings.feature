@@ -6,8 +6,7 @@ Feature: Challenge settings
     And I open the challenge settings
     Then I should see the "Challenge settings" modal
 
-    When I click the "SubmissionSettings-SubmissionPanel"
-    And I click the "SubmissionSettings-AcceptNew"
+    When I click the "SubmissionSettings-AcceptNew"
     Then I should see "Accept new submissions (OFF)" in a "SubmissionSettings-AcceptNewText"
     When I click the "SubmissionSettings-HideNew"
     Then I should see "Hide new submissions" in a "SubmissionSettings-HideNew"
@@ -21,11 +20,17 @@ Feature: Challenge settings
     And I click the "ConfirmButton"
     Then I should see "Allow anyone with this link to view (ON)" in a "anyone-can-view-checkbox"
 
-    When I click the "EntityAvatarAndName"
-    Then I should see a modal
-
-    When I close the modal
-    And I click the "ChallengeSettings-TopicsNav"
+    When I click the "ChallengeSettings-TopicsNav"
     And I type in a topic "bitcoin"
     And I press enter
     Then I should see "bitcoin" in a "Pill"
+
+    When I click the "ChallengeSettings-PhasesNav"
+    Then I should see 3 "ChallengeSettings-Phase"
+    When I click the "CollectionDateRange"
+    And I click on the first available date in the datepicker
+    And I click on the last date in the datepicker
+    And I click the "InlineModal-Ok"
+    Then I should see "to" in a "CollectionDateRange"
+    When I click the "ChallengeSettings-PhaseEdit"
+    Then I should see "phase" in the URL

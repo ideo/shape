@@ -359,7 +359,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       end
     end
 
-    context 'success' do
+    context 'success creating an item' do
       let(:collection) do
         create(:collection, add_editors: [user], organization: organization)
       end
@@ -396,7 +396,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         )
       end
 
-      context 'with a collection' do
+      context 'with a board collection' do
         let(:raw_params) do
           {
             order: 1,
@@ -412,12 +412,13 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           }
         end
 
-        it 'creates record' do
+        it 'creates record and assigns created_by user' do
           expect do
             post(path, params: params)
           end.to change(Collection::Board, :count).by(1)
           card = CollectionCard.find(json['data']['id'])
           expect(card.record.num_columns).to eq 4
+          expect(card.collection.created_by).to eq user
         end
       end
 

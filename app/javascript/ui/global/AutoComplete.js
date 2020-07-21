@@ -18,7 +18,7 @@ const SearchIconContainer = styled.span`
   left: 5px;
   position: absolute;
   width: 14px;
-  top: 14px;
+  top: 9px;
 
   .icon {
     width: 22px;
@@ -120,6 +120,8 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   }),
   placeholder: base => ({
     ...base,
+    paddingTop: '0px',
+    paddingBottom: '12px',
   }),
   singleValue: () => ({}),
   valueContainer: () => ({}),
@@ -215,6 +217,8 @@ const styles = theme => ({
     backgroundColor: 'white',
     flexGrow: 1,
     height: 30,
+    paddingTop: '8px',
+    paddingBottom: '8px',
     width: '100%',
   },
   chip: {
@@ -223,6 +227,10 @@ const styles = theme => ({
     paddingLeft: '4px',
     paddingRight: '4px',
     paddingTop: 0,
+  },
+  input: {
+    paddingBottom: '20px',
+    paddingTop: '0px',
   },
 })
 
@@ -233,6 +241,7 @@ SelectWrapped.propTypes = {
     root: PropTypes.string,
     chip: PropTypes.string,
     '@global': PropTypes.string,
+    input: PropTypes.string,
   }).isRequired,
 }
 
@@ -306,7 +315,7 @@ class AutoComplete extends React.Component {
             instanceId: 'react-select-chip',
             id: 'react-select-chip',
             name: 'react-select-chip',
-            className: 'react-select-chip',
+            className: `react-select-chip ${classes.input}`,
             promptTextCreator: label => `Invite email ${label}`,
             simpleValue: true,
           }}

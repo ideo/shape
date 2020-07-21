@@ -32,6 +32,12 @@ Then('I should see {string} in a {string}', (text, el) => {
   cy.locateDataOrClassWith(el, text).should('be.visible')
 })
 
+Then('I should see {string} element in a {string}', (el, outerEl) => {
+  cy.locateDataOrClass(outerEl).within(outer => {
+    cy.get(el).should('be.visible')
+  })
+})
+
 Then('I should see the value {string} in a {string}', (text, el) => {
   cy.locateDataOrClass(el).should('have.value', text)
 })

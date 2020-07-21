@@ -80,7 +80,7 @@ module TestResultsCollection
     end
 
     def create_idea_collection
-      collection = create_card(
+      collection = create_board_card(
         params: {
           collection_attributes: {
             name: idea.name,

@@ -4,7 +4,16 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 
-export const StyledHotspot = styled.div`
+export const StyledHotspot = styled.div.attrs(
+  ({ height, width, top, zIndex }) => ({
+    style: {
+      height,
+      width,
+      top,
+      zIndex,
+    },
+  })
+)`
   align-items: center;
   display: flex;
   height: ${props => props.height};

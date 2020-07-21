@@ -101,20 +101,23 @@ class SearchCollection extends React.Component {
       return <Loader />
     }
 
+    const searchCollectionSettings = {
+      collection: searchResultsCollection,
+      loadCollectionCards: this.loadSearchedCards,
+    }
     let searchResults = (
       <CollectionGrid
         {...gridSettings}
-        loadCollectionCards={this.loadSearchedCards}
+        {...searchCollectionSettings}
         trackCollectionUpdated={trackCollectionUpdated}
         cardProperties={this.searchCardProperties}
-        collection={collection.searchResultsCollection}
         canEditCollection={false}
         movingCardIds={[]}
       />
     )
 
     if (searchResultsCollection.viewMode === 'list') {
-      searchResults = <CollectionList collection={searchResultsCollection} />
+      searchResults = <CollectionList {...searchCollectionSettings} />
     }
 
     return (

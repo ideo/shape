@@ -1,12 +1,14 @@
-import { uiStore } from '~/stores'
+import _ from 'lodash'
 import { observe } from 'mobx'
 
+import { uiStore } from '~/stores'
 const PADDING_V = 20
 const PADDING_H = 40
 
 function WithDropTarget(Wrapped) {
   class DropTarget extends React.Component {
     state = { currentlyDraggedOn: null }
+    disposers = {}
 
     constructor(props) {
       super(props)
@@ -15,7 +17,6 @@ function WithDropTarget(Wrapped) {
 
     componentDidMount() {
       const { item } = this.props
-      this.disposers = {}
       this.disposers.dropTargeted = observe(
         uiStore,
         'activeDragTarget',
@@ -42,6 +43,7 @@ function WithDropTarget(Wrapped) {
     componentWillUnmount() {
       this.unmounted = true
       uiStore.removeDragTarget(this.props.item, this.coordinates, 'Breadcrumb')
+      _.each(this.disposers, disposer => disposer())
     }
 
     get coordinates() {

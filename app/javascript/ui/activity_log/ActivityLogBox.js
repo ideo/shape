@@ -76,7 +76,7 @@ const TestAction = styled(Action)`
 @inject('apiStore', 'uiStore')
 @observer
 class ActivityLogBox extends React.Component {
-  disposer = null
+  disposers = {}
 
   constructor(props) {
     super(props)
@@ -90,14 +90,31 @@ class ActivityLogBox extends React.Component {
         this.position.h = DEFAULT.h
       }
     })
-    this.disposer = observe(props.uiStore, 'activityLogOpen', change => {
-      if (change.newValue === true) {
-        apiStore.setupCommentThreadAndMenusForPage(uiStore.viewingRecord)
+    this.disposers.activityLogOpen = observe(
+      props.uiStore,
+      'activityLogOpen',
+      async change => {
+        if (change.newValue === true) {
+          // if we just opened the activity log, make sure the CommentThread is loaded
+          await apiStore.setupCommentThreadAndMenusForPage(
+            uiStore.viewingRecord
+          )
+        }
+        if (this.isOffscreen()) {
+          this.setToDefaultPosition()
+        }
       }
-      if (this.isOffscreen()) {
-        this.setToDefaultPosition()
+    )
+    this.disposers.activityLogForceWidth = observe(
+      props.uiStore,
+      'activityLogForceWidth',
+      change => {
+        if (change.newValue !== change.oldValue) {
+          // if we resized the window check if we need to reset the position
+          this.resetPosition()
+        }
       }
-    })
+    )
   }
 
   @action
@@ -110,12 +127,15 @@ class ActivityLogBox extends React.Component {
 
   componentWillUnmount() {
     // cancel the observer
-    this.disposer()
+    _.each(this.disposers, disposer => disposer())
   }
 
   resetPosition = () => {
     const { uiStore } = this.props
-    if (uiStore.isTouchDevice) return
+    if (uiStore.isTouchDevice || uiStore.isMobileXs) {
+      this.setToFixedPosition()
+      return
+    }
     const existingPosition = localStorage.getItem(POSITION_KEY) || {}
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
@@ -158,7 +178,6 @@ class ActivityLogBox extends React.Component {
       y: 0,
       w: width,
       h: height,
-      override: true,
     })
   }
 
@@ -177,10 +196,20 @@ class ActivityLogBox extends React.Component {
       this.resetPosition()
       return
     }
-    this.position.x = x || existingPosition.x || this.position.x
-    this.position.y = y || existingPosition.y || this.position.y
-    this.position.w = w || existingPosition.w || this.position.w
-    this.position.h = h || existingPosition.h || this.position.h
+
+    const positionArgs = {
+      x,
+      y,
+      w,
+      h,
+    }
+    _.each(positionArgs, (value, field) => {
+      if (value !== null) {
+        this.position[field] = value
+      } else {
+        this.position[field] = existingPosition[field] || this.position[field]
+      }
+    })
     if (!temporary) {
       localStorage.setItem(POSITION_KEY, this.position)
     } else {
@@ -348,9 +377,6 @@ class ActivityLogBox extends React.Component {
   render() {
     const { apiStore, uiStore } = this.props
     if (!uiStore.activityLogOpen) return null
-    if (uiStore.isTouchDevice) {
-      this.setToFixedPosition()
-    }
     return (
       <Rnd
         className="activity_log-draggable"
