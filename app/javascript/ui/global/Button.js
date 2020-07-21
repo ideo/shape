@@ -29,8 +29,7 @@ const Button = styled.button`
   transition: all 0.3s;
   width: ${({ width }) => (width ? width : 183)}px;
 
-  &:hover,
-  &:focus {
+  &:hover {
     background-color: ${v.colors.commonDark};
     color: ${v.colors.white};
     border-color: ${v.colors.commonDark};

@@ -157,7 +157,7 @@ export const StyledMenuItem = styled.li`
   display: flex;
   min-height: 1rem;
   overflow-y: hidden;
-  padding: 18px 0 18px 16px;
+  padding: ${props => props.padding};
   position: relative;
   width: ${props => props.width || 200}px;
   ${props => props.bgColor && `background-color: ${props.bgColor};`}
@@ -233,6 +233,13 @@ export const StyledMenuItem = styled.li`
   }
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
+StyledMenuItem.propTypes = {
+  padding: PropTypes.String,
+}
+
+StyledMenuItem.defaultProps = {
+  padding: '18px 0 18px 16px',
+}
 
 class PopoutMenu extends React.Component {
   get groupedMenuItems() {
@@ -286,6 +293,7 @@ class PopoutMenu extends React.Component {
               hasCheckbox,
               isChecked,
               noHover,
+              padding,
             } = item
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
@@ -302,6 +310,7 @@ class PopoutMenu extends React.Component {
                 wrapperClassName={wrapperClassName}
                 bgColor={bgColor}
                 width={width - 20}
+                padding={padding}
               >
                 {hasCheckbox && (
                   <Checkbox
