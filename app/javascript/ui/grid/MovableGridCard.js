@@ -321,22 +321,12 @@ class MovableGridCard extends React.Component {
   }
 
   renderBlank = cardType => {
-    const { card, parent } = this.props
+    const { card, parent, zoomLevel } = this.props
     const styleProps = this.styleProps()
     const { height, width, xPos, yPos } = styleProps
     const { blankType } = card
 
     let cardElement = <GridCardBlank parent={parent} preselected={blankType} />
-    if (cardType === 'submission') {
-      cardElement = (
-        <AddSubmission
-          parent_id={card.parent_id}
-          submissionSettings={card.submissionSettings}
-          enabled={parent.submissions_enabled}
-        />
-      )
-    }
-
     let transformOrigin = `${xPos}px ${yPos}px`
     if (card.id === 'blank') {
       transformOrigin = `${xPos + width / 2}px ${yPos + height / 2}px`
@@ -353,6 +343,26 @@ class MovableGridCard extends React.Component {
     if (xPos + width + padding > window.pageXOffset + window.innerWidth) {
       offsetXAmt = xPos - (window.pageXOffset + window.innerWidth)
       styleProps.xPos = xPos - width - offsetXAmt - padding
+    }
+
+    if (cardType === 'submission') {
+      cardElement = (
+        <AddSubmission
+          parent_id={card.parent_id}
+          submissionSettings={card.submissionSettings}
+          enabled={parent.submissions_enabled}
+        />
+      )
+      return (
+        <div
+          style={{
+            transform: `translateZ(0) scale(${1 / zoomLevel})`,
+            transformOrigin,
+          }}
+        >
+          <PositionedGridCard {...styleProps}>{cardElement}</PositionedGridCard>
+        </div>
+      )
     }
 
     return (
@@ -538,7 +548,6 @@ class MovableGridCard extends React.Component {
     let transform = `translateZ(0) scale(${1 / zoomLevel})`
     const adjustedWidth = (width + resizeWidth) / zoomLevel
     const adjustedHeight = (height + resizeHeight) / zoomLevel
-    // const outerTransform = `scale(${1 / zoomLevel})`
     let transition = dragging || resizing ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!activeDragTarget

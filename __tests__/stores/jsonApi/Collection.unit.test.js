@@ -988,4 +988,26 @@ describe('Collection', () => {
       })
     })
   })
+
+  describe('showFilters', () => {
+    describe('searchCollection or submissionBox', () => {
+      it('returns false', () => {
+        collection.type = 'Collection::SearchCollection'
+        expect(collection.showFilters).toEqual(false)
+        collection.type = 'Collection::SubmissionBox'
+        expect(collection.showFilters).toEqual(false)
+      })
+    })
+
+    describe('normal, board, submissions collection', () => {
+      it('returns true', () => {
+        collection.type = 'Collection'
+        expect(collection.showFilters).toEqual(true)
+        collection.type = 'Collection::Board'
+        expect(collection.showFilters).toEqual(true)
+        collection.type = 'Collection::SubmissionsCollection'
+        expect(collection.showFilters).toEqual(true)
+      })
+    })
+  })
 })

@@ -6,15 +6,23 @@ module CollectionGrid
     # delegate_to_context :collection
 
     def call
-      migrate_collection_and_subcollections
+      migrate_collection_and_subcollections(context.collection)
     end
 
     private
 
-    def migrate_collection_and_subcollections
-      migrate_collection_to_board(context.collection)
-      context.collection.all_child_collections.each do |collection|
-        migrate_collection_to_board(collection)
+    def migrate_collection_and_subcollections(collection)
+      migrate_collection_to_board(collection)
+      collection.all_child_collections.each do |c|
+        migrate_collection_to_board(c)
+      end
+
+      # if we migrate a master template then we also migrate the instances
+      return unless collection.master_template? && !collection.subtemplate?
+
+      puts "migrating instances of... #{collection.name} (#{collection.id})"
+      collection.templated_collections.each do |c|
+        migrate_collection_to_board(c)
       end
     end
 
@@ -44,11 +52,12 @@ module CollectionGrid
 
     def skip_migration?(collection)
       return true if collection.board_collection?
+      # don't migrate template instances unless their template has been migrated
+      return true if collection.templated? && !collection.template.board_collection?
 
       type = collection.type&.gsub('Collection::', '')
       non_migratable_types = %w[
         TestCollection
-        SubmissionsCollection
       ]
       non_migratable_types.include?(type)
     end

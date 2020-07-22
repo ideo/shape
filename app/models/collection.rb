@@ -1012,6 +1012,9 @@ class Collection < ApplicationRecord
   end
 
   def board_collection?
+    # eventually going to have to rethink what "board_collection?" means
+    return false if is_a?(Collection::SubmissionsCollection)
+
     num_columns.present?
   end
 

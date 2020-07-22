@@ -27,13 +27,23 @@ export const findBottomRowCards = cards => {
 }
 
 // calculate row/col of these cards as if they were in a 4-column grid sequentially
-export const calculateRowsCols = cards => {
+export const calculateRowsCols = (
+  cards,
+  { sortByOrder = true, apply = false, prefilled = 0 } = {}
+) => {
   let row = 0
   const matrix = []
   const cols = 4
   // create an empty row
   matrix.push(_.fill(Array(cols), null))
-  const sortedCards = _.sortBy(cards, 'order')
+  if (prefilled > 0) {
+    _.fill(matrix[0], 'prefilled', 0, prefilled)
+  }
+  let sortedCards = cards
+  if (sortByOrder) {
+    // e.g. for search results we don't want to re-sort the cards
+    sortedCards = _.sortBy(cards, 'order')
+  }
 
   _.each(sortedCards, (card, i) => {
     let filled = false
@@ -51,6 +61,10 @@ export const calculateRowsCols = cards => {
         const position = {
           x: nextX,
           y: row,
+        }
+        if (apply) {
+          card.row = row
+          card.col = nextX
         }
         card.position = position
 

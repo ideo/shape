@@ -456,7 +456,12 @@ class CollectionPage extends React.Component {
 
   renderSubmissionsCollection() {
     const { collection, uiStore } = this.props
-    const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
+    const {
+      blankContentToolState,
+      gridSettings,
+      loadedSubmissions,
+      selectedArea,
+    } = uiStore
     const {
       submissions_collection,
       submission_box_type,
@@ -481,6 +486,45 @@ class CollectionPage extends React.Component {
       movingCardIds: [],
     }
 
+    let renderedSubmissions
+    if (submissions_collection.viewMode === 'list') {
+      renderedSubmissions = (
+        <CollectionList
+          collection={submissions_collection}
+          loadCollectionCards={this.loadSubmissionsCollectionCards}
+        />
+      )
+    } else if (submissions_collection.isBoard) {
+      // TODO: remove this switch between Foamcore and Normal Grid, only needed for now;
+      // same note as in SearchCollection
+      renderedSubmissions = (
+        <FoamcoreGrid
+          {...genericCollectionProps}
+          submissionSettings={{
+            type: submission_box_type,
+            template: submission_template,
+            enabled: submissions_enabled,
+          }}
+          selectedArea={selectedArea}
+          // Included so that component re-renders when area changes
+          selectedAreaMinX={selectedArea.minX}
+        />
+      )
+    } else {
+      renderedSubmissions = (
+        <CollectionGrid
+          {...gridSettings}
+          {...genericCollectionProps}
+          submissionSettings={{
+            type: submission_box_type,
+            template: submission_template,
+            enabled: submissions_enabled,
+          }}
+          sorting
+        />
+      )
+    }
+
     return (
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
@@ -495,23 +539,7 @@ class CollectionPage extends React.Component {
             sortable
           />
         </Flex>
-        {submissions_collection.viewMode === 'list' ? (
-          <CollectionList
-            collection={submissions_collection}
-            loadCollectionCards={this.loadSubmissionsCollectionCards}
-          />
-        ) : (
-          <CollectionGrid
-            {...gridSettings}
-            {...genericCollectionProps}
-            submissionSettings={{
-              type: submission_box_type,
-              template: submission_template,
-              enabled: submissions_enabled,
-            }}
-            sorting
-          />
-        )}
+        {renderedSubmissions}
         {submissions_enabled && submissions_collection.viewMode !== 'list' && (
           <FloatingActionButton
             toolTip={`Create New Submission`}

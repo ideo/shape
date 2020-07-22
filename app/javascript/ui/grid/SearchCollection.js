@@ -5,6 +5,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import _ from 'lodash'
 
+import FoamcoreGrid from '~/ui/grid/FoamcoreGrid'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
@@ -89,14 +90,62 @@ class SearchCollection extends React.Component {
     })
     runInAction(() => {
       this.loading = false
+      if (searchResultsCollection.viewMode === 'list') {
+        searchResultsCollection.API_fetchCardRoles()
+      }
     })
     return
+  }
+
+  renderTop() {
+    const { uiStore, collection, trackCollectionUpdated } = this.props
+    const { blankContentToolState, gridSettings, selectedArea } = uiStore
+
+    const genericCollectionProps = {
+      collection,
+      loadCollectionCards: this.loadCollectionCards,
+      trackCollectionUpdated,
+      blankContentToolState,
+      cardProperties: collection.cardProperties,
+      collection,
+      canEditCollection: collection.can_edit_content,
+      movingCardIds: [],
+    }
+
+    // TODO: remove this switch between Foamcore and Normal Grid, only needed for now;
+    // operating in a hybrid context where search collections may/not be 4WFC
+    if (collection.isBoard) {
+      return (
+        <FoamcoreGrid
+          {...genericCollectionProps}
+          selectedArea={selectedArea}
+          // Included so that component re-renders when area changes
+          selectedAreaMinX={selectedArea.minX}
+        />
+      )
+    }
+
+    return (
+      <CollectionGrid
+        {...gridSettings}
+        {...genericCollectionProps}
+        loadCollectionCards={this.loadCollectionCards}
+        trackCollectionUpdated={trackCollectionUpdated}
+        blankContentToolState={blankContentToolState}
+        cardProperties={collection.cardProperties}
+        collection={collection}
+        canEditCollection={collection.can_edit_content}
+        shouldAddEmptyRow={false}
+        movingCardIds={[]}
+      />
+    )
   }
 
   render() {
     const { uiStore, collection, trackCollectionUpdated } = this.props
     const { searchResultsCollection } = collection
-    const { blankContentToolState, gridSettings } = uiStore
+    const { selectedArea } = uiStore
+    // const { gridSettings } = uiStore
     if (uiStore.isLoading || collection.reloading) {
       return <Loader />
     }
@@ -106,13 +155,16 @@ class SearchCollection extends React.Component {
       loadCollectionCards: this.loadSearchedCards,
     }
     let searchResults = (
-      <CollectionGrid
-        {...gridSettings}
+      <FoamcoreGrid
         {...searchCollectionSettings}
         trackCollectionUpdated={trackCollectionUpdated}
         cardProperties={this.searchCardProperties}
         canEditCollection={false}
         movingCardIds={[]}
+        selectedArea={selectedArea}
+        // Included so that component re-renders when area changes
+        selectedAreaMinX={selectedArea.minX}
+        renderOnly
       />
     )
 
@@ -122,17 +174,7 @@ class SearchCollection extends React.Component {
 
     return (
       <div style={{ position: 'relative' }}>
-        <CollectionGrid
-          {...gridSettings}
-          loadCollectionCards={this.loadCollectionCards}
-          trackCollectionUpdated={trackCollectionUpdated}
-          blankContentToolState={blankContentToolState}
-          cardProperties={collection.cardProperties}
-          collection={collection}
-          canEditCollection={collection.can_edit_content}
-          shouldAddEmptyRow={false}
-          movingCardIds={[]}
-        />
+        {this.renderTop()}
         <PageSeparator title={<h3>Search Results</h3>} />
         <Flex justify="space-between">
           <Flex align="center" mb="4px" mt="18px">

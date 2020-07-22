@@ -1422,6 +1422,9 @@ export default class UiStore {
 
   @action
   determineZoomLevels(collection) {
+    if (collection.isSplitLevelBottom) {
+      return
+    }
     const { windowWidth } = this
     const maxCols = this.maxCols(collection)
     const pageMargins = this.pageMargins(collection)
