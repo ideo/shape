@@ -28,13 +28,18 @@ class VideoChatContainer extends React.Component {
               /* Use the rest of the SWRTC React Components to render your UI */
               return (
                 <>
+                  <SWRTC.LocalMediaList
+                    shared={true}
+                    render={({ media }) => (
+                      <UserVideo media={media} fullScreenActive={false} />
+                    )}
+                  />
                   <SWRTC.PeerList
                     room={room.address}
                     activeSpeakerView={activeSpeakerView}
                     render={({ peers }) => {
                       if (peers.length < 1)
                         return <div>No one else is online</div>
-                      console.log('WebRTC peers', peers)
                       return (
                         <SWRTC.GridLayout
                           items={peers}

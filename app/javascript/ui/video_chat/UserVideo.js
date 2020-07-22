@@ -1,10 +1,10 @@
-import { Video, AudioOnlyPeer } from '@andyet/simplewebrtc'
+import { Video } from '@andyet/simplewebrtc'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 const LoadingVideo = ({ media, qualityProfile }) => {
   if (!media.loaded) {
-    return <AudioOnlyPeer />
+    return <div>Audio-only</div>
   }
   return (
     <Video
@@ -33,39 +33,45 @@ const PictureInPictureContainer = styled.div`
   width: 100%;
 `
 
-const UserVideo = ({ media, fullScreenActive, onlyVisible }) => {
-  const videoStreams = media.filter(
-    m => m.kind === 'video' && !m.remoteDisabled
-  )
-  if (videoStreams.length > 0) {
-    const webcamStreams = videoStreams.filter(s => !s.screenCapture)
-    const screenCaptureStreams = videoStreams.filter(s => s.screenCapture)
-    if (videoStreams.length === 1) {
-      return (
-        <LoadingVideo
-          media={videoStreams[0]}
-          qualityProfile={fullScreenActive ? 'high' : 'medium'}
-        />
-      )
-    }
-    if (screenCaptureStreams.length === 0) {
-      return (
-        <LoadingVideo
-          media={webcamStreams[0]}
-          qualityProfile={fullScreenActive ? 'high' : 'medium'}
-        />
-      )
-    }
-    return (
-      <PictureInPictureContainer>
-        {/* Screenshare */}
-        <LoadingVideo media={screenCaptureStreams[0]} />
-        {/* Camera */}
-        <Video media={webcamStreams[0]} qualityProfile="low" />
-      </PictureInPictureContainer>
+class UserVideo extends React.Component {
+  render() {
+    const { media, fullScreenActive } = this.props
+
+    if (media.length === 0) return ''
+
+    const videoStreams = media.filter(
+      m => m.kind === 'video' && !m.remoteDisabled
     )
+    if (videoStreams.length > 0) {
+      const webcamStreams = videoStreams.filter(s => !s.screenCapture)
+      const screenCaptureStreams = videoStreams.filter(s => s.screenCapture)
+      if (videoStreams.length === 1) {
+        return (
+          <LoadingVideo
+            media={videoStreams[0]}
+            qualityProfile={fullScreenActive ? 'high' : 'medium'}
+          />
+        )
+      }
+      if (screenCaptureStreams.length === 0) {
+        return (
+          <LoadingVideo
+            media={webcamStreams[0]}
+            qualityProfile={fullScreenActive ? 'high' : 'medium'}
+          />
+        )
+      }
+      return (
+        <PictureInPictureContainer>
+          {/* Screenshare */}
+          <LoadingVideo media={screenCaptureStreams[0]} />
+          {/* Camera */}
+          <Video media={webcamStreams[0]} qualityProfile="low" />
+        </PictureInPictureContainer>
+      )
+    }
+    return <div>Audio-only</div>
   }
-  return <AudioOnlyPeer />
 }
 
 UserVideo.propTypes = {
