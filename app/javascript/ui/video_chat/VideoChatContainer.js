@@ -1,13 +1,9 @@
 import * as SWRTC from '@andyet/simplewebrtc'
-import { observer } from 'mobx-react'
 import PropTypes from 'prop-types'
 
 import UserVideo from '~/ui/video_chat/UserVideo'
 
 class VideoChatContainer extends React.Component {
-  @observer
-  hiddenPeers = []
-
   render() {
     const { roomName, activeSpeakerView, userToken } = this.props
 
@@ -36,15 +32,12 @@ class VideoChatContainer extends React.Component {
                     room={room.address}
                     activeSpeakerView={activeSpeakerView}
                     render={({ peers }) => {
-                      console.log('WebRTC peers', peers)
-                      const visiblePeers = peers.filter(
-                        p => !this.hiddenPeers.includes(p.id)
-                      )
                       if (peers.length < 1)
                         return <div>No one else is online</div>
+                      console.log('WebRTC peers', peers)
                       return (
                         <SWRTC.GridLayout
-                          items={visiblePeers}
+                          items={peers}
                           renderCell={peer => (
                             <SWRTC.RemoteMediaList
                               peer={peer.address}
@@ -52,7 +45,7 @@ class VideoChatContainer extends React.Component {
                                 <UserVideo
                                   media={media}
                                   fullScreenActive={false}
-                                  onlyVisible={visiblePeers.length === 1}
+                                  onlyVisible={peers.length === 1}
                                 />
                               )}
                             />
