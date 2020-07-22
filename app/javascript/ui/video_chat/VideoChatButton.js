@@ -15,9 +15,10 @@ const VideoChatButton = ({
       render={({ peers }) => {
         if (!joinedVideo) {
           return (
-            <Button onClick={() => handleJoinVideo()}>
-              Join Video ({peers.length} people chatting)
-            </Button>
+            <React.Fragment>
+              <Button onClick={() => handleJoinVideo()}>Join Video</Button>
+              <i>{' ' + peers.length} people chatting</i>
+            </React.Fragment>
           )
         } else {
           return <Button onClick={() => handleLeaveVideo()}>Leave Video</Button>

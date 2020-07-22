@@ -1,7 +1,34 @@
 import * as SWRTC from '@andyet/simplewebrtc'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 
 import UserVideo from '~/ui/video_chat/UserVideo'
+
+const StyledVideoCell = styled.div`
+  margin: 0 10px 10px 0;
+  display: inline-block;
+  video {
+    max-width: 200px;
+    max-height: 200px;
+  }
+`
+
+const VideoCell = (peer, peersLength) => {
+  return (
+    <StyledVideoCell>
+      <SWRTC.RemoteMediaList
+        peer={peer.address}
+        render={({ media }) => (
+          <UserVideo
+            media={media}
+            fullScreenActive={false}
+            onlyVisible={peersLength === 1}
+          />
+        )}
+      />
+    </StyledVideoCell>
+  )
+}
 
 class VideoChatContainer extends React.Component {
   render() {
@@ -31,7 +58,9 @@ class VideoChatContainer extends React.Component {
                   <SWRTC.LocalMediaList
                     shared={true}
                     render={({ media }) => (
-                      <UserVideo media={media} fullScreenActive={false} />
+                      <StyledVideoCell>
+                        <UserVideo media={media} fullScreenActive={false} />
+                      </StyledVideoCell>
                     )}
                   />
                   <SWRTC.PeerList
@@ -39,21 +68,12 @@ class VideoChatContainer extends React.Component {
                     activeSpeakerView={activeSpeakerView}
                     render={({ peers }) => {
                       if (peers.length < 1)
-                        return <div>No one else is online</div>
+                        return <h4>No one else is online</h4>
                       return (
                         <SWRTC.GridLayout
                           items={peers}
                           renderCell={peer => (
-                            <SWRTC.RemoteMediaList
-                              peer={peer.address}
-                              render={({ media }) => (
-                                <UserVideo
-                                  media={media}
-                                  fullScreenActive={false}
-                                  onlyVisible={peers.length === 1}
-                                />
-                              )}
-                            />
+                            <VideoCell peer={peer} peersLength={peers.length} />
                           )}
                         />
                       )

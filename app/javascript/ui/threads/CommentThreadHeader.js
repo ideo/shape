@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 // import { Fragment } from 'react'
-import { Flex } from 'reflexbox'
+import { Flex, Box } from 'reflexbox'
 import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
@@ -247,12 +247,14 @@ class CommentThreadHeader extends React.Component {
         </StyledHeader>
         {expanded && (
           <ReduxProvider store={store}>
-            <VideoChatButton
-              roomName={this.record.name}
-              joinedVideo={this.joinedVideo}
-              handleLeaveVideo={this.handleLeaveVideo}
-              handleJoinVideo={this.handleJoinVideo}
-            />
+            <Box mt={1} mb={1}>
+              <VideoChatButton
+                roomName={this.record.name}
+                joinedVideo={this.joinedVideo}
+                handleLeaveVideo={this.handleLeaveVideo}
+                handleJoinVideo={this.handleJoinVideo}
+              />
+            </Box>
             {this.joinedVideo && (
               <VideoChatContainer
                 userToken={userToken}
