@@ -221,8 +221,10 @@ class CommentThreadHeader extends React.Component {
               </SubduedTitle>
               {this.renderUnreadCount()}
               {this.renderFollow()}
+              <VideoChatButton />
             </Flex>
           )}
+          <VideoChatContainer />
         </StyledHeader>
       </Wrapper>
     )
