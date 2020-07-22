@@ -9,10 +9,11 @@ import * as SWRTC from '@andyet/simplewebrtc'
 // Replace `YOUR_PUBLISHABLE_API_KEY` here with the Publishable API Key
 // you received when signing up for SimpleWebRTC
 // --------------------------------------------------------------------
-const API_KEY = 'YOUR_PUBLISHABLE_API_KEY'
+const API_KEY = process.env.SIMPLE_WEB_RTC_API_KEY
 // ====================================================================
 
-const ROOM_NAME = 'Your Room Name'
+// TODO: set these using collection/item name
+const ROOM_NAME = 'Ideo Products'
 const ROOM_PASSWORD = 'Your Room Password'
 const CONFIG_URL = `https://api.simplewebrtc.com/config/guest/${API_KEY}`
 
