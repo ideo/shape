@@ -74,6 +74,7 @@
     ]
   },
   "dependencies": {
+    "@andyet/simplewebrtc": "^1.24.0",
     "@babel/core": "^7.7.0",
     "@babel/plugin-proposal-class-properties": "^7.7.0",
     "@babel/plugin-proposal-decorators": "^7.7.0",
