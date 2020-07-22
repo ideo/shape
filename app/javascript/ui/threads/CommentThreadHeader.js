@@ -248,8 +248,7 @@ class CommentThreadHeader extends React.Component {
         {expanded && (
           <ReduxProvider store={store}>
             <SWRTC.Provider
-              configUrl={`https://api.simplewebrtc.com/config/user/${process.env.SIMPLE_WEB_RTC_API_KEY}`}
-              userData={''}
+              configUrl={`https://api.simplewebrtc.com/config/guest/${process.env.SIMPLE_WEB_RTC_API_KEY}`}
             >
               <VideoChatButton
                 roomName={this.record.name}

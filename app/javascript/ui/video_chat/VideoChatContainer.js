@@ -14,11 +14,9 @@ class VideoChatContainer extends React.Component {
     return (
       <>
         <SWRTC.Connecting>
-          <h1>Connecting...</h1>
+          <h4>Connecting...</h4>
         </SWRTC.Connecting>
-
         <SWRTC.Connected>
-          <h1>Connected!</h1>
           {/* Request the user's media */}
           <SWRTC.RequestUserMedia audio video auto />
 
@@ -31,7 +29,6 @@ class VideoChatContainer extends React.Component {
               /* Use the rest of the SWRTC React Components to render your UI */
               return (
                 <>
-                  In Room {roomName}
                   <SWRTC.PeerList
                     roomAddress={room.address}
                     activeSpeakerView={activeSpeakerView}
