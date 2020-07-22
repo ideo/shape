@@ -184,6 +184,7 @@ class RealtimeTextItem extends React.Component {
       routingTo.id === item.id && routingTo.type === 'items'
     if (routingToSameItem) return
     ChannelManager.unsubscribe(this.channelName, item.id)
+    item.setCollaborators([])
   }
 
   clearQuillClipboardHistory() {

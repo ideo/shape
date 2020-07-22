@@ -339,7 +339,7 @@ class CollectionPage extends React.Component {
 
   receivedChannelData = async data => {
     const { collection, apiStore } = this.props
-    const { collaborators } = data
+    const { collaborators, current_editor } = data
     collection.setCollaborators(collaborators)
     // catch if receivedData happens after reload
     if (!collection) return
@@ -358,14 +358,14 @@ class CollectionPage extends React.Component {
     const updateData = data.data
     if (updateData && !updateData.text_item) {
       // don't show editor for text item updates, might be overkill
-      this.setEditor(data.current_editor)
+      this.setEditor(current_editor)
     }
     if (!updateData || updateData.reload_cards) {
       this.reloadData()
       return
     }
     const service = new CollectionCollaborationService({ collection })
-    service.handleReceivedData(updateData)
+    service.handleReceivedData(updateData, current_editor)
   }
 
   async _reloadData() {
@@ -444,7 +444,9 @@ class CollectionPage extends React.Component {
 
     const collaborator = _.find(collaborators, c => c.id === currentEditor.id)
     if (collaborator && collaborator.color) {
-      currentEditor.color = collaborator.color
+      runInAction(() => {
+        currentEditor.color = collaborator.color
+      })
     }
     if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId) {
       // toggle hidden on/off to allow EditorPill CSS to fade in/out

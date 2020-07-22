@@ -1,5 +1,6 @@
 import GridCard from '~/ui/grid/GridCard'
 import { uiStore } from '~/stores'
+import v from '~/utils/variables'
 
 import {
   fakeItemCard,
@@ -12,7 +13,7 @@ import {
 const props = {
   card: fakeItemCard,
   cardType: 'items',
-  record: fakeTextItem,
+  record: { ...fakeTextItem, collaborators: [] },
   onMoveStart: jest.fn(),
   dragging: false,
   height: 100,
@@ -301,6 +302,20 @@ describe('GridCard', () => {
 
     afterEach(() => {
       uiStore.deselectCards()
+    })
+  })
+
+  describe('with an active collaborator', () => {
+    it('renders the collaborator color', () => {
+      expect(
+        wrapper.find('StyledGridCard').props().collaboratorColor
+      ).toBeNull()
+      // now simulate collaborator on the record
+      props.record.collaborators = [{ id: '1', name: 'Vlad', color: 'Blue' }]
+      rerender()
+      expect(wrapper.find('StyledGridCard').props().collaboratorColor).toEqual(
+        v.colors.collaboratorPrimaryBlue
+      )
     })
   })
 

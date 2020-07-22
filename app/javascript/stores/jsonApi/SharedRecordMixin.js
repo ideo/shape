@@ -308,6 +308,14 @@ const SharedRecordMixin = superclass =>
       this.collaborators.replace(sorted)
     }
 
+    // this is used to highlight someone making an edit on a card
+    setLatestCollaborator(collaborator) {
+      this.setCollaborators([collaborator])
+      setTimeout(() => {
+        this.setCollaborators([])
+      }, 5000)
+    }
+
     @computed
     get taggedUsersWithStatuses() {
       if (_.isEmpty(this.tagged_users)) return []

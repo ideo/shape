@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { objectsEqual } from '~/utils/objectUtils'
 
 export default class CollectionCollaborationService {
@@ -8,8 +9,8 @@ export default class CollectionCollaborationService {
     this.uiStore = collection.uiStore
   }
 
-  handleReceivedData(updateData) {
-    const { collection } = this
+  async handleReceivedData(updateData, current_editor = {}) {
+    const { collection, apiStore } = this
     if (updateData.collection_updated) {
       collection.refetch()
       return
@@ -17,16 +18,26 @@ export default class CollectionCollaborationService {
     if (updateData.collection_cards_attributes) {
       // e.g. cards were resized or dragged; apply those same updates
       collection.applyRemoteUpdates(updateData)
+      if (updateData.collection_cards_attributes) {
+        _.each(updateData.collection_cards_attributes, cardData => {
+          const card = apiStore.find('collection_cards', cardData.id)
+          this.setCollaborator(card, current_editor)
+        })
+      }
       return
     }
     if (updateData.card_id) {
       // a card has been created or updated, so fetch that individual card
-      collection.API_fetchCard(updateData.card_id)
+      const card = await collection.API_fetchCard(updateData.card_id)
+      this.setCollaborator(card, current_editor)
       return
     }
     if (updateData.card_ids) {
       // a card has been created or updated, so fetch those cards
-      collection.API_fetchAndMergeCards(updateData.card_ids)
+      const cards = collection.API_fetchAndMergeCards(updateData.card_ids)
+      _.each(cards, card => {
+        this.setCollaborator(card, current_editor)
+      })
       return
     }
     if (updateData.row_updated) {
@@ -41,7 +52,7 @@ export default class CollectionCollaborationService {
     if (updateData.text_item) {
       const { text_item } = updateData
       if (text_item && text_item.quill_data) {
-        this.handleTextItemUpdate(text_item.id, text_item)
+        this.handleTextItemUpdate(text_item.id, text_item, current_editor)
       }
       return
     }
@@ -51,7 +62,13 @@ export default class CollectionCollaborationService {
     }
   }
 
-  handleTextItemUpdate = (itemId, item) => {
+  setCollaborator(card, current_editor) {
+    if (card && card.record && !_.isEmpty(current_editor)) {
+      card.record.setLatestCollaborator(current_editor)
+    }
+  }
+
+  handleTextItemUpdate = (itemId, item, current_editor) => {
     const { collection, apiStore, uiStore } = this
     const localItem = apiStore.find('items', itemId)
     if (localItem) {
@@ -64,6 +81,7 @@ export default class CollectionCollaborationService {
       }
       // update the item which will cause it to re-render
       if (!objectsEqual(localItem.quill_data, item.quill_data)) {
+        localItem.setLatestCollaborator(current_editor)
         localItem.quill_data = item.quill_data
       }
     } else if (item.parent_collection_card_id) {
