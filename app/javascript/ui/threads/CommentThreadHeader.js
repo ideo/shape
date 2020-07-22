@@ -1,9 +1,11 @@
 import PropTypes from 'prop-types'
 // import { Fragment } from 'react'
 import { Flex } from 'reflexbox'
-import { observable, action } from 'mobx'
+import { observable, action, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled, { css } from 'styled-components'
+import { Provider as ReduxProvider } from 'react-redux'
+import * as SWRTC from '@andyet/simplewebrtc'
 
 import { apiStore, routingStore, uiStore } from '~/stores'
 import Moment from '~/ui/global/Moment'
@@ -14,6 +16,10 @@ import v from '~/utils/variables'
 import hexToRgba from '~/utils/hexToRgba'
 import CommentThumbnail from '~/ui/threads/CommentThumbnail'
 import UnresolvedCount from '~/ui/threads/UnresolvedCount'
+import VideoChatButton from '~/ui/video_chat/VideoChatButton'
+import VideoChatContainer from '~/ui/video_chat/VideoChatContainer'
+
+const store = SWRTC.createStore()
 
 export const threadTitleCss = css`
   position: ${props => (props.sticky ? 'sticky' : 'relative')};
@@ -86,6 +92,8 @@ export const FollowHolder = styled.span`
 class CommentThreadHeader extends React.Component {
   @observable
   titleLines = 1
+  @observable
+  joinedVideo = false
 
   componentDidMount() {
     this.countLines()
@@ -182,13 +190,26 @@ class CommentThreadHeader extends React.Component {
     )
   }
 
+  handleJoinVideo = () => {
+    runInAction(() => {
+      this.joinedVideo = true
+    })
+  }
+
+  handleLeaveVideo = () => {
+    runInAction(() => {
+      this.joinedVideo = false
+    })
+  }
+
   render() {
-    const { thread, sticky, onClick } = this.props
+    const { thread, sticky, onClick, expanded } = this.props
     // Wrapper will render a button or div depending on onClick presence
     let Wrapper = StyledHeaderWrapper
     if (onClick) {
       Wrapper = StyledHeaderButton
     }
+    if (expanded) console.log('is expanded')
     return (
       <Wrapper sticky={sticky} onClick={onClick}>
         <StyledHeader lines={this.titleLines}>
@@ -221,11 +242,27 @@ class CommentThreadHeader extends React.Component {
               </SubduedTitle>
               {this.renderUnreadCount()}
               {this.renderFollow()}
-              <VideoChatButton />
             </Flex>
           )}
-          <VideoChatContainer />
         </StyledHeader>
+        {expanded && (
+          <ReduxProvider store={store}>
+            <SWRTC.Provider
+              configUrl={`https://api.simplewebrtc.com/config/user/${process.env.SIMPLE_WEB_RTC_API_KEY}`}
+              userData={''}
+            >
+              <VideoChatButton
+                roomName={this.record.name}
+                joinedVideo={this.joinedVideo}
+                handleLeaveVideo={this.handleLeaveVideo}
+                handleJoinVideo={this.handleJoinVideo}
+              />
+              {this.joinedVideo && (
+                <VideoChatContainer roomName={this.record.name} store={store} />
+              )}
+            </SWRTC.Provider>
+          </ReduxProvider>
+        )}
       </Wrapper>
     )
   }
@@ -236,12 +273,14 @@ CommentThreadHeader.propTypes = {
   record: MobxPropTypes.objectOrObservableObject,
   sticky: PropTypes.bool,
   onClick: PropTypes.func,
+  expanded: PropTypes.bool,
 }
 CommentThreadHeader.defaultProps = {
   thread: null,
   record: null,
   sticky: false,
   onClick: null,
+  expanded: false,
 }
 
 export default CommentThreadHeader

@@ -103,7 +103,7 @@ class CommentThread extends React.Component {
 
     return (
       <div id={thread.containerId}>
-        <CommentThreadHeader thread={thread} sticky />
+        <CommentThreadHeader thread={thread} expanded sticky />
         <div className="comments">
           {thread.hasMore && <CommentThreadLoader thread={thread} />}
           {this.renderComments()}
