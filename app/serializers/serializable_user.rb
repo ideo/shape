@@ -8,6 +8,10 @@ class SerializableUser < BaseJsonSerializer
     @object.picture || 'https://s3-us-west-2.amazonaws.com/assets.shape.space/user-avatar.png'
   end
 
+  attribute :simple_web_rtc_token do
+    GenerateSimpleWebRtcToken.call(@object)
+  end
+
   belongs_to :current_organization
   has_many :organizations do
     data do

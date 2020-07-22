@@ -9,10 +9,13 @@ class VideoChatContainer extends React.Component {
   hiddenPeers = []
 
   render() {
-    const { roomName, activeSpeakerView } = this.props
+    const { roomName, activeSpeakerView, userToken } = this.props
 
     return (
-      <>
+      <SWRTC.Provider
+        configUrl={`https://api.simplewebrtc.com/config/user/${process.env.SIMPLE_WEB_RTC_API_KEY}`}
+        userData={userToken}
+      >
         <SWRTC.Connecting>
           <h4>Connecting...</h4>
         </SWRTC.Connecting>
@@ -30,12 +33,15 @@ class VideoChatContainer extends React.Component {
               return (
                 <>
                   <SWRTC.PeerList
-                    roomAddress={room.address}
+                    room={room.address}
                     activeSpeakerView={activeSpeakerView}
                     render={({ peers }) => {
+                      console.log('WebRTC peers', peers)
                       const visiblePeers = peers.filter(
                         p => !this.hiddenPeers.includes(p.id)
                       )
+                      if (peers.length < 1)
+                        return <div>No one else is online</div>
                       return (
                         <SWRTC.GridLayout
                           items={visiblePeers}
@@ -60,14 +66,15 @@ class VideoChatContainer extends React.Component {
             }}
           </SWRTC.Room>
         </SWRTC.Connected>
-      </>
+      </SWRTC.Provider>
     )
   }
 }
 
 VideoChatContainer.propTypes = {
   roomName: PropTypes.string.isRequired,
-  store: PropTypes.node.isRequired,
+  userToken: PropTypes.string.isRequired,
+  store: PropTypes.object.isRequired,
   activeSpeakerView: PropTypes.bool,
 }
 

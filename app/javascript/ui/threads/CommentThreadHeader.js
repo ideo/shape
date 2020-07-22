@@ -204,12 +204,12 @@ class CommentThreadHeader extends React.Component {
 
   render() {
     const { thread, sticky, onClick, expanded } = this.props
+    const userToken = apiStore.currentUser.simple_web_rtc_token
     // Wrapper will render a button or div depending on onClick presence
     let Wrapper = StyledHeaderWrapper
     if (onClick) {
       Wrapper = StyledHeaderButton
     }
-    if (expanded) console.log('is expanded')
     return (
       <Wrapper sticky={sticky} onClick={onClick}>
         <StyledHeader lines={this.titleLines}>
@@ -247,19 +247,19 @@ class CommentThreadHeader extends React.Component {
         </StyledHeader>
         {expanded && (
           <ReduxProvider store={store}>
-            <SWRTC.Provider
-              configUrl={`https://api.simplewebrtc.com/config/guest/${process.env.SIMPLE_WEB_RTC_API_KEY}`}
-            >
-              <VideoChatButton
+            <VideoChatButton
+              roomName={this.record.name}
+              joinedVideo={this.joinedVideo}
+              handleLeaveVideo={this.handleLeaveVideo}
+              handleJoinVideo={this.handleJoinVideo}
+            />
+            {this.joinedVideo && (
+              <VideoChatContainer
+                userToken={userToken}
                 roomName={this.record.name}
-                joinedVideo={this.joinedVideo}
-                handleLeaveVideo={this.handleLeaveVideo}
-                handleJoinVideo={this.handleJoinVideo}
+                store={store}
               />
-              {this.joinedVideo && (
-                <VideoChatContainer roomName={this.record.name} store={store} />
-              )}
-            </SWRTC.Provider>
+            )}
           </ReduxProvider>
         )}
       </Wrapper>
