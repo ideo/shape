@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
-import pluralize from 'pluralize'
 import { Flex } from 'reflexbox'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -35,9 +34,6 @@ import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import SuggestedTagsBanner from '~/ui/global/SuggestedTagsBanner'
-
-// more global way to do this?
-pluralize.addPluralRule(/canvas$/i, 'canvases')
 
 @inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
@@ -311,7 +307,9 @@ class CollectionPage extends React.Component {
       collection.isSubmissionBoxInsideChallenge
     ) {
       await collection.API_fetchChallengeReviewersGroup()
-      await collection.submissions_collection.API_fetchCardReviewerStatuses()
+      if (collection.submissions_collection) {
+        collection.submissions_collection.API_fetchCardReviewerStatuses()
+      }
     }
   }
 
@@ -417,7 +415,7 @@ class CollectionPage extends React.Component {
 
   get submissionsPageSeparator() {
     const { collection } = this.props
-    const { submissionTypeName, submissions_collection } = collection
+    const { submissions_collection } = collection
     if (!submissions_collection) return ''
     return (
       <PageSeparator
@@ -425,8 +423,8 @@ class CollectionPage extends React.Component {
           <h3>
             {submissions_collection.collection_cards.length}{' '}
             {submissions_collection.collection_cards.length === 1
-              ? submissionTypeName
-              : pluralize(submissionTypeName)}
+              ? 'Submission'
+              : 'Submissions'}
           </h3>
         }
       />
