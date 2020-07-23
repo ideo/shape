@@ -98,6 +98,10 @@ class DataItemCoverCollectionsItems extends React.Component {
   onSelectMeasure = value => {
     // don't allow setting null measure
     if (!value) return
+    if (value === 'csv') {
+      console.log('attempting to read csv')
+      return
+    }
     this.saveSettings({
       measure: value,
     })
@@ -174,7 +178,9 @@ class DataItemCoverCollectionsItems extends React.Component {
 
   renderInfoIconTooltip = metric => {
     const measure = _.find(DATA_MEASURES, measure => measure.value === metric)
-    return <HoverableDescriptionIcon description={measure.description} />
+    if (measure) {
+      return <HoverableDescriptionIcon description={measure.description} />
+    }
   }
 
   get measureControl() {

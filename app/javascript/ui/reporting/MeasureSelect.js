@@ -8,6 +8,7 @@ import { Select, SelectOption } from '~/ui/global/styled/forms'
 import v, { DATA_MEASURES } from '~/utils/variables'
 import TruncatableText from '~/ui/global/TruncatableText'
 import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
+import CSVUploader from '~/ui/global/CSVUploader'
 
 const contentMeasureValues = ['collections', 'items', 'records']
 
@@ -56,6 +57,9 @@ class MeasureSelect extends React.Component {
   @observable
   contentSectionOpen = false
 
+  @observable
+  externalSectionOpen = false
+
   get currentValue() {
     const { item, dataSettingsName } = this.props
     if (!item) return null
@@ -71,6 +75,11 @@ class MeasureSelect extends React.Component {
     this.contentSectionOpen = !this.contentSectionOpen
   }
 
+  @action
+  toggleExternalSection() {
+    this.externalSectionOpen = !this.externalSectionOpen
+  }
+
   handleOpen = ev => {
     runInAction(() => (this.menuOpen = true))
   }
@@ -81,6 +90,9 @@ class MeasureSelect extends React.Component {
 
   handleChange = ev => {
     ev.preventDefault()
+    if (ev.target.value === 'externalMenu') {
+      return
+    }
     if (ev.target.value === 'contentMenu') {
       this.toggleContentSection()
       runInAction(() => (this.menuOpen = true))
@@ -99,6 +111,7 @@ class MeasureSelect extends React.Component {
         { name: 'Select Measure...', value: null },
         ...shownMeasures,
         { name: 'Content', value: 'contentMenu' },
+        { name: null, value: 'externalMenu' },
       ]
       if (this.contentSectionOpen || this.contentSelected) {
         measures.push(...contentMeasures)
@@ -112,10 +125,12 @@ class MeasureSelect extends React.Component {
     return (
       <StyledInlineSelectItem>
         <StyledMeasureName>
-          <TruncatableText
-            text={measureName}
-            maxLength={v.maxSelectMeasureTextLength}
-          />
+          {measureName && (
+            <TruncatableText
+              text={measureName}
+              maxLength={v.maxSelectMeasureTextLength}
+            />
+          )}
         </StyledMeasureName>
         {description && (
           <HoverableDescriptionIcon
@@ -163,6 +178,13 @@ class MeasureSelect extends React.Component {
                 >
                   <ArrowIcon />
                 </ToggleIconHolder>
+              )}
+              {opt.value === 'externalMenu' && (
+                <CSVUploader
+                  onFileLoaded={() => {
+                    console.log('parse CSV')
+                  }}
+                />
               )}
             </SelectOption>
           ))}

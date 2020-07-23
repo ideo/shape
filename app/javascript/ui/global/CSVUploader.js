@@ -1,6 +1,6 @@
 // some inspiration taken from https://github.com/nzambello/react-csv-reader
 import PropTypes from 'prop-types'
-import Papa from 'papaparse'
+import { loadCSVFile } from '~/utils/fileUtils'
 import styled from 'styled-components'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -33,18 +33,15 @@ class CSVUploader extends React.Component {
 
   handleFileUpload = e => {
     if (!e.target.files) return
-    const { onFileLoaded } = this.props
-    const reader = new FileReader()
-    const filename = e.target.files[0].name
+    const file = e.target.files[0]
 
-    reader.onload = event => {
-      const csvData = Papa.parse(event.target.result, {
-        error: err => console.warn('csv parse error', err),
-      })
-      onFileLoaded(csvData.data, filename)
+    const onFileLoadedCallback = (data, filename) => {
+      const { onFileLoaded } = this.props
+      onFileLoaded(data, filename)
       this.setState({ loading: false })
     }
-    reader.readAsText(e.target.files[0])
+
+    loadCSVFile(file, onFileLoadedCallback)
     // clear out input
     this.setState({ fileInputValue: '', loading: true })
   }
