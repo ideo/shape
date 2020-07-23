@@ -234,7 +234,7 @@ export const StyledMenuItem = styled.li`
 `
 StyledMenuItem.displayName = 'StyledMenuItem'
 StyledMenuItem.propTypes = {
-  padding: PropTypes.String,
+  padding: PropTypes.string,
 }
 
 StyledMenuItem.defaultProps = {
