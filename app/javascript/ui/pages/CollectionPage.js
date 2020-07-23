@@ -310,7 +310,6 @@ class CollectionPage extends React.Component {
       collection.isSubmissionInChallenge ||
       collection.isSubmissionBoxInsideChallenge
     ) {
-      await collection.API_fetchChallengeReviewersGroup()
       await collection.submissions_collection.API_fetchCardReviewerStatuses()
     }
   }

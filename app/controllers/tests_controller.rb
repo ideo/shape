@@ -65,16 +65,20 @@ class TestsController < ApplicationController
   def look_up_challenge_test_audience
     return unless user_signed_in? && current_user.present?
 
-    reviewer_group = @collection&.parent_challenge&.challenge_reviewer_group
-
-    return unless reviewer_group.present? && reviewer_group.user_ids.include?(current_user.id)
-
     # use master template test audience
-    test_audiences = @collection&.template&.test_audiences
-    return unless test_audiences.present?
+    open_test_audiences = @collection&.template&.test_audiences&.open
+    return unless open_test_audiences.present? && open_test_audiences.any?
 
-    # tests will share the same submission template reviewer test audience
-    @test_audience = test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
+    %i[challenge_participant_group challenge_admin_group challenge_reviewer_group].each do |challenge_group|
+      group = @collection&.parent_challenge&.send(challenge_group)
+
+      next unless group.present? && group.user_ids.include?(current_user.id)
+
+      group_name = group.name.split.last
+
+      # will set test audience to reviewer audience in-case user belongs to multiple challenge audiences
+      @test_audience ||= open_test_audiences.joins(:audience).find_by(audiences: { name: group_name })
+    end
   end
 
   def redirect_to_test

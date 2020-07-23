@@ -408,6 +408,15 @@ class Collection < ApplicationRecord
     ]
   end
 
+  def self.default_relationships_for_challenge
+    [
+      :tagged_users,
+      challenge_participant_group: [roles: [:users]],
+      challenge_admin_group: [roles: [:users]],
+      challenge_reviewer_group: [roles: [:users]],
+    ]
+  end
+
   amoeba do
     enable
     # propagate to STI models

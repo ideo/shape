@@ -20,8 +20,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
+    include = Collection.default_relationships_for_api
+    if @collection.collection_type == 'challenge'
+      include.concat Collection.default_relationships_for_challenge
+    end
     render_collection(
-      include: Collection.default_relationships_for_api + [:tagged_users],
+      include: include,
     )
   end
 
