@@ -56,6 +56,12 @@ export default class CollectionCollaborationService {
       }
       return
     }
+    if (updateData.cards_selected) {
+      _.each(updateData.cards_selected, cardId => {
+        const card = apiStore.find('collection_cards', cardId)
+        this.setCollaborator(card, current_editor)
+      })
+    }
     if (updateData.num_viewers_changed) {
       // TODO: update collaborators here?
       // uiStore.update('collaborators' ...)

@@ -311,7 +311,10 @@ const SharedRecordMixin = superclass =>
     // this is used to highlight someone making an edit on a card
     setLatestCollaborator(collaborator) {
       this.setCollaborators([collaborator])
-      setTimeout(() => {
+      if (this.latestCollaboratorTimeout) {
+        clearTimeout(this.latestCollaboratorTimeout)
+      }
+      this.latestCollaboratorTimeout = setTimeout(() => {
         this.setCollaborators([])
       }, 5000)
     }

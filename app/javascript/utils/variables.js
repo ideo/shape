@@ -153,6 +153,9 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
   },
 ]
 
+export const COLLECTION_CHANNEL_NAME = 'CollectionViewingChannel'
+export const ITEM_CHANNEL_NAME = 'ItemRealtimeChannel'
+
 export const KEYS = {
   ENTER: 13,
   ESC: 27,

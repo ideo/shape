@@ -19,7 +19,7 @@ import {
 } from '~/ui/global/QuillTextHighlighter'
 import { QuillStyleWrapper } from '~/ui/global/styled/typography'
 import TextItemToolbar from '~/ui/items/TextItemToolbar'
-import v from '~/utils/variables'
+import v, { ITEM_CHANNEL_NAME } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
 Quill.debug('error')
@@ -104,7 +104,6 @@ const StyledContainer = styled.div`
 @observer
 class RealtimeTextItem extends React.Component {
   unmounted = false
-  channelName = 'ItemRealtimeChannel'
   state = {
     disconnected: false,
     canEdit: false,
@@ -183,7 +182,7 @@ class RealtimeTextItem extends React.Component {
     const routingToSameItem =
       routingTo.id === item.id && routingTo.type === 'items'
     if (routingToSameItem) return
-    ChannelManager.unsubscribe(this.channelName, item.id)
+    ChannelManager.unsubscribe(ITEM_CHANNEL_NAME, item.id)
     item.setCollaborators([])
   }
 
@@ -229,7 +228,7 @@ class RealtimeTextItem extends React.Component {
 
   subscribeToItemRealtimeChannel() {
     const { item } = this.props
-    this.channel = ChannelManager.subscribe(this.channelName, item.id, {
+    this.channel = ChannelManager.subscribe(ITEM_CHANNEL_NAME, item.id, {
       channelConnected: this.channelConnected,
       channelDisconnected: this.channelDisconnected,
       channelReceivedData: this.channelReceivedData,
@@ -565,7 +564,7 @@ class RealtimeTextItem extends React.Component {
 
   socketSend = (method, data) => {
     const channel = ChannelManager.getChannel(
-      this.channelName,
+      ITEM_CHANNEL_NAME,
       this.props.item.id
     )
     if (!channel) {
