@@ -285,6 +285,7 @@ describe('CollectionPage', () => {
       id: 100,
       collection_cards: [],
       cardProperties: [],
+      view_mode: 'grid',
       isSubmissionsCollectionInsideChallenge: true,
       API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
       API_fetchCardReviewerStatuses: jest
@@ -292,6 +293,7 @@ describe('CollectionPage', () => {
         .mockReturnValue(Promise.resolve({})),
     }
     beforeEach(() => {
+      props.apiStore.currentUser = fakeUser
       wrapper = shallow(
         <CollectionPage.wrappedComponent
           {...props}
@@ -316,6 +318,10 @@ describe('CollectionPage', () => {
     it('should render a second CollectionGrid for the submissions', () => {
       expect(wrapper.find('PageSeparator').exists()).toBe(true)
       expect(wrapper.find('CollectionGrid').length).toEqual(2)
+    })
+
+    it('should render FloatingActionButton', () => {
+      expect(wrapper.find('FloatingActionButton').exists()).toBe(true)
     })
 
     it('should pass the right props to the SubmissionCollection', () => {
