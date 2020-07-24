@@ -1549,29 +1549,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @computed
   get potentialReviewers() {
     if (!this.parentChallenge || !this.isSubmissionsCollection) return []
-    const participantGroupRoles = _.get(
-      this.parentChallenge,
-      'challenge_participant_group.roles'
-    )
-    const adminGroupRoles = _.get(
-      this.parentChallenge,
-      'challenge_admin_group.roles'
-    )
     const reviewerGroupRoles = _.get(
       this.parentChallenge,
       'challenge_reviewer_group.roles'
     )
 
-    const allChallengeRoles = [
-      ...participantGroupRoles,
-      ...adminGroupRoles,
-      ...reviewerGroupRoles,
-    ]
-
-    if (_.isEmpty(allChallengeRoles)) return []
+    if (_.isEmpty(reviewerGroupRoles)) return []
 
     const potentialReviewerList = []
-    _.each(allChallengeRoles, role => {
+    _.each(reviewerGroupRoles, role => {
       const users = _.get(role, 'users', [])
       _.each(users, user => {
         if (!_.includes(potentialReviewerList, user)) {

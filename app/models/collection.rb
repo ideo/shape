@@ -411,8 +411,6 @@ class Collection < ApplicationRecord
   def self.default_relationships_for_challenge
     [
       :tagged_users,
-      challenge_participant_group: [roles: [:users]],
-      challenge_admin_group: [roles: [:users]],
       challenge_reviewer_group: [roles: [:users]],
     ]
   end
