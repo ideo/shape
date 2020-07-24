@@ -14,6 +14,7 @@ const SubmissionsSettings = ({ collection, submissionBoxes, closeModal }) => {
           key={submissionBox.id}
           title={submissionBox.name}
           open={viewingSubmissionBoxId === submissionBox.id}
+          data-cy="SubmissionSettings-SubmissionPanel"
         >
           <SubmissionBoxSettings
             collection={submissionBox}

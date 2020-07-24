@@ -100,6 +100,7 @@ const CollectionDateRange = ({ collection, hideEditIcon }) => {
         onClick={openDatePicker}
         ref={dateDisplayRef}
         className="date-range-wrapper"
+        data-cy="CollectionDateRange"
       >
         <FormatDateRange dateRange={dateRange} />
         {!hideEditIcon && (

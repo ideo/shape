@@ -25,7 +25,7 @@ const EditActions = ({ onEdit, onSwitch }) => {
   return (
     <React.Fragment>
       {onEdit && (
-        <IconRight onClick={onEdit}>
+        <IconRight onClick={onEdit} data-cy="SubmissionSettings-TemplateEdit">
           <Tooltip
             classes={{ tooltip: 'Tooltip' }}
             title="Edit submission template"
@@ -35,7 +35,7 @@ const EditActions = ({ onEdit, onSwitch }) => {
           </Tooltip>
         </IconRight>
       )}
-      <IconRight onClick={onSwitch}>
+      <IconRight onClick={onSwitch} data-cy="SubmissionSettings-TemplateEdit">
         <Tooltip
           classes={{ tooltip: 'Tooltip' }}
           title="Switch format"

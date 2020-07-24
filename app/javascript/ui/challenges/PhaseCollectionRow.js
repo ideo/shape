@@ -59,7 +59,7 @@ PhaseCollectionThumbnail.propTypes = {
 
 export const PhaseCollectionWithoutTemplateRow = ({ formatType }) => {
   return (
-    <PhaseRow>
+    <PhaseRow data-cy="ChallengeSettings-Phase">
       <SmallHelperText color={v.colors.black}>
         Phases can not be added to a {formatType}. Change this submission box to
         use a submission template in the 'Submission Settings' tab above if you
@@ -94,7 +94,7 @@ const PhaseCollectionRow = ({
   }, [showEdit])
 
   return (
-    <PhaseRow>
+    <PhaseRow data-cy="ChallengeSettings-Phase">
       <PhaseCollectionThumbnail collection={collection} />
       <PhaseRowText>
         <EditableName
@@ -126,6 +126,7 @@ const PhaseCollectionRow = ({
               closeModal()
               collection.routingStore.routeTo('collections', collection.id)
             }}
+            data-cy="ChallengeSettings-PhaseEdit"
           >
             <EditPencilIconLarge />
           </EditIcon>
