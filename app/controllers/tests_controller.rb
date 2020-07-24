@@ -83,7 +83,7 @@ class TestsController < ApplicationController
         redirect_to_collection_to_test(@collection.collection_to_test)
       end
     elsif @collection.submission_box_template_test?
-      redirect_to "/tests/#{next_test.id}"
+      redirect_to_submission_box_test
     elsif @collection.collection_to_test.present?
       redirect_to_collection_to_test(@collection.collection_to_test)
     elsif @collection.submission_test?
@@ -100,7 +100,6 @@ class TestsController < ApplicationController
     redirect_to "#{frontend_url_for(collection_to_test)}?open=tests"
   end
 
-  # NOTE: unused method, did this logic get moved somewhere?
   def redirect_to_submission_box_test
     # first we have to determine if any tests are available for the user
     next_test = @collection.parent_submission_box.random_next_submission_test(for_user: current_user).first

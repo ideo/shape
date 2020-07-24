@@ -34,12 +34,10 @@ export const ReviewSubmissionsButton = ({ record }) => {
 
   useEffect(() => {
     const loadNextAvailableTest = async () => {
-      if (record.isSubmissionBox) {
-        const path = await record.API_getNextAvailableTest({
-          forSubmissionBox: true,
-        })
-        setNextAvailableTestPath(path)
-      }
+      const path = await record.API_getNextAvailableTest({
+        forSubmissionBox: true,
+      })
+      setNextAvailableTestPath(path)
     }
     loadNextAvailableTest()
   }, [record])

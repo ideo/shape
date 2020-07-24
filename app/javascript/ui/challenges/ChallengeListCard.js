@@ -17,6 +17,10 @@ export const transformColumnsForChallenge = columns =>
       col.displayName = 'Reviewers'
       col.name = 'reviewers'
     }
+    if (col.name === 'actions') {
+      // make room for review button
+      col.style.width = '175px'
+    }
     return col
   })
 
@@ -84,7 +88,7 @@ class ChallengeListCard extends React.Component {
               key="column3"
               reviewerStatus={submission_reviewer_status}
               onClick={() => {
-                record.navigateToNextAvailableChallengeTest()
+                record.navigateToTest()
               }}
             />
           )

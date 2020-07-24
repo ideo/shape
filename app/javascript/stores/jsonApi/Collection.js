@@ -584,6 +584,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.submission_attrs.test_status
   }
 
+  @computed
+  get liveTestCollectionId() {
+    return this.live_test_collection ? this.live_test_collection.id : null
+  }
+
   get isDraftTest() {
     // NOTE: we show this even if the test is not necessarily "launchable", so that you can click it and see why
     return this.launchableTestStatus === 'draft'
@@ -1579,40 +1584,29 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return potentialReviewerList
   }
 
-  async API_getNextAvailableTest({ forSubmissionBox = false }) {
+  async API_getNextAvailableTest() {
     this.setNextAvailableTestPath(null)
-    const nextTestPath = !forSubmissionBox
-      ? `test_collections/${this.id}/next_available`
-      : `collections/${this.id}/next_available_submission_test`
-    const res = await this.apiStore.request(nextTestPath)
+    const res = await this.apiStore.request(
+      `collections/${this.id}/next_available_submission_test`
+    )
     const { data: nextTest } = res
     if (!nextTest) return
-    let path = `${this.routingStore.pathTo('collections', nextTest.id)}`
 
+    let path = this.routingStore.pathTo('tests', nextTest.id)
     if (nextTest.collection_to_test_id) {
-      path += '?open=tests'
+      path = this.routingStore.pathTo(
+        'collections',
+        nextTest.collection_to_test_id
+      )
+      path += `?open=tests`
     }
+
     this.setNextAvailableTestPath(path)
     return path
   }
 
-  async navigateToNextAvailableChallengeTest() {
-    if (!this.isSubmissionBox && !this.isSubmission) return
-
-    let nextTestPath = null
-    if (this.isSubmission) {
-      nextTestPath = this.publicTestURL
-    } else if (this.isSubmissionBox) {
-      const nextTest = await this.API_getNextAvailableTest()
-
-      if (!nextTest || !nextTest.launchableTestId) return
-
-      nextTestPath = nextTest.publicTestURL
-    }
-
-    if (!nextTestPath) return
-
-    window.location.href = nextTestPath
+  navigateToTest() {
+    window.location.href = this.publicTestURL
   }
 
   @action

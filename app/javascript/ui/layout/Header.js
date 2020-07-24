@@ -124,7 +124,7 @@ class Header extends React.Component {
 
   handleReviewSubmissions = () => {
     const { record } = this
-    record.navigateToNextAvailableChallengeTest()
+    record.navigateToTest()
   }
 
   get onArchivedPage() {

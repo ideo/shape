@@ -1,7 +1,7 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover next_available_submission_test]
+  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
@@ -174,14 +174,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                               )
   end
 
-  before_action :load_and_authorize_next_available_submission_test, only: %i[next_available_submission_test]
+  before_action :load_submission_box_test, only: %i[next_available_submission_test]
   def next_available_submission_test
-    test = @collection.random_next_submission_test(
-      for_user: current_user,
-      omit_id: nil,
-    ).first
-    if test.present?
-      render jsonapi: test
+    if @test_collection.present?
+      render jsonapi: @test_collection
     else
       render json: nil
     end
@@ -342,9 +338,22 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
   end
 
-  def load_and_authorize_next_available_submission_test
-    @collection = Collection.find(params[:id])
-    authorize! :read, @collection
+  def load_submission_box_test
+    if @collection.is_a?(Collection::SubmissionBox)
+      @submission_box = @collection
+    else
+      @submission_box = @collection.parent_submission_box
+    end
+
+    unless @submission_box.present?
+      head(404)
+      return
+    end
+
+    @test_collection = @submission_box.random_next_submission_test(
+      for_user: current_user,
+      omit_id: @collection.test_collection? ? @collection.id : nil,
+    ).first
   end
 
   def collection_params

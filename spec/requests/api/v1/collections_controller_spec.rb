@@ -1057,4 +1057,47 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(json_ids.map(&:to_i)).to match_array(phases.map(&:id))
     end
   end
+
+  describe 'GET #next_available_submission_test' do
+    let(:submission_box) { create(:submission_box, add_editors: [user]) }
+    let(:submissions_collection) { create(:submissions_collection, submission_box: submission_box) }
+    let(:submission) { create(:collection, :submission, parent_collection: submissions_collection, add_editors: [user]) }
+    let(:collection) { submission }
+    let(:path) { "/api/v1/collections/#{collection.id}/next_available_submission_test" }
+
+    it 'finds parent submission box and next available test' do
+      expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+        for_user: user,
+        omit_id: nil,
+      ).and_return([])
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    describe 'with the submission_box itself' do
+      let(:collection) { submission_box }
+
+      it 'finds current submission box and next available test' do
+        expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+          for_user: user,
+          omit_id: nil,
+        ).and_return([])
+        get(path)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    describe 'with a test collection' do
+      let(:collection) { create(:test_collection, parent_collection: submission) }
+
+      it 'finds parent submission box and next available test, omitting current test' do
+        expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+          for_user: user,
+          omit_id: collection.id,
+        ).and_return([])
+        get(path)
+        expect(response.status).to eq(200)
+      end
+    end
+  end
 end

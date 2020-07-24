@@ -117,9 +117,15 @@ class RoutingStore extends RouterStore {
     this.beforeRouting()
     if (!id && type !== 'homepage' && type !== 'search') {
       // in this case, type is a path like '/' or '/terms'
+      if (_.includes(type, 'tests')) {
+        // for /tests URLs we need to do a full navigation
+        window.location.href = `${process.env.BASE_HOST}${type}`
+        return
+      }
       this.push(type)
       return
     }
+
     if (type === 'search') {
       this.updatePreviousPageBeforeSearch(this.location)
     }
