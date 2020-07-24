@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { ThemeProvider } from 'styled-components'
@@ -21,29 +22,25 @@ class InlineCollectionTest extends React.Component {
   testCollection = null
 
   componentDidMount() {
-    if (!this.hasLiveTestCollection) {
-      return
-    }
     this.fetchTestCollection()
   }
 
-  componentWillUnmount() {
-    this.unmounted = true
-  }
-
-  get collection() {
-    return this.props.uiStore.viewingCollection
-  }
-
-  get hasLiveTestCollection() {
-    return !!this.collection.live_test_collection
+  componentDidUpdate(prevProps) {
+    const { testCollectionId } = this.props
+    if (testCollectionId && testCollectionId !== prevProps.testCollectionId) {
+      runInAction(() => {
+        this.fetchTestCollection()
+      })
+    }
   }
 
   async fetchTestCollection() {
-    const { apiStore } = this.props
-    const res = await apiStore.request(
-      `test_collections/${this.collection.live_test_collection.id}`
-    )
+    const { testCollectionId, apiStore } = this.props
+    if (!testCollectionId) {
+      return
+    }
+
+    const res = await apiStore.request(`test_collections/${testCollectionId}`)
     const testCollection = res.data
     runInAction(() => {
       this.testCollection = testCollection
@@ -61,9 +58,14 @@ class InlineCollectionTest extends React.Component {
   }
 
   renderInner() {
-    const { collection, testCollection } = this
-    if (!collection) return null
-    if (!this.hasLiveTestCollection) {
+    const { testCollectionId, uiStore } = this.props
+    const { viewingCollection } = uiStore
+    const { testCollection } = this
+
+    if (!viewingCollection || !viewingCollection.fullyLoaded) {
+      return null
+    }
+    if (!testCollectionId) {
       return (
         <div>
           {/*
@@ -71,7 +73,7 @@ class InlineCollectionTest extends React.Component {
             because it is no longer the "live" test collection.
             So as a fallback, the header here just displays the actual collection being tested
           */}
-          <CommentThreadHeader record={collection} sticky />
+          <CommentThreadHeader record={viewingCollection} sticky />
           <ThemeProvider theme={styledTestTheme('secondary')}>
             <SurveyClosed>
               <DisplayText color="white">
@@ -80,7 +82,7 @@ class InlineCollectionTest extends React.Component {
               <br />
               <br />
               <DisplayText color="white">
-                Feedback on {collection.name} is finished.
+                Feedback on {viewingCollection.name} is finished.
               </DisplayText>
               <Tooltip
                 classes={{ tooltip: 'Tooltip' }}
@@ -95,8 +97,7 @@ class InlineCollectionTest extends React.Component {
           </ThemeProvider>
         </div>
       )
-    }
-    if (
+    } else if (
       testCollection &&
       testCollection.test_status === 'live' &&
       testCollection.question_cards
@@ -130,6 +131,13 @@ class InlineCollectionTest extends React.Component {
       </ActivityContainer>
     )
   }
+}
+
+InlineCollectionTest.propTypes = {
+  testCollectionId: PropTypes.string,
+}
+InlineCollectionTest.defaultProps = {
+  testCollectionId: null,
 }
 
 InlineCollectionTest.wrappedComponent.propTypes = {

@@ -13,7 +13,10 @@ import TestCollectionIcon from '~/ui/icons/TestCollectionIcon'
 import { ActivityCount } from '~/ui/notifications/ActivityLogButton'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import CommentThreadContainer from '~/ui/threads/CommentThreadContainer'
-import v from '~/utils/variables'
+import v, {
+  ACTIVITY_LOG_PAGE_KEY,
+  ACTIVITY_LOG_POSITION_KEY,
+} from '~/utils/variables'
 
 const MIN_WIDTH = 319
 const MIN_HEIGHT = 200
@@ -27,9 +30,6 @@ const DEFAULT = {
   w: MIN_WIDTH + 100,
   h: MIN_HEIGHT + 200,
 }
-
-export const POSITION_KEY = 'ActivityLog:position'
-export const PAGE_KEY = 'ActivityLog:page'
 
 const StyledActivityLog = styled.div`
   background-color: ${v.colors.secondaryDark};
@@ -97,8 +97,12 @@ class ActivityLogBox extends React.Component {
         if (change.newValue === true) {
           // if we just opened the activity log, make sure the CommentThread is loaded
           await apiStore.setupCommentThreadAndMenusForPage(
-            uiStore.viewingRecord
+            uiStore.viewingRecord,
+            { initialPageLoad: false }
           )
+          if (!this.liveTestCollectionId && this.currentPage === 'tests') {
+            uiStore.setActivityLogPage('comments')
+          }
         }
         if (this.isOffscreen()) {
           this.setToDefaultPosition()
@@ -120,8 +124,15 @@ class ActivityLogBox extends React.Component {
   @action
   componentDidMount() {
     const { uiStore } = this.props
-    const existingPage = localStorage.getItem(PAGE_KEY)
-    uiStore.update('activityLogPage', existingPage || 'comments')
+    const { activityLogPage } = uiStore
+    const existingPage = localStorage.getItem(ACTIVITY_LOG_PAGE_KEY)
+    if (
+      existingPage &&
+      existingPage !== activityLogPage &&
+      (existingPage !== 'tests' || this.liveTestCollectionId)
+    ) {
+      uiStore.setActivityLogPage(existingPage)
+    }
     this.resetPosition()
   }
 
@@ -130,13 +141,15 @@ class ActivityLogBox extends React.Component {
     _.each(this.disposers, disposer => disposer())
   }
 
+  @action
   resetPosition = () => {
     const { uiStore } = this.props
     if (uiStore.isTouchDevice || uiStore.isMobileXs) {
       this.setToFixedPosition()
       return
     }
-    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
+    const existingPosition =
+      localStorage.getItem(ACTIVITY_LOG_POSITION_KEY) || {}
     this.position.y = existingPosition.y || DEFAULT.y
     this.position.w = existingPosition.w || DEFAULT.w
     this.position.h = existingPosition.h || DEFAULT.h
@@ -158,9 +171,16 @@ class ActivityLogBox extends React.Component {
     return x
   }
 
-  get hasLiveTestCollection() {
-    const collection = this.props.uiStore.viewingCollection
-    return collection && collection.live_test_collection
+  get liveTestCollectionId() {
+    const { apiStore, uiStore } = this.props
+    // HACK: use loadingThreads to observe whether we have fully loaded the current record
+    // e.g. navigating between tests; record.fullyLoaded did not trigger properly here
+    const { loadingThreads } = apiStore
+    const collection = uiStore.viewingCollection
+    if (!loadingThreads && collection) {
+      return collection.liveTestCollectionId
+    }
+    return null
   }
 
   setToDefaultPosition() {
@@ -190,7 +210,8 @@ class ActivityLogBox extends React.Component {
     temporary = false,
     reset = false,
   }) => {
-    const existingPosition = localStorage.getItem(POSITION_KEY) || {}
+    const existingPosition =
+      localStorage.getItem(ACTIVITY_LOG_POSITION_KEY) || {}
     if (y < 0) return
     if (reset) {
       this.resetPosition()
@@ -203,6 +224,12 @@ class ActivityLogBox extends React.Component {
       w,
       h,
     }
+
+    if (temporary && this.liveTestCollectionId) {
+      // don't shrink the height if we have a test collection
+      delete positionArgs.h
+    }
+
     _.each(positionArgs, (value, field) => {
       if (value !== null) {
         this.position[field] = value
@@ -211,10 +238,10 @@ class ActivityLogBox extends React.Component {
       }
     })
     if (!temporary) {
-      localStorage.setItem(POSITION_KEY, this.position)
+      localStorage.setItem(ACTIVITY_LOG_POSITION_KEY, this.position)
     } else {
       // temporarily set this, but don't store it in localStorage
-      this.position.h = _.min([existingPosition.h, h])
+      this.position.h = _.min([existingPosition.h, positionArgs.h])
     }
     return this.position
   }
@@ -222,8 +249,7 @@ class ActivityLogBox extends React.Component {
   @action
   changePage(page) {
     const { uiStore } = this.props
-    uiStore.update('activityLogPage', page)
-    localStorage.setItem(PAGE_KEY, page)
+    uiStore.setActivityLogPage(page)
   }
 
   isOffscreen() {
@@ -349,28 +375,34 @@ class ActivityLogBox extends React.Component {
     }
   }
 
-  renderComments = () => (
-    <CommentThreadContainer
-      parentWidth={this.position.w}
-      loadingThreads={this.props.apiStore.loadingThreads}
-      expandedThreadKey={this.props.uiStore.expandedThreadKey}
-      updateContainerSize={this.updatePosition}
-    />
-  )
+  get renderComments() {
+    return (
+      <CommentThreadContainer
+        parentWidth={this.position.w}
+        loadingThreads={this.props.apiStore.loadingThreads}
+        expandedThreadKey={this.props.uiStore.expandedThreadKey}
+        updateContainerSize={this.updatePosition}
+      />
+    )
+  }
 
-  renderNotifications = () => <NotificationsContainer />
+  get renderNotifications() {
+    return <NotificationsContainer />
+  }
 
-  renderTest = () => <InlineCollectionTest />
+  get renderTest() {
+    return <InlineCollectionTest testCollectionId={this.liveTestCollectionId} />
+  }
 
-  renderPage = () => {
+  get renderPage() {
     switch (this.currentPage) {
       case 'notifications':
-        return this.renderNotifications()
+        return this.renderNotifications
       case 'tests':
-        return this.renderTest()
+        return this.renderTest
       case 'comments':
       default:
-        return this.renderComments()
+        return this.renderComments
     }
   }
 
@@ -435,7 +467,7 @@ class ActivityLogBox extends React.Component {
                   </ActivityCount>
                 )}
               </Action>
-              {this.hasLiveTestCollection && (
+              {this.liveTestCollectionId && (
                 <TestAction
                   className="liveTest"
                   active={this.currentPage === 'tests'}
@@ -446,7 +478,7 @@ class ActivityLogBox extends React.Component {
               )}
               <CloseButton size="lg" onClick={this.handleClose} />
             </StyledHeader>
-            {this.renderPage()}
+            {this.renderPage}
           </StyledActivityLog>
         </div>
       </Rnd>
