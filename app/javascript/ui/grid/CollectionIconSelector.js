@@ -52,7 +52,10 @@ const CollectionIconSelector = ({ selectedIcon, onSelectIcon }) => {
           {Object.keys(allIcons).map(iconName => {
             const Icon = allIcons[iconName]
             return (
-              <IconWrapper onClick={() => handleSelectIcon(iconName)}>
+              <IconWrapper
+                key={iconName}
+                onClick={() => handleSelectIcon(iconName)}
+              >
                 <Icon size={'lg'} />
               </IconWrapper>
             )

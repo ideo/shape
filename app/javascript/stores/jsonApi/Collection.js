@@ -1836,10 +1836,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get subtitleHidden() {
     const { cover } = this
-    if (cover && cover.subtitle_hidden) {
-      return cover
-    }
-    return false
+    return cover && cover.subtitle_hidden ? true : false
   }
 
   get coverItem() {
