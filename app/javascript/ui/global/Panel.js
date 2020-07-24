@@ -61,7 +61,11 @@ class Panel extends React.Component {
 
     return (
       <React.Fragment>
-        <PanelHeader onClick={() => this.toggle()} open={this.state.open}>
+        <PanelHeader
+          onClick={() => this.toggle()}
+          open={this.state.open}
+          data-cy={this.props['data-cy']}
+        >
           <StyledRow align="center">
             <DisplayText>{title}</DisplayText>
             <RowItemLeft style={{ marginLeft: '0px' }}>
@@ -89,6 +93,10 @@ Panel.propTypes = {
   children: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
   open: PropTypes.bool.isRequired,
+  'data-cy': PropTypes.string,
+}
+Panel.defaultProps = {
+  'data-cy': '',
 }
 
 export default Panel

@@ -66,6 +66,13 @@ When('I choose a link item from the submission box', () => {
   cy.locate('submission-box-link-item').click({ force: true })
 })
 
+When('I click on the first card', () => {
+  cy.get('[data-cy="GridCard"][data-order="0"]')
+    .first()
+    .click()
+  cy.wait(1000)
+})
+
 // ----------------------
 // Sharing collections
 // ----------------------
@@ -545,6 +552,11 @@ When('I select to invite a new user', () => {
     .click({ force: true })
 })
 
+When('I close the modal', () => {
+  cy.get('.MuiDialog-container').click(1, 1, { force: true })
+  cy.wait(100)
+})
+
 // ----------------------
 // Admin (Test Collection Feedback)
 // ----------------------
@@ -566,4 +578,52 @@ When('I click the new query button for the first audience', index => {
 When('I scroll down by {int} pixels', pixels => {
   // scrollTo(x, y)
   cy.scrollTo(0, pixels)
+})
+
+// ----------------------
+// Challenges
+// ----------------------
+When('I open the challenge settings', () => {
+  cy.locate('ChallengeSettingsButton')
+    .first()
+    .click()
+  cy.wait(100)
+})
+
+When('I type in a topic {string}', topic => {
+  cy.get('[role="combobox"]')
+    .first()
+    .type(topic)
+  cy.wait(50)
+})
+
+When('I press enter', () => {
+  cy.get('[role="combobox"]')
+    .first()
+    .type('{enter}')
+  cy.wait(50)
+})
+When('I click on the first available date in the datepicker', () => {
+  cy.get('.MuiPickersDateRangeDay-rangeIntervalDay button')
+    .first()
+    .click()
+  cy.wait(25)
+})
+When('I click on the last date in the datepicker', () => {
+  cy.get('.MuiPickersDateRangeDay-rangeIntervalDay button')
+    .last()
+    .click()
+  cy.wait(25)
+})
+When('I click on the first checkbox', () => {
+  cy.get('input[type="checkbox"]')
+    .first()
+    .click()
+  cy.wait(25)
+})
+When('I escape', () => {
+  cy.get('body')
+    .first()
+    .type('{esc}')
+  cy.wait(25)
 })

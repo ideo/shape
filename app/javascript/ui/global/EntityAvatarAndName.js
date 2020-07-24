@@ -52,6 +52,7 @@ class EntityAvatarAndName extends React.Component {
         align="center"
         style={{ height: '42px' }}
         onClick={this.handleClick}
+        data-cy="EntityAvatarAndName"
       >
         <Avatar key={entity.id} url={this.avatarUrl} />
         {entity.name && entity.name.trim().length > 0 && (

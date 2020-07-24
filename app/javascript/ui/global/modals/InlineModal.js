@@ -76,6 +76,7 @@ class InlineModal extends React.PureComponent {
                     fontSizeEm={0.75}
                     color={v.colors.black}
                     className="ok-button"
+                    data-cy="InlineModal-Ok"
                   >
                     OK
                   </TextButton>

@@ -35,6 +35,10 @@ Given('I visit the Test Area', () => {
   cy.wait('@apiGetCollectionCards')
 })
 
+Given('I login and create an automated challenge', () => {
+  cy.loginAndCreateAutomatedChallenge()
+})
+
 Given('I logout', () => {
   cy.logout()
 })

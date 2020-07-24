@@ -1,4 +1,5 @@
 class Automate::CollectionsController < ActionController::Base
+  include ApplicationHelper
   include CollectionCardBuilderHelpers
 
   def create_challenge
@@ -24,40 +25,23 @@ class Automate::CollectionsController < ActionController::Base
       current_user: current_user,
     )
 
-    # Create collection with phase type x 3
-    # Set collection icons for phase collections
-    3.times do |idx|
-      num = idx + 1
-      logger.info "-- Creating Phase #{num}"
-      phase_card = create_card(
-        params: {
-          collection_attributes: {
-            collection_type: :phase,
-            icon: 'phase',
-            name: "Phase #{num}",
-          },
-        },
-        parent_collection: challenge_collection,
-        created_by: current_user,
-      )
-      submission_box = create_submission_box(
-        phase_collection: phase_card.collection,
-        template_card: template_card,
-        user: current_user,
-      )
-      submission_box.update(
-        submission_attrs: {
-          launchable_test_id: template_card.collection.submission_attrs['launchable_test_id'],
-        },
-      )
-      submissions_collection = submission_box.submissions_collection
-      logger.info "-- Creating submission for Phase #{num}"
-      create_submission(
-        submissions_collection: submissions_collection,
-        template: template_card.collection,
-        user: current_user,
-      )
-    end
+    submission_box = create_submission_box(
+      collection: challenge_collection,
+      template_card: template_card,
+      user: current_user,
+    )
+    submission_box.update(
+      submission_attrs: {
+        launchable_test_id: template_card.collection.submission_attrs['launchable_test_id'],
+      },
+    )
+    submissions_collection = submission_box.submissions_collection
+    create_submission(
+      submissions_collection: submissions_collection,
+      template: template_card.collection,
+      user: current_user,
+    )
+
     # Add people to the reviewers group
     logger.info "-- Adding users to reviewers group"
     challenge_reviewer_group = challenge_collection.challenge_reviewer_group
@@ -66,7 +50,9 @@ class Automate::CollectionsController < ActionController::Base
     end
     # Add reviewers to submissions
 
-    head :ok
+    # Redirect to the current user collection where challenge was created
+    # redirect_to root_path
+    redirect_to "#{frontend_url_for(challenge_collection)}"
   end
 
   private
@@ -110,20 +96,39 @@ class Automate::CollectionsController < ActionController::Base
         template: true,
       },
     )
+    template_collection = template_card.collection
+
+    # Create phases in template
+    3.times do |idx|
+      num = idx + 1
+      logger.info "-- Creating submission for Phase #{num}"
+      phase_card = create_card(
+        params: {
+          collection_attributes: {
+            collection_type: :phase,
+            icon: 'phase',
+            name: "Phase #{idx}",
+          },
+        },
+        parent_collection: template_collection,
+        created_by: current_user,
+      )
+    end
+
     template_card
   end
 
-  def create_submission_box(phase_collection:, template_card:, user:)
+  def create_submission_box(collection:, template_card:, user:)
     # Create submission box
     # Set the submission box template to a the previously created template
     submission_box_card = create_card(
       params: {
         collection_attributes: {
-          name: "#{phase_collection.name} Submissions",
+          name: "#{collection.name} Submissions",
           type: 'Collection::SubmissionBox',
         },
       },
-      parent_collection: phase_collection,
+      parent_collection: collection,
       created_by: user,
     )
     submission_box = submission_box_card.collection

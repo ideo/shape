@@ -69,7 +69,11 @@ class CollectionViewToggle extends React.Component {
           </IconHolder>
         </Tooltip>
         <Tooltip classes={{ tooltip: 'Tooltip' }} title="List view">
-          <IconHolder onClick={this.onListClick} show={!isCurrentlyListMode}>
+          <IconHolder
+            onClick={this.onListClick}
+            show={!isCurrentlyListMode}
+            data-cy="ListViewToggle"
+          >
             <ListIcon />
           </IconHolder>
         </Tooltip>

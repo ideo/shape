@@ -204,7 +204,7 @@ class Modal extends React.Component {
         </StyledDialogTitle>
         {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
         {_.isFunction(onClose) && (
-          <ModalCloseButton onClick={this.handleClose}>
+          <ModalCloseButton onClick={this.handleClose} data-cy="ModalClose">
             <CloseIcon />
           </ModalCloseButton>
         )}
