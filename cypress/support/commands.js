@@ -24,6 +24,15 @@ Cypress.Commands.add('loginAndVisitAdmin', () => {
   cy.wait('@apiAdminGetTestCollections')
 })
 
+Cypress.Commands.add('loginAndCreateAutomatedChallenge', () => {
+  cy.login({ email: 'cypress-test@ideo.com' })
+  // after creating challenge it will redirect you back to My Collection
+  cy.visit('/automate/create_challenge')
+  cy.wait('@apiGetCurrentUser')
+  cy.wait('@apiGetCollectionCards')
+  cy.wait('@apiGetChallengePhaseCollections')
+})
+
 Cypress.Commands.add('logout', () => {
   cy.request('DELETE', '/api/v1/sessions')
 })

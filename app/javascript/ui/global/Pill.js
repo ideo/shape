@@ -74,7 +74,7 @@ const Pill = props => {
   if (selectable) wrapperProps.paddingLeft = '4px'
 
   return (
-    <PillWrapper {...wrapperProps}>
+    <PillWrapper {...wrapperProps} data-cy="Pill">
       {selectable && (
         <Checkbox
           style={{ marginRight: '0px', marginLeft: '-4px' }}
