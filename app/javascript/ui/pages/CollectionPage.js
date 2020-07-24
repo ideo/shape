@@ -455,7 +455,7 @@ class CollectionPage extends React.Component {
   }
 
   renderSubmissionsCollection() {
-    const { collection, uiStore } = this.props
+    const { collection, uiStore, apiStore } = this.props
     const {
       blankContentToolState,
       gridSettings,
@@ -468,6 +468,10 @@ class CollectionPage extends React.Component {
       submission_template,
       submissions_enabled,
     } = collection
+
+    if (!apiStore.currentUser && !collection.anyone_can_view) {
+      return
+    }
 
     if (!submissions_collection || !loadedSubmissions) {
       return this.loader()
@@ -724,7 +728,6 @@ class CollectionPage extends React.Component {
                 pastingCards={uiStore.pastingCards}
               />
               {isSubmissionBox &&
-                apiStore.currentUser &&
                 collection.submission_box_type &&
                 this.renderSubmissionsCollection()}
               {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
