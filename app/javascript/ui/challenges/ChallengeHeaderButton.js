@@ -34,9 +34,7 @@ export const ReviewSubmissionsButton = ({ record }) => {
 
   useEffect(() => {
     const loadNextAvailableTest = async () => {
-      const path = await record.API_getNextAvailableTest({
-        forSubmissionBox: true,
-      })
+      const path = await record.API_getNextAvailableTest()
       setNextAvailableTestPath(path)
     }
     loadNextAvailableTest()
