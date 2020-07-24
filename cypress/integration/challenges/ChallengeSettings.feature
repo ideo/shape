@@ -1,8 +1,6 @@
 Feature: Challenge settings
   Scenario: Setting up challenge settings through the settings modal
-    Given I login and visit My Collection
-
-    And I visit URL "/automate/create_challenge"
+    Given I login and create an automated challenge
     And I open the challenge settings
     Then I should see the "Challenge settings" modal
 
