@@ -104,6 +104,48 @@ class Collection
         }
       end
     end
+
+    def submissions_reviewable_by_user(current_user)
+      return false unless current_user.present?
+
+      template_test_id = submission_box&.submission_template&.launchable_test_id
+      return unless template_test_id.present?
+
+      template_test = Collection.find(submission_box.submission_template.launchable_test_id)
+
+      return false unless template_test.present?
+
+      open_test_audiences = template_test.test_audiences.open
+
+      return false unless open_test_audiences.any?
+
+      template_test_audience_names = open_test_audiences.map(&:name)
+
+      template_test_audience_names.each do |audience_name|
+        challenge_group = nil
+        if audience_name == 'Reviewers'
+          challenge_group = parent_challenge&.challenge_reviewer_group
+        elsif audience_name == 'Admins'
+          challenge_group = parent_challenge&.challenge_participants_group
+        elsif audience_name == 'Participants'
+          challenge_group = parent_challenge&.challenge_admins_group
+        end
+
+        next unless challenge_group.present?
+
+        challenge_group.roles.each do |role|
+          next unless role.users.present?
+
+          role.users.each do |user|
+            # will return early if current user belongs to a challenge group
+            return true if user.id == current_user.id
+          end
+        end
+      end
+
+      # catch-all, return false when user is not in any challenge groups
+      false
+    end
   end
 
   def follow_submission_box(user)

@@ -970,6 +970,20 @@ class Collection < ApplicationRecord
     user_tag_list.include?(user.handle)
   end
 
+  def reviewable_by_user?(user)
+    return false unless submission?
+
+    # if they are a reviewer return early
+    if challenge_reviewer?(user)
+      return true
+    end
+
+    return false unless parent.present?
+
+    # otherwise check submission template test settings if the user is a reviewer
+    parent.submissions_reviewable_by_user(user)
+  end
+
   def submission_reviewer_status(user)
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
