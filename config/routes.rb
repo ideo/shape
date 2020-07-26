@@ -103,7 +103,6 @@ Rails.application.routes.draw do
           patch 'launch'
           patch 'close'
           patch 'reopen'
-          get 'next_available'
           post 'add_comparison'
           post 'remove_comparison'
           get 'csv_report'

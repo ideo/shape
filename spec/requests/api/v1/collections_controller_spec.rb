@@ -1087,6 +1087,38 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
 
+    describe 'with a challenge' do
+      let!(:challenge) do
+        create(
+          :collection,
+          collection_type: :challenge,
+          record_type: :collection,
+          add_editors: [user],
+        )
+      end
+      let(:collection) { challenge }
+
+      context 'with no submission box' do
+        it 'returns a 404' do
+          get(path)
+          expect(response.status).to eq(404)
+        end
+      end
+
+      context 'with submission box inside' do
+        let!(:submission_box) { create(:submission_box, add_viewers: [user], parent_collection: challenge) }
+
+        it 'finds submission box inside and next available test' do
+          expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+            for_user: user,
+            omit_id: nil,
+          ).and_return([])
+          get(path)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+
     describe 'with a test collection' do
       let(:collection) { create(:test_collection, parent_collection: submission) }
 

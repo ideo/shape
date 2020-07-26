@@ -174,7 +174,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                               )
   end
 
-  before_action :load_submission_box_test, only: %i[next_available_submission_test]
+  before_action :load_related_submission_box, only: %i[next_available_submission_test]
   def next_available_submission_test
     if @test_collection.present?
       render jsonapi: @test_collection
@@ -338,11 +338,19 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
   end
 
-  def load_submission_box_test
+  def load_related_submission_box
     if @collection.is_a?(Collection::SubmissionBox)
       @submission_box = @collection
     else
       @submission_box = @collection.parent_submission_box
+      if @submission_box.nil? && @collection.challenge_or_inside_challenge?
+        # NOTE: if a challenge happens to have multiple submission boxes
+        # this may not find the "best" one, since we just use most recently updated
+        @submission_box = @collection
+                          .challenge_submission_boxes
+                          .order(updated_at: :desc)
+                          .first
+      end
     end
 
     unless @submission_box.present?
