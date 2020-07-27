@@ -32,7 +32,6 @@ Rails.application.routes.draw do
           get 'next_available_challenge_test'
           get 'phase_sub_collections'
           get 'challenge_phase_collections'
-          get 'challenge_reviewers'
           post 'clear_collection_cover'
           patch 'submit'
           patch 'restore_permissions'

@@ -925,16 +925,6 @@ class Collection < ApplicationRecord
     result
   end
 
-  def challenge_reviewers
-    return [] unless inside_a_challenge?
-
-    User.where(
-      User.arel_table[:handle].lower.in(
-        parent_challenge.collection_filters.user_tag.pluck(:text),
-      ),
-    )
-  end
-
   # This method is called when a user tag is added to a submission collection
   # in the UserTaggable concern
   def add_challenge_reviewer_filter_to_submission_box(user)
