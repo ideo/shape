@@ -45,6 +45,7 @@ const fakeUiStore = {
     offsetX: 0,
     offsetY: 0,
   },
+  selectedArea: { minX: null, maxX: null, minY: null, maxY: null },
   openBlankContentTool: jest.fn(),
   closeBlankContentTool: jest.fn(),
   setBctPlaceholderCard: jest.fn(),

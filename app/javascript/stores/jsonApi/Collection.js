@@ -1352,14 +1352,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return currentUserIsAReviewer
   }
 
-  // after we reorder a single card, we want to make sure everything goes into sequential order
+  // TODO: deprecate once we fully migrate 4WFC
   @action
   _reorderCards() {
     // NOTE: this should work ok even if there are infinite scroll / pagination cards
     // not being displayed offscreen...
     if (this.collection_cards) {
       _.each(this.sortedCards, (card, i) => {
-        card.order = i
+        if (this.isBoard) {
+          card.order = 0
+        } else {
+          card.order = i
+        }
       })
     }
   }

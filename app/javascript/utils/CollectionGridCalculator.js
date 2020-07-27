@@ -39,7 +39,7 @@ export const calculateRowsCols = (
   if (prefilled > 0) {
     _.fill(matrix[0], 'prefilled', 0, prefilled)
   }
-  let sortedCards = cards
+  let sortedCards = [...cards]
   if (sortByOrder) {
     // e.g. for search results we don't want to re-sort the cards
     sortedCards = _.sortBy(cards, 'order')
@@ -47,8 +47,10 @@ export const calculateRowsCols = (
 
   _.each(sortedCards, (card, i) => {
     let filled = false
-    while (!filled) {
-      const { width, height } = card
+    while (!filled && row < 500) {
+      let { width, height } = card
+      if (!width) width = 1
+      if (!height) height = 1
       // go through the row and see if there is an empty gap that fits cardWidth
       const gaps = groupByConsecutive(matrix[row], null)
       const maxGap = _.find(gaps, g => g.length >= width) || {
