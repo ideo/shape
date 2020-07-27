@@ -184,6 +184,7 @@ class CommentThreadHeader extends React.Component {
 
   render() {
     const { thread, sticky, onClick } = this.props
+    const { record } = this
     // Wrapper will render a button or div depending on onClick presence
     let Wrapper = StyledHeaderWrapper
     if (onClick) {
@@ -197,7 +198,7 @@ class CommentThreadHeader extends React.Component {
             {thread && (
               <CommentThumbnail
                 threadRecord={thread.record}
-                subjectRecord={this.record}
+                subjectRecord={record}
                 iconTop={this.titleLines === 1 ? 18 : 9}
                 useSubjectIcon={false}
               />
@@ -209,7 +210,7 @@ class CommentThreadHeader extends React.Component {
                 this.title = r
               }}
             >
-              {this.record.name}
+              {record.baseName || record.name}
             </span>
           </Flex>
 

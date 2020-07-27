@@ -3,7 +3,7 @@ import { fakeTestCollection, fakeQuestionItem } from '#/mocks/data'
 
 import fakeApiStore from '#/mocks/fakeApiStore'
 
-let wrapper, props, component
+let wrapper, props, component, rerender
 const testCollection = {
   ...fakeTestCollection,
   test_status: 'live',
@@ -24,8 +24,11 @@ describe('TestSurveyResponder', () => {
       collection: testCollection,
       apiStore: fakeApiStore(),
     }
-    wrapper = shallow(<TestSurveyResponder.wrappedComponent {...props} />)
-    component = wrapper.instance()
+    rerender = () => {
+      wrapper = shallow(<TestSurveyResponder.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
+    rerender()
   })
 
   describe('with a live survey', () => {
@@ -70,6 +73,38 @@ describe('TestSurveyResponder', () => {
       it('renders the ThemeProvider with secondary theme', () => {
         expect(component.theme).toEqual('secondary')
         expect(wrapper.find('ThemeProvider').exists()).toBe(true)
+      })
+    })
+
+    describe('with survey_response_for_user_id', () => {
+      beforeEach(() => {
+        testCollection.survey_response_for_user_id = '101'
+        rerender()
+      })
+
+      it('fetches the survey response', () => {
+        expect(props.apiStore.fetch).toHaveBeenCalledWith(
+          'survey_responses',
+          '101',
+          true
+        )
+      })
+
+      it('refetches the survey response if testCollection id changes', async () => {
+        props.apiStore.fetch.mockClear()
+        wrapper.setProps({
+          ...props,
+          collection: {
+            ...testCollection,
+            id: '999',
+            survey_response_for_user_id: '202',
+          },
+        })
+        expect(props.apiStore.fetch).toHaveBeenCalledWith(
+          'survey_responses',
+          '202',
+          true
+        )
       })
     })
   })

@@ -980,19 +980,6 @@ class Collection < ApplicationRecord
     response.completed? ? :completed : :in_progress
   end
 
-  def next_available_challenge_test(for_user:, omit_id: nil)
-    return nil unless challenge_submission_boxes.any?
-
-    # next test to review from the list of submission boxes in the challenge
-    next_test = nil
-    challenge_submission_boxes.each do |sb|
-      next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
-      # break early since it already found the next test
-      break if next_test.present?
-    end
-    next_test
-  end
-
   def default_group_id
     return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
@@ -1294,6 +1281,27 @@ class Collection < ApplicationRecord
     # Reset all memoized data
     @parent_challenge = @parent_submission_box_template = nil
     super(*args)
+  end
+
+  def lookup_reviewer_audience_for_current_user(current_user)
+    return nil unless current_user.present? && in_reviewer_group?(current_user)
+
+    # use master template test audience
+    test_audiences = template&.test_audiences
+
+    return nil unless test_audiences.present?
+
+    test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
+  end
+
+  def in_reviewer_group?(current_user)
+    return false unless inside_a_challenge?
+
+    reviewer_ids = parent_challenge&.challenge_reviewer_group&.user_ids
+
+    return false unless reviewer_ids.present?
+
+    reviewer_ids.include?(current_user.id)
   end
 
   private

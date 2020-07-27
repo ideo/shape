@@ -255,24 +255,42 @@ class CollectionCover extends React.Component {
   get launchTestButton() {
     const { collection, uiStore } = this.props
     if (!this.hasLaunchTestButton) return ''
-    let launchCollection = collection.launchTest
+    let launchMethod = 'launchTest'
     let buttonText = 'Start Feedback'
     if (collection.isLiveTest) {
       buttonText = 'Stop Feedback'
-      launchCollection = collection.closeTest
+      launchMethod = 'closeTest'
     } else if (collection.isClosedTest) {
       buttonText = 'Re-open Feedback'
-      launchCollection = collection.reopenTest
+      launchMethod = 'reopenTest'
     }
 
     return (
       <LaunchButton
         className="cancelGridClick"
-        onClick={launchCollection}
+        onClick={() => {
+          collection[launchMethod]()
+        }}
         disabled={uiStore.launchButtonLoading}
       >
         {buttonText}
       </LaunchButton>
+    )
+  }
+
+  get challengeReviewButton() {
+    const { collection } = this.props
+    const { submission_reviewer_status, isCurrentUserAReviewer } = collection
+    if (!isCurrentUserAReviewer || !submission_reviewer_status) {
+      return null
+    }
+    return (
+      <ChallengeReviewButton
+        reviewerStatus={submission_reviewer_status}
+        onClick={() => {
+          collection.navigateToTest()
+        }}
+      />
     )
   }
 
@@ -380,14 +398,7 @@ class CollectionCover extends React.Component {
       cardId,
       fontColor,
     } = this.props
-    const {
-      subtitle,
-      collection_type,
-      icon,
-      show_icon_on_cover,
-      submission_reviewer_status,
-      isCurrentUserAReviewer,
-    } = collection
+    const { subtitle, collection_type, icon, show_icon_on_cover } = collection
 
     const { gridW, gutter } = uiStore.gridSettings
     // Don't show collection/foamcore for selector since that will be shown in lower left of card
@@ -484,14 +495,7 @@ class CollectionCover extends React.Component {
                     <CollectionDateRange collection={collection} />
                   )}
                   {this.launchTestButton}
-                  {isCurrentUserAReviewer && submission_reviewer_status && (
-                    <ChallengeReviewButton
-                      reviewerStatus={submission_reviewer_status}
-                      onClick={() => {
-                        collection.navigateToNextAvailableTest()
-                      }}
-                    />
-                  )}
+                  {this.challengeReviewButton}
                   {this.collectionScore}
                   {this.hasUseTemplateButton && this.useTemplateButton}
                   {!this.hasLaunchTestButton && subtitle && (
