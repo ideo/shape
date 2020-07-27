@@ -1,7 +1,6 @@
 class Api::V1::TestCollectionsController < Api::V1::BaseController
   before_action :load_and_authorize_test_collection, only: %i[validate_launch launch close reopen add_comparison csv_report]
-  before_action :load_test_collection, only: %i[show next_available add_comparison remove_comparison]
-  before_action :load_submission_box_test_collection, only: %i[next_available]
+  before_action :load_test_collection, only: %i[show add_comparison remove_comparison]
   before_action :load_comparison_collection, only: %i[add_comparison remove_comparison]
 
   def show
@@ -44,19 +43,6 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       render_test_collection
     else
       render_api_errors @test_collection.errors
-    end
-  end
-
-  def next_available
-    test = @submission_box.random_next_submission_test(
-      for_user: current_user,
-      # don't want to re-get the same test again
-      omit_id: @test_collection.id,
-    ).first
-    if test.present? && test.collection_to_test.present?
-      render jsonapi: test.collection_to_test
-    else
-      render json: nil
     end
   end
 
@@ -114,15 +100,6 @@ class Api::V1::TestCollectionsController < Api::V1::BaseController
       id: json_api_params[:data][:comparison_collection_id],
     )
     if @comparison_collection.blank?
-      head(404)
-      return false
-    end
-    true
-  end
-
-  def load_submission_box_test_collection
-    @submission_box = @test_collection.parent_submission_box
-    unless @submission_box.present?
       head(404)
       return false
     end

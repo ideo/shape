@@ -37,7 +37,7 @@ class TestsController < ApplicationController
       # if you're invited to a test audience it'll set to `invalid` if that audience is closed
       @invalid = true unless @test_audience&.open?
     elsif @collection.live_challenge_submission_test?
-      look_up_challenge_test_audience
+      lookup_challenge_test_audience
       @invalid = true unless @test_audience&.open? || @collection.link_sharing_enabled?
     elsif !@collection.link_sharing_enabled?
       # if no test audience param, then you can only view the test if link_sharing_enabled
@@ -45,7 +45,7 @@ class TestsController < ApplicationController
     end
 
     # will reset to nil if no test_audience
-    session[:test_audience_id] = @test_audience&.id
+    session[:test_audience_id] = @test_audience&.id unless @collection.live_challenge_submission_test?
   end
 
   def look_up_test_audience
@@ -62,35 +62,28 @@ class TestsController < ApplicationController
     end
   end
 
-  def look_up_challenge_test_audience
+  def lookup_challenge_test_audience
     return unless user_signed_in? && current_user.present?
 
-    # use master template test audience
-    open_test_audiences = @collection&.template&.test_audiences&.open
-    return unless open_test_audiences.present? && open_test_audiences.any?
+    challenge_test_audience = @collection.lookup_reviewer_audience_for_current_user(current_user)
 
-    %i[challenge_participant_group challenge_admin_group challenge_reviewer_group].each do |challenge_group|
-      group = @collection&.parent_challenge&.send(challenge_group)
-
-      next unless group.present? && group.user_ids.include?(current_user.id)
-
-      group_name = group.name.split.last
-
-      # will set test audience to reviewer audience in-case user belongs to multiple challenge audiences
-      @test_audience ||= open_test_audiences.joins(:audience).find_by(audiences: { name: group_name })
-    end
+    # tests will share the same submission template reviewer test audience
+    @test_audience = challenge_test_audience
   end
 
   def redirect_to_test
     if @collection.challenge_or_inside_challenge? && !@collection.submission_box_template_test?
       @next_submission_test = @collection
-                              .parent_challenge
-                              .next_available_challenge_test(
+                              &.parent_submission_box
+                              &.random_next_submission_test(
                                 for_user: current_user,
                                 omit_id: @collection.id,
-                              )
+                              )&.first
+      if @collection&.collection_to_test.present?
+        redirect_to_collection_to_test(@collection.collection_to_test)
+      end
     elsif @collection.submission_box_template_test?
-      redirect_to "/tests/#{next_test.id}"
+      redirect_to_submission_box_test
     elsif @collection.collection_to_test.present?
       redirect_to_collection_to_test(@collection.collection_to_test)
     elsif @collection.submission_test?

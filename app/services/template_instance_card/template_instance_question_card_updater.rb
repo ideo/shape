@@ -18,7 +18,7 @@ module TemplateInstanceCard
       return unless test.is_a?(Collection::TestCollection) && test.draft?
 
       # Skip if we reach the ideas collection
-      return if @master_card.record.is_a?(Collection)
+      return if @master_card.record.is_a?(Collection) || @instance_card.item.nil?
 
       @instance_card.item.update(
         type: @master_card.item.type,

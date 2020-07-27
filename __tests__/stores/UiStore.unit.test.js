@@ -1,6 +1,10 @@
 import { runInAction } from 'mobx'
+import localStorage from 'mobx-localstorage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import UiStore from '~/stores/UiStore'
+import { ACTIVITY_LOG_PAGE_KEY } from '~/utils/variables'
+
+jest.mock('mobx-localstorage')
 
 let uiStore
 const fakeCollection = {
@@ -354,6 +358,16 @@ describe('UiStore', () => {
         it('should return the minimum of num_columns and 16', () => {
           expect(uiStore.maxCols(collection)).toEqual(4)
         })
+      })
+    })
+
+    describe('#setActivityLogPage', () => {
+      it('should set the local storage key for page', () => {
+        uiStore.setActivityLogPage('notifications')
+        expect(uiStore.activityLogPage).toEqual('notifications')
+        expect(localStorage.getItem(ACTIVITY_LOG_PAGE_KEY)).toEqual(
+          'notifications'
+        )
       })
     })
   })

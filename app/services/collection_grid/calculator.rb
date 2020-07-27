@@ -179,11 +179,12 @@ module CollectionGrid
       moving_cards:
     )
       master_card = nil
-      if from_collection.board_collection?
-        master_card = top_left_card(moving_cards)
-      else
+      moving_cards_without_position = moving_cards.any? { |cc| cc.row.nil? || cc.col.nil? }
+      if !from_collection.board_collection? || moving_cards_without_position
         # important to do this first to assign row/col onto the cards
         moving_cards = calculate_rows_cols(moving_cards)
+      else
+        master_card = top_left_card(moving_cards)
       end
 
       moving_cards = moving_cards_ordered_row_col(moving_cards)
@@ -199,6 +200,7 @@ module CollectionGrid
         # alter the master_position based on calculation
         row = placement.row
         col = placement.col
+
         unless placement.fit_entire_width
           # re-flow all the cards into a uniform sequential grid
           # and do this before determine_drag_map
@@ -281,7 +283,17 @@ module CollectionGrid
       # get the width span of the cards we're moving
       span = max_col - min_col
 
-      last_card = collection.collection_cards.ordered.last || Mashie.new(row: 0, col: 0, width: 0)
+      # reject erroneous cards
+      last_card = collection
+                  .collection_cards
+                  .ordered
+                  .reject { |card| card.row.nil? || card.col.nil? }
+                  .last
+
+      unless last_card&.col.present?
+        # placeholder so that calculations can still continue
+        last_card = Mashie.new(row: 0, col: 0, width: 0)
+      end
 
       last_row_open_width = collection.num_columns - (last_card.col + last_card.width)
 

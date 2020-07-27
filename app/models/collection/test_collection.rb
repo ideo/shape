@@ -107,7 +107,7 @@ class Collection
     after_create :add_test_tag
     after_create :add_child_roles
     after_create :setup_link_sharing_test_audience, unless: :collection_to_test
-    after_create :setup_challenge_test_audiences, unless: :collection_to_test
+    after_create :setup_challenge_test_audiences
     after_update :touch_test_results_collection, if: :saved_change_to_test_status?
     after_update :update_ideas_collection, if: :saved_change_to_test_show_media?
     after_update :archive_idea_questions, if: :now_in_collection_test_with_default_cards?
@@ -245,6 +245,7 @@ class Collection
           submission: true,
           template_test_id: id,
           launchable_test_id: launchable_test.id,
+          launchable_test_collection_to_test_id: launchable_test.collection_to_test_id,
           test_status: launchable_test.test_status,
         },
       )
@@ -746,7 +747,7 @@ class Collection
     end
 
     def live_challenge_submission_test?
-      challenge_or_inside_challenge? && !submission_box_template_test? && live?
+      challenge_or_inside_challenge? && submission_test? && !submission_box_template_test? && live?
     end
 
     private
@@ -786,6 +787,7 @@ class Collection
           submission_attrs: {
             template: true,
             launchable_test_id: id,
+            launchable_test_collection_to_test_id: collection_to_test_id,
             test_status: test_status,
           },
         )

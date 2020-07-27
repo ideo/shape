@@ -1,12 +1,14 @@
 import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
+import localStorage from 'mobx-localstorage'
 
 import sleep from '~/utils/sleep'
 import v, {
   TOUCH_DEVICE_OS,
   EVENT_SOURCE_TYPES,
   FOAMCORE_MAX_ZOOM,
+  ACTIVITY_LOG_PAGE_KEY,
 } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
@@ -157,7 +159,7 @@ export default class UiStore {
   @observable
   activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
   @observable
-  activityLogPage = null
+  activityLogPage = 'comments'
   @observable
   activityLogMoving = false
   @observable
@@ -870,6 +872,12 @@ export default class UiStore {
       : null
   }
 
+  @computed
+  get viewingCollectionId() {
+    const { viewingCollection } = this
+    return viewingCollection ? viewingCollection.id : null
+  }
+
   @action
   clearTextEditingItem() {
     this.textEditingItem = null
@@ -994,10 +1002,16 @@ export default class UiStore {
   }
 
   @action
+  setActivityLogPage(page) {
+    this.activityLogPage = page
+    localStorage.setItem(ACTIVITY_LOG_PAGE_KEY, page)
+  }
+
+  @action
   openOptionalMenus(opts = {}) {
     if (opts) {
       if (opts.open) {
-        this.activityLogPage = opts.open
+        this.setActivityLogPage(opts.open)
         this.activityLogOpen = true
       } else if (opts.manage_group_id) {
         // /shape.space/ideo?manage_group_id=123`
@@ -1072,14 +1086,14 @@ export default class UiStore {
   expandAndOpenThread(key) {
     // make sure the activityLog is open
     this.activityLogOpen = true
+    // when we expand a thread we also want it to set the ActivityLog to Comments
+    this.setActivityLogPage('comments')
     this.expandThread(key)
   }
 
   @action
   expandThread(key, { reset = false } = {}) {
     if (key) {
-      // when we expand a thread we also want it to set the ActivityLog to Comments
-      this.activityLogPage = 'comments'
       // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
       if (reset) this.expandedThreadKey = null
     } else {
