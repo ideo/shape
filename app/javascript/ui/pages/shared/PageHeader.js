@@ -481,7 +481,7 @@ class PageHeader extends React.Component {
         <StyledHeader
           pageHeader
           sticky={isSticky}
-          className="StickyHeader"
+          className={isSticky && 'StickyHeader'}
           data-empty-space-click
           bottomPadding={record.isCollection ? 0.2 : 1.875}
         >
