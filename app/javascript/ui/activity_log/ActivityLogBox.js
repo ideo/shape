@@ -172,13 +172,11 @@ class ActivityLogBox extends React.Component {
   }
 
   get liveTestCollectionId() {
-    const { apiStore, uiStore } = this.props
-    // HACK: use loadingThreads to observe whether we have fully loaded the current record
-    // e.g. navigating between tests; record.fullyLoaded did not trigger properly here
-    const { loadingThreads } = apiStore
-    const collection = uiStore.viewingCollection
-    if (!loadingThreads && collection) {
-      return collection.liveTestCollectionId
+    const { uiStore } = this.props
+    const { viewingCollection, viewingCollectionId } = uiStore
+    // this way we observe the change in viewingCollection by id
+    if (viewingCollectionId) {
+      return viewingCollection.liveTestCollectionId
     }
     return null
   }

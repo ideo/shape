@@ -78,6 +78,7 @@ describe('ActivityLogBox', () => {
           liveTestCollectionId: '100',
         })
         props.uiStore.viewingCollection = collectionWithTest
+        props.uiStore.viewingCollectionId = collectionWithTest.id
         reRender()
       })
 

@@ -872,6 +872,12 @@ export default class UiStore {
       : null
   }
 
+  @computed
+  get viewingCollectionId() {
+    const { viewingCollection } = this
+    return viewingCollection ? viewingCollection.id : null
+  }
+
   @action
   clearTextEditingItem() {
     this.textEditingItem = null
