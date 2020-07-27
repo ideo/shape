@@ -1,11 +1,15 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
+
 import Button from '~/ui/global/Button'
 import v from '~/utils/variables'
-import _ from 'lodash'
 
 const ChallengeReviewButton = ({ reviewerStatus, onClick }) => {
   const reviewButtonProps = {
-    style: { marginLeft: '3.2rem' },
+    style: {
+      margin: '0 auto',
+      display: 'block',
+    },
     className: 'cancelGridClick',
     size: 'sm',
     width: 172,
@@ -13,12 +17,10 @@ const ChallengeReviewButton = ({ reviewerStatus, onClick }) => {
   }
   if (reviewerStatus === 'completed') {
     name = 'Revisit'
-    _.merge(reviewButtonProps, {
-      style: {
-        backgroundColor: `${v.colors.transparent}`,
-        border: `1px solid ${v.colors.white}`,
-        color: `${v.colors.white}`,
-      },
+    _.merge(reviewButtonProps.style, {
+      backgroundColor: `${v.colors.transparent}`,
+      border: `1px solid ${v.colors.white}`,
+      color: `${v.colors.white}`,
     })
   } else {
     name = 'Review'

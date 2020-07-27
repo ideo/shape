@@ -63,7 +63,7 @@ describe('ChallengeHeaderButton', () => {
 describe('ReviewSubmissionsButton', () => {
   beforeEach(() => {
     props = {
-      record: fakeCollection,
+      record: { ...fakeCollection, isSubmissionBox: true },
     }
     rerender = () => {
       wrapper = shallow(<ReviewSubmissionsButton {...props} />)
@@ -72,9 +72,7 @@ describe('ReviewSubmissionsButton', () => {
 
   it('calls API_getNextAvailableTest to see if there are any tests to review', () => {
     rerender()
-    expect(props.record.API_getNextAvailableTest).toHaveBeenCalledWith({
-      challenge: true,
-    })
+    expect(props.record.API_getNextAvailableTest).toHaveBeenCalled()
   })
 
   describe('if user has no submissions to review', () => {

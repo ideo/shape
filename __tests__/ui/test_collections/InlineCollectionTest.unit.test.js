@@ -5,32 +5,35 @@ import { fakeCollection } from '#/mocks/data'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-let wrapper, props, uiStore, respondedTestCollection
+let wrapper, props, uiStore, respondedTestCollection, rerender
 const fakeTestCollection = {
   // NOTE: weird error when using fakeCollection and its fakeCollectionCards...
   // would get "maximum call stack", so we just create a simpler data set here
+  id: '101',
   question_cards: [{ id: '1', record: {} }],
 }
 
 describe('InlineCollectionTest', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     uiStore = fakeUiStore
+    fakeCollection.fullyLoaded = true
     uiStore.viewingCollection = fakeCollection
     props = {
       apiStore: fakeApiStore({
         requestResult: { data: fakeTestCollection },
       }),
       uiStore,
+      testCollectionId: '101',
     }
-    wrapper = await shallow(
-      <InlineCollectionTest.wrappedComponent {...props} />
-    )
-    wrapper.update()
+    rerender = () => {
+      wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+    }
+    rerender()
   })
 
   describe('render', () => {
     describe('with a test collection', () => {
-      beforeEach(async () => {
+      beforeEach(() => {
         const testCollection = {
           ...fakeTestCollection,
           survey_response_for_user_id: null,
@@ -39,11 +42,8 @@ describe('InlineCollectionTest', () => {
         props.apiStore = fakeApiStore({
           requestResult: { data: testCollection },
         })
-        props.uiStore.viewingCollection.live_test_collection = testCollection
-        wrapper = await shallow(
-          <InlineCollectionTest.wrappedComponent {...props} />
-        )
-        wrapper.update()
+        props.testCollectionId = testCollection.id
+        rerender()
       })
 
       it('should render a test survey responder with collection', () => {
@@ -57,7 +57,7 @@ describe('InlineCollectionTest', () => {
           requestResult: { data: {} },
         })
         props.uiStore.viewingCollection.live_test_collection = null
-        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+        rerender()
       })
 
       it('should not render the test survey responder', () => {
@@ -67,7 +67,8 @@ describe('InlineCollectionTest', () => {
 
     describe('with a closed test', () => {
       beforeEach(() => {
-        wrapper.setState({ noTestCollection: true })
+        props.testCollectionId = null
+        rerender()
       })
 
       it('it should render a survey closed message', () => {
@@ -77,16 +78,16 @@ describe('InlineCollectionTest', () => {
   })
 
   describe('componentDidMount', () => {
-    const testCollection = { ...fakeTestCollection, id: 99 }
+    const testCollection = { ...fakeTestCollection, id: '101' }
 
     beforeEach(() => {
-      props.uiStore.viewingCollection.live_test_collection = { id: 99 }
-      wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+      props.testCollectionId = '101'
+      rerender()
     })
 
     it('should fetch the test collection', () => {
       expect(props.apiStore.request).toHaveBeenCalledWith(
-        `test_collections/${testCollection.id}`
+        `test_collections/${props.testCollectionId}`
       )
     })
 
@@ -100,7 +101,7 @@ describe('InlineCollectionTest', () => {
         props.apiStore = fakeApiStore({
           requestResult: { data: respondedTestCollection },
         })
-        wrapper = shallow(<InlineCollectionTest.wrappedComponent {...props} />)
+        rerender()
       })
 
       it('should check for the next available test', () => {

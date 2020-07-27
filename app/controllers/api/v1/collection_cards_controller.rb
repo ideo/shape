@@ -94,7 +94,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def reviewer_statuses
     submissions = @collection_cards.map(&:record)
-    parent_challenge = submissions.first&.parent_challenge
+    parent_challenge = submissions&.first&.parent_challenge
+
+    return {} if parent_challenge.nil?
+
     result = SubmissionReviewerStatuses.call(
       challenge: parent_challenge,
       submissions: submissions,

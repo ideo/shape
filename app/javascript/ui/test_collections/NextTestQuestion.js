@@ -16,13 +16,8 @@ const FinishedEmojiHolder = styled.div`
 `
 
 const NextTestQuestion = ({ path }) => {
-  const isStandalone = path.indexOf('/tests/') === 0
   const goToNextTest = () => {
-    if (isStandalone) {
-      window.location = path
-    } else {
-      routingStore.routeTo(path)
-    }
+    routingStore.routeTo(path)
   }
 
   return (
