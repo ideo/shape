@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Flex } from 'reflexbox'
+import stickybits from 'stickybits'
 import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
@@ -91,6 +92,13 @@ class PageHeader extends React.Component {
   @observable
   iconAndTagsWidth = 0
   templateButtonRef = null
+
+  componentDidMount() {
+    const { uiStore } = this.props
+    if (uiStore.isIE) {
+      stickybits('.StickyHeader', { stickyBitStickyOffset: v.headerHeight + 4 })
+    }
+  }
 
   @action
   updateIconAndTagsWidth(ref) {
@@ -461,104 +469,110 @@ class PageHeader extends React.Component {
       (!record.isBoard || record.viewMode === 'list')
 
     return (
-      <StyledHeader
-        pageHeader
-        data-empty-space-click
-        bottomPadding={record.isCollection ? 0.2 : 1.875}
-      >
-        <MaxWidthContainer>
-          <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
-          {record.is_inside_a_challenge && (
-            <ChallengeSubHeader
-              challengeName={_.get(record, 'parentChallenge.name', '')}
-              challengeNavigationHandler={() => {
-                routingStore.routeTo('collections', record.parentChallenge.id)
-              }}
-            />
-          )}
-          <div style={{ minHeight: '72px', display: 'flex' }}>
-            <StyledTitleAndRoles
-              data-empty-space-click
-              className={record.isCurrentUserProfile ? 'user-profile' : ''}
-              justify="space-between"
-            >
-              <Flex
-                wrap
-                align="center"
-                className="title"
-                onClick={this.handleTitleClick}
-              >
-                {this.leftIcon}
-                <EditableName
-                  name={record.name}
-                  updateNameHandler={this.updateRecordName}
-                  canEdit={record.canEdit}
-                  extraWidth={this.iconAndTagsWidth}
-                  fieldName="recordName"
-                />
-                {/* Can't use <Flex> if we want to attach refs... */}
-                <div
-                  style={{ display: 'flex' }}
-                  ref={ref => {
-                    this.updateIconAndTagsWidth(ref)
-                  }}
-                >
-                  {this.rightIcon}
-                  {this.collectionLabelSelector}
-                  {this.hiddenIcon}
-                  {record.isLiveTest && (
-                    <LiveTestIndicator>Live</LiveTestIndicator>
-                  )}
-                  {this.collectionTypeOrInheritedTags}
-                </div>
-                <HeaderButtonContainer>
-                  {record.isChallengeOrInsideChallenge && (
-                    <ChallengePhasesIcons collection={record} />
-                  )}
-                  {this.renderTemplateButton}
-                  {this.renderRestoreButton}
-                  {this.renderSubmissionSubmitButton}
-                  {this.renderReopenTestButton}
-                  {this.renderJoinCollectionButton}
-                  {this.renderTestUi}
-                </HeaderButtonContainer>
-              </Flex>
-
-              {record.show_language_selector && (
-                <FixedRightContainer>
-                  <LanguageSelector />
-                </FixedRightContainer>
-              )}
-
-              {record.isChallengeOrInsideChallenge && (
-                <FixedRightContainer>
-                  <ChallengeHeaderButton
-                    record={record}
-                    parentChallenge={record.parentChallenge}
-                  />
-                </FixedRightContainer>
-              )}
-            </StyledTitleAndRoles>
-            {showFilterControls && (
-              <div style={{ marginBottom: '-16px', display: 'flex' }}>
-                <CollectionViewToggle collection={record} />
-                <CollectionFilter
-                  collection={record}
-                  // this is the one case where UserCollection breaks from
-                  // other system_required / canEdit restrictions
-                  canEdit={record.canEdit || record.isUserCollection}
-                />
-              </div>
+      <Fragment>
+        <StyledHeader
+          pageHeader
+          sticky
+          className="StickyHeader"
+          data-empty-space-click
+          bottomPadding={record.isCollection ? 0.2 : 1.875}
+        >
+          <MaxWidthContainer>
+            <RolesModal record={rolesRecord} open={!!uiStore.rolesMenuOpen} />
+            {record.is_inside_a_challenge && (
+              <ChallengeSubHeader
+                challengeName={_.get(record, 'parentChallenge.name', '')}
+                challengeNavigationHandler={() => {
+                  routingStore.routeTo('collections', record.parentChallenge.id)
+                }}
+              />
             )}
-          </div>
+            <div style={{ minHeight: '72px', display: 'flex' }}>
+              <StyledTitleAndRoles
+                data-empty-space-click
+                className={record.isCurrentUserProfile ? 'user-profile' : ''}
+                justify="space-between"
+              >
+                <Flex
+                  wrap
+                  align="center"
+                  className="title"
+                  onClick={this.handleTitleClick}
+                >
+                  {this.leftIcon}
+                  <EditableName
+                    name={record.name}
+                    updateNameHandler={this.updateRecordName}
+                    canEdit={record.canEdit}
+                    extraWidth={this.iconAndTagsWidth}
+                    fieldName="recordName"
+                  />
+                  {/* Can't use <Flex> if we want to attach refs... */}
+                  <div
+                    style={{ display: 'flex' }}
+                    ref={ref => {
+                      this.updateIconAndTagsWidth(ref)
+                    }}
+                  >
+                    {this.rightIcon}
+                    {this.collectionLabelSelector}
+                    {this.hiddenIcon}
+                    {record.isLiveTest && (
+                      <LiveTestIndicator>Live</LiveTestIndicator>
+                    )}
+                    {this.collectionTypeOrInheritedTags}
+                  </div>
+                  <HeaderButtonContainer>
+                    {record.isChallengeOrInsideChallenge && (
+                      <ChallengePhasesIcons collection={record} />
+                    )}
+                    {this.renderTemplateButton}
+                    {this.renderRestoreButton}
+                    {this.renderSubmissionSubmitButton}
+                    {this.renderReopenTestButton}
+                    {this.renderJoinCollectionButton}
+                    {this.renderTestUi}
+                  </HeaderButtonContainer>
+                </Flex>
+
+                {record.show_language_selector && (
+                  <FixedRightContainer>
+                    <LanguageSelector />
+                  </FixedRightContainer>
+                )}
+
+                {record.isChallengeOrInsideChallenge && (
+                  <FixedRightContainer>
+                    <ChallengeHeaderButton
+                      record={record}
+                      parentChallenge={record.parentChallenge}
+                    />
+                  </FixedRightContainer>
+                )}
+              </StyledTitleAndRoles>
+              {showFilterControls && (
+                <div style={{ marginBottom: '-16px', display: 'flex' }}>
+                  <CollectionViewToggle collection={record} />
+                  <CollectionFilter
+                    collection={record}
+                    // this is the one case where UserCollection breaks from
+                    // other system_required / canEdit restrictions
+                    canEdit={record.canEdit || record.isUserCollection}
+                  />
+                </div>
+              )}
+            </div>
+          </MaxWidthContainer>
+          <CollectionCardsTagEditorModal
+            canEdit={record.canEdit}
+            cards={this.cardsForTagging}
+            open={this.tagsEditorOpen}
+          />
+        </StyledHeader>
+        <MaxWidthContainer>
           {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
         </MaxWidthContainer>
-        <CollectionCardsTagEditorModal
-          canEdit={record.canEdit}
-          cards={this.cardsForTagging}
-          open={this.tagsEditorOpen}
-        />
-      </StyledHeader>
+      </Fragment>
     )
   }
 }

@@ -99,6 +99,14 @@ export const StyledHeader = styled.header`
       top: 0;
     `};
   }
+  ${props =>
+    props.sticky &&
+    `
+    background: ${hexToRgba(v.colors.commonLight, 0.96)};
+    position: sticky;
+    top: ${v.headerHeight + 4}px;
+    z-index: ${v.zIndex.globalHeader};
+  `}
 `
 StyledHeader.displayName = 'StyledHeader'
 StyledHeader.defaultProps = {

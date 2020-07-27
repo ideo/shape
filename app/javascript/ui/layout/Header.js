@@ -28,7 +28,6 @@ import Avatar from '~/ui/global/Avatar'
 import v, { EVENT_SOURCE_TYPES } from '~/utils/variables'
 import BasicHeader from '~/ui/layout/BasicHeader'
 import LoggedOutBasicHeader from '~/ui/layout/LoggedOutBasicHeader'
-import ChallengeFixedHeader from '~/ui/layout/ChallengeFixedHeader'
 import ChallengeSettingsModal from '~/ui/challenges/ChallengeSettingsModal'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
@@ -275,37 +274,6 @@ class Header extends React.Component {
     )
   }
 
-  renderChallengeFixedHeader() {
-    const { uiStore, routingStore, apiStore } = this.props
-    const { record } = this
-    const { shouldRenderFixedHeader } = uiStore
-    const { currentUser } = apiStore
-    const { reviewable_collections } = currentUser
-
-    return (
-      record &&
-      record.isChallengeOrInsideChallenge &&
-      shouldRenderFixedHeader && (
-        <ChallengeFixedHeader
-          collection={record}
-          showSettingsModal={uiStore.challengeSettingsOpen}
-          handleShowSettings={() =>
-            this.handleOpenChallengeSettings({ open: true })
-          }
-          handleReviewSubmissions={() => {
-            this.handleReviewSubmissions()
-          }}
-          challengeNavigationHandler={() => {
-            routingStore.routeTo('collections', record.parentChallenge.id)
-          }}
-          currentUserHasReviewableCollections={
-            !_.isEmpty(reviewable_collections)
-          }
-        />
-      )
-    )
-  }
-
   render() {
     const { record } = this
     const { apiStore, routingStore, uiStore } = this.props
@@ -456,7 +424,6 @@ class Header extends React.Component {
               onClose={() => this.handleOpenChallengeSettings({ open: false })}
             />
           )}
-          {this.renderChallengeFixedHeader()}
         </FixedHeader>
         <HeaderSpacer />
       </Fragment>
