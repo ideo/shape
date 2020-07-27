@@ -468,11 +468,19 @@ class PageHeader extends React.Component {
       // FoamcoreGrid displays its own fixed controls at the top
       (!record.isBoard || record.viewMode === 'list')
 
+    const isSticky =
+      record.isChallengeOrInsideChallenge ||
+      record.isLiveTest ||
+      record.isUsableTemplate ||
+      record.isMasterTemplate ||
+      record.is_restorable ||
+      record.isPublicJoinable
+
     return (
       <Fragment>
         <StyledHeader
           pageHeader
-          sticky
+          sticky={isSticky}
           className="StickyHeader"
           data-empty-space-click
           bottomPadding={record.isCollection ? 0.2 : 1.875}
