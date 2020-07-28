@@ -1287,7 +1287,7 @@ class Collection < ApplicationRecord
     reviewer_ids.include?(current_user.id)
   end
 
-  def lookup_user_challenge_audience
+  def lookup_user_challenge_audience(_current_user)
     nil
   end
 
