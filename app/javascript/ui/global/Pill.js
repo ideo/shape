@@ -102,15 +102,46 @@ const Pill = props => {
 }
 
 Pill.propTypes = {
+  /** The text to put into the pill */
   label: PropTypes.string,
+  /**
+   * A graphic symbol in put to the left side of the text on the pill which can
+   * be an svg or something else
+   */
   symbol: PropTypes.node,
+  /** The size of the symbol in px */
   symbolSize: PropTypes.number,
+  /**
+   * A function to call when the close / delete icon is clicked. Passing this
+   * prop will also render a default close icon on the pill
+   */
   onDelete: PropTypes.func,
+  /**
+   * An override for the default close icon for deleting the Pill
+   */
   deleteIcon: PropTypes.node,
+  /**
+   * A tag with all the same props as this component. This is used when we have
+   * a 3rd party library using the Pill that has it's own structure for the
+   * component that gets passed to pill.
+   */
   tag: PropTypes.object,
+  /**
+   * If the pill is possible to select, passing true will render a checkbox to
+   * the left size of the pill text.
+   */
   selectable: PropTypes.bool,
+  /**
+   * Keeps the state if the pill is selected, should only be used if `selectable`
+   * is being used
+   */
   selected: PropTypes.bool,
+  /**
+   * The function to call when the select checkbox is clicked, should only be
+   * used if `selectable` is being used
+   */
   onSelect: PropTypes.func,
+  /** A unique ID for the Pill, used to uniquely identify it */
   id: PropTypes.string,
 }
 
