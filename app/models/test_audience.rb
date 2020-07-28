@@ -59,7 +59,6 @@ class TestAudience < ApplicationRecord
   scope :challenge, -> { where(price_per_response: 0) }
   scope :link_sharing, -> { joins(:audience).where('price_per_response = 0 AND audiences.audience_type IS NULL') }
   scope :paid, -> { where('price_per_response > 0') }
-  scope :open, -> { where(open: true) }
 
   enum status: {
     open: 0,

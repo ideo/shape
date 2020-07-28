@@ -1106,6 +1106,49 @@ describe Collection, type: :model do
     end
   end
 
+  describe '#unreviewed_by?' do
+    let(:user) { create(:user) }
+    let(:submission) { create(:collection, :submission) }
+    let(:in_a_reviewer_group_with_audience) { true }
+
+    it 'should be true' do
+      expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(true)
+    end
+
+    describe 'when user is a reviewer with an audience and is tagged' do
+      before do
+        submission.update(user_tag_list: [user.handle])
+      end
+
+      it 'should be true' do
+        submission.reload
+        expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(true)
+      end
+    end
+
+    describe 'when user is a reviewer without an audience' do
+      let!(:in_a_reviewer_group_with_audience) { false }
+
+      it 'should be true' do
+        expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(true)
+      end
+    end
+
+    describe 'when reviewer has a completed response' do
+      let(:test_collection) { create(:test_collection, :completed) }
+      let(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection, user: user) }
+
+      before do
+        submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
+      end
+
+      it 'should be false' do
+        survey_response.reload
+        expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(false)
+      end
+    end
+  end
+
   # Caching methods
   context 'caching and stored attributes' do
     describe '#cache_key' do

@@ -1287,43 +1287,17 @@ class Collection < ApplicationRecord
     reviewer_ids.include?(current_user.id)
   end
 
-  def lookup_user_challenge_audience(current_user)
-    return nil unless inside_a_challenge? && test_collection? && current_user.present?
-
-    open_test_audiences = test_audiences&.open
-    return nil unless open_test_audiences.present? && open_test_audiences.any?
-
-    challenge_user_groups = lookup_user_challenge_groups(current_user)
-
-    return nil unless challenge_user_groups.any?
-
-    reviewer_audience = open_test_audiences.find { |a| a.name == 'Reviewers' }
-    admin_audience = open_test_audiences.find { |a| a.name == 'Admins' }
-    participant_audience = open_test_audiences.find { |a| a.name == 'Participants' }
-
-    challenge_user_groups.each do |user_group|
-      return reviewer_audience if parent_challenge.challenge_reviewer_group == user_group && reviewer_audience.present?
-      return admin_audience if parent_challenge.challenge_admin_group == user_group && admin_audience.present?
-      return participant_audience if parent_challenge.challenge_participant_group == user_group && participant_group.present?
-    end
-
-    # catch-all, the user does not belong to any challenge group whose test audience is open
+  def lookup_user_challenge_audience
     nil
   end
 
-  def lookup_user_challenge_groups(user)
-    return [] unless inside_a_challenge?
-
-    user.groups.where(id: [parent_challenge.challenge_reviewer_group_id,
-                           parent_challenge.challenge_admin_group_id,
-                           parent_challenge.challenge_participant_group_id])
-  end
-
-  def unreviewed_by?(user, in_a_reviewer_group)
+  def unreviewed_by?(user, in_a_reviewer_group_with_audience)
     return false if submission_reviewer_status(user) == :completed
-    return true unless in_a_reviewer_group
+    return true unless in_a_reviewer_group_with_audience
 
-    submission.cached_user_tag_list.exclude?(user&.handle)
+    return true unless user_tag_list.present? && user_tag_list.any?
+
+    user_tag_list.include?(user.handle)
   end
 
   private
@@ -1410,5 +1384,13 @@ class Collection < ApplicationRecord
     else
       self.icon = collection_type
     end
+  end
+
+  def lookup_user_challenge_groups(user)
+    return [] unless inside_a_challenge?
+
+    user.groups.where(id: [parent_challenge.challenge_reviewer_group_id,
+                           parent_challenge.challenge_admin_group_id,
+                           parent_challenge.challenge_participant_group_id])
   end
 end

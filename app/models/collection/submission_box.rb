@@ -135,15 +135,15 @@ class Collection
 
       test_ids = []
 
-      in_a_reviewer_group = false
+      has_challenge_group_with_audience = false
       if inside_a_challenge?
-        in_a_reviewer_group = lookup_user_challenge_audience(for_user).present?
+        has_challenge_group_with_audience = lookup_user_challenge_audience(for_user).present?
       end
 
       submissions.each do |submission|
         # only include reviewable submissions whose current user is tagged
         next unless submission.launchable_test_id.present?
-        next if inside_a_challenge? && submission.unreviewed_by?(for_user, in_a_reviewer_group)
+        next if inside_a_challenge? && submission.unreviewed_by?(for_user, has_challenge_group_with_audience)
 
         test_ids << submission.launchable_test_id
       end
