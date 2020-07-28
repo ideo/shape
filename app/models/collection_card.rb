@@ -14,6 +14,7 @@
 #  hidden            :boolean          default(FALSE)
 #  identifier        :string
 #  image_contain     :boolean          default(FALSE)
+#  is_background     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
 #  parent_snapshot   :jsonb

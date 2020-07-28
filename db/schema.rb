@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_26_174631) do
+ActiveRecord::Schema.define(version: 2020_07_28_220748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -137,6 +137,7 @@ ActiveRecord::Schema.define(version: 2020_06_26_174631) do
     t.string "font_color"
     t.boolean "font_background", default: false
     t.jsonb "parent_snapshot"
+    t.boolean "is_background", default: false
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
