@@ -23,6 +23,12 @@ const StyledJoinableGroupLabel = styled.div`
   }
 `
 
+/*
+ * A component that renders an avatar and some text side by side in a
+ * consistent manner
+ *
+ * @component
+ */
 class EntityAvatarAndName extends React.Component {
   get avatarUrl() {
     const { entity } = this.props
@@ -80,7 +86,9 @@ class EntityAvatarAndName extends React.Component {
 }
 
 EntityAvatarAndName.propTypes = {
+  /** The entity to render, a user, group, or something else */
   entity: MobxPropTypes.objectOrObservableObject.isRequired,
+  /** If it's a group that's public, this should be true */
   isJoinableGroup: PropTypes.bool,
 }
 
