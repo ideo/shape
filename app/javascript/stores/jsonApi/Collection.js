@@ -1284,25 +1284,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return _.get(this, 'user_tag_list', [])
   }
 
-  get isCurrentUserAReviewer() {
-    if (
-      !this.isSubmissionInChallenge ||
-      !this.isLiveTest ||
-      !this.currentReviewerHandles
-    ) {
+  get canBeReviewedByCurrentUser() {
+    if (!this.isSubmissionInChallenge || !this.isLiveTest) {
       return false
     }
 
-    const { apiStore } = this
-    const { currentUser } = apiStore
-
-    const currentUserIsAReviewer =
-      this.currentReviewerHandles.findIndex(
-        handle => handle === _.get(currentUser, 'handle')
-      ) > -1
-    return currentUserIsAReviewer
+    return this.can_review
   }
-
   // after we reorder a single card, we want to make sure everything goes into sequential order
   @action
   _reorderCards() {

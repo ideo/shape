@@ -970,6 +970,11 @@ class Collection < ApplicationRecord
     response.completed? ? :completed : :in_progress
   end
 
+  def can_review?(user)
+    audience = lookup_user_challenge_audience(user)
+    unreviewed_by?(user, audience.present?)
+  end
+
   def default_group_id
     return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
@@ -1278,26 +1283,26 @@ class Collection < ApplicationRecord
   end
 
   def in_reviewer_group?(current_user)
-    return false unless inside_a_challenge?
+    return false unless parent_challenge.present? && parent_challenge.challenge_reviewer_group.present?
 
-    reviewer_ids = parent_challenge&.challenge_reviewer_group&.user_ids
-
-    return false unless reviewer_ids.present?
-
-    reviewer_ids.include?(current_user.id)
+    current_user.has_role?(Role::MEMBER, parent_challenge.challenge_reviewer_group)
   end
 
-  def lookup_user_challenge_audience(_current_user)
-    nil
+  def lookup_user_challenge_audience(current_user)
+    return nil unless submission? && launchable_test_id.present?
+
+    test = Collection::TestCollection.find launchable_test_id
+
+    return nil unless test.present?
+
+    test.lookup_user_challenge_audience(current_user)
   end
 
   def unreviewed_by?(user, in_a_reviewer_group_with_audience)
     return false if submission_reviewer_status(user) == :completed
-    return true unless in_a_reviewer_group_with_audience
+    return true unless in_a_reviewer_group_with_audience && in_reviewer_group?(user)
 
-    return true unless user_tag_list.present? && user_tag_list.any?
-
-    user_tag_list.include?(user.handle)
+    tagged_users.include?(user)
   end
 
   private

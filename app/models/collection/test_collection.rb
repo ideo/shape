@@ -767,7 +767,7 @@ class Collection
       challenge_user_groups.each do |user_group|
         return reviewer_audience if parent_challenge.challenge_reviewer_group == user_group && reviewer_audience.present?
         return admin_audience if parent_challenge.challenge_admin_group == user_group && admin_audience.present?
-        return participant_audience if parent_challenge.challenge_participant_group == user_group && participant_group.present?
+        return participant_audience if parent_challenge.challenge_participant_group == user_group && participant_audience.present?
       end
 
       # catch-all, the user does not belong to any challenge group whose test audience is open

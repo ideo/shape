@@ -56,7 +56,7 @@ class ChallengeListCard extends React.Component {
   @computed
   get columnsWithChallengeContent() {
     const { columns, record, submissionsCollection } = this.props
-    const { isCurrentUserAReviewer, submission_reviewer_status } = record
+    const { canBeReviewedByCurrentUser, submission_reviewer_status } = record
 
     return _.map(columns, column => {
       if (column.name === 'reviewers') {
@@ -81,7 +81,7 @@ class ChallengeListCard extends React.Component {
           )
         }
       }
-      if (column.name === 'actions' && isCurrentUserAReviewer) {
+      if (column.name === 'actions' && canBeReviewedByCurrentUser) {
         column.overrideContent = () =>
           submission_reviewer_status && (
             <ChallengeReviewButton
