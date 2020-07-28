@@ -14,6 +14,12 @@ const NoGridWrapper = styled.div`
   padding: 5px;
 `
 
+/*
+ * Creates a "popover" modal, a small modal that opens anchored to an element
+ * and doesn't include any background blurring.
+ *
+ * @component
+ */
 class InlineModal extends React.PureComponent {
   handleCancel = ev => {
     ev.preventDefault()
@@ -90,13 +96,27 @@ class InlineModal extends React.PureComponent {
 }
 
 InlineModal.propTypes = {
+  /** Whether the modal is open */
   open: PropTypes.bool.isRequired,
+  /** The children of the modal, what it's inner content is */
   children: PropTypes.node,
+  /** The function to call when clicking the default modal confirm button */
   onConfirm: PropTypes.func,
+  /** The function to call when clicking the default modal cancel button */
   onCancel: PropTypes.func,
+  /**
+   * A button to appear on the left bottom of the modal, should be passed
+   * unless noButtons is true
+   */
   leftButton: PropTypes.node,
+  /** A component to anchor the popover to, it will appear beside it */
   anchorElement: PropTypes.node,
+  /** The function to call when clicking the default modal cancel button */
   noButtons: PropTypes.bool,
+  /**
+   * Origin elements for the anchor, follows MaterialUI's Popover prop
+   * of the same name
+   */
   anchorOrigin: PropTypes.shape({
     horizontal: PropTypes.string,
     vertical: PropTypes.string,
