@@ -1446,7 +1446,6 @@ class FoamcoreGrid extends React.Component {
       uiStore,
       canEditCollection,
       selectedAreaMinX,
-      submissionSettings,
     } = this.props
     const { num_columns } = collection
     const { blankContentToolState, blankContentToolIsOpen } = uiStore
@@ -1494,21 +1493,6 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
-    if (submissionSettings) {
-      // add the card for "Add your submission here"
-      cards.unshift({
-        width: 1,
-        height: 1,
-        // this card should be first
-        col: 0,
-        row: 0,
-        id: 'submission',
-        cardType: 'submission',
-        parent_id: collection.id,
-        submissionSettings,
-      })
-    }
-
     cards = _.map(cards, this.renderCard)
 
     if (canEditCollection && !this.dragging) {
@@ -1518,6 +1502,25 @@ class FoamcoreGrid extends React.Component {
     }
 
     return cards
+  }
+
+  renderAddSubmission() {
+    const { collection, submissionSettings } = this.props
+    if (!submissionSettings) {
+      return
+    }
+    // add the card for "Add your submission here"
+    return this.renderCard({
+      width: 1,
+      height: 1,
+      // this card should be first
+      col: 0,
+      row: 0,
+      id: 'submission',
+      cardType: 'submission',
+      parent_id: collection.id,
+      submissionSettings,
+    })
   }
 
   // render the MDL placeholder to be draggable from the MoveSnackbar
@@ -1633,6 +1636,7 @@ class FoamcoreGrid extends React.Component {
         )}
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}
+        {this.renderAddSubmission()}
         {this.renderMdlPlaceholder()}
         {this.renderHotspots()}
         {this.renderVisibleCards()}
