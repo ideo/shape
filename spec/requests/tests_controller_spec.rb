@@ -89,10 +89,10 @@ describe TestsController, type: :request do
           let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
           let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
           let(:master_test) do
-            create(:test_collection, :with_reviewers_audience, parent_collection: submission_template, master_template: true)
+            create(:test_collection, parent_collection: submission_template, master_template: true)
           end
           let!(:test_collection) do
-            create(:test_collection, :launched, parent_collection: submission, template_id: master_test.id)
+            create(:test_collection, :with_reviewers_audience, :launched, parent_collection: submission, template_id: master_test.id)
           end
           before do
             submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })

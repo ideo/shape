@@ -926,8 +926,8 @@ describe Collection, type: :model do
       end
 
       context 'if user is not assigned as a reviewer' do
-        it 'returns nil' do
-          expect(submission.submission_reviewer_status(reviewer)).to be_nil
+        it 'returns unstarted' do
+          expect(submission.submission_reviewer_status(reviewer)).to eq(:unstarted)
         end
       end
 
@@ -1003,25 +1003,11 @@ describe Collection, type: :model do
       end
       it 'should lookup reviewer audience' do
         expect(test_collection
-          .lookup_reviewer_audience_for_current_user(reviewer)).to eq(master_test
+          .lookup_user_challenge_audience(reviewer)).to eq(test_collection
                                                                       .test_audiences
                                                                       .joins(:audience)
                                                                       .find_by(audiences: { name: 'Reviewers' }))
       end
-    end
-  end
-
-  describe 'challenge_reviewer?' do
-    let(:parent_challenge) { create(:collection, collection_type: 'challenge') }
-    let!(:collection) { create(:collection, parent_collection: parent_challenge) }
-    let(:user) { create(:user, handle: 'challenge-reviewer') }
-
-    before do
-      collection.update(user_tag_list: user.handle)
-    end
-
-    it 'returns true when user_tag_list includes the user handle' do
-      expect(collection.challenge_reviewer?(user)).to be true
     end
   end
 
