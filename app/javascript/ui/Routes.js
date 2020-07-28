@@ -9,6 +9,7 @@ import _ from 'lodash'
 import ActivityLogBox from '~/ui/activity_log/ActivityLogBox'
 import DialogWrapper from '~/ui/global/modals/DialogWrapper'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
+import SelectedArea from '~/ui/global/SelectedArea'
 import ZendeskWidget from '~/ui/global/ZendeskWidget'
 import AppendUtmParams from '~/utils/googleAnalytics/AppendUtmParams'
 import Header from '~/ui/layout/Header'
@@ -77,19 +78,6 @@ const FixedActivityLogWrapper = styled.div`
   position: fixed;
   top: 0;
   z-index: ${v.zIndex.activityLog};
-`
-
-const SelectedArea = styled.div.attrs(({ coords }) => ({
-  style: {
-    left: `${coords.left}px`,
-    top: `${coords.top}px`,
-    height: `${coords.height}px`,
-    width: `${coords.width}px`,
-  },
-}))`
-  background-color: rgba(192, 219, 222, 0.4);
-  position: absolute;
-  z-index: ${v.zIndex.clickWrapper};
 `
 
 // withRouter allows it to respond automatically to routing changes in props
@@ -226,19 +214,6 @@ class Routes extends React.Component {
     }
   }
 
-  // Props for the div that shows area selected
-  get selectedAreaStyleProps() {
-    const {
-      selectedArea: { minX, maxX, minY, maxY },
-    } = this.props.uiStore
-    return {
-      top: minY,
-      left: minX,
-      height: maxY - minY,
-      width: maxX - minX,
-    }
-  }
-
   goToRoot = () => {
     const { apiStore } = this.props
     if (apiStore.currentOrgSlug) {
@@ -254,8 +229,9 @@ class Routes extends React.Component {
   }
 
   render() {
-    const { apiStore, routingStore } = this.props
+    const { apiStore, uiStore, routingStore } = this.props
     const { sessionLoaded, currentUser } = apiStore
+    const { selectedAreaEnabled } = uiStore
     if (!sessionLoaded) {
       return <Loader />
     }
@@ -264,10 +240,6 @@ class Routes extends React.Component {
       currentUser &&
       (!termsAccepted || termsAccepted === 'outdated') &&
       !routingStore.pathContains('/terms')
-
-    const {
-      uiStore: { selectedAreaEnabled },
-    } = apiStore
 
     return (
       <AppWrapper
@@ -278,9 +250,7 @@ class Routes extends React.Component {
         id="AppWrapper"
       >
         <LowerRightCorner />
-        {selectedAreaEnabled && (
-          <SelectedArea coords={this.selectedAreaStyleProps} />
-        )}
+        {selectedAreaEnabled && <SelectedArea />}
         <ErrorBoundary>
           <MuiThemeProvider theme={MuiTheme}>
             {/* Global components are rendered here */}

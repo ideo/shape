@@ -221,7 +221,6 @@ class FoamcoreGrid extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { collection, uiStore } = this.props
-    this.updateSelectedArea()
     if (collection.id !== prevProps.collection.id) {
       uiStore.determineZoomLevels(collection)
     }
@@ -383,7 +382,7 @@ class FoamcoreGrid extends React.Component {
     const { pageMargins } = this
     if (!this.gridRef) return { min: null, max: null }
 
-    const top = window.scrollY || window.pageYOffset
+    const top = window.pageYOffset
     const gridHeight = window.innerHeight - pageMargins.top
 
     const min = parseFloat((top / this.cardAndGutterHeight).toFixed(1))
@@ -404,7 +403,7 @@ class FoamcoreGrid extends React.Component {
     const { pageMargins } = this
     if (!this.gridRef) return { min: null, max: null }
 
-    const left = window.scrollX || window.pageXOffset
+    const left = window.pageXOffset
     const gridWidth = window.innerWidth - pageMargins.left
 
     const min = parseFloat((left / this.cardAndGutterWidth).toFixed(1))
@@ -514,67 +513,13 @@ class FoamcoreGrid extends React.Component {
     return !!this.getDraggedOnSpot(coords)
   }
 
-  // Adjusts global x,y coords to foamcore grid coords
-  get selectedAreaAdjustedForGrid() {
-    const { pageMargins } = this
-    const { selectedArea } = this.props
-    let { minX, minY, maxX, maxY } = selectedArea
-
-    // If no area is selected, return null values
-    if (minX === null) return selectedArea
-
-    // Adjust coordinates by page margins
-    minX -= pageMargins.left
-    minY -= pageMargins.top
-    maxX -= pageMargins.left
-    maxY -= pageMargins.top
-
-    // If the user is selecting outside of the grid,
-    // set to 0 if the bottom of selected area is over the grid
-    if (minX < 0 && maxX > 0) minX = 0
-    if (minY < 0 && maxY > 0) minY = 0
-
-    return {
-      minX,
-      minY,
-      maxX,
-      maxY,
-    }
-  }
-
-  updateSelectedArea = () => {
-    const { collection, uiStore } = this.props
-    const { minX, minY, maxX, maxY } = this.selectedAreaAdjustedForGrid
-
-    // Check if there is a selected area
-    if (minX === null) return
-
-    // Select all cards that this drag rectangle 'touches'
-    const topLeftCoords = this.coordinatesForPosition({
-      x: minX,
-      y: minY,
-    })
-    const bottomRightCoords = this.coordinatesForPosition({
-      x: maxX,
-      y: maxY,
-    })
-
-    // Return if it couldn't find cards in both positions
-    if (!topLeftCoords || !bottomRightCoords) return
-
-    let selectedCardIds = collection.cardIdsWithinRectangle(
-      topLeftCoords,
-      bottomRightCoords
-    )
-    if (uiStore.selectedAreaShifted) {
-      selectedCardIds = _.union(selectedCardIds, uiStore.selectedCardIds)
-    }
-    console.log(collection.id, [...selectedCardIds])
-    uiStore.reselectCardIds(selectedCardIds)
+  get selectedAreaMinX() {
+    return this.props.uiStore.selectedArea.minX
   }
 
   handleBlankCardClick = ({ row, col, create = false }) => e => {
-    const { apiStore, uiStore, collection, selectedAreaMinX } = this.props
+    const { selectedAreaMinX } = this
+    const { apiStore, uiStore, collection } = this.props
 
     // If user is selecting an area, don't trigger blank card click
     if (selectedAreaMinX) {
@@ -1441,12 +1386,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderBlanksAndBct() {
-    const {
-      collection,
-      uiStore,
-      canEditCollection,
-      selectedAreaMinX,
-    } = this.props
+    const { collection, uiStore, canEditCollection } = this.props
+    const { selectedAreaMinX } = this
     const { num_columns } = collection
     const { blankContentToolState, blankContentToolIsOpen } = uiStore
 
@@ -1653,8 +1594,6 @@ FoamcoreGrid.propTypes = {
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
   blankContentToolState: MobxPropTypes.objectOrObservableObject,
   loadCollectionCards: PropTypes.func.isRequired,
-  selectedArea: MobxPropTypes.objectOrObservableObject.isRequired,
-  selectedAreaMinX: PropTypes.number,
   sorting: PropTypes.bool,
   cardIdMenuOpen: PropTypes.string,
   submissionSettings: PropTypes.shape({
@@ -1670,7 +1609,6 @@ FoamcoreGrid.wrappedComponent.propTypes = {
 FoamcoreGrid.defaultProps = {
   blankContentToolState: {},
   sorting: false,
-  selectedAreaMinX: null,
   cardIdMenuOpen: null,
   submissionSettings: null,
 }

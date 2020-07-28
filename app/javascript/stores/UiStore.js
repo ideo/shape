@@ -223,6 +223,7 @@ export default class UiStore {
   selectedAreaShifted = false
   @observable
   selectedAreaEnabled = false
+  cardPositions = []
   @observable
   linkedBreadcrumbTrail = []
   @observable
@@ -342,8 +343,61 @@ export default class UiStore {
 
   @action
   setSelectedArea(selectedArea, { shifted = false } = {}) {
+    const { viewingCollection } = this
     this.selectedArea = selectedArea
     this.selectedAreaShifted = shifted
+
+    if (viewingCollection && viewingCollection.isBoard) {
+      this.selectCardsWithinSelectedArea()
+    }
+  }
+
+  @action
+  resetCardPositions() {
+    this.cardPositions = []
+  }
+
+  @action
+  setCardPosition(cardId, { top, right, bottom, left } = {}) {
+    const idx = _.findIndex(this.cardPositions, { cardId })
+    const data = { cardId, position: { top, right, bottom, left } }
+    if (idx >= 0) {
+      this.cardPositions[idx] = data
+      return
+    }
+    this.cardPositions.push(data)
+  }
+
+  @action
+  selectCardsWithinSelectedArea() {
+    const { minX, minY, maxX, maxY } = this.selectedArea
+    const { selectedCardIds, selectedAreaShifted } = this
+    let newSelectedCardIds = []
+
+    if (minY === null || minX === null) {
+      // or select none??
+      return
+    }
+
+    const scrollTop = window.pageYOffset
+
+    newSelectedCardIds = _.map(
+      _.filter(this.cardPositions, pos => {
+        const { top, right, bottom, left } = pos.position
+        return !(
+          right < minX ||
+          left > maxX ||
+          bottom + scrollTop < minY ||
+          top + scrollTop > maxY
+        )
+      }),
+      'cardId'
+    )
+
+    if (selectedAreaShifted) {
+      newSelectedCardIds = _.union(newSelectedCardIds, selectedCardIds)
+    }
+    this.reselectCardIds(newSelectedCardIds)
   }
 
   @action

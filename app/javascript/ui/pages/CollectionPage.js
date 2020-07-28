@@ -69,7 +69,7 @@ class CollectionPage extends React.Component {
 
   @action
   componentDidUpdate(prevProps) {
-    const { collection, routingStore } = this.props
+    const { collection, uiStore, routingStore } = this.props
     const {
       collection: { id: previousId },
     } = prevProps
@@ -82,7 +82,8 @@ class CollectionPage extends React.Component {
       ChannelManager.unsubscribeAllFromChannel(this.channelName)
       this.subscribeToChannel(currentId)
       // when navigating between collections, close BCT
-      this.props.uiStore.closeBlankContentTool()
+      uiStore.closeBlankContentTool()
+      uiStore.resetCardPositions()
       this.setViewingRecordAndRestoreScrollPosition()
       this.loadCollectionCards({})
       routingStore.updateScrollState(previousId, window.pageYOffset)
@@ -454,12 +455,7 @@ class CollectionPage extends React.Component {
 
   renderSubmissionsCollection() {
     const { collection, uiStore, apiStore } = this.props
-    const {
-      blankContentToolState,
-      gridSettings,
-      loadedSubmissions,
-      selectedArea,
-    } = uiStore
+    const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
     const {
       submissions_collection,
       submission_box_type,
@@ -507,9 +503,6 @@ class CollectionPage extends React.Component {
             template: submission_template,
             enabled: submissions_enabled,
           }}
-          selectedArea={selectedArea}
-          // Included so that component re-renders when area changes
-          selectedAreaMinX={selectedArea.minX}
         />
       )
     } else {
@@ -627,7 +620,6 @@ class CollectionPage extends React.Component {
       blankContentToolState,
       submissionBoxSettingsOpen,
       gridSettings,
-      selectedArea,
     } = uiStore
 
     // props shared by Foamcore + Normal
@@ -662,14 +654,7 @@ class CollectionPage extends React.Component {
         />
       )
     } else if (collection.isBoard) {
-      inner = (
-        <FoamcoreGrid
-          {...genericCollectionProps}
-          selectedArea={selectedArea}
-          // Included so that component re-renders when area changes
-          selectedAreaMinX={selectedArea.minX}
-        />
-      )
+      inner = <FoamcoreGrid {...genericCollectionProps} />
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {

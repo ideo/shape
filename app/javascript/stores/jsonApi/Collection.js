@@ -284,22 +284,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return cardIds
   }
 
-  cardIdsWithinRectangle(minCoords, maxCoords) {
-    const rowRange = _.range(minCoords.row, maxCoords.row + 1)
-    const colRange = _.range(minCoords.col, maxCoords.col + 1)
-
-    const matrix = this.cardMatrix
-    const cardIds = []
-    _.each(rowRange, row => {
-      _.each(colRange, col => {
-        const card = matrix[row] && matrix[row][col]
-        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
-      })
-    })
-
-    return cardIds
-  }
-
   get shouldShowEditWarning() {
     if (!this.isTemplate || this.template_num_instances === 0) return false
     // if we already have the confirmation open, don't try to re-open

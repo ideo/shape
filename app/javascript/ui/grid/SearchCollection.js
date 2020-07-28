@@ -99,7 +99,7 @@ class SearchCollection extends React.Component {
 
   renderTop() {
     const { uiStore, collection, trackCollectionUpdated } = this.props
-    const { blankContentToolState, gridSettings, selectedArea } = uiStore
+    const { blankContentToolState, gridSettings } = uiStore
 
     const genericCollectionProps = {
       collection,
@@ -115,28 +115,14 @@ class SearchCollection extends React.Component {
     // TODO: remove this switch between Foamcore and Normal Grid, only needed for now;
     // operating in a hybrid context where search collections may/not be 4WFC
     if (collection.isBoard) {
-      return (
-        <FoamcoreGrid
-          {...genericCollectionProps}
-          selectedArea={selectedArea}
-          // Included so that component re-renders when area changes
-          selectedAreaMinX={selectedArea.minX}
-        />
-      )
+      return <FoamcoreGrid {...genericCollectionProps} />
     }
 
     return (
       <CollectionGrid
         {...gridSettings}
         {...genericCollectionProps}
-        loadCollectionCards={this.loadCollectionCards}
-        trackCollectionUpdated={trackCollectionUpdated}
-        blankContentToolState={blankContentToolState}
-        cardProperties={collection.cardProperties}
-        collection={collection}
-        canEditCollection={collection.can_edit_content}
         shouldAddEmptyRow={false}
-        movingCardIds={[]}
       />
     )
   }
@@ -144,7 +130,6 @@ class SearchCollection extends React.Component {
   render() {
     const { uiStore, collection, trackCollectionUpdated } = this.props
     const { searchResultsCollection } = collection
-    const { selectedArea } = uiStore
     // const { gridSettings } = uiStore
     if (uiStore.isLoading || collection.reloading) {
       return <Loader />
@@ -161,9 +146,6 @@ class SearchCollection extends React.Component {
         cardProperties={this.searchCardProperties}
         canEditCollection={false}
         movingCardIds={[]}
-        selectedArea={selectedArea}
-        // Included so that component re-renders when area changes
-        selectedAreaMinX={selectedArea.minX}
         renderOnly
       />
     )
