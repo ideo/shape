@@ -5,6 +5,12 @@ import Avatar, { AvatarPropTypes } from '~/ui/global/Avatar'
 import AvatarGroup from '~/ui/global/AvatarGroup'
 import { StyledRolesSummary } from '~/ui/roles/RolesSummary'
 
+/*
+ * Avatar list, a list of moudlars side by side, including an add button at the
+ * end.
+ *
+ * @component
+ */
 const AvatarList = ({ avatars, onAdd }) => {
   return (
     <StyledRolesSummary>
@@ -32,7 +38,9 @@ const AvatarList = ({ avatars, onAdd }) => {
 }
 
 AvatarList.propTypes = {
+  /** The list of avatars to render */
   avatars: PropTypes.arrayOf(PropTypes.shape(AvatarPropTypes)).isRequired,
+  /** A function called when you click the add button */
   onAdd: PropTypes.func.isRequired,
 }
 

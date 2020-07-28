@@ -67,6 +67,11 @@ const StyledAvatar = styled(MuiAvatar)`
   }
 `
 
+/*
+ * An avatar with an small, circular image, mainly used to show users and groups
+ *
+ * @component
+ */
 @observer
 class Avatar extends React.Component {
   @observable

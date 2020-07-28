@@ -51,7 +51,11 @@ const SymbolHolder = styled.span`
   height: ${props => props.symbolSize || 16}px;
   margin-right: ${props => (props.selectable ? 6 : 12)}px;
 `
-
+/*
+ * A modular box that can list pieces of data like tags.
+ *
+ * @component
+ */
 const Pill = props => {
   const {
     label,
