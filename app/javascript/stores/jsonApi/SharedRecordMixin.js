@@ -327,20 +327,17 @@ const SharedRecordMixin = superclass =>
       return _.compact(taggedUsers)
     }
 
-    initializeTags = async () => {
-      const userTagsWithUsers = await Promise.all(
-        _.map(this.user_tag_list, async tag => {
-          const userSearch = await this.apiStore.searchUsers({ query: tag })
-          // NOTE: assumes that the first search result is the user described in the tag
-          const user = _.get(userSearch, 'data[0]')
+    initializeTags = () => {
+      const { tagged_users } = this
+      const userTagsWithUsers = _.map(tagged_users, user => {
+        if (user) {
           return {
-            label: tag,
+            label: user.handle,
             type: 'user_tag_list',
-            user: user.toJSON(), // how do we not use .toJSON() here
+            user: user.toJSON(),
           }
-        })
-      )
-
+        }
+      })
       const tagList = []
       const tagListKeys = _.get(this, 'isChallengeOrInsideChallenge')
         ? ['tag_list', 'topic_list']
