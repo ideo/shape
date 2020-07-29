@@ -117,7 +117,8 @@ class Collection < ApplicationRecord
                  :loading_content,
                  :cached_inheritance,
                  :common_viewable,
-                 :broadcasting
+                 :broadcasting,
+                 :background_image_url
 
   # validations
   validates :name, presence: true
@@ -887,6 +888,14 @@ class Collection < ApplicationRecord
     return if cover.nil?
 
     cover.update(is_cover: false)
+    touch
+  end
+
+  def clear_background_image
+    bg_card = primary_collection_cards.where(is_background: true).first
+    return if bg_card.nil?
+
+    bg_card.update(is_background: false)
     touch
   end
 
