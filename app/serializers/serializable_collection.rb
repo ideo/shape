@@ -189,6 +189,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.test_collection.id.to_s
   end
 
+  attribute :parent_submission_box, if: -> { @object.is_a?(Collection::TestCollection) } do
+    @object.parent_submission_box
+  end
+
   attribute :awaiting_updates do
     @object.awaiting_updates?
   end
