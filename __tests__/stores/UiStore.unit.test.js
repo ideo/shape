@@ -370,5 +370,13 @@ describe('UiStore', () => {
         )
       })
     })
+
+    describe('#setBodyBackgroundImage', () => {
+      it('should set the style on document.body', () => {
+        const img = 'http://img.url/123'
+        uiStore.setBodyBackgroundImage(img)
+        expect(document.body.style['background-image']).toEqual(`url(${img})`)
+      })
+    })
   })
 })

@@ -26,14 +26,15 @@ describe('CardCoverEditor', () => {
   beforeEach(() => {
     card = fakeCollectionCard
     card.record = {
-      id: 3,
-      internalType: 'collections',
-      API_fetchCards: jest.fn(),
-      API_updateNameAndCover: jest.fn(),
+      ...fakeCollection,
+      id: '3',
       collection_cards: [
         { id: 1, record: { id: 1, name: '', filestack_file_url: '' } },
       ],
       sortedCoverCards: [
+        { id: 1, record: { id: 1, name: 'CoverImg', imageUrl: jest.fn() } },
+      ],
+      sortedBackgroundCards: [
         { id: 1, record: { id: 1, name: 'CoverImg', imageUrl: jest.fn() } },
       ],
       cover: {
@@ -76,12 +77,14 @@ describe('CardCoverEditor', () => {
   })
 
   describe('renderInner()', () => {
-    it('should render the QuickOptionSelectors for images and filters', () => {
-      expect(innerWrapper.find('QuickOptionSelector').length).toEqual(2)
-    })
+    describe('with a collection', () => {
+      it('should render the QuickOptionSelectors for cover, bg images, and filters', () => {
+        expect(innerWrapper.find('QuickOptionSelector').length).toEqual(3)
+      })
 
-    it('should render a TextareaAutosize for editing card titles', () => {
-      expect(innerWrapper.find('TextareaAutosize').length).toEqual(1)
+      it('should render a TextareaAutosize for editing card title and subtitle', () => {
+        expect(innerWrapper.find('TextareaAutosize').length).toEqual(2)
+      })
     })
 
     describe('with a VideoItem that has no thumbnail_url', () => {
@@ -97,7 +100,7 @@ describe('CardCoverEditor', () => {
         })
       })
 
-      it('should not render the second QuickOptionSelector for filters', () => {
+      it('should only render the single option selector for cover images', () => {
         expect(innerWrapper.find('QuickOptionSelector').length).toEqual(1)
       })
     })
@@ -115,8 +118,8 @@ describe('CardCoverEditor', () => {
 
     it('should set the list of options from the api', async () => {
       await component.populateAllImageOptions()
-      expect(component.imageOptions.length).toEqual(4)
-      expect(component.imageOptions.map(i => i.title)).toEqual([
+      expect(component.coverImageOptions.length).toEqual(4)
+      expect(component.coverImageOptions.map(i => i.title)).toEqual([
         'remove image',
         'CoverImg',
         'gray',
@@ -143,11 +146,20 @@ describe('CardCoverEditor', () => {
     })
   })
 
-  describe('onImageOpionSelect', () => {
+  describe('onImageOptionSelect', () => {
     describe('with an image', () => {
-      it('should set the selecteds card cover to true', () => {})
+      beforeEach(() => {
+        apiStore.find.mockReset()
+        apiStore.find.mockReturnValue(collection)
+        collection.patch.mockReset()
+        component.onImageOptionSelect({ cardId: 'something' })
+      })
 
-      it('should save the card', () => {})
+      it('should update the selected card cover to true', () => {
+        expect(collection.patch).toHaveBeenCalledWith({
+          attributes: { is_cover: true },
+        })
+      })
     })
 
     describe('with a remove action', () => {
@@ -158,12 +170,6 @@ describe('CardCoverEditor', () => {
       })
 
       describe('when removing a collection cover', () => {
-        beforeEach(() => {
-          apiStore.find.mockReset()
-          apiStore.find.mockReturnValue(collection)
-          component.onImageOptionSelect({ type: 'remove' })
-        })
-
         it('should call clear collection cover for the collection', () => {
           expect(collection.API_clearCollectionCover).toHaveBeenCalled()
         })
@@ -194,7 +200,49 @@ describe('CardCoverEditor', () => {
     describe('with an upload action', () => {
       beforeEach(() => {
         component.onImageOptionSelect({ type: 'upload' })
-        wrapper.update()
+      })
+
+      it('should call the filestack upload picker', () => {
+        expect(FilestackUpload.pickImage).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('onBackgroundImageOptionSelect', () => {
+    describe('with an image', () => {
+      beforeEach(() => {
+        apiStore.find.mockReset()
+        apiStore.find.mockReturnValue(collection)
+        collection.patch.mockReset()
+        component.onBackgroundImageOptionSelect({ cardId: 'something' })
+      })
+
+      it('should update the selected card cover to true', () => {
+        expect(collection.patch).toHaveBeenCalledWith({
+          attributes: { is_background: true },
+        })
+      })
+    })
+
+    describe('with a remove action', () => {
+      beforeEach(() => {
+        apiStore.find.mockReset()
+        apiStore.find.mockReturnValue(collection)
+        component.onBackgroundImageOptionSelect({ type: 'remove' })
+      })
+
+      it('should call clear collection cover for the collection', () => {
+        expect(collection.API_clearBackgroundImage).toHaveBeenCalled()
+      })
+
+      it('should close the selector', () => {
+        expect(uiStore.setEditingCardCover).toHaveBeenCalledWith(null)
+      })
+    })
+
+    describe('with an upload action', () => {
+      beforeEach(() => {
+        component.onBackgroundImageOptionSelect({ type: 'upload' })
       })
 
       it('should call the filestack upload picker', () => {

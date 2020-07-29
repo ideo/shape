@@ -854,6 +854,8 @@ export default class UiStore {
       return
     if (this.viewingRecord) this.previousViewingRecord = this.viewingRecord
     this.viewingRecord = record
+    // background_image_url could be null in which case we are un-setting the background
+    this.setBodyBackgroundImage(record.background_image_url)
     this.deselectCards()
   }
 
@@ -876,6 +878,18 @@ export default class UiStore {
   get viewingCollectionId() {
     const { viewingCollection } = this
     return viewingCollection ? viewingCollection.id : null
+  }
+
+  setBodyBackgroundImage(image_url) {
+    if (image_url) {
+      _.assign(document.body.style, {
+        'background-image': `url('${image_url}')`,
+      })
+    } else {
+      _.assign(document.body.style, {
+        'background-image': null,
+      })
+    }
   }
 
   @action

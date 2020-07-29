@@ -1266,13 +1266,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @computed
-  // hidden is actually shown first for these to better surface uploaded covers
   get sortedCoverCards() {
-    return _.orderBy(
-      _.filter(this.collection_cards, card => card.record.isImage),
-      ['hidden', 'order'],
-      ['desc', 'asc']
+    const filteredCards = _.filter(
+      this.collection_cards,
+      card =>
+        card.record.isImage &&
+        (!card.section_type || card.section_type === 'cover')
     )
+    return _.orderBy(
+      filteredCards,
+      // hidden is actually shown first for these to better surface uploaded covers
+      ['hidden', 'order', 'row', 'col', 'updated_at'],
+      ['desc', 'asc', 'asc', 'asc', 'desc']
+    )
+  }
+
+  @computed
+  get sortedBackgroundCards() {
+    const filteredCards = _.filter(
+      this.collection_cards,
+      card => card.section_type === 'background'
+    )
+    return _.orderBy(filteredCards, ['order', 'updated_at'], ['asc', 'desc'])
   }
 
   get isChallengeOrInsideChallenge() {
@@ -1549,6 +1564,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
           'Unable to change the collection cover. This may be a special collection that you cannot edit.'
         )
       })
+  }
+
+  API_clearBackgroundImage() {
+    this.background_image_url = null
+    return this.apiStore.request(
+      `collections/${this.id}/clear_background_image`,
+      'POST'
+    )
   }
 
   async API_fetchChallengeReviewersGroup() {

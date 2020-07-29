@@ -103,6 +103,7 @@ class CollectionPage extends React.Component {
   setViewingRecordAndRestoreScrollPosition() {
     const { collection, uiStore } = this.props
     // setViewingRecord has to happen first bc we use it in openBlankContentTool
+    // this will also determine if there is a background image for this collection and set it
     uiStore.setViewingRecord(collection)
     this.restoreWindowScrollPosition()
   }

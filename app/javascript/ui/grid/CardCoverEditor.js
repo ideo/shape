@@ -116,7 +116,9 @@ const filterOptions = [
 @observer
 class CardCoverEditor extends React.Component {
   @observable
-  imageOptions = []
+  coverImageOptions = []
+  @observable
+  backgroundImageOptions = []
   @observable
   parentCard = null
   @observable
@@ -145,8 +147,7 @@ class CardCoverEditor extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.isEditingCardCover !== this.props.isEditingCardCover) {
-      const { card } = this.props
-      const { record } = card
+      const { record } = this
 
       if (
         record.name === this.cardTitle &&
@@ -165,6 +166,10 @@ class CardCoverEditor extends React.Component {
     }
   }
 
+  get record() {
+    return this.props.card.record
+  }
+
   @action
   setLoading(val) {
     this.loading = val
@@ -174,9 +179,17 @@ class CardCoverEditor extends React.Component {
     return this.props.card.record.internalType === 'collections'
   }
 
-  async fetchOptions() {
-    const { card } = this.props
-    const { record } = card
+  fetchOptions() {
+    const { record } = this
+    if (!this.recordIsCollection) {
+      return
+    }
+    const collection = record
+    return collection.API_fetchCards({ hidden: true })
+  }
+
+  get coverImageBaseOptions() {
+    const { record } = this
     if (!this.recordIsCollection) {
       if (!record.previous_thumbnail_urls) return []
       return record.previous_thumbnail_urls.map(url => ({
@@ -184,10 +197,23 @@ class CardCoverEditor extends React.Component {
         imageUrl: url,
       }))
     }
+    return this.imageBaseOptions('cover')
+  }
+
+  get backgroundImageBaseOptions() {
+    return this.imageBaseOptions('background')
+  }
+
+  imageBaseOptions(type = 'cover') {
+    const { record } = this
+    if (!this.recordIsCollection) {
+      return []
+    }
     const collection = record
-    await collection.API_fetchCards({ hidden: true })
+    const sortMethod =
+      type === 'cover' ? 'sortedCoverCards' : 'sortedBackgroundCards'
     return _.take(
-      collection.sortedCoverCards.map(card => ({
+      collection[sortMethod].map(card => ({
         cardId: card.id,
         title: card.record.name,
         imageUrl: card.record.imageUrl({ resize: { width: 128 } }),
@@ -197,10 +223,11 @@ class CardCoverEditor extends React.Component {
   }
 
   async populateAllImageOptions() {
-    const { record } = this.props.card
+    const { record } = this
     this.setLoading(true)
-    const imageOptionsAll = await this.fetchOptions()
+    await this.fetchOptions()
     this.setLoading(false)
+
     let bgOption = null
     if (this.recordIsCollection) {
       bgOption = collectionBackgroundOption
@@ -208,17 +235,27 @@ class CardCoverEditor extends React.Component {
       bgOption = linkBackgroundOption
     }
     runInAction(() => {
-      const options = [removeOption, ...imageOptionsAll]
+      const options = [removeOption, ...this.coverImageBaseOptions]
       if (bgOption) options.push(bgOption)
       options.push(uploadOption)
-      this.imageOptions = options
+      this.coverImageOptions = options
+
+      this.backgroundImageOptions = [
+        removeOption,
+        ...this.backgroundImageBaseOptions,
+        uploadOption,
+      ]
     })
   }
 
-  createCard = async file => {
+  createCard = async (file, type = 'cover') => {
     const { apiStore, card } = this.props
-    const collection = apiStore.find('collections', card.record.id)
-    await collection.API_clearCollectionCover()
+    const collection = card.record
+    const isCover = type === 'cover'
+    const isBackground = type === 'background'
+    if (isCover) {
+      await collection.API_clearCollectionCover()
+    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.FILE,
@@ -232,8 +269,10 @@ class CardCoverEditor extends React.Component {
       row: 0,
       col: 0,
       parent_id: collection.id,
-      is_cover: true,
+      is_cover: isCover,
+      is_background: isBackground,
       hidden: true,
+      section_type: type,
     }
     Object.assign(cardAttrs, attrs)
     const newCard = new CollectionCard(cardAttrs, apiStore)
@@ -300,7 +339,7 @@ class CardCoverEditor extends React.Component {
   }
 
   handleRestore = async ev => {
-    const { record } = this.props.card
+    const { record } = this
     const meta = await parseURLMeta(record.url)
     runInAction(() => {
       this.hardcodedSubtitle = meta.description
@@ -310,7 +349,7 @@ class CardCoverEditor extends React.Component {
 
   @action
   setObservableInputs = () => {
-    const { record } = this.props.card
+    const { record } = this
     const { name } = record
     this.cardTitle = name || record.url
     if (record.isCollection) {
@@ -322,9 +361,10 @@ class CardCoverEditor extends React.Component {
   }
 
   async clearCover() {
-    const { apiStore, card } = this.props
-    if (card.record.internalType === 'collections') {
-      const collection = apiStore.find('collections', card.record.id)
+    const { card } = this.props
+    const { recordIsCollection } = this
+    if (recordIsCollection) {
+      const collection = card.record
       return collection.API_clearCollectionCover()
     }
     const item = card.record
@@ -332,33 +372,55 @@ class CardCoverEditor extends React.Component {
     return item.save()
   }
 
+  async clearBackground() {
+    const collection = this.props.card.record
+    return collection.API_clearBackgroundImage()
+  }
+
   onImageOptionSelect = async option => {
     const { apiStore, uiStore, card } = this.props
+    const { recordIsCollection } = this
     uiStore.setEditingCardCover(null)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
-      selectedCard.is_cover = true
-      await selectedCard.save()
+      await selectedCard.patch({ attributes: { is_cover: true } })
     } else if (option.type === 'remove') {
       await this.clearCover()
     } else if (option.type === 'upload') {
-      const afterPickAction =
-        card.record.internalType === 'collections'
-          ? this.createCard
-          : this.changeCover
+      const afterPickAction = recordIsCollection
+        ? this.createCard
+        : this.changeCover
       FilestackUpload.pickImage({
         onSuccess: file => afterPickAction(file),
       })
-    } else if (!this.recordIsCollection && option.imageUrl) {
+    } else if (!recordIsCollection && option.imageUrl) {
       // we are picking a previous_thumbnail_url
       const item = card.record
       // update back to the selected one
       item.thumbnail_url = option.imageUrl
       item.save()
     }
-    if (this.recordIsCollection) {
+    if (recordIsCollection) {
       apiStore.fetch('collections', card.record.id, true)
     }
+  }
+
+  onBackgroundImageOptionSelect = async option => {
+    const { apiStore, uiStore, card } = this.props
+    const collection = card.record
+
+    uiStore.setEditingCardCover(null)
+    if (option.cardId) {
+      const selectedCard = apiStore.find('collection_cards', option.cardId)
+      await selectedCard.patch({ attributes: { is_background: true } })
+    } else if (option.type === 'remove') {
+      await collection.API_clearBackgroundImage()
+    } else if (option.type === 'upload') {
+      FilestackUpload.pickImage({
+        onSuccess: file => this.createCard(file, 'background'),
+      })
+    }
+    apiStore.fetch('collections', collection.id, true)
   }
 
   onFilterOptionSelect = async option => {
@@ -384,7 +446,7 @@ class CardCoverEditor extends React.Component {
   }
 
   get showFilters() {
-    const { record } = this.props.card
+    const { record } = this
     const { thumbnail_url, isLink } = record
     if (this.recordIsCollection) return true
     if (isLink) return true
@@ -431,6 +493,7 @@ class CardCoverEditor extends React.Component {
 
   renderInner() {
     const { uiStore, card } = this.props
+    const { recordIsCollection } = this
     const { record } = card
     const { gridSettings } = uiStore
     const { gridW } = gridSettings
@@ -446,9 +509,21 @@ class CardCoverEditor extends React.Component {
               <MediumBreak />
               <h3>Cover</h3>
               <QuickOptionSelector
-                options={toJS(this.imageOptions)}
+                options={toJS(this.coverImageOptions)}
                 onSelect={this.onImageOptionSelect}
               />
+
+              {recordIsCollection && (
+                <Fragment>
+                  <MediumBreak />
+                  <h3>Background Image</h3>
+                  <QuickOptionSelector
+                    options={toJS(this.backgroundImageOptions)}
+                    onSelect={this.onBackgroundImageOptionSelect}
+                  />
+                </Fragment>
+              )}
+
               <MediumBreak />
               <h3>Icon</h3>
               <CollectionIconSelector
