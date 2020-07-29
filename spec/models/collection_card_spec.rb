@@ -578,7 +578,8 @@ RSpec.describe CollectionCard, type: :model do
   end
 
   describe '#update_collection_background' do
-    let(:collection) { create(:collection) }
+    # give this one a parent so it has a parent card
+    let!(:collection) { create(:collection, parent_collection: create(:collection)) }
     let!(:image_item) do
       create(:collection_card_image, parent: collection, section_type: 'background', is_background: true)
     end
@@ -597,7 +598,7 @@ RSpec.describe CollectionCard, type: :model do
       it 'should touch collection and unset any other cards is_background attribute' do
         expect {
           new_background
-        }.to change(collection, :updated_at)
+        }.to change(collection.parent_collection_card, :updated_at)
         expect(new_background.reload.is_background).to be true
         expect(image_item.reload.is_background).to be false
       end

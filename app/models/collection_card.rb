@@ -499,6 +499,8 @@ class CollectionCard < ApplicationRecord
     else
       parent.update(background_image_url: nil)
     end
+    # doing this to ensure cache is definitely busted
+    parent.touch
   end
 
   # used by serializer to have multiple "versions" of a card, one per idea

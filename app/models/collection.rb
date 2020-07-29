@@ -893,10 +893,12 @@ class Collection < ApplicationRecord
 
   def clear_background_image
     bg_card = primary_collection_cards.where(is_background: true).first
-    return if bg_card.nil?
+    if bg_card.nil?
+      update(background_image_url: nil)
+      return
+    end
 
     bg_card.update(is_background: false)
-    touch
   end
 
   def reset_permissions!
