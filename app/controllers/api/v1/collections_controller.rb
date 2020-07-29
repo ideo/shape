@@ -1,14 +1,14 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover]
+  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover clear_background_image]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
-  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover]
+  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover clear_background_image]
   after_action :broadcast_parent_collection_card_update, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -62,6 +62,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def clear_collection_cover
     @parent_collection = @collection.parent
     @collection.clear_collection_cover
+    @collection.reload
+    render_collection
+  end
+
+  def clear_background_image
+    @collection.clear_background_image
     @collection.reload
     render_collection
   end

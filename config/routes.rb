@@ -34,6 +34,7 @@ Rails.application.routes.draw do
           get 'challenge_phase_collections'
           get 'challenge_reviewers'
           post 'clear_collection_cover'
+          post 'clear_background_image'
           patch 'submit'
           patch 'restore_permissions'
           post 'background_update_template_instances'
