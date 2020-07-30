@@ -204,7 +204,7 @@ class MoveHelperModal extends React.Component {
             {this.helperText}
           </StyledSpecialDisplayHeading>
           {currentUser.show_template_helper &&
-            type == 'template' &&
+            type === 'template' &&
             this.renderModalButtons}
           <StyledFormControl component="fieldset" required>
             <FormControlLabel

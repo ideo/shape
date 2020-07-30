@@ -617,6 +617,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :height,
       :image_contain,
       :is_cover,
+      :is_background,
       :filter,
       :show_replace,
       :order,
@@ -725,6 +726,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       item_id
       image_contain
       is_cover
+      is_background
       filter
       hidden
       show_replace

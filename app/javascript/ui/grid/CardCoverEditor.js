@@ -1,14 +1,17 @@
-import { Fragment } from 'react'
-import ReactDOM from 'react-dom'
 import _ from 'lodash'
+import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
+import { CompactPicker } from 'react-color'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
+import Modal from '~/ui/global/modals/Modal'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
 import CollectionIconSelector from '~/ui/grid/CollectionIconSelector'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
@@ -18,9 +21,9 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import TextareaAutosize from 'react-autosize-textarea'
-import { CloseButton, NamedActionButton } from '~/ui/global/styled/buttons'
+import { NamedActionButton } from '~/ui/global/styled/buttons'
 import PropTypes from 'prop-types'
-import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import CheckboxWithLabel from '~/ui/global/CheckboxWithLabel'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import parseURLMeta from '~/utils/parseURLMeta'
 
@@ -44,25 +47,11 @@ const linkBackgroundOption = {
   title: 'black',
   color: v.colors.black,
 }
-
-const TopRightHolderWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  max-width: ${props => props.maxWidth}px;
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  z-index: ${v.zIndex.gridCardTop};
-  opacity: 0.9;
-  align-items: stretch;
-  background: ${v.colors.primaryLight};
-  min-height: ${v.defaultGridSettings.gridH}px;
-`
-TopRightHolderWrapper.displayName = 'TopRightHolderWrapper'
-
-const TopRightHolder = styled.div`
-  margin: 14px 14px 0px;
-`
+const pickColorOption = {
+  type: 'color',
+  title: 'font color',
+  icon: <ColorPickerIcon />,
+}
 
 const StyledEditTitle = styled.div`
   display: flex;
@@ -116,9 +105,9 @@ const filterOptions = [
 @observer
 class CardCoverEditor extends React.Component {
   @observable
-  imageOptions = []
+  coverImageOptions = []
   @observable
-  parentCard = null
+  backgroundImageOptions = []
   @observable
   loading = false
   @observable
@@ -127,26 +116,40 @@ class CardCoverEditor extends React.Component {
   hardcodedSubtitle = '' // overrides cover text set by text items
   @observable
   subtitleHidden = false
+  @observable
+  fontColorPickerOpen = false
+
+  constructor(props) {
+    super(props)
+    this.saveFontColor = _.debounce(this._saveFontColor, 2000)
+  }
 
   componentDidMount() {
     const { card, uiStore } = this.props
     const { record } = card
     this.setObservableInputs()
     runInAction(() => {
-      // this references the id in GridCard.js
-      this.parentCard = document.getElementById(`gridCard-${card.id}`)
       if (uiStore.isNewCard(record.id) && record.isLink) {
         this.populateAllImageOptions()
         uiStore.setEditingCardCover(card.id)
-        this.props.uiStore.removeNewCard(record.id)
+        uiStore.removeNewCard(record.id)
       }
     })
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.isEditingCardCover !== this.props.isEditingCardCover) {
-      const { card } = this.props
-      const { record } = card
+    const { isEditingCardCover, pageMenu } = this.props
+    if (prevProps.isEditingCardCover !== isEditingCardCover) {
+      const { record } = this
+
+      if (isEditingCardCover) {
+        // just opened
+        if (pageMenu) {
+          this.setObservableInputs()
+          this.populateAllImageOptions()
+        }
+        return
+      }
 
       if (
         record.name === this.cardTitle &&
@@ -155,14 +158,21 @@ class CardCoverEditor extends React.Component {
       ) {
         return
       }
-
-      // only update when there are changes
+      // only update when you close the editor and there are changes
       record.API_updateNameAndCover({
         name: this.cardTitle,
         hardcodedSubtitle: this.hardcodedSubtitle,
         subtitleHidden: this.subtitleHidden,
       })
     }
+  }
+
+  componentWillUnmount() {
+    this.saveFontColor.flush()
+  }
+
+  get record() {
+    return this.props.card.record
   }
 
   @action
@@ -174,9 +184,19 @@ class CardCoverEditor extends React.Component {
     return this.props.card.record.internalType === 'collections'
   }
 
-  async fetchOptions() {
-    const { card } = this.props
-    const { record } = card
+  fetchOptions() {
+    const { record } = this
+    if (!this.recordIsCollection) {
+      return
+    }
+    const collection = record
+    // fetch the full collection to get the styles
+    collection.refetch()
+    return collection.API_fetchCards({ hidden: true })
+  }
+
+  get coverImageBaseOptions() {
+    const { record } = this
     if (!this.recordIsCollection) {
       if (!record.previous_thumbnail_urls) return []
       return record.previous_thumbnail_urls.map(url => ({
@@ -184,10 +204,24 @@ class CardCoverEditor extends React.Component {
         imageUrl: url,
       }))
     }
+    return this.imageBaseOptions('cover')
+  }
+
+  get backgroundImageBaseOptions() {
+    // TODO: if background_image_url is set, but the card comes from above??
+    return this.imageBaseOptions('background')
+  }
+
+  imageBaseOptions(type = 'cover') {
+    const { record } = this
+    if (!this.recordIsCollection) {
+      return []
+    }
     const collection = record
-    await collection.API_fetchCards({ hidden: true })
+    const sortMethod =
+      type === 'cover' ? 'sortedCoverCards' : 'sortedBackgroundCards'
     return _.take(
-      collection.sortedCoverCards.map(card => ({
+      collection[sortMethod].map(card => ({
         cardId: card.id,
         title: card.record.name,
         imageUrl: card.record.imageUrl({ resize: { width: 128 } }),
@@ -197,10 +231,11 @@ class CardCoverEditor extends React.Component {
   }
 
   async populateAllImageOptions() {
-    const { record } = this.props.card
+    const { record } = this
     this.setLoading(true)
-    const imageOptionsAll = await this.fetchOptions()
+    await this.fetchOptions()
     this.setLoading(false)
+
     let bgOption = null
     if (this.recordIsCollection) {
       bgOption = collectionBackgroundOption
@@ -208,17 +243,27 @@ class CardCoverEditor extends React.Component {
       bgOption = linkBackgroundOption
     }
     runInAction(() => {
-      const options = [removeOption, ...imageOptionsAll]
+      const options = [removeOption, ...this.coverImageBaseOptions]
       if (bgOption) options.push(bgOption)
       options.push(uploadOption)
-      this.imageOptions = options
+      this.coverImageOptions = options
+
+      this.backgroundImageOptions = [
+        removeOption,
+        ...this.backgroundImageBaseOptions,
+        uploadOption,
+      ]
     })
   }
 
-  createCard = async file => {
-    const { apiStore, card } = this.props
-    const collection = apiStore.find('collections', card.record.id)
-    await collection.API_clearCollectionCover()
+  createCard = async (file, type = 'cover') => {
+    const { apiStore, uiStore, card, pageMenu } = this.props
+    const collection = card.record
+    const isCover = type === 'cover'
+    const isBackground = type === 'background'
+    if (isCover) {
+      await collection.API_clearCollectionCover()
+    }
     const attrs = {
       item_attributes: {
         type: ITEM_TYPES.FILE,
@@ -232,8 +277,10 @@ class CardCoverEditor extends React.Component {
       row: 0,
       col: 0,
       parent_id: collection.id,
-      is_cover: true,
+      is_cover: isCover,
+      is_background: isBackground,
       hidden: true,
+      section_type: type,
     }
     Object.assign(cardAttrs, attrs)
     const newCard = new CollectionCard(cardAttrs, apiStore)
@@ -242,6 +289,10 @@ class CardCoverEditor extends React.Component {
     await newCard.API_create()
     // get collection with new collection_cover info attached
     apiStore.fetch('collections', collection.id, true)
+    if (isBackground && pageMenu) {
+      // set this, which otherwise happens on page load
+      uiStore.setBodyBackgroundImage(collection.backgroundImageUrl)
+    }
     this.setLoading(false)
   }
 
@@ -264,7 +315,7 @@ class CardCoverEditor extends React.Component {
   }
 
   @action
-  onToggleSubtitleCheckbox = async e => {
+  onToggleSubtitleCheckbox = () => {
     this.subtitleHidden = !this.subtitleHidden
   }
 
@@ -300,7 +351,7 @@ class CardCoverEditor extends React.Component {
   }
 
   handleRestore = async ev => {
-    const { record } = this.props.card
+    const { record } = this
     const meta = await parseURLMeta(record.url)
     runInAction(() => {
       this.hardcodedSubtitle = meta.description
@@ -310,8 +361,9 @@ class CardCoverEditor extends React.Component {
 
   @action
   setObservableInputs = () => {
-    const { record } = this.props.card
+    const { record } = this
     const { name } = record
+    this.fontColorPickerOpen = false
     this.cardTitle = name || record.url
     if (record.isCollection) {
       this.hardcodedSubtitle = record.subtitleForEditing
@@ -322,9 +374,10 @@ class CardCoverEditor extends React.Component {
   }
 
   async clearCover() {
-    const { apiStore, card } = this.props
-    if (card.record.internalType === 'collections') {
-      const collection = apiStore.find('collections', card.record.id)
+    const { card } = this.props
+    const { recordIsCollection } = this
+    if (recordIsCollection) {
+      const collection = card.record
       return collection.API_clearCollectionCover()
     }
     const item = card.record
@@ -332,33 +385,55 @@ class CardCoverEditor extends React.Component {
     return item.save()
   }
 
+  async clearBackground() {
+    const collection = this.props.card.record
+    return collection.API_clearBackgroundImage()
+  }
+
   onImageOptionSelect = async option => {
     const { apiStore, uiStore, card } = this.props
+    const { recordIsCollection } = this
     uiStore.setEditingCardCover(null)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
-      selectedCard.is_cover = true
-      await selectedCard.save()
+      await selectedCard.patch({ attributes: { is_cover: true } })
     } else if (option.type === 'remove') {
       await this.clearCover()
     } else if (option.type === 'upload') {
-      const afterPickAction =
-        card.record.internalType === 'collections'
-          ? this.createCard
-          : this.changeCover
+      const afterPickAction = recordIsCollection
+        ? this.createCard
+        : this.changeCover
       FilestackUpload.pickImage({
         onSuccess: file => afterPickAction(file),
       })
-    } else if (!this.recordIsCollection && option.imageUrl) {
+    } else if (!recordIsCollection && option.imageUrl) {
       // we are picking a previous_thumbnail_url
       const item = card.record
       // update back to the selected one
       item.thumbnail_url = option.imageUrl
       item.save()
     }
-    if (this.recordIsCollection) {
-      apiStore.fetch('collections', card.record.id, true)
+    if (recordIsCollection) {
+      card.record.refetch()
     }
+  }
+
+  onBackgroundImageOptionSelect = async option => {
+    const { apiStore, uiStore, card } = this.props
+    const collection = card.record
+
+    uiStore.setEditingCardCover(null)
+    if (option.cardId) {
+      const selectedCard = apiStore.find('collection_cards', option.cardId)
+      await selectedCard.patch({ attributes: { is_background: true } })
+    } else if (option.type === 'remove') {
+      await collection.API_clearBackgroundImage()
+    } else if (option.type === 'upload') {
+      FilestackUpload.pickImage({
+        onSuccess: file => this.createCard(file, 'background'),
+      })
+    }
+    collection.refetch()
   }
 
   onFilterOptionSelect = async option => {
@@ -368,23 +443,65 @@ class CardCoverEditor extends React.Component {
   }
 
   onCustomIconSelect = iconName => {
-    const {
-      card: { record },
-    } = this.props
+    const { record } = this
     record.icon = iconName
     record.save()
   }
 
+  get titleFontOptions() {
+    const { fontColor } = this.record
+    const options = [{ ...removeOption, title: 'reset font color' }]
+    if (fontColor) {
+      options.push({
+        // clicking this will also open the picker
+        type: 'color',
+        title: 'current color',
+        color: fontColor,
+      })
+    }
+    options.push(pickColorOption)
+    return options
+  }
+
+  @action
+  onTitleFontOptionSelect = opt => {
+    if (opt.type === 'color') {
+      // toggle picker
+      this.fontColorPickerOpen = !this.fontColorPickerOpen
+    } else if (opt.type === 'remove') {
+      this.fontColorPickerOpen = false
+      this.onSelectTitleFontColor({ hex: null })
+    }
+  }
+
+  @action
+  onSelectTitleFontColor = ({ hex }) => {
+    const { record } = this
+    // set immediately to reflect in UI
+    record.collection_style.font_color = hex
+    this.saveFontColor(hex)
+  }
+
+  _saveFontColor = hex => {
+    this.record.patch({ cancel_sync: true, attributes: { font_color: hex } })
+  }
+
+  onTogglePropagate = field => ev => {
+    const { checked } = ev.target
+    const { record } = this
+    const fieldName = `propagate_${field}`
+    record[fieldName] = checked
+    record.patch({ cancel_sync: true, attributes: { [fieldName]: checked } })
+  }
+
   onToggleShowIconOnCoverCheckbox = () => {
-    const {
-      card: { record },
-    } = this.props
+    const { record } = this
     record.show_icon_on_cover = !record.show_icon_on_cover
     record.save()
   }
 
   get showFilters() {
-    const { record } = this.props.card
+    const { record } = this
     const { thumbnail_url, isLink } = record
     if (this.recordIsCollection) return true
     if (isLink) return true
@@ -397,7 +514,6 @@ class CardCoverEditor extends React.Component {
       <div>
         <TextareaAutosize
           maxRows={3}
-          maxLength={144}
           value={this.cardTitle}
           placeholder="untitled"
           onChange={this.changeTitle}
@@ -430,114 +546,146 @@ class CardCoverEditor extends React.Component {
   }
 
   renderInner() {
-    const { uiStore, card } = this.props
-    const { record } = card
-    const { gridSettings } = uiStore
-    const { gridW } = gridSettings
+    const { record, recordIsCollection, fontColorPickerOpen, loading } = this
+
+    if (loading) {
+      return (
+        <div
+          data-cy="EditCoverOptions"
+          style={{ marginTop: '40px', paddingTop: '80px' }}
+        >
+          <InlineLoader />
+        </div>
+      )
+    }
+
     return (
-      <TopRightHolderWrapper maxWidth={gridW}>
-        <TopRightHolder data-cy="EditCoverOptions">
-          {!this.loading && (
-            <div>
-              <StyledEditTitle>
-                <h3>Title</h3>
-                {this.renderEditTitleInput()}
-              </StyledEditTitle>
+      <div data-cy="EditCoverOptions">
+        <div>
+          <StyledEditTitle>
+            <h3>Title</h3>
+            {this.renderEditTitleInput()}
+          </StyledEditTitle>
+          <MediumBreak />
+          <h3>Cover</h3>
+          <QuickOptionSelector
+            options={toJS(this.coverImageOptions)}
+            onSelect={this.onImageOptionSelect}
+          />
+
+          {recordIsCollection && (
+            <Fragment>
               <MediumBreak />
-              <h3>Cover</h3>
+              <h3>Background Image</h3>
               <QuickOptionSelector
-                options={toJS(this.imageOptions)}
-                onSelect={this.onImageOptionSelect}
+                options={toJS(this.backgroundImageOptions)}
+                onSelect={this.onBackgroundImageOptionSelect}
               />
+              <CheckboxWithLabel
+                onChange={this.onTogglePropagate('background_image')}
+                checked={record.propagate_background_image}
+                label="Apply to all nested collections"
+              />
+            </Fragment>
+          )}
+
+          {recordIsCollection && (
+            <Fragment>
               <MediumBreak />
-              <h3>Icon</h3>
-              <CollectionIconSelector
-                selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
-                onSelectIcon={this.onCustomIconSelect}
+              <h3>Title Font Color</h3>
+              <QuickOptionSelector
+                options={this.titleFontOptions}
+                onSelect={this.onTitleFontOptionSelect}
               />
-              <LabelContainer
-                labelPlacement={'end'}
-                control={
-                  <Checkbox
-                    onChange={this.onToggleShowIconOnCoverCheckbox}
-                    checked={record.show_icon_on_cover}
+              {fontColorPickerOpen && (
+                <Fragment>
+                  <CompactPicker
+                    color={record.fontColor || v.colors.black}
+                    onChangeComplete={this.onSelectTitleFontColor}
                   />
-                }
-                label={
-                  <div style={{ maxWidth: '582px', paddingTop: '9px' }}>
-                    Show icon on cover
-                  </div>
-                }
-              ></LabelContainer>
-              <MediumBreak />
-              <h3>Cover Effects</h3>
-              {this.showFilters && (
-                <QuickOptionSelector
-                  options={filterOptions}
-                  onSelect={this.onFilterOptionSelect}
-                />
+                  <MediumBreak />
+                </Fragment>
               )}
-              <MediumBreak />
-              {(record.isCollection || record.isLink) && (
-                <div>
-                  <h3>Subtitle</h3>
-                  <StyledEditTitle>
-                    {this.renderEditSubtitleInput()}
-                  </StyledEditTitle>
-                  <LabelContainer
-                    labelPlacement={'end'}
-                    control={
-                      <Checkbox
-                        onChange={this.onToggleSubtitleCheckbox}
-                        checked={this.subtitleHidden}
-                      />
-                    }
-                    label={
-                      <div style={{ maxWidth: '582px', paddingTop: '9px' }}>
-                        Hide subtitle
-                      </div>
-                    }
-                  ></LabelContainer>
-                  <br />
-                  {record.isLink && (
-                    <NamedActionButton
-                      noPadding
-                      marginBottom={20}
-                      onClick={this.handleRestore}
-                    >
-                      Restore
-                    </NamedActionButton>
-                  )}
-                </div>
+              <CheckboxWithLabel
+                onChange={this.onTogglePropagate('font_color')}
+                checked={record.propagate_font_color}
+                label="Apply to all nested collections"
+              />
+            </Fragment>
+          )}
+
+          <MediumBreak />
+          <h3>Icon</h3>
+          <CollectionIconSelector
+            selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
+            onSelectIcon={this.onCustomIconSelect}
+          />
+          <CheckboxWithLabel
+            onChange={this.onToggleShowIconOnCoverCheckbox}
+            checked={record.show_icon_on_cover}
+            label="Show icon on cover"
+          />
+          <MediumBreak />
+          <h3>Cover Effects</h3>
+          {this.showFilters && (
+            <QuickOptionSelector
+              options={filterOptions}
+              onSelect={this.onFilterOptionSelect}
+            />
+          )}
+          <MediumBreak />
+          {(record.isCollection || record.isLink) && (
+            <div>
+              <h3>Subtitle</h3>
+              <StyledEditTitle>
+                {this.renderEditSubtitleInput()}
+              </StyledEditTitle>
+
+              <CheckboxWithLabel
+                onChange={this.onToggleSubtitleCheckbox}
+                checked={this.subtitleHidden}
+                label="Hide subtitle"
+              />
+              <br />
+              {record.isLink && (
+                <NamedActionButton
+                  noPadding
+                  marginBottom={20}
+                  onClick={this.handleRestore}
+                >
+                  Restore
+                </NamedActionButton>
               )}
             </div>
           )}
-          <CloseButton
-            size="lg"
-            onClick={this.handleClose}
-            data-cy="EditCoverCloseBtn"
-          />
-        </TopRightHolder>
-      </TopRightHolderWrapper>
+        </div>
+      </div>
     )
   }
 
   render() {
-    const { isEditingCardCover } = this.props
+    const { recordIsCollection } = this
+    const { isEditingCardCover, pageMenu } = this.props
+
+    const modalTitle = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
     return (
       <Fragment>
-        <CardActionHolder
-          active={this.isEditingCardCover}
-          className="show-on-hover"
-          tooltipText="edit cover"
-          role="button"
-          onClick={this.handleClick}
-        >
-          <EditPencilIconLarge />
-        </CardActionHolder>
-        {isEditingCardCover &&
-          this.parentCard &&
-          ReactDOM.createPortal(this.renderInner(), this.parentCard)}
+        {!pageMenu && (
+          <CardActionHolder
+            active={this.isEditingCardCover}
+            className="show-on-hover"
+            tooltipText="edit cover"
+            role="button"
+            onClick={this.handleClick}
+          >
+            <EditPencilIconLarge />
+          </CardActionHolder>
+        )}
+        {isEditingCardCover && (
+          <Modal open onClose={this.handleClose} title={modalTitle}>
+            {this.renderInner()}
+          </Modal>
+        )}
       </Fragment>
     )
   }
@@ -546,6 +694,10 @@ class CardCoverEditor extends React.Component {
 CardCoverEditor.propTypes = {
   card: MobxPropTypes.objectOrObservableObject.isRequired,
   isEditingCardCover: PropTypes.bool.isRequired,
+  pageMenu: PropTypes.bool,
+}
+CardCoverEditor.defaultProps = {
+  pageMenu: false,
 }
 
 CardCoverEditor.wrappedComponent.propTypes = {

@@ -340,8 +340,8 @@ export const InvertMarketingLinkMail = styled(Anchor)`
   letter-spacing: -0.2px;
   font-size: ${props => props.fontSize}px;
   font-family: ${props =>
-    props.fontSize == 32 ? v.fonts.serif : v.fonts.sans};
-  margin-bottom: ${props => (props.fontSize == 32 ? 68 : 20)}px;
+    props.fontSize === 32 ? v.fonts.serif : v.fonts.sans};
+  margin-bottom: ${props => (props.fontSize === 32 ? 68 : 20)}px;
   display: inline-block;
 `
 InvertMarketingLinkMail.defaultProps = {

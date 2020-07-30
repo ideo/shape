@@ -259,6 +259,7 @@ class AudienceSettingsWidget extends React.Component {
       onToggleCheckbox,
       displayChallengeAudiences,
       challengeName,
+      handleAssignReviewers,
     } = this.props
     const audienceCheckboxProps = {
       audience,
@@ -271,6 +272,7 @@ class AudienceSettingsWidget extends React.Component {
       disabled: this.isAudienceLocked(audience),
       openAudienceMenu: this.openAudienceMenu,
       displayChallengeAudiences,
+      handleAssignReviewers,
     }
 
     return <AudienceCheckbox {...audienceCheckboxProps} />
