@@ -1553,36 +1553,36 @@ class FoamcoreGrid extends React.Component {
 
     const gridSize = this.totalGridSize
     return (
-      <Grid
-        className="foamcoreGridBoundary"
-        data-empty-space-click
-        ref={ref => {
-          this.gridRef = ref
-        }}
-        width={gridSize.width}
-        height={gridSize.height}
-      >
-        {this.showZoomControls && (
-          <FoamcoreZoomControls
-            onZoomIn={this.handleZoomIn}
-            onZoomOut={this.handleZoomOut}
-          />
-        )}
-        <CollectionFilterWrapper>
-          <CollectionViewToggle collection={collection} />
-          <CollectionFilter
-            collection={collection}
-            canEdit={collection.canEdit}
-          />
-        </CollectionFilterWrapper>
-        <ThemeProvider theme={foamcoreTheme}>
+      <ThemeProvider theme={foamcoreTheme}>
+        <Grid
+          className="foamcoreGridBoundary"
+          data-empty-space-click
+          ref={ref => {
+            this.gridRef = ref
+          }}
+          width={gridSize.width}
+          height={gridSize.height}
+        >
+          {this.showZoomControls && (
+            <FoamcoreZoomControls
+              onZoomIn={this.handleZoomIn}
+              onZoomOut={this.handleZoomOut}
+            />
+          )}
+          <CollectionFilterWrapper>
+            <CollectionViewToggle collection={collection} />
+            <CollectionFilter
+              collection={collection}
+              canEdit={collection.canEdit}
+            />
+          </CollectionFilterWrapper>
           {this.renderDragSpots()}
           {this.renderBlanksAndBct()}
           {this.renderMdlPlaceholder()}
           {this.renderHotspots()}
           {this.renderVisibleCards()}
-        </ThemeProvider>
-      </Grid>
+        </Grid>
+      </ThemeProvider>
     )
   }
 }
