@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
-import { Checkbox } from '~/ui/global/styled/forms'
+import Checkbox from '~/ui/forms/Checkbox'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { tagColor } from '~/ui/pages/shared/StyledReactTags'
 import v from '~/utils/variables'
