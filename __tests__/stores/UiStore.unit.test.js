@@ -240,6 +240,8 @@ describe('UiStore', () => {
     }
     beforeEach(() => {
       uiStore.setSelectedArea(coords)
+      // cardPositions determines where each card is placed on the grid
+      // gets called in GridCard when it sets the ref
       uiStore.setCardPosition('1', { top: 0, right: 100, bottom: 100, left: 0 })
       uiStore.setCardPosition('2', {
         top: 300,

@@ -38,6 +38,7 @@ describe('GridCard', () => {
     describe('as viewer', () => {
       beforeEach(() => {
         props.record.can_edit = false
+        uiStore.setCardPosition = jest.fn()
         rerender()
       })
 
@@ -69,6 +70,16 @@ describe('GridCard', () => {
       it('renders selection circle without hotspot', () => {
         expect(wrapper.find('SelectionCircle').exists()).toBe(true)
         expect(wrapper.find('GridCardHotspot').exists()).toBe(false)
+      })
+
+      it('sets the card ref and calls uiStore.setCardPosition', () => {
+        const rect = {}
+        const fakeRef = { getBoundingClientRect: () => rect }
+        component.setCardRef(fakeRef)
+        expect(uiStore.setCardPosition).toHaveBeenCalledWith(
+          props.card.id,
+          rect
+        )
       })
     })
 

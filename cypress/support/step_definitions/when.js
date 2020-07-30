@@ -481,8 +481,10 @@ When(
   }
 )
 
-When('I click the {string} on the index {int} card', (action, pos) => {
-  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="${action}"]`)
+When('I click the {string} on the card at {int},{int}', (action, row, col) => {
+  cy.get(
+    `[data-cy="GridCard"][data-row="${row}"][data-col="${col}"] [data-cy="${action}"]`
+  )
     .first()
     .click({ force: true })
   cy.wait(100)

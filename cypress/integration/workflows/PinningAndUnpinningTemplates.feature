@@ -8,9 +8,9 @@ Feature: Pinning and Unpinning
     And I create a textItem card at 1,1 on the board with "2nd unpinned."
     And I create a textItem card at 1,2 on the board with "Pin me too!"
 
-    And I click the "CardAction-Pin to Template" on the index 0 card
+    And I click the "CardAction-Pin to Template" on the card at 0,0
     And I wait for "@apiTogglePin" to finish
-    And I click the "CardAction-Pin to Template" on the index 3 card
+    And I click the "CardAction-Pin to Template" on the card at 1,2
     And I wait for "@apiTogglePin" to finish
     And I wait for 1 second
 
