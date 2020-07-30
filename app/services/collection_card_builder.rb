@@ -112,8 +112,6 @@ class CollectionCardBuilder
       @collection_card.id = @placeholder.id
     end
 
-    return if @collection_card.board_placement_is_valid?
-
     # first capture these, row/col are allowed to be nil for BoardPlacement
     row = @collection_card.row
     col = @collection_card.col
@@ -125,12 +123,16 @@ class CollectionCardBuilder
     @collection_card.height ||= 1
     @collection_card.width ||= 1
     # valid row/col will get applied to the card here for later saving
+
     CollectionGrid::BoardPlacement.call(
       row: row,
       col: col,
       to_collection: @parent_collection,
       moving_cards: [@collection_card],
     )
+
+    # This adds validation errors if there are any
+    @collection_card.board_placement_is_valid?
   end
 
   def post_creation_record_update

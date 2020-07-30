@@ -190,7 +190,6 @@ module CollectionGrid
       moving_cards = moving_cards_ordered_row_col(moving_cards)
       # e.g. for non-board collection we use the first based on the above sorting
       master_card ||= moving_cards.first
-
       if row.nil? || col.nil?
         placement = calculate_best_placement(
           collection: collection,
