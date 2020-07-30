@@ -764,10 +764,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get collectionFilterQuery() {
     const { activeFilters } = this
     if (activeFilters.length === 0) return {}
-    const spaces = /\s+/
     const filterQuery = activeFilters.map(filter => {
       if (filter.filter_type === 'tag') {
-        return `#${filter.text.replace(spaces, '-')}`
+        return `#${filter.text.split(' ').join('-')}`
       } else if (filter.filter_type === 'user_tag') {
         return `@${filter.text}`
       } else {
