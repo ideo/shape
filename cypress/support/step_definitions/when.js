@@ -292,6 +292,12 @@ When('I click the {string}', el => {
     .click({ force: true })
 })
 
+When('I click the {string} located in {string}', (selector, el) => {
+  cy.get(`${el} ${selector}`)
+    .first()
+    .click({ force: true })
+})
+
 When('I click the last {string}', el => {
   cy.locateDataOrClass(el)
     .last()

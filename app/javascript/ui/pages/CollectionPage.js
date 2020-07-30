@@ -6,9 +6,11 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 import { Helmet } from 'react-helmet'
 import VisibilitySensor from 'react-visibility-sensor'
+import { ThemeProvider } from 'styled-components'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
+import CardCoverEditor from '~/ui/grid/CardCoverEditor'
 import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter, {
@@ -103,6 +105,7 @@ class CollectionPage extends React.Component {
   setViewingRecordAndRestoreScrollPosition() {
     const { collection, uiStore } = this.props
     // setViewingRecord has to happen first bc we use it in openBlankContentTool
+    // this will also determine if there is a background image for this collection and set it
     uiStore.setViewingRecord(collection)
     this.restoreWindowScrollPosition()
   }
@@ -619,7 +622,11 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox, isTestCollection } = collection
+    const {
+      isSubmissionBox,
+      isTestCollection,
+      parent_collection_card,
+    } = collection
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
@@ -659,60 +666,73 @@ class CollectionPage extends React.Component {
     }
 
     return (
-      <Fragment>
-        <Helmet title={collection.pageTitle} />
-        {!isLoading && collection.showSubmissionTopicSuggestions && (
-          <SuggestedTagsBanner
-            collection={collection}
-            suggestions={_.get(collection, 'parentChallenge.topic_list', [])}
-          />
-        )}
-        {!isLoading && (
-          <Fragment>
-            <ArchivedBanner />
-            <OverdueBanner />
-          </Fragment>
-        )}
-        {this.renderPageHeader()}
-        {userRequiresOrg && (
-          // for new user's trying to add a common resource, they'll see the Create Org modal
-          // pop up over the CollectionGrid
-          <CreateOrgPage commonViewableResource={collection} />
-        )}
-        {!isLoading && (
-          <Fragment>
-            <PageContainer
-              fullWidth={
-                collection.isBoard &&
-                !collection.isFourWideBoard &&
-                collection.viewMode !== 'list'
-              }
-            >
-              {this.renderEditorPill}
-              {inner}
-              {(collection.requiresSubmissionBoxSettings ||
-                submissionBoxSettingsOpen) && (
-                <SubmissionBoxSettingsModal collection={collection} />
-              )}
-              {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-              <GlobalPageComponentsContainer
-                pastingCards={uiStore.pastingCards}
-              />
-              {isSubmissionBox &&
-                collection.submission_box_type &&
-                this.renderSubmissionsCollection()}
-              {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-                <ClickWrapper
-                  clickHandlers={[this.handleAllClick]}
-                  onContextMenu={this.handleAllClick}
+      <ThemeProvider theme={collection.styledTheme}>
+        <Fragment>
+          <Helmet title={collection.pageTitle} />
+          {!isLoading && collection.showSubmissionTopicSuggestions && (
+            <SuggestedTagsBanner
+              collection={collection}
+              suggestions={_.get(collection, 'parentChallenge.topic_list', [])}
+            />
+          )}
+          {!isLoading && (
+            <Fragment>
+              <ArchivedBanner />
+              <OverdueBanner />
+            </Fragment>
+          )}
+          {this.renderPageHeader()}
+          {userRequiresOrg && (
+            // for new user's trying to add a common resource, they'll see the Create Org modal
+            // pop up over the CollectionGrid
+            <CreateOrgPage commonViewableResource={collection} />
+          )}
+          {!isLoading && (
+            <Fragment>
+              <PageContainer
+                fullWidth={
+                  collection.isBoard &&
+                  !collection.isFourWideBoard &&
+                  collection.viewMode !== 'list'
+                }
+              >
+                {this.renderEditorPill}
+                {inner}
+                {(collection.requiresSubmissionBoxSettings ||
+                  submissionBoxSettingsOpen) && (
+                  <SubmissionBoxSettingsModal collection={collection} />
+                )}
+                {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+                <GlobalPageComponentsContainer
+                  pastingCards={uiStore.pastingCards}
                 />
-              )}
-            </PageContainer>
-          </Fragment>
-        )}
-        {isLoading && this.loader()}
-        {!isLoading && isTransparentLoading && this.transparentLoader()}
-      </Fragment>
+                {isSubmissionBox &&
+                  collection.submission_box_type &&
+                  this.renderSubmissionsCollection()}
+                {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+                  <ClickWrapper
+                    clickHandlers={[this.handleAllClick]}
+                    onContextMenu={this.handleAllClick}
+                  />
+                )}
+              </PageContainer>
+            </Fragment>
+          )}
+          {isLoading && this.loader()}
+          {!isLoading && isTransparentLoading && this.transparentLoader()}
+          {collection.can_edit_content &&
+            collection.canSetACover &&
+            parent_collection_card && (
+              <CardCoverEditor
+                card={parent_collection_card}
+                isEditingCardCover={
+                  uiStore.editingCardCover === parent_collection_card.id
+                }
+                pageMenu
+              />
+            )}
+        </Fragment>
+      </ThemeProvider>
     )
   }
 }

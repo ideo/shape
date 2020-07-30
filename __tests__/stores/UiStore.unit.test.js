@@ -9,7 +9,7 @@ jest.mock('mobx-localstorage')
 let uiStore
 const fakeCollection = {
   id: '123',
-  internalType: 'collections',
+  isCollection: true,
   parent_collection_card: {},
 }
 const fakeEvent = {
@@ -368,6 +368,14 @@ describe('UiStore', () => {
         expect(localStorage.getItem(ACTIVITY_LOG_PAGE_KEY)).toEqual(
           'notifications'
         )
+      })
+    })
+
+    describe('#setBodyBackgroundImage', () => {
+      it('should set the style on document.body', () => {
+        const img = 'http://img.url/123'
+        uiStore.setBodyBackgroundImage(img)
+        expect(document.body.style['background-image']).toEqual(`url(${img})`)
       })
     })
   })

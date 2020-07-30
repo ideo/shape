@@ -43,6 +43,7 @@ const AudienceCheckbox = ({
   disabled,
   openAudienceMenu,
   displayChallengeAudiences,
+  handleAssignReviewers,
 }) => {
   const { id, global_default } = audience
   return (
@@ -72,7 +73,9 @@ const AudienceCheckbox = ({
                     <AssignReviewersLink
                       onClick={e => {
                         e.preventDefault()
-                        // FIXME: to be implemented in an upcoming story
+                        if (handleAssignReviewers) {
+                          handleAssignReviewers()
+                        }
                       }}
                     >
                       ASSIGN REVIEWERS
@@ -106,11 +109,13 @@ AudienceCheckbox.propTypes = {
   disabled: PropTypes.bool,
   openAudienceMenu: PropTypes.func.isRequired,
   displayChallengeAudiences: PropTypes.bool,
+  handleAssignReviewers: PropTypes.func,
 }
 
 AudienceCheckbox.defaultProps = {
   disabled: false,
   displayChallengeAudiences: false,
+  handleAssignReviewers: null,
 }
 
 export default AudienceCheckbox

@@ -33,15 +33,27 @@ module TestResultsCollection
           context.test_results_collection = master_results_collection? ? create_master_collection : create_idea_collection
           reload_collections
         end
-
       rescue Interactor::Failure => e
         raise ActiveRecord::Rollback, e.message
       end
+
+      move_roles_to_results_collection if test_collection.roles.present?
 
       TestResultsCollection::CreateContentWorker.perform_async(
         test_results_collection.id,
         created_by&.id,
       )
+    end
+
+    # why did the spec explode when this method was private?
+    def move_roles_to_results_collection
+      test_collection.roles.each do |role|
+        role.update(resource: test_results_collection)
+      end
+      # reload to re-associate the roles
+      reload_collections
+      # reanchor the test collection and children to test_results_collection
+      test_collection.reanchor!(parent: test_results_collection, propagate: true)
     end
 
     private

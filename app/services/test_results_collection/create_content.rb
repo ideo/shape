@@ -269,19 +269,6 @@ module TestResultsCollection
 
       update_test_collection_name
       move_test_collection_inside_test_results
-      move_roles_to_results_collection if test_collection.roles.present?
-    end
-
-    def move_roles_to_results_collection
-      test_collection.roles.each do |role|
-        role.update(resource: test_results_collection)
-      end
-      # Test Results Collection has its own roles
-      test_results_collection.update(roles_anchor_collection: nil)
-      # reload to re-associate the roles
-      reload_collections
-      # reanchor the test collection and children to test_results_collection
-      test_collection.reanchor!(parent: test_results_collection, propagate: true)
     end
 
     def update_test_collection_name

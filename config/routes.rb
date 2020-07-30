@@ -33,6 +33,7 @@ Rails.application.routes.draw do
           get 'next_available_submission_test'
           get 'challenge_phase_collections'
           post 'clear_collection_cover'
+          post 'clear_background_image'
           patch 'submit'
           patch 'restore_permissions'
           post 'background_update_template_instances'
