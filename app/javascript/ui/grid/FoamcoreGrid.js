@@ -2,7 +2,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 
 import hexToRgba from '~/utils/hexToRgba'
 import CardMoveService from '~/utils/CardMoveService'
@@ -29,6 +29,10 @@ import { objectsEqual } from '~/utils/objectUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
+
+const foamcoreTheme = {
+  isResponsiveText: true,
+}
 
 const CircleIconHolder = styled.button`
   border: 1px solid ${v.colors.secondaryMedium};
@@ -1571,11 +1575,13 @@ class FoamcoreGrid extends React.Component {
             canEdit={collection.canEdit}
           />
         </CollectionFilterWrapper>
-        {this.renderDragSpots()}
-        {this.renderBlanksAndBct()}
-        {this.renderMdlPlaceholder()}
-        {this.renderHotspots()}
-        {this.renderVisibleCards()}
+        <ThemeProvider theme={foamcoreTheme}>
+          {this.renderDragSpots()}
+          {this.renderBlanksAndBct()}
+          {this.renderMdlPlaceholder()}
+          {this.renderHotspots()}
+          {this.renderVisibleCards()}
+        </ThemeProvider>
       </Grid>
     )
   }
