@@ -82,7 +82,7 @@ class PageBreadcrumb extends React.Component {
 
       if (longBreadcrumb && idx >= 2 && idx <= len - 3) {
         // if we have a really long breadcrumb we compress some options in the middle
-        if (idx == len - 3) {
+        if (idx === len - 3) {
           return items.push({
             ...item,
             name,

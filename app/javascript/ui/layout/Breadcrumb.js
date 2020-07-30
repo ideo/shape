@@ -93,7 +93,7 @@ class Breadcrumb extends React.Component {
     let includeSubItem = _.isEmpty(firstItem)
     const subItems = items.map((item, idx) => {
       // if a firstItem was used, we don't include any items until that one is found
-      includeSubItem = includeSubItem || item.id == firstItem.id
+      includeSubItem = includeSubItem || item.id === firstItem.id
       if (includeSubItem) {
         const subItem = { ...item }
         if (item.ellipses && lastItem.id && item.id !== lastItem.id) {

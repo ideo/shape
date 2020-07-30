@@ -30,6 +30,7 @@ class CollectionCard extends BaseRecord {
     'image_contain',
     'card_type',
     'is_cover',
+    'is_background',
     'hidden',
     'filter',
     'section_type',

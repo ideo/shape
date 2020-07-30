@@ -11,7 +11,7 @@ const onFoamcoreBoard = () => {
 }
 
 export const Heading1TypographyCss = css`
-  color: ${v.colors.black};
+  color: ${props => props.theme.titleColor || v.colors.black};
   font-family: ${v.fonts.sans};
   font-size: 1.75rem;
   font-weight: ${v.weights.book};
@@ -294,6 +294,13 @@ export const HugeNumber = styled(Heading1)`
 export const QuillStyleWrapper = styled.div`
   height: 100%;
 
+  ${props =>
+    props.hasTitleText &&
+    props.theme.titleColor &&
+    `
+    color: ${props.theme.titleColor};
+  `}
+
   .quill {
     height: 100%;
 
@@ -318,10 +325,12 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-size-huge {
       ${Heading1TypographyCss};
+      /* always use black as opposed to props.theme.titleColor */
+      color: ${v.colors.black};
     }
 
     h5 {
-      color: ${v.colors.black};
+      color: ${props => props.theme.titleColor || v.colors.black};
       font-size: 4rem;
       font-weight: 700;
       letter-spacing: -0.5px;
