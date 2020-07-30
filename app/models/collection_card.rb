@@ -555,6 +555,7 @@ class CollectionCard < ApplicationRecord
       # no real point in trying to cache a search result with no parent card, but this allows it to work
       id || "search-result-#{record.id}",
       (updated_at || Time.current).to_f,
+      ENV['HEROKU_RELEASE_VERSION'],
     ].join('--')
     "CollectionCardCache::#{key}"
   end

@@ -9,7 +9,7 @@ jest.mock('mobx-localstorage')
 let uiStore
 const fakeCollection = {
   id: '123',
-  internalType: 'collections',
+  isCollection: true,
   parent_collection_card: {},
 }
 const fakeEvent = {

@@ -44,7 +44,7 @@ const CollectionIconSelector = ({ selectedIcon, onSelectIcon }) => {
       <InlineModal
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
-        anchorElement={selectRef && selectRef.current}
+        anchorElement={selectRef ? selectRef.current : null}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
         noButtons
       >

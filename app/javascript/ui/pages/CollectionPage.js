@@ -6,6 +6,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { animateScroll as scroll } from 'react-scroll'
 import { Helmet } from 'react-helmet'
 import VisibilitySensor from 'react-visibility-sensor'
+import { ThemeProvider } from 'styled-components'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
@@ -661,60 +662,62 @@ class CollectionPage extends React.Component {
     }
 
     return (
-      <Fragment>
-        <Helmet title={collection.pageTitle} />
-        {!isLoading && collection.showSubmissionTopicSuggestions && (
-          <SuggestedTagsBanner
-            collection={collection}
-            suggestions={_.get(collection, 'parentChallenge.topic_list', [])}
-          />
-        )}
-        {!isLoading && (
-          <Fragment>
-            <ArchivedBanner />
-            <OverdueBanner />
-          </Fragment>
-        )}
-        {this.renderPageHeader()}
-        {userRequiresOrg && (
-          // for new user's trying to add a common resource, they'll see the Create Org modal
-          // pop up over the CollectionGrid
-          <CreateOrgPage commonViewableResource={collection} />
-        )}
-        {!isLoading && (
-          <Fragment>
-            <PageContainer
-              fullWidth={
-                collection.isBoard &&
-                !collection.isFourWideBoard &&
-                collection.viewMode !== 'list'
-              }
-            >
-              {this.renderEditorPill}
-              {inner}
-              {(collection.requiresSubmissionBoxSettings ||
-                submissionBoxSettingsOpen) && (
-                <SubmissionBoxSettingsModal collection={collection} />
-              )}
-              {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
-              <GlobalPageComponentsContainer
-                pastingCards={uiStore.pastingCards}
-              />
-              {isSubmissionBox &&
-                collection.submission_box_type &&
-                this.renderSubmissionsCollection()}
-              {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
-                <ClickWrapper
-                  clickHandlers={[this.handleAllClick]}
-                  onContextMenu={this.handleAllClick}
+      <ThemeProvider theme={collection.styledTheme}>
+        <Fragment>
+          <Helmet title={collection.pageTitle} />
+          {!isLoading && collection.showSubmissionTopicSuggestions && (
+            <SuggestedTagsBanner
+              collection={collection}
+              suggestions={_.get(collection, 'parentChallenge.topic_list', [])}
+            />
+          )}
+          {!isLoading && (
+            <Fragment>
+              <ArchivedBanner />
+              <OverdueBanner />
+            </Fragment>
+          )}
+          {this.renderPageHeader()}
+          {userRequiresOrg && (
+            // for new user's trying to add a common resource, they'll see the Create Org modal
+            // pop up over the CollectionGrid
+            <CreateOrgPage commonViewableResource={collection} />
+          )}
+          {!isLoading && (
+            <Fragment>
+              <PageContainer
+                fullWidth={
+                  collection.isBoard &&
+                  !collection.isFourWideBoard &&
+                  collection.viewMode !== 'list'
+                }
+              >
+                {this.renderEditorPill}
+                {inner}
+                {(collection.requiresSubmissionBoxSettings ||
+                  submissionBoxSettingsOpen) && (
+                  <SubmissionBoxSettingsModal collection={collection} />
+                )}
+                {/* Listen to this pastingCards value which comes from pressing CTRL+V */}
+                <GlobalPageComponentsContainer
+                  pastingCards={uiStore.pastingCards}
                 />
-              )}
-            </PageContainer>
-          </Fragment>
-        )}
-        {isLoading && this.loader()}
-        {!isLoading && isTransparentLoading && this.transparentLoader()}
-      </Fragment>
+                {isSubmissionBox &&
+                  collection.submission_box_type &&
+                  this.renderSubmissionsCollection()}
+                {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+                  <ClickWrapper
+                    clickHandlers={[this.handleAllClick]}
+                    onContextMenu={this.handleAllClick}
+                  />
+                )}
+              </PageContainer>
+            </Fragment>
+          )}
+          {isLoading && this.loader()}
+          {!isLoading && isTransparentLoading && this.transparentLoader()}
+        </Fragment>
+      </ThemeProvider>
     )
   }
 }

@@ -120,6 +120,7 @@ class PageWithApiWrapper extends React.Component {
 
     uiStore.update('pageError', null)
     uiStore.update('isTransparentLoading', true)
+    uiStore.setBodyBackgroundImage(null)
 
     if (fetchType && cachedFetchId) {
       // First check if we already have this record in the local store
@@ -177,6 +178,8 @@ class PageWithApiWrapper extends React.Component {
 
     record.updateFullyLoaded(true)
     uiStore.update('isTransparentLoading', false)
+    // url could be null which will reset it
+    uiStore.setBodyBackgroundImage(record.backgroundImageUrl)
     // We may be in the callback of a request that we've since left (e.g. navigating multiple pages quickly),
     // so only set this.record if we're returning from our current matching request
     // -- could also abort past requests? https://developer.mozilla.org/en-US/docs/Web/API/AbortController

@@ -4,11 +4,13 @@ import _ from 'lodash'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
+import { CompactPicker } from 'react-color'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
 import CollectionIconSelector from '~/ui/grid/CollectionIconSelector'
+import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
@@ -20,7 +22,8 @@ import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
 import TextareaAutosize from 'react-autosize-textarea'
 import { CloseButton, NamedActionButton } from '~/ui/global/styled/buttons'
 import PropTypes from 'prop-types'
-import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+// import { Checkbox, LabelContainer } from '~/ui/global/styled/forms'
+import CheckboxWithLabel from '~/ui/global/CheckboxWithLabel'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import parseURLMeta from '~/utils/parseURLMeta'
 
@@ -43,6 +46,11 @@ const linkBackgroundOption = {
   type: 'remove',
   title: 'black',
   color: v.colors.black,
+}
+const pickColorOption = {
+  type: 'color',
+  title: 'font color',
+  icon: <ColorPickerIcon />,
 }
 
 const TopRightHolderWrapper = styled.div`
@@ -129,6 +137,13 @@ class CardCoverEditor extends React.Component {
   hardcodedSubtitle = '' // overrides cover text set by text items
   @observable
   subtitleHidden = false
+  @observable
+  fontColorPickerOpen = false
+
+  constructor(props) {
+    super(props)
+    this.saveFontColor = _.debounce(this._saveFontColor, 2000)
+  }
 
   componentDidMount() {
     const { card, uiStore } = this.props
@@ -166,6 +181,10 @@ class CardCoverEditor extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.saveFontColor.flush()
+  }
+
   get record() {
     return this.props.card.record
   }
@@ -185,6 +204,8 @@ class CardCoverEditor extends React.Component {
       return
     }
     const collection = record
+    // fetch the full collection to get the styles
+    collection.refetch()
     return collection.API_fetchCards({ hidden: true })
   }
 
@@ -201,6 +222,7 @@ class CardCoverEditor extends React.Component {
   }
 
   get backgroundImageBaseOptions() {
+    // TODO: if background_image_url is set, but the card comes from above??
     return this.imageBaseOptions('background')
   }
 
@@ -303,7 +325,7 @@ class CardCoverEditor extends React.Component {
   }
 
   @action
-  onToggleSubtitleCheckbox = async e => {
+  onToggleSubtitleCheckbox = () => {
     this.subtitleHidden = !this.subtitleHidden
   }
 
@@ -351,6 +373,7 @@ class CardCoverEditor extends React.Component {
   setObservableInputs = () => {
     const { record } = this
     const { name } = record
+    this.fontColorPickerOpen = false
     this.cardTitle = name || record.url
     if (record.isCollection) {
       this.hardcodedSubtitle = record.subtitleForEditing
@@ -401,7 +424,7 @@ class CardCoverEditor extends React.Component {
       item.save()
     }
     if (recordIsCollection) {
-      apiStore.fetch('collections', card.record.id, true)
+      card.record.refetch()
     }
   }
 
@@ -420,7 +443,7 @@ class CardCoverEditor extends React.Component {
         onSuccess: file => this.createCard(file, 'background'),
       })
     }
-    apiStore.fetch('collections', collection.id, true)
+    collection.refetch()
   }
 
   onFilterOptionSelect = async option => {
@@ -430,17 +453,58 @@ class CardCoverEditor extends React.Component {
   }
 
   onCustomIconSelect = iconName => {
-    const {
-      card: { record },
-    } = this.props
+    const { record } = this
     record.icon = iconName
     record.save()
   }
 
+  get titleFontOptions() {
+    const { fontColor } = this.record
+    const options = [{ ...removeOption, title: 'reset font color' }]
+    if (fontColor) {
+      options.push({
+        type: 'current_color',
+        title: 'current color',
+        color: fontColor,
+      })
+    }
+    options.push(pickColorOption)
+    return options
+  }
+
+  @action
+  onTitleFontOptionSelect = opt => {
+    if (opt.type === 'color') {
+      // toggle picker
+      this.fontColorPickerOpen = !this.fontColorPickerOpen
+    } else if (opt.type === 'remove') {
+      this.fontColorPickerOpen = false
+      this.onSelectTitleFontColor({ hex: null })
+    }
+  }
+
+  @action
+  onSelectTitleFontColor = ({ hex }) => {
+    const { record } = this
+    // set immediately to reflect in UI
+    record.collection_style.font_color = hex
+    this.saveFontColor(hex)
+  }
+
+  _saveFontColor = hex => {
+    this.record.patch({ cancel_sync: true, attributes: { font_color: hex } })
+  }
+
+  onTogglePropagate = field => ev => {
+    const { checked } = ev.target
+    const { record } = this
+    const fieldName = `propagate_${field}`
+    record[fieldName] = checked
+    record.patch({ cancel_sync: true, attributes: { [fieldName]: checked } })
+  }
+
   onToggleShowIconOnCoverCheckbox = () => {
-    const {
-      card: { record },
-    } = this.props
+    const { record } = this
     record.show_icon_on_cover = !record.show_icon_on_cover
     record.save()
   }
@@ -493,7 +557,7 @@ class CardCoverEditor extends React.Component {
 
   renderInner() {
     const { uiStore, card } = this.props
-    const { recordIsCollection } = this
+    const { recordIsCollection, fontColorPickerOpen } = this
     const { record } = card
     const { gridSettings } = uiStore
     const { gridW } = gridSettings
@@ -521,6 +585,33 @@ class CardCoverEditor extends React.Component {
                     options={toJS(this.backgroundImageOptions)}
                     onSelect={this.onBackgroundImageOptionSelect}
                   />
+                  <CheckboxWithLabel
+                    onChange={this.onTogglePropagate('background_image')}
+                    checked={record.propagate_background_image}
+                    label="Apply to all nested collections"
+                  />
+                </Fragment>
+              )}
+
+              {recordIsCollection && (
+                <Fragment>
+                  <MediumBreak />
+                  <h3>Title Font Color</h3>
+                  <QuickOptionSelector
+                    options={this.titleFontOptions}
+                    onSelect={this.onTitleFontOptionSelect}
+                  />
+                  {fontColorPickerOpen && (
+                    <CompactPicker
+                      color={record.fontColor || v.colors.black}
+                      onChangeComplete={this.onSelectTitleFontColor}
+                    />
+                  )}
+                  <CheckboxWithLabel
+                    onChange={this.onTogglePropagate('font_color')}
+                    checked={record.propagate_font_color}
+                    label="Apply to all nested collections"
+                  />
                 </Fragment>
               )}
 
@@ -530,20 +621,11 @@ class CardCoverEditor extends React.Component {
                 selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
                 onSelectIcon={this.onCustomIconSelect}
               />
-              <LabelContainer
-                labelPlacement={'end'}
-                control={
-                  <Checkbox
-                    onChange={this.onToggleShowIconOnCoverCheckbox}
-                    checked={record.show_icon_on_cover}
-                  />
-                }
-                label={
-                  <div style={{ maxWidth: '582px', paddingTop: '9px' }}>
-                    Show icon on cover
-                  </div>
-                }
-              ></LabelContainer>
+              <CheckboxWithLabel
+                onChange={this.onToggleShowIconOnCoverCheckbox}
+                checked={record.show_icon_on_cover}
+                label="Show icon on cover"
+              />
               <MediumBreak />
               <h3>Cover Effects</h3>
               {this.showFilters && (
@@ -559,20 +641,12 @@ class CardCoverEditor extends React.Component {
                   <StyledEditTitle>
                     {this.renderEditSubtitleInput()}
                   </StyledEditTitle>
-                  <LabelContainer
-                    labelPlacement={'end'}
-                    control={
-                      <Checkbox
-                        onChange={this.onToggleSubtitleCheckbox}
-                        checked={this.subtitleHidden}
-                      />
-                    }
-                    label={
-                      <div style={{ maxWidth: '582px', paddingTop: '9px' }}>
-                        Hide subtitle
-                      </div>
-                    }
-                  ></LabelContainer>
+
+                  <CheckboxWithLabel
+                    onChange={this.onToggleSubtitleCheckbox}
+                    checked={this.subtitleHidden}
+                    label="Hide subtitle"
+                  />
                   <br />
                   {record.isLink && (
                     <NamedActionButton

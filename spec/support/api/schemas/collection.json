@@ -57,7 +57,8 @@
     "idea_id": { "type": ["string", "null"] },
     "serializer": { "type": "string" },
     "collection_type": { "type": ["string", "null"] },
-    "cloned_from_id": { "type": ["string", "null"] }
+    "cloned_from_id": { "type": ["string", "null"] },
+    "collection_style": { "type": ["object", "null"] }
   },
   "required": ["name", "class_type", "created_at", "cover"]
 }

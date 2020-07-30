@@ -470,7 +470,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isBoard() {
-    return this.type == 'Collection::Board' || !!this.num_columns
+    return this.type === 'Collection::Board' || !!this.num_columns
   }
 
   get isFourWideBoard() {
@@ -886,7 +886,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       } else {
         this.totalPages = links.last
       }
-      const firstPage = page === 1 && (!rows || rows[0] == 0)
+      const firstPage = page === 1 && (!rows || rows[0] === 0)
       if (
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||
@@ -1956,6 +1956,24 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.uiStore.closeMoveMenu()
       this.uiStore.update('showTemplateHelperForCollection', this)
       this.uiStore.update('templateName', this.name)
+    }
+  }
+
+  get backgroundImageUrl() {
+    return _.get(this, 'collection_style.background_image_url')
+  }
+
+  get fontColor() {
+    return _.get(this, 'collection_style.font_color')
+  }
+
+  get styledTheme() {
+    const { fontColor } = this
+    if (!fontColor) {
+      return {}
+    }
+    return {
+      titleColor: fontColor,
     }
   }
 }

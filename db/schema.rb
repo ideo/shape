@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_28_220748) do
+ActiveRecord::Schema.define(version: 2020_07_29_224906) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -217,6 +217,9 @@ ActiveRecord::Schema.define(version: 2020_07_28_220748) do
     t.integer "challenge_participant_group_id"
     t.string "icon"
     t.boolean "show_icon_on_cover"
+    t.string "font_color"
+    t.boolean "propagate_font_color", default: false
+    t.boolean "propagate_background_image", default: false
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin
