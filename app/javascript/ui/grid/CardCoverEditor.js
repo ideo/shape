@@ -653,8 +653,10 @@ class CardCoverEditor extends React.Component {
   }
 
   render() {
+    const { recordIsCollection } = this
     const { isEditingCardCover, pageMenu } = this.props
 
+    const modalTitle = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
     return (
       <Fragment>
         {!pageMenu && (
@@ -669,7 +671,7 @@ class CardCoverEditor extends React.Component {
           </CardActionHolder>
         )}
         {isEditingCardCover && (
-          <Modal open onClose={this.handleClose} title="Collection Settings">
+          <Modal open onClose={this.handleClose} title={modalTitle}>
             {this.renderInner()}
           </Modal>
         )}
