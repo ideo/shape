@@ -65,7 +65,7 @@ module.exports = {
         varsIgnorePattern: '^React$'
       },
     ],
-    'eqeqeq': 'error',
+    'eqeqeq': ['error', 'smart'],
     'no-var': 'error',
     'prefer-const': 'error',
     'import/no-unresolved': 2,
