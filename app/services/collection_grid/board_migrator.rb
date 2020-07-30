@@ -3,7 +3,6 @@ module CollectionGrid
   class BoardMigrator
     include Interactor
     require_in_context :collection
-    # delegate_to_context :collection
 
     def call
       migrate_collection_and_subcollections(context.collection)
