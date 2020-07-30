@@ -12,6 +12,6 @@ Feature: Editing Cover
 
     When I click the "CardAction-edit cover"
     Then I should see a 'EditCoverOptions'
-    And I click the ".PrivateSwitchBase-input"
+    And I click the "input" located in ".checkbox-hide-subtitle"
     And I click the 'ModalClose'
     Then I should not see a collection card with subtitle "Subtitle"
