@@ -97,7 +97,7 @@ class DefaultCollectionCover < SimpleService
       # for FileItems we find, skip over any non-images
       next if item.is_a?(Item::FileItem) && !item.image?
       next if @inheritance.private_child?(item)
-      next if item.parent_collection_card.section_type_background?
+      next if item.parent_collection_card&.section_type_background?
 
       first_item = item
       break

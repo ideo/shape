@@ -317,7 +317,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def ideas_collection_card?
-    section_type == 'ideas' && collection_id.present?
+    section_type_ideas? && collection_id.present?
   end
 
   def pinned_and_locked?

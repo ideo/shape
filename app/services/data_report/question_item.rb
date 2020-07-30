@@ -167,7 +167,7 @@ module DataReport
       # because answers outside of that section aren't tagged with an idea_id
       # so we wouldn't want to scope the dataset on them
       return if idea_id.blank? ||
-                !question_item.parent_collection_card.ideas?
+                !question_item.parent_collection_card.section_type_ideas?
 
       @group_by_idea_id = idea_id
     end
