@@ -294,6 +294,21 @@ class AudienceSettings extends React.Component {
     })
   }
 
+  handleAssignReviewers = () => {
+    const { routingStore, uiStore, submissionBox } = this.props
+
+    if (!submissionBox) return
+    if (uiStore.challengeSettingsOpen) {
+      uiStore.update('challengeSettingsOpen', false)
+    }
+
+    routingStore.routeTo('collections', submissionBox.id)
+
+    runInAction(() => {
+      submissionBox.submissions_collection.setViewMode('list')
+    })
+  }
+
   renderAudienceHeading() {
     const { uiStore, routingStore, testCollection } = this.props
     const { viewingChallengeTest } = this
@@ -314,7 +329,7 @@ class AudienceSettings extends React.Component {
   }
 
   render() {
-    const { uiStore, testCollection, apiStore } = this.props
+    const { uiStore, testCollection, apiStore, submissionBox } = this.props
     const { numPaidQuestions, is_inside_a_challenge } = testCollection
     const { currentUser } = apiStore
     const currentUserOrganization = currentUser.current_organization
@@ -351,6 +366,9 @@ class AudienceSettings extends React.Component {
               locked={this.locked}
               displayChallengeAudiences={is_inside_a_challenge}
               challengeName={this.challengeName}
+              handleAssignReviewers={
+                !submissionBox ? null : this.handleAssignReviewers
+              }
             />
           </Fragment>
         )}
@@ -376,6 +394,11 @@ class AudienceSettings extends React.Component {
 
 AudienceSettings.propTypes = {
   testCollection: MobxPropTypes.objectOrObservableObject.isRequired,
+  submissionBox: MobxPropTypes.objectOrObservableObject,
+}
+
+AudienceSettings.defaultProps = {
+  submissionBox: null,
 }
 AudienceSettings.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,

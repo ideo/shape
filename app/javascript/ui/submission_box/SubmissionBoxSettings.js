@@ -145,7 +145,10 @@ class SubmissionBoxSettings extends React.Component {
         <Heading3>Submission Format</Heading3>
         <SubmissionBoxFormat collection={collection} closeModal={closeModal} />
         {this.submissionTemplateTest && (
-          <AudienceSettings testCollection={this.submissionTemplateTest} />
+          <AudienceSettings
+            testCollection={this.submissionTemplateTest}
+            submissionBox={collection}
+          />
         )}
       </React.Fragment>
     )

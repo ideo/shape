@@ -447,6 +447,8 @@ export const fakeCollection = {
   isParentMethodLibrary: false,
   collection_cards: fakeCards,
   sortedCards: fakeCards,
+  sortedCoverCards: fakeCards,
+  sortedBackgroundCards: fakeCards,
   parent_collection_card: fakeCollectionCard,
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
@@ -465,6 +467,7 @@ export const fakeCollection = {
   API_updateNameAndCover: jest.fn(),
   API_getNextAvailableTest: jest.fn().mockReturnValue(Promise.resolve(null)),
   API_clearCollectionCover: jest.fn(),
+  API_clearBackgroundImage: jest.fn(),
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCard: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCardRoles: jest.fn().mockReturnValue(Promise.resolve({})),

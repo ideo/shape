@@ -37,6 +37,8 @@ class SerializableCollection < BaseJsonSerializer
     :challenge_participant_group_id,
     :icon,
     :show_icon_on_cover,
+    :propagate_background_image,
+    :propagate_font_color,
   )
 
   stringified_attributes(
@@ -189,6 +191,10 @@ class SerializableCollection < BaseJsonSerializer
     @object.test_collection.id.to_s
   end
 
+  attribute :parent_submission_box, if: -> { @object.is_a?(Collection::TestCollection) } do
+    @object.parent_submission_box
+  end
+
   attribute :awaiting_updates do
     @object.awaiting_updates?
   end
@@ -223,6 +229,11 @@ class SerializableCollection < BaseJsonSerializer
 
   has_one :restorable_parent do
     @object.try(:restorable_parent)
+  end
+
+  # don't include this when nested in cards so that it does not get thrown off by caching
+  attribute :collection_style, if: -> { @object == @current_record } do
+    @object.collection_style
   end
 
   attribute :serializer do

@@ -752,6 +752,25 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
+  describe 'POST #clear_background_image' do
+    let!(:collection) { create(:collection, parent_collection: create(:collection), add_editors: [user]) }
+    let(:collection_card) do
+      create(:collection_card_image, order: 0, width: 1, parent: collection, is_background: true)
+    end
+    let(:path) { "/api/v1/collections/#{collection.id}/clear_background_image" }
+
+    before do
+      user.add_role(Role::VIEWER, collection_card.item)
+    end
+
+    it 'should clear the cover from the collection' do
+      expect(collection.background_image_url).to eq collection_card.item.image_url
+      post(path)
+      expect(collection_card.reload.is_background).to be false
+      expect(collection.reload.background_image_url).to be nil
+    end
+  end
+
   describe 'POST #background_update_template_instances' do
     let(:template) { create(:collection, master_template: true, add_editors: [user], num_cards: 1) }
     let(:path) { "/api/v1/collections/#{template.id}/background_update_template_instances" }

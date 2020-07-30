@@ -229,8 +229,6 @@ export default class UiStore {
   @observable
   linkedInMyCollection = false
   @observable
-  editingCardCover = null
-  @observable
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null
@@ -903,7 +901,7 @@ export default class UiStore {
       this.viewingRecord &&
       record &&
       this.viewingRecord.id === record.id &&
-      this.viewingRecord.internalType == record.internalType
+      this.viewingRecord.internalType === record.internalType
     )
       return
     if (this.viewingRecord) this.previousViewingRecord = this.viewingRecord
@@ -913,15 +911,14 @@ export default class UiStore {
 
   @computed
   get viewingCollection() {
-    return this.viewingRecord &&
-      this.viewingRecord.internalType === 'collections'
+    return this.viewingRecord && this.viewingRecord.isCollection
       ? this.viewingRecord
       : null
   }
 
   @computed
   get viewingItem() {
-    return this.viewingRecord && this.viewingRecord.internalType === 'items'
+    return this.viewingRecord && this.viewingRecord.isItem
       ? this.viewingRecord
       : null
   }
@@ -930,6 +927,18 @@ export default class UiStore {
   get viewingCollectionId() {
     const { viewingCollection } = this
     return viewingCollection ? viewingCollection.id : null
+  }
+
+  setBodyBackgroundImage(image_url = null) {
+    if (image_url) {
+      _.assign(document.body.style, {
+        'background-image': `url('${image_url}')`,
+      })
+    } else {
+      _.assign(document.body.style, {
+        'background-image': null,
+      })
+    }
   }
 
   @action
@@ -1303,7 +1312,7 @@ export default class UiStore {
   // after performing an action (event), track following the record for notifications
   trackEvent(event, record) {
     this.trackRecord(record.identifier)
-    if (record.internalType === 'items' && record.parent) {
+    if (record.isItem && record.parent) {
       this.trackRecord(record.parent.identifier)
     }
   }

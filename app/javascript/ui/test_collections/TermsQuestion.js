@@ -60,7 +60,7 @@ class TermsQuestion extends React.Component {
             selected={
               !answered ||
               (answered && user && !user.respondent_terms_accepted) ||
-              choice == 'no'
+              choice === 'no'
             }
             onClick={this.handleClick(false)}
           >
@@ -71,7 +71,7 @@ class TermsQuestion extends React.Component {
             selected={
               !answered ||
               (answered && user && user.respondent_terms_accepted) ||
-              choice == 'yes'
+              choice === 'yes'
             }
             onClick={this.handleClick(true)}
           >

@@ -14,12 +14,15 @@
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
 #  end_date                       :datetime
+#  font_color                     :string
 #  hide_submissions               :boolean          default(FALSE)
 #  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
 #  num_columns                    :integer
 #  processing_status              :integer
+#  propagate_background_image     :boolean          default(FALSE)
+#  propagate_font_color           :boolean          default(FALSE)
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
 #  show_icon_on_cover             :boolean
@@ -117,7 +120,8 @@ class Collection < ApplicationRecord
                  :loading_content,
                  :cached_inheritance,
                  :common_viewable,
-                 :broadcasting
+                 :broadcasting,
+                 :background_image_url
 
   # validations
   validates :name, presence: true
@@ -806,6 +810,10 @@ class Collection < ApplicationRecord
     save
   end
 
+  def collection_style
+    CollectionStyle.call(self)
+  end
+
   def cache_card_count!
     cache_attribute!(
       :cached_card_count,
@@ -857,14 +865,15 @@ class Collection < ApplicationRecord
       /#{ActiveRecord::Migrator.current_version}
       /#{ENV['HEROKU_RELEASE_VERSION']}
       /order_#{card_order}
-      /cards_#{collection_cards.maximum(:updated_at).to_i}
+      /cards_#{collection_cards.maximum(:updated_at).to_f}
       /#{test_details}
       /#{challenge_details}
       /gs_#{getting_started_shell}
-        /org_#{organization.updated_at}
+      /org_#{organization.updated_at}
       /user_id_#{user_id}
       /locale_#{I18n.locale}
-      /roles_#{anchored_roles.maximum(:updated_at).to_i}
+      /roles_#{anchored_roles.maximum(:updated_at).to_f}
+      /inherited_#{parents.maximum(:updated_at).to_f}
     ).gsub(/\s+/, '')
   end
 
@@ -887,6 +896,16 @@ class Collection < ApplicationRecord
 
     cover.update(is_cover: false)
     touch
+  end
+
+  def clear_background_image
+    bg_card = primary_collection_cards.where(is_background: true).first
+    if bg_card.nil?
+      update(background_image_url: nil)
+      return
+    end
+
+    bg_card.update(is_background: false)
   end
 
   def reset_permissions!
@@ -1112,7 +1131,7 @@ class Collection < ApplicationRecord
   end
 
   def inside_a_challenge?
-    parent_challenge.present?
+    parents.where(collection_type: :challenge).any?
   end
 
   def submission_test?
