@@ -78,8 +78,8 @@ describe('CardCoverEditor', () => {
 
   describe('renderInner()', () => {
     describe('with a collection', () => {
-      it('should render the QuickOptionSelectors for cover, bg images, and filters', () => {
-        expect(innerWrapper.find('QuickOptionSelector').length).toEqual(3)
+      it('should render the QuickOptionSelectors for cover, bg images, font and filters', () => {
+        expect(innerWrapper.find('QuickOptionSelector').length).toEqual(4)
       })
 
       it('should render a TextareaAutosize for editing card title and subtitle', () => {

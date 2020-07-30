@@ -10,6 +10,7 @@ import { ThemeProvider } from 'styled-components'
 
 import ClickWrapper from '~/ui/layout/ClickWrapper'
 import ChannelManager from '~/utils/ChannelManager'
+import CardCoverEditor from '~/ui/grid/CardCoverEditor'
 import CollectionCollaborationService from '~/utils/CollectionCollaborationService'
 import CollectionGrid from '~/ui/grid/CollectionGrid'
 import CollectionFilter, {
@@ -622,7 +623,11 @@ class CollectionPage extends React.Component {
     }
 
     // submissions_collection will only exist for submission boxes
-    const { isSubmissionBox, isTestCollection } = collection
+    const {
+      isSubmissionBox,
+      isTestCollection,
+      parent_collection_card,
+    } = collection
     const userRequiresOrg =
       !apiStore.currentUserOrganization && collection.common_viewable
 
@@ -716,6 +721,17 @@ class CollectionPage extends React.Component {
           )}
           {isLoading && this.loader()}
           {!isLoading && isTransparentLoading && this.transparentLoader()}
+          {collection.can_edit_content &&
+            collection.canSetACover &&
+            parent_collection_card && (
+              <CardCoverEditor
+                card={parent_collection_card}
+                isEditingCardCover={
+                  uiStore.editingCardCover === parent_collection_card.id
+                }
+                pageMenu
+              />
+            )}
         </Fragment>
       </ThemeProvider>
     )

@@ -228,8 +228,6 @@ export default class UiStore {
   @observable
   linkedInMyCollection = false
   @observable
-  editingCardCover = null
-  @observable
   replyingToCommentId = null
   @observable
   commentThreadBottomVisible = null

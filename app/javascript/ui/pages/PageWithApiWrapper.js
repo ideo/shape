@@ -186,6 +186,11 @@ class PageWithApiWrapper extends React.Component {
     if (requestPath === this.pathRequested) {
       this.setRecord(record)
     }
+    const { parent_collection_card } = record
+    if (parent_collection_card && !parent_collection_card.record) {
+      // set this relationship in the other direction
+      parent_collection_card.record = record
+    }
     this.trackPageView(record)
   }
 
