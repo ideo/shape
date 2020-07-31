@@ -472,6 +472,7 @@ export const fakeCollection = {
   API_fetchCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCard: jest.fn().mockReturnValue(Promise.resolve({})),
   API_fetchCardRoles: jest.fn().mockReturnValue(Promise.resolve({})),
+  API_fetchAndMergeCards: jest.fn().mockReturnValue(Promise.resolve({})),
   API_batchUpdateCardsWithUndo: jest.fn().mockReturnValue(Promise.resolve({})),
   API_createCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
   API_destroyCollectionFilter: jest.fn().mockReturnValue(Promise.resolve({})),
@@ -501,12 +502,14 @@ export const fakeCollection = {
   removeCardIds: jest.fn(),
   setCarouselIdx: jest.fn(),
   setViewMode: jest.fn(),
+  setLatestCollaborator: jest.fn(),
   cardProperties: [],
   internalType: 'collections',
   collection_type: 'method',
   phaseSubCollections: [],
   loadPhaseSubCollections: jest.fn().mockReturnValue(Promise.resolve([])),
   setPhaseSubCollections: jest.fn(),
+  applyRemoteUpdates: jest.fn(),
   meta: {
     snapshot: {
       can_edit: false,

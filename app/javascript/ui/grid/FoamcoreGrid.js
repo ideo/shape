@@ -547,7 +547,9 @@ class FoamcoreGrid extends React.Component {
     if (uiStore.selectedAreaShifted) {
       selectedCardIds = _.union(selectedCardIds, uiStore.selectedCardIds)
     }
-    uiStore.reselectCardIds(selectedCardIds)
+    if (_.difference(selectedCardIds, uiStore.selectedCardIds).length > 0) {
+      uiStore.reselectCardIds(selectedCardIds)
+    }
   }
 
   handleBlankCardClick = ({ row, col, create = false }) => e => {

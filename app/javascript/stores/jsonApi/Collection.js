@@ -927,7 +927,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const { apiStore } = this
     const res = await apiStore.fetch('collection_cards', cardId, true)
     // make sure it's in our current collection
-    this.addCard(res.data)
+    const card = res.data
+    this.addCard(card)
+    return card
   }
 
   @action
@@ -998,11 +1000,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await apiStore.request(
       `collections/${this.id}/collection_cards?select_ids=${ids}`
     )
+    const cards = res.data
     runInAction(() => {
-      this.mergeCards(res.data)
-      if (this.isBoard) return
-      this.API_fetchCardOrders()
+      this.mergeCards(cards)
+      if (!this.isBoard) {
+        this.API_fetchCardOrders()
+      }
     })
+    return cards
   }
 
   @action
