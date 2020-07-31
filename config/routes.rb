@@ -41,6 +41,7 @@ Rails.application.routes.draw do
           post 'insert_row'
           post 'remove_row'
           post 'background_update_live_test'
+          post 'collection_challenge_setup'
         end
         collection do
           post 'create_template'

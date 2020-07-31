@@ -141,30 +141,6 @@ describe Collection, type: :model do
       end
     end
 
-    describe '#create_challenge_groups_and_assign_roles' do
-      let(:organization) { create(:organization) }
-      let(:current_user) { create(:user) }
-      let!(:collection) { create(:collection, organization: organization, collection_type: 'project', created_by: current_user) }
-
-      before do
-        collection.update(collection_type: 'challenge')
-      end
-
-      it 'should create a challenge admin group, participant group, and reviewer group' do
-        admin_group = collection.challenge_admin_group
-        reviewer_group = collection.challenge_reviewer_group
-        participant_group = collection.challenge_participant_group
-        expect(admin_group.present?).to be true
-        expect(reviewer_group.present?).to be true
-        expect(reviewer_group.present?).to be true
-        expect(admin_group.can_edit?(current_user)).to be true
-        expect(reviewer_group.can_edit?(current_user)).to be true
-        expect(participant_group.can_edit?(current_user)).to be true
-        expect(reviewer_group.can_edit?(admin_group)).to be true
-        expect(participant_group.can_edit?(admin_group)).to be true
-      end
-    end
-
     describe '#submission_template_test_collections' do
       let(:organization) { create(:organization) }
       let!(:submission_box) { create(:submission_box) }
@@ -998,7 +974,9 @@ describe Collection, type: :model do
       let!(:test_collection) do
         create(:test_collection, :completed, parent_collection: submission_template, template_id: master_test.id)
       end
+      let(:reviewer_group) { create(:group, name: 'Collection Reviewers') }
       before do
+        parent_challenge.update(challenge_reviewer_group: reviewer_group)
         reviewer.add_role(Role::MEMBER, parent_challenge.challenge_reviewer_group)
       end
       it 'should lookup reviewer audience' do

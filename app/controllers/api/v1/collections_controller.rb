@@ -8,7 +8,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
-  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover clear_background_image]
+  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover clear_background_image collection_challenge_setup]
   after_action :broadcast_parent_collection_card_update, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -68,6 +68,14 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def clear_background_image
     @collection.clear_background_image
+    @collection.reload
+    render_collection
+  end
+
+  def collection_challenge_setup
+    # collections that become a challenge gets their roles unanchored
+    collection_challenge_setup = CollectionChallengeSetup.new(collection: @collection, current_user: current_user)
+    collection_challenge_setup.call
     @collection.reload
     render_collection
   end
