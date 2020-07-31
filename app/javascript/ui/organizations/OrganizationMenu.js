@@ -139,7 +139,13 @@ class OrganizationMenu extends React.Component {
   }
 
   renderAddGroup() {
-    return <GroupModify group={{}} onSave={this.createGroup} />
+    return (
+      <GroupModify
+        group={{}}
+        isLoading={this.isLoading}
+        onSave={this.createGroup}
+      />
+    )
   }
 
   renderCreateOrganization() {
@@ -148,6 +154,7 @@ class OrganizationMenu extends React.Component {
         {this.isLoading && <InlineLoader />}
         <GroupModify
           group={{}}
+          isLoading={this.isLoading}
           onSave={this.createOrganization}
           onCancel={this.handleLogout}
           groupType="Organization"
@@ -164,6 +171,7 @@ class OrganizationMenu extends React.Component {
       <GroupModify
         onGroupRoles={this.onGroupRoles(editGroup)}
         group={editGroup}
+        isLoading={this.isLoading}
         onSave={group => {
           this.saveOrganization(group)
           this.afterGroupSave(group)
