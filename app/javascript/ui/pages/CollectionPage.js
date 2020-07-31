@@ -30,7 +30,7 @@ import SubmissionBoxSettingsModal from '~/ui/submission_box/SubmissionBoxSetting
 import EditorPill from '~/ui/items/EditorPill'
 import SearchCollection from '~/ui/grid/SearchCollection'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
-import v from '~/utils/variables'
+import v, { COLLECTION_CHANNEL_NAME } from '~/utils/variables'
 import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
@@ -47,7 +47,6 @@ class CollectionPage extends React.Component {
 
   updatePoller = null
   editorTimeout = null
-  channelName = 'CollectionViewingChannel'
 
   constructor(props) {
     super(props)
@@ -71,7 +70,7 @@ class CollectionPage extends React.Component {
 
   @action
   componentDidUpdate(prevProps) {
-    const { collection, routingStore } = this.props
+    const { collection, uiStore, routingStore } = this.props
     const {
       collection: { id: previousId },
     } = prevProps
@@ -81,10 +80,11 @@ class CollectionPage extends React.Component {
         this.cardsFetched = false
       })
       // unsubscribe from previous collection; subscribe to new one
-      ChannelManager.unsubscribeAllFromChannel(this.channelName)
+      ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
       this.subscribeToChannel(currentId)
       // when navigating between collections, close BCT
-      this.props.uiStore.closeBlankContentTool()
+      uiStore.closeBlankContentTool()
+      uiStore.resetCardPositions()
       this.setViewingRecordAndRestoreScrollPosition()
       this.loadCollectionCards({})
       routingStore.updateScrollState(previousId, window.pageYOffset)
@@ -93,7 +93,7 @@ class CollectionPage extends React.Component {
 
   componentWillUnmount() {
     const { routingStore, collection } = this.props
-    ChannelManager.unsubscribeAllFromChannel(this.channelName)
+    ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
     routingStore.updateScrollState(collection.id, window.pageYOffset)
   }
 
@@ -316,7 +316,7 @@ class CollectionPage extends React.Component {
   }
 
   subscribeToChannel(id) {
-    ChannelManager.subscribe(this.channelName, id, {
+    ChannelManager.subscribe(COLLECTION_CHANNEL_NAME, id, {
       channelReceivedData: this.receivedChannelData,
     })
   }
@@ -338,7 +338,7 @@ class CollectionPage extends React.Component {
 
   receivedChannelData = async data => {
     const { collection, apiStore } = this.props
-    const { collaborators } = data
+    const { collaborators, current_editor } = data
     collection.setCollaborators(collaborators)
     // catch if receivedData happens after reload
     if (!collection) return
@@ -355,16 +355,16 @@ class CollectionPage extends React.Component {
     }
 
     const updateData = data.data
-    if (updateData && !updateData.text_item) {
+    if (updateData && !updateData.text_item && !updateData.cards_selected) {
       // don't show editor for text item updates, might be overkill
-      this.setEditor(data.current_editor)
+      this.setEditor(current_editor)
     }
     if (!updateData || updateData.reload_cards) {
       this.reloadData()
       return
     }
     const service = new CollectionCollaborationService({ collection })
-    service.handleReceivedData(updateData)
+    service.handleReceivedData(updateData, current_editor)
   }
 
   async _reloadData() {
@@ -443,7 +443,9 @@ class CollectionPage extends React.Component {
 
     const collaborator = _.find(collaborators, c => c.id === currentEditor.id)
     if (collaborator && collaborator.color) {
-      currentEditor.color = collaborator.color
+      runInAction(() => {
+        currentEditor.color = collaborator.color
+      })
     }
     if (_.isEmpty(currentEditor) || currentEditor.id === currentUserId) {
       // toggle hidden on/off to allow EditorPill CSS to fade in/out
@@ -485,6 +487,42 @@ class CollectionPage extends React.Component {
       movingCardIds: [],
     }
 
+    let renderedSubmissions
+    if (submissions_collection.viewMode === 'list') {
+      renderedSubmissions = (
+        <CollectionList
+          collection={submissions_collection}
+          loadCollectionCards={this.loadSubmissionsCollectionCards}
+        />
+      )
+    } else if (submissions_collection.isBoard) {
+      // TODO: remove this switch between Foamcore and Normal Grid, only needed for now;
+      // same note as in SearchCollection
+      renderedSubmissions = (
+        <FoamcoreGrid
+          {...genericCollectionProps}
+          submissionSettings={{
+            type: submission_box_type,
+            template: submission_template,
+            enabled: submissions_enabled,
+          }}
+        />
+      )
+    } else {
+      renderedSubmissions = (
+        <CollectionGrid
+          {...gridSettings}
+          {...genericCollectionProps}
+          submissionSettings={{
+            type: submission_box_type,
+            template: submission_template,
+            enabled: submissions_enabled,
+          }}
+          sorting
+        />
+      )
+    }
+
     return (
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
@@ -499,32 +537,14 @@ class CollectionPage extends React.Component {
             sortable
           />
         </Flex>
-        {submissions_collection.viewMode === 'list' ? (
-          <CollectionList
-            collection={submissions_collection}
-            loadCollectionCards={this.loadSubmissionsCollectionCards}
-          />
-        ) : (
-          <CollectionGrid
-            {...gridSettings}
-            {...genericCollectionProps}
-            submissionSettings={{
-              type: submission_box_type,
-              template: submission_template,
-              enabled: submissions_enabled,
-            }}
-            sorting
+        {renderedSubmissions}
+        {submissions_enabled && submissions_collection.viewMode !== 'list' && (
+          <FloatingActionButton
+            toolTip={`Create New Submission`}
+            onClick={this.onAddSubmission}
+            icon={<PlusIcon />}
           />
         )}
-        {apiStore.currentUser &&
-          submissions_enabled &&
-          submissions_collection.viewMode !== 'list' && (
-            <FloatingActionButton
-              toolTip={`Create New Submission`}
-              onClick={this.onAddSubmission}
-              icon={<PlusIcon />}
-            />
-          )}
       </div>
     )
   }
@@ -603,7 +623,6 @@ class CollectionPage extends React.Component {
       blankContentToolState,
       submissionBoxSettingsOpen,
       gridSettings,
-      selectedArea,
     } = uiStore
 
     // props shared by Foamcore + Normal
@@ -642,14 +661,7 @@ class CollectionPage extends React.Component {
         />
       )
     } else if (collection.isBoard) {
-      inner = (
-        <FoamcoreGrid
-          {...genericCollectionProps}
-          selectedArea={selectedArea}
-          // Included so that component re-renders when area changes
-          selectedAreaMinX={selectedArea.minX}
-        />
-      )
+      inner = <FoamcoreGrid {...genericCollectionProps} />
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {

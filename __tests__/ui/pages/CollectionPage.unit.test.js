@@ -90,6 +90,10 @@ describe('CollectionPage', () => {
         expect(uiStore.closeBlankContentTool).toHaveBeenCalled()
       })
 
+      it('should reset card positions', () => {
+        expect(uiStore.resetCardPositions).toHaveBeenCalled()
+      })
+
       it('should reload the data', () => {
         expect(collection.API_fetchCards).toHaveBeenCalled()
         expect(component.cardsFetched).toBe(true)

@@ -9,7 +9,10 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl, useTemplateInMyCollection } from '~/utils/url'
 
-import { findTopLeftCard } from '~/utils/CollectionGridCalculator'
+import {
+  calculateRowsCols,
+  findTopLeftCard,
+} from '~/utils/CollectionGridCalculator'
 import BaseRecord from './BaseRecord'
 import CardMoveService from '~/utils/CardMoveService'
 import CollectionCard from './CollectionCard'
@@ -85,6 +88,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.searchResultsCollection = new Collection(
         {
           ...this.rawAttributes(),
+          // create as a 4WFC board
+          num_columns: 4,
+          can_edit_content: false,
           // making up a type
           class_type: 'SearchResultsCollection',
         },
@@ -278,22 +284,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return cardIds
   }
 
-  cardIdsWithinRectangle(minCoords, maxCoords) {
-    const rowRange = _.range(minCoords.row, maxCoords.row + 1)
-    const colRange = _.range(minCoords.col, maxCoords.col + 1)
-
-    const matrix = this.cardMatrix
-    const cardIds = []
-    _.each(rowRange, row => {
-      _.each(colRange, col => {
-        const card = matrix[row] && matrix[row][col]
-        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
-      })
-    })
-
-    return cardIds
-  }
-
   get shouldShowEditWarning() {
     if (!this.isTemplate || this.template_num_instances === 0) return false
     // if we already have the confirmation open, don't try to re-open
@@ -473,6 +463,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.type === 'Collection::Board' || !!this.num_columns
   }
 
+  get isBigBoard() {
+    return this.isBoard && this.num_columns > 4
+  }
+
   get isFourWideBoard() {
     return this.isBoard && this.num_columns === 4
   }
@@ -631,7 +625,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @computed
   get cardProperties() {
     return this.collection_cards.map(c =>
-      _.pick(c, ['id', 'updated_at', 'order'])
+      _.pick(c, ['id', 'updated_at', 'order', 'row', 'col'])
     )
   }
 
@@ -743,6 +737,25 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  get isSplitLevel() {
+    return this.isSubmissionBox || this.isSearchCollection
+  }
+
+  get isSplitLevelBottom() {
+    return this.isSubmissionsCollection || this.isSearchResultsCollection
+  }
+
+  get showFilters() {
+    // these split-level types don't show the filters for the top half
+    if (this.isSplitLevel) return false
+    return (
+      this.isRegularCollection ||
+      this.isUserCollection ||
+      this.isSubmissionsCollection ||
+      this.isBoard
+    )
+  }
+
   get activeFilters() {
     let { collection_filters } = this
     if (this.isSearchResultsCollection) {
@@ -844,7 +857,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (this.isBoard) {
+    if (this.isBoard && !this.isSplitLevelBottom) {
       // nullify these as they have no effect on boards
       delete params.per_page
       delete params.page
@@ -916,6 +929,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         )
         this.collection_cards.replace(newData)
       }
+
+      if (this.isSplitLevelBottom) {
+        this.calculateRowsCols()
+      }
+
       if (this.isBoard && params.rows) {
         this.updateMaxLoadedColsRows({ maxRow: params.rows[1] })
       }
@@ -923,11 +941,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  @action
+  calculateRowsCols() {
+    // EXPERIMENT: apply rows/cols so that we can render search results as a FoamcoreGrid
+    calculateRowsCols(this.collection_cards, {
+      sortByOrder: false,
+      apply: true,
+      // submissionsCollection needs to make room for "AddSubmission" at 0,0
+      prefilled: this.isSubmissionsCollection ? 1 : 0,
+    })
+    const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
+    // this value is simulated
+    this.max_row_index = maxRow
+    this.updateMaxLoadedColsRows({ maxRow })
+  }
+
   API_fetchCard = async cardId => {
     const { apiStore } = this
     const res = await apiStore.fetch('collection_cards', cardId, true)
     // make sure it's in our current collection
-    this.addCard(res.data)
+    const card = res.data
+    this.addCard(card)
+    return card
   }
 
   @action
@@ -998,11 +1033,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await apiStore.request(
       `collections/${this.id}/collection_cards?select_ids=${ids}`
     )
+    const cards = res.data
     runInAction(() => {
-      this.mergeCards(res.data)
-      if (this.isBoard) return
-      this.API_fetchCardOrders()
+      this.mergeCards(cards)
+      if (!this.isBoard) {
+        this.API_fetchCardOrders()
+      }
     })
+    return cards
   }
 
   @action
@@ -1305,14 +1343,19 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
     return this.can_review
   }
-  // after we reorder a single card, we want to make sure everything goes into sequential order
+
+  // TODO: deprecate once we fully migrate 4WFC
   @action
   _reorderCards() {
     // NOTE: this should work ok even if there are infinite scroll / pagination cards
     // not being displayed offscreen...
     if (this.collection_cards) {
       _.each(this.sortedCards, (card, i) => {
-        card.order = i
+        if (this.isBoard) {
+          card.order = 0
+        } else {
+          card.order = i
+        }
       })
     }
   }
@@ -1893,6 +1936,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   applyRowUpdate({ row, action }) {
     // by making this an action it will cause one re-render instead of many
+    if (action === ROW_ACTIONS.REMOVE) {
+      this.max_row_index -= 1
+    } else {
+      this.max_row_index += 1
+    }
     this.collection_cards.forEach(card => {
       const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
       if (card.row > row) {

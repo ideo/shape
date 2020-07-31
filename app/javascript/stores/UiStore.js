@@ -9,11 +9,13 @@ import v, {
   EVENT_SOURCE_TYPES,
   FOAMCORE_MAX_ZOOM,
   ACTIVITY_LOG_PAGE_KEY,
+  COLLECTION_CHANNEL_NAME,
 } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 import { calculatePageMargins } from '~/utils/pageUtils'
+import ChannelManager from '~/utils/ChannelManager'
 
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
@@ -223,6 +225,7 @@ export default class UiStore {
   selectedAreaShifted = false
   @observable
   selectedAreaEnabled = false
+  cardPositions = []
   @observable
   linkedBreadcrumbTrail = []
   @observable
@@ -340,8 +343,63 @@ export default class UiStore {
 
   @action
   setSelectedArea(selectedArea, { shifted = false } = {}) {
+    const { viewingCollection } = this
     this.selectedArea = selectedArea
     this.selectedAreaShifted = shifted
+
+    if (viewingCollection && viewingCollection.isBoard) {
+      this.selectCardsWithinSelectedArea()
+    }
+  }
+
+  @action
+  resetCardPositions() {
+    this.cardPositions = []
+  }
+
+  @action
+  setCardPosition(cardId, { top, right, bottom, left } = {}) {
+    const idx = _.findIndex(this.cardPositions, { cardId })
+    const data = { cardId, position: { top, right, bottom, left } }
+    if (idx >= 0) {
+      this.cardPositions[idx] = data
+      return
+    }
+    this.cardPositions.push(data)
+  }
+
+  @action
+  selectCardsWithinSelectedArea() {
+    const { minX, minY, maxX, maxY } = this.selectedArea
+    const { selectedCardIds, selectedAreaShifted } = this
+    let newSelectedCardIds = []
+
+    if (minY === null || minX === null) {
+      // or select none??
+      return
+    }
+
+    const scrollTop = window.pageYOffset
+
+    newSelectedCardIds = _.map(
+      _.filter(this.cardPositions, pos => {
+        const { top, right, bottom, left } = pos.position
+        return !(
+          right < minX ||
+          left > maxX ||
+          bottom + scrollTop < minY ||
+          top + scrollTop > maxY
+        )
+      }),
+      'cardId'
+    )
+
+    if (selectedAreaShifted) {
+      newSelectedCardIds = _.union(newSelectedCardIds, selectedCardIds)
+    }
+    if (_.difference(newSelectedCardIds, selectedCardIds).length > 0) {
+      this.reselectCardIds(newSelectedCardIds)
+    }
   }
 
   @action
@@ -913,6 +971,7 @@ export default class UiStore {
     } else {
       this.selectedCardIds.push(cardId)
     }
+    this.broadcastCardSelection([...this.selectedCardIds])
   }
 
   // For certain actions we want to force a toggle on
@@ -927,11 +986,26 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+    this.broadcastCardSelection([...cardIds])
   }
 
   @action
   selectCardIds(cardIds) {
-    this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
+    this.reselectCardIds(_.uniq([...this.selectedCardIds, ...cardIds]))
+  }
+
+  broadcastCardSelection = cardIds => {
+    const { viewingCollection } = this
+    if (!viewingCollection) {
+      return
+    }
+    const channel = ChannelManager.getChannel(
+      COLLECTION_CHANNEL_NAME,
+      viewingCollection.id
+    )
+    if (channel) {
+      channel.perform('cards_selected', { card_ids: cardIds })
+    }
   }
 
   reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
@@ -1445,6 +1519,9 @@ export default class UiStore {
 
   @action
   determineZoomLevels(collection) {
+    if (collection.isSplitLevelBottom) {
+      return
+    }
     const { windowWidth } = this
     const maxCols = this.maxCols(collection)
     const pageMargins = this.pageMargins(collection)

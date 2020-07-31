@@ -27,18 +27,30 @@ export const findBottomRowCards = cards => {
 }
 
 // calculate row/col of these cards as if they were in a 4-column grid sequentially
-export const calculateRowsCols = cards => {
+export const calculateRowsCols = (
+  cards,
+  { sortByOrder = true, apply = false, prefilled = 0 } = {}
+) => {
   let row = 0
   const matrix = []
   const cols = 4
   // create an empty row
   matrix.push(_.fill(Array(cols), null))
-  const sortedCards = _.sortBy(cards, 'order')
+  if (prefilled > 0) {
+    _.fill(matrix[0], 'prefilled', 0, prefilled)
+  }
+  let sortedCards = [...cards]
+  if (sortByOrder) {
+    // e.g. for search results we don't want to re-sort the cards
+    sortedCards = _.sortBy(cards, 'order')
+  }
 
   _.each(sortedCards, (card, i) => {
     let filled = false
-    while (!filled) {
-      const { width, height } = card
+    while (!filled && row < 500) {
+      let { width, height } = card
+      if (!width) width = 1
+      if (!height) height = 1
       // go through the row and see if there is an empty gap that fits cardWidth
       const gaps = groupByConsecutive(matrix[row], null)
       const maxGap = _.find(gaps, g => g.length >= width) || {
@@ -51,6 +63,10 @@ export const calculateRowsCols = cards => {
         const position = {
           x: nextX,
           y: row,
+        }
+        if (apply) {
+          card.row = row
+          card.col = nextX
         }
         card.position = position
 

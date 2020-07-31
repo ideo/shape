@@ -231,6 +231,40 @@ describe('UiStore', () => {
     })
   })
 
+  describe('#selectCardsWithinSelectedArea', () => {
+    const coords = {
+      minX: 0,
+      minY: 0,
+      maxX: 100,
+      maxY: 200,
+    }
+    beforeEach(() => {
+      uiStore.setSelectedArea(coords)
+      // cardPositions determines where each card is placed on the grid
+      // gets called in GridCard when it sets the ref
+      uiStore.setCardPosition('1', { top: 0, right: 100, bottom: 100, left: 0 })
+      uiStore.setCardPosition('2', {
+        top: 300,
+        right: 100,
+        bottom: 500,
+        left: 0,
+      })
+    })
+
+    it('selects cards in within the selectedArea', () => {
+      expect(uiStore.selectedCardIds).toEqual([])
+      uiStore.selectCardsWithinSelectedArea()
+      expect(uiStore.selectedCardIds).toEqual(['1'])
+    })
+
+    it('adds to selection if shifted', () => {
+      uiStore.reselectCardIds(['5'])
+      uiStore.setSelectedArea(coords, { shifted: true })
+      uiStore.selectCardsWithinSelectedArea()
+      expect(uiStore.selectedCardIds).toEqual(['1', '5'])
+    })
+  })
+
   describe('zoom functions', () => {
     const collection = fakeCollection
     beforeEach(() => {
