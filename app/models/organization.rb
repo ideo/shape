@@ -5,6 +5,7 @@
 #  id                                    :bigint(8)        not null, primary key
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
+#  billable                              :boolean          default(FALSE)
 #  deactivated                           :boolean          default(FALSE), not null
 #  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
@@ -122,11 +123,6 @@ class Organization < ApplicationRecord
 
   scope :active, -> { where(deactivated: false) }
   scope :shell, -> { where(shell: true) }
-  scope :billable, -> do
-    active
-      .where(in_app_billing: true)
-      .where(arel_table[:active_users_count].gt(FREEMIUM_USER_LIMIT))
-  end
   scope :overdue, -> do
     billable
       .where.not(overdue_at: nil)
