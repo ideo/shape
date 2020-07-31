@@ -67,8 +67,6 @@ export const highlightedCardCss = css`
 
 export const StyledGridCard = styled.div`
   background: ${props => props.background || 'white'};
-  box-shadow: ${props =>
-    props.dragging ? '1px 1px 5px 2px rgba(0, 0, 0, 0.25)' : ''};
   cursor: ${props => {
     if (props.dragging) return 'grabbing'
     else if (props.unclickable) return 'auto'
@@ -81,6 +79,9 @@ export const StyledGridCard = styled.div`
   padding: 0;
   position: relative;
   width: 100%;
+  /* box-shadow is used for collaborator and dragging */
+  transition: box-shadow 0.6s;
+
   ${props => !props.inSearchPage && `z-index: 1`};
 
   ${props =>
@@ -90,10 +91,23 @@ export const StyledGridCard = styled.div`
     ${highlightedCardCss}
   }
   `};
+
+  ${props =>
+    props.collaboratorColor &&
+    `
+    box-shadow: 0 0 0 3px ${props.collaboratorColor};
+  `}
+  ${props =>
+    props.dragging &&
+    `
+    box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.25);
+    transition: box-shadow 0s;
+  `}
   ${props =>
     props.draggingMultiple &&
     `
       box-shadow: -10px 10px 0 0px ${v.colors.secondaryLight};
+      transition: box-shadow 0s;
     `};
 `
 StyledGridCard.displayName = 'StyledGridCard'

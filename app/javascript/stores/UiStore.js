@@ -9,11 +9,13 @@ import v, {
   EVENT_SOURCE_TYPES,
   FOAMCORE_MAX_ZOOM,
   ACTIVITY_LOG_PAGE_KEY,
+  COLLECTION_CHANNEL_NAME,
 } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 import { calculatePageMargins } from '~/utils/pageUtils'
+import ChannelManager from '~/utils/ChannelManager'
 
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
@@ -395,7 +397,9 @@ export default class UiStore {
     if (selectedAreaShifted) {
       newSelectedCardIds = _.union(newSelectedCardIds, selectedCardIds)
     }
-    this.reselectCardIds(newSelectedCardIds)
+    if (_.difference(newSelectedCardIds, selectedCardIds).length > 0) {
+      this.reselectCardIds(newSelectedCardIds)
+    }
   }
 
   @action
@@ -967,6 +971,7 @@ export default class UiStore {
     } else {
       this.selectedCardIds.push(cardId)
     }
+    this.broadcastCardSelection([...this.selectedCardIds])
   }
 
   // For certain actions we want to force a toggle on
@@ -981,11 +986,26 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+    this.broadcastCardSelection([...cardIds])
   }
 
   @action
   selectCardIds(cardIds) {
-    this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
+    this.reselectCardIds(_.uniq([...this.selectedCardIds, ...cardIds]))
+  }
+
+  broadcastCardSelection = cardIds => {
+    const { viewingCollection } = this
+    if (!viewingCollection) {
+      return
+    }
+    const channel = ChannelManager.getChannel(
+      COLLECTION_CHANNEL_NAME,
+      viewingCollection.id
+    )
+    if (channel) {
+      channel.perform('cards_selected', { card_ids: cardIds })
+    }
   }
 
   reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
