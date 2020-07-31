@@ -506,6 +506,13 @@ class GridCard extends React.Component {
     }
   }
 
+  setCardRef(ref) {
+    const { card } = this.props
+    this.gridCardRef = ref
+    if (!ref) return
+    uiStore.setCardPosition(card.id, ref.getBoundingClientRect())
+  }
+
   render() {
     const {
       card,
@@ -624,7 +631,7 @@ class GridCard extends React.Component {
         data-row={card.row}
         data-cy="GridCard"
         onContextMenu={this.handleContextMenu}
-        ref={c => (this.gridCardRef = c)}
+        ref={r => this.setCardRef(r)}
         onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
         inSearchPage={searchResult}

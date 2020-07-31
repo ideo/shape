@@ -57,8 +57,6 @@ describe('FoamcoreGrid', () => {
       gridH: 200,
       gutter: 10,
       sortBy: 'order',
-      selectedArea: { minX: null, minY: null, maxX: null, maxY: null },
-      minX: null,
       loadCollectionCards: jest.fn(() => Promise.resolve()),
       updateCollection: jest.fn(),
       cardProperties: [],
@@ -535,51 +533,6 @@ describe('FoamcoreGrid', () => {
           rows: [minRow, Math.ceil(minRow + component.visibleRows.num + 3)],
         }
         expect(props.loadCollectionCards).toHaveBeenCalledWith(expectedRows)
-      })
-    })
-  })
-
-  describe('updateSelectedArea', () => {
-    beforeEach(() => {
-      cardA = createCard({ row: 0, col: 1 })
-      cardB = createCard({ row: 1, col: 2 })
-      cardC = createCard({ row: 3, col: 3 })
-      props.collection.collection_cards = [cardA, cardB, cardC]
-    })
-
-    describe('selected area not matching any cards', () => {
-      beforeEach(() => {
-        props.collection.cardIdsWithinRectangle = jest.fn().mockReturnValue([])
-        rerender()
-        props.uiStore.selectedCardIds = []
-        props.selectedArea = { minX: 500, minY: 10, maxX: 550, maxY: 20 }
-        // It would be nice if we could use the real Collection class
-        // instead of having to mock the return value:
-        component.componentDidUpdate(props)
-      })
-
-      it('does not set uiStore.selectedCardIds', () => {
-        expect(props.uiStore.selectedCardIds).toEqual([])
-      })
-    })
-
-    describe('selected area matching two cards', () => {
-      beforeEach(() => {
-        props.selectedArea = { minX: 40, minY: 150, maxX: 550, maxY: 450 }
-        // It would be nice if we could use the real Collection class
-        // instead of having to mock the return value:
-        props.collection.cardIdsWithinRectangle = jest
-          .fn()
-          .mockReturnValue([cardA.id, cardB.id])
-        rerender()
-        component.componentDidUpdate(props)
-      })
-
-      it('sets uiStore.selectedCardIds', () => {
-        expect(props.uiStore.reselectCardIds).toHaveBeenCalledWith([
-          cardA.id,
-          cardB.id,
-        ])
       })
     })
   })

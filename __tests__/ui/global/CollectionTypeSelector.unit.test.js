@@ -9,7 +9,7 @@ const props = {
   collection: fakeCollection,
   location: 'CollectionCover',
 }
-let wrapper
+let wrapper, rerender
 const types = [
   'collection',
   'project',
@@ -22,7 +22,10 @@ const types = [
 
 describe('CollectionTypeSelector', () => {
   beforeEach(() => {
-    wrapper = shallow(<CollectionTypeSelector {...props} />)
+    rerender = () => {
+      wrapper = shallow(<CollectionTypeSelector {...props} />)
+    }
+    rerender()
   })
 
   it('renders the collection type options and selects one', () => {
@@ -41,5 +44,23 @@ describe('CollectionTypeSelector', () => {
 
     expect(popout.props().menuItems.length).toEqual(types.length)
     expect(_.map(popout.props().menuItems, i => i.name)).toEqual(types)
+  })
+
+  describe('with 16-wide board collection', () => {
+    beforeEach(() => {
+      props.collection.isBigBoard = true
+      rerender()
+    })
+    afterEach(() => {
+      props.collection.isBigBoard = false
+    })
+
+    it('renders foamcore as the base collection type', () => {
+      const foamcoreTypes = ['foamcore', ...types.slice(1)]
+      const popout = wrapper.find('PopoutMenu').at(0)
+      expect(_.map(popout.props().menuItems, i => i.name)).toEqual(
+        foamcoreTypes
+      )
+    })
   })
 })

@@ -4,7 +4,6 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import { StyledGridCard } from '~/ui/grid/shared'
-import InlineLoader from '~/ui/layout/InlineLoader'
 import Collection from '~/stores/jsonApi/Collection'
 
 const StyledAddSubmission = styled(StyledGridCard)`
@@ -12,6 +11,9 @@ const StyledAddSubmission = styled(StyledGridCard)`
   cursor: auto;
   position: relative;
   text-align: center;
+  ${props =>
+    props.zoomLevel &&
+    `transform: translateZ(0) scale(${1 / props.zoomLevel});`}
 `
 StyledAddSubmission.displayName = 'StyledAddSubmission'
 
@@ -48,10 +50,6 @@ SubmissionButton.displayName = 'SubmissionButton'
 @inject('uiStore', 'apiStore')
 @observer
 class AddSubmission extends React.Component {
-  state = {
-    loading: false,
-  }
-
   handleSubmission = ev => {
     ev.preventDefault()
     const { parent_id, submissionSettings } = this.props
@@ -80,7 +78,6 @@ class AddSubmission extends React.Component {
     return (
       <StyledBlankCreationTool>
         <h3>Create New Submission</h3>
-        {this.state.loading && <InlineLoader />}
         <SubmissionButton
           disabled={this.loading}
           onClick={this.handleSubmission}
@@ -92,11 +89,11 @@ class AddSubmission extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { uiStore, zoomLevel } = this.props
     const { gridSettings, blankContentToolState } = uiStore
 
     return (
-      <StyledAddSubmission>
+      <StyledAddSubmission zoomLevel={zoomLevel}>
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridSettings.gridW}
@@ -116,7 +113,12 @@ AddSubmission.propTypes = {
     template: MobxPropTypes.objectOrObservableObject,
     enabled: PropTypes.bool,
   }).isRequired,
+  zoomLevel: PropTypes.number,
 }
+AddSubmission.defaultProps = {
+  zoomLevel: 1,
+}
+
 AddSubmission.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }

@@ -452,7 +452,6 @@ export const fakeCollection = {
   parent_collection_card: fakeCollectionCard,
   // This is a computed property on the collection store
   cardIds: _.map(fakeCards, c => c.id),
-  cardIdsWithinRectangle: jest.fn().mockReturnValue([]),
   addCard: jest.fn(),
   setCollaborators: jest.fn(),
   collaborators: [],

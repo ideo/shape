@@ -70,7 +70,7 @@ class CollectionPage extends React.Component {
 
   @action
   componentDidUpdate(prevProps) {
-    const { collection, routingStore } = this.props
+    const { collection, uiStore, routingStore } = this.props
     const {
       collection: { id: previousId },
     } = prevProps
@@ -83,7 +83,8 @@ class CollectionPage extends React.Component {
       ChannelManager.unsubscribeAllFromChannel(COLLECTION_CHANNEL_NAME)
       this.subscribeToChannel(currentId)
       // when navigating between collections, close BCT
-      this.props.uiStore.closeBlankContentTool()
+      uiStore.closeBlankContentTool()
+      uiStore.resetCardPositions()
       this.setViewingRecordAndRestoreScrollPosition()
       this.loadCollectionCards({})
       routingStore.updateScrollState(previousId, window.pageYOffset)
@@ -487,6 +488,42 @@ class CollectionPage extends React.Component {
       movingCardIds: [],
     }
 
+    let renderedSubmissions
+    if (submissions_collection.viewMode === 'list') {
+      renderedSubmissions = (
+        <CollectionList
+          collection={submissions_collection}
+          loadCollectionCards={this.loadSubmissionsCollectionCards}
+        />
+      )
+    } else if (submissions_collection.isBoard) {
+      // TODO: remove this switch between Foamcore and Normal Grid, only needed for now;
+      // same note as in SearchCollection
+      renderedSubmissions = (
+        <FoamcoreGrid
+          {...genericCollectionProps}
+          submissionSettings={{
+            type: submission_box_type,
+            template: submission_template,
+            enabled: submissions_enabled,
+          }}
+        />
+      )
+    } else {
+      renderedSubmissions = (
+        <CollectionGrid
+          {...gridSettings}
+          {...genericCollectionProps}
+          submissionSettings={{
+            type: submission_box_type,
+            template: submission_template,
+            enabled: submissions_enabled,
+          }}
+          sorting
+        />
+      )
+    }
+
     return (
       <div style={{ position: 'relative' }}>
         {this.submissionsPageSeparator}
@@ -501,32 +538,14 @@ class CollectionPage extends React.Component {
             sortable
           />
         </Flex>
-        {submissions_collection.viewMode === 'list' ? (
-          <CollectionList
-            collection={submissions_collection}
-            loadCollectionCards={this.loadSubmissionsCollectionCards}
-          />
-        ) : (
-          <CollectionGrid
-            {...gridSettings}
-            {...genericCollectionProps}
-            submissionSettings={{
-              type: submission_box_type,
-              template: submission_template,
-              enabled: submissions_enabled,
-            }}
-            sorting
+        {renderedSubmissions}
+        {submissions_enabled && submissions_collection.viewMode !== 'list' && (
+          <FloatingActionButton
+            toolTip={`Create New Submission`}
+            onClick={this.onAddSubmission}
+            icon={<PlusIcon />}
           />
         )}
-        {apiStore.currentUser &&
-          submissions_enabled &&
-          submissions_collection.viewMode !== 'list' && (
-            <FloatingActionButton
-              toolTip={`Create New Submission`}
-              onClick={this.onAddSubmission}
-              icon={<PlusIcon />}
-            />
-          )}
       </div>
     )
   }
@@ -605,7 +624,6 @@ class CollectionPage extends React.Component {
       blankContentToolState,
       submissionBoxSettingsOpen,
       gridSettings,
-      selectedArea,
     } = uiStore
 
     // props shared by Foamcore + Normal
@@ -644,14 +662,7 @@ class CollectionPage extends React.Component {
         />
       )
     } else if (collection.isBoard) {
-      inner = (
-        <FoamcoreGrid
-          {...genericCollectionProps}
-          selectedArea={selectedArea}
-          // Included so that component re-renders when area changes
-          selectedAreaMinX={selectedArea.minX}
-        />
-      )
+      inner = <FoamcoreGrid {...genericCollectionProps} />
     } else if (isTestCollection) {
       inner = this.renderTestDesigner()
     } else {

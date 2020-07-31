@@ -44,7 +44,7 @@ class CollectionTypeSelector extends React.Component {
 
   get baseCollectionType() {
     const { collection } = this.props
-    if (collection.isBoard) return 'foamcore'
+    if (collection.isBigBoard) return 'foamcore'
 
     return 'collection'
   }
