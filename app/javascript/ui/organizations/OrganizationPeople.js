@@ -1,7 +1,10 @@
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+
+import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
 import TextButton from '~/ui/global/TextButton'
 import { FormSpacer } from '~/ui/global/styled/forms'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
@@ -12,10 +15,48 @@ import {
 } from '~/ui/global/styled/typography'
 import TrashIcon from '~/ui/icons/TrashIconXl'
 import { GroupIconContainer } from '~/ui/groups/styles'
+import v from '~/utils/variables'
 
 const RemoveIconHolder = styled.button`
   width: 16px;
 `
+
+const ResponsiveSearchPosition = styled.div`
+  position: absolute;
+  right: 40px;
+  top: -40px;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    left: 0;
+    right: auto;
+    top: inherit;
+    width: 100%;
+  }
+`
+
+const ResponsiveScrollingModalList = styled.div``
+
+function fuzzySearch(items, query, propsToSearch) {
+  const search = query.split(' ')
+  return items.reduce((found, i) => {
+    let matches = 0
+    search.forEach(s => {
+      let props = 0
+      propsToSearch.forEach(prop => {
+        if (i[prop].indexOf(s) > -1) {
+          props++
+        }
+      })
+      if (props >= 1) {
+        matches++
+      }
+    })
+    if (matches == search.length) {
+      found.push(i)
+    }
+    return found
+  }, [])
+}
 
 const renderGroup = group => {
   return (
@@ -32,24 +73,60 @@ const renderGroup = group => {
 
 @observer
 class OrganizationPeople extends React.Component {
-  renderUserGroups = () => {
+  @observable
+  groupSearchTerm = ''
+
+  onGroupSearch = term => {
+    runInAction(() => {
+      this.groupSearchTerm = term
+    })
+  }
+
+  filterGroupsWithTerm() {
     const { userGroups } = this.props
     const groups = userGroups.filter(g => g.isNormalGroup)
-    if (!groups.length) {
-      return <SubduedText>You have not been added to any groups.</SubduedText>
-    }
-    return groups.map(group => (
-      <Row key={group.id}>
-        <button className="groupEdit" onClick={this.props.onGroupRoles(group)}>
-          {renderGroup(group)}
-        </button>
-        {group.can_edit && (
-          <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
-            <TrashIcon />
-          </RemoveIconHolder>
-        )}
-      </Row>
-    ))
+    if (this.groupSearchTerm.length < 3) return groups
+    const filteredGroups = fuzzySearch(groups, this.groupSearchTerm, [
+      'name',
+      'handle',
+    ])
+    return filteredGroups
+  }
+
+  renderUserGroups = () => {
+    const groups = this.filterGroupsWithTerm()
+    return (
+      <div style={{ position: 'relative' }}>
+        <ResponsiveSearchPosition>
+          <ExpandableSearchInput
+            onChange={this.onGroupSearch}
+            onClear={() => runInAction(() => (this.groupSearchTerm = ''))}
+            value={this.groupSearchTerm}
+          />
+        </ResponsiveSearchPosition>
+        <ResponsiveScrollingModalList>
+          {!groups.length ? (
+            <SubduedText>You have not been added to any groups.</SubduedText>
+          ) : (
+            groups.map(group => (
+              <Row key={group.id}>
+                <button
+                  className="groupEdit"
+                  onClick={this.props.onGroupRoles(group)}
+                >
+                  {renderGroup(group)}
+                </button>
+                {group.can_edit && (
+                  <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
+                    <TrashIcon />
+                  </RemoveIconHolder>
+                )}
+              </Row>
+            ))
+          )}
+        </ResponsiveScrollingModalList>
+      </div>
+    )
   }
 
   renderYourOrganization() {
