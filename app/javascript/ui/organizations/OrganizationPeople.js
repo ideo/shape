@@ -4,17 +4,18 @@ import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
-import TextButton from '~/ui/global/TextButton'
 import { FormSpacer } from '~/ui/global/styled/forms'
+import { GroupIconContainer } from '~/ui/groups/styles'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import {
   Heading3,
   DisplayText,
   SubduedText,
 } from '~/ui/global/styled/typography'
+import TextButton from '~/ui/global/TextButton'
 import TrashIcon from '~/ui/icons/TrashIconXl'
-import { GroupIconContainer } from '~/ui/groups/styles'
 import v from '~/utils/variables'
 
 const RemoveIconHolder = styled.button`
@@ -114,7 +115,7 @@ class OrganizationPeople extends React.Component {
                   className="groupEdit"
                   onClick={this.props.onGroupRoles(group)}
                 >
-                  {renderGroup(group)}
+                  <EntityAvatarAndName entity={group} isJoinableGroup />
                 </button>
                 {group.can_edit && (
                   <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
