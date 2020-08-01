@@ -15,6 +15,7 @@ import {
   SubduedText,
 } from '~/ui/global/styled/typography'
 import TextButton from '~/ui/global/TextButton'
+import Tooltip from '~/ui/global/Tooltip'
 import TrashIcon from '~/ui/icons/TrashIconXl'
 import v from '~/utils/variables'
 
@@ -129,7 +130,12 @@ class OrganizationPeople extends React.Component {
                 </button>
                 {group.can_edit && (
                   <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
-                    <TrashIcon />
+                    <Tooltip
+                      classes={{ tooltip: 'Tooltip' }}
+                      title="delete group"
+                    >
+                      <TrashIcon />
+                    </Tooltip>
                   </RemoveIconHolder>
                 )}
               </GroupRow>
