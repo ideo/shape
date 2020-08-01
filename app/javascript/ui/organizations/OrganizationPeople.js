@@ -37,6 +37,16 @@ const ResponsiveSearchPosition = styled.div`
 
 const ResponsiveScrollingModalList = styled.div``
 
+const GroupRow = styled(Row)`
+  ${RemoveIconHolder} {
+    display: none;
+
+    &:hover {
+      display: block;
+    }
+  }
+`
+
 function fuzzySearch(items, query, propsToSearch) {
   const search = query.split(' ')
   return items.reduce((found, i) => {
@@ -110,7 +120,7 @@ class OrganizationPeople extends React.Component {
             <SubduedText>You have not been added to any groups.</SubduedText>
           ) : (
             groups.map(group => (
-              <Row key={group.id}>
+              <GroupRow key={group.id}>
                 <button
                   className="groupEdit"
                   onClick={this.props.onGroupRoles(group)}
@@ -122,7 +132,7 @@ class OrganizationPeople extends React.Component {
                     <TrashIcon />
                   </RemoveIconHolder>
                 )}
-              </Row>
+              </GroupRow>
             ))
           )}
         </ResponsiveScrollingModalList>
