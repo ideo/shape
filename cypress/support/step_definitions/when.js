@@ -413,7 +413,7 @@ When('I fill out the organization name with {string}', orgName => {
 })
 
 // ----------------------
-// Action Menu
+// Action Menu and Collection Settings
 // ----------------------
 
 When('I click ... in the nav and select {string}', option => {
@@ -422,6 +422,21 @@ When('I click ... in the nav and select {string}', option => {
     .click({ force: true })
 
   cy.locate(`PopoutMenu_${option}`).click()
+})
+
+When('I click the edit collection settings icon', () => {
+  cy.locateDataOrClass('CardAction-edit collection settings')
+    .first()
+    .click({ force: true })
+  cy.wait('@apiGetCollection')
+  cy.wait('@apiGetCollectionCards')
+})
+
+When('I click the {string} font color option', hex => {
+  cy.get(`.compact-picker div[title="${hex}"]`)
+    .first()
+    .click({ force: true })
+  cy.wait('@apiUpdateCollectionCard')
 })
 
 // ----------------------

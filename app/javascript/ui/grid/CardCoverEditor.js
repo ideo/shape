@@ -50,6 +50,7 @@ const linkBackgroundOption = {
 
 const StyledEditTitle = styled.div`
   display: flex;
+  max-width: 94%;
   h3 {
     flex: 1;
     margin-right: 10px;
@@ -60,7 +61,6 @@ const StyledEditTitle = styled.div`
   div {
     flex: 3 1 auto;
     border-bottom: 1px solid ${v.colors.black};
-    max-width: 316px;
     textarea {
       width: 100%;
       background: transparent;
@@ -202,24 +202,37 @@ class CardCoverEditor extends React.Component {
         imageUrl: url,
       }))
     }
-    return this.imageBaseOptions('cover')
+    return this.imageBaseOptions(record.sortedCoverCards)
   }
 
   get backgroundImageBaseOptions() {
-    // TODO: if background_image_url is set, but the card comes from above??
-    return this.imageBaseOptions('background')
+    const { record } = this
+    const { backgroundImageUrl, sortedBackgroundCards } = record
+    if (_.isEmpty(sortedBackgroundCards) && backgroundImageUrl) {
+      let imageUrl = backgroundImageUrl
+      if (_.includes(imageUrl, 'cdn.filestackcontent.com')) {
+        const handle = _.last(imageUrl.split('/'))
+        imageUrl = FilestackUpload.imageUrl({
+          handle,
+          filestackOpts: { resize: { width: 128 } },
+        })
+      }
+      return [
+        {
+          title: 'inherited background',
+          imageUrl,
+        },
+      ]
+    }
+    return this.imageBaseOptions(sortedBackgroundCards)
   }
 
-  imageBaseOptions(type = 'cover') {
-    const { record } = this
+  imageBaseOptions(imageCards) {
     if (!this.recordIsCollection) {
       return []
     }
-    const collection = record
-    const sortMethod =
-      type === 'cover' ? 'sortedCoverCards' : 'sortedBackgroundCards'
     return _.take(
-      collection[sortMethod].map(card => ({
+      imageCards.map(card => ({
         cardId: card.id,
         title: card.record.name,
         imageUrl: card.record.imageUrl({ resize: { width: 128 } }),
@@ -545,6 +558,9 @@ class CardCoverEditor extends React.Component {
       )
     }
 
+    // the right column is only needed for collection settings
+    const leftColumnWidth = recordIsCollection ? [1, 0.425] : 1
+
     return (
       <div>
         <StyledEditTitle>
@@ -553,30 +569,31 @@ class CardCoverEditor extends React.Component {
         </StyledEditTitle>
         <BigBreak />
         <Flex wrap w={1} data-cy="EditCoverOptions">
-          <Box w={[1, 0.425]}>
-            <h3>Cover</h3>
+          <Box w={leftColumnWidth}>
+            <h3>Cover Image</h3>
             <QuickOptionSelector
               options={toJS(this.coverImageOptions)}
               onSelect={this.onImageOptionSelect}
             />
 
-            {recordIsCollection && (
-              <Fragment>
-                <MediumBreak />
-                <h3>Background Image</h3>
-                <QuickOptionSelector
-                  options={toJS(this.backgroundImageOptions)}
-                  onSelect={this.onBackgroundImageOptionSelect}
-                />
-                <CheckboxWithLabel
-                  onChange={this.onTogglePropagate('background_image')}
-                  checked={record.propagate_background_image}
-                  label="Apply to all nested collections"
-                />
-              </Fragment>
+            <MediumBreak />
+            <h3>Cover Effects</h3>
+            {this.showFilters && (
+              <QuickOptionSelector
+                options={filterOptions}
+                onSelect={this.onFilterOptionSelect}
+              />
             )}
 
-            {(record.isCollection || record.isLink) && (
+            <MediumBreak />
+            <h3>Cover Font Color</h3>
+            <FontColorSelector
+              fontColor={card.font_color}
+              defaultFontColor={v.colors.white}
+              onSelect={this.onSelectCoverFontColor}
+            />
+
+            {(recordIsCollection || record.isLink) && (
               <Fragment>
                 <MediumBreak />
                 <h3>Subtitle</h3>
@@ -602,49 +619,42 @@ class CardCoverEditor extends React.Component {
               </Fragment>
             )}
           </Box>
-          <Box w={[1, 0.425]} ml={[0, 64]}>
-            <h3>Cover Effects</h3>
-            {this.showFilters && (
+          {recordIsCollection && (
+            <Box w={[1, 0.425]} ml={[0, 64]}>
+              <MediumBreak />
+              <h3>Background Image</h3>
               <QuickOptionSelector
-                options={filterOptions}
-                onSelect={this.onFilterOptionSelect}
+                options={toJS(this.backgroundImageOptions)}
+                onSelect={this.onBackgroundImageOptionSelect}
               />
-            )}
+              <CheckboxWithLabel
+                onChange={this.onTogglePropagate('background_image')}
+                checked={record.propagate_background_image}
+                label="Apply to all nested collections"
+              />
 
-            <MediumBreak />
-            <h3>Cover Font Color</h3>
-            <FontColorSelector
-              fontColor={card.font_color}
-              defaultFontColor={v.colors.white}
-              onSelect={this.onSelectCoverFontColor}
-            />
-
-            {recordIsCollection && (
-              <Fragment>
-                <MediumBreak />
-                <h3>Title Font Color</h3>
-                <FontColorSelector
-                  fontColor={record.fontColor}
-                  defaultFontColor={v.colors.black}
-                  onSelect={this.onSelectTitleFontColor}
-                  onTogglePropagate={this.onTogglePropagate('font_color')}
-                  propagate={record.propagate_font_color}
-                />
-              </Fragment>
-            )}
-
-            <MediumBreak />
-            <h3>Icon</h3>
-            <CollectionIconSelector
-              selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
-              onSelectIcon={this.onCustomIconSelect}
-            />
-            <CheckboxWithLabel
-              onChange={this.onToggleShowIconOnCoverCheckbox}
-              checked={record.show_icon_on_cover}
-              label="Show icon on cover"
-            />
-          </Box>
+              <MediumBreak />
+              <h3>Font Color</h3>
+              <FontColorSelector
+                fontColor={record.fontColor}
+                defaultFontColor={v.colors.black}
+                onSelect={this.onSelectTitleFontColor}
+                onTogglePropagate={this.onTogglePropagate('font_color')}
+                propagate={record.propagate_font_color}
+              />
+              <MediumBreak />
+              <h3>Icon</h3>
+              <CollectionIconSelector
+                selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
+                onSelectIcon={this.onCustomIconSelect}
+              />
+              <CheckboxWithLabel
+                onChange={this.onToggleShowIconOnCoverCheckbox}
+                checked={record.show_icon_on_cover}
+                label="Show icon on cover"
+              />
+            </Box>
+          )}
         </Flex>
       </div>
     )
@@ -654,14 +664,14 @@ class CardCoverEditor extends React.Component {
     const { recordIsCollection } = this
     const { isEditingCardCover, pageMenu } = this.props
 
-    const modalTitle = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
+    const title = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
     return (
       <Fragment>
         {!pageMenu && (
           <CardActionHolder
             active={this.isEditingCardCover}
             className="show-on-hover"
-            tooltipText="edit cover"
+            tooltipText={`edit ${_.lowerCase(title)}`}
             role="button"
             onClick={this.handleClick}
           >
@@ -669,7 +679,7 @@ class CardCoverEditor extends React.Component {
           </CardActionHolder>
         )}
         {isEditingCardCover && (
-          <Modal open onClose={this.handleClose} title={modalTitle}>
+          <Modal open onClose={this.handleClose} title={title}>
             {this.renderInner()}
           </Modal>
         )}
