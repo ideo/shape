@@ -1320,10 +1320,12 @@ class Collection < ApplicationRecord
   end
 
   def unreviewed_by?(user, in_a_reviewer_group_with_audience)
-    return false if submission_reviewer_status(user) == :completed
-    # If you're in a non-reviewer group that's marked with an audience you can review this submission
-    return true if in_a_reviewer_group_with_audience && !in_reviewer_group?(user)
+    return false if submission_reviewer_status(user) == :completed || !in_a_reviewer_group_with_audience
 
+    # If you're in a non-reviewer group that's marked with an audience you can review this submission
+    return true unless in_reviewer_group?(user)
+
+    # Otherwise if you're in a reviewer group, check if you are tagged
     tagged_users.include?(user)
   end
 
