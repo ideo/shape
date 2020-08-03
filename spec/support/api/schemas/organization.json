@@ -2,6 +2,7 @@
   "type": "object",
   "properties": {
     "active_users_count": { "type": "number" },
+    "billable": { "type": "boolean" },
     "current_billing_period_end": { "type": "date" },
     "current_billing_period_start": { "type": "date" },
     "deactivated": { "type": "boolean" },
