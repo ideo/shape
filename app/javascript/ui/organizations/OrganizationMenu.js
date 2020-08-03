@@ -268,6 +268,7 @@ class OrganizationMenu extends React.Component {
       default:
         content = this.renderOrganizationPeople()
         title = 'People & Groups'
+        noScroll = true
         break
     }
 

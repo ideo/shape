@@ -36,15 +36,20 @@ const ResponsiveSearchPosition = styled.div`
   }
 `
 
-const ResponsiveScrollingModalList = styled.div``
+const ResponsiveScrollingModalList = styled.div`
+  max-height: 54vh;
+  overflow-y: scroll;
+`
 
 const GroupRow = styled(Row)`
-  ${RemoveIconHolder} {
-    display: none;
-
-    &:hover {
+  &:hover {
+    ${RemoveIconHolder} {
       display: block;
     }
+  }
+
+  ${RemoveIconHolder} {
+    display: none;
   }
 `
 
@@ -126,17 +131,18 @@ class OrganizationPeople extends React.Component {
                   className="groupEdit"
                   onClick={this.props.onGroupRoles(group)}
                 >
-                  <EntityAvatarAndName entity={group} isJoinableGroup />
+                  <EntityAvatarAndName entity={group} />
                 </button>
                 {group.can_edit && (
-                  <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
-                    <Tooltip
-                      classes={{ tooltip: 'Tooltip' }}
-                      title="delete group"
-                    >
+                  <Tooltip
+                    classes={{ tooltip: 'Tooltip' }}
+                    title="delete group"
+                    placement="top"
+                  >
+                    <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
                       <TrashIcon />
-                    </Tooltip>
-                  </RemoveIconHolder>
+                    </RemoveIconHolder>
+                  </Tooltip>
                 )}
               </GroupRow>
             ))
