@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -107,7 +108,9 @@ class OrganizationPeople extends React.Component {
 
   filterGroupsWithTerm() {
     const { userGroups } = this.props
-    const groups = userGroups.filter(g => g.isNormalGroup)
+    const groups = _.sortBy(userGroups.filter(g => g.isNormalGroup), [
+      g => g.name.toLowerCase(),
+    ])
     if (this.groupSearchTerm.length < 3) return groups
     const filteredGroups = fuzzySearch(groups, this.groupSearchTerm, [
       'name',
