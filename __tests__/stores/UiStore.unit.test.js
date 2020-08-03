@@ -1,11 +1,15 @@
 import { runInAction } from 'mobx'
+import localStorage from 'mobx-localstorage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import UiStore from '~/stores/UiStore'
+import { ACTIVITY_LOG_PAGE_KEY } from '~/utils/variables'
+
+jest.mock('mobx-localstorage')
 
 let uiStore
 const fakeCollection = {
   id: '123',
-  internalType: 'collections',
+  isCollection: true,
   parent_collection_card: {},
 }
 const fakeEvent = {
@@ -227,6 +231,40 @@ describe('UiStore', () => {
     })
   })
 
+  describe('#selectCardsWithinSelectedArea', () => {
+    const coords = {
+      minX: 0,
+      minY: 0,
+      maxX: 100,
+      maxY: 200,
+    }
+    beforeEach(() => {
+      uiStore.setSelectedArea(coords)
+      // cardPositions determines where each card is placed on the grid
+      // gets called in GridCard when it sets the ref
+      uiStore.setCardPosition('1', { top: 0, right: 100, bottom: 100, left: 0 })
+      uiStore.setCardPosition('2', {
+        top: 300,
+        right: 100,
+        bottom: 500,
+        left: 0,
+      })
+    })
+
+    it('selects cards in within the selectedArea', () => {
+      expect(uiStore.selectedCardIds).toEqual([])
+      uiStore.selectCardsWithinSelectedArea()
+      expect(uiStore.selectedCardIds).toEqual(['1'])
+    })
+
+    it('adds to selection if shifted', () => {
+      uiStore.reselectCardIds(['5'])
+      uiStore.setSelectedArea(coords, { shifted: true })
+      uiStore.selectCardsWithinSelectedArea()
+      expect(uiStore.selectedCardIds).toEqual(['1', '5'])
+    })
+  })
+
   describe('zoom functions', () => {
     const collection = fakeCollection
     beforeEach(() => {
@@ -354,6 +392,24 @@ describe('UiStore', () => {
         it('should return the minimum of num_columns and 16', () => {
           expect(uiStore.maxCols(collection)).toEqual(4)
         })
+      })
+    })
+
+    describe('#setActivityLogPage', () => {
+      it('should set the local storage key for page', () => {
+        uiStore.setActivityLogPage('notifications')
+        expect(uiStore.activityLogPage).toEqual('notifications')
+        expect(localStorage.getItem(ACTIVITY_LOG_PAGE_KEY)).toEqual(
+          'notifications'
+        )
+      })
+    })
+
+    describe('#setBodyBackgroundImage', () => {
+      it('should set the style on document.body', () => {
+        const img = 'http://img.url/123'
+        uiStore.setBodyBackgroundImage(img)
+        expect(document.body.style['background-image']).toEqual(`url(${img})`)
       })
     })
   })

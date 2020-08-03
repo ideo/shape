@@ -5,7 +5,7 @@ class ApplicationRecord < ActiveRecord::Base
     [
       self.class.base_class.name,
       id,
-      (updated_at || created_at).to_i,
+      (updated_at || created_at).to_f,
     ].compact.join('_')
   end
 

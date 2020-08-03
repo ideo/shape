@@ -94,7 +94,7 @@ class BottomLeftCardIcons extends React.Component {
             </Tooltip>
           </StyledIconWrapper>
         )
-      } else if (record.isBoard) {
+      } else if (record.isBigBoard) {
         icons.push(
           <StyledIconWrapper>
             <FoamcoreBoardIcon />

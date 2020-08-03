@@ -355,9 +355,12 @@ PublicSharingOptions.propTypes = {
   startMenuOpen: PropTypes.bool,
 }
 
+PublicSharingOptions.defaultProps = {
+  startMenuOpen: false,
+}
+
 PublicSharingOptions.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  startMenuOpen: false,
 }
 
 export default PublicSharingOptions

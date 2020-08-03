@@ -256,6 +256,10 @@ class Item extends SharedRecordMixin(BaseRecord) {
     return _.find(this.primaryDataset.data_source_id, { type: 'Collection' })
   }
 
+  get isItem() {
+    return true
+  }
+
   pushTextUndo({ previousData, currentData, redirectTo }) {
     this.pushUndo({
       snapshot: {

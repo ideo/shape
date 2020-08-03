@@ -137,6 +137,7 @@ ActiveRecord::Schema.define(version: 2020_07_31_212721) do
     t.string "font_color"
     t.boolean "font_background", default: false
     t.jsonb "parent_snapshot"
+    t.boolean "is_background", default: false
     t.index ["archive_batch"], name: "index_collection_cards_on_archive_batch"
     t.index ["collection_id"], name: "index_collection_cards_on_collection_id"
     t.index ["identifier", "parent_id"], name: "index_collection_cards_on_identifier_and_parent_id"
@@ -216,6 +217,9 @@ ActiveRecord::Schema.define(version: 2020_07_31_212721) do
     t.datetime "end_date"
     t.string "icon"
     t.boolean "show_icon_on_cover"
+    t.string "font_color"
+    t.boolean "propagate_font_color", default: false
+    t.boolean "propagate_background_image", default: false
     t.index ["archive_batch"], name: "index_collections_on_archive_batch"
     t.index ["breadcrumb"], name: "index_collections_on_breadcrumb", using: :gin
     t.index ["cached_test_scores"], name: "index_collections_on_cached_test_scores", using: :gin

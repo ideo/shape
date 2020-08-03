@@ -69,6 +69,7 @@ class ModalWithNavigation extends React.Component {
               onClick={() => this.handleNavClick(element.name)}
               isActive={this.isActive(element)}
               key={element.name}
+              data-cy={element.dataCy}
             >
               {element.name}
             </NavElement>

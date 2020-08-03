@@ -567,6 +567,7 @@ describe('Collection', () => {
     beforeEach(() => {
       runInAction(() => {
         collectionCard_1.row = 0
+        collectionCard_1.order = 0
         collection.class_type = 'Collection::Board'
         collectionCard_3.order = 99
         collection.collection_cards = [
@@ -592,18 +593,6 @@ describe('Collection', () => {
         'PATCH',
         { data }
       )
-    })
-
-    it('should reorder cards sequentially', async () => {
-      await collection.API_batchUpdateCardsWithUndo({
-        updates,
-        undoMessage: 'Undoing action',
-      })
-      expect(_.map(collection.sortedCards, c => [c.id, c.order])).toEqual([
-        [collectionCard_1.id, 0],
-        [collectionCard_2.id, 1],
-        [collectionCard_3.id, 2],
-      ])
     })
   })
 
@@ -988,4 +977,26 @@ describe('Collection', () => {
       })
     })
   })
+
+  // describe('showFilters', () => {
+  //   describe('searchCollection or submissionBox', () => {
+  //     it('returns false', () => {
+  //       collection.type = 'Collection::SearchCollection'
+  //       expect(collection.showFilters).toEqual(false)
+  //       collection.type = 'Collection::SubmissionBox'
+  //       expect(collection.showFilters).toEqual(false)
+  //     })
+  //   })
+  //
+  //   describe('normal, board, submissions collection', () => {
+  //     it('returns true', () => {
+  //       collection.type = 'Collection'
+  //       expect(collection.showFilters).toEqual(true)
+  //       collection.type = 'Collection::Board'
+  //       expect(collection.showFilters).toEqual(true)
+  //       collection.type = 'Collection::SubmissionsCollection'
+  //       expect(collection.showFilters).toEqual(true)
+  //     })
+  //   })
+  // })
 })

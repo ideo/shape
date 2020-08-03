@@ -125,26 +125,6 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
         # drag_map = [[0, 0], [0, 1], [0, 3], [1, 0]]
       end
 
-      context 'with bad card (no row or col)' do
-        before do
-          collection.collection_cards.first.update(row: nil)
-        end
-
-        let(:placement) do
-          { row: 0, col: 0 }
-        end
-
-        it 'does not blow up; still calculates proper move' do
-          calculate
-          expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
-            [0, 0, collection.id],
-            [0, 1, collection.id],
-            [0, 3, collection.id],
-            [3, 0, collection.id],
-          ])
-        end
-      end
-
       context 'at placement row: 0, col: 0, moving to empty collection' do
         before do
           # clear out the collection
@@ -291,6 +271,51 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
                 [5, 2, collection.id],
               ])
             end
+          end
+        end
+      end
+
+      context 'with bad cards (no row or col)' do
+        before do
+          collection.collection_cards.last.update(row: nil, col: nil)
+          moving_cards.each { |cc| cc.update(row: nil, col: nil) }
+        end
+
+        let(:placement) do
+          { row: 0, col: 0 }
+        end
+
+        it 'does not blow up; still calculates proper move' do
+          # since we are placing at 0,0 it just tries to best fill in the gaps like so
+          # [[0, 0, 0, 0, X, X, _, _, _, _, _, _, _, _, _, _],
+          #  [1, 2, 3, X, 4, _, _, _, _, _, _, _, _, _, _, _],
+          #  [1, X, 5, 5, _, _, _, _, _, _, _, _, _, _, _, _],
+          #  [X, 6, 7, 7, 7, _, _, _, _, _, _, _, _, _, _, _],
+          #  [X, _, _, _, _, ...
+
+          calculate
+          expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+            [2, 1, collection.id],
+            [0, 4, collection.id],
+            [1, 3, collection.id],
+            [3, 0, collection.id],
+          ])
+        end
+
+        context 'with nil placement (calculate_best_placement)' do
+          let(:placement) do
+            { row: nil, col: nil }
+          end
+
+          it 'does not blow up; still calculates proper move' do
+            calculate
+            # this time it should place after all existing cards, starting 3,2
+            expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+              [3, 2, collection.id],
+              [3, 3, collection.id],
+              [3, 5, collection.id],
+              [4, 2, collection.id],
+            ])
           end
         end
       end
