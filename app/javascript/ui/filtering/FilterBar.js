@@ -96,6 +96,8 @@ FilterBar.defaultProps = {
   showIcon: false,
 }
 
+FilterBar.displayName = 'FilterBar'
+
 FilterBar.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
