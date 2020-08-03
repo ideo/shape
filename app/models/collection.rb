@@ -989,7 +989,7 @@ class Collection < ApplicationRecord
   end
 
   def can_review?(user)
-    audience = lookup_user_challenge_audience(user)
+    audience = user_challenge_audience(user)
     unreviewed_by?(user, audience.present?)
   end
 
@@ -1309,19 +1309,20 @@ class Collection < ApplicationRecord
     current_user.has_role?(Role::MEMBER, parent_challenge.challenge_reviewer_group)
   end
 
-  def lookup_user_challenge_audience(current_user)
+  def user_challenge_audience(current_user)
     return nil unless submission? && launchable_test_id.present?
 
     test = Collection::TestCollection.find launchable_test_id
 
     return nil unless test.present?
 
-    test.lookup_user_challenge_audience(current_user)
+    test.user_challenge_audience(current_user)
   end
 
   def unreviewed_by?(user, in_a_reviewer_group_with_audience)
     return false if submission_reviewer_status(user) == :completed
-    return true unless in_a_reviewer_group_with_audience && in_reviewer_group?(user)
+    # If you're in a non-reviewer group that's marked with an audience you can review this submission
+    return true if in_a_reviewer_group_with_audience && !in_reviewer_group?(user)
 
     tagged_users.include?(user)
   end
@@ -1412,7 +1413,7 @@ class Collection < ApplicationRecord
     end
   end
 
-  def lookup_user_challenge_groups(user)
+  def user_challenge_groups(user)
     return [] unless inside_a_challenge?
 
     user.groups.where(id: [parent_challenge.challenge_reviewer_group_id,

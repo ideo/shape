@@ -140,7 +140,7 @@ class Collection
 
       has_challenge_group_with_audience = false
       if inside_a_challenge?
-        has_challenge_group_with_audience = lookup_user_challenge_audience(for_user).present?
+        has_challenge_group_with_audience = user_challenge_audience(for_user).present?
       end
 
       submissions.each do |submission|

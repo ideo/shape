@@ -1003,7 +1003,7 @@ describe Collection, type: :model do
       end
       it 'should lookup reviewer audience' do
         expect(test_collection
-          .lookup_user_challenge_audience(reviewer)).to eq(test_collection
+          .user_challenge_audience(reviewer)).to eq(test_collection
                                                                       .test_audiences
                                                                       .joins(:audience)
                                                                       .find_by(audiences: { name: 'Reviewers' }))
