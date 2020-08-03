@@ -144,9 +144,9 @@ class Collection
       end
 
       submissions.each do |submission|
-        # only include reviewable submissions whose current user is tagged
         next unless submission.launchable_test_id.present?
-        next if inside_a_challenge? && submission.unreviewed_by?(for_user, has_challenge_group_with_audience)
+        # only include reviewable submissions whose current user has not already reviewed it
+        next if inside_a_challenge? && !submission.unreviewed_by?(for_user, has_challenge_group_with_audience)
 
         test_ids << submission.launchable_test_id
       end

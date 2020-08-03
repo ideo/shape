@@ -1310,9 +1310,18 @@ class Collection < ApplicationRecord
   end
 
   def user_challenge_audience(current_user)
-    return nil unless submission? && launchable_test_id.present?
+    return nil unless inside_a_challenge? && (submission? || submission_box?)
 
-    test = Collection::TestCollection.find launchable_test_id
+    test_id = nil
+    if submission?
+      test_id = launchable_test_id
+    else
+      test_id = submission_template&.launchable_test_id
+    end
+
+    return nil unless test_id.present?
+
+    test = Collection::TestCollection.find test_id
 
     return nil unless test.present?
 
