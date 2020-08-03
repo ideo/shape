@@ -112,6 +112,9 @@ class CollectionCardBuilder
       @collection_card.id = @placeholder.id
     end
 
+    # Don't place hidden cards on board => setting row/col for them messes up other card positions
+    return if @collection_card.hidden?
+
     # first capture these, row/col are allowed to be nil for BoardPlacement
     row = @collection_card.row
     col = @collection_card.col
