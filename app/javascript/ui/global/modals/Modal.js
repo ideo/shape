@@ -45,7 +45,7 @@ const StyledDialogContent = styled.div`
   &.modal__no-scroll {
     padding-top: 0px;
     padding-bottom: 0px;
-    overflow-y: auto;
+    overflow-y: hidden;
     display: flex;
     flex-direction: column;
   }

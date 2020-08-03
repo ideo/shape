@@ -25,20 +25,26 @@ const RemoveIconHolder = styled.button`
 
 const ResponsiveSearchPosition = styled.div`
   position: absolute;
-  right: 40px;
+  right: 58px;
   top: -40px;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     left: 0;
     right: auto;
-    top: inherit;
+    top: -30px;
     width: 100%;
   }
 `
 
 const ResponsiveScrollingModalList = styled.div`
-  max-height: 54vh;
+  max-height: 62vh;
+  min-height: 546px;
   overflow-y: scroll;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-top: 30px;
+    min-height: 426px;
+  }
 `
 
 const GroupRow = styled(Row)`
