@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 import v from '~/utils/variables'
 
 export const Heading1TypographyCss = css`
-  color: ${props => props.theme.titleColor || v.colors.black};
+  color: ${props => props.theme.fontColor || v.colors.black};
   font-family: ${v.fonts.sans};
   font-size: 1.75rem;
   font-weight: ${v.weights.book};
@@ -60,7 +60,6 @@ export const Heading3 = styled.h3`
   font-size: 0.9375rem;
   font-weight: ${v.weights.medium};
   letter-spacing: 0.0625rem;
-  color: ${props => props.color || v.colors.black};
 `
 Heading3.displayName = 'StyledHeading3'
 
@@ -72,7 +71,7 @@ export const LargerH3 = styled(Heading3)`
 LargerH3.displayName = 'StyledLargerH3'
 
 export const DisplayTextCss = css`
-  color: ${props => props.color || v.colors.black};
+  color: ${props => props.color || 'inherit'};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -288,12 +287,10 @@ export const HugeNumber = styled(Heading1)`
 export const QuillStyleWrapper = styled.div`
   height: 100%;
 
-  ${props =>
-    props.hasTitleText &&
-    props.theme.titleColor &&
-    `
-    color: ${props.theme.titleColor};
-  `}
+  color: ${props =>
+    props.hasTitleText && props.theme.fontColor
+      ? props.theme.fontColor
+      : v.colors.black};
 
   .quill {
     height: 100%;
@@ -319,12 +316,11 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-size-huge {
       ${Heading1TypographyCss};
-      /* always use black as opposed to props.theme.titleColor */
-      color: ${v.colors.black};
+      /* color depends on whether it is inside a textItem that hasTitleText or not */
+      color: inherit;
     }
 
     h5 {
-      color: ${props => props.theme.titleColor || v.colors.black};
       font-size: 4rem;
       font-weight: 700;
       letter-spacing: -0.5px;

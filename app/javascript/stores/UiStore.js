@@ -949,6 +949,12 @@ export default class UiStore {
     }
   }
 
+  setBodyFontColor(color = null) {
+    _.assign(document.body.style, {
+      color,
+    })
+  }
+
   @action
   clearTextEditingItem() {
     this.textEditingItem = null

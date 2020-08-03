@@ -1987,7 +1987,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       useResponsiveText: !this.isBoard,
     }
     if (fontColor) {
-      theme.titleColor = fontColor
+      theme.fontColor = fontColor
     }
     return theme
   }

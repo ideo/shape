@@ -11,7 +11,6 @@ import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 const IconHolder = styled.div`
-  color: ${v.colors.black};
   display: ${props => (props.show ? 'block' : 'none')};
   cursor: pointer;
   height: 32px;
