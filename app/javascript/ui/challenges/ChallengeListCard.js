@@ -81,7 +81,11 @@ class ChallengeListCard extends React.Component {
           )
         }
       }
-      if (column.name === 'actions' && canBeReviewedByCurrentUser) {
+      if (
+        column.name === 'actions' &&
+        (canBeReviewedByCurrentUser ||
+          submission_reviewer_status === 'completed')
+      ) {
         column.overrideContent = () =>
           submission_reviewer_status && (
             <ChallengeReviewButton
