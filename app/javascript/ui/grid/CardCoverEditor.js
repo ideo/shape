@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { Fragment } from 'react'
+import { Flex, Box } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
@@ -560,105 +561,109 @@ class CardCoverEditor extends React.Component {
     }
 
     return (
-      <div data-cy="EditCoverOptions">
-        <div>
-          <StyledEditTitle>
-            <h3>Title</h3>
-            {this.renderEditTitleInput()}
-          </StyledEditTitle>
-          <MediumBreak />
-          <h3>Cover</h3>
-          <QuickOptionSelector
-            options={toJS(this.coverImageOptions)}
-            onSelect={this.onImageOptionSelect}
-          />
-
-          {recordIsCollection && (
-            <Fragment>
-              <MediumBreak />
-              <h3>Background Image</h3>
-              <QuickOptionSelector
-                options={toJS(this.backgroundImageOptions)}
-                onSelect={this.onBackgroundImageOptionSelect}
-              />
-              <CheckboxWithLabel
-                onChange={this.onTogglePropagate('background_image')}
-                checked={record.propagate_background_image}
-                label="Apply to all nested collections"
-              />
-            </Fragment>
-          )}
-
-          {recordIsCollection && (
-            <Fragment>
-              <MediumBreak />
-              <h3>Title Font Color</h3>
-              <QuickOptionSelector
-                options={this.titleFontOptions}
-                onSelect={this.onTitleFontOptionSelect}
-              />
-              {fontColorPickerOpen && (
-                <Fragment>
-                  <CompactPicker
-                    color={record.fontColor || v.colors.black}
-                    onChangeComplete={this.onSelectTitleFontColor}
-                  />
-                  <MediumBreak />
-                </Fragment>
-              )}
-              <CheckboxWithLabel
-                onChange={this.onTogglePropagate('font_color')}
-                checked={record.propagate_font_color}
-                label="Apply to all nested collections"
-              />
-            </Fragment>
-          )}
-
-          <MediumBreak />
-          <h3>Icon</h3>
-          <CollectionIconSelector
-            selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
-            onSelectIcon={this.onCustomIconSelect}
-          />
-          <CheckboxWithLabel
-            onChange={this.onToggleShowIconOnCoverCheckbox}
-            checked={record.show_icon_on_cover}
-            label="Show icon on cover"
-          />
-          <MediumBreak />
-          <h3>Cover Effects</h3>
-          {this.showFilters && (
+      <div>
+        <StyledEditTitle>
+          <h3>Title</h3>
+          {this.renderEditTitleInput()}
+        </StyledEditTitle>
+        <MediumBreak />
+        <Flex column data-cy="EditCoverOptions">
+          <Box w={[1]}>
+            <h3>Cover</h3>
             <QuickOptionSelector
-              options={filterOptions}
-              onSelect={this.onFilterOptionSelect}
+              options={toJS(this.coverImageOptions)}
+              onSelect={this.onImageOptionSelect}
             />
-          )}
-          <MediumBreak />
-          {(record.isCollection || record.isLink) && (
-            <div>
-              <h3>Subtitle</h3>
-              <StyledEditTitle>
-                {this.renderEditSubtitleInput()}
-              </StyledEditTitle>
 
-              <CheckboxWithLabel
-                onChange={this.onToggleSubtitleCheckbox}
-                checked={this.subtitleHidden}
-                label="Hide subtitle"
+            {recordIsCollection && (
+              <Fragment>
+                <MediumBreak />
+                <h3>Background Image</h3>
+                <QuickOptionSelector
+                  options={toJS(this.backgroundImageOptions)}
+                  onSelect={this.onBackgroundImageOptionSelect}
+                />
+                <CheckboxWithLabel
+                  onChange={this.onTogglePropagate('background_image')}
+                  checked={record.propagate_background_image}
+                  label="Apply to all nested collections"
+                />
+              </Fragment>
+            )}
+
+            {(record.isCollection || record.isLink) && (
+              <Fragment>
+                <MediumBreak />
+                <h3>Subtitle</h3>
+                <StyledEditTitle>
+                  {this.renderEditSubtitleInput()}
+                </StyledEditTitle>
+
+                <CheckboxWithLabel
+                  onChange={this.onToggleSubtitleCheckbox}
+                  checked={this.subtitleHidden}
+                  label="Hide subtitle"
+                />
+                <br />
+                {record.isLink && (
+                  <NamedActionButton
+                    noPadding
+                    marginBottom={20}
+                    onClick={this.handleRestore}
+                  >
+                    Restore
+                  </NamedActionButton>
+                )}
+              </Fragment>
+            )}
+          </Box>
+          <Box ml={64} w={[1]}>
+            <h3>Cover Effects</h3>
+            {this.showFilters && (
+              <QuickOptionSelector
+                options={filterOptions}
+                onSelect={this.onFilterOptionSelect}
               />
-              <br />
-              {record.isLink && (
-                <NamedActionButton
-                  noPadding
-                  marginBottom={20}
-                  onClick={this.handleRestore}
-                >
-                  Restore
-                </NamedActionButton>
-              )}
-            </div>
-          )}
-        </div>
+            )}
+
+            {recordIsCollection && (
+              <Fragment>
+                <MediumBreak />
+                <h3>Title Font Color</h3>
+                <QuickOptionSelector
+                  options={this.titleFontOptions}
+                  onSelect={this.onTitleFontOptionSelect}
+                />
+                {fontColorPickerOpen && (
+                  <Fragment>
+                    <CompactPicker
+                      color={record.fontColor || v.colors.black}
+                      onChangeComplete={this.onSelectTitleFontColor}
+                    />
+                    <MediumBreak />
+                  </Fragment>
+                )}
+                <CheckboxWithLabel
+                  onChange={this.onTogglePropagate('font_color')}
+                  checked={record.propagate_font_color}
+                  label="Apply to all nested collections"
+                />
+              </Fragment>
+            )}
+
+            <MediumBreak />
+            <h3>Icon</h3>
+            <CollectionIconSelector
+              selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
+              onSelectIcon={this.onCustomIconSelect}
+            />
+            <CheckboxWithLabel
+              onChange={this.onToggleShowIconOnCoverCheckbox}
+              checked={record.show_icon_on_cover}
+              label="Show icon on cover"
+            />
+          </Box>
+        </Flex>
       </div>
     )
   }
