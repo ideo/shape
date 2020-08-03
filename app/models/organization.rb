@@ -123,6 +123,7 @@ class Organization < ApplicationRecord
 
   scope :active, -> { where(deactivated: false) }
   scope :shell, -> { where(shell: true) }
+  scope :billable, -> { where(deactivated: false, billable: true) }
   scope :overdue, -> do
     billable
       .where.not(overdue_at: nil)
