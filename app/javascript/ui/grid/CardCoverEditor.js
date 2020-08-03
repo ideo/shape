@@ -1,18 +1,19 @@
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 import { Fragment } from 'react'
 import { Flex, Box } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
-import { CompactPicker } from 'react-color'
+import TextareaAutosize from 'react-autosize-textarea'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Modal from '~/ui/global/modals/Modal'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
+import FontColorSelector from '~/ui/global/FontColorSelector'
 import CollectionIconSelector from '~/ui/grid/CollectionIconSelector'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
@@ -21,9 +22,7 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
-import TextareaAutosize from 'react-autosize-textarea'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
-import PropTypes from 'prop-types'
 import CheckboxWithLabel from '~/ui/global/CheckboxWithLabel'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import parseURLMeta from '~/utils/parseURLMeta'
@@ -47,11 +46,6 @@ const linkBackgroundOption = {
   type: 'remove',
   title: 'black',
   color: v.colors.black,
-}
-const pickColorOption = {
-  type: 'color',
-  title: 'font color',
-  icon: <ColorPickerIcon />,
 }
 
 const StyledEditTitle = styled.div`
@@ -89,6 +83,11 @@ export const MediumBreak = styled.div`
   margin-bottom: 0.75rem;
 `
 
+const BigBreak = styled.div`
+  display: block;
+  margin-bottom: 1.5rem;
+`
+
 const filterOptions = [
   {
     type: 'nothing',
@@ -117,8 +116,6 @@ class CardCoverEditor extends React.Component {
   hardcodedSubtitle = '' // overrides cover text set by text items
   @observable
   subtitleHidden = false
-  @observable
-  fontColorPickerOpen = false
 
   constructor(props) {
     super(props)
@@ -364,7 +361,6 @@ class CardCoverEditor extends React.Component {
   setObservableInputs = () => {
     const { record } = this
     const { name } = record
-    this.fontColorPickerOpen = false
     this.cardTitle = name || record.url
     if (record.isCollection) {
       this.hardcodedSubtitle = record.subtitleForEditing
@@ -449,42 +445,30 @@ class CardCoverEditor extends React.Component {
     record.save()
   }
 
-  get titleFontOptions() {
-    const { fontColor } = this.record
-    const options = [{ ...removeOption, title: 'reset font color' }]
-    if (fontColor) {
-      options.push({
-        // clicking this will also open the picker
-        type: 'color',
-        title: 'current color',
-        color: fontColor,
-      })
-    }
-    options.push(pickColorOption)
-    return options
-  }
-
-  @action
-  onTitleFontOptionSelect = opt => {
-    if (opt.type === 'color') {
-      // toggle picker
-      this.fontColorPickerOpen = !this.fontColorPickerOpen
-    } else if (opt.type === 'remove') {
-      this.fontColorPickerOpen = false
-      this.onSelectTitleFontColor({ hex: null })
-    }
-  }
-
   @action
   onSelectTitleFontColor = ({ hex }) => {
     const { record } = this
     // set immediately to reflect in UI
     record.collection_style.font_color = hex
-    this.saveFontColor(hex)
+    this.saveFontColor('record', hex)
   }
 
-  _saveFontColor = hex => {
-    this.record.patch({ cancel_sync: true, attributes: { font_color: hex } })
+  @action
+  onSelectCoverFontColor = ({ hex }) => {
+    const { card } = this.props
+    // set immediately to reflect in UI
+    card.font_color = hex
+    this.saveFontColor('card', hex)
+  }
+
+  _saveFontColor = (type, hex) => {
+    let obj
+    if (type === 'record') {
+      obj = this.record
+    } else {
+      obj = this.props.card
+    }
+    obj.patch({ cancel_sync: true, attributes: { font_color: hex } })
   }
 
   onTogglePropagate = field => ev => {
@@ -547,7 +531,8 @@ class CardCoverEditor extends React.Component {
   }
 
   renderInner() {
-    const { record, recordIsCollection, fontColorPickerOpen, loading } = this
+    const { card } = this.props
+    const { record, recordIsCollection, loading } = this
 
     if (loading) {
       return (
@@ -566,9 +551,9 @@ class CardCoverEditor extends React.Component {
           <h3>Title</h3>
           {this.renderEditTitleInput()}
         </StyledEditTitle>
-        <MediumBreak />
-        <Flex column data-cy="EditCoverOptions">
-          <Box w={[1]}>
+        <BigBreak />
+        <Flex wrap w={1} data-cy="EditCoverOptions">
+          <Box w={[1, 0.425]}>
             <h3>Cover</h3>
             <QuickOptionSelector
               options={toJS(this.coverImageOptions)}
@@ -617,7 +602,7 @@ class CardCoverEditor extends React.Component {
               </Fragment>
             )}
           </Box>
-          <Box ml={64} w={[1]}>
+          <Box w={[1, 0.425]} ml={[0, 64]}>
             <h3>Cover Effects</h3>
             {this.showFilters && (
               <QuickOptionSelector
@@ -626,27 +611,24 @@ class CardCoverEditor extends React.Component {
               />
             )}
 
+            <MediumBreak />
+            <h3>Cover Font Color</h3>
+            <FontColorSelector
+              fontColor={card.font_color}
+              defaultFontColor={v.colors.white}
+              onSelect={this.onSelectCoverFontColor}
+            />
+
             {recordIsCollection && (
               <Fragment>
                 <MediumBreak />
                 <h3>Title Font Color</h3>
-                <QuickOptionSelector
-                  options={this.titleFontOptions}
-                  onSelect={this.onTitleFontOptionSelect}
-                />
-                {fontColorPickerOpen && (
-                  <Fragment>
-                    <CompactPicker
-                      color={record.fontColor || v.colors.black}
-                      onChangeComplete={this.onSelectTitleFontColor}
-                    />
-                    <MediumBreak />
-                  </Fragment>
-                )}
-                <CheckboxWithLabel
-                  onChange={this.onTogglePropagate('font_color')}
-                  checked={record.propagate_font_color}
-                  label="Apply to all nested collections"
+                <FontColorSelector
+                  fontColor={record.fontColor}
+                  defaultFontColor={v.colors.black}
+                  onSelect={this.onSelectTitleFontColor}
+                  onTogglePropagate={this.onTogglePropagate('font_color')}
+                  propagate={record.propagate_font_color}
                 />
               </Fragment>
             )}
