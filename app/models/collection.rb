@@ -1274,7 +1274,6 @@ class Collection < ApplicationRecord
   end
 
   def lookup_reviewer_audience_for_current_user(current_user)
-    binding.pry
     return nil unless current_user.present? && in_reviewer_group?(current_user)
 
     # use master template test audience

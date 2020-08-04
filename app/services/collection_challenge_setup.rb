@@ -6,8 +6,8 @@ class CollectionChallengeSetup < SimpleService
 
   def call
     return unless @collection.collection_type == 'challenge' ||
-                  (challenge_admin_group.blank? && challenge_reviewer_group.blank? &&
-                  challenge_participant_group.blank?)
+                  (@collection.challenge_admin_group.blank? && @collection.challenge_reviewer_group.blank? &&
+                  @collection.challenge_participant_group.blank?)
 
     # collections that become a challenge gets their roles unanchored
     if @collection.roles_anchor_collection_id.present?

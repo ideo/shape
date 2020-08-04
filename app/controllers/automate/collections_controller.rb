@@ -20,6 +20,10 @@ class Automate::CollectionsController < ActionController::Base
     challenge_collection.topic_list = %w[main automated]
     challenge_collection.save
 
+    # Setup challenge groups
+    setup = CollectionChallengeSetup.new(collection: challenge_collection, current_user: current_user)
+    setup.call
+
     template_card = create_template_with_test(
       collection: current_user.current_user_collection,
       current_user: current_user,
@@ -43,7 +47,7 @@ class Automate::CollectionsController < ActionController::Base
     )
 
     # Add people to the reviewers group
-    logger.info "-- Adding users to reviewers group"
+    logger.info '-- Adding users to reviewers group'
     challenge_reviewer_group = challenge_collection.challenge_reviewer_group
     User.first(10).each do |user|
       user.add_role(Role::MEMBER, challenge_reviewer_group)
@@ -52,7 +56,7 @@ class Automate::CollectionsController < ActionController::Base
 
     # Redirect to the current user collection where challenge was created
     # redirect_to root_path
-    redirect_to "#{frontend_url_for(challenge_collection)}"
+    redirect_to frontend_url_for(challenge_collection).to_s
   end
 
   private
