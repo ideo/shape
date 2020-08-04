@@ -145,21 +145,21 @@ describe Collection::TestCollection, type: :model, seed: true do
         end
       end
 
-      describe '#user_challenge_audience' do
+      describe '#challenge_test_audience_for_user' do
         it 'should find the first relevant audience for the user' do
           user.add_role(Role::MEMBER, template.challenge_reviewer_group)
-          expect(test_collection.user_challenge_audience(user)).to eq reviewer_test_audience
+          expect(test_collection.challenge_test_audience_for_user(user)).to eq reviewer_test_audience
         end
 
         it 'should find the admin audience for the user before any others' do
           user.add_role(Role::MEMBER, template.challenge_reviewer_group)
           user.add_role(Role::MEMBER, template.challenge_admin_group)
           admin_test_audience.update(status: :open)
-          expect(test_collection.user_challenge_audience(user)).to eq admin_test_audience
+          expect(test_collection.challenge_test_audience_for_user(user)).to eq admin_test_audience
         end
 
         it 'should not find any if the user is not in one of the groups' do
-          expect(test_collection.user_challenge_audience(user)).to be nil
+          expect(test_collection.challenge_test_audience_for_user(user)).to be nil
         end
       end
     end

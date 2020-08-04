@@ -753,7 +753,7 @@ class Collection
       challenge_or_inside_challenge? && submission_test? && !submission_box_template_test? && live?
     end
 
-    def user_challenge_audience(current_user)
+    def challenge_test_audience_for_user(current_user)
       return nil unless inside_a_challenge? && current_user.present?
 
       open_test_audiences = test_audiences&.open

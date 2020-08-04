@@ -143,6 +143,7 @@ module JsonapiCache
       json_data
     end
 
+    # most of these are replicating serialized UserSpecificFields
     def cached_card_with_user_fields(json, record)
       json[:data][:attributes][:can_edit_parent] = can_edit_parent
       related = json[:data][:relationships][:record][:data]
@@ -152,6 +153,7 @@ module JsonapiCache
       related_json[:attributes][:can_view] = true
       related_json[:attributes][:can_edit] = @current_ability.can?(:edit, record)
       related_json[:attributes][:can_edit_content] = record.active? && @current_ability.can?(:edit_content, record)
+      # NOTE: the can_review attribute is only rendered here, to be displayed on the CollectionCover
       related_json[:attributes][:can_review] =
         record.present? && record.submission? && @user.present? ? record.can_review?(@user) : nil
       related_json[:attributes][:submission_reviewer_status] =

@@ -989,7 +989,7 @@ class Collection < ApplicationRecord
   end
 
   def can_review?(user)
-    audience = user_challenge_audience(user)
+    audience = challenge_test_audience_for_user(user)
     unreviewed_by?(user, audience.present?)
   end
 
@@ -1309,7 +1309,8 @@ class Collection < ApplicationRecord
     current_user.has_role?(Role::MEMBER, parent_challenge.challenge_reviewer_group)
   end
 
-  def user_challenge_audience(current_user)
+  # This method looks for the relevant TestCollection, and then calls challenge_test_audience_for_user on it
+  def challenge_test_audience_for_user(current_user)
     return nil unless inside_a_challenge? && (submission? || submission_box?)
 
     test_id = nil
@@ -1325,7 +1326,7 @@ class Collection < ApplicationRecord
 
     return nil unless test.present?
 
-    test.user_challenge_audience(current_user)
+    test.challenge_test_audience_for_user(current_user)
   end
 
   def unreviewed_by?(user, in_a_reviewer_group_with_audience)

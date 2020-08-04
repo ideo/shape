@@ -991,7 +991,7 @@ describe Collection, type: :model do
       end
     end
 
-    describe 'with reviewer added to challenge reviewer group' do
+    describe '#challenge_test_audience_for_user' do
       let!(:master_test) do
         create(:test_collection, :with_reviewers_audience, parent_collection: submission_template, master_template: true)
       end
@@ -1001,12 +1001,15 @@ describe Collection, type: :model do
       before do
         reviewer.add_role(Role::MEMBER, parent_challenge.challenge_reviewer_group)
       end
+
       it 'should lookup reviewer audience' do
-        expect(test_collection
-          .user_challenge_audience(reviewer)).to eq(test_collection
-                                                                      .test_audiences
-                                                                      .joins(:audience)
-                                                                      .find_by(audiences: { name: 'Reviewers' }))
+        test_audience = test_collection.test_audiences
+                                       .joins(:audience)
+                                       .find_by(audiences: { name: 'Reviewers' })
+
+        expect(submission.challenge_test_audience_for_user(reviewer)).to eq(test_audience)
+        # these should be equivalent
+        expect(test_collection.challenge_test_audience_for_user(reviewer)).to eq(test_audience)
       end
     end
   end
