@@ -299,10 +299,6 @@ class GridCard extends React.Component {
     return !!record.thumbnail_url
   }
 
-  handleMoreCoverClick = ev => {
-    this.defaultHandleClick(ev)
-  }
-
   defaultHandleClick = ev => {
     pageBoundsScroller.setScrolling(false)
     const { cardType, record } = this.props
@@ -310,20 +306,22 @@ class GridCard extends React.Component {
       uiStore.closeCardMenu()
       return
     }
-    const formTags = ['SELECT', 'OPTION']
 
-    if (
-      typeof ev.target.className !== 'string' ||
-      // cancel for elements matching or inside a .cancelGridClick
-      ev.target.className.match(/cancelGridClick/) ||
-      ev.target.closest('.cancelGridClick') ||
-      ev.target.className.match(/selectMenu/) ||
-      // cancel for links within the card as these should handle their own routing
-      (ev.target.tagName === 'A' && ev.target.href) ||
-      formTags.includes(ev.target.tagName) ||
-      record.type === 'Item::DataItem' ||
-      ev.target.className.match(/CollectionCoverFormButton/)
-    ) {
+    // check if we should cancel default click (i.e. do not route to the card)
+    // cancel when clicking form tags inside the card
+    const isFormTag = ['SELECT', 'OPTION'].includes(ev.target.tagName)
+    // cancel for elements matching or inside a .cancelGridClick
+    const cancelGridClick =
+      (typeof ev.target.className === 'string' &&
+        (ev.target.className.match(/cancelGridClick/) ||
+          ev.target.className.match(/selectMenu/) ||
+          ev.target.className.match(/CollectionCoverFormButton/))) ||
+      ev.target.closest('.cancelGridClick')
+    // cancel for links within the card as these should handle their own routing
+    const isHref = ev.target.tagName === 'A' && ev.target.href
+
+    // also cancel clicks for DataItems
+    if (record.isData || cancelGridClick || isHref || isFormTag) {
       return
     }
 
@@ -364,6 +362,8 @@ class GridCard extends React.Component {
       Activity.trackActivity('downloaded', record)
       return
     } else if (record.isCreativeDifferenceChartCover) {
+      // make sure creativeDifferenceChartCover navigates to the collection
+      this.defaultHandleClick(ev)
       return
     } else if (record.isVideo || record.isImage || record.isLegend) {
       return
@@ -469,6 +469,7 @@ class GridCard extends React.Component {
         height={height}
         dragging={dragging}
         searchResult={searchResult}
+        // NOTE: handleClick is really only used by TextItemCover
         handleClick={this.defaultHandleClick}
         isBoardCollection={isBoardCollection}
         isTestCollectionCard={testCollectionCard}
@@ -591,7 +592,7 @@ class GridCard extends React.Component {
             {this.renderCover}
           </StyledGridCardInner>
           {record.isCreativeDifferenceChartCover && (
-            <BottomRightActionHolder onClick={this.handleMoreCoverClick}>
+            <BottomRightActionHolder onClick={this.defaultHandleClick}>
               <TextButton fontSizeEm={0.75} color={v.colors.black}>
                 More…
               </TextButton>
