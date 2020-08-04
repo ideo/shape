@@ -1315,8 +1315,10 @@ class Collection < ApplicationRecord
 
     test_id = nil
     if submission?
+      # e.g. when looking up a particular submission + test
       test_id = launchable_test_id
     else
+      # e.g. when checking available_submission_tests at the SubmissionBox level
       test_id = submission_template&.launchable_test_id
     end
 
