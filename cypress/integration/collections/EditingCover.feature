@@ -6,12 +6,12 @@ Feature: Editing Cover
 
     When I type "Title" in the title textarea
     And I type "Subtitle" in the subtitle textarea
-    And I click the 'EditCoverCloseBtn'
+    And I click the 'ModalClose'
     And I wait for "@apiUpdateCollection" to finish
     Then I should see a collection card title "Title" with a subtitle "Subtitle"
 
     When I click the "CardAction-edit cover"
     Then I should see a 'EditCoverOptions'
-    And I click the ".PrivateSwitchBase-input"
-    And I click the 'EditCoverCloseBtn'
+    And I click the "input" located in ".checkbox-hide-subtitle"
+    And I click the 'ModalClose'
     Then I should not see a collection card with subtitle "Subtitle"

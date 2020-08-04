@@ -17,6 +17,7 @@ const ChallengeSettingsButton = ({ record }) => {
       {...buttonStyleProps}
       colorScheme={v.colors.primaryDark}
       onClick={() => uiStore.update('challengeSettingsOpen', true)}
+      data-cy="ChallengeSettingsButton"
     >
       Challenge Settings
     </Button>
@@ -34,7 +35,7 @@ export const ReviewSubmissionsButton = ({ record }) => {
 
   useEffect(() => {
     const loadNextAvailableTest = async () => {
-      const path = await record.API_getNextAvailableTest({ challenge: true })
+      const path = await record.API_getNextAvailableTest()
       setNextAvailableTestPath(path)
     }
     loadNextAvailableTest()

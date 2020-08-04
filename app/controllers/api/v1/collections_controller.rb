@@ -1,14 +1,14 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover next_available_challenge_test]
+  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover clear_background_image]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
-  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover]
+  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover clear_background_image]
   after_action :broadcast_parent_collection_card_update, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -62,6 +62,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def clear_collection_cover
     @parent_collection = @collection.parent
     @collection.clear_collection_cover
+    @collection.reload
+    render_collection
+  end
+
+  def clear_background_image
+    @collection.clear_background_image
     @collection.reload
     render_collection
   end
@@ -174,15 +180,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
                               )
   end
 
-  before_action :load_and_authorize_next_available_challenge_test, only: %i[next_available_challenge_test]
-  def next_available_challenge_test
-    test = @collection.next_available_challenge_test(
-      for_user: current_user,
-      omit_id: nil,
-    )
-    # FIXME: need to handle in-collection tests
-    if test.present?
-      render jsonapi: test
+  before_action :load_related_submission_box, only: %i[next_available_submission_test]
+  def next_available_submission_test
+    if @test_collection.present?
+      render jsonapi: @test_collection
     else
       render json: nil
     end
@@ -343,9 +344,30 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
   end
 
-  def load_and_authorize_next_available_challenge_test
-    @collection = Collection.find(params[:id])
-    authorize! :read, @collection
+  def load_related_submission_box
+    if @collection.is_a?(Collection::SubmissionBox)
+      @submission_box = @collection
+    else
+      @submission_box = @collection.parent_submission_box
+      if @submission_box.nil? && @collection.challenge_or_inside_challenge?
+        # NOTE: if a challenge happens to have multiple submission boxes
+        # this may not find the "best" one, since we just use most recently updated
+        @submission_box = @collection
+                          .challenge_submission_boxes
+                          .order(updated_at: :desc)
+                          .first
+      end
+    end
+
+    unless @submission_box.present?
+      head(404)
+      return
+    end
+
+    @test_collection = @submission_box.random_next_submission_test(
+      for_user: current_user,
+      omit_id: @collection.test_collection? ? @collection.id : nil,
+    ).first
   end
 
   def collection_params
@@ -394,6 +416,9 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       :start_date,
       :end_date,
       :icon,
+      :font_color,
+      :propagate_font_color,
+      :propagate_background_image,
       :show_icon_on_cover,
       submission_attrs: {},
       user_tag_list: [],

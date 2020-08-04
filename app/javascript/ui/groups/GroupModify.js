@@ -1,5 +1,6 @@
+import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
+import { action, runInAction, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
 import Button from '~/ui/global/Button'
@@ -16,6 +17,7 @@ import { uiStore } from '~/stores'
 import { FloatRight } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Avatar from '~/ui/global/Avatar'
+import v from '~/utils/variables'
 
 function transformToHandle(name) {
   // Keep in sync with models/group.rb
@@ -39,16 +41,18 @@ class GroupModify extends React.Component {
   constructor(props) {
     super(props)
     const { group } = props
-    this.editingGroup = {
-      name: group.name || '',
-      handle: group.handle || '',
-      filestack_file_url: group.filestack_file_url || '',
-      filestack_file_attributes: null,
-    }
-    if (!group.id) this.setSyncing(true)
-    if (this.editingGroup.handle.length < 2) {
-      this.formDisabled = true
-    }
+    runInAction(() => {
+      this.editingGroup = {
+        name: group.name || '',
+        handle: group.handle || '',
+        filestack_file_url: group.filestack_file_url || '',
+        filestack_file_attributes: null,
+      }
+      if (!group.id) this.setSyncing(true)
+      if (this.editingGroup.handle.length < 2) {
+        this.formDisabled = true
+      }
+    })
   }
 
   @action
@@ -65,8 +69,9 @@ class GroupModify extends React.Component {
   changeHandle(handle) {
     // limit to 30
     this.editingGroup.handle = handle.slice(0, 30)
-    // disable the form if the handle is numbers only
-    this.formDisabled = parseInt(handle).toString() === handle
+    const first = _.first(_.slice(handle, 0, 1))
+    // disable the form if the handle starts with a number
+    this.formDisabled = parseInt(first).toString() === first
   }
 
   @action
@@ -106,7 +111,9 @@ class GroupModify extends React.Component {
   handleSave = ev => {
     ev.preventDefault()
     const { onSave } = this.props
-    if (onSave) onSave(this.editingGroup)
+    if (onSave) {
+      onSave(this.editingGroup)
+    }
   }
 
   renderImagePicker() {
@@ -129,7 +136,8 @@ class GroupModify extends React.Component {
   }
 
   render() {
-    const { creatingOrg, group, groupType, onCancel } = this.props
+    const { creatingOrg, group, groupType, onCancel, isLoading } = this.props
+    const { editingGroup } = this
     return (
       <form>
         <FloatRight>
@@ -143,7 +151,7 @@ class GroupModify extends React.Component {
             id="groupName"
             type="text"
             data-cy="TextField_groupName"
-            value={this.editingGroup.name}
+            value={editingGroup.name}
             onChange={this.handleNameChange}
             placeholder={`Enter ${groupType} Name`}
           />
@@ -151,7 +159,13 @@ class GroupModify extends React.Component {
         <FieldContainer>
           <Label htmlFor="grouphandle">{groupType} handle</Label>
           <div style={{ marginTop: '-10px', marginBottom: '10px' }}>
-            <SmallHelperText>
+            <SmallHelperText
+              color={
+                this.formDisabled && editingGroup.name
+                  ? v.colors.alert
+                  : v.colors.commonMedium
+              }
+            >
               Must be 1-30 characters, starting with a letter.
             </SmallHelperText>
           </div>
@@ -159,7 +173,7 @@ class GroupModify extends React.Component {
             id="grouphandle"
             type="text"
             data-cy="TextField_groupHandle"
-            value={this.editingGroup.handle}
+            value={editingGroup.handle}
             onChange={this.handleHandleChange}
             placeholder={`@${groupType.toLowerCase()}-handle`}
           />
@@ -173,7 +187,7 @@ class GroupModify extends React.Component {
         <FormActionsContainer>
           <Button
             data-cy="FormButton_submitGroup"
-            disabled={this.formDisabled}
+            disabled={this.formDisabled || isLoading}
             onClick={this.handleSave}
             minWidth={190}
             type="submit"
@@ -204,12 +218,14 @@ GroupModify.propTypes = {
   onGroupRoles: PropTypes.func,
   groupType: PropTypes.oneOf(['Group', 'Organization']),
   creatingOrg: PropTypes.bool,
+  isLoading: PropTypes.bool,
 }
 GroupModify.defaultProps = {
   onGroupRoles: null,
   onCancel: () => {},
   groupType: 'Group',
   creatingOrg: false,
+  isLoading: false,
 }
 
 export default GroupModify

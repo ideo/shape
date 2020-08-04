@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 import v from '~/utils/variables'
 
 export const Heading1TypographyCss = css`
-  color: ${v.colors.black};
+  color: ${props => props.theme.titleColor || v.colors.black};
   font-family: ${v.fonts.sans};
   font-size: 1.75rem;
   font-weight: ${v.weights.book};
@@ -12,7 +12,7 @@ export const Heading1TypographyCss = css`
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !props.theme.isResponsiveText &&
+      props.theme.useResponsiveText &&
       `
       font-size: 1.5rem;
       line-height: 1.75rem;
@@ -29,7 +29,7 @@ const Heading1Css = css`
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     /* Allow us not to have responsive behavior */
     ${props =>
-      props.notResponsive || props.theme.isResponsiveText
+      props.notResponsive || !props.theme.useResponsiveText
         ? ''
         : 'padding: 1rem 0;'};
   }
@@ -240,7 +240,7 @@ export const CardHeadingCss = css`
   @media only screen and (min-width: ${v.responsive
       .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !props.theme.isResponsiveText &&
+      props.theme.useResponsiveText &&
       `
       padding: 0;
     `}
@@ -277,7 +277,7 @@ export const HugeNumber = styled(Heading1)`
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !props.theme.isResponsiveText &&
+      props.theme.useResponsiveText &&
       `
         font-size: 4rem;
         line-height: 3rem;
@@ -287,6 +287,13 @@ export const HugeNumber = styled(Heading1)`
 
 export const QuillStyleWrapper = styled.div`
   height: 100%;
+
+  ${props =>
+    props.hasTitleText &&
+    props.theme.titleColor &&
+    `
+    color: ${props.theme.titleColor};
+  `}
 
   .quill {
     height: 100%;
@@ -312,10 +319,12 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-size-huge {
       ${Heading1TypographyCss};
+      /* always use black as opposed to props.theme.titleColor */
+      color: ${v.colors.black};
     }
 
     h5 {
-      color: ${v.colors.black};
+      color: ${props => props.theme.titleColor || v.colors.black};
       font-size: 4rem;
       font-weight: 700;
       letter-spacing: -0.5px;

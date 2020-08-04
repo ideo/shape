@@ -58,4 +58,6 @@ FloatingActionButton.defaultProps = {
   icon: null,
 }
 
+FloatingActionButton.displayName = 'FloatingActionButton'
+
 export default FloatingActionButton

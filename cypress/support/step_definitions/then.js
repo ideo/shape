@@ -32,6 +32,12 @@ Then('I should see {string} in a {string}', (text, el) => {
   cy.locateDataOrClassWith(el, text).should('be.visible')
 })
 
+Then('I should see {string} element in a {string}', (el, outerEl) => {
+  cy.locateDataOrClass(outerEl).within(outer => {
+    cy.get(el).should('be.visible')
+  })
+})
+
 Then('I should see the value {string} in a {string}', (text, el) => {
   cy.locateDataOrClass(el).should('have.value', text)
 })
@@ -122,6 +128,12 @@ Then('I should see the single data value', () => {
 
 Then('I should see an svg on the report item', () => {
   cy.get('[data-cy="ChartContainer"] svg')
+    .first()
+    .should('exist')
+})
+
+Then('I should see a modal', () => {
+  cy.get('[role="dialog"]')
     .first()
     .should('exist')
 })

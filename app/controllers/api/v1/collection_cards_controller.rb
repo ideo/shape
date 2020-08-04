@@ -94,7 +94,10 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def reviewer_statuses
     submissions = @collection_cards.map(&:record)
-    parent_challenge = submissions.first&.parent_challenge
+    parent_challenge = submissions&.first&.parent_challenge
+
+    return {} if parent_challenge.nil?
+
     result = SubmissionReviewerStatuses.call(
       challenge: parent_challenge,
       submissions: submissions,
@@ -614,6 +617,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       :height,
       :image_contain,
       :is_cover,
+      :is_background,
       :filter,
       :show_replace,
       :order,
@@ -722,6 +726,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       item_id
       image_contain
       is_cover
+      is_background
       filter
       hidden
       show_replace
