@@ -12,8 +12,10 @@ module CollectionGrid
 
     def migrate_collection_and_subcollections(collection)
       migrate_collection_to_board(collection)
-      collection.all_child_collections.each do |c|
-        migrate_collection_to_board(c)
+      collection.all_child_collections.find_in_batches do |batch|
+        batch.each do |c|
+          migrate_collection_to_board(c)
+        end
       end
 
       # if we migrate a master template then we also migrate the instances
