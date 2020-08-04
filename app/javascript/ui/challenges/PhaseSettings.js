@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
+import _ from 'lodash'
 
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Panel from '~/ui/global/Panel'
@@ -50,43 +51,70 @@ const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
     setEditingPhaseCollectionId(phaseCollection.id)
   }
 
+  const renderPhaseRowsForItem = submissionBox => {
+    if (!submissionBox || !submissionBox.submission_box_type) return null
+
+    const message = `Phases can not be added to a ${submissionBox.submission_box_type} item. Change this submission box to
+    use a submission template in the 'Submission Settings' tab above if you
+    want to add phases.`
+    return <PhaseCollectionWithoutTemplateRow message={message} />
+  }
+
+  const renderPhaseRowsForTemplate = submissionBox => {
+    const { phaseSubCollections } = submissionBox
+    const phaseRows = phaseSubCollections.map(phase => (
+      <PhaseCollectionRow
+        collection={phase}
+        showEdit={editingPhaseCollectionId === phase.id}
+        onDoneEditing={() => setEditingPhaseCollectionId(null)}
+        closeModal={closeModal}
+        key={phase.id}
+      />
+    ))
+
+    return (
+      <Fragment>
+        {phaseRows}
+        <TextButton
+          color={v.colors.black}
+          fontSizeEm={0.75}
+          onClick={() => createSubmissionTemplatePhaseCollection(submissionBox)}
+        >
+          + Add Phase
+        </TextButton>
+      </Fragment>
+    )
+
+    return null
+  }
+
+  const renderPhaseRows = submissionBox => {
+    const { submissionFormat } = submissionBox
+
+    if (submissionFormat === 'item') {
+      return renderPhaseRowsForItem(submissionBox)
+    } else if (submissionFormat === 'template') {
+      return renderPhaseRowsForTemplate(submissionBox)
+    }
+
+    return null
+  }
+
   return (
     <div>
       {isLoading && <InlineLoader />}
+      {_.isEmpty(submissionBoxesWithPhases) && (
+        <PhaseCollectionWithoutTemplateRow
+          message={'Please create a submission box in order to add Phases.'}
+        />
+      )}
       {submissionBoxesWithPhases.map(submissionBox => (
         <Panel
           key={submissionBox.id}
           title={submissionBox.name}
           open={viewingSubmissionBoxId === submissionBox.id}
         >
-          <Phases>
-            {submissionBox.submissionFormat === 'item' && (
-              <PhaseCollectionWithoutTemplateRow
-                formatType={`${submissionBox.submission_box_type} item`}
-              />
-            )}
-            {submissionBox.submissionFormat === 'template' &&
-              submissionBox.phaseSubCollections.map(phase => (
-                <PhaseCollectionRow
-                  collection={phase}
-                  showEdit={editingPhaseCollectionId === phase.id}
-                  onDoneEditing={() => setEditingPhaseCollectionId(null)}
-                  closeModal={closeModal}
-                  key={phase.id}
-                />
-              ))}
-            {submissionBox.submissionFormat === 'template' && (
-              <TextButton
-                color={v.colors.black}
-                fontSizeEm={0.75}
-                onClick={() =>
-                  createSubmissionTemplatePhaseCollection(submissionBox)
-                }
-              >
-                + Add Phase
-              </TextButton>
-            )}
-          </Phases>
+          <Phases>{renderPhaseRows(submissionBox)}</Phases>
         </Panel>
       ))}
     </div>

@@ -57,19 +57,15 @@ PhaseCollectionThumbnail.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export const PhaseCollectionWithoutTemplateRow = ({ formatType }) => {
+export const PhaseCollectionWithoutTemplateRow = ({ message }) => {
   return (
     <PhaseRow data-cy="ChallengeSettings-Phase">
-      <SmallHelperText color={v.colors.black}>
-        Phases can not be added to a {formatType}. Change this submission box to
-        use a submission template in the 'Submission Settings' tab above if you
-        want to add phases.
-      </SmallHelperText>
+      <SmallHelperText color={v.colors.black}>{message}</SmallHelperText>
     </PhaseRow>
   )
 }
 PhaseCollectionWithoutTemplateRow.propTypes = {
-  formatType: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
 }
 
 const PhaseCollectionRow = ({
