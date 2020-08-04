@@ -61,6 +61,7 @@ const Pill = props => {
     symbol,
     symbolSize,
     onDelete,
+    disabled,
   } = props.tag || props
   let { deleteIcon } = props.tag || props
   if (props.tag && !props.tag.deleteIcon) {
@@ -84,6 +85,7 @@ const Pill = props => {
             onSelect(props.tag || props)
           }}
           value="yes"
+          disabled={disabled}
         />
       )}
       {symbol && (
@@ -110,6 +112,7 @@ Pill.propTypes = {
   tag: PropTypes.object,
   selectable: PropTypes.bool,
   selected: PropTypes.bool,
+  disabled: PropTypes.bool,
   onSelect: PropTypes.func,
   id: PropTypes.string,
 }
@@ -123,6 +126,7 @@ Pill.defaultProps = {
   tag: null,
   selectable: false,
   selected: false,
+  disabled: false,
   onSelect: null,
   id: null,
 }
