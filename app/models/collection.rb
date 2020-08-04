@@ -14,12 +14,15 @@
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
 #  end_date                       :datetime
+#  font_color                     :string
 #  hide_submissions               :boolean          default(FALSE)
 #  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
 #  num_columns                    :integer
 #  processing_status              :integer
+#  propagate_background_image     :boolean          default(FALSE)
+#  propagate_font_color           :boolean          default(FALSE)
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
 #  show_icon_on_cover             :boolean
@@ -117,7 +120,8 @@ class Collection < ApplicationRecord
                  :loading_content,
                  :cached_inheritance,
                  :common_viewable,
-                 :broadcasting
+                 :broadcasting,
+                 :background_image_url
 
   # validations
   validates :name, presence: true
@@ -645,10 +649,9 @@ class Collection < ApplicationRecord
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
-    # no need to do this for boards
     if board_collection?
+      # There is a non-null constraint, but we want to effectively nullify orders
       collection_cards.update_all(order: 0)
-      # There is a non-null constraint
       return
     end
 
@@ -807,6 +810,10 @@ class Collection < ApplicationRecord
     save
   end
 
+  def collection_style
+    CollectionStyle.call(self)
+  end
+
   def cache_card_count!
     cache_attribute!(
       :cached_card_count,
@@ -858,14 +865,15 @@ class Collection < ApplicationRecord
       /#{ActiveRecord::Migrator.current_version}
       /#{ENV['HEROKU_RELEASE_VERSION']}
       /order_#{card_order}
-      /cards_#{collection_cards.maximum(:updated_at).to_i}
+      /cards_#{collection_cards.maximum(:updated_at).to_f}
       /#{test_details}
       /#{challenge_details}
       /gs_#{getting_started_shell}
-        /org_#{organization.updated_at}
+      /org_#{organization.updated_at}
       /user_id_#{user_id}
       /locale_#{I18n.locale}
-      /roles_#{anchored_roles.maximum(:updated_at).to_i}
+      /roles_#{anchored_roles.maximum(:updated_at).to_f}
+      /inherited_#{parents.maximum(:updated_at).to_f}
     ).gsub(/\s+/, '')
   end
 
@@ -888,6 +896,16 @@ class Collection < ApplicationRecord
 
     cover.update(is_cover: false)
     touch
+  end
+
+  def clear_background_image
+    bg_card = primary_collection_cards.where(is_background: true).first
+    if bg_card.nil?
+      update(background_image_url: nil)
+      return
+    end
+
+    bg_card.update(is_background: false)
   end
 
   def reset_permissions!
@@ -980,19 +998,6 @@ class Collection < ApplicationRecord
     response.completed? ? :completed : :in_progress
   end
 
-  def next_available_challenge_test(for_user:, omit_id: nil)
-    return nil unless challenge_submission_boxes.any?
-
-    # next test to review from the list of submission boxes in the challenge
-    next_test = nil
-    challenge_submission_boxes.each do |sb|
-      next_test = sb.random_next_submission_test(for_user: for_user, omit_id: omit_id).first
-      # break early since it already found the next test
-      break if next_test.present?
-    end
-    next_test
-  end
-
   def default_group_id
     return self[:default_group_id] if self[:default_group_id].present? || roles_anchor == self
 
@@ -1013,6 +1018,9 @@ class Collection < ApplicationRecord
   end
 
   def board_collection?
+    # eventually going to have to rethink what "board_collection?" means
+    return false if is_a?(Collection::SubmissionsCollection)
+
     num_columns.present?
   end
 
@@ -1123,7 +1131,7 @@ class Collection < ApplicationRecord
   end
 
   def inside_a_challenge?
-    parent_challenge.present?
+    parents.where(collection_type: :challenge).any?
   end
 
   def submission_test?
@@ -1294,6 +1302,27 @@ class Collection < ApplicationRecord
     # Reset all memoized data
     @parent_challenge = @parent_submission_box_template = nil
     super(*args)
+  end
+
+  def lookup_reviewer_audience_for_current_user(current_user)
+    return nil unless current_user.present? && in_reviewer_group?(current_user)
+
+    # use master template test audience
+    test_audiences = template&.test_audiences
+
+    return nil unless test_audiences.present?
+
+    test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
+  end
+
+  def in_reviewer_group?(current_user)
+    return false unless inside_a_challenge?
+
+    reviewer_ids = parent_challenge&.challenge_reviewer_group&.user_ids
+
+    return false unless reviewer_ids.present?
+
+    reviewer_ids.include?(current_user.id)
   end
 
   private

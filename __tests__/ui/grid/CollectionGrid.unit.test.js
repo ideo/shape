@@ -3,7 +3,7 @@ import CollectionGrid from '~/ui/grid/CollectionGrid'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-import { fakeCollection, fakeItemCard } from '#/mocks/data'
+import { fakeCollection, fakeItemCard, fakeUser } from '#/mocks/data'
 
 let props, wrapper, component
 const rerender = () => {
@@ -105,6 +105,20 @@ describe('CollectionGrid', () => {
         // card 5 cannot overlap itself
         overlap = component.findOverlap('5', dragPosition)
         expect(overlap).toEqual(null)
+      })
+    })
+
+    describe('with submission box settings', () => {
+      beforeEach(() => {
+        props.apiStore.currentUser = fakeUser
+        props.submissionSettings = { enabled: true }
+        rerender()
+        component.addSubmissionCard = jest.fn()
+      })
+
+      it('should rerender and add submission card', () => {
+        component.positionMovingCardsAndBCT(props)
+        expect(component.addSubmissionCard).toHaveBeenCalled()
       })
     })
   })

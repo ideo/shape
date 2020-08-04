@@ -18,6 +18,9 @@ export const AUDIENCE_PRICES = {
 export const FOAMCORE_MAX_ZOOM = 3
 export const FOUR_WIDE_MAX_ZOOM = 2
 
+export const ACTIVITY_LOG_POSITION_KEY = 'ActivityLog:position'
+export const ACTIVITY_LOG_PAGE_KEY = 'ActivityLog:page'
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
@@ -149,6 +152,9 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
     ],
   },
 ]
+
+export const COLLECTION_CHANNEL_NAME = 'CollectionViewingChannel'
+export const ITEM_CHANNEL_NAME = 'ItemRealtimeChannel'
 
 export const KEYS = {
   ENTER: 13,

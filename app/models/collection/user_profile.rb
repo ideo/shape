@@ -14,12 +14,15 @@
 #  collection_type                :integer          default("collection")
 #  cover_type                     :integer          default("cover_type_default")
 #  end_date                       :datetime
+#  font_color                     :string
 #  hide_submissions               :boolean          default(FALSE)
 #  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
 #  num_columns                    :integer
 #  processing_status              :integer
+#  propagate_background_image     :boolean          default(FALSE)
+#  propagate_font_color           :boolean          default(FALSE)
 #  search_term                    :string
 #  shared_with_organization       :boolean          default(FALSE)
 #  show_icon_on_cover             :boolean

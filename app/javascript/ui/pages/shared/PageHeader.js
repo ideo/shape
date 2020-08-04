@@ -457,11 +457,7 @@ class PageHeader extends React.Component {
 
     const rolesRecord = uiStore.rolesMenuOpen ? uiStore.rolesMenuOpen : record
 
-    const showFilters =
-      record.isRegularCollection ||
-      record.isUserCollection ||
-      record.isSubmissionsCollection ||
-      record.isBoard
+    const { showFilters } = record
 
     const showFilterControls =
       showFilters &&

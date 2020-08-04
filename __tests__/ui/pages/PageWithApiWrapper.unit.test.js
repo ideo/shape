@@ -89,6 +89,12 @@ describe('PageWithApiWrapper', () => {
     it('calls record.updateFullyLoaded', () => {
       expect(fakeCollection.updateFullyLoaded).toHaveBeenCalledWith(true)
     })
+
+    it('calls uiStore.setBodyBackgroundImage', () => {
+      expect(uiStore.setBodyBackgroundImage).toHaveBeenCalledWith(
+        fakeCollection.backgroundImageUrl
+      )
+    })
   })
 
   describe('afterFetchData', () => {

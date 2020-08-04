@@ -44,7 +44,7 @@ const CollectionIconSelector = ({ selectedIcon, onSelectIcon }) => {
       <InlineModal
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
-        anchorElement={selectRef && selectRef.current}
+        anchorElement={selectRef ? selectRef.current : null}
         anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
         noButtons
       >
@@ -52,7 +52,10 @@ const CollectionIconSelector = ({ selectedIcon, onSelectIcon }) => {
           {Object.keys(allIcons).map(iconName => {
             const Icon = allIcons[iconName]
             return (
-              <IconWrapper onClick={() => handleSelectIcon(iconName)}>
+              <IconWrapper
+                key={iconName}
+                onClick={() => handleSelectIcon(iconName)}
+              >
                 <Icon size={'lg'} />
               </IconWrapper>
             )

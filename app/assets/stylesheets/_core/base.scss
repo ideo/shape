@@ -7,6 +7,9 @@ $largeBreakpoint: 1308px;
 body {
   background: #f2f1ee;
   overscroll-behavior: none;
+  // these rules are just for when you do add a body background image (in app)
+  background-position: 50% 0;
+  background-attachment: fixed;
 }
 
 h1, h2, h3, h4, h5, h6 {

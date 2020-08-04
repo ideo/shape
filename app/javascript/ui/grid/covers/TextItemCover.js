@@ -17,7 +17,9 @@ const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 
 const StyledPaddedCover = styled(PaddedCardCover)`
   border-top: ${props =>
-    !props.isEditing && props.hasTitleText ? '2px solid black' : 'none'};
+    !props.isEditing && props.hasTitleText
+      ? `2px solid ${props.theme.titleColor || v.colors.black}`
+      : 'none'};
   background: ${props => {
     const { hasTitleText, isTransparent, uneditable } = props
     if (hasTitleText && uneditable) {
@@ -265,10 +267,12 @@ class TextItemCover extends React.Component {
         hasTitleText={hasTitleText}
         isTransparent={isTransparent}
         uneditable={uneditable}
+        isEditing={isEditing}
       >
         <QuillStyleWrapper
           notEditing={!isEditing}
           smallGrid={uiStore.isSmallGrid}
+          hasTitleText={hasTitleText}
         >
           {this.state.loading && <InlineLoader />}
           {content}

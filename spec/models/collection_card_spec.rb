@@ -577,6 +577,34 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
+  describe '#update_collection_background' do
+    # give this one a parent so it has a parent card
+    let!(:collection) { create(:collection, parent_collection: create(:collection)) }
+    let!(:image_item) do
+      create(:collection_card_image, parent: collection, section_type: 'background', is_background: true)
+    end
+    # new_background is lazy evaluated on purpose so we can test what happens when created
+    let(:new_background) do
+      create(:collection_card_image, parent: collection, section_type: 'background', is_background: true)
+    end
+
+    context 'creating a new background image' do
+      it 'should set collection background_image_url' do
+        expect(collection.background_image_url).to eq image_item.item.filestack_file_url
+      end
+    end
+
+    context 'setting a new background image' do
+      it 'should touch collection and unset any other cards is_background attribute' do
+        expect {
+          new_background
+        }.to change(collection.parent_collection_card, :updated_at)
+        expect(new_background.reload.is_background).to be true
+        expect(image_item.reload.is_background).to be false
+      end
+    end
+  end
+
   describe 'update_parent_card_count!' do
     let(:collection) { create(:collection) }
 

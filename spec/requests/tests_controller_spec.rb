@@ -85,15 +85,17 @@ describe TestsController, type: :request do
         end
 
         context 'with a valid test audience' do
-          let(:template) { create(:test_collection) }
-          let(:test_collection) do
-            create(:test_collection, :launched, template: template, parent_collection: challenge)
+          let(:submission_box) { create(:submission_box, :with_submissions_collection, parent_collection: challenge) }
+          let(:submission) { create(:collection, :submission, parent_collection: submission_box.submissions_collection) }
+          let(:submission_template) { create(:collection, master_template: true, parent_collection: submission_box) }
+          let(:master_test) do
+            create(:test_collection, :with_reviewers_audience, parent_collection: submission_template, master_template: true)
           end
-          let!(:audience) { create(:audience, audience_type: :challenge, name: 'Reviewers') }
-          let!(:test_audience) do
-            create(:test_audience, test_collection: template, price_per_response: 0, audience: audience)
+          let!(:test_collection) do
+            create(:test_collection, :launched, parent_collection: submission, template_id: master_test.id)
           end
           before do
+            submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
             user.add_role(Role::MEMBER, challenge.challenge_reviewer_group)
           end
 

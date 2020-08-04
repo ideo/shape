@@ -9,7 +9,10 @@ import googleTagManager from '~/vendor/googleTagManager'
 import { apiStore } from '~/stores'
 import { apiUrl, useTemplateInMyCollection } from '~/utils/url'
 
-import { findTopLeftCard } from '~/utils/CollectionGridCalculator'
+import {
+  calculateRowsCols,
+  findTopLeftCard,
+} from '~/utils/CollectionGridCalculator'
 import BaseRecord from './BaseRecord'
 import CardMoveService from '~/utils/CardMoveService'
 import CollectionCard from './CollectionCard'
@@ -85,6 +88,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.searchResultsCollection = new Collection(
         {
           ...this.rawAttributes(),
+          // create as a 4WFC board
+          num_columns: 4,
+          can_edit_content: false,
           // making up a type
           class_type: 'SearchResultsCollection',
         },
@@ -278,22 +284,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return cardIds
   }
 
-  cardIdsWithinRectangle(minCoords, maxCoords) {
-    const rowRange = _.range(minCoords.row, maxCoords.row + 1)
-    const colRange = _.range(minCoords.col, maxCoords.col + 1)
-
-    const matrix = this.cardMatrix
-    const cardIds = []
-    _.each(rowRange, row => {
-      _.each(colRange, col => {
-        const card = matrix[row] && matrix[row][col]
-        if (card && !_.includes(cardIds, card.id)) cardIds.push(card.id)
-      })
-    })
-
-    return cardIds
-  }
-
   get shouldShowEditWarning() {
     if (!this.isTemplate || this.template_num_instances === 0) return false
     // if we already have the confirmation open, don't try to re-open
@@ -470,7 +460,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   get isBoard() {
-    return this.type == 'Collection::Board' || !!this.num_columns
+    return this.type === 'Collection::Board' || !!this.num_columns
+  }
+
+  get isBigBoard() {
+    return this.isBoard && this.num_columns > 4
   }
 
   get isFourWideBoard() {
@@ -584,6 +578,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return this.submission_attrs.test_status
   }
 
+  @computed
+  get liveTestCollectionId() {
+    return this.live_test_collection ? this.live_test_collection.id : null
+  }
+
   get isDraftTest() {
     // NOTE: we show this even if the test is not necessarily "launchable", so that you can click it and see why
     return this.launchableTestStatus === 'draft'
@@ -626,7 +625,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @computed
   get cardProperties() {
     return this.collection_cards.map(c =>
-      _.pick(c, ['id', 'updated_at', 'order'])
+      _.pick(c, ['id', 'updated_at', 'order', 'row', 'col'])
     )
   }
 
@@ -738,6 +737,25 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  get isSplitLevel() {
+    return this.isSubmissionBox || this.isSearchCollection
+  }
+
+  get isSplitLevelBottom() {
+    return this.isSubmissionsCollection || this.isSearchResultsCollection
+  }
+
+  get showFilters() {
+    // these split-level types don't show the filters for the top half
+    if (this.isSplitLevel) return false
+    return (
+      this.isRegularCollection ||
+      this.isUserCollection ||
+      this.isSubmissionsCollection ||
+      this.isBoard
+    )
+  }
+
   get activeFilters() {
     let { collection_filters } = this
     if (this.isSearchResultsCollection) {
@@ -759,10 +777,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   get collectionFilterQuery() {
     const { activeFilters } = this
     if (activeFilters.length === 0) return {}
-    const spaces = /\s+/
     const filterQuery = activeFilters.map(filter => {
       if (filter.filter_type === 'tag') {
-        return `#${filter.text.replace(spaces, '-')}`
+        return `#${filter.text.split(' ').join('-')}`
       } else if (filter.filter_type === 'user_tag') {
         return `@${filter.text}`
       } else {
@@ -840,7 +857,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (this.isBoard) {
+    if (this.isBoard && !this.isSplitLevelBottom) {
       // nullify these as they have no effect on boards
       delete params.per_page
       delete params.page
@@ -881,7 +898,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       } else {
         this.totalPages = links.last
       }
-      const firstPage = page === 1 && (!rows || rows[0] == 0)
+      const firstPage = page === 1 && (!rows || rows[0] === 0)
       if (
         firstPage &&
         (this.storedCacheKey !== this.cache_key ||
@@ -912,6 +929,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         )
         this.collection_cards.replace(newData)
       }
+
+      if (this.isSplitLevelBottom) {
+        this.calculateRowsCols()
+      }
+
       if (this.isBoard && params.rows) {
         this.updateMaxLoadedColsRows({ maxRow: params.rows[1] })
       }
@@ -919,11 +941,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return data
   }
 
+  @action
+  calculateRowsCols() {
+    // EXPERIMENT: apply rows/cols so that we can render search results as a FoamcoreGrid
+    calculateRowsCols(this.collection_cards, {
+      sortByOrder: false,
+      apply: true,
+      // submissionsCollection needs to make room for "AddSubmission" at 0,0
+      prefilled: this.isSubmissionsCollection ? 1 : 0,
+    })
+    const maxRow = (_.maxBy(this.collection_cards, 'row') || { row: 0 }).row
+    // this value is simulated
+    this.max_row_index = maxRow
+    this.updateMaxLoadedColsRows({ maxRow })
+  }
+
   API_fetchCard = async cardId => {
     const { apiStore } = this
     const res = await apiStore.fetch('collection_cards', cardId, true)
     // make sure it's in our current collection
-    this.addCard(res.data)
+    const card = res.data
+    this.addCard(card)
+    return card
   }
 
   @action
@@ -994,11 +1033,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const res = await apiStore.request(
       `collections/${this.id}/collection_cards?select_ids=${ids}`
     )
+    const cards = res.data
     runInAction(() => {
-      this.mergeCards(res.data)
-      if (this.isBoard) return
-      this.API_fetchCardOrders()
+      this.mergeCards(cards)
+      if (!this.isBoard) {
+        this.API_fetchCardOrders()
+      }
     })
+    return cards
   }
 
   @action
@@ -1261,13 +1303,28 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @computed
-  // hidden is actually shown first for these to better surface uploaded covers
   get sortedCoverCards() {
-    return _.orderBy(
-      _.filter(this.collection_cards, card => card.record.isImage),
-      ['hidden', 'order'],
-      ['desc', 'asc']
+    const filteredCards = _.filter(
+      this.collection_cards,
+      card =>
+        card.record.isImage &&
+        (!card.section_type || card.section_type === 'cover')
     )
+    return _.orderBy(
+      filteredCards,
+      // hidden is actually shown first for these to better surface uploaded covers
+      ['hidden', 'order', 'row', 'col', 'updated_at'],
+      ['desc', 'asc', 'asc', 'asc', 'desc']
+    )
+  }
+
+  @computed
+  get sortedBackgroundCards() {
+    const filteredCards = _.filter(
+      this.collection_cards,
+      card => card.section_type === 'background'
+    )
+    return _.orderBy(filteredCards, ['order', 'updated_at'], ['asc', 'desc'])
   }
 
   get isChallengeOrInsideChallenge() {
@@ -1298,14 +1355,18 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return currentUserIsAReviewer
   }
 
-  // after we reorder a single card, we want to make sure everything goes into sequential order
+  // TODO: deprecate once we fully migrate 4WFC
   @action
   _reorderCards() {
     // NOTE: this should work ok even if there are infinite scroll / pagination cards
     // not being displayed offscreen...
     if (this.collection_cards) {
       _.each(this.sortedCards, (card, i) => {
-        card.order = i
+        if (this.isBoard) {
+          card.order = 0
+        } else {
+          card.order = i
+        }
       })
     }
   }
@@ -1546,6 +1607,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       })
   }
 
+  API_clearBackgroundImage() {
+    this.background_image_url = null
+    return this.apiStore.request(
+      `collections/${this.id}/clear_background_image`,
+      'POST'
+    )
+  }
+
   async API_fetchChallengeReviewersGroup() {
     if (!this.parentChallenge) return
 
@@ -1579,52 +1648,29 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return potentialReviewerList
   }
 
-  async API_getNextAvailableTest({ challenge = false }) {
+  async API_getNextAvailableTest() {
     this.setNextAvailableTestPath(null)
-    const nextTestPath = !challenge
-      ? 'test_collections/${this.id}/next_available'
-      : 'collections/${this.id}/next_available_challenge_test'
-    const res = await this.apiStore.request(nextTestPath)
-    if (!res.data) return
-    const path = `${this.routingStore.pathTo(
-      'collections',
-      res.data.id
-    )}?open=tests`
+    const res = await this.apiStore.request(
+      `collections/${this.id}/next_available_submission_test`
+    )
+    const { data: nextTest } = res
+    if (!nextTest) return
+
+    let path = this.routingStore.pathTo('tests', nextTest.id)
+    if (nextTest.collection_to_test_id) {
+      path = this.routingStore.pathTo(
+        'collections',
+        nextTest.collection_to_test_id
+      )
+      path += `?open=tests`
+    }
+
     this.setNextAvailableTestPath(path)
     return path
   }
 
-  async navigateToNextInCollectionTest() {
-    // FIXME: add later when in-collection tests are supported
-    if (this.isSubmission) {
-      await this.API_getNextAvailableTest()
-    } else if (this.isSubmissionBox) {
-      await this.API_getNextAvailableTest({ challenge: true })
-    }
-    if (!this.nextAvailableTestPath) return
-
-    return this.routingStore.routeTo(this.nextAvailableTestPath)
-  }
-
-  async navigateToNextAvailableTest() {
-    let testUrl = null
-    if (this.isSubmission && this.launchableTestId) {
-      testUrl = this.publicTestURL
-    } else if (this.isSubmissionBox) {
-      const res = await this.apiStore.request(
-        `collections/${this.id}/next_available_challenge_test`
-      )
-
-      if (!res.data) return
-
-      testUrl = res.data.publicTestURL
-    }
-
-    if (!testUrl) return
-
-    window.location.href = testUrl
-
-    return
+  navigateToTest() {
+    window.location.href = this.publicTestURL
   }
 
   @action
@@ -1836,10 +1882,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get subtitleHidden() {
     const { cover } = this
-    if (cover && cover.subtitle_hidden) {
-      return cover
-    }
-    return false
+    return cover && cover.subtitle_hidden ? true : false
   }
 
   get coverItem() {
@@ -1923,6 +1966,11 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   applyRowUpdate({ row, action }) {
     // by making this an action it will cause one re-render instead of many
+    if (action === ROW_ACTIONS.REMOVE) {
+      this.max_row_index -= 1
+    } else {
+      this.max_row_index += 1
+    }
     this.collection_cards.forEach(card => {
       const shift = action === ROW_ACTIONS.REMOVE ? -1 : 1
       if (card.row > row) {
@@ -1954,6 +2002,24 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       this.uiStore.closeMoveMenu()
       this.uiStore.update('showTemplateHelperForCollection', this)
       this.uiStore.update('templateName', this.name)
+    }
+  }
+
+  get backgroundImageUrl() {
+    return _.get(this, 'collection_style.background_image_url')
+  }
+
+  get fontColor() {
+    return _.get(this, 'collection_style.font_color')
+  }
+
+  get styledTheme() {
+    const { fontColor } = this
+    if (!fontColor) {
+      return {}
+    }
+    return {
+      titleColor: fontColor,
     }
   }
 }

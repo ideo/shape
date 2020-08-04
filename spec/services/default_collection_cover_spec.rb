@@ -50,6 +50,15 @@ RSpec.describe DefaultCollectionCover, type: :service do
         end
       end
 
+      context 'with background images (uploaded into background section)' do
+        let!(:image_item) { create(:collection_card_image, parent: collection, order: 2, section_type: 'background') }
+
+        it 'should not select the background image as the cover' do
+          collection.cache_cover!
+          expect(collection.cached_cover['image_url']).to eq video_item.item.image_url
+        end
+      end
+
       context 'with cover_type_items' do
         before { collection.update(cover_type: :cover_type_items) }
 
