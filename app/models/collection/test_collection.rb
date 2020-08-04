@@ -757,20 +757,20 @@ class Collection
       return nil unless inside_a_challenge? && current_user.present?
 
       open_test_audiences = test_audiences&.open
-      return nil unless open_test_audiences.present? && open_test_audiences.any?
+      return nil unless open_test_audiences.any?
 
       challenge_user_groups = user_challenge_groups(current_user)
-
       return nil unless challenge_user_groups.any?
 
-      reviewer_audience = open_test_audiences.find { |a| a.name == 'Reviewers' }
-      admin_audience = open_test_audiences.find { |a| a.name == 'Admins' }
-      participant_audience = open_test_audiences.find { |a| a.name == 'Participants' }
+      %i[admin reviewer participant].each do |group_name|
+        # determine which group this is
+        group_id = parent_challenge.send("challenge_#{group_name}_group_id")
+        next unless challenge_user_groups.find_by(id: group_id).present?
 
-      challenge_user_groups.each do |user_group|
-        return reviewer_audience if parent_challenge.challenge_reviewer_group == user_group && reviewer_audience.present?
-        return admin_audience if parent_challenge.challenge_admin_group == user_group && admin_audience.present?
-        return participant_audience if parent_challenge.challenge_participant_group == user_group && participant_audience.present?
+        audience_name = group_name.to_s.capitalize.pluralize
+        test_audience = open_test_audiences.find { |a| a.name == audience_name }
+
+        return test_audience if test_audience.present?
       end
 
       # catch-all, the user does not belong to any challenge group whose test audience is open
