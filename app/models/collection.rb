@@ -132,7 +132,6 @@ class Collection < ApplicationRecord
   before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
   before_validation :set_icon_from_collection_type, if: :collection_type_changed?
   before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
-  before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :rename_challenge_groups, if: :saved_change_to_name?, unless: :destroyed?
@@ -1261,36 +1260,6 @@ class Collection < ApplicationRecord
       )
   end
 
-  def create_challenge_groups_and_assign_roles
-    return if challenge_admin_group.present? && challenge_reviewer_group.present? && challenge_participant_group.present?
-
-    # collections that become a challenge gets their roles unanchored
-    if roles_anchor_collection_id.present?
-      unanchor_and_inherit_roles_from_anchor!
-    end
-
-    admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
-    reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
-    participant_group = create_challenge_participant_group(name: "#{name} Participants", organization: organization)
-
-    self.challenge_admin_group_id = admin_group.id
-    self.challenge_reviewer_group_id = reviewer_group.id
-    self.challenge_participant_group_id = participant_group.id
-    # NOTE: somehow unachoring changes collection_type back to 'collection', so re-set it to 'challenge'
-    self.collection_type = 'challenge'
-
-    created_by.add_role(Role::ADMIN, admin_group)
-    created_by.add_role(Role::ADMIN, reviewer_group)
-    created_by.add_role(Role::ADMIN, participant_group)
-
-    admin_group.add_role(Role::ADMIN, reviewer_group)
-    admin_group.add_role(Role::ADMIN, participant_group)
-
-    admin_group.add_role(Role::EDITOR, self)
-    reviewer_group.add_role(Role::VIEWER, self)
-    participant_group.add_role(Role::VIEWER, self)
-  end
-
   def submission_template_test_collections
     return [] unless master_template? && submission_box_template?
 
@@ -1411,10 +1380,6 @@ class Collection < ApplicationRecord
     return unless templated? && inside_a_master_template?
 
     errors.add(:base, "can't be an instance inside a template")
-  end
-
-  def will_become_a_challenge?
-    will_save_change_to_collection_type? && collection_type_in_database != 'challenge' && collection_type == 'challenge'
   end
 
   def set_icon_from_collection_type

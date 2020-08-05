@@ -1585,6 +1585,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  async API_collectionChallengeSetup() {
+    const {
+      challenge_admin_group_id,
+      challenge_reviewer_group_id,
+      challenge_participant_group_id,
+    } = this
+    if (
+      challenge_admin_group_id &&
+      challenge_reviewer_group_id &&
+      challenge_participant_group_id
+    ) {
+      return
+    }
+
+    const { apiStore } = this
+    return apiStore.request(
+      `collections/${this.id}/collection_challenge_setup`,
+      'POST'
+    )
+  }
+
   API_clearCollectionCover() {
     return this.apiStore
       .request(`collections/${this.id}/clear_collection_cover`, 'POST')

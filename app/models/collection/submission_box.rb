@@ -110,6 +110,7 @@ class Collection
       build_submissions_collection(
         name: "#{name} Submissions",
         organization: organization,
+        num_columns: num_columns,
       )
     end
 

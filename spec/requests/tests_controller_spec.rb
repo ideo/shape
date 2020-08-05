@@ -72,6 +72,13 @@ describe TestsController, type: :request do
                name: 'Challenge',
                collection_type: 'challenge')
       end
+      let(:reviewer_group) {
+        create(:group, name: 'Challenge Reviewers')
+      }
+
+      before do
+        challenge.update(challenge_reviewer_group: reviewer_group)
+      end
 
       context 'with link sharing not enabled' do
         before do
