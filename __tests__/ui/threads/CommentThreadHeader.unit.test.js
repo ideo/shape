@@ -101,6 +101,22 @@ describe('CommentThreadHeader', () => {
 
     it('should render the StyledHeader', () => {
       expect(wrapper.find('StyledHeader').exists()).toBeTruthy()
+      expect(wrapper.find('StyledHeader .name').text()).toEqual(
+        props.record.name
+      )
+    })
+
+    describe('with a test collection record', () => {
+      beforeEach(() => {
+        props.record.baseName = 'Feedback Test'
+        wrapper = shallow(<CommentThreadHeader {...props} />)
+      })
+
+      it('should use baseName to omit "Feedback Design" from the name', () => {
+        expect(wrapper.find('StyledHeader .name').text()).toEqual(
+          props.record.baseName
+        )
+      })
     })
   })
 

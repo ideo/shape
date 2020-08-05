@@ -14,6 +14,7 @@
 #  hidden            :boolean          default(FALSE)
 #  identifier        :string
 #  image_contain     :boolean          default(FALSE)
+#  is_background     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
 #  order             :integer          not null
 #  parent_snapshot   :jsonb
@@ -69,6 +70,7 @@ class CollectionCard < ApplicationRecord
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
   after_update :touch_collection, if: :saved_change_to_filter?
   after_create :update_parent_card_count!
+  after_save :update_collection_background, if: :saved_change_to_is_background?
   after_save :set_collection_as_master_template,
              if: :test_collection_within_master_template_after_save?
 
@@ -111,11 +113,15 @@ class CollectionCard < ApplicationRecord
   }
 
   enum section_type: {
+    # for test collections
     intro: 0,
     ideas: 1,
     outro: 2,
     custom: 3,
-  }
+    # for collection style settings
+    cover: 4,
+    background: 5,
+  }, _prefix: true
 
   amoeba do
     enable
@@ -311,7 +317,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def ideas_collection_card?
-    section_type == 'ideas' && collection_id.present?
+    section_type_ideas? && collection_id.present?
   end
 
   def pinned_and_locked?
@@ -485,6 +491,18 @@ class CollectionCard < ApplicationRecord
     parent.cache_cover!
   end
 
+  def update_collection_background
+    if is_background?
+      # A new background was selected so turn off other backgrounds
+      parent.collection_cards.where.not(id: id).update_all(is_background: false)
+      parent.update(background_image_url: item.image_url)
+    else
+      parent.update(background_image_url: nil)
+    end
+    # doing this to ensure cache is definitely busted
+    parent.touch
+  end
+
   # used by serializer to have multiple "versions" of a card, one per idea
   def id_with_idea_id
     idea_suffix = idea_id ? "_#{idea_id}" : ''
@@ -537,6 +555,7 @@ class CollectionCard < ApplicationRecord
       # no real point in trying to cache a search result with no parent card, but this allows it to work
       id || "search-result-#{record.id}",
       (updated_at || Time.current).to_f,
+      ENV['HEROKU_RELEASE_VERSION'],
     ].join('--')
     "CollectionCardCache::#{key}"
   end

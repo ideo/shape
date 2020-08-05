@@ -1,10 +1,7 @@
 import GroupModify from '~/ui/groups/GroupModify'
 
 describe('GroupModify', () => {
-  let apiStore
-  let props
-  let wrapper
-  let component
+  let apiStore, props, wrapper, component, rerender
 
   beforeEach(() => {
     apiStore = {
@@ -22,8 +19,11 @@ describe('GroupModify', () => {
       onGroupRoles: jest.fn(),
       apiStore,
     }
-    wrapper = shallow(<GroupModify {...props} />)
-    component = wrapper.instance()
+    rerender = () => {
+      wrapper = shallow(<GroupModify {...props} />)
+      component = wrapper.instance()
+    }
+    rerender()
   })
 
   describe('constructor', () => {
@@ -39,6 +39,20 @@ describe('GroupModify', () => {
       })
     })
 
+    describe('with isLoading = true', () => {
+      beforeEach(() => {
+        props.isLoading = true
+        rerender()
+      })
+      afterEach(() => {
+        props.isLoading = false
+      })
+
+      it('should disable the form button', () => {
+        expect(component.formDisabled).toBeTruthy()
+      })
+    })
+
     describe('with an existing group to be edited', () => {
       beforeEach(() => {
         props.group = {
@@ -48,8 +62,7 @@ describe('GroupModify', () => {
           filestack_file_url: 'test.jpg',
           assign: jest.fn(),
         }
-        wrapper = shallow(<GroupModify {...props} />)
-        component = wrapper.instance()
+        rerender()
       })
 
       it('should should copy the existing group attrs to editingGroup', () => {
@@ -69,6 +82,13 @@ describe('GroupModify', () => {
       it('should set syncing to false', () => {
         component.handleHandleChange({ target: { value: 'a' } })
         expect(component.syncing).toBeFalsy()
+      })
+    })
+
+    describe('with an invalid handle (starts with a number)', () => {
+      it('should disable the form button', () => {
+        component.handleHandleChange({ target: { value: '12a' } })
+        expect(component.formDisabled).toBeTruthy()
       })
     })
   })

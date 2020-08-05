@@ -55,13 +55,25 @@ describe('SearchCollection', () => {
         wrapper.update()
       })
 
-      it('should render a second collection grid', () => {
-        expect(
-          wrapper
-            .find('CollectionGrid')
-            .at(1)
-            .exists()
-        ).toBe(true)
+      it('should render a second foamcore grid', () => {
+        const foamcoreGrid = wrapper.find('FoamcoreGrid').at(0)
+        expect(foamcoreGrid.exists()).toBe(true)
+        expect(foamcoreGrid.props().collection).toEqual(
+          collection.searchResultsCollection
+        )
+        expect(foamcoreGrid.props().renderOnly).toBe(true)
+      })
+
+      describe('with both collections as board', () => {
+        beforeEach(() => {
+          collection.isBoard = true
+          rerender()
+        })
+
+        it('should render a second foamcore grid', () => {
+          const foamcoreGrid = wrapper.find('FoamcoreGrid').at(1)
+          expect(foamcoreGrid.exists()).toBe(true)
+        })
       })
     })
 

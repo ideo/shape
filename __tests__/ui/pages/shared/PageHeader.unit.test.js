@@ -72,6 +72,7 @@ describe('PageHeader', () => {
           ...fakeCollection,
           isRegularCollection: true,
           canEdit: true,
+          showFilters: true,
         }
         rerender()
       })
@@ -96,6 +97,7 @@ describe('PageHeader', () => {
           isNormalCollection: false,
           isUserCollection: true,
           canEdit: false,
+          showFilters: true,
         }
         rerender()
       })

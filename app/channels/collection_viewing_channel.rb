@@ -14,6 +14,12 @@ class CollectionViewingChannel < ApplicationCable::Channel
     collection.stopped_viewing(current_user)
   end
 
+  def cards_selected(data)
+    return reject if collection.nil?
+
+    collection.received_changes({ cards_selected: data['card_ids'] }, current_user)
+  end
+
   private
 
   def collection

@@ -45,19 +45,19 @@ class TestSurveyResponder extends React.Component {
   currentCardIdx = 0
   @observable
   surveyResponse = null
-  @observable
-  collection = null
-
-  constructor(props) {
-    super(props)
-    this.collection = props.collection
-  }
 
   async componentDidMount() {
     this.initializeCards()
 
     if (!this.currentUser) return
     await this.fetchSurveyResponse()
+  }
+
+  componentDidUpdate(prevProps) {
+    const { collection } = this.props
+    if (collection.id !== prevProps.collection.id) {
+      this.fetchSurveyResponse()
+    }
   }
 
   get includeRecontactQuestion() {
@@ -78,13 +78,12 @@ class TestSurveyResponder extends React.Component {
   }
 
   async fetchSurveyResponse() {
-    const { collection } = this
-    const { apiStore } = this.props
+    const { collection, apiStore } = this.props
 
     const surveyResponseId = collection.survey_response_for_user_id
     const surveyResponseResult =
       surveyResponseId &&
-      (await apiStore.fetch('survey_responses', surveyResponseId))
+      (await apiStore.fetch('survey_responses', surveyResponseId, true))
     const surveyResponse = surveyResponseResult
       ? surveyResponseResult.data
       : null
@@ -99,7 +98,7 @@ class TestSurveyResponder extends React.Component {
 
     const newResponse = new SurveyResponse(
       {
-        test_collection_id: this.collection.id,
+        test_collection_id: collection.id,
       },
       apiStore
     )
@@ -119,7 +118,7 @@ class TestSurveyResponder extends React.Component {
   }
 
   initializeCards() {
-    const { collection } = this
+    const { collection } = this.props
     if (!collection || !collection.question_cards) return
 
     const questionCards = [...collection.question_cards]

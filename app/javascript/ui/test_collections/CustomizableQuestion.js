@@ -129,7 +129,7 @@ class CustomizableQuestion extends React.Component {
   updateMultipleChoiceIds(selected_choice_ids, choice) {
     if (selected_choice_ids.includes(choice.id)) {
       // Keep ids that we don't already have
-      return selected_choice_ids.filter(id => id != choice.id)
+      return selected_choice_ids.filter(id => id !== choice.id)
     } else {
       runInAction(() => {
         selected_choice_ids.push(choice.id)

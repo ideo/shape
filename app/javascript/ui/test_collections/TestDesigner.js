@@ -618,7 +618,10 @@ class TestDesigner extends React.Component {
             <LargerH3>Feedback Settings</LargerH3>
             {this.renderTestTypeForm()}
             {apiStore.currentUser && (
-              <AudienceSettings testCollection={collection} />
+              <AudienceSettings
+                testCollection={collection}
+                submissionBox={collection.parent_submission_box}
+              />
             )}
           </div>
         </OuterContainer>

@@ -12,6 +12,7 @@ const modalContents = ({ collection, submissionBoxes, onClose }) => {
   return [
     {
       name: 'Submission settings',
+      dataCy: 'ChallengeSettings-SubmissionsSettingsNav',
       component: (
         <SubmissionsSettings
           collection={collection}
@@ -22,6 +23,7 @@ const modalContents = ({ collection, submissionBoxes, onClose }) => {
     },
     {
       name: 'Phases',
+      dataCy: 'ChallengeSettings-PhasesNav',
       component: (
         <PhaseSettings
           collection={collection}
@@ -32,12 +34,14 @@ const modalContents = ({ collection, submissionBoxes, onClose }) => {
     },
     {
       name: 'People',
+      dataCy: 'ChallengeSettings-PeopleNav',
       component: (
         <PeopleSettings collection={collection} closeModal={onClose} />
       ),
     },
     {
       name: 'Topics',
+      dataCy: 'ChallengeSettings-TopicsNav',
       component: (
         <ChallengeTopics collection={collection} closeModal={onClose} />
       ),

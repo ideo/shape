@@ -442,7 +442,10 @@ class ApiStore extends jsonapi(datxCollection) {
     this.setCurrentPageThreadKey(null)
   }
 
-  async setupCommentThreadAndMenusForPage(record) {
+  async setupCommentThreadAndMenusForPage(
+    record,
+    { initialPageLoad = true } = {}
+  ) {
     const { uiStore, routingStore, currentUser } = this
     if (!currentUser) {
       return
@@ -455,7 +458,7 @@ class ApiStore extends jsonapi(datxCollection) {
         this.update('loadingThreads', false)
       })
     }
-    if (!_.isEmpty(routingStore.query)) {
+    if (initialPageLoad && !_.isEmpty(routingStore.query)) {
       // This must run after findOrBuildCommentThread,
       // as it needs that if displaying in-collection test
       uiStore.openOptionalMenus(routingStore.query)

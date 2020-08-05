@@ -44,7 +44,7 @@ Feature: Undo actions
     And I undo with CTRL+Z
     # This is testing our Shape undo that undoes a saved title edit
     And I type "New Title" in the title textarea
-    And I click the 'EditCoverCloseBtn'
+    And I click the 'ModalClose'
     And I wait for "@apiUpdateCollection" to finish
     Then I should see a collection card named "New Title"
 

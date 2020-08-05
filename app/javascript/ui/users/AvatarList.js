@@ -31,7 +31,9 @@ const AvatarList = ({ avatars, onAdd }) => {
             />
           ))}
         </AvatarGroup>
-        <AddButton onClick={onAdd}>+</AddButton>
+        <AddButton onClick={onAdd} data-cy="RolesAdd">
+          +
+        </AddButton>
       </div>
     </StyledRolesSummary>
   )
