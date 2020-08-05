@@ -73,9 +73,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def collection_challenge_setup
-    # collections that become a challenge gets their roles unanchored
-    collection_challenge_setup = CollectionChallengeSetup.new(collection: @collection, current_user: current_user)
-    collection_challenge_setup.call
+    CollectionChallengeSetup.call(collection: @collection, current_user: current_user)
     @collection.reload
     render_collection
   end
