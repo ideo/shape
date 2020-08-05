@@ -455,6 +455,10 @@ class Collection < ApplicationRecord
       c.template = self
       c.master_template = false
     end
+    if collection_type == 'challenge'
+      CollectionChallengeSetup.call(collection: c, current_user: for_user)
+    end
+
     # clear out cached submission_attrs
     c.cached_attributes.delete 'submission_attrs'
     c.cloned_from = self
