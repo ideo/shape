@@ -1415,7 +1415,7 @@ export default class UiStore {
     window.scrollTo({
       top: 560,
       left: 1280,
-      behavior: 'smooth'
+      behavior: 'smooth',
     })
   }
 
