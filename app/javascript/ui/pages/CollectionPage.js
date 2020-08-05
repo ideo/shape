@@ -31,7 +31,6 @@ import EditorPill from '~/ui/items/EditorPill'
 import SearchCollection from '~/ui/grid/SearchCollection'
 import TestDesigner from '~/ui/test_collections/TestDesigner'
 import v, { COLLECTION_CHANNEL_NAME } from '~/utils/variables'
-import Collection from '~/stores/jsonApi/Collection'
 import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
@@ -291,10 +290,7 @@ class CollectionPage extends React.Component {
       this.setLoadedSubmissions(false)
       // NOTE: if other collections get sortable features we may move this logic
       uiStore.update('collectionCardSortOrder', 'updated_at')
-      await Collection.fetchSubmissionsCollection(
-        collection.submissions_collection_id,
-        { order: 'updated_at' }
-      )
+      await collection.fetchSubmissionsCollection({ order: 'updated_at' })
       this.setLoadedSubmissions(true)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
@@ -402,12 +398,13 @@ class CollectionPage extends React.Component {
 
   onAddSubmission = ev => {
     ev.preventDefault()
+    const { apiStore } = this.props
     const { id } = this.collection.submissions_collection
     const submissionSettings = {
       type: this.collection.submission_box_type,
       template: this.collection.submission_template,
     }
-    Collection.createSubmission(id, submissionSettings)
+    apiStore.createSubmission(id, submissionSettings)
   }
 
   trackCollectionUpdated = () => {

@@ -70,6 +70,7 @@ const fakeApiStore = ({
     expandAndOpenThreadForRecord: jest.fn(),
     alwaysShowCurrentThread: jest.fn(),
     updateModelId: jest.fn().mockImplementation((obj, id) => (obj.id = id)),
+    createSubmission: jest.fn(),
     unreadActivityCount: 0,
     selectedCards: [],
 

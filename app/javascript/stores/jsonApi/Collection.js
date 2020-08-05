@@ -5,8 +5,6 @@ import pluralize from 'pluralize'
 import queryString from 'query-string'
 import googleTagManager from '~/vendor/googleTagManager'
 
-// TODO: remove this apiStore import by refactoring static methods that depend on it
-import { apiStore } from '~/stores'
 import { apiUrl, useTemplateInMyCollection } from '~/utils/url'
 
 import {
@@ -1550,7 +1548,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_fetchAllCardIds() {
-    return apiStore.requestJson(`collections/${this.id}/collection_cards/ids`)
+    return this.apiStore.requestJson(
+      `collections/${this.id}/collection_cards/ids`
+    )
   }
 
   async API_setSubmissionBoxTemplate(data) {
@@ -1691,7 +1691,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   // Load phase collections for given submission box collections
-  static async loadPhasesForSubmissionBoxes(submissionBoxes) {
+  async loadPhasesForSubmissionBoxes(submissionBoxes) {
     // Filter out any that don't have a submission template (can't assign phases)
     // Or any that have phase sub-collections already loaded
     const subBoxesWithTemplates = submissionBoxes.filter(
@@ -1711,11 +1711,16 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return submissionBoxes
   }
 
-  static async fetchSubmissionsCollection(id, { order } = {}) {
-    const res = await apiStore.request(`collections/${id}`)
-    const collection = res.data
-    await collection.API_fetchCards({ order })
-    return collection
+  async fetchSubmissionsCollection({ order } = {}) {
+    const { apiStore, submissions_collection_id } = this
+    const res = await apiStore.request(
+      `collections/${submissions_collection_id}`
+    )
+    const submissions_collection = res.data
+    // set the reverse relationship
+    submissions_collection.submission_box = this
+    await submissions_collection.API_fetchCards({ order })
+    return submissions_collection
   }
 
   async API_sortCards() {
@@ -1815,32 +1820,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
     // onSuccess is really "successfully able to edit this collection"
     if (_.isFunction(onSuccess)) onSuccess()
-  }
-
-  static async createSubmission(parent_id, submissionSettings) {
-    const { routingStore, uiStore } = apiStore
-    const { type, template } = submissionSettings
-    if (type === 'template' && template) {
-      const templateData = {
-        template_id: template.id,
-        parent_id,
-        placement: 'beginning',
-      }
-      uiStore.update('isLoading', true)
-      const res = await apiStore.createTemplateInstance({
-        data: templateData,
-        template,
-        inSubmissionBox: true,
-      })
-      uiStore.update('isLoading', false)
-      routingStore.routeTo('collections', res.data.id)
-    } else {
-      uiStore.openBlankContentTool({
-        order: 0,
-        collectionId: parent_id,
-        blankType: type,
-      })
-    }
   }
 
   // find all data cards in the collection and refetch

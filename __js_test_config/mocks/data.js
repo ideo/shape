@@ -490,7 +490,6 @@ export const fakeCollection = {
   refetch: jest.fn(),
   initializeTags: jest.fn(),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
-  createSubmission: jest.fn(),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
