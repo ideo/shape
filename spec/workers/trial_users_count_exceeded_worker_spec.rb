@@ -10,6 +10,7 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.day.ago,
              active_users_count: over_trial_user_count,
+             billable: true,
              trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:in_app_billing_disabled) do
@@ -35,6 +36,7 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.day.from_now,
              active_users_count: over_trial_user_count,
+             billable: true,
              trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:trial_users_count_not_exceeding) do
@@ -51,6 +53,7 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.day.ago,
              active_users_count: over_trial_user_count,
+             billable: true,
              trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
     let!(:should_process_b) do
@@ -59,6 +62,7 @@ RSpec.describe TrialUsersCountExceededWorker, type: :worker do
              in_app_billing: true,
              trial_ends_at: 1.day.ago,
              active_users_count: over_trial_user_count,
+             billable: true,
              trial_users_count: Organization::DEFAULT_TRIAL_USERS_COUNT)
     end
 

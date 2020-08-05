@@ -16,6 +16,10 @@ class CalculateOrganizationBillableUsers
       count -= organization.trial_users_count
     end
 
+    if count > Organization::FREEMIUM_USER_LIMIT && organization.in_app_billing
+      organization.update(billable: true)
+    end
+
     [count, 0].max
   end
 end
