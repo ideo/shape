@@ -31,17 +31,30 @@ ChallengeSettingsButton.propTypes = {
 ChallengeSettingsButton.displayName = 'ChallengeSettingsButton'
 
 export const ReviewSubmissionsButton = ({ record }) => {
-  const [nextAvailableTestPath, setNextAvailableTestPath] = useState(null)
+  const [submissionBox, setSubmissionBox] = useState(null)
 
   useEffect(() => {
-    const loadNextAvailableTest = async () => {
-      const path = await record.API_getNextAvailableTest()
-      setNextAvailableTestPath(path)
+    const { parentChallenge } = record
+    if (!parentChallenge) return
+    const loadSubmissionBoxes = async () => {
+      // fetch parent challenge submission boxes
+      const request = await record.API_fetchSubmissionBoxSubCollections()
+      const submissionBoxes = request.data
+
+      for (const submissionBox of submissionBoxes) {
+        // fetch submission boxes for an available submission box test
+        const availableTest = await submissionBox.API_getNextAvailableTest()
+        if (availableTest) {
+          // if found set submission box and return
+          setSubmissionBox(submissionBox)
+          return
+        }
+      }
     }
-    loadNextAvailableTest()
+    loadSubmissionBoxes()
   }, [record])
 
-  if (!nextAvailableTestPath && !record.in_reviewer_group) {
+  if (!submissionBox && !record.in_reviewer_group) {
     // in this case, not in reviewer group and nothing left to review, no button is shown
     return null
   }
@@ -50,15 +63,12 @@ export const ReviewSubmissionsButton = ({ record }) => {
     <Button
       {...buttonStyleProps}
       colorScheme={v.colors.alert}
-      disabled={!nextAvailableTestPath}
-      onClick={() =>
-        nextAvailableTestPath &&
-        record.routingStore.routeTo(nextAvailableTestPath)
-      }
+      disabled={!submissionBox}
+      onClick={() => {
+        record.routingStore.routeTo('collections', submissionBox.id)
+      }}
     >
-      {nextAvailableTestPath
-        ? `Review Submissions`
-        : `No Reviewable Submissions`}
+      {submissionBox ? `Review Submissions` : `No Reviewable Submissions`}
     </Button>
   )
 }

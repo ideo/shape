@@ -1,14 +1,17 @@
 class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
-  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover clear_background_image]
+  load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover clear_background_image
+                                         challenge_submission_boxes next_available_submission_test]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
-  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover clear_background_image collection_challenge_setup]
+  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover
+                                                                clear_background_image collection_challenge_setup]
+  before_action :load_and_authorize_parent_challenge, only: %i[challenge_submission_boxes next_available_submission_test]
   after_action :broadcast_parent_collection_card_update, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -309,6 +312,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
     @template_card = CollectionCard.find(json_api_params[:template_card_id])
     authorize! :read, @template_card
+  end
+
+  def load_and_authorize_parent_challenge
+    @collection = Collection.find(params[:id])
+    authorize! :read, @collection.parent_challenge
   end
 
   def load_and_authorize_collection_layout_update
