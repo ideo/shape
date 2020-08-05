@@ -10,15 +10,18 @@ class CalculateOrganizationBillableUsers
   def calculate_billable_users
     count = organization.active_users_count
 
-    return 0 if count <= Organization::FREEMIUM_USER_LIMIT
-
+    # adjust for trial period
     if organization.within_trial_period?
       count -= organization.trial_users_count
     end
 
+    # if over the limit (and not enterprise) mark as billable
     if count > Organization::FREEMIUM_USER_LIMIT && organization.in_app_billing
       organization.update(billable: true)
     end
+
+    # at this point if they have never been marked `billable`, return 0
+    return 0 unless organization.billable?
 
     [count, 0].max
   end

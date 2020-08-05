@@ -6,7 +6,9 @@ RSpec.describe CalculateOrganizationBillableUsers, type: :service do
 
   describe '#call' do
     context 'when within trial period' do
-      before { organization.update(active_users_count: active_users_count, trial_users_count: 25, trial_ends_at: 1.month.from_now) }
+      before do
+        organization.update(active_users_count: active_users_count, trial_users_count: 25, trial_ends_at: 1.month.from_now)
+      end
 
       context 'when active users exceeds trial users quota' do
         let(:active_users_count) { 35 }
@@ -37,14 +39,33 @@ RSpec.describe CalculateOrganizationBillableUsers, type: :service do
           expect(context).to be_a_success
           expect(context.billable_users_count).to eql(active_users_count)
         end
+
+        it 'marks the org as billable' do
+          expect(context.organization.billable?).to be true
+        end
       end
 
-      context 'when active users is less than or equals freemium user quota' do
+      context 'when active users <= freemium user quota' do
         let(:active_users_count) { 2 }
 
         it 'calculates 0 billable users' do
           expect(context).to be_a_success
           expect(context.billable_users_count).to eql(0)
+        end
+
+        it 'does not mark the org as billable' do
+          expect(context.organization.billable?).to be false
+        end
+      end
+
+      context 'when active users <= freemium user quota, but org has already been marked billable' do
+        before { organization.update(billable: true) }
+
+        let(:active_users_count) { 2 }
+
+        it 'calculates 2 billable users' do
+          expect(context).to be_a_success
+          expect(context.billable_users_count).to eql(2)
         end
       end
     end
