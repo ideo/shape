@@ -38,6 +38,7 @@ describe('BillingInformation', () => {
         current_billing_period_start: '2015-01-01',
         current_billing_period_end: '2015-01-31',
         deactivated: false,
+        billable: true,
       },
     }
     networkStore = {
