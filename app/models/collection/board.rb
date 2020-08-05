@@ -96,8 +96,8 @@ class Collection
     private
 
     def set_as_foamcore
-      # only set when blank since duplicating will trigger this callback
-      self.collection_type = :foamcore if collection_type.blank?
+      # only set when type is collection since duplicating may have changed the collection_type
+      self.collection_type = :foamcore if collection_type == 'collection'
     end
   end
 end
