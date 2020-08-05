@@ -65,7 +65,7 @@ const InnerCardWrapper = styled.div.attrs(
   }
 `
 
-const cardCSSTransition = 'transform 0.4s, width 0.25s, height 0.25s'
+const cardCSSTransition = ''
 const cardHoverTransition = 'transform 0.2s'
 
 @observer

@@ -1408,14 +1408,14 @@ export default class UiStore {
     this.scroll.scrollToBottom()
   }
 
-  scrollToCenter() {
-    // const middleY = window.innerHeight / 2
-    // const middleX = window.innerWidth / 2
+  scrollToCenter(direction) {
+    const middleY = window.innerHeight / 2 + window.scrollY
+    const middleX = window.innerWidth / 2
+    console.log({ middleX, middleY })
     // window.scrollTo(middleX, middleY)
     window.scrollTo({
-      top: 560,
-      left: 1280,
-      behavior: 'smooth',
+      top: middleY,
+      left: middleX,
     })
   }
 
