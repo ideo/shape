@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { Fragment } from 'react'
+import React, { Fragment } from 'react'
 import styled from 'styled-components'
 import { Popover, Grid } from '@material-ui/core'
 
