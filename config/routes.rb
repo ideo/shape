@@ -32,7 +32,6 @@ Rails.application.routes.draw do
           get 'phase_sub_collections'
           get 'next_available_submission_test'
           get 'challenge_phase_collections'
-          get 'challenge_reviewers'
           post 'clear_collection_cover'
           post 'clear_background_image'
           patch 'submit'
@@ -41,6 +40,7 @@ Rails.application.routes.draw do
           post 'insert_row'
           post 'remove_row'
           post 'background_update_live_test'
+          post 'collection_challenge_setup'
         end
         collection do
           post 'create_template'

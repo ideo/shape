@@ -132,7 +132,6 @@ class Collection < ApplicationRecord
   before_validation :set_joinable_guest_group, on: :update, if: :will_save_change_to_anyone_can_join?
   before_validation :set_icon_from_collection_type, if: :collection_type_changed?
   before_save :add_viewer_to_joinable_group, if: :will_save_change_to_joinable_group_id?
-  before_save :create_challenge_groups_and_assign_roles, if: :will_become_a_challenge?
   after_touch :touch_related_cards, unless: :destroyed?
   after_commit :touch_related_cards, if: :saved_change_to_updated_at?, unless: :destroyed?
   after_commit :rename_challenge_groups, if: :saved_change_to_name?, unless: :destroyed?
@@ -409,6 +408,13 @@ class Collection < ApplicationRecord
       :translations,
       parent_collection_card: %i[parent],
       roles: %i[users groups resource],
+    ]
+  end
+
+  def self.default_relationships_for_challenge
+    [
+      :tagged_users,
+      challenge_reviewer_group: [roles: [:users]],
     ]
   end
 
@@ -936,16 +942,6 @@ class Collection < ApplicationRecord
     result
   end
 
-  def challenge_reviewers
-    return [] unless inside_a_challenge?
-
-    User.where(
-      User.arel_table[:handle].lower.in(
-        parent_challenge.collection_filters.user_tag.pluck(:text),
-      ),
-    )
-  end
-
   # This method is called when a user tag is added to a submission collection
   # in the UserTaggable concern
   def add_challenge_reviewer_filter_to_submission_box(user)
@@ -975,18 +971,11 @@ class Collection < ApplicationRecord
     sub_collection.collection_filters.tagged_with_user_handle(user.handle).destroy_all
   end
 
-  def challenge_reviewer?(user)
-    return false if parent_challenge.blank? || user&.handle.blank? || user_tag_list.empty?
-
-    user_tag_list.include?(user.handle)
-  end
-
   def submission_reviewer_status(user)
     # Return unless it is a submission that the user has been added as a reviewer for
     return unless submission? &&
                   launchable_test_id.present? &&
-                  user.present? &&
-                  challenge_reviewer?(user)
+                  user.present?
 
     response = SurveyResponse.find_by(
       test_collection_id: launchable_test_id,
@@ -996,6 +985,11 @@ class Collection < ApplicationRecord
     return :unstarted if response.blank?
 
     response.completed? ? :completed : :in_progress
+  end
+
+  def can_review?(user)
+    audience = challenge_test_audience_for_user(user)
+    unreviewed_by?(user, audience.present?)
   end
 
   def default_group_id
@@ -1011,6 +1005,10 @@ class Collection < ApplicationRecord
   # =================================
   def test_collection?
     is_a?(Collection::TestCollection)
+  end
+
+  def submission_box?
+    is_a?(Collection::SubmissionBox)
   end
 
   def test_or_test_results_collection?
@@ -1262,36 +1260,6 @@ class Collection < ApplicationRecord
       )
   end
 
-  def create_challenge_groups_and_assign_roles
-    return if challenge_admin_group.present? && challenge_reviewer_group.present? && challenge_participant_group.present?
-
-    # collections that become a challenge gets their roles unanchored
-    if roles_anchor_collection_id.present?
-      unanchor_and_inherit_roles_from_anchor!
-    end
-
-    admin_group = create_challenge_admin_group(name: "#{name} Admins", organization: organization)
-    reviewer_group = create_challenge_reviewer_group(name: "#{name} Reviewers", organization: organization)
-    participant_group = create_challenge_participant_group(name: "#{name} Participants", organization: organization)
-
-    self.challenge_admin_group_id = admin_group.id
-    self.challenge_reviewer_group_id = reviewer_group.id
-    self.challenge_participant_group_id = participant_group.id
-    # NOTE: somehow unachoring changes collection_type back to 'collection', so re-set it to 'challenge'
-    self.collection_type = 'challenge'
-
-    created_by.add_role(Role::ADMIN, admin_group)
-    created_by.add_role(Role::ADMIN, reviewer_group)
-    created_by.add_role(Role::ADMIN, participant_group)
-
-    admin_group.add_role(Role::ADMIN, reviewer_group)
-    admin_group.add_role(Role::ADMIN, participant_group)
-
-    admin_group.add_role(Role::EDITOR, self)
-    reviewer_group.add_role(Role::VIEWER, self)
-    participant_group.add_role(Role::VIEWER, self)
-  end
-
   def submission_template_test_collections
     return [] unless master_template? && submission_box_template?
 
@@ -1304,25 +1272,42 @@ class Collection < ApplicationRecord
     super(*args)
   end
 
-  def lookup_reviewer_audience_for_current_user(current_user)
-    return nil unless current_user.present? && in_reviewer_group?(current_user)
+  def in_reviewer_group?(current_user)
+    return false unless parent_challenge.present? && parent_challenge.challenge_reviewer_group.present?
 
-    # use master template test audience
-    test_audiences = template&.test_audiences
-
-    return nil unless test_audiences.present?
-
-    test_audiences.joins(:audience).find_by(audiences: { name: 'Reviewers' })
+    current_user.has_role?(Role::MEMBER, parent_challenge.challenge_reviewer_group)
   end
 
-  def in_reviewer_group?(current_user)
-    return false unless inside_a_challenge?
+  # This method looks for the relevant TestCollection, and then calls challenge_test_audience_for_user on it
+  def challenge_test_audience_for_user(current_user)
+    return nil unless inside_a_challenge? && (submission? || submission_box?)
 
-    reviewer_ids = parent_challenge&.challenge_reviewer_group&.user_ids
+    test_id = nil
+    if submission?
+      # e.g. when looking up a particular submission + test
+      test_id = launchable_test_id
+    else
+      # e.g. when checking available_submission_tests at the SubmissionBox level
+      test_id = submission_template&.launchable_test_id
+    end
 
-    return false unless reviewer_ids.present?
+    return nil unless test_id.present?
 
-    reviewer_ids.include?(current_user.id)
+    test = Collection::TestCollection.find test_id
+
+    return nil unless test.present?
+
+    test.challenge_test_audience_for_user(current_user)
+  end
+
+  def unreviewed_by?(user, in_a_reviewer_group_with_audience)
+    return false if submission_reviewer_status(user) == :completed || !in_a_reviewer_group_with_audience
+
+    # If you're in a non-reviewer group that's marked with an audience you can review this submission
+    return true unless in_reviewer_group?(user)
+
+    # Otherwise if you're in a reviewer group, check if you are tagged
+    tagged_users.include?(user)
   end
 
   private
@@ -1397,10 +1382,6 @@ class Collection < ApplicationRecord
     errors.add(:base, "can't be an instance inside a template")
   end
 
-  def will_become_a_challenge?
-    will_save_change_to_collection_type? && collection_type_in_database != 'challenge' && collection_type == 'challenge'
-  end
-
   def set_icon_from_collection_type
     return unless collection_type.present?
 
@@ -1409,5 +1390,13 @@ class Collection < ApplicationRecord
     else
       self.icon = collection_type
     end
+  end
+
+  def user_challenge_groups(user)
+    return [] unless inside_a_challenge?
+
+    user.groups.where(id: [parent_challenge.challenge_reviewer_group_id,
+                           parent_challenge.challenge_admin_group_id,
+                           parent_challenge.challenge_participant_group_id])
   end
 end

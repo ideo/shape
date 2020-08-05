@@ -7,7 +7,6 @@ import { ReferenceType, updateModelId } from 'datx'
 import { apiStore } from '~/stores'
 import Collection, { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import Organization from '~/stores/jsonApi/Organization'
-import User from '~/stores/jsonApi/User'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import CollectionFilter from '~/stores/jsonApi/CollectionFilter'
 import googleTagManager from '~/vendor/googleTagManager'
@@ -901,7 +900,7 @@ describe('Collection', () => {
     })
   })
 
-  describe('isCurrentUserAReviewer', () => {
+  describe('canBeReviewedByCurrentUser', () => {
     const handle = 'jappleseed'
     beforeEach(() => {
       collection = new Collection(
@@ -918,24 +917,17 @@ describe('Collection', () => {
           parentChallenge: {},
           user_tag_list: [handle],
           is_inside_a_challenge: true,
+          can_review: true,
         },
         apiStore
       )
-      const user = new User(
-        {
-          handle,
-        },
-        apiStore
-      )
-      updateModelId(user, '1')
       runInAction(() => {
         apiStore.currentUserId = '1'
       })
-      apiStore.add(user, 'users')
     })
 
     it('should be true if inside a challenge', () => {
-      expect(collection.isCurrentUserAReviewer).toBe(true)
+      expect(collection.canBeReviewedByCurrentUser).toBe(true)
     })
   })
 

@@ -1336,23 +1336,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return _.get(this, 'user_tag_list', [])
   }
 
-  get isCurrentUserAReviewer() {
-    if (
-      !this.isSubmissionInChallenge ||
-      !this.isLiveTest ||
-      !this.currentReviewerHandles
-    ) {
+  get canBeReviewedByCurrentUser() {
+    if (!this.isSubmissionInChallenge || !this.isLiveTest) {
       return false
     }
 
-    const { apiStore } = this
-    const { currentUser } = apiStore
-
-    const currentUserIsAReviewer =
-      this.currentReviewerHandles.findIndex(
-        handle => handle === _.get(currentUser, 'handle')
-      ) > -1
-    return currentUserIsAReviewer
+    return this.can_review
   }
 
   // TODO: deprecate once we fully migrate 4WFC
@@ -1596,6 +1585,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  async API_collectionChallengeSetup() {
+    const {
+      challenge_admin_group_id,
+      challenge_reviewer_group_id,
+      challenge_participant_group_id,
+    } = this
+    if (
+      challenge_admin_group_id &&
+      challenge_reviewer_group_id &&
+      challenge_participant_group_id
+    ) {
+      return
+    }
+
+    const { apiStore } = this
+    return apiStore.request(
+      `collections/${this.id}/collection_challenge_setup`,
+      'POST'
+    )
+  }
+
   API_clearCollectionCover() {
     return this.apiStore
       .request(`collections/${this.id}/clear_collection_cover`, 'POST')
@@ -1615,34 +1625,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  async API_fetchChallengeReviewersGroup() {
-    if (!this.parentChallenge) return
-
-    // NOTE: assumes that the reviewer group are the reviewers
-    const challengeReviewerGroup = await this.apiStore.request(
-      `groups/${this.parentChallenge.challenge_reviewer_group_id}`,
-      'GET'
-    )
-
-    if (challengeReviewerGroup && challengeReviewerGroup.data) {
-      this.setChallengeReviewerGroup(challengeReviewerGroup.data)
-    }
-  }
-
   @computed
   get potentialReviewers() {
-    if (!this.isSubmissionsCollection) return []
+    if (!this.parentChallenge || !this.isSubmissionsCollection) return []
+    const reviewerGroupRoles = _.get(
+      this.parentChallenge,
+      'challenge_reviewer_group.roles'
+    )
 
-    const challengeReviewerRoles = _.get(this, 'challengeReviewerGroup.roles')
-
-    if (_.isEmpty(challengeReviewerRoles)) return []
+    if (_.isEmpty(reviewerGroupRoles)) return []
 
     const potentialReviewerList = []
-    _.each(['admin', 'member'], roleLabel => {
-      const role = challengeReviewerRoles.find(r => r.label === roleLabel)
+    _.each(reviewerGroupRoles, role => {
       const users = _.get(role, 'users', [])
       _.each(users, user => {
-        potentialReviewerList.push(user)
+        if (!_.includes(potentialReviewerList, user)) {
+          potentialReviewerList.push(user)
+        }
       })
     })
     return potentialReviewerList
@@ -1676,14 +1675,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   @action
   setNextAvailableTestPath(path) {
     this.nextAvailableTestPath = path
-  }
-
-  @action
-  setChallengeReviewerGroup(group) {
-    this.challengeReviewerGroup = group
-    if (this.isSubmissionBox && this.submissions_collection) {
-      this.submissions_collection.challengeReviewerGroup = group
-    }
   }
 
   @action
