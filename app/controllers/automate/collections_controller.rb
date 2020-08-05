@@ -174,15 +174,10 @@ class Automate::CollectionsController < ActionController::Base
   end
 
   def create_submission(submissions_collection:, template:, user:)
-    # Create a submission or two
-    submission = CollectionTemplateBuilder.new(
+    CollectionTemplateBuilder.new(
       parent: submissions_collection,
       template: template,
       created_by: user,
     ).call
-    submission_test = Collection::TestCollection.find(
-      submission.submission_attrs['launchable_test_id'],
-    )
-    submission_test.launch!
   end
 end

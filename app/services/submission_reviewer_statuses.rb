@@ -16,8 +16,6 @@ class SubmissionReviewerStatuses
 
       test_id = submission.launchable_test_id
 
-      next unless test_id.present?
-
       submission.tagged_users.each do |user|
         next unless user.present?
 
@@ -32,7 +30,11 @@ class SubmissionReviewerStatuses
 
   private
 
-  def status_for_test_user(test_id:, user_id:)
+  def status_for_test_user(test_id: nil, user_id:)
+    if test_id.nil?
+      return :unstarted
+    end
+
     survey_response = survey_responses_by_test_id[test_id]&.find do |sr|
       sr.user_id == user_id
     end
