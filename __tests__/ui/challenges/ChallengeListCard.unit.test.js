@@ -53,9 +53,9 @@ describe('ListCard', () => {
         expect(Column4Override).toBe(undefined)
       })
 
-      describe('when isCurrentUserAReviewer', () => {
+      describe('when canBeReviewedByCurrentUser', () => {
         beforeEach(() => {
-          props.record.isCurrentUserAReviewer = true
+          props.record.canBeReviewedByCurrentUser = true
           props.record.submission_reviewer_status = 'in_progress'
           render()
         })

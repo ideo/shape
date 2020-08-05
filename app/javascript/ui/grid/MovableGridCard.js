@@ -677,8 +677,8 @@ class MovableGridCard extends React.Component {
         <Rnd {...rndProps}>
           <InnerCardWrapper
             animatedBounce={holdingOver}
-            width={width + resizeWidth}
-            height={height + resizeHeight}
+            width={(width || 1) + resizeWidth}
+            height={(height || 1) + resizeHeight}
             transition={transition}
             transform={transform}
             zoomLevel={zoomLevel}

@@ -926,8 +926,8 @@ describe Collection, type: :model do
       end
 
       context 'if user is not assigned as a reviewer' do
-        it 'returns nil' do
-          expect(submission.submission_reviewer_status(reviewer)).to be_nil
+        it 'returns unstarted' do
+          expect(submission.submission_reviewer_status(reviewer)).to eq(:unstarted)
         end
       end
 
@@ -991,7 +991,7 @@ describe Collection, type: :model do
       end
     end
 
-    describe 'with reviewer added to challenge reviewer group' do
+    describe '#challenge_test_audience_for_user' do
       let!(:master_test) do
         create(:test_collection, :with_reviewers_audience, parent_collection: submission_template, master_template: true)
       end
@@ -1001,27 +1001,16 @@ describe Collection, type: :model do
       before do
         reviewer.add_role(Role::MEMBER, parent_challenge.challenge_reviewer_group)
       end
+
       it 'should lookup reviewer audience' do
-        expect(test_collection
-          .lookup_reviewer_audience_for_current_user(reviewer)).to eq(master_test
-                                                                      .test_audiences
-                                                                      .joins(:audience)
-                                                                      .find_by(audiences: { name: 'Reviewers' }))
+        test_audience = test_collection.test_audiences
+                                       .joins(:audience)
+                                       .find_by(audiences: { name: 'Reviewers' })
+
+        expect(submission.challenge_test_audience_for_user(reviewer)).to eq(test_audience)
+        # these should be equivalent
+        expect(test_collection.challenge_test_audience_for_user(reviewer)).to eq(test_audience)
       end
-    end
-  end
-
-  describe 'challenge_reviewer?' do
-    let(:parent_challenge) { create(:collection, collection_type: 'challenge') }
-    let!(:collection) { create(:collection, parent_collection: parent_challenge) }
-    let(:user) { create(:user, handle: 'challenge-reviewer') }
-
-    before do
-      collection.update(user_tag_list: user.handle)
-    end
-
-    it 'returns true when user_tag_list includes the user handle' do
-      expect(collection.challenge_reviewer?(user)).to be true
     end
   end
 
@@ -1117,6 +1106,70 @@ describe Collection, type: :model do
         [cards[1].id, 3],
         # archived card not included
       ])
+    end
+  end
+
+  describe '#unreviewed_by?' do
+    let(:user) { create(:user) }
+    let(:submission) { create(:collection, :submission) }
+    let(:in_a_reviewer_group_with_audience) { true }
+
+    describe 'when reviewer has a completed response' do
+      let(:test_collection) { create(:test_collection, :completed) }
+      let(:survey_response) { create(:survey_response, :fully_answered, test_collection: test_collection, user: user) }
+
+      before do
+        submission.update(submission_attrs: { submission: true, launchable_test_id: test_collection.id })
+      end
+
+      it 'should be false' do
+        survey_response.reload
+        expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(false)
+      end
+    end
+
+    describe 'when user is a reviewer without an audience' do
+      let!(:in_a_reviewer_group_with_audience) { false }
+
+      it 'should be false' do
+        expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(false)
+      end
+    end
+
+    describe 'when user is a reviewer with an audience' do
+      let!(:user) { create(:user) }
+      let(:parent_challenge) { create(:collection, collection_type: 'challenge') }
+      let!(:submission) { create(:collection, :submission, parent_collection: parent_challenge) }
+
+      describe 'when user is a member of the participant group' do
+        let(:participant_group) { create(:group, add_members: [user]) }
+
+        before do
+          parent_challenge.update(challenge_participant_group: participant_group)
+        end
+
+        it 'should be true when user belongs to a non-reviewer, ie: participant group' do
+          expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(true)
+        end
+      end
+
+      describe 'when user is a member of the reviewer group' do
+        let(:reviewer_group) { create(:group, add_members: [user]) }
+
+        before do
+          parent_challenge.update(challenge_reviewer_group: reviewer_group)
+        end
+
+        it 'should be false when the user is untagged' do
+          expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(false)
+        end
+
+        it 'should be true when the user is tagged' do
+          submission.update(user_tag_list: [user.handle])
+          submission.reload
+          expect(submission.unreviewed_by?(user, in_a_reviewer_group_with_audience)).to eq(true)
+        end
+      end
     end
   end
 

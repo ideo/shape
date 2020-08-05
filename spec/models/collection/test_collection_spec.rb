@@ -117,25 +117,50 @@ describe Collection::TestCollection, type: :model, seed: true do
       end
     end
 
-    describe '#setup_challenge_test_audiences' do
+    context 'challenge test audiences' do
       let!(:challenge_test_audience) { create(:audience, min_price_per_response: 0, audience_type: :challenge) }
       let(:template) { create(:collection, master_template: true, collection_type: 'challenge') }
       let!(:test_collection) { create(:test_collection, parent_collection: template) }
       let!(:admin_audience) { Audience.find_by(name: 'Admins') }
       let!(:reviewer_audience) { Audience.find_by(name: 'Reviewers') }
       let!(:participant_audience) { Audience.find_by(name: 'Participants') }
-
-      it 'should add the test_audiences"' do
-        expect(test_collection.challenge_audiences.any?).to be(true)
-        audiences = test_collection.challenge_audiences.map(&:audience)
-        expect(audiences).to include(admin_audience)
-        expect(audiences).to include(reviewer_audience)
-        expect(audiences).to include(participant_audience)
+      let(:reviewer_test_audience) do
+        test_collection.challenge_audiences.find { |ca| ca.audience.name == 'Reviewers' }
+      end
+      let(:admin_test_audience) do
+        test_collection.challenge_audiences.find { |ca| ca.audience.name == 'Admins' }
       end
 
-      it 'should set Reviwer test audience to open' do
-        reviewer_test_audience = test_collection.challenge_audiences.find { |ca| ca.audience.name == 'Reviewers' }
-        expect(reviewer_test_audience.open?).to be(true)
+      describe '#setup_challenge_test_audiences' do
+        it 'should add the test_audiences' do
+          expect(test_collection.challenge_audiences.any?).to be(true)
+          audiences = test_collection.challenge_audiences.map(&:audience)
+          expect(audiences).to include(admin_audience)
+          expect(audiences).to include(reviewer_audience)
+          expect(audiences).to include(participant_audience)
+        end
+
+        it 'should set Reviewer test audience to open' do
+          expect(reviewer_test_audience.open?).to be(true)
+        end
+      end
+
+      describe '#challenge_test_audience_for_user' do
+        it 'should find the first relevant audience for the user' do
+          user.add_role(Role::MEMBER, template.challenge_reviewer_group)
+          expect(test_collection.challenge_test_audience_for_user(user)).to eq reviewer_test_audience
+        end
+
+        it 'should find the admin audience for the user before any others' do
+          user.add_role(Role::MEMBER, template.challenge_reviewer_group)
+          user.add_role(Role::MEMBER, template.challenge_admin_group)
+          admin_test_audience.update(status: :open)
+          expect(test_collection.challenge_test_audience_for_user(user)).to eq admin_test_audience
+        end
+
+        it 'should not find any if the user is not in one of the groups' do
+          expect(test_collection.challenge_test_audience_for_user(user)).to be nil
+        end
       end
     end
 

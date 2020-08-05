@@ -80,13 +80,29 @@ describe('ReviewSubmissionsButton', () => {
       props.record.API_getNextAvailableTest = jest
         .fn()
         .mockReturnValue(Promise.resolve(null))
-      rerender()
     })
 
-    it('should render the button with no reviewable submissions', () => {
-      expect(wrapper.find('Button').text()).toContain(
-        'No Reviewable Submissions'
-      )
+    describe('when not in the reviewer group', () => {
+      beforeEach(() => {
+        rerender()
+      })
+
+      it('should not render the button', () => {
+        expect(wrapper.find('Button').exists()).toBe(false)
+      })
+    })
+
+    describe('when in the reviewer group', () => {
+      beforeEach(() => {
+        props.record.in_reviewer_group = true
+        rerender()
+      })
+
+      it('should render the button with no reviewable submissions', () => {
+        expect(wrapper.find('Button').text()).toContain(
+          'No Reviewable Submissions'
+        )
+      })
     })
   })
 

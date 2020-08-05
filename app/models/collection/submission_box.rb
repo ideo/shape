@@ -138,13 +138,17 @@ class Collection
 
       test_ids = []
 
-      submissions.each do |submission|
-        # disclude from available tests if submission is inside a challenge
-        next if inside_a_challenge? &&
-                submission.cached_user_tag_list.exclude?(for_user&.handle) &&
-                submission_reviewer_status(for_user) == :completed
+      has_challenge_group_with_audience = false
+      if inside_a_challenge?
+        has_challenge_group_with_audience = challenge_test_audience_for_user(for_user).present?
+      end
 
-        test_ids << submission.submission_attrs['launchable_test_id']
+      submissions.each do |submission|
+        next unless submission.launchable_test_id.present?
+        # only include reviewable submissions whose current user has not already reviewed it
+        next if inside_a_challenge? && !submission.unreviewed_by?(for_user, has_challenge_group_with_audience)
+
+        test_ids << submission.launchable_test_id
       end
       if for_user.present?
         user_responses = SurveyResponse.where(
