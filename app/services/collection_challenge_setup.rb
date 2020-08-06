@@ -15,7 +15,7 @@ class CollectionChallengeSetup < SimpleService
     end
 
     collection_name = @collection.name
-    organization = @current_user.current_organization
+    organization = @collection.organization
 
     admin_group = @collection.create_challenge_admin_group(
       name: "#{collection_name} Admins",

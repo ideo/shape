@@ -119,10 +119,18 @@ class Collection
       submissions_collection.save
     end
 
+    def submit_all_submissions!
+      submissions.find_each do |submission|
+        next if submission.item?
+
+        submission.submit_submission!
+      end
+    end
+
     def submissions
       return [] unless submissions_collection
 
-      submissions_collection.collections
+      submissions_collection.submissions
     end
 
     def destroyable?
@@ -145,7 +153,7 @@ class Collection
       end
 
       submissions.each do |submission|
-        next unless submission.launchable_test_id.present?
+        next unless submission.try(:launchable_test_id).present?
         # only include reviewable submissions whose current user has not already reviewed it
         next if inside_a_challenge? && !submission.unreviewed_by?(for_user, has_challenge_group_with_audience)
 

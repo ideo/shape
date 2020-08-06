@@ -119,7 +119,7 @@ describe Collection::TestCollection, type: :model, seed: true do
 
     context 'challenge test audiences' do
       let!(:challenge_test_audience) { create(:audience, min_price_per_response: 0, audience_type: :challenge) }
-      let(:template) { create(:collection, master_template: true, collection_type: 'challenge') }
+      let(:template) { create(:collection, :challenge, master_template: true) }
       let!(:test_collection) { create(:test_collection, parent_collection: template) }
       let!(:admin_audience) { Audience.find_by(name: 'Admins') }
       let!(:reviewer_audience) { Audience.find_by(name: 'Reviewers') }

@@ -10,7 +10,7 @@ Feature: Challenge settings
     Then I should see "Hide new submissions" in a "SubmissionSettings-HideNew"
 
     When I click the "SubmissionSettings-TemplateEdit"
-    Then I should see "challenge-template" in the URL
+    Then I should see "challenge-submission" in the URL
 
     When I open the challenge settings
     And I click the "ChallengeSettings-PeopleNav"

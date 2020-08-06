@@ -950,12 +950,13 @@ class Collection < ApplicationRecord
     return unless inside_a_challenge? && sub_collection.present? && user&.handle.present?
 
     filter_for_user = sub_collection.collection_filters.tagged_with_user_handle(user.handle).first
+    # create the filter itself (i.e. the checkbox that shows up for everyone)
     filter_for_user ||= sub_collection.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
     )
 
-    # Find or create the filter for this user
+    # for the user that was just tagged: create a `selected` user filter (checking the checkbox)
     filter_for_user.user_collection_filters.find_or_create_by(
       user_id: user.id,
     )
