@@ -91,13 +91,12 @@ class Collection
              through: :collection_cards,
              source: :item
 
-    before_create :set_as_foamcore
+    before_create :set_as_foamcore, if: :collection_type_collection?
 
     private
 
     def set_as_foamcore
-      # only set when type is collection since duplicating may have changed the collection_type
-      self.collection_type = :foamcore if collection_type == 'collection'
+      self.collection_type = :foamcore
     end
   end
 end

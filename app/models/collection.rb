@@ -455,9 +455,6 @@ class Collection < ApplicationRecord
       c.template = self
       c.master_template = false
     end
-    if collection_type == 'challenge'
-      CollectionChallengeSetup.call(collection: c, current_user: for_user)
-    end
 
     # clear out cached submission_attrs
     c.cached_attributes.delete 'submission_attrs'
@@ -479,6 +476,11 @@ class Collection < ApplicationRecord
     # return if it didn't work for whatever reason
     c.parent_collection_card = card if card
     return c unless c.save
+
+    # set up the challenge if that's what we're duplicating
+    if collection_type_challenge?
+      CollectionChallengeSetup.call(collection: c, user: for_user)
+    end
 
     c.parent_collection_card.save if c.parent_collection_card.present?
 
@@ -1071,13 +1073,13 @@ class Collection < ApplicationRecord
   end
 
   def challenge_or_inside_challenge?
-    return true if collection_type == 'challenge'
+    return true if collection_type_challenge?
 
     inside_a_challenge?
   end
 
   def challenge_submission_boxes
-    challenge_collection = collection_type == 'challenge' ? self : parent_challenge
+    challenge_collection = collection_type_challenge? ? self : parent_challenge
     challenge_collection.all_child_collections
                         .active
                         .submission_box

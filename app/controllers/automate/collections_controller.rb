@@ -21,7 +21,7 @@ class Automate::CollectionsController < ActionController::Base
     challenge_collection.save
 
     # Setup challenge groups
-    CollectionChallengeSetup.call(collection: challenge_collection, current_user: current_user)
+    CollectionChallengeSetup.call(collection: challenge_collection, user: current_user)
 
     create_card(
       params: {
