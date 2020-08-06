@@ -3,9 +3,13 @@
 $smallBreakpoint: 645px;
 $medBreakpoint: 1060px;
 $largeBreakpoint: 1308px;
+// colors
+$colorCommonLight: #f2f1ee;
+$colorBlack: #120f0e;
 
 body {
-  background: #f2f1ee;
+  background: $colorCommonLight;
+  color: $colorBlack;
   overscroll-behavior: none;
   // these rules are just for when you do add a body background image (in app)
   background-position: 50% 0;

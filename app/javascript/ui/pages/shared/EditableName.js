@@ -36,7 +36,7 @@ const StyledEditableName = styled.div`
       border-top: none;
       border-right: none;
       border-bottom: 1px solid
-        ${props => props.theme.titleColor || v.colors.black};
+        ${props => props.theme.fontColor || v.colors.black};
       &:focus {
         outline: 0;
       }
