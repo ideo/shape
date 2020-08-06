@@ -17,7 +17,7 @@ import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BackIcon from '~/ui/icons/BackIcon'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
-import { StyledHeader, MaxWidthContainer } from '~/ui/global/styled/layout'
+import { FixedHeader, MaxWidthContainer, StyledHeader } from '~/ui/global/styled/layout'
 import Button from '~/ui/global/Button'
 import {
   SubduedHeading1,
@@ -476,9 +476,10 @@ class PageHeader extends React.Component {
       record.is_restorable ||
       record.isPublicJoinable
 
+    const HeaderComponent = isSticky ? FixedHeader : StyledHeader
     return (
       <Fragment>
-        <StyledHeader
+        <HeaderComponent
           pageHeader
           sticky={isSticky}
           className={isSticky && 'StickyHeader'}
@@ -576,7 +577,7 @@ class PageHeader extends React.Component {
             cards={this.cardsForTagging}
             open={this.tagsEditorOpen}
           />
-        </StyledHeader>
+        </HeaderComponent>
         <MaxWidthContainer>
           {showFilters && <CollectionPillHolder id="collectionFilterPortal" />}
         </MaxWidthContainer>
