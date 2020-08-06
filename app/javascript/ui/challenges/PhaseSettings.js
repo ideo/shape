@@ -10,7 +10,6 @@ import PhaseCollectionRow, {
   PhaseCollectionWithoutTemplateRow,
 } from '~/ui/challenges/PhaseCollectionRow'
 import v from '~/utils/variables'
-import Collection from '~/stores/jsonApi/Collection'
 
 const Phases = styled.div`
   margin-bottom: 1rem;
@@ -24,7 +23,7 @@ const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
 
   useEffect(() => {
     const loadData = async () => {
-      const subBoxesWithPhases = await Collection.loadPhasesForSubmissionBoxes(
+      const subBoxesWithPhases = await collection.loadPhasesForSubmissionBoxes(
         submissionBoxes
       )
       if (subBoxesWithPhases.length === 1) {

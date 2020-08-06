@@ -31,9 +31,7 @@ FactoryBot.define do
       end
     end
     factory :user_profile, class: Collection::UserProfile
-    factory :submission_box, class: Collection::SubmissionBox do
-      submission_box_type :template
-    end
+    factory :submission_box, class: Collection::SubmissionBox
     factory :submissions_collection, class: Collection::SubmissionsCollection
     factory :search_collection, class: Collection::SearchCollection
 

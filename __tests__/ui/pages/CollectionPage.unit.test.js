@@ -270,10 +270,6 @@ describe('CollectionPage', () => {
             ...fakeCollection,
             isSearchCollection: true,
           }}
-          uiStore={{
-            ...uiStore,
-            loadedSubmissions: true,
-          }}
         />
       )
       component = wrapper.instance()
@@ -309,10 +305,6 @@ describe('CollectionPage', () => {
             submissions_enabled: true,
             submission_template: { id: '123' },
             submissions_collection,
-          }}
-          uiStore={{
-            ...uiStore,
-            loadedSubmissions: true,
           }}
         />
       )
@@ -367,7 +359,7 @@ describe('CollectionPage', () => {
           }}
           uiStore={{
             ...uiStore,
-            loadedSubmissions: true,
+            loadingSubmissions: false,
           }}
         />
       )
