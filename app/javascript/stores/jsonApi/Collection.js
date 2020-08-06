@@ -33,8 +33,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   static endpoint = apiUrl('collections')
 
   @observable
-  reloading = false
-  @observable
   nextAvailableTestPath = null
   @observable
   currentPage = 1
@@ -147,11 +145,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   setPhaseSubCollections(value) {
     this.phaseSubCollections = value
     return this.phaseSubCollections
-  }
-
-  @action
-  setReloading(value) {
-    this.reloading = value
   }
 
   @action
@@ -1723,11 +1716,15 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return submissions_collection
   }
 
+  @action
   async API_sortCards() {
-    const order = this.uiStore.collectionCardSortOrder
-    this.setReloading(true)
+    const { uiStore } = this
+    const order = uiStore.collectionCardSortOrder
+    // don't do full loading which will blank out the whole page
+    const loading = 'isTransparentLoading'
+    uiStore.update(loading, true)
     await this.API_fetchCards({ order })
-    this.setReloading(false)
+    uiStore.update(loading, false)
   }
 
   async API_updateComparison(comparisonTest, action) {

@@ -63,7 +63,7 @@ class CollectionPage extends React.Component {
       routingStore.routeToLogin({ redirect: collection.frontendUrl })
     }
     this.setViewingRecordAndRestoreScrollPosition()
-    this.loadCollectionCards({})
+    this.loadCollectionCards()
     this.subscribeToChannel(collection.id)
   }
 
@@ -85,7 +85,7 @@ class CollectionPage extends React.Component {
       uiStore.closeBlankContentTool()
       uiStore.resetCardPositions()
       this.setViewingRecordAndRestoreScrollPosition()
-      this.loadCollectionCards({})
+      this.loadCollectionCards()
       routingStore.updateScrollState(previousId, window.pageYOffset)
     }
   }
@@ -115,7 +115,7 @@ class CollectionPage extends React.Component {
     rows,
     cols,
     reloading = false,
-  }) => {
+  } = {}) => {
     const { collection, undoStore } = this.props
     // if the collection is still awaiting updates, there are no cards to load
     if (collection.awaiting_updates) {
@@ -153,7 +153,12 @@ class CollectionPage extends React.Component {
     })
   }
 
-  loadSubmissionsCollectionCards = async ({ page, per_page, rows, cols }) => {
+  loadSubmissionsCollectionCards = async ({
+    page,
+    per_page,
+    rows,
+    cols,
+  } = {}) => {
     const { submissions_collection } = this.props.collection
     await submissions_collection.API_fetchCards({
       page,
@@ -275,7 +280,7 @@ class CollectionPage extends React.Component {
       if (collection.awaiting_updates) {
         const res = await apiStore.fetch('collections', collection.id, true)
         if (!res.data.awaiting_updates) {
-          this.loadCollectionCards({})
+          this.loadCollectionCards()
         }
       } else {
         clearInterval(this.updatePoller)
@@ -287,11 +292,11 @@ class CollectionPage extends React.Component {
   async checkSubmissionBox() {
     const { collection, uiStore } = this.props
     if (collection.isSubmissionBox && collection.submissions_collection_id) {
-      this.setLoadedSubmissions(false)
+      this.setLoadingSubmissions(true)
       // NOTE: if other collections get sortable features we may move this logic
       uiStore.update('collectionCardSortOrder', 'updated_at')
       await collection.fetchSubmissionsCollection({ order: 'updated_at' })
-      this.setLoadedSubmissions(true)
+      this.setLoadingSubmissions(false)
       // Also subscribe to updates for the submission boxes
       this.subscribeToChannel(collection.submissions_collection_id)
     }
@@ -333,22 +338,30 @@ class CollectionPage extends React.Component {
   }
 
   receivedChannelData = async data => {
-    const { collection, apiStore } = this.props
+    const { apiStore } = this.props
+    let { collection } = this.props
+    let { loadCollectionCards } = this
     const { collaborators, current_editor } = data
-    collection.setCollaborators(collaborators)
     // catch if receivedData happens after reload
     if (!collection) return
-    const currentId = collection.id
-    const submissions = collection.submissions_collection
-    const submissionsId = submissions ? submissions.id : ''
 
-    if (!_.includes(_.compact([currentId, submissionsId]), data.record_id)) {
+    if (
+      collection.submissions_collection &&
+      data.record_id === collection.submissions_collection.id
+    ) {
+      loadCollectionCards = this.loadSubmissionsCollectionCards
+      collection = collection.submissions_collection
+    }
+    if (collection.id !== data.record_id) {
       return
     }
     if (_.get(data, 'current_editor.id') === apiStore.currentUserId) {
       // don't reload your own updates
       return
     }
+
+    // set collaborators on this collection
+    collection.setCollaborators(collaborators)
 
     const updateData = data.data
     if (updateData && !updateData.text_item && !updateData.cards_selected) {
@@ -359,7 +372,10 @@ class CollectionPage extends React.Component {
       this.reloadData()
       return
     }
-    const service = new CollectionCollaborationService({ collection })
+    const service = new CollectionCollaborationService({
+      collection,
+      loadCollectionCards,
+    })
     service.handleReceivedData(updateData, current_editor)
   }
 
@@ -376,24 +392,24 @@ class CollectionPage extends React.Component {
       this.loadCollectionCards({ reloading: true, per_page })
     }
     if (this.collection.submissions_collection) {
-      this.setLoadedSubmissions(false)
+      this.setLoadingSubmissions(true)
       await this.collection.submissions_collection.API_fetchCards()
-      this.setLoadedSubmissions(true)
+      this.setLoadingSubmissions(false)
     }
   }
 
   @action
-  setLoadedSubmissions = val => {
+  setLoadingSubmissions = val => {
     const { uiStore } = this.props
 
     if (!this.collection) return
     const { submissions_collection } = this.collection
     if (submissions_collection && submissions_collection.cardIds.length) {
       // if submissions_collection is preloaded with some cards, no need to show loader
-      uiStore.update('loadedSubmissions', true)
+      uiStore.update('loadingSubmissions', false)
       return
     }
-    uiStore.update('loadedSubmissions', val)
+    uiStore.update('loadingSubmissions', val)
   }
 
   onAddSubmission = ev => {
@@ -455,7 +471,7 @@ class CollectionPage extends React.Component {
 
   renderSubmissionsCollection() {
     const { collection, uiStore, apiStore } = this.props
-    const { blankContentToolState, gridSettings, loadedSubmissions } = uiStore
+    const { blankContentToolState, gridSettings, loadingSubmissions } = uiStore
     const {
       submissions_collection,
       submission_box_type,
@@ -467,7 +483,7 @@ class CollectionPage extends React.Component {
       return
     }
 
-    if (!submissions_collection || !loadedSubmissions) {
+    if (!submissions_collection || loadingSubmissions) {
       return this.loader()
     }
 

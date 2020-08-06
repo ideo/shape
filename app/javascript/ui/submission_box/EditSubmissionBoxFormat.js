@@ -79,7 +79,7 @@ class EditSubmissionBoxFormat extends React.Component {
           true
         )
         // this will update the CollectionPage
-        uiStore.update('loadedSubmissions', true)
+        uiStore.update('loadingSubmissions', true)
       }
     } catch (e) {
       uiStore.alert('Unable to use that template')
