@@ -52,6 +52,10 @@ FactoryBot.define do
       end
     end
 
+    trait :with_submissions_collection do
+      after(:create, &:setup_submissions_collection!)
+    end
+
     factory :test_results_collection, class: Collection::TestResultsCollection
     factory :test_collection, class: Collection::TestCollection do
       transient do
@@ -141,6 +145,17 @@ FactoryBot.define do
             test_collection: collection,
             audience: create(:audience),
             price_per_response: 4.50,
+            launched_by: create(:user),
+          )
+        end
+      end
+
+      trait :with_reviewers_audience do
+        after(:create) do |collection|
+          create(
+            :test_audience,
+            :reviewers,
+            test_collection: collection,
             launched_by: create(:user),
           )
         end

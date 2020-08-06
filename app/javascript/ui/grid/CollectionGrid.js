@@ -172,7 +172,9 @@ class CollectionGrid extends React.Component {
         cards.unshift(blankCard)
       }
     }
-    if (submissionSettings) {
+    const { currentUser } = apiStore
+
+    if (submissionSettings && currentUser) {
       this.addSubmissionCard(cards)
     }
     return cards

@@ -18,6 +18,9 @@ export const AUDIENCE_PRICES = {
 export const FOAMCORE_MAX_ZOOM = 3
 export const FOUR_WIDE_MAX_ZOOM = 2
 
+export const ACTIVITY_LOG_POSITION_KEY = 'ActivityLog:position'
+export const ACTIVITY_LOG_PAGE_KEY = 'ActivityLog:page'
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',
@@ -149,6 +152,9 @@ export const TEST_COLLECTION_SELECT_OPTIONS = [
     ],
   },
 ]
+
+export const COLLECTION_CHANNEL_NAME = 'CollectionViewingChannel'
+export const ITEM_CHANNEL_NAME = 'ItemRealtimeChannel'
 
 export const KEYS = {
   ENTER: 13,
@@ -316,14 +322,14 @@ export default {
     commentMentions: 255,
     commentHeader: 252,
     activityLog: 251,
-    // NOTE: if globalHeader is > pageHeader
-    // then it will also be above the EditableName ClickWrapper
     cardDragging: 222,
+    zoomControls: 222,
+    // NOTE: globalHeader contains the breadcrumb menu,
+    // so it needs to be above the pageHeader
     globalHeader: 221,
     pageHeader: 220,
     popoutMenu: 201,
     scrollIndicator: 200,
-    zoomControls: 199,
     cardHovering: 160,
     gridCardTop: 151,
     gridCard: 150,

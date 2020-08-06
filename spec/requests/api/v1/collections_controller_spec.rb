@@ -752,6 +752,25 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
   end
 
+  describe 'POST #clear_background_image' do
+    let!(:collection) { create(:collection, parent_collection: create(:collection), add_editors: [user]) }
+    let(:collection_card) do
+      create(:collection_card_image, order: 0, width: 1, parent: collection, is_background: true)
+    end
+    let(:path) { "/api/v1/collections/#{collection.id}/clear_background_image" }
+
+    before do
+      user.add_role(Role::VIEWER, collection_card.item)
+    end
+
+    it 'should clear the cover from the collection' do
+      expect(collection.background_image_url).to eq collection_card.item.image_url
+      post(path)
+      expect(collection_card.reload.is_background).to be false
+      expect(collection.reload.background_image_url).to be nil
+    end
+  end
+
   describe 'POST #background_update_template_instances' do
     let(:template) { create(:collection, master_template: true, add_editors: [user], num_cards: 1) }
     let(:path) { "/api/v1/collections/#{template.id}/background_update_template_instances" }
@@ -1055,6 +1074,81 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       expect(response.status).to eq(200)
       expect(json['data'].size).to eq(2)
       expect(json_ids.map(&:to_i)).to match_array(phases.map(&:id))
+    end
+  end
+
+  describe 'GET #next_available_submission_test' do
+    let(:submission_box) { create(:submission_box, add_editors: [user]) }
+    let(:submissions_collection) { create(:submissions_collection, submission_box: submission_box) }
+    let(:submission) { create(:collection, :submission, parent_collection: submissions_collection, add_editors: [user]) }
+    let(:collection) { submission }
+    let(:path) { "/api/v1/collections/#{collection.id}/next_available_submission_test" }
+
+    it 'finds parent submission box and next available test' do
+      expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+        for_user: user,
+        omit_id: nil,
+      ).and_return([])
+      get(path)
+      expect(response.status).to eq(200)
+    end
+
+    describe 'with the submission_box itself' do
+      let(:collection) { submission_box }
+
+      it 'finds current submission box and next available test' do
+        expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+          for_user: user,
+          omit_id: nil,
+        ).and_return([])
+        get(path)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    describe 'with a challenge' do
+      let!(:challenge) do
+        create(
+          :collection,
+          collection_type: :challenge,
+          record_type: :collection,
+          add_editors: [user],
+        )
+      end
+      let(:collection) { challenge }
+
+      context 'with no submission box' do
+        it 'returns a 404' do
+          get(path)
+          expect(response.status).to eq(404)
+        end
+      end
+
+      context 'with submission box inside' do
+        let!(:submission_box) { create(:submission_box, add_viewers: [user], parent_collection: challenge) }
+
+        it 'finds submission box inside and next available test' do
+          expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+            for_user: user,
+            omit_id: nil,
+          ).and_return([])
+          get(path)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+
+    describe 'with a test collection' do
+      let(:collection) { create(:test_collection, parent_collection: submission) }
+
+      it 'finds parent submission box and next available test, omitting current test' do
+        expect_any_instance_of(Collection::SubmissionBox).to receive(:random_next_submission_test).with(
+          for_user: user,
+          omit_id: collection.id,
+        ).and_return([])
+        get(path)
+        expect(response.status).to eq(200)
+      end
     end
   end
 end

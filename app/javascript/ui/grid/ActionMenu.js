@@ -13,6 +13,7 @@ import ReplaceIcon from '~/ui/icons/ReplaceIcon'
 import CommentIcon from '~/ui/icons/CommentIcon'
 import PrintIcon from '~/ui/icons/PrintIcon'
 import SelectAllIcon from '~/ui/icons/SelectAllIcon'
+import SettingsIcon from '~/ui/icons/SettingsIcon'
 import SharingIcon from '~/ui/icons/SharingIcon'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
@@ -137,6 +138,11 @@ class ActionMenu extends React.Component {
   openSubmissionBoxSettings = () => {
     const { uiStore } = this.props
     uiStore.update('submissionBoxSettingsOpen', true)
+  }
+
+  openSettings = ev => {
+    const { card, uiStore } = this.props
+    uiStore.setEditingCardCover(card.id)
   }
 
   printPage = ev => {
@@ -286,6 +292,13 @@ class ActionMenu extends React.Component {
     }
 
     if (location === 'PageMenu' && record.isCollection) {
+      if (canEdit) {
+        items.push({
+          name: 'Settings',
+          iconRight: <SettingsIcon />,
+          onClick: this.openSettings,
+        })
+      }
       items.push({
         name: 'Print',
         iconRight: <PrintIcon />,

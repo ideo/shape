@@ -3,7 +3,7 @@ import Tooltip from '~/ui/global/Tooltip'
 import PropTypes from 'prop-types'
 
 const TruncatableText = ({ text, maxLength }) => {
-  if (!text) return
+  if (!text) return null
 
   const shouldTruncate = text.length > maxLength
   const truncatedText = shouldTruncate ? rightClamp(text, maxLength) : text

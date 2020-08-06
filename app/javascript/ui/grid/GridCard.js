@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { observable, computed, action } from 'mobx'
@@ -505,6 +506,13 @@ class GridCard extends React.Component {
     }
   }
 
+  setCardRef(ref) {
+    const { card } = this.props
+    this.gridCardRef = ref
+    if (!ref) return
+    uiStore.setCardPosition(card.id, ref.getBoundingClientRect())
+  }
+
   render() {
     const {
       card,
@@ -598,11 +606,18 @@ class GridCard extends React.Component {
       )
     }
 
+    let collaboratorColor = null
+    if (!_.isEmpty(record.collaborators)) {
+      const { color } = _.last(record.collaborators)
+      collaboratorColor = v.colors[`collaboratorPrimary${color}`]
+    }
+
     return (
       <StyledGridCard
         background={
           this.transparentBackground ? v.colors.transparent : v.colors.white
         }
+        collaboratorColor={collaboratorColor}
         className="gridCard"
         id={`gridCard-${card.id}`}
         dragging={dragging}
@@ -616,7 +631,7 @@ class GridCard extends React.Component {
         data-row={card.row}
         data-cy="GridCard"
         onContextMenu={this.handleContextMenu}
-        ref={c => (this.gridCardRef = c)}
+        ref={r => this.setCardRef(r)}
         onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
         inSearchPage={searchResult}

@@ -131,7 +131,7 @@ export const FixedHeader = styled(StyledHeader)`
     background: ${hexToRgba(v.colors.commonLight, 0.96)};
     position: sticky;
     top: ${v.headerHeight + 4}px;
-    z-index: ${v.zIndex.globalHeader};
+    z-index: ${v.zIndex.pageHeader};
   `}
 
   @media print {

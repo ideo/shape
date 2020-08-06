@@ -146,6 +146,7 @@
     "quill-delta": "^4.2.0",
     "react": "16.8.6",
     "react-autosize-textarea": "^3.0.3",
+    "react-color": "^2.18.1",
     "react-copy-to-clipboard": "^5.0.1",
     "react-docgen": "^2.21.0",
     "react-docgen-typescript": "^1.9.1",

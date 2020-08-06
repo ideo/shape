@@ -1,17 +1,21 @@
 import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
+import localStorage from 'mobx-localstorage'
 
 import sleep from '~/utils/sleep'
 import v, {
   TOUCH_DEVICE_OS,
   EVENT_SOURCE_TYPES,
   FOAMCORE_MAX_ZOOM,
+  ACTIVITY_LOG_PAGE_KEY,
+  COLLECTION_CHANNEL_NAME,
 } from '~/utils/variables'
 import { POPUP_ACTION_TYPES } from '~/enums/actionEnums'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 import { calculatePageMargins } from '~/utils/pageUtils'
+import ChannelManager from '~/utils/ChannelManager'
 
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
@@ -157,7 +161,7 @@ export default class UiStore {
   @observable
   activityLogPosition = { x: 0, y: 0, w: 1, h: 1 }
   @observable
-  activityLogPage = null
+  activityLogPage = 'comments'
   @observable
   activityLogMoving = false
   @observable
@@ -221,12 +225,11 @@ export default class UiStore {
   selectedAreaShifted = false
   @observable
   selectedAreaEnabled = false
+  cardPositions = []
   @observable
   linkedBreadcrumbTrail = []
   @observable
   linkedInMyCollection = false
-  @observable
-  editingCardCover = null
   @observable
   replyingToCommentId = null
   @observable
@@ -340,8 +343,63 @@ export default class UiStore {
 
   @action
   setSelectedArea(selectedArea, { shifted = false } = {}) {
+    const { viewingCollection } = this
     this.selectedArea = selectedArea
     this.selectedAreaShifted = shifted
+
+    if (viewingCollection && viewingCollection.isBoard) {
+      this.selectCardsWithinSelectedArea()
+    }
+  }
+
+  @action
+  resetCardPositions() {
+    this.cardPositions = []
+  }
+
+  @action
+  setCardPosition(cardId, { top, right, bottom, left } = {}) {
+    const idx = _.findIndex(this.cardPositions, { cardId })
+    const data = { cardId, position: { top, right, bottom, left } }
+    if (idx >= 0) {
+      this.cardPositions[idx] = data
+      return
+    }
+    this.cardPositions.push(data)
+  }
+
+  @action
+  selectCardsWithinSelectedArea() {
+    const { minX, minY, maxX, maxY } = this.selectedArea
+    const { selectedCardIds, selectedAreaShifted } = this
+    let newSelectedCardIds = []
+
+    if (minY === null || minX === null) {
+      // or select none??
+      return
+    }
+
+    const scrollTop = window.pageYOffset
+
+    newSelectedCardIds = _.map(
+      _.filter(this.cardPositions, pos => {
+        const { top, right, bottom, left } = pos.position
+        return !(
+          right < minX ||
+          left > maxX ||
+          bottom + scrollTop < minY ||
+          top + scrollTop > maxY
+        )
+      }),
+      'cardId'
+    )
+
+    if (selectedAreaShifted) {
+      newSelectedCardIds = _.union(newSelectedCardIds, selectedCardIds)
+    }
+    if (_.difference(newSelectedCardIds, selectedCardIds).length > 0) {
+      this.reselectCardIds(newSelectedCardIds)
+    }
   }
 
   @action
@@ -852,7 +910,7 @@ export default class UiStore {
       this.viewingRecord &&
       record &&
       this.viewingRecord.id === record.id &&
-      this.viewingRecord.internalType == record.internalType
+      this.viewingRecord.internalType === record.internalType
     )
       return
     if (this.viewingRecord) this.previousViewingRecord = this.viewingRecord
@@ -862,17 +920,34 @@ export default class UiStore {
 
   @computed
   get viewingCollection() {
-    return this.viewingRecord &&
-      this.viewingRecord.internalType === 'collections'
+    return this.viewingRecord && this.viewingRecord.isCollection
       ? this.viewingRecord
       : null
   }
 
   @computed
   get viewingItem() {
-    return this.viewingRecord && this.viewingRecord.internalType === 'items'
+    return this.viewingRecord && this.viewingRecord.isItem
       ? this.viewingRecord
       : null
+  }
+
+  @computed
+  get viewingCollectionId() {
+    const { viewingCollection } = this
+    return viewingCollection ? viewingCollection.id : null
+  }
+
+  setBodyBackgroundImage(image_url = null) {
+    if (image_url) {
+      _.assign(document.body.style, {
+        'background-image': `url('${image_url}')`,
+      })
+    } else {
+      _.assign(document.body.style, {
+        'background-image': null,
+      })
+    }
   }
 
   @action
@@ -901,6 +976,7 @@ export default class UiStore {
     } else {
       this.selectedCardIds.push(cardId)
     }
+    this.broadcastCardSelection([...this.selectedCardIds])
   }
 
   // For certain actions we want to force a toggle on
@@ -915,11 +991,26 @@ export default class UiStore {
   @action
   reselectCardIds(cardIds) {
     this.selectedCardIds.replace(cardIds)
+    this.broadcastCardSelection([...cardIds])
   }
 
   @action
   selectCardIds(cardIds) {
-    this.selectedCardIds.replace(_.uniq([...this.selectedCardIds, ...cardIds]))
+    this.reselectCardIds(_.uniq([...this.selectedCardIds, ...cardIds]))
+  }
+
+  broadcastCardSelection = cardIds => {
+    const { viewingCollection } = this
+    if (!viewingCollection) {
+      return
+    }
+    const channel = ChannelManager.getChannel(
+      COLLECTION_CHANNEL_NAME,
+      viewingCollection.id
+    )
+    if (channel) {
+      channel.perform('cards_selected', { card_ids: cardIds })
+    }
   }
 
   reselectOnlyEditableRecords(cardIds = this.selectedCardIds) {
@@ -999,10 +1090,16 @@ export default class UiStore {
   }
 
   @action
+  setActivityLogPage(page) {
+    this.activityLogPage = page
+    localStorage.setItem(ACTIVITY_LOG_PAGE_KEY, page)
+  }
+
+  @action
   openOptionalMenus(opts = {}) {
     if (opts) {
       if (opts.open) {
-        this.activityLogPage = opts.open
+        this.setActivityLogPage(opts.open)
         this.activityLogOpen = true
       } else if (opts.manage_group_id) {
         // /shape.space/ideo?manage_group_id=123`
@@ -1077,14 +1174,14 @@ export default class UiStore {
   expandAndOpenThread(key) {
     // make sure the activityLog is open
     this.activityLogOpen = true
+    // when we expand a thread we also want it to set the ActivityLog to Comments
+    this.setActivityLogPage('comments')
     this.expandThread(key)
   }
 
   @action
   expandThread(key, { reset = false } = {}) {
     if (key) {
-      // when we expand a thread we also want it to set the ActivityLog to Comments
-      this.activityLogPage = 'comments'
       // reset it first, that way if it's expanded offscreen, it will get re-opened/scrolled to
       if (reset) this.expandedThreadKey = null
     } else {
@@ -1240,7 +1337,7 @@ export default class UiStore {
   // after performing an action (event), track following the record for notifications
   trackEvent(event, record) {
     this.trackRecord(record.identifier)
-    if (record.internalType === 'items' && record.parent) {
+    if (record.isItem && record.parent) {
       this.trackRecord(record.parent.identifier)
     }
   }
@@ -1427,6 +1524,9 @@ export default class UiStore {
 
   @action
   determineZoomLevels(collection) {
+    if (collection.isSplitLevelBottom) {
+      return
+    }
     const { windowWidth } = this
     const maxCols = this.maxCols(collection)
     const pageMargins = this.pageMargins(collection)
