@@ -31,30 +31,17 @@ ChallengeSettingsButton.propTypes = {
 ChallengeSettingsButton.displayName = 'ChallengeSettingsButton'
 
 export const ReviewSubmissionsButton = ({ record }) => {
-  const [submissionBox, setSubmissionBox] = useState(null)
+  const [submissionBoxPath, setSubmissionBoxPath] = useState(null)
 
   useEffect(() => {
-    const { parentChallenge } = record
-    if (!parentChallenge) return
-    const loadSubmissionBoxes = async () => {
-      // fetch parent challenge submission boxes
-      const request = await record.API_fetchSubmissionBoxSubCollections()
-      const submissionBoxes = request.data
-
-      for (const submissionBox of submissionBoxes) {
-        // fetch submission boxes for an available submission box test
-        const availableTest = await submissionBox.API_getNextAvailableTest()
-        if (availableTest) {
-          // if found set submission box and return
-          setSubmissionBox(submissionBox)
-          return
-        }
-      }
+    const loadNextAvailableTest = async () => {
+      const path = await record.API_getNextAvailableTest({ challenge: true })
+      setSubmissionBoxPath(path)
     }
-    loadSubmissionBoxes()
+    loadNextAvailableTest()
   }, [record])
 
-  if (!submissionBox && !record.in_reviewer_group) {
+  if (!submissionBoxPath && !record.in_reviewer_group) {
     // in this case, not in reviewer group and nothing left to review, no button is shown
     return null
   }
@@ -63,12 +50,12 @@ export const ReviewSubmissionsButton = ({ record }) => {
     <Button
       {...buttonStyleProps}
       colorScheme={v.colors.alert}
-      disabled={!submissionBox}
-      onClick={() => {
-        record.routingStore.routeTo('collections', submissionBox.id)
-      }}
+      disabled={!submissionBoxPath}
+      onClick={() =>
+        submissionBoxPath && record.routingStore.routeTo(submissionBoxPath)
+      }
     >
-      {submissionBox ? `Review Submissions` : `No Reviewable Submissions`}
+      {submissionBoxPath ? `Review Submissions` : `No Reviewable Submissions`}
     </Button>
   )
 }

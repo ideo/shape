@@ -316,7 +316,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def load_and_authorize_parent_challenge
     @collection = Collection.find(params[:id])
-    authorize! :read, @collection.parent_challenge
+    authorize! :read, @collection.collection_type == 'challenge' ? @collection : @collection.parent_challenge
   end
 
   def load_and_authorize_collection_layout_update
