@@ -1,21 +1,86 @@
 import { Fragment } from 'react'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
+import { observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import TextButton from '~/ui/global/TextButton'
+
+import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
+import ExpandableSearchInput from '~/ui/global/ExpandableSearchInput'
 import { FormSpacer } from '~/ui/global/styled/forms'
+import { GroupIconContainer } from '~/ui/groups/styles'
 import { Row, RowItemRight } from '~/ui/global/styled/layout'
 import {
   Heading3,
   DisplayText,
   SubduedText,
 } from '~/ui/global/styled/typography'
+import TextButton from '~/ui/global/TextButton'
+import Tooltip from '~/ui/global/Tooltip'
 import TrashIcon from '~/ui/icons/TrashIconXl'
-import { GroupIconContainer } from '~/ui/groups/styles'
+import v from '~/utils/variables'
 
 const RemoveIconHolder = styled.button`
   width: 16px;
 `
+
+const ResponsiveSearchPosition = styled.div`
+  position: absolute;
+  right: 58px;
+  top: -40px;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    left: 0;
+    right: auto;
+    top: -30px;
+    width: 100%;
+  }
+`
+
+const ResponsiveScrollingModalList = styled.div`
+  /* subtract to account for area at top of modal */
+  max-height: calc(70vh - 200px);
+  min-height: 125px;
+  overflow-y: scroll;
+
+  @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
+    margin-top: 30px;
+  }
+`
+
+const GroupRow = styled(Row)`
+  &:hover {
+    ${RemoveIconHolder} {
+      display: block;
+    }
+  }
+
+  ${RemoveIconHolder} {
+    display: none;
+  }
+`
+
+function fuzzySearch(items = [], query = '', fields = []) {
+  const search = query.toLowerCase().split(' ')
+  return items.reduce((found, i) => {
+    let matches = 0
+    search.forEach(s => {
+      let props = 0
+      fields.forEach(prop => {
+        if (i[prop].indexOf(s) > -1) {
+          props++
+        }
+      })
+      if (props >= 1) {
+        matches++
+      }
+    })
+    if (matches == search.length) {
+      found.push(i)
+    }
+    return found
+  }, [])
+}
 
 const renderGroup = group => {
   return (
@@ -32,24 +97,73 @@ const renderGroup = group => {
 
 @observer
 class OrganizationPeople extends React.Component {
-  renderUserGroups = () => {
+  @observable
+  groupSearchTerm = ''
+
+  onGroupSearch = term => {
+    runInAction(() => {
+      this.groupSearchTerm = term
+    })
+  }
+
+  filterGroupsWithTerm() {
     const { userGroups } = this.props
-    const groups = userGroups.filter(g => g.isNormalGroup)
-    if (!groups.length) {
-      return <SubduedText>You have not been added to any groups.</SubduedText>
+    const groups = _.sortBy(userGroups.filter(g => g.isNormalGroup), [
+      g => g.name.toLowerCase(),
+    ])
+    if (this.groupSearchTerm.length < 1) {
+      return groups
     }
-    return groups.map(group => (
-      <Row key={group.id}>
+    const filteredGroups = fuzzySearch(groups, this.groupSearchTerm, [
+      'name',
+      'handle',
+    ])
+    return filteredGroups
+  }
+
+  renderUserGroups = () => {
+    const groups = this.filterGroupsWithTerm()
+
+    let innerScrollingContent = groups.map(group => (
+      <GroupRow key={group.id}>
         <button className="groupEdit" onClick={this.props.onGroupRoles(group)}>
-          {renderGroup(group)}
+          <EntityAvatarAndName entity={group} />
         </button>
         {group.can_edit && (
-          <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
-            <TrashIcon />
-          </RemoveIconHolder>
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title="delete group"
+            placement="top"
+          >
+            <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
+              <TrashIcon />
+            </RemoveIconHolder>
+          </Tooltip>
         )}
-      </Row>
+      </GroupRow>
     ))
+    if (!groups.length) {
+      let noGroupMessage = 'You have not been added to any groups.'
+      if (this.groupSearchTerm.length >= 1) {
+        noGroupMessage = `No groups found matching "${this.groupSearchTerm}".`
+      }
+      innerScrollingContent = <SubduedText>{noGroupMessage}</SubduedText>
+    }
+
+    return (
+      <div style={{ position: 'relative' }}>
+        <ResponsiveSearchPosition>
+          <ExpandableSearchInput
+            onChange={this.onGroupSearch}
+            onClear={() => runInAction(() => (this.groupSearchTerm = ''))}
+            value={this.groupSearchTerm}
+          />
+        </ResponsiveSearchPosition>
+        <ResponsiveScrollingModalList>
+          {innerScrollingContent}
+        </ResponsiveScrollingModalList>
+      </div>
+    )
   }
 
   renderYourOrganization() {
