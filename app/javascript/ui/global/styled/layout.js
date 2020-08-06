@@ -124,6 +124,16 @@ export const FixedHeader = styled(StyledHeader)`
     padding-left: 5px;
     padding-right: 5px;
   }
+
+  ${props =>
+    props.sticky &&
+    `
+    background: ${hexToRgba(v.colors.commonLight, 0.96)};
+    position: sticky;
+    top: ${v.headerHeight + 4}px;
+    z-index: ${v.zIndex.pageHeader};
+  `}
+
   @media print {
     display: none !important;
   }
