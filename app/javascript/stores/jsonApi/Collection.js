@@ -2006,12 +2006,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get styledTheme() {
     const { fontColor } = this
-    if (!fontColor) {
-      return {}
+    const theme = {
+      // can probably deprecate this once we fully migrate 4WFC?
+      useResponsiveText: !this.isBoard,
     }
-    return {
-      titleColor: fontColor,
+    if (fontColor) {
+      theme.titleColor = fontColor
     }
+    return theme
   }
 }
 

@@ -1,14 +1,6 @@
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
-// allow responsive styling to be disabled based on viewingCollection
-import { uiStore } from '~/stores'
 import v from '~/utils/variables'
-
-const onFoamcoreBoard = () => {
-  // Disable responsive CSS on foamcore because cards will already zoom + scale
-  const collection = uiStore.viewingCollection
-  return collection && collection.isBoard
-}
 
 export const Heading1TypographyCss = css`
   color: ${props => props.theme.titleColor || v.colors.black};
@@ -20,7 +12,7 @@ export const Heading1TypographyCss = css`
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !onFoamcoreBoard() &&
+      props.theme.useResponsiveText &&
       `
       font-size: 1.5rem;
       line-height: 1.75rem;
@@ -37,7 +29,9 @@ const Heading1Css = css`
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     /* Allow us not to have responsive behavior */
     ${props =>
-      props.notResponsive || onFoamcoreBoard() ? '' : 'padding: 1rem 0;'};
+      props.notResponsive || !props.theme.useResponsiveText
+        ? ''
+        : 'padding: 1rem 0;'};
   }
 `
 /** @component */
@@ -246,7 +240,7 @@ export const CardHeadingCss = css`
   @media only screen and (min-width: ${v.responsive
       .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !onFoamcoreBoard() &&
+      props.theme.useResponsiveText &&
       `
       padding: 0;
     `}
@@ -283,7 +277,7 @@ export const HugeNumber = styled(Heading1)`
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !onFoamcoreBoard() &&
+      props.theme.useResponsiveText &&
       `
         font-size: 4rem;
         line-height: 3rem;
