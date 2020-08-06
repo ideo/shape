@@ -92,6 +92,14 @@ class Collection
       submission_box
     end
 
+    def submissions
+      if %i[text link file].include?(submission_box_type&.to_sym)
+        items
+      else
+        collections
+      end
+    end
+
     def sort_options
       collections
         .unscope(:order)

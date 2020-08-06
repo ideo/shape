@@ -123,6 +123,7 @@ const fakeUiStore = {
   setCommentingOnRecord: jest.fn(),
   setActivityLogPage: jest.fn(),
   setBodyBackgroundImage: jest.fn(),
+  setBodyFontColor: jest.fn(),
   selectedTextRangeForCard: jest.fn(),
   reselectCardIds: jest.fn(),
   reselectOnlyEditableRecords: jest.fn(),

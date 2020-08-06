@@ -18,7 +18,7 @@ const stripTags = str => str.replace(/(<([^>]+)>)/gi, '')
 const StyledPaddedCover = styled(PaddedCardCover)`
   border-top: ${props =>
     !props.isEditing && props.hasTitleText
-      ? `2px solid ${props.theme.titleColor || v.colors.black}`
+      ? `2px solid ${props.theme.fontColor || v.colors.black}`
       : 'none'};
   background: ${props => {
     const { hasTitleText, isTransparent, uneditable } = props

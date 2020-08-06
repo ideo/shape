@@ -27,6 +27,7 @@ RSpec.describe TrialExpiredWorker, type: :worker do
              trial_expired_email_sent: false,
              in_app_billing: true,
              active_users_count: billable_users_count,
+             billable: true,
              trial_ends_at: 1.day.from_now)
     end
     let!(:should_process_a) do
@@ -34,6 +35,7 @@ RSpec.describe TrialExpiredWorker, type: :worker do
              trial_expired_email_sent: false,
              in_app_billing: true,
              active_users_count: billable_users_count,
+             billable: true,
              trial_ends_at: 1.day.ago)
     end
     let!(:should_process_b) do
@@ -41,6 +43,7 @@ RSpec.describe TrialExpiredWorker, type: :worker do
              trial_expired_email_sent: false,
              in_app_billing: true,
              active_users_count: billable_users_count,
+             billable: true,
              trial_ends_at: 1.day.ago)
     end
 

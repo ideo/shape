@@ -81,7 +81,7 @@ export default class UiStore {
   @observable
   submissionBoxSettingsOpen = null
   @observable
-  loadedSubmissions = false
+  loadingSubmissions = false
   @observable
   adminUsersMenuOpen = null
   @observable
@@ -908,7 +908,11 @@ export default class UiStore {
       this.viewingRecord.internalType === record.internalType
     )
       return
-    if (this.viewingRecord) this.previousViewingRecord = this.viewingRecord
+    if (this.viewingRecord) {
+      this.previousViewingRecord = this.viewingRecord
+      // clear out previous collaborators
+      this.previousViewingRecord.setCollaborators([])
+    }
     this.viewingRecord = record
     this.deselectCards()
   }
@@ -943,6 +947,12 @@ export default class UiStore {
         'background-image': null,
       })
     }
+  }
+
+  setBodyFontColor(color = null) {
+    _.assign(document.body.style, {
+      color,
+    })
   }
 
   @action

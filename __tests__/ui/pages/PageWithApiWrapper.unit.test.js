@@ -95,6 +95,12 @@ describe('PageWithApiWrapper', () => {
         fakeCollection.backgroundImageUrl
       )
     })
+
+    it('calls uiStore.setBodyFontColor', () => {
+      expect(uiStore.setBodyFontColor).toHaveBeenCalledWith(
+        fakeCollection.fontColor
+      )
+    })
   })
 
   describe('afterFetchData', () => {

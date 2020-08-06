@@ -3,16 +3,24 @@ import { objectsEqual } from '~/utils/objectUtils'
 
 export default class CollectionCollaborationService {
   // stores can be passed in e.g. for unit testing, but default to the imported ones
-  constructor({ collection } = {}) {
+  constructor({ collection, loadCollectionCards } = {}) {
     this.collection = collection
     this.apiStore = collection.apiStore
     this.uiStore = collection.uiStore
+    this.loadCollectionCards = loadCollectionCards
   }
 
   async handleReceivedData(updateData, current_editor = {}) {
     const { collection, apiStore } = this
     if (updateData.collection_updated) {
-      collection.refetch()
+      const previousFilters = collection.activeFilters
+      const res = await collection.refetch()
+      const updated = res.data
+      // use case for challenges, where selected filters may have changed
+      if (updated.activeFilters.length !== previousFilters.length) {
+        // then we also refetch cards
+        this.loadCollectionCards()
+      }
       return
     }
     if (updateData.collection_cards_attributes) {
