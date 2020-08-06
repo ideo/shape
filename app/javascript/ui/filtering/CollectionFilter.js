@@ -55,10 +55,13 @@ class CollectionFilter extends React.Component {
    * that required a collection card reload
    */
   async onFilterChange(fn) {
-    uiStore.update('isLoading', true)
+    const { collection } = this.props
+    const { isSplitLevelBottom } = collection
+    if (!isSplitLevelBottom) {
+      uiStore.update('isLoading', true)
+    }
     try {
       const result = await fn()
-      const { collection } = this.props
       await collection.API_fetchCards()
       return result
     } catch (e) {

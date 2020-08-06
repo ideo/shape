@@ -78,6 +78,7 @@ class MethodLibraryFilterBar extends React.Component {
     return filtersToTags({
       filters: this.filtersForType(type, onlySelected),
       onSelect,
+      disabled: uiStore.isLoading,
     })
   }
 
@@ -146,6 +147,7 @@ class MethodLibraryFilterBar extends React.Component {
         const subqualityTags = filtersToTags({
           filters: subqualityFilters,
           onSelect,
+          disabled: uiStore.isLoading,
         })
         tags = [...tags, ...subqualityTags.map(tag => this.tagToMenuItem(tag))]
       })

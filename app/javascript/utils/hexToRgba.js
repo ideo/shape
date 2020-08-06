@@ -52,6 +52,11 @@ function hexRgb(hexStr, options = {}) {
     : { red, green, blue, alpha }
 }
 
+export function hexToRgb(hex) {
+  const rgb = hexRgb(hex, { format: 'array' })
+  return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
+}
+
 export default function hexToRgba(hex, alpha = 1) {
   const rgb = hexRgb(hex, { format: 'array' })
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`

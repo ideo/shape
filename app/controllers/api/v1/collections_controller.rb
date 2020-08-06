@@ -8,7 +8,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :switch_to_organization, only: :show, if: :user_signed_in?
   before_action :load_and_authorize_collection_layout_update, only: %i[insert_row remove_row]
   before_action :load_collection_with_roles, only: %i[show update]
-  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover clear_background_image]
+  before_action :load_and_authorize_collection_update, only: %i[update clear_collection_cover clear_background_image collection_challenge_setup]
   after_action :broadcast_parent_collection_card_update, only: %i[create_template clear_collection_cover]
 
   before_action :load_and_filter_index, only: %i[index]
@@ -20,8 +20,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
+    include = Collection.default_relationships_for_api
+    if @collection.collection_type == 'challenge'
+      include.concat Collection.default_relationships_for_challenge
+    end
     render_collection(
-      include: Collection.default_relationships_for_api + [:tagged_users],
+      include: include,
     )
   end
 
@@ -68,6 +72,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   def clear_background_image
     @collection.clear_background_image
+    @collection.reload
+    render_collection
+  end
+
+  def collection_challenge_setup
+    CollectionChallengeSetup.call(collection: @collection, current_user: current_user)
     @collection.reload
     render_collection
   end

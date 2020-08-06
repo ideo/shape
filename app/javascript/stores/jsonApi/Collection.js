@@ -5,8 +5,6 @@ import pluralize from 'pluralize'
 import queryString from 'query-string'
 import googleTagManager from '~/vendor/googleTagManager'
 
-// TODO: remove this apiStore import by refactoring static methods that depend on it
-import { apiStore } from '~/stores'
 import { apiUrl, useTemplateInMyCollection } from '~/utils/url'
 
 import {
@@ -34,8 +32,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   static type = 'collections'
   static endpoint = apiUrl('collections')
 
-  @observable
-  reloading = false
   @observable
   nextAvailableTestPath = null
   @observable
@@ -149,11 +145,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   setPhaseSubCollections(value) {
     this.phaseSubCollections = value
     return this.phaseSubCollections
-  }
-
-  @action
-  setReloading(value) {
-    this.reloading = value
   }
 
   @action
@@ -1336,23 +1327,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return _.get(this, 'user_tag_list', [])
   }
 
-  get isCurrentUserAReviewer() {
-    if (
-      !this.isSubmissionInChallenge ||
-      !this.isLiveTest ||
-      !this.currentReviewerHandles
-    ) {
+  get canBeReviewedByCurrentUser() {
+    if (!this.isSubmissionInChallenge || !this.isLiveTest) {
       return false
     }
 
-    const { apiStore } = this
-    const { currentUser } = apiStore
-
-    const currentUserIsAReviewer =
-      this.currentReviewerHandles.findIndex(
-        handle => handle === _.get(currentUser, 'handle')
-      ) > -1
-    return currentUserIsAReviewer
+    return this.can_review
   }
 
   // TODO: deprecate once we fully migrate 4WFC
@@ -1561,7 +1541,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   API_fetchAllCardIds() {
-    return apiStore.requestJson(`collections/${this.id}/collection_cards/ids`)
+    return this.apiStore.requestJson(
+      `collections/${this.id}/collection_cards/ids`
+    )
   }
 
   async API_setSubmissionBoxTemplate(data) {
@@ -1596,6 +1578,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
+  async API_collectionChallengeSetup() {
+    const {
+      challenge_admin_group_id,
+      challenge_reviewer_group_id,
+      challenge_participant_group_id,
+    } = this
+    if (
+      challenge_admin_group_id &&
+      challenge_reviewer_group_id &&
+      challenge_participant_group_id
+    ) {
+      return
+    }
+
+    const { apiStore } = this
+    return apiStore.request(
+      `collections/${this.id}/collection_challenge_setup`,
+      'POST'
+    )
+  }
+
   API_clearCollectionCover() {
     return this.apiStore
       .request(`collections/${this.id}/clear_collection_cover`, 'POST')
@@ -1615,34 +1618,23 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     )
   }
 
-  async API_fetchChallengeReviewersGroup() {
-    if (!this.parentChallenge) return
-
-    // NOTE: assumes that the reviewer group are the reviewers
-    const challengeReviewerGroup = await this.apiStore.request(
-      `groups/${this.parentChallenge.challenge_reviewer_group_id}`,
-      'GET'
-    )
-
-    if (challengeReviewerGroup && challengeReviewerGroup.data) {
-      this.setChallengeReviewerGroup(challengeReviewerGroup.data)
-    }
-  }
-
   @computed
   get potentialReviewers() {
-    if (!this.isSubmissionsCollection) return []
+    if (!this.parentChallenge || !this.isSubmissionsCollection) return []
+    const reviewerGroupRoles = _.get(
+      this.parentChallenge,
+      'challenge_reviewer_group.roles'
+    )
 
-    const challengeReviewerRoles = _.get(this, 'challengeReviewerGroup.roles')
-
-    if (_.isEmpty(challengeReviewerRoles)) return []
+    if (_.isEmpty(reviewerGroupRoles)) return []
 
     const potentialReviewerList = []
-    _.each(['admin', 'member'], roleLabel => {
-      const role = challengeReviewerRoles.find(r => r.label === roleLabel)
+    _.each(reviewerGroupRoles, role => {
       const users = _.get(role, 'users', [])
       _.each(users, user => {
-        potentialReviewerList.push(user)
+        if (!_.includes(potentialReviewerList, user)) {
+          potentialReviewerList.push(user)
+        }
       })
     })
     return potentialReviewerList
@@ -1679,14 +1671,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   @action
-  setChallengeReviewerGroup(group) {
-    this.challengeReviewerGroup = group
-    if (this.isSubmissionBox && this.submissions_collection) {
-      this.submissions_collection.challengeReviewerGroup = group
-    }
-  }
-
-  @action
   updateScrollBottom(y) {
     this.scrollBottom = y
   }
@@ -1700,7 +1684,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   // Load phase collections for given submission box collections
-  static async loadPhasesForSubmissionBoxes(submissionBoxes) {
+  async loadPhasesForSubmissionBoxes(submissionBoxes) {
     // Filter out any that don't have a submission template (can't assign phases)
     // Or any that have phase sub-collections already loaded
     const subBoxesWithTemplates = submissionBoxes.filter(
@@ -1720,18 +1704,27 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return submissionBoxes
   }
 
-  static async fetchSubmissionsCollection(id, { order } = {}) {
-    const res = await apiStore.request(`collections/${id}`)
-    const collection = res.data
-    await collection.API_fetchCards({ order })
-    return collection
+  async fetchSubmissionsCollection({ order } = {}) {
+    const { apiStore, submissions_collection_id } = this
+    const res = await apiStore.request(
+      `collections/${submissions_collection_id}`
+    )
+    const submissions_collection = res.data
+    // set the reverse relationship
+    submissions_collection.submission_box = this
+    await submissions_collection.API_fetchCards({ order })
+    return submissions_collection
   }
 
+  @action
   async API_sortCards() {
-    const order = this.uiStore.collectionCardSortOrder
-    this.setReloading(true)
+    const { uiStore } = this
+    const order = uiStore.collectionCardSortOrder
+    // don't do full loading which will blank out the whole page
+    const loading = 'isTransparentLoading'
+    uiStore.update(loading, true)
     await this.API_fetchCards({ order })
-    this.setReloading(false)
+    uiStore.update(loading, false)
   }
 
   async API_updateComparison(comparisonTest, action) {
@@ -1824,32 +1817,6 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
     // onSuccess is really "successfully able to edit this collection"
     if (_.isFunction(onSuccess)) onSuccess()
-  }
-
-  static async createSubmission(parent_id, submissionSettings) {
-    const { routingStore, uiStore } = apiStore
-    const { type, template } = submissionSettings
-    if (type === 'template' && template) {
-      const templateData = {
-        template_id: template.id,
-        parent_id,
-        placement: 'beginning',
-      }
-      uiStore.update('isLoading', true)
-      const res = await apiStore.createTemplateInstance({
-        data: templateData,
-        template,
-        inSubmissionBox: true,
-      })
-      uiStore.update('isLoading', false)
-      routingStore.routeTo('collections', res.data.id)
-    } else {
-      uiStore.openBlankContentTool({
-        order: 0,
-        collectionId: parent_id,
-        blankType: type,
-      })
-    }
   }
 
   // find all data cards in the collection and refetch
@@ -2015,12 +1982,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
 
   get styledTheme() {
     const { fontColor } = this
-    if (!fontColor) {
-      return {}
+    const theme = {
+      // can probably deprecate this once we fully migrate 4WFC?
+      useResponsiveText: !this.isBoard,
     }
-    return {
-      titleColor: fontColor,
+    if (fontColor) {
+      theme.fontColor = fontColor
     }
+    return theme
   }
 }
 

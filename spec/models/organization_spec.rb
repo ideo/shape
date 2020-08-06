@@ -7,7 +7,7 @@ describe Organization, type: :model do
 
   describe 'billable scope' do
     let!(:billable) do
-      create(:organization, in_app_billing: true, deactivated: false, active_users_count: Organization::FREEMIUM_USER_LIMIT + 2)
+      create(:organization, in_app_billing: true, deactivated: false, billable: true, active_users_count: Organization::FREEMIUM_USER_LIMIT + 2)
     end
     let!(:not_enough_users) do
       create(:organization, in_app_billing: true, deactivated: false, active_users_count: Organization::FREEMIUM_USER_LIMIT - 2)

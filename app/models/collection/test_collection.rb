@@ -753,6 +753,30 @@ class Collection
       challenge_or_inside_challenge? && submission_test? && !submission_box_template_test? && live?
     end
 
+    def challenge_test_audience_for_user(current_user)
+      return nil unless inside_a_challenge? && current_user.present?
+
+      open_test_audiences = test_audiences&.open
+      return nil unless open_test_audiences.any?
+
+      challenge_user_groups = user_challenge_groups(current_user)
+      return nil unless challenge_user_groups.any?
+
+      %i[admin reviewer participant].each do |group_name|
+        # determine which group this is
+        group_id = parent_challenge.send("challenge_#{group_name}_group_id")
+        next unless challenge_user_groups.find_by(id: group_id).present?
+
+        audience_name = group_name.to_s.capitalize.pluralize
+        test_audience = open_test_audiences.find { |a| a.name == audience_name }
+
+        return test_audience if test_audience.present?
+      end
+
+      # catch-all, the user does not belong to any challenge group whose test audience is open
+      nil
+    end
+
     private
 
     def question_items_from_sections(section_names)

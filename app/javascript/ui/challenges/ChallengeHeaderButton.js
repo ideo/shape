@@ -41,6 +41,11 @@ export const ReviewSubmissionsButton = ({ record }) => {
     loadNextAvailableTest()
   }, [record])
 
+  if (!nextAvailableTestPath && !record.in_reviewer_group) {
+    // in this case, not in reviewer group and nothing left to review, no button is shown
+    return null
+  }
+
   return (
     <Button
       {...buttonStyleProps}
@@ -70,7 +75,7 @@ const ChallengeHeaderButton = ({ record, parentChallenge }) => {
   }
   if (parentChallenge.canEdit) {
     return <ChallengeSettingsButton record={record} />
-  } else if (record.in_reviewer_group) {
+  } else {
     return <ReviewSubmissionsButton record={record} />
   }
   return null

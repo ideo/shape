@@ -185,7 +185,7 @@ const SharedRecordMixin = superclass =>
           user_id: user.id,
         })
       }
-      this.API_addRemoveTag('add', { label, type })
+      return this.API_addRemoveTag('add', { label, type })
     }
 
     @action
@@ -201,7 +201,7 @@ const SharedRecordMixin = superclass =>
           })
         }
       }
-      this.API_addRemoveTag('remove', { label, type })
+      return this.API_addRemoveTag('remove', { label, type })
     }
 
     async initializeParentChallengeForCollection() {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_224906) do
+ActiveRecord::Schema.define(version: 2020_07_31_212721) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -555,6 +555,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_224906) do
     t.integer "terms_version"
     t.string "default_locale", default: "en"
     t.boolean "shell", default: false
+    t.boolean "billable", default: false
     t.index ["autojoin_domains"], name: "index_organizations_on_autojoin_domains", using: :gin
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
   end

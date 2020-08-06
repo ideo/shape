@@ -45,10 +45,6 @@ const MobileWrapper = styled.div`
   }
 `
 
-const AddAudienceButton = styled(Button)`
-  z-index: ${v.zIndex.aboveClickWrapper};
-`
-
 const AddAudienceMenu = styled.span`
   .icon {
     left: 0;
@@ -291,12 +287,12 @@ class AudienceSettingsWidget extends React.Component {
     let newAudienceButton = (
       <Flex align="center">
         <StyledRowFlexItem style={{ marginTop: '5px' }}>
-          <AddAudienceButton onClick={this.toggleAddAudienceMenu}>
+          <Button onClick={this.toggleAddAudienceMenu}>
             <StyledPlusIcon>
               <PlusIcon />
             </StyledPlusIcon>
             Audience
-          </AddAudienceButton>
+          </Button>
           <AddAudienceMenu>
             <PopoutMenu
               width={280}

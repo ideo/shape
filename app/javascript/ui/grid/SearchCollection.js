@@ -130,8 +130,7 @@ class SearchCollection extends React.Component {
   render() {
     const { uiStore, collection, trackCollectionUpdated } = this.props
     const { searchResultsCollection } = collection
-    // const { gridSettings } = uiStore
-    if (uiStore.isLoading || collection.reloading) {
+    if (uiStore.isLoading) {
       return <Loader />
     }
 

@@ -45,7 +45,7 @@ class CollectionUpdater < SimpleService
 
         # TODO: Kind of an edge case of someone toggling the "hide submissions" feature
         # but we may want to put this in a worker if there are >100's of submissions
-        @collection.submissions.find_each(&:submit_submission!)
+        @collection.submit_all_submissions!
       end
     end
   end

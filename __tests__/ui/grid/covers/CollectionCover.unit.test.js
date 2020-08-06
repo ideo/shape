@@ -169,7 +169,7 @@ describe('CollectionCover', () => {
       props.collection.isLiveTest = true
       props.collection.submission_reviewer_status = 'in_progress'
       props.inSubmissionsCollection = true
-      props.collection.isCurrentUserAReviewer = true
+      props.collection.canBeReviewedByCurrentUser = true
       wrapper = shallow(<CollectionCover.wrappedComponent {...props} />)
       component = wrapper.instance()
     })

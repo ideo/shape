@@ -194,6 +194,8 @@ export const Select = styled(MuiSelect)`
     padding-bottom: 0;
     padding-top: 0;
     vertical-align: baseline;
+    color: ${props => props.theme.fontColor || 'inherit'};
+
     &.bottomPadded {
       padding-bottom: 7px;
     }
@@ -203,7 +205,7 @@ export const Select = styled(MuiSelect)`
     &:hover {
       background-color: transparent;
     }
-    ${props => props.onDefault && `color: ${v.colors.commonMedium};`} li {
+    li {
       font-family: ${v.fonts.sans};
       font-size: ${props => (props.inline ? 'inherit' : '1rem')};
       font-weight: ${v.weights.book};

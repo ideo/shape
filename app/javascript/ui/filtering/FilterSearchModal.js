@@ -36,11 +36,12 @@ class FilterSearchModal extends React.Component {
   }
 
   get filtersFormattedAsTags() {
-    const { filters } = this.props
+    const { filters, uiStore } = this.props
     return filtersToTags({
       filters,
       onDelete: this.onRemoveTag,
       onSelect: this.onTagSelect,
+      disabled: uiStore.isLoading,
     })
   }
 

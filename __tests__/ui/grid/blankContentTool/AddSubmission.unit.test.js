@@ -1,11 +1,10 @@
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
-import Collection from '~/stores/jsonApi/Collection'
 import fakeUiStore from '#/mocks/fakeUiStore'
+import fakeApiStore from '#/mocks/fakeApiStore'
 
 import { fakeCollection, fakeCollectionCard } from '#/mocks/data'
 
 jest.mock('../../../../app/javascript/stores/index')
-jest.mock('../../../../app/javascript/stores/jsonApi/Collection')
 
 let props, wrapper
 const fakeEv = { preventDefault: jest.fn() }
@@ -16,6 +15,7 @@ describe('GridCardBlank', () => {
     fakeUiStore.viewingCollection.submissionTypeName = 'text'
     props = {
       uiStore: fakeUiStore,
+      apiStore: fakeApiStore(),
       parent_id: fakeCollectionCard.parent_id,
       submissionSettings: {
         type: 'text',
@@ -38,8 +38,7 @@ describe('GridCardBlank', () => {
     })
 
     it('should create submission on the collection record', () => {
-      expect(Collection.createSubmission).toHaveBeenCalled()
-      expect(Collection.createSubmission).toHaveBeenCalledWith(
+      expect(props.apiStore.createSubmission).toHaveBeenCalledWith(
         props.parent_id,
         props.submissionSettings
       )
