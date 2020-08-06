@@ -1151,4 +1151,26 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       end
     end
   end
+
+  describe 'POST #collection_challenge_setup' do
+    let(:collection) { create(:collection) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_challenge_setup" }
+
+    context 'without edit access' do
+      it 'returns a 401' do
+        post(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with edit access' do
+      let(:collection) { create(:collection, add_editors: [user]) }
+
+      it 'should call CollectionChallengeSetup' do
+        expect(CollectionChallengeSetup).to receive(:call)
+        post(path)
+        expect(response.status).to eq(200)
+      end
+    end
+  end
 end

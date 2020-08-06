@@ -93,7 +93,6 @@ const fakeApiStore = ({
       terms_accepted: true,
       API_hideHelper: jest.fn(),
       API_updateUseTemplateSetting: jest.fn(),
-      API_fetchAllReviewableSubmissions: jest.fn(),
     },
     // NOTE: important that this matches currentUserOrganization.slug
     currentOrgSlug: 'org-slug',

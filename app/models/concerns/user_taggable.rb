@@ -88,8 +88,17 @@ module UserTaggable
   def after_remove_tagged_user_ids(user_ids)
     return unless submission? && inside_a_challenge?
 
-    # Remove the challenge collection filter for these user(s)
-    User.where(id: user_ids).each do |user|
+    # Remove the challenge collection filter for these user(s), if this was the last tag for them
+    remaining_user_ids = UserTag.where(
+      record_id: parent.submissions.pluck(:id),
+      record_type: self.class.base_class.name,
+      user_id: user_ids,
+    ).pluck(:user_id)
+
+    remove_user_ids = user_ids - remaining_user_ids
+    return if remove_user_ids.empty?
+
+    User.where(id: remove_user_ids).each do |user|
       remove_challenge_reviewer_filter_from_submission_box(user)
     end
   end

@@ -20,54 +20,63 @@ RSpec.describe OverdueNotificationWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              overdue_at: nil,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:overdue_1_day) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 1.day.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:overdue_3_days) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 3.days.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:overdue_7_days) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 7.days.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:overdue_9_days) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 9.days.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:overdue_14_days) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 14.days.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:overdue_21_days) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 21.days.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:overdue_100_days) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 100.days.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:not_active) do
       create(:organization,
              in_app_billing: true,
              overdue_at: 100.days.ago,
+             billable: true,
              active_users_count: 0)
     end
 

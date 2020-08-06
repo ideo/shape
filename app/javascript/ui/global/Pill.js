@@ -66,6 +66,7 @@ const Pill = props => {
     symbol,
     symbolSize,
     onDelete,
+    disabled,
   } = props.tag || props
   let { deleteIcon } = props.tag || props
   if (props.tag && !props.tag.deleteIcon) {
@@ -89,6 +90,7 @@ const Pill = props => {
             onSelect(props.tag || props)
           }}
           value="yes"
+          disabled={disabled}
         />
       )}
       {symbol && (
@@ -142,6 +144,10 @@ Pill.propTypes = {
    */
   selected: PropTypes.bool,
   /**
+   * Whether the pill has disabled styling
+   */
+  disabled: PropTypes.bool,
+  /**
    * The function to call when the select checkbox is clicked, should only be
    * used if `selectable` is being used
    */
@@ -159,6 +165,7 @@ Pill.defaultProps = {
   tag: null,
   selectable: false,
   selected: false,
+  disabled: false,
   onSelect: null,
   id: null,
 }

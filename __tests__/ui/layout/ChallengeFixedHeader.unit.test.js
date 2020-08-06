@@ -25,9 +25,6 @@ describe('ChallengeFixedHeader', () => {
     beforeEach(() => {
       props.collection.collection_type = 'challenge'
       props.collection.canEdit = true
-      props.collection.API_fetchAllReviewableSubmissions = jest
-        .fn()
-        .mockReturnValue(Promise.resolve([]))
       rerender()
     })
     it('should render an inline EditableName with the challenge name', () => {

@@ -55,6 +55,12 @@ describe('GridCard', () => {
         )
       })
 
+      it('renders a CoverRenderer with passed in defaultHandleClick prop', () => {
+        expect(wrapper.find('CoverRenderer').props().handleClick).toEqual(
+          component.defaultHandleClick
+        )
+      })
+
       it('does not render link icon if card is primary', () => {
         expect(
           wrapper
