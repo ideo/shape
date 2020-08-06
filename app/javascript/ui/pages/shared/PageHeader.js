@@ -17,7 +17,11 @@ import HiddenIconButton from '~/ui/global/HiddenIconButton'
 import LinkIconSm from '~/ui/icons/LinkIconSm'
 import BackIcon from '~/ui/icons/BackIcon'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
-import { FixedHeader, MaxWidthContainer, StyledHeader } from '~/ui/global/styled/layout'
+import {
+  FixedHeader,
+  MaxWidthContainer,
+  StyledHeader,
+} from '~/ui/global/styled/layout'
 import Button from '~/ui/global/Button'
 import {
   SubduedHeading1,
