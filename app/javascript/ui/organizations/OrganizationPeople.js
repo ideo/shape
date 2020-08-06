@@ -38,13 +38,13 @@ const ResponsiveSearchPosition = styled.div`
 `
 
 const ResponsiveScrollingModalList = styled.div`
-  max-height: 62vh;
-  min-height: 546px;
+  /* subtract to account for area at top of modal */
+  max-height: calc(70vh - 200px);
+  min-height: 125px;
   overflow-y: scroll;
 
   @media only screen and (max-width: ${v.responsive.medBreakpoint}px) {
     margin-top: 30px;
-    min-height: 426px;
   }
 `
 
@@ -60,13 +60,13 @@ const GroupRow = styled(Row)`
   }
 `
 
-function fuzzySearch(items, query, propsToSearch) {
-  const search = query.split(' ')
+function fuzzySearch(items = [], query = '', fields = []) {
+  const search = query.toLowerCase().split(' ')
   return items.reduce((found, i) => {
     let matches = 0
     search.forEach(s => {
       let props = 0
-      propsToSearch.forEach(prop => {
+      fields.forEach(prop => {
         if (i[prop].indexOf(s) > -1) {
           props++
         }
@@ -111,7 +111,9 @@ class OrganizationPeople extends React.Component {
     const groups = _.sortBy(userGroups.filter(g => g.isNormalGroup), [
       g => g.name.toLowerCase(),
     ])
-    if (this.groupSearchTerm.length < 3) return groups
+    if (this.groupSearchTerm.length < 1) {
+      return groups
+    }
     const filteredGroups = fuzzySearch(groups, this.groupSearchTerm, [
       'name',
       'handle',
@@ -121,6 +123,33 @@ class OrganizationPeople extends React.Component {
 
   renderUserGroups = () => {
     const groups = this.filterGroupsWithTerm()
+
+    let innerScrollingContent = groups.map(group => (
+      <GroupRow key={group.id}>
+        <button className="groupEdit" onClick={this.props.onGroupRoles(group)}>
+          <EntityAvatarAndName entity={group} />
+        </button>
+        {group.can_edit && (
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            title="delete group"
+            placement="top"
+          >
+            <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
+              <TrashIcon />
+            </RemoveIconHolder>
+          </Tooltip>
+        )}
+      </GroupRow>
+    ))
+    if (!groups.length) {
+      let noGroupMessage = 'You have not been added to any groups.'
+      if (this.groupSearchTerm.length >= 1) {
+        noGroupMessage = `No groups found matching "${this.groupSearchTerm}".`
+      }
+      innerScrollingContent = <SubduedText>{noGroupMessage}</SubduedText>
+    }
+
     return (
       <div style={{ position: 'relative' }}>
         <ResponsiveSearchPosition>
@@ -131,31 +160,7 @@ class OrganizationPeople extends React.Component {
           />
         </ResponsiveSearchPosition>
         <ResponsiveScrollingModalList>
-          {!groups.length ? (
-            <SubduedText>You have not been added to any groups.</SubduedText>
-          ) : (
-            groups.map(group => (
-              <GroupRow key={group.id}>
-                <button
-                  className="groupEdit"
-                  onClick={this.props.onGroupRoles(group)}
-                >
-                  <EntityAvatarAndName entity={group} />
-                </button>
-                {group.can_edit && (
-                  <Tooltip
-                    classes={{ tooltip: 'Tooltip' }}
-                    title="delete group"
-                    placement="top"
-                  >
-                    <RemoveIconHolder onClick={this.props.onGroupRemove(group)}>
-                      <TrashIcon />
-                    </RemoveIconHolder>
-                  </Tooltip>
-                )}
-              </GroupRow>
-            ))
-          )}
+          {innerScrollingContent}
         </ResponsiveScrollingModalList>
       </div>
     )
