@@ -75,7 +75,7 @@ function fuzzySearch(items = [], query = '', fields = []) {
         matches++
       }
     })
-    if (matches == search.length) {
+    if (matches === search.length) {
       found.push(i)
     }
     return found
