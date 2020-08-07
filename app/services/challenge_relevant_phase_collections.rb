@@ -19,7 +19,7 @@ class ChallengeRelevantPhaseCollections < SimpleService
   private
 
   def challenge?
-    @collection.collection_type == 'challenge'
+    @collection.collection_type_challenge?
   end
 
   def relevant_phase_collections
