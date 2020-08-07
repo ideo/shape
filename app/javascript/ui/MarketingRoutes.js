@@ -2,6 +2,7 @@ import { Switch, Route } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import createBrowserHistory from 'history/createBrowserHistory'
 
+import CookieMessage from '~/ui/marketing/CookieMessage'
 import ErrorBoundary from '~/ui/global/ErrorBoundary'
 import MarketingHomepage from '~/ui/pages/MarketingHomepage'
 import MarketingProductPage from '~/ui/pages/MarketingProductPage'
@@ -38,6 +39,7 @@ class MarketingRoutes extends React.Component {
             <Route path="/product/:page" component={MarketingProductPage} />
           </Switch>
         </MuiThemeProvider>
+        <CookieMessage />
       </ErrorBoundary>
     )
   }
