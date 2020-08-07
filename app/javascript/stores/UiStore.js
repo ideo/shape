@@ -1424,10 +1424,10 @@ export default class UiStore {
   }
 
   scrollToCenter(direction) {
-    const middleY = window.innerHeight / 2 + window.scrollY
+    // TODO: you don't always want to scroll down to the "middle"
+    // -- also "middle" really depends more on rows of cards vs. window.innerHeight
+    const middleY = window.pageYOffset / window.innerHeight
     const middleX = window.innerWidth / 2
-    console.log({ middleX, middleY })
-    // window.scrollTo(middleX, middleY)
     window.scrollTo({
       top: middleY,
       left: middleX,
@@ -1530,10 +1530,18 @@ export default class UiStore {
   // Foamcore zoom functions
   zoomOut() {
     this.updateZoomLevel(this.zoomLevel + 1)
+    setTimeout(() => {
+      window.scrollTo({
+        top: window.pageYOffset / 2,
+      })
+    }, 1)
   }
 
   zoomIn() {
     this.updateZoomLevel(this.zoomLevel - 1)
+    setTimeout(() => {
+      this.scrollToCenter()
+    }, 1)
   }
 
   @action

@@ -548,11 +548,6 @@ class FoamcoreGrid extends React.Component {
   handleZoomOut = () => {
     const { uiStore } = this.props
     uiStore.zoomOut()
-    setTimeout(() => {
-      window.scrollTo({
-        top: window.scrollY / 2,
-      })
-    }, 1)
     this.updateCollectionScrollBottom()
   }
 
@@ -560,9 +555,6 @@ class FoamcoreGrid extends React.Component {
   handleZoomIn = () => {
     const { uiStore } = this.props
     uiStore.zoomIn()
-    setTimeout(() => {
-      uiStore.scrollToCenter()
-    }, 1)
     this.updateCollectionScrollBottom()
   }
 
