@@ -32,7 +32,10 @@ class QuickOptionSelector extends React.Component {
             key={`${option.title} ${option.cardId || option.imageUrl}`}
             PopperProps={{ style: { pointerEvents: 'none' } }}
           >
-            <button onClick={e => this.handleClick(option, e)}>
+            <button
+              onClick={e => this.handleClick(option, e)}
+              data-cy={`QuickOption-${option.title}`}
+            >
               {option.icon ? (
                 <Option color={'white'}>{option.icon}</Option>
               ) : (

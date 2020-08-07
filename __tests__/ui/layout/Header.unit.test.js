@@ -166,18 +166,4 @@ describe('Header', () => {
       )
     })
   })
-
-  describe('with a challenge collection type', () => {
-    beforeEach(() => {
-      fakeCollection.collection_type = 'challenge'
-      fakeCollection.isChallengeOrInsideChallenge = true
-      props.uiStore.viewingRecord = fakeCollection
-      props.uiStore.shouldRenderFixedHeader = true
-      render()
-    })
-
-    it('should render the ChallengeFixedHeader', () => {
-      expect(wrapper.find('ChallengeFixedHeader').exists()).toBe(true)
-    })
-  })
 })

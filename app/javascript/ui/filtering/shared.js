@@ -14,7 +14,12 @@ const color = tagName => {
   return allQualityColors[tagName.toLowerCase()]
 }
 
-export const filtersToTags = ({ filters, onSelect, onDelete } = {}) => {
+export const filtersToTags = ({
+  filters,
+  onSelect,
+  onDelete,
+  disabled,
+} = {}) => {
   return filters.map(filter => {
     const tag = {
       id: filter.id,
@@ -24,6 +29,7 @@ export const filtersToTags = ({ filters, onSelect, onDelete } = {}) => {
       symbol: filterSymbol(filter),
       color: color(filter.text),
       selectable: true,
+      disabled,
       selected: filter.selected,
     }
     tag.onDelete = () => onDelete && onDelete(tag)

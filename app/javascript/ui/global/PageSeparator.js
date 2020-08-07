@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const StyledHr = styled.div`
-  background-color: ${v.colors.black};
+  background-color: ${props => props.theme.fontColor || v.colors.black};
   display: block;
   flex-grow: 1;
   height: 1px;
@@ -13,7 +13,7 @@ const StyledHr = styled.div`
 `
 
 const TitleHolder = styled.div`
-  background: ${v.colors.commonLight};
+  background: transparent;
   flex-grow: 1;
   flex-shrink: 0;
 

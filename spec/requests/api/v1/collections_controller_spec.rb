@@ -351,7 +351,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   describe 'POST #create_template' do
     let(:organization) { create(:organization) }
     let(:template) { create(:collection, master_template: true, organization: organization) }
-    let(:to_collection) { create(:collection, organization: organization) }
+    let(:to_collection) do
+      create(
+        :collection,
+        organization: organization,
+        num_columns: 4,
+      )
+    end
     let(:path) { '/api/v1/collections/create_template' }
     let(:placement) { 'beginning' }
     let(:raw_params) do
@@ -1147,6 +1153,28 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
           omit_id: collection.id,
         ).and_return([])
         get(path)
+        expect(response.status).to eq(200)
+      end
+    end
+  end
+
+  describe 'POST #collection_challenge_setup' do
+    let(:collection) { create(:collection) }
+    let(:path) { "/api/v1/collections/#{collection.id}/collection_challenge_setup" }
+
+    context 'without edit access' do
+      it 'returns a 401' do
+        post(path)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with edit access' do
+      let(:collection) { create(:collection, add_editors: [user]) }
+
+      it 'should call CollectionChallengeSetup' do
+        expect(CollectionChallengeSetup).to receive(:call)
+        post(path)
         expect(response.status).to eq(200)
       end
     end

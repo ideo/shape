@@ -624,6 +624,32 @@ class ApiStore extends jsonapi(datxCollection) {
     return this.request(`organizations/${orgId}/admin_users`, 'GET')
   }
 
+  async createSubmission(parent_id, submissionSettings) {
+    const { routingStore, uiStore } = this
+    const { type, template } = submissionSettings
+    if (type === 'template' && template) {
+      const templateData = {
+        template_id: template.id,
+        parent_id,
+        placement: 'beginning',
+      }
+      uiStore.update('isLoading', true)
+      const res = await this.createTemplateInstance({
+        data: templateData,
+        template,
+        inSubmissionBox: true,
+      })
+      uiStore.update('isLoading', false)
+      routingStore.routeTo('collections', res.data.id)
+    } else {
+      uiStore.openBlankContentTool({
+        order: 0,
+        collectionId: parent_id,
+        blankType: type,
+      })
+    }
+  }
+
   async createTemplateInstance({ data, template, inSubmissionBox = false }) {
     const result = await this.request(
       'collections/create_template',

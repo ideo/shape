@@ -490,7 +490,6 @@ export const fakeCollection = {
   refetch: jest.fn(),
   initializeTags: jest.fn(),
   reloadDataItemsDatasets: jest.fn().mockReturnValue(Promise.resolve({})),
-  createSubmission: jest.fn(),
   checkCurrentOrg: jest.fn(),
   confirmEdit: jest.fn(),
   updateScrollBottom: jest.fn(),
@@ -582,7 +581,6 @@ export const fakeUserAttrs = {
   API_updateSurveyRespondent: jest.fn(),
   API_hideHelper: jest.fn().mockReturnValue(Promise.resolve({})),
   API_updateUseTemplateSetting: jest.fn().mockReturnValue(Promise.resolve({})),
-  API_fetchAllReviewableSubmissions: jest.fn().mockReturnValue(Promise.resolve([])),
   notify_through_email: true,
   show_move_modal: false,
 }

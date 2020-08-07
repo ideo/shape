@@ -95,6 +95,27 @@ RSpec.describe CollectionTemplateBuilder, type: :service do
       end
     end
 
+    context 'with no row/col' do
+      let(:parent) do
+        create(
+          :board_collection,
+          organization: organization,
+          add_viewers: [viewer],
+          num_cards: 2,
+        )
+      end
+      let(:placement) { nil }
+
+      it 'should place the collection in the parent collection in last row' do
+        instance
+        parent.reload
+        card = parent.collection_cards.last
+        expect(card.record).to eq instance
+        expect(card.row).to eq 2
+        expect(card.col).to eq 1
+      end
+    end
+
     context 'with hardcoded cover settings on the template' do
       before do
         template.update(

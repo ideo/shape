@@ -67,6 +67,11 @@ const StyledAvatar = styled(MuiAvatar)`
   }
 `
 
+/*
+ * An avatar with an small, circular image, mainly used to show users and groups
+ *
+ * @component
+ */
 @observer
 class Avatar extends React.Component {
   @observable
@@ -138,14 +143,35 @@ class Avatar extends React.Component {
 }
 
 export const AvatarPropTypes = {
+  /**
+   * The title or text for the avatar, mainly appears in the tooltip
+   */
   title: PropTypes.string,
+  /** The url for the image of the avatar */
   url: PropTypes.string,
+  /** The size of the avatar in px */
   size: PropTypes.number,
+  /** Any classnames for the component */
   className: PropTypes.string,
+  /** Whether to display the title in a tooltip or not */
   displayName: PropTypes.bool,
+  /**
+   * A collection ID that will be used to route to on click. If not passed
+   * through, clicking the avatar will do nothing.
+   */
   linkToCollectionId: PropTypes.string,
+  /**
+   * Whether the avatar should include responsive behavior such as adjusting
+   * it's size when mobile.
+   */
   responsive: PropTypes.bool,
+  /**
+   * If the avatar is clickable and has the clickable cursor behavior
+   */
   clickable: PropTypes.bool,
+  /**
+   * Adds a colored border to the avatar if a valid hex code is passed through
+   */
   color: PropTypes.string,
 }
 

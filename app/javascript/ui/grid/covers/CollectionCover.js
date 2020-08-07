@@ -280,8 +280,15 @@ class CollectionCover extends React.Component {
 
   get challengeReviewButton() {
     const { collection } = this.props
-    const { submission_reviewer_status, isCurrentUserAReviewer } = collection
-    if (!isCurrentUserAReviewer || !submission_reviewer_status) {
+    const {
+      submission_reviewer_status,
+      canBeReviewedByCurrentUser,
+    } = collection
+    if (
+      (!canBeReviewedByCurrentUser &&
+        submission_reviewer_status !== 'completed') ||
+      !submission_reviewer_status
+    ) {
       return null
     }
     return (

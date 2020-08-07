@@ -69,7 +69,7 @@ class Api::V1::SurveyResponsesController < Api::V1::BaseController
   def load_challenge_test_audience
     return unless @collection.live_challenge_submission_test? || @collection.collection_to_test.present?
 
-    test_audience = @collection.lookup_reviewer_audience_for_current_user(current_user)
+    test_audience = @collection.challenge_test_audience_for_user(current_user)
 
     return head(:unprocessable_entity) if test_audience.nil?
 

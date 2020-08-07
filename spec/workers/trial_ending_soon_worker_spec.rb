@@ -16,6 +16,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 7.days.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:has_payment_method) do
@@ -23,6 +24,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: false,
              has_payment_method: true,
              trial_ends_at: 7.days.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:trial_ended_2_days_ago) do
@@ -30,6 +32,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 2.days.ago,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:trial_ends_in_1_day) do
@@ -37,6 +40,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 1.day.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:trial_ends_in_2_days) do
@@ -44,6 +48,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 2.days.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:trial_ends_in_3_days) do
@@ -51,6 +56,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 3.days.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:trial_ends_in_1_week) do
@@ -58,6 +64,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 1.week.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:trial_ends_in_2_weeks) do
@@ -65,6 +72,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 2.weeks.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
     let!(:trial_ends_in_2_weeks_at_freemium_limit) do
@@ -79,6 +87,7 @@ RSpec.describe TrialEndingSoonWorker, type: :worker do
              in_app_billing: true,
              has_payment_method: false,
              trial_ends_at: 3.weeks.from_now,
+             billable: true,
              active_users_count: billable_users_count)
     end
 
