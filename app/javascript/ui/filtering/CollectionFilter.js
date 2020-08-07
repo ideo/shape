@@ -39,7 +39,7 @@ class CollectionFilter extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (!prevProps.hasPreselectedTags && this.props.hasPreselectedTags) {
+    if (prevProps.hasPreselectedTags && !this.props.hasPreselectedTags) {
       const filters = apiStore.findAll('collection_filters')
       if (_.isEmpty(filters)) return
 

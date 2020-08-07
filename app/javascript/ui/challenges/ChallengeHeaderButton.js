@@ -51,9 +51,12 @@ export const ReviewSubmissionsButton = ({ record }) => {
       {...buttonStyleProps}
       colorScheme={v.colors.alert}
       disabled={!submissionBoxPath}
-      onClick={() =>
-        submissionBoxPath && record.routingStore.routeTo(submissionBoxPath)
-      }
+      onClick={() => {
+        if (submissionBoxPath) {
+          record.uiStore.update('preselectUserTag', true)
+          record.routingStore.routeTo(submissionBoxPath)
+        }
+      }}
     >
       {submissionBoxPath ? `Review Submissions` : `No Reviewable Submissions`}
     </Button>
