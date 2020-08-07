@@ -64,6 +64,8 @@ export default class UiStore {
   @observable
   organizationMenuGroupId = null
   @observable
+  preselectUserTag = false
+  @observable
   rolesMenuOpen = null
   @observable
   isCypress = navigator && navigator.userAgent === 'cypress'
@@ -1100,6 +1102,8 @@ export default class UiStore {
         // /shape.space/ideo?manage_group_id=123`
         this.organizationMenuPage = 'editRoles'
         this.organizationMenuGroupId = opts.manage_group_id
+      } else if (opts.filterForUser) {
+        this.preselectUserTag = true
       }
       if (opts.testing_completed) {
         this.alert(

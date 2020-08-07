@@ -1661,6 +1661,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
         'collections',
         nextTest.parent_submission_box.id
       )
+      path += `?filterForUser=true`
     } else if (nextTest.collection_to_test_id) {
       path = this.routingStore.pathTo(
         'collections',
