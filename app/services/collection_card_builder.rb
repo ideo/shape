@@ -11,6 +11,7 @@ class CollectionCardBuilder
     @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
     @parent_collection = parent_collection
+
     if parent_collection.board_collection?
       # Required to satisfy non-null DB constraint
       @params[:order] = 0
@@ -20,6 +21,7 @@ class CollectionCardBuilder
       @params.delete :row
       @params.delete :col
     end
+
     @user = user
     @placeholder = placeholder
     @collection_card = build_collection_card(type.to_s)
