@@ -13,11 +13,14 @@ import { coverTextClamp } from '~/utils/textUtils'
 
 const StyledLinkCover = styled.div`
   background: ${v.colors.commonLight};
-  color: ${v.colors.commonLight};
   cursor: pointer;
   width: 100%;
   height: 100%;
   .inner {
+    &,
+    & h1 {
+      color: ${props => props.fontColor || v.colors.commonLight};
+    }
     box-sizing: border-box;
     height: 100%;
     padding: 20px 20px;
@@ -74,7 +77,7 @@ class LinkItemCover extends React.Component {
   }
 
   render() {
-    const { item, cardHeight, listStyle, uiStore } = this.props
+    const { item, cardHeight, listStyle, fontColor, uiStore } = this.props
     const { url, thumbnail_url } = item
     const { truncatedName, truncatedContent } = coverTextClamp({
       name: item.name,
@@ -83,7 +86,7 @@ class LinkItemCover extends React.Component {
       cardHeight,
     })
     return (
-      <StyledLinkCover>
+      <StyledLinkCover fontColor={fontColor}>
         <StyledImageCover url={thumbnail_url} bgColor={v.colors.black}>
           {!this.isImage && (
             <Flex className="inner" align="center" justify="center">
@@ -105,11 +108,13 @@ class LinkItemCover extends React.Component {
 
 LinkItemCover.propTypes = {
   item: MobxPropTypes.objectOrObservableObject.isRequired,
+  fontColor: PropTypes.string,
   cardHeight: PropTypes.number,
   listStyle: PropTypes.bool,
 }
 
 LinkItemCover.defaultProps = {
+  fontColor: 'inherit',
   cardHeight: 1,
   listStyle: false,
 }

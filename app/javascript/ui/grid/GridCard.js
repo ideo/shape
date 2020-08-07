@@ -312,11 +312,11 @@ class GridCard extends React.Component {
     const isFormTag = ['SELECT', 'OPTION'].includes(ev.target.tagName)
     // cancel for elements matching or inside a .cancelGridClick
     const cancelGridClick =
-      (typeof ev.target.className === 'string' &&
+      (_.isString(ev.target.className) &&
         (ev.target.className.match(/cancelGridClick/) ||
           ev.target.className.match(/selectMenu/) ||
           ev.target.className.match(/CollectionCoverFormButton/))) ||
-      ev.target.closest('.cancelGridClick')
+      (_.isFunction(ev.target.closest) && ev.target.closest('.cancelGridClick'))
     // cancel for links within the card as these should handle their own routing
     const isHref = ev.target.tagName === 'A' && ev.target.href
 

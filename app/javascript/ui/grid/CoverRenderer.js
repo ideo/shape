@@ -87,6 +87,7 @@ class CoverRenderer extends React.Component {
           return (
             <LinkItemCover
               item={record}
+              fontColor={card.font_color}
               cardHeight={card.height}
               dragging={dragging}
             />

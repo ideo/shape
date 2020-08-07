@@ -351,7 +351,13 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   describe 'POST #create_template' do
     let(:organization) { create(:organization) }
     let(:template) { create(:collection, master_template: true, organization: organization) }
-    let(:to_collection) { create(:collection, organization: organization) }
+    let(:to_collection) do
+      create(
+        :collection,
+        organization: organization,
+        num_columns: 4,
+      )
+    end
     let(:path) { '/api/v1/collections/create_template' }
     let(:placement) { 'beginning' }
     let(:raw_params) do

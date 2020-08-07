@@ -455,6 +455,7 @@ class Collection < ApplicationRecord
       c.template = self
       c.master_template = false
     end
+
     # clear out cached submission_attrs
     c.cached_attributes.delete 'submission_attrs'
     c.cloned_from = self
@@ -475,6 +476,11 @@ class Collection < ApplicationRecord
     # return if it didn't work for whatever reason
     c.parent_collection_card = card if card
     return c unless c.save
+
+    # set up the challenge if that's what we're duplicating
+    if collection_type_challenge?
+      CollectionChallengeSetup.call(collection: c, user: for_user)
+    end
 
     c.parent_collection_card.save if c.parent_collection_card.present?
 
@@ -950,12 +956,13 @@ class Collection < ApplicationRecord
     return unless inside_a_challenge? && sub_collection.present? && user&.handle.present?
 
     filter_for_user = sub_collection.collection_filters.tagged_with_user_handle(user.handle).first
+    # create the filter itself (i.e. the checkbox that shows up for everyone)
     filter_for_user ||= sub_collection.collection_filters.create(
       text: user.handle,
       filter_type: :user_tag,
     )
 
-    # Find or create the filter for this user
+    # for the user that was just tagged: create a `selected` user filter (checking the checkbox)
     filter_for_user.user_collection_filters.find_or_create_by(
       user_id: user.id,
     )
@@ -1066,13 +1073,13 @@ class Collection < ApplicationRecord
   end
 
   def challenge_or_inside_challenge?
-    return true if collection_type == 'challenge'
+    return true if collection_type_challenge?
 
     inside_a_challenge?
   end
 
   def challenge_submission_boxes
-    challenge_collection = collection_type == 'challenge' ? self : parent_challenge
+    challenge_collection = collection_type_challenge? ? self : parent_challenge
     challenge_collection.all_child_collections
                         .active
                         .submission_box

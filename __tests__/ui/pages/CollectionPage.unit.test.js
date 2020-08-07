@@ -270,10 +270,6 @@ describe('CollectionPage', () => {
             ...fakeCollection,
             isSearchCollection: true,
           }}
-          uiStore={{
-            ...uiStore,
-            loadedSubmissions: true,
-          }}
         />
       )
       component = wrapper.instance()
@@ -309,10 +305,6 @@ describe('CollectionPage', () => {
             submissions_enabled: true,
             submission_template: { id: '123' },
             submissions_collection,
-          }}
-          uiStore={{
-            ...uiStore,
-            loadedSubmissions: true,
           }}
         />
       )
@@ -353,29 +345,6 @@ describe('CollectionPage', () => {
       expect(
         submissions_collection.API_fetchCardReviewerStatuses
       ).toHaveBeenCalled()
-    })
-  })
-
-  describe('renderPageHeader', () => {
-    beforeEach(() => {
-      wrapper = shallow(
-        <CollectionPage.wrappedComponent
-          {...props}
-          collection={{
-            ...fakeCollection,
-            isSearchCollection: true,
-          }}
-          uiStore={{
-            ...uiStore,
-            loadedSubmissions: true,
-          }}
-        />
-      )
-      component = wrapper.instance()
-    })
-
-    it('should render VisibilitySensor', () => {
-      expect(wrapper.find('VisibilitySensor').exists()).toBeTruthy()
     })
   })
 

@@ -4,7 +4,6 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import { StyledGridCard } from '~/ui/grid/shared'
-import Collection from '~/stores/jsonApi/Collection'
 
 const StyledAddSubmission = styled(StyledGridCard)`
   background: transparent;
@@ -52,9 +51,8 @@ SubmissionButton.displayName = 'SubmissionButton'
 class AddSubmission extends React.Component {
   handleSubmission = ev => {
     ev.preventDefault()
-    const { parent_id, submissionSettings } = this.props
-    //  TODO figure out how to put loading state even when calling this
-    Collection.createSubmission(parent_id, submissionSettings)
+    const { parent_id, submissionSettings, apiStore } = this.props
+    apiStore.createSubmission(parent_id, submissionSettings)
   }
 
   renderInner = () => {
@@ -121,9 +119,10 @@ AddSubmission.defaultProps = {
 
 AddSubmission.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 // give a name to the injected component for unit tests
-AddSubmission.displayName = 'AddSubmissionHOC'
+AddSubmission.displayName = 'AddSubmission'
 
 export default AddSubmission

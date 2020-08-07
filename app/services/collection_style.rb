@@ -1,3 +1,4 @@
+# Allows collection to have a background and font color, potentially inherited from a parent collection
 class CollectionStyle < SimpleService
   def initialize(collection)
     @collection = collection

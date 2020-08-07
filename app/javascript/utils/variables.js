@@ -322,14 +322,14 @@ export default {
     commentMentions: 255,
     commentHeader: 252,
     activityLog: 251,
-    // NOTE: if globalHeader is > pageHeader
-    // then it will also be above the EditableName ClickWrapper
     cardDragging: 222,
+    zoomControls: 222,
+    // NOTE: globalHeader contains the breadcrumb menu,
+    // so it needs to be above the pageHeader
     globalHeader: 221,
     pageHeader: 220,
     popoutMenu: 201,
     scrollIndicator: 200,
-    zoomControls: 199,
     cardHovering: 160,
     gridCardTop: 151,
     gridCard: 150,

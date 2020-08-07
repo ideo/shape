@@ -23,6 +23,10 @@ class CollectionCardsAddRemoveTagWorker
     parent_collection = collection_cards.first.parent
     parent_collection.touch
     # Notify other people collection has updated
+    if type.to_sym == :user_tag_list
+      # for user tags we want to update the submissions collection
+      CollectionUpdateBroadcaster.new(parent_collection).collection_updated
+    end
     user = User.find_by_id(user_id)
     CollectionUpdateBroadcaster.new(parent_collection, user).cards_updated(
       collection_card_ids,

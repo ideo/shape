@@ -24,7 +24,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   def show
     check_getting_started_shell
     include = Collection.default_relationships_for_api
-    if @collection.collection_type == 'challenge'
+    if @collection.collection_type_challenge?
       include.concat Collection.default_relationships_for_challenge
     end
     render_collection(
@@ -80,7 +80,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   end
 
   def collection_challenge_setup
-    CollectionChallengeSetup.call(collection: @collection, current_user: current_user)
+    CollectionChallengeSetup.call(collection: @collection, user: current_user)
     @collection.reload
     render_collection
   end

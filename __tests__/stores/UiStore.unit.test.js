@@ -406,10 +406,17 @@ describe('UiStore', () => {
     })
 
     describe('#setBodyBackgroundImage', () => {
-      it('should set the style on document.body', () => {
+      it('should set the background style on document.body', () => {
         const img = 'http://img.url/123'
         uiStore.setBodyBackgroundImage(img)
         expect(document.body.style['background-image']).toEqual(`url(${img})`)
+      })
+    })
+
+    describe('#setBodyFontColor', () => {
+      it('should set the color style on document.body', () => {
+        uiStore.setBodyFontColor('blue')
+        expect(document.body.style.color).toEqual('blue')
       })
     })
   })
