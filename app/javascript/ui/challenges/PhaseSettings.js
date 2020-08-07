@@ -10,6 +10,7 @@ import TextButton from '~/ui/global/TextButton'
 import PhaseCollectionRow, {
   PhaseCollectionWithoutTemplateRow,
 } from '~/ui/challenges/PhaseCollectionRow'
+import InfoIcon from '~/ui/icons/InfoIcon'
 import v from '~/utils/variables'
 
 const Phases = styled.div`
@@ -105,6 +106,7 @@ const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
       {_.isEmpty(submissionBoxesWithPhases) && (
         <PhaseCollectionWithoutTemplateRow
           message={'Please create a submission box in order to add Phases.'}
+          icon={<InfoIcon />}
         />
       )}
       {submissionBoxesWithPhases.map(submissionBox => (

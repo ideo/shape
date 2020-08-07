@@ -57,15 +57,35 @@ PhaseCollectionThumbnail.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export const PhaseCollectionWithoutTemplateRow = ({ message }) => {
+const IconWrapper = styled.span`
+  position: relative;
+  top: 2px;
+  right: 4px;
+  color: ${v.colors.commonMedium};
+  > .icon {
+    width: 16px;
+  }
+`
+
+export const PhaseCollectionWithoutTemplateRow = ({ message, icon }) => {
   return (
     <PhaseRow data-cy="ChallengeSettings-Phase">
-      <SmallHelperText color={v.colors.black}>{message}</SmallHelperText>
+      <span>
+        {icon && <IconWrapper>{icon}</IconWrapper>}
+        <SmallHelperText color={v.colors.commonMedium}>
+          {message}
+        </SmallHelperText>
+      </span>
     </PhaseRow>
   )
 }
 PhaseCollectionWithoutTemplateRow.propTypes = {
   message: PropTypes.string.isRequired,
+  icon: PropTypes.node,
+}
+
+PhaseCollectionWithoutTemplateRow.defaultProps = {
+  icon: null,
 }
 
 const PhaseCollectionRow = ({
