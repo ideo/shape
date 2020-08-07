@@ -505,6 +505,19 @@ describe Collection, type: :model do
       end
     end
 
+    context 'with a challenge' do
+      let(:collection) { create(:collection, :challenge) }
+
+      it 'sets up the duplicate challenge properly' do
+        allow(CollectionChallengeSetup).to receive(:call)
+        # should preserve type
+        expect(duplicate.collection_type_challenge?).to be true
+        expect(CollectionChallengeSetup).to have_received(:call).with(
+          collection: duplicate, user: user,
+        )
+      end
+    end
+
     context 'with a subcollection inside the system-generated getting started collection' do
       let(:parent_collection) { create(:global_collection, organization: organization) }
       let!(:subcollection) { create(:collection, num_cards: 2, parent_collection: collection, organization: organization) }

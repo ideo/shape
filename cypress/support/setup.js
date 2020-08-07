@@ -11,11 +11,17 @@ import './commands'
 
 const createNamedRoutes = () => {
   cy.server()
-  // internal API routes
+  // users
   cy.route('GET', '/api/v1/users/me').as('apiGetCurrentUser')
   cy.route('DELETE', '/api/v1/sessions').as('apiLogout')
+  cy.route('POST', '/api/v1/users/create_limited_user').as(
+    'apiCreateLimitedUser'
+  )
 
+  // -- collection cards
   cy.route('POST', '/api/v1/collection_cards').as('apiCreateCollectionCard')
+  // update has to be first so that later matches like collection_cards/move can be more specific
+  cy.route('PATCH', '/api/v1/collection_cards/*').as('apiUpdateCollectionCard')
   cy.route('PATCH', '/api/v1/collection_cards/archive').as(
     'apiArchiveCollectionCards'
   )
@@ -25,23 +31,26 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/collection_cards/*/replace').as(
     'apiReplaceCollectionCard'
   )
-  cy.route('PATCH', '/api/v1/collection_cards/*').as('apiUpdateCollectionCard')
   cy.route('PATCH', '/api/v1/collection_cards/*/toggle_pin').as('apiTogglePin')
-  cy.route('GET', '/api/v1/collections/*').as('apiGetCollection')
   cy.route('GET', '/api/v1/collections/*/collection_cards*').as(
     'apiGetCollectionCards'
   )
+
+  // -- collections
+  cy.route('PATCH', '/api/v1/collections/*').as('apiUpdateCollection')
+  cy.route('GET', '/api/v1/collections/*').as('apiGetCollection')
   cy.route('GET', '/api/v1/collections/*/challenge_phase_collections').as(
     'apiGetChallengePhaseCollections'
   )
-  cy.route('PATCH', '/api/v1/collections/*').as('apiUpdateCollection')
   cy.route('POST', '/api/v1/collections/create_template').as(
     'apiCreateTemplate'
   )
-  cy.route('GET', '/api/v1/test_collections/*').as('apiGetTestCollection')
   cy.route('GET', '/api/v1/collections/*/in_my_collection').as(
     'apiGetInMyCollection'
   )
+
+  // -- test collections
+  cy.route('GET', '/api/v1/test_collections/*').as('apiGetTestCollection')
   cy.route('GET', '/api/v1/test_collections/*/validate_launch').as(
     'apiValidateLaunch'
   )
@@ -49,51 +58,56 @@ const createNamedRoutes = () => {
   cy.route('PATCH', '/api/v1/test_collections/*/close').as('apiCloseTest')
   cy.route('PATCH', '/api/v1/test_collections/*/reopen').as('apiReopenTest')
 
-  cy.route('GET', '/api/v1/items/*').as('apiGetItem')
-  cy.route('PATCH', '/api/v1/items/*').as('apiUpdateItem')
-  cy.route('GET', '/api/v1/items/*/datasets').as('apiGetItemDataset')
-
-  cy.route('POST', '/api/v1/organizations').as('apiCreateOrganization')
-  cy.route('GET', '/api/v1/organizations/*/audiences').as(
-    'apiGetOrganizationAudiences'
-  )
-  cy.route('GET', '/api/v1/groups/*').as('apiGetGroup')
-  cy.route('POST', '/api/v1/groups/**/roles').as('apiInviteUserToGroup')
-  cy.route('DELETE', '/api/v1/groups/**/roles/**').as('apiDeleteGroupRoles')
-
-  cy.route('GET', '/api/v1/comment_threads/find_by_record/Collection/*').as(
-    'apiGetCommentThread'
+  cy.route('PATCH', '/api/v1/test_audiences/*').as('apiUpdateTestAudience')
+  cy.route('PATCH', '/api/v1/test_audiences/*/toggle_status').as(
+    'apiToggleAudienceStatus'
   )
 
+  // -- survey responses
   cy.route('POST', '/api/v1/survey_responses').as('apiCreateSurveyResponse')
   cy.route('POST', '/api/v1/survey_responses/*/question_answers').as(
     'apiCreateQuestionAnswer'
   )
 
-  cy.route('PATCH', '/api/v1/test_audiences/*').as('apiUpdateTestAudience')
-  cy.route('PATCH', '/api/v1/test_audiences/*/toggle_status').as(
-    'apiToggleAudienceStatus'
+  // -- items
+  cy.route('GET', '/api/v1/items/*').as('apiGetItem')
+  cy.route('PATCH', '/api/v1/items/*').as('apiUpdateItem')
+  cy.route('GET', '/api/v1/items/*/datasets').as('apiGetItemDataset')
+
+  // -- orgs
+  cy.route('POST', '/api/v1/organizations').as('apiCreateOrganization')
+  cy.route('GET', '/api/v1/organizations/*/audiences').as(
+    'apiGetOrganizationAudiences'
   )
+
+  // -- groups
+  cy.route('GET', '/api/v1/groups/*').as('apiGetGroup')
+  cy.route('POST', '/api/v1/groups/**/roles').as('apiInviteUserToGroup')
+  cy.route('DELETE', '/api/v1/groups/**/roles/**').as('apiDeleteGroupRoles')
+
+  // -- comment threads
+  cy.route('GET', '/api/v1/comment_threads/find_by_record/Collection/*').as(
+    'apiGetCommentThread'
+  )
+
+  // -- datasets
   cy.route('PATCH', '/api/v1/datasets/*').as('apiUpdateDataset')
 
-  cy.route('POST', '/api/v1/users/create_limited_user').as(
-    'apiCreateLimitedUser'
-  )
-
+  // -- roles
   cy.route('POST', '/api/v1/collections/**/roles').as(
     'apiInviteUserToCollection'
   )
-
   cy.route('GET', '/api/v1/collections/**/roles/**').as('apiGetCollectionRoles')
-
   cy.route('DELETE', '/api/v1/collections/**/roles/**').as(
     'apiDeleteCollectionRoles'
   )
 
+  // -- search
   cy.route('GET', '/api/v1/search/users_and_groups*').as(
     'apiSearchUsersAndGroups'
   )
-  // Admin routes
+
+  // -- admin
   cy.route('GET', '/api/v1/admin/users').as('apiAdminGetUsers')
   cy.route('GET', '/api/v1/admin/test_collections*').as(
     'apiAdminGetTestCollections'

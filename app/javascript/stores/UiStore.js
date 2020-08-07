@@ -687,6 +687,11 @@ export default class UiStore {
     return this.windowWidth && this.windowWidth >= v.responsive.largeBreakpoint
   }
 
+  get isIE() {
+    const isIE11 = !!window.MSInputMethodContext && !!document.documentMode
+    return getTouchDeviceOS() === TOUCH_DEVICE_OS.WINDOWS || isIE11
+  }
+
   get isAndroid() {
     return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
   }

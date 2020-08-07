@@ -91,7 +91,7 @@ class Collection
              through: :collection_cards,
              source: :item
 
-    before_create :set_as_foamcore
+    before_create :set_as_foamcore, if: :collection_type_collection?
 
     private
 
