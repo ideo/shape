@@ -15,6 +15,7 @@ import {
 } from '~/ui/global/styled/typography'
 import { Row, RowItemLeft, RowItemRight } from '~/ui/global/styled/layout'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
+import InfoIcon from '~/ui/icons/InfoIcon'
 import Tooltip from '~/ui/global/Tooltip'
 
 const EditIcon = styled.span`
@@ -87,6 +88,13 @@ PhaseCollectionWithoutTemplateRow.propTypes = {
 PhaseCollectionWithoutTemplateRow.defaultProps = {
   icon: null,
 }
+
+export const ChallengeWithoutSubmissionBoxMessage = () => (
+  <PhaseCollectionWithoutTemplateRow
+    message="Please create a submission box in order to add Phases."
+    icon={<InfoIcon />}
+  />
+)
 
 const PhaseCollectionRow = ({
   collection,
