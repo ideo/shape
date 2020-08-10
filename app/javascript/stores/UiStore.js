@@ -64,6 +64,8 @@ export default class UiStore {
   @observable
   organizationMenuGroupId = null
   @observable
+  preselectUserTag = false
+  @observable
   rolesMenuOpen = null
   @observable
   isCypress = navigator && navigator.userAgent === 'cypress'

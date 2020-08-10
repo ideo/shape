@@ -1084,7 +1084,8 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
   end
 
   describe 'GET #next_available_submission_test' do
-    let(:submission_box) { create(:submission_box, add_editors: [user]) }
+    let(:challenge) { create(:collection, collection_type: 'challenge', add_editors: [user]) }
+    let(:submission_box) { create(:submission_box, parent_collection: challenge, add_editors: [user]) }
     let(:submissions_collection) { create(:submissions_collection, submission_box: submission_box) }
     let(:submission) { create(:collection, :submission, parent_collection: submissions_collection, add_editors: [user]) }
     let(:collection) { submission }

@@ -218,6 +218,7 @@ class CollectionPage extends React.Component {
       this.initializeChallenges()
     }
     uiStore.update('dragTargets', [])
+    uiStore.update('preselectUserTag', false)
   }
 
   restoreWindowScrollPosition() {
@@ -546,6 +547,7 @@ class CollectionPage extends React.Component {
           <CollectionFilter
             collection={submissions_collection}
             canEdit={collection.can_edit_content}
+            hasPreselectedTags={uiStore.preselectUserTag}
             sortable
           />
         </Flex>
