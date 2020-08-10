@@ -1,7 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { Grid } from '@material-ui/core'
-import localStorage from 'mobx-localstorage'
+import Cookies from 'js-cookie'
 import styled from 'styled-components'
 
 import Button from '~/ui/global/Button'
@@ -79,13 +79,15 @@ class CookiesMessage extends React.Component {
       justAccepted: true,
     })
     setTimeout(() => {
-      localStorage.setItem('accepted_cookies', true)
+      Cookies.set('accepted_cookies', true, {
+        expires: 30,
+      })
     }, FADE_OUT_MS)
   }
 
   render() {
     const { justAccepted } = this.state
-    const previouslyAccepted = localStorage.getItem('accepted_cookies')
+    const previouslyAccepted = Cookies.get('accepted_cookies')
     if (previouslyAccepted) return <div />
     return (
       <StyledCookiesMessage justAccepted={justAccepted}>
