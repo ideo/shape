@@ -42,6 +42,9 @@ const createNamedRoutes = () => {
   cy.route('GET', '/api/v1/collections/*/challenge_phase_collections').as(
     'apiGetChallengePhaseCollections'
   )
+  cy.route('GET', '/api/v1/collections/57/phase_sub_collections').as(
+    'apiGetPhaseSubCollections'
+  )
   cy.route('POST', '/api/v1/collections/create_template').as(
     'apiCreateTemplate'
   )
