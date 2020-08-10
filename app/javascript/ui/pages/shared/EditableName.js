@@ -13,7 +13,6 @@ const StyledName = styled.div`
   display: ${props => (props.inline ? 'inline-block' : 'block')};
   margin-top: 0;
   vertical-align: top;
-  color: red;
 
   .editable-name-heading {
     margin-bottom: 0;
@@ -24,7 +23,6 @@ StyledName.displayName = 'StyledName'
 
 const StyledEditableName = styled.div`
   display: block;
-  color: red;
   .input__name {
     margin-top: ${props => props.editingMarginTop};
     input {
