@@ -23,10 +23,10 @@ describe('PhaseSettings', () => {
       rerender()
     })
 
-    it('renders PhaseCollectionWithoutTemplateRow with prompt', () => {
+    it('renders ChallengeWithoutSubmissionBoxMessage', () => {
       expect(
-        wrapper.find('PhaseCollectionWithoutTemplateRow').props().message
-      ).toContain('Please create a submission box in order to add Phases.')
+        wrapper.find('ChallengeWithoutSubmissionBoxMessage').exists()
+      ).toBe(true)
     })
   })
   describe('with submission box and phases', () => {

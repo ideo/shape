@@ -1593,10 +1593,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
 
     const { apiStore } = this
-    return apiStore.request(
+    const res = await apiStore.request(
       `collections/${this.id}/collection_challenge_setup`,
       'POST'
     )
+    // need to set parentChallenge as "this"
+    this.initializeParentChallengeForCollection()
+    return res
   }
 
   API_clearCollectionCover() {

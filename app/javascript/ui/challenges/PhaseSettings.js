@@ -51,30 +51,20 @@ const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
     setEditingPhaseCollectionId(phaseCollection.id)
   }
 
-  const renderPhaseRowsForItem = submissionBox => {
-    if (!submissionBox || !submissionBox.submission_box_type) return null
-
-    const message = `Phases can not be added to a ${submissionBox.submission_box_type} item. Change this submission box to
-    use a submission template in the 'Submission Settings' tab above if you
-    want to add phases.`
-    return <PhaseCollectionWithoutTemplateRow message={message} />
-  }
-
   const renderPhaseRowsForTemplate = submissionBox => {
     const { phaseSubCollections } = submissionBox
-    const phaseRows = phaseSubCollections.map(phase => (
-      <PhaseCollectionRow
-        collection={phase}
-        showEdit={editingPhaseCollectionId === phase.id}
-        onDoneEditing={() => setEditingPhaseCollectionId(null)}
-        closeModal={closeModal}
-        key={phase.id}
-      />
-    ))
 
     return (
       <Fragment>
-        {phaseRows}
+        {phaseSubCollections.map(phase => (
+          <PhaseCollectionRow
+            collection={phase}
+            showEdit={editingPhaseCollectionId === phase.id}
+            onDoneEditing={() => setEditingPhaseCollectionId(null)}
+            closeModal={closeModal}
+            key={phase.id}
+          />
+        ))}
         <TextButton
           color={v.colors.black}
           fontSizeEm={0.75}
@@ -89,10 +79,13 @@ const PhaseSettings = ({ collection, submissionBoxes, closeModal }) => {
   }
 
   const renderPhaseRows = submissionBox => {
-    const { submissionFormat } = submissionBox
+    const { submissionFormat, submission_box_type } = submissionBox
 
     if (submissionFormat === 'item') {
-      return renderPhaseRowsForItem(submissionBox)
+      const message = `Phases can not be added to a ${submission_box_type} item. Change this submission box to
+      use a submission template in the 'Submission Settings' tab above if you
+      want to add phases.`
+      return <PhaseCollectionWithoutTemplateRow message={message} />
     } else if (submissionFormat === 'template') {
       return renderPhaseRowsForTemplate(submissionBox)
     }
