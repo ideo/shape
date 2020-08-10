@@ -1,8 +1,9 @@
+import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
-import { Checkbox } from '~/ui/global/styled/forms'
+import Checkbox from '~/ui/forms/Checkbox'
 import { DisplayText } from '~/ui/global/styled/typography'
 import { tagColor } from '~/ui/pages/shared/StyledReactTags'
 import v from '~/utils/variables'
@@ -51,7 +52,11 @@ const SymbolHolder = styled.span`
   height: ${props => props.symbolSize || 16}px;
   margin-right: ${props => (props.selectable ? 6 : 12)}px;
 `
-
+/*
+ * A modular box that can list pieces of data like tags.
+ *
+ * @component
+ */
 const Pill = props => {
   const {
     label,
@@ -61,6 +66,7 @@ const Pill = props => {
     symbol,
     symbolSize,
     onDelete,
+    disabled,
   } = props.tag || props
   let { deleteIcon } = props.tag || props
   if (props.tag && !props.tag.deleteIcon) {
@@ -84,6 +90,7 @@ const Pill = props => {
             onSelect(props.tag || props)
           }}
           value="yes"
+          disabled={disabled}
         />
       )}
       {symbol && (
@@ -102,15 +109,50 @@ const Pill = props => {
 }
 
 Pill.propTypes = {
+  /** The text to put into the pill */
   label: PropTypes.string,
+  /**
+   * A graphic symbol in put to the left side of the text on the pill which can
+   * be an svg or something else
+   */
   symbol: PropTypes.node,
+  /** The size of the symbol in px */
   symbolSize: PropTypes.number,
+  /**
+   * A function to call when the close / delete icon is clicked. Passing this
+   * prop will also render a default close icon on the pill
+   */
   onDelete: PropTypes.func,
+  /**
+   * An override for the default close icon for deleting the Pill
+   */
   deleteIcon: PropTypes.node,
+  /**
+   * A tag with all the same props as this component. This is used when we have
+   * a 3rd party library using the Pill that has it's own structure for the
+   * component that gets passed to pill.
+   */
   tag: PropTypes.object,
+  /**
+   * If the pill is possible to select, passing true will render a checkbox to
+   * the left size of the pill text.
+   */
   selectable: PropTypes.bool,
+  /**
+   * Keeps the state if the pill is selected, should only be used if `selectable`
+   * is being used
+   */
   selected: PropTypes.bool,
+  /**
+   * Whether the pill has disabled styling
+   */
+  disabled: PropTypes.bool,
+  /**
+   * The function to call when the select checkbox is clicked, should only be
+   * used if `selectable` is being used
+   */
   onSelect: PropTypes.func,
+  /** A unique ID for the Pill, used to uniquely identify it */
   id: PropTypes.string,
 }
 
@@ -123,6 +165,7 @@ Pill.defaultProps = {
   tag: null,
   selectable: false,
   selected: false,
+  disabled: false,
   onSelect: null,
   id: null,
 }

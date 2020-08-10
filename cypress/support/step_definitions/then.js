@@ -1,4 +1,5 @@
 /* global Then */
+import { hexToRgb } from '~/utils/hexToRgba'
 
 Then('I should see a collection card named {string}', name => {
   cy.locateWith('CollectionCover', name)
@@ -7,15 +8,18 @@ Then('I should see a collection card named {string}', name => {
 })
 
 Then(
-  'I should see a collection card title {string} with a subtitle {string}',
-  (title, subtitle) => {
+  'I should see a collection card title {string} with a subtitle {string} and color {string}',
+  (title, subtitle, hex) => {
     cy.locateDataOrClass('CollectionCover').within(cover => {
       cy.contains(title)
         .last()
         .should('be.visible')
+        // hex color gets converted to rgb when applied
+        .and('have.css', 'color', hexToRgb(hex))
       cy.contains(subtitle)
         .last()
         .should('be.visible')
+        .and('have.css', 'color', hexToRgb(hex))
     })
   }
 )

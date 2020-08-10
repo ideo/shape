@@ -30,6 +30,10 @@ class CollectionTypeSelector extends React.Component {
     const { collection } = this.props
     await collection.API_selectCollectionType(collectionType)
 
+    if (collectionType === 'challenge') {
+      await collection.API_collectionChallengeSetup()
+    }
+
     // TODO: Do we want error handling?
     // If so, I think this needs a try/catch block?
     this.hidePopoutMenu()

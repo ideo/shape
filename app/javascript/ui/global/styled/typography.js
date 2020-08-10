@@ -1,17 +1,9 @@
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
-// allow responsive styling to be disabled based on viewingCollection
-import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
-const onFoamcoreBoard = () => {
-  // Disable responsive CSS on foamcore because cards will already zoom + scale
-  const collection = uiStore.viewingCollection
-  return collection && collection.isBoard
-}
-
 export const Heading1TypographyCss = css`
-  color: ${props => props.theme.titleColor || v.colors.black};
+  color: ${props => props.theme.fontColor || v.colors.black};
   font-family: ${v.fonts.sans};
   font-size: 1.75rem;
   font-weight: ${v.weights.book};
@@ -20,7 +12,7 @@ export const Heading1TypographyCss = css`
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !onFoamcoreBoard() &&
+      props.theme.useResponsiveText &&
       `
       font-size: 1.5rem;
       line-height: 1.75rem;
@@ -37,7 +29,9 @@ const Heading1Css = css`
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     /* Allow us not to have responsive behavior */
     ${props =>
-      props.notResponsive || onFoamcoreBoard() ? '' : 'padding: 1rem 0;'};
+      props.notResponsive || !props.theme.useResponsiveText
+        ? ''
+        : 'padding: 1rem 0;'};
   }
 `
 /** @component */
@@ -66,7 +60,6 @@ export const Heading3 = styled.h3`
   font-size: 0.9375rem;
   font-weight: ${v.weights.medium};
   letter-spacing: 0.0625rem;
-  color: ${props => props.color || v.colors.black};
 `
 Heading3.displayName = 'StyledHeading3'
 
@@ -78,7 +71,7 @@ export const LargerH3 = styled(Heading3)`
 LargerH3.displayName = 'StyledLargerH3'
 
 export const DisplayTextCss = css`
-  color: ${props => props.color || v.colors.black};
+  color: ${props => props.color || 'inherit'};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
   font-size: 1rem;
@@ -246,7 +239,7 @@ export const CardHeadingCss = css`
   @media only screen and (min-width: ${v.responsive
       .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !onFoamcoreBoard() &&
+      props.theme.useResponsiveText &&
       `
       padding: 0;
     `}
@@ -283,7 +276,7 @@ export const HugeNumber = styled(Heading1)`
 
   @media only screen and (max-width: ${v.responsive.largeBreakpoint}px) {
     ${props =>
-      !onFoamcoreBoard() &&
+      props.theme.useResponsiveText &&
       `
         font-size: 4rem;
         line-height: 3rem;
@@ -294,12 +287,10 @@ export const HugeNumber = styled(Heading1)`
 export const QuillStyleWrapper = styled.div`
   height: 100%;
 
-  ${props =>
-    props.hasTitleText &&
-    props.theme.titleColor &&
-    `
-    color: ${props.theme.titleColor};
-  `}
+  color: ${props =>
+    props.hasTitleText && props.theme.fontColor
+      ? props.theme.fontColor
+      : v.colors.black};
 
   .quill {
     height: 100%;
@@ -325,12 +316,11 @@ export const QuillStyleWrapper = styled.div`
 
     .ql-size-huge {
       ${Heading1TypographyCss};
-      /* always use black as opposed to props.theme.titleColor */
-      color: ${v.colors.black};
+      /* color depends on whether it is inside a textItem that hasTitleText or not */
+      color: inherit;
     }
 
     h5 {
-      color: ${props => props.theme.titleColor || v.colors.black};
       font-size: 4rem;
       font-weight: 700;
       letter-spacing: -0.5px;

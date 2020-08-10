@@ -52,6 +52,15 @@ FactoryBot.define do
       end
     end
 
+    trait :challenge do
+      collection_type { :challenge }
+      after(:create) do |collection|
+        # set up the challenge groups
+        user = collection.created_by
+        CollectionChallengeSetup.call(collection: collection, current_user: user)
+      end
+    end
+
     trait :with_submissions_collection do
       after(:create, &:setup_submissions_collection!)
     end

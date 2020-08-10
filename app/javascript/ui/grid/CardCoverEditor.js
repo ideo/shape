@@ -1,17 +1,19 @@
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 import { Fragment } from 'react'
+import { Flex, Box } from 'reflexbox'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, action, runInAction, toJS } from 'mobx'
 import styled from 'styled-components'
-import { CompactPicker } from 'react-color'
+import TextareaAutosize from 'react-autosize-textarea'
 
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Modal from '~/ui/global/modals/Modal'
 import QuickOptionSelector from '~/ui/global/QuickOptionSelector'
+import FontColorSelector from '~/ui/global/FontColorSelector'
 import CollectionIconSelector from '~/ui/grid/CollectionIconSelector'
 import InlineLoader from '~/ui/layout/InlineLoader'
-import ColorPickerIcon from '~/ui/icons/ColorPickerIcon'
 import SingleCrossIcon from '~/ui/icons/SingleCrossIcon'
 import UploadIcon from '~/ui/icons/UploadIcon'
 import XIcon from '~/ui/icons/XIcon'
@@ -20,9 +22,7 @@ import v, { ITEM_TYPES } from '~/utils/variables'
 // circular dependency issue
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import EditPencilIconLarge from '~/ui/icons/EditPencilIconLarge'
-import TextareaAutosize from 'react-autosize-textarea'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
-import PropTypes from 'prop-types'
 import CheckboxWithLabel from '~/ui/global/CheckboxWithLabel'
 import CollectionIcon from '~/ui/icons/CollectionIcon'
 import parseURLMeta from '~/utils/parseURLMeta'
@@ -47,14 +47,10 @@ const linkBackgroundOption = {
   title: 'black',
   color: v.colors.black,
 }
-const pickColorOption = {
-  type: 'color',
-  title: 'font color',
-  icon: <ColorPickerIcon />,
-}
 
 const StyledEditTitle = styled.div`
   display: flex;
+  max-width: 94%;
   h3 {
     flex: 1;
     margin-right: 10px;
@@ -65,7 +61,6 @@ const StyledEditTitle = styled.div`
   div {
     flex: 3 1 auto;
     border-bottom: 1px solid ${v.colors.black};
-    max-width: 316px;
     textarea {
       width: 100%;
       background: transparent;
@@ -86,6 +81,11 @@ StyledEditTitle.displayName = 'StyledEditTitle'
 export const MediumBreak = styled.div`
   display: block;
   margin-bottom: 0.75rem;
+`
+
+const BigBreak = styled.div`
+  display: block;
+  margin-bottom: 1.5rem;
 `
 
 const filterOptions = [
@@ -116,8 +116,6 @@ class CardCoverEditor extends React.Component {
   hardcodedSubtitle = '' // overrides cover text set by text items
   @observable
   subtitleHidden = false
-  @observable
-  fontColorPickerOpen = false
 
   constructor(props) {
     super(props)
@@ -204,24 +202,37 @@ class CardCoverEditor extends React.Component {
         imageUrl: url,
       }))
     }
-    return this.imageBaseOptions('cover')
+    return this.imageBaseOptions(record.sortedCoverCards)
   }
 
   get backgroundImageBaseOptions() {
-    // TODO: if background_image_url is set, but the card comes from above??
-    return this.imageBaseOptions('background')
+    const { record } = this
+    const { backgroundImageUrl, sortedBackgroundCards } = record
+    if (_.isEmpty(sortedBackgroundCards) && backgroundImageUrl) {
+      let imageUrl = backgroundImageUrl
+      if (_.includes(imageUrl, 'cdn.filestackcontent.com')) {
+        const handle = _.last(imageUrl.split('/'))
+        imageUrl = FilestackUpload.imageUrl({
+          handle,
+          filestackOpts: { resize: { width: 128 } },
+        })
+      }
+      return [
+        {
+          title: 'inherited background',
+          imageUrl,
+        },
+      ]
+    }
+    return this.imageBaseOptions(sortedBackgroundCards)
   }
 
-  imageBaseOptions(type = 'cover') {
-    const { record } = this
+  imageBaseOptions(imageCards) {
     if (!this.recordIsCollection) {
       return []
     }
-    const collection = record
-    const sortMethod =
-      type === 'cover' ? 'sortedCoverCards' : 'sortedBackgroundCards'
     return _.take(
-      collection[sortMethod].map(card => ({
+      imageCards.map(card => ({
         cardId: card.id,
         title: card.record.name,
         imageUrl: card.record.imageUrl({ resize: { width: 128 } }),
@@ -363,7 +374,6 @@ class CardCoverEditor extends React.Component {
   setObservableInputs = () => {
     const { record } = this
     const { name } = record
-    this.fontColorPickerOpen = false
     this.cardTitle = name || record.url
     if (record.isCollection) {
       this.hardcodedSubtitle = record.subtitleForEditing
@@ -448,42 +458,30 @@ class CardCoverEditor extends React.Component {
     record.save()
   }
 
-  get titleFontOptions() {
-    const { fontColor } = this.record
-    const options = [{ ...removeOption, title: 'reset font color' }]
-    if (fontColor) {
-      options.push({
-        // clicking this will also open the picker
-        type: 'color',
-        title: 'current color',
-        color: fontColor,
-      })
-    }
-    options.push(pickColorOption)
-    return options
-  }
-
-  @action
-  onTitleFontOptionSelect = opt => {
-    if (opt.type === 'color') {
-      // toggle picker
-      this.fontColorPickerOpen = !this.fontColorPickerOpen
-    } else if (opt.type === 'remove') {
-      this.fontColorPickerOpen = false
-      this.onSelectTitleFontColor({ hex: null })
-    }
-  }
-
   @action
   onSelectTitleFontColor = ({ hex }) => {
     const { record } = this
     // set immediately to reflect in UI
     record.collection_style.font_color = hex
-    this.saveFontColor(hex)
+    this.saveFontColor('record', hex)
   }
 
-  _saveFontColor = hex => {
-    this.record.patch({ cancel_sync: true, attributes: { font_color: hex } })
+  @action
+  onSelectCoverFontColor = ({ hex }) => {
+    const { card } = this.props
+    // set immediately to reflect in UI
+    card.font_color = hex
+    this.saveFontColor('card', hex)
+  }
+
+  _saveFontColor = (type, hex) => {
+    let obj
+    if (type === 'record') {
+      obj = this.record
+    } else {
+      obj = this.props.card
+    }
+    obj.patch({ cancel_sync: true, attributes: { font_color: hex } })
   }
 
   onTogglePropagate = field => ev => {
@@ -546,7 +544,8 @@ class CardCoverEditor extends React.Component {
   }
 
   renderInner() {
-    const { record, recordIsCollection, fontColorPickerOpen, loading } = this
+    const { card } = this.props
+    const { record, recordIsCollection, loading } = this
 
     if (loading) {
       return (
@@ -559,22 +558,69 @@ class CardCoverEditor extends React.Component {
       )
     }
 
-    return (
-      <div data-cy="EditCoverOptions">
-        <div>
-          <StyledEditTitle>
-            <h3>Title</h3>
-            {this.renderEditTitleInput()}
-          </StyledEditTitle>
-          <MediumBreak />
-          <h3>Cover</h3>
-          <QuickOptionSelector
-            options={toJS(this.coverImageOptions)}
-            onSelect={this.onImageOptionSelect}
-          />
+    // the right column is only needed for collection settings
+    const leftColumnWidth = recordIsCollection ? [1, 0.425] : 1
 
+    return (
+      <div>
+        <StyledEditTitle>
+          <h3>Title</h3>
+          {this.renderEditTitleInput()}
+        </StyledEditTitle>
+        <BigBreak />
+        <Flex wrap w={1} data-cy="EditCoverOptions">
+          <Box w={leftColumnWidth}>
+            <h3>Cover Image</h3>
+            <QuickOptionSelector
+              options={toJS(this.coverImageOptions)}
+              onSelect={this.onImageOptionSelect}
+            />
+
+            <MediumBreak />
+            <h3>Cover Effects</h3>
+            {this.showFilters && (
+              <QuickOptionSelector
+                options={filterOptions}
+                onSelect={this.onFilterOptionSelect}
+              />
+            )}
+
+            <MediumBreak />
+            <h3>Cover Font Color</h3>
+            <FontColorSelector
+              fontColor={card.font_color}
+              defaultFontColor={v.colors.white}
+              onSelect={this.onSelectCoverFontColor}
+            />
+
+            {(recordIsCollection || record.isLink) && (
+              <Fragment>
+                <MediumBreak />
+                <h3>Subtitle</h3>
+                <StyledEditTitle>
+                  {this.renderEditSubtitleInput()}
+                </StyledEditTitle>
+
+                <CheckboxWithLabel
+                  onChange={this.onToggleSubtitleCheckbox}
+                  checked={this.subtitleHidden}
+                  label="Hide subtitle"
+                />
+                <br />
+                {record.isLink && (
+                  <NamedActionButton
+                    noPadding
+                    marginBottom={20}
+                    onClick={this.handleRestore}
+                  >
+                    Restore
+                  </NamedActionButton>
+                )}
+              </Fragment>
+            )}
+          </Box>
           {recordIsCollection && (
-            <Fragment>
+            <Box w={[1, 0.425]} ml={[0, 64]}>
               <MediumBreak />
               <h3>Background Image</h3>
               <QuickOptionSelector
@@ -586,79 +632,30 @@ class CardCoverEditor extends React.Component {
                 checked={record.propagate_background_image}
                 label="Apply to all nested collections"
               />
-            </Fragment>
-          )}
 
-          {recordIsCollection && (
-            <Fragment>
               <MediumBreak />
-              <h3>Title Font Color</h3>
-              <QuickOptionSelector
-                options={this.titleFontOptions}
-                onSelect={this.onTitleFontOptionSelect}
+              <h3>Font Color</h3>
+              <FontColorSelector
+                fontColor={record.fontColor}
+                defaultFontColor={v.colors.black}
+                onSelect={this.onSelectTitleFontColor}
+                onTogglePropagate={this.onTogglePropagate('font_color')}
+                propagate={record.propagate_font_color}
               />
-              {fontColorPickerOpen && (
-                <Fragment>
-                  <CompactPicker
-                    color={record.fontColor || v.colors.black}
-                    onChangeComplete={this.onSelectTitleFontColor}
-                  />
-                  <MediumBreak />
-                </Fragment>
-              )}
+              <MediumBreak />
+              <h3>Icon</h3>
+              <CollectionIconSelector
+                selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
+                onSelectIcon={this.onCustomIconSelect}
+              />
               <CheckboxWithLabel
-                onChange={this.onTogglePropagate('font_color')}
-                checked={record.propagate_font_color}
-                label="Apply to all nested collections"
+                onChange={this.onToggleShowIconOnCoverCheckbox}
+                checked={record.show_icon_on_cover}
+                label="Show icon on cover"
               />
-            </Fragment>
+            </Box>
           )}
-
-          <MediumBreak />
-          <h3>Icon</h3>
-          <CollectionIconSelector
-            selectedIcon={<CollectionIcon type={record.icon} size="lg" />}
-            onSelectIcon={this.onCustomIconSelect}
-          />
-          <CheckboxWithLabel
-            onChange={this.onToggleShowIconOnCoverCheckbox}
-            checked={record.show_icon_on_cover}
-            label="Show icon on cover"
-          />
-          <MediumBreak />
-          <h3>Cover Effects</h3>
-          {this.showFilters && (
-            <QuickOptionSelector
-              options={filterOptions}
-              onSelect={this.onFilterOptionSelect}
-            />
-          )}
-          <MediumBreak />
-          {(record.isCollection || record.isLink) && (
-            <div>
-              <h3>Subtitle</h3>
-              <StyledEditTitle>
-                {this.renderEditSubtitleInput()}
-              </StyledEditTitle>
-
-              <CheckboxWithLabel
-                onChange={this.onToggleSubtitleCheckbox}
-                checked={this.subtitleHidden}
-                label="Hide subtitle"
-              />
-              <br />
-              {record.isLink && (
-                <NamedActionButton
-                  noPadding
-                  marginBottom={20}
-                  onClick={this.handleRestore}
-                >
-                  Restore
-                </NamedActionButton>
-              )}
-            </div>
-          )}
-        </div>
+        </Flex>
       </div>
     )
   }
@@ -667,14 +664,14 @@ class CardCoverEditor extends React.Component {
     const { recordIsCollection } = this
     const { isEditingCardCover, pageMenu } = this.props
 
-    const modalTitle = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
+    const title = `${recordIsCollection ? 'Collection' : 'Cover'} Settings`
     return (
       <Fragment>
         {!pageMenu && (
           <CardActionHolder
             active={this.isEditingCardCover}
             className="show-on-hover"
-            tooltipText="edit cover"
+            tooltipText={`edit ${_.lowerCase(title)}`}
             role="button"
             onClick={this.handleClick}
           >
@@ -682,7 +679,7 @@ class CardCoverEditor extends React.Component {
           </CardActionHolder>
         )}
         {isEditingCardCover && (
-          <Modal open onClose={this.handleClose} title={modalTitle}>
+          <Modal open onClose={this.handleClose} title={title}>
             {this.renderInner()}
           </Modal>
         )}

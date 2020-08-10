@@ -521,6 +521,7 @@ class CollectionCard < ApplicationRecord
       errors.add(:base, 'Board position is invalid')
       return false
     end
+
     return true if CollectionGrid::Calculator.exact_open_spot?(card: self, collection: parent)
 
     errors.add(:base, 'Board position is already taken')

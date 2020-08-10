@@ -998,10 +998,10 @@ class CollectionGrid extends React.Component {
   }
 
   render() {
-    const { uiStore, collection } = this.props
+    const { uiStore } = this.props
     const { gridSettings } = uiStore
     const { rows } = this
-    if (uiStore.isLoading || collection.reloading) return <Loader />
+    if (uiStore.isLoading) return <Loader />
 
     const minHeight = rows * (gridSettings.gridH + gridSettings.gutter)
 

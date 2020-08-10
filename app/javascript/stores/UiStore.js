@@ -81,7 +81,7 @@ export default class UiStore {
   @observable
   submissionBoxSettingsOpen = null
   @observable
-  loadedSubmissions = false
+  loadingSubmissions = false
   @observable
   adminUsersMenuOpen = null
   @observable
@@ -687,6 +687,11 @@ export default class UiStore {
     return this.windowWidth && this.windowWidth >= v.responsive.largeBreakpoint
   }
 
+  get isIE() {
+    const isIE11 = !!window.MSInputMethodContext && !!document.documentMode
+    return getTouchDeviceOS() === TOUCH_DEVICE_OS.WINDOWS || isIE11
+  }
+
   get isAndroid() {
     return getTouchDeviceOS() === TOUCH_DEVICE_OS.ANDROID
   }
@@ -908,7 +913,11 @@ export default class UiStore {
       this.viewingRecord.internalType === record.internalType
     )
       return
-    if (this.viewingRecord) this.previousViewingRecord = this.viewingRecord
+    if (this.viewingRecord) {
+      this.previousViewingRecord = this.viewingRecord
+      // clear out previous collaborators
+      this.previousViewingRecord.setCollaborators([])
+    }
     this.viewingRecord = record
     this.deselectCards()
   }
@@ -943,6 +952,12 @@ export default class UiStore {
         'background-image': null,
       })
     }
+  }
+
+  setBodyFontColor(color = null) {
+    _.assign(document.body.style, {
+      color,
+    })
   }
 
   @action
@@ -1410,9 +1425,9 @@ export default class UiStore {
 
   scrollToCenter(direction) {
     const middleY = window.innerHeight / 2 + window.scrollY * 2
+    // TODO: you don't always want to scroll down to the "middle"
+    // -- also "middle" really depends more on rows of cards vs. window.innerHeight
     const middleX = window.innerWidth / 2
-    console.log({ middleX, middleY })
-    // window.scrollTo(middleX, middleY)
     window.scrollTo({
       top: middleY,
       left: middleX,
@@ -1515,10 +1530,18 @@ export default class UiStore {
   // Foamcore zoom functions
   zoomOut() {
     this.updateZoomLevel(this.zoomLevel + 1)
+    setTimeout(() => {
+      window.scrollTo({
+        top: window.pageYOffset / 2,
+      })
+    }, 1)
   }
 
   zoomIn() {
     this.updateZoomLevel(this.zoomLevel - 1)
+    setTimeout(() => {
+      this.scrollToCenter()
+    }, 1)
   }
 
   @action

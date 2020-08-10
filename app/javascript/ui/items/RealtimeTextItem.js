@@ -693,7 +693,8 @@ class RealtimeTextItem extends React.Component {
   }
 
   render() {
-    const { item, onExpand, fullPageView, containerRef } = this.props
+    const { item, uiStore, onExpand, fullPageView, containerRef } = this.props
+    const { textEditingItemHasTitleText } = uiStore
     const { canEdit } = this.state
     // item is not fully loaded yet, e.g. from a CommentThread
     if (!item.quill_data) {
@@ -760,7 +761,10 @@ class RealtimeTextItem extends React.Component {
             size={fullPageView ? 'lg' : 'sm'}
           />
         </DockedToolbar>
-        <QuillStyleWrapper fullPageView={fullPageView}>
+        <QuillStyleWrapper
+          hasTitleText={textEditingItemHasTitleText}
+          fullPageView={fullPageView}
+        >
           <ReactQuill
             {...quillProps}
             defaultValue={this.quillData}

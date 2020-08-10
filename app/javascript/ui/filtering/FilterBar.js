@@ -2,7 +2,7 @@ import _ from 'lodash'
 import ReactDOM from 'react-dom'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import { Box, Flex } from 'reflexbox'
 import styled from 'styled-components'
 
@@ -20,13 +20,15 @@ export const FilterIconHolder = styled.div`
 `
 FilterIconHolder.displayName = 'FilterIconHolder'
 
+@inject('uiStore')
 @observer
 class FilterBar extends React.Component {
   get formattedPills() {
-    const { onSelect, filters } = this.props
+    const { onSelect, filters, uiStore } = this.props
     return filtersToTags({
       filters,
       onSelect,
+      disabled: uiStore.isLoading,
     })
   }
 
@@ -92,6 +94,12 @@ FilterBar.propTypes = {
 FilterBar.defaultProps = {
   hideTotalResults: false,
   showIcon: false,
+}
+
+FilterBar.displayName = 'FilterBar'
+
+FilterBar.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default FilterBar

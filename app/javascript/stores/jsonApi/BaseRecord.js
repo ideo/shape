@@ -95,7 +95,7 @@ class BaseRecord extends jsonapi(Model) {
   }
 
   refetch() {
-    this.apiStore.fetch(this.internalType, this.id, true)
+    return this.apiStore.fetch(this.internalType, this.id, true)
   }
 
   async create(extraPath = '') {

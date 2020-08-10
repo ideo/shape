@@ -63,12 +63,9 @@ class TestsController < ApplicationController
   end
 
   def lookup_challenge_test_audience
-    return unless user_signed_in? && current_user.present?
+    return unless user_signed_in?
 
-    challenge_test_audience = @collection.lookup_reviewer_audience_for_current_user(current_user)
-
-    # tests will share the same submission template reviewer test audience
-    @test_audience = challenge_test_audience
+    @test_audience = @collection.challenge_test_audience_for_user(current_user)
   end
 
   def redirect_to_test

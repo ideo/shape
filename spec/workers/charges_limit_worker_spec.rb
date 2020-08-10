@@ -25,6 +25,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::LOW + 1,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: false)
@@ -34,6 +35,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::LOW + 1,
+             billable: true,
              sent_high_charges_low_email: true,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: false)
@@ -43,6 +45,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::MIDDLE + 1,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: false)
@@ -52,6 +55,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::MIDDLE + 1,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: true,
              sent_high_charges_high_email: false)
@@ -61,6 +65,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::HIGH,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: false)
@@ -70,6 +75,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::HIGH,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: true)
@@ -79,6 +85,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::HIGH * 2,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: false)
@@ -88,6 +95,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::HIGH * 2,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: true)
@@ -97,6 +105,7 @@ RSpec.describe ChargesLimitWorker, type: :worker do
       create(:organization,
              in_app_billing: true,
              active_users_count: ChargesLimitWorker::LOW - 1,
+             billable: true,
              sent_high_charges_low_email: false,
              sent_high_charges_middle_email: false,
              sent_high_charges_high_email: false)

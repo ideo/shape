@@ -192,6 +192,7 @@ class BillingInformation extends React.Component {
       currentUserOrganization: {
         in_app_billing,
         active_users_count,
+        billable,
         current_billing_period_end,
         current_billing_period_start,
         is_within_trial_period,
@@ -221,8 +222,7 @@ class BillingInformation extends React.Component {
     const isOrgWithinFreemiumLimit =
       !is_within_trial_period && active_users_count <= FREEMIUM_USER_LIMIT
 
-    const currentMonthlyRate =
-      billableUserCount > 0 ? billableUserCount * price_per_user : 0
+    const currentMonthlyRate = billable ? billableUserCount * price_per_user : 0
 
     const activePeopleDesc = `
       Shape bills based on the number of people who are active within the organization

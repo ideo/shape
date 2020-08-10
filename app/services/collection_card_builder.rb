@@ -11,6 +11,7 @@ class CollectionCardBuilder
     @datasets_params = params.try(:[], :item_attributes).try(:[], :datasets_attributes)
     @params = params
     @parent_collection = parent_collection
+
     if parent_collection.board_collection?
       # Required to satisfy non-null DB constraint
       @params[:order] = 0
@@ -20,6 +21,7 @@ class CollectionCardBuilder
       @params.delete :row
       @params.delete :col
     end
+
     @user = user
     @placeholder = placeholder
     @collection_card = build_collection_card(type.to_s)
@@ -112,7 +114,8 @@ class CollectionCardBuilder
       @collection_card.id = @placeholder.id
     end
 
-    return if @collection_card.board_placement_is_valid?
+    # Don't place hidden cards on board => setting row/col for them messes up other card positions
+    return if @collection_card.hidden?
 
     # first capture these, row/col are allowed to be nil for BoardPlacement
     row = @collection_card.row
@@ -125,12 +128,16 @@ class CollectionCardBuilder
     @collection_card.height ||= 1
     @collection_card.width ||= 1
     # valid row/col will get applied to the card here for later saving
+
     CollectionGrid::BoardPlacement.call(
       row: row,
       col: col,
       to_collection: @parent_collection,
       moving_cards: [@collection_card],
     )
+
+    # This adds validation errors if there are any
+    @collection_card.board_placement_is_valid?
   end
 
   def post_creation_record_update
