@@ -1409,7 +1409,7 @@ export default class UiStore {
   }
 
   scrollToCenter(direction) {
-    const middleY = window.innerHeight / 2 + window.scrollY
+    const middleY = window.innerHeight / 2 + window.scrollY * 2
     const middleX = window.innerWidth / 2
     console.log({ middleX, middleY })
     // window.scrollTo(middleX, middleY)
