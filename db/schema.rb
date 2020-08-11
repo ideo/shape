@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_31_212721) do
+ActiveRecord::Schema.define(version: 2020_08_11_165028) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
@@ -110,9 +110,9 @@ ActiveRecord::Schema.define(version: 2020_07_31_212721) do
   end
 
   create_table "collection_cards", force: :cascade do |t|
-    t.integer "order", null: false
-    t.integer "width"
-    t.integer "height"
+    t.integer "order"
+    t.integer "width", default: 1
+    t.integer "height", default: 1
     t.bigint "parent_id"
     t.bigint "collection_id"
     t.bigint "item_id"
@@ -209,7 +209,7 @@ ActiveRecord::Schema.define(version: 2020_07_31_212721) do
     t.integer "survey_response_id"
     t.string "search_term"
     t.integer "collection_type", default: 0
-    t.integer "num_columns"
+    t.integer "num_columns", default: 4
     t.datetime "start_date"
     t.datetime "end_date"
     t.integer "challenge_admin_group_id"

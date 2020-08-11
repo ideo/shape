@@ -10,13 +10,13 @@
 #  filter            :integer          default("transparent_gray")
 #  font_background   :boolean          default(FALSE)
 #  font_color        :string
-#  height            :integer
+#  height            :integer          default(1)
 #  hidden            :boolean          default(FALSE)
 #  identifier        :string
 #  image_contain     :boolean          default(FALSE)
 #  is_background     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
-#  order             :integer          not null
+#  order             :integer
 #  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
@@ -24,7 +24,7 @@
 #  show_replace      :boolean          default(TRUE)
 #  type              :string
 #  unarchived_at     :datetime
-#  width             :integer
+#  width             :integer          default(1)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  collection_id     :bigint(8)
