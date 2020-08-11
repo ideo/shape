@@ -286,6 +286,7 @@ module CollectionGrid
       last_card = collection
                   .collection_cards
                   .ordered
+                  .visible
                   .reject { |card| card.row.nil? || card.col.nil? }
                   .last
 
