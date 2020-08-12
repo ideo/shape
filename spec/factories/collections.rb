@@ -67,6 +67,8 @@ FactoryBot.define do
 
     factory :test_results_collection, class: Collection::TestResultsCollection
     factory :test_collection, class: Collection::TestCollection do
+      num_columns nil
+
       transient do
         record_type :question
         num_responses 1
@@ -174,16 +176,25 @@ FactoryBot.define do
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
-        1.upto(evaluator.num_cards) do |i|
+        evaluator.num_cards.times do |i|
           card_type = :"collection_card_#{evaluator.record_type}"
+          order = nil
+          col = nil
+          row = nil
+          if collection.board_collection?
+            col = i % collection.num_columns
+            row = (i / collection.num_columns).floor
+          else
+            order = i
+          end
           cc = build(
             card_type,
             parent: collection,
-            order: (i - 1),
             width: 1,
             height: 1,
-            col: 0,
-            row: i,
+            order: order,
+            col: col,
+            row: row,
             pinned: evaluator.pin_cards,
           )
           # e.g. primary_collection_cards or link_collection_cards

@@ -74,7 +74,7 @@ class CollectionCard < ApplicationRecord
   after_save :set_collection_as_master_template,
              if: :test_collection_within_master_template_after_save?
 
-  validates :parent, :order, presence: true
+  validates :parent, presence: true
   validate :single_item_or_collection_is_present
   validate :parent_is_not_readonly, on: :create
   validates :section_type, presence: true, if: :parent_test_collection?
@@ -237,7 +237,9 @@ class CollectionCard < ApplicationRecord
 
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb! unless shallow || link?
-    cc.increment_card_orders! if placement != 'end' && placeholder.nil?
+    if placement != 'end' && placeholder.nil? && !parent.board_collection?
+      cc.increment_card_orders!
+    end
 
     # if we are duplicating a submission box template,
     # the cloned template should be marked as the clone's submission_template
@@ -324,6 +326,10 @@ class CollectionCard < ApplicationRecord
     pinned? && !master_template_card?
   end
 
+  def unpinned?
+    !pinned?
+  end
+
   def bct_placeholder?
     is_a?(CollectionCard::Placeholder) && parent_snapshot.present?
   end
@@ -343,6 +349,8 @@ class CollectionCard < ApplicationRecord
   # - Defaults to use this card's order
   # - Useful when inserting a new card to increment card order after this card
   def increment_card_orders!(starting_at_order = order)
+    return if parent.board_collection?
+
     greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards
@@ -360,6 +368,8 @@ class CollectionCard < ApplicationRecord
   # - Defaults to use this card's order
   # - Useful when removing a card from the collection
   def decrement_card_orders!(starting_at_order = order)
+    return if parent.board_collection?
+
     greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards
@@ -404,7 +414,7 @@ class CollectionCard < ApplicationRecord
 
   # gets called by child STI classes
   def after_archive_card
-    decrement_card_orders!
+    decrement_card_orders! unless parent.board_collection?
     update_parent_card_count!
     cover = parent.cached_cover
     if cover && cover['card_ids'].include?(id)
@@ -458,7 +468,12 @@ class CollectionCard < ApplicationRecord
       (cover['image_url'].blank? && media_card?) ||
       cover['card_ids'].include?(id) ||
       cover['card_order'].nil? ||
-      order <= cover['card_order']
+      card_order <= cover['card_order']
+      # ^^^ TODO: remove notion of card_order, as it's not applicable
+  end
+
+  def card_order
+    order || (row * 1000 + col)
   end
 
   def text_card?
@@ -569,7 +584,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def assign_order?
-    order.blank? && parent.present?
+    order.blank? && parent.present? && !parent.board_collection?
   end
 
   def assign_order

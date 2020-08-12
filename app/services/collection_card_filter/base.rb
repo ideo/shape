@@ -82,6 +82,8 @@ module CollectionCardFilter
             cards_scope: cards_scope,
             user: @user,
           )
+        else
+          @cards = @cards.select(*fields)
         end
       elsif @filters[:q].present?
         where_clause = {

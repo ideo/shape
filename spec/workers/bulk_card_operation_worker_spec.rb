@@ -5,7 +5,7 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
   let(:from_collection) { create(:collection, num_cards: 3) }
   let(:to_collection) { create(:collection, num_cards: 1) }
   let(:cards) { CollectionCard.where(id: from_collection.collection_cards.pluck(:id)) }
-  let(:placement) { 'beginning' }
+  let(:placement) { Mashie.new(row: 3, col: 2) }
   let(:action) { 'duplicate' }
 
   let(:placeholder) do
@@ -47,7 +47,7 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         expect(CollectionCardDuplicator).to receive(:call).with(
           to_collection: to_collection,
           cards: cards,
-          placement: placeholder.order,
+          placement: placement,
           for_user: user,
         )
         subject
@@ -61,7 +61,7 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         expect(CardMover).to receive(:call).with(
           to_collection: to_collection,
           cards: cards,
-          placement: placeholder.order,
+          placement: placement,
           from_collection: from_collection,
           card_action: 'move',
         )
@@ -72,19 +72,21 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         let(:to_collection) { create(:board_collection, num_cards: 1) }
 
         context 'without row/col placement' do
+          let(:placement) { nil }
+
           it 'should return false for BulkCardOperationProcessor' do
             expect(placeholder).to eq false
           end
         end
 
         context 'with row/col placement' do
-          let(:placement) { Hashie::Mash.new(row: 2, col: 3) }
+          let(:placement) { Mashie.new(row: 2, col: 3) }
 
           it 'should call CardMover with move action' do
             expect(CardMover).to receive(:call).with(
               to_collection: to_collection,
               cards: cards,
-              placement: { 'row' => 2, 'col' => 3 },
+              placement: placement,
               from_collection: from_collection,
               card_action: 'move',
             )
@@ -101,7 +103,7 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         expect(CardMover).to receive(:call).with(
           to_collection: to_collection,
           cards: cards,
-          placement: placeholder.order,
+          placement: placement,
           from_collection: from_collection,
           card_action: 'link',
         )
@@ -116,7 +118,7 @@ RSpec.describe BulkCardOperationWorker, type: :worker do
         expect(CardMover).to receive(:call).with(
           to_collection: to_collection,
           cards: cards,
-          placement: placeholder.order,
+          placement: placement,
           from_collection: from_collection,
           card_action: 'move',
         ).and_return(false)

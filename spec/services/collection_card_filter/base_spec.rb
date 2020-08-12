@@ -22,11 +22,16 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
         expect(subject).to match_array(visible_cards)
       end
 
-      context 'regular collection' do
+      context 'non-board collection' do
         let!(:filters) do
           {
             page: 2,
           }
+        end
+
+        before do
+          # e.g. a test collection
+          collection.update(num_columns: nil)
         end
 
         it 'filters by given page/per_page' do
@@ -157,6 +162,9 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
               col: cc.col,
             }
           end
+          binding.pry
+          subject
+
           expect(subject).to match_array(data)
         end
       end

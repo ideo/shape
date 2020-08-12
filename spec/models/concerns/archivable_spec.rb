@@ -113,11 +113,11 @@ describe Archivable, type: :concern do
       end
 
       it 'will retain its original place in the collection' do
-        expect(parent.collection_cards.map(&:order)).to match_array([0, 1, 2, 3])
+        expect(parent.collection_cards.pluck(:row, :col)).to match_array([[0, 0], [0, 1], [0, 2], [1, 1]])
         collection.archive!
-        expect(parent.reload.collection_cards.map(&:order)).to match_array([0, 1, 2])
+        expect(parent.reload.collection_cards.pluck(:row, :col)).to match_array([[0, 0], [0, 1], [0, 2]])
         collection.unarchive!
-        expect(parent.reload.collection_cards.map(&:order)).to match_array([0, 1, 2, 3])
+        expect(parent.collection_cards.pluck(:row, :col)).to match_array([[0, 0], [0, 1], [0, 2], [1, 1]])
       end
 
       it 'will unarchive related items' do

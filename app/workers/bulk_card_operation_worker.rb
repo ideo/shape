@@ -32,15 +32,13 @@ class BulkCardOperationWorker
   end
 
   def common_params
-    if @to_collection.board_collection?
-      placement = { 'row' => @placeholder.row, 'col' => @placeholder.col }
-    else
-      placement = @placeholder.order
-    end
     {
       to_collection: @to_collection,
       cards: @cards,
-      placement: placement,
+      placement: Hashie::Mash.new(
+        row: @placeholder.row,
+        col: @placeholder.col,
+      ),
     }
   end
 

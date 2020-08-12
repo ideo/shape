@@ -99,7 +99,7 @@ class Item
       parent_collection ||= parent
       builder = CollectionCardBuilder.new(
         params: {
-          order: parent_collection_card.order + 1,
+          order: parent_collection_card.order.to_i + 1,
           width: 1,
           height: 2,
           item_attributes: {

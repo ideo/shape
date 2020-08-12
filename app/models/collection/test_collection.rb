@@ -437,6 +437,7 @@ class Collection
     end
 
     def setup_default_status_and_questions
+      self.num_columns = nil
       order = -1
 
       self.class

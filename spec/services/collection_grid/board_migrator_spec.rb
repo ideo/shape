@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CollectionGrid::BoardMigrator, type: :service do
-  let(:collection) { create(:collection, num_cards: 3) }
+  let(:collection) { create(:collection, num_columns: nil, num_cards: 3) }
   let(:cards) { collection.collection_cards }
 
   subject do
@@ -39,7 +39,7 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
     end
 
     context 'with subcollections' do
-      let!(:subcollections) { create_list(:collection, 2, num_cards: 2, parent_collection: collection) }
+      let!(:subcollections) { create_list(:collection, 2, num_columns: nil, num_cards: 2, parent_collection: collection) }
 
       it 'migrates all subcollections as well' do
         subject.call
@@ -52,8 +52,8 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
       end
 
       context 'with a collection that\'s already a board collection' do
-        let(:collection) { create(:collection, num_columns: 4) }
-        let!(:subcollections) { create_list(:collection, 2, num_cards: 2, parent_collection: collection) }
+        let(:collection) { create(:board_collection) }
+        let!(:subcollections) { create_list(:collection, 2, num_columns: nil, num_cards: 2, parent_collection: collection) }
 
         it 'skips migration on parent but still runs on subcollections' do
           allow(CollectionGrid::Calculator).to receive(:calculate_rows_cols).and_call_original
