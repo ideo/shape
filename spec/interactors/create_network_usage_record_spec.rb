@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe CreateNetworkUsageRecord, type: :service do
-  let(:organization) { create(:organization_without_groups) }
+  let(:billable) { true }
+  let(:organization) { create(:organization_without_groups, billable: billable) }
   let(:billable_users_count) { 10 }
   subject(:context) do
     CreateNetworkUsageRecord.call(
@@ -11,8 +12,19 @@ RSpec.describe CreateNetworkUsageRecord, type: :service do
   end
 
   describe '#call' do
-    context 'with billable users' do
-      let(:billable_users_count) { 10 }
+    context 'with billable org' do
+      it 'creates a NetworkApi::UsageRecord' do
+        expect(NetworkApi::UsageRecord).to receive(:create).with(
+          quantity: billable_users_count,
+          timestamp: Time.current.end_of_day.to_i,
+          external_organization_id: organization.id,
+        )
+        expect(context).to be_a_success
+      end
+    end
+
+    context 'with billable org and no billable users' do
+      let(:billable_users_count) { 0 }
 
       it 'creates a NetworkApi::UsageRecord' do
         expect(NetworkApi::UsageRecord).to receive(:create).with(
@@ -24,8 +36,8 @@ RSpec.describe CreateNetworkUsageRecord, type: :service do
       end
     end
 
-    context 'with zero billable users' do
-      let(:billable_users_count) { 0 }
+    context 'with a non-billable org' do
+      let(:billable) { false }
 
       it 'does not create a NetworkApi::UsageRecord' do
         expect(NetworkApi::UsageRecord).not_to receive(:create)

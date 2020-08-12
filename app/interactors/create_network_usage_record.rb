@@ -4,7 +4,7 @@ class CreateNetworkUsageRecord
   delegate_to_context :organization
 
   def call
-    return unless context.billable_users_count.positive?
+    return unless organization.billable?
 
     create_network_usage_record
   end
