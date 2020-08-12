@@ -1215,9 +1215,9 @@ class FoamcoreGrid extends React.Component {
       collection,
       collection: { collection_cards },
     } = this.props
-    const { num_columns } = collection
-
+    const { isFourWideBoard } = collection
     const { relativeZoomLevel } = this
+
     let inner = ''
     const emptyRow =
       !_.some(collection_cards, { row }) &&
@@ -1232,7 +1232,7 @@ class FoamcoreGrid extends React.Component {
           <StyledPlusIcon className="plus-icon">
             <PlusIcon />
           </StyledPlusIcon>
-          {num_columns === 4 && emptyRow && this.renderRightBlankActions(row)}
+          {isFourWideBoard && emptyRow && this.renderRightBlankActions(row)}
         </div>
       )
     } else if (type === 'unrendered') {
@@ -1427,10 +1427,14 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
-    if (canEditCollection && this.placeholderSpot) {
+    const { placeholderSpot } = this
+    if (
+      canEditCollection &&
+      (placeholderSpot.row !== null && placeholderSpot.col !== null)
+    ) {
       cards.push({
         id: 'resize',
-        ...this.placeholderSpot,
+        ...placeholderSpot,
       })
     }
 

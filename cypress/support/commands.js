@@ -64,6 +64,14 @@ Cypress.Commands.add('locateDataOrClassWith', (selector, text) => {
   cy.locateDataOrClass(selector).contains(text)
 })
 
+Cypress.Commands.add('selectCardAt', ({ row, col, value = null } = {}) => {
+  let selector = `[data-cy="GridCard"][data-row="${row}"][data-col="${col}"]`
+  if (value) {
+    selector += ` [data-cy="${value}"]`
+  }
+  return cy.get(selector)
+})
+
 Cypress.Commands.add(
   'createCollection',
   ({ name, collectionType = 'normal', empty = false }) => {
@@ -85,8 +93,6 @@ Cypress.Commands.add(
     if (collectionType === 'searchCollection') {
       cy.selectPopoutTemplateBctType({
         type: 'searchCollection',
-        order: 'first',
-        empty: false,
       })
     } else {
       cy.selectBctType({ type, empty })
@@ -108,7 +114,7 @@ Cypress.Commands.add(
   (cardType, { content = 'Testing', row, col, empty = false } = {}) => {
     switch (cardType) {
       case 'textItem':
-        cy.selectBctType({ type: 'text', order: 'first', row, col, empty })
+        cy.selectBctType({ type: 'text', row, col, empty })
         cy.wait('@apiCreateCollectionCard')
         cy.wait(150)
         cy.get('.ql-editor')
@@ -124,29 +130,21 @@ Cypress.Commands.add(
       case 'data':
         cy.selectPopoutTemplateBctType({
           type: 'report',
-          order: 'first',
-          empty: true,
         })
         break
       case 'submissionBox':
         cy.selectPopoutTemplateBctType({
           type: 'submissionBox',
-          order: 'first',
-          empty: false,
         })
         break
       case 'template':
         cy.selectPopoutTemplateBctType({
           type: 'template',
-          order: 'first',
-          empty: false,
         })
         break
       case 'searchCollection':
         cy.selectPopoutTemplateBctType({
           type: 'searchCollection',
-          order: 'first',
-          empty: false,
         })
         break
       default:
@@ -169,15 +167,14 @@ Cypress.Commands.add('createTextItem', () => {
   cy.wait(50)
 })
 
-Cypress.Commands.add('resizeCard', (pos, size) => {
+Cypress.Commands.add('resizeCard', ({ row, col, size }) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
   const [width, height] = _.map(sizes, Number)
   cy.window()
     .then(win => {
       const collection = win.uiStore.viewingCollection
-      const f = pos === 'last' ? _.last : _.first
-      const card = f(collection.sortedCards)
+      const card = _.find(collection.sortedCards, { row, col })
       collection.API_updateCard({
         card,
         updates: { width, height },
@@ -188,14 +185,14 @@ Cypress.Commands.add('resizeCard', (pos, size) => {
     .wait(1000)
 })
 
-Cypress.Commands.add('reorderFirstTwoCards', () => {
+Cypress.Commands.add('moveFirstCardDown', (row = 1) => {
   cy.window().then(win => {
     const collection = win.uiStore.viewingCollection
     collection._reorderCards()
     const card = _.first(collection.sortedCards)
     collection.API_updateCard({
       card,
-      updates: { order: 1.5 },
+      updates: { row, col: 0 },
       undoMessage: 'Card move undone',
     })
     cy.wait('@apiUpdateCollection')
@@ -211,86 +208,76 @@ Cypress.Commands.add('undo', () => {
   })
 })
 
-Cypress.Commands.add(
-  'selectBctType',
-  ({ type, empty = false, order = 'last', row = null, col = null }) => {
-    if (!empty) {
-      let className = '.StyledHotspot'
-      if (row !== null && col !== null) {
-        className += `-${row}:${col}`
-      }
-      cy.locateDataOrClass(className)
-        [order]()
-        .click({ force: true })
-    }
-    switch (type) {
-      case 'file':
-        cy.wait(1000)
-        break
-      default:
-        break
-    }
-    cy.locate(`BctButton-${type}`)
-      .first()
-      .click({ force: true })
+Cypress.Commands.add('selectBctType', ({ type, row = null, col = null }) => {
+  let className = '.StyledHotspot'
+  if (row !== null && col !== null) {
+    className += `-${row}:${col}`
   }
-)
+  cy.locateDataOrClass(className)
+    .first()
+    .click({ force: true })
+  switch (type) {
+    case 'file':
+      cy.wait(1000)
+      break
+    default:
+      break
+  }
+  cy.locate(`BctButton-${type}`)
+    .first()
+    .click({ force: true })
+})
 
-Cypress.Commands.add(
-  'selectPopoutTemplateBctType',
-  ({ type, empty = false, order = 'last' }) => {
-    if (!empty) {
-      cy.locateDataOrClass('.StyledHotspot')
-        [order]()
+Cypress.Commands.add('selectPopoutTemplateBctType', ({ type }) => {
+  cy.locateDataOrClass('.StyledHotspot')
+    .first()
+    .click({ force: true })
+  cy.locate('BctButton-more')
+    .last()
+    .click({ force: true })
+  cy.wait(100)
+  switch (type) {
+    case 'template':
+      cy.locate('PopoutMenu_createTemplate')
+        .first()
         .click({ force: true })
-    }
-    cy.locate('BctButton-more')
-      .last()
-      .click({ force: true })
-    cy.wait(100)
-    switch (type) {
-      case 'template':
-        cy.locate('PopoutMenu_createTemplate')
-          .first()
-          .click({ force: true })
-        cy.locate('CollectionCreatorTextField')
-          .first()
-          .click()
-          .type('Test Template')
-        break
-      case 'report':
-        cy.locate('PopoutMenu_createReport')
-          .first()
-          .click({ force: true })
-        return
-      case 'searchCollection':
-        cy.locate('PopoutMenu_createSearchCollection')
-          .first()
-          .click({ force: true })
-        return
-      case 'submissionBox':
-        cy.locate('PopoutMenu_createSubmissionBox')
-          .first()
-          .click({ force: true })
-        cy.locate('CollectionCreatorTextField')
-          .first()
-          .click()
-          .type('Submissions')
-        break
-      default:
-        break
-    }
-    cy.locate(`CollectionCreatorFormButton`)
-      .first()
-      .click({ force: true })
-    cy.wait('@apiCreateCollectionCard')
-    if (['searchCollection', 'submissionBox'].includes(type)) {
-      cy.wait('@apiGetCollectionCards')
-    }
-    cy.wait(50)
-    return
+      cy.locate('CollectionCreatorTextField')
+        .first()
+        .click()
+        .type('Test Template')
+      break
+    case 'report':
+      cy.locate('PopoutMenu_createReport')
+        .first()
+        .click({ force: true })
+      return
+    case 'searchCollection':
+      cy.locate('PopoutMenu_createSearchCollection')
+        .first()
+        .click({ force: true })
+      return
+    case 'submissionBox':
+      cy.locate('PopoutMenu_createSubmissionBox')
+        .first()
+        .click({ force: true })
+      cy.locate('CollectionCreatorTextField')
+        .first()
+        .click()
+        .type('Submissions')
+      break
+    default:
+      break
   }
-)
+  cy.locate(`CollectionCreatorFormButton`)
+    .first()
+    .click({ force: true })
+  cy.wait('@apiCreateCollectionCard')
+  if (['searchCollection', 'submissionBox'].includes(type)) {
+    cy.wait('@apiGetCollectionCards')
+  }
+  cy.wait(50)
+  return
+})
 
 Cypress.Commands.add(
   'typeInTextarea',
