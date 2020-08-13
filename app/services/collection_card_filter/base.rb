@@ -72,7 +72,10 @@ module CollectionCardFilter
 
       if @ids_only || @select_ids.present?
         # start with all_collection_cards to unscope the order, and `active` will be applied below
-        @cards = @collection.all_collection_cards.not_placeholder
+        @cards = @collection
+                 .all_collection_cards
+                 .not_placeholder
+                 .ordered
         if @select_ids.present?
           cards_scope = @cards.where(id: @select_ids)
           if @collection.is_a?(Collection::SearchCollection)

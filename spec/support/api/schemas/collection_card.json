@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "parent_id": { "type": "integer" },
-    "order": { "type": "integer" },
+    "order": { "type": ["integer", "null"] },
     "width": { "type": "integer" },
     "height": { "type": "integer" },
     "row": { "type": ["integer", "null"] },

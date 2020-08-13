@@ -135,8 +135,8 @@ const CollectionFilterWrapper = styled.div`
   display: flex;
   position: fixed;
   z-index: ${v.zIndex.zoomControls};
-  top: ${v.headerHeight}px;
-  height: ${props => (props.hasBanner ? 200 : 86)}px;
+  top: ${props => (v.headerHeight + props.hasBanner ? 140 : 0)}px;
+  height: 86px;
   right: 32px;
 `
 

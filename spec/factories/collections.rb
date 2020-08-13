@@ -209,7 +209,7 @@ FactoryBot.define do
         collection.parent_collection_card = build(
           :collection_card,
           parent: parent_collection,
-          order: parent_collection.collection_cards.count,
+          order: parent_collection.board_collection? ? nil : parent_collection.collection_cards.count,
           width: 1,
           height: 1,
           pinned: evaluator.pin_cards,

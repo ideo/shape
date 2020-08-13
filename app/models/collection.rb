@@ -654,7 +654,7 @@ class Collection < ApplicationRecord
       .and(
         table[:col].lteq(cols[1]),
       ),
-    )
+    ).ordered_row_col
   end
 
   # convenience method if card order ever gets out of sync

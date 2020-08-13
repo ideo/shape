@@ -49,14 +49,20 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       expect(json['data'].map { |cc| cc['id'].to_i }).to match_array(collection.collection_card_ids)
     end
 
-    it 'includes pagination info' do
-      get(path)
-      expect(json['links']).to eq({
-        first: 1,
-        last: 1,
-        next: nil,
-        prev: nil,
-      }.as_json)
+    context 'with a non-board collection' do
+      before do
+        collection.update(num_columns: nil)
+      end
+
+      it 'includes pagination info' do
+        get(path)
+        expect(json['links']).to eq({
+          first: 1,
+          last: 1,
+          next: nil,
+          prev: nil,
+        }.as_json)
+      end
     end
 
     context 'with no user session and public collection', auth: false do
@@ -148,6 +154,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
 
     context 'with pagination options' do
+      # only makes sense for non-board
+      let!(:collection) { create(:collection, num_columns: nil, num_cards: 5, add_editors: [user]) }
       let(:path) { "/api/v1/collections/#{collection.id}/collection_cards?per_page=2&page=2" }
 
       before do
@@ -296,7 +304,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     let!(:collection) { create(:board_collection, num_cards: 5, add_editors: [user]) }
     let(:path) { "/api/v1/collections/#{collection.id}/collection_cards/ids_in_direction" }
     let(:direction) { 'bottom' }
-    let(:card_id) { collection.collection_cards.first.id }
+    let(:first_card) { collection.collection_cards.first }
+    let(:card_id) { first_card.id }
     let(:params) do
       {
         direction: direction,
@@ -304,11 +313,17 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
       }
     end
 
+    before do
+      # put these all below
+      collection.collection_cards.where.not(id: card_id).each_with_index do |cc, i|
+        cc.update(row: i + 1, col: 0)
+      end
+    end
+
     it 'returns stringified ids of selected cards at the bottom' do
       get(path, params: params)
       expect(response.status).to eq(200)
       expect(json.length).to eq(5)
-      # FIXME: should be the cards at the bottom
       expect(json).to eq(collection.collection_cards.pluck(:id).map(&:to_s))
     end
   end
@@ -813,9 +828,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
               id: collection.id,
               attributes: {
                 collection_cards_attributes: [
-                  { id: unarchiving_card.id, order: 0, width: 2, height: 1 },
-                  { id: card2.id, order: 1 },
-                  { id: card3.id, order: 2 },
+                  { id: unarchiving_card.id, row: 0, col: 0, width: 2, height: 1 },
+                  { id: card2.id, row: 0, col: 2 },
+                  { id: card3.id, row: 0, col: 3 },
                 ],
               },
             },
@@ -838,7 +853,6 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           # should be mapped to snapshot
           expect(unarchiving_card.active?).to be true
           expect(unarchiving_card.width).to eq 2
-          expect(unarchiving_card.order).to eq 0
           expect(collection.collection_cards.first).to eq unarchiving_card
         end
       end
@@ -915,10 +929,9 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         from_id: from_collection.id,
         to_id: to_collection.id,
         collection_card_ids: moving_cards.map(&:id),
-        placement: 'beginning',
+        placement: 'end',
       }
     end
-    let(:params_at_end) { raw_params.merge(placement: 'end').to_json }
     let(:params) { raw_params.to_json }
 
     context 'with edit access' do
@@ -1100,16 +1113,8 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(unmoved_card.reload.parent_id).to eq from_collection.id
       end
 
-      it 'moves new cards to the front of the collection' do
-        patch(path, params: params)
-        combined_cards = to_collection.reload.collection_cards
-        # expect to find moved cards at the front
-        expect(combined_cards.first(2)).to eq moving_cards
-        expect(combined_cards.count).to eq 5
-      end
-
       it 'moves new cards to the bottom of the collection if placement: end' do
-        patch(path, params: params_at_end)
+        patch(path, params: params)
         combined_cards = to_collection.reload.collection_cards
         # expect to find moved card at the end
         expect(combined_cards.last).to eq moving_cards.last
@@ -1168,7 +1173,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         it 'should call perform_bulk_operation instead of CardMover' do
           expect(CardMover).not_to receive(:new)
           expect(BulkCardOperationProcessor).to receive(:call).with(
-            placement: 'beginning',
+            placement: 'end',
             action: 'move',
             cards: moving_cards,
             to_collection: to_collection,
@@ -1193,7 +1198,7 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         from_id: from_collection.id,
         to_id: to_collection.id,
         collection_card_ids: moving_cards.map(&:id),
-        placement: 'beginning',
+        placement: 'end',
       }
     end
     let(:params) { raw_params.to_json }
@@ -1257,13 +1262,13 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
         post(path, params: params)
         # newly linked cards should link to the original moving_cards' items
-        expect(to_collection.collection_cards.first(2).map(&:item)).to match_array moving_cards.map(&:item)
-        expect(to_collection.collection_cards.first.link?).to be true
+        expect(to_collection.collection_cards.last(2).map(&:item)).to match_array moving_cards.map(&:item)
+        expect(to_collection.collection_cards.last.link?).to be true
       end
 
       it 'broadcasts collection updates' do
         post(path, params: params)
-        card_ids = to_collection.collection_cards.first(2).pluck(:id)
+        card_ids = to_collection.collection_cards.last(2).pluck(:id)
         expect(broadcaster_instance).to have_received(:cards_updated).with(
           array_including(card_ids),
         )
