@@ -109,8 +109,7 @@ RSpec.describe CollectionCardDuplicationWorker, type: :worker do
           to_collection.update(cached_cover: collection.cached_cover)
         end
 
-        it 'reorders and updates cached card count' do
-          expect(CollectionCard).to receive(:import)
+        it 'updates cached card count' do
           expect {
             run_worker
             to_collection.reload

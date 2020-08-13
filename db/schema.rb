@@ -725,7 +725,7 @@ ActiveRecord::Schema.define(version: 2020_08_11_165028) do
     t.integer "status", default: 0
     t.string "invitation_token"
     t.integer "current_user_collection_id"
-    t.boolean "show_helper", default: true
+    t.boolean "show_helper", default: false
     t.string "handle"
     t.boolean "notify_through_email", default: true
     t.jsonb "cached_attributes"

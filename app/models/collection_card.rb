@@ -473,7 +473,7 @@ class CollectionCard < ApplicationRecord
   end
 
   def card_order
-    order || (row * 1000 + col)
+    order || (row.to_i * 1000 + col.to_i)
   end
 
   def text_card?

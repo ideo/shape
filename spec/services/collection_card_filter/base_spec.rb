@@ -162,7 +162,6 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
               col: cc.col,
             }
           end
-          binding.pry
           subject
 
           expect(subject).to match_array(data)

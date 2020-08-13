@@ -136,7 +136,7 @@ const CollectionFilterWrapper = styled.div`
   position: fixed;
   z-index: ${v.zIndex.zoomControls};
   top: ${v.headerHeight}px;
-  height: 86px;
+  height: ${props => (props.hasBanner ? 200 : 86)}px;
   right: 32px;
 `
 
@@ -1550,7 +1550,10 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { collection } = this.props
+    const {
+      collection,
+      apiStore: { currentUser },
+    } = this.props
     const { isSplitLevelBottom } = collection
 
     const gridSize = this.totalGridSize
@@ -1571,7 +1574,9 @@ class FoamcoreGrid extends React.Component {
           />
         )}
         {!isSplitLevelBottom && collection.showFilters && (
-          <CollectionFilterWrapper>
+          <CollectionFilterWrapper
+            hasBanner={currentUser && currentUser.show_helper}
+          >
             <CollectionViewToggle collection={collection} />
             <CollectionFilter
               collection={collection}

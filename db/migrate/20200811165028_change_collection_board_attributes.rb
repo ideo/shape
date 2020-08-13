@@ -6,6 +6,9 @@ class ChangeCollectionBoardAttributes < ActiveRecord::Migration[5.2]
     # resolve some other issues when these are nil
     change_column :collection_cards, :height, :integer, default: 1
     change_column :collection_cards, :width, :integer, default: 1
+
+    # also for new 4wfc helper
+    change_column :users, :show_helper, :boolean, default: false
   end
 
   def self.down
@@ -13,5 +16,6 @@ class ChangeCollectionBoardAttributes < ActiveRecord::Migration[5.2]
     change_column :collection_cards, :order, :integer, null: false
     change_column :collection_cards, :height, :integer, default: nil
     change_column :collection_cards, :width, :integer, default: nil
+    change_column :users, :show_helper, :boolean, default: true
   end
 end

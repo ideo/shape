@@ -502,7 +502,7 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     let(:tagged_user) { create(:user) }
     let!(:collection) { create(:collection, parent_collection: create(:collection), add_editors: [user]) }
     let(:collection_card) do
-      create(:collection_card_text, order: 0, width: 1, parent: collection)
+      create(:collection_card_text, row: 0, col: 0, width: 1, parent: collection)
     end
     let(:path) { "/api/v1/collections/#{collection.id}" }
     let(:raw_params) do
@@ -512,8 +512,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         collection_cards_attributes: [
           {
             id: collection_card.id,
-            order: 1,
-            width: 3,
+            row: 1,
+            col: 1,
+            width: 2,
           },
         ],
       }
@@ -548,9 +549,9 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
         let(:card_attrs) do
           [{
             id: collection_card.id,
-            width: 3,
+            width: 2,
             row: 4,
-            col: 5,
+            col: 1,
           }]
         end
         let(:raw_params) do
@@ -589,11 +590,11 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
     end
 
     it 'updates the collection_card' do
-      expect(collection_card.width).not_to eq(3)
-      expect(collection_card.order).not_to eq(1)
+      expect(collection_card.width).not_to eq(2)
+      expect(collection_card.row).not_to eq(1)
       patch(path, params: params)
-      expect(collection_card.reload.width).to eq(3)
-      expect(collection_card.reload.order).to eq(1)
+      expect(collection_card.reload.width).to eq(2)
+      expect(collection_card.reload.row).to eq(1)
     end
 
     it 'broadcasts collection_updated and parent card_updated' do
