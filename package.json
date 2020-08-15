@@ -152,6 +152,7 @@
     "react-docgen-typescript": "^1.9.1",
     "react-dom": "16.8.6",
     "react-dotdotdot": "^1.2.3",
+    "react-dropzone": "^11.0.3",
     "react-flip-move": "^3.0.3",
     "react-headroom": "^2.2.2",
     "react-helmet": "^5.2.1",

@@ -4,7 +4,18 @@ import styled from 'styled-components'
 
 import v from '~/utils/variables'
 import PlusIcon from '~/ui/icons/PlusIcon'
+import CloudIcon from '~/ui/icons/CloudIcon'
 import { StyledPlusIcon } from '~/ui/grid/FoamcoreGrid'
+import { Heading2 } from '~/ui/global/styled/typography'
+import Dropzone from 'react-dropzone'
+
+const StyledDropzoneHolder = styled.div`
+  position: absolute;
+  height: 20%;
+  top: 38%;
+  left: 28%;
+  color: ${v.colors.secondaryMedium};
+`
 
 const StyledGridCardEmpty = styled.div`
   width: 100%;
@@ -17,8 +28,12 @@ const StyledGridCardEmpty = styled.div`
     .plus-icon {
       display: block;
     }
+    .cloud-icon {
+      display: block;
+    }
   }
-  .plus-icon {
+  .plus-icon,
+  .cloud-icon {
     display: none;
   }
 `
@@ -50,7 +65,7 @@ class GridCardEmptyHotspot extends React.Component {
     this.openBlankContentTool()
   }
 
-  render() {
+  get renderGridCardEmpty() {
     const { visible } = this.props
 
     return (
@@ -64,14 +79,40 @@ class GridCardEmptyHotspot extends React.Component {
       </StyledGridCardEmpty>
     )
   }
+
+  get renderGridCardDropzone() {
+    const { visible } = this.props
+    return (
+      <Dropzone onDrop={acceptedFiles => console.log(acceptedFiles)}>
+        {({ getRootProps, getInputProps }) => (
+          <StyledGridCardEmpty className={visible ? 'visible' : ''}>
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              <StyledDropzoneHolder className="cloud-icon">
+                <CloudIcon />
+                <Heading2 fontSize={'1em'}>Drag & Drop</Heading2>
+              </StyledDropzoneHolder>
+            </div>
+          </StyledGridCardEmpty>
+        )}
+      </Dropzone>
+    )
+  }
+
+  render() {
+    const { uploading } = this.props
+    return uploading ? this.renderGridCardDropzone : this.renderGridCardEmpty
+  }
 }
 
 GridCardEmptyHotspot.propTypes = {
   visible: PropTypes.bool,
   card: MobxPropTypes.objectOrObservableObject.isRequired,
+  uploading: PropTypes.bool,
 }
 GridCardEmptyHotspot.defaultProps = {
   visible: false,
+  uploading: false,
 }
 GridCardEmptyHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

@@ -44,7 +44,7 @@ Heading1.displayName = 'Heading1'
 export const Heading2 = styled.h2`
   text-transform: uppercase;
   font-family: ${v.fonts.sans};
-  font-size: 1.5rem;
+  font-size: ${props => (props.fontSize ? props.fontSize : '1.5rem')};
   font-weight: ${v.weights.medium};
   letter-spacing: 0.14375rem;
   color: ${v.colors.black};
