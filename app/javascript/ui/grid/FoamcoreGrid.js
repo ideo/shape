@@ -14,29 +14,20 @@ import {
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
-import InlineLoader from '~/ui/layout/InlineLoader'
-import PlusIcon from '~/ui/icons/PlusIcon'
-import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
-import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
 import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
 import CollectionFilter from '~/ui/filtering/CollectionFilter'
-import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
+import { isFile } from '~/utils/FilestackUpload'
+import GridCardEmptyHotspot, {
+  CircleIconHolder,
+} from '~/ui/grid/GridCardEmptyHotspot'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
-
-const CircleIconHolder = styled.button`
-  border: 1px solid ${v.colors.secondaryMedium};
-  border-radius: 50%;
-  color: ${v.colors.secondaryMedium};
-  height: 32px;
-  width: 32px;
-`
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
@@ -122,15 +113,6 @@ export const StyledPlusIcon = styled.div`
   color: ${v.colors.secondaryMedium};
 `
 
-const RightBlankActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  right: 12px;
-  top: calc(50% - 36px);
-`
-RightBlankActions.displayName = 'RightBlankActions'
-
 const CollectionFilterWrapper = styled.div`
   display: flex;
   position: fixed;
@@ -180,6 +162,8 @@ class FoamcoreGrid extends React.Component {
   }
   @observable
   disableHorizontalScroll = false
+  @observable
+  uploading = false
 
   placeholderDefaults = {
     row: null,
@@ -1184,31 +1168,6 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  renderRightBlankActions(row) {
-    return (
-      <RightBlankActions>
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title="Remove row"
-          placement="top"
-        >
-          <CircleIconHolder onClick={ev => this.handleRemoveRowClick(ev, row)}>
-            <CircleTrashIcon />
-          </CircleIconHolder>
-        </Tooltip>
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title="Add row"
-          placement="top"
-        >
-          <CircleIconHolder onClick={ev => this.handleInsertRowClick(ev, row)}>
-            <CircleAddRowIcon />
-          </CircleIconHolder>
-        </Tooltip>
-      </RightBlankActions>
-    )
-  }
-
   positionBlank({ row, col, width, height }, type = 'drag') {
     const position = this.positionForCoordinates({ col, row, width, height })
     const {
@@ -1216,28 +1175,11 @@ class FoamcoreGrid extends React.Component {
       collection: { collection_cards },
     } = this.props
     const { num_columns } = collection
-
-    const { relativeZoomLevel } = this
-    let inner = ''
     const emptyRow =
       !_.some(collection_cards, { row }) &&
       !_.some(collection_cards, { row: row - 1, height: 2 })
 
-    if (type === 'hover') {
-      inner = (
-        <div
-          style={{ position: 'relative', height: '100%' }}
-          data-empty-space-click
-        >
-          <StyledPlusIcon className="plus-icon">
-            <PlusIcon />
-          </StyledPlusIcon>
-          {num_columns === 4 && emptyRow && this.renderRightBlankActions(row)}
-        </div>
-      )
-    } else if (type === 'unrendered') {
-      inner = <InlineLoader background={v.colors.commonLightest} />
-    }
+    const { relativeZoomLevel } = this
 
     // could be drag or drag-overflow
     const isDrag = _.includes(type, 'drag')
@@ -1257,7 +1199,17 @@ class FoamcoreGrid extends React.Component {
         data-empty-space-click
         draggedOn
       >
-        {inner}
+        <GridCardEmptyHotspot
+          visible={true}
+          card={this.props.card}
+          uploading={this.uploading}
+          interactionType={type}
+          numColumns={num_columns}
+          emptyRow={emptyRow}
+          handleRemoveRowClick={this.handleRemoveRowClick}
+          handleInsertRowClick={this.handleInsertRowClick}
+          row={row}
+        />
       </BlankCard>
     )
   }
@@ -1304,6 +1256,11 @@ class FoamcoreGrid extends React.Component {
       this.placeholderSpot.height = height
       this.placeholderSpot.type = type
     }
+  }
+
+  @action
+  setUploading = e => {
+    this.uploading = isFile(e)
   }
 
   get blankCardsForEmptySpacesWithinVisibleArea() {
@@ -1559,6 +1516,7 @@ class FoamcoreGrid extends React.Component {
         }}
         width={gridSize.width}
         height={gridSize.height}
+        onDragOver={this.setUploading}
       >
         {!isSplitLevelBottom && this.showZoomControls && (
           <FoamcoreZoomControls

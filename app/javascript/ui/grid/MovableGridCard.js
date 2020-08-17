@@ -297,14 +297,19 @@ class MovableGridCard extends React.Component {
     </PositionedGridCard>
   )
 
-  renderEmpty = () => (
-    <PositionedGridCard {...this.styleProps()} transition={cardCSSTransition}>
-      <GridCardEmptyHotspot
-        visible={this.props.card.visible}
-        card={this.props.card}
-      />
-    </PositionedGridCard>
-  )
+  renderEmpty = () => {
+    const { uploading } = this.props
+    console.log({ uploading })
+    return (
+      <PositionedGridCard {...this.styleProps()} transition={cardCSSTransition}>
+        <GridCardEmptyHotspot
+          visible={true}
+          card={this.props.card}
+          uploading={uploading}
+        />
+      </PositionedGridCard>
+    )
+  }
 
   renderPagination = () => {
     const { loadCollectionCards } = this.props
@@ -717,6 +722,7 @@ MovableGridCard.propTypes = {
   horizontalScroll: PropTypes.bool,
   showHotEdge: PropTypes.bool,
   searchResult: PropTypes.bool,
+  uploading: PropTypes.bool,
 }
 
 MovableGridCard.defaultProps = {
@@ -736,6 +742,7 @@ MovableGridCard.defaultProps = {
     y: 0,
   },
   searchResult: false,
+  uploading: false,
 }
 
 export default MovableGridCard
