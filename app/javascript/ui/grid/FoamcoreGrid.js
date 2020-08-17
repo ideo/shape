@@ -103,16 +103,6 @@ const Grid = styled.div`
   min-height: ${props => `${props.height}px`};
 `
 
-export const StyledPlusIcon = styled.div`
-  position: absolute;
-  /* TODO: better styling than this? */
-  width: 20%;
-  height: 20%;
-  top: 38%;
-  left: 38%;
-  color: ${v.colors.secondaryMedium};
-`
-
 const CollectionFilterWrapper = styled.div`
   display: flex;
   position: fixed;
@@ -1200,7 +1190,7 @@ class FoamcoreGrid extends React.Component {
         draggedOn
       >
         <GridCardEmptyHotspot
-          visible={true}
+          visible={this.uploading}
           card={this.props.card}
           uploading={this.uploading}
           interactionType={type}
@@ -1259,8 +1249,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   @action
-  setUploading = e => {
-    this.uploading = isFile(e)
+  setUploading = uploading => {
+    this.uploading = uploading
   }
 
   get blankCardsForEmptySpacesWithinVisibleArea() {
@@ -1516,7 +1506,10 @@ class FoamcoreGrid extends React.Component {
         }}
         width={gridSize.width}
         height={gridSize.height}
-        onDragOver={this.setUploading}
+        onDragOver={e => {
+          this.setUploading(isFile(e.dataTransfer))
+        }}
+        // onDragEnd={this.setUploading(false)}
       >
         {!isSplitLevelBottom && this.showZoomControls && (
           <FoamcoreZoomControls

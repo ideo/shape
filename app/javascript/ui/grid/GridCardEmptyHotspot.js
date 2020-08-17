@@ -4,21 +4,30 @@ import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import v from '~/utils/variables'
+import { Heading2 } from '~/ui/global/styled/typography'
+import { isFile } from '~/utils/FilestackUpload'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Tooltip from '~/ui/global/Tooltip'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
 import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
-import { StyledPlusIcon } from '~/ui/grid/FoamcoreGrid'
-import { Heading2 } from '~/ui/global/styled/typography'
-import { isFile } from '~/utils/FilestackUpload'
 
 const StyledDropzoneHolder = styled.div`
   position: absolute;
   height: 20%;
   top: 38%;
   left: 28%;
+  color: ${v.colors.secondaryMedium};
+`
+
+const StyledPlusIcon = styled.div`
+  position: absolute;
+  /* TODO: better styling than this? */
+  width: 20%;
+  height: 20%;
+  top: 38%;
+  left: 38%;
   color: ${v.colors.secondaryMedium};
 `
 
@@ -92,9 +101,15 @@ class GridCardEmptyHotspot extends React.Component {
 
   onDragOver = e => {
     runInAction(() => {
-      this.isDraggedOver = isFile(e)
+      this.isDraggedOver = isFile(e.dataTransfer)
     })
   }
+
+  // onDragEnd = () => {
+  //   runInAction(() => {
+  //     this.isDraggedOver = false
+  //   })
+  // }
 
   get renderRightBlankActions() {
     const { handleRemoveRowClick, handleInsertRowClick, row } = this.props
@@ -159,11 +174,14 @@ class GridCardEmptyHotspot extends React.Component {
       <StyledGridCardEmpty
         className={visible ? 'visible' : ''}
         onDragOver={this.onDragOver}
+        // onDragEnd={this.onDragEnd}
       >
-        <StyledDropzoneHolder className="cloud-icon">
-          <CloudIcon />
-          <Heading2 fontSize={'1em'}>Drag & Drop</Heading2>
-        </StyledDropzoneHolder>
+        {this.isDraggedOver && (
+          <StyledDropzoneHolder className="cloud-icon">
+            <CloudIcon />
+            <Heading2 fontSize={'1em'}>Drag & Drop</Heading2>
+          </StyledDropzoneHolder>
+        )}
       </StyledGridCardEmpty>
     )
   }
