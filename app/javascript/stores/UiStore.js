@@ -1531,8 +1531,9 @@ export default class UiStore {
   zoomOut() {
     this.updateZoomLevel(this.zoomLevel + 1)
     setTimeout(() => {
+      const y = window.scrollY - window.innerHeight / 2
       window.scrollTo({
-        top: window.pageYOffset / 2,
+        top: y,
       })
     }, 1)
   }
