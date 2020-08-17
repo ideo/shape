@@ -12,6 +12,7 @@ module CollectionCardFilter
       @collection = collection
       @user = user
       @filters = filters
+      @card_order = @filters.try(:[], :card_order)
       @application = application
       @cards = []
       # ids_only means literally just return collection card ids
@@ -70,12 +71,14 @@ module CollectionCardFilter
       per_page = [@filters[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
       per_page = [per_page, 200].min
 
-      if @ids_only || @select_ids.present?
+      if @ids_only || @select_ids.present? || @card_order.present?
         # start with all_collection_cards to unscope the order, and `active` will be applied below
         @cards = @collection
                  .all_collection_cards
                  .not_placeholder
-                 .ordered
+        unless @card_order.present?
+          @cards = @cards.ordered
+        end
         if @select_ids.present?
           cards_scope = @cards.where(id: @select_ids)
           if @collection.is_a?(Collection::SearchCollection)
@@ -150,15 +153,14 @@ module CollectionCardFilter
     end
 
     def apply_order
-      card_order = @filters[:card_order]
       order = { order: :asc }
-      if card_order
-        if card_order == 'total' || card_order.include?('question_')
-          @collection_order = "collections.cached_test_scores->'#{card_order}'"
+      if @card_order
+        if @card_order == 'total' || @card_order.include?('question_')
+          @collection_order = "collections.cached_test_scores->'#{@card_order}'"
           order = Arel.sql("#{@collection_order} DESC NULLS LAST")
         else
           # e.g. updated_at
-          order = { card_order => :desc }
+          order = { @card_order => :desc }
         end
       end
 

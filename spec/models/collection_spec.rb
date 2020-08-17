@@ -615,6 +615,7 @@ describe Collection, type: :model do
 
     context 'with links' do
       let(:fake_parent) { create(:collection) }
+      let(:target_collection) { create(:collection, num_cards: 2) }
       let(:source_collection) { create(:collection, num_cards: 3, record_type: :link_text, card_relation: :link) }
       before do
         # all these cards' linked records need corresponding parent_collection_cards for duplication

@@ -66,7 +66,7 @@ class CollectionCard < ApplicationRecord
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
 
-  before_create :assign_default_height_and_width
+  before_create :assign_default_attrs
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
   after_update :touch_collection, if: :saved_change_to_filter?
   after_create :update_parent_card_count!
@@ -578,9 +578,15 @@ class CollectionCard < ApplicationRecord
 
   private
 
-  def assign_default_height_and_width
+  def assign_default_attrs
     self.height ||= 1
     self.width ||= 1
+    if parent&.board_collection?
+      self.row ||= 0
+      self.col ||= 0
+    else
+      self.order ||= 0
+    end
   end
 
   def assign_order?

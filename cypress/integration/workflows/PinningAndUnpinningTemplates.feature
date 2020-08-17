@@ -34,7 +34,8 @@ Feature: Pinning and Unpinning
     Then I should see a "PinnedIcon" in the card at 1,2
 
     When I click the selectAll action for the card at 0,0
-    And I click the move action for the card at 1,1
+    And I wait for "@apiGetCollectionCardIds" to finish
+    And I click the move action for the card at 0,1
     And I close the move helper modal
     And I click the down arrow on the MDL snackbar
 

@@ -35,6 +35,9 @@ const createNamedRoutes = () => {
   cy.route('GET', '/api/v1/collections/*/collection_cards*').as(
     'apiGetCollectionCards'
   )
+  cy.route('GET', '/api/v1/collections/*/collection_cards/ids').as(
+    'apiGetCollectionCardIds'
+  )
 
   // -- collections
   cy.route('PATCH', '/api/v1/collections/*').as('apiUpdateCollection')
