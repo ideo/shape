@@ -7,7 +7,6 @@ import PlusIcon from '~/ui/icons/PlusIcon'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import { StyledPlusIcon } from '~/ui/grid/FoamcoreGrid'
 import { Heading2 } from '~/ui/global/styled/typography'
-import Dropzone from 'react-dropzone'
 
 const StyledDropzoneHolder = styled.div`
   position: absolute;
@@ -83,19 +82,12 @@ class GridCardEmptyHotspot extends React.Component {
   get renderGridCardDropzone() {
     const { visible } = this.props
     return (
-      <Dropzone onDrop={acceptedFiles => console.log(acceptedFiles)}>
-        {({ getRootProps, getInputProps }) => (
-          <StyledGridCardEmpty className={visible ? 'visible' : ''}>
-            <div {...getRootProps()}>
-              <input {...getInputProps()} />
-              <StyledDropzoneHolder className="cloud-icon">
-                <CloudIcon />
-                <Heading2 fontSize={'1em'}>Drag & Drop</Heading2>
-              </StyledDropzoneHolder>
-            </div>
-          </StyledGridCardEmpty>
-        )}
-      </Dropzone>
+      <StyledGridCardEmpty className={visible ? 'visible' : ''}>
+        <StyledDropzoneHolder className="cloud-icon">
+          <CloudIcon />
+          <Heading2 fontSize={'1em'}>Drag & Drop</Heading2>
+        </StyledDropzoneHolder>
+      </StyledGridCardEmpty>
     )
   }
 

@@ -233,8 +233,10 @@ class GridCardBlank extends React.Component {
     if (replacingId) {
       uploadOpts.maxFiles = 1
     }
+
+    // CSS selector where the dropzone will be
+    const container = 'dropzone'
     const dropPaneOpts = {
-      id: 'dropzone',
       onProgress: pct => {
         if (this.state.loading) return
         this.setState({ loading: true })
@@ -275,7 +277,7 @@ class GridCardBlank extends React.Component {
         }
       },
     }
-    FilestackUpload.makeDropPane(dropPaneOpts, uploadOpts)
+    FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
   }
 
   get emptyState() {

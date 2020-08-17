@@ -1,5 +1,5 @@
 import axios from 'axios'
-import filestack from 'filestack-js'
+import * as filestack from 'filestack-js'
 
 const API_KEY = process.env.FILESTACK_API_KEY
 
@@ -72,14 +72,15 @@ class FilestackUpload {
 
   static async pickOneOrMore({ onSuccess, onFailure, multiple } = {}) {
     const config = multiple ? multiImageUploadConfig : imageUploadConfig
-    const resp = await this.client.pick(config)
-    if (resp.filesUploaded.length > 0) {
-      const filesAttrs = await this.processFiles(resp.filesUploaded)
-      if (onSuccess) onSuccess(multiple ? filesAttrs : filesAttrs[0])
-    } else if (onFailure) {
-      onFailure(resp.filesFailed)
-    }
-    return resp
+    await this.client
+      .picker({
+        ...config,
+        onUploadDone: async resp => {
+          const filesAttrs = await this.processFiles(resp.filesUploaded)
+          if (onSuccess) onSuccess(multiple ? filesAttrs : filesAttrs[0])
+        },
+      })
+      .open()
   }
 
   static pdfCoverUrl(handle) {
@@ -120,10 +121,18 @@ class FilestackUpload {
     return this.client.preview(handle, { id })
   }
 
-  static makeDropPane(opts = {}, uploadOpts = {}) {
+  static makeDropPane(container, opts = {}, uploadOpts = {}) {
     const config = Object.assign({}, dropPaneDefaults, opts)
     const uploadConfig = Object.assign({}, multiImageUploadConfig, uploadOpts)
-    return this.client.makeDropPane(config, uploadConfig)
+    const options = {
+      container, // can be CSS selector string or DOM node
+      displayMode: 'dropPane',
+      dropPane: {
+        ...config,
+      },
+      ...uploadConfig,
+    }
+    return this.client.picker(options).open()
   }
 
   static filestackFileAttrs(file) {
