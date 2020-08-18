@@ -31,7 +31,7 @@ module CollectionGrid
       # if we migrate a master template then we also migrate the instances
       return unless collection.master_template? && !collection.subtemplate?
 
-      puts "migrating instances of... #{collection.name} (#{collection.id})"
+      puts "#{Time.current}: migrating instances of... #{collection.name} (#{collection.id})"
       collection.templated_collections.each do |c|
         migrate_collection_to_board(c)
       end
@@ -40,15 +40,36 @@ module CollectionGrid
     def migrate_collection_to_board(collection)
       return if skip_migration?(collection)
 
-      puts "migrating... #{collection.name} (#{collection.id})"
+      puts "#{Time.current}: migrating... #{collection.name} (#{collection.id})"
+
+      # special case
+      if collection.is_a?(Collection::UserCollection)
+        user = collection.editors[:users].first
+        links = collection.link_collection_cards
+        unviewable_ids = []
+        if user.present? && links.any?
+          links.each do |card|
+            unless card.can_view?(user)
+              unviewable_ids << card.id
+            end
+          end
+          if unviewable_ids.present?
+            CollectionCard
+              .where(id: unviewable_ids)
+              .update_all(archived: true, updated_at: Time.current, archived_at: Time.current)
+          end
+        end
+      end
+
       cards = collection.collection_cards.to_a
+
       # apply row/col values onto ordered cards
       CollectionGrid::Calculator.calculate_rows_cols(
         cards,
         num_columns: 4,
       )
       cards.each do |cc|
-        cc.order = 0
+        cc.order = nil
         cc.updated_at = Time.current
       end
       # bulk import cards with new row/col/order/updated_at values

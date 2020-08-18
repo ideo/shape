@@ -25,9 +25,9 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
         expect(cards.pluck(:row, :col).flatten.compact).to be_empty
         subject.call
         expect(cards.pluck(:order, :row, :col)).to eq([
-          [0, 0, 0],
-          [0, 0, 2],
-          [0, 1, 0],
+          [nil, 0, 0],
+          [nil, 0, 2],
+          [nil, 1, 0],
         ])
       end
 
@@ -47,8 +47,8 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
         subject.call
         subcollections.each do |coll|
           expect(coll.collection_cards.pluck(:order, :row, :col)).to eq([
-            [0, 0, 0],
-            [0, 0, 1],
+            [nil, 0, 0],
+            [nil, 0, 1],
           ])
         end
       end
@@ -63,8 +63,8 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
           subject.call
           subcollections.each do |coll|
             expect(coll.collection_cards.pluck(:order, :row, :col)).to eq([
-              [0, 0, 0],
-              [0, 0, 1],
+              [nil, 0, 0],
+              [nil, 0, 1],
             ])
           end
         end
@@ -80,6 +80,44 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
           )
           subject.call
         end
+      end
+    end
+
+    context 'with a user collection and hidden links' do
+      let(:user) { create(:user) }
+      let(:collection) do
+        create(
+          :user_collection,
+          num_columns: nil,
+          num_cards: 4,
+          record_type: :link_text,
+          card_relation: :link,
+          created_by: user,
+          add_editors: [user],
+        )
+      end
+      let(:visible_cards) { collection.collection_cards.last(2) }
+
+      before do
+        # the user is able to view the last 2 records
+        visible_cards.each do |card|
+          user.add_role(Role::VIEWER, card.record)
+        end
+      end
+
+      it 'archives hidden links from the UserCollection' do
+        expect(cards.pluck(:row, :col).flatten.compact).to be_empty
+        subject.call
+        expect(cards.pluck(:id, :row, :col)).to eq([
+          [visible_cards.first.id, 0, 0],
+          [visible_cards.second.id, 0, 1],
+        ])
+        expect(collection.all_collection_cards.ordered_row_col.pluck(:row, :col, :archived)).to eq([
+          [0, 0, false],
+          [0, 1, false],
+          [nil, nil, true],
+          [nil, nil, true],
+        ])
       end
     end
   end
