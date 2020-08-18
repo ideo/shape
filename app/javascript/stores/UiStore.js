@@ -1529,19 +1529,49 @@ export default class UiStore {
   // -----------------------
   // Foamcore zoom functions
   zoomOut() {
+    const previousZoom = this.zoomLevel
     this.updateZoomLevel(this.zoomLevel + 1)
+    const zoomDiff = (1 / this.zoomLevel - 1 / previousZoom) * 10
     setTimeout(() => {
-      const y = window.scrollY - window.innerHeight / 2
+      const scrollAmountY = window.scrollY * zoomDiff
+      const scrollAmountX = window.scrollX * zoomDiff
+      const middleY = window.scrollY + scrollAmountY
+      const middleX = window.scrollX + scrollAmountX
+      console.log('zoom', {
+        zoomDiff,
+        scrollAmountY,
+        scrollAmountX,
+        middleX,
+        middleY,
+      })
       window.scrollTo({
-        top: y,
+        top: middleY,
+        left: middleX,
       })
     }, 1)
   }
 
   zoomIn() {
+    const previousZoom = this.zoomLevel
+    console.log('zoom', this.zoomLevel, this.zoomLevel - 1)
     this.updateZoomLevel(this.zoomLevel - 1)
+    const zoomDiff = (1 / this.zoomLevel - 1 / previousZoom) * 10
     setTimeout(() => {
-      this.scrollToCenter()
+      const scrollAmountY = window.scrollY / zoomDiff
+      const scrollAmountX = window.scrollX / zoomDiff
+      const middleY = window.innerHeight / 2 + scrollAmountY
+      const middleX = window.innerWidth / 2 + scrollAmountX
+      console.log('zoom', {
+        zoomDiff,
+        scrollAmountY,
+        scrollAmountX,
+        middleX,
+        middleY,
+      })
+      window.scrollTo({
+        top: middleY,
+        left: middleX,
+      })
     }, 1)
   }
 
