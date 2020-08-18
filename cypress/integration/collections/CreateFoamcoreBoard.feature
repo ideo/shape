@@ -12,18 +12,22 @@ Feature: Creating a FoamcoreBoard Collection
     And I create a textItem card at 0,0 on the board with "Welcome!"
     And I create a textItem card at 0,1 on the board with "To my board."
     And I create a textItem card at 1,1 on the board with "Hello."
+    # hotspot in between two cards
     When I click the "FoamcoreHotspot-0:1"
+    And I wait for "@apiCreateCollectionCardBct" to finish
 
     # should move the card out of the way
     Then I should see the text "To my board." in the card at 0,2
     # closing it should move back
     When I wait for 1 second
     And I click the "BCT-closeButton"
+    And I wait for "@apiDeleteCollectionCard" to finish
     Then I should see the text "To my board." in the card at 0,1
 
     # There should be a hotspot to the left of the 0,0 card
     When I click the "FoamcoreHotspot-0:0"
-    And I create a textItem card using the foamcore hotspot with "Inserted!"
+    And I wait for "@apiCreateCollectionCardBct" to finish
+    And I create a textItem card using the open BCT with "Inserted!"
     # should move both row 0 cards out of the way
     Then I should see the text "Inserted!" in the card at 0,0
     Then I should see the text "Welcome!" in the card at 0,1

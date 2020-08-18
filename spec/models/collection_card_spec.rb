@@ -659,7 +659,7 @@ RSpec.describe CollectionCard, type: :model do
       end
 
       it 'should decrement parent cached_card_count' do
-        expect(collection.cached_card_count).to eq 5
+        expect(collection.reload.cached_card_count).to eq 5
         collection_card.archive!
         expect(collection.reload.cached_card_count).to eq 4
       end

@@ -176,15 +176,14 @@ FactoryBot.define do
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
+        # e.g. primary_collection_cards or link_collection_cards
+        card_relation = "#{evaluator.card_relation}_collection_cards"
         evaluator.num_cards.times do |i|
           card_type = :"collection_card_#{evaluator.record_type}"
           order = nil
           col = nil
           row = nil
-          if collection.board_collection?
-            col = i % collection.num_columns
-            row = (i / collection.num_columns).floor
-          else
+          unless collection.board_collection?
             order = i
           end
           cc = build(
@@ -197,9 +196,10 @@ FactoryBot.define do
             row: row,
             pinned: evaluator.pin_cards,
           )
-          # e.g. primary_collection_cards or link_collection_cards
-          card_relation = "#{evaluator.card_relation}_collection_cards"
           collection.send(card_relation) << cc
+        end
+        if collection.board_collection?
+          place_cards(collection: collection, cards: collection.send(card_relation))
         end
       end
 
@@ -214,6 +214,9 @@ FactoryBot.define do
           height: 1,
           pinned: evaluator.pin_cards,
         )
+        if parent_collection.board_collection?
+          place_cards(collection: parent_collection, cards: [collection.parent_collection_card])
+        end
       end
     end
 
@@ -231,4 +234,12 @@ FactoryBot.define do
       end
     end
   end
+end
+
+def place_cards(collection:, cards:)
+  CollectionGrid::Calculator.place_cards_on_board(
+    collection: collection,
+    from_collection: collection,
+    moving_cards: cards,
+  )
 end

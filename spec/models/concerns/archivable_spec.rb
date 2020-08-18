@@ -94,12 +94,8 @@ describe Archivable, type: :concern do
 
     describe '#unarchive!' do
       let(:parent) { create(:collection, num_cards: 3) }
-      let(:collection_card) { create(:collection_card, parent: parent, order: 3) }
+      let(:collection_card) { create(:collection_card, parent: parent, row: 1, col: 1) }
       let!(:collection) { create(:collection, num_cards: 2, parent_collection_card: collection_card) }
-
-      before do
-        parent.reorder_cards!
-      end
 
       it 'can be unarchived' do
         collection.archive!

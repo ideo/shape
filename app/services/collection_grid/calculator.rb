@@ -178,6 +178,8 @@ module CollectionGrid
       from_collection:,
       moving_cards:
     )
+      return false unless collection.num_columns.present?
+
       master_card = nil
       moving_cards_without_position = moving_cards.any? { |cc| cc.row.nil? || cc.col.nil? }
       if !from_collection.board_collection? || moving_cards_without_position
