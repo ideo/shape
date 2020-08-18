@@ -100,16 +100,20 @@ class GridCardEmptyHotspot extends React.Component {
   }
 
   onDragOver = e => {
+    e.preventDefault()
+    e.stopPropagation()
     runInAction(() => {
       this.isDraggedOver = isFile(e.dataTransfer)
     })
   }
 
-  // onDragEnd = () => {
-  //   runInAction(() => {
-  //     this.isDraggedOver = false
-  //   })
-  // }
+  onDragLeave = e => {
+    e.preventDefault()
+    e.stopPropagation()
+    runInAction(() => {
+      this.isDraggedOver = false
+    })
+  }
 
   get renderRightBlankActions() {
     const { handleRemoveRowClick, handleInsertRowClick, row } = this.props
@@ -174,7 +178,7 @@ class GridCardEmptyHotspot extends React.Component {
       <StyledGridCardEmpty
         className={visible ? 'visible' : ''}
         onDragOver={this.onDragOver}
-        // onDragEnd={this.onDragEnd}
+        onDragLeave={this.onDragLeave}
       >
         {this.isDraggedOver && (
           <StyledDropzoneHolder className="cloud-icon">

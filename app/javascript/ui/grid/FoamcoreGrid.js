@@ -1507,9 +1507,15 @@ class FoamcoreGrid extends React.Component {
         width={gridSize.width}
         height={gridSize.height}
         onDragOver={e => {
+          e.preventDefault()
+          e.stopPropagation()
           this.setUploading(isFile(e.dataTransfer))
         }}
-        // onDragEnd={this.setUploading(false)}
+        onDragLeave={e => {
+          e.preventDefault()
+          e.stopPropagation()
+          this.setUploading(false)
+        }}
       >
         {!isSplitLevelBottom && this.showZoomControls && (
           <FoamcoreZoomControls
