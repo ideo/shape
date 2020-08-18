@@ -19,6 +19,7 @@ const StyledDropzoneHolder = styled.div`
   top: 38%;
   left: 28%;
   color: ${v.colors.secondaryMedium};
+  pointer-events: none;
 `
 
 const StyledPlusIcon = styled.div`
@@ -77,6 +78,7 @@ class GridCardEmptyHotspot extends React.Component {
 
   openBlankContentTool = () => {
     const { uiStore, card } = this.props
+    if (!card) return
     const { order, position } = card
     uiStore.openBlankContentTool({
       order,
@@ -87,6 +89,7 @@ class GridCardEmptyHotspot extends React.Component {
 
   onClickHotspot = () => {
     const { card } = this.props
+    if (!card) return
     const collection = card.parentCollection
 
     // confirmEdit will check if we're in a template and need to confirm changes
@@ -198,7 +201,7 @@ class GridCardEmptyHotspot extends React.Component {
 
 GridCardEmptyHotspot.propTypes = {
   visible: PropTypes.bool,
-  card: MobxPropTypes.objectOrObservableObject.isRequired,
+  card: MobxPropTypes.objectOrObservableObject,
   uploading: PropTypes.bool,
   interactionType: PropTypes.string,
   numColumns: PropTypes.number,
@@ -208,6 +211,7 @@ GridCardEmptyHotspot.propTypes = {
   row: PropTypes.number,
 }
 GridCardEmptyHotspot.defaultProps = {
+  card: null,
   visible: false,
   uploading: false,
   interactionType: 'drag',
