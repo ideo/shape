@@ -21,8 +21,6 @@ import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
-import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
@@ -130,15 +128,6 @@ const RightBlankActions = styled.div`
   top: calc(50% - 36px);
 `
 RightBlankActions.displayName = 'RightBlankActions'
-
-const CollectionFilterWrapper = styled.div`
-  display: flex;
-  position: fixed;
-  z-index: ${v.zIndex.zoomControls};
-  top: ${props => (v.headerHeight + props.hasBanner ? 140 : 0)}px;
-  height: 86px;
-  right: 32px;
-`
 
 function getMapKey({ col, row }) {
   return `${col},${row}`
@@ -1550,10 +1539,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const {
-      collection,
-      apiStore: { currentUser },
-    } = this.props
+    const { collection } = this.props
     const { isSplitLevelBottom } = collection
 
     const gridSize = this.totalGridSize
@@ -1572,17 +1558,6 @@ class FoamcoreGrid extends React.Component {
             onZoomIn={this.handleZoomIn}
             onZoomOut={this.handleZoomOut}
           />
-        )}
-        {!isSplitLevelBottom && collection.showFilters && (
-          <CollectionFilterWrapper
-            hasBanner={currentUser && currentUser.show_helper}
-          >
-            <CollectionViewToggle collection={collection} />
-            <CollectionFilter
-              collection={collection}
-              canEdit={collection.canEdit}
-            />
-          </CollectionFilterWrapper>
         )}
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}

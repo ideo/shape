@@ -208,25 +208,30 @@ Cypress.Commands.add('undo', () => {
   })
 })
 
-Cypress.Commands.add('selectBctType', ({ type, row = null, col = null }) => {
-  let className = '.StyledHotspot'
-  if (row !== null && col !== null) {
-    className += `-${row}:${col}`
+Cypress.Commands.add(
+  'selectBctType',
+  ({ type, row = null, col = null, empty = false }) => {
+    let className = '.StyledHotspot'
+    if (row !== null && col !== null) {
+      className += `-${row}:${col}`
+    }
+    if (!empty) {
+      cy.locateDataOrClass(className)
+        .first()
+        .click({ force: true })
+    }
+    switch (type) {
+      case 'file':
+        cy.wait(1000)
+        break
+      default:
+        break
+    }
+    cy.locate(`BctButton-${type}`)
+      .first()
+      .click({ force: true })
   }
-  cy.locateDataOrClass(className)
-    .first()
-    .click({ force: true })
-  switch (type) {
-    case 'file':
-      cy.wait(1000)
-      break
-    default:
-      break
-  }
-  cy.locate(`BctButton-${type}`)
-    .first()
-    .click({ force: true })
-})
+)
 
 Cypress.Commands.add('selectPopoutTemplateBctType', ({ type }) => {
   cy.locateDataOrClass('.StyledHotspot')
