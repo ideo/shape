@@ -1,11 +1,6 @@
 FactoryBot.define do
   factory :collection_card, class: 'CollectionCard::Primary' do
     parent factory: :collection
-    order 0
-    width 1
-    height 1
-    sequence(:row)
-    sequence(:col)
 
     factory :collection_card_image do
       item factory: :file_item, strategy: :build

@@ -93,18 +93,6 @@ RSpec.describe CollectionCardBuilder, type: :service do
         expect(organization.primary_group.has_role?(Role::VIEWER, collection)).to be false
       end
 
-      it 'should set user show_helper to false if it was true' do
-        expect(user.show_helper).to be true
-        expect(builder.create).to be true
-        expect(user.show_helper).to be false
-      end
-
-      it 'should ignore the row and col values' do
-        expect(builder.create).to be true
-        expect(builder.collection_card.row).to eq nil
-        expect(builder.collection_card.col).to eq nil
-      end
-
       context 'with card_type == "link"' do
         let(:card_type) { 'link' }
         let(:parent_collection) { create(:collection, organization: organization) }
@@ -140,6 +128,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
         context 'with multiple ordered cards' do
           let!(:parent) do
             create(:collection,
+                   num_columns: nil,
                    num_cards: 5,
                    organization: organization,
                    add_editors: [user])

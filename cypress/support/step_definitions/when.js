@@ -14,13 +14,6 @@ When('I create a {word} collection named {string}', (collectionType, name) => {
   cy.createCollection({ name, collectionType })
 })
 
-When(
-  'I create a {word} collection named {string} in my empty collection',
-  (collectionType, name) => {
-    cy.createCollection({ name, collectionType, empty: true })
-  }
-)
-
 When('I create a {word} card', itemType => {
   cy.createCard(itemType)
 })
@@ -32,13 +25,10 @@ When(
   }
 )
 
-When(
-  'I create a textItem card using the foamcore hotspot with {string}',
-  content => {
-    // `empty` being equivalent to "BCT is already open"
-    cy.createCard('textItem', { content, empty: true })
-  }
-)
+When('I create a textItem card using the open BCT with {string}', content => {
+  // `empty` being equivalent to "BCT is already open"
+  cy.createCard('textItem', { content, empty: true })
+})
 
 When('I add a link URL {string} and wait for {string}', (url, request) => {
   cy.locate('BctTextField').type(url, {
@@ -119,12 +109,12 @@ When('I remove the user from the group sharing modal', () => {
 // ----------------------
 // Resizing/moving cards
 // ----------------------
-When('I resize the {word} card to {word}', (pos, size) => {
-  cy.resizeCard(pos, size)
+When('I resize the card at {int},{int} to {word}', (row, col, size) => {
+  cy.resizeCard({ row, col, size })
 })
 
-When('I reorder the first two cards', () => {
-  cy.reorderFirstTwoCards()
+When('I move the first card down {int} row(s)', rows => {
+  cy.moveFirstCardDown(rows)
 })
 
 When('I undo with CTRL+Z', () => {
@@ -459,25 +449,15 @@ When('I edit the report item', () => {
   cy.wait(100)
 })
 
-When('I select the index {int} {word} card', (pos, type) => {
-  cy.get(
-    `[data-cy="GridCard"][data-order="${pos}"] [data-cy="CardAction-select"]`
-  )
+When('I select the card at {int},{int}', (row, col) => {
+  cy.selectCardAt({ row, col, value: 'CardAction-select' })
     .first()
     .click()
   cy.wait(100)
 })
 
-When('I click the action menu for the index {int} card', pos => {
-  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="PopoutMenu"]`)
-    .first()
-    .click({ force: true })
-  cy.wait(100)
-})
-
-When('I click the {word} action for the index {int} card', (action, pos) => {
-  const value = `PopoutMenu_${_.camelCase(action)}`
-  cy.get(`[data-cy="GridCard"][data-order="${pos}"] [data-cy="${value}"]`)
+When('I click the action menu for the card at {int},{int}', (row, col) => {
+  cy.selectCardAt({ row, col, value: 'PopoutMenu' })
     .first()
     .click({ force: true })
   cy.wait(100)
@@ -487,9 +467,7 @@ When(
   'I click the {word} action for the card at {int},{int}',
   (action, row, col) => {
     const value = `PopoutMenu_${_.camelCase(action)}`
-    cy.get(
-      `[data-cy="GridCard"][data-row="${row}"][data-col="${col}"] [data-cy="${value}"]`
-    )
+    cy.selectCardAt({ row, col, value })
       .first()
       .click({ force: true })
     cy.wait(100)
@@ -497,9 +475,7 @@ When(
 )
 
 When('I click the {string} on the card at {int},{int}', (action, row, col) => {
-  cy.get(
-    `[data-cy="GridCard"][data-row="${row}"][data-col="${col}"] [data-cy="${action}"]`
-  )
+  cy.selectCardAt({ row, col, value: action })
     .first()
     .click({ force: true })
   cy.wait(100)

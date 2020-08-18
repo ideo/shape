@@ -58,7 +58,8 @@ describe('CollectionCreator', () => {
             name: component.state.inputText,
             master_template: false,
             type: null,
-            num_columns: null,
+            // collections are 4 columns by default
+            num_columns: 4,
           },
         },
         {
@@ -85,7 +86,7 @@ describe('CollectionCreator', () => {
               name: component.state.inputText,
               master_template: false,
               type: 'Collection::SubmissionBox',
-              num_columns: null,
+              num_columns: 4,
             },
           },
           {
@@ -123,36 +124,6 @@ describe('CollectionCreator', () => {
       })
     })
 
-    describe('when parent is a fourWide FoamcoreBoard', () => {
-      beforeEach(() => {
-        // parentIsFourWide overrides normal "collection" type as 4WFC
-        props.type = 'collection'
-        props.parentIsFourWide = true
-        props.createCard.mockClear()
-        rerender()
-      })
-
-      it('creates a Collection::Board with 4 columns', () => {
-        component.state = {
-          inputText: 'Ideas Board',
-        }
-        component.createCollection(e)
-        expect(props.createCard).toHaveBeenCalledWith(
-          {
-            collection_attributes: {
-              name: component.state.inputText,
-              master_template: false,
-              type: 'Collection::Board',
-              num_columns: 4,
-            },
-          },
-          {
-            afterCreate: component.afterCreate,
-          }
-        )
-      })
-    })
-
     describe('when collection is a SearchColleciton', () => {
       beforeEach(() => {
         props.type = 'search'
@@ -172,7 +143,7 @@ describe('CollectionCreator', () => {
               master_template: false,
               type: 'Collection::SearchCollection',
               search_term: 'plants',
-              num_columns: null,
+              num_columns: 4,
             },
           },
           {
@@ -200,7 +171,7 @@ describe('CollectionCreator', () => {
               name: component.state.inputText,
               master_template: false,
               type: 'Collection::TestCollection',
-              num_columns: null,
+              num_columns: 4,
             },
           },
           {

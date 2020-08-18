@@ -7,7 +7,7 @@ RSpec.describe CardMover, type: :service do
   let!(:to_collection) { create(:collection, organization: organization, num_cards: 3) }
   let!(:moving_cards) { from_collection.collection_cards }
   let(:cards) { moving_cards }
-  let(:placement) { 'beginning' }
+  let(:placement) { 'end' }
   let(:card_action) { 'move' }
   let(:card_mover) do
     CardMover.new(
@@ -28,13 +28,51 @@ RSpec.describe CardMover, type: :service do
   end
 
   describe '#call' do
-    context 'with placement "beginning"' do
-      let(:placement) { 'beginning' }
+    context 'with placement "end"' do
+      let(:placement) { 'end' }
 
-      it 'should move cards into the to_collection at the beginning' do
+      it 'should move cards into the to_collection at the end' do
         expect(from_collection.collection_cards).to match_array moving_cards
         card_mover.call
-        expect(to_collection.reload.collection_cards.first(3)).to match_array moving_cards
+        expect(from_collection.reload.collection_cards).to match_array []
+        expect(to_collection.reload.collection_cards.last(3)).to match_array moving_cards
+      end
+
+      context 'when to_collection is a foamcore board' do
+        let(:num_columns) { 16 }
+        let!(:to_collection) do
+          create(:board_collection,
+                 num_columns: num_columns,
+                 num_cards: 3,
+                 add_editors: [user],
+                 organization: organization)
+        end
+
+        it 'places cards in their best fit after the last card' do
+          card_mover.call
+          to_collection.reload
+          # they are all 1x1 so should fit consecutively
+          expect(to_collection.collection_cards.last(3).pluck(:row, :col)).to eq([
+            [0, 3],
+            [0, 4],
+            [0, 5],
+          ])
+        end
+
+        context 'on a 4 column board' do
+          let(:num_columns) { 4 }
+
+          it 'places cards in their best fit after the last card' do
+            card_mover.call
+            to_collection.reload
+            # will find the next open row to fit them
+            expect(to_collection.collection_cards.last(3).pluck(:row, :col)).to eq([
+              [1, 0],
+              [1, 1],
+              [1, 2],
+            ])
+          end
+        end
       end
 
       context 'with roles' do
@@ -108,172 +146,140 @@ RSpec.describe CardMover, type: :service do
       end
     end
 
-    context 'with placement "end"' do
-      let(:placement) { 'end' }
-
-      it 'should move cards into the to_collection at the end' do
-        expect(from_collection.collection_cards).to match_array moving_cards
-        card_mover.call
-        expect(from_collection.reload.collection_cards).to match_array []
-        expect(to_collection.reload.collection_cards.last(3)).to match_array moving_cards
-      end
-
-      context 'when to_collection is a foamcore board' do
-        let!(:to_collection) do
-          create(:board_collection,
-                 num_cards: 3,
-                 add_editors: [user],
-                 organization: organization)
-        end
-        let(:placement) { 'end' }
-
-        it 'places cards in their best fit after the last card' do
-          card_mover.call
-          to_collection.reload
-          # they are all 1x1 so should fit consecutively
-          expect(to_collection.collection_cards.last(3).pluck(:row, :col)).to eq([
-            [3, 1],
-            [3, 2],
-            [3, 3],
-          ])
-        end
-      end
-    end
-
-    context 'with placement as an order number (insert cards in middle of collection)' do
-      let(:placement) { 1 }
-      let(:cards) { moving_cards.ordered }
-      let(:original_cards) { to_collection.collection_cards.to_a }
-      before do
-        # mix them around to make sure we're following `order` and not id/date
-        original_cards[0].update_columns(order: 0)
-        original_cards[2].update_columns(order: 1)
-        original_cards[1].update_columns(order: 2)
-        moving_cards[1].update_columns(order: 0)
-        moving_cards[2].update_columns(order: 1)
-        moving_cards[0].update_columns(order: 2)
-      end
-
-      it 'should place the moved cards in the middle of the collection, preserving their order' do
-        card_mover.call
-        expect(to_collection.reload.collection_cards.map(&:id)).to eq([
-          # 3 cards so order '1' should be in the middle
-          # before: [0, 2, 1]
-          # after: [0, x, x, x, 2, 1]
-          original_cards[0].id,
-          moving_cards[1].id,
-          moving_cards[2].id,
-          moving_cards[0].id,
-          original_cards[2].id,
-          original_cards[1].id,
-        ])
-      end
-
-      context 'with moving with same collection that\'s a master template' do
-        let!(:from_collection) { to_collection }
-
-        before do
-          from_collection.update(master_template: true)
-        end
-
-        it 'should call update_template_instances' do
-          expect(from_collection).to receive(:queue_update_template_instances).with(
-            updated_card_ids: from_collection.collection_cards.pluck(:id),
-            template_update_action: :update_card_attributes,
-          )
-          card_mover.call
-        end
-      end
-
-      context 'with pinned cards that already exist in to_collection' do
-        before do
-          # update first 2 cards to be pinned
-          to_collection.reload.collection_cards.limit(2).update_all(pinned: true)
-        end
-
-        it 'should place the moved cards in the middle of the collection' do
-          card_mover.call
-          expect(to_collection.reload.collection_cards.map(&:id)).to eq([
-            original_cards[0].id,
-            # even though we use placement: 1, the first two cards are pinned
-            original_cards[2].id,
-            moving_cards[1].id,
-            moving_cards[2].id,
-            moving_cards[0].id,
-            original_cards[1].id,
-          ])
-        end
-
-        it 'should pin the all the moving cards' do
-          card_mover.call
-          expect(to_collection.reload.collection_cards.pinned.all?(&:id)).to eq(true)
-        end
-
-        context 'moving cards right next to unpinned cards' do
-          before do
-            # update second card to be pinned
-            to_collection.reload.collection_cards[1].update(pinned: false)
-          end
-          it 'should keep all the moving cards unpinned' do
-            card_mover.call
-            cards_moved = to_collection.reload.collection_cards.select { |cc| moving_cards.pluck(:id).include? cc.id }
-            expect(cards_moved.pluck(:pinned)).to all(be_falsy)
-          end
-        end
-      end
-
-      context 'with pinned cards in the from_collection' do
-        before do
-          # update first 2 cards to be pinned
-          from_collection.reload.collection_cards.limit(2).update_all(pinned: true)
-        end
-
-        context 'moving into a normal collection' do
-          it 'should unpin all cards' do
-            card_mover.call
-            to_collection.reload
-            expect(to_collection.collection_cards.count).to eq 6
-            expect(to_collection.collection_cards.none?(&:pinned?)).to be true
-          end
-        end
-
-        context 'moving into a master template' do
-          let!(:child_collection) do
-            create(:collection, parent_collection: from_collection, num_cards: 2, record_type: :collection)
-          end
-          let!(:child_subcollection_cards) do
-            create_list(:collection_card_text, 2, parent: child_collection.collections.first)
-          end
-          before do
-            to_collection.update(master_template: true)
-          end
-
-          context 'moving to the beginning of master template with pinned cards' do
-            it 'should pin all cards if moving to the beginning of collection with pinned cards' do
-              card_mover.call
-              to_collection.reload
-              expect(to_collection.collection_cards.count).to eq 7
-              expect(to_collection.collection_cards.any?(&:pinned?)).to be true
-              subcollection = to_collection.collections.first
-              expect(subcollection.collection_cards.all?(&:pinned)).to be true
-              # subcollection should now be a subtemplate
-              expect(subcollection.master_template?).to be true
-              expect(subcollection.collections.first.master_template?).to be true
-            end
-          end
-
-          context 'when linking' do
-            let(:card_action) { 'link' }
-
-            it 'should not convert to template' do
-              links = card_mover.call
-              expect(links.last.collection).to eq(child_collection)
-              expect(links.last.collection.master_template?).to be false
-            end
-          end
-        end
-      end
-    end
+    # context 'with placement as an order number (insert cards in middle of collection)' do
+    #   let(:placement) { 1 }
+    #   let(:cards) { moving_cards.ordered }
+    #   let(:original_cards) { to_collection.collection_cards.to_a }
+    #   before do
+    #     # mix them around to make sure we're following `order` and not id/date
+    #     original_cards[0].update_columns(order: 0)
+    #     original_cards[2].update_columns(order: 1)
+    #     original_cards[1].update_columns(order: 2)
+    #     moving_cards[1].update_columns(order: 0)
+    #     moving_cards[2].update_columns(order: 1)
+    #     moving_cards[0].update_columns(order: 2)
+    #   end
+    #
+    #   it 'should place the moved cards in the middle of the collection, preserving their order' do
+    #     card_mover.call
+    #     expect(to_collection.reload.collection_cards.map(&:id)).to eq([
+    #       # 3 cards so order '1' should be in the middle
+    #       # before: [0, 2, 1]
+    #       # after: [0, x, x, x, 2, 1]
+    #       original_cards[0].id,
+    #       moving_cards[1].id,
+    #       moving_cards[2].id,
+    #       moving_cards[0].id,
+    #       original_cards[2].id,
+    #       original_cards[1].id,
+    #     ])
+    #   end
+    #
+    #   context 'with moving with same collection that\'s a master template' do
+    #     let!(:from_collection) { to_collection }
+    #
+    #     before do
+    #       from_collection.update(master_template: true)
+    #     end
+    #
+    #     it 'should call update_template_instances' do
+    #       expect(from_collection).to receive(:queue_update_template_instances).with(
+    #         updated_card_ids: from_collection.collection_cards.pluck(:id),
+    #         template_update_action: :update_card_attributes,
+    #       )
+    #       card_mover.call
+    #     end
+    #   end
+    #
+    #   context 'with pinned cards that already exist in to_collection' do
+    #     before do
+    #       # update first 2 cards to be pinned
+    #       to_collection.reload.collection_cards.limit(2).update_all(pinned: true)
+    #     end
+    #
+    #     it 'should place the moved cards in the middle of the collection' do
+    #       card_mover.call
+    #       expect(to_collection.reload.collection_cards.map(&:id)).to eq([
+    #         original_cards[0].id,
+    #         # even though we use placement: 1, the first two cards are pinned
+    #         original_cards[2].id,
+    #         moving_cards[1].id,
+    #         moving_cards[2].id,
+    #         moving_cards[0].id,
+    #         original_cards[1].id,
+    #       ])
+    #     end
+    #
+    #     it 'should pin the all the moving cards' do
+    #       card_mover.call
+    #       expect(to_collection.reload.collection_cards.pinned.all?(&:id)).to eq(true)
+    #     end
+    #
+    #     context 'moving cards right next to unpinned cards' do
+    #       before do
+    #         # update second card to be pinned
+    #         to_collection.reload.collection_cards[1].update(pinned: false)
+    #       end
+    #       it 'should keep all the moving cards unpinned' do
+    #         card_mover.call
+    #         cards_moved = to_collection.reload.collection_cards.select { |cc| moving_cards.pluck(:id).include? cc.id }
+    #         expect(cards_moved.pluck(:pinned)).to all(be_falsy)
+    #       end
+    #     end
+    #   end
+    #
+    #   context 'with pinned cards in the from_collection' do
+    #     before do
+    #       # update first 2 cards to be pinned
+    #       from_collection.reload.collection_cards.limit(2).update_all(pinned: true)
+    #     end
+    #
+    #     context 'moving into a normal collection' do
+    #       it 'should unpin all cards' do
+    #         card_mover.call
+    #         to_collection.reload
+    #         expect(to_collection.collection_cards.count).to eq 6
+    #         expect(to_collection.collection_cards.none?(&:pinned?)).to be true
+    #       end
+    #     end
+    #
+    #     context 'moving into a master template' do
+    #       let!(:child_collection) do
+    #         create(:collection, parent_collection: from_collection, num_cards: 2, record_type: :collection)
+    #       end
+    #       let!(:child_subcollection_cards) do
+    #         create_list(:collection_card_text, 2, parent: child_collection.collections.first)
+    #       end
+    #       before do
+    #         to_collection.update(master_template: true)
+    #       end
+    #
+    #       context 'moving to the beginning of master template with pinned cards' do
+    #         it 'should pin all cards if moving to the beginning of collection with pinned cards' do
+    #           card_mover.call
+    #           to_collection.reload
+    #           expect(to_collection.collection_cards.count).to eq 7
+    #           expect(to_collection.collection_cards.any?(&:pinned?)).to be true
+    #           subcollection = to_collection.collections.first
+    #           expect(subcollection.collection_cards.all?(&:pinned)).to be true
+    #           # subcollection should now be a subtemplate
+    #           expect(subcollection.master_template?).to be true
+    #           expect(subcollection.collections.first.master_template?).to be true
+    #         end
+    #       end
+    #
+    #       context 'when linking' do
+    #         let(:card_action) { 'link' }
+    #
+    #         it 'should not convert to template' do
+    #           links = card_mover.call
+    #           expect(links.last.collection).to eq(child_collection)
+    #           expect(links.last.collection.master_template?).to be false
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
 
     context 'with card_action "link"' do
       let(:card_action) { 'link' }
@@ -283,11 +289,11 @@ RSpec.describe CardMover, type: :service do
         card_mover.call
         # original cards should still be in the from_collection
         expect(from_collection.reload.collection_cards).to match_array linking_cards
-        # first card should now be a new link
-        to_collection.reload
 
-        expect(to_collection.collection_cards.first.link?).to be true
-        expect(to_collection.collection_cards.first.item).to eq linking_cards.first.item
+        to_collection.reload
+        # last card should now be a new link
+        expect(to_collection.collection_cards.last.link?).to be true
+        expect(to_collection.collection_cards.last.item).to eq linking_cards.last.item
       end
 
       it 'should not assign any permissions' do
@@ -298,20 +304,23 @@ RSpec.describe CardMover, type: :service do
       context 'when to_collection is a foamcore board' do
         let!(:to_collection) do
           create(:board_collection,
-                 num_cards: 3,
+                 num_cards: 2,
                  add_editors: [user],
                  organization: organization)
         end
-        let(:placement) { 'end' }
+
+        before do
+          to_collection.collection_cards.last.update(row: 2, col: 1)
+        end
 
         it 'places cards in their best fit after the last card' do
           card_mover.call
           to_collection.reload
           # they are all 1x1 so should fit consecutively
           expect(to_collection.collection_cards.last(3).pluck(:row, :col)).to eq([
-            [3, 1],
-            [3, 2],
-            [3, 3],
+            [2, 2],
+            [2, 3],
+            [2, 4],
           ])
         end
       end

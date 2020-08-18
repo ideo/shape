@@ -25,7 +25,7 @@
 #  provider                    :string
 #  remember_created_at         :datetime
 #  shape_circle_member         :boolean          default(FALSE)
-#  show_helper                 :boolean          default(TRUE)
+#  show_helper                 :boolean          default(FALSE)
 #  show_move_helper            :boolean          default(TRUE)
 #  show_template_helper        :boolean          default(TRUE)
 #  sign_in_count               :integer          default(0), not null

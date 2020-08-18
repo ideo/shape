@@ -23,6 +23,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   before_action :check_cache, only: %i[show]
   def show
     check_getting_started_shell
+    check_4wfc_migration
+
     include = Collection.default_relationships_for_api
     if @collection.collection_type_challenge?
       include.concat Collection.default_relationships_for_challenge
@@ -338,6 +340,12 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
     PopulateGettingStartedShellCollection.call(@collection, for_user: current_user)
     @collection.reload
+  end
+
+  def check_4wfc_migration
+    return if @collection.board_collection?
+
+    CollectionGrid::BoardMigrator.call(collection: @collection, async: true)
   end
 
   def load_and_authorize_collection_destroy

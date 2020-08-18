@@ -467,8 +467,13 @@ class Item < ApplicationRecord
   end
 
   def incomplete_description
-    # TODO: Make this handle order when people delete and then add questions
-    question_number = parent_collection_card.order + 1
+    if parent_collection_card.order.nil?
+      # now that ideas collection is a 4WFC, its item cards have order = nil
+      question_number = 1
+    else
+      # TODO: Make this handle order when people delete and then add questions
+      question_number = parent_collection_card.order + 1
+    end
 
     if question_single_choice? || question_multiple_choice?
       return "Question #{question_number} needs question text" if content.blank?

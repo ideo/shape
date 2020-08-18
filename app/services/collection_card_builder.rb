@@ -13,9 +13,9 @@ class CollectionCardBuilder
     @parent_collection = parent_collection
 
     if parent_collection.board_collection?
-      # Required to satisfy non-null DB constraint
-      @params[:order] = 0
+      @params[:order] = nil
     else
+      # TODO: deprecate?
       @params[:order] ||= next_card_order
       # row and col can come from GridCardHotspot, but we nullify for non-Boards
       @params.delete :row
@@ -71,7 +71,7 @@ class CollectionCardBuilder
 
   def create_collection_card
     # NOTE: cards created inside a master_template are unpinned by default unless it's being created within a pinned area
-    @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
+    # @collection_card.pinned = true if @parent_collection.should_pin_cards? @collection_card.order
     @collection_card.collection&.created_by = @user if @user.present?
     @parent_collection.transaction do
       if @parent_collection.board_collection?
