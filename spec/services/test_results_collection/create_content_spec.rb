@@ -116,7 +116,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
 
   context 'with multiple ideas' do
     let!(:second_idea_card) do
-      create(:collection_card_video, parent: test_collection.ideas_collection)
+      create(:collection_card_video, parent: test_collection.ideas_collection, row: 0, col: 1)
     end
     let(:second_idea) { second_idea_card.item }
 

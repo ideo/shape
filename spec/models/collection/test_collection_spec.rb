@@ -852,7 +852,6 @@ describe Collection::TestCollection, type: :model, seed: true do
     let(:test_collection) { create(:test_collection) }
 
     it 'returns false with test_status errors' do
-      # binding.pry
       expect(test_collection.launch!(initiated_by: user)).to be false
       expect(test_collection.errors).to match_array([
         'Please add your content to idea 1',

@@ -511,6 +511,37 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
             )
           end
         end
+
+        context 'with a test collection and idea question' do
+          let!(:collection) { create(:test_collection, add_editors: [user], organization: organization) }
+          let(:raw_params) do
+            {
+              # parent_id is required to retrieve the parent collection without a nested route
+              parent_id: collection.ideas_collection.id,
+              # create with a nested item
+              item_attributes: {
+                type: 'Item::QuestionItem',
+                content: 'This is my item content',
+                section_type: :ideas,
+                question_type: :question_idea,
+              },
+            }
+          end
+
+          it 'adds idea cards to the ideas collection (4WFC)' do
+            # comes with 1 pre-built idea card
+            expect(collection.idea_cards.count).to eq 1
+            expect do
+              post(path, params: params)
+              collection.reload
+            end.to change(collection.idea_cards, :count).by(1)
+            expect(collection.reload.idea_cards.count).to eq 2
+            expect(collection.idea_cards.pluck(:row, :col)).to eq([
+              [0, 0],
+              [0, 1],
+            ])
+          end
+        end
       end
     end
 

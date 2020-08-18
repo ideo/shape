@@ -18,6 +18,7 @@ module CollectionGrid
     end
 
     def self.top_left_card(cards)
+      cards = cards.reject { |card| card.row.nil? || card.col.nil? }
       min_row, min_col = cards.pluck(:row, :col).min
       cards.find { |c| c.row == min_row && c.col == min_col }
     end

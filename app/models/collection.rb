@@ -692,7 +692,7 @@ class Collection < ApplicationRecord
         unarchiving: true,
       )
     end
-    if board_collection? && !success
+    if board_collection? && (!success || cards.select { |cc| cc.row.nil? }.present?)
       # re-place any unarchived cards to do collision detection on their original position(s)
       cards.each(&:reload)
       top_left_card = CollectionGrid::Calculator.top_left_card(cards)

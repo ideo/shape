@@ -24,7 +24,7 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
       it 'migrates cards to row/col positions, and sets order to 0' do
         expect(cards.pluck(:row, :col).flatten.compact).to be_empty
         subject.call
-        expect(cards.pluck(:order, :row, :col)).to eq([
+        expect(cards.reload.pluck(:order, :row, :col)).to eq([
           [nil, 0, 0],
           [nil, 0, 2],
           [nil, 1, 0],
@@ -108,7 +108,7 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
       it 'archives hidden links from the UserCollection' do
         expect(cards.pluck(:row, :col).flatten.compact).to be_empty
         subject.call
-        expect(cards.pluck(:id, :row, :col)).to eq([
+        expect(cards.reload.pluck(:id, :row, :col)).to eq([
           [visible_cards.first.id, 0, 0],
           [visible_cards.second.id, 0, 1],
         ])

@@ -805,6 +805,35 @@ describe Collection, type: :model do
       end
     end
 
+    context 'with a board collection and no snapshot' do
+      let(:collection) { create(:board_collection, num_cards: 3) }
+      let(:cards) { collection.all_collection_cards.first(3) }
+      let(:snapshot) { nil }
+
+      before do
+        cards.last.update(row: nil, col: nil)
+      end
+
+      it 'calls the BoardPlacement service to place cards with collision detection' do
+        allow(CollectionGrid::BoardPlacement).to receive(:call).and_call_original
+        expect(CollectionGrid::BoardPlacement).to receive(:call).with(
+          moving_cards: cards,
+          to_collection: collection,
+          row: 0,
+          col: 0,
+        )
+        collection.unarchive_cards!(cards, snapshot)
+        # pick up new attrs
+        first_card.reload
+        expect(first_card.active?).to be true
+        expect(first_card.row).to eq 0
+        expect(collection.reload.collection_cards.pluck(:row, :col)).to eq([
+          [0, 0],
+          [0, 1],
+          [0, 2],
+        ])
+      end
+    end
 
     context 'with a master template and existing instances' do
       let!(:instance) { create(:collection, template: collection) }
