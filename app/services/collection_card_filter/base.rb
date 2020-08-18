@@ -71,14 +71,12 @@ module CollectionCardFilter
       per_page = [@filters[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
       per_page = [per_page, 200].min
 
-      if @ids_only || @select_ids.present? || @card_order.present?
+      if @ids_only || @select_ids.present?
         # start with all_collection_cards to unscope the order, and `active` will be applied below
         @cards = @collection
                  .all_collection_cards
                  .not_placeholder
-        unless @card_order.present?
-          @cards = @cards.ordered
-        end
+                 .ordered
         if @select_ids.present?
           cards_scope = @cards.where(id: @select_ids)
           if @collection.is_a?(Collection::SearchCollection)
@@ -164,7 +162,7 @@ module CollectionCardFilter
         end
       end
 
-      @cards = @cards.order(order)
+      @cards = @cards.reorder(order)
     end
 
     def apply_hidden

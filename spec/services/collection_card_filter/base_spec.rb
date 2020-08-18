@@ -58,6 +58,24 @@ RSpec.describe CollectionCardFilter::Base, type: :service do
             expect(viewable.first).to eq(sorted.first)
             expect(viewable.last).to eq(sorted.last)
           end
+
+          context 'and a filter query' do
+            let(:filters) { { card_order: 'updated_at', q: 'plant' } }
+
+            before do
+              visible_card_1.record.update(
+                name: 'a plant',
+              )
+              Collection.reindex
+              Collection.searchkick_index.refresh
+            end
+
+            it 'should only return the cards that match the filter query' do
+              expect(subject).to match_array(
+                [visible_card_1],
+              )
+            end
+          end
         end
 
         context 'card_order by test score' do
