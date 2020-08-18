@@ -76,7 +76,6 @@ module CollectionCardFilter
         @cards = @collection
                  .all_collection_cards
                  .not_placeholder
-                 .ordered
         if @select_ids.present?
           cards_scope = @cards.where(id: @select_ids)
           if @collection.is_a?(Collection::SearchCollection)
@@ -151,15 +150,17 @@ module CollectionCardFilter
     end
 
     def apply_order
-      order = { order: :asc }
-      if @card_order
-        if @card_order == 'total' || @card_order.include?('question_')
-          @collection_order = "collections.cached_test_scores->'#{@card_order}'"
-          order = Arel.sql("#{@collection_order} DESC NULLS LAST")
-        else
-          # e.g. updated_at
-          order = { @card_order => :desc }
-        end
+      unless @card_order.present?
+        @cards = @cards.ordered
+        return
+      end
+
+      if @card_order == 'total' || @card_order.include?('question_')
+        @collection_order = "collections.cached_test_scores->'#{@card_order}'"
+        order = Arel.sql("#{@collection_order} DESC NULLS LAST")
+      else
+        # e.g. updated_at
+        order = { @card_order => :desc }
       end
 
       @cards = @cards.reorder(order)

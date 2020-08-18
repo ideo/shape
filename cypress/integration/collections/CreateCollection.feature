@@ -11,7 +11,7 @@ Feature: Creating a Collection
     # wait to make sure that the slug is in the URL
     When I wait for 1 second
     When I capture the current URL
-    And I create a normal collection named "Another One" in my empty collection
+    And I create a normal collection named "Another One"
     And I navigate to the collection named "Another One" via the "CollectionCover"
     Then I should see "Hello World" in a "Breadcrumb"
     When I navigate to the collection named "Hello World" via the breadcrumb

@@ -14,13 +14,6 @@ When('I create a {word} collection named {string}', (collectionType, name) => {
   cy.createCollection({ name, collectionType })
 })
 
-When(
-  'I create a {word} collection named {string} in my empty collection',
-  (collectionType, name) => {
-    cy.createCollection({ name, collectionType, empty: true })
-  }
-)
-
 When('I create a {word} card', itemType => {
   cy.createCard(itemType)
 })
