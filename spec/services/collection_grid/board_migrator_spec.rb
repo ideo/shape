@@ -3,10 +3,12 @@ require 'rails_helper'
 RSpec.describe CollectionGrid::BoardMigrator, type: :service do
   let(:collection) { create(:collection, num_columns: nil, num_cards: 3) }
   let(:cards) { collection.collection_cards }
+  let(:async) { false }
 
   subject do
     CollectionGrid::BoardMigrator.new(
       collection: collection,
+      async: async,
     )
   end
 
@@ -65,6 +67,18 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
               [0, 0, 1],
             ])
           end
+        end
+      end
+
+      context 'with async true' do
+        let(:async) { true }
+
+        it 'calculates for current collection, but calls worker to migrate child collections' do
+          expect(CollectionGrid::Calculator).to receive(:calculate_rows_cols).once
+          expect(CollectionGrid::BoardMigratorWorker).to receive(:perform_async).with(
+            collection.id,
+          )
+          subject.call
         end
       end
     end

@@ -2,6 +2,9 @@
 module CollectionGrid
   class BoardMigrator
     include Interactor
+    include Interactor::Schema
+
+    schema :collection, :async
     require_in_context :collection
 
     def call
@@ -12,9 +15,16 @@ module CollectionGrid
 
     def migrate_collection_and_subcollections(collection)
       migrate_collection_to_board(collection)
-      collection.all_child_collections.find_in_batches do |batch|
-        batch.each do |c|
-          migrate_collection_to_board(c)
+      child_collections = collection.all_child_collections
+      return if child_collections.empty?
+
+      if context.async
+        CollectionGrid::BoardMigratorWorker.perform_async(collection.id)
+      else
+        child_collections.find_in_batches do |batch|
+          batch.each do |c|
+            migrate_collection_to_board(c)
+          end
         end
       end
 
