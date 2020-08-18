@@ -632,11 +632,7 @@ RSpec.describe CollectionCard, type: :model do
     let(:collection_card) { collection_cards.first }
 
     describe '#decrement_card_orders!' do
-      before do
-        # Make sure cards are in sequential order
-        collection.update(num_columns: nil)
-        collection.reorder_cards!
-      end
+      let(:collection) { create(:collection, num_columns: nil, num_cards: 5) }
 
       it 'should decrement all orders by 1' do
         order_arr = collection_cards.reload.map(&:order)
