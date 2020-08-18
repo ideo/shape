@@ -199,7 +199,7 @@ describe('CollectionCreator', () => {
             collection_attributes: {
               name: component.state.inputText,
               master_template: true,
-              type: 'Collection::Board',
+              type: null,
               num_columns: 4,
             },
           },

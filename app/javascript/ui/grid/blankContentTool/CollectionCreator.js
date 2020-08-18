@@ -75,13 +75,13 @@ class CollectionCreator extends React.Component {
         return 'Collection::TestCollection'
         break
       case 'foamcoreBoard':
-      case 'template':
         return 'Collection::Board'
         break
       case 'search':
         return 'Collection::SearchCollection'
         break
       case 'collection':
+      case 'template':
         return null
     }
     return null

@@ -34,8 +34,7 @@ import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import SuggestedTagsBanner from '~/ui/global/SuggestedTagsBanner'
-import { CloseButton } from '~/ui/global/styled/buttons'
-import Banner from '~/ui/layout/Banner'
+import HelperBanner4WFC from '~/ui/global/HelperBanner4WFC'
 
 @inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
@@ -693,34 +692,7 @@ class CollectionPage extends React.Component {
           )}
 
           {currentUser && currentUser.show_helper && (
-            <Banner
-              color={v.colors.primaryDarkest}
-              leftComponent={
-                <div style={{ fontSize: '1rem' }}>
-                  The way Shape's grid works has changed - now you can move or
-                  add content anywhere you'd like!
-                  <br />
-                   Click the +, drag and drop, and add new rows in the location
-                  of your choice.
-                </div>
-              }
-              rightComponent={
-                <CloseButton
-                  size="lg"
-                  color={v.colors.commonLight}
-                  onClick={() => {
-                    // after creating the card this will get set in the backend
-                    // so just make it false locally
-                    runInAction(() => {
-                      currentUser.show_helper = false
-                    })
-                    currentUser.API_updateCurrentUser({
-                      show_helper: false,
-                    })
-                  }}
-                />
-              }
-            />
+            <HelperBanner4WFC currentUser={currentUser} />
           )}
 
           <PageHeader record={collection} template={collection.template} />
