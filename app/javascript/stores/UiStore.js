@@ -1528,39 +1528,61 @@ export default class UiStore {
     _.assign(this.placeholderPosition, position)
   }
 
+  get scrollMaxX() {
+    return (
+      window.scrollMaxX ||
+      document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
+    )
+  }
+
+  get percentScrolledX() {
+    const { scrollMaxX } = this
+    // in the case where you don't have much horizontalScroll, default to midpoint
+    if (scrollMaxX < 20) return 0.5
+    return window.pageXOffset / scrollMaxX
+  }
+
+  get scrollMaxY() {
+    return (
+      window.scrollMaxY ||
+      document.documentElement.scrollHeight -
+        document.documentElement.clientHeight
+    )
+  }
+
+  get percentScrolledY() {
+    const { scrollMaxY } = this
+    // in the case where you're at the top, zoom in should take you a little ways down
+    if (window.pageYOffset < 20) return 0.1
+    return window.pageYOffset / scrollMaxY
+  }
+
   // -----------------------
   // Foamcore zoom functions
   zoomOut() {
-    const container = document.querySelector('.foamcoreGridBoundary')
-    const prevW = container.clientWidth
-    const prevScrollY = window.scrollY
-    this.updateZoomLevel(this.zoomLevel + 1)
-    setTimeout(() => {
-      const currW = container.clientWidth
-      const diff = prevW / currW
-      const scrollY = prevScrollY / diff
-      const scrollX = window.scrollX / diff
-      const top = scrollY - window.innerHeight / 4
-      const left = scrollX - window.innerHeight / 4
-
-      window.scrollTo({
-        left,
-        top,
-      })
-    })
+    this.zoomAndScroll(1)
   }
 
   zoomIn() {
-    const container = document.querySelector('.foamcoreGridBoundary')
-    const prevW = container.clientWidth
-    this.updateZoomLevel(this.zoomLevel - 1)
+    this.zoomAndScroll(-1)
+  }
+
+  zoomAndScroll(zoomChange) {
+    // capture these first
+    const { percentScrolledX, percentScrolledY } = this
+    const zoomBefore = this.relativeZoomLevel
+    this.updateZoomLevel(this.zoomLevel + zoomChange)
+    const zoomAfter = this.relativeZoomLevel
+    if (zoomBefore === zoomAfter) {
+      return
+    }
+
     setTimeout(() => {
-      const currW = container.clientWidth
-      const diff = prevW / currW
-      const scrollY = window.scrollY / diff
-      const scrollX = window.scrollX / diff
-      const top = scrollY + window.innerHeight / 2
-      const left = scrollX + window.innerWidth / 2
+      // now that things have changed
+      const { scrollMaxX, scrollMaxY } = this
+      const left = percentScrolledX * scrollMaxX
+      const top = percentScrolledY * scrollMaxY
 
       window.scrollTo({
         left,
