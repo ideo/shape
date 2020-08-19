@@ -9,7 +9,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
     let!(:to_collection) do
       create(:collection, num_cards: 3, add_editors: [user])
     end
-    let(:placement) { 'beginning' }
+    let(:placement) { 'end' }
     let(:synchronous) { :async }
     let(:building_template_instance) { false }
     let(:service) do
@@ -25,6 +25,7 @@ RSpec.describe CollectionCardDuplicator, type: :service do
 
     describe 'with invalid cards' do
       let(:default_moving_cards) { from_collection.collection_cards.first(3) }
+      let(:moving_cards) { from_collection.collection_cards }
       let(:invalid_card) do
         create(
           :collection_card,
@@ -37,7 +38,8 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       end
 
       it 'filters out invalid cards (global collections or missing a parent collection card' do
-        expect(service.call.length).to eq 2
+        expect(moving_cards.count).to eq 4
+        expect(service.call.count).to eq 3
       end
     end
 
@@ -45,12 +47,12 @@ RSpec.describe CollectionCardDuplicator, type: :service do
       expect(moving_cards.map(&:parent_id).uniq).to match_array [from_collection.id]
       new_cards = service.call
 
-      first_cards = to_collection.reload.collection_cards.first(2)
+      last_cards = to_collection.reload.collection_cards.last(2)
       # newly created cards should be duplicates
-      expect(first_cards).to match_array new_cards
+      expect(last_cards).to match_array new_cards
       # should point back to original items
-      expect(first_cards.map(&:item)).to match_array moving_cards.map(&:item)
-      expect(first_cards.all?(&:placeholder?)).to be true
+      expect(last_cards.map(&:item)).to match_array moving_cards.map(&:item)
+      expect(last_cards.all?(&:placeholder?)).to be true
       expect(to_collection.collection_cards.count).to eq 5
     end
 
@@ -113,18 +115,6 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         end
       end
 
-      context 'moving into a pinned area' do
-        before do
-          to_collection.update(master_template: true)
-          to_collection.collection_cards.each { |c| c.update(pinned: true) }
-        end
-        it 'creates Placeholder cards that are pinned' do
-          new_cards = service.call
-          expect(new_cards.all?(&:placeholder?)).to be true
-          expect(new_cards.all?(&:pinned?)).to be true
-        end
-      end
-
       context 'copying an entire template' do
         let!(:other_collection) { create(:collection) }
         let!(:from_collection_parent_card) { create(:collection_card, parent: other_collection, collection: from_collection) }
@@ -144,7 +134,9 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         let(:template) { create(:collection, master_template: true) }
         let(:building_template_instance) { true }
         let(:synchronous) { :all_levels }
+
         before do
+          to_collection.collection_cards.destroy_all
           to_collection.update(template: template)
           allow(CollectionCardDuplicationWorker).to receive(:perform_sync).and_call_original
         end
@@ -156,12 +148,10 @@ RSpec.describe CollectionCardDuplicator, type: :service do
 
         it 'creates cards that are pinned like the originals' do
           service.call
-          expect(to_collection.collection_cards.pluck(:templated_from_id, :order, :pinned)).to eq([
-            [moving_cards[0].id, 0, true],
-            [moving_cards[1].id, 1, true],
-            [nil, 2, false],
-            [nil, 3, false],
-            [nil, 4, false],
+          cards = to_collection.reload.collection_cards
+          expect(cards.pluck(:templated_from_id, :pinned, :row, :col)).to eq([
+            [moving_cards[0].id, true, 0, 0],
+            [moving_cards[1].id, true, 0, 1],
           ])
         end
 
@@ -185,11 +175,28 @@ RSpec.describe CollectionCardDuplicator, type: :service do
         create(:collection, master_template: true, pin_cards: true, num_cards: 3, add_editors: [user])
       end
 
-      it 'creates pinned Placeholder cards' do
-        new_cards = service.call
-        # newly created cards should be duplicates
-        expect(new_cards.all?(&:placeholder?)).to be true
-        expect(new_cards.all?(&:pinned?)).to be true
+      context 'with unpinned source cards' do
+        it 'preserves pinned value = false' do
+          new_cards = service.call
+          # newly created cards should be duplicates
+          expect(new_cards.all?(&:placeholder?)).to be true
+          # should not be pinned
+          expect(new_cards.all?(&:unpinned?)).to be true
+        end
+      end
+
+      context 'with pinned source cards' do
+        before do
+          moving_cards.each { |cc| cc.update(pinned: true) }
+        end
+
+        it 'preserves pinned value = false' do
+          new_cards = service.call
+          # newly created cards should be duplicates
+          expect(new_cards.all?(&:placeholder?)).to be true
+          # should be pinned like the source ones
+          expect(new_cards.all?(&:pinned?)).to be true
+        end
       end
     end
 
@@ -234,22 +241,6 @@ RSpec.describe CollectionCardDuplicator, type: :service do
           )
           expect(new_cards.count).to eq moving_cards.count
         end
-      end
-    end
-
-    context 'with integer order' do
-      let(:placement) { 1 }
-
-      it 'duplicates cards starting at the specified order' do
-        new_cards = service.call
-        expect(new_cards.map(&:order)).to eq [1, 2]
-        expect(to_collection.collection_cards.pluck(:type, :order)).to eq([
-          ['CollectionCard::Primary', 0],
-          ['CollectionCard::Placeholder', 1],
-          ['CollectionCard::Placeholder', 2],
-          ['CollectionCard::Primary', 3],
-          ['CollectionCard::Primary', 4],
-        ])
       end
     end
 

@@ -599,27 +599,23 @@ describe Collection, type: :model do
 
   describe '#copy_all_cards_into!' do
     let(:source_collection) { create(:collection, num_cards: 3) }
-    let(:target_collection) { create(:collection, num_cards: 2) }
+    let(:target_collection) { create(:collection) }
     let(:first_record) { source_collection.collection_cards.first.record }
 
-    it 'copies all cards from source to target, to the beginning' do
-      source_collection.copy_all_cards_into!(target_collection, synchronous: true)
-      target_collection.reload
-      expect(target_collection.collection_cards.count).to eq 5
+    it 'copies all cards from source to target, at the beginning' do
+      expect {
+        source_collection.copy_all_cards_into!(
+          target_collection,
+          synchronous: true,
+        )
+        target_collection.reload
+      }.to change(target_collection.collection_cards, :count).by(3)
       expect(target_collection.collection_cards.first.record.cloned_from).to eq first_record
-    end
-
-    it 'copies all cards from source to target, to the specified order' do
-      source_collection.copy_all_cards_into!(target_collection, synchronous: true, placement: 1)
-      target_collection.reload
-      # first record should still be the original target_collection card
-      expect(target_collection.collection_cards.first.record.cloned_from).to be nil
-      # check the second record
-      expect(target_collection.collection_cards.second.record.cloned_from).to eq first_record
     end
 
     context 'with links' do
       let(:fake_parent) { create(:collection) }
+      let(:target_collection) { create(:collection, num_cards: 2) }
       let(:source_collection) { create(:collection, num_cards: 3, record_type: :link_text, card_relation: :link) }
       before do
         # all these cards' linked records need corresponding parent_collection_cards for duplication
@@ -742,14 +738,12 @@ describe Collection, type: :model do
   describe '#unarchive_cards!' do
     let(:collection) { create(:collection, num_cards: 3) }
     let(:cards) { collection.all_collection_cards }
+    let(:first_card) { cards.first }
     let(:snapshot) do
       {
-        id: collection.id,
-        attributes: {
-          collection_cards_attributes: cards.map do |card|
-            { id: card.id, order: 3, width: 2, height: 1 }
-          end,
-        },
+        collection_cards_attributes: [
+          { id: first_card.id, row: 3, col: 1, width: 2, height: 1 },
+        ],
       }
     end
 
@@ -762,17 +756,83 @@ describe Collection, type: :model do
       expect do
         collection.unarchive_cards!(cards, snapshot)
       end.to change(collection.collection_cards, :count).by(3)
-      expect(cards.first.reload.active?).to be true
+      expect(first_card.reload.active?).to be true
     end
 
     it 'applies snapshot to revert the state' do
-      expect(cards.first.width).to eq 1 # default
+      expect(first_card.width).to eq 1 # default
       collection.unarchive_cards!(cards, snapshot)
+      first_card.reload
       # pick up new attrs
-      card = collection.reload.collection_cards.first
-      expect(card.width).to eq 2
-      # should always reorder the cards
-      expect(card.order).to eq 0
+      expect(first_card.width).to eq 2
+      expect(first_card.row).to eq 3
+      expect(first_card.col).to eq 1
+    end
+
+    context 'with a board collection and collision' do
+      let(:collection) { create(:board_collection, num_cards: 3) }
+      let(:cards) { collection.all_collection_cards.first(3) }
+      let(:overlap_card) { create(:collection_card_text, parent: collection, row: 1, col: 1) }
+      let(:snapshot) do
+        {
+          collection_cards_attributes: [
+            { id: first_card.id, row: 1, col: 1 },
+          ],
+        }
+      end
+
+      before do
+        first_card.update(row: 1, col: 1)
+      end
+
+      it 'calls the BoardPlacement service to place cards with collision detection' do
+        allow(CollectionGrid::BoardPlacement).to receive(:call).and_call_original
+        top_left_card = CollectionGrid::Calculator.top_left_card(cards)
+        expect(CollectionGrid::BoardPlacement).to receive(:call).with(
+          moving_cards: cards,
+          to_collection: collection,
+          row: top_left_card.row,
+          col: top_left_card.col,
+        )
+        # create overlap card
+        overlap_card
+        collection.unarchive_cards!(cards, snapshot)
+        # pick up new attrs
+        first_card.reload
+        expect(first_card.active?).to be true
+        # should have bumped it out of the way by 1
+        expect(first_card.col).to eq 2
+      end
+    end
+
+    context 'with a board collection and no snapshot' do
+      let(:collection) { create(:board_collection, num_cards: 3) }
+      let(:cards) { collection.all_collection_cards.first(3) }
+      let(:snapshot) { nil }
+
+      before do
+        cards.last.update(row: nil, col: nil)
+      end
+
+      it 'calls the BoardPlacement service to place cards with collision detection' do
+        allow(CollectionGrid::BoardPlacement).to receive(:call).and_call_original
+        expect(CollectionGrid::BoardPlacement).to receive(:call).with(
+          moving_cards: cards,
+          to_collection: collection,
+          row: 0,
+          col: 0,
+        )
+        collection.unarchive_cards!(cards, snapshot)
+        # pick up new attrs
+        first_card.reload
+        expect(first_card.active?).to be true
+        expect(first_card.row).to eq 0
+        expect(collection.reload.collection_cards.pluck(:row, :col)).to eq([
+          [0, 0],
+          [0, 1],
+          [0, 2],
+        ])
+      end
     end
 
     context 'with a master template and existing instances' do
@@ -784,35 +844,6 @@ describe Collection, type: :model do
       it 'calls queue_update_template_instances' do
         expect(UpdateTemplateInstancesWorker).to receive(:perform_async)
         collection.unarchive_cards!(cards, snapshot)
-      end
-    end
-
-    context 'with a board collection' do
-      let(:collection) { create(:board_collection, num_cards: 3) }
-      let(:cards) { collection.all_collection_cards.first(3) }
-      let(:first_card) { cards.first }
-      let(:overlap_card) { create(:collection_card_text, parent: collection, row: 1, col: 1) }
-
-      before do
-        first_card.update(row: 1, col: 1)
-      end
-
-      it 'calls the BoardPlacement service to place cards with collision detection' do
-        allow(CollectionGrid::BoardPlacement).to receive(:call).and_call_original
-        expect(CollectionGrid::BoardPlacement).to receive(:call).with(
-          moving_cards: cards,
-          to_collection: collection,
-          row: cards.first.row,
-          col: cards.first.col,
-        )
-        # create overlap card
-        overlap_card
-        collection.unarchive_cards!(cards, snapshot)
-        # pick up new attrs
-        first_card.reload
-        expect(first_card.active?).to be true
-        # should have bumped it out of the way by 1
-        expect(first_card.col).to eq 2
       end
     end
 
@@ -1033,72 +1064,18 @@ describe Collection, type: :model do
     end
   end
 
-  describe '#increment_card_orders_at' do
-    let!(:collection) { create(:collection, num_cards: 3) }
-
-    it 'should bump all card orders by the desired amount' do
-      expect(collection.collection_cards.map(&:order)).to eq [0, 1, 2]
-      collection.increment_card_orders_at(0)
-      collection.reload
-      expect(collection.collection_cards.map(&:order)).to eq [1, 2, 3]
-      collection.increment_card_orders_at(2, amount: 4)
-      collection.reload
-      expect(collection.collection_cards.map(&:order)).to eq [1, 6, 7]
-    end
-
-    it 'should modify timestamps' do
-      card = collection.collection_cards.first
-      expect {
-        collection.increment_card_orders_at(0)
-        card.reload
-      }.to change(card, :updated_at)
-    end
-  end
-
-  describe '#card_order_at' do
-    let!(:collection) { create(:collection, num_cards: 3) }
-
-    it 'should convert "beginning/end" into the correct order' do
-      expect(collection.card_order_at('beginning')).to eq 0
-      expect(collection.card_order_at('end')).to eq 3
-    end
-
-    it 'should return the order if it\'s an integer' do
-      expect(collection.card_order_at(2)).to eq 2
-    end
-  end
-
-  describe '#reorder_cards!' do
-    let!(:collection) { create(:collection, num_cards: 5) }
-    let(:cards) { collection.collection_cards }
-
-    it 'reorders with pinned and hidden in consideration' do
-      expect(collection.all_collection_cards.order(order: :asc).pluck(:id, :order)).to eq([
-        [cards[0].id, 0],
-        [cards[1].id, 1],
-        [cards[2].id, 2],
-        [cards[3].id, 3],
-        [cards[4].id, 4],
-      ])
-
-      cards[0].update(archived: true)
-      cards[1].update(hidden: true)
-      cards[2].update(order: 999)
-      cards[3].update(pinned: true)
-      collection.reorder_cards!
-      expect(collection.reload.collection_cards.pluck(:id, :order)).to eq([
-        # pinned
-        [cards[3].id, 0],
-        # normal order
-        [cards[4].id, 1],
-        # high order
-        [cards[2].id, 2],
-        # low order, hidden
-        [cards[1].id, 3],
-        # archived card not included
-      ])
-    end
-  end
+  # describe '#card_order_at' do
+  #   let!(:collection) { create(:collection, num_cards: 3) }
+  #
+  #   it 'should convert "beginning/end" into the correct order' do
+  #     expect(collection.card_order_at('beginning')).to eq 0
+  #     expect(collection.card_order_at('end')).to eq 3
+  #   end
+  #
+  #   it 'should return the order if it\'s an integer' do
+  #     expect(collection.card_order_at(2)).to eq 2
+  #   end
+  # end
 
   describe '#unreviewed_by?' do
     let(:user) { create(:user) }

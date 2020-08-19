@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { runInAction } from 'mobx'
 import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 import googleTagManager from '~/vendor/googleTagManager'
@@ -137,7 +136,6 @@ class GridCardBlank extends React.Component {
     this.state = {
       creating: preselected || null,
       loading: false,
-      droppingFile: false,
       bctMenuOpen: false,
       bctMenuOffsetPosition: null,
     }
@@ -300,13 +298,6 @@ class GridCardBlank extends React.Component {
     const card = new CollectionCard(attrs, apiStore)
     card.parent = parent // Assign parent so store can get access to it
     this.setState({ loading: true }, async () => {
-      if (apiStore.currentUser.show_helper) {
-        // after creating the card this will get set in the backend
-        // so just make it false locally
-        runInAction(() => {
-          apiStore.currentUser.show_helper = false
-        })
-      }
       let newCard
       if (isReplacing) {
         newCard = await card.API_replace({ replacingId })
@@ -378,8 +369,8 @@ class GridCardBlank extends React.Component {
   renderInner = () => {
     let inner
     const { parent } = this.props
-    const { isBoard, isFourWideBoard } = parent
-    const { creating, loading, droppingFile } = this.state
+    const { isBoard } = parent
+    const { creating, loading } = this.state
     const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
 
@@ -396,7 +387,6 @@ class GridCardBlank extends React.Component {
             loading={loading}
             createCard={this.createCard}
             closeBlankContentTool={this.closeBlankContentTool}
-            parentIsFourWide={isFourWideBoard}
           />
         )
         break

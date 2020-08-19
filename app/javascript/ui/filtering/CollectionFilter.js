@@ -154,7 +154,7 @@ class CollectionFilter extends React.Component {
   onSelectFilter = async filter => {
     return this.onFilterChange(async () => {
       // toggle whatever the current selected value is
-      this.toggleFilterSelected(filter, !filter.selected)
+      return this.toggleFilterSelected(filter, !filter.selected)
     })
   }
 

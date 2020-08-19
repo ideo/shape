@@ -78,6 +78,9 @@ class CollectionCardDuplicationWorker
 
   def cards_to_duplicate
     @duplicating_cards.select do |card|
+      # Skip if legend item - they will be moved over in `duplicate_legend_items`
+      next if card.item&.is_a?(Item::LegendItem)
+
       # Skip duplicating any cards this user can't view (if user provided)
       # If a system collection don't check if user can view
       if @building_template_instance || @system_collection

@@ -95,7 +95,7 @@ class GridCardEmptyHotspot extends React.Component {
 
   /**FIXME: check if this isn't being rendered correctly **/
   get renderGridCardEmpty() {
-    const { interactionType, numColumns, emptyRow } = this.props
+    const { interactionType, emptyRow, isFourWideBoard, row } = this.props
 
     let inner = ''
 
@@ -108,7 +108,7 @@ class GridCardEmptyHotspot extends React.Component {
           <StyledPlusIcon className="plus-icon">
             <PlusIcon />
           </StyledPlusIcon>
-          {numColumns === 4 && emptyRow && this.renderRightBlankActions}
+          {isFourWideBoard && emptyRow && this.renderRightBlankActions(row)}
         </div>
       )
     } else if (interactionType === 'unrendered') {
@@ -138,6 +138,7 @@ GridCardEmptyHotspot.propTypes = {
   interactionType: PropTypes.string,
   numColumns: PropTypes.number,
   emptyRow: PropTypes.bool,
+  isFourWideBoard: PropTypes.bool,
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,
   row: PropTypes.number,
@@ -149,6 +150,7 @@ GridCardEmptyHotspot.defaultProps = {
   interactionType: 'drag',
   numColumns: 4,
   emptyRow: false,
+  isFourWideBoard: false,
   handleRemoveRowClick: null,
   handleInsertRowClick: null,
   row: 0,

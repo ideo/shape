@@ -21,5 +21,21 @@ RSpec.describe CollectionChallengeSetup, type: :service do
       expect(reviewer_group.can_edit?(admin_group)).to be true
       expect(participant_group.can_edit?(admin_group)).to be true
     end
+
+    context 'without a user (e.g. OrganizationShellBuilder)' do
+      let(:user) { nil }
+
+      it 'should still create groups without the user' do
+        challenge_setup.call
+        admin_group = collection.challenge_admin_group
+        reviewer_group = collection.challenge_reviewer_group
+        participant_group = collection.challenge_participant_group
+        expect(admin_group.present?).to be true
+        expect(reviewer_group.present?).to be true
+        expect(reviewer_group.present?).to be true
+        expect(reviewer_group.can_edit?(admin_group)).to be true
+        expect(participant_group.can_edit?(admin_group)).to be true
+      end
+    end
   end
 end

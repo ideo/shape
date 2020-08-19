@@ -65,7 +65,7 @@ class CollectionCreator extends React.Component {
   }
 
   get dbType() {
-    const { type, parentIsFourWide } = this.props
+    const { type } = this.props
 
     switch (type) {
       case 'submissionBox':
@@ -75,30 +75,25 @@ class CollectionCreator extends React.Component {
         return 'Collection::TestCollection'
         break
       case 'foamcoreBoard':
-      case 'template':
         return 'Collection::Board'
         break
       case 'search':
         return 'Collection::SearchCollection'
         break
       case 'collection':
-        if (parentIsFourWide) return 'Collection::Board'
+      case 'template':
         return null
     }
     return null
   }
 
   get numColumns() {
-    const { type, parentIsFourWide } = this.props
+    const { type } = this.props
     if (type === 'foamcoreBoard') {
       return 16
-    } else if (
-      type === 'template' ||
-      (parentIsFourWide && type === 'collection')
-    ) {
-      return 4
     }
-    return null
+    // NOTE: 4 is already the default num_columns in the DB
+    return 4
   }
 
   get typeName() {
@@ -150,11 +145,9 @@ CollectionCreator.propTypes = {
   ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
-  parentIsFourWide: PropTypes.bool,
 }
 CollectionCreator.defaultProps = {
   type: 'collection',
-  parentIsFourWide: false,
 }
 
 export default CollectionCreator

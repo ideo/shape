@@ -82,7 +82,9 @@ class DefaultCollectionCover < SimpleService
 
     {
       card_id: card.id,
-      card_order: card.order,
+      # TODO: remove notion of card_order, as it's not applicable,
+      # we use card order which also computes row/col
+      card_order: card.card_order,
       item_id: card.item.id,
       content: card.item.type == 'Item::TextItem' ? cover_text(card.item) : card.item.image_url,
       # this will just return nil e.g. for text items

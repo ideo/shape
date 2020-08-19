@@ -67,6 +67,8 @@ FactoryBot.define do
 
     factory :test_results_collection, class: Collection::TestResultsCollection
     factory :test_collection, class: Collection::TestCollection do
+      num_columns nil
+
       transient do
         record_type :question
         num_responses 1
@@ -174,21 +176,30 @@ FactoryBot.define do
 
     after(:build) do |collection, evaluator|
       if evaluator.num_cards > 0
-        1.upto(evaluator.num_cards) do |i|
+        # e.g. primary_collection_cards or link_collection_cards
+        card_relation = "#{evaluator.card_relation}_collection_cards"
+        evaluator.num_cards.times do |i|
           card_type = :"collection_card_#{evaluator.record_type}"
+          order = nil
+          col = nil
+          row = nil
+          unless collection.board_collection?
+            order = i
+          end
           cc = build(
             card_type,
             parent: collection,
-            order: (i - 1),
             width: 1,
             height: 1,
-            col: 0,
-            row: i,
+            order: order,
+            col: col,
+            row: row,
             pinned: evaluator.pin_cards,
           )
-          # e.g. primary_collection_cards or link_collection_cards
-          card_relation = "#{evaluator.card_relation}_collection_cards"
           collection.send(card_relation) << cc
+        end
+        if collection.board_collection?
+          place_cards(collection: collection, cards: collection.send(card_relation))
         end
       end
 
@@ -198,11 +209,14 @@ FactoryBot.define do
         collection.parent_collection_card = build(
           :collection_card,
           parent: parent_collection,
-          order: parent_collection.collection_cards.count,
+          order: parent_collection.board_collection? ? nil : parent_collection.collection_cards.count,
           width: 1,
           height: 1,
           pinned: evaluator.pin_cards,
         )
+        if parent_collection.board_collection?
+          place_cards(collection: parent_collection, cards: [collection.parent_collection_card])
+        end
       end
     end
 
@@ -220,4 +234,12 @@ FactoryBot.define do
       end
     end
   end
+end
+
+def place_cards(collection:, cards:)
+  CollectionGrid::Calculator.place_cards_on_board(
+    collection: collection,
+    from_collection: collection,
+    moving_cards: cards,
+  )
 end

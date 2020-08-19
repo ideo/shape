@@ -6,7 +6,7 @@ RSpec.describe BulkCardOperationProcessor, type: :service do
   let(:to_collection) { create(:collection, num_cards: 1) }
   let(:cards) { from_collection.collection_cards }
   let(:action) { 'duplicate' }
-  let(:placement) { 'beginning' }
+  let(:placement) { Hashie::Mash.new(row: 3, col: 2) }
 
   subject do
     BulkCardOperationProcessor.new(
@@ -23,16 +23,14 @@ RSpec.describe BulkCardOperationProcessor, type: :service do
       expect {
         subject.call
       }.to change(CollectionCard::Placeholder, :count).by(1)
-      expect(to_collection.collection_cards.pluck(:type, :order)).to eq([
-        ['CollectionCard::Placeholder', 0],
-        ['CollectionCard::Primary', 1],
+      expect(to_collection.collection_cards.pluck(:type, :row, :col)).to eq([
+        ['CollectionCard::Primary', 0, 0],
+        ['CollectionCard::Placeholder', 3, 2],
       ])
     end
 
     context 'on a foamcore board' do
       let(:to_collection) { create(:board_collection, num_cards: 1) }
-      let(:placement) { Hashie::Mash.new(row: 3, col: 2) }
-
       before do
         # assign this a fixed value
         to_collection.collection_cards.first.update(row: 1, col: 1)

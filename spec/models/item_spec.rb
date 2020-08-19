@@ -91,10 +91,6 @@ RSpec.describe Item, type: :model do
       it 'duplicates parent' do
         expect(duplicate.parent_collection_card.id).not_to eq(item.parent_collection_card.id)
       end
-
-      it 'increases the order by 1' do
-        expect(duplicate.parent_collection_card.order).to eq(item.parent_collection_card.order + 1)
-      end
     end
 
     context 'with filestack file' do

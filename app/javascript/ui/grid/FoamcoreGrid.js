@@ -17,8 +17,6 @@ import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
-import CollectionViewToggle from '~/ui/grid/CollectionViewToggle'
-import CollectionFilter from '~/ui/filtering/CollectionFilter'
 import v from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 import { isFile } from '~/utils/FilestackUpload'
@@ -101,15 +99,6 @@ const Grid = styled.div`
   position: relative;
   width: ${props => `${props.width}px`};
   min-height: ${props => `${props.height}px`};
-`
-
-const CollectionFilterWrapper = styled.div`
-  display: flex;
-  position: fixed;
-  z-index: ${v.zIndex.zoomControls};
-  top: ${v.headerHeight}px;
-  height: 86px;
-  right: 32px;
 `
 
 function getMapKey({ col, row }) {
@@ -1164,12 +1153,12 @@ class FoamcoreGrid extends React.Component {
       collection,
       collection: { collection_cards },
     } = this.props
-    const { num_columns } = collection
+    const { isFourWideBoard } = collection
+    const { relativeZoomLevel } = this
+
     const emptyRow =
       !_.some(collection_cards, { row }) &&
       !_.some(collection_cards, { row: row - 1, height: 2 })
-
-    const { relativeZoomLevel } = this
 
     // could be drag or drag-overflow
     const isDrag = _.includes(type, 'drag')
@@ -1200,8 +1189,8 @@ class FoamcoreGrid extends React.Component {
             }
           }}
           interactionType={type}
-          numColumns={num_columns}
           emptyRow={emptyRow}
+          isFourWideBoard={isFourWideBoard}
           handleRemoveRowClick={this.handleRemoveRowClick}
           handleInsertRowClick={this.handleInsertRowClick}
           row={row}
@@ -1380,10 +1369,14 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
-    if (canEditCollection && this.placeholderSpot) {
+    const { placeholderSpot } = this
+    if (
+      canEditCollection &&
+      (placeholderSpot.row !== null && placeholderSpot.col !== null)
+    ) {
       cards.push({
         id: 'resize',
-        ...this.placeholderSpot,
+        ...placeholderSpot,
       })
     }
 
@@ -1536,15 +1529,6 @@ class FoamcoreGrid extends React.Component {
             onZoomIn={this.handleZoomIn}
             onZoomOut={this.handleZoomOut}
           />
-        )}
-        {!isSplitLevelBottom && collection.showFilters && (
-          <CollectionFilterWrapper>
-            <CollectionViewToggle collection={collection} />
-            <CollectionFilter
-              collection={collection}
-              canEdit={collection.canEdit}
-            />
-          </CollectionFilterWrapper>
         )}
         {this.renderDragSpots()}
         {this.renderBlanksAndBct()}

@@ -463,11 +463,6 @@ class PageHeader extends React.Component {
 
     const { showFilters } = record
 
-    const showFilterControls =
-      showFilters &&
-      // FoamcoreGrid displays its own fixed controls at the top
-      (!record.isBoard || record.viewMode === 'list')
-
     const isSticky =
       record.isChallengeOrInsideChallenge ||
       record.isLiveTest ||
@@ -559,7 +554,7 @@ class PageHeader extends React.Component {
                   </FixedRightContainer>
                 )}
               </StyledTitleAndRoles>
-              {showFilterControls && (
+              {showFilters && (
                 <div style={{ marginBottom: '-16px', display: 'flex' }}>
                   <CollectionViewToggle collection={record} />
                   <CollectionFilter

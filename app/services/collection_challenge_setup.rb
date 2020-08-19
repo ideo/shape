@@ -1,5 +1,5 @@
 class CollectionChallengeSetup < SimpleService
-  def initialize(collection:, user:)
+  def initialize(collection:, user: nil)
     @collection = collection
     @user = user
   end
@@ -30,9 +30,8 @@ class CollectionChallengeSetup < SimpleService
       organization: organization,
     )
 
-    @user.add_role(Role::ADMIN, admin_group)
-    @user.add_role(Role::ADMIN, participant_group)
-    @user.add_role(Role::ADMIN, reviewer_group)
+    # user won't be present e.g. on OrganizationShellBuilder setup
+    @user&.add_role(Role::ADMIN, admin_group)
 
     admin_group.add_role(Role::ADMIN, reviewer_group)
     admin_group.add_role(Role::ADMIN, participant_group)
