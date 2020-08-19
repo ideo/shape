@@ -12,6 +12,7 @@ module CollectionCardFilter
       @collection = collection
       @user = user
       @filters = filters
+      @card_order = @filters.try(:[], :card_order)
       @application = application
       @cards = []
       # ids_only means literally just return collection card ids
@@ -72,7 +73,9 @@ module CollectionCardFilter
 
       if @ids_only || @select_ids.present?
         # start with all_collection_cards to unscope the order, and `active` will be applied below
-        @cards = @collection.all_collection_cards.not_placeholder
+        @cards = @collection
+                 .all_collection_cards
+                 .not_placeholder
         if @select_ids.present?
           cards_scope = @cards.where(id: @select_ids)
           if @collection.is_a?(Collection::SearchCollection)
@@ -82,6 +85,8 @@ module CollectionCardFilter
             cards_scope: cards_scope,
             user: @user,
           )
+        else
+          @cards = @cards.select(*fields)
         end
       elsif @filters[:q].present?
         where_clause = {
@@ -145,19 +150,20 @@ module CollectionCardFilter
     end
 
     def apply_order
-      card_order = @filters[:card_order]
-      order = { order: :asc }
-      if card_order
-        if card_order == 'total' || card_order.include?('question_')
-          @collection_order = "collections.cached_test_scores->'#{card_order}'"
-          order = Arel.sql("#{@collection_order} DESC NULLS LAST")
-        else
-          # e.g. updated_at
-          order = { card_order => :desc }
-        end
+      unless @card_order.present?
+        @cards = @cards.ordered
+        return
       end
 
-      @cards = @cards.order(order)
+      if @card_order == 'total' || @card_order.include?('question_')
+        @collection_order = "collections.cached_test_scores->'#{@card_order}'"
+        order = Arel.sql("#{@collection_order} DESC NULLS LAST")
+      else
+        # e.g. updated_at
+        order = { @card_order => :desc }
+      end
+
+      @cards = @cards.reorder(order)
     end
 
     def apply_hidden

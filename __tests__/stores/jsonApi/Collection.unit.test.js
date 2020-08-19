@@ -970,25 +970,57 @@ describe('Collection', () => {
     })
   })
 
-  // describe('showFilters', () => {
-  //   describe('searchCollection or submissionBox', () => {
-  //     it('returns false', () => {
-  //       collection.type = 'Collection::SearchCollection'
-  //       expect(collection.showFilters).toEqual(false)
-  //       collection.type = 'Collection::SubmissionBox'
-  //       expect(collection.showFilters).toEqual(false)
-  //     })
-  //   })
-  //
-  //   describe('normal, board, submissions collection', () => {
-  //     it('returns true', () => {
-  //       collection.type = 'Collection'
-  //       expect(collection.showFilters).toEqual(true)
-  //       collection.type = 'Collection::Board'
-  //       expect(collection.showFilters).toEqual(true)
-  //       collection.type = 'Collection::SubmissionsCollection'
-  //       expect(collection.showFilters).toEqual(true)
-  //     })
-  //   })
-  // })
+  describe('API_collectionChallengeSetup', () => {
+    beforeEach(() => {
+      apiStore.request.mockClear()
+      collection.initializeParentChallengeForCollection = jest.fn()
+    })
+
+    it('calls collection_challenge_setup API endpoint', async () => {
+      await collection.API_collectionChallengeSetup()
+      expect(apiStore.request).toHaveBeenCalledWith(
+        `collections/${collection.id}/collection_challenge_setup`,
+        'POST'
+      )
+      expect(
+        collection.initializeParentChallengeForCollection
+      ).toHaveBeenCalled()
+    })
+
+    describe('with group ids already available', () => {
+      beforeEach(() => {
+        collection.challenge_admin_group_id = '1'
+        collection.challenge_reviewer_group_id = '2'
+        collection.challenge_participant_group_id = '3'
+        apiStore.request.mockClear()
+      })
+
+      it('does not call collection_challenge_setup API endpoint', async () => {
+        await collection.API_collectionChallengeSetup()
+        expect(apiStore.request).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('showFilters', () => {
+    describe('searchCollection or submissionBox', () => {
+      it('returns false', () => {
+        collection.type = 'Collection::SearchCollection'
+        expect(collection.showFilters).toEqual(false)
+        collection.type = 'Collection::SubmissionBox'
+        expect(collection.showFilters).toEqual(false)
+      })
+    })
+
+    describe('normal, board, submissions collection', () => {
+      it('returns true', () => {
+        collection.type = 'Collection'
+        expect(collection.showFilters).toEqual(true)
+        collection.type = 'Collection::Board'
+        expect(collection.showFilters).toEqual(true)
+        collection.type = 'Collection::SubmissionsCollection'
+        expect(collection.showFilters).toEqual(true)
+      })
+    })
+  })
 })

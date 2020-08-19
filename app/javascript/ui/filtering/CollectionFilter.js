@@ -5,6 +5,7 @@ import { action, observable, runInAction } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import pluralize from 'pluralize'
 import styled from 'styled-components'
+import _ from 'lodash'
 
 import { apiStore, uiStore } from '~/stores'
 import CollectionSort from '~/ui/grid/CollectionSort'
@@ -34,6 +35,25 @@ class CollectionFilter extends React.Component {
     // update this observable because FilterBar uses a portal (with a DOM id)
     // so we want to make sure this has rendered before trying to render FilterBar
     this.rendered = true
+    this.toggleFilterSelected = this.toggleFilterSelected.bind(this)
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.hasPreselectedTags && !this.props.hasPreselectedTags) {
+      const filters = apiStore.findAll('collection_filters')
+      if (_.isEmpty(filters)) return
+
+      const { currentUser } = apiStore
+      const { handle } = currentUser
+      const userFilter = _.find(
+        filters,
+        f => f.filter_type === 'user_tag' && f.text === handle
+      )
+
+      if (!userFilter.selected) {
+        this.toggleFilterSelected(userFilter, true)
+      }
+    }
   }
 
   get tagFilters() {
@@ -112,24 +132,29 @@ class CollectionFilter extends React.Component {
       return collection.API_createCollectionFilter(filter)
   }
 
-  onDeleteFilter = async tag => {
+  onDeleteFilter = async object => {
     return this.onFilterChange(async () => {
       const { collection } = this.props
-      const filter = apiStore.find('collection_filters', tag.id)
+      const filter = apiStore.find('collection_filters', object.id)
       if (filter) {
         return collection.API_destroyCollectionFilter(filter)
       }
     })
   }
 
-  onSelectFilter = async tag => {
+  toggleFilterSelected = (object, selected = null) => {
+    const filter = apiStore.find('collection_filters', object.id)
+    const { collection } = this.props
+    if (collection.isBoard && collection.viewMode !== 'list') {
+      collection.setViewMode('list')
+    }
+    return filter.API_toggleSelected(collection, selected)
+  }
+
+  onSelectFilter = async filter => {
     return this.onFilterChange(async () => {
-      const filter = apiStore.find('collection_filters', tag.id)
-      const { collection } = this.props
-      if (collection.isBoard && collection.viewMode !== 'list') {
-        collection.setViewMode('list')
-      }
-      return filter.API_toggleSelected(collection, !tag.selected)
+      // toggle whatever the current selected value is
+      return this.toggleFilterSelected(filter, !filter.selected)
     })
   }
 
@@ -242,12 +267,14 @@ CollectionFilter.propTypes = {
   canEdit: PropTypes.bool,
   sortable: PropTypes.bool,
   inSearchCollection: PropTypes.bool,
+  hasPreselectedTags: PropTypes.bool,
 }
 
 CollectionFilter.defaultProps = {
   canEdit: false,
   sortable: false,
   inSearchCollection: false,
+  hasPreselectedTags: false,
 }
 
 export default CollectionFilter

@@ -24,6 +24,8 @@ Feature: Challenge settings
     Then I should see "bitcoin" in a "Pill"
 
     When I click the "ChallengeSettings-PhasesNav"
+    And I wait for "@apiGetPhaseSubCollections" to finish
+    And I wait for 1 second
     Then I should see 3 "ChallengeSettings-Phase"
     When I click the "CollectionDateRange"
     And I click on the first available date in the datepicker

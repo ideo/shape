@@ -57,35 +57,36 @@ RSpec.describe TemplateInstanceUpdater, type: :service do
         )
       end
 
-      it 'should update all pinned cards to match any height, width and order updates' do
-        # Update master cards height, width and order
-        first_template_card = template.collection_cards.find_by_id(updated_card_ids[0])
-        second_template_card = template.collection_cards.find_by_id(updated_card_ids[1])
-        # fake bumping all cards to the end
-        template.collection_cards.update_all(order: 100)
+      it 'should update all pinned cards to match any height, width and placement updates' do
         template.update(
           collection_cards_attributes: [
-            { id: first_template_card.id, height: 2, width: 2, order: 1 },
-            { id: second_template_card.id, order: 0 },
+            { id: updated_card_ids.first, height: 2, width: 2, row: 2, col: 1 },
+            { id: updated_card_ids.second, row: 0, col: 0 },
           ],
         )
-        # now first and second should be swapped, all other cards should get reordered after
-        template.reorder_cards!
         # Update instances
         template_instance_updater.call
         template_instance.reload
         template.collection_cards.reload
 
         # Instance cards should reflect the updates, and be in the updated order
-        expect(template_instance.collection_cards[0].height).to eq(1)
-        expect(template_instance.collection_cards[0].width).to eq(1)
-        expect(template_instance.collection_cards[0].templated_from_id).to eq(
-          second_template_card.id,
+        # 1, 2, 3 has become 2, 3, 1
+        first_card = template_instance.collection_cards.first
+        expect(first_card.height).to eq(1)
+        expect(first_card.width).to eq(1)
+        expect(first_card.templated_from_id).to eq(
+          updated_card_ids.second,
         )
-        expect(template_instance.collection_cards[1].height).to eq(2)
-        expect(template_instance.collection_cards[1].width).to eq(2)
-        expect(template_instance.collection_cards[1].templated_from_id).to eq(
-          first_template_card.id,
+
+        second_card = template_instance.collection_cards.second
+        expect(second_card.templated_from_id).to eq(
+          updated_card_ids.third,
+        )
+        third_card = template_instance.collection_cards.third
+        expect(third_card.height).to eq(2)
+        expect(third_card.width).to eq(2)
+        expect(third_card.templated_from_id).to eq(
+          updated_card_ids.first,
         )
       end
 

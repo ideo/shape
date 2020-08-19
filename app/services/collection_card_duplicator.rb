@@ -71,10 +71,6 @@ class CollectionCardDuplicator < SimpleService
       @row = @placement.try(:[], 'row')
       @col = @placement.try(:[], 'col')
     end
-    # now make room for these cards (unless we're at the end)
-    return if @placement == 'end' || @to_collection.board_collection?
-
-    @to_collection.increment_card_orders_at(@order, amount: @cards.count)
   end
 
   def register_card_mappings
@@ -121,8 +117,6 @@ class CollectionCardDuplicator < SimpleService
   end
 
   def duplicate_cards_with_placeholders
-    pin_duplicating_cards = should_pin_duplicating_cards?
-
     @cards.each_with_index do |card, i|
       # Skip if legend item - they will be moved over in `CollectionCardDuplicationWorker#duplicate_legend_items`
       next if card.item&.is_a?(Item::LegendItem)
@@ -133,10 +127,7 @@ class CollectionCardDuplicator < SimpleService
       # help us refer back to the originals when duplicating
       dup = card.amoeba_dup.becomes(CollectionCard::Placeholder)
       dup.type = 'CollectionCard::Placeholder'
-      if @to_collection.master_template?
-        # only override the source card pinned value if pin_duplicating_cards is true or false
-        dup.pinned = pin_duplicating_cards unless pin_duplicating_cards.nil?
-      else
+      unless @to_collection.master_template?
         dup.pinned = false
       end
       dup.parent_id = @to_collection.id

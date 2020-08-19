@@ -34,6 +34,7 @@ import ArchivedBanner from '~/ui/layout/ArchivedBanner'
 import OverdueBanner from '~/ui/layout/OverdueBanner'
 import CreateOrgPage from '~/ui/pages/CreateOrgPage'
 import SuggestedTagsBanner from '~/ui/global/SuggestedTagsBanner'
+import HelperBanner4WFC from '~/ui/global/HelperBanner4WFC'
 
 @inject('apiStore', 'uiStore', 'routingStore', 'undoStore')
 @observer
@@ -195,9 +196,9 @@ class CollectionPage extends React.Component {
     if (undoStore.actionAfterRoute) {
       undoStore.performActionAfterRoute()
     }
-    if (collection.isEmpty && !collection.isBoard) {
-      uiStore.openBlankContentTool()
-    }
+    // if (collection.isEmpty && !collection.isBoard) {
+    //   uiStore.openBlankContentTool()
+    // }
     if (collection.joinable_group_id) {
       apiStore.checkJoinableGroup(collection.joinable_group_id)
     }
@@ -218,6 +219,7 @@ class CollectionPage extends React.Component {
       this.initializeChallenges()
     }
     uiStore.update('dragTargets', [])
+    uiStore.update('preselectUserTag', false)
   }
 
   restoreWindowScrollPosition() {
@@ -546,6 +548,7 @@ class CollectionPage extends React.Component {
           <CollectionFilter
             collection={submissions_collection}
             canEdit={collection.can_edit_content}
+            hasPreselectedTags={uiStore.preselectUserTag}
             sortable
           />
         </Flex>
@@ -596,6 +599,7 @@ class CollectionPage extends React.Component {
 
   render() {
     const { collection, uiStore, apiStore } = this.props
+    const { currentUser } = apiStore
 
     if (!collection) {
       return this.loader()
@@ -686,6 +690,11 @@ class CollectionPage extends React.Component {
               <OverdueBanner />
             </Fragment>
           )}
+
+          {currentUser && currentUser.show_helper && (
+            <HelperBanner4WFC currentUser={currentUser} />
+          )}
+
           <PageHeader record={collection} template={collection.template} />
           {userRequiresOrg && (
             // for new user's trying to add a common resource, they'll see the Create Org modal

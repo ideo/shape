@@ -19,7 +19,7 @@
 #  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
-#  num_columns                    :integer
+#  num_columns                    :integer          default(4)
 #  processing_status              :integer
 #  propagate_background_image     :boolean          default(FALSE)
 #  propagate_font_color           :boolean          default(FALSE)
@@ -455,6 +455,7 @@ class Collection < ApplicationRecord
       c.template = self
       c.master_template = false
     end
+
     # clear out cached submission_attrs
     c.cached_attributes.delete 'submission_attrs'
     c.cloned_from = self
@@ -475,6 +476,11 @@ class Collection < ApplicationRecord
     # return if it didn't work for whatever reason
     c.parent_collection_card = card if card
     return c unless c.save
+
+    # set up the challenge if that's what we're duplicating
+    if collection_type_challenge?
+      CollectionChallengeSetup.call(collection: c, user: for_user)
+    end
 
     c.parent_collection_card.save if c.parent_collection_card.present?
 
@@ -519,7 +525,6 @@ class Collection < ApplicationRecord
 
   def copy_all_cards_into!(
     target_collection,
-    placement: 'beginning',
     synchronous: false,
     system_collection: false
   )
@@ -532,7 +537,6 @@ class Collection < ApplicationRecord
     duplicates = CollectionCardDuplicator.call(
       to_collection: target_collection,
       cards: cards,
-      placement: placement,
       system_collection: system_collection,
       synchronous: synchronous,
       # important that we disable this so it preserves links
@@ -650,14 +654,13 @@ class Collection < ApplicationRecord
       .and(
         table[:col].lteq(cols[1]),
       ),
-    )
+    ).ordered_row_col
   end
 
   # convenience method if card order ever gets out of sync
   def reorder_cards!
     if board_collection?
-      # There is a non-null constraint, but we want to effectively nullify orders
-      collection_cards.update_all(order: 0)
+      collection_cards.update_all(order: nil)
       return
     end
 
@@ -679,27 +682,19 @@ class Collection < ApplicationRecord
     )
   end
 
-  def increment_card_orders_at(order, amount: 1)
-    collection_cards
-      .where(CollectionCard.arel_table[:order].gteq(order))
-      .update_all([
-        '"order" = "order" + ?, updated_at = ?',
-        amount,
-        Time.current,
-      ])
-  end
-
   def unarchive_cards!(cards, card_attrs_snapshot)
     cards.each(&:unarchive!)
+    success = true
     if card_attrs_snapshot.present?
-      CollectionUpdater.call(
+      success = CollectionUpdater.call(
         self,
         card_attrs_snapshot,
         unarchiving: true,
       )
     end
-    if board_collection?
+    if board_collection? && (!success || cards.select { |cc| cc.row.nil? }.present?)
       # re-place any unarchived cards to do collision detection on their original position(s)
+      cards.each(&:reload)
       top_left_card = CollectionGrid::Calculator.top_left_card(cards)
       CollectionGrid::BoardPlacement.call(
         moving_cards: cards,
@@ -1018,7 +1013,7 @@ class Collection < ApplicationRecord
 
   def board_collection?
     # eventually going to have to rethink what "board_collection?" means
-    return false if is_a?(Collection::SubmissionsCollection)
+    return false if test_collection? || is_a?(Collection::SubmissionsCollection)
 
     num_columns.present?
   end
@@ -1067,13 +1062,13 @@ class Collection < ApplicationRecord
   end
 
   def challenge_or_inside_challenge?
-    return true if collection_type == 'challenge'
+    return true if collection_type_challenge?
 
     inside_a_challenge?
   end
 
   def challenge_submission_boxes
-    challenge_collection = collection_type == 'challenge' ? self : parent_challenge
+    challenge_collection = collection_type_challenge? ? self : parent_challenge
     challenge_collection.all_child_collections
                         .active
                         .submission_box

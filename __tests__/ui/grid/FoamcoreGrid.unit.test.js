@@ -183,7 +183,8 @@ describe('FoamcoreGrid', () => {
       cardB = createCard({ row: 3, col: 2, height: 2 })
       cardC = createCard({ row: 5, col: 1 })
       collection.collection_cards = [cardA, cardB, cardC]
-      collection.num_columns = 4
+      // special actions only show up for fourWide
+      collection.isFourWideBoard = true
       props.collection = collection
       rerender()
     })
@@ -205,9 +206,11 @@ describe('FoamcoreGrid', () => {
 
   describe('renderHotspots', () => {
     describe('with one card at the beginning of a row and none touching', () => {
-      it('should have hotspots at the beginning of every row', () => {
+      it('should have vertical hotspots at the beginning of every row', () => {
+        const hotspots = wrapper.find('FoamcoreHotspot')
         // default cardMatrix only has card C at the beginning of the row
-        expect(wrapper.find('FoamcoreHotspot').length).toEqual(1)
+        expect(hotspots.find({ horizontal: false }).length).toEqual(1)
+        expect(hotspots.find({ horizontal: true }).length).toEqual(3)
       })
     })
 
@@ -217,9 +220,11 @@ describe('FoamcoreGrid', () => {
         rerender()
       })
 
-      it('should have hotspots at the beginning of every row', () => {
+      it('should have vertical hotspots at the beginning of every row', () => {
         // cardA now is at the beginning of the row AND bumps into cardB (+2)
-        expect(wrapper.find('FoamcoreHotspot').length).toEqual(3)
+        const hotspots = wrapper.find('FoamcoreHotspot')
+        expect(hotspots.find({ horizontal: false }).length).toEqual(3)
+        expect(hotspots.find({ horizontal: true }).length).toEqual(3)
       })
     })
 

@@ -16,37 +16,18 @@ RSpec.describe CardPinner, type: :service do
 
   describe '#call' do
     context 'with card to pin' do
-      it 'should move pinned card to the beginning' do
-        card_pinner.call
-        expect(template.collection_cards.pinned).not_to be_empty
-        expect(card_to_pin.reload.order).to eql(0)
-      end
-
-      context 'with card to pin along already pinned cards' do
-        before do
-          template.collection_cards.first.update(pinned: true)
-        end
-
-        it 'should move pinned card to the end of the pinned cards' do
-          card_pinner.call
-          expect(template.collection_cards.pluck(:order, :pinned)).to eql(
-            [[0, true], [1, true], [2, false]],
-          )
-        end
-      end
-    end
-
-    context 'with card to unpin' do
-      let!(:pin_cards) { true }
-      let!(:card_to_pin) { template.collection_cards.first }
-      let!(:pinning) { false }
-
-      it 'should move unpinned card to the beginning of the unpinned cards' do
+      it 'should pin the card' do
         expect {
           card_pinner.call
-        }.to change(card_to_pin, :order)
-        expect(template.collection_cards.unpinned).not_to be_empty
-        expect(template.collection_cards.unpinned.first.id).to equal card_to_pin.id
+        }.to change(card_to_pin, :pinned)
+      end
+
+      it 'should call queue_update_template_instances' do
+        expect_any_instance_of(Collection).to receive(:queue_update_template_instances).with(
+          updated_card_ids: [card_to_pin.id],
+          template_update_action: :pin,
+        )
+        card_pinner.call
       end
     end
   end

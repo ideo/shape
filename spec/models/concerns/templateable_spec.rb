@@ -70,42 +70,42 @@ describe Templateable, type: :concern do
 
   describe '#update_test_template_instance_types!' do
     let(:parent_collection) { create(:collection) }
-    let!(:template) do
+    let!(:template_test) do
       create(:test_collection,
              master_template: true,
              parent_collection: parent_collection,
              collection_to_test_id: parent_collection.id)
     end
     let(:instance_parent) { create(:collection) }
-    let!(:template_instance) do
-      create(:test_collection, template: template, parent_collection: instance_parent)
+    let!(:template_instance_test) do
+      create(:test_collection, template: template_test, parent_collection: instance_parent)
     end
 
     before do
-      template.setup_templated_collection(
+      template_test.setup_templated_collection(
         for_user: nil,
-        collection: template_instance,
+        collection: template_instance_test,
         synchronous: true,
       )
     end
 
     it 'should update all instances with collection_to_test setting' do
       expect {
-        template.update_test_template_instance_types!
-        template_instance.reload
-      }.to change(template_instance, :collection_to_test_id)
+        template_test.update_test_template_instance_types!
+        template_instance_test.reload
+      }.to change(template_instance_test, :collection_to_test_id)
       # collection_to_test in instance should refer to its own parent
-      expect(template_instance.collection_to_test_id).to eq instance_parent.id
+      expect(template_instance_test.collection_to_test_id).to eq instance_parent.id
     end
 
     it 'should call hide_or_show_section_questions! on each instance' do
-      template.update_test_template_instance_types!
-      template.hide_or_show_section_questions!
-      template.reload
-      template_instance.reload
+      template_test.update_test_template_instance_types!
+      template_test.hide_or_show_section_questions!
+      template_test.reload
+      template_instance_test.reload
       # template and instance should both have hidden 3 cards
-      hidden_cards = template_instance.collection_cards.hidden
-      hidden_template_cards = template.collection_cards.hidden
+      hidden_cards = template_instance_test.collection_cards.hidden
+      hidden_template_cards = template_test.collection_cards.hidden
       expect(hidden_cards.count).to eq 3
       expect(hidden_cards.pluck(:templated_from_id)).to match_array(
         hidden_template_cards.pluck(:id),

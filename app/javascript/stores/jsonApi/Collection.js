@@ -1593,10 +1593,13 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     }
 
     const { apiStore } = this
-    return apiStore.request(
+    const res = await apiStore.request(
       `collections/${this.id}/collection_challenge_setup`,
       'POST'
     )
+    // need to set parentChallenge as "this"
+    this.initializeParentChallengeForCollection()
+    return res
   }
 
   API_clearCollectionCover() {
@@ -1640,7 +1643,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     return potentialReviewerList
   }
 
-  async API_getNextAvailableTest() {
+  async API_getNextAvailableTest({ challenge = false } = {}) {
     this.setNextAvailableTestPath(null)
     const res = await this.apiStore.request(
       `collections/${this.id}/next_available_submission_test`
@@ -1649,7 +1652,12 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (!nextTest) return
 
     let path = this.routingStore.pathTo('tests', nextTest.id)
-    if (nextTest.collection_to_test_id) {
+    if (challenge && nextTest.parent_submission_box) {
+      path = this.routingStore.pathTo(
+        'collections',
+        nextTest.parent_submission_box.id
+      )
+    } else if (nextTest.collection_to_test_id) {
       path = this.routingStore.pathTo(
         'collections',
         nextTest.collection_to_test_id
@@ -1657,7 +1665,10 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       path += `?open=tests`
     }
 
-    this.setNextAvailableTestPath(path)
+    if (!challenge) {
+      // inline-collection tests will use this path
+      this.setNextAvailableTestPath(path)
+    }
     return path
   }
 
@@ -1712,6 +1723,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const submissions_collection = res.data
     // set the reverse relationship
     submissions_collection.submission_box = this
+    if (submissions_collection.activeFilters.length > 0) {
+      submissions_collection.setViewMode('list')
+    }
     await submissions_collection.API_fetchCards({ order })
     return submissions_collection
   }

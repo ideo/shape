@@ -17,6 +17,7 @@ class OrganizationAssigner < SimpleService
       add_role
       assign_user_collection
       setup_user_membership_and_collections
+      add_user_to_challenge_groups
       create_application_organization if @user.application_bot?
 
       if @full_setup
@@ -108,5 +109,13 @@ class OrganizationAssigner < SimpleService
       organization: @organization,
       application: @user.application,
     )
+  end
+
+  def add_user_to_challenge_groups
+    @organization.collections.where(collection_type: :challenge).find_each do |challenge|
+      next unless challenge.challenge_admin_group.present?
+
+      @user.add_role(Role::ADMIN, challenge.challenge_admin_group)
+    end
   end
 end

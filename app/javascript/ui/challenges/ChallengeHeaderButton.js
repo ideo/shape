@@ -31,17 +31,17 @@ ChallengeSettingsButton.propTypes = {
 ChallengeSettingsButton.displayName = 'ChallengeSettingsButton'
 
 export const ReviewSubmissionsButton = ({ record }) => {
-  const [nextAvailableTestPath, setNextAvailableTestPath] = useState(null)
+  const [submissionBoxPath, setSubmissionBoxPath] = useState(null)
 
   useEffect(() => {
     const loadNextAvailableTest = async () => {
-      const path = await record.API_getNextAvailableTest()
-      setNextAvailableTestPath(path)
+      const path = await record.API_getNextAvailableTest({ challenge: true })
+      setSubmissionBoxPath(path)
     }
     loadNextAvailableTest()
   }, [record])
 
-  if (!nextAvailableTestPath && !record.in_reviewer_group) {
+  if (!submissionBoxPath && !record.in_reviewer_group) {
     // in this case, not in reviewer group and nothing left to review, no button is shown
     return null
   }
@@ -50,15 +50,15 @@ export const ReviewSubmissionsButton = ({ record }) => {
     <Button
       {...buttonStyleProps}
       colorScheme={v.colors.alert}
-      disabled={!nextAvailableTestPath}
-      onClick={() =>
-        nextAvailableTestPath &&
-        record.routingStore.routeTo(nextAvailableTestPath)
-      }
+      disabled={!submissionBoxPath}
+      onClick={() => {
+        if (submissionBoxPath) {
+          record.uiStore.update('preselectUserTag', true)
+          record.routingStore.routeTo(submissionBoxPath)
+        }
+      }}
     >
-      {nextAvailableTestPath
-        ? `Review Submissions`
-        : `No Reviewable Submissions`}
+      {submissionBoxPath ? `Review Submissions` : `No Reviewable Submissions`}
     </Button>
   )
 }

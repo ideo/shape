@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe CollectionCard, type: :model do
   context 'validations' do
     it { should validate_presence_of(:parent) }
-    it { should validate_presence_of(:order) }
 
     describe '#single_item_or_collection_is_present' do
       let(:collection_card) { build(:collection_card) }
@@ -273,17 +272,6 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    context 'with specified order placement' do
-      let!(:collection) { create(:collection, num_cards: 3, record_type: :collection) }
-      let(:collection_card) { collection.collection_cards.first }
-      let(:placement) { 1 }
-
-      it 'should place the duplicate in the middle of the collection' do
-        expect(duplicate.order).to eq 1
-        expect(collection.collection_cards.second).to eq duplicate
-      end
-    end
-
     context 'with linked card' do
       let(:parent_collection_card) { create(:collection_card_collection) }
       let(:collection) { parent_collection_card.collection }
@@ -385,15 +373,6 @@ RSpec.describe CollectionCard, type: :model do
       end
     end
 
-    context 'with placement at beginning' do
-      let!(:placement) { 'beginning' }
-
-      it 'should call increment_card_orders!' do
-        expect_any_instance_of(CollectionCard).to receive(:increment_card_orders!)
-        duplicate
-      end
-    end
-
     context 'for user collection' do
       let!(:shared_with_me_collection) { create(:shared_with_me_collection) }
       let!(:collection_card_collection) { create(:collection_card, collection: shared_with_me_collection) }
@@ -432,81 +411,81 @@ RSpec.describe CollectionCard, type: :model do
     end
   end
 
-  context 'card order' do
-    let(:collection) { create(:collection) }
-    let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
-    let(:collection_cards) { collection.collection_cards }
-
-    describe '#increment_card_orders!' do
-      before do
-        # Make sure cards are in sequential order
-        collection.reorder_cards!
-      end
-
-      it 'should increment all orders by 1' do
-        collection_cards.first.increment_card_orders!
-        order_arr = collection_cards.map(&:reload).map(&:order)
-        expect(order_arr).to match_array([0, 2, 3, 4, 5])
-      end
-
-      it 'should return true if success' do
-        expect(collection_cards.first.increment_card_orders!).to be true
-      end
-
-      context 'with another card created at same order as existing' do
-        let(:second_card_order) { collection.collection_cards[1].order }
-        let!(:dupe_card) do
-          create(:collection_card, parent: collection, order: second_card_order)
-        end
-
-        it 'should increment all cards by 1, and leave dupe card' do
-          expect(dupe_card.order).to eq(second_card_order)
-          dupe_card.increment_card_orders!
-          order_array = collection_cards.map(&:reload).map(&:order)
-          expect(dupe_card.reload.order).to eq(1)
-          expect(order_array).to match_array([0, 2, 3, 4, 5])
-        end
-      end
-    end
-
-    describe '#reorder_cards!' do
-      before do
-        collection_cards[2].update(pinned: true, order: 99)
-        collection_cards[0].update(order: 2)
-        collection_cards[3].update(order: 3)
-        collection_cards[4].update(order: 4)
-        collection_cards[1].update(order: 10)
-      end
-
-      it 'reorders cards sequentially, always putting pinned cards first' do
-        collection.reorder_cards!
-        collection.reload
-        expect(collection.collection_cards.pluck(:id, :order)).to eq(
-          [
-            [collection_cards[2].id, 0],
-            [collection_cards[0].id, 1],
-            [collection_cards[3].id, 2],
-            [collection_cards[4].id, 3],
-            [collection_cards[1].id, 4],
-          ],
-        )
-      end
-    end
-
-    describe '#move_to_order' do
-      let(:moving_card) { collection_cards.fourth }
-      before do
-        # Make sure cards are in sequential order
-        collection.reorder_cards!
-      end
-
-      it 'should move the card to the specified order and keep things sequential' do
-        moving_card.move_to_order(1)
-        expect(collection.collection_cards.map(&:order)).to eq [0, 1, 2, 3, 4]
-        expect(moving_card.order).to eq 1
-      end
-    end
-  end
+  # context 'card order' do
+  #   let(:collection) { create(:collection) }
+  #   let!(:collection_card_list) { create_list(:collection_card, 5, parent: collection) }
+  #   let(:collection_cards) { collection.collection_cards }
+  #
+  #   describe '#increment_card_orders!' do
+  #     before do
+  #       # Make sure cards are in sequential order
+  #       collection.reorder_cards!
+  #     end
+  #
+  #     it 'should increment all orders by 1' do
+  #       collection_cards.first.increment_card_orders!
+  #       order_arr = collection_cards.map(&:reload).map(&:order)
+  #       expect(order_arr).to match_array([0, 2, 3, 4, 5])
+  #     end
+  #
+  #     it 'should return true if success' do
+  #       expect(collection_cards.first.increment_card_orders!).to be true
+  #     end
+  #
+  #     context 'with another card created at same order as existing' do
+  #       let(:second_card_order) { collection.collection_cards[1].order }
+  #       let!(:dupe_card) do
+  #         create(:collection_card, parent: collection, order: second_card_order)
+  #       end
+  #
+  #       it 'should increment all cards by 1, and leave dupe card' do
+  #         expect(dupe_card.order).to eq(second_card_order)
+  #         dupe_card.increment_card_orders!
+  #         order_array = collection_cards.map(&:reload).map(&:order)
+  #         expect(dupe_card.reload.order).to eq(1)
+  #         expect(order_array).to match_array([0, 2, 3, 4, 5])
+  #       end
+  #     end
+  #   end
+  #
+  #   describe '#reorder_cards!' do
+  #     before do
+  #       collection_cards[2].update(pinned: true, order: 99)
+  #       collection_cards[0].update(order: 2)
+  #       collection_cards[3].update(order: 3)
+  #       collection_cards[4].update(order: 4)
+  #       collection_cards[1].update(order: 10)
+  #     end
+  #
+  #     it 'reorders cards sequentially, always putting pinned cards first' do
+  #       collection.reorder_cards!
+  #       collection.reload
+  #       expect(collection.collection_cards.pluck(:id, :order)).to eq(
+  #         [
+  #           [collection_cards[2].id, 0],
+  #           [collection_cards[0].id, 1],
+  #           [collection_cards[3].id, 2],
+  #           [collection_cards[4].id, 3],
+  #           [collection_cards[1].id, 4],
+  #         ],
+  #       )
+  #     end
+  #   end
+  #
+  #   describe '#move_to_order' do
+  #     let(:moving_card) { collection_cards.fourth }
+  #     before do
+  #       # Make sure cards are in sequential order
+  #       collection.reorder_cards!
+  #     end
+  #
+  #     it 'should move the card to the specified order and keep things sequential' do
+  #       moving_card.move_to_order(1)
+  #       expect(collection.collection_cards.map(&:order)).to eq [0, 1, 2, 3, 4]
+  #       expect(moving_card.order).to eq 1
+  #     end
+  #   end
+  # end
 
   describe 'should_update_parent_collection_cover?' do
     let(:collection) { create(:collection, num_cards: 3) }
@@ -653,14 +632,13 @@ RSpec.describe CollectionCard, type: :model do
     let(:collection_card) { collection_cards.first }
 
     describe '#decrement_card_orders!' do
-      before do
-        # Make sure cards are in sequential order
-        collection.reorder_cards!
-      end
+      let(:collection) { create(:collection, num_columns: nil, num_cards: 5) }
 
       it 'should decrement all orders by 1' do
+        order_arr = collection_cards.reload.map(&:order)
+        expect(order_arr).to match_array([0, 1, 2, 3, 4])
         collection_cards.first.decrement_card_orders!
-        order_arr = collection_cards.map(&:reload).map(&:order)
+        order_arr = collection_cards.reload.map(&:order)
         # technically you'd do this while archiving card 0, so it would get removed
         expect(order_arr).to match_array([0, 0, 1, 2, 3])
       end
@@ -671,16 +649,25 @@ RSpec.describe CollectionCard, type: :model do
     end
 
     describe '#archive!' do
-      it 'should archive and call decrement_card_orders' do
-        expect(CollectionCard).to receive(:decrement_counter)
+      it 'should archive' do
         collection_card.archive!
         expect(collection_card.archived?).to be true
       end
 
       it 'should decrement parent cached_card_count' do
-        expect(collection.cached_card_count).to eq 5
+        expect(collection.reload.cached_card_count).to eq 5
         collection_card.archive!
         expect(collection.reload.cached_card_count).to eq 4
+      end
+
+      context 'with test collection (no columns)' do
+        let(:collection) { create(:test_collection, num_cards: 1) }
+
+        it 'should archive and call decrement_card_orders' do
+          expect(CollectionCard).to receive(:decrement_counter)
+          collection_card.archive!
+          expect(collection_card.archived?).to be true
+        end
       end
     end
 

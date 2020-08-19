@@ -18,6 +18,7 @@ module CollectionGrid
     end
 
     def self.top_left_card(cards)
+      cards = cards.reject { |card| card.row.nil? || card.col.nil? }
       min_row, min_col = cards.pluck(:row, :col).min
       cards.find { |c| c.row == min_row && c.col == min_col }
     end
@@ -178,6 +179,8 @@ module CollectionGrid
       from_collection:,
       moving_cards:
     )
+      return false unless collection.num_columns.present?
+
       master_card = nil
       moving_cards_without_position = moving_cards.any? { |cc| cc.row.nil? || cc.col.nil? }
       if !from_collection.board_collection? || moving_cards_without_position
@@ -286,6 +289,7 @@ module CollectionGrid
       last_card = collection
                   .collection_cards
                   .ordered
+                  .visible
                   .reject { |card| card.row.nil? || card.col.nil? }
                   .last
 

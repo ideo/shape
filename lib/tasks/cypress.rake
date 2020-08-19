@@ -40,7 +40,6 @@ namespace :cypress do
   def create_cards(collection, user)
     builder = CollectionCardBuilder.new(
       params: {
-        order: collection.collection_cards.last.order + 1,
         collection_attributes: {
           name: 'Cypress Test Area',
         },
@@ -54,7 +53,6 @@ namespace :cypress do
 
     builder = CollectionCardBuilder.new(
       params: {
-        order: 0,
         collection_attributes: {
           name: 'Inner Collection',
         },

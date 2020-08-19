@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Fade from '@material-ui/core/Fade'
@@ -177,47 +177,49 @@ class Modal extends React.Component {
     const scrollVisibleClass = scrollVisible ? 'modal__scroll-visible' : ''
     // TODO progamatically set disableAutoFocus
     return (
-      <StyledDialog
-        classes={{ paper: `modal__paper ${scrollVisibleClass}` }}
-        disableAutoFocus
-        open={open}
-        onClose={this.handleclose}
-        onBackdropClick={disableBackdropClick ? null : this.handleClose}
-        BackdropProps={{ invisible: true }}
-        {...labeledBy}
-      >
-        {/*
-          NOTE: DialogTitle / DialogContent need to be direct children of Dialog
-          for built-in scrolling to work (where title remains fixed at top)
-        */}
-        <StyledDialogTitle
-          classes={{ root: 'modal__padding' }}
-          disableTypography
+      <ThemeProvider theme={{ fontColor: null }}>
+        <StyledDialog
+          classes={{ paper: `modal__paper ${scrollVisibleClass}` }}
+          disableAutoFocus
+          open={open}
+          onClose={this.handleclose}
+          onBackdropClick={disableBackdropClick ? null : this.handleClose}
+          BackdropProps={{ invisible: true }}
+          {...labeledBy}
         >
-          {/* onBack is an optional button */}
-          {_.isFunction(onBack) && (
-            <BackIconHolder onClick={onBack}>
-              <ArrowIcon />
-            </BackIconHolder>
+          {/*
+            NOTE: DialogTitle / DialogContent need to be direct children of Dialog
+            for built-in scrolling to work (where title remains fixed at top)
+          */}
+          <StyledDialogTitle
+            classes={{ root: 'modal__padding' }}
+            disableTypography
+          >
+            {/* onBack is an optional button */}
+            {_.isFunction(onBack) && (
+              <BackIconHolder onClick={onBack}>
+                <ArrowIcon />
+              </BackIconHolder>
+            )}
+            {wrappedTitle}
+          </StyledDialogTitle>
+          {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
+          {_.isFunction(onClose) && (
+            <ModalCloseButton onClick={this.handleClose} data-cy="ModalClose">
+              <CloseIcon />
+            </ModalCloseButton>
           )}
-          {wrappedTitle}
-        </StyledDialogTitle>
-        {/* if onClose is not supplied, then the modal is "locked" until user takes an action */}
-        {_.isFunction(onClose) && (
-          <ModalCloseButton onClick={this.handleClose} data-cy="ModalClose">
-            <CloseIcon />
-          </ModalCloseButton>
-        )}
-        <StyledDialogContent
-          data-cy="DialogContent"
-          ref={this.contentArea}
-          className={['modal__padding', noScroll && 'modal__no-scroll'].join(
-            ' '
-          )}
-        >
-          {children}
-        </StyledDialogContent>
-      </StyledDialog>
+          <StyledDialogContent
+            data-cy="DialogContent"
+            ref={this.contentArea}
+            className={['modal__padding', noScroll && 'modal__no-scroll'].join(
+              ' '
+            )}
+          >
+            {children}
+          </StyledDialogContent>
+        </StyledDialog>
+      </ThemeProvider>
     )
   }
 }

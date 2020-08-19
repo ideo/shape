@@ -18,7 +18,7 @@ RSpec.describe CollectionUpdater, type: :service do
 
     context 'with valid attributes' do
       let(:attributes) do
-        { name: 'My new name', collection_cards_attributes: [{ id: first_card.id, order: 3, width: 3 }] }
+        { name: 'My new name', collection_cards_attributes: [{ id: first_card.id, row: 3, width: 3 }] }
       end
 
       it 'assigns and saves attributes onto the collection' do
@@ -29,7 +29,7 @@ RSpec.describe CollectionUpdater, type: :service do
       it 'assigns and saves attributes onto the collection cards' do
         service.call
         first_card.reload
-        expect(first_card.order).to eq 3
+        expect(first_card.row).to eq 3
         expect(first_card.width).to eq 3
       end
 
@@ -120,8 +120,8 @@ RSpec.describe CollectionUpdater, type: :service do
             name: 'My new name',
             collection_cards_attributes: [
               # send id as string to mimic front-end
-              { id: first_card.id.to_s, order: 3, width: 3 },
-              { id: '991919', order: 1, width: 1 },
+              { id: first_card.id.to_s, row: 3, width: 3 },
+              { id: '991919', row: 1, width: 1 },
             ],
           }
         end
@@ -130,7 +130,7 @@ RSpec.describe CollectionUpdater, type: :service do
           service.call
           expect(collection.name).to eq attributes[:name]
           first_card.reload
-          expect(first_card.order).to eq 3
+          expect(first_card.row).to eq 3
           expect(first_card.width).to eq 3
         end
       end

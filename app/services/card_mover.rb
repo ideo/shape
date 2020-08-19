@@ -30,7 +30,6 @@ class CardMover < SimpleService
     select_pinned_cards
     select_to_collection_cards
     duplicate_or_link_legend_items
-    move_cards_to_collection
     move_cards_to_board
     recalculate_cached_values
     update_template_instances
@@ -115,51 +114,36 @@ class CardMover < SimpleService
       col: @placement_col,
     )
     # BoardPlacement does not save the records, just updates their attrs
-    @moving_cards.each do |card|
-      card.save if card.board_placement_is_valid?
-    end
+    apply_updates_and_save_cards
   end
 
-  def move_cards_to_collection
-    return [] if @to_collection.board_collection?
-
-    pin_moving_cards = @to_collection.should_pin_cards?(@placement)
-
-    # Reorder all cards based on order of joined_cards
-    @to_collection_cards.map.with_index do |card, i|
-      card.assign_attributes(order: i)
-
-      if @moving_cards.include?(card)
-        # assign new parent
-        card.assign_attributes(parent_id: @to_collection.id)
-        if @to_collection.master_template?
-          # any cards created in master_template's pinned area become pinned
-          card.assign_attributes(pinned: pin_moving_cards)
-          if card.primary? && card.collection.present?
-            card.collection.convert_to_template!
-          end
-        elsif @to_collection != @from_collection
-          card.assign_attributes(pinned: false)
+  def apply_updates_and_save_cards
+    @moving_cards.each do |card|
+      if @to_collection.master_template?
+        # any cards created in master_template's pinned area become pinned
+        # card.assign_attributes(pinned: pin_moving_cards)
+        if card.primary? && card.collection.present?
+          card.collection.convert_to_template!
         end
-        if @to_collection.anyone_can_view? && card.primary? && card.collection.present?
-          collection = card.collection
-          collection.update(anyone_can_view: true)
-          Sharing::PropagateAnyoneCanView.call(collection: collection)
-        end
+      elsif @to_collection != @from_collection
+        card.assign_attributes(pinned: false)
+      end
+      if @to_collection.anyone_can_view? && card.primary? && card.collection.present?
+        collection = card.collection
+        collection.update(anyone_can_view: true)
+        Sharing::PropagateAnyoneCanView.call(collection: collection)
       end
 
-      if card.changed?
+      if card.changed? && card.board_placement_is_valid?
         @should_update_to_cover ||= card.should_update_parent_collection_cover?
         card.save
       end
-      card
     end
   end
 
   def recalculate_cached_values
     unless link? || @from_collection == @to_collection
       @from_collection.touch
-      @from_collection.reload.reorder_cards!
       @from_collection.cache_card_count!
       @from_collection.cache_cover! if @should_update_from_cover
     end

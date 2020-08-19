@@ -1,11 +1,11 @@
 class CollectionChallengeSetup < SimpleService
-  def initialize(collection:, current_user:)
+  def initialize(collection:, user: nil)
     @collection = collection
-    @current_user = current_user
+    @user = user
   end
 
   def call
-    return unless @collection.collection_type == 'challenge' ||
+    return unless @collection.collection_type_challenge? ||
                   (@collection.challenge_admin_group.blank? && @collection.challenge_reviewer_group.blank? &&
                   @collection.challenge_participant_group.blank?)
 
@@ -30,9 +30,8 @@ class CollectionChallengeSetup < SimpleService
       organization: organization,
     )
 
-    @current_user.add_role(Role::ADMIN, admin_group)
-    @current_user.add_role(Role::ADMIN, participant_group)
-    @current_user.add_role(Role::ADMIN, reviewer_group)
+    # user won't be present e.g. on OrganizationShellBuilder setup
+    @user&.add_role(Role::ADMIN, admin_group)
 
     admin_group.add_role(Role::ADMIN, reviewer_group)
     admin_group.add_role(Role::ADMIN, participant_group)

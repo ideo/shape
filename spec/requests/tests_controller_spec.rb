@@ -82,7 +82,7 @@ describe TestsController, type: :request do
 
       context 'with link sharing not enabled' do
         before do
-          test_audiences.first.update(status: :closed)
+          test_audiences.link_sharing.update_all(status: :closed)
         end
 
         it 'sets invalid = true' do

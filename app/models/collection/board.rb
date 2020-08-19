@@ -19,7 +19,7 @@
 #  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
-#  num_columns                    :integer
+#  num_columns                    :integer          default(4)
 #  processing_status              :integer
 #  propagate_background_image     :boolean          default(FALSE)
 #  propagate_font_color           :boolean          default(FALSE)
@@ -76,6 +76,10 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #
 
+# NOTE: this model exists somewhat as a legacy, right now it is just for 16-wide boards.
+# It used to be that Collections either acted like a board, and had 16 columns (STI type = Board),
+# or they followed "collection_card.order" in a flowing grid (STI type = nil).
+# We should be able to eventually deprecate this.
 class Collection
   class Board < Collection
     # Re-define association to use `ordered_row_col` scope,
@@ -91,7 +95,7 @@ class Collection
              through: :collection_cards,
              source: :item
 
-    before_create :set_as_foamcore
+    before_create :set_as_foamcore, if: :collection_type_collection?
 
     private
 

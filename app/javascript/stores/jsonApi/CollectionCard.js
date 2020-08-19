@@ -443,12 +443,13 @@ class CollectionCard extends BaseRecord {
           if (selectedCardIds.length > 1) {
             prompt += `these ${selectedCardIds.length} objects?`
           } else {
-            prompt += 'this?'
             if (this.link) {
               iconName = 'Link'
-              prompt = 'this link?'
+              prompt += 'this link?'
             } else if (this.isTestCollection) {
-              prompt = 'this test? It will close your feedback.'
+              prompt += 'this test? It will close your feedback.'
+            } else {
+              prompt += 'this?'
             }
           }
         }

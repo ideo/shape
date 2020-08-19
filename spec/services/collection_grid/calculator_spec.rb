@@ -317,6 +317,21 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
               [4, 2, collection.id],
             ])
           end
+
+          context 'with hidden cards in the target spot' do
+            let!(:hidden_card) { create(:collection_card_text, hidden: true, row: 3, col: 2, parent: collection) }
+
+            it 'should ignore the hidden card placement' do
+              calculate
+              # this time it should place after all existing cards, starting 3,2
+              expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
+                [3, 2, collection.id],
+                [3, 3, collection.id],
+                [3, 5, collection.id],
+                [4, 2, collection.id],
+              ])
+            end
+          end
         end
       end
     end
