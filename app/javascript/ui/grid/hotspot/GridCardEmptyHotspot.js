@@ -67,7 +67,7 @@ class GridCardEmptyHotspot extends React.Component {
     this.openBlankContentTool()
   }
 
-  get renderRightBlankActions() {
+  renderRightBlankActions() {
     const { handleRemoveRowClick, handleInsertRowClick, row } = this.props
     return (
       <RightBlankActions>
