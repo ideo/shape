@@ -555,7 +555,6 @@ class MovableGridCard extends React.Component {
     const adjustedHeight = (height + resizeHeight) / zoomLevel
     let transition =
       dragging || resizing || currentlyZooming ? 'none' : cardCSSTransition
-    console.log('poop', transition, currentlyZooming)
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!activeDragTarget
     if (dragging || this.state.allowTouchDeviceDragging) {
