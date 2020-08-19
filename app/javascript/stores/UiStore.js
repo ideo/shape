@@ -271,6 +271,8 @@ export default class UiStore {
   challengeSettingsOpen = false
   @observable
   zoomLevels = []
+  @observable
+  currentlyZooming = false
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -1568,7 +1570,9 @@ export default class UiStore {
     this.zoomAndScroll(-1)
   }
 
+  @action
   zoomAndScroll(zoomChange) {
+    this.currentlyZooming = true
     // capture these first
     const { percentScrolledX, percentScrolledY } = this
     const zoomBefore = this.relativeZoomLevel
@@ -1587,6 +1591,9 @@ export default class UiStore {
       window.scrollTo({
         left,
         top,
+      })
+      runInAction(() => {
+        this.currentlyZooming = false
       })
     })
   }
