@@ -50,17 +50,13 @@ class DropzoneHolder extends React.Component {
     this.createDropPane()
   }
 
-  handleDragOver = e => {
-    console.log('DropzoneHolder — handleDragOver')
-  }
+  handleDragOver = e => {}
 
   handleDragLeave = e => {
-    console.log('DropzoneHolder — handleDragLeave')
-    this.props.handleResetUpload()
+    this.props.handleAfterUploading({ success: false })
   }
 
   handleDrop = e => {
-    console.log('DropzoneHolder — handleDrop')
     // if (this.state.loading) return
     // const { files } = ev.dataTransfer
     // const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
@@ -83,13 +79,14 @@ class DropzoneHolder extends React.Component {
   }
 
   handleProgress = e => {
-    console.log('DropzoneHolder — handleProgress')
+    // if (this.state.loading) return
+    // this.setState({ loading: true })
   }
 
   handleSuccess = async res => {
-    console.log('DropzoneHolder — handleSuccess')
     if (res.length > 0) {
       const files = await FilestackUpload.processFiles(res)
+      const fileAttrs = []
       _.each(files, (file, idx) => {
         const filestack_file_attributes = {
           url: file.url,
@@ -99,9 +96,12 @@ class DropzoneHolder extends React.Component {
           mimetype: file.mimetype,
           docinfo: file.docinfo,
         }
-        console.log({ filestack_file_attributes })
+        fileAttrs.push(filestack_file_attributes)
       })
-      this.props.handleResetUpload()
+
+      // TODO: add call to bulk upload here?
+      // create placeholder cards then rerender files
+      this.props.handleAfterUploading({ success: true })
     }
   }
 
@@ -139,7 +139,7 @@ DropzoneHolder.wrappedComponent.propTypes = {
 }
 
 DropzoneHolder.propTypes = {
-  handleResetUpload: PropTypes.func.isRequired,
+  handleAfterUploading: PropTypes.func.isRequired,
 }
 
 export default DropzoneHolder

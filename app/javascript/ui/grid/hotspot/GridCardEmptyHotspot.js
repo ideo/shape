@@ -123,9 +123,9 @@ class GridCardEmptyHotspot extends React.Component {
   }
 
   render() {
-    const { uploading, handleDidUpload } = this.props
-    return uploading && handleDidUpload ? (
-      <GridCardDropzone handleDidUpload={handleDidUpload} />
+    const { uploading, handleAfterUploading } = this.props
+    return uploading && handleAfterUploading ? (
+      <GridCardDropzone handleAfterUploading={handleAfterUploading} />
     ) : (
       this.renderGridCardEmpty
     )
@@ -141,7 +141,7 @@ GridCardEmptyHotspot.propTypes = {
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,
   row: PropTypes.number,
-  handleDidUpload: PropTypes.func,
+  handleAfterUploading: PropTypes.func,
 }
 GridCardEmptyHotspot.defaultProps = {
   card: null,
@@ -152,7 +152,7 @@ GridCardEmptyHotspot.defaultProps = {
   handleRemoveRowClick: null,
   handleInsertRowClick: null,
   row: 0,
-  handleDidUpload: null,
+  handleAfterUploading: null,
 }
 GridCardEmptyHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

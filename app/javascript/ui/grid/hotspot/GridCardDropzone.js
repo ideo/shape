@@ -27,9 +27,9 @@ class GridCardDropzone extends React.Component {
     this.willUpload = willUpload
   }
 
-  resetUpload = e => {
-    const { handleDidUpload } = this.props
-    handleDidUpload()
+  resetUpload = ({ success = false }) => {
+    const { handleAfterUploading } = this.props
+    handleAfterUploading({ success })
     this.updateWillUpload(false)
   }
 
@@ -41,7 +41,7 @@ class GridCardDropzone extends React.Component {
         onDragLeave={this.handleDragLeave}
       >
         {this.willUpload && (
-          <DropzoneHolder handleResetUpload={this.resetUpload} />
+          <DropzoneHolder handleAfterUploading={this.resetUpload} />
         )}
       </StyledGridCardEmpty>
     )
@@ -49,7 +49,7 @@ class GridCardDropzone extends React.Component {
 }
 
 GridCardDropzone.propTypes = {
-  handleDidUpload: PropTypes.func.isRequired,
+  handleAfterUploading: PropTypes.func.isRequired,
 }
 
 export default GridCardDropzone

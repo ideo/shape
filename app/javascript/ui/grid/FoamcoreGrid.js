@@ -1192,8 +1192,12 @@ class FoamcoreGrid extends React.Component {
         <GridCardEmptyHotspot
           card={this.props.card}
           uploading={this.uploading}
-          handleDidUpload={() => {
+          handleAfterUploading={success => {
             this.uploading && this.setUploading(false)
+            if (success) {
+              // TODO: should render placeholder cards here?
+              console.log('handle upload success')
+            }
           }}
           interactionType={type}
           numColumns={num_columns}
