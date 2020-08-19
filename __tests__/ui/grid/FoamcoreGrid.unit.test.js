@@ -576,4 +576,30 @@ describe('FoamcoreGrid', () => {
       )
     })
   })
+
+  describe('onCursorMove', () => {
+    const fakeEv = {
+      clientX: 100,
+      clientY: 200,
+      target: {
+        classList: ['foamcoreGridBoundary'],
+      },
+    }
+
+    it('should look up coordinatesForPosition', () => {
+      const result = component.onCursorMove(fakeEv)
+      expect(result).toEqual({
+        col: 0,
+        row: 1,
+      })
+    })
+
+    it('should ignore events that are outside foamcoreGridBoundary', () => {
+      fakeEv.target = {
+        classList: ['other'],
+      }
+      const result = component.onCursorMove(fakeEv)
+      expect(result).toEqual(true)
+    })
+  })
 })
