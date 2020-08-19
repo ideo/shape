@@ -18,13 +18,12 @@ import TestCollectionIconSm from '~/ui/icons/TestCollectionIconSm'
 import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
 import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
 import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
-import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import { CloseButton } from '~/ui/global/styled/buttons'
-import bctIcons from '~/assets/bct_icons.png'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import FilestackUpload from '~/utils/FilestackUpload'
 
 import CollectionCreator from './CollectionCreator'
 import LinkCreator from './LinkCreator'
@@ -129,65 +128,6 @@ const BctBackground = styled.div`
 `
 BctBackground.displayName = 'BctBackground'
 
-const BctDropzone = styled.div`
-  position: absolute;
-  text-align: center;
-  top: 40px;
-  left: 60px;
-  width: 175px;
-  .text {
-    z-index: ${v.zIndex.gridCardBg + 1};
-    font-family: ${v.fonts.sans};
-    font-weight: 500;
-    font-size: 1rem;
-    position: absolute;
-    top: 55px;
-    left: 38px;
-    .top,
-    .bottom {
-      text-transform: uppercase;
-    }
-    .top,
-    .or {
-      color: ${v.colors.primaryLight};
-    }
-    .bottom {
-      color: ${v.colors.black};
-    }
-    .or {
-      font-size: 0.75rem;
-      margin: 6px 0;
-    }
-    p {
-      font-size: 0.8rem;
-      color: ${v.colors.commonDark};
-    }
-    transition: ${v.transitionWithDelay};
-  }
-
-  /* Override Filestack styling */
-  .fsp-drop-pane__container {
-    font-family: ${v.fonts.sans};
-    cursor: pointer;
-    z-index: ${v.zIndex.gridCardBg + 1};
-    border-radius: 50%;
-    /* must be transparent -- dropzone is transparent and content behind it is visible */
-    background: transparent;
-    border: none;
-    width: 160px;
-    height: 160px;
-    ${props =>
-      props.droppingFile &&
-      `
-      background: ${v.colors.primaryLight};
-      &::after {
-        content: '+';
-        font-size: 4rem;
-      }
-    `};
-  }
-`
-
 @inject('uiStore', 'apiStore')
 @observer
 class GridCardBlank extends React.Component {
@@ -204,11 +144,6 @@ class GridCardBlank extends React.Component {
   }
 
   componentDidMount() {
-    // creating the DropPane via filestack is asynchronous;
-    // if the BCT mounts but then immediately gets closed via a uiStore action,
-    // we check to not to make the drop pane to prevent it throwing an error
-    setTimeout(this.createDropPane, 500)
-
     if (this.props.preselected === 'text') {
       this.createTextItem()
     }
@@ -222,62 +157,6 @@ class GridCardBlank extends React.Component {
     const { uiStore, replacingId } = this.props
     if (replacingId) return replacingId
     return uiStore.blankContentToolState.replacingId
-  }
-
-  createDropPane = () => {
-    const { replacingId } = this
-    const { creating } = this.state
-    const { uiStore } = this.props
-    if (this.canceled || (creating && creating !== 'file')) return
-    const uploadOpts = {}
-    if (replacingId) {
-      uploadOpts.maxFiles = 1
-    }
-
-    // CSS selector where the dropzone will be
-    const container = 'dropzone'
-    const dropPaneOpts = {
-      onProgress: pct => {
-        if (this.state.loading) return
-        this.setState({ loading: true })
-      },
-      onDragOver: () => {
-        this.setState({ droppingFile: true })
-      },
-      onDragLeave: () => {
-        this.setState({ droppingFile: false })
-      },
-      onDrop: ev => {
-        if (this.state.loading) return
-        const { files } = ev.dataTransfer
-        const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
-        if (filesThatFit.length) {
-          this.setState({ loading: true, droppingFile: false })
-        } else {
-          this.setState({ loading: false, droppingFile: false })
-        }
-        if (filesThatFit.length < files.length) {
-          uiStore.popupAlert({
-            prompt: `
-              ${filesThatFit.length} file(s) were successfully added.
-              ${files.length -
-                filesThatFit.length} file(s) were over 25MB and could not
-              be added.
-            `,
-            fadeOutTime: 6000,
-          })
-        }
-      },
-      onSuccess: async res => {
-        if (res.length > 0) {
-          const files = await FilestackUpload.processFiles(res)
-          _.each(files, (file, idx) => {
-            this.createCardWith(file, idx)
-          })
-        }
-      },
-    }
-    FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
   }
 
   get emptyState() {
@@ -472,8 +351,6 @@ class GridCardBlank extends React.Component {
       (uiStore.blankContentToolState.emptyCollection && !preselected)
     ) {
       this.setState({ creating: null })
-      // have to re-create the DropPane
-      this.createDropPane()
     } else {
       uiStore.closeBlankContentTool()
     }
@@ -553,26 +430,7 @@ class GridCardBlank extends React.Component {
         )
         break
       default:
-        inner = (
-          <BctDropzone
-            className="bct-dropzone"
-            droppingFile={droppingFile}
-            id="dropzone"
-          >
-            {!loading && !droppingFile && (
-              <div className="text">
-                <img
-                  src={bctIcons}
-                  alt="dropzone icons"
-                  style={{ width: '80px' }}
-                />
-                <div className="top">Drag &amp; Drop</div>
-                <div className="or">or</div>
-                <div className="bottom">Browse</div>
-              </div>
-            )}
-          </BctDropzone>
-        )
+        inner = null
     }
 
     const testBctBox = (

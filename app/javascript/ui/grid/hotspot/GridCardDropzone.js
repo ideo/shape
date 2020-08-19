@@ -1,0 +1,55 @@
+import { observable, action } from 'mobx'
+import { observer } from 'mobx-react'
+import PropTypes from 'prop-types'
+
+import { StyledGridCardEmpty } from '~/ui/grid/hotspot/shared'
+import DropzoneHolder from '~/ui/grid/hotspot/DropzoneHolder'
+
+@observer
+class GridCardDropzone extends React.Component {
+  @observable
+  willUpload = false
+
+  handleDragOver = e => {
+    e.preventDefault()
+    this.updateWillUpload(true)
+  }
+
+  handleDragLeave = e => {
+    if (e.target.closest('.dropzoneEmpty')) {
+      return
+    }
+    this.updateWillUpload(false)
+  }
+
+  @action
+  updateWillUpload = willUpload => {
+    this.willUpload = willUpload
+  }
+
+  resetUpload = e => {
+    const { handleDidUpload } = this.props
+    handleDidUpload()
+    this.updateWillUpload(false)
+  }
+
+  render() {
+    return (
+      <StyledGridCardEmpty
+        className={'visible dropzoneEmpty'}
+        onDragOver={this.handleDragOver}
+        onDragLeave={this.handleDragLeave}
+      >
+        {this.willUpload && (
+          <DropzoneHolder handleResetUpload={this.resetUpload} />
+        )}
+      </StyledGridCardEmpty>
+    )
+  }
+}
+
+GridCardDropzone.propTypes = {
+  handleDidUpload: PropTypes.func.isRequired,
+}
+
+export default GridCardDropzone

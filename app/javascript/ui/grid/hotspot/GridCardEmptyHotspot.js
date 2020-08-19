@@ -1,26 +1,15 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
-
 import v from '~/utils/variables'
-import { Heading2 } from '~/ui/global/styled/typography'
-import { isFile } from '~/utils/FilestackUpload'
+
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Tooltip from '~/ui/global/Tooltip'
 import PlusIcon from '~/ui/icons/PlusIcon'
-import CloudIcon from '~/ui/icons/CloudIcon'
 import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
 import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
-
-const StyledDropzoneHolder = styled.div`
-  position: absolute;
-  height: 20%;
-  top: 38%;
-  left: 28%;
-  color: ${v.colors.secondaryMedium};
-  pointer-events: none;
-`
+import GridCardDropzone from '~/ui/grid/hotspot/GridCardDropzone'
+import { StyledGridCardEmpty } from '~/ui/grid/hotspot/shared'
 
 const StyledPlusIcon = styled.div`
   position: absolute;
@@ -30,27 +19,6 @@ const StyledPlusIcon = styled.div`
   top: 38%;
   left: 38%;
   color: ${v.colors.secondaryMedium};
-`
-
-const StyledGridCardEmpty = styled.div`
-  width: 100%;
-  height: 100%;
-  position: relative;
-
-  &.visible,
-  &:hover {
-    background-color: ${v.colors.primaryLight} !important;
-    .plus-icon {
-      display: block;
-    }
-    .cloud-icon {
-      display: block;
-    }
-  }
-  .plus-icon,
-  .cloud-icon {
-    display: none;
-  }
 `
 
 const RightBlankActions = styled.div`
@@ -73,9 +41,6 @@ export const CircleIconHolder = styled.button`
 @inject('uiStore')
 @observer
 class GridCardEmptyHotspot extends React.Component {
-  @observable
-  isDraggedOver = false
-
   openBlankContentTool = () => {
     const { uiStore, card } = this.props
     if (!card) return
@@ -100,22 +65,6 @@ class GridCardEmptyHotspot extends React.Component {
       return
     }
     this.openBlankContentTool()
-  }
-
-  onDragOver = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    runInAction(() => {
-      this.isDraggedOver = isFile(e.dataTransfer)
-    })
-  }
-
-  onDragLeave = e => {
-    e.preventDefault()
-    e.stopPropagation()
-    runInAction(() => {
-      this.isDraggedOver = false
-    })
   }
 
   get renderRightBlankActions() {
@@ -144,8 +93,9 @@ class GridCardEmptyHotspot extends React.Component {
     )
   }
 
+  /**FIXME: check if this isn't being rendered correctly **/
   get renderGridCardEmpty() {
-    const { visible, interactionType, numColumns, emptyRow } = this.props
+    const { interactionType, numColumns, emptyRow } = this.props
 
     let inner = ''
 
@@ -166,53 +116,35 @@ class GridCardEmptyHotspot extends React.Component {
     }
 
     return (
-      <StyledGridCardEmpty
-        className={visible ? 'visible' : ''}
-        onClick={this.onClickHotspot}
-      >
+      <StyledGridCardEmpty className={''} onClick={this.onClickHotspot}>
         {inner}
       </StyledGridCardEmpty>
     )
   }
 
-  get renderGridCardDropzone() {
-    const { visible } = this.props
-    return (
-      <StyledGridCardEmpty
-        className={visible ? 'visible' : ''}
-        onDragOver={this.onDragOver}
-        onDragLeave={this.onDragLeave}
-      >
-        {this.isDraggedOver && (
-          <StyledDropzoneHolder className="cloud-icon">
-            <CloudIcon />
-            <Heading2 fontSize={'1em'}>Drag & Drop</Heading2>
-          </StyledDropzoneHolder>
-        )}
-      </StyledGridCardEmpty>
-    )
-  }
-
   render() {
-    const { uploading } = this.props
-    return uploading ? this.renderGridCardDropzone : this.renderGridCardEmpty
+    const { uploading, handleDidUpload } = this.props
+    return uploading && handleDidUpload ? (
+      <GridCardDropzone handleDidUpload={handleDidUpload} />
+    ) : (
+      this.renderGridCardEmpty
+    )
   }
 }
 
 GridCardEmptyHotspot.propTypes = {
-  visible: PropTypes.bool,
-  card: MobxPropTypes.objectOrObservableObject,
   uploading: PropTypes.bool,
+  card: MobxPropTypes.objectOrObservableObject,
   interactionType: PropTypes.string,
   numColumns: PropTypes.number,
   emptyRow: PropTypes.bool,
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,
   row: PropTypes.number,
+  handleDidUpload: PropTypes.func,
 }
 GridCardEmptyHotspot.defaultProps = {
   card: null,
-  visible: false,
   uploading: false,
   interactionType: 'drag',
   numColumns: 4,
@@ -220,6 +152,7 @@ GridCardEmptyHotspot.defaultProps = {
   handleRemoveRowClick: null,
   handleInsertRowClick: null,
   row: 0,
+  handleDidUpload: null,
 }
 GridCardEmptyHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

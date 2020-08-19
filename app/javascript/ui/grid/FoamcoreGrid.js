@@ -24,7 +24,7 @@ import { objectsEqual } from '~/utils/objectUtils'
 import { isFile } from '~/utils/FilestackUpload'
 import GridCardEmptyHotspot, {
   CircleIconHolder,
-} from '~/ui/grid/GridCardEmptyHotspot'
+} from '~/ui/grid/hotspot/GridCardEmptyHotspot'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
@@ -1190,9 +1190,11 @@ class FoamcoreGrid extends React.Component {
         draggedOn
       >
         <GridCardEmptyHotspot
-          visible={this.uploading}
           card={this.props.card}
           uploading={this.uploading}
+          handleDidUpload={() => {
+            this.uploading && this.setUploading(false)
+          }}
           interactionType={type}
           numColumns={num_columns}
           emptyRow={emptyRow}
@@ -1508,12 +1510,20 @@ class FoamcoreGrid extends React.Component {
         height={gridSize.height}
         onDragOver={e => {
           e.preventDefault()
-          e.stopPropagation()
           this.setUploading(isFile(e.dataTransfer))
         }}
         onDragLeave={e => {
           e.preventDefault()
-          e.stopPropagation()
+          if (
+            !!(
+              e.target.getAttribute &&
+              e.target.getAttribute('data-empty-space-click')
+            ) ||
+            e.target.closest('.dropzoneHolder') ||
+            e.target.closest('.dropzoneEmpty')
+          ) {
+            return
+          }
           this.setUploading(false)
         }}
       >
