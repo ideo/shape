@@ -13,6 +13,7 @@ module CollectionCardFilter
       @user = user
       @filters = filters
       @card_order = @filters.try(:[], :card_order)
+      @show_hidden = @filters.try(:[], :hidden)
       @application = application
       @cards = []
       # ids_only means literally just return collection card ids
@@ -67,8 +68,8 @@ module CollectionCardFilter
     end
 
     def initialize_cards
-      # ensure per_page is between 50 and 200
-      per_page = [@filters[:per_page].to_i, CollectionCard::DEFAULT_PER_PAGE].max
+      # ensure per_page is between 10 and 200
+      per_page = [@filters[:per_page].to_i, 10].max
       per_page = [per_page, 200].min
 
       if @ids_only || @select_ids.present?
@@ -116,7 +117,7 @@ module CollectionCardFilter
             cc[:item_id].in(item_ids),
           ),
         )
-      elsif @collection.board_collection?
+      elsif @collection.board_collection? && !@show_hidden
         # Defaults to 16x16 since we default to a fully zoomed-out view
         rows = @filters[:rows].is_a?(Array) ? @filters[:rows] : [0, 16]
         # make sure it's getting at least 4 rows
@@ -168,7 +169,9 @@ module CollectionCardFilter
 
     def apply_hidden
       # `hidden` means include both hidden and unhidden cards
-      @cards = @cards.visible unless @filters[:hidden].present?
+      return if @show_hidden
+
+      @cards = @cards.visible
     end
 
     def filter_external_id
