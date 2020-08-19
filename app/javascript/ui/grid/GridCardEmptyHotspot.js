@@ -3,15 +3,16 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
-import v from '~/utils/variables'
-import { Heading2 } from '~/ui/global/styled/typography'
 import { isFile } from '~/utils/FilestackUpload'
+import HotCell from '~/ui/grid/HotCell'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Tooltip from '~/ui/global/Tooltip'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
 import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
+import v from '~/utils/variables'
+import { Heading2 } from '~/ui/global/styled/typography'
 
 const StyledDropzoneHolder = styled.div`
   position: absolute;
@@ -37,6 +38,9 @@ const StyledGridCardEmpty = styled.div`
   height: 100%;
   position: relative;
 
+  ${props =>
+    !props.currentlyHotCell &&
+    `
   &.visible,
   &:hover {
     background-color: ${v.colors.primaryLight} !important;
@@ -51,6 +55,7 @@ const StyledGridCardEmpty = styled.div`
   .cloud-icon {
     display: none;
   }
+  `}
 `
 
 const RightBlankActions = styled.div`
@@ -75,6 +80,14 @@ export const CircleIconHolder = styled.button`
 class GridCardEmptyHotspot extends React.Component {
   @observable
   isDraggedOver = false
+  @observable
+  isMouseOver = false
+
+  constructor(props) {
+    super(props)
+    console.log(props)
+    if (props.row === 1) this.isMouseOver = true
+  }
 
   openBlankContentTool = () => {
     const { uiStore, card } = this.props
@@ -100,6 +113,19 @@ class GridCardEmptyHotspot extends React.Component {
       return
     }
     this.openBlankContentTool()
+  }
+
+  handleMouseOver = ev => {
+    console.log('moused over')
+    runInAction(() => {
+      this.isMouseOver = true
+    })
+  }
+
+  handleMouseLeave = ev => {
+    runInAction(() => {
+      // this.isMouseOver = false
+    })
   }
 
   onDragOver = e => {
@@ -145,7 +171,7 @@ class GridCardEmptyHotspot extends React.Component {
   }
 
   get renderGridCardEmpty() {
-    const { visible, interactionType, numColumns, emptyRow } = this.props
+    const { card, visible, interactionType, numColumns, emptyRow } = this.props
 
     let inner = ''
 
@@ -164,11 +190,18 @@ class GridCardEmptyHotspot extends React.Component {
     } else if (interactionType === 'unrendered') {
       inner = <InlineLoader background={v.colors.commonLightest} />
     }
+    console.log('fuck', this.isMouseOver)
+    if (this.isMouseOver) {
+      inner = <HotCell card={card} />
+    }
 
     return (
       <StyledGridCardEmpty
         className={visible ? 'visible' : ''}
         onClick={this.onClickHotspot}
+        onMouseEnter={this.handleMouseOver}
+        onMouseLeave={this.handleMouseLeave}
+        currentlyHotCell={this.isMouseOver}
       >
         {inner}
       </StyledGridCardEmpty>

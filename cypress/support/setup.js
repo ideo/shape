@@ -20,6 +20,9 @@ const createNamedRoutes = () => {
 
   // -- collection cards
   cy.route('POST', '/api/v1/collection_cards').as('apiCreateCollectionCard')
+  cy.route('POST', '/api/v1/collection_cards/create_bct').as(
+    'apiCreateCollectionCardBct'
+  )
   // update has to be first so that later matches like collection_cards/move can be more specific
   cy.route('PATCH', '/api/v1/collection_cards/*').as('apiUpdateCollectionCard')
   cy.route('PATCH', '/api/v1/collection_cards/archive').as(
@@ -35,6 +38,10 @@ const createNamedRoutes = () => {
   cy.route('GET', '/api/v1/collections/*/collection_cards*').as(
     'apiGetCollectionCards'
   )
+  cy.route('GET', '/api/v1/collections/*/collection_cards/ids').as(
+    'apiGetCollectionCardIds'
+  )
+  cy.route('DELETE', '/api/v1/collection_cards/*').as('apiDeleteCollectionCard')
 
   // -- collections
   cy.route('PATCH', '/api/v1/collections/*').as('apiUpdateCollection')

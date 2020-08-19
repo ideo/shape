@@ -40,8 +40,6 @@
 #  index_items_on_data_source_type_and_data_source_id  (data_source_type,data_source_id)
 #  index_items_on_question_type                        (question_type)
 #  index_items_on_roles_anchor_collection_id           (roles_anchor_collection_id)
-#  index_items_on_transcoding_uuid                     (((cached_attributes ->> 'pending_transcoding_uuid'::text)))
-#  index_items_on_type                                 (type)
 #
 
 class Item < ApplicationRecord
@@ -467,8 +465,13 @@ class Item < ApplicationRecord
   end
 
   def incomplete_description
-    # TODO: Make this handle order when people delete and then add questions
-    question_number = parent_collection_card.order + 1
+    if parent_collection_card.order.nil?
+      # now that ideas collection is a 4WFC, its item cards have order = nil
+      question_number = 1
+    else
+      # TODO: Make this handle order when people delete and then add questions
+      question_number = parent_collection_card.order + 1
+    end
 
     if question_single_choice? || question_multiple_choice?
       return "Question #{question_number} needs question text" if content.blank?

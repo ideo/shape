@@ -5,26 +5,20 @@ class CardPinner < SimpleService
   end
 
   def call
-    reorder_cards!
+    pin_card
   end
 
-  def reorder_cards!
+  private
+
+  def pin_card
     template = @card.parent
 
-    next_order = nil
-    unless template.board_collection?
-      # next to last pinned
-      next_order = (template.collection_cards.pinned&.last&.order || -1) + 1
-    end
-    @card.update(pinned: @pinning, order: next_order)
+    @card.update(pinned: @pinning)
 
     # we just pinned a template card, so update the instances
     template.queue_update_template_instances(
       updated_card_ids: [@card.id],
       template_update_action: :pin,
     )
-
-    template.reorder_cards!
-    template.reload
   end
 end

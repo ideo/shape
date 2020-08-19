@@ -116,7 +116,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
 
   context 'with multiple ideas' do
     let!(:second_idea_card) do
-      create(:collection_card_video, order: 1, parent: test_collection.ideas_collection)
+      create(:collection_card_video, parent: test_collection.ideas_collection, row: 0, col: 1)
     end
     let(:second_idea) { second_idea_card.item }
 
@@ -142,13 +142,7 @@ RSpec.describe TestResultsCollection::CreateContent, type: :service do
   context 'with media disabled' do
     it 'does not create media link' do
       test_collection.update(test_show_media: false)
-      expect(TestResultsCollection::CreateItemLink).not_to receive(:call!).with(
-        hash_including(
-          item: idea,
-          identifier: 'first-idea-media',
-          order: 0,
-        ),
-      )
+      expect(TestResultsCollection::CreateItemLink).not_to receive(:call!)
       expect(subject).to be_a_success
     end
 

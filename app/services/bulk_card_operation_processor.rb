@@ -18,18 +18,13 @@ class BulkCardOperationProcessor < SimpleService
   private
 
   def create_placeholder
-    if @placement.is_a?(String) || @placement.is_a?(Integer)
-      order = @to_collection.card_order_at(@placement)
-    elsif @placement.respond_to?('[]')
-      row = @placement.try(:[], 'row')
-      col = @placement.try(:[], 'col')
-    else
-      return false
-    end
+    return false unless @placement.respond_to?('[]')
+
+    row = @placement.try(:[], 'row')
+    col = @placement.try(:[], 'col')
 
     @placeholder = CollectionCard::Placeholder.new(
       parent: @to_collection,
-      order: order,
       row: row,
       col: col,
       width: 1,
@@ -45,11 +40,6 @@ class BulkCardOperationProcessor < SimpleService
     end
 
     @placeholder.save
-    return false unless @placeholder.persisted?
-
-    # bump cards out of the way as needed
-    @placeholder.move_to_order(order)
-    true
   end
 
   def placeholder_message

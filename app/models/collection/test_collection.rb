@@ -19,7 +19,7 @@
 #  icon                           :string
 #  master_template                :boolean          default(FALSE)
 #  name                           :string
-#  num_columns                    :integer
+#  num_columns                    :integer          default(4)
 #  processing_status              :integer
 #  propagate_background_image     :boolean          default(FALSE)
 #  propagate_font_color           :boolean          default(FALSE)
@@ -437,6 +437,7 @@ class Collection
     end
 
     def setup_default_status_and_questions
+      self.num_columns = nil
       order = -1
 
       self.class

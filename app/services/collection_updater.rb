@@ -111,7 +111,7 @@ class CollectionUpdater < SimpleService
   def cache_collection_cover_if_needed
     should_cache_cover = false
     @collection.collection_cards.each do |card|
-      should_cache_cover ||= card.should_update_parent_collection_cover? if card.saved_change_to_order?
+      should_cache_cover ||= card.should_update_parent_collection_cover? if card.saved_change_to_row? || card.saved_change_to_col?
     end
     @collection.cache_cover! if should_cache_cover
   end

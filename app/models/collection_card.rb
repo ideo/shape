@@ -10,13 +10,13 @@
 #  filter            :integer          default("transparent_gray")
 #  font_background   :boolean          default(FALSE)
 #  font_color        :string
-#  height            :integer
+#  height            :integer          default(1)
 #  hidden            :boolean          default(FALSE)
 #  identifier        :string
 #  image_contain     :boolean          default(FALSE)
 #  is_background     :boolean          default(FALSE)
 #  is_cover          :boolean          default(FALSE)
-#  order             :integer          not null
+#  order             :integer
 #  parent_snapshot   :jsonb
 #  pinned            :boolean          default(FALSE)
 #  row               :integer
@@ -24,7 +24,7 @@
 #  show_replace      :boolean          default(TRUE)
 #  type              :string
 #  unarchived_at     :datetime
-#  width             :integer
+#  width             :integer          default(1)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  collection_id     :bigint(8)
@@ -66,7 +66,7 @@ class CollectionCard < ApplicationRecord
   before_validation :assign_order, if: :assign_order?
   before_validation :ensure_width_and_height
 
-  before_create :assign_default_height_and_width
+  before_create :assign_default_attrs
   after_update :update_collection_cover, if: :saved_change_to_is_cover?
   after_update :touch_collection, if: :saved_change_to_filter?
   after_create :update_parent_card_count!
@@ -74,7 +74,7 @@ class CollectionCard < ApplicationRecord
   after_save :set_collection_as_master_template,
              if: :test_collection_within_master_template_after_save?
 
-  validates :parent, :order, presence: true
+  validates :parent, presence: true
   validate :single_item_or_collection_is_present
   validate :parent_is_not_readonly, on: :create
   validates :section_type, presence: true, if: :parent_test_collection?
@@ -237,7 +237,9 @@ class CollectionCard < ApplicationRecord
 
     # now that the card exists, we can recalculate the breadcrumb
     cc.record.recalculate_breadcrumb! unless shallow || link?
-    cc.increment_card_orders! if placement != 'end' && placeholder.nil?
+    if placement != 'end' && placeholder.nil? && !parent.board_collection?
+      cc.increment_card_orders!
+    end
 
     # if we are duplicating a submission box template,
     # the cloned template should be marked as the clone's submission_template
@@ -324,6 +326,10 @@ class CollectionCard < ApplicationRecord
     pinned? && !master_template_card?
   end
 
+  def unpinned?
+    !pinned?
+  end
+
   def bct_placeholder?
     is_a?(CollectionCard::Placeholder) && parent_snapshot.present?
   end
@@ -343,6 +349,8 @@ class CollectionCard < ApplicationRecord
   # - Defaults to use this card's order
   # - Useful when inserting a new card to increment card order after this card
   def increment_card_orders!(starting_at_order = order)
+    return if parent.board_collection?
+
     greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards
@@ -360,6 +368,8 @@ class CollectionCard < ApplicationRecord
   # - Defaults to use this card's order
   # - Useful when removing a card from the collection
   def decrement_card_orders!(starting_at_order = order)
+    return if parent.board_collection?
+
     greater_than_or_equal = CollectionCard.arel_table[:order].gteq(starting_at_order)
 
     update_ids = parent.collection_cards
@@ -404,7 +414,7 @@ class CollectionCard < ApplicationRecord
 
   # gets called by child STI classes
   def after_archive_card
-    decrement_card_orders!
+    decrement_card_orders! unless parent.board_collection?
     update_parent_card_count!
     cover = parent.cached_cover
     if cover && cover['card_ids'].include?(id)
@@ -458,7 +468,12 @@ class CollectionCard < ApplicationRecord
       (cover['image_url'].blank? && media_card?) ||
       cover['card_ids'].include?(id) ||
       cover['card_order'].nil? ||
-      order <= cover['card_order']
+      card_order <= cover['card_order']
+      # ^^^ TODO: remove notion of card_order, as it's not applicable
+  end
+
+  def card_order
+    order || (row.to_i * 1000 + col.to_i)
   end
 
   def text_card?
@@ -563,13 +578,19 @@ class CollectionCard < ApplicationRecord
 
   private
 
-  def assign_default_height_and_width
+  def assign_default_attrs
     self.height ||= 1
     self.width ||= 1
+    if parent&.board_collection?
+      self.row ||= 0
+      self.col ||= 0
+    else
+      self.order ||= 0
+    end
   end
 
   def assign_order?
-    order.blank? && parent.present?
+    order.blank? && parent.present? && !parent.board_collection?
   end
 
   def assign_order

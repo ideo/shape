@@ -61,7 +61,7 @@ Then('I should see a {string} in the index {int} card', (el, pos) => {
 })
 
 Then('I should see a {string} in the card at {int},{int}', (el, row, col) => {
-  cy.get(`[data-cy="GridCard"][data-row="${row}"][data-col="${col}"]`)
+  cy.selectCardAt({ row, col })
     .locateDataOrClass(el)
     .first()
     .should('be.visible')
@@ -82,7 +82,7 @@ Then(
 Then(
   'I should not see a {string} in the card at {int},{int}',
   (el, row, col) => {
-    cy.get(`[data-cy="GridCard"][data-row="${row}"][data-col="${col}"]`)
+    cy.selectCardAt({ row, col })
       .locateDataOrClass(el)
       .should('not.exist')
   }
@@ -152,12 +152,11 @@ Then('I should not see the {string} modal', modalTitle => {
   cy.get(`[role="dialog"][aria-labelledby="${modalTitle}"]`).should('not.exist')
 })
 
-Then('I should see the {word} of {int} cards as {word}', (pos, count, size) => {
+Then('I should see the card at {int},{int} as {word}', (row, col, size) => {
   // size e.g. "2x1" so we split on 'x'
   const sizes = size.split('x')
   const [width, height] = sizes
-  const order = pos === 'last' ? count - 1 : 0
-  const cardEl = cy.get(`[data-cy="GridCard"][data-order="${order}"]`)
+  const cardEl = cy.selectCardAt({ row, col })
   cardEl.should('have.attr', 'data-width', width)
   cardEl.should('have.attr', 'data-height', height)
 })

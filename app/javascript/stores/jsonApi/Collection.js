@@ -1723,6 +1723,9 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     const submissions_collection = res.data
     // set the reverse relationship
     submissions_collection.submission_box = this
+    if (submissions_collection.activeFilters.length > 0) {
+      submissions_collection.setViewMode('list')
+    }
     await submissions_collection.API_fetchCards({ order })
     return submissions_collection
   }
