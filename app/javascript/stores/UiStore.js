@@ -1529,50 +1529,42 @@ export default class UiStore {
   // -----------------------
   // Foamcore zoom functions
   zoomOut() {
-    const previousZoom = this.zoomLevel
+    const container = document.querySelector('.foamcoreGridBoundary')
+    const prevW = container.clientWidth
+    const prevScrollY = window.scrollY
     this.updateZoomLevel(this.zoomLevel + 1)
-    const zoomDiff = (1 / this.zoomLevel - 1 / previousZoom) * 10
     setTimeout(() => {
-      const scrollAmountY = window.scrollY * zoomDiff
-      const scrollAmountX = window.scrollX * zoomDiff
-      const middleY = window.scrollY + scrollAmountY
-      const middleX = window.scrollX + scrollAmountX
-      console.log('zoom', {
-        zoomDiff,
-        scrollAmountY,
-        scrollAmountX,
-        middleX,
-        middleY,
-      })
+      const currW = container.clientWidth
+      const diff = prevW / currW
+      const scrollY = prevScrollY / diff
+      const scrollX = window.scrollX / diff
+      const top = scrollY - window.innerHeight / 4
+      const left = scrollX - window.innerHeight / 4
+
       window.scrollTo({
-        top: middleY,
-        left: middleX,
+        left,
+        top,
       })
-    }, 1)
+    })
   }
 
   zoomIn() {
-    const previousZoom = this.zoomLevel
-    console.log('zoom', this.zoomLevel, this.zoomLevel - 1)
+    const container = document.querySelector('.foamcoreGridBoundary')
+    const prevW = container.clientWidth
     this.updateZoomLevel(this.zoomLevel - 1)
-    const zoomDiff = (1 / this.zoomLevel - 1 / previousZoom) * 10
     setTimeout(() => {
-      const scrollAmountY = window.scrollY / zoomDiff
-      const scrollAmountX = window.scrollX / zoomDiff
-      const middleY = window.innerHeight / 2 + scrollAmountY
-      const middleX = window.innerWidth / 2 + scrollAmountX
-      console.log('zoom', {
-        zoomDiff,
-        scrollAmountY,
-        scrollAmountX,
-        middleX,
-        middleY,
-      })
+      const currW = container.clientWidth
+      const diff = prevW / currW
+      const scrollY = window.scrollY / diff
+      const scrollX = window.scrollX / diff
+      const top = scrollY + window.innerHeight / 2
+      const left = scrollX + window.innerWidth / 2
+
       window.scrollTo({
-        top: middleY,
-        left: middleX,
+        left,
+        top,
       })
-    }, 1)
+    })
   }
 
   @action
