@@ -83,12 +83,6 @@ class GridCardEmptyHotspot extends React.Component {
   @observable
   isMouseOver = false
 
-  constructor(props) {
-    super(props)
-    console.log(props)
-    if (props.row === 1) this.isMouseOver = true
-  }
-
   openBlankContentTool = () => {
     const { uiStore, card } = this.props
     if (!card) return
@@ -116,7 +110,6 @@ class GridCardEmptyHotspot extends React.Component {
   }
 
   handleMouseOver = ev => {
-    console.log('moused over')
     runInAction(() => {
       this.isMouseOver = true
     })
@@ -124,7 +117,7 @@ class GridCardEmptyHotspot extends React.Component {
 
   handleMouseLeave = ev => {
     runInAction(() => {
-      // this.isMouseOver = false
+      this.isMouseOver = false
     })
   }
 
