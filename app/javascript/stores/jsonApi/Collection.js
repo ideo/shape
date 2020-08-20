@@ -1881,6 +1881,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
+  @action
   API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted

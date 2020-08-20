@@ -447,30 +447,6 @@ class FoamcoreGrid extends React.Component {
     return { col, row, outsideDraggableArea }
   }
 
-  positionForCoordinates({ col, row, width = 1, height = 1 }) {
-    const { gridW, gridH, gutter } = this.gridSettings
-    const { relativeZoomLevel } = this
-    const pos = {
-      x: (col * (gridW + gutter)) / relativeZoomLevel,
-      y: (row * (gridH + gutter)) / relativeZoomLevel,
-      w: width * (gridW + gutter) - gutter,
-      h: height * (gridH + gutter) - gutter,
-    }
-    // TODO: why sometimes NaN? zoomLevel divide by 0??
-    if (_.isNaN(pos.x)) {
-      pos.x = 0
-      pos.y = 0
-    }
-    // TODO try and get rid of {x|y}Pos
-    return {
-      ...pos,
-      xPos: pos.x,
-      yPos: pos.y,
-      width: pos.w,
-      height: pos.h,
-    }
-  }
-
   findOverlap(card) {
     const { collection, uiStore } = this.props
     const { row, col, height, width } = card
@@ -1137,11 +1113,11 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderMovableCard(card, key) {
-    const { canEditCollection, collection } = this.props
+    const { canEditCollection, collection, uiStore } = this.props
     const { pageMargins, zoomLevel, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
 
-    const position = this.positionForCoordinates(card)
+    const position = uiStore.positionForCoordinates(card)
 
     if (card.id === 'blank' && zoomLevel !== 1) {
       // TODO: on fourWide these numbers are not perfect... figure out better calculation?
@@ -1212,13 +1188,14 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionBlank({ row, col, width, height }, type = 'drag') {
-    const position = this.positionForCoordinates({ col, row, width, height })
     const {
       collection,
       collection: { collection_cards },
+      uiStore,
     } = this.props
     const { isFourWideBoard } = collection
     const { relativeZoomLevel } = this
+    const position = uiStore.positionForCoordinates({ col, row, width, height })
 
     let inner = ''
     const emptyRow =
@@ -1496,7 +1473,7 @@ class FoamcoreGrid extends React.Component {
       record: movingCard.record,
       width: movingCard.width,
       height: movingCard.height,
-      position: this.positionForCoordinates(movingCard),
+      position: uiStore.positionForCoordinates(movingCard),
     }
     const placeholder = new CollectionCard(data, apiStore)
     apiStore.updateModelId(placeholder, `${movingCard.id}-mdlPlaceholder`)

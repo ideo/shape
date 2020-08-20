@@ -189,12 +189,12 @@ Cypress.Commands.add('resizeCard', ({ row, col, size }) => {
 
 Cypress.Commands.add('moveFirstCardDown', (row = 1) => {
   cy.window()
-    .then(win => {
+    .then(async win => {
       const collection = win.uiStore.viewingCollection
       const card = _.first(collection.sortedCards)
-      collection.API_updateCard({
+      await collection.API_updateCard({
         card,
-        updates: { row, col: 0, updated_at: 'some new time' },
+        updates: { row, col: 0 },
         undoMessage: 'Card move undone',
       })
     })
@@ -219,15 +219,30 @@ Cypress.Commands.add(
       className += `-${row}:${col}`
     }
     if (!empty) {
-      // this is how we simulate a mouseover to create a blank hover spot
-      cy.get(`.${FOAMCORE_GRID_BOUNDARY}`).trigger('mousemove', {
-        clientX: 100,
-        clientY: 200,
-        force: true,
+      // we need to hover over the right spot to make the BCT appear
+      cy.window().then(win => {
+        // make sure we're at top left
+        cy.scrollTo(0, 0)
+        const { uiStore } = win
+        // this is how we simulate a mouseover to create a blank hover spot
+        const pos = uiStore.positionForCoordinates({
+          row: row || 0,
+          col: col || 0,
+        })
+        const rect = {
+          // estimated values to simulate bounding rectangle
+          left: 50,
+          top: 150,
+        }
+        cy.get(`.${FOAMCORE_GRID_BOUNDARY}`).trigger('mousemove', {
+          clientX: pos.x + rect.left,
+          clientY: pos.y + rect.top,
+          force: true,
+        })
+        cy.locateDataOrClass(className)
+          .first()
+          .click({ force: true })
       })
-      cy.locateDataOrClass(className)
-        .first()
-        .click({ force: true })
     }
     if (type === 'file') {
       cy.wait(1000)

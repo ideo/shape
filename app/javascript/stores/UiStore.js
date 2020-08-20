@@ -1696,4 +1696,28 @@ export default class UiStore {
     gridWidth += marginLeft * _.max([0, zoomLevelEstimate - 1])
     return gridWidth
   }
+
+  positionForCoordinates({ col, row, width = 1, height = 1 }) {
+    const { gridW, gridH, gutter } = v.defaultGridSettings
+    const { relativeZoomLevel } = this
+    const pos = {
+      x: (col * (gridW + gutter)) / relativeZoomLevel,
+      y: (row * (gridH + gutter)) / relativeZoomLevel,
+      w: width * (gridW + gutter) - gutter,
+      h: height * (gridH + gutter) - gutter,
+    }
+    // TODO: why sometimes NaN? zoomLevel divide by 0??
+    if (_.isNaN(pos.x)) {
+      pos.x = 0
+      pos.y = 0
+    }
+    // TODO try and get rid of {x|y}Pos
+    return {
+      ...pos,
+      xPos: pos.x,
+      yPos: pos.y,
+      width: pos.w,
+      height: pos.h,
+    }
+  }
 }
