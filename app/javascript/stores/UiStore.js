@@ -1427,17 +1427,6 @@ export default class UiStore {
     this.scroll.scrollToBottom()
   }
 
-  scrollToCenter(direction) {
-    const middleY = window.innerHeight / 2 + window.scrollY * 2
-    // TODO: you don't always want to scroll down to the "middle"
-    // -- also "middle" really depends more on rows of cards vs. window.innerHeight
-    const middleX = window.innerWidth / 2
-    window.scrollTo({
-      top: middleY,
-      left: middleX,
-    })
-  }
-
   scrollToPosition(position) {
     this.scroll.scrollTo(position)
   }
