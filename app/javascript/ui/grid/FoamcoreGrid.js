@@ -1181,11 +1181,10 @@ class FoamcoreGrid extends React.Component {
         <GridCardEmptyHotspot
           card={this.props.card}
           uploading={this.uploading}
-          handleAfterUploading={success => {
-            this.uploading && this.setUploading(false)
+          handleAfterUploading={({ success = false }) => {
             if (success) {
               // TODO: should render placeholder cards here?
-              console.log('handle upload success')
+              this.uploading && this.setUploading(false)
             }
           }}
           interactionType={type}
@@ -1517,7 +1516,7 @@ class FoamcoreGrid extends React.Component {
               e.target.getAttribute('data-empty-space-click')
             ) ||
             e.target.closest('.dropzoneHolder') ||
-            e.target.closest('.dropzoneEmpty')
+            e.target.closest('.gridCardDropzone')
           ) {
             return
           }

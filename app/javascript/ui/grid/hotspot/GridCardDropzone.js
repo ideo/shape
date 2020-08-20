@@ -1,9 +1,17 @@
 import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
+import v from '~/utils/variables'
 
 import { StyledGridCardEmpty } from '~/ui/grid/hotspot/shared'
 import DropzoneHolder from '~/ui/grid/hotspot/DropzoneHolder'
+
+const StyledGridCardDropzone = styled.div`
+  width: 100%;
+  height: 100%;
+  background: ${v.colors.primaryLight};
+`
 
 @observer
 class GridCardDropzone extends React.Component {
@@ -12,11 +20,17 @@ class GridCardDropzone extends React.Component {
 
   handleDragOver = e => {
     e.preventDefault()
-    this.updateWillUpload(true)
+    if (e.target.closest('.gridCardDropzone')) {
+      this.updateWillUpload(true)
+    }
   }
 
   handleDragLeave = e => {
-    if (e.target.closest('.dropzoneEmpty')) {
+    e.preventDefault()
+    if (
+      e.target.closest('.dropzoneHolder') ||
+      e.target.closest('.fsp-drop-pane__drop-zone')
+    ) {
       return
     }
     this.updateWillUpload(false)
@@ -35,15 +49,18 @@ class GridCardDropzone extends React.Component {
 
   render() {
     return (
-      <StyledGridCardEmpty
-        className={'visible dropzoneEmpty'}
+      <StyledGridCardDropzone
+        className={'gridCardDropzone'}
         onDragOver={this.handleDragOver}
         onDragLeave={this.handleDragLeave}
+        onDragEnd={this.handleDragEnd}
       >
-        {this.willUpload && (
-          <DropzoneHolder handleAfterUploading={this.resetUpload} />
+        {!this.willUpload ? (
+          <StyledGridCardEmpty className={'visible'} />
+        ) : (
+          <DropzoneHolder handleResetUpload={this.resetUpload} />
         )}
-      </StyledGridCardEmpty>
+      </StyledGridCardDropzone>
     )
   }
 }

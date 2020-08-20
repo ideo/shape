@@ -13,7 +13,6 @@ import IconHolder from '~/ui/icons/IconHolder'
 const StyledDropzoneHolder = styled.div`
   width: 100%;
   height: 100%;
-  color: ${v.colors.secondaryMedium};
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -53,7 +52,7 @@ class DropzoneHolder extends React.Component {
   handleDragOver = e => {}
 
   handleDragLeave = e => {
-    this.props.handleAfterUploading({ success: false })
+    this.props.handleResetUpload({ success: false })
   }
 
   handleDrop = e => {
@@ -101,7 +100,7 @@ class DropzoneHolder extends React.Component {
 
       // TODO: add call to bulk upload here?
       // create placeholder cards then rerender files
-      this.props.handleAfterUploading({ success: true })
+      this.props.handleResetUpload({ success: true })
     }
   }
 
@@ -139,7 +138,7 @@ DropzoneHolder.wrappedComponent.propTypes = {
 }
 
 DropzoneHolder.propTypes = {
-  handleAfterUploading: PropTypes.func.isRequired,
+  handleResetUpload: PropTypes.func.isRequired,
 }
 
 export default DropzoneHolder

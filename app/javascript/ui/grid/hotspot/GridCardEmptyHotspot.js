@@ -124,6 +124,8 @@ class GridCardEmptyHotspot extends React.Component {
 
   render() {
     const { uploading, handleAfterUploading } = this.props
+
+    // render uploading or hover state
     return uploading && handleAfterUploading ? (
       <GridCardDropzone handleAfterUploading={handleAfterUploading} />
     ) : (
