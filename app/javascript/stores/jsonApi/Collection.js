@@ -848,7 +848,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (this.isBoard && !this.isSplitLevelBottom) {
+    if (this.isBoard && !hidden && !this.isSplitLevelBottom) {
       // nullify these as they have no effect on boards
       delete params.per_page
       delete params.page

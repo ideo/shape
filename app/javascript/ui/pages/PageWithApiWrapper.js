@@ -126,11 +126,14 @@ class PageWithApiWrapper extends React.Component {
     if (fetchType && cachedFetchId) {
       // First check if we already have this record in the local store
       const record = apiStore.find(fetchType, cachedFetchId)
+      // 4WFC migration related... we treat non-board collections as needing full fetch
+      const needsMigration = record && record.isCollection && !record.isBoard
       if (
         record &&
         !record.isText &&
         !record.awaiting_updates &&
-        !record.isTestCollection
+        !record.isTestCollection &&
+        !needsMigration
       ) {
         // mark as !fullyLoaded until we re-fetch the latest data
         // (mostly just used by RealtimeTextItem)
