@@ -13,6 +13,7 @@ import IconHolder from '~/ui/icons/IconHolder'
 const StyledDropzoneHolder = styled.div`
   width: 100%;
   height: 100%;
+  background-color: ${v.colors.primaryLight};
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -45,8 +46,10 @@ class DropzoneHolder extends React.Component {
     super(props)
   }
 
-  componentDidMount() {
-    this.createDropPane()
+  componentDidUpdate(prevProps) {
+    if (!prevProps.willUpload && this.props.willUpload) {
+      this.createDropPane()
+    }
   }
 
   handleDragOver = e => {}
@@ -120,14 +123,18 @@ class DropzoneHolder extends React.Component {
   }
 
   render() {
+    const { willUpload, didUpload } = this.props
+    const id = willUpload || didUpload ? 'dropzone' : ''
     return (
-      <StyledDropzoneHolder id="dropzone" className="dropzoneHolder">
-        <StyledIconAndHeadingHolder display={'inline-block'}>
-          <CloudIcon />
-          <DisplayText fontSize={'.75em'} textTransform="uppercase">
-            Drag & Drop
-          </DisplayText>
-        </StyledIconAndHeadingHolder>
+      <StyledDropzoneHolder id={id}>
+        {(willUpload || didUpload) && (
+          <StyledIconAndHeadingHolder display={'inline-block'}>
+            <CloudIcon />
+            <DisplayText fontSize={'.75em'} textTransform="uppercase">
+              Drag & Drop
+            </DisplayText>
+          </StyledIconAndHeadingHolder>
+        )}
       </StyledDropzoneHolder>
     )
   }
@@ -139,6 +146,8 @@ DropzoneHolder.wrappedComponent.propTypes = {
 
 DropzoneHolder.propTypes = {
   handleResetUpload: PropTypes.func.isRequired,
+  willUpload: PropTypes.bool.isRequired,
+  didUpload: PropTypes.bool.isRequired,
 }
 
 export default DropzoneHolder

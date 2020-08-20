@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 import _ from 'lodash'
 
-import { StyledGridCardEmpty } from '~/ui/grid/hotspot/shared'
 import DropzoneHolder from '~/ui/grid/hotspot/DropzoneHolder'
 
 const StyledGridCardDropzone = styled.div`
@@ -19,11 +18,14 @@ class GridCardDropzone extends React.Component {
   @observable
   willUpload = false
 
+  @observable
+  didUpload = false
+
   constructor(props) {
     super(props)
     this.debouncedWillResetUpload = _.debounce(() => {
       this.updateWillUpload(false)
-    }, 100)
+    }, 25)
   }
 
   handleDragOver = e => {
@@ -35,15 +37,28 @@ class GridCardDropzone extends React.Component {
     }
   }
 
+  handleDrop = e => {
+    e.preventDefault()
+    if (!this.willUpload) {
+      this.updateDidUpload(true)
+    }
+  }
+
   @action
   updateWillUpload = willUpload => {
     this.willUpload = willUpload
+  }
+
+  @action
+  updateDidUpload = didUpload => {
+    this.didUpload = didUpload
   }
 
   resetUpload = ({ success = false }) => {
     const { handleAfterUploading } = this.props
     handleAfterUploading({ success })
     this.updateWillUpload(false)
+    this.updateDidUpload(false)
   }
 
   render() {
@@ -54,11 +69,11 @@ class GridCardDropzone extends React.Component {
         onDragLeave={this.handleDragLeave}
         onDragEnd={this.handleDragEnd}
       >
-        {!this.willUpload ? (
-          <StyledGridCardEmpty className={'visible'} />
-        ) : (
-          <DropzoneHolder handleResetUpload={this.resetUpload} />
-        )}
+        <DropzoneHolder
+          handleResetUpload={this.resetUpload}
+          willUpload={this.willUpload}
+          didUpload={this.didUpload}
+        />
       </StyledGridCardDropzone>
     )
   }
