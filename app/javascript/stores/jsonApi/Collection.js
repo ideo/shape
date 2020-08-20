@@ -1343,7 +1343,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.collection_cards) {
       _.each(this.sortedCards, (card, i) => {
         if (this.isBoard) {
-          card.order = 0
+          card.order = null
         } else {
           card.order = i
         }

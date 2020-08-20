@@ -6,7 +6,7 @@ import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
-import v from '~/utils/variables'
+import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
@@ -604,7 +604,7 @@ class MovableGridCard extends React.Component {
       ref: c => {
         this.rnd = c
       },
-      bounds: isBoardCollection ? '.foamcoreGridBoundary' : null,
+      bounds: isBoardCollection ? `.${FOAMCORE_GRID_BOUNDARY}` : null,
       onDragStart: this.handleStart,
       onDrag: this.handleDrag,
       onDragStop: this.handleStop('drag'),

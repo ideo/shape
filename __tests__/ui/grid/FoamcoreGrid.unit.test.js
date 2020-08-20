@@ -4,7 +4,7 @@ import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
-import v from '~/utils/variables'
+import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 
 // because of mdlPlaceholder... without this mock it blows up
 jest.mock('../../../app/javascript/stores/jsonApi/CollectionCard')
@@ -582,7 +582,7 @@ describe('FoamcoreGrid', () => {
       clientX: 100,
       clientY: 200,
       target: {
-        classList: ['foamcoreGridBoundary'],
+        classList: [FOAMCORE_GRID_BOUNDARY],
       },
     }
 

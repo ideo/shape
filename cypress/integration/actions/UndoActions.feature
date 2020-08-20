@@ -4,7 +4,7 @@ Feature: Undo actions
     Given I login and visit the Test Area
 
     And I create a textItem card
-    Then I should see a "TextItemCover" in the first card
+    Then I should see a "TextItemCover" in the card at 0,0
     Then I should see the value "Testing" in the first text item
 
     # Testing undoing text item content changes
@@ -86,8 +86,10 @@ Feature: Undo actions
     Then I should see the card at 0,2 as 1x1
 
     # Undo moving cards to a collection
-    When I select the card at 0,1
-    And I select the card at 0,2
+    # pick up "hello world"
+    When I select the card at 0,0
+    # pick up text item
+    And I select the card at 0,1
     And I click the action menu for the card at 0,1
     And I click the move action for the card at 0,1
     And I close the move helper modal
@@ -101,7 +103,7 @@ Feature: Undo actions
     And I wait for "@apiMoveCollectionCards" to finish
     And I wait for 1 second
     Then I should see a collection card named "Hello World"
-    Then I should see a "TextItemCover" in the first card
+    Then I should see a "TextItemCover" in the card at 0,1
     Then I should see the value "Testing" in the first text item
     And I close the snackbar
 

@@ -22,7 +22,7 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
 import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
+import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
@@ -1416,7 +1416,7 @@ class FoamcoreGrid extends React.Component {
     const { uiStore } = this.props
 
     let rect = { left: 0, top: 0 }
-    const container = document.querySelector('.foamcoreGridBoundary')
+    const container = document.querySelector(`.${FOAMCORE_GRID_BOUNDARY}`)
     if (container) {
       // just a guard for jest shallow render
       rect = container.getBoundingClientRect()
@@ -1430,7 +1430,7 @@ class FoamcoreGrid extends React.Component {
       target = touch.target
     }
     const { classList } = target
-    if (!classList || !_.includes(classList, 'foamcoreGridBoundary')) {
+    if (!classList || !_.includes(classList, FOAMCORE_GRID_BOUNDARY)) {
       // only perform calculation if target is the grid itself
       return true
     }
@@ -1567,9 +1567,11 @@ class FoamcoreGrid extends React.Component {
 
     return (
       <Grid
-        onMouseMove={!uiStore.isTouchDevice && this.onCursorMove}
-        onTouchStart={uiStore.isTouchDevice && this.onCursorMove}
-        className={`foamcoreGridBoundary${isSplitLevelBottom ? '-bottom' : ''}`}
+        onMouseMove={!uiStore.isTouchDevice ? this.onCursorMove : null}
+        onTouchStart={uiStore.isTouchDevice ? this.onCursorMove : null}
+        className={`${FOAMCORE_GRID_BOUNDARY}${
+          isSplitLevelBottom ? '-bottom' : ''
+        }`}
         data-empty-space-click
         ref={ref => {
           this.gridRef = ref
