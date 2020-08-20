@@ -3,6 +3,7 @@ import { observer } from 'mobx-react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import v from '~/utils/variables'
+import _ from 'lodash'
 
 import { StyledGridCardEmpty } from '~/ui/grid/hotspot/shared'
 import DropzoneHolder from '~/ui/grid/hotspot/DropzoneHolder'
@@ -18,22 +19,20 @@ class GridCardDropzone extends React.Component {
   @observable
   willUpload = false
 
+  constructor(props) {
+    super(props)
+    this.debouncedWillResetUpload = _.debounce(() => {
+      this.updateWillUpload(false)
+    }, 100)
+  }
+
   handleDragOver = e => {
     e.preventDefault()
     if (e.target.closest('.gridCardDropzone')) {
       this.updateWillUpload(true)
+      // reset willUpload to prevent many instances of this class to render DropzoneHolder
+      this.debouncedWillResetUpload()
     }
-  }
-
-  handleDragLeave = e => {
-    e.preventDefault()
-    if (
-      e.target.closest('.dropzoneHolder') ||
-      e.target.closest('.fsp-drop-pane__drop-zone')
-    ) {
-      return
-    }
-    this.updateWillUpload(false)
   }
 
   @action
