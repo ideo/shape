@@ -6,7 +6,7 @@ import Rnd from 'react-rnd'
 import styled, { css, keyframes } from 'styled-components'
 
 import { uiStore } from '~/stores'
-import v from '~/utils/variables'
+import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import propShapes from '~/utils/propShapes'
 import PositionedGridCard from '~/ui/grid/PositionedGridCard'
 import GridCard from '~/ui/grid/GridCard'
@@ -298,9 +298,15 @@ class MovableGridCard extends React.Component {
   )
 
   renderEmpty = () => {
+    const { currentlyZooming } = uiStore
+    const transition = currentlyZooming ? 'none' : cardCSSTransition
     return (
-      <PositionedGridCard {...this.styleProps()} transition={cardCSSTransition}>
-        <GridCardEmptyHotspot visible={true} card={this.props.card} />
+      <PositionedGridCard {...this.styleProps()} transition={transition}>
+        <GridCardEmptyHotspot
+          // this was set to always visible...
+          visible={this.props.card.visible}
+          card={this.props.card}
+        />
       </PositionedGridCard>
     )
   }
@@ -529,6 +535,7 @@ class MovableGridCard extends React.Component {
       cardMenuOpen,
       editingCardCover,
       activeDragTarget,
+      currentlyZooming,
       shouldOpenMoveSnackbar,
       isTouchDevice,
       isCypress,
@@ -547,7 +554,8 @@ class MovableGridCard extends React.Component {
     let transform = `translateZ(0) scale(${1 / zoomLevel})`
     const adjustedWidth = (width + resizeWidth) / zoomLevel
     const adjustedHeight = (height + resizeHeight) / zoomLevel
-    let transition = dragging || resizing ? 'none' : cardCSSTransition
+    let transition =
+      dragging || resizing || currentlyZooming ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!activeDragTarget
     if (dragging || this.state.allowTouchDeviceDragging) {
@@ -597,7 +605,7 @@ class MovableGridCard extends React.Component {
       ref: c => {
         this.rnd = c
       },
-      bounds: isBoardCollection ? '.foamcoreGridBoundary' : null,
+      bounds: isBoardCollection ? `.${FOAMCORE_GRID_BOUNDARY}` : null,
       onDragStart: this.handleStart,
       onDrag: this.handleDrag,
       onDragStop: this.handleStop('drag'),

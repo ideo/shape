@@ -46,20 +46,6 @@ Then('I should see the value {string} in a {string}', (text, el) => {
   cy.locateDataOrClass(el).should('have.value', text)
 })
 
-Then('I should see a {string} in the first card', el => {
-  cy.get('[data-cy="GridCard"][data-order="0"]')
-    .locateDataOrClass(el)
-    .first()
-    .should('be.visible')
-})
-
-Then('I should see a {string} in the index {int} card', (el, pos) => {
-  cy.get(`[data-cy="GridCard"][data-order="${pos}"]`)
-    .locateDataOrClass(el)
-    .first()
-    .should('be.visible')
-})
-
 Then('I should see a {string} in the card at {int},{int}', (el, row, col) => {
   cy.selectCardAt({ row, col })
     .locateDataOrClass(el)
@@ -85,16 +71,6 @@ Then(
     cy.selectCardAt({ row, col })
       .locateDataOrClass(el)
       .should('not.exist')
-  }
-)
-
-Then(
-  'I should see a collection card named {string} in the index {int}',
-  (name, pos) => {
-    cy.get(`[data-cy="GridCard"][data-order="${pos}"]`)
-      .locateWith('CollectionCover', name)
-      .first()
-      .should('be.visible')
   }
 )
 

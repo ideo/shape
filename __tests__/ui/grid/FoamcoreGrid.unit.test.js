@@ -4,7 +4,7 @@ import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
-import v from '~/utils/variables'
+import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 
 // because of mdlPlaceholder... without this mock it blows up
 jest.mock('../../../app/javascript/stores/jsonApi/CollectionCard')
@@ -574,6 +574,32 @@ describe('FoamcoreGrid', () => {
       expect(props.uiStore.determineZoomLevels).toHaveBeenCalledWith(
         props.collection
       )
+    })
+  })
+
+  describe('onCursorMove', () => {
+    const fakeEv = {
+      clientX: 100,
+      clientY: 200,
+      target: {
+        classList: [FOAMCORE_GRID_BOUNDARY],
+      },
+    }
+
+    it('should look up coordinatesForPosition', () => {
+      const result = component.onCursorMove(fakeEv)
+      expect(result).toEqual({
+        col: 0,
+        row: 1,
+      })
+    })
+
+    it('should ignore events that are outside foamcoreGridBoundary', () => {
+      fakeEv.target = {
+        classList: ['other'],
+      }
+      const result = component.onCursorMove(fakeEv)
+      expect(result).toEqual(true)
     })
   })
 })

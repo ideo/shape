@@ -271,6 +271,8 @@ export default class UiStore {
   challengeSettingsOpen = false
   @observable
   zoomLevels = []
+  @observable
+  currentlyZooming = false
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -1517,14 +1519,72 @@ export default class UiStore {
     _.assign(this.placeholderPosition, position)
   }
 
+  get scrollMaxX() {
+    return (
+      window.scrollMaxX ||
+      document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
+    )
+  }
+
+  get percentScrolledX() {
+    const { scrollMaxX } = this
+    // in the case where you don't have much horizontalScroll, default to midpoint
+    if (scrollMaxX < 20) return 0.5
+    return window.pageXOffset / scrollMaxX
+  }
+
+  get scrollMaxY() {
+    return (
+      window.scrollMaxY ||
+      document.documentElement.scrollHeight -
+        document.documentElement.clientHeight
+    )
+  }
+
+  get percentScrolledY() {
+    const { scrollMaxY } = this
+    // in the case where you're at the top, zoom in should take you a little ways down
+    if (window.pageYOffset < 20) return 0.1
+    return window.pageYOffset / scrollMaxY
+  }
+
   // -----------------------
   // Foamcore zoom functions
   zoomOut() {
-    this.updateZoomLevel(this.zoomLevel + 1)
+    this.zoomAndScroll(1)
   }
 
   zoomIn() {
-    this.updateZoomLevel(this.zoomLevel - 1)
+    this.zoomAndScroll(-1)
+  }
+
+  @action
+  zoomAndScroll(zoomChange) {
+    this.currentlyZooming = true
+    // capture these first
+    const { percentScrolledX, percentScrolledY } = this
+    const zoomBefore = this.relativeZoomLevel
+    this.updateZoomLevel(this.zoomLevel + zoomChange)
+    const zoomAfter = this.relativeZoomLevel
+    if (zoomBefore === zoomAfter) {
+      return
+    }
+
+    setTimeout(() => {
+      // now that things have changed
+      const { scrollMaxX, scrollMaxY } = this
+      const left = percentScrolledX * scrollMaxX
+      const top = percentScrolledY * scrollMaxY
+
+      window.scrollTo({
+        left,
+        top,
+      })
+      runInAction(() => {
+        this.currentlyZooming = false
+      })
+    })
   }
 
   @action
@@ -1624,5 +1684,29 @@ export default class UiStore {
     // we have to adjust since the margins and the scale of zoom will both factor into the actual width
     gridWidth += marginLeft * _.max([0, zoomLevelEstimate - 1])
     return gridWidth
+  }
+
+  positionForCoordinates({ col, row, width = 1, height = 1 }) {
+    const { gridW, gridH, gutter } = v.defaultGridSettings
+    const { relativeZoomLevel } = this
+    const pos = {
+      x: (col * (gridW + gutter)) / relativeZoomLevel,
+      y: (row * (gridH + gutter)) / relativeZoomLevel,
+      w: width * (gridW + gutter) - gutter,
+      h: height * (gridH + gutter) - gutter,
+    }
+    // TODO: why sometimes NaN? zoomLevel divide by 0??
+    if (_.isNaN(pos.x)) {
+      pos.x = 0
+      pos.y = 0
+    }
+    // TODO try and get rid of {x|y}Pos
+    return {
+      ...pos,
+      xPos: pos.x,
+      yPos: pos.y,
+      width: pos.w,
+      height: pos.h,
+    }
   }
 }

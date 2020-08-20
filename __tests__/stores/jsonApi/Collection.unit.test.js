@@ -562,7 +562,7 @@ describe('Collection', () => {
   })
 
   describe('API_batchUpdateCardsWithUndo', () => {
-    const updates = [{ card: collectionCard_1, row: 2, col: 3 }]
+    const updates = [{ card: collectionCard_1, order: null, row: 2, col: 3 }]
     beforeEach(() => {
       runInAction(() => {
         collectionCard_1.row = 0
@@ -585,7 +585,7 @@ describe('Collection', () => {
       // local update should be applied and then sent through to apiStore
       const data = collection.toJsonApiWithCards([collectionCard_1.id])
       expect(data.attributes.collection_cards_attributes).toEqual([
-        { id: collectionCard_1.id, order: 0, row: 2, col: 3 },
+        { id: collectionCard_1.id, order: null, row: 2, col: 3 },
       ])
       expect(apiStore.request).toHaveBeenCalledWith(
         `collections/${collection.id}`,
