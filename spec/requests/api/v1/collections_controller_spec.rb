@@ -982,6 +982,19 @@ describe Api::V1::CollectionsController, type: :request, json: true, auth: true 
       )
       post(path, params: params)
     end
+
+    context 'system_required collection' do
+      let(:collection) { create(:user_collection) }
+
+      it 'should call row inserter' do
+        expect(CollectionGrid::RowInserter).to receive(:call).with(
+          collection: collection,
+          row: 1,
+          action: action,
+        )
+        post(path, params: params)
+      end
+    end
   end
 
   describe 'POST #remove_row' do

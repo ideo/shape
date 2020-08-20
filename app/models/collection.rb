@@ -1238,11 +1238,11 @@ class Collection < ApplicationRecord
   end
 
   def max_row_index
-    collection_cards.maximum(:row) || 0
+    collection_cards.visible.maximum(:row) || 0
   end
 
   def max_col_index
-    collection_cards.maximum(:col) || 0
+    collection_cards.visible.maximum(:col) || 0
   end
 
   def bct_placeholder_at(row:, col:)

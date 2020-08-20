@@ -26,9 +26,11 @@ namespace :board_migrator do
       CollectionGrid::BoardMigrator.call(collection: special_collection)
     end
 
-    Collection.where(num_columns: nil).find_in_batches.each do |batch|
+    Collection.order(updated_at: :desc).where(num_columns: nil).find_in_batches.each do |batch|
       batch.each do |collection|
         CollectionGrid::BoardMigrator.call(collection: collection)
+      rescue StandardError
+        puts "unable to migrate collection #{collection.id}"
       end
     end
   end

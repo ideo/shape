@@ -62,7 +62,8 @@ module CollectionGrid
       end
 
       # have to make into an array for bulk CollectionCard.import to work
-      cards = collection.collection_cards.map { |cc| Mashie.new(cc.as_json) }
+      collection.collection_cards.hidden.update_all(order: nil)
+      cards = collection.collection_cards.visible.map { |cc| Mashie.new(cc.as_json) }
 
       # apply row/col values onto ordered cards
       CollectionGrid::Calculator.calculate_rows_cols(

@@ -2,7 +2,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
   deserializable_resource :collection, class: DeserializableCollection, only: %i[update]
   load_and_authorize_resource :collection_card, only: [:create]
   load_and_authorize_resource except: %i[update destroy in_my_collection clear_collection_cover clear_background_image
-                                         challenge_submission_boxes next_available_submission_test]
+                                         challenge_submission_boxes next_available_submission_test insert_row remove_row]
   skip_before_action :check_api_authentication!, only: %i[show]
 
   before_action :join_collection_group, only: :show, if: :join_collection_group?
