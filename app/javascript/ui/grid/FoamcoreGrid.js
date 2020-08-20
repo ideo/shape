@@ -78,7 +78,7 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
 
   ${props =>
     props.type !== 'unrendered' &&
-    `&:hover {
+    `
     background-color: ${v.colors.primaryLight} !important;
 
     .plus-icon {
@@ -88,7 +88,6 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
     ${CircleIconHolder} {
       display: block;
     }
-  }
   `} .plus-icon {
     display: none;
   }
@@ -143,6 +142,7 @@ class FoamcoreGrid extends React.Component {
   disableHorizontalScroll = false
   @observable
   uploading = false
+  @observable
   hoveringRowCol = {
     row: null,
     col: null,
@@ -1216,7 +1216,9 @@ class FoamcoreGrid extends React.Component {
 
   @action
   setUploading = uploading => {
-    this.uploading = uploading
+    if (this.uploading !== uploading) {
+      this.uploading = uploading
+    }
   }
 
   clearDragTimeout() {
@@ -1508,6 +1510,7 @@ class FoamcoreGrid extends React.Component {
         height={gridSize.height}
         onDragOver={e => {
           e.preventDefault()
+          this.onCursorMove(e)
           this.setUploading(isFile(e.dataTransfer))
         }}
         onDragLeave={e => {
