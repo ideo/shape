@@ -22,6 +22,7 @@ export const ACTIVITY_LOG_POSITION_KEY = 'ActivityLog:position'
 export const ACTIVITY_LOG_PAGE_KEY = 'ActivityLog:page'
 
 export const FOAMCORE_GRID_BOUNDARY = 'foamcoreGridBoundary'
+export const FOAMCORE_DRAG_LAYER = 'foamcoreDragLayer'
 
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',

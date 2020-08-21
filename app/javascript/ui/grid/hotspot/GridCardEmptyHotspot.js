@@ -116,17 +116,21 @@ class GridCardEmptyHotspot extends React.Component {
     }
 
     return (
-      <StyledGridCardEmpty className={''} onClick={this.onClickHotspot}>
+      <StyledGridCardEmpty
+        data-empty-space-click
+        className={''}
+        onClick={this.onClickHotspot}
+      >
         {inner}
       </StyledGridCardEmpty>
     )
   }
 
   render() {
-    const { uploading, handleAfterUploading } = this.props
+    const { droppingFiles, handleAfterUploading } = this.props
 
-    // render uploading or hover state
-    return uploading && handleAfterUploading ? (
+    // render droppingFiles or hover state
+    return droppingFiles && handleAfterUploading ? (
       <GridCardDropzone handleAfterUploading={handleAfterUploading} />
     ) : (
       this.renderGridCardEmpty
@@ -135,7 +139,7 @@ class GridCardEmptyHotspot extends React.Component {
 }
 
 GridCardEmptyHotspot.propTypes = {
-  uploading: PropTypes.bool,
+  droppingFiles: PropTypes.bool,
   card: MobxPropTypes.objectOrObservableObject,
   interactionType: PropTypes.string,
   numColumns: PropTypes.number,
@@ -148,7 +152,7 @@ GridCardEmptyHotspot.propTypes = {
 }
 GridCardEmptyHotspot.defaultProps = {
   card: null,
-  uploading: false,
+  droppingFiles: false,
   interactionType: 'drag',
   numColumns: 4,
   emptyRow: false,

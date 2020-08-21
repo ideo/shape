@@ -185,6 +185,7 @@ export default class UiStore {
   dragging = false
   @observable
   draggingFromMDL = false
+  dragGridSpot = observable.map({})
   @observable
   // track if you are dragging/moving more cards than visible
   movingCardsOverflow = false
