@@ -8,7 +8,6 @@ import Tooltip from '~/ui/global/Tooltip'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
 import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
-import GridCardDropzone from '~/ui/grid/hotspot/GridCardDropzone'
 import { StyledGridCardEmpty } from '~/ui/grid/hotspot/shared'
 
 const StyledPlusIcon = styled.div`
@@ -29,14 +28,6 @@ const RightBlankActions = styled.div`
   top: calc(50% - 36px);
 `
 RightBlankActions.displayName = 'RightBlankActions'
-
-export const CircleIconHolder = styled.button`
-  border: 1px solid ${v.colors.secondaryMedium};
-  border-radius: 50%;
-  color: ${v.colors.secondaryMedium};
-  height: 32px;
-  width: 32px;
-`
 
 @inject('uiStore')
 @observer
@@ -127,19 +118,16 @@ class GridCardEmptyHotspot extends React.Component {
   }
 
   render() {
-    const { droppingFiles, handleAfterUploading } = this.props
+    const { interactionType } = this.props
 
-    // render droppingFiles or hover state
-    return droppingFiles && handleAfterUploading ? (
-      <GridCardDropzone handleAfterUploading={handleAfterUploading} />
-    ) : (
-      this.renderGridCardEmpty
-    )
+    console.log({ interactionType })
+
+    // render  or hover state
+    return null
   }
 }
 
 GridCardEmptyHotspot.propTypes = {
-  droppingFiles: PropTypes.bool,
   card: MobxPropTypes.objectOrObservableObject,
   interactionType: PropTypes.string,
   numColumns: PropTypes.number,
@@ -148,11 +136,9 @@ GridCardEmptyHotspot.propTypes = {
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,
   row: PropTypes.number,
-  handleAfterUploading: PropTypes.func,
 }
 GridCardEmptyHotspot.defaultProps = {
   card: null,
-  droppingFiles: false,
   interactionType: 'drag',
   numColumns: 4,
   emptyRow: false,
@@ -160,7 +146,6 @@ GridCardEmptyHotspot.defaultProps = {
   handleRemoveRowClick: null,
   handleInsertRowClick: null,
   row: 0,
-  handleAfterUploading: null,
 }
 GridCardEmptyHotspot.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

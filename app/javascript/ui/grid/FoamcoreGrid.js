@@ -4,7 +4,6 @@ import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
-import hexToRgba from '~/utils/hexToRgba'
 import CardMoveService from '~/utils/CardMoveService'
 import {
   calculateOpenSpotMatrix,
@@ -17,83 +16,12 @@ import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
-import FoamcoreDragLayer from '~/ui/grid/FoamcoreDragLayer'
+import FoamcoreDragLayer from '~/ui/grid/dragLayer/FoamcoreDragLayer'
 import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
-import GridCardEmptyHotspot, {
-  CircleIconHolder,
-} from '~/ui/grid/hotspot/GridCardEmptyHotspot'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
 const USE_COLLISION_DETECTION_ON_DRAG = false
-
-// When you have attributes that will change a lot,
-// it's a performance gain to use `styled.div.attrs`
-const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
-  style: {
-    height: `${h}px`,
-    left: `${x}px`,
-    top: `${y}px`,
-    transform: `scale(${1 / zoomLevel})`,
-    width: `${w}px`,
-    cursor: 'pointer',
-  },
-}))`
-  background: ${props => {
-    if (props.type === 'unrendered') {
-      return v.colors.commonLightest
-    } else if (props.type === 'drag-overflow') {
-      const color = props.blocked ? v.colors.alert : v.colors.primaryLight
-      return `linear-gradient(
-        to bottom,
-        ${hexToRgba(color)} 0%,
-        ${hexToRgba(color)} 25%,
-        ${hexToRgba(color, 0)} 100%)`
-    } else if (props.blocked) {
-      return v.colors.alert
-    } else if (_.includes(['blank', 'drag', 'resize'], props.type)) {
-      return v.colors.primaryLight
-    }
-    return 'none'
-  }};
-  position: absolute;
-  transform-origin: left top;
-  opacity: ${props => {
-    if (props.type === 'unrendered') return 0.75
-    if (_.includes(props.type, 'drag')) return 0.5
-    return 1
-  }};
-  z-index: ${props =>
-    _.includes(props.type, 'drag') ? v.zIndex.cardHovering : 0};
-
-  ${CircleIconHolder} {
-    display: none;
-    height: 32px;
-    width: 32px;
-  }
-
-  ${CircleIconHolder} + ${CircleIconHolder} {
-    margin-top: 8px;
-  }
-
-  ${props =>
-    props.type !== 'unrendered' &&
-    `&:hover {
-    background-color: ${v.colors.primaryLight} !important;
-
-    .plus-icon {
-      display: block;
-    }
-
-    ${CircleIconHolder} {
-      display: block;
-    }
-  }
-  `} .plus-icon {
-    display: none;
-  }
-`
-BlankCard.displayName = 'BlankCard'
 
 const Grid = styled.div`
   position: relative;
@@ -456,37 +384,6 @@ class FoamcoreGrid extends React.Component {
 
   isBeingDraggedOn(coords) {
     return !!this.getDraggedOnSpot(coords)
-  }
-
-  get selectedAreaMinX() {
-    return this.props.uiStore.selectedArea.minX
-  }
-
-  handleBlankCardClick = ({ row, col, create = false }) => e => {
-    const { selectedAreaMinX } = this
-    const { apiStore, uiStore, collection } = this.props
-
-    // If user is selecting an area, don't trigger blank card click
-    if (selectedAreaMinX) {
-      return
-    }
-
-    uiStore.openBlankContentTool({
-      row,
-      col,
-    })
-
-    if (create) {
-      const placeholder = new CollectionCard(
-        {
-          row,
-          col,
-          parent_id: collection.id,
-        },
-        apiStore
-      )
-      placeholder.API_createBct()
-    }
   }
 
   @action
@@ -1130,58 +1027,6 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  positionBlank = ({ row, col, width, height }, type = 'drag') => {
-    const {
-      collection,
-      collection: { collection_cards },
-      uiStore,
-    } = this.props
-    const { isFourWideBoard } = collection
-    const { relativeZoomLevel } = this
-    const position = uiStore.positionForCoordinates({ col, row, width, height })
-
-    const emptyRow =
-      !_.some(collection_cards, { row }) &&
-      !_.some(collection_cards, { row: row - 1, height: 2 })
-
-    // could be drag or drag-overflow
-    const isDrag = _.includes(type, 'drag')
-
-    return (
-      <BlankCard
-        onClick={this.handleBlankCardClick({ col, row })}
-        {...position}
-        type={type}
-        zoomLevel={relativeZoomLevel}
-        key={`blank-${type}-${row}:${col}`}
-        /* Why is this rendering on top of a collection? */
-        blocked={this.hasDragCollision && isDrag}
-        data-blank-type={type}
-        // this is to make it work the same as CollectionGrid BCT for cypress
-        className={`StyledHotspot-${row}:${col}-BCT`}
-        data-empty-space-click
-        draggedOn
-      >
-        <GridCardEmptyHotspot
-          card={this.props.card}
-          droppingFiles={this.droppingFiles}
-          handleAfterUploading={({ success = false }) => {
-            if (success) {
-              // TODO: should render placeholder cards here?
-              this.droppingFiles && this.setDroppingFiles(false)
-            }
-          }}
-          interactionType={type}
-          emptyRow={emptyRow}
-          isFourWideBoard={isFourWideBoard}
-          handleRemoveRowClick={this.handleRemoveRowClick}
-          handleInsertRowClick={this.handleInsertRowClick}
-          row={row}
-        />
-      </BlankCard>
-    )
-  }
-
   positionBct({ col = 0, row = 0, width, height, blankType }) {
     // TODO this has to be documented
     const blankContentTool = {
@@ -1209,13 +1054,6 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-  @action
-  setDroppingFiles = droppingFiles => {
-    if (this.droppingFiles !== droppingFiles) {
-      this.droppingFiles = droppingFiles
-    }
-  }
-
   clearDragTimeout() {
     if (this.dragTimeoutId) {
       clearTimeout(this.dragTimeoutId)
@@ -1228,8 +1066,6 @@ class FoamcoreGrid extends React.Component {
     // the hover spot at all (which gets rendered after this loop)
     if (cardOrBlank.id === 'blank') {
       return this.positionBct(cardOrBlank)
-    } else if (_.includes(['unrendered', 'resize', 'hover'], cardOrBlank.id)) {
-      return this.positionBlank(cardOrBlank, cardOrBlank.id)
     } else if (cardOrBlank.id) {
       return this.positionCard(cardOrBlank)
     }
@@ -1272,12 +1108,17 @@ class FoamcoreGrid extends React.Component {
 
   renderBlanksAndBct() {
     const { collection, uiStore, canEditCollection } = this.props
-    const { selectedAreaMinX } = this
     const { num_columns } = collection
-    const { blankContentToolState, blankContentToolIsOpen } = uiStore
+    const {
+      blankContentToolState,
+      blankContentToolIsOpen,
+      selectedArea,
+    } = uiStore
+
+    const { minX } = selectedArea
 
     // if we're dragging the selection square, don't bother rendering blanks
-    if (selectedAreaMinX || this.dragging) {
+    if (minX || this.dragging) {
       return null
     }
 
@@ -1404,7 +1245,6 @@ class FoamcoreGrid extends React.Component {
               row={row}
               col={col}
               horizontal={false}
-              onClick={this.handleBlankCardClick({ col, row, create: true })}
             />
           )
         }
@@ -1456,14 +1296,11 @@ class FoamcoreGrid extends React.Component {
         {this.renderMdlPlaceholder()}
         {this.renderHotspots()}
         {this.renderVisibleCards()}
-
         {canEditCollection && (
           <FoamcoreDragLayer
             collection={collection}
             hoveringOverCollection={!!this.hoveringOverCollection}
             coordinatesForPosition={this.coordinatesForPosition}
-            setDroppingFiles={this.setDroppingFiles}
-            positionBlank={this.positionBlank}
             dragging={this.dragging}
           />
         )}

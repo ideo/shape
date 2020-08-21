@@ -101,7 +101,6 @@ class DropzoneHolder extends React.Component {
         fileAttrs.push(filestack_file_attributes)
       })
 
-      // TODO: add call to bulk upload here?
       // create placeholder cards then rerender files
       this.props.handleResetUpload({ success: true })
     }

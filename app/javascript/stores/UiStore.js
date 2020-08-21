@@ -118,6 +118,8 @@ export default class UiStore {
   pastingCards = false
   @observable
   templateName = ''
+  @observable
+  droppingFiles = false
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
@@ -1656,6 +1658,13 @@ export default class UiStore {
     // zoomLevels start at 1, so we subtract to get the array idx
     const zoom = this.zoomLevels[this.zoomLevel - 1]
     return zoom ? zoom.relativeZoomLevel : 1
+  }
+
+  @action
+  setDroppingFiles = droppingFiles => {
+    if (this.droppingFiles !== droppingFiles) {
+      this.droppingFiles = droppingFiles
+    }
   }
 
   pageMargins(collection) {

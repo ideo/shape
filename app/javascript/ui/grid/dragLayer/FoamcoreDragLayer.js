@@ -4,8 +4,10 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import PositionedBlankCard from '~/ui/grid/dragLayer/PositionedBlankCard'
 import { isFile } from '~/utils/FilestackUpload'
 import { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
+import GridCardDropzone from '~/ui/grid/hotspot/GridCardDropzone'
 
 const DragLayerWrapper = styled.div`
   height: 100%;
@@ -63,6 +65,19 @@ class FoamcoreDragLayer extends React.Component {
     return { row, col }
   }
 
+  renderDropzone = () => {
+    // Will need a container to put the dropzone in...
+    return <GridCardDropzone />
+  }
+
+  positionBlank = ({ row, col, width, height }, type = 'drag') => {
+    const { uiStore } = this.props
+    const { droppingFiles } = uiStore
+    return !droppingFiles
+      ? this.renderBlankCard({ row, col, width, height }, type)
+      : this.renderDropzone()
+  }
+
   @action
   setHoveringRowCol = ({ row, col }) => {
     const prevRow = this.hoveringRowCol.row
@@ -73,8 +88,32 @@ class FoamcoreDragLayer extends React.Component {
     this.hoveringRowCol = { row, col }
   }
 
+  renderBlankCard = ({ row, col, width, height }, type) => {
+    const { uiStore } = this.props
+    const position = uiStore.positionForCoordinates({ col, row, width, height })
+
+    // could be drag or drag-overflow
+    const isDrag = _.includes(type, 'drag')
+
+    return (
+      <PositionedBlankCard
+        {...position}
+        type={type}
+        key={`blank-${type}-${row}:${col}`}
+        /* Why is this rendering on top of a collection? */
+        blocked={this.hasDragCollision && isDrag}
+        blocked={this.hasDragCollision && isDrag}
+        data-blank-type={type}
+        // this is to make it work the same as CollectionGrid BCT for cypress
+        className={`StyledHotspot-${row}:${col}-BCT`}
+        data-empty-space-click
+        draggedOn
+      />
+    )
+  }
+
   get renderDragSpots() {
-    const { hoveringOverCollection, positionBlank, uiStore } = this.props
+    const { hoveringOverCollection, uiStore } = this.props
     const { dragGridSpot, movingCardsOverflow } = uiStore
 
     if (!dragGridSpot.size || hoveringOverCollection) {
@@ -95,19 +134,27 @@ class FoamcoreDragLayer extends React.Component {
       if (movingCardsOverflow && atMaxRow) {
         placeholder.id = 'drag-overflow'
       }
-      return positionBlank(placeholder, placeholder.id)
+      return this.positionBlank(placeholder, placeholder.id)
     })
   }
 
   get renderBlanks() {
-    const { positionBlank, dragging } = this.props
+    const { dragging } = this.props
     const { row, col } = this.hoveringRowCol
     if (dragging) {
       return
     }
 
+    console.log({
+      id: 'hover',
+      row,
+      col,
+      width: 1,
+      height: 1,
+    })
+
     if (row !== null && col !== null) {
-      return positionBlank(
+      return this.positionBlank(
         {
           id: 'hover',
           row,
@@ -121,7 +168,7 @@ class FoamcoreDragLayer extends React.Component {
   }
 
   render() {
-    const { uiStore, setDroppingFiles } = this.props
+    const { uiStore } = this.props
 
     return (
       <DragLayerWrapper
@@ -132,7 +179,7 @@ class FoamcoreDragLayer extends React.Component {
         onDragOver={e => {
           e.preventDefault()
           this.onCursorMove(e)
-          setDroppingFiles(isFile(e.dataTransfer))
+          uiStore.setDroppingFiles(isFile(e.dataTransfer))
         }}
         onDragLeave={e => {
           e.preventDefault()
@@ -146,7 +193,7 @@ class FoamcoreDragLayer extends React.Component {
           ) {
             return
           }
-          setDroppingFiles(false)
+          uiStore.setDroppingFiles(false)
         }}
       >
         {this.renderDragSpots}
@@ -159,8 +206,6 @@ class FoamcoreDragLayer extends React.Component {
 FoamcoreDragLayer.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   coordinatesForPosition: PropTypes.func.isRequired,
-  setDroppingFiles: PropTypes.func.isRequired,
-  positionBlank: PropTypes.func.isRequired,
   hoveringOverCollection: PropTypes.bool.isRequired,
   dragging: PropTypes.bool.isRequired,
 }

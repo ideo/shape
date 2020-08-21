@@ -1,6 +1,5 @@
 import { observable, action } from 'mobx'
-import { observer } from 'mobx-react'
-import PropTypes from 'prop-types'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 import _ from 'lodash'
@@ -13,6 +12,7 @@ const StyledGridCardDropzone = styled.div`
   background: ${v.colors.primaryLight};
 `
 
+@inject('uiStore')
 @observer
 class GridCardDropzone extends React.Component {
   @observable
@@ -55,10 +55,13 @@ class GridCardDropzone extends React.Component {
   }
 
   resetUpload = ({ success = false }) => {
-    const { handleAfterUploading } = this.props
-    handleAfterUploading({ success })
+    const { uiStore } = this.props
     this.updateWillUpload(false)
     this.updateDidUpload(false)
+    if (success) {
+      // TODO: should render placeholder cards here?
+      uiStore.setDroppingFiles(false)
+    }
   }
 
   render() {
@@ -79,8 +82,8 @@ class GridCardDropzone extends React.Component {
   }
 }
 
-GridCardDropzone.propTypes = {
-  handleAfterUploading: PropTypes.func.isRequired,
+GridCardDropzone.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default GridCardDropzone
