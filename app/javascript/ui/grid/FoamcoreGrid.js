@@ -78,7 +78,7 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
 
   ${props =>
     props.type !== 'unrendered' &&
-    `
+    `&:hover {
     background-color: ${v.colors.primaryLight} !important;
 
     .plus-icon {
@@ -88,6 +88,7 @@ const BlankCard = styled.div.attrs(({ x, y, h, w, zoomLevel, draggedOn }) => ({
     ${CircleIconHolder} {
       display: block;
     }
+  }
   `} .plus-icon {
     display: none;
   }
