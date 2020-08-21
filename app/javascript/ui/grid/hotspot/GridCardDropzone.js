@@ -25,7 +25,7 @@ class GridCardDropzone extends React.Component {
     super(props)
     this.debouncedWillResetUpload = _.debounce(() => {
       this.updateWillUpload(false)
-    }, 25)
+    }, 100)
   }
 
   handleDragOver = e => {
