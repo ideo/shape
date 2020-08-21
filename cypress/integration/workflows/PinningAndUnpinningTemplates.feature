@@ -1,7 +1,7 @@
 Feature: Pinning and Unpinning
   Scenario: Pin and Unpinned Area
     Given I login and visit the Test Area
-    When I create a template card
+    When I create a template collection named "Test Template" using the first hot edge
     And I navigate to the collection named "Test Template" via the "CollectionCover"
     And I create a textItem card at 0,0 on the board with "Pin me!"
     And I create a textItem card at 0,1 on the board with "Unpinned."

@@ -28,11 +28,7 @@ When(
 When(
   'I create a textItem card with {string} using the first hot edge',
   content => {
-    cy.locateDataOrClass('FoamcoreHotspot-0:0')
-      .first()
-      .click({ force: true })
-      .wait(100)
-    cy.wait('@apiCreateCollectionCardBct')
+    cy.clickFirstHotEdge()
     // `empty` being equivalent to "BCT is already open"
     cy.createCard('textItem', { content, empty: true })
   }
@@ -41,10 +37,7 @@ When(
 When(
   'I create a {word} collection named {string} using the first hot edge',
   (collectionType, name) => {
-    cy.locateDataOrClass('FoamcoreHotspot-0:0')
-      .first()
-      .click({ force: true })
-    cy.wait('@apiCreateCollectionCardBct')
+    cy.clickFirstHotEdge()
     // `empty` being equivalent to "BCT is already open"
     cy.createCollection({ name, collectionType, empty: true })
   }
