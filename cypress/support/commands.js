@@ -174,17 +174,19 @@ Cypress.Commands.add('resizeCard', ({ row, col, size }) => {
   const sizes = size.split('x')
   const [width, height] = _.map(sizes, Number)
   cy.window()
-    .then(win => {
+    .then(async win => {
       const collection = win.uiStore.viewingCollection
       const card = _.find(collection.sortedCards, { row, col })
-      collection.API_updateCard({
+      await collection.API_updateCard({
         card,
         updates: { width, height },
         undoMessage: 'Card resize undone',
       })
+      cy.wait(250)
     })
+    .wait(500)
     .wait('@apiUpdateCollection')
-    .wait(1000)
+    .wait(500)
 })
 
 Cypress.Commands.add('moveFirstCardDown', (row = 1) => {
@@ -194,12 +196,13 @@ Cypress.Commands.add('moveFirstCardDown', (row = 1) => {
       const card = _.first(collection.sortedCards)
       await collection.API_updateCard({
         card,
-        updates: { row, col: 0 },
+        updates: { row, col: 0, updated_at: new Date() },
         undoMessage: 'Card move undone',
       })
+      cy.wait(1000)
     })
     .wait('@apiUpdateCollection')
-    .wait(1000)
+    .wait(500)
 })
 
 Cypress.Commands.add('undo', () => {
@@ -234,18 +237,22 @@ Cypress.Commands.add(
           left: 50,
           top: 150,
         }
-        cy.get(`.${FOAMCORE_GRID_BOUNDARY}`).trigger('mousemove', {
-          clientX: pos.x + rect.left,
-          clientY: pos.y + rect.top,
-          force: true,
-        })
-        cy.locateDataOrClass(className)
+        cy.get(`.${FOAMCORE_GRID_BOUNDARY}`)
+          .trigger('mousemove', {
+            clientX: pos.x + rect.left,
+            clientY: pos.y + rect.top,
+            force: true,
+          })
+          .wait(150)
+          .locateDataOrClass(className)
           .first()
           .click({ force: true })
       })
     }
     if (type === 'file') {
       cy.wait(1000)
+    } else {
+      cy.wait(150)
     }
     cy.locate(`BctButton-${type}`)
       .first()

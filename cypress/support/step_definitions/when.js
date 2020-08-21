@@ -25,10 +25,30 @@ When(
   }
 )
 
-When('I create a textItem card using the open BCT with {string}', content => {
-  // `empty` being equivalent to "BCT is already open"
-  cy.createCard('textItem', { content, empty: true })
-})
+When(
+  'I create a textItem card with {string} using the first hot edge',
+  content => {
+    cy.locateDataOrClass('FoamcoreHotspot-0:0')
+      .first()
+      .click({ force: true })
+      .wait(100)
+    cy.wait('@apiCreateCollectionCardBct')
+    // `empty` being equivalent to "BCT is already open"
+    cy.createCard('textItem', { content, empty: true })
+  }
+)
+
+When(
+  'I create a {word} collection named {string} using the first hot edge',
+  (collectionType, name) => {
+    cy.locateDataOrClass('FoamcoreHotspot-0:0')
+      .first()
+      .click({ force: true })
+    cy.wait('@apiCreateCollectionCardBct')
+    // `empty` being equivalent to "BCT is already open"
+    cy.createCollection({ name, collectionType, empty: true })
+  }
+)
 
 When('I add a link URL {string} and wait for {string}', (url, request) => {
   cy.locate('BctTextField').type(url, {

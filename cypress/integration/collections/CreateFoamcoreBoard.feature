@@ -2,7 +2,7 @@ Feature: Creating a FoamcoreBoard Collection
 
   Scenario: Adding the FoamcoreBoard collection via the BCT
     Given I login and visit the Test Area
-    When I create a foamcoreBoard collection named "Mural"
+    When I create a foamcoreBoard collection named "Hello World" using the first hot edge
     Then I should see a collection card named "Mural"
     When I navigate to the collection named "Mural" via the "CollectionCover"
     Then I should see "Mural" in a "EditableNameHeading-recordName"
@@ -25,9 +25,7 @@ Feature: Creating a FoamcoreBoard Collection
     Then I should see the text "To my board." in the card at 0,1
 
     # There should be a hotspot to the left of the 0,0 card
-    When I click the "FoamcoreHotspot-0:0"
-    And I wait for "@apiCreateCollectionCardBct" to finish
-    And I create a textItem card using the open BCT with "Inserted!"
+    And I create a textItem card with "Inserted!" using the first hot edge
     # should move both row 0 cards out of the way
     Then I should see the text "Inserted!" in the card at 0,0
     Then I should see the text "Welcome!" in the card at 0,1

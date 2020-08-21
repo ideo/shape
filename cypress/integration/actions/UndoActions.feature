@@ -3,7 +3,7 @@ Feature: Undo actions
   Scenario: Performing several actions and then undoing them
     Given I login and visit the Test Area
 
-    And I create a textItem card
+    And I create a textItem card with "Testing" using the first hot edge
     Then I should see a "TextItemCover" in the card at 0,0
     Then I should see the value "Testing" in the first text item
 
@@ -31,7 +31,7 @@ Feature: Undo actions
     Then I should see the value "Testing" in the first text item
 
     # Testing undoing resizing collections, rename, and navigations
-    When I create a normal collection named "Hello World"
+    When I create a normal collection named "Hello World" using the first hot edge
     And I wait for 1 second
     And I resize the card at 0,2 to 2x2
     Then I should see the card at 0,2 as 2x2

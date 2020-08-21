@@ -2,7 +2,7 @@ Feature: Creating a Collection
 
   Scenario: Opening BCT to create a collection
     Given I login and visit the Test Area
-    When I create a normal collection named "Hello World"
+    When I create a normal collection named "Hello World" using the first hot edge
     Then I should see a collection card named "Hello World"
     When I navigate to the collection named "Hello World" via the "CollectionCover"
     Then I should see "Hello World" in a "EditableNameHeading-recordName"
