@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
+
 // For more comprehensive examples of custom
 // commands please read more here:
 // https://on.cypress.io/custom-commands
@@ -186,17 +188,18 @@ Cypress.Commands.add('resizeCard', ({ row, col, size }) => {
 })
 
 Cypress.Commands.add('moveFirstCardDown', (row = 1) => {
-  cy.window().then(win => {
-    const collection = win.uiStore.viewingCollection
-    collection._reorderCards()
-    const card = _.first(collection.sortedCards)
-    collection.API_updateCard({
-      card,
-      updates: { row, col: 0 },
-      undoMessage: 'Card move undone',
+  cy.window()
+    .then(async win => {
+      const collection = win.uiStore.viewingCollection
+      const card = _.first(collection.sortedCards)
+      await collection.API_updateCard({
+        card,
+        updates: { row, col: 0 },
+        undoMessage: 'Card move undone',
+      })
     })
-    cy.wait('@apiUpdateCollection')
-  })
+    .wait('@apiUpdateCollection')
+    .wait(1000)
 })
 
 Cypress.Commands.add('undo', () => {
@@ -216,16 +219,33 @@ Cypress.Commands.add(
       className += `-${row}:${col}`
     }
     if (!empty) {
-      cy.locateDataOrClass(className)
-        .first()
-        .click({ force: true })
+      // we need to hover over the right spot to make the BCT appear
+      cy.window().then(win => {
+        // make sure we're at top left
+        cy.scrollTo(0, 0)
+        const { uiStore } = win
+        // this is how we simulate a mouseover to create a blank hover spot
+        const pos = uiStore.positionForCoordinates({
+          row: row || 0,
+          col: col || 0,
+        })
+        const rect = {
+          // estimated values to simulate bounding rectangle
+          left: 50,
+          top: 150,
+        }
+        cy.get(`.${FOAMCORE_GRID_BOUNDARY}`).trigger('mousemove', {
+          clientX: pos.x + rect.left,
+          clientY: pos.y + rect.top,
+          force: true,
+        })
+        cy.locateDataOrClass(className)
+          .first()
+          .click({ force: true })
+      })
     }
-    switch (type) {
-      case 'file':
-        cy.wait(1000)
-        break
-      default:
-        break
+    if (type === 'file') {
+      cy.wait(1000)
     }
     cy.locate(`BctButton-${type}`)
       .first()
@@ -234,12 +254,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add('selectPopoutTemplateBctType', ({ type }) => {
-  cy.locateDataOrClass('.StyledHotspot')
-    .first()
-    .click({ force: true })
-  cy.locate('BctButton-more')
-    .last()
-    .click({ force: true })
+  cy.selectBctType({ type: 'more' })
   cy.wait(100)
   switch (type) {
     case 'template':

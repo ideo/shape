@@ -75,7 +75,8 @@ RSpec.describe CollectionUpdater, type: :service do
       let(:attributes) do
         {
           collection_cards_attributes: [
-            { id: last_card.id.to_s, row: 10, col: 1 },
+            # row/col should apply, order should get nullified
+            { id: last_card.id.to_s, row: 10, col: 1, order: 2 },
           ],
         }
       end
@@ -88,6 +89,8 @@ RSpec.describe CollectionUpdater, type: :service do
       it 'moves the cards' do
         service.call
         expect(last_card.reload.row).to eq 10
+        # order should get nullified
+        expect(last_card.reload.order).to be nil
       end
     end
 
