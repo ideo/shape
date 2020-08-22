@@ -7,7 +7,6 @@ import styled from 'styled-components'
 import PositionedBlankCard from '~/ui/grid/dragLayer/PositionedBlankCard'
 import { isFile } from '~/utils/FilestackUpload'
 import { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
-import GridCardDropzone from '~/ui/grid/hotspot/GridCardDropzone'
 
 const DragLayerWrapper = styled.div`
   height: 100%;
@@ -25,7 +24,10 @@ class FoamcoreDragLayer extends React.Component {
 
   constructor(props) {
     super(props)
-    this.throttledSetHoveringRowCol = _.throttle(this.setHoveringRowCol, 150)
+    this.throttledRepositionBlankCard = _.throttle(
+      this.repositionBlankCard,
+      150
+    )
   }
 
   onCursorMove = ev => {
@@ -61,35 +63,31 @@ class FoamcoreDragLayer extends React.Component {
       row = null
       col = null
     }
-    this.throttledSetHoveringRowCol({ row, col })
+    this.throttledRepositionBlankCard({ row, col })
     return { row, col }
   }
 
-  renderDropzone = () => {
-    // Will need a container to put the dropzone in...
-    return <GridCardDropzone />
-  }
-
   positionBlank = ({ row, col, width, height }, type = 'drag') => {
-    const { uiStore } = this.props
-    const { droppingFiles } = uiStore
-    return !droppingFiles
-      ? this.renderBlankCard({ row, col, width, height }, type)
-      : this.renderDropzone()
+    return this.renderBlankCard({ row, col, width, height }, type)
   }
 
   @action
-  setHoveringRowCol = ({ row, col }) => {
+  repositionBlankCard = ({ row, col }) => {
+    const { uiStore } = this.props
+    const { blankContentToolIsOpen } = uiStore
     const prevRow = this.hoveringRowCol.row
     const prevCol = this.hoveringRowCol.col
     if (row === prevRow && col === prevCol) {
       return
     }
+    if (blankContentToolIsOpen) {
+      uiStore.closeBlankContentTool()
+    }
     this.hoveringRowCol = { row, col }
   }
 
   renderBlankCard = ({ row, col, width, height }, type) => {
-    const { uiStore } = this.props
+    const { uiStore, collection } = this.props
     const position = uiStore.positionForCoordinates({ col, row, width, height })
 
     // could be drag or drag-overflow
@@ -97,9 +95,12 @@ class FoamcoreDragLayer extends React.Component {
 
     return (
       <PositionedBlankCard
-        {...position}
+        collection={collection}
+        position={position}
         type={type}
         key={`blank-${type}-${row}:${col}`}
+        row={row}
+        col={col}
         /* Why is this rendering on top of a collection? */
         blocked={this.hasDragCollision && isDrag}
         blocked={this.hasDragCollision && isDrag}

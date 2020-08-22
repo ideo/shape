@@ -4,8 +4,11 @@ import v from '~/utils/variables'
 import PropTypes from 'prop-types'
 
 import hexToRgba from '~/utils/hexToRgba'
+import propShapes from '~/utils/propShapes'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import GridCardDropzone from '~/ui/grid/hotspot/GridCardDropzone'
+import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 
 const CircleIconHolder = styled.button`
   border: 1px solid ${v.colors.secondaryMedium};
@@ -17,18 +20,16 @@ const CircleIconHolder = styled.button`
 
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
-const StyledBlankCard = styled.div.attrs(
-  ({ x, y, h, w, zoomLevel, draggedOn }) => ({
-    style: {
-      height: `${h}px`,
-      left: `${x}px`,
-      top: `${y}px`,
-      transform: `scale(${1 / zoomLevel})`,
-      width: `${w}px`,
-      cursor: 'pointer',
-    },
-  })
-)`
+const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
+  style: {
+    height: `${h}px`,
+    left: `${x}px`,
+    top: `${y}px`,
+    transform: `scale(${1 / zoomLevel})`,
+    width: `${w}px`,
+    cursor: 'pointer',
+  },
+}))`
   background: ${props => {
     if (props.type === 'unrendered') {
       return v.colors.commonLightest
@@ -106,8 +107,7 @@ class PositionedBlankCard extends React.Component {
       col,
     })
 
-    // TODO: render bct card here
-
+    // FIXME: when should this be true
     if (create) {
       const placeholder = new CollectionCard(
         {
@@ -122,20 +122,55 @@ class PositionedBlankCard extends React.Component {
   }
 
   render() {
-    const { row, col, x, y, h, w, draggedOn, uiStore } = this.props
+    const { collection, row, col, position, uiStore } = this.props
+    const { blankContentToolIsOpen, droppingFiles } = uiStore
+
+    const { xPos, yPos, height, width } = position
+
+    const defaultProps = {
+      row,
+      col,
+      x: xPos,
+      y: yPos,
+      h: height,
+      w: width,
+      zoomLevel: uiStore.relativeZoomLevel,
+    }
+
+    if (droppingFiles) {
+      return (
+        <BlankCardContainer {...defaultProps}>
+          <GridCardDropzone />
+        </BlankCardContainer>
+      )
+    } else if (blankContentToolIsOpen) {
+      const blankContentTool = {
+        id: 'blank',
+        num: 0,
+        cardType: 'blank',
+        blankType: 'bct',
+        col,
+        row,
+        width,
+        height,
+      }
+      return (
+        <BlankCardContainer {...defaultProps}>
+          <GridCardBlank
+            card={blankContentTool}
+            cardType={'blank'}
+            position={position}
+            record={null}
+            parent={collection}
+          />
+        </BlankCardContainer>
+      )
+    }
+
     return (
-      <StyledBlankCard
-        row={row}
-        col={col}
-        x={x}
-        y={y}
-        h={h}
-        w={w}
-        zoomLevel={uiStore.relativeZoomLevel}
-        draggedOn={draggedOn}
-        onClick={() => {
-          this.handleBlankCardClick({ row, col })
-        }}
+      <BlankCardContainer
+        {...defaultProps}
+        onClick={this.handleBlankCardClick({ row, col })}
       />
     )
   }
@@ -150,11 +185,9 @@ PositionedBlankCard.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
-  x: PropTypes.number.isRequired,
-  y: PropTypes.number.isRequired,
-  h: PropTypes.number.isRequired,
-  w: PropTypes.number.isRequired,
-  draggedOn: PropTypes.bool.isRequired,
+  position: PropTypes.shape(propShapes.position).isRequired,
+  // FIXME: clarify what this prop was supposed to do
+  // draggedOn: PropTypes.bool.isRequired,
 }
 
 export default PositionedBlankCard

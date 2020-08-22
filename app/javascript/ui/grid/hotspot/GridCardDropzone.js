@@ -1,7 +1,6 @@
 import { observable, action } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
-import v from '~/utils/variables'
 import _ from 'lodash'
 
 import DropzoneHolder from '~/ui/grid/hotspot/DropzoneHolder'
@@ -9,7 +8,6 @@ import DropzoneHolder from '~/ui/grid/hotspot/DropzoneHolder'
 const StyledGridCardDropzone = styled.div`
   width: 100%;
   height: 100%;
-  background: ${v.colors.primaryLight};
 `
 
 @inject('uiStore')
