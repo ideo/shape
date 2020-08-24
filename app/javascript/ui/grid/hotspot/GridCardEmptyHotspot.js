@@ -29,35 +29,17 @@ const RightBlankActions = styled.div`
 `
 RightBlankActions.displayName = 'RightBlankActions'
 
+export const CircleIconHolder = styled.button`
+  border: 1px solid ${v.colors.secondaryMedium};
+  border-radius: 50%;
+  color: ${v.colors.secondaryMedium};
+  height: 32px;
+  width: 32px;
+`
+
 @inject('uiStore')
 @observer
 class GridCardEmptyHotspot extends React.Component {
-  openBlankContentTool = () => {
-    const { uiStore, card } = this.props
-    if (!card) return
-    const { order, position } = card
-    uiStore.openBlankContentTool({
-      order,
-      col: position.x,
-      row: position.y,
-    })
-  }
-
-  onClickHotspot = () => {
-    const { card } = this.props
-    if (!card) return
-    const collection = card.parentCollection
-
-    // confirmEdit will check if we're in a template and need to confirm changes
-    if (collection) {
-      collection.confirmEdit({
-        onConfirm: () => this.openBlankContentTool(),
-      })
-      return
-    }
-    this.openBlankContentTool()
-  }
-
   renderRightBlankActions() {
     const { handleRemoveRowClick, handleInsertRowClick, row } = this.props
     return (
@@ -84,8 +66,7 @@ class GridCardEmptyHotspot extends React.Component {
     )
   }
 
-  /**FIXME: check if this isn't being rendered correctly **/
-  get renderGridCardEmpty() {
+  render() {
     const { interactionType, emptyRow, isFourWideBoard, row } = this.props
 
     let inner = ''
@@ -106,24 +87,7 @@ class GridCardEmptyHotspot extends React.Component {
       inner = <InlineLoader background={v.colors.commonLightest} />
     }
 
-    return (
-      <StyledGridCardEmpty
-        data-empty-space-click
-        className={''}
-        onClick={this.onClickHotspot}
-      >
-        {inner}
-      </StyledGridCardEmpty>
-    )
-  }
-
-  render() {
-    const { interactionType } = this.props
-
-    console.log({ interactionType })
-
-    // render  or hover state
-    return null
+    return <StyledGridCardEmpty className={''}>{inner}</StyledGridCardEmpty>
   }
 }
 

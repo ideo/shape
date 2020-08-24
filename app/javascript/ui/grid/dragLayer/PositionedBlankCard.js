@@ -9,6 +9,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import GridCardDropzone from '~/ui/grid/hotspot/GridCardDropzone'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
+import GridCardEmptyHotspot from '~/ui/grid/hotspot/GridCardEmptyHotspot'
 
 const CircleIconHolder = styled.button`
   border: 1px solid ${v.colors.secondaryMedium};
@@ -57,6 +58,8 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   z-index: ${props =>
     _.includes(props.type, 'drag') ? v.zIndex.cardHovering : 0};
 
+  /* FIXME: is this the same CircleIconHolder under GridCardEmptyHotspot? */
+
   ${CircleIconHolder} {
     display: none;
     height: 32px;
@@ -92,13 +95,21 @@ class PositionedBlankCard extends React.Component {
     super(props)
   }
 
-  handleBlankCardClick = ({ row, col, create = false }) => e => {
+  onClickHotspot = ({ row, col, create = false }) => e => {
     const { apiStore, uiStore, collection } = this.props
     const { selectedArea } = uiStore
     const { minX } = selectedArea
 
     // If user is selecting an area, don't trigger blank card click
     if (minX) {
+      return
+    }
+
+    // confirmEdit will check if we're in a template and need to confirm changes
+    if (collection) {
+      collection.confirmEdit({
+        onConfirm: () => uiStore.openBlankContentTool({ row, col }),
+      })
       return
     }
 
@@ -170,8 +181,13 @@ class PositionedBlankCard extends React.Component {
     return (
       <BlankCardContainer
         {...defaultProps}
-        onClick={this.handleBlankCardClick({ row, col })}
-      />
+        onClick={this.onClickHotspot({ row, col })}
+      >
+        <GridCardEmptyHotspot
+          visible={true}
+          interactionType={'hover'}
+        ></GridCardEmptyHotspot>
+      </BlankCardContainer>
     )
   }
 }
