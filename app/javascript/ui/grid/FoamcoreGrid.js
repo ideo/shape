@@ -1286,7 +1286,9 @@ class FoamcoreGrid extends React.Component {
           */}
         {this.renderAddSubmission()}
         {this.renderMdlPlaceholder()}
-        {this.renderHotspots()}
+        {/* FIXME: this is refactored into PositionedBlankCard, confirm if that's a good idea
+          this.renderHotspots()
+          */}
         {this.renderVisibleCards()}
         {canEditCollection && (
           <FoamcoreDragLayer

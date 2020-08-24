@@ -32,9 +32,9 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   },
 }))`
   background: ${props => {
-    if (props.type === 'unrendered') {
+    if (props.interactionType === 'unrendered') {
       return v.colors.commonLightest
-    } else if (props.type === 'drag-overflow') {
+    } else if (props.interactionType === 'drag-overflow') {
       const color = props.blocked ? v.colors.alert : v.colors.primaryLight
       return `linear-gradient(
         to bottom,
@@ -43,7 +43,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
         ${hexToRgba(color, 0)} 100%)`
     } else if (props.blocked) {
       return v.colors.alert
-    } else if (_.includes(['drag', 'resize'], props.type)) {
+    } else if (_.includes(['drag', 'resize'], props.interactionType)) {
       return v.colors.primaryLight
     }
     return 'none'
@@ -51,12 +51,12 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   position: absolute;
   transform-origin: left top;
   opacity: ${props => {
-    if (props.type === 'unrendered') return 0.75
-    if (_.includes(props.type, 'drag')) return 0.5
+    if (props.interactionType === 'unrendered') return 0.75
+    if (_.includes(props.interactionType, 'drag')) return 0.5
     return 1
   }};
   z-index: ${props =>
-    _.includes(props.type, 'drag') ? v.zIndex.cardHovering : 0};
+    _.includes(props.interactionType, 'drag') ? v.zIndex.cardHovering : 0};
 
   /* FIXME: is this the same CircleIconHolder under GridCardEmptyHotspot? */
 
@@ -71,7 +71,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   }
 
   ${props =>
-    props.type !== 'unrendered' &&
+    props.interactionType !== 'unrendered' &&
     `&:hover {
     background-color: ${v.colors.primaryLight} !important;
 
@@ -178,14 +178,18 @@ class PositionedBlankCard extends React.Component {
       )
     }
 
+    const { interactionType } = this.props
+    const draggingOrResizing = _.includes(['drag', 'resize'], interactionType)
+
     return (
       <BlankCardContainer
         {...defaultProps}
-        onClick={this.onClickHotspot({ row, col })}
+        interactionType={interactionType}
+        onClick={draggingOrResizing ? this.onClickHotspot({ row, col }) : null}
       >
         <GridCardEmptyHotspot
           visible={true}
-          interactionType={'hover'}
+          interactionType={interactionType}
         ></GridCardEmptyHotspot>
       </BlankCardContainer>
     )
@@ -202,6 +206,9 @@ PositionedBlankCard.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
+  interactionType: PropTypes.oneOf(['hover', 'drag', 'unrendered', 'resize'])
+    .isRequired,
+  blocked: PropTypes.bool.isRequired,
   // FIXME: clarify what this prop was supposed to do
   // draggedOn: PropTypes.bool.isRequired,
 }

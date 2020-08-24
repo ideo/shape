@@ -67,8 +67,8 @@ class FoamcoreDragLayer extends React.Component {
     return { row, col }
   }
 
-  positionBlank = ({ row, col, width, height }, type = 'drag') => {
-    return this.renderBlankCard({ row, col, width, height }, type)
+  positionBlank = ({ row, col, width, height }, interactionType = 'drag') => {
+    return this.renderBlankCard({ row, col, width, height }, interactionType)
   }
 
   @action
@@ -86,29 +86,29 @@ class FoamcoreDragLayer extends React.Component {
     this.hoveringRowCol = { row, col }
   }
 
-  renderBlankCard = ({ row, col, width, height }, type) => {
+  renderBlankCard = ({ row, col, width, height }, interactionType) => {
     const { uiStore, collection } = this.props
     const position = uiStore.positionForCoordinates({ col, row, width, height })
 
     // could be drag or drag-overflow
-    const isDrag = _.includes(type, 'drag')
+    const isDrag = _.includes(interactionType, 'drag')
 
     return (
       <PositionedBlankCard
         collection={collection}
         position={position}
-        type={type}
-        key={`blank-${type}-${row}:${col}`}
+        interactionType={interactionType}
+        key={`blank-${interactionType}-${row}:${col}`}
         row={row}
         col={col}
         /* Why is this rendering on top of a collection? */
         blocked={this.hasDragCollision && isDrag}
-        blocked={this.hasDragCollision && isDrag}
-        data-blank-type={type}
+        data-blank-type={interactionType}
         // this is to make it work the same as CollectionGrid BCT for cypress
         className={`StyledHotspot-${row}:${col}-BCT`}
         data-empty-space-click
-        draggedOn
+        // FIXME: what is this used for?
+        // draggedOn
       />
     )
   }
@@ -123,11 +123,9 @@ class FoamcoreDragLayer extends React.Component {
 
     const draggingPlaceholders = [...dragGridSpot.values()]
 
-    console.log(draggingPlaceholders)
-
     const maxRowCard = _.maxBy(draggingPlaceholders, 'row')
     const maxRow = maxRowCard && maxRowCard.row
-    return _.map(draggingPlaceholders, placeholder => {
+    const dragSpots = _.map(draggingPlaceholders, placeholder => {
       placeholder.id = 'drag'
       const atMaxRow =
         placeholder.row === maxRow ||
@@ -137,22 +135,16 @@ class FoamcoreDragLayer extends React.Component {
       }
       return this.positionBlank(placeholder, placeholder.id)
     })
+
+    return dragSpots
   }
 
-  get renderBlanks() {
+  get renderEmptyCard() {
     const { dragging } = this.props
     const { row, col } = this.hoveringRowCol
     if (dragging) {
       return
     }
-
-    console.log({
-      id: 'hover',
-      row,
-      col,
-      width: 1,
-      height: 1,
-    })
 
     if (row !== null && col !== null) {
       return this.positionBlank(
@@ -212,6 +204,21 @@ class FoamcoreDragLayer extends React.Component {
     return blankCards
   }
 
+  get renderInnerDragLayer() {
+    const { uiStore, dragging } = this.props
+
+    const { droppingFiles } = uiStore
+
+    if (dragging && !droppingFiles) {
+      return this.renderDragSpots
+    } else if (uiStore.droppingFiles) {
+      return this.renderDropspots
+    }
+
+    // hovering over
+    return this.renderEmptyCard
+  }
+
   render() {
     const { uiStore } = this.props
 
@@ -241,8 +248,7 @@ class FoamcoreDragLayer extends React.Component {
           uiStore.setDroppingFiles(false)
         }}
       >
-        {this.renderDragSpots}
-        {uiStore.droppingFiles && this.renderDropspots}
+        {this.renderInnerDragLayer}
       </DragLayerWrapper>
     )
   }
