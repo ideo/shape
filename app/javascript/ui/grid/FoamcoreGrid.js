@@ -979,18 +979,19 @@ class FoamcoreGrid extends React.Component {
 
   renderMovableCard(card, key) {
     const { canEditCollection, collection, uiStore } = this.props
-    const { pageMargins, zoomLevel, relativeZoomLevel } = this
+    // const { pageMargins, zoomLevel, relativeZoomLevel } = this
+    const { pageMargins, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
 
     const position = uiStore.positionForCoordinates(card)
 
-    if (card.id === 'blank' && zoomLevel !== 1) {
-      // TODO: on fourWide these numbers are not perfect... figure out better calculation?
-      const xShift = collection.isFourWideBoard ? 20 : 38
-      const yShift = collection.isFourWideBoard ? 16 : 30
-      position.xPos = position.x - zoomLevel * xShift
-      position.yPos = position.y - zoomLevel * yShift
-    }
+    // if (card.id === 'blank' && zoomLevel !== 1) {
+    //   // TODO: on fourWide these numbers are not perfect... figure out better calculation?
+    //   const xShift = collection.isFourWideBoard ? 20 : 38
+    //   const yShift = collection.isFourWideBoard ? 16 : 30
+    //   position.xPos = position.x - zoomLevel * xShift
+    //   position.yPos = position.y - zoomLevel * yShift
+    // }
 
     const dragOffset = {
       x: pageMargins.left,
@@ -1027,20 +1028,20 @@ class FoamcoreGrid extends React.Component {
     )
   }
 
-  positionBct({ col = 0, row = 0, width, height, blankType }) {
-    // TODO this has to be documented
-    const blankContentTool = {
-      id: 'blank',
-      num: 0,
-      cardType: 'blank',
-      blankType,
-      col,
-      row,
-      width,
-      height,
-    }
-    return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`)
-  }
+  // positionBct({ col = 0, row = 0, width, height, blankType }) {
+  //   // TODO this has to be documented
+  //   const blankContentTool = {
+  //     id: 'blank',
+  //     num: 0,
+  //     cardType: 'blank',
+  //     blankType,
+  //     col,
+  //     row,
+  //     width,
+  //     height,
+  //   }
+  //   return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`)
+  // }
 
   @action
   setPlaceholderSpot = (placeholderSpot = this.placeholderDefaults) => {
@@ -1064,9 +1065,10 @@ class FoamcoreGrid extends React.Component {
   renderCard = cardOrBlank => {
     // If another real card is filling up the hover spot, don't render
     // the hover spot at all (which gets rendered after this loop)
-    if (cardOrBlank.id === 'blank') {
-      return this.positionBct(cardOrBlank)
-    } else if (cardOrBlank.id) {
+    // if (cardOrBlank.id === 'blank') {
+    // return this.positionBct(cardOrBlank)
+    // } else if (cardOrBlank.id) {
+    if (cardOrBlank.id) {
       return this.positionCard(cardOrBlank)
     }
     return null
@@ -1106,67 +1108,67 @@ class FoamcoreGrid extends React.Component {
   //   })
   // }
 
-  renderBlanksAndBct() {
-    const { collection, uiStore, canEditCollection } = this.props
-    const { num_columns } = collection
-    const {
-      blankContentToolState,
-      blankContentToolIsOpen,
-      selectedArea,
-    } = uiStore
-
-    const { minX } = selectedArea
-
-    // if we're dragging the selection square, don't bother rendering blanks
-    if (minX || this.dragging) {
-      return null
-    }
-
-    let cards = []
-    const leftPad = num_columns > 4 ? 3 : 0
-    const topPad = num_columns > 4 ? 3 : 1
-    const across = _.min([10, num_columns])
-    if (this.loadingRow) {
-      _.times(across, i => {
-        _.times(4, j => {
-          cards.push({
-            id: 'unrendered',
-            // loading squares are centered, 3 from the left
-            col: i + leftPad,
-            // down from the beginning of loadingRow by topPad rows
-            row: this.loadingRow + j + topPad,
-            width: 1,
-            height: 1,
-          })
-        })
-      })
-    }
-
-    if (
-      blankContentToolIsOpen &&
-      blankContentToolState.collectionId === collection.id
-    ) {
-      cards.push({
-        id: 'blank',
-        blankType: 'bct',
-        ...blankContentToolState,
-      })
-    }
-
-    const { placeholderSpot } = this
-    if (
-      canEditCollection &&
-      (placeholderSpot.row !== null && placeholderSpot.col !== null)
-    ) {
-      cards.push({
-        id: 'resize',
-        ...placeholderSpot,
-      })
-    }
-
-    cards = _.map(cards, this.renderCard)
-    return cards
-  }
+  // renderBlanksAndBct() {
+  //   const { collection, uiStore, canEditCollection } = this.props
+  //   const { num_columns } = collection
+  //   const {
+  //     blankContentToolState,
+  //     blankContentToolIsOpen,
+  //     selectedArea,
+  //   } = uiStore
+  //
+  //   const { minX } = selectedArea
+  //
+  //   // if we're dragging the selection square, don't bother rendering blanks
+  //   if (minX || this.dragging) {
+  //     return null
+  //   }
+  //
+  //   let cards = []
+  //   const leftPad = num_columns > 4 ? 3 : 0
+  //   const topPad = num_columns > 4 ? 3 : 1
+  //   const across = _.min([10, num_columns])
+  //   if (this.loadingRow) {
+  //     _.times(across, i => {
+  //       _.times(4, j => {
+  //         cards.push({
+  //           id: 'unrendered',
+  //           // loading squares are centered, 3 from the left
+  //           col: i + leftPad,
+  //           // down from the beginning of loadingRow by topPad rows
+  //           row: this.loadingRow + j + topPad,
+  //           width: 1,
+  //           height: 1,
+  //         })
+  //       })
+  //     })
+  //   }
+  //
+  //   if (
+  //     blankContentToolIsOpen &&
+  //     blankContentToolState.collectionId === collection.id
+  //   ) {
+  //     cards.push({
+  //       id: 'blank',
+  //       blankType: 'bct',
+  //       ...blankContentToolState,
+  //     })
+  //   }
+  //
+  //   const { placeholderSpot } = this
+  //   if (
+  //     canEditCollection &&
+  //     (placeholderSpot.row !== null && placeholderSpot.col !== null)
+  //   ) {
+  //     cards.push({
+  //       id: 'resize',
+  //       ...placeholderSpot,
+  //     })
+  //   }
+  //
+  //   cards = _.map(cards, this.renderCard)
+  //   return cards
+  // }
 
   renderAddSubmission() {
     const { collection, submissionSettings } = this.props
@@ -1317,7 +1319,7 @@ FoamcoreGrid.propTypes = {
   trackCollectionUpdated: PropTypes.func.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
-  blankContentToolState: MobxPropTypes.objectOrObservableObject,
+  // blankContentToolState: MobxPropTypes.objectOrObservableObject,
   loadCollectionCards: PropTypes.func.isRequired,
   sorting: PropTypes.bool,
   cardIdMenuOpen: PropTypes.string,
@@ -1332,7 +1334,7 @@ FoamcoreGrid.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 FoamcoreGrid.defaultProps = {
-  blankContentToolState: {},
+  // blankContentToolState: {},
   sorting: false,
   cardIdMenuOpen: null,
   submissionSettings: null,

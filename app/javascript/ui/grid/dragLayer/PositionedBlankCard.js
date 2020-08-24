@@ -43,7 +43,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
         ${hexToRgba(color, 0)} 100%)`
     } else if (props.blocked) {
       return v.colors.alert
-    } else if (_.includes(['blank', 'drag', 'resize'], props.type)) {
+    } else if (_.includes(['drag', 'resize'], props.type)) {
       return v.colors.primaryLight
     }
     return 'none'
