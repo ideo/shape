@@ -21,6 +21,8 @@ export const FOUR_WIDE_MAX_ZOOM = 2
 export const ACTIVITY_LOG_POSITION_KEY = 'ActivityLog:position'
 export const ACTIVITY_LOG_PAGE_KEY = 'ActivityLog:page'
 
+export const FOAMCORE_GRID_BOUNDARY = 'foamcoreGridBoundary'
+
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
   FILE: 'Item::FileItem',

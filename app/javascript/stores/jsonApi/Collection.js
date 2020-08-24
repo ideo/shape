@@ -848,7 +848,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (hidden) {
       params.hidden = true
     }
-    if (this.isBoard && !this.isSplitLevelBottom) {
+    if (this.isBoard && !hidden && !this.isSplitLevelBottom) {
       // nullify these as they have no effect on boards
       delete params.per_page
       delete params.page
@@ -1343,7 +1343,7 @@ class Collection extends SharedRecordMixin(BaseRecord) {
     if (this.collection_cards) {
       _.each(this.sortedCards, (card, i) => {
         if (this.isBoard) {
-          card.order = 0
+          card.order = null
         } else {
           card.order = i
         }
@@ -1881,7 +1881,8 @@ class Collection extends SharedRecordMixin(BaseRecord) {
   }
 
   // NOTE: this is only used as a Cypress test method, to simulate card resizing
-  API_updateCard({ card, updates, undoMessage } = {}) {
+  @action
+  async API_updateCard({ card, updates, undoMessage } = {}) {
     // this works a little differently than the typical "undo" snapshot...
     // we snapshot the collection_cards.attributes so that they can be reverted
     const jsonData = this.toJsonApiWithCards()
@@ -1890,15 +1891,14 @@ class Collection extends SharedRecordMixin(BaseRecord) {
       message: undoMessage,
       actionType: POPUP_ACTION_TYPES.SNACKBAR,
     })
-    // now actually make the change to the card
+    // now make the local change to the card
     _.assign(card, updates)
-
-    // this will also reorder the cards
     const data = this.toJsonApiWithCards()
     // we don't want to receive updates which are just going to try to re-render
     data.cancel_sync = true
-    const apiPath = `collections/${this.id}`
-    return this.apiStore.request(apiPath, 'PATCH', { data })
+    await this.apiStore.request(this.baseApiPath, 'PATCH', { data })
+    // force rendering?
+    this.mergeCards([card])
   }
 
   async API_manipulateRow({ row, action, pushUndo = true } = {}) {

@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
+
 // For more comprehensive examples of custom
 // commands please read more here:
 // https://on.cypress.io/custom-commands
@@ -77,35 +79,32 @@ Cypress.Commands.add(
   ({ name, collectionType = 'normal', empty = false }) => {
     let type = 'collection'
     // these types correspond to the BctButtonBox types in GridCardBlank
-    switch (collectionType) {
-      case 'foamcoreBoard':
-        type = 'foamcoreBoard'
-        break
-      case 'test':
-        type = 'testCollection'
-        break
-      default:
-        // e.g. "normal"
-        type = 'collection'
-        break
+    if (collectionType === 'test') {
+      type = 'testCollection'
     }
 
-    if (collectionType === 'searchCollection') {
+    if (
+      _.includes(
+        ['template', 'searchCollection', 'submissionBox'],
+        collectionType
+      )
+    ) {
       cy.selectPopoutTemplateBctType({
-        type: 'searchCollection',
+        type: collectionType,
+        empty,
+        name,
       })
     } else {
       cy.selectBctType({ type, empty })
+      // force == don't care if it's "covered by tooltip"
+      cy.locate('CollectionCreatorTextField').type(name, {
+        force: true,
+      })
+      cy.locate('CollectionCreatorFormButton').click({ force: true })
+      cy.wait('@apiCreateCollectionCard')
+      // waiting a tiny bit here seems to allow the new card to actually finish creating/rendering
+      cy.wait(50)
     }
-
-    // force == don't care if it's "covered by tooltip"
-    cy.locate('CollectionCreatorTextField').type(name, {
-      force: true,
-    })
-    cy.locate('CollectionCreatorFormButton').click({ force: true })
-    cy.wait('@apiCreateCollectionCard')
-    // waiting a tiny bit here seems to allow the new card to actually finish creating/rendering
-    cy.wait(50)
   }
 )
 
@@ -172,31 +171,35 @@ Cypress.Commands.add('resizeCard', ({ row, col, size }) => {
   const sizes = size.split('x')
   const [width, height] = _.map(sizes, Number)
   cy.window()
-    .then(win => {
+    .then(async win => {
       const collection = win.uiStore.viewingCollection
       const card = _.find(collection.sortedCards, { row, col })
-      collection.API_updateCard({
+      await collection.API_updateCard({
         card,
         updates: { width, height },
         undoMessage: 'Card resize undone',
       })
+      cy.wait(250)
     })
+    .wait(500)
     .wait('@apiUpdateCollection')
-    .wait(1000)
+    .wait(500)
 })
 
 Cypress.Commands.add('moveFirstCardDown', (row = 1) => {
-  cy.window().then(win => {
-    const collection = win.uiStore.viewingCollection
-    collection._reorderCards()
-    const card = _.first(collection.sortedCards)
-    collection.API_updateCard({
-      card,
-      updates: { row, col: 0 },
-      undoMessage: 'Card move undone',
+  cy.window()
+    .then(async win => {
+      const collection = win.uiStore.viewingCollection
+      const card = _.first(collection.sortedCards)
+      await collection.API_updateCard({
+        card,
+        updates: { row, col: 0, updated_at: new Date() },
+        undoMessage: 'Card move undone',
+      })
+      cy.wait(1000)
     })
-    cy.wait('@apiUpdateCollection')
-  })
+    .wait('@apiUpdateCollection')
+    .wait(500)
 })
 
 Cypress.Commands.add('undo', () => {
@@ -208,6 +211,16 @@ Cypress.Commands.add('undo', () => {
   })
 })
 
+Cypress.Commands.add('clickFirstHotEdge', () => {
+  cy.locateDataOrClass('FoamcoreHotspot-0:0')
+    .first()
+    .click({ force: true })
+  cy.wait('@apiCreateCollectionCardBct')
+  // this is when it gets the placeholder
+  cy.wait('@apiGetCollectionCard')
+  cy.wait(200)
+})
+
 Cypress.Commands.add(
   'selectBctType',
   ({ type, row = null, col = null, empty = false }) => {
@@ -216,73 +229,78 @@ Cypress.Commands.add(
       className += `-${row}:${col}`
     }
     if (!empty) {
-      cy.locateDataOrClass(className)
-        .first()
-        .click({ force: true })
+      // we need to hover over the right spot to make the BCT appear
+      cy.window().then(win => {
+        // make sure we're at top left
+        cy.scrollTo(0, 0)
+        const { uiStore } = win
+        // this is how we simulate a mouseover to create a blank hover spot
+        const pos = uiStore.positionForCoordinates({
+          row: row || 0,
+          col: col || 0,
+        })
+        const rect = {
+          // estimated values to simulate bounding rectangle
+          left: 50,
+          top: 150,
+        }
+        cy.get(`.${FOAMCORE_GRID_BOUNDARY}`)
+          .trigger('mousemove', {
+            clientX: pos.x + rect.left,
+            clientY: pos.y + rect.top,
+            force: true,
+          })
+          .wait(150)
+          .locateDataOrClass(className)
+          .first()
+          .click({ force: true })
+      })
     }
-    switch (type) {
-      case 'file':
-        cy.wait(1000)
-        break
-      default:
-        break
-    }
+    cy.wait(type === 'file' ? 1000 : 150)
     cy.locate(`BctButton-${type}`)
       .first()
       .click({ force: true })
   }
 )
 
-Cypress.Commands.add('selectPopoutTemplateBctType', ({ type }) => {
-  cy.locateDataOrClass('.StyledHotspot')
-    .first()
-    .click({ force: true })
-  cy.locate('BctButton-more')
-    .last()
-    .click({ force: true })
-  cy.wait(100)
-  switch (type) {
-    case 'template':
-      cy.locate('PopoutMenu_createTemplate')
+Cypress.Commands.add(
+  'selectPopoutTemplateBctType',
+  ({ type, empty = false, name = '' }) => {
+    cy.selectBctType({ type: 'more', empty })
+    cy.wait(100)
+
+    const popoutType = `PopoutMenu_create${_.upperFirst(type)}`
+    cy.locate(popoutType)
+      .first()
+      .click({ force: true })
+
+    switch (type) {
+      case 'template':
+      case 'searchCollection':
+      case 'submissionBox':
+        cy.locate('CollectionCreatorTextField')
+          .first()
+          .click()
+          .type(name || `My ${type}`)
+        break
+      default:
+        break
+    }
+
+    if (type !== 'data') {
+      cy.locate(`CollectionCreatorFormButton`)
         .first()
         .click({ force: true })
-      cy.locate('CollectionCreatorTextField')
-        .first()
-        .click()
-        .type('Test Template')
-      break
-    case 'report':
-      cy.locate('PopoutMenu_createReport')
-        .first()
-        .click({ force: true })
-      return
-    case 'searchCollection':
-      cy.locate('PopoutMenu_createSearchCollection')
-        .first()
-        .click({ force: true })
-      return
-    case 'submissionBox':
-      cy.locate('PopoutMenu_createSubmissionBox')
-        .first()
-        .click({ force: true })
-      cy.locate('CollectionCreatorTextField')
-        .first()
-        .click()
-        .type('Submissions')
-      break
-    default:
-      break
+    }
+    cy.wait('@apiCreateCollectionCard')
+
+    if (['submissionBox'].includes(type)) {
+      cy.wait('@apiGetCollectionCards')
+    }
+    cy.wait(50)
+    return
   }
-  cy.locate(`CollectionCreatorFormButton`)
-    .first()
-    .click({ force: true })
-  cy.wait('@apiCreateCollectionCard')
-  if (['searchCollection', 'submissionBox'].includes(type)) {
-    cy.wait('@apiGetCollectionCards')
-  }
-  cy.wait(50)
-  return
-})
+)
 
 Cypress.Commands.add(
   'typeInTextarea',

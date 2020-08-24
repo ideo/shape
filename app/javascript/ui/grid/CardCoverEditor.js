@@ -190,7 +190,7 @@ class CardCoverEditor extends React.Component {
     const collection = record
     // fetch the full collection to get the styles
     collection.refetch()
-    return collection.API_fetchCards({ hidden: true })
+    return collection.API_fetchCards({ hidden: true, per_page: 10 })
   }
 
   get coverImageBaseOptions() {

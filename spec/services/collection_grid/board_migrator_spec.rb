@@ -38,6 +38,22 @@ RSpec.describe CollectionGrid::BoardMigrator, type: :service do
         expect(collection.board_collection?).to be true
         expect(collection.num_columns).to eq 4
       end
+
+      context 'with hidden cards' do
+        before do
+          cards[1].update(hidden: true)
+        end
+
+        it 'updates collection to 4 columns and ignores hidden cards' do
+          expect(cards.pluck(:row, :col).flatten.compact).to be_empty
+          subject.call
+          expect(cards.reload.pluck(:hidden, :order, :row, :col)).to eq([
+            [false, nil, 0, 0],
+            [false, nil, 0, 2],
+            [true, nil, nil, nil],
+          ])
+        end
+      end
     end
 
     context 'with subcollections' do

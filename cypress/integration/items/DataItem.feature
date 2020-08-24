@@ -8,7 +8,7 @@ Feature: Data Item
     And I create a data card
     And I wait for "@apiCreateCollectionCard" to finish
     And I wait for "@apiGetItemDataset" to finish
-    Then I should see a "DataItemCover" in the first card
+    Then I should see a "DataItemCover" in the card at 0,0
     Then I should see 1 for the single data value
 
     When I select "viewers" on the "measure" select on the report item

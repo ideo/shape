@@ -100,6 +100,12 @@ class CollectionUpdater < SimpleService
       found_ids.include?(card_attr[:id].to_i)
     end
 
+    if @collection.board_collection?
+      @attributes[:collection_cards_attributes].each do |card_attr|
+        card_attr.delete :order
+      end
+    end
+
     return unless @collection.templated?
 
     @attributes[:collection_cards_attributes].each do |card_attr|
