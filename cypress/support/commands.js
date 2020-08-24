@@ -77,7 +77,7 @@ Cypress.Commands.add('selectCardAt', ({ row, col, value = null } = {}) => {
 Cypress.Commands.add(
   'createCollection',
   ({ name, collectionType = 'normal', empty = false }) => {
-    let type = 'collection'
+    let type = collectionType
     // these types correspond to the BctButtonBox types in GridCardBlank
     if (collectionType === 'test') {
       type = 'testCollection'
