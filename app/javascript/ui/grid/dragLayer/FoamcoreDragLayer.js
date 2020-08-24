@@ -168,6 +168,50 @@ class FoamcoreDragLayer extends React.Component {
     }
   }
 
+  cardWithinViewPlusPage = card => {
+    const { uiStore } = this.props
+    // Select all cards that are within view,
+    // plus half a screen on any side
+    const rows = uiStore.visibleRows
+    const cols = uiStore.visibleCols
+
+    const numRows = Math.ceil(rows.num)
+    const numCols = Math.ceil(cols.num)
+
+    const withinCols =
+      card.col > cols.min - numCols && card.col < cols.max + numCols
+    const withinRows =
+      card.row > rows.min - numRows && card.row < rows.max + numRows
+
+    return withinRows && withinCols
+  }
+
+  get renderDropspots() {
+    const { collection, uiStore } = this.props
+    const { cardMatrix } = collection
+    const blankCards = []
+    // Add blank cards to all empty spaces,
+    // and 2x screen heights at the bottom
+    let extraRows = 0
+    if (collection.isSplitLevel) {
+      extraRows = 1
+    } else {
+      extraRows = uiStore.visibleRows.num * 2
+    }
+    _.each(_.range(0, collection.max_row_index + extraRows), row => {
+      _.each(_.range(0, collection.num_columns), col => {
+        // If there's no row, or nothing in this column, add a blank card for this spot
+        const blankCard = { row, col, width: 1, height: 1 }
+        if (!cardMatrix[row] || !cardMatrix[row][col]) {
+          if (this.cardWithinViewPlusPage(blankCard)) {
+            blankCards.push(this.positionBlank(blankCard, 'hover'))
+          }
+        }
+      })
+    })
+    return blankCards
+  }
+
   render() {
     const { uiStore } = this.props
 
@@ -198,7 +242,7 @@ class FoamcoreDragLayer extends React.Component {
         }}
       >
         {this.renderDragSpots}
-        {this.renderBlanks}
+        {uiStore.droppingFiles && this.renderDropspots}
       </DragLayerWrapper>
     )
   }

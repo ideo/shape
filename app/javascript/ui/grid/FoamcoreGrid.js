@@ -53,20 +53,6 @@ class FoamcoreGrid extends React.Component {
   // track which row # we are in the process of loading from API
   loadingRow = null
   @observable
-  // track which rows are visible on the page
-  visibleRows = {
-    min: 0,
-    max: 0,
-    num: 0,
-  }
-  @observable
-  // track which cols are visible on the page
-  visibleCols = {
-    min: 0,
-    max: 0,
-    num: 0,
-  }
-  @observable
   disableHorizontalScroll = false
   @observable
   uploading = false
@@ -150,7 +136,7 @@ class FoamcoreGrid extends React.Component {
 
   // Load more cards if we are approaching a boundary of what we have loaded
   loadAfterScroll = async () => {
-    const { collection } = this.props
+    const { collection, uiStore } = this.props
     // return if we're still loading a new page
     if (this.loadingRow || collection.loadedRows === 0) {
       return
@@ -164,7 +150,7 @@ class FoamcoreGrid extends React.Component {
       this.handleZoomIn()
     }
 
-    const visRows = this.visibleRows
+    const visRows = uiStore.visibleRows
 
     // Attempt to load more rows if currently loaded rows is less than
     // one full screen out of view
@@ -174,7 +160,7 @@ class FoamcoreGrid extends React.Component {
   }
 
   loadMoreRows = () => {
-    const { collection } = this.props
+    const { collection, uiStore } = this.props
     const { loadMoreCollectionCards } = this
     if (collection.isSplitLevelBottom) {
       if (collection.hasMore) {
@@ -183,7 +169,7 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
-    const visRows = this.visibleRows
+    const visRows = uiStore.visibleRows
     const collectionMaxRow = collection.max_row_index
     // min row should start with the next row after what's loaded
     const loadMinRow = collection.loadedRows + 1
@@ -244,7 +230,7 @@ class FoamcoreGrid extends React.Component {
     const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
-    const visRows = this.visibleRows.num || 1
+    const visRows = uiStore.visibleRows.num || 1
     let maxRows = collection.max_row_index + 1
     if (collection.isSplitLevelBottom) {
       maxRows += 1
@@ -274,9 +260,10 @@ class FoamcoreGrid extends React.Component {
     return (gridH + gutter) / this.relativeZoomLevel
   }
 
-  @action
   computeVisibleRows() {
     const { pageMargins } = this
+    const { uiStore } = this.props
+
     if (!this.gridRef) return { min: null, max: null }
 
     const top = window.pageYOffset
@@ -288,16 +275,17 @@ class FoamcoreGrid extends React.Component {
     )
     const num = max - min
 
-    this.visibleRows = {
+    uiStore.setVisibleRows({
       min,
       max,
       num,
-    }
+    })
   }
 
   @action
   computeVisibleCols() {
     const { pageMargins } = this
+    const { uiStore } = this.props
     if (!this.gridRef) return { min: null, max: null }
 
     const left = window.pageXOffset
@@ -309,11 +297,11 @@ class FoamcoreGrid extends React.Component {
     )
     const num = max - min
 
-    this.visibleCols = {
+    uiStore.setVisibleCols({
       min,
       max,
       num,
-    }
+    })
   }
 
   // Finds row and column from an x,y coordinate
