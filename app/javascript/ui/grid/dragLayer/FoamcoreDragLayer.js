@@ -228,7 +228,7 @@ class FoamcoreDragLayer extends React.Component {
       return this.renderDragSpots
     } else if (resizing && !droppingFiles) {
       return this.renderResizeSpot
-    } else if (resizing && !droppingFiles) {
+    } else if (droppingFiles) {
       return this.renderDropSpots
     }
 
