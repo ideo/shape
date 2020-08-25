@@ -6,8 +6,6 @@ Feature: Data Item
     And I navigate to the collection named "Test data items" via the "CollectionCover"
 
     And I create a data card
-    And I wait for "@apiCreateCollectionCard" to finish
-    And I wait for "@apiGetItemDataset" to finish
     Then I should see a "DataItemCover" in the card at 0,0
     Then I should see 1 for the single data value
 

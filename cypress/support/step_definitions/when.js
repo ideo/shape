@@ -473,7 +473,7 @@ When('I click the action menu for the card at {int},{int}', (row, col) => {
   cy.selectCardAt({ row, col, value: 'PopoutMenu' })
     .first()
     .click({ force: true })
-  cy.wait(100)
+  cy.wait(200)
 })
 
 When(
@@ -483,7 +483,7 @@ When(
     cy.selectCardAt({ row, col, value })
       .first()
       .click({ force: true })
-    cy.wait(100)
+    cy.wait(200)
   }
 )
 

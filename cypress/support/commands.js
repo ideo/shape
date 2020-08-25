@@ -76,25 +76,27 @@ Cypress.Commands.add('selectCardAt', ({ row, col, value = null } = {}) => {
 
 Cypress.Commands.add(
   'createCollection',
-  ({ name, collectionType = 'normal', empty = false }) => {
-    let type = 'collection'
-    // these types correspond to the BctButtonBox types in GridCardBlank
-    if (collectionType === 'test') {
-      type = 'testCollection'
-    }
-
+  ({ name, collectionType = 'collection', empty = false }) => {
     if (
       _.includes(
         ['template', 'searchCollection', 'submissionBox'],
         collectionType
       )
     ) {
+      // these cards get created via the BCT popout (...) menu
       cy.selectPopoutTemplateBctType({
         type: collectionType,
         empty,
         name,
       })
     } else {
+      let type = 'collection'
+      // these types correspond to the BctButtonBox types in GridCardBlank
+      if (collectionType === 'test') {
+        type = 'testCollection'
+      } else if (collectionType !== 'normal') {
+        type = collectionType
+      }
       cy.selectBctType({ type, empty })
       // force == don't care if it's "covered by tooltip"
       cy.locate('CollectionCreatorTextField').type(name, {
@@ -287,12 +289,15 @@ Cypress.Commands.add(
         break
     }
 
-    if (type !== 'data') {
+    if (type === 'data' || type === 'report') {
+      cy.wait('@apiCreateCollectionCard')
+      cy.wait('@apiGetItemDataset')
+    } else {
       cy.locate(`CollectionCreatorFormButton`)
         .first()
         .click({ force: true })
+      cy.wait('@apiCreateCollectionCard')
     }
-    cy.wait('@apiCreateCollectionCard')
 
     if (['submissionBox'].includes(type)) {
       cy.wait('@apiGetCollectionCards')
