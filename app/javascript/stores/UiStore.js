@@ -16,6 +16,7 @@ import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 import { calculatePageMargins } from '~/utils/pageUtils'
 import ChannelManager from '~/utils/ChannelManager'
+import { objectsEqual } from '~/utils/objectUtils'
 
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
@@ -188,6 +189,8 @@ export default class UiStore {
   @observable
   draggingFromMDL = false
   dragGridSpot = observable.map({})
+  @observable
+  placeholderSpot = { ...v.placeholderDefaults }
   @observable
   // track if you are dragging/moving more cards than visible
   movingCardsOverflow = false
@@ -1689,6 +1692,18 @@ export default class UiStore {
   @action
   setVisibleCols = visibleCols => {
     this.visibleCols = visibleCols
+  }
+
+  @action
+  setPlaceholderSpot = (placeholderSpot = this.placeholderDefaults) => {
+    if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
+      const { row, col, width, height, type } = placeholderSpot
+      this.placeholderSpot.row = row
+      this.placeholderSpot.col = col
+      this.placeholderSpot.width = width
+      this.placeholderSpot.height = height
+      this.placeholderSpot.type = type
+    }
   }
 
   pageMargins(collection) {

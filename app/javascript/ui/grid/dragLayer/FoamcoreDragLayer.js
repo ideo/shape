@@ -139,12 +139,8 @@ class FoamcoreDragLayer extends React.Component {
     return dragSpots
   }
 
-  get renderEmptyCard() {
-    const { dragging } = this.props
+  get renderHoveringSpot() {
     const { row, col } = this.hoveringRowCol
-    if (dragging) {
-      return
-    }
 
     if (row !== null && col !== null) {
       return this.positionBlank(
@@ -156,6 +152,25 @@ class FoamcoreDragLayer extends React.Component {
           height: 1,
         },
         'hover'
+      )
+    }
+  }
+
+  get renderResizeSpot() {
+    const { uiStore } = this.props
+    const { placeholderSpot } = uiStore
+    const { row, col, width, height } = placeholderSpot
+
+    if (row !== null && col !== null) {
+      return this.positionBlank(
+        {
+          id: 'resize',
+          row,
+          col,
+          width,
+          height,
+        },
+        'resize'
       )
     }
   }
@@ -178,7 +193,7 @@ class FoamcoreDragLayer extends React.Component {
     return withinRows && withinCols
   }
 
-  get renderDropspots() {
+  get renderDropSpots() {
     const { collection, uiStore } = this.props
     const { cardMatrix } = collection
     const blankCards = []
@@ -205,18 +220,19 @@ class FoamcoreDragLayer extends React.Component {
   }
 
   get renderInnerDragLayer() {
-    const { uiStore, dragging } = this.props
+    const { uiStore, dragging, resizing } = this.props
 
     const { droppingFiles } = uiStore
 
-    if (dragging && !droppingFiles) {
+    if (dragging && !resizing && !droppingFiles) {
       return this.renderDragSpots
-    } else if (uiStore.droppingFiles) {
-      return this.renderDropspots
+    } else if (resizing && !droppingFiles) {
+      return this.renderResizeSpot
+    } else if (resizing && !droppingFiles) {
+      return this.renderDropSpots
     }
 
-    // hovering over
-    return this.renderEmptyCard
+    return this.renderHoveringSpot
   }
 
   render() {
@@ -259,6 +275,7 @@ FoamcoreDragLayer.propTypes = {
   coordinatesForPosition: PropTypes.func.isRequired,
   hoveringOverCollection: PropTypes.bool.isRequired,
   dragging: PropTypes.bool.isRequired,
+  resizing: PropTypes.bool.isRequired,
 }
 
 FoamcoreDragLayer.wrappedComponent.propTypes = {

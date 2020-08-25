@@ -378,6 +378,14 @@ export default {
     gridH: 200,
   },
 
+  placeholderDefaults: {
+    row: null,
+    col: null,
+    width: null,
+    height: null,
+    type: null,
+  },
+
   commentScrollOpts: {
     containerId: 'ctc-content',
     bottom: 'ctc-bottom',

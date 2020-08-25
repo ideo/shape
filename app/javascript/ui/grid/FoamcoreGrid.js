@@ -48,22 +48,12 @@ class FoamcoreGrid extends React.Component {
   @observable
   resizing = false
   @observable
-  placeholderSpot = { ...this.placeholderDefaults }
-  @observable
   // track which row # we are in the process of loading from API
   loadingRow = null
   @observable
   disableHorizontalScroll = false
   @observable
   uploading = false
-
-  placeholderDefaults = {
-    row: null,
-    col: null,
-    width: null,
-    height: null,
-    type: null,
-  }
   draggingCardMasterPosition = {}
   draggingMap = []
   // track whether drag movement is blocked because of overlapping cards
@@ -490,8 +480,8 @@ class FoamcoreGrid extends React.Component {
 
   resizeCard = card => {
     let undoMessage
-    const { collection, trackCollectionUpdated } = this.props
-    let { height, width } = this.placeholderSpot
+    const { collection, trackCollectionUpdated, uiStore } = this.props
+    let { height, width } = uiStore.placeholderSpot
     // Some double-checking validations
     const maxHeight = this.calcEdgeRow(card)
     const maxWidth = this.calcEdgeCol(card)
@@ -659,7 +649,7 @@ class FoamcoreGrid extends React.Component {
       this.dragging = false
       this.resizing = false
       this.draggingCardMasterPosition = {}
-      this.setPlaceholderSpot(this.placeholderDefaults)
+      uiStore.setPlaceholderSpot(this.placeholderDefaults)
       if (!keepMDLOpen) {
         uiStore.setMovingCards([])
       }
@@ -900,7 +890,8 @@ class FoamcoreGrid extends React.Component {
   }
 
   setResizeSpot({ row, col, width, height }) {
-    this.setPlaceholderSpot({
+    const { uiStore } = this.props
+    uiStore.setPlaceholderSpot({
       row,
       col,
       width,
@@ -1030,18 +1021,6 @@ class FoamcoreGrid extends React.Component {
   //   }
   //   return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`)
   // }
-
-  @action
-  setPlaceholderSpot = (placeholderSpot = this.placeholderDefaults) => {
-    if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
-      const { row, col, width, height, type } = placeholderSpot
-      this.placeholderSpot.row = row
-      this.placeholderSpot.col = col
-      this.placeholderSpot.width = width
-      this.placeholderSpot.height = height
-      this.placeholderSpot.type = type
-    }
-  }
 
   clearDragTimeout() {
     if (this.dragTimeoutId) {
@@ -1296,6 +1275,7 @@ class FoamcoreGrid extends React.Component {
             hoveringOverCollection={!!this.hoveringOverCollection}
             coordinatesForPosition={this.coordinatesForPosition}
             dragging={this.dragging}
+            resizing={this.resizing}
           />
         )}
       </Grid>
