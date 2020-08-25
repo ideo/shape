@@ -1,4 +1,4 @@
-import GridCardEmptyHotspot from '~/ui/grid/hotspot/GridCardEmptyHotspot'
+import GridCardEmptyHotspot from '~/ui/grid/dragLayer/GridCardEmptyHotspot'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
 let wrapper, component, props, uiStore, rerender

@@ -8,7 +8,6 @@ import Tooltip from '~/ui/global/Tooltip'
 import PlusIcon from '~/ui/icons/PlusIcon'
 import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
 import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
-import { StyledGridCardEmpty } from '~/ui/grid/hotspot/shared'
 
 const StyledPlusIcon = styled.div`
   position: absolute;
@@ -35,6 +34,27 @@ export const CircleIconHolder = styled.button`
   color: ${v.colors.secondaryMedium};
   height: 32px;
   width: 32px;
+`
+
+const StyledGridCardEmpty = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  &.visible,
+  &:hover {
+    background-color: ${v.colors.primaryLight} !important;
+    .plus-icon {
+      display: block;
+    }
+    .cloud-icon {
+      display: block;
+    }
+  }
+  .plus-icon,
+  .cloud-icon {
+    display: none;
+  }
 `
 
 @inject('uiStore')

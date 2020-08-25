@@ -263,6 +263,10 @@ class FoamcoreDragLayer extends React.Component {
           }
           uiStore.setDroppingFiles(false)
         }}
+        onMouseLeave={e => {
+          e.preventDefault()
+          uiStore.setDroppingFiles(false)
+        }}
       >
         {this.renderInnerDragLayer}
       </DragLayerWrapper>

@@ -3,7 +3,7 @@ import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import _ from 'lodash'
 
-import DropzoneHolder from '~/ui/grid/hotspot/DropzoneHolder'
+import DropzoneHolder from '~/ui/grid/dropzone/DropzoneHolder'
 
 const StyledGridCardDropzone = styled.div`
   width: 100%;

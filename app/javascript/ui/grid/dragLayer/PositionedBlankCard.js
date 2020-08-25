@@ -7,9 +7,9 @@ import hexToRgba from '~/utils/hexToRgba'
 import propShapes from '~/utils/propShapes'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-import GridCardDropzone from '~/ui/grid/hotspot/GridCardDropzone'
+import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
-import GridCardEmptyHotspot from '~/ui/grid/hotspot/GridCardEmptyHotspot'
+import GridCardEmptyHotspot from '~/ui/grid/dragLayer/GridCardEmptyHotspot'
 
 const CircleIconHolder = styled.button`
   border: 1px solid ${v.colors.secondaryMedium};
@@ -155,6 +155,7 @@ class PositionedBlankCard extends React.Component {
         </BlankCardContainer>
       )
     } else if (blankContentToolIsOpen) {
+      // FIXME: This will be deprecated in the upcoming story
       const blankContentTool = {
         id: 'blank',
         num: 0,
@@ -187,10 +188,7 @@ class PositionedBlankCard extends React.Component {
         interactionType={interactionType}
         onClick={draggingOrResizing ? this.onClickHotspot({ row, col }) : null}
       >
-        <GridCardEmptyHotspot
-          visible={true}
-          interactionType={interactionType}
-        ></GridCardEmptyHotspot>
+        <GridCardEmptyHotspot interactionType={interactionType} />
       </BlankCardContainer>
     )
   }
