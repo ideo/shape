@@ -76,7 +76,7 @@ Cypress.Commands.add('selectCardAt', ({ row, col, value = null } = {}) => {
 
 Cypress.Commands.add(
   'createCollection',
-  ({ name, collectionType = 'normal', empty = false }) => {
+  ({ name, collectionType = 'collection', empty = false }) => {
     if (
       _.includes(
         ['template', 'searchCollection', 'submissionBox'],
