@@ -183,7 +183,6 @@ class GridCardEmptyHotspot extends React.Component {
     } else if (interactionType === 'unrendered') {
       inner = <InlineLoader background={v.colors.commonLightest} />
     }
-    console.log('fuck', this.isMouseOver)
     if (this.isMouseOver) {
       inner = <HotCell card={card} />
     }
@@ -191,7 +190,6 @@ class GridCardEmptyHotspot extends React.Component {
     return (
       <StyledGridCardEmpty
         className={visible ? 'visible' : ''}
-        onClick={this.onClickHotspot}
         onMouseEnter={this.handleMouseOver}
         onMouseLeave={this.handleMouseLeave}
         currentlyHotCell={this.isMouseOver}

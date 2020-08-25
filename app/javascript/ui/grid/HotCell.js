@@ -1,26 +1,9 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
+import { observable } from 'mobx'
 import styled from 'styled-components'
 
-import CollectionIcon from '~/ui/icons/htc/CollectionIcon'
-import FileIcon from '~/ui/icons/htc/FileIcon'
-import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
-import TextIcon from '~/ui/icons/htc/TextIcon'
-import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
-
-const Quadrant = styled.div`
-  background-color: ${v.colors.primaryLight};
-  box-sizing: border-box;
-  float: left;
-  height: calc(50% - 1px);
-  padding-bottom: 14%;
-  padding-left: 20%;
-  padding-right: 20%;
-  padding-top: 14%;
-  width: calc(50% - 1px);
-`
+import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
 
 const Container = styled.div`
   height: 100%;
@@ -42,21 +25,50 @@ class HotCell extends React.Component {
   @observable
   isDraggedOver = false
 
+  handleTypeClick = type => () => {
+    this.startCreating(type)
+  }
+
   render() {
+    const itemTypes = [
+      { name: 'file', description: 'Add File' },
+      { name: 'link', description: 'Add Link' },
+      { name: 'video', description: 'Link Video' },
+      { name: 'report', description: 'Create Report' },
+    ]
+
+    const collectionTypes = [
+      { name: 'collection', description: 'Create Collection' },
+      { name: 'foamcore', description: 'Create Foamcore Board' },
+      { name: 'searchCollection', description: 'Create Search Collection' },
+      { name: 'submissionBox', description: 'Create Submission Box' },
+      { name: 'testCollection', description: 'Get Feedback' },
+    ]
+
+    const primaryTypes = [
+      { name: 'text', description: 'Add Text' },
+      { name: 'file', description: 'Add File', subTypes: () => itemTypes },
+      {
+        name: 'collection',
+        description: 'Create Collection',
+        subTypes: () => collectionTypes,
+      },
+      {
+        name: 'template',
+        description: 'Create New Template',
+        subTypes: this.fetchTemplates,
+      },
+    ]
+
     return (
       <Container>
-        <Quadrant>
-          <TextIcon />
-        </Quadrant>
-        <Quadrant>
-          <FileIcon />
-        </Quadrant>
-        <Quadrant>
-          <CollectionIcon />
-        </Quadrant>
-        <Quadrant>
-          <TemplateIcon />
-        </Quadrant>
+        {primaryTypes.map(({ name, description, subTypes }) => (
+          <HotCellQuadrant
+            name={name}
+            description={description}
+            subTypes={subTypes}
+          />
+        ))}
       </Container>
     )
   }

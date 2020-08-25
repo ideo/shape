@@ -17,7 +17,6 @@ import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
-import Tooltip from '~/ui/global/Tooltip'
 import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 import { isFile } from '~/utils/FilestackUpload'
@@ -1175,7 +1174,6 @@ class FoamcoreGrid extends React.Component {
 
     return (
       <BlankCard
-        onClick={this.handleBlankCardClick({ col, row })}
         {...position}
         type={type}
         zoomLevel={relativeZoomLevel}
@@ -1231,7 +1229,6 @@ class FoamcoreGrid extends React.Component {
     }
   }
 
-<<<<<<< HEAD
   @action
   setUploading = uploading => {
     this.uploading = uploading
@@ -1263,8 +1260,6 @@ class FoamcoreGrid extends React.Component {
     return blankCards
   }
 
-=======
->>>>>>> origin/development
   clearDragTimeout() {
     if (this.dragTimeoutId) {
       clearTimeout(this.dragTimeoutId)
