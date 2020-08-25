@@ -1189,6 +1189,7 @@ class FoamcoreGrid extends React.Component {
         <GridCardEmptyHotspot
           visible={this.uploading}
           card={this.props.card}
+          parent={this.props.collection}
           uploading={this.uploading}
           interactionType={type}
           numColumns={num_columns}

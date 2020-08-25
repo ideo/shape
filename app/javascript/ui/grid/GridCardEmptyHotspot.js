@@ -164,7 +164,14 @@ class GridCardEmptyHotspot extends React.Component {
   }
 
   get renderGridCardEmpty() {
-    const { card, visible, interactionType, numColumns, emptyRow } = this.props
+    const {
+      parent,
+      visible,
+      interactionType,
+      numColumns,
+      emptyRow,
+      uiStore,
+    } = this.props
 
     let inner = ''
 
@@ -183,8 +190,8 @@ class GridCardEmptyHotspot extends React.Component {
     } else if (interactionType === 'unrendered') {
       inner = <InlineLoader background={v.colors.commonLightest} />
     }
-    if (this.isMouseOver) {
-      inner = <HotCell card={card} />
+    if (this.isMouseOver || uiStore.blankContentType) {
+      inner = <HotCell parent={parent} />
     }
 
     return (
@@ -224,6 +231,7 @@ class GridCardEmptyHotspot extends React.Component {
 }
 
 GridCardEmptyHotspot.propTypes = {
+  parent: MobxPropTypes.objectOrObservableObject.isRequired,
   visible: PropTypes.bool,
   card: MobxPropTypes.objectOrObservableObject,
   uploading: PropTypes.bool,

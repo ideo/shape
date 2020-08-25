@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { observer } from 'mobx-react'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
@@ -56,6 +56,7 @@ const nameToIcon = {
   video: VideoIcon,
 }
 
+@inject('uiStore')
 @observer
 class HotCellQuadrant extends React.Component {
   @observable
@@ -63,11 +64,14 @@ class HotCellQuadrant extends React.Component {
 
   handleClick = ev => {
     const { name } = this.props
+    console.log('jand;e c;ocl')
     this.createContent(name)
   }
 
   handleMore = ev => {
     console.log('handleMore')
+    ev.preventDefault()
+    ev.stopPropagation()
     runInAction(() => {
       this.moreTypesOpen = true
     })
@@ -79,7 +83,11 @@ class HotCellQuadrant extends React.Component {
     })
   }
 
-  createContent = type => {}
+  createContent = type => {
+    const { uiStore } = this.props
+    console.log('create content')
+    uiStore.setBlankContentType(type)
+  }
 
   get moreMenuItems() {
     const { subTypes } = this.props
@@ -128,6 +136,9 @@ HotCellQuadrant.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   subTypes: PropTypes.func,
+}
+HotCellQuadrant.wrappedComponent.propTypes = {
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 HotCellQuadrant.defaultProps = {
   subTypes: null,

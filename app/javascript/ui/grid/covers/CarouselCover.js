@@ -66,7 +66,9 @@ class CarouselCover extends React.Component {
       })
       if (!data || data.length === 0) this.props.onEmptyCarousel()
     } catch {
-      this.loading = false
+      runInAction(() => {
+        this.loading = false
+      })
       this.props.onEmptyCarousel()
     }
   }

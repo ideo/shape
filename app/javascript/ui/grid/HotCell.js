@@ -3,6 +3,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable } from 'mobx'
 import styled from 'styled-components'
 
+import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
 
 const Container = styled.div`
@@ -30,6 +31,10 @@ class HotCell extends React.Component {
   }
 
   render() {
+    const {
+      parent,
+      uiStore: { blankContentType },
+    } = this.props
     const itemTypes = [
       { name: 'file', description: 'Add File' },
       { name: 'link', description: 'Add Link' },
@@ -62,13 +67,17 @@ class HotCell extends React.Component {
 
     return (
       <Container>
-        {primaryTypes.map(({ name, description, subTypes }) => (
-          <HotCellQuadrant
-            name={name}
-            description={description}
-            subTypes={subTypes}
-          />
-        ))}
+        {blankContentType ? (
+          <GridCardBlank preselected={blankContentType} parent={parent} />
+        ) : (
+          primaryTypes.map(({ name, description, subTypes }) => (
+            <HotCellQuadrant
+              name={name}
+              description={description}
+              subTypes={subTypes}
+            />
+          ))
+        )}
       </Container>
     )
   }
@@ -76,25 +85,10 @@ class HotCell extends React.Component {
 
 HotCell.propTypes = {
   visible: PropTypes.bool,
-  card: MobxPropTypes.objectOrObservableObject,
-  uploading: PropTypes.bool,
-  interactionType: PropTypes.string,
-  numColumns: PropTypes.number,
-  emptyRow: PropTypes.bool,
-  handleRemoveRowClick: PropTypes.func,
-  handleInsertRowClick: PropTypes.func,
-  row: PropTypes.number,
+  parent: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 HotCell.defaultProps = {
-  card: null,
   visible: false,
-  uploading: false,
-  interactionType: 'drag',
-  numColumns: 4,
-  emptyRow: false,
-  handleRemoveRowClick: null,
-  handleInsertRowClick: null,
-  row: 0,
 }
 HotCell.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

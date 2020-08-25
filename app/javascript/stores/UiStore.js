@@ -48,6 +48,8 @@ export default class UiStore {
   @observable
   blankContentToolState = { ...this.defaultBCTState }
   @observable
+  blankContentType = null
+  @observable
   cardMenuOpen = { ...this.defaultCardMenuState }
   defaultSelectedTextRange = {
     range: null,
@@ -852,6 +854,11 @@ export default class UiStore {
     })
   }
 
+  @action
+  setBlankContentType(type) {
+    this.blankContentType = type
+  }
+
   @computed
   get blankContentToolIsOpen() {
     // even for foamcore, order will at least == 0 when open
@@ -879,6 +886,7 @@ export default class UiStore {
   @action
   async closeBlankContentTool({ force = false } = {}) {
     const { viewingCollection } = this
+    this.setBlankContentType(null)
     if (
       !force &&
       viewingCollection &&
