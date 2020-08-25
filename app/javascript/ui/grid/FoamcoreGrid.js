@@ -22,7 +22,7 @@ import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
 import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
 import Tooltip from '~/ui/global/Tooltip'
-import v from '~/utils/variables'
+import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
 // set as a flag in case we ever want to enable this, it just makes a couple minor differences in logic
@@ -169,6 +169,11 @@ class FoamcoreGrid extends React.Component {
   }
   @observable
   disableHorizontalScroll = false
+  @observable
+  hoveringRowCol = {
+    row: null,
+    col: null,
+  }
 
   placeholderDefaults = {
     row: null,
@@ -193,6 +198,7 @@ class FoamcoreGrid extends React.Component {
     this.debouncedSetDraggedOnSpots = _.debounce(this.setDraggedOnSpots, 15)
     this.throttledSetResizeSpot = _.throttle(this.setResizeSpot, 25)
     this.throttledLoadAfterScroll = _.debounce(this.loadAfterScroll, 250)
+    this.throttledSetHoveringRowCol = _.throttle(this.setHoveringRowCol, 150)
   }
 
   componentDidMount() {
@@ -255,7 +261,7 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
-    const { zoomLevel, maxRow } = this
+    const { zoomLevel } = this
     this.computeVisibleRows()
     this.computeVisibleCols()
 
@@ -265,24 +271,19 @@ class FoamcoreGrid extends React.Component {
 
     const visRows = this.visibleRows
 
-    // Load more rows if currently loaded rows is less than
+    // Attempt to load more rows if currently loaded rows is less than
     // one full screen out of view
     if (collection.loadedRows < visRows.max + visRows.num) {
-      runInAction(() => {
-        this.loadingRow = maxRow
-      })
-      await this.loadMoreRows()
-      runInAction(() => {
-        this.loadingRow = null
-      })
+      this.loadMoreRows()
     }
   }
 
   loadMoreRows = () => {
-    const { collection, loadCollectionCards } = this.props
+    const { collection } = this.props
+    const { loadMoreCollectionCards } = this
     if (collection.isSplitLevelBottom) {
       if (collection.hasMore) {
-        loadCollectionCards({ page: collection.nextPage })
+        loadMoreCollectionCards({ page: collection.nextPage })
       }
       return
     }
@@ -298,11 +299,23 @@ class FoamcoreGrid extends React.Component {
     ])
     // min and max could be equal if there is one more row to load
     if (loadMinRow <= loadMaxRow) {
-      return loadCollectionCards({
+      return loadMoreCollectionCards({
         // just load by row # downward, and always load all 16 cols
         rows: [loadMinRow, loadMaxRow],
       })
     }
+  }
+
+  loadMoreCollectionCards = async (opts = {}) => {
+    const { maxRow } = this
+    const { loadCollectionCards } = this.props
+    runInAction(() => {
+      this.loadingRow = maxRow
+    })
+    await loadCollectionCards(opts)
+    runInAction(() => {
+      this.loadingRow = null
+    })
   }
 
   get pageMargins() {
@@ -432,30 +445,6 @@ class FoamcoreGrid extends React.Component {
 
     col = _.clamp(col, 0, collection.num_columns - width)
     return { col, row, outsideDraggableArea }
-  }
-
-  positionForCoordinates({ col, row, width = 1, height = 1 }) {
-    const { gridW, gridH, gutter } = this.gridSettings
-    const { relativeZoomLevel } = this
-    const pos = {
-      x: (col * (gridW + gutter)) / relativeZoomLevel,
-      y: (row * (gridH + gutter)) / relativeZoomLevel,
-      w: width * (gridW + gutter) - gutter,
-      h: height * (gridH + gutter) - gutter,
-    }
-    // TODO: why sometimes NaN? zoomLevel divide by 0??
-    if (_.isNaN(pos.x)) {
-      pos.x = 0
-      pos.y = 0
-    }
-    // TODO try and get rid of {x|y}Pos
-    return {
-      ...pos,
-      xPos: pos.x,
-      yPos: pos.y,
-      width: pos.w,
-      height: pos.h,
-    }
   }
 
   findOverlap(card) {
@@ -1124,11 +1113,11 @@ class FoamcoreGrid extends React.Component {
   }
 
   renderMovableCard(card, key) {
-    const { canEditCollection, collection } = this.props
+    const { canEditCollection, collection, uiStore } = this.props
     const { pageMargins, zoomLevel, relativeZoomLevel } = this
     const cardType = card.record ? card.record.internalType : card.cardType
 
-    const position = this.positionForCoordinates(card)
+    const position = uiStore.positionForCoordinates(card)
 
     if (card.id === 'blank' && zoomLevel !== 1) {
       // TODO: on fourWide these numbers are not perfect... figure out better calculation?
@@ -1199,13 +1188,14 @@ class FoamcoreGrid extends React.Component {
   }
 
   positionBlank({ row, col, width, height }, type = 'drag') {
-    const position = this.positionForCoordinates({ col, row, width, height })
     const {
       collection,
       collection: { collection_cards },
+      uiStore,
     } = this.props
     const { isFourWideBoard } = collection
     const { relativeZoomLevel } = this
+    const position = uiStore.positionForCoordinates({ col, row, width, height })
 
     let inner = ''
     const emptyRow =
@@ -1266,23 +1256,6 @@ class FoamcoreGrid extends React.Component {
     return this.renderMovableCard(blankContentTool, `bct-${col}:${row}`)
   }
 
-  cardWithinViewPlusPage = card => {
-    // Select all cards that are within view,
-    // plus half a screen on any side
-    const rows = this.visibleRows
-    const cols = this.visibleCols
-
-    const numRows = Math.ceil(rows.num)
-    const numCols = Math.ceil(cols.num)
-
-    const withinCols =
-      card.col > cols.min - numCols && card.col < cols.max + numCols
-    const withinRows =
-      card.row > rows.min - numRows && card.row < rows.max + numRows
-
-    return withinRows && withinCols
-  }
-
   @action
   setPlaceholderSpot = (placeholderSpot = this.placeholderDefaults) => {
     if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
@@ -1293,32 +1266,6 @@ class FoamcoreGrid extends React.Component {
       this.placeholderSpot.height = height
       this.placeholderSpot.type = type
     }
-  }
-
-  get blankCardsForEmptySpacesWithinVisibleArea() {
-    const { collection } = this.props
-    const { cardMatrix } = collection
-    const blankCards = []
-    // Add blank cards to all empty spaces,
-    // and 2x screen heights at the bottom
-    let extraRows = 0
-    if (collection.isSplitLevel) {
-      extraRows = 1
-    } else {
-      extraRows = this.visibleRows.num * 2
-    }
-    _.each(_.range(0, collection.max_row_index + extraRows), row => {
-      _.each(_.range(0, collection.num_columns), col => {
-        // If there's no row, or nothing in this column, add a blank card for this spot
-        const blankCard = { row, col, width: 1, height: 1 }
-        if (!cardMatrix[row] || !cardMatrix[row][col]) {
-          if (this.cardWithinViewPlusPage(blankCard)) {
-            blankCards.push(this.positionBlank(blankCard, 'hover'))
-          }
-        }
-      })
-    })
-    return blankCards
   }
 
   clearDragTimeout() {
@@ -1333,7 +1280,7 @@ class FoamcoreGrid extends React.Component {
     // the hover spot at all (which gets rendered after this loop)
     if (cardOrBlank.id === 'blank') {
       return this.positionBct(cardOrBlank)
-    } else if (_.includes(['unrendered', 'resize'], cardOrBlank.id)) {
+    } else if (_.includes(['unrendered', 'resize', 'hover'], cardOrBlank.id)) {
       return this.positionBlank(cardOrBlank, cardOrBlank.id)
     } else if (cardOrBlank.id) {
       return this.positionCard(cardOrBlank)
@@ -1427,15 +1374,66 @@ class FoamcoreGrid extends React.Component {
       })
     }
 
-    cards = _.map(cards, this.renderCard)
-
-    if (canEditCollection && !this.dragging) {
-      // Add blank cards for all empty spaces - for hover and click -> BCT actions
-      // NOTE: this may be a factor in more re-renders as it will update as you scroll
-      cards = [...cards, ...this.blankCardsForEmptySpacesWithinVisibleArea]
+    const { row, col } = this.hoveringRowCol
+    if (canEditCollection && !this.dragging && row !== null && col !== null) {
+      cards.push({
+        id: 'hover',
+        row,
+        col,
+        width: 1,
+        height: 1,
+      })
     }
 
+    cards = _.map(cards, this.renderCard)
     return cards
+  }
+
+  onCursorMove = ev => {
+    const { uiStore } = this.props
+
+    let rect = { left: 0, top: 0 }
+    const container = document.querySelector(`.${FOAMCORE_GRID_BOUNDARY}`)
+    if (container) {
+      // just a guard for jest shallow render
+      rect = container.getBoundingClientRect()
+    }
+
+    let { clientX, clientY, target } = ev
+    if (uiStore.isTouchDevice) {
+      const touch = _.first(ev.touches)
+      clientX = touch.clientX
+      clientY = touch.clientY
+      target = touch.target
+    }
+    const { classList } = target
+    if (!classList || !_.includes(classList, FOAMCORE_GRID_BOUNDARY)) {
+      // only perform calculation if target is the grid itself
+      return true
+    }
+    const coords = this.coordinatesForPosition({
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    })
+
+    const { cardMatrix } = this.props.collection
+    let { row, col } = coords
+    if (cardMatrix[row] && cardMatrix[row][col]) {
+      row = null
+      col = null
+    }
+    this.throttledSetHoveringRowCol({ row, col })
+    return { row, col }
+  }
+
+  @action
+  setHoveringRowCol = ({ row, col }) => {
+    const prevRow = this.hoveringRowCol.row
+    const prevCol = this.hoveringRowCol.col
+    if (row === prevRow && col === prevCol) {
+      return
+    }
+    this.hoveringRowCol = { row, col }
   }
 
   renderAddSubmission() {
@@ -1475,7 +1473,7 @@ class FoamcoreGrid extends React.Component {
       record: movingCard.record,
       width: movingCard.width,
       height: movingCard.height,
-      position: this.positionForCoordinates(movingCard),
+      position: uiStore.positionForCoordinates(movingCard),
     }
     const placeholder = new CollectionCard(data, apiStore)
     apiStore.updateModelId(placeholder, `${movingCard.id}-mdlPlaceholder`)
@@ -1539,13 +1537,18 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { collection } = this.props
+    const { collection, uiStore } = this.props
     const { isSplitLevelBottom } = collection
 
     const gridSize = this.totalGridSize
+
     return (
       <Grid
-        className={`foamcoreGridBoundary${isSplitLevelBottom ? '-bottom' : ''}`}
+        onMouseMove={!uiStore.isTouchDevice ? this.onCursorMove : null}
+        onTouchStart={uiStore.isTouchDevice ? this.onCursorMove : null}
+        className={`${FOAMCORE_GRID_BOUNDARY}${
+          isSplitLevelBottom ? '-bottom' : ''
+        }`}
         data-empty-space-click
         ref={ref => {
           this.gridRef = ref
