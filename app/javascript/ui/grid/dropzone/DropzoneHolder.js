@@ -1,11 +1,10 @@
 import v from '~/utils/variables'
 import styled from 'styled-components'
 import { observable } from 'mobx'
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import FilestackUpload from '~/utils/FilestackUpload'
 
+import FilestackUpload from '~/utils/FilestackUpload'
 import { DisplayText } from '~/ui/global/styled/typography'
 import CloudIcon from '~/ui/icons/CloudIcon'
 import IconHolder from '~/ui/icons/IconHolder'
@@ -55,54 +54,21 @@ class DropzoneHolder extends React.Component {
   handleDragOver = e => {}
 
   handleDragLeave = e => {
-    this.props.handleResetUpload({ success: false })
+    this.props.handleDragLeave()
   }
 
   handleDrop = e => {
-    // if (this.state.loading) return
-    // const { files } = ev.dataTransfer
-    // const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
-    // if (filesThatFit.length) {
-    //   this.setState({ loading: true, droppingFile: false })
-    // } else {
-    //   this.setState({ loading: false, droppingFile: false })
-    // }
-    // if (filesThatFit.length < files.length) {
-    //   uiStore.popupAlert({
-    //     prompt: `
-    //       ${filesThatFit.length} file(s) were successfully added.
-    //       ${files.length -
-    //         filesThatFit.length} file(s) were over 25MB and could not
-    //       be added.
-    //     `,
-    //     fadeOutTime: 6000,
-    //   })
-    // }
+    this.props.handleDrop(e)
   }
 
   handleProgress = e => {
-    // if (this.state.loading) return
-    // this.setState({ loading: true })
+    this.props.handleProgress()
   }
 
   handleSuccess = async res => {
     if (res.length > 0) {
       const files = await FilestackUpload.processFiles(res)
-      const fileAttrs = []
-      _.each(files, (file, idx) => {
-        const filestack_file_attributes = {
-          url: file.url,
-          handle: file.handle,
-          filename: file.filename,
-          size: file.size,
-          mimetype: file.mimetype,
-          docinfo: file.docinfo,
-        }
-        fileAttrs.push(filestack_file_attributes)
-      })
-
-      // create placeholder cards then rerender files
-      this.props.handleResetUpload({ success: true })
+      this.props.handleAfterSuccess(files)
     }
   }
 
@@ -144,7 +110,10 @@ DropzoneHolder.wrappedComponent.propTypes = {
 }
 
 DropzoneHolder.propTypes = {
-  handleResetUpload: PropTypes.func.isRequired,
+  handleDragLeave: PropTypes.func.isRequired,
+  handleDrop: PropTypes.func.isRequired,
+  handleProgress: PropTypes.func.isRequired,
+  handleAfterSuccess: PropTypes.func.isRequired,
   willUpload: PropTypes.bool.isRequired,
   didUpload: PropTypes.bool.isRequired,
 }

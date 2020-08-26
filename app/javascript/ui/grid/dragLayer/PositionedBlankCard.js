@@ -151,7 +151,7 @@ class PositionedBlankCard extends React.Component {
     if (droppingFiles) {
       return (
         <BlankCardContainer {...defaultProps}>
-          <GridCardDropzone />
+          <GridCardDropzone collection={collection} row={row} col={col} />
         </BlankCardContainer>
       )
     } else if (blankContentToolIsOpen) {
@@ -186,7 +186,7 @@ class PositionedBlankCard extends React.Component {
       <BlankCardContainer
         {...defaultProps}
         interactionType={interactionType}
-        onClick={draggingOrResizing ? this.onClickHotspot({ row, col }) : null}
+        onClick={!draggingOrResizing ? this.onClickHotspot({ row, col }) : null}
       >
         <GridCardEmptyHotspot interactionType={interactionType} />
       </BlankCardContainer>

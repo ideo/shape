@@ -265,6 +265,7 @@ class FoamcoreDragLayer extends React.Component {
         }}
         onMouseLeave={e => {
           e.preventDefault()
+          // FIXME: will reset dropzone even while files are being uploaded
           uiStore.setDroppingFiles(false)
         }}
       >

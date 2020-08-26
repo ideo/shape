@@ -2,7 +2,11 @@ import { observable, action } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 
+import googleTagManager from '~/vendor/googleTagManager'
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { ITEM_TYPES } from '~/utils/variables'
 import DropzoneHolder from '~/ui/grid/dropzone/DropzoneHolder'
 
 const StyledGridCardDropzone = styled.div`
@@ -10,7 +14,7 @@ const StyledGridCardDropzone = styled.div`
   height: 100%;
 `
 
-@inject('uiStore')
+@inject('uiStore', 'apiStore')
 @observer
 class GridCardDropzone extends React.Component {
   @observable
@@ -52,14 +56,84 @@ class GridCardDropzone extends React.Component {
     this.didUpload = didUpload
   }
 
-  resetUpload = ({ success = false }) => {
+  resetUpload = (success = false) => {
     const { uiStore } = this.props
     this.updateWillUpload(false)
     this.updateDidUpload(false)
     if (success) {
-      // TODO: should render placeholder cards here?
       uiStore.setDroppingFiles(false)
     }
+  }
+
+  validateFile = e => {
+    // if (this.state.loading) return
+    // const { files } = ev.dataTransfer
+    // const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
+    // if (filesThatFit.length) {
+    //   this.setState({ loading: true, droppingFile: false })
+    // } else {
+    //   this.setState({ loading: false, droppingFile: false })
+    // }
+    // if (filesThatFit.length < files.length) {
+    //   uiStore.popupAlert({
+    //     prompt: `
+    //       ${filesThatFit.length} file(s) were successfully added.
+    //       ${files.length -
+    //         filesThatFit.length} file(s) were over 25MB and could not
+    //       be added.
+    //     `,
+    //     fadeOutTime: 6000,
+    //   })
+    // }
+  }
+
+  showProgress = () => {
+    // if (this.state.loading) return
+    // this.setState({ loading: true })
+  }
+
+  createCardsForFiles = files => {
+    const { collection, height, width, apiStore } = this.props
+    let { col, row } = this.props
+
+    _.each(files, async (file, idx) => {
+      if (row !== null && col !== null) {
+        col += idx % 4
+        row += Math.floor(idx / 4)
+      }
+
+      const attrs = {
+        // FIXME: this assumes that order is the same as index
+        order: idx,
+        col,
+        row,
+        width,
+        height,
+        parent_id: collection.id,
+        item_attributes: {
+          type: ITEM_TYPES.FILE,
+          filestack_file_attributes: {
+            url: file.url,
+            handle: file.handle,
+            filename: file.filename,
+            size: file.size,
+            mimetype: file.mimetype,
+            docinfo: file.docinfo,
+          },
+        },
+      }
+      const card = new CollectionCard(attrs, apiStore)
+      card.parent = parent // Assign parent so store can get access to it
+      await card.API_create()
+
+      googleTagManager.push({
+        event: 'formSubmission',
+        formType: `Create ${ITEM_TYPES.FILE}`,
+        parentType: 'foamcore',
+      })
+    })
+
+    this.resetUpload(true)
   }
 
   render() {
@@ -71,7 +145,10 @@ class GridCardDropzone extends React.Component {
         onDragEnd={this.handleDragEnd}
       >
         <DropzoneHolder
-          handleResetUpload={this.resetUpload}
+          handleDragLeave={this.resetUpload}
+          handleDrop={this.validateFile}
+          handleProgress={this.showProgress}
+          handleAfterSuccess={this.createCardsForFiles}
           willUpload={this.willUpload}
           didUpload={this.didUpload}
         />
@@ -82,6 +159,15 @@ class GridCardDropzone extends React.Component {
 
 GridCardDropzone.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+GridCardDropzone.propTypes = {
+  collection: MobxPropTypes.objectOrObservableObject.isRequired,
+  row: PropTypes.number.isRequired,
+  col: PropTypes.number.isRequired,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
 }
 
 export default GridCardDropzone
