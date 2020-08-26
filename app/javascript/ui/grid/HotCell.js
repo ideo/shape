@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import localStorage from 'mobx-localstorage'
 import { observable } from 'mobx'
 import styled from 'styled-components'
 
@@ -20,6 +21,9 @@ const Container = styled.div`
   }
 `
 
+const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
+const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
+
 @inject('uiStore')
 @observer
 class HotCell extends React.Component {
@@ -30,34 +34,65 @@ class HotCell extends React.Component {
     this.startCreating(type)
   }
 
-  render() {
-    const {
-      parent,
-      uiStore: { blankContentType },
-    } = this.props
-    const itemTypes = [
-      { name: 'file', description: 'Add File' },
-      { name: 'link', description: 'Add Link' },
-      { name: 'video', description: 'Link Video' },
-      { name: 'report', description: 'Create Report' },
-    ]
+  onCreateContent = type => {
+    const collectionType = this.collectionTypes.find(
+      collectionType => collectionType.name === type
+    )
+    const itemType = this.itemTypes.find(itemType => itemType.name === type)
+    if (collectionType) {
+      localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, type)
+    } else if (itemType) {
+      localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, type)
+    }
+  }
 
-    const collectionTypes = [
+  get collectionTypes() {
+    return [
       { name: 'collection', description: 'Create Collection' },
       { name: 'foamcore', description: 'Create Foamcore Board' },
       { name: 'searchCollection', description: 'Create Search Collection' },
       { name: 'submissionBox', description: 'Create Submission Box' },
       { name: 'testCollection', description: 'Get Feedback' },
     ]
+  }
+
+  get itemTypes() {
+    return [
+      { name: 'file', description: 'Add File' },
+      { name: 'link', description: 'Add Link' },
+      { name: 'video', description: 'Link Video' },
+      { name: 'report', description: 'Create Report' },
+    ]
+  }
+
+  get defaultCollectionType() {
+    const collectionType = localStorage.getItem(
+      HOT_CELL_DEFAULT_COLLECTION_TYPE
+    )
+    if (collectionType) {
+      return this.collectionTypes.find(type => type.name === collectionType)
+    }
+    return this.collectionTypes[0]
+  }
+
+  get defaultItemType() {
+    const itemType = localStorage.getItem(HOT_CELL_DEFAULT_ITEM_TYPE)
+    if (itemType) {
+      return this.itemTypes.find(type => type.name === itemType)
+    }
+    return this.itemTypes[0]
+  }
+
+  render() {
+    const {
+      parent,
+      uiStore: { blankContentType },
+    } = this.props
 
     const primaryTypes = [
       { name: 'text', description: 'Add Text' },
-      { name: 'file', description: 'Add File', subTypes: () => itemTypes },
-      {
-        name: 'collection',
-        description: 'Create Collection',
-        subTypes: () => collectionTypes,
-      },
+      { ...this.defaultItemType, subTypes: () => this.itemTypes },
+      { ...this.defaultCollectionType, subTypes: () => this.collectionTypes },
       {
         name: 'template',
         description: 'Create New Template',
@@ -75,6 +110,7 @@ class HotCell extends React.Component {
               name={name}
               description={description}
               subTypes={subTypes}
+              onCreateContent={this.onCreateContent}
             />
           ))
         )}

@@ -64,12 +64,10 @@ class HotCellQuadrant extends React.Component {
 
   handleClick = ev => {
     const { name } = this.props
-    console.log('jand;e c;ocl')
     this.createContent(name)
   }
 
   handleMore = ev => {
-    console.log('handleMore')
     ev.preventDefault()
     ev.stopPropagation()
     runInAction(() => {
@@ -84,9 +82,10 @@ class HotCellQuadrant extends React.Component {
   }
 
   createContent = type => {
-    const { uiStore } = this.props
+    const { onCreateContent, uiStore } = this.props
     console.log('create content')
     uiStore.setBlankContentType(type)
+    onCreateContent(type)
   }
 
   get moreMenuItems() {
@@ -135,6 +134,7 @@ class HotCellQuadrant extends React.Component {
 HotCellQuadrant.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
+  onCreateContent: PropTypes.func.isRequired,
   subTypes: PropTypes.func,
 }
 HotCellQuadrant.wrappedComponent.propTypes = {
