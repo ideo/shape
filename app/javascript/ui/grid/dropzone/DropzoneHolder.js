@@ -61,10 +61,6 @@ class DropzoneHolder extends React.Component {
     this.props.handleDrop(e)
   }
 
-  handleProgress = e => {
-    this.props.handleProgress()
-  }
-
   handleSuccess = async res => {
     if (res.length > 0) {
       const files = await FilestackUpload.processFiles(res)
@@ -112,7 +108,6 @@ DropzoneHolder.wrappedComponent.propTypes = {
 DropzoneHolder.propTypes = {
   handleDragLeave: PropTypes.func.isRequired,
   handleDrop: PropTypes.func.isRequired,
-  handleProgress: PropTypes.func.isRequired,
   handleAfterSuccess: PropTypes.func.isRequired,
   willUpload: PropTypes.bool.isRequired,
   didUpload: PropTypes.bool.isRequired,

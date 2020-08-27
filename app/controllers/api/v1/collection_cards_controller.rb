@@ -1,7 +1,7 @@
 class Api::V1::CollectionCardsController < Api::V1::BaseController
   deserializable_resource :collection_card, class: DeserializableCollectionCard, only: %i[
     create
-    create_bct
+    create_placeholder
     update
     replace
     update_card_filter
@@ -18,7 +18,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   ]
   before_action :load_and_authorize_parent_collection, only: %i[
     create
-    create_bct
+    create_placeholder
     replace
     update_card_filter
   ]
@@ -127,7 +127,27 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  def create_bct
+  # FIXME: may be deprecated in a later story
+  # def create_bct
+  #   row = collection_card_params[:row]
+  #   col = collection_card_params[:col]
+  #   if row.nil? || col.nil?
+  #     head :unprocessable_entity
+  #     return
+  #   end
+  #
+  #   service = CollectionGrid::BctInserter.new(
+  #     row: row,
+  #     col: col,
+  #     collection: @collection,
+  #   )
+  #   service.call
+  #   # render the placeholder card
+  #   @collection_card = service.placeholder
+  #   render_collection_card
+  # end
+
+  def create_placeholder
     row = collection_card_params[:row]
     col = collection_card_params[:col]
     if row.nil? || col.nil?
@@ -135,7 +155,7 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
       return
     end
 
-    service = CollectionGrid::BctInserter.new(
+    service = CollectionGrid::PlaceholderInserter.new(
       row: row,
       col: col,
       collection: @collection,

@@ -127,7 +127,7 @@ Rails.application.routes.draw do
           get 'unarchive_from_email'
           post 'link'
           post 'duplicate'
-          post 'create_bct'
+          post 'create_placeholder'
         end
       end
       resources :groups, except: :delete do

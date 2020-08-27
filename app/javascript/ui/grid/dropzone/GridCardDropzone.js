@@ -23,6 +23,9 @@ class GridCardDropzone extends React.Component {
   @observable
   didUpload = false
 
+  @observable
+  placeholderCardIds = []
+
   constructor(props) {
     super(props)
     this.debouncedWillResetUpload = _.debounce(() => {
@@ -39,13 +42,6 @@ class GridCardDropzone extends React.Component {
     }
   }
 
-  handleDrop = e => {
-    e.preventDefault()
-    if (!this.willUpload) {
-      this.updateDidUpload(true)
-    }
-  }
-
   @action
   updateWillUpload = willUpload => {
     this.willUpload = willUpload
@@ -56,40 +52,58 @@ class GridCardDropzone extends React.Component {
     this.didUpload = didUpload
   }
 
+  @action
+  setPlaceholderCardIds = ids => {
+    this.placeholderCardIds = ids
+  }
+
   resetUpload = (success = false) => {
     const { uiStore } = this.props
     this.updateWillUpload(false)
     this.updateDidUpload(false)
+    this.setPlaceholderCardIds([])
     if (success) {
       uiStore.setDroppingFiles(false)
     }
   }
 
-  validateFile = e => {
-    // if (this.state.loading) return
-    // const { files } = ev.dataTransfer
+  handleDrop = async e => {
+    e.preventDefault()
+    const { dataTransfer } = e
+    const { files } = dataTransfer
+    const { row, col, collection, apiStore } = this.props
+
+    // FIXME: does not work with uploading multiple files
     // const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
-    // if (filesThatFit.length) {
-    //   this.setState({ loading: true, droppingFile: false })
-    // } else {
-    //   this.setState({ loading: false, droppingFile: false })
-    // }
     // if (filesThatFit.length < files.length) {
     //   uiStore.popupAlert({
     //     prompt: `
-    //       ${filesThatFit.length} file(s) were successfully added.
-    //       ${files.length -
-    //         filesThatFit.length} file(s) were over 25MB and could not
-    //       be added.
-    //     `,
+    //     ${filesThatFit.length} file(s) were successfully added.
+    //     ${files.length -
+    //       filesThatFit.length} file(s) were over 25MB and could not
+    //     be added.
+    //   `,
     //     fadeOutTime: 6000,
     //   })
     // }
-  }
 
-  showProgress = () => {
-    // if (this.state.loading) return
-    // this.setState({ loading: true })
+    const ids = []
+    for (let i = 0; i < files.length; i++) {
+      const placeholder = new CollectionCard(
+        {
+          row,
+          col,
+          parent_id: collection.id,
+        },
+        apiStore
+      )
+      const placeholderCard = await placeholder.API_createPlaceholderCard()
+      const { data } = placeholderCard
+      const { id } = data
+
+      ids.push(id)
+    }
+    this.setPlaceholderCardIds(ids)
   }
 
   createCardsForFiles = files => {
@@ -103,13 +117,13 @@ class GridCardDropzone extends React.Component {
       }
 
       const attrs = {
-        // FIXME: this assumes that order is the same as index
         order: idx,
         col,
         row,
         width,
         height,
         parent_id: collection.id,
+        placeholder_card_id: this.placeholderCardIds[idx],
         item_attributes: {
           type: ITEM_TYPES.FILE,
           filestack_file_attributes: {
@@ -146,8 +160,7 @@ class GridCardDropzone extends React.Component {
       >
         <DropzoneHolder
           handleDragLeave={this.resetUpload}
-          handleDrop={this.validateFile}
-          handleProgress={this.showProgress}
+          handleDrop={this.handleDrop}
           handleAfterSuccess={this.createCardsForFiles}
           willUpload={this.willUpload}
           didUpload={this.didUpload}

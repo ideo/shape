@@ -207,16 +207,25 @@ class CollectionCard extends BaseRecord {
     }
   }
 
-  async API_createBct() {
-    const { uiStore } = this
+  // FIXME: may be deprecated in a later story
+  // async API_createBct() {
+  //   const { uiStore } = this
+  //   try {
+  //     await this.create('/create_bct')
+  //     // `this` is now set to the newly created placeholder card
+  //     uiStore.setBctPlaceholderCard(this)
+  //   } catch (e) {
+  //     uiStore.closeBlankContentTool({ force: true })
+  //     uiStore.defaultAlertError()
+  //     return false
+  //   }
+  // }
+
+  API_createPlaceholderCard() {
     try {
-      await this.create('/create_bct')
-      // `this` is now set to the newly created placeholder card
-      uiStore.setBctPlaceholderCard(this)
+      return this.create('/create_placeholder')
     } catch (e) {
-      uiStore.closeBlankContentTool({ force: true })
-      uiStore.defaultAlertError()
-      return false
+      return null
     }
   }
 

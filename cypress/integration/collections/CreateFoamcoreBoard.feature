@@ -14,7 +14,7 @@ Feature: Creating a FoamcoreBoard Collection
     And I create a textItem card at 1,1 on the board with "Hello."
     # hotspot in between two cards
     When I click the "FoamcoreHotspot-0:1"
-    And I wait for "@apiCreateCollectionCardBct" to finish
+    # And I wait for "@apiCreateCollectionCardBct" to finish
 
     # should move the card out of the way
     Then I should see the text "To my board." in the card at 0,2
@@ -26,7 +26,7 @@ Feature: Creating a FoamcoreBoard Collection
 
     # There should be a hotspot to the left of the 0,0 card
     When I click the "FoamcoreHotspot-0:0"
-    And I wait for "@apiCreateCollectionCardBct" to finish
+    # And I wait for "@apiCreateCollectionCardBct" to finish
     And I create a textItem card using the open BCT with "Inserted!"
     # should move both row 0 cards out of the way
     Then I should see the text "Inserted!" in the card at 0,0
