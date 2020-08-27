@@ -234,14 +234,6 @@ class CollectionCard extends BaseRecord {
   //   }
   // }
 
-  API_createPlaceholderCard() {
-    try {
-      return this.create('/create_placeholder')
-    } catch (e) {
-      return null
-    }
-  }
-
   async API_replace({ replacingId = null, replacingCard = null }) {
     const { uiStore } = this
     try {

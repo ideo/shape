@@ -87,23 +87,29 @@ class GridCardDropzone extends React.Component {
     //   })
     // }
 
-    const ids = []
-    for (let idx = 0; idx < files.length; idx++) {
-      const placeholder = new CollectionCard(
-        {
-          row: row + idx, // increment rows to trigger board placement
-          col,
-          parent_id: collection.id,
-        },
-        apiStore
-      )
-      const placeholderCard = await placeholder.API_createPlaceholderCard()
-      const { data } = placeholderCard
-      const { id } = data
+    if (_.isEmpty(files)) return
 
-      ids.push(id)
+    const data = {
+      row,
+      col,
+      count: files.length,
+      parent_id: collection.id,
     }
-    this.setPlaceholderCardIds(ids)
+
+    const response = await apiStore.createPlaceholderCards({
+      data,
+    })
+
+    const { data: placeholderCards } = response
+
+    // store placeholder cards to replace with actual file cards
+    this.setPlaceholderCardIds(
+      placeholderCards.map(placeholderCard => placeholderCard.id)
+    )
+
+    for (const placeholderCard of placeholderCards) {
+      collection.addCard(placeholderCard)
+    }
   }
 
   createCardsForFiles = files => {
@@ -138,6 +144,7 @@ class GridCardDropzone extends React.Component {
       const card = new CollectionCard(attrs, apiStore)
       card.parent = parent // Assign parent so store can get access to it
       // NOTE: use this method instead of API_create since placeholder_id isn't an attribute on collection_card
+      console.log({ placeholderCardIds: this.placeholderCardIds })
       await card.API_createFromPlaceholderId(this.placeholderCardIds[idx])
 
       googleTagManager.push({

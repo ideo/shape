@@ -1,14 +1,18 @@
 module CollectionGrid
   class PlaceholderInserter < SimpleService
-    attr_reader :placeholder, :card_attributes, :card_attributes_was
+    # attr_reader :placeholders, :card_attributes, :card_attributes_was
+    attr_reader :placeholders
 
     def initialize(
       row: 0,
       col: 0,
+      count: 0,
       collection:
     )
+      @placeholders = []
       @row = row
       @col = col
+      @count = count
       @collection = collection
 
       @card_attributes_was = []
@@ -16,24 +20,28 @@ module CollectionGrid
     end
 
     def call
-      insert_bct_square
+      insert_placeholder_cards
       move_placeholder_cards
-      @placeholder
+      @placeholders
     end
 
     private
 
-    def insert_bct_square
+    def insert_placeholder_cards
       # first create the placeholder in the spot that it should take
-      @placeholder = CollectionCard::Placeholder.create(
-        row: @row,
-        col: @col,
-        width: 1,
-        height: 1,
-        parent: @collection,
-      )
+      next_row = @row
+      @count.times do
+        placeholder = CollectionCard::Placeholder.create(
+          row: next_row,
+          col: @col,
+          width: 1,
+          height: 1,
+          parent: @collection,
+        )
+        @placeholders << placeholder
+      end
       # broadcast updates
-      broadcaster.card_updated(@placeholder)
+      # broadcaster.card_updated(@placeholder)
     end
 
     def move_placeholder_cards
@@ -42,7 +50,7 @@ module CollectionGrid
         row: @row,
         col: @col,
         to_collection: @collection,
-        moving_cards: [@placeholder],
+        moving_cards: @placeholders,
       )
 
       # parent_snapshot = { collection_cards_attributes: [] }
