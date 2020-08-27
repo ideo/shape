@@ -107,7 +107,7 @@ BlankCard.displayName = 'BlankCard'
 const Grid = styled.div`
   position: relative;
   width: ${props => `${props.width}px`};
-  min-height: ${props => `${props.height}px`};
+  height: ${props => `${props.height}px`};
 `
 
 export const StyledPlusIcon = styled.div`
@@ -344,8 +344,9 @@ class FoamcoreGrid extends React.Component {
   // one reason for this, is split level collections need to allocate height for the top half
   get totalGridSize() {
     const { gridW, gridH, gutter } = this.gridSettings
-    const { relativeZoomLevel } = this
     const { collection, uiStore } = this.props
+    // this is where we use the zoom level that is "about" to be set
+    const relativeZoomLevel = uiStore.relativeTempZoomLevel
     const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
