@@ -88,10 +88,10 @@ class GridCardDropzone extends React.Component {
     // }
 
     const ids = []
-    for (let i = 0; i < files.length; i++) {
+    for (let idx = 0; idx < files.length; idx++) {
       const placeholder = new CollectionCard(
         {
-          row,
+          row: row + idx, // increment rows to trigger board placement
           col,
           parent_id: collection.id,
         },
@@ -123,7 +123,6 @@ class GridCardDropzone extends React.Component {
         width,
         height,
         parent_id: collection.id,
-        placeholder_card_id: this.placeholderCardIds[idx],
         item_attributes: {
           type: ITEM_TYPES.FILE,
           filestack_file_attributes: {
@@ -138,7 +137,8 @@ class GridCardDropzone extends React.Component {
       }
       const card = new CollectionCard(attrs, apiStore)
       card.parent = parent // Assign parent so store can get access to it
-      await card.API_create()
+      // NOTE: use this method instead of API_create since placeholder_id isn't an attribute on collection_card
+      await card.API_createFromPlaceholderId(this.placeholderCardIds[idx])
 
       googleTagManager.push({
         event: 'formSubmission',

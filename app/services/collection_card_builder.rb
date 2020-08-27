@@ -104,14 +104,16 @@ class CollectionCardBuilder
   end
 
   def adjust_card_properties_for_board
-    @placeholder ||= @parent_collection.bct_placeholder_at(
-      row: @collection_card.row,
-      col: @collection_card.col,
-    )
+    # @placeholder ||= @parent_collection.bct_placeholder_at(
+    # row: @collection_card.row,
+    # col: @collection_card.col,
+    # )
     if @placeholder.present?
       # take over its identity
-      @placeholder.destroy
       @collection_card.id = @placeholder.id
+      @collection_card.row = @placeholder.row
+      @collection_card.col = @placeholder.col
+      @placeholder.delete
     end
 
     # Don't place hidden cards on board => setting row/col for them messes up other card positions
@@ -128,7 +130,6 @@ class CollectionCardBuilder
     @collection_card.height ||= 1
     @collection_card.width ||= 1
     # valid row/col will get applied to the card here for later saving
-
     CollectionGrid::BoardPlacement.call(
       row: row,
       col: col,
