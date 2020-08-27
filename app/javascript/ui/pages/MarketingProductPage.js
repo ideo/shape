@@ -21,13 +21,14 @@ import { Pricing } from '~/ui/marketing/Pricing'
 import marketingFirebaseClient from '~/vendor/firebase/clients/marketingFirebaseClient'
 import ReactPlayer from 'react-player'
 import PageFooter from '~/ui/marketing/PageFooter.js'
-
+import v from '~/utils/variables'
 import styled from 'styled-components'
 
 const Subtitle = styled(DisplayText)`
   font-size: 18px;
   line-height: 25px;
   text-align: center;
+  color: ${v.colors.black};
 `
 
 class MarketingProductPage extends React.Component {

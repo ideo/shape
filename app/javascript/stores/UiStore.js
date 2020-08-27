@@ -272,6 +272,8 @@ export default class UiStore {
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
+  tempZoomLevel = FOAMCORE_MAX_ZOOM
+  @observable
   collaboratorColors = new Map()
   @observable
   challengeSettingsOpen = false
@@ -1547,13 +1549,6 @@ export default class UiStore {
     )
   }
 
-  get percentScrolledX() {
-    const { scrollMaxX } = this
-    // in the case where you don't have much horizontalScroll, default to midpoint
-    if (scrollMaxX < 20) return 0.5
-    return window.pageXOffset / scrollMaxX
-  }
-
   get scrollMaxY() {
     return (
       window.scrollMaxY ||
@@ -1562,56 +1557,79 @@ export default class UiStore {
     )
   }
 
+  get percentScrolledX() {
+    const { scrollMaxX } = this
+    // in the case where you don't have much horizontalScroll, default to midpoint
+    if (scrollMaxX < 20) return 0.5
+    const percent = window.pageXOffset / scrollMaxX
+    return _.clamp(percent, 0.05, 0.95)
+  }
+
   get percentScrolledY() {
     const { scrollMaxY } = this
-    // in the case where you're at the top, zoom in should take you a little ways down
-    if (window.pageYOffset < 20) return 0.1
     return window.pageYOffset / scrollMaxY
   }
 
   // -----------------------
   // Foamcore zoom functions
-  zoomOut() {
-    this.zoomAndScroll(1)
+  zoomOut(useTimeout = true) {
+    this.zoomAndScroll(1, useTimeout)
   }
 
-  zoomIn() {
-    this.zoomAndScroll(-1)
+  zoomIn(useTimeout = true) {
+    this.zoomAndScroll(-1, useTimeout)
   }
 
   @action
-  zoomAndScroll(zoomChange) {
+  zoomAndScroll(zoomChange, useTimeout = true) {
     this.currentlyZooming = true
-    // capture these first
+    // capture these percentages first
     const { percentScrolledX, percentScrolledY } = this
-    const zoomBefore = this.relativeZoomLevel
-    this.updateZoomLevel(this.zoomLevel + zoomChange)
-    const zoomAfter = this.relativeZoomLevel
-    if (zoomBefore === zoomAfter) {
+    const zoomBefore = this.zoomLevel
+    const newZoomLevel = this.updateZoomLevel(this.zoomLevel + zoomChange)
+    if (zoomBefore === newZoomLevel) {
       return
     }
-
-    setTimeout(() => {
-      // now that things have changed
+    const afterTimeout = () => {
+      runInAction(() => {
+        // now we actually apply the new zoom level (resize the cards)
+        this.zoomLevel = newZoomLevel
+      })
+      // now that the canvas is resized, we can determine how much to scroll
       const { scrollMaxX, scrollMaxY } = this
-      const left = percentScrolledX * scrollMaxX
+      let left = percentScrolledX * scrollMaxX
       const top = percentScrolledY * scrollMaxY
-
+      if (newZoomLevel === this.zoomLevels.length) {
+        // if we're all the way zoomed out, reset any horizontal scroll
+        left = 0
+      }
       window.scrollTo({
         left,
         top,
       })
+
       runInAction(() => {
+        // finally, tell it we're not currently zooming which will re-enable card animation
         this.currentlyZooming = false
       })
-    })
+    }
+    if (useTimeout) {
+      // timeout allows it to render with new tempZoomLevel + gridSize before trying to determine scroll
+      setTimeout(afterTimeout)
+    } else {
+      // mainly just for unit tests
+      afterTimeout()
+    }
   }
 
   @action
   updateZoomLevel(val, collection = this.viewingCollection) {
     if (!collection || !collection.isBoard) return
-    this.zoomLevel = _.clamp(val, 1, this.zoomLevels.length)
-    collection.lastZoom = this.zoomLevel
+    // tempZoomLevel gets set first to resize the board before actually resizing cards;
+    // this is called within zoomAndScroll, which then sets this.zoomLevel
+    this.tempZoomLevel = _.clamp(val, 1, this.zoomLevels.length)
+    collection.lastZoom = this.tempZoomLevel
+    return this.tempZoomLevel
   }
 
   @action
@@ -1665,15 +1683,26 @@ export default class UiStore {
       // and only store uiStore.zoomLevel, not the collection.lastZoom
       this.zoomLevel = this.zoomLevels.length
     }
+    this.tempZoomLevel = this.zoomLevel
   }
 
   get relativeZoomLevel() {
-    if (this.zoomLevels.length < this.zoomLevel) {
+    return this.calculatedZoomLevel()
+  }
+
+  // this helps us calculate the grid size we are about to enter, so that scrolling can happen before zoom render
+  get relativeTempZoomLevel() {
+    return this.calculatedZoomLevel('temp')
+  }
+
+  calculatedZoomLevel(type = 'current') {
+    const zoomLevel = type === 'current' ? this.zoomLevel : this.tempZoomLevel
+    if (this.zoomLevels.length < zoomLevel) {
       // e.g. when first initializing the page, before determineZoomLevels
       return 1
     }
     // zoomLevels start at 1, so we subtract to get the array idx
-    const zoom = this.zoomLevels[this.zoomLevel - 1]
+    const zoom = this.zoomLevels[zoomLevel - 1]
     return zoom ? zoom.relativeZoomLevel : 1
   }
 

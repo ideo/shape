@@ -2,7 +2,7 @@ Feature: Creating an "in-collection" Test Collection
 
   Scenario: Creating an in-collection test
     Given I login and visit the Test Area
-    When I create a test collection named "Cypress Test"
+    When I create a test collection named "Cypress Test" using the first hot edge
     Then I should see a collection card named "Cypress Test"
     When I navigate to the collection named "Cypress Test" via the "CollectionCover"
     # the extra cards load for ideas collection

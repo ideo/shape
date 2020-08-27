@@ -270,6 +270,7 @@ describe('UiStore', () => {
     beforeEach(() => {
       collection.isBoard = true
       collection.maxZoom = 3
+      window.scrollTo = jest.fn()
       // this is used by zoomIn/Out
       uiStore.setViewingRecord(collection)
       uiStore.determineZoomLevels(
@@ -297,9 +298,12 @@ describe('UiStore', () => {
     describe('#zoomIn', () => {
       it('reduces zoom number until it reaches 1', () => {
         expect(uiStore.zoomLevel).toEqual(2)
-        uiStore.zoomIn()
+        uiStore.zoomIn(false)
+        expect(window.scrollTo).toHaveBeenCalled()
         expect(uiStore.zoomLevel).toEqual(1)
-        uiStore.zoomIn()
+        window.scrollTo.mockClear()
+        uiStore.zoomIn(false)
+        expect(window.scrollTo).not.toHaveBeenCalled()
         expect(uiStore.zoomLevel).toEqual(1)
       })
     })
@@ -308,18 +312,18 @@ describe('UiStore', () => {
       it('increase zoom number until it reaches maxZoom', () => {
         uiStore.adjustZoomLevel({ ...collection, lastZoom: 2 })
         expect(uiStore.zoomLevel).toEqual(2)
-        uiStore.zoomOut()
+        uiStore.zoomOut(false)
         expect(uiStore.zoomLevel).toEqual(3)
-        uiStore.zoomOut()
+        uiStore.zoomOut(false)
         expect(uiStore.zoomLevel).toEqual(4)
       })
     })
 
     describe('#updateZoomLevel', () => {
-      it('sets UiStore#zoomLevel and collection#lastZoom to given value', () => {
+      it('sets UiStore#tempZoomLevel and collection#lastZoom to given value', () => {
         uiStore.updateZoomLevel(3, collection)
         expect(collection.lastZoom).toEqual(3)
-        expect(uiStore.zoomLevel).toEqual(3)
+        expect(uiStore.tempZoomLevel).toEqual(3)
       })
     })
 
