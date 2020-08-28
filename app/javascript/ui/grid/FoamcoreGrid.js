@@ -1504,10 +1504,6 @@ class FoamcoreGrid extends React.Component {
       }
     ).row
 
-    if (pinnedCardMaxRow > -1) {
-      console.log({ pinnedCardMaxRow })
-    }
-
     const hotEdges = []
     _.each(_.range(0, maxRow), row => {
       _.each(_.range(0, num_columns), col => {

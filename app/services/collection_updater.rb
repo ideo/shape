@@ -1,8 +1,9 @@
 class CollectionUpdater < SimpleService
-  def initialize(collection, attributes, unarchiving: false)
+  def initialize(collection, attributes, unarchiving: false, super_admin: false)
     @collection = collection
     @attributes = attributes
     @unarchiving = unarchiving
+    @super_admin = super_admin
     @card_ids = []
   end
 
@@ -94,7 +95,7 @@ class CollectionUpdater < SimpleService
     found_cards = @collection.collection_cards.where(id: @card_ids).select(:id, :pinned, :parent_id)
     found_ids = found_cards.map do |cc|
       # don't allow changing attributes of pinned/locked cards in template instance
-      cc.id unless cc.pinned_and_locked?
+      cc.id unless cc.pinned_and_locked? && !@super_admin
     end.compact
     @attributes[:collection_cards_attributes].select! do |card_attr|
       found_ids.include?(card_attr[:id].to_i)
