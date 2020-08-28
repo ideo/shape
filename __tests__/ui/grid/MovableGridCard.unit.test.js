@@ -27,23 +27,31 @@ const props = {
 }
 
 let wrapper, component
+uiStore.apiStore = {
+  currentUser: {},
+}
+
+const rerender = () => {
+  wrapper = shallow(<MovableGridCard {...props} />)
+}
+
 describe('MovableGridCard', () => {
   it('renders a placeholder card if cardType is "placeholder"', () => {
     props.cardType = 'placeholder'
-    wrapper = shallow(<MovableGridCard {...props} />)
+    rerender()
     expect(wrapper.find('GridCardPlaceholder').exists()).toBeTruthy()
   })
 
   it('renders a blank card creation tool if cardType is "blank"', () => {
     props.cardType = 'blank'
-    wrapper = shallow(<MovableGridCard {...props} />)
+    rerender()
     expect(wrapper.find('GridCardBlank').exists()).toBeTruthy()
   })
 
   it('renders an empty card if cardType is "empty"', () => {
     props.cardType = 'empty'
     props.card.position = { x: 0 }
-    wrapper = shallow(<MovableGridCard {...props} />)
+    rerender()
     expect(wrapper.find('PositionedGridCard').exists()).toBeTruthy()
     expect(wrapper.find('GridCardEmptyHotspot').exists()).toBeTruthy()
   })
@@ -51,7 +59,7 @@ describe('MovableGridCard', () => {
   describe('as viewer, with grid cards for items and collections', () => {
     beforeEach(() => {
       props.cardType = 'items'
-      wrapper = shallow(<MovableGridCard {...props} />)
+      rerender()
     })
 
     it('renders a "Rnd" Resize-n-Draggable component', () => {
@@ -81,7 +89,7 @@ describe('MovableGridCard', () => {
     describe('with a collection thats a carousel', () => {
       beforeEach(() => {
         props.card.record.isCarousel = true
-        wrapper = shallow(<MovableGridCard {...props} />)
+        rerender()
       })
 
       afterEach(() => {
@@ -100,7 +108,7 @@ describe('MovableGridCard', () => {
     beforeEach(() => {
       props.cardType = 'items'
       props.canEditCollection = true
-      wrapper = shallow(<MovableGridCard {...props} />)
+      rerender()
     })
 
     it('passes position props to Rnd component', () => {
@@ -113,11 +121,34 @@ describe('MovableGridCard', () => {
       expect(wrapper.find('Rnd').props().disableDragging).toBeFalsy()
     })
 
+    describe('with card.isPinnedAndLocked', () => {
+      beforeEach(() => {
+        props.card.isPinnedAndLocked = true
+        rerender()
+      })
+
+      it('disables dragging', () => {
+        expect(wrapper.find('Rnd').props().disableDragging).toBeTruthy()
+      })
+
+      describe('when isSuperAdmin', () => {
+        beforeEach(() => {
+          uiStore.apiStore.currentUser.is_super_admin = true
+          rerender()
+        })
+
+        it('enables dragging', () => {
+          expect(wrapper.find('Rnd').props().disableDragging).toBeFalsy()
+        })
+      })
+    })
+
     describe('when editing the card cover', () => {
       beforeEach(() => {
         uiStore.editingCardCover = props.card.id
-        wrapper = shallow(<MovableGridCard {...props} />)
+        rerender()
       })
+
       it('disables dragging', () => {
         expect(wrapper.find('Rnd').props().disableDragging).toBeTruthy()
       })
@@ -130,7 +161,7 @@ describe('MovableGridCard', () => {
         card: { id: props.card.id },
         direction: 'right',
       }
-      wrapper = shallow(<MovableGridCard {...props} />)
+      rerender()
     })
 
     it('passes hoveringOver to GridCard', () => {
@@ -140,7 +171,7 @@ describe('MovableGridCard', () => {
 
   describe('handleDrag', () => {
     beforeEach(() => {
-      wrapper = shallow(<MovableGridCard {...props} />)
+      rerender()
       component = wrapper.instance()
     })
 
