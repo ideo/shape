@@ -107,8 +107,6 @@ class FoamcoreDragLayer extends React.Component {
         // this is to make it work the same as CollectionGrid BCT for cypress
         className={`StyledHotspot-${row}:${col}-BCT`}
         data-empty-space-click
-        // FIXME: what is this used for?
-        // draggedOn
       />
     )
   }

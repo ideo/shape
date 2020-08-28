@@ -125,26 +125,6 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     end
   end
 
-  # FIXME: may be deprecated in a later story
-  # def create_bct
-  #   row = collection_card_params[:row]
-  #   col = collection_card_params[:col]
-  #   if row.nil? || col.nil?
-  #     head :unprocessable_entity
-  #     return
-  #   end
-  #
-  #   service = CollectionGrid::BctInserter.new(
-  #     row: row,
-  #     col: col,
-  #     collection: @collection,
-  #   )
-  #   service.call
-  #   # render the placeholder card
-  #   @collection_card = service.placeholder
-  #   render_collection_card
-  # end
-
   before_action :load_and_authorize_parent_collection_for_create_placeholders, only: %i[create_placeholders]
   def create_placeholders
     row = json_api_params[:data][:row]

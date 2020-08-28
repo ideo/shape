@@ -208,8 +208,8 @@ PositionedBlankCard.propTypes = {
   interactionType: PropTypes.oneOf(['hover', 'drag', 'unrendered', 'resize'])
     .isRequired,
   blocked: PropTypes.bool.isRequired,
-  // FIXME: clarify what this prop was supposed to do
-  // draggedOn: PropTypes.bool.isRequired,
 }
+
+PositionedBlankCard.displayName = 'PositionedBlankCard'
 
 export default PositionedBlankCard

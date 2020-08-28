@@ -220,20 +220,6 @@ class CollectionCard extends BaseRecord {
     return res.data
   }
 
-  // FIXME: may be deprecated in a later story
-  // async API_createBct() {
-  //   const { uiStore } = this
-  //   try {
-  //     await this.create('/create_bct')
-  //     // `this` is now set to the newly created placeholder card
-  //     uiStore.setBctPlaceholderCard(this)
-  //   } catch (e) {
-  //     uiStore.closeBlankContentTool({ force: true })
-  //     uiStore.defaultAlertError()
-  //     return false
-  //   }
-  // }
-
   async API_replace({ replacingId = null, replacingCard = null }) {
     const { uiStore } = this
     try {
