@@ -65,7 +65,10 @@ class CollectionCardBuilder
     return card unless type == 'link' && card.record&.parent_collection_card.present?
 
     # Copy style attributes from existing card
-    card.attributes = card.record.parent_collection_card.link_card_copy_attributes
+    card.attributes = card.record.parent_collection_card.link_card_copy_attributes.merge(
+      # override with size params if passed in
+      @params.slice(:height, :width)
+    )
     card
   end
 
