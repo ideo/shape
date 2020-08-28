@@ -87,7 +87,7 @@ class FoamcoreDragLayer extends React.Component {
   }
 
   renderBlankCard = ({ row, col, width, height }, interactionType) => {
-    const { uiStore, collection } = this.props
+    const { uiStore, collection, hasDragCollision } = this.props
     const position = uiStore.positionForCoordinates({ col, row, width, height })
 
     // could be drag or drag-overflow
@@ -102,7 +102,7 @@ class FoamcoreDragLayer extends React.Component {
         row={row}
         col={col}
         /* Why is this rendering on top of a collection? */
-        blocked={this.hasDragCollision && isDrag}
+        blocked={hasDragCollision && isDrag}
         data-blank-type={interactionType}
         // this is to make it work the same as CollectionGrid BCT for cypress
         className={`StyledHotspot-${row}:${col}-BCT`}
@@ -280,6 +280,7 @@ FoamcoreDragLayer.propTypes = {
   hoveringOverCollection: PropTypes.bool.isRequired,
   dragging: PropTypes.bool.isRequired,
   resizing: PropTypes.bool.isRequired,
+  hasDragCollision: PropTypes.bool.isRequired,
 }
 
 FoamcoreDragLayer.wrappedComponent.propTypes = {

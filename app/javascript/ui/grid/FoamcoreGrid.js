@@ -57,6 +57,7 @@ class FoamcoreGrid extends React.Component {
   draggingCardMasterPosition = {}
   draggingMap = []
   // track whether drag movement is blocked because of overlapping cards
+  @observable
   hasDragCollision = false
   hoveringOver = false
   dragTimeoutId = null
@@ -1276,6 +1277,7 @@ class FoamcoreGrid extends React.Component {
             coordinatesForPosition={this.coordinatesForPosition}
             dragging={this.dragging}
             resizing={this.resizing}
+            hasDragCollision={this.hasDragCollision}
           />
         )}
       </Grid>

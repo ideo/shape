@@ -133,7 +133,7 @@ class PositionedBlankCard extends React.Component {
   }
 
   render() {
-    const { collection, row, col, position, uiStore } = this.props
+    const { collection, row, col, position, uiStore, blocked } = this.props
     const { blankContentToolIsOpen, droppingFiles } = uiStore
 
     const { xPos, yPos, height, width } = position
@@ -185,6 +185,7 @@ class PositionedBlankCard extends React.Component {
     return (
       <BlankCardContainer
         {...defaultProps}
+        blocked={blocked}
         interactionType={interactionType}
         onClick={!draggingOrResizing ? this.onClickHotspot({ row, col }) : null}
       >
