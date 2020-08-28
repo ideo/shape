@@ -80,7 +80,12 @@ class LinkToSharedCollectionsWorker
 
   def ensure_two_open_rows(collection)
     cards = collection.collection_cards.visible
-    return unless cards.where(row: 0).or(cards.where(row: 1)).any?
+    non_dashboard_cards_taking_up_first_two_rows = false
+    cards.where(row: 0).or(cards.where(row: 1)).find_each do |card|
+      non_dashboard_cards_taking_up_first_two_rows = !within_creative_difference_application?(card.record)
+    end
+
+    return unless non_dashboard_cards_taking_up_first_two_rows
 
     # insert two rows at the top (push down everything below row: -1)
     CollectionGrid::RowInserter.call(

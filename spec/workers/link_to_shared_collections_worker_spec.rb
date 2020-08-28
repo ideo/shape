@@ -99,6 +99,8 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
             name: '{{CD.DASHBOARD.METHOD_LIBRARY}}',
             parent_collection: application_collection,
             organization: organization,
+            num_cards: 1,
+            record_type: :collection,
           )
         end
         let!(:preexisting_links) do
@@ -140,6 +142,28 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
           perform
 
           expect(visible_cards.pluck(:collection_id, :item_id, :row, :col)).to eq([
+            [dashboard_collection.id, nil, 0, 0],
+            [method_library_collection.id, nil, 0, 3],
+            [nil, preexisting_links.first.item_id, 2, 0],
+            [nil, preexisting_links.second.item_id, 2, 1],
+            [other_collection.id, nil, 2, 2],
+          ])
+        end
+
+        it 'does not continue inserting rows when called multiple times' do
+          perform
+          LinkToSharedCollectionsWorker.new.perform(
+            users_to_add.map(&:id),
+            groups_to_add.map(&:id),
+            [
+              # now link a *differerent* collection but that would trigger another add
+              # but really just pointing to the same collections as above
+              method_library_collection.collections.first.id,
+            ],
+            [],
+          )
+
+          expect(visible_cards.reload.pluck(:collection_id, :item_id, :row, :col)).to eq([
             [dashboard_collection.id, nil, 0, 0],
             [method_library_collection.id, nil, 0, 3],
             [nil, preexisting_links.first.item_id, 2, 0],
