@@ -186,6 +186,11 @@ class ChartGroup extends React.Component {
   }
 
   areLabelsOverlapping(labelA, labelB) {
+    if (labelA.overlapping || labelB.overlapping) {
+      // don't mark labels as overlapping if they have already been removed
+      return false
+    }
+
     return this.areElementsOverlapping(
       { ...labelA, w: this.calculateLabelWidth(labelA) },
       { ...labelB, w: this.calculateLabelWidth(labelB) }
@@ -209,34 +214,30 @@ class ChartGroup extends React.Component {
   }
 
   findOverlappingLabels(renderedLabels) {
-    let sortedLabels = _.sortBy(renderedLabels, 'x')
-    // Take out first label if more than two data points
+    let sortedLabels = _.orderBy(renderedLabels, ['x'], ['desc'])
     if (sortedLabels.length > 2) {
-      sortedLabels = sortedLabels.slice(1)
+      // Take out earliest label if more than two data points
+      sortedLabels = sortedLabels.slice(0, sortedLabels.length - 1)
     }
+    const latest = _.first(sortedLabels)
+
     const overlappingLabels = []
     if (sortedLabels.length === 1) return []
     sortedLabels.forEach((label, i) => {
       let overlapping = false
       for (let j = i + 1; j < sortedLabels.length; j++) {
-        const subLabel = sortedLabels[j]
-        overlapping = this.areLabelsOverlapping(label, subLabel)
+        const nextLabel = sortedLabels[j]
+        let { x } = label
+        if (label === latest) {
+          x = latest.x - this.calculateLabelWidth(latest) / 2
+        }
+        overlapping = this.areLabelsOverlapping({ ...label, x }, nextLabel)
+
         if (overlapping) {
-          let subOverlapping = false
-          for (let k = j + 1; k < sortedLabels.length; k++) {
-            subOverlapping = this.areLabelsOverlapping(
-              sortedLabels[j],
-              sortedLabels[k]
-            )
-          }
-          if (!subOverlapping) {
-            overlappingLabels.push(label)
-            label.overlapping = true
-            continue
-          } else {
-            overlappingLabels.push(subLabel)
-            subLabel.overlapping = true
-          }
+          overlappingLabels.push(nextLabel)
+          nextLabel.overlapping = true
+          // remove label text from overlapping label to only show the tick mark
+          nextLabel.text = ''
         }
       }
     })
@@ -256,14 +257,11 @@ class ChartGroup extends React.Component {
   get axisFilteredDateValues() {
     const victoryProps = VictoryAxis.getBaseProps(this.axisProps)
     const renderedLabels = this.extractLabelsFromVictoryProps(victoryProps)
-    const overlappingLabels = this.findOverlappingLabels(renderedLabels)
+    // this will go through and remove the text label from the overlapping ones
+    // it will also (somehow?) adjust the right-most one to be aligned
+    this.findOverlappingLabels(renderedLabels)
 
-    const nonPrioritizedLabels = []
-    overlappingLabels.forEach(l => {
-      nonPrioritizedLabels.push(l)
-    })
-
-    return _.uniq(_.xorWith(renderedLabels, nonPrioritizedLabels, _.isEqual))
+    return renderedLabels
   }
 
   get axisProps() {
@@ -292,20 +290,23 @@ class ChartGroup extends React.Component {
   get chartAxis() {
     const { axisProps } = this
     if (this.isSmallChartStyle) {
-      const overlappingIndexes = []
-      this.axisFilteredDateValues.forEach((l, i) => {
-        if (l.overlapping) overlappingIndexes.push(i)
-      })
-      const previousTickFormat = axisProps.tickFormat
-      axisProps.tickFormat = (label, index) => {
-        if (overlappingIndexes.includes(index)) return '|'
-        return previousTickFormat(label, index)
-      }
-      let filteredLabels = _.sortBy(this.axisFilteredDateValues, 'x')
+      // const overlappingIndexes = []
+      // this.axisFilteredDateValues.forEach((l, i) => {
+      //   if (l.overlapping) overlappingIndexes.push(i)
+      // })
+      // const previousTickFormat = axisProps.tickFormat
+      // axisProps.tickFormat = (label, index) => {
+      //   // if (overlappingIndexes.includes(index)) return '|'
+      //   return previousTickFormat(label, index)
+      // }
+      const filteredLabels = _.sortBy(this.axisFilteredDateValues, 'x')
       if (filteredLabels.length > 2) {
-        filteredLabels = filteredLabels.slice(1)
+        // cut off the earliest label
+        const first = _.first(filteredLabels)
+        first.text = ''
       }
       axisProps.tickValues = filteredLabels.map(l => l.datum)
+      axisProps.tickFormat = filteredLabels.map(l => l.text)
     }
     return <VictoryAxis {...axisProps} />
   }
