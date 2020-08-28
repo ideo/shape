@@ -94,6 +94,15 @@ describe('UiStore', () => {
         })
       })
     })
+
+    describe('#blankContentToolIsOpen', () => {
+      it('should check if there is at least a row set on blankContentToolState', () => {
+        uiStore.closeBlankContentTool()
+        expect(uiStore.blankContentToolIsOpen).toBe(false)
+        uiStore.openBlankContentTool({ row: 0, col: 0 })
+        expect(uiStore.blankContentToolIsOpen).toBe(true)
+      })
+    })
   })
 
   describe('#startDragging', () => {

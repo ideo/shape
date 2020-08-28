@@ -856,8 +856,10 @@ export default class UiStore {
 
   @computed
   get blankContentToolIsOpen() {
-    // even for foamcore, order will at least == 0 when open
-    return this.blankContentToolState.order !== null
+    const { blankContentToolState } = this
+    return (
+      blankContentToolState.order !== null || blankContentToolState.row !== null
+    )
   }
 
   @computed

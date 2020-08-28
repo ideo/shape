@@ -1488,10 +1488,25 @@ class FoamcoreGrid extends React.Component {
       return
     }
 
-    const { cardMatrix, num_columns, isFourWideBoard } = collection
+    const {
+      cardMatrix,
+      collection_cards,
+      num_columns,
+      isFourWideBoard,
+    } = collection
     const { relativeZoomLevel } = this
     // rows start at 0, plus add an extra at the bottom
     const maxRow = this.maxRow + 1
+
+    const pinnedCardMaxRow = (
+      _.maxBy(_.filter(collection_cards, 'isPinnedAndLocked'), 'row') || {
+        row: -1,
+      }
+    ).row
+
+    if (pinnedCardMaxRow > -1) {
+      console.log({ pinnedCardMaxRow })
+    }
 
     const hotEdges = []
     _.each(_.range(0, maxRow), row => {
@@ -1520,7 +1535,7 @@ class FoamcoreGrid extends React.Component {
         }
       })
 
-      if (isFourWideBoard) {
+      if (isFourWideBoard && pinnedCardMaxRow <= row) {
         // only 4WFC has horizontal hot edges in the row gutters
         hotEdges.push(
           <FoamcoreHotspot
