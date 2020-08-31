@@ -477,6 +477,37 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           linked_id = json['data']['relationships']['record']['data']['id']
           expect(Collection.find(linked_id)).to eq linked_collection
         end
+
+        context 'overriding parent collection card size' do
+          let(:parent) { create(:collection) }
+          let!(:linked_collection) { create(:collection, parent_collection: parent) }
+          let(:raw_params) do
+            {
+              width: 2,
+              parent_id: collection.id,
+              collection_id: linked_collection.id,
+              card_type: 'link',
+            }
+          end
+
+          before do
+            linked_collection.parent_collection_card.update(
+              width: 3,
+              height: 2,
+              font_color: '#abc123',
+            )
+          end
+
+          it 'should create a link card respecting the overriden params' do
+            post(path, params: params)
+            link_card = CollectionCard.find(json['data']['id'])
+            # width overridden in params as 2
+            expect(link_card.width).to eq 2
+            # height comes from the parent (not overridden)
+            expect(link_card.height).to eq 2
+            expect(link_card.font_color).to eq '#abc123'
+          end
+        end
       end
 
       context 'broadcasting updates' do

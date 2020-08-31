@@ -57,7 +57,11 @@ class Api::V1::CollectionsController < Api::V1::BaseController
 
   after_action :broadcast_collection_updates, only: %i[update]
   def update
-    @updated = CollectionUpdater.call(@collection, collection_params)
+    @updated = CollectionUpdater.call(
+      @collection,
+      collection_params,
+      super_admin: current_user.super_admin?,
+    )
     if @updated
       log_collection_activity(:edited) if log_activity?
       return if @cancel_sync

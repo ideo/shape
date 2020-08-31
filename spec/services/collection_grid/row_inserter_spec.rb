@@ -7,11 +7,13 @@ RSpec.describe CollectionGrid::RowInserter, type: :service do
   let(:cards) { collection.collection_cards }
   let(:action) { :insert_row }
   let(:row) { 1 }
+  let(:movement) { nil }
   let(:inserter) do
     CollectionGrid::RowInserter.new(
       row: row,
       collection: collection,
       action: action,
+      movement: movement,
     )
   end
 
@@ -45,6 +47,20 @@ RSpec.describe CollectionGrid::RowInserter, type: :service do
       inserter.call
       card.reload
     }.to change(card, :updated_at)
+  end
+
+  context 'with movement param' do
+    let(:movement) { 3 }
+
+    it 'inserts n rows below the row passed in' do
+      inserter.call
+      cards.reload
+      # should not move
+      expect(cards[1].row).to eq 1
+      # should move down +3
+      expect(cards[3].row).to eq 5
+      expect(cards[5].row).to eq 6
+    end
   end
 
   context 'when removing a row' do

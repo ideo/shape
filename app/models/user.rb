@@ -574,6 +574,10 @@ class User < ApplicationRecord
     locale_in_database || current_organization&.default_locale
   end
 
+  def super_admin?
+    has_cached_role?(Role::SUPER_ADMIN)
+  end
+
   private
 
   def email_required?

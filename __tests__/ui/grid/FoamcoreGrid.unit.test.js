@@ -198,6 +198,23 @@ describe('FoamcoreGrid', () => {
         expect(hotspots.find({ horizontal: false }).length).toEqual(1)
         expect(hotspots.find({ horizontal: true }).length).toEqual(3)
       })
+
+      describe('with pinnedAndLocked cards', () => {
+        beforeEach(() => {
+          cardB.row = 2
+          cardB.isPinnedAndLocked = true
+          rerender()
+        })
+
+        it('should not render hot edges that would push pinnedAndLocked cards down', () => {
+          const hotspots = wrapper.find('FoamcoreHotspot')
+          // should only have the one horizontal "insert row" at row = 2
+          expect(hotspots.find({ horizontal: true }).length).toEqual(1)
+          expect(hotspots.find({ horizontal: true }).get(0).props.row).toEqual(
+            2
+          )
+        })
+      })
     })
 
     describe('with two cards at the beginning of a row and two touching', () => {

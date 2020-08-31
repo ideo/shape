@@ -61,6 +61,10 @@ const calculateDx = (x, w, isSmallChartStyle) => {
 }
 
 const TickLabel = props => {
+  let lastDateItem = false
+  if (props.dateValuesLength && props.index === props.dateValuesLength - 1) {
+    lastDateItem = true
+  }
   const w = calculateRelativeWidth(props)
   const dx = calculateDx(props.x, w, props.isSmallChartStyle)
   let dy = props.dy || 5
@@ -71,14 +75,12 @@ const TickLabel = props => {
 
   if (props.text === '|') dy = -25
 
+  const labelProps = { ...props }
+  if (lastDateItem) {
+    labelProps.textAnchor = 'end'
+  }
   const Label = (
-    <VictoryLabel
-      {...props}
-      textAnchor="end"
-      dx={dx}
-      dy={dy}
-      style={updatedStyle}
-    />
+    <VictoryLabel {...labelProps} dx={dx} dy={dy} style={updatedStyle} />
   )
 
   return Label
@@ -178,6 +180,7 @@ const ChartAxisProps = ({
             dy={tickLabelStyleProps.dy}
             isSmallChartStyle={isSmallChartStyle}
             itemId={itemId}
+            dateValuesLength={dateValues ? dateValues.length : 0}
           />
         ),
         orientation: 'bottom',

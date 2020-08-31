@@ -17,7 +17,7 @@ class SerializableCurrentUser < SerializableUser
   end
 
   attribute :is_super_admin do
-    @current_user ? @current_user.has_role?(Role::SUPER_ADMIN) : false
+    @current_user ? @current_user.super_admin? : false
   end
 
   attribute :current_incentive_balance do

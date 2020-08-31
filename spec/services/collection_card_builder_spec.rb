@@ -97,6 +97,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
         let(:card_type) { 'link' }
         let(:parent_collection) { create(:collection, organization: organization) }
         let!(:collection) { create(:collection, organization: organization, parent_collection: parent_collection) }
+        let(:parent_collection_card) { collection.parent_collection_card }
         let(:full_params) do
           params.merge(collection_id: collection.id)
         end
@@ -110,7 +111,7 @@ RSpec.describe CollectionCardBuilder, type: :service do
           }
         end
         before do
-          collection.parent_collection_card.update(card_style_attrs)
+          parent_collection_card.update(card_style_attrs)
         end
 
         it 'should create a link card' do
@@ -123,6 +124,40 @@ RSpec.describe CollectionCardBuilder, type: :service do
         it 'should copy style attrs from original card' do
           builder_card_attrs = builder.collection_card.attributes.symbolize_keys.slice(*card_style_attrs.keys)
           expect(builder_card_attrs).to eq(card_style_attrs)
+        end
+
+        context 'with height, width of original card' do
+          let(:params) do
+            {
+              row: 3,
+              col: 2,
+            }
+          end
+
+          before do
+            parent_collection_card.update(width: 3, height: 2)
+          end
+
+          it 'should copy size attrs from original card' do
+            expect(builder.create).to be true
+            expect(builder.collection_card.width).to eq(3)
+            expect(builder.collection_card.height).to eq(2)
+          end
+
+          context 'with overridden size' do
+            let(:params) do
+              {
+                width: 2,
+                height: 1,
+              }
+            end
+
+            it 'should override original card properties' do
+              expect(builder.create).to be true
+              expect(builder.collection_card.width).to eq(2)
+              expect(builder.collection_card.height).to eq(1)
+            end
+          end
         end
 
         context 'with multiple ordered cards' do

@@ -8,11 +8,13 @@ RSpec.describe CollectionUpdater, type: :service do
     let(:last_card) { cards.last }
     let(:attributes) { {} }
     let(:unarchiving) { false }
+    let(:super_admin) { false }
     let(:service) do
       CollectionUpdater.new(
         collection,
         attributes,
         unarchiving: unarchiving,
+        super_admin: super_admin,
       )
     end
 
@@ -188,6 +190,34 @@ RSpec.describe CollectionUpdater, type: :service do
         it 'does not call queue_update_template_instances' do
           expect(collection).not_to receive(:queue_update_template_instances)
           service.call
+        end
+      end
+    end
+
+    context 'with pinned and locked cards' do
+      let(:attributes) do
+        { collection_cards_attributes: [{ id: first_card.id, row: 3, width: 3 }] }
+      end
+
+      before do
+        first_card.update(pinned: true)
+      end
+
+      it 'does not allow the action to go through' do
+        service.call
+        first_card.reload
+        expect(first_card.row).to eq 0
+        expect(first_card.width).to eq 1
+      end
+
+      context 'as super admin' do
+        let(:super_admin) { true }
+
+        it 'does allow you to make any updates to pinned cards' do
+          service.call
+          first_card.reload
+          expect(first_card.row).to eq 3
+          expect(first_card.width).to eq 3
         end
       end
     end
