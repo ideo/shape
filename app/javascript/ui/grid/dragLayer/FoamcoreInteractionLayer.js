@@ -9,11 +9,12 @@ import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import PositionedBlankCard from '~/ui/grid/dragLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import { isFile } from '~/utils/FilestackUpload'
-import { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
+import v, { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
 
 const DragLayerWrapper = styled.div`
   height: 100%;
   width: 100%;
+  z-index: ${v.zIndex.gridCardTop};
 `
 
 @inject('apiStore', 'uiStore')
@@ -134,25 +135,23 @@ class FoamcoreInteractionLayer extends React.Component {
 
   @action
   repositionBlankCard = ({ row, col }) => {
-    const { uiStore } = this.props
-    const { blankContentToolIsOpen } = uiStore
     const prevRow = this.hoveringRowCol.row
     const prevCol = this.hoveringRowCol.col
     if (row === prevRow && col === prevCol) {
       return
     }
-    if (blankContentToolIsOpen) {
-      uiStore.closeBlankContentTool()
-    }
     this.hoveringRowCol = { row, col }
   }
 
   renderBlankCard = (
-    { row, col, width, height, emptyRow },
+    { row, col, width, height, emptyRow = false },
     interactionType
   ) => {
     const { uiStore, collection, hasDragCollision } = this.props
     const position = uiStore.positionForCoordinates({ col, row, width, height })
+    const {
+      blankContentToolState: { replacingId },
+    } = uiStore
 
     // could be drag or drag-overflow
     const isDrag = _.includes(interactionType, 'drag')
@@ -166,6 +165,7 @@ class FoamcoreInteractionLayer extends React.Component {
         row={row}
         col={col}
         emptyRow={emptyRow}
+        replacingId={replacingId}
         /* Why is this rendering on top of a collection? */
         blocked={hasDragCollision && isDrag}
         data-blank-type={interactionType}
@@ -360,6 +360,19 @@ class FoamcoreInteractionLayer extends React.Component {
     return <div>{hotEdges}</div>
   }
 
+  get renderBct() {
+    const { uiStore, collection } = this.props
+    const { blankContentToolIsOpen, blankContentToolState } = uiStore
+    const { collectionId } = blankContentToolState
+
+    // NOTE: ensure that the bct is open in the same collection
+    if (blankContentToolIsOpen && collectionId === collection.id) {
+      return this.positionBlank({ ...blankContentToolState }, 'bct')
+    }
+
+    return null
+  }
+
   render() {
     const { uiStore } = this.props
 
@@ -395,6 +408,7 @@ class FoamcoreInteractionLayer extends React.Component {
       >
         {this.renderInnerDragLayer}
         {this.renderHotEdges}
+        {this.renderBct}
       </DragLayerWrapper>
     )
   }

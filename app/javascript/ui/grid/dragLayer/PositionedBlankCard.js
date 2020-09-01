@@ -55,7 +55,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
     return 1
   }};
   z-index: ${props =>
-    _.includes(props.interactionType, 'drag') ? v.zIndex.cardHovering : 0};
+    _.includes(props.interactionType, 'drag') ? v.zIndex.cardHovering : 1};
 
   /* FIXME: is this the same CircleIconHolder under GridCardEmptyHotspot? */
 
@@ -94,32 +94,16 @@ class PositionedBlankCard extends React.Component {
     super(props)
   }
 
-  onClickHotspot = ({ row, col, create = false }) => e => {
-    const { uiStore, collection } = this.props
-    const { selectedArea } = uiStore
-    const { minX } = selectedArea
-
-    // If user is selecting an area, don't trigger blank card click
-    if (minX) {
-      return
-    }
-
-    // confirmEdit will check if we're in a template and need to confirm changes
-    if (collection) {
-      collection.confirmEdit({
-        onConfirm: () => uiStore.openBlankContentTool({ row, col }),
-      })
-      return
-    }
-
-    uiStore.openBlankContentTool({
+  render() {
+    const {
+      collection,
       row,
       col,
-    })
-  }
-
-  render() {
-    const { collection, row, col, position, uiStore, blocked } = this.props
+      position,
+      uiStore,
+      blocked,
+      interactionType,
+    } = this.props
     const { blankContentToolIsOpen, droppingFiles } = uiStore
 
     const { xPos, yPos, height, width } = position
@@ -140,7 +124,7 @@ class PositionedBlankCard extends React.Component {
           <GridCardDropzone collection={collection} row={row} col={col} />
         </BlankCardContainer>
       )
-    } else if (blankContentToolIsOpen) {
+    } else if (blankContentToolIsOpen && interactionType === 'bct') {
       // FIXME: should render new hot cell since bct will be deprecated
       const blankContentTool = {
         id: 'blank',
@@ -166,7 +150,6 @@ class PositionedBlankCard extends React.Component {
     }
 
     const {
-      interactionType,
       emptyRow,
       handleBlankCardClick,
       handleInsertRowClick,
@@ -215,6 +198,7 @@ PositionedBlankCard.propTypes = {
   handleInsertRowClick: PropTypes.func,
   blocked: PropTypes.bool,
   emptyRow: PropTypes.bool,
+  replacingId: PropTypes.String,
 }
 
 PositionedBlankCard.defaultProps = {
@@ -223,6 +207,7 @@ PositionedBlankCard.defaultProps = {
   handleInsertRowClick: null,
   blocked: false,
   emptyRow: false,
+  replacingId: null,
 }
 
 PositionedBlankCard.displayName = 'PositionedBlankCard'
