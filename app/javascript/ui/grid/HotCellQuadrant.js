@@ -46,7 +46,7 @@ const nameToIcon = {
   collection: CollectionIcon,
   link: LinkIcon,
   file: FileIcon,
-  foamcore: FoamcoreIcon,
+  foamcoreBoard: FoamcoreIcon,
   report: ReportIcon,
   searchCollection: SearchCollectionIcon,
   submissionBox: SubmissionBoxIcon,
@@ -101,6 +101,7 @@ class HotCellQuadrant extends React.Component {
   render() {
     const { name, description, subTypes } = this.props
     const TypeIcon = nameToIcon[name]
+    console.log('hotcellquadrant render', { nameToIcon, name })
     console.log('quadrant', subTypes)
     return (
       <Tooltip

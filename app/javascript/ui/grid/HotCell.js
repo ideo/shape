@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import localStorage from 'mobx-localstorage'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
@@ -39,17 +39,19 @@ class HotCell extends React.Component {
       collectionType => collectionType.name === type
     )
     const itemType = this.itemTypes.find(itemType => itemType.name === type)
-    if (collectionType) {
-      localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, type)
-    } else if (itemType) {
-      localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, type)
-    }
+    runInAction(() => {
+      if (collectionType) {
+        localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, type)
+      } else if (itemType) {
+        localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, type)
+      }
+    })
   }
 
   get collectionTypes() {
     return [
       { name: 'collection', description: 'Create Collection' },
-      { name: 'foamcore', description: 'Create Foamcore Board' },
+      { name: 'foamcoreBoard', description: 'Create Foamcore Board' },
       { name: 'searchCollection', description: 'Create Search Collection' },
       { name: 'submissionBox', description: 'Create Submission Box' },
       { name: 'testCollection', description: 'Get Feedback' },

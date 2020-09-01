@@ -497,6 +497,7 @@ class GridCardBlank extends React.Component {
     const { creating, loading, droppingFile } = this.state
     const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
+    console.log('render inner', { creating })
 
     switch (creating) {
       case 'collection':
