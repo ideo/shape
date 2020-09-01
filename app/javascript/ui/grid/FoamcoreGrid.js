@@ -1392,6 +1392,7 @@ class FoamcoreGrid extends React.Component {
 
   onCursorMove = ev => {
     const { uiStore } = this.props
+    const { isTouchDevice } = uiStore
 
     let rect = { left: 0, top: 0 }
     const container = document.querySelector(`.${FOAMCORE_GRID_BOUNDARY}`)
@@ -1401,10 +1402,10 @@ class FoamcoreGrid extends React.Component {
     }
 
     let { clientX, clientY, target } = ev
-    if (uiStore.isTouchDevice) {
+    if (isTouchDevice && ev.touches) {
       const touch = _.first(ev.touches)
       // Check if touch device and make sure touch event has real data
-      if (touch.clientX > 0 && touch.clientY > 0) {
+      if (touch && touch.clientX && touch.clientY) {
         clientX = touch.clientX
         clientY = touch.clientY
         target = touch.target
@@ -1552,15 +1553,15 @@ class FoamcoreGrid extends React.Component {
   }
 
   render() {
-    const { collection, uiStore } = this.props
+    const { collection } = this.props
     const { isSplitLevelBottom } = collection
 
     const gridSize = this.totalGridSize
 
     return (
       <Grid
-        onMouseMove={!uiStore.isTouchDevice ? this.onCursorMove : null}
-        onTouchStart={uiStore.isTouchDevice ? this.onCursorMove : null}
+        onMouseMove={this.onCursorMove}
+        onTouchStart={this.onCursorMove}
         className={`${FOAMCORE_GRID_BOUNDARY}${
           isSplitLevelBottom ? '-bottom' : ''
         }`}
