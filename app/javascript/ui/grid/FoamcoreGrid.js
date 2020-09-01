@@ -1403,9 +1403,12 @@ class FoamcoreGrid extends React.Component {
     let { clientX, clientY, target } = ev
     if (uiStore.isTouchDevice) {
       const touch = _.first(ev.touches)
-      clientX = touch.clientX
-      clientY = touch.clientY
-      target = touch.target
+      // Check if touch device and make sure touch event has real data
+      if (touch.clientX > 0 && touch.clientY > 0) {
+        clientX = touch.clientX
+        clientY = touch.clientY
+        target = touch.target
+      }
     }
     const { classList } = target
     if (!classList || !_.includes(classList, FOAMCORE_GRID_BOUNDARY)) {
@@ -1416,6 +1419,7 @@ class FoamcoreGrid extends React.Component {
       x: clientX - rect.left,
       y: clientY - rect.top,
     })
+    console.log('onmove', { rect, clientX, clientY, coords })
 
     const { cardMatrix } = this.props.collection
     let { row, col } = coords
@@ -1535,7 +1539,6 @@ class FoamcoreGrid extends React.Component {
         // only 4WFC has horizontal hot edges in the row gutters
         hotEdges.push(
           <FoamcoreHotspot
-            key={`hotspot-${row}`}
             relativeZoomLevel={relativeZoomLevel}
             row={row}
             onClick={ev => this.handleInsertRowClick(ev, row)}
