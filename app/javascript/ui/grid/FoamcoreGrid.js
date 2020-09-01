@@ -12,11 +12,9 @@ import {
   findTopLeftCard,
 } from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
-import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
-import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
-import FoamcoreDragLayer from '~/ui/grid/dragLayer/FoamcoreDragLayer'
+import FoamcoreInteractionLayer from '~/ui/grid/dragLayer/FoamcoreInteractionLayer'
 import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
@@ -389,23 +387,6 @@ class FoamcoreGrid extends React.Component {
 
   handleScroll = ev => {
     this.throttledLoadAfterScroll()
-  }
-
-  handleInsertRowClick = (ev, row) => {
-    return this.onRowClick(ev, row, ROW_ACTIONS.INSERT)
-  }
-
-  handleRemoveRowClick = (ev, row) => {
-    return this.onRowClick(ev, row, ROW_ACTIONS.REMOVE)
-  }
-
-  onRowClick = async (ev, row, action) => {
-    ev.stopPropagation()
-    const { collection, uiStore } = this.props
-    if (uiStore.isTransparentLoading) {
-      return false
-    }
-    collection.API_manipulateRow({ row, action })
   }
 
   originalCard(cardId) {
@@ -1072,71 +1053,6 @@ class FoamcoreGrid extends React.Component {
     return this.renderCard(placeholder)
   }
 
-  renderHotspots() {
-    const { collection, canEditCollection } = this.props
-    if (!canEditCollection) {
-      return
-    }
-
-    const {
-      cardMatrix,
-      collection_cards,
-      num_columns,
-      isFourWideBoard,
-    } = collection
-    const { relativeZoomLevel } = this
-    // rows start at 0, plus add an extra at the bottom
-    const maxRow = this.maxRow + 1
-
-    const pinnedCardMaxRow = (
-      _.maxBy(_.filter(collection_cards, 'isPinnedAndLocked'), 'row') || {
-        row: -1,
-      }
-    ).row
-
-    const hotEdges = []
-    _.each(_.range(0, maxRow), row => {
-      _.each(_.range(0, num_columns), col => {
-        if (!cardMatrix[row] || !cardMatrix[row][col]) {
-          // continue iteration
-          return true
-        }
-        // find two cards together UNLESS the card on the right isPinnedAndLocked
-        const twoCardsTogether =
-          col > 0 &&
-          !cardMatrix[row][col].isPinnedAndLocked &&
-          cardMatrix[row][col - 1] &&
-          cardMatrix[row][col - 1] !== cardMatrix[row][col]
-        if (col === 0 || twoCardsTogether) {
-          hotEdges.push(
-            <FoamcoreHotspot
-              key={`hotspot-${row}:${col}`}
-              relativeZoomLevel={relativeZoomLevel}
-              row={row}
-              col={col}
-              horizontal={false}
-            />
-          )
-        }
-      })
-
-      if (isFourWideBoard && pinnedCardMaxRow <= row) {
-        // only 4WFC has horizontal hot edges in the row gutters
-        hotEdges.push(
-          <FoamcoreHotspot
-            key={`hotspot-${row}`}
-            relativeZoomLevel={relativeZoomLevel}
-            row={row}
-            onClick={ev => this.handleInsertRowClick(ev, row)}
-            horizontal
-          />
-        )
-      }
-    })
-
-    return <div>{hotEdges}</div>
-  }
-
   render() {
     const { collection, canEditCollection } = this.props
     const { isSplitLevelBottom } = collection
@@ -1166,18 +1082,17 @@ class FoamcoreGrid extends React.Component {
           */}
         {this.renderAddSubmission()}
         {this.renderMdlPlaceholder()}
-        {/* FIXME: this is refactored into PositionedBlankCard, confirm if that's a good idea
-          this.renderHotspots()
-          */}
         {this.renderVisibleCards()}
         {canEditCollection && (
-          <FoamcoreDragLayer
+          <FoamcoreInteractionLayer
             collection={collection}
             hoveringOverCollection={!!this.hoveringOverCollection}
             coordinatesForPosition={this.coordinatesForPosition}
             dragging={this.dragging}
             resizing={this.resizing}
             hasDragCollision={this.hasDragCollision}
+            relativeZoomLevel={this.relativeZoomLevel}
+            maxRow={this.maxRow}
           />
         )}
       </Grid>
@@ -1191,7 +1106,6 @@ FoamcoreGrid.propTypes = {
   trackCollectionUpdated: PropTypes.func.isRequired,
   canEditCollection: PropTypes.bool.isRequired,
   movingCardIds: MobxPropTypes.arrayOrObservableArray.isRequired,
-  // blankContentToolState: MobxPropTypes.objectOrObservableObject,
   loadCollectionCards: PropTypes.func.isRequired,
   sorting: PropTypes.bool,
   cardIdMenuOpen: PropTypes.string,
@@ -1206,7 +1120,6 @@ FoamcoreGrid.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 FoamcoreGrid.defaultProps = {
-  // blankContentToolState: {},
   sorting: false,
   cardIdMenuOpen: null,
   submissionSettings: null,

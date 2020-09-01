@@ -193,7 +193,7 @@ describe('FoamcoreGrid', () => {
           },
           'hover'
         )
-        const hotspots = wrapper.find('FoamcoreHotspot')
+        const hotspots = wrapper.find('FoamcoreHotEdge')
         // default cardMatrix only has card C at the beginning of the row
         expect(hotspots.find({ horizontal: false }).length).toEqual(1)
         expect(hotspots.find({ horizontal: true }).length).toEqual(3)
@@ -207,7 +207,7 @@ describe('FoamcoreGrid', () => {
         })
 
         it('should not render hot edges that would push pinnedAndLocked cards down', () => {
-          const hotspots = wrapper.find('FoamcoreHotspot')
+          const hotspots = wrapper.find('FoamcoreHotEdge')
           // should only have the one horizontal "insert row" at row = 2
           expect(hotspots.find({ horizontal: true }).length).toEqual(1)
           expect(hotspots.find({ horizontal: true }).get(0).props.row).toEqual(
@@ -225,7 +225,7 @@ describe('FoamcoreGrid', () => {
 
       it('should have vertical hotspots at the beginning of every row', () => {
         // cardA now is at the beginning of the row AND bumps into cardB (+2)
-        const hotspots = wrapper.find('FoamcoreHotspot')
+        const hotspots = wrapper.find('FoamcoreHotEdge')
         expect(hotspots.find({ horizontal: false }).length).toEqual(3)
         expect(hotspots.find({ horizontal: true }).length).toEqual(3)
       })
@@ -238,8 +238,8 @@ describe('FoamcoreGrid', () => {
       })
 
       it('should have horizontal hotspots between rows', () => {
-        expect(wrapper.find('FoamcoreHotspot').length).toEqual(4)
-        const hotspotProps = wrapper.find('FoamcoreHotspot').map(h => h.props())
+        expect(wrapper.find('FoamcoreHotEdge').length).toEqual(4)
+        const hotspotProps = wrapper.find('FoamcoreHotEdge').map(h => h.props())
         // 1 vertical edge and 3 row hotspots
         expect(hotspotProps.filter(p => p.horizontal).length).toEqual(3)
         expect(hotspotProps.filter(p => !p.horizontal).length).toEqual(1)

@@ -758,6 +758,92 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'POST #create_bct' do
+    let(:path) { '/api/v1/collection_cards/create_bct' }
+    let(:raw_params) do
+      {
+        row: 0,
+        col: 2,
+        parent_id: collection.id,
+      }
+    end
+    let(:params) { json_api_params('collection_cards', raw_params) }
+    let(:bad_params) do
+      json_api_params('collection_cards', parent_id: collection.id)
+    end
+
+    before do
+      allow(CollectionGrid::BctInserter).to receive(:new).and_call_original
+    end
+
+    context 'without content editor access' do
+      let(:user) { create(:user) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with errors' do
+      it 'returns a 422 bad request' do
+        post(path, params: bad_params)
+        expect(response.status).to eq(422)
+      end
+    end
+
+    context 'bad collection' do
+      let(:collection) { create(:board_collection, num_cards: 2, add_editors: [user]) }
+      let(:raw_params) do
+        {
+          row: 0,
+          col: 0,
+          parent_id: collection.id,
+        }
+      end
+
+      before do
+        # replicating an issue that we encountered in prod
+        collection.collection_cards.first.update(row: nil, col: nil)
+      end
+
+      it 'returns a 200' do
+        expect(CollectionGrid::BctInserter).to receive(:new).with(
+          row: 0,
+          col: 0,
+          collection: collection,
+        )
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'success' do
+      let(:collection) { create(:board_collection, add_editors: [user]) }
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates a placeholder' do
+        expect(CollectionGrid::BctInserter).to receive(:new).with(
+          row: 0,
+          col: 2,
+          collection: collection,
+        )
+        expect {
+          post(path, params: params)
+        }.to change(CollectionCard::Placeholder, :count).by(1)
+        expect(json['data']['attributes']).to match_json_schema('collection_card')
+        expect(json['data']['attributes']['row']).to eq 0
+        expect(json['data']['attributes']['col']).to eq 2
+        expect(json['data']['attributes']['private_card']).to be nil
+        expect(json['data']['attributes']['class_type']).to eq 'CollectionCard::Placeholder'
+      end
+    end
+  end
+
   describe 'PATCH #archive' do
     # user is an editor of collection
     let!(:collection_cards) { create_list(:collection_card_collection, 3, parent: collection) }

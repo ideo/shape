@@ -1,11 +1,11 @@
-import FoamcoreDragLayer from '~/ui/grid/dragLayer/FoamcoreDragLayer'
+import FoamcoreInteractionLayer from '~/ui/grid/dragLayer/FoamcoreInteractionLayer'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection } from '#/mocks/data'
 import { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
 
 let props, wrapper, component, rerender
-describe('FoamcoreDragLayer', () => {
+describe('FoamcoreInteractionLayer', () => {
   beforeEach(() => {
     props = {
       collection: fakeCollection,
@@ -14,7 +14,9 @@ describe('FoamcoreDragLayer', () => {
     }
     rerender = () => {
       props.collection.API_batchUpdateCardsWithUndo.mockClear()
-      wrapper = shallow(<FoamcoreDragLayer.wrappedComponent {...props} />)
+      wrapper = shallow(
+        <FoamcoreInteractionLayer.wrappedComponent {...props} />
+      )
       component = wrapper.instance()
     }
     rerender()

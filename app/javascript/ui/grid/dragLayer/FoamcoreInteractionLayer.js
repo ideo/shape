@@ -4,7 +4,10 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import PositionedBlankCard from '~/ui/grid/dragLayer/PositionedBlankCard'
+import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import { isFile } from '~/utils/FilestackUpload'
 import { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
 
@@ -13,9 +16,9 @@ const DragLayerWrapper = styled.div`
   width: 100%;
 `
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
-class FoamcoreDragLayer extends React.Component {
+class FoamcoreInteractionLayer extends React.Component {
   @observable
   hoveringRowCol = {
     row: null,
@@ -67,8 +70,66 @@ class FoamcoreDragLayer extends React.Component {
     return { row, col }
   }
 
+  onCreateBct = ({ row, col, create = false }) => {
+    const { selectedAreaMinX } = this
+    const { apiStore, uiStore, collection } = this.props
+
+    // If user is selecting an area, don't trigger blank card click
+    if (selectedAreaMinX) {
+      return
+    }
+
+    uiStore.openBlankContentTool({
+      row,
+      col,
+    })
+
+    if (create) {
+      const placeholder = new CollectionCard(
+        {
+          row,
+          col,
+          parent_id: collection.id,
+        },
+        apiStore
+      )
+      placeholder.API_createBct()
+    }
+  }
+
+  handleInsertRowClick = (ev, row) => {
+    return this.onRowClick(ev, row, ROW_ACTIONS.INSERT)
+  }
+
+  handleRemoveRowClick = (ev, row) => {
+    return this.onRowClick(ev, row, ROW_ACTIONS.REMOVE)
+  }
+
+  onRowClick = async (ev, row, action) => {
+    ev.stopPropagation()
+    const { collection, uiStore } = this.props
+    if (uiStore.isTransparentLoading) {
+      return false
+    }
+    collection.API_manipulateRow({ row, action })
+  }
+
   positionBlank = ({ row, col, width, height }, interactionType = 'drag') => {
-    return this.renderBlankCard({ row, col, width, height }, interactionType)
+    let emptyRow = false
+    if (interactionType === 'hover') {
+      const {
+        collection: { collection_cards },
+      } = this.props
+
+      emptyRow =
+        !_.some(collection_cards, { row }) &&
+        !_.some(collection_cards, { row: row - 1, height: 2 })
+    }
+
+    return this.renderBlankCard(
+      { row, col, width, height, emptyRow },
+      interactionType
+    )
   }
 
   @action
@@ -86,7 +147,10 @@ class FoamcoreDragLayer extends React.Component {
     this.hoveringRowCol = { row, col }
   }
 
-  renderBlankCard = ({ row, col, width, height }, interactionType) => {
+  renderBlankCard = (
+    { row, col, width, height, emptyRow },
+    interactionType
+  ) => {
     const { uiStore, collection, hasDragCollision } = this.props
     const position = uiStore.positionForCoordinates({ col, row, width, height })
 
@@ -101,11 +165,15 @@ class FoamcoreDragLayer extends React.Component {
         key={`blank-${interactionType}-${row}:${col}`}
         row={row}
         col={col}
+        emptyRow={emptyRow}
         /* Why is this rendering on top of a collection? */
         blocked={hasDragCollision && isDrag}
         data-blank-type={interactionType}
         // this is to make it work the same as CollectionGrid BCT for cypress
         className={`StyledHotspot-${row}:${col}-BCT`}
+        handleBlankCardClick={this.onCreateBct}
+        handleInsertRowClick={this.handleInsertRowClick}
+        handleRemoveRowClick={this.handleRemoveRowClick}
         data-empty-space-click
       />
     )
@@ -233,6 +301,65 @@ class FoamcoreDragLayer extends React.Component {
     return this.renderHoveringSpot
   }
 
+  get renderHotEdges() {
+    const { collection, relativeZoomLevel, maxRow } = this.props
+    const {
+      cardMatrix,
+      collection_cards,
+      num_columns,
+      isFourWideBoard,
+    } = collection
+    // rows start at 0, plus add an extra at the bottom
+    const newMaxRow = maxRow + 1
+    const pinnedCardMaxRow = (
+      _.maxBy(_.filter(collection_cards, 'isPinnedAndLocked'), 'row') || {
+        row: -1,
+      }
+    ).row
+    const hotEdges = []
+    _.each(_.range(0, newMaxRow), row => {
+      _.each(_.range(0, num_columns), col => {
+        if (!cardMatrix[row] || !cardMatrix[row][col]) {
+          // continue iteration
+          return true
+        }
+        // find two cards together UNLESS the card on the right isPinnedAndLocked
+        const twoCardsTogether =
+          col > 0 &&
+          !cardMatrix[row][col].isPinnedAndLocked &&
+          cardMatrix[row][col - 1] &&
+          cardMatrix[row][col - 1] !== cardMatrix[row][col]
+        if (col === 0 || twoCardsTogether) {
+          hotEdges.push(
+            <FoamcoreHotEdge
+              key={`hotspot-${row}:${col}`}
+              relativeZoomLevel={relativeZoomLevel}
+              row={row}
+              col={col}
+              horizontal={false}
+              onClick={() => {
+                this.onCreateBct({ col, row, create: true })
+              }}
+            />
+          )
+        }
+      })
+      if (isFourWideBoard && pinnedCardMaxRow <= row) {
+        // only 4WFC has horizontal hot edges in the row gutters
+        hotEdges.push(
+          <FoamcoreHotEdge
+            key={`hotspot-${row}`}
+            relativeZoomLevel={relativeZoomLevel}
+            row={row}
+            onClick={ev => this.handleInsertRowClick(ev, row)}
+            horizontal
+          />
+        )
+      }
+    })
+    return <div>{hotEdges}</div>
+  }
+
   render() {
     const { uiStore } = this.props
 
@@ -267,22 +394,26 @@ class FoamcoreDragLayer extends React.Component {
         }}
       >
         {this.renderInnerDragLayer}
+        {this.renderHotEdges}
       </DragLayerWrapper>
     )
   }
 }
 
-FoamcoreDragLayer.propTypes = {
+FoamcoreInteractionLayer.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   coordinatesForPosition: PropTypes.func.isRequired,
   hoveringOverCollection: PropTypes.bool.isRequired,
   dragging: PropTypes.bool.isRequired,
   resizing: PropTypes.bool.isRequired,
   hasDragCollision: PropTypes.bool.isRequired,
+  relativeZoomLevel: PropTypes.number.isRequired,
+  maxRow: PropTypes.number.isRequired,
 }
 
-FoamcoreDragLayer.wrappedComponent.propTypes = {
+FoamcoreInteractionLayer.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-export default FoamcoreDragLayer
+export default FoamcoreInteractionLayer

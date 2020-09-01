@@ -165,7 +165,13 @@ class PositionedBlankCard extends React.Component {
       )
     }
 
-    const { interactionType } = this.props
+    const {
+      interactionType,
+      emptyRow,
+      handleBlankCardClick,
+      handleInsertRowClick,
+      handleRemoveRowClick,
+    } = this.props
     const draggingOrResizing = _.includes(['drag', 'resize'], interactionType)
 
     return (
@@ -173,9 +179,21 @@ class PositionedBlankCard extends React.Component {
         {...defaultProps}
         blocked={blocked}
         interactionType={interactionType}
-        onClick={!draggingOrResizing ? this.onClickHotspot({ row, col }) : null}
+        onClick={
+          !draggingOrResizing
+            ? () => {
+                handleBlankCardClick({ row, col })
+              }
+            : null
+        }
       >
-        <GridCardEmptyHotspot interactionType={interactionType} />
+        <GridCardEmptyHotspot
+          interactionType={interactionType}
+          emptyRow={emptyRow}
+          isFourWideBoard={collection.isFourWideBoard}
+          handleInsertRowClick={handleInsertRowClick}
+          handleRemoveRowClick={handleRemoveRowClick}
+        />
       </BlankCardContainer>
     )
   }
@@ -192,7 +210,19 @@ PositionedBlankCard.propTypes = {
   position: PropTypes.shape(propShapes.position).isRequired,
   interactionType: PropTypes.oneOf(['hover', 'drag', 'unrendered', 'resize'])
     .isRequired,
-  blocked: PropTypes.bool.isRequired,
+  handleBlankCardClick: PropTypes.func,
+  handleRemoveRowClick: PropTypes.func,
+  handleInsertRowClick: PropTypes.func,
+  blocked: PropTypes.bool,
+  emptyRow: PropTypes.bool,
+}
+
+PositionedBlankCard.defaultProps = {
+  handleBlankCardClick: null,
+  handleRemoveRowClick: null,
+  handleInsertRowClick: null,
+  blocked: false,
+  emptyRow: false,
 }
 
 PositionedBlankCard.displayName = 'PositionedBlankCard'
