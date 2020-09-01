@@ -700,89 +700,60 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
-  # FIXME: reuse some of these unit tests
-  describe 'POST #create_bct' do
-    let(:path) { '/api/v1/collection_cards/create_bct' }
-    let(:raw_params) do
+  describe 'POST #create_placeholders' do
+    let(:path) { '/api/v1/collection_cards/create_placeholders' }
+    let(:merge_data) do
       {
         row: 0,
         col: 2,
+        count: 1,
         parent_id: collection.id,
       }
     end
-    let(:params) { json_api_params('collection_cards', raw_params) }
+    # merge_data is used since it's not using json_api attributes
+    let(:params) { json_api_params('data', {}, merge_data) }
     let(:bad_params) do
-      json_api_params('collection_cards', parent_id: collection.id)
+      json_api_params('collection_cards', {}, parent_id: collection.id)
     end
 
     before do
-      allow(CollectionGrid::BctInserter).to receive(:new).and_call_original
+      allow(CollectionGrid::PlaceholderInserter).to receive(:new).and_call_original
     end
 
     context 'without content editor access' do
       let(:user) { create(:user) }
 
-      xit 'returns a 401' do
+      it 'returns a 401' do
         post(path, params: params)
         expect(response.status).to eq(401)
       end
     end
 
     context 'with errors' do
-      xit 'returns a 422 bad request' do
+      it 'returns a 422 bad request' do
         post(path, params: bad_params)
         expect(response.status).to eq(422)
-      end
-    end
-
-    context 'bad collection' do
-      let(:collection) { create(:board_collection, num_cards: 2, add_editors: [user]) }
-      let(:raw_params) do
-        {
-          row: 0,
-          col: 0,
-          parent_id: collection.id,
-        }
-      end
-
-      before do
-        # replicating an issue that we encountered in prod
-        collection.collection_cards.first.update(row: nil, col: nil)
-      end
-
-      xit 'returns a 200' do
-        expect(CollectionGrid::BctInserter).to receive(:new).with(
-          row: 0,
-          col: 0,
-          collection: collection,
-        )
-        post(path, params: params)
-        expect(response.status).to eq(200)
       end
     end
 
     context 'success' do
       let(:collection) { create(:board_collection, add_editors: [user]) }
 
-      xit 'returns a 200' do
+      it 'returns a 200' do
         post(path, params: params)
         expect(response.status).to eq(200)
       end
 
-      xit 'creates a placeholder' do
-        expect(CollectionGrid::BctInserter).to receive(:new).with(
+      it 'creates a placeholder' do
+        expect(CollectionGrid::PlaceholderInserter).to receive(:new).with(
           row: 0,
           col: 2,
+          count: 1,
           collection: collection,
         )
         expect {
           post(path, params: params)
         }.to change(CollectionCard::Placeholder, :count).by(1)
-        expect(json['data']['attributes']).to match_json_schema('collection_card')
-        expect(json['data']['attributes']['row']).to eq 0
-        expect(json['data']['attributes']['col']).to eq 2
-        expect(json['data']['attributes']['private_card']).to be nil
-        expect(json['data']['attributes']['class_type']).to eq 'CollectionCard::Placeholder'
       end
     end
   end

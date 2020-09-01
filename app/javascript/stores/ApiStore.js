@@ -667,7 +667,6 @@ class ApiStore extends jsonapi(datxCollection) {
   }
 
   async createPlaceholderCards({ data }) {
-    // similar to datx save but using our toJsonApi() to scrub the data
     const result = await this.request(
       `collection_cards/create_placeholders`,
       'POST',

@@ -143,8 +143,6 @@ class GridCardDropzone extends React.Component {
       }
       const card = new CollectionCard(attrs, apiStore)
       card.parent = parent // Assign parent so store can get access to it
-      // NOTE: use this method instead of API_create since placeholder_id isn't an attribute on collection_card
-      console.log({ placeholderCardIds: this.placeholderCardIds })
       await card.API_createFromPlaceholderId(this.placeholderCardIds[idx])
 
       googleTagManager.push({

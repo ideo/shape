@@ -217,7 +217,6 @@ Cypress.Commands.add('clickFirstHotEdge', () => {
   cy.locateDataOrClass('FoamcoreHotspot-0:0')
     .first()
     .click({ force: true })
-  cy.wait('@apiCreateCollectionCardBct')
   // this is when it gets the placeholder
   cy.wait('@apiGetCollectionCard')
   cy.wait(200)

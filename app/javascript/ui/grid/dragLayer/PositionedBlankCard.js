@@ -6,7 +6,6 @@ import PropTypes from 'prop-types'
 import hexToRgba from '~/utils/hexToRgba'
 import propShapes from '~/utils/propShapes'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import GridCardEmptyHotspot from '~/ui/grid/dragLayer/GridCardEmptyHotspot'
@@ -88,7 +87,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   }
 `
 
-@inject('apiStore', 'uiStore')
+@inject('uiStore')
 @observer
 class PositionedBlankCard extends React.Component {
   constructor(props) {
@@ -96,7 +95,7 @@ class PositionedBlankCard extends React.Component {
   }
 
   onClickHotspot = ({ row, col, create = false }) => e => {
-    const { apiStore, uiStore, collection } = this.props
+    const { uiStore, collection } = this.props
     const { selectedArea } = uiStore
     const { minX } = selectedArea
 
@@ -117,19 +116,6 @@ class PositionedBlankCard extends React.Component {
       row,
       col,
     })
-
-    // FIXME: when should this be true
-    if (create) {
-      const placeholder = new CollectionCard(
-        {
-          row,
-          col,
-          parent_id: collection.id,
-        },
-        apiStore
-      )
-      placeholder.API_createBct()
-    }
   }
 
   render() {
@@ -155,7 +141,7 @@ class PositionedBlankCard extends React.Component {
         </BlankCardContainer>
       )
     } else if (blankContentToolIsOpen) {
-      // FIXME: This will be deprecated in the upcoming story
+      // FIXME: should render new hot cell since bct will be deprecated
       const blankContentTool = {
         id: 'blank',
         num: 0,
@@ -196,7 +182,6 @@ class PositionedBlankCard extends React.Component {
 }
 
 PositionedBlankCard.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 

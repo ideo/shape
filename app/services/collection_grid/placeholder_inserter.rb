@@ -21,6 +21,8 @@ module CollectionGrid
 
     def call
       insert_placeholder_cards
+      return [] unless @placeholders.present?
+
       move_placeholder_cards
       @placeholders
     end
@@ -40,8 +42,6 @@ module CollectionGrid
         )
         @placeholders << placeholder
       end
-      # broadcast updates
-      # broadcaster.card_updated(@placeholder)
     end
 
     def move_placeholder_cards
@@ -52,30 +52,6 @@ module CollectionGrid
         to_collection: @collection,
         moving_cards: @placeholders,
       )
-
-      # parent_snapshot = { collection_cards_attributes: [] }
-      # moving_cards.each do |cc|
-      #   @card_attributes << {
-      #     id: cc.id,
-      #     row: cc.row,
-      #     col: cc.col,
-      #   }
-      #   parent_snapshot[:collection_cards_attributes] << {
-      #     id: cc.id,
-      #     row: cc.row,
-      #     col: cc.col,
-      #     row_was: cc.row_was,
-      #     col_was: cc.col_was,
-      #   }
-      # end
-      # @placeholder.update(parent_snapshot: parent_snapshot)
-      # use this service so that template updates also flow through
-      # CollectionUpdater.call(@collection, collection_cards_attributes: @card_attributes)
-      # broadcaster.card_attrs_updated(@card_attributes)
-    end
-
-    def broadcaster
-      CollectionUpdateBroadcaster.new(@collection)
     end
   end
 end

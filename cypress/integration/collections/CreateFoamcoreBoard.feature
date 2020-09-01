@@ -14,7 +14,6 @@ Feature: Creating a FoamcoreBoard Collection
     And I create a textItem card at 1,1 on the board with "Hello."
     # hotspot in between two cards
     When I click the "FoamcoreHotspot-0:1"
-    And I wait for "@apiCreateCollectionCardBct" to finish
     And I wait for "@apiGetCollectionCard" to finish
 
     # should move the card out of the way
