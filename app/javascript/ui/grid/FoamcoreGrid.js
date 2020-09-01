@@ -1390,10 +1390,7 @@ class FoamcoreGrid extends React.Component {
     return cards
   }
 
-  onCursorMove = ev => {
-    const { uiStore } = this.props
-    const { isTouchDevice } = uiStore
-
+  onCursorMove = type => ev => {
     let rect = { left: 0, top: 0 }
     const container = document.querySelector(`.${FOAMCORE_GRID_BOUNDARY}`)
     if (container) {
@@ -1402,7 +1399,7 @@ class FoamcoreGrid extends React.Component {
     }
 
     let { clientX, clientY, target } = ev
-    if (isTouchDevice && ev.touches) {
+    if (type === 'touch' && ev.touches) {
       const touch = _.first(ev.touches)
       // Check if touch device and make sure touch event has real data
       if (touch && touch.clientX && touch.clientY) {
@@ -1420,7 +1417,6 @@ class FoamcoreGrid extends React.Component {
       x: clientX - rect.left,
       y: clientY - rect.top,
     })
-    console.log('onmove', { rect, clientX, clientY, coords })
 
     const { cardMatrix } = this.props.collection
     let { row, col } = coords
@@ -1540,6 +1536,7 @@ class FoamcoreGrid extends React.Component {
         // only 4WFC has horizontal hot edges in the row gutters
         hotEdges.push(
           <FoamcoreHotspot
+            key={`hotspot-${row}`}
             relativeZoomLevel={relativeZoomLevel}
             row={row}
             onClick={ev => this.handleInsertRowClick(ev, row)}
@@ -1560,8 +1557,8 @@ class FoamcoreGrid extends React.Component {
 
     return (
       <Grid
-        onMouseMove={this.onCursorMove}
-        onTouchStart={this.onCursorMove}
+        onMouseMove={this.onCursorMove('mouse')}
+        onTouchStart={this.onCursorMove('touch')}
         className={`${FOAMCORE_GRID_BOUNDARY}${
           isSplitLevelBottom ? '-bottom' : ''
         }`}
