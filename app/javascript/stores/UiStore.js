@@ -71,11 +71,9 @@ export default class UiStore {
   isCypress = navigator && navigator.userAgent === 'cypress'
   @observable
   isTouchDevice =
-    // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
     'ontouchstart' in window ||
-    // eslint-disable-next-line
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0
+    window.TouchEvent ||
+    (window.DocumentTouch && document instanceof window.DocumentTouch)
   @observable
   pageMenuOpen = false
   @observable
