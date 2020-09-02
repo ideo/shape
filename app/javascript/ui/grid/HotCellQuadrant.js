@@ -82,9 +82,7 @@ class HotCellQuadrant extends React.Component {
   }
 
   createContent = type => {
-    const { onCreateContent, uiStore } = this.props
-    console.log('create content')
-    uiStore.setBlankContentType(type)
+    const { onCreateContent } = this.props
     onCreateContent(type)
   }
 
@@ -101,8 +99,6 @@ class HotCellQuadrant extends React.Component {
   render() {
     const { name, description, subTypes } = this.props
     const TypeIcon = nameToIcon[name]
-    console.log('hotcellquadrant render', { nameToIcon, name })
-    console.log('quadrant', subTypes)
     return (
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}

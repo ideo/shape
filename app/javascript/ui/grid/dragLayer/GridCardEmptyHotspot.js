@@ -36,13 +36,15 @@ const StyledGridCardEmpty = styled.div`
 class GridCardEmptyHotspot extends React.Component {
   render() {
     const {
-      parent,
-      visible,
+      emptyRow,
       handleRemoveRowClick,
       handleInsertRowClick,
       interactionType,
       isFourWideBoard,
-      emptyRow,
+      onCreateContent,
+      rowIdx,
+      parent,
+      visible,
     } = this.props
 
     let inner = ''
@@ -54,6 +56,8 @@ class GridCardEmptyHotspot extends React.Component {
           emptyRow={emptyRow}
           handleRemoveRowClick={handleRemoveRowClick}
           handleInsertRowClick={handleInsertRowClick}
+          onCreateContent={onCreateContent}
+          rowIdx={rowIdx}
           isFourWideBoard={isFourWideBoard}
         />
       )
@@ -76,6 +80,7 @@ class GridCardEmptyHotspot extends React.Component {
 
 GridCardEmptyHotspot.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
+  onCreateContent: PropTypes.func.isRequired,
   card: MobxPropTypes.objectOrObservableObject,
   visible: PropTypes.bool,
   interactionType: PropTypes.string,

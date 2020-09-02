@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
+import { action, observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -73,7 +73,7 @@ class FoamcoreInteractionLayer extends React.Component {
     return { row, col }
   }
 
-  onCreateBct = ({ row, col, create = false }) => {
+  onCreateBct = ({ row, col, create = false }, contentType) => {
     const { selectedAreaMinX } = this
     const { apiStore, uiStore, collection } = this.props
 
@@ -85,6 +85,11 @@ class FoamcoreInteractionLayer extends React.Component {
     uiStore.openBlankContentTool({
       row,
       col,
+      collectionId: collection.id,
+      blankType: contentType,
+    })
+    runInAction(() => {
+      this.hoveringRowCol = { row: null, col: null }
     })
 
     if (create) {
@@ -208,9 +213,15 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   get renderHoveringSpot() {
+    const { uiStore } = this.props
+    const { blankContentToolState } = uiStore
     const { row, col } = this.hoveringRowCol
 
-    if (row !== null && col !== null) {
+    if (
+      row !== null &&
+      col !== null &&
+      (blankContentToolState.row !== row || blankContentToolState.col !== col)
+    ) {
       return this.positionBlank(
         {
           id: 'hover',

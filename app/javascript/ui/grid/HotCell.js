@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import localStorage from 'mobx-localstorage'
-import { observable, runInAction } from 'mobx'
+import { runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
 import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
-import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
 import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
@@ -48,18 +47,17 @@ const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 @inject('uiStore')
 @observer
 class HotCell extends React.Component {
-  @observable
-  isDraggedOver = false
-
   handleTypeClick = type => () => {
     this.startCreating(type)
   }
 
   onCreateContent = type => {
+    const { onCreateContent } = this.props
     const collectionType = this.collectionTypes.find(
       collectionType => collectionType.name === type
     )
     const itemType = this.itemTypes.find(itemType => itemType.name === type)
+    onCreateContent(type)
     runInAction(() => {
       if (collectionType) {
         localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, type)
@@ -133,11 +131,6 @@ class HotCell extends React.Component {
   }
 
   render() {
-    const {
-      parent,
-      uiStore: { blankContentType },
-    } = this.props
-
     const primaryTypes = [
       { name: 'text', description: 'Add Text' },
       { ...this.defaultItemType, subTypes: () => this.itemTypes },
@@ -151,18 +144,14 @@ class HotCell extends React.Component {
 
     return (
       <Container>
-        {blankContentType ? (
-          <GridCardBlank preselected={blankContentType} parent={parent} />
-        ) : (
-          primaryTypes.map(({ name, description, subTypes }) => (
-            <HotCellQuadrant
-              name={name}
-              description={description}
-              subTypes={subTypes}
-              onCreateContent={this.onCreateContent}
-            />
-          ))
-        )}
+        {primaryTypes.map(({ name, description, subTypes }) => (
+          <HotCellQuadrant
+            name={name}
+            description={description}
+            subTypes={subTypes}
+            onCreateContent={this.onCreateContent}
+          />
+        ))}
       </Container>
     )
   }
@@ -172,16 +161,15 @@ HotCell.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   handleInsertRowClick: PropTypes.func.isRequired,
   handleRemoveRowClick: PropTypes.func.isRequired,
+  onCreateContent: PropTypes.func.isRequired,
   emptyRow: PropTypes.bool,
   isFourWideBoard: PropTypes.bool,
   rowIdx: PropTypes.number,
-  visible: PropTypes.bool,
 }
 HotCell.defaultProps = {
   emptyRow: false,
   isFourWideBoard: true,
   rowIdx: 0,
-  visible: false,
 }
 HotCell.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,

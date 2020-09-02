@@ -127,10 +127,9 @@ class PositionedBlankCard extends React.Component {
     } else if (blankContentToolIsOpen && interactionType === 'bct') {
       // FIXME: should render new hot cell since bct will be deprecated
       const blankContentTool = {
+        ...uiStore.blankContentToolState,
         id: 'blank',
-        num: 0,
         cardType: 'blank',
-        blankType: 'bct',
         col,
         row,
         width,
@@ -144,6 +143,7 @@ class PositionedBlankCard extends React.Component {
             position={position}
             record={null}
             parent={collection}
+            preselected={blankContentTool.blankType}
           />
         </BlankCardContainer>
       )
@@ -155,25 +155,21 @@ class PositionedBlankCard extends React.Component {
       handleInsertRowClick,
       handleRemoveRowClick,
     } = this.props
-    const draggingOrResizing = _.includes(['drag', 'resize'], interactionType)
+    // const draggingOrResizing = _.includes(['drag', 'resize'], interactionType)
 
     return (
       <BlankCardContainer
         {...defaultProps}
         blocked={blocked}
         interactionType={interactionType}
-        onClick={
-          !draggingOrResizing
-            ? () => {
-                handleBlankCardClick({ row, col })
-              }
-            : null
-        }
       >
         <GridCardEmptyHotspot
           interactionType={interactionType}
           emptyRow={emptyRow}
           isFourWideBoard={collection.isFourWideBoard}
+          onCreateContent={contentType => {
+            handleBlankCardClick({ row, col }, contentType)
+          }}
           handleInsertRowClick={handleInsertRowClick}
           handleRemoveRowClick={handleRemoveRowClick}
         />

@@ -37,6 +37,7 @@ export default class UiStore {
     collectionId: null,
     blankType: null,
     placeholderCard: null,
+    selectedContentType: null,
   }
   defaultCardMenuState = {
     id: null,
@@ -875,11 +876,6 @@ export default class UiStore {
     })
   }
 
-  @action
-  setBlankContentType(type) {
-    this.blankContentType = type
-  }
-
   @computed
   get blankContentToolIsOpen() {
     const { blankContentToolState } = this
@@ -909,7 +905,6 @@ export default class UiStore {
   @action
   async closeBlankContentTool({ force = false } = {}) {
     const { viewingCollection } = this
-    this.setBlankContentType(null)
     if (
       !force &&
       viewingCollection &&
