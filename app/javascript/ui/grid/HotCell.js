@@ -133,6 +133,7 @@ class HotCell extends React.Component {
   }
 
   render() {
+    const { zoomLevel } = this.props
     const primaryTypes = [
       { name: 'text', description: 'Add Text' },
       { ...this.defaultItemType, subTypes: () => this.itemTypes },
@@ -152,6 +153,7 @@ class HotCell extends React.Component {
             description={description}
             subTypes={subTypes}
             onCreateContent={this.onCreateContent}
+            zoomLevel={zoomLevel}
           />
         ))}
       </Container>
@@ -164,6 +166,7 @@ HotCell.propTypes = {
   handleInsertRowClick: PropTypes.func.isRequired,
   handleRemoveRowClick: PropTypes.func.isRequired,
   onCreateContent: PropTypes.func.isRequired,
+  zoomLevel: PropTypes.number.isRequired,
   emptyRow: PropTypes.bool,
   isFourWideBoard: PropTypes.bool,
   rowIdx: PropTypes.number,

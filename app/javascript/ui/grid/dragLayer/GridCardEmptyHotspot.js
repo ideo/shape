@@ -26,6 +26,7 @@ class GridCardEmptyHotspot extends React.Component {
       rowIdx,
       parent,
       visible,
+      zoomLevel,
     } = this.props
 
     let inner = ''
@@ -40,6 +41,7 @@ class GridCardEmptyHotspot extends React.Component {
           onCreateContent={onCreateContent}
           rowIdx={rowIdx}
           isFourWideBoard={isFourWideBoard}
+          zoomLevel={zoomLevel}
         />
       )
     } else if (interactionType === 'unrendered') {
@@ -63,6 +65,7 @@ GridCardEmptyHotspot.propTypes = {
   parent: MobxPropTypes.objectOrObservableObject.isRequired,
   onCreateContent: PropTypes.func.isRequired,
   card: MobxPropTypes.objectOrObservableObject,
+  zoomLevel: PropTypes.number.isRequired,
   visible: PropTypes.bool,
   interactionType: PropTypes.string,
   emptyRow: PropTypes.bool,

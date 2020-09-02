@@ -155,7 +155,7 @@ class FoamcoreInteractionLayer extends React.Component {
     { row, col, width, height, emptyRow = false },
     interactionType
   ) => {
-    const { uiStore, collection, hasDragCollision } = this.props
+    const { uiStore, collection, hasDragCollision, relativeZoomLevel } = this.props
     const position = uiStore.positionForCoordinates({ col, row, width, height })
     const {
       blankContentToolState: { replacingId },
@@ -182,6 +182,7 @@ class FoamcoreInteractionLayer extends React.Component {
         handleBlankCardClick={this.onCreateBct}
         handleInsertRowClick={this.handleInsertRowClick}
         handleRemoveRowClick={this.handleRemoveRowClick}
+        zoomLevel={relativeZoomLevel}
         data-empty-space-click
       />
     )

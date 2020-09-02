@@ -36,6 +36,12 @@ export const Quadrant = styled.div`
   &:hover {
     color: ${v.colors.black};
   }
+
+  ${props =>
+    props.zoomLevel > 1 &&
+    `
+    padding: 12px 23px 12px 23px;
+  `}
 `
 
 const More = styled.button`
@@ -45,6 +51,15 @@ const More = styled.button`
   position: absolute;
   width: 28px;
   z-index: ${v.zIndex.cardHovering + 1};
+
+  ${props =>
+    props.zoomLevel > 1 &&
+    `
+    bottom: 2px;
+    height: 52px;
+    right: 1px;
+    width: 52px
+  `}
 `
 
 const nameToIcon = {
@@ -105,7 +120,7 @@ class HotCellQuadrant extends React.Component {
   }
 
   render() {
-    const { name, description, subTypes } = this.props
+    const { name, description, subTypes, zoomLevel } = this.props
     const TypeIcon = nameToIcon[name]
     return (
       <Tooltip
@@ -113,22 +128,32 @@ class HotCellQuadrant extends React.Component {
         title={description}
         placement="bottom"
       >
-        <Quadrant onClick={this.handleClick} moreMenuOpen={this.moreTypesOpen}>
+        <Quadrant
+          onClick={this.handleClick}
+          moreMenuOpen={this.moreTypesOpen}
+          zoomLevel={zoomLevel}
+        >
           <TypeIcon />
           {subTypes && (
-            <More onClick={this.handleMore}>
+            <More onClick={this.handleMore} zoomLevel={zoomLevel}>
               <DropdownIcon />
-              <PopoutMenu
-                hideDotMenu
-                menuOpen={this.moreTypesOpen}
-                menuItems={this.moreMenuItems}
-                onMouseLeave={this.handleNoMore}
-                offsetPosition={{
-                  x: 0,
-                  y: -40,
+              <div
+                style={{
+                  transform: `translateZ(0) scale(${zoomLevel})`,
                 }}
-                width={280}
-              />
+              >
+                <PopoutMenu
+                  hideDotMenu
+                  menuOpen={this.moreTypesOpen}
+                  menuItems={this.moreMenuItems}
+                  onMouseLeave={this.handleNoMore}
+                  offsetPosition={{
+                    x: 0,
+                    y: -40,
+                  }}
+                  width={280}
+                />
+              </div>
             </More>
           )}
         </Quadrant>
@@ -141,6 +166,7 @@ HotCellQuadrant.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   onCreateContent: PropTypes.func.isRequired,
+  zoomLevel: PropTypes.number.isRequired,
   subTypes: PropTypes.func,
 }
 HotCellQuadrant.wrappedComponent.propTypes = {

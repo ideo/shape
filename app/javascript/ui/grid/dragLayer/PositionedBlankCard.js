@@ -141,6 +141,7 @@ class PositionedBlankCard extends React.Component {
       handleBlankCardClick,
       handleInsertRowClick,
       handleRemoveRowClick,
+      zoomLevel,
     } = this.props
     // const draggingOrResizing = _.includes(['drag', 'resize'], interactionType)
 
@@ -159,6 +160,7 @@ class PositionedBlankCard extends React.Component {
           }}
           handleInsertRowClick={handleInsertRowClick}
           handleRemoveRowClick={handleRemoveRowClick}
+          zoomLevel={zoomLevel}
         />
       </BlankCardContainer>
     )
