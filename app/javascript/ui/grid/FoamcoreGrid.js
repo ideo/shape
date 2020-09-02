@@ -14,7 +14,7 @@ import {
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import MovableGridCard from '~/ui/grid/MovableGridCard'
 import FoamcoreZoomControls from '~/ui/grid/FoamcoreZoomControls'
-import FoamcoreInteractionLayer from '~/ui/grid/dragLayer/FoamcoreInteractionLayer'
+import FoamcoreInteractionLayer from '~/ui/grid/interactionLayer/FoamcoreInteractionLayer'
 import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
 import { objectsEqual } from '~/utils/objectUtils'
 
@@ -141,9 +141,12 @@ class FoamcoreGrid extends React.Component {
 
     const visRows = uiStore.visibleRows
 
+    if (!visRows) return
+
     // Attempt to load more rows if currently loaded rows is less than
     // one full screen out of view
-    if (collection.loadedRows < visRows.max + visRows.num) {
+    const willLoadMoreRows = collection.loadedRows < visRows.max + visRows.num
+    if (willLoadMoreRows) {
       this.loadMoreRows()
     }
   }
@@ -219,7 +222,7 @@ class FoamcoreGrid extends React.Component {
     const maxCols = uiStore.maxCols(collection)
     // Max rows is the max row of any current cards (max_row_index)
     // + 1, since it is zero-indexed,
-    const visRows = uiStore.visibleRows.num || 1
+    const visRows = _.get('visibleRows.num', uiStore) || 1
     let maxRows = collection.max_row_index + 1
     if (collection.isSplitLevelBottom) {
       maxRows += 1
@@ -624,18 +627,17 @@ class FoamcoreGrid extends React.Component {
   }
 
   // reset the grid back to its original state
+  @action
   resetCardPositions({ keepMDLOpen = false } = {}) {
     const { uiStore } = this.props
-    runInAction(() => {
-      uiStore.dragGridSpot.clear()
-      this.dragging = false
-      this.resizing = false
-      this.draggingCardMasterPosition = {}
-      uiStore.setPlaceholderSpot(this.placeholderDefaults)
-      if (!keepMDLOpen) {
-        uiStore.setMovingCards([])
-      }
-    })
+    uiStore.dragGridSpot.clear()
+    this.dragging = false
+    this.resizing = false
+    this.draggingCardMasterPosition = {}
+    uiStore.setPlaceholderSpot(this.placeholderDefaults)
+    if (!keepMDLOpen) {
+      uiStore.setMovingCards([])
+    }
   }
 
   /*
@@ -749,7 +751,7 @@ class FoamcoreGrid extends React.Component {
       if (!_.isEmpty(bump)) return bump
       uiStore.dragGridSpot.set(getMapKey(position), position)
       this.hasDragCollision =
-        this.hasDragCollision || this.findOverlap(position)
+        this.hasDragCollision || !!this.findOverlap(position)
       return {}
     }
     const openSpot = findClosestOpenSpot(position, this.openSpotMatrix)

@@ -8,7 +8,7 @@ import propShapes from '~/utils/propShapes'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
-import GridCardEmptyHotspot from '~/ui/grid/dragLayer/GridCardEmptyHotspot'
+import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 
 const CircleIconHolder = styled.button`
   border: 1px solid ${v.colors.secondaryMedium};
@@ -86,6 +86,8 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
     display: none;
   }
 `
+
+BlankCardContainer.displayName = 'BlankCardContainer'
 
 @inject('uiStore')
 @observer
@@ -198,7 +200,7 @@ PositionedBlankCard.propTypes = {
   handleInsertRowClick: PropTypes.func,
   blocked: PropTypes.bool,
   emptyRow: PropTypes.bool,
-  replacingId: PropTypes.String,
+  replacingId: PropTypes.string,
 }
 
 PositionedBlankCard.defaultProps = {

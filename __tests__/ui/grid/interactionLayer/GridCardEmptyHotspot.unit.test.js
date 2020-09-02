@@ -1,7 +1,7 @@
-import GridCardEmptyHotspot from '~/ui/grid/dragLayer/GridCardEmptyHotspot'
+import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-let wrapper, component, props, uiStore, rerender
+let wrapper, props, uiStore, rerender
 describe('GridCardEmptyHotspot', () => {
   beforeEach(() => {
     const emptyCard = {
@@ -26,23 +26,12 @@ describe('GridCardEmptyHotspot', () => {
       wrapper = shallow(
         <GridCardEmptyHotspot.wrappedComponent {...withProps} />
       )
-      component = wrapper.instance()
     }
   })
 
   it('renders a PlusIcon', () => {
     rerender(props)
     expect(wrapper.find('PlusIcon').exists()).toBeTruthy()
-  })
-
-  it('calls uiStore.openBlankContentTool with card.order on click', () => {
-    rerender(props)
-    component.onClickHotspot()
-    expect(uiStore.openBlankContentTool).toHaveBeenCalledWith({
-      order: props.card.order,
-      col: props.card.position.x,
-      row: props.card.position.y,
-    })
   })
 
   describe('render blanks with blank rows', () => {
