@@ -111,10 +111,10 @@ class CollectionCardBuilder
   end
 
   def adjust_card_properties_for_board
-    # @placeholder ||= @parent_collection.bct_placeholder_at(
-    # row: @collection_card.row,
-    # col: @collection_card.col,
-    # )
+    @placeholder ||= @parent_collection.bct_placeholder_at(
+      row: @collection_card.row,
+      col: @collection_card.col,
+    )
     if @placeholder.present?
       # take over its identity
       @collection_card.id = @placeholder.id
