@@ -2,8 +2,10 @@ import { runInAction } from 'mobx'
 import localStorage from 'mobx-localstorage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import UiStore from '~/stores/UiStore'
+import isTouchDevice from 'is-touch-device'
 import { ACTIVITY_LOG_PAGE_KEY } from '~/utils/variables'
 
+jest.mock('is-touch-device')
 jest.mock('mobx-localstorage')
 
 let uiStore
@@ -389,7 +391,7 @@ describe('UiStore', () => {
       describe('on touchDevice', () => {
         beforeEach(() => {
           collection.num_columns = 16
-          uiStore.isTouchDevice = true
+          isTouchDevice.mockImplementation(() => true)
           uiStore.windowWidth = 720
         })
         it('should return the minimum of num_columns and 8', () => {
@@ -399,7 +401,7 @@ describe('UiStore', () => {
       describe('on desktop', () => {
         beforeEach(() => {
           collection.num_columns = 4
-          uiStore.isTouchDevice = false
+          isTouchDevice.mockImplementation(() => false)
           uiStore.windowWidth = 1280 // Can't set isMobile because it is computed
         })
         it('should return the minimum of num_columns and 16', () => {

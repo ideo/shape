@@ -604,7 +604,7 @@ describe('FoamcoreGrid', () => {
     }
 
     it('should look up coordinatesForPosition', () => {
-      const result = component.onCursorMove(fakeEv)
+      const result = component.onCursorMove('mouse')(fakeEv)
       expect(result).toEqual({
         col: 0,
         row: 1,
@@ -615,7 +615,7 @@ describe('FoamcoreGrid', () => {
       fakeEv.target = {
         classList: ['other'],
       }
-      const result = component.onCursorMove(fakeEv)
+      const result = component.onCursorMove('mouse')(fakeEv)
       expect(result).toEqual(true)
     })
   })
