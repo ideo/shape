@@ -32,7 +32,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
 }))`
   background: ${props => {
     if (props.interactionType === 'unrendered') {
-      return v.colors.commonLightest
+      return 'none'
     } else if (props.interactionType === 'drag-overflow') {
       const color = props.blocked ? v.colors.alert : v.colors.primaryLight
       return `linear-gradient(
@@ -67,23 +67,6 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
 
   ${CircleIconHolder} + ${CircleIconHolder} {
     margin-top: 8px;
-  }
-
-  ${props =>
-    props.interactionType !== 'unrendered' &&
-    `&:hover {
-    background-color: ${v.colors.primaryLight} !important;
-
-    .plus-icon {
-      display: block;
-    }
-
-    ${CircleIconHolder} {
-      display: block;
-    }
-  }
-  `} .plus-icon {
-    display: none;
   }
 `
 

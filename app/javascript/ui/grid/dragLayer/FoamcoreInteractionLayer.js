@@ -147,6 +147,7 @@ class FoamcoreInteractionLayer extends React.Component {
     if (row === prevRow && col === prevCol) {
       return
     }
+    if (!row || !col) return
     this.hoveringRowCol = { row, col }
   }
 

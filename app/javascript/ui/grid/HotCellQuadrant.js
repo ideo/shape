@@ -24,10 +24,10 @@ export const Quadrant = styled.div`
   box-sizing: border-box;
   float: left;
   height: calc(50% - 1px);
-  padding-bottom: 14%;
-  padding-left: 20%;
-  padding-right: 20%;
-  padding-top: 14%;
+  padding-bottom: 40px;
+  padding-left: 58px;
+  padding-right: 58px;
+  padding-top: 40px;
   position: relative;
   width: calc(50% - 1px);
   z-index: ${props => props.moreMenuOpen && v.zIndex.gridCard};
