@@ -142,8 +142,12 @@ class GridCardBlank extends React.Component {
   }
 
   componentDidMount() {
+    console.log('fuck', this.props.preselected)
     if (this.props.preselected === 'text') {
       this.createTextItem()
+    }
+    if (this.props.preselected === 'file') {
+      this.pickImages()
     }
   }
 
@@ -381,7 +385,7 @@ class GridCardBlank extends React.Component {
       case 'template':
       case 'submissionBox':
       case 'foamcoreBoard':
-      case 'search':
+      case 'searchCollection':
         inner = (
           <CollectionCreator
             type={creating}
@@ -411,7 +415,7 @@ class GridCardBlank extends React.Component {
           />
         )
         break
-      case 'data':
+      case 'report':
         inner = (
           <DataItemCreator
             loading={loading}
@@ -525,7 +529,7 @@ class GridCardBlank extends React.Component {
           {creating === 'testCollection' && (
             <BctButtonRotation>{testBctBox}</BctButtonRotation>
           )}
-          {creating === 'data' && (
+          {creating === 'report' && (
             <BctButtonRotation>
               <BctButtonBox
                 type="data"
@@ -576,7 +580,7 @@ class GridCardBlank extends React.Component {
                 {
                   name: 'Create Search Collection',
                   iconLeft: <SearchCollectionIcon size="xs" />,
-                  onClick: this.startCreating('search'),
+                  onClick: this.startCreating('searchCollection'),
                 },
                 {
                   name: 'Create Report',
