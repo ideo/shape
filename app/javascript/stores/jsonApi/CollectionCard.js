@@ -207,6 +207,19 @@ class CollectionCard extends BaseRecord {
     }
   }
 
+  // TODO: see if this can be refactored into API_Create
+  async API_createFromPlaceholderId(placeholderCardId) {
+    const { uiStore } = this
+    if (!placeholderCardId) return
+    const data = this.toJsonApi()
+    data.placeholder_card_id = placeholderCardId
+    const res = await this.apiStore.request('collection_cards', 'POST', {
+      data,
+    })
+    uiStore.trackEvent('create', this.parentCollection)
+    return res.data
+  }
+
   async API_createBct() {
     const { uiStore } = this
     try {

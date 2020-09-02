@@ -575,7 +575,9 @@ class GridCard extends React.Component {
             filter={card.filter}
             forceFilter={!this.hasCover}
             isText={record.isText}
-            visibleOverflow={record.isReportTypeRecord}
+            visibleOverflow={
+              record.isReportTypeRecord || record.isCreativeDifferenceChartCover
+            }
           >
             {showRestore && (
               <StyledTopRightActions

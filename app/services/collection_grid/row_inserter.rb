@@ -5,12 +5,14 @@ module CollectionGrid
     def initialize(
       row: 0,
       collection:,
-      action: :insert_row
+      action: :insert_row,
+      movement: nil
     )
       @row = row
       @parent_collection = collection
       @action = action
       @errors = []
+      @movement = movement || calculate_movement
     end
 
     def call
@@ -19,13 +21,16 @@ module CollectionGrid
 
     private
 
+    def calculate_movement
+      @action.to_sym == :insert_row ? 1 : -1
+    end
+
     def move_all_cards_in_direction
-      movement = @action.to_sym == :insert_row ? 1 : -1
       cards = select_all_cards_below
       # capture these before things get moved
       card_ids = cards.pluck(:id)
       cards.update_all([
-        "row = row + #{movement}, updated_at = ?",
+        "row = row + #{@movement}, updated_at = ?",
         Time.current,
       ])
 

@@ -7,7 +7,7 @@ import {
 } from '~/ui/grid/GridCardHotspot'
 import v from '~/utils/variables'
 
-class FoamcoreHotspot extends React.Component {
+class FoamcoreHotEdge extends React.Component {
   render() {
     const { row, col, horizontal, relativeZoomLevel, onClick } = this.props
     let { gridH, gridW, gutter } = v.defaultGridSettings
@@ -37,7 +37,7 @@ class FoamcoreHotspot extends React.Component {
         data-row={row}
         data-col={col}
         zIndex={0}
-        data-cy={`FoamcoreHotspot-${row}:${col}`}
+        data-cy={`FoamcoreHotEdge-${row}:${col}`}
       >
         <HotspotLine
           height={height}
@@ -53,7 +53,7 @@ class FoamcoreHotspot extends React.Component {
   }
 }
 
-FoamcoreHotspot.propTypes = {
+FoamcoreHotEdge.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number,
   // relativeZoomLevel is needed so that the hotspot can be scaled appropriately
@@ -62,10 +62,10 @@ FoamcoreHotspot.propTypes = {
   horizontal: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
 }
-FoamcoreHotspot.defaultProps = {
+FoamcoreHotEdge.defaultProps = {
   col: null,
 }
 
-FoamcoreHotspot.displayName = 'FoamcoreHotspot'
+FoamcoreHotEdge.displayName = 'FoamcoreHotEdge'
 
-export default FoamcoreHotspot
+export default FoamcoreHotEdge

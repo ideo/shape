@@ -145,6 +145,7 @@ const fakeUiStore = {
   openContextMenu: jest.fn(),
   clearTextEditingItem: jest.fn(),
   positionForCoordinates: jest.fn().mockReturnValue({ x:0, y:0, xPos: 0, yPos: 0, width: 1, height: 1 }),
+  dragGridSpot: new Map(),
 }
 
 export default fakeUiStore

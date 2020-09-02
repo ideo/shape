@@ -74,8 +74,8 @@ export const DisplayTextCss = css`
   color: ${props => props.color || 'inherit'};
   font-weight: ${v.weights.book};
   font-family: ${v.fonts.sans};
-  font-size: 1rem;
-  text-transform: none;
+  font-size: ${props => props.fontSize || '1rem'};
+  text-transform: ${props => props.textTransform || 'none'};
 `
 
 /** @component */

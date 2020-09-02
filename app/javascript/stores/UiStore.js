@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
+import isTouchDevice from 'is-touch-device'
 import localStorage from 'mobx-localstorage'
 
 import sleep from '~/utils/sleep'
@@ -16,6 +17,7 @@ import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 import { calculatePageMargins } from '~/utils/pageUtils'
 import ChannelManager from '~/utils/ChannelManager'
+import { objectsEqual } from '~/utils/objectUtils'
 
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
@@ -72,13 +74,6 @@ export default class UiStore {
   @observable
   isCypress = navigator && navigator.userAgent === 'cypress'
   @observable
-  isTouchDevice =
-    // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
-    'ontouchstart' in window ||
-    // eslint-disable-next-line
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0
-  @observable
   pageMenuOpen = false
   @observable
   tagsModalOpenId = null
@@ -120,6 +115,8 @@ export default class UiStore {
   pastingCards = false
   @observable
   templateName = ''
+  @observable
+  droppingFiles = false
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
@@ -187,6 +184,9 @@ export default class UiStore {
   dragging = false
   @observable
   draggingFromMDL = false
+  dragGridSpot = observable.map({})
+  @observable
+  placeholderSpot = { ...v.placeholderDefaults }
   @observable
   // track if you are dragging/moving more cards than visible
   movingCardsOverflow = false
@@ -268,6 +268,8 @@ export default class UiStore {
   @observable
   zoomLevel = FOAMCORE_MAX_ZOOM
   @observable
+  tempZoomLevel = FOAMCORE_MAX_ZOOM
+  @observable
   collaboratorColors = new Map()
   @observable
   challengeSettingsOpen = false
@@ -275,9 +277,28 @@ export default class UiStore {
   zoomLevels = []
   @observable
   currentlyZooming = false
+  @observable
+  // track which rows are visible on the page
+  visibleRows = {
+    min: 0,
+    max: 0,
+    num: 0,
+  }
+  @observable
+  // track which cols are visible on the page
+  visibleCols = {
+    min: 0,
+    max: 0,
+    num: 0,
+  }
 
   get routingStore() {
     return this.apiStore.routingStore
+  }
+
+  get isTouchDevice() {
+    // from airbnb/is-touch-device
+    return isTouchDevice()
   }
 
   @action
@@ -861,8 +882,10 @@ export default class UiStore {
 
   @computed
   get blankContentToolIsOpen() {
-    // even for foamcore, order will at least == 0 when open
-    return this.blankContentToolState.order !== null
+    const { blankContentToolState } = this
+    return (
+      blankContentToolState.order !== null || blankContentToolState.row !== null
+    )
   }
 
   @computed
@@ -1535,13 +1558,6 @@ export default class UiStore {
     )
   }
 
-  get percentScrolledX() {
-    const { scrollMaxX } = this
-    // in the case where you don't have much horizontalScroll, default to midpoint
-    if (scrollMaxX < 20) return 0.5
-    return window.pageXOffset / scrollMaxX
-  }
-
   get scrollMaxY() {
     return (
       window.scrollMaxY ||
@@ -1550,56 +1566,79 @@ export default class UiStore {
     )
   }
 
+  get percentScrolledX() {
+    const { scrollMaxX } = this
+    // in the case where you don't have much horizontalScroll, default to midpoint
+    if (scrollMaxX < 20) return 0.5
+    const percent = window.pageXOffset / scrollMaxX
+    return _.clamp(percent, 0.05, 0.95)
+  }
+
   get percentScrolledY() {
     const { scrollMaxY } = this
-    // in the case where you're at the top, zoom in should take you a little ways down
-    if (window.pageYOffset < 20) return 0.1
     return window.pageYOffset / scrollMaxY
   }
 
   // -----------------------
   // Foamcore zoom functions
-  zoomOut() {
-    this.zoomAndScroll(1)
+  zoomOut(useTimeout = true) {
+    this.zoomAndScroll(1, useTimeout)
   }
 
-  zoomIn() {
-    this.zoomAndScroll(-1)
+  zoomIn(useTimeout = true) {
+    this.zoomAndScroll(-1, useTimeout)
   }
 
   @action
-  zoomAndScroll(zoomChange) {
+  zoomAndScroll(zoomChange, useTimeout = true) {
     this.currentlyZooming = true
-    // capture these first
+    // capture these percentages first
     const { percentScrolledX, percentScrolledY } = this
-    const zoomBefore = this.relativeZoomLevel
-    this.updateZoomLevel(this.zoomLevel + zoomChange)
-    const zoomAfter = this.relativeZoomLevel
-    if (zoomBefore === zoomAfter) {
+    const zoomBefore = this.zoomLevel
+    const newZoomLevel = this.updateZoomLevel(this.zoomLevel + zoomChange)
+    if (zoomBefore === newZoomLevel) {
       return
     }
-
-    setTimeout(() => {
-      // now that things have changed
+    const afterTimeout = () => {
+      runInAction(() => {
+        // now we actually apply the new zoom level (resize the cards)
+        this.zoomLevel = newZoomLevel
+      })
+      // now that the canvas is resized, we can determine how much to scroll
       const { scrollMaxX, scrollMaxY } = this
-      const left = percentScrolledX * scrollMaxX
+      let left = percentScrolledX * scrollMaxX
       const top = percentScrolledY * scrollMaxY
-
+      if (newZoomLevel === this.zoomLevels.length) {
+        // if we're all the way zoomed out, reset any horizontal scroll
+        left = 0
+      }
       window.scrollTo({
         left,
         top,
       })
+
       runInAction(() => {
+        // finally, tell it we're not currently zooming which will re-enable card animation
         this.currentlyZooming = false
       })
-    })
+    }
+    if (useTimeout) {
+      // timeout allows it to render with new tempZoomLevel + gridSize before trying to determine scroll
+      setTimeout(afterTimeout)
+    } else {
+      // mainly just for unit tests
+      afterTimeout()
+    }
   }
 
   @action
   updateZoomLevel(val, collection = this.viewingCollection) {
     if (!collection || !collection.isBoard) return
-    this.zoomLevel = _.clamp(val, 1, this.zoomLevels.length)
-    collection.lastZoom = this.zoomLevel
+    // tempZoomLevel gets set first to resize the board before actually resizing cards;
+    // this is called within zoomAndScroll, which then sets this.zoomLevel
+    this.tempZoomLevel = _.clamp(val, 1, this.zoomLevels.length)
+    collection.lastZoom = this.tempZoomLevel
+    return this.tempZoomLevel
   }
 
   @action
@@ -1653,16 +1692,56 @@ export default class UiStore {
       // and only store uiStore.zoomLevel, not the collection.lastZoom
       this.zoomLevel = this.zoomLevels.length
     }
+    this.tempZoomLevel = this.zoomLevel
   }
 
   get relativeZoomLevel() {
-    if (this.zoomLevels.length < this.zoomLevel) {
+    return this.calculatedZoomLevel()
+  }
+
+  // this helps us calculate the grid size we are about to enter, so that scrolling can happen before zoom render
+  get relativeTempZoomLevel() {
+    return this.calculatedZoomLevel('temp')
+  }
+
+  calculatedZoomLevel(type = 'current') {
+    const zoomLevel = type === 'current' ? this.zoomLevel : this.tempZoomLevel
+    if (this.zoomLevels.length < zoomLevel) {
       // e.g. when first initializing the page, before determineZoomLevels
       return 1
     }
     // zoomLevels start at 1, so we subtract to get the array idx
-    const zoom = this.zoomLevels[this.zoomLevel - 1]
+    const zoom = this.zoomLevels[zoomLevel - 1]
     return zoom ? zoom.relativeZoomLevel : 1
+  }
+
+  @action
+  setDroppingFiles = droppingFiles => {
+    if (this.droppingFiles !== droppingFiles) {
+      this.droppingFiles = droppingFiles
+    }
+  }
+
+  @action
+  setVisibleRows = visibleRows => {
+    this.visibleRows = visibleRows
+  }
+
+  @action
+  setVisibleCols = visibleCols => {
+    this.visibleCols = visibleCols
+  }
+
+  @action
+  setPlaceholderSpot = (placeholderSpot = this.placeholderDefaults) => {
+    if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
+      const { row, col, width, height, type } = placeholderSpot
+      this.placeholderSpot.row = row
+      this.placeholderSpot.col = col
+      this.placeholderSpot.width = width
+      this.placeholderSpot.height = height
+      this.placeholderSpot.type = type
+    }
   }
 
   pageMargins(collection) {

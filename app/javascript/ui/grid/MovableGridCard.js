@@ -14,7 +14,7 @@ import GridCardPlaceholder from '~/ui/grid/GridCardPlaceholder'
 import GridCardPagination from '~/ui/grid/GridCardPagination'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import AddSubmission from '~/ui/grid/blankContentTool/AddSubmission'
-import GridCardEmptyHotspot from '~/ui/grid/GridCardEmptyHotspot'
+import GridCardEmptyHotspot from '~/ui/grid/dragLayer/GridCardEmptyHotspot'
 import ResizeIcon from '~/ui/icons/ResizeIcon'
 import { StyledCardWrapper } from '~/ui/grid/shared'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
@@ -303,6 +303,7 @@ class MovableGridCard extends React.Component {
     return (
       <PositionedGridCard {...this.styleProps()} transition={transition}>
         <GridCardEmptyHotspot
+          // this was set to always visible...
           visible={this.props.card.visible}
           card={this.props.card}
         />
@@ -544,6 +545,12 @@ class MovableGridCard extends React.Component {
     let menuOpen = false
     if (!moveComplete) _zIndex = cardDragging
     let disableDragging = !canEditCollection || card.isPinnedAndLocked
+    const { currentUser } = uiStore.apiStore
+    const isSuperAdmin = currentUser && currentUser.is_super_admin
+    if (isSuperAdmin) {
+      // allow super admin to move things around as needed
+      disableDragging = false
+    }
     if (_.includes([cardMenuOpen.id, editingCardCover], card.id)) {
       menuOpen = true
       disableDragging = true
@@ -629,7 +636,7 @@ class MovableGridCard extends React.Component {
       enableResizing: {
         bottomRight:
           canEditCollection &&
-          !card.isPinnedAndLocked &&
+          (isSuperAdmin || !card.isPinnedAndLocked) &&
           card.record &&
           !card.record.isChart &&
           !card.record.isGenericFile &&

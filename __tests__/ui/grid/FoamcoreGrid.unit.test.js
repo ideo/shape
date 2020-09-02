@@ -4,7 +4,7 @@ import CardMoveService from '~/utils/CardMoveService'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollectionCard, fakeCollection } from '#/mocks/data'
-import v, { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
+import v from '~/utils/variables'
 
 // because of mdlPlaceholder... without this mock it blows up
 jest.mock('../../../app/javascript/stores/jsonApi/CollectionCard')
@@ -13,7 +13,8 @@ CollectionCard.mockImplementation((data, apiStore) => {
   return data
 })
 
-let props, wrapper, component, rerender, cards, cardA, cardB, cardC
+let props, wrapper, component, rerender
+let cards, cardA, cardB, cardC
 let idCounter = 0
 
 function createCard(data) {
@@ -146,7 +147,7 @@ describe('FoamcoreGrid', () => {
 
     it('should stop all dragging', () => {
       component.resetCardPositions()
-      expect(component.dragGridSpot.size).toEqual(0)
+      expect(props.uiStore.dragGridSpot.size).toEqual(0)
       expect(component.dragging).toEqual(false)
       expect(props.uiStore.setMovingCards).toHaveBeenCalledWith([])
     })
@@ -175,42 +176,44 @@ describe('FoamcoreGrid', () => {
     })
   })
 
-  describe('render blanks with blank rows', () => {
+  describe('renderHotspots', () => {
     beforeEach(() => {
-      const collection = fakeCollection
-      cardA = createCard({ row: 1, col: 1 })
-      // Blank row
-      cardB = createCard({ row: 3, col: 2, height: 2 })
-      cardC = createCard({ row: 5, col: 1 })
-      collection.collection_cards = [cardA, cardB, cardC]
-      // special actions only show up for fourWide
-      collection.isFourWideBoard = true
-      props.collection = collection
+      props.collection.isFourWideBoard = true
       rerender()
     })
 
-    it('should have a modified blank card for empty rows', () => {
-      const blankCard = component.positionBlank(
-        {
-          row: 2,
-          col: 1,
-          width: 1,
-          height: 1,
-        },
-        'hover'
-      )
-      const blankCardComponent = mount(blankCard)
-      expect(blankCardComponent.find('RightBlankActions').exists()).toBe(true)
-    })
-  })
-
-  describe('renderHotspots', () => {
     describe('with one card at the beginning of a row and none touching', () => {
       it('should have vertical hotspots at the beginning of every row', () => {
-        const hotspots = wrapper.find('FoamcoreHotspot')
+        component.positionBlank(
+          {
+            row: 2,
+            col: 1,
+            width: 1,
+            height: 1,
+          },
+          'hover'
+        )
+        const hotspots = wrapper.find('FoamcoreHotEdge')
         // default cardMatrix only has card C at the beginning of the row
         expect(hotspots.find({ horizontal: false }).length).toEqual(1)
         expect(hotspots.find({ horizontal: true }).length).toEqual(3)
+      })
+
+      describe('with pinnedAndLocked cards', () => {
+        beforeEach(() => {
+          cardB.row = 2
+          cardB.isPinnedAndLocked = true
+          rerender()
+        })
+
+        it('should not render hot edges that would push pinnedAndLocked cards down', () => {
+          const hotspots = wrapper.find('FoamcoreHotEdge')
+          // should only have the one horizontal "insert row" at row = 2
+          expect(hotspots.find({ horizontal: true }).length).toEqual(1)
+          expect(hotspots.find({ horizontal: true }).get(0).props.row).toEqual(
+            2
+          )
+        })
       })
     })
 
@@ -222,7 +225,7 @@ describe('FoamcoreGrid', () => {
 
       it('should have vertical hotspots at the beginning of every row', () => {
         // cardA now is at the beginning of the row AND bumps into cardB (+2)
-        const hotspots = wrapper.find('FoamcoreHotspot')
+        const hotspots = wrapper.find('FoamcoreHotEdge')
         expect(hotspots.find({ horizontal: false }).length).toEqual(3)
         expect(hotspots.find({ horizontal: true }).length).toEqual(3)
       })
@@ -235,8 +238,8 @@ describe('FoamcoreGrid', () => {
       })
 
       it('should have horizontal hotspots between rows', () => {
-        expect(wrapper.find('FoamcoreHotspot').length).toEqual(4)
-        const hotspotProps = wrapper.find('FoamcoreHotspot').map(h => h.props())
+        expect(wrapper.find('FoamcoreHotEdge').length).toEqual(4)
+        const hotspotProps = wrapper.find('FoamcoreHotEdge').map(h => h.props())
         // 1 vertical edge and 3 row hotspots
         expect(hotspotProps.filter(p => p.horizontal).length).toEqual(3)
         expect(hotspotProps.filter(p => !p.horizontal).length).toEqual(1)
@@ -336,7 +339,7 @@ describe('FoamcoreGrid', () => {
     const card2 = { ...card, id: '2' }
     describe('when moving a single card', () => {
       beforeEach(() => {
-        component.dragGridSpot.set('6,7', { col: 6, row: 7, card })
+        props.uiStore.dragGridSpot.set('6,7', { col: 6, row: 7, card })
         component.moveCards(card)
       })
 
@@ -361,9 +364,9 @@ describe('FoamcoreGrid', () => {
     describe('when moving multiple cards', () => {
       beforeEach(() => {
         props.uiStore.multiMoveCardIds = [card.id, card2.id]
+        props.uiStore.dragGridSpot.set('6,7', { col: 6, row: 7, card })
+        props.uiStore.dragGridSpot.set('8,9', { col: 8, row: 9, card: card2 })
         rerender()
-        component.dragGridSpot.set('6,7', { col: 6, row: 7, card })
-        component.dragGridSpot.set('8,9', { col: 8, row: 9, card: card2 })
         component.draggingMap = [
           { card, row: 6, col: 7 },
           { card: card2, row: 8, col: 9 },
@@ -398,8 +401,8 @@ describe('FoamcoreGrid', () => {
       beforeEach(() => {
         CardMoveService.moveCards = jest.fn()
         props.uiStore.draggingFromMDL = true
+        props.uiStore.dragGridSpot.set('6,7', { col: 6, row: 7, card })
         component.movingCards = [card, card2]
-        component.dragGridSpot.set('6,7', { col: 6, row: 7, card })
         component.moveCards(card)
       })
 
@@ -574,32 +577,6 @@ describe('FoamcoreGrid', () => {
       expect(props.uiStore.determineZoomLevels).toHaveBeenCalledWith(
         props.collection
       )
-    })
-  })
-
-  describe('onCursorMove', () => {
-    const fakeEv = {
-      clientX: 100,
-      clientY: 200,
-      target: {
-        classList: [FOAMCORE_GRID_BOUNDARY],
-      },
-    }
-
-    it('should look up coordinatesForPosition', () => {
-      const result = component.onCursorMove(fakeEv)
-      expect(result).toEqual({
-        col: 0,
-        row: 1,
-      })
-    })
-
-    it('should ignore events that are outside foamcoreGridBoundary', () => {
-      fakeEv.target = {
-        classList: ['other'],
-      }
-      const result = component.onCursorMove(fakeEv)
-      expect(result).toEqual(true)
     })
   })
 })

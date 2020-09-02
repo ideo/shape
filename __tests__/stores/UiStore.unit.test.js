@@ -2,8 +2,10 @@ import { runInAction } from 'mobx'
 import localStorage from 'mobx-localstorage'
 import fakeApiStore from '#/mocks/fakeApiStore'
 import UiStore from '~/stores/UiStore'
+import isTouchDevice from 'is-touch-device'
 import { ACTIVITY_LOG_PAGE_KEY } from '~/utils/variables'
 
+jest.mock('is-touch-device')
 jest.mock('mobx-localstorage')
 
 let uiStore
@@ -92,6 +94,15 @@ describe('UiStore', () => {
           uiStore.closeBlankContentTool()
           expect(card.API_destroy).toHaveBeenCalled()
         })
+      })
+    })
+
+    describe('#blankContentToolIsOpen', () => {
+      it('should check if there is at least a row set on blankContentToolState', () => {
+        uiStore.closeBlankContentTool()
+        expect(uiStore.blankContentToolIsOpen).toBe(false)
+        uiStore.openBlankContentTool({ row: 0, col: 0 })
+        expect(uiStore.blankContentToolIsOpen).toBe(true)
       })
     })
   })
@@ -270,6 +281,7 @@ describe('UiStore', () => {
     beforeEach(() => {
       collection.isBoard = true
       collection.maxZoom = 3
+      window.scrollTo = jest.fn()
       // this is used by zoomIn/Out
       uiStore.setViewingRecord(collection)
       uiStore.determineZoomLevels(
@@ -297,9 +309,12 @@ describe('UiStore', () => {
     describe('#zoomIn', () => {
       it('reduces zoom number until it reaches 1', () => {
         expect(uiStore.zoomLevel).toEqual(2)
-        uiStore.zoomIn()
+        uiStore.zoomIn(false)
+        expect(window.scrollTo).toHaveBeenCalled()
         expect(uiStore.zoomLevel).toEqual(1)
-        uiStore.zoomIn()
+        window.scrollTo.mockClear()
+        uiStore.zoomIn(false)
+        expect(window.scrollTo).not.toHaveBeenCalled()
         expect(uiStore.zoomLevel).toEqual(1)
       })
     })
@@ -308,18 +323,18 @@ describe('UiStore', () => {
       it('increase zoom number until it reaches maxZoom', () => {
         uiStore.adjustZoomLevel({ ...collection, lastZoom: 2 })
         expect(uiStore.zoomLevel).toEqual(2)
-        uiStore.zoomOut()
+        uiStore.zoomOut(false)
         expect(uiStore.zoomLevel).toEqual(3)
-        uiStore.zoomOut()
+        uiStore.zoomOut(false)
         expect(uiStore.zoomLevel).toEqual(4)
       })
     })
 
     describe('#updateZoomLevel', () => {
-      it('sets UiStore#zoomLevel and collection#lastZoom to given value', () => {
+      it('sets UiStore#tempZoomLevel and collection#lastZoom to given value', () => {
         uiStore.updateZoomLevel(3, collection)
         expect(collection.lastZoom).toEqual(3)
-        expect(uiStore.zoomLevel).toEqual(3)
+        expect(uiStore.tempZoomLevel).toEqual(3)
       })
     })
 
@@ -376,7 +391,7 @@ describe('UiStore', () => {
       describe('on touchDevice', () => {
         beforeEach(() => {
           collection.num_columns = 16
-          uiStore.isTouchDevice = true
+          isTouchDevice.mockImplementation(() => true)
           uiStore.windowWidth = 720
         })
         it('should return the minimum of num_columns and 8', () => {
@@ -386,7 +401,7 @@ describe('UiStore', () => {
       describe('on desktop', () => {
         beforeEach(() => {
           collection.num_columns = 4
-          uiStore.isTouchDevice = false
+          isTouchDevice.mockImplementation(() => false)
           uiStore.windowWidth = 1280 // Can't set isMobile because it is computed
         })
         it('should return the minimum of num_columns and 16', () => {

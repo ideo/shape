@@ -277,6 +277,8 @@ class CollectionCard < ApplicationRecord
       font_color: font_color,
       filter: filter,
       show_replace: show_replace,
+      width: width,
+      height: height,
     }
   end
 

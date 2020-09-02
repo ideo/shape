@@ -128,6 +128,7 @@ Rails.application.routes.draw do
           post 'link'
           post 'duplicate'
           post 'create_bct'
+          post 'create_placeholders'
         end
       end
       resources :groups, except: :delete do

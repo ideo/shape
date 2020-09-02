@@ -477,6 +477,37 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
           linked_id = json['data']['relationships']['record']['data']['id']
           expect(Collection.find(linked_id)).to eq linked_collection
         end
+
+        context 'overriding parent collection card size' do
+          let(:parent) { create(:collection) }
+          let!(:linked_collection) { create(:collection, parent_collection: parent) }
+          let(:raw_params) do
+            {
+              width: 2,
+              parent_id: collection.id,
+              collection_id: linked_collection.id,
+              card_type: 'link',
+            }
+          end
+
+          before do
+            linked_collection.parent_collection_card.update(
+              width: 3,
+              height: 2,
+              font_color: '#abc123',
+            )
+          end
+
+          it 'should create a link card respecting the overriden params' do
+            post(path, params: params)
+            link_card = CollectionCard.find(json['data']['id'])
+            # width overridden in params as 2
+            expect(link_card.width).to eq 2
+            # height comes from the parent (not overridden)
+            expect(link_card.height).to eq 2
+            expect(link_card.font_color).to eq '#abc123'
+          end
+        end
       end
 
       context 'broadcasting updates' do
@@ -665,6 +696,64 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
         item = Item.find(json_item['id'])
         expect(item.translated_name_es).to eq('Algo genial')
         expect(item.translated_content_es).to eq('¿No es este un widget genial?')
+      end
+    end
+  end
+
+  describe 'POST #create_placeholders' do
+    let(:path) { '/api/v1/collection_cards/create_placeholders' }
+    let(:merge_data) do
+      {
+        row: 0,
+        col: 2,
+        count: 1,
+        parent_id: collection.id,
+      }
+    end
+    # merge_data is used since it's not using json_api attributes
+    let(:params) { json_api_params('data', {}, merge_data) }
+    let(:bad_params) do
+      json_api_params('collection_cards', {}, parent_id: collection.id)
+    end
+
+    before do
+      allow(CollectionGrid::PlaceholderInserter).to receive(:new).and_call_original
+    end
+
+    context 'without content editor access' do
+      let(:user) { create(:user) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with errors' do
+      it 'returns a 422 bad request' do
+        post(path, params: bad_params)
+        expect(response.status).to eq(422)
+      end
+    end
+
+    context 'success' do
+      let(:collection) { create(:board_collection, add_editors: [user]) }
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates a placeholder' do
+        expect(CollectionGrid::PlaceholderInserter).to receive(:new).with(
+          row: 0,
+          col: 2,
+          count: 1,
+          collection: collection,
+        )
+        expect {
+          post(path, params: params)
+        }.to change(CollectionCard::Placeholder, :count).by(1)
       end
     end
   end

@@ -1,7 +1,7 @@
-import GridCardEmptyHotspot from '~/ui/grid/GridCardEmptyHotspot'
+import GridCardEmptyHotspot from '~/ui/grid/dragLayer/GridCardEmptyHotspot'
 import fakeUiStore from '#/mocks/fakeUiStore'
 
-let wrapper, component, props, uiStore, shallowRender
+let wrapper, component, props, uiStore, rerender
 describe('GridCardEmptyHotspot', () => {
   beforeEach(() => {
     const emptyCard = {
@@ -19,9 +19,10 @@ describe('GridCardEmptyHotspot', () => {
     uiStore = fakeUiStore
     props = {
       card: emptyCard,
+      interactionType: 'hover',
       uiStore,
     }
-    shallowRender = (withProps = props) => {
+    rerender = (withProps = props) => {
       wrapper = shallow(
         <GridCardEmptyHotspot.wrappedComponent {...withProps} />
       )
@@ -30,17 +31,31 @@ describe('GridCardEmptyHotspot', () => {
   })
 
   it('renders a PlusIcon', () => {
-    shallowRender(props)
+    rerender(props)
     expect(wrapper.find('PlusIcon').exists()).toBeTruthy()
   })
 
   it('calls uiStore.openBlankContentTool with card.order on click', () => {
-    shallowRender(props)
+    rerender(props)
     component.onClickHotspot()
     expect(uiStore.openBlankContentTool).toHaveBeenCalledWith({
       order: props.card.order,
       col: props.card.position.x,
       row: props.card.position.y,
+    })
+  })
+
+  describe('render blanks with blank rows', () => {
+    beforeEach(() => {
+      rerender({
+        ...props,
+        isFourWideBoard: true,
+        emptyRow: true,
+      })
+    })
+
+    it('should have a modified blank card for empty rows', () => {
+      expect(wrapper.find('RightBlankActions').exists()).toBe(true)
     })
   })
 })
