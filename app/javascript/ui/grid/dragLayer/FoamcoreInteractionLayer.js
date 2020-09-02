@@ -9,7 +9,7 @@ import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import PositionedBlankCard from '~/ui/grid/dragLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import { isFile } from '~/utils/FilestackUpload'
-import v, { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
+import v, { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
 
 const DragLayerWrapper = styled.div`
   height: 100%;
@@ -34,25 +34,27 @@ class FoamcoreInteractionLayer extends React.Component {
     )
   }
 
-  onCursorMove = ev => {
-    const { uiStore, coordinatesForPosition } = this.props
-
+  onCursorMove = type => ev => {
+    const { coordinatesForPosition } = this.props
     let rect = { left: 0, top: 0 }
-    const container = document.querySelector(`.${FOAMCORE_DRAG_LAYER}`)
+    const container = document.querySelector(`.${FOAMCORE_INTERACTION_LAYER}`)
     if (container) {
       // just a guard for jest shallow render
       rect = container.getBoundingClientRect()
     }
 
     let { clientX, clientY, target } = ev
-    if (uiStore.isTouchDevice) {
+    if (type === 'touch' && ev.touches) {
       const touch = _.first(ev.touches)
-      clientX = touch.clientX
-      clientY = touch.clientY
-      target = touch.target
+      // Check if touch device and make sure touch event has real data
+      if (touch && touch.clientX && touch.clientY) {
+        clientX = touch.clientX
+        clientY = touch.clientY
+        target = touch.target
+      }
     }
     const { classList } = target
-    if (!classList || !_.includes(classList, FOAMCORE_DRAG_LAYER)) {
+    if (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) {
       // only perform calculation if target is the grid itself
       return true
     }
@@ -379,12 +381,12 @@ class FoamcoreInteractionLayer extends React.Component {
     return (
       <DragLayerWrapper
         data-empty-space-click
-        className={FOAMCORE_DRAG_LAYER}
-        onMouseMove={!uiStore.isTouchDevice ? this.onCursorMove : null}
-        onTouchStart={uiStore.isTouchDevice ? this.onCursorMove : null}
+        className={FOAMCORE_INTERACTION_LAYER}
+        onMouseMove={this.onCursorMove('mouse')}
+        onTouchStart={this.onCursorMove('touch')}
         onDragOver={e => {
           e.preventDefault()
-          this.onCursorMove(e)
+          this.onCursorMove('mouse')
           uiStore.setDroppingFiles(isFile(e.dataTransfer))
         }}
         onDragLeave={e => {

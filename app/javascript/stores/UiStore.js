@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { scroller, animateScroll } from 'react-scroll'
 import { observable, action, runInAction, computed } from 'mobx'
+import isTouchDevice from 'is-touch-device'
 import localStorage from 'mobx-localstorage'
 
 import sleep from '~/utils/sleep'
@@ -70,13 +71,6 @@ export default class UiStore {
   rolesMenuOpen = null
   @observable
   isCypress = navigator && navigator.userAgent === 'cypress'
-  @observable
-  isTouchDevice =
-    // https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
-    'ontouchstart' in window ||
-    // eslint-disable-next-line
-    navigator.maxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0
   @observable
   pageMenuOpen = false
   @observable
@@ -298,6 +292,11 @@ export default class UiStore {
 
   get routingStore() {
     return this.apiStore.routingStore
+  }
+
+  get isTouchDevice() {
+    // from airbnb/is-touch-device
+    return isTouchDevice()
   }
 
   @action

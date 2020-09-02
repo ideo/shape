@@ -2,7 +2,7 @@ import FoamcoreInteractionLayer from '~/ui/grid/dragLayer/FoamcoreInteractionLay
 import fakeApiStore from '#/mocks/fakeApiStore'
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection } from '#/mocks/data'
-import { FOAMCORE_DRAG_LAYER } from '~/utils/variables'
+import { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
 
 let props, wrapper, component, rerender
 describe('FoamcoreInteractionLayer', () => {
@@ -107,7 +107,7 @@ describe('FoamcoreInteractionLayer', () => {
     const fakeEv = {
       clientX: 100,
       clientY: 200,
-      classList: [FOAMCORE_DRAG_LAYER],
+      classList: [FOAMCORE_INTERACTION_LAYER],
     }
 
     xit('should look up coordinatesForPosition', () => {
