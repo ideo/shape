@@ -22,6 +22,7 @@ import v from '~/utils/variables'
 export const Quadrant = styled.div`
   background-color: ${v.colors.primaryLight};
   box-sizing: border-box;
+  color: ${v.colors.secondaryMedium};
   float: left;
   height: calc(50% - 1px);
   padding-bottom: 40px;
@@ -31,6 +32,10 @@ export const Quadrant = styled.div`
   position: relative;
   width: calc(50% - 1px);
   z-index: ${props => props.moreMenuOpen && v.zIndex.gridCard};
+
+  &:hover {
+    color: ${v.colors.black};
+  }
 `
 
 const More = styled.button`
@@ -89,11 +94,14 @@ class HotCellQuadrant extends React.Component {
   get moreMenuItems() {
     const { subTypes } = this.props
     if (!subTypes()) return []
-    return subTypes().map(({ name, description }) => ({
-      name: description,
-      iconLeft: nameToIcon[name],
-      onClick: () => this.createContent(name),
-    }))
+    return subTypes().map(({ name, description }) => {
+      const TypeIcon = nameToIcon[name]
+      return {
+        name: description,
+        iconLeft: <TypeIcon />,
+        onClick: () => this.createContent(name),
+      }
+    })
   }
 
   render() {
@@ -119,6 +127,7 @@ class HotCellQuadrant extends React.Component {
                   x: 0,
                   y: -40,
                 }}
+                width={280}
               />
             </More>
           )}

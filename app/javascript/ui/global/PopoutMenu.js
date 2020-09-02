@@ -135,7 +135,7 @@ export const StyledMenuButton = styled.button`
   font-weight: 400;
   font-size: 1rem;
   text-align: left;
-  max-width: 200px;
+  max-width: 280px;
   padding-left: ${props => props.nested * 10}px;
   margin-top: -13px;
   margin-bottom: -13px;
@@ -193,7 +193,7 @@ export const StyledMenuItem = styled.li`
         if (props.hasCheckbox) {
           return 0
         } else {
-          return -10
+          return -5
         }
       }}px;
     }
@@ -212,7 +212,7 @@ export const StyledMenuItem = styled.li`
         props.wrapperClassName === 'add-audience-menu' ? 0.5 : 1.5}rem;
     }
     .icon-left .icon {
-      display: block;
+      display: inline-block;
       margin-left: ${props => {
         if (props.hasCheckbox) {
           return 10
@@ -298,7 +298,7 @@ class PopoutMenu extends React.Component {
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
             if (withAvatar) className += ' with-avatar'
-
+            console.log('asxdfg;jlnkasdf', iconLeft)
             return (
               <StyledMenuItem
                 key={`${name}-${id || i}`}

@@ -107,7 +107,11 @@ class PositionedBlankCard extends React.Component {
           <GridCardDropzone collection={collection} row={row} col={col} />
         </BlankCardContainer>
       )
-    } else if (blankContentToolIsOpen && interactionType === 'bct') {
+    } else if (
+      blankContentToolIsOpen &&
+      interactionType === 'bct' &&
+      !uiStore.blankContentToolState.blankType
+    ) {
       // FIXME: should render new hot cell since bct will be deprecated
       const blankContentTool = {
         ...uiStore.blankContentToolState,
