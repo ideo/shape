@@ -330,7 +330,6 @@ class MovableGridCard extends React.Component {
     const styleProps = this.styleProps()
     const { height, width, xPos, yPos } = styleProps
     const { blankType } = card
-
     let cardElement = <GridCardBlank parent={parent} preselected={blankType} />
     let transformOrigin = `${xPos}px ${yPos}px`
     if (card.id === 'blank') {

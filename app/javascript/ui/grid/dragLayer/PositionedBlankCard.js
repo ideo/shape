@@ -110,7 +110,7 @@ class PositionedBlankCard extends React.Component {
     } else if (
       blankContentToolIsOpen &&
       interactionType === 'bct' &&
-      !uiStore.blankContentToolState.blankType
+      !!uiStore.blankContentToolState.blankType
     ) {
       // FIXME: should render new hot cell since bct will be deprecated
       const blankContentTool = {

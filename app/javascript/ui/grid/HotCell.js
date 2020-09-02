@@ -32,12 +32,14 @@ const Container = styled.div`
   width: 100%;
 
   ${Quadrant}:nth-child(even) {
-    margin-left: 1px;
+    border-left: 1px solid ${v.colors.commonLight};
+    width: calc(50% + 1px);
   }
 
   ${Quadrant}:nth-child(3),
   ${Quadrant}:nth-child(4) {
-    margin-top: 1px;
+    border-top: 1px solid ${v.colors.commonLight};
+    height: calc(50% + 1px);
   }
 `
 

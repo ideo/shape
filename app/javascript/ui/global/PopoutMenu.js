@@ -298,7 +298,6 @@ class PopoutMenu extends React.Component {
             let className = `menu-${_.kebabCase(name)}`
             const rightIconClassName = 'icon-right'
             if (withAvatar) className += ' with-avatar'
-            console.log('asxdfg;jlnkasdf', iconLeft)
             return (
               <StyledMenuItem
                 key={`${name}-${id || i}`}

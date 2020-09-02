@@ -30,7 +30,7 @@ class GridCardEmptyHotspot extends React.Component {
 
     let inner = ''
 
-    if (interactionType === 'hover') {
+    if (interactionType === 'hover' || interactionType === 'bct') {
       inner = (
         <HotCell
           parent={parent}

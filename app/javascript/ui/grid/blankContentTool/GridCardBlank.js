@@ -142,7 +142,6 @@ class GridCardBlank extends React.Component {
   }
 
   componentDidMount() {
-    console.log('fuck', this.props.preselected)
     if (this.props.preselected === 'text') {
       this.createTextItem()
     }
@@ -377,7 +376,6 @@ class GridCardBlank extends React.Component {
     const { creating, loading } = this.state
     const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
-    console.log('render inner', { creating })
 
     switch (creating) {
       case 'collection':
