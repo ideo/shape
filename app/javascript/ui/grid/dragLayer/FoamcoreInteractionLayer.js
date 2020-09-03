@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
+import RowActions from './RowActions'
 import PositionedBlankCard from '~/ui/grid/dragLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import { isFile } from '~/utils/FilestackUpload'
@@ -16,7 +17,6 @@ const DragLayerWrapper = styled.div`
   width: 100%;
   z-index: ${v.zIndex.gridCardTop};
 `
-
 @inject('apiStore', 'uiStore')
 @observer
 class FoamcoreInteractionLayer extends React.Component {
@@ -189,6 +189,26 @@ class FoamcoreInteractionLayer extends React.Component {
         handleRemoveRowClick={this.handleRemoveRowClick}
         zoomLevel={relativeZoomLevel}
         data-empty-space-click
+      />
+    )
+  }
+
+  get renderRightBlankActions() {
+    const {
+      collection: { collection_cards },
+    } = this.props
+    const { row } = this.hoveringRowCol
+    const emptyRow =
+      !_.some(collection_cards, { row }) &&
+      !_.some(collection_cards, { row: row - 1, height: 2 })
+
+    if (!emptyRow) return null
+
+    return (
+      <RowActions
+        row={row}
+        onInsertRow={this.handleInsertRowClick}
+        onRemoveRow={this.handleRemoveRowClick}
       />
     )
   }
@@ -429,6 +449,7 @@ class FoamcoreInteractionLayer extends React.Component {
         {this.renderInnerDragLayer}
         {this.renderHotEdges}
         {this.renderBct}
+        {this.renderRightBlankActions}
       </DragLayerWrapper>
     )
   }

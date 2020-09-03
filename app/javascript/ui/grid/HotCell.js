@@ -4,28 +4,8 @@ import localStorage from 'mobx-localstorage'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
 
-import CircleAddRowIcon from '~/ui/icons/CircleAddRowIcon'
-import CircleTrashIcon from '~/ui/icons/CircleTrashIcon'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
-import Tooltip from '~/ui/global/Tooltip'
 import v from '~/utils/variables'
-
-const RightBlankActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  right: 12px;
-  top: calc(50% - 36px);
-`
-RightBlankActions.displayName = 'RightBlankActions'
-
-export const CircleIconHolder = styled.button`
-  border: 1px solid ${v.colors.secondaryMedium};
-  border-radius: 50%;
-  color: ${v.colors.secondaryMedium};
-  height: 32px;
-  width: 32px;
-`
 
 const Container = styled.div`
   height: 100%;
@@ -104,32 +84,6 @@ class HotCell extends React.Component {
       return this.itemTypes.find(type => type.name === itemType)
     }
     return this.itemTypes[0]
-  }
-
-  renderRightBlankActions() {
-    const { handleRemoveRowClick, handleInsertRowClick, rowIdx } = this.props
-    return (
-      <RightBlankActions>
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title="Remove row"
-          placement="top"
-        >
-          <CircleIconHolder onClick={ev => handleRemoveRowClick(ev, rowIdx)}>
-            <CircleTrashIcon />
-          </CircleIconHolder>
-        </Tooltip>
-        <Tooltip
-          classes={{ tooltip: 'Tooltip' }}
-          title="Add row"
-          placement="top"
-        >
-          <CircleIconHolder onClick={ev => handleInsertRowClick(ev, rowIdx)}>
-            <CircleAddRowIcon />
-          </CircleIconHolder>
-        </Tooltip>
-      </RightBlankActions>
-    )
   }
 
   render() {
