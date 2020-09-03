@@ -495,5 +495,9 @@ module CollectionGrid
 
       uninterrupted_cards.flatten.uniq
     end
+
+    def self.has_overlapping_cards?(collection:)
+      collection.collection_cards.visible.ordered_row_col.group(:row, :col).count.any? { |_coords, count| count > 1 }
+    end
   end
 end
