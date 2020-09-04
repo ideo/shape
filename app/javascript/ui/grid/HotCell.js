@@ -86,9 +86,23 @@ class HotCell extends React.Component {
     return this.itemTypes[0]
   }
 
+  get expandedSubtypes() {
+    return [
+      { description: 'Media', isCategory: true, subType: () => this.itemTypes },
+      { description: 'Collections', isCategory: true, subType: () => this.collectionTypes },
+      { description: 'Template', isCategory: true, subType: () => {} },
+    ]
+  }
+
+  get defaultBothType() {
+    return this.defaultCollectionType || this.defaultItemType
+  }
+
   render() {
-    const { zoomLevel } = this.props
-    const primaryTypes = [
+    const { uiStore, zoomLevel } = this.props
+    const cardWidth = uiStore.gridSettings.gridW / zoomLevel
+    console.log('hotcell render', { cardWidth, zoomLevel })
+    let primaryTypes = [
       { name: 'text', description: 'Add Text' },
       { ...this.defaultItemType, subTypes: () => this.itemTypes },
       { ...this.defaultCollectionType, subTypes: () => this.collectionTypes },
@@ -98,6 +112,11 @@ class HotCell extends React.Component {
         subTypes: this.fetchTemplates,
       },
     ]
+    if (cardWidth < 132) {
+      primaryTypes = [
+        { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
+      ]
+    }
 
     return (
       <Container>

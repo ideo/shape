@@ -12,7 +12,7 @@ const RightBlankActions = styled.div`
   display: flex;
   flex-direction: column;
   position: absolute;
-  left: -40px;
+  left: -34px;
   top: ${props => props.position.y}px;
 
   &:hover {
@@ -36,7 +36,7 @@ const RowActions = ({ row, onRemoveRow, onInsertRow }) => {
     width: 1,
     height: 1,
   })
-  const cardHeight = uiStore.gridHeightFor(1)
+  const cardHeight = uiStore.gridHeightFor(1) / uiStore.zoomLevel * 2
   position.y = position.y + cardHeight / 2 - 35
   return (
     <RightBlankActions position={position}>
