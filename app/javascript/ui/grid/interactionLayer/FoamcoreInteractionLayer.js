@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import RowActions from './RowActions'
-import PositionedBlankCard from '~/ui/grid/dragLayer/PositionedBlankCard'
+import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import { isFile } from '~/utils/FilestackUpload'
 import v, { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
@@ -58,6 +58,7 @@ class FoamcoreInteractionLayer extends React.Component {
       // only perform calculation if target is the grid itself
       return true
     }
+
     const coords = coordinatesForPosition({
       x: clientX - rect.left,
       y: clientY - rect.top,

@@ -1711,24 +1711,24 @@ export default class UiStore {
   }
 
   @action
-  setDroppingFiles = droppingFiles => {
+  setDroppingFiles(droppingFiles) {
     if (this.droppingFiles !== droppingFiles) {
       this.droppingFiles = droppingFiles
     }
   }
 
   @action
-  setVisibleRows = visibleRows => {
+  setVisibleRows(visibleRows) {
     this.visibleRows = visibleRows
   }
 
   @action
-  setVisibleCols = visibleCols => {
+  setVisibleCols(visibleCols) {
     this.visibleCols = visibleCols
   }
 
   @action
-  setPlaceholderSpot = (placeholderSpot = this.placeholderDefaults) => {
+  setPlaceholderSpot(placeholderSpot = this.placeholderDefaults) {
     if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
       const { row, col, width, height, type } = placeholderSpot
       this.placeholderSpot.row = row

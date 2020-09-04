@@ -176,77 +176,6 @@ describe('FoamcoreGrid', () => {
     })
   })
 
-  describe('renderHotspots', () => {
-    beforeEach(() => {
-      props.collection.isFourWideBoard = true
-      rerender()
-    })
-
-    describe('with one card at the beginning of a row and none touching', () => {
-      it('should have vertical hotspots at the beginning of every row', () => {
-        component.positionBlank(
-          {
-            row: 2,
-            col: 1,
-            width: 1,
-            height: 1,
-          },
-          'hover'
-        )
-        const hotspots = wrapper.find('FoamcoreHotEdge')
-        // default cardMatrix only has card C at the beginning of the row
-        expect(hotspots.find({ horizontal: false }).length).toEqual(1)
-        expect(hotspots.find({ horizontal: true }).length).toEqual(3)
-      })
-
-      describe('with pinnedAndLocked cards', () => {
-        beforeEach(() => {
-          cardB.row = 2
-          cardB.isPinnedAndLocked = true
-          rerender()
-        })
-
-        it('should not render hot edges that would push pinnedAndLocked cards down', () => {
-          const hotspots = wrapper.find('FoamcoreHotEdge')
-          // should only have the one horizontal "insert row" at row = 2
-          expect(hotspots.find({ horizontal: true }).length).toEqual(1)
-          expect(hotspots.find({ horizontal: true }).get(0).props.row).toEqual(
-            2
-          )
-        })
-      })
-    })
-
-    describe('with two cards at the beginning of a row and two touching', () => {
-      beforeEach(() => {
-        props.collection.cardMatrix[1][0] = cardA
-        rerender()
-      })
-
-      it('should have vertical hotspots at the beginning of every row', () => {
-        // cardA now is at the beginning of the row AND bumps into cardB (+2)
-        const hotspots = wrapper.find('FoamcoreHotEdge')
-        expect(hotspots.find({ horizontal: false }).length).toEqual(3)
-        expect(hotspots.find({ horizontal: true }).length).toEqual(3)
-      })
-    })
-
-    describe('with two cards at the beginning of a row and two touching', () => {
-      beforeEach(() => {
-        props.collection.isFourWideBoard = true
-        rerender()
-      })
-
-      it('should have horizontal hotspots between rows', () => {
-        expect(wrapper.find('FoamcoreHotEdge').length).toEqual(4)
-        const hotspotProps = wrapper.find('FoamcoreHotEdge').map(h => h.props())
-        // 1 vertical edge and 3 row hotspots
-        expect(hotspotProps.filter(p => p.horizontal).length).toEqual(3)
-        expect(hotspotProps.filter(p => !p.horizontal).length).toEqual(1)
-      })
-    })
-  })
-
   describe('onDragOrResizeStop', () => {
     let cardId
 
@@ -307,7 +236,7 @@ describe('FoamcoreGrid', () => {
 
   describe('resizeCard', () => {
     beforeEach(() => {
-      component.placeholderSpot = { width: 2, height: 2 }
+      props.uiStore.placeholderSpot = { width: 2, height: 2 }
     })
 
     it('calls collection.API_batchUpdateCardsWithUndo', () => {
@@ -511,18 +440,16 @@ describe('FoamcoreGrid', () => {
 
   describe('loadAfterScroll', () => {
     beforeEach(() => {
-      const { collection, uiStore } = props
+      const { collection } = props
       collection.loadedRows = 9
       collection.loadedCols = 9
       component.loadCards = jest.fn()
-      // zoomed out one level (this affects visibleRows)
-      uiStore.zoomLevel = 2
     })
 
     describe('scrolling in loaded bounds', () => {
       beforeEach(() => {
-        component.visibleCols = { min: 0, max: 4, num: 5 }
-        component.visibleRows = { min: 1, max: 4, num: 4 }
+        props.uiStore.visibleCols = { min: 0, max: 4, num: 5 }
+        props.uiStore.visibleRows = { min: 1, max: 4, num: 4 }
       })
 
       it('does not call loadCards if all in view', () => {
@@ -532,13 +459,18 @@ describe('FoamcoreGrid', () => {
     })
 
     describe('scrolling out of bounds vertically', () => {
+      beforeEach(() => {
+        // re-set visible rows to go out of bounds
+        props.uiStore.visibleRows = { min: 1, max: 6, num: 6 }
+      })
+
       it('calls loadMoreRows', () => {
         component.computeVisibleRows()
         component.loadAfterScroll()
         const minRow = props.collection.loadedRows + 1
         const expectedRows = {
           // ceil needed because visibleRows.num may be fractional
-          rows: [minRow, Math.ceil(minRow + component.visibleRows.num + 3)],
+          rows: [minRow, Math.ceil(minRow + props.uiStore.visibleRows.num + 3)],
         }
         expect(props.loadCollectionCards).toHaveBeenCalledWith(expectedRows)
       })
