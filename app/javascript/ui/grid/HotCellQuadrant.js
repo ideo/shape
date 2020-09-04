@@ -61,8 +61,8 @@ const More = styled.button`
   z-index: ${v.zIndex.cardHovering + 1};
 
   ${props =>
-        props.zoomLevel > 1 &&
-        `
+    props.zoomLevel > 1 &&
+    `
     bottom: 2px;
     height: 52px;
     right: 1px;
@@ -71,135 +71,135 @@ const More = styled.button`
 `
 
 const nameToIcon = {
-    collection: CollectionIcon,
-    link: LinkIcon,
-    file: FileIcon,
-    foamcoreBoard: FoamcoreIcon,
-    report: ReportIcon,
-    searchCollection: SearchCollectionIcon,
-    submissionBox: SubmissionBoxIcon,
-    template: TemplateIcon,
-    testCollection: FeedbackIcon,
-    text: TextIcon,
-    video: VideoIcon,
+  collection: CollectionIcon,
+  link: LinkIcon,
+  file: FileIcon,
+  foamcoreBoard: FoamcoreIcon,
+  report: ReportIcon,
+  searchCollection: SearchCollectionIcon,
+  submissionBox: SubmissionBoxIcon,
+  template: TemplateIcon,
+  testCollection: FeedbackIcon,
+  text: TextIcon,
+  video: VideoIcon,
 }
 
 @inject('uiStore')
 @observer
 class HotCellQuadrant extends React.Component {
-    @observable
-    moreTypesOpen = false
+  @observable
+  moreTypesOpen = false
 
-    handleClick = ev => {
-        const { name } = this.props
-        this.createContent(name)
-    }
+  handleClick = ev => {
+    const { name } = this.props
+    this.createContent(name)
+  }
 
-    handleMore = ev => {
-        ev.preventDefault()
-        ev.stopPropagation()
-        runInAction(() => {
-            this.moreTypesOpen = true
-        })
-    }
+  handleMore = ev => {
+    ev.preventDefault()
+    ev.stopPropagation()
+    runInAction(() => {
+      this.moreTypesOpen = true
+    })
+  }
 
-    handleNoMore = () => {
-        runInAction(() => {
-            this.moreTypesOpen = false
-        })
-    }
+  handleNoMore = () => {
+    runInAction(() => {
+      this.moreTypesOpen = false
+    })
+  }
 
-    createContent = type => {
-        const { onCreateContent } = this.props
-        onCreateContent(type)
-    }
+  createContent = type => {
+    const { onCreateContent } = this.props
+    onCreateContent(type)
+  }
 
-    get moreMenuItems() {
-        const { subTypes } = this.props
-        if (!subTypes()) return []
-        return subTypes().map(({ name, description, isCategory, subTypes }) => {
-            if (isCategory) {
-                return {
-                    name: description,
-                    onClick: () => { },
-                    menuItems: subTypes().map(subType => {
-                        const TypeIcon = nameToIcon[name]
-                        return {
-                            name: description,
-                            iconLeft: <TypeIcon />,
-                            onClick: () => this.createContent(name),
-                        }
-                    })
-                }
-            }
+  get moreMenuItems() {
+    const { subTypes } = this.props
+    if (!subTypes()) return []
+    return subTypes().map(({ name, description, isCategory, subTypes }) => {
+      if (isCategory) {
+        return {
+          name: description,
+          onClick: () => {},
+          menuItems: subTypes().map(subType => {
             const TypeIcon = nameToIcon[name]
             return {
-                name: description,
-                iconLeft: <TypeIcon />,
-                onClick: () => this.createContent(name),
+              name: description,
+              iconLeft: <TypeIcon />,
+              onClick: () => this.createContent(name),
             }
-        })
-    }
+          }),
+        }
+      }
+      const TypeIcon = nameToIcon[name]
+      return {
+        name: description,
+        iconLeft: <TypeIcon />,
+        onClick: () => this.createContent(name),
+      }
+    })
+  }
 
-    render() {
-        const { name, description, subTypes, zoomLevel } = this.props
-        const TypeIcon = nameToIcon[name]
-        return (
-            <Tooltip
-                classes={{ tooltip: 'Tooltip' }}
-                title={description}
-                placement="bottom"
-            >
-                <Quadrant
-                    onClick={this.handleClick}
-                    moreMenuOpen={this.moreTypesOpen}
-                    zoomLevel={zoomLevel}
-                >
-                    <QuadrantIconPositioner>
-                        <QuadrantIconHolder zoomLevel={zoomLevel}>
-                            <TypeIcon />
-                        </QuadrantIconHolder>
-                    </QuadrantIconPositioner>
-                    {subTypes && (
-                        <More onClick={this.handleMore} zoomLevel={zoomLevel}>
-                            <DropdownIcon />
-                            <div
-                                style={{
-                                    transform: `translateZ(0) scale(${zoomLevel})`,
-                                }}
-                            >
-                                <PopoutMenu
-                                    hideDotMenu
-                                    menuOpen={this.moreTypesOpen}
-                                    menuItems={this.moreMenuItems}
-                                    onMouseLeave={this.handleNoMore}
-                                    offsetPosition={{
-                                        x: 0,
-                                        y: -40,
-                                    }}
-                                    width={280}
-                                />
-                            </div>
-                        </More>
-                    )}
-                </Quadrant>
-            </Tooltip>
-        )
-    }
+  render() {
+    const { name, description, subTypes, zoomLevel } = this.props
+    const TypeIcon = nameToIcon[name]
+    return (
+      <Tooltip
+        classes={{ tooltip: 'Tooltip' }}
+        title={description}
+        placement="bottom"
+      >
+        <Quadrant
+          onClick={this.handleClick}
+          moreMenuOpen={this.moreTypesOpen}
+          zoomLevel={zoomLevel}
+        >
+          <QuadrantIconPositioner>
+            <QuadrantIconHolder zoomLevel={zoomLevel}>
+              <TypeIcon />
+            </QuadrantIconHolder>
+          </QuadrantIconPositioner>
+          {subTypes && (
+            <More onClick={this.handleMore} zoomLevel={zoomLevel}>
+              <DropdownIcon />
+              <div
+                style={{
+                  transform: `translateZ(0) scale(${zoomLevel})`,
+                }}
+              >
+                <PopoutMenu
+                  hideDotMenu
+                  menuOpen={this.moreTypesOpen}
+                  menuItems={this.moreMenuItems}
+                  onMouseLeave={this.handleNoMore}
+                  offsetPosition={{
+                    x: 0,
+                    y: -40,
+                  }}
+                  width={280}
+                />
+              </div>
+            </More>
+          )}
+        </Quadrant>
+      </Tooltip>
+    )
+  }
 }
 
 HotCellQuadrant.propTypes = {
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    onCreateContent: PropTypes.func.isRequired,
-    zoomLevel: PropTypes.number.isRequired,
-    subTypes: PropTypes.func,
+  name: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  onCreateContent: PropTypes.func.isRequired,
+  zoomLevel: PropTypes.number.isRequired,
+  subTypes: PropTypes.func,
 }
 HotCellQuadrant.wrappedComponent.propTypes = {
-    uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 HotCellQuadrant.defaultProps = {
-    subTypes: null,
+  subTypes: null,
 }
 
 export default HotCellQuadrant

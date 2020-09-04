@@ -89,7 +89,11 @@ class HotCell extends React.Component {
   get expandedSubtypes() {
     return [
       { description: 'Media', isCategory: true, subType: () => this.itemTypes },
-      { description: 'Collections', isCategory: true, subType: () => this.collectionTypes },
+      {
+        description: 'Collections',
+        isCategory: true,
+        subType: () => this.collectionTypes,
+      },
       { description: 'Template', isCategory: true, subType: () => {} },
     ]
   }
