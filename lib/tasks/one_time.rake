@@ -18,20 +18,32 @@ namespace :one_time do
   desc 'Fix collection card overlaps'
   task reposition_overlapping_cards: :environment do
     user_collections = Collection::UserCollection.all
+
     user_collections.each do |user_collection|
       has_overlapping_cards = CollectionGrid::Calculator.has_overlapping_cards?(collection: user_collection)
+
       next unless has_overlapping_cards
 
-      user_collection.collection_cards.each do |cc|
-        next if cc.board_placement_is_valid
+      cards = user_collection.collection_cards
 
-        CollectionGrid::BoardPlacement.call(
-          row: cc.row,
-          col: cc.col,
-          to_collection: user_collection,
-          moving_cards: [cc],
-        )
-      end
+      top_left_card = CollectionGrid::Calculator.top_left_card(cards)
+
+      next unless top_left_card.present? || cards.present?
+
+      cards.each(&:reload)
+
+      CollectionGrid::BoardPlacement.call(
+        moving_cards: cards,
+        to_collection: user_collection,
+        row: top_left_card.row,
+        col: top_left_card.col,
+      )
+
+      CollectionCard.import(
+        cards.to_a,
+        validate: false,
+        on_duplicate_key_update: %i[row col],
+      )
     end
   end
 end
