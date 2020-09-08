@@ -36,13 +36,14 @@ export const Quadrant = styled.div`
 
 const QuadrantIconPositioner = styled.div`
   display: table;
+  margin: 0 auto;
   height: 100%;
-  width: 100%;
 `
 
 const QuadrantIconHolder = styled.div`
   display: table-cell;
   height: ${props => props.zoomLevel * 44}px;
+  margin: 0 auto;
   text-align: center;
   width: ${props => props.zoomLevel * 44}px;
   vertical-align: middle;
