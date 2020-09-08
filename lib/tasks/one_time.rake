@@ -18,6 +18,10 @@ namespace :one_time do
   desc 'Fix collection card overlaps'
   task reposition_overlapping_cards: :environment do
     Collection::UserCollection.find_each do |user_collection|
+      unless user_collection.board_collection?
+        CollectionGrid::BoardMigrator.call(collection: user_collection)
+      end
+
       has_overlapping_cards = CollectionGrid::Calculator.has_overlapping_cards?(collection: user_collection)
 
       next unless has_overlapping_cards
