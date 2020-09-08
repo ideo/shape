@@ -25,10 +25,6 @@ export const Quadrant = styled.div`
   color: ${v.colors.secondaryMedium};
   float: left;
   height: calc(50% - 1px);
-  // padding-bottom: 40px;
-  // padding-left: 58px;
-  // padding-right: 58px;
-  // padding-top: 40px;
   position: relative;
   width: calc(50% - 1px);
   z-index: ${props => props.moreMenuOpen && v.zIndex.gridCard};
