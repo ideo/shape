@@ -1,6 +1,5 @@
 import v from '~/utils/variables'
 import styled from 'styled-components'
-import { observable } from 'mobx'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
@@ -38,9 +37,6 @@ const StyledIconAndHeadingHolder = styled(IconHolder)`
 @inject('uiStore')
 @observer
 class DropzoneHolder extends React.Component {
-  @observable
-  droppingFile = false
-
   constructor(props) {
     super(props)
   }

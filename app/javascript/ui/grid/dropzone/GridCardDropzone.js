@@ -57,14 +57,11 @@ class GridCardDropzone extends React.Component {
     this.placeholderCardIds = ids
   }
 
-  resetUpload = (success = false) => {
+  resetUpload = () => {
     const { uiStore } = this.props
+    uiStore.setDroppingFiles(false)
     this.updateWillUpload(false)
     this.updateDidUpload(false)
-    this.setPlaceholderCardIds([])
-    if (success) {
-      uiStore.setDroppingFiles(false)
-    }
   }
 
   handleDrop = async e => {
@@ -110,6 +107,8 @@ class GridCardDropzone extends React.Component {
     for (const placeholderCard of placeholderCards) {
       collection.addCard(placeholderCard)
     }
+
+    this.resetUpload()
   }
 
   createCardsForFiles = files => {
@@ -150,9 +149,10 @@ class GridCardDropzone extends React.Component {
         formType: `Create ${ITEM_TYPES.FILE}`,
         parentType: 'foamcore',
       })
-    })
 
-    this.resetUpload(true)
+      // clear placeholder card ids for next upload
+      this.setPlaceholderCardIds([])
+    })
   }
 
   render() {
