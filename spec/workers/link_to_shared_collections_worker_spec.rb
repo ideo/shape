@@ -151,7 +151,11 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
         end
 
         it 'does not continue inserting rows when called multiple times' do
+          expect(CollectionGrid::RowInserter).to receive(:call).and_call_original
           perform
+
+          # should not call a 2nd time
+          expect(CollectionGrid::RowInserter).not_to receive(:call)
           LinkToSharedCollectionsWorker.new.perform(
             users_to_add.map(&:id),
             groups_to_add.map(&:id),
