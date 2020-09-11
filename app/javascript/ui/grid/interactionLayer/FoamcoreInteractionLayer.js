@@ -4,11 +4,14 @@ import { action, observable } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import {
+  calculateOpenSpotMatrix,
+  findClosestOpenSpot,
+} from '~/utils/CollectionGridCalculator'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
-import { isFile } from '~/utils/FilestackUpload'
 import v, { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
 
 const DragLayerWrapper = styled.div`
@@ -264,40 +267,54 @@ class FoamcoreInteractionLayer extends React.Component {
 
   get renderDropSpots() {
     const { collection, uiStore } = this.props
-    const { cardMatrix } = collection
     const blankCards = []
-    // Add blank cards to all empty spaces,
-    // and 2x screen heights at the bottom
-    let extraRows = 0
-    if (collection.isSplitLevel) {
-      extraRows = 1
-    } else {
-      extraRows = uiStore.visibleRows.num * 2
-    }
-    _.each(_.range(0, collection.max_row_index + extraRows), row => {
-      _.each(_.range(0, collection.num_columns), col => {
-        // If there's no row, or nothing in this column, add a blank card for this spot
-        const blankCard = { row, col, width: 1, height: 1 }
-        if (!cardMatrix[row] || !cardMatrix[row][col]) {
-          if (this.cardWithinViewPlusPage(blankCard)) {
-            blankCards.push(this.positionBlank(blankCard, 'hover'))
-          }
-        }
+    const { row, col } = this.hoveringRowCol
+    const { droppingFilesCount } = uiStore
+
+    const takenSpots = []
+
+    for (let i = 0; i < droppingFilesCount; i++) {
+      const openSpotMatrix = calculateOpenSpotMatrix({
+        collection,
+        multiMoveCardIds: [],
+        takenSpots,
       })
-    })
+
+      const openSpot = findClosestOpenSpot(
+        {
+          row,
+          col,
+          width: 1,
+          height: 1,
+        },
+        openSpotMatrix
+      )
+
+      if (openSpot) {
+        const position = {
+          row: openSpot.row,
+          col: openSpot.col,
+          width: 1,
+          height: 1,
+        }
+        blankCards.push(this.positionBlank(position, 'hover'))
+        takenSpots.push(position)
+      }
+    }
+
     return blankCards
   }
 
   get renderInnerDragLayer() {
     const { uiStore, dragging, resizing } = this.props
 
-    const { droppingFiles } = uiStore
+    const { droppingFilesCount } = uiStore
 
-    if (dragging && !resizing && !droppingFiles) {
+    if (dragging && !resizing && droppingFilesCount === 0) {
       return this.renderDragSpots
-    } else if (resizing && !droppingFiles) {
+    } else if (resizing && !droppingFilesCount === 0) {
       return this.renderResizeSpot
-    } else if (droppingFiles) {
+    } else if (droppingFilesCount > 0) {
       return this.renderDropSpots
     }
 
@@ -387,8 +404,9 @@ class FoamcoreInteractionLayer extends React.Component {
         onTouchStart={this.onCursorMove('touch')}
         onDragOver={e => {
           e.preventDefault()
-          this.onCursorMove('mouse')
-          uiStore.setDroppingFiles(isFile(e.dataTransfer))
+          this.onCursorMove('mouse')(e)
+          const numItems = _.get(e, 'dataTransfer.items.length', 0)
+          uiStore.setDroppingFilesCount(numItems)
         }}
         onDragLeave={e => {
           e.preventDefault()
@@ -402,11 +420,11 @@ class FoamcoreInteractionLayer extends React.Component {
           ) {
             return
           }
-          uiStore.setDroppingFiles(false)
+          uiStore.setDroppingFilesCount(false)
         }}
         onMouseLeave={e => {
           e.preventDefault()
-          uiStore.setDroppingFiles(false)
+          uiStore.setDroppingFilesCount(false)
         }}
       >
         {this.renderInnerDragLayer}

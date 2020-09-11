@@ -121,7 +121,7 @@ describe('FoamcoreInteractionLayer', () => {
   describe('dropping files', () => {
     beforeEach(() => {
       const uiStore = fakeUiStore
-      uiStore.droppingFiles = true
+      uiStore.droppingFilesCount = true
       uiStore.visibleRows = {
         min: 0,
         max: 4,

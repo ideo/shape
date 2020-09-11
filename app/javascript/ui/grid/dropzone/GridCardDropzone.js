@@ -59,7 +59,7 @@ class GridCardDropzone extends React.Component {
 
   resetUpload = () => {
     const { uiStore } = this.props
-    uiStore.setDroppingFiles(false)
+    uiStore.setDroppingFilesCount(false)
     this.updateWillUpload(false)
     this.updateDidUpload(false)
   }

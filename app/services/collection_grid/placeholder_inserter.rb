@@ -31,10 +31,9 @@ module CollectionGrid
 
     def insert_placeholder_cards
       # first create the placeholder in the spot that it should take
-      next_row = @row
       @count.times do
         placeholder = CollectionCard::Placeholder.create(
-          row: next_row,
+          row: @row,
           col: @col,
           width: 1,
           height: 1,

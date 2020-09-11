@@ -176,11 +176,16 @@ export const calculateOpenSpotMatrix = ({
   multiMoveCardIds,
   dragGridSpot,
   withDraggedSpots = false,
+  takenSpots = [],
 } = {}) => {
   const cardMatrix = withDraggedSpots
     ? matrixWithDraggedSpots(collection, dragGridSpot)
     : collection.cardMatrix
   const openSpotMatrix = [[]]
+
+  _.each(takenSpots, spot => {
+    cardMatrix[spot.row][spot.col] = 'taken'
+  })
 
   _.each(cardMatrix, (row, rowIdx) => {
     let open = 0
