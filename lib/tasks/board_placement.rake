@@ -1,7 +1,7 @@
 namespace :board_placement do
   desc 'Fix collection card overlaps'
   task reposition_overlapping_cards: :environment do
-    Collection::UserCollection.find_each do |user_collection|
+    Collection::UserCollection.order(updated_at: :desc).where.not(num_columns: nil).find_each do |user_collection|
       next unless user_collection.board_collection?
 
       cards = user_collection.collection_cards
