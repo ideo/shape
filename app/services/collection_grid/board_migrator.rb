@@ -11,6 +11,25 @@ module CollectionGrid
       migrate_collection_and_subcollections(context.collection)
     end
 
+    def self.remove_hidden_user_collection_links(collection)
+      user = collection.editors[:users].first
+      links = collection.link_collection_cards
+      unviewable_ids = []
+      return unless user.present? && links.any?
+
+      links.each do |card|
+        unless card.can_view?(user)
+          unviewable_ids << card.id
+        end
+      end
+      return unless unviewable_ids.present?
+
+      CollectionCard
+        .where(id: unviewable_ids)
+        .update_all(archived: true, updated_at: Time.current, archived_at: Time.current)
+      collection.touch
+    end
+
     private
 
     def migrate_collection_and_subcollections(collection)
@@ -44,21 +63,7 @@ module CollectionGrid
 
       # special case
       if collection.is_a?(Collection::UserCollection)
-        user = collection.editors[:users].first
-        links = collection.link_collection_cards
-        unviewable_ids = []
-        if user.present? && links.any?
-          links.each do |card|
-            unless card.can_view?(user)
-              unviewable_ids << card.id
-            end
-          end
-          if unviewable_ids.present?
-            CollectionCard
-              .where(id: unviewable_ids)
-              .update_all(archived: true, updated_at: Time.current, archived_at: Time.current)
-          end
-        end
+        self.class.remove_hidden_user_collection_links(collection)
       end
 
       # have to make into an array for bulk CollectionCard.import to work
