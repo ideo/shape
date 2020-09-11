@@ -34,4 +34,14 @@ namespace :board_migrator do
       end
     end
   end
+
+  task migrate_user_collections: :environment do
+    Collection::UserCollection.order(updated_at: :desc).where(num_columns: nil).find_in_batches.each do |batch|
+      batch.each do |collection|
+        CollectionGrid::BoardMigrator.call(collection: collection)
+      rescue StandardError
+        puts "unable to migrate collection #{collection.id}"
+      end
+    end
+  end
 end

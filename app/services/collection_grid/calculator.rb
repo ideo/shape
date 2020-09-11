@@ -496,8 +496,40 @@ module CollectionGrid
       uninterrupted_cards.flatten.uniq
     end
 
-    def self.has_overlapping_cards?(collection:)
-      collection.collection_cards.visible.ordered_row_col.group(:row, :col).count.any? { |_coords, count| count > 1 }
+    # NOTE: only captures adjacent cards for each row
+    def self.overlapping_cards(collection:)
+      card_matrix = board_matrix(
+        collection: collection,
+      )
+
+      return if card_matrix.empty?
+
+      total_rows = card_matrix.length - 1
+      total_cols = card_matrix[0].length - 1
+
+      overlapping_cards = []
+
+      (0..total_rows).each do |grid_row|
+        (0..total_cols - 1).each do |grid_col|
+          # for each row, compare adjacent cards
+          card = card_matrix[grid_row][grid_col]
+          next_card = card_matrix[grid_row][grid_col + 1]
+
+          next unless card.present? && next_card.present? && card.id != next_card.id
+
+          # if the current card's length exceed's the next card's col, it's overlapping
+          if (card_max_col(card) + 1) > next_card.col
+            # select more recently created card
+            if card.created_at > next_card.created_at
+              overlapping_cards.push(card)
+            else
+              overlapping_cards.push(next_card)
+            end
+          end
+        end
+      end
+
+      overlapping_cards
     end
   end
 end
