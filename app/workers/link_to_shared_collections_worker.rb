@@ -82,6 +82,10 @@ class LinkToSharedCollectionsWorker
     cards = collection.collection_cards.visible
     non_dashboard_cards_taking_up_first_two_rows = false
     cards.where(row: 0).or(cards.where(row: 1)).find_each do |card|
+      if within_creative_difference_application?(card.record)
+        return false
+      end
+
       non_dashboard_cards_taking_up_first_two_rows = !within_creative_difference_application?(card.record)
     end
 

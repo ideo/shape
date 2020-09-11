@@ -36,9 +36,13 @@ namespace :board_migrator do
   end
 
   task migrate_user_collections: :environment do
-    Collection::UserCollection.order(updated_at: :desc).where(num_columns: nil).find_in_batches.each do |batch|
+    Collection::UserCollection.order(updated_at: :desc).find_in_batches.each do |batch|
       batch.each do |collection|
-        CollectionGrid::BoardMigrator.call(collection: collection)
+        if collection.board_collection?
+          CollectionGrid::BoardMigrator.remove_hidden_user_collection_links(collection)
+        else
+          CollectionGrid::BoardMigrator.call(collection: collection)
+        end
       rescue StandardError
         puts "unable to migrate collection #{collection.id}"
       end
