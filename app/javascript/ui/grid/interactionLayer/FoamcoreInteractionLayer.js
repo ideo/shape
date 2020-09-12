@@ -312,7 +312,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     if (dragging && !resizing && droppingFilesCount === 0) {
       return this.renderDragSpots
-    } else if (resizing && !droppingFilesCount === 0) {
+    } else if (resizing && droppingFilesCount === 0) {
       return this.renderResizeSpot
     } else if (droppingFilesCount > 0) {
       return this.renderDropSpots
@@ -420,11 +420,11 @@ class FoamcoreInteractionLayer extends React.Component {
           ) {
             return
           }
-          uiStore.setDroppingFilesCount(false)
+          uiStore.setDroppingFilesCount(0)
         }}
         onMouseLeave={e => {
           e.preventDefault()
-          uiStore.setDroppingFilesCount(false)
+          uiStore.setDroppingFilesCount(0)
         }}
       >
         {this.renderInnerDragLayer}

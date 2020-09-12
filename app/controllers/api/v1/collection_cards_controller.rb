@@ -346,6 +346,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render_collection_card
   end
 
+  def cleanup_placeholder
+    placeholder_id = params[:placeholder_id]
+    placeholder = CollectionCard::Placeholder.find placeholder_id
+
+    placeholder.delete if placeholder.present?
+
+    head :no_content
+  end
+
   private
 
   def render_collection_cards(collection: @collection, collection_cards: @collection_cards, include_roles: false)
