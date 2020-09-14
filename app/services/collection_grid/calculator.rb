@@ -115,7 +115,18 @@ module CollectionGrid
         cols = (card.col..card_max_col(card))
         rows.each do |row|
           cols.each do |col|
-            matrix[row][col] = card
+            if matrix[row][col].present? && col + 1 < collection.num_columns
+              # if card exists for [row][col] place newer card right next to the older card
+              # they will still overlap and will be captured by Calculator::overlapping_cards
+              if matrix[row][col].created_at > card.created_at
+                matrix[row][col + 1] = matrix[row][col]
+                matrix[row][col] = card
+              else
+                matrix[row][col + 1] = card
+              end
+            else
+              matrix[row][col] = card
+            end
           end
         end
       end

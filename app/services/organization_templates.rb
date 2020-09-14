@@ -1,4 +1,6 @@
 class OrganizationTemplates < SimpleService
+  include CollectionCardBuilderHelpers
+
   def initialize(organization, user)
     @org = organization
     @user = user
@@ -54,9 +56,11 @@ class OrganizationTemplates < SimpleService
       org_user_collection = Collection::UserCollection.find_by(
         organization_id: @org.id,
       )
-      CollectionCard::Link.create(
-        parent: org_user_collection,
-        collection_id: template_collection.id,
+      create_card(
+        parent_collection: org_user_collection,
+        params: {
+          collection_id: template_collection.id,
+        },
       )
     end
   end

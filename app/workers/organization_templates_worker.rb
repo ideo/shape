@@ -1,5 +1,6 @@
 class OrganizationTemplatesWorker
   include Sidekiq::Worker
+  include CollectionCardBuilderHelpers
 
   def perform(organization_id, user_id)
     @organization = Organization.find(organization_id)
@@ -33,13 +34,16 @@ class OrganizationTemplatesWorker
     profile_template = @organization.create_profile_master_template(
       name: 'Profile',
     )
-    CollectionCard::Primary.create(
-      # stick at the end
-      order: @organization.template_collection.collection_cards.count,
-      width: 1,
-      height: 1,
-      parent: @organization.template_collection,
-      collection: profile_template,
+
+    create_card(
+      parent_collection: @organization.template_collection,
+      params: {
+        # stick at the end
+        order: @organization.template_collection.collection_cards.count,
+        width: 1,
+        height: 1,
+        collection: profile_template,
+      },
     )
     profile_template.reload.update_cached_tag_lists
     profile_template.reanchor!
@@ -79,21 +83,27 @@ class OrganizationTemplatesWorker
         ],
       },
     )
-    CollectionCard::Primary.create(
-      order: 0,
-      width: 2,
-      height: 1,
-      parent: @organization.profile_template,
-      item: photo,
-      pinned: true,
+
+    create_card(
+      parent_collection: @organization.profile_template,
+      params: {
+        order: 0,
+        width: 2,
+        height: 1,
+        item: photo,
+        pinned: true,
+      },
     )
-    CollectionCard::Primary.create(
-      order: 1,
-      width: 2,
-      height: 2,
-      parent: @organization.profile_template,
-      item: text,
-      pinned: true,
+
+    create_card(
+      parent_collection: @organization.profile_template,
+      params: {
+        order: 1,
+        width: 2,
+        height: 2,
+        item: text,
+        pinned: true,
+      },
     )
     [photo, text].each(&:recalculate_breadcrumb!)
   end
