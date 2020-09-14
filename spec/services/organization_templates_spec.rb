@@ -66,5 +66,24 @@ RSpec.describe OrganizationTemplates, type: :service do
         ).to be true
       end
     end
+    context 'with a shell org' do
+      let!(:organization) { create(:organization, shell: true) }
+      let(:user_collection) {
+        Collection::UserCollection.find_by(
+          organization_id: organization.id,
+        )
+      }
+      let(:template_collection) {
+        Collection::Global.find_by(
+          name: "#{organization.name} Templates",
+          organization: organization,
+        )
+      }
+      it 'should add create a org templates card' do
+        user_collection.collection_cards.reload
+        expect(user_collection.collection_cards.last.record).to eq(template_collection)
+        expect(user_collection.collection_cards.last.parent).to equal(user_collection)
+      end
+    end
   end
 end

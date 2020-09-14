@@ -60,6 +60,10 @@ RSpec.describe OrganizationTemplatesWorker, type: :worker do
         expect(organization.profile_template.parent).to eq template_collection
       end
 
+      it 'should profile template card on the org templates collection' do
+        expect(template_collection.collection_cards.last.record.name).to eq 'Profile'
+      end
+
       it 'should create two collection cards' do
         expect(profile_template.collection_cards.count).to eq 2
       end
@@ -82,10 +86,15 @@ RSpec.describe OrganizationTemplatesWorker, type: :worker do
         expect(profile_template.cached_owned_tag_list).to match_array(['template'])
       end
 
-      it 'should create a image item and a text item' do
+      it 'should create a image item and a text item for profile and bio' do
         expect(profile_template.items.count).to eq 2
         expect(profile_template.items.first.type).to eq 'Item::FileItem'
         expect(profile_template.items.last.type).to eq 'Item::TextItem'
+      end
+
+      it 'should create profile and bio cards' do
+        expect(profile_template.collection_cards.first.record.name).to eq 'Default profile'
+        expect(profile_template.collection_cards.last.record.name).to eq 'Biography'
       end
 
       it 'should calculate the breadcrumb for the items' do
