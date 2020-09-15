@@ -92,9 +92,16 @@ RSpec.describe OrganizationTemplatesWorker, type: :worker do
         expect(profile_template.items.last.type).to eq 'Item::TextItem'
       end
 
-      it 'should create profile and bio cards' do
+      it 'should create profile and bio cards that are positioned right next to each other' do
         expect(profile_template.collection_cards.first.record.name).to eq 'Default profile'
+        expect(profile_template.collection_cards.first.width).to eq 2
+        expect(profile_template.collection_cards.first.height).to eq 1
+        expect(profile_template.collection_cards.first.row).to eq 0
+        expect(profile_template.collection_cards.first.col).to eq 0
         expect(profile_template.collection_cards.last.record.name).to eq 'Biography'
+        expect(profile_template.collection_cards.last.height).to eq 2
+        expect(profile_template.collection_cards.last.row).to eq 0
+        expect(profile_template.collection_cards.last.col).to eq 2
       end
 
       it 'should calculate the breadcrumb for the items' do

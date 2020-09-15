@@ -38,12 +38,11 @@ class OrganizationTemplatesWorker
     create_card(
       parent_collection: @organization.template_collection,
       params: {
-        # stick at the end
-        order: @organization.template_collection.collection_cards.count,
         width: 1,
         height: 1,
         collection: profile_template,
       },
+      placement: 'end',
     )
     profile_template.reload.update_cached_tag_lists
     profile_template.reanchor!
@@ -84,10 +83,11 @@ class OrganizationTemplatesWorker
       },
     )
 
-    create_card(
+    photo_card = create_card(
       parent_collection: @organization.profile_template,
       params: {
-        order: 0,
+        row: 0,
+        col: 0,
         width: 2,
         height: 1,
         item: photo,
@@ -95,11 +95,11 @@ class OrganizationTemplatesWorker
       },
     )
 
-    create_card(
+    text_card = create_card(
       parent_collection: @organization.profile_template,
       params: {
-        order: 1,
-        width: 2,
+        row: 0,
+        col: 2,
         height: 2,
         item: text,
         pinned: true,
