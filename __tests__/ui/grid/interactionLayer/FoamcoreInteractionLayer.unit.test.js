@@ -69,6 +69,31 @@ describe('FoamcoreInteractionLayer', () => {
     component.gridRef = { scrollLeft: 0, scrollTop: 0 }
   })
 
+  describe('onCursorMove', () => {
+    const fakeEv = {
+      clientX: 100,
+      clientY: 200,
+      target: {
+        classList: [FOAMCORE_INTERACTION_LAYER],
+      },
+    }
+
+    it('should look up coordinatesForPosition', () => {
+      const cursorMoveEvent = component.onCursorMove('mouse')
+      const result = cursorMoveEvent(fakeEv)
+      expect(result).toBeTruthy()
+    })
+
+    it('should ignore events that are outside foamcoreGridBoundary', () => {
+      fakeEv.target = {
+        classList: ['other'],
+      }
+      const cursorMoveEvent = component.onCursorMove('mouse')
+      const result = cursorMoveEvent(fakeEv)
+      expect(result).toEqual(true)
+    })
+  })
+
   describe('resizing', () => {
     beforeEach(() => {
       const placeholderSpot = {
@@ -121,7 +146,7 @@ describe('FoamcoreInteractionLayer', () => {
   describe('dropping files', () => {
     beforeEach(() => {
       const uiStore = fakeUiStore
-      uiStore.droppingFilesCount = true
+      uiStore.droppingFilesCount = 4
       uiStore.visibleRows = {
         min: 0,
         max: 4,
@@ -140,37 +165,21 @@ describe('FoamcoreInteractionLayer', () => {
         collection,
         apiStore: fakeApiStore(),
         uiStore,
-        resizing: true,
+        resizing: false,
+        dragging: false,
+        coordinatesForPosition: jest.fn().mockReturnValue({ row: 0, col: 0 }),
       }
       rerender()
-    })
-    it('should render a PositionedBlankCard with resizing interactionType', () => {
-      expect(wrapper.find('PositionedBlankCard').exists()).toBeTruthy()
-    })
-  })
-
-  describe('onCursorMove', () => {
-    const fakeEv = {
-      clientX: 100,
-      clientY: 200,
-      target: {
-        classList: [FOAMCORE_INTERACTION_LAYER],
-      },
-    }
-
-    it('should look up coordinatesForPosition', () => {
-      const cursorMoveEvent = component.onCursorMove('mouse')
-      const result = cursorMoveEvent(fakeEv)
-      expect(result).toBeTruthy()
+      component.calculateOpenSpot = jest.fn().mockReturnValue({
+        row: 1,
+        col: 2,
+        width: 1,
+        height: 1,
+      }) // mock value for testing
     })
 
-    it('should ignore events that are outside foamcoreGridBoundary', () => {
-      fakeEv.target = {
-        classList: ['other'],
-      }
-      const cursorMoveEvent = component.onCursorMove('mouse')
-      const result = cursorMoveEvent(fakeEv)
-      expect(result).toEqual(true)
+    it('should render a PositionedBlankCard with dropping interactionType', () => {
+      expect(component.renderDropSpots.length > 0).toEqual(true)
     })
   })
 

@@ -190,7 +190,7 @@ class FoamcoreInteractionLayer extends React.Component {
     const { dragGridSpot, movingCardsOverflow } = uiStore
 
     if (!dragGridSpot.size || hoveringOverCollection) {
-      return
+      return null
     }
 
     const draggingPlaceholders = [...dragGridSpot.values()]
@@ -266,29 +266,14 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   get renderDropSpots() {
-    const { collection, uiStore } = this.props
     const blankCards = []
-    const { row, col } = this.hoveringRowCol
+    const { uiStore } = this.props
     const { droppingFilesCount } = uiStore
 
     const takenSpots = []
 
     for (let i = 0; i < droppingFilesCount; i++) {
-      const openSpotMatrix = calculateOpenSpotMatrix({
-        collection,
-        multiMoveCardIds: [],
-        takenSpots,
-      })
-
-      const openSpot = findClosestOpenSpot(
-        {
-          row,
-          col,
-          width: 1,
-          height: 1,
-        },
-        openSpotMatrix
-      )
+      const openSpot = this.calculateOpenSpot(takenSpots)
 
       if (openSpot) {
         const position = {
@@ -303,6 +288,29 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     return blankCards
+  }
+
+  calculateOpenSpot = takenSpots => {
+    const { collection } = this.props
+    const { row, col } = this.hoveringRowCol
+
+    if (!row && !col) return null
+
+    const openSpotMatrix = calculateOpenSpotMatrix({
+      collection,
+      multiMoveCardIds: [],
+      takenSpots,
+    })
+
+    return findClosestOpenSpot(
+      {
+        row,
+        col,
+        width: 1,
+        height: 1,
+      },
+      openSpotMatrix
+    )
   }
 
   get renderInnerDragLayer() {
@@ -415,7 +423,6 @@ class FoamcoreInteractionLayer extends React.Component {
               e.target.getAttribute &&
               e.target.getAttribute('data-empty-space-click')
             ) ||
-            e.target.closest('.dropzoneHolder') ||
             e.target.closest('.gridCardDropzone')
           ) {
             return
