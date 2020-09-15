@@ -102,7 +102,7 @@ class HotCellQuadrant extends React.Component {
 
   handleNoMore = () => {
     runInAction(() => {
-      this.moreTypesOpen = false
+      this.moreTypesOpen = true
     })
   }
 
@@ -119,14 +119,16 @@ class HotCellQuadrant extends React.Component {
         return {
           name: description,
           onClick: () => {},
-          menuItems: subTypes().map(subType => {
-            const TypeIcon = nameToIcon[name]
-            return {
-              name: description,
-              iconLeft: <TypeIcon />,
-              onClick: () => this.createContent(name),
-            }
-          }),
+          subItems:
+            subTypes() &&
+            subTypes().map(subType => {
+              const TypeIcon = nameToIcon[subType.name]
+              return {
+                name: subType.description,
+                iconLeft: <TypeIcon />,
+                onClick: () => this.createContent(subType.name),
+              }
+            }),
         }
       }
       const TypeIcon = nameToIcon[name]
@@ -167,6 +169,7 @@ class HotCellQuadrant extends React.Component {
               >
                 <PopoutMenu
                   hideDotMenu
+                  mobileFixedMenu
                   menuOpen={this.moreTypesOpen}
                   menuItems={this.moreMenuItems}
                   onMouseLeave={this.handleNoMore}

@@ -86,7 +86,7 @@ class HotCell extends React.Component {
     return this.itemTypes[0]
   }
 
-  get expandedSubtypes() {
+  get expandedSubTypes() {
     return [
       {
         description: 'Media',
@@ -98,7 +98,13 @@ class HotCell extends React.Component {
         isCategory: true,
         subTypes: () => this.collectionTypes,
       },
-      { description: 'Template', isCategory: true, subTypes: () => {} },
+      {
+        description: 'Template',
+        isCategory: true,
+        subTypes: () => [
+          { description: 'Create New Template', name: 'template' },
+        ],
+      },
     ]
   }
 
@@ -116,7 +122,7 @@ class HotCell extends React.Component {
       {
         name: 'template',
         description: 'Create New Template',
-        subTypes: this.fetchTemplates,
+        subTypes: () => [],
       },
     ]
     if (cardWidth < 132) {

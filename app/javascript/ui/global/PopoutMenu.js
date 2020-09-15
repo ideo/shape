@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -7,7 +7,10 @@ import BctButton from '~/ui/global/BctButton'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import Checkbox from '~/ui/forms/Checkbox'
+import CornerPositioned from '~/ui/global/CornerPositioned'
+import { Heading3 } from '~/ui/global/styled/typography'
 import MenuIcon from '~/ui/icons/MenuIcon'
+import { uiStore } from '~/stores'
 import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
@@ -42,13 +45,40 @@ export const StyledMenuButtonWrapper = styled.div`
       opacity: 1;
     }
   }
+  ${props =>
+    props.mobileFixedMenu &&
+    `
+    border-top: 1px solid ${v.colors.commonMedium};
+
+    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
+      left: 0;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      width: 100vw;
+    }
+  `}
 `
 
 export const StyledMenuWrapper = styled.div`
-  position: ${props => (props.positionRelative ? 'relative' : 'absolute')};
+  position: ${props => {
+    if (props.isMobileFullScreen) return 'static'
+    if (props.positionRelative) return 'relative'
+    return 'absolute'
+  }};
   padding: 10px;
   transition: left 120ms;
   z-index: ${v.zIndex.aboveClickWrapper};
+
+  ${props =>
+    props.isMobileFullScreen &&
+    `
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+  `}
+
   ${props => {
     const { position, offsetPosition } = props
     if (position && offsetPosition) {
@@ -101,11 +131,23 @@ StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 export const StyledMenu = styled.ul`
   background-color: white;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
-  max-height: ${window.innerHeight - 260}px;
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
   width: ${props => props.width}px;
+
+  ${props =>
+    props.isMobileFullScreen &&
+    `
+    box-shadow: none;
+    width: 100%;
+
+    ${StyledMenuItem} {
+      padding-left: 0;
+      width: 100%;
+    }
+  `}
+
   .organizations {
     border-top: 1px solid ${v.colors.commonMedium};
     li {
@@ -164,6 +206,16 @@ export const StyledMenuItem = styled.li`
   border-top: solid
     ${props => (props.borderColor ? props.borderColor : v.colors.commonMedium)};
   border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
+
+  ${props =>
+    props.isMobileFullScreen &&
+    `
+    border-left-width: 0px;
+    border-top: none;
+    display: block;
+    padding-bottom: 0;
+    padding-left: 7px !important;
+  `}
 
   ${StyledMenuButton} {
     opacity: ${props => (props.loading ? 0.5 : 1)};
@@ -242,6 +294,11 @@ StyledMenuItem.defaultProps = {
 }
 
 class PopoutMenu extends React.Component {
+  get mobileFullScreen() {
+    const { mobileFixedMenu } = this.props
+    return uiStore.isMobileXs && mobileFixedMenu
+  }
+
   get groupedMenuItems() {
     const { menuItems } = this.props
     let { groupedMenuItems } = this.props
@@ -265,7 +322,7 @@ class PopoutMenu extends React.Component {
     return <div style={{ display: 'inline-block' }}>{menuItem}</div>
   }
 
-  renderMenuItem(item, i) {
+  renderMenuItem = (item, i) => {
     const { wrapperClassName, width, wrapText } = this.props
     const {
       id,
@@ -280,6 +337,7 @@ class PopoutMenu extends React.Component {
       borderColor,
       hasCheckbox,
       isChecked,
+      subItems,
       noHover,
       padding,
     } = item
@@ -294,6 +352,7 @@ class PopoutMenu extends React.Component {
         noBorder={noBorder}
         noHover={noHover}
         hasCheckbox={hasCheckbox}
+        isMobileFullScreen={this.mobileFullScreen}
         loading={loading}
         wrapperClassName={wrapperClassName}
         bgColor={bgColor}
@@ -301,17 +360,34 @@ class PopoutMenu extends React.Component {
         padding={padding}
       >
         {subItems ? (
-          <StyledMenuWrapper
-            offsetPosition={{ x: this.width, y: 25 }}
-          >
-            <StyledMenu
-              width={width}
-              onMouseOver={this.onSubMenuHoverOver}
-              onMouseOut={this.onSubMenuHoverOut}
+          <Fragment>
+            <Heading3
+              noSpacing
+              style={{
+                borderBottom: `1px solid ${v.colors.commonMedium}`,
+                marginLeft: '7px',
+                paddingBottom: '8px',
+              }}
             >
-              {subItems.map(this.renderMenuItem)}
-            </StyledMenu>
-          </StyledMenuWrapper>
+              {item.name}
+            </Heading3>
+            <StyledMenuWrapper
+              isMobileFullScreen={this.mobileFullScreen}
+              offsetPosition={{
+                x: this.mobileFullScreen ? 0 : this.width,
+                y: 25,
+              }}
+            >
+              <StyledMenu
+                isMobileFullScreen={this.mobileFullScreen}
+                width={width}
+                onMouseOver={this.onSubMenuHoverOver}
+                onMouseOut={this.onSubMenuHoverOut}
+              >
+                {subItems.map(subItem => this.renderMenuItem(subItem))}
+              </StyledMenu>
+            </StyledMenuWrapper>
+          </Fragment>
         ) : (
           <Fragment>
             {hasCheckbox && (
@@ -338,11 +414,13 @@ class PopoutMenu extends React.Component {
             >
               {iconLeft && <span className="icon-left">{iconLeft}</span>}
               {this.renderName(item)}
-              {iconRight && <span className={rightIconClassName}>{iconRight}</span>}
+              {iconRight && (
+                <span className={rightIconClassName}>{iconRight}</span>
+              )}
             </StyledMenuButton>
-          </StyledMenuItem>
           </Fragment>
         )}
+      </StyledMenuItem>
     )
   }
 
@@ -389,18 +467,19 @@ class PopoutMenu extends React.Component {
 
   render() {
     const {
-      className,
-      wrapperClassName,
-      menuOpen,
-      disabled,
-      onMouseLeave,
-      onClick,
-      width,
       buttonStyle,
-      position,
-      offsetPosition,
+      className,
+      disabled,
       hideDotMenu,
+      menuOpen,
+      mobileFixedMenu,
+      onClick,
+      offsetPosition,
+      onMouseLeave,
+      position,
       positionRelative,
+      width,
+      wrapperClassName,
     } = this.props
 
     const isBct = buttonStyle === 'bct'
@@ -408,35 +487,41 @@ class PopoutMenu extends React.Component {
 
     const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
     const icon = this.buttonStyleIcon(buttonStyle)
+    const Wrapper =
+      uiStore.isMobileXs && mobileFixedMenu ? CornerPositioned : styled.div``
+
     return (
-      <StyledMenuButtonWrapper
-        className={`${wrapperClassName} ${menuOpen && ' open'}`}
-        role="presentation"
-        onMouseLeave={onMouseLeave}
-        hideDotMenu={hideDotMenu}
-      >
-        {!hideDotMenu && (
-          <MenuToggle
-            disabled={disabled}
-            onClick={onClick}
-            size={isCard ? 28 : 14}
-            className={`${className} menu-toggle`}
-            data-cy={isBct ? 'BctButton-more' : 'PopoutMenu'}
-          >
-            {icon}
-          </MenuToggle>
-        )}
-        <StyledMenuWrapper
-          positionRelative={positionRelative}
-          position={position}
-          offsetPosition={offsetPosition}
-          height={200}
-          className="menu-wrapper"
-          menuClass={className}
+      <Wrapper>
+        <StyledMenuButtonWrapper
+          className={`${wrapperClassName} ${menuOpen && ' open'}`}
+          role="presentation"
+          onMouseLeave={onMouseLeave}
+          hideDotMenu={hideDotMenu}
+          mobileFixedMenu={mobileFixedMenu}
         >
-          <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
-        </StyledMenuWrapper>
-      </StyledMenuButtonWrapper>
+          {!hideDotMenu && (
+            <MenuToggle
+              disabled={disabled}
+              onClick={onClick}
+              size={isCard ? 28 : 14}
+              className={`${className} menu-toggle`}
+              data-cy={isBct ? 'BctButton-more' : 'PopoutMenu'}
+            >
+              {icon}
+            </MenuToggle>
+          )}
+          <StyledMenuWrapper
+            positionRelative={positionRelative}
+            position={position}
+            offsetPosition={offsetPosition}
+            height={200}
+            className="menu-wrapper"
+            menuClass={className}
+          >
+            <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
+          </StyledMenuWrapper>
+        </StyledMenuButtonWrapper>
+      </Wrapper>
     )
   }
 }
@@ -482,6 +567,8 @@ PopoutMenu.propTypes = {
   menuItems: propTypeMenuItem,
   /** The dot menu is used for the action menu and opens the popout menu */
   hideDotMenu: PropTypes.bool,
+  /** Configures the menu to open fixed to the bottom half of screen on mobile */
+  mobileFixedMenu: PropTypes.bool,
   /** Used to completely reposition the whole menu */
   position: PropTypes.shape({
     x: PropTypes.number,
