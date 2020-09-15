@@ -265,83 +265,98 @@ class PopoutMenu extends React.Component {
     return <div style={{ display: 'inline-block' }}>{menuItem}</div>
   }
 
-  get renderMenuItems() {
+  renderMenuItem(item, i) {
+    const { wrapperClassName, width, wrapText } = this.props
     const {
-      groupExtraComponent,
-      wrapperClassName,
-      width,
-      wrapText,
-    } = this.props
+      id,
+      name,
+      iconLeft,
+      iconRight,
+      onClick,
+      loading,
+      withAvatar,
+      bgColor,
+      noBorder,
+      borderColor,
+      hasCheckbox,
+      isChecked,
+      noHover,
+      padding,
+    } = item
+
+    let className = `menu-${_.kebabCase(name)}`
+    const rightIconClassName = 'icon-right'
+    if (withAvatar) className += ' with-avatar'
+    return (
+      <StyledMenuItem
+        key={`${name}-${id || i}`}
+        borderColor={borderColor}
+        noBorder={noBorder}
+        noHover={noHover}
+        hasCheckbox={hasCheckbox}
+        loading={loading}
+        wrapperClassName={wrapperClassName}
+        bgColor={bgColor}
+        width={width - 20}
+        padding={padding}
+      >
+        {subItems ? (
+          <StyledMenuWrapper
+            offsetPosition={{ x: this.width, y: 25 }}
+          >
+            <StyledMenu
+              width={width}
+              onMouseOver={this.onSubMenuHoverOver}
+              onMouseOut={this.onSubMenuHoverOut}
+            >
+              {subItems.map(this.renderMenuItem)}
+            </StyledMenu>
+          </StyledMenuWrapper>
+        ) : (
+          <Fragment>
+            {hasCheckbox && (
+              <Checkbox
+                style={{
+                  marginRight: '0px',
+                  marginLeft: '-14px',
+                  width: 'auto',
+                  height: 'auto',
+                }}
+                color="primary"
+                checked={isChecked}
+                onChange={loading ? () => null : onClick}
+                value="yes"
+                size="small"
+                className="checkBox"
+              />
+            )}
+            <StyledMenuButton
+              onClick={loading ? () => null : onClick}
+              data-cy={`PopoutMenu_${_.camelCase(name)}`}
+              className={className}
+              wrapText={wrapText}
+            >
+              {iconLeft && <span className="icon-left">{iconLeft}</span>}
+              {this.renderName(item)}
+              {iconRight && <span className={rightIconClassName}>{iconRight}</span>}
+            </StyledMenuButton>
+          </StyledMenuItem>
+          </Fragment>
+        )}
+    )
+  }
+
+  get renderMenuItems() {
+    const { groupExtraComponent } = this.props
     const { groupedMenuItems } = this
     const rendered = []
     Object.keys(groupedMenuItems).forEach(groupName => {
       rendered.push(
         <div className={groupName} key={groupName}>
           {groupExtraComponent[groupName]}
-          {groupedMenuItems[groupName].map((item, i) => {
-            const {
-              id,
-              name,
-              iconLeft,
-              iconRight,
-              onClick,
-              loading,
-              withAvatar,
-              bgColor,
-              noBorder,
-              borderColor,
-              hasCheckbox,
-              isChecked,
-              noHover,
-              padding,
-            } = item
-            let className = `menu-${_.kebabCase(name)}`
-            const rightIconClassName = 'icon-right'
-            if (withAvatar) className += ' with-avatar'
-            return (
-              <StyledMenuItem
-                key={`${name}-${id || i}`}
-                borderColor={borderColor}
-                noBorder={noBorder}
-                noHover={noHover}
-                hasCheckbox={hasCheckbox}
-                loading={loading}
-                wrapperClassName={wrapperClassName}
-                bgColor={bgColor}
-                width={width - 20}
-                padding={padding}
-              >
-                {hasCheckbox && (
-                  <Checkbox
-                    style={{
-                      marginRight: '0px',
-                      marginLeft: '-14px',
-                      width: 'auto',
-                      height: 'auto',
-                    }}
-                    color="primary"
-                    checked={isChecked}
-                    onChange={loading ? () => null : onClick}
-                    value="yes"
-                    size="small"
-                    className="checkBox"
-                  />
-                )}
-                <StyledMenuButton
-                  onClick={loading ? () => null : onClick}
-                  data-cy={`PopoutMenu_${_.camelCase(name)}`}
-                  className={className}
-                  wrapText={wrapText}
-                >
-                  {iconLeft && <span className="icon-left">{iconLeft}</span>}
-                  {this.renderName(item)}
-                  {iconRight && (
-                    <span className={rightIconClassName}>{iconRight}</span>
-                  )}
-                </StyledMenuButton>
-              </StyledMenuItem>
-            )
-          })}
+          {groupedMenuItems[groupName].map((item, i) =>
+            this.renderMenuItem(item, i)
+          )}
         </div>
       )
     })
@@ -428,19 +443,20 @@ class PopoutMenu extends React.Component {
 
 const propTypeMenuItem = PropTypes.arrayOf(
   PropTypes.shape({
-    name: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+    bgColor: PropTypes.string,
+    borderColor: PropTypes.string,
+    hasCheckbox: PropTypes.bool,
     iconLeft: PropTypes.element,
     iconRight: PropTypes.element,
-    onClick: PropTypes.func,
-    noBorder: PropTypes.bool,
-    borderColor: PropTypes.string,
-    noHover: PropTypes.bool,
-    loading: PropTypes.bool,
-    withAvatar: PropTypes.bool,
-    bgColor: PropTypes.string,
-    TextComponent: PropTypes.object,
-    hasCheckbox: PropTypes.bool,
     isChecked: PropTypes.bool,
+    loading: PropTypes.bool,
+    name: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+    noBorder: PropTypes.bool,
+    noHover: PropTypes.bool,
+    onClick: PropTypes.func,
+    subItems: PropTypes.arrayOf(propTypeMenuItem),
+    TextComponent: PropTypes.object,
+    withAvatar: PropTypes.bool,
   })
 )
 
