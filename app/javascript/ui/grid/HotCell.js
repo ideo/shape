@@ -4,12 +4,30 @@ import localStorage from 'mobx-localstorage'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
 
+import CornerPositioned from '~/ui/global/CornerPositioned'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
 import v from '~/utils/variables'
 
 const Container = styled.div`
   height: 100%;
   width: 100%;
+
+  ${props =>
+    props.isMobileXs &&
+    `
+    bottom: 0;
+    height: 209px;
+    left: 0;
+    position: fixed;
+    width: 100%
+
+    ${Quadrant} {
+      border-left: none !important;
+      border-top: none !important;
+      height: calc(50% - 1px) !important;
+      width: calc(33.33%) !important;
+    }
+  `}
 
   ${Quadrant}:nth-child(even) {
     border-left: 1px solid ${v.colors.commonLight};
@@ -125,24 +143,38 @@ class HotCell extends React.Component {
         subTypes: () => [],
       },
     ]
-    if (cardWidth < 132) {
+    if (cardWidth < 132 && !uiStore.isMobileXs) {
       primaryTypes = [
         { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
       ]
     }
+    if (uiStore.isMobileXs) {
+      primaryTypes = [
+        { name: 'text', description: 'Add Text' },
+        { name: 'file', description: 'Add File' },
+        { name: 'collection', description: 'Create Collection' },
+        { name: 'link', description: 'Add Link' },
+        { name: 'template', description: 'Create New Template' },
+        { name: 'more', description: 'More'}
+      ]
+    }
+    const PositionWrapper = uiStore.isMobileXs ? CornerPositioned : styled.div``
 
     return (
-      <Container>
-        {primaryTypes.map(({ name, description, subTypes }) => (
-          <HotCellQuadrant
-            name={name}
-            description={description}
-            subTypes={subTypes}
-            onCreateContent={this.onCreateContent}
-            zoomLevel={zoomLevel}
-          />
-        ))}
-      </Container>
+      <PositionWrapper>
+        <Container isMobileXs={uiStore.isMobileXs}>
+          {primaryTypes.map(({ name, description, subTypes }) => (
+            <HotCellQuadrant
+              name={name}
+              description={description}
+              subTypes={subTypes}
+              onCreateContent={this.onCreateContent}
+              zoomLevel={zoomLevel}
+              displayName={uiStore.isMobileXs}
+            />
+          ))}
+        </Container>
+      </PositionWrapper>
     )
   }
 }

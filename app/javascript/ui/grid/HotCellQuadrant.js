@@ -9,9 +9,11 @@ import FeedbackIcon from '~/ui/icons/htc/FeedbackIcon'
 import FileIcon from '~/ui/icons/htc/FileIcon'
 import FoamcoreIcon from '~/ui/icons/htc/FoamcoreIcon'
 import LinkIcon from '~/ui/icons/htc/LinkIcon'
+import MenuIconRotated from '~/ui/icons/MenuIconRotated'
 import ReportIcon from '~/ui/icons/htc/ReportIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
+import { SmallHelperText } from '~/ui/global/styled/typography'
 import SubmissionBoxIcon from '~/ui/icons/htc/SubmissionBoxIcon'
 import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
 import TextIcon from '~/ui/icons/htc/TextIcon'
@@ -42,10 +44,10 @@ const QuadrantIconPositioner = styled.div`
 
 const QuadrantIconHolder = styled.div`
   display: table-cell;
-  height: ${props => props.zoomLevel * 44}px;
+  height: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
   margin: 0 auto;
   text-align: center;
-  width: ${props => props.zoomLevel * 44}px;
+  width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
   vertical-align: middle;
 `
 
@@ -72,6 +74,7 @@ const nameToIcon = {
   link: LinkIcon,
   file: FileIcon,
   foamcoreBoard: FoamcoreIcon,
+  more: MenuIconRotated,
   report: ReportIcon,
   searchCollection: SearchCollectionIcon,
   submissionBox: SubmissionBoxIcon,
@@ -126,7 +129,15 @@ class HotCellQuadrant extends React.Component {
               return {
                 name: subType.description,
                 iconLeft: <TypeIcon />,
-                onClick: () => this.createContent(subType.name),
+                onClick: () => {
+                  if (name === 'more') {
+                    runInAction(() => {
+                      this.moreTypesOpen = true
+                    })
+                  } else {
+                    this.createContent(subType.name)
+                  }
+                },
               }
             }),
         }
@@ -141,7 +152,14 @@ class HotCellQuadrant extends React.Component {
   }
 
   render() {
-    const { name, description, subTypes, zoomLevel } = this.props
+    const {
+      name,
+      description,
+      displayName,
+      subTypes,
+      uiStore,
+      zoomLevel,
+    } = this.props
     const TypeIcon = nameToIcon[name]
     return (
       <Tooltip
@@ -155,11 +173,19 @@ class HotCellQuadrant extends React.Component {
           zoomLevel={zoomLevel}
         >
           <QuadrantIconPositioner>
-            <QuadrantIconHolder zoomLevel={zoomLevel}>
+            <QuadrantIconHolder
+              isMobileXs={uiStore.isMobileXs}
+              zoomLevel={zoomLevel}
+            >
               <TypeIcon />
+              {displayName && (
+                <SmallHelperText color={v.colors.secondaryMedium}>
+                  {description}
+                </SmallHelperText>
+              )}
             </QuadrantIconHolder>
           </QuadrantIconPositioner>
-          {subTypes && (
+          {subTypes && false && (
             <More onClick={this.handleMore} zoomLevel={zoomLevel}>
               <DropdownIcon />
               <div
@@ -194,12 +220,14 @@ HotCellQuadrant.propTypes = {
   onCreateContent: PropTypes.func.isRequired,
   zoomLevel: PropTypes.number.isRequired,
   subTypes: PropTypes.func,
+  displayName: PropTypes.bool,
 }
 HotCellQuadrant.wrappedComponent.propTypes = {
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 HotCellQuadrant.defaultProps = {
   subTypes: null,
+  displayName: false,
 }
 
 export default HotCellQuadrant
