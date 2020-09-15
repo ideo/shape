@@ -402,7 +402,7 @@ export default class UiStore {
     if (selectedAreaShifted) {
       newSelectedCardIds = _.union(newSelectedCardIds, selectedCardIds)
     }
-    if (_.difference(newSelectedCardIds, selectedCardIds).length > 0) {
+    if (!_.isEqual(newSelectedCardIds, [...selectedCardIds])) {
       this.reselectCardIds(newSelectedCardIds)
     }
   }
