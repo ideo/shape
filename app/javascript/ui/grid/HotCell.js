@@ -31,6 +31,7 @@ const Container = styled.div`
 
   ${props =>
     props.smallCardWidth &&
+    !props.isMobileXs &&
     `
     ${Quadrant} {
       height: 100% !important;
@@ -95,6 +96,10 @@ class HotCell extends React.Component {
     ]
   }
 
+  get templateTypes() {
+    return [{ description: 'Create New Template', name: 'template' }]
+  }
+
   get defaultCollectionType() {
     const collectionType = localStorage.getItem(
       HOT_CELL_DEFAULT_COLLECTION_TYPE
@@ -128,9 +133,7 @@ class HotCell extends React.Component {
       {
         description: 'Template',
         isCategory: true,
-        subTypes: () => [
-          { description: 'Create New Template', name: 'template' },
-        ],
+        subTypes: () => this.templateTypes,
       },
     ]
   }
@@ -148,8 +151,8 @@ class HotCell extends React.Component {
       { ...this.defaultCollectionType, subTypes: () => this.collectionTypes },
       {
         name: 'template',
-        description: 'Create New Template',
-        subTypes: () => [],
+        description: 'Templates',
+        subTypes: () => this.templateTypes,
       },
     ]
     if (cardWidth < 132 && !uiStore.isMobileXs) {
@@ -167,6 +170,7 @@ class HotCell extends React.Component {
         { name: 'more', description: 'More' },
       ]
     }
+    console.log({ primaryTypes })
     const PositionWrapper = uiStore.isMobileXs
       ? CornerPositioned
       : styled.div`

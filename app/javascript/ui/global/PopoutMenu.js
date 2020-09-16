@@ -47,17 +47,14 @@ export const StyledMenuButtonWrapper = styled.div`
     }
   }
   ${props =>
-    props.theme.mobileFixedMenu &&
+    props.theme.isMobileFullScreen &&
     `
     border-top: 1px solid ${v.colors.commonMedium};
-
-    @media only screen and (max-width: ${v.responsive.smallBreakpoint}px) {
-      left: 0;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      width: 100vw;
-    }
+    left: 0;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    width: 100vw;
   `}
 `
 
@@ -543,6 +540,7 @@ class PopoutMenu extends React.Component {
     const Wrapper =
       uiStore.isMobileXs && mobileFixedMenu ? CornerPositioned : styled.div``
 
+    console.log('Popout render', { isMobileFullScreen, mobileFixedMenu })
     return (
       <Wrapper>
         <ThemeProvider
@@ -665,7 +663,7 @@ PopoutMenu.defaultProps = {
   // you need one or the other between menuItems / groupedMenuItems
   menuItems: [],
   menuOpen: false,
-  mobileFixedMenu: PropTypes.bool,
+  mobileFixedMenu: false,
   onMouseLeave: () => null,
   onClick: () => null,
   position: null,

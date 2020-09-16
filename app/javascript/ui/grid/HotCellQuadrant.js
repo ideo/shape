@@ -9,7 +9,7 @@ import FeedbackIcon from '~/ui/icons/htc/FeedbackIcon'
 import FileIcon from '~/ui/icons/htc/FileIcon'
 import FoamcoreIcon from '~/ui/icons/htc/FoamcoreIcon'
 import LinkIcon from '~/ui/icons/htc/LinkIcon'
-import MenuIconRotated from '~/ui/icons/MenuIconRotated'
+import MoreIcon from '~/ui/icons/MoreIcon'
 import ReportIcon from '~/ui/icons/htc/ReportIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
@@ -74,7 +74,7 @@ const nameToIcon = {
   link: LinkIcon,
   file: FileIcon,
   foamcoreBoard: FoamcoreIcon,
-  more: MenuIconRotated,
+  more: MoreIcon,
   report: ReportIcon,
   searchCollection: SearchCollectionIcon,
   submissionBox: SubmissionBoxIcon,
@@ -105,7 +105,7 @@ class HotCellQuadrant extends React.Component {
 
   handleNoMore = () => {
     runInAction(() => {
-      this.moreTypesOpen = true
+      this.moreTypesOpen = false
     })
   }
 
@@ -168,8 +168,8 @@ class HotCellQuadrant extends React.Component {
         placement="bottom"
       >
         <Quadrant
-          onClick={this.handleClick}
           moreMenuOpen={this.moreTypesOpen}
+          onClick={this.handleClick}
           zoomLevel={zoomLevel}
         >
           <QuadrantIconPositioner>
