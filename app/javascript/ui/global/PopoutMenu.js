@@ -333,7 +333,7 @@ class PopoutMenu extends React.Component {
 
   get isMobileFullScreen() {
     const { mobileFixedMenu } = this.props
-    return uiStore.isMobileXs && mobileFixedMenu
+    return uiStore.isTouchDevice && mobileFixedMenu
   }
 
   get isMultiTieredMenu() {
@@ -537,10 +537,8 @@ class PopoutMenu extends React.Component {
 
     const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
     const icon = this.buttonStyleIcon(buttonStyle)
-    const Wrapper =
-      uiStore.isMobileXs && mobileFixedMenu ? CornerPositioned : styled.div``
+    const Wrapper = isMobileFullScreen ? CornerPositioned : styled.div``
 
-    console.log('Popout render', { isMobileFullScreen, mobileFixedMenu })
     return (
       <Wrapper>
         <ThemeProvider

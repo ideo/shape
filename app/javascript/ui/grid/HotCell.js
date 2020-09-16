@@ -155,12 +155,12 @@ class HotCell extends React.Component {
         subTypes: () => this.templateTypes,
       },
     ]
-    if (cardWidth < 132 && !uiStore.isMobileXs) {
+    if (cardWidth < 132 && !uiStore.isTouchDevice) {
       primaryTypes = [
         { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
       ]
     }
-    if (uiStore.isMobileXs) {
+    if (uiStore.isTouchDevice) {
       primaryTypes = [
         { name: 'text', description: 'Add Text' },
         { name: 'file', description: 'Add File' },
@@ -170,8 +170,7 @@ class HotCell extends React.Component {
         { name: 'more', description: 'More' },
       ]
     }
-    console.log({ primaryTypes })
-    const PositionWrapper = uiStore.isMobileXs
+    const PositionWrapper = uiStore.isTouchDevice
       ? CornerPositioned
       : styled.div`
           height: 100%;
@@ -180,7 +179,7 @@ class HotCell extends React.Component {
     return (
       <PositionWrapper>
         <Container
-          isMobileXs={uiStore.isMobileXs}
+          isMobileXs={uiStore.isTouchDevice}
           smallCardWidth={cardWidth < 132}
         >
           {primaryTypes.map(({ name, description, subTypes }) => (

@@ -89,9 +89,11 @@ class FoamcoreInteractionLayer extends React.Component {
       collectionId: collection.id,
       blankType: contentType,
     })
-    runInAction(() => {
-      this.hoveringRowCol = { row: null, col: null }
-    })
+    if (!uiStore.isTouchDevice) {
+      runInAction(() => {
+        this.hoveringRowCol = { row: null, col: null }
+      })
+    }
 
     if (create) {
       const placeholder = new CollectionCard(

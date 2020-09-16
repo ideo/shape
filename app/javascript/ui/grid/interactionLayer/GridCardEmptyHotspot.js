@@ -1,10 +1,22 @@
 import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
 import HotCell from '~/ui/grid/HotCell'
 import InlineLoader from '~/ui/layout/InlineLoader'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import v from '~/utils/variables'
+
+const StyledPlusIcon = styled.div`
+  position: absolute;
+  /* TODO: better styling than this? */
+  width: 20%;
+  height: 20%;
+  top: 38%;
+  left: 38%;
+  color: ${v.colors.secondaryMedium};
+`
 
 const StyledGridCardEmpty = styled.div`
   width: 100%;
@@ -26,6 +38,7 @@ class GridCardEmptyHotspot extends React.Component {
       rowIdx,
       parent,
       visible,
+      uiStore,
       zoomLevel,
     } = this.props
 
@@ -33,16 +46,32 @@ class GridCardEmptyHotspot extends React.Component {
 
     if (interactionType === 'hover' || interactionType === 'bct') {
       inner = (
-        <HotCell
-          parent={parent}
-          emptyRow={emptyRow}
-          handleRemoveRowClick={handleRemoveRowClick}
-          handleInsertRowClick={handleInsertRowClick}
-          onCreateContent={onCreateContent}
-          rowIdx={rowIdx}
-          isFourWideBoard={isFourWideBoard}
-          zoomLevel={zoomLevel}
-        />
+        <Fragment>
+          {uiStore.isTouchDevice && (
+            <div
+              style={{
+                backgroundColor: v.colors.primaryLight,
+                position: 'relative',
+                height: '100%',
+              }}
+              data-empty-space-click
+            >
+              <StyledPlusIcon className="plus-icon">
+                <PlusIcon />
+              </StyledPlusIcon>
+            </div>
+          )}
+          <HotCell
+            parent={parent}
+            emptyRow={emptyRow}
+            handleRemoveRowClick={handleRemoveRowClick}
+            handleInsertRowClick={handleInsertRowClick}
+            onCreateContent={onCreateContent}
+            rowIdx={rowIdx}
+            isFourWideBoard={isFourWideBoard}
+            zoomLevel={zoomLevel}
+          />
+        </Fragment>
       )
     } else if (interactionType === 'unrendered') {
       inner = <InlineLoader background={v.colors.commonLightest} />
