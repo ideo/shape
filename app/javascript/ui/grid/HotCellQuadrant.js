@@ -92,7 +92,13 @@ class HotCellQuadrant extends React.Component {
 
   handleClick = ev => {
     const { name } = this.props
-    this.createContent(name)
+    if (name === 'more') {
+      runInAction(() => {
+        this.moreTypesOpen = true
+      })
+    } else {
+      this.createContent(name)
+    }
   }
 
   handleMore = ev => {
@@ -111,6 +117,7 @@ class HotCellQuadrant extends React.Component {
 
   createContent = type => {
     const { onCreateContent } = this.props
+    console.log('create', type)
     onCreateContent(type)
   }
 
@@ -130,13 +137,7 @@ class HotCellQuadrant extends React.Component {
                 name: subType.description,
                 iconLeft: <TypeIcon />,
                 onClick: () => {
-                  if (name === 'more') {
-                    runInAction(() => {
-                      this.moreTypesOpen = true
-                    })
-                  } else {
-                    this.createContent(subType.name)
-                  }
+                  this.createContent(name)
                 },
               }
             }),
@@ -187,7 +188,7 @@ class HotCellQuadrant extends React.Component {
           </QuadrantIconPositioner>
           {subTypes && (
             <More onClick={this.handleMore} zoomLevel={zoomLevel}>
-              <DropdownIcon />
+              {!uiStore.isTouchDevice && <DropdownIcon />}
               <div
                 style={{
                   transform: `translateZ(0) scale(${zoomLevel})`,

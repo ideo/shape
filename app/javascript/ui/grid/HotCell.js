@@ -167,7 +167,11 @@ class HotCell extends React.Component {
         { name: 'collection', description: 'Create Collection' },
         { name: 'link', description: 'Add Link' },
         { name: 'template', description: 'Create New Template' },
-        { name: 'more', description: 'More' },
+        {
+          name: 'more',
+          description: 'More',
+          subTypes: () => this.expandedSubTypes,
+        },
       ]
     }
     const PositionWrapper = uiStore.isTouchDevice

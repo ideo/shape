@@ -28,7 +28,13 @@ export const StyledMenuButtonWrapper = styled.div`
       props.hideDotMenu &&
       `
       margin-top: 25px;
-    `};
+    `}
+    ${props =>
+      props.theme.isMobileFullScreen &&
+      `
+      margin-top: 0;
+      `
+      }
   }
   @keyframes fadeInFromNone {
     0% {
@@ -146,6 +152,7 @@ export const StyledMenu = styled.ul`
     props.theme.isMobileFullScreen &&
     `
     box-shadow: none;
+    padding-bottom: 6px;
     width: 100%;
 
     ${StyledMenuItem} {
@@ -313,7 +320,7 @@ const TieredMenuHeading = styled(Heading3)`
   ${props =>
     props.theme.isMobileFullScreen &&
     `
-    border-bottom: 1px solid ${v.colors.commonMedium};
+    border-bottom: 2px solid ${v.colors.black};
     margin-left: 7px;
     padding-bottom: 8px;
   `}
@@ -426,7 +433,10 @@ class PopoutMenu extends React.Component {
               {item.name} <ArrowIcon rotation={0} />
             </TieredMenuHeading>
             <StyledMenuWrapper
-              open={this.state.openSubMenuName === item.name}
+              open={
+                this.state.openSubMenuName === item.name ||
+                this.isMobileFullScreen
+              }
               offsetPosition={{
                 x: this.isMobileFullScreen ? 0 : 260,
                 y: -11,
@@ -539,6 +549,11 @@ class PopoutMenu extends React.Component {
     const icon = this.buttonStyleIcon(buttonStyle)
     const Wrapper = isMobileFullScreen ? CornerPositioned : styled.div``
 
+    console.log('Popout render', {
+      menuOpen,
+      mobileFixedMenu,
+      isMobileFullScreen,
+    })
     return (
       <Wrapper>
         <ThemeProvider
