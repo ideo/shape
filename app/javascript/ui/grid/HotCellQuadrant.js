@@ -185,7 +185,7 @@ class HotCellQuadrant extends React.Component {
               )}
             </QuadrantIconHolder>
           </QuadrantIconPositioner>
-          {subTypes && false && (
+          {subTypes && (
             <More onClick={this.handleMore} zoomLevel={zoomLevel}>
               <DropdownIcon />
               <div

@@ -158,7 +158,7 @@ class HotCell extends React.Component {
         { name: 'more', description: 'More' },
       ]
     }
-    const PositionWrapper = uiStore.isMobileXs ? CornerPositioned : styled.div``
+    const PositionWrapper = uiStore.isMobileXs ? CornerPositioned : styled.div`height: 100%`
 
     return (
       <PositionWrapper>

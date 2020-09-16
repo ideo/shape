@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 
 import BctButton from '~/ui/global/BctButton'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
@@ -46,7 +46,7 @@ export const StyledMenuButtonWrapper = styled.div`
     }
   }
   ${props =>
-    props.mobileFixedMenu &&
+    props.theme.mobileFixedMenu &&
     `
     border-top: 1px solid ${v.colors.commonMedium};
 
@@ -61,8 +61,9 @@ export const StyledMenuButtonWrapper = styled.div`
 `
 
 export const StyledMenuWrapper = styled.div`
+  display: ${props => (props.open ? 'block' : 'none')};
   position: ${props => {
-    if (props.isMobileFullScreen) return 'static'
+    if (props.theme.isMobileFullScreen) return 'static'
     if (props.positionRelative) return 'relative'
     return 'absolute'
   }};
@@ -71,7 +72,7 @@ export const StyledMenuWrapper = styled.div`
   z-index: ${v.zIndex.aboveClickWrapper};
 
   ${props =>
-    props.isMobileFullScreen &&
+    props.theme.isMobileFullScreen &&
     `
     padding-bottom: 0;
     padding-left: 0;
@@ -137,7 +138,14 @@ export const StyledMenu = styled.ul`
   width: ${props => props.width}px;
 
   ${props =>
-    props.isMobileFullScreen &&
+    props.theme.isMultiTieredMenu &&
+    `
+    box-shadow: none;
+    overflow: visible !important;
+  `}
+
+  ${props =>
+    props.theme.isMobileFullScreen &&
     `
     box-shadow: none;
     width: 100%;
@@ -208,7 +216,13 @@ export const StyledMenuItem = styled.li`
   border-top-width: ${props => (props.noBorder ? 0 : 1)}px;
 
   ${props =>
-    props.isMobileFullScreen &&
+    props.theme.isMultiTieredMenu &&
+    `
+    overflow: visible;
+  `}
+
+  ${props =>
+    props.theme.isMobileFullScreen &&
     `
     border-left-width: 0px;
     border-top: none;
@@ -293,10 +307,33 @@ StyledMenuItem.defaultProps = {
   padding: '18px 0 18px 16px',
 }
 
+const TieredMenuHeading = styled(Heading3)`
+  ${props =>
+    props.theme.isMobileFullScreen &&
+    `
+    border-bottom: 1px solid ${v.colors.commonMedium};
+    margin-left: 7px;
+    padding-bottom: 8px;
+  `}
+`
+
 class PopoutMenu extends React.Component {
-  get mobileFullScreen() {
+  state = {
+    openSubMenuName: null,
+  }
+
+  get isMobileFullScreen() {
     const { mobileFixedMenu } = this.props
     return uiStore.isMobileXs && mobileFixedMenu
+  }
+
+  get isMultiTieredMenu() {
+    const { menuItems } = this.props
+    const { isMobileFullScreen } = this
+    return (
+      _.some(menuItems, item => item.subItems && !!item.subItems.length) &&
+      !isMobileFullScreen
+    )
   }
 
   get groupedMenuItems() {
@@ -307,6 +344,18 @@ class PopoutMenu extends React.Component {
       groupedMenuItems = { main: menuItems }
     }
     return groupedMenuItems
+  }
+
+  handleTierMouseover = (itemName, ev) => {
+    this.setState({
+      openSubMenuName: itemName,
+    })
+  }
+
+  handleTierMouseLeave = ev => {
+    this.setState({
+      openSubMenuName: null,
+    })
   }
 
   renderName(item) {
@@ -352,34 +401,25 @@ class PopoutMenu extends React.Component {
         noBorder={noBorder}
         noHover={noHover}
         hasCheckbox={hasCheckbox}
-        isMobileFullScreen={this.mobileFullScreen}
         loading={loading}
         wrapperClassName={wrapperClassName}
         bgColor={bgColor}
         width={width - 20}
         padding={padding}
+        onMouseEnter={subItems && (() => this.handleTierMouseover(item.name))}
+        onMouseLeave={subItems && this.handleTierMouseLeave}
       >
         {subItems ? (
           <Fragment>
-            <Heading3
-              noSpacing
-              style={{
-                borderBottom: `1px solid ${v.colors.commonMedium}`,
-                marginLeft: '7px',
-                paddingBottom: '8px',
-              }}
-            >
-              {item.name}
-            </Heading3>
+            <TieredMenuHeading noSpacing>{item.name}</TieredMenuHeading>
             <StyledMenuWrapper
-              isMobileFullScreen={this.mobileFullScreen}
+              open={this.state.openSubMenuName === item.name}
               offsetPosition={{
-                x: this.mobileFullScreen ? 0 : this.width,
-                y: 25,
+                x: this.isMobileFullScreen ? 0 : 260,
+                y: -10,
               }}
             >
               <StyledMenu
-                isMobileFullScreen={this.mobileFullScreen}
                 width={width}
                 onMouseOver={this.onSubMenuHoverOver}
                 onMouseOut={this.onSubMenuHoverOut}
@@ -481,6 +521,7 @@ class PopoutMenu extends React.Component {
       width,
       wrapperClassName,
     } = this.props
+    const { isMultiTieredMenu, isMobileFullScreen } = this
 
     const isBct = buttonStyle === 'bct'
     const isCard = buttonStyle === 'card'
@@ -492,35 +533,40 @@ class PopoutMenu extends React.Component {
 
     return (
       <Wrapper>
-        <StyledMenuButtonWrapper
-          className={`${wrapperClassName} ${menuOpen && ' open'}`}
-          role="presentation"
-          onMouseLeave={onMouseLeave}
-          hideDotMenu={hideDotMenu}
-          mobileFixedMenu={mobileFixedMenu}
+        <ThemeProvider
+          theme={{ mobileFixedMenu, isMobileFullScreen, isMultiTieredMenu }}
         >
-          {!hideDotMenu && (
-            <MenuToggle
-              disabled={disabled}
-              onClick={onClick}
-              size={isCard ? 28 : 14}
-              className={`${className} menu-toggle`}
-              data-cy={isBct ? 'BctButton-more' : 'PopoutMenu'}
-            >
-              {icon}
-            </MenuToggle>
-          )}
-          <StyledMenuWrapper
-            positionRelative={positionRelative}
-            position={position}
-            offsetPosition={offsetPosition}
-            height={200}
-            className="menu-wrapper"
-            menuClass={className}
+          <StyledMenuButtonWrapper
+            className={`${wrapperClassName} ${menuOpen && ' open'}`}
+            role="presentation"
+            onMouseLeave={onMouseLeave}
+            hideDotMenu={hideDotMenu}
+            mobileFixedMenu={mobileFixedMenu}
+            multiTiered={this.isMultiTieredMenu}
           >
-            <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
-          </StyledMenuWrapper>
-        </StyledMenuButtonWrapper>
+            {!hideDotMenu && (
+              <MenuToggle
+                disabled={disabled}
+                onClick={onClick}
+                size={isCard ? 28 : 14}
+                className={`${className} menu-toggle`}
+                data-cy={isBct ? 'BctButton-more' : 'PopoutMenu'}
+              >
+                {icon}
+              </MenuToggle>
+            )}
+            <StyledMenuWrapper
+              positionRelative={positionRelative}
+              position={position}
+              offsetPosition={offsetPosition}
+              height={200}
+              className="menu-wrapper"
+              menuClass={className}
+            >
+              <StyledMenu width={width}>{this.renderMenuItems}</StyledMenu>
+            </StyledMenuWrapper>
+          </StyledMenuButtonWrapper>
+        </ThemeProvider>
       </Wrapper>
     )
   }
