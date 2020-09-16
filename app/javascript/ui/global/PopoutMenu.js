@@ -3,6 +3,7 @@ import _ from 'lodash'
 import PropTypes from 'prop-types'
 import styled, { ThemeProvider } from 'styled-components'
 
+import ArrowIcon from '~/ui/icons/ArrowIcon'
 import BctButton from '~/ui/global/BctButton'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
@@ -209,7 +210,7 @@ export const StyledMenuItem = styled.li`
   overflow-y: hidden;
   padding: ${props => props.padding};
   position: relative;
-  width: ${props => props.width || 200}px;
+  width: ${props => props.width - 3 || 200}px;
   ${props => props.bgColor && `background-color: ${props.bgColor};`}
   border-top: solid
     ${props => (props.borderColor ? props.borderColor : v.colors.commonMedium)};
@@ -219,6 +220,10 @@ export const StyledMenuItem = styled.li`
     props.theme.isMultiTieredMenu &&
     `
     overflow: visible;
+
+    &:first-of-type {
+      border-top-width: 0;
+    }
   `}
 
   ${props =>
@@ -315,6 +320,13 @@ const TieredMenuHeading = styled(Heading3)`
     margin-left: 7px;
     padding-bottom: 8px;
   `}
+
+  .icon {
+    height: 15px;
+    right: 16px;
+    position: absolute;
+    width: 8px;
+  }
 `
 
 class PopoutMenu extends React.Component {
@@ -388,12 +400,14 @@ class PopoutMenu extends React.Component {
       isChecked,
       subItems,
       noHover,
-      padding,
     } = item
+    let { padding } = item
 
     let className = `menu-${_.kebabCase(name)}`
     const rightIconClassName = 'icon-right'
     if (withAvatar) className += ' with-avatar'
+    if (subItems) padding = '16px 0 16px 16px'
+    // padding: '18px 0 18px 16px',
     return (
       <StyledMenuItem
         key={`${name}-${id || i}`}
@@ -411,12 +425,14 @@ class PopoutMenu extends React.Component {
       >
         {subItems ? (
           <Fragment>
-            <TieredMenuHeading noSpacing>{item.name}</TieredMenuHeading>
+            <TieredMenuHeading noSpacing>
+              {item.name} <ArrowIcon rotation={0} />
+            </TieredMenuHeading>
             <StyledMenuWrapper
               open={this.state.openSubMenuName === item.name}
               offsetPosition={{
                 x: this.isMobileFullScreen ? 0 : 260,
-                y: -10,
+                y: -11,
               }}
             >
               <StyledMenu width={width}>
