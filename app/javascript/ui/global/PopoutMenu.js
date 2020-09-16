@@ -419,11 +419,7 @@ class PopoutMenu extends React.Component {
                 y: -10,
               }}
             >
-              <StyledMenu
-                width={width}
-                onMouseOver={this.onSubMenuHoverOver}
-                onMouseOut={this.onSubMenuHoverOut}
-              >
+              <StyledMenu width={width}>
                 {subItems.map(subItem => this.renderMenuItem(subItem))}
               </StyledMenu>
             </StyledMenuWrapper>
@@ -592,39 +588,17 @@ const propTypeMenuItem = PropTypes.arrayOf(
 )
 
 PopoutMenu.propTypes = {
-  onMouseLeave: PropTypes.func,
-  onClick: PropTypes.func,
-  className: PropTypes.string,
-  /** If the value is 'card-menu' it applies extra right margin. If the value
-   * is 'add-audience-menu' it will apply special positioning to the right
-   * icon. Any value will also be passed to the element's `class` attribute on
-   * the menu button wrapper, which could be used for styling or targeting in
-   * tests. */
-  wrapperClassName: PropTypes.string,
-  width: PropTypes.number,
-  /** Use this prop to control yourself when the menu should be open, required
-   * if you are not rendering the dot dot dot menu */
-  menuOpen: PropTypes.bool,
-  /** Disables the dot menu, meaning it won't open the menu on click */
-  disabled: PropTypes.bool,
   /** Controls the size of the dotdot menu and generally how it renders */
   buttonStyle: PropTypes.string,
-  /** Need one or the other between menuItems / groupedMenuItems */
-  menuItems: propTypeMenuItem,
+  className: PropTypes.string,
+  /** Disables the dot menu, meaning it won't open the menu on click */
+  disabled: PropTypes.bool,
   /** The dot menu is used for the action menu and opens the popout menu */
   hideDotMenu: PropTypes.bool,
-  /** Configures the menu to open fixed to the bottom half of screen on mobile */
-  mobileFixedMenu: PropTypes.bool,
-  /** Used to completely reposition the whole menu */
-  position: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number,
-  }),
-  /** Controls where to position the menu compared to where it currently is. Use
-   * this to push the menu to the left or right of where it should open from */
-  offsetPosition: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number,
+  /** The component passed in will be rendered before the grouped items. Use this
+   * if you need to render something special before all the grouped items. */
+  groupExtraComponent: PropTypes.shape({
+    component: PropTypes.node,
   }),
   /** Allows you to group the menu items over different sections for top, bottom
    * and the special organizations use case.
@@ -634,32 +608,55 @@ PopoutMenu.propTypes = {
     organizations: propTypeMenuItem,
     bottom: propTypeMenuItem,
   }),
-  /** The component passed in will be rendered before the grouped items. Use this
-   * if you need to render something special before all the grouped items. */
-  groupExtraComponent: PropTypes.shape({
-    component: PropTypes.node,
+  /** Use this prop to control yourself when the menu should be open, required
+   * if you are not rendering the dot dot dot menu */
+  menuOpen: PropTypes.bool,
+  /** Need one or the other between menuItems / groupedMenuItems */
+  menuItems: propTypeMenuItem,
+  /** Configures the menu to open fixed to the bottom half of screen on mobile */
+  mobileFixedMenu: PropTypes.bool,
+  /** Controls where to position the menu compared to where it currently is. Use
+   * this to push the menu to the left or right of where it should open from */
+  offsetPosition: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
+  onClick: PropTypes.func,
+  onMouseLeave: PropTypes.func,
+  /** Used to completely reposition the whole menu */
+  position: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
   }),
   positionRelative: PropTypes.bool,
+  width: PropTypes.number,
+  /** If the value is 'card-menu' it applies extra right margin. If the value
+   * is 'add-audience-menu' it will apply special positioning to the right
+   * icon. Any value will also be passed to the element's `class` attribute on
+   * the menu button wrapper, which could be used for styling or targeting in
+   * tests. */
+  wrapperClassName: PropTypes.string,
   wrapText: PropTypes.bool,
 }
 
 PopoutMenu.defaultProps = {
-  onMouseLeave: () => null,
-  onClick: () => null,
-  // you need one or the other between menuItems / groupedMenuItems
-  menuItems: [],
-  groupedMenuItems: {},
-  className: '',
-  wrapperClassName: 'card-menu',
-  menuOpen: false,
-  position: null,
-  offsetPosition: null,
-  disabled: false,
   buttonStyle: '',
-  width: 200,
+  className: '',
+  disabled: false,
+  groupedMenuItems: {},
   groupExtraComponent: {},
   hideDotMenu: false,
+  // you need one or the other between menuItems / groupedMenuItems
+  menuItems: [],
+  menuOpen: false,
+  mobileFixedMenu: PropTypes.bool,
+  onMouseLeave: () => null,
+  onClick: () => null,
+  position: null,
+  offsetPosition: null,
   positionRelative: true,
+  width: 200,
+  wrapperClassName: 'card-menu',
   wrapText: false,
 }
 
