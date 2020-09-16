@@ -1,6 +1,6 @@
 import Icon from './Icon'
 
-const GoIcon = () => (
+const CloudIcon = () => (
   <Icon fill>
     <svg
       version="1.1"
@@ -26,4 +26,4 @@ const GoIcon = () => (
   </Icon>
 )
 
-export default GoIcon
+export default CloudIcon

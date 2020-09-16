@@ -341,6 +341,7 @@ class FoamcoreInteractionLayer extends React.Component {
       num_columns,
       isFourWideBoard,
     } = collection
+
     // rows start at 0, plus add an extra at the bottom
     const newMaxRow = maxRow + 1
     const pinnedCardMaxRow = (
@@ -389,6 +390,7 @@ class FoamcoreInteractionLayer extends React.Component {
         )
       }
     })
+
     return <div>{hotEdges}</div>
   }
 

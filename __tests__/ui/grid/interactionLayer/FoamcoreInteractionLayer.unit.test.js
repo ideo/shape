@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import FoamcoreInteractionLayer from '~/ui/grid/interactionLayer/FoamcoreInteractionLayer'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -227,10 +228,11 @@ describe('FoamcoreInteractionLayer', () => {
     describe('with two cards at the beginning of a row and two touching', () => {
       beforeEach(() => {
         props.collection.cardMatrix[1][0] = cardA
+        props.maxRow = _.maxBy(props.collection.collection_cards, 'row').row
         rerender()
       })
 
-      xit('should have vertical hotspots at the beginning of every row', () => {
+      it('should have vertical hotspots at the beginning of every row', () => {
         // cardA now is at the beginning of the row AND bumps into cardB (+2)
         const hotspots = wrapper.find('FoamcoreHotEdge')
         expect(hotspots.find({ horizontal: false }).length).toEqual(3)
@@ -241,10 +243,11 @@ describe('FoamcoreInteractionLayer', () => {
     describe('with two cards at the beginning of a row and two touching', () => {
       beforeEach(() => {
         props.collection.isFourWideBoard = true
+        props.maxRow = _.maxBy(props.collection.collection_cards, 'row').row
         rerender()
       })
 
-      xit('should have horizontal hotspots between rows', () => {
+      it('should have horizontal hotspots between rows', () => {
         expect(wrapper.find('FoamcoreHotEdge').length).toEqual(4)
         const hotspotProps = wrapper.find('FoamcoreHotEdge').map(h => h.props())
         // 1 vertical edge and 3 row hotspots
