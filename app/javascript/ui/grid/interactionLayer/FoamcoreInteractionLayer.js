@@ -272,6 +272,8 @@ class FoamcoreInteractionLayer extends React.Component {
 
     const takenSpots = []
 
+    const positions = []
+
     for (let i = 0; i < droppingFilesCount; i++) {
       const openSpot = this.calculateOpenSpot(takenSpots)
 
@@ -282,6 +284,7 @@ class FoamcoreInteractionLayer extends React.Component {
           width: 1,
           height: 1,
         }
+        positions.push(position)
         blankCards.push(this.positionBlank(position, 'hover'))
         takenSpots.push(position)
       }
@@ -296,6 +299,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     if (!row && !col) return null
 
+    // NOTE: Collection::cardMatrix only returns cards until the collection cards max row
     const openSpotMatrix = calculateOpenSpotMatrix({
       collection,
       multiMoveCardIds: [],

@@ -193,8 +193,13 @@ PositionedBlankCard.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
-  interactionType: PropTypes.oneOf(['hover', 'drag', 'unrendered', 'resize'])
-    .isRequired,
+  interactionType: PropTypes.oneOf([
+    'hover',
+    'drag',
+    'unrendered',
+    'resize',
+    'bct',
+  ]).isRequired,
   handleBlankCardClick: PropTypes.func,
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,

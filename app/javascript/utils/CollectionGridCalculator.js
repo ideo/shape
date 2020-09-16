@@ -173,8 +173,8 @@ const matrixWithDraggedSpots = (collection, dragGridSpot) => {
  */
 export const calculateOpenSpotMatrix = ({
   collection,
-  multiMoveCardIds,
-  dragGridSpot,
+  multiMoveCardIds = [],
+  dragGridSpot = null,
   withDraggedSpots = false,
   takenSpots = [],
 } = {}) => {
@@ -187,19 +187,28 @@ export const calculateOpenSpotMatrix = ({
     cardMatrix[spot.row][spot.col] = 'taken'
   })
 
-  _.each(cardMatrix, (row, rowIdx) => {
-    let open = 0
-    openSpotMatrix[rowIdx] = Array(16)
-    const reversed = _.reverse(row)
-    _.each(reversed, (card, colIdx) => {
-      if (card && !_.includes(multiMoveCardIds, card.id)) {
-        open = 0
-      } else {
-        open += 1
-      }
-      openSpotMatrix[rowIdx][15 - colIdx] = open
+  const columnCount =
+    collection.num_columns ||
+    (collection.isBoard && 16) ||
+    (collection.isFourWideBoard && 4) ||
+    null
+
+  if (columnCount) {
+    _.each(cardMatrix, (row, rowIdx) => {
+      let open = 0
+
+      openSpotMatrix[rowIdx] = Array(columnCount)
+      const reversed = _.reverse(row)
+      _.each(reversed, (card, colIdx) => {
+        if (card && !_.includes(multiMoveCardIds, card.id)) {
+          open = 0
+        } else {
+          open += 1
+        }
+        openSpotMatrix[rowIdx][columnCount - 1 - colIdx] = open
+      })
     })
-  })
+  }
 
   return openSpotMatrix
 }
