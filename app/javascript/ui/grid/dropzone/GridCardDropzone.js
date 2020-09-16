@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 
 import googleTagManager from '~/vendor/googleTagManager'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { MAX_SIZE } from '~/utils/FilestackUpload'
 import { ITEM_TYPES } from '~/utils/variables'
 import DropzoneHolder from '~/ui/grid/dropzone/DropzoneHolder'
 
@@ -59,7 +60,7 @@ class GridCardDropzone extends React.Component {
 
   resetUpload = () => {
     const { uiStore } = this.props
-    uiStore.setDroppingFilesCount(false)
+    uiStore.setDroppingFilesCount(0)
     this.updateWillUpload(false)
     this.updateDidUpload(false)
   }
@@ -68,21 +69,22 @@ class GridCardDropzone extends React.Component {
     e.preventDefault()
     const { dataTransfer } = e
     const { files } = dataTransfer
-    const { row, col, collection, apiStore } = this.props
+    const { row, col, collection, apiStore, uiStore } = this.props
+    const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
 
-    // FIXME: does not work with uploading multiple files
-    // const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
-    // if (filesThatFit.length < files.length) {
-    //   uiStore.popupAlert({
-    //     prompt: `
-    //     ${filesThatFit.length} file(s) were successfully added.
-    //     ${files.length -
-    //       filesThatFit.length} file(s) were over 25MB and could not
-    //     be added.
-    //   `,
-    //     fadeOutTime: 6000,
-    //   })
-    // }
+    if (filesThatFit.length < files.length) {
+      this.resetUpload()
+      uiStore.popupAlert({
+        prompt: `There are
+        ${files.length -
+          filesThatFit.length} file(s) that were over the ${MAX_SIZE /
+          (1024 *
+            1024)} MB limit. Please remove them from your selection and try again.
+      `,
+        fadeOutTime: 6000,
+      })
+      return
+    }
 
     if (_.isEmpty(files)) return
 
@@ -99,12 +101,12 @@ class GridCardDropzone extends React.Component {
 
     // store placeholder cards to replace with actual file cards
     this.setPlaceholderCardIds(
-      placeholderCards.map(placeholderCard => placeholderCard.id)
+      _.map(placeholderCards, placeholderCard => placeholderCard.id)
     )
 
-    for (const placeholderCard of placeholderCards) {
+    _.each(placeholderCards, placeholderCard => {
       collection.addCard(placeholderCard)
-    }
+    })
 
     this.resetUpload()
   }
@@ -147,10 +149,10 @@ class GridCardDropzone extends React.Component {
         formType: `Create ${ITEM_TYPES.FILE}`,
         parentType: 'foamcore',
       })
-
-      // clear placeholder card ids for next upload
-      this.setPlaceholderCardIds([])
     })
+
+    // clear placeholder card ids for next upload
+    this.setPlaceholderCardIds([])
   }
 
   render() {

@@ -47,8 +47,6 @@ class DropzoneHolder extends React.Component {
     }
   }
 
-  handleDragOver = e => {}
-
   handleDragLeave = e => {
     this.props.handleDragLeave()
   }
@@ -70,7 +68,6 @@ class DropzoneHolder extends React.Component {
     // CSS selector where the dropzone will be
     const container = 'dropzone'
     const dropPaneOpts = {
-      onDragOver: this.handleDragOver,
       onDragLeave: this.handleDragLeave,
       onDrop: this.handleDrop,
       onProgress: this.handleProgress,
