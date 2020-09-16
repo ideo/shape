@@ -33,8 +33,7 @@ export const StyledMenuButtonWrapper = styled.div`
       props.theme.isMobileFullScreen &&
       `
       margin-top: 0;
-      `
-      }
+      `}
   }
   @keyframes fadeInFromNone {
     0% {
