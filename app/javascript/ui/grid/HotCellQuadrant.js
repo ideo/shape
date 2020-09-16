@@ -46,6 +46,8 @@ const QuadrantIconHolder = styled.div`
   display: table-cell;
   height: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
   margin: 0 auto;
+  max-height: 100px;
+  max-width: 100px;
   text-align: center;
   width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
   vertical-align: middle;
@@ -53,19 +55,17 @@ const QuadrantIconHolder = styled.div`
 
 const More = styled.button`
   bottom: 6px;
-  height: 28px;
+  height: ${props => 28 * props.zoomLevel}px;
   right: 6px;
   position: absolute;
-  width: 28px;
+  width: ${props => 28 * props.zoomLevel}px;
   z-index: ${v.zIndex.cardHovering + 1};
 
   ${props =>
     props.zoomLevel > 1 &&
     `
     bottom: 2px;
-    height: 52px;
     right: 1px;
-    width: 52px
   `}
 `
 

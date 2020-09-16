@@ -29,6 +29,15 @@ const Container = styled.div`
     }
   `}
 
+  ${props =>
+    props.smallCardWidth &&
+    `
+    ${Quadrant} {
+      height: 100% !important;
+      width: 100% !important;
+    }
+`}
+
   ${Quadrant}:nth-child(even) {
     border-left: 1px solid ${v.colors.commonLight};
     width: calc(50% + 1px);
@@ -166,7 +175,10 @@ class HotCell extends React.Component {
 
     return (
       <PositionWrapper>
-        <Container isMobileXs={uiStore.isMobileXs}>
+        <Container
+          isMobileXs={uiStore.isMobileXs}
+          smallCardWidth={cardWidth < 132}
+        >
           {primaryTypes.map(({ name, description, subTypes }) => (
             <HotCellQuadrant
               name={name}
