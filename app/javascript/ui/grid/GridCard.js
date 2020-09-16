@@ -524,7 +524,22 @@ class GridCard extends React.Component {
         </StyledGridCardPrivate>
       )
     } else if (card.isBctPlaceholder) {
-      contents = <PlaceholderCard card={card} />
+      const { droppingFilesCount } = uiStore
+      const { row, col } = uiStore.blankContentToolState
+
+      let warnBeforeLeaving = false
+
+      if (row === card.row && col === card.col) {
+        warnBeforeLeaving = true
+      } else if (droppingFilesCount > 0) {
+        // will technically mark other collaborator's placeholders as true
+        // but this is still correct when the user is dropping files
+        warnBeforeLeaving = true
+      }
+
+      contents = (
+        <PlaceholderCard card={card} warnBeforeLeaving={warnBeforeLeaving} />
+      )
     } else {
       contents = (
         <Fragment>

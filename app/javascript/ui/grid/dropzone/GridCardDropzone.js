@@ -93,11 +93,9 @@ class GridCardDropzone extends React.Component {
       parent_id: collection.id,
     }
 
-    const response = await apiStore.createPlaceholderCards({
+    const placeholderCards = await apiStore.createPlaceholderCards({
       data,
     })
-
-    const { data: placeholderCards } = response
 
     // store placeholder cards to replace with actual file cards
     this.setPlaceholderCardIds(
