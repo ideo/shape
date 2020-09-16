@@ -60,6 +60,7 @@ export const StyledMenuButtonWrapper = styled.div`
     position: fixed;
     top: 0;
     width: 100vw;
+    z-index: ${v.zIndex.zoomControls};
   `}
 `
 
@@ -429,7 +430,8 @@ class PopoutMenu extends React.Component {
         {subItems ? (
           <Fragment>
             <TieredMenuHeading noSpacing>
-              {item.name} <ArrowIcon rotation={0} />
+              {item.name}{' '}
+              {!this.isMobileFullScreen && <ArrowIcon rotation={0} />}
             </TieredMenuHeading>
             <StyledMenuWrapper
               open={
