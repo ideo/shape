@@ -173,18 +173,40 @@ const matrixWithDraggedSpots = (collection, dragGridSpot) => {
  */
 export const calculateOpenSpotMatrix = ({
   collection,
-  multiMoveCardIds,
-  dragGridSpot,
+  multiMoveCardIds = [],
+  dragGridSpot = null,
   withDraggedSpots = false,
+  takenSpots = [],
+  maxVisibleRow = null,
 } = {}) => {
   const cardMatrix = withDraggedSpots
     ? matrixWithDraggedSpots(collection, dragGridSpot)
     : collection.cardMatrix
-  const openSpotMatrix = [[]]
+  const columnCount =
+    collection.num_columns ||
+    (collection.isBoard && 16) ||
+    (collection.isFourWideBoard && 4) ||
+    null
 
+  if (!columnCount) return [[]]
+
+  // initialize open spot matrix
+  const openSpotMatrix = _.map(Array(maxVisibleRow), () => {
+    return _.fill(new Array(columnCount))
+  })
+
+  // mark spots beyond the last row with cards as not taken
+  const firstRowWithNoCards = cardMatrix.length - 1
+  if (maxVisibleRow && maxVisibleRow > firstRowWithNoCards) {
+    const openRows = _.rangeRight(1, columnCount + 1)
+    for (let rowIdx = firstRowWithNoCards; rowIdx < maxVisibleRow; rowIdx++) {
+      openSpotMatrix[rowIdx] = openRows
+    }
+  }
+
+  // check every collection card in the card matrix to mark spot as open
   _.each(cardMatrix, (row, rowIdx) => {
     let open = 0
-    openSpotMatrix[rowIdx] = Array(16)
     const reversed = _.reverse(row)
     _.each(reversed, (card, colIdx) => {
       if (card && !_.includes(multiMoveCardIds, card.id)) {
@@ -192,8 +214,17 @@ export const calculateOpenSpotMatrix = ({
       } else {
         open += 1
       }
-      openSpotMatrix[rowIdx][15 - colIdx] = open
+      if (openSpotMatrix[rowIdx]) {
+        openSpotMatrix[rowIdx][columnCount - 1 - colIdx] = open
+      }
     })
+  })
+
+  // override card matrix spots that are now taken
+  _.each(takenSpots, spot => {
+    if (openSpotMatrix[spot.row]) {
+      openSpotMatrix[spot.row][spot.col] = 'taken'
+    }
   })
 
   return openSpotMatrix

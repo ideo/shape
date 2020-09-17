@@ -1,8 +1,6 @@
 import v from '~/utils/variables'
 import styled from 'styled-components'
-import { observable } from 'mobx'
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import FilestackUpload from '~/utils/FilestackUpload'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -25,6 +23,8 @@ const StyledDropzoneHolder = styled.div`
   }
 `
 
+StyledDropzoneHolder.displayName = 'DropzoneHolder'
+
 const StyledIconAndHeadingHolder = styled(IconHolder)`
   width: 30%;
   height: auto;
@@ -35,12 +35,7 @@ const StyledIconAndHeadingHolder = styled(IconHolder)`
   pointer-events: none;
 `
 
-@inject('uiStore')
-@observer
 class DropzoneHolder extends React.Component {
-  @observable
-  droppingFile = false
-
   constructor(props) {
     super(props)
   }
@@ -50,8 +45,6 @@ class DropzoneHolder extends React.Component {
       this.createDropPane()
     }
   }
-
-  handleDragOver = e => {}
 
   handleDragLeave = e => {
     this.props.handleDragLeave()
@@ -74,7 +67,6 @@ class DropzoneHolder extends React.Component {
     // CSS selector where the dropzone will be
     const container = 'dropzone'
     const dropPaneOpts = {
-      onDragOver: this.handleDragOver,
       onDragLeave: this.handleDragLeave,
       onDrop: this.handleDrop,
       onProgress: this.handleProgress,
@@ -99,10 +91,6 @@ class DropzoneHolder extends React.Component {
       </StyledDropzoneHolder>
     )
   }
-}
-
-DropzoneHolder.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 DropzoneHolder.propTypes = {

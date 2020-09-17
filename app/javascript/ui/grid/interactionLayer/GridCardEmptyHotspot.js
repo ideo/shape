@@ -22,6 +22,17 @@ const StyledGridCardEmpty = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
+
+  &.visible,
+  &:hover {
+    background-color: ${v.colors.primaryLight} !important;
+    .plus-icon {
+      display: block;
+    }
+  }
+  .plus-icon,
+    display: none;
+  }
 `
 
 @inject('uiStore')

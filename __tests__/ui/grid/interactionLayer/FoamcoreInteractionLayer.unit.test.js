@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
 import FoamcoreInteractionLayer from '~/ui/grid/interactionLayer/FoamcoreInteractionLayer'
 import fakeApiStore from '#/mocks/fakeApiStore'
@@ -69,6 +70,58 @@ describe('FoamcoreInteractionLayer', () => {
     component.gridRef = { scrollLeft: 0, scrollTop: 0 }
   })
 
+  describe('onCursorMove', () => {
+    let fakeEv
+    beforeEach(() => {
+      fakeEv = {
+        clientX: 100,
+        clientY: 200,
+        target: {
+          classList: [FOAMCORE_INTERACTION_LAYER],
+        },
+      }
+      component.resetHoveringRowCol = jest.fn()
+    })
+
+    it('should ignore events that are outside foamcoreGridBoundary', () => {
+      fakeEv.target = {
+        classList: ['other'],
+      }
+      const cursorMoveEvent = component.onCursorMove('mouse')
+      const result = cursorMoveEvent(fakeEv)
+      expect(result).toEqual(true)
+    })
+
+    it('not show a positioned blank card a card is already there', () => {
+      const cursorMoveEvent = component.onCursorMove('mouse')
+      cursorMoveEvent(fakeEv)
+      expect(component.resetHoveringRowCol).toHaveBeenCalled()
+    })
+
+    describe('when hovering over a spot with no cards', () => {
+      beforeEach(() => {
+        props.coordinatesForPosition = jest
+          .fn()
+          .mockReturnValue({ col: 1, row: 4, outsideDraggableArea: false })
+        fakeEv = {
+          clientX: 720,
+          clientY: 360,
+          target: {
+            classList: [FOAMCORE_INTERACTION_LAYER],
+          },
+        }
+        rerender()
+        component.throttledRepositionBlankCard = jest.fn()
+      })
+
+      it('not show a positioned blank card a card is already there', () => {
+        const cursorMoveEvent = component.onCursorMove('mouse')
+        cursorMoveEvent(fakeEv)
+        expect(component.throttledRepositionBlankCard).toHaveBeenCalled()
+      })
+    })
+  })
+
   describe('resizing', () => {
     beforeEach(() => {
       const placeholderSpot = {
@@ -121,7 +174,7 @@ describe('FoamcoreInteractionLayer', () => {
   describe('dropping files', () => {
     beforeEach(() => {
       const uiStore = fakeUiStore
-      uiStore.droppingFiles = true
+      uiStore.droppingFilesCount = 4
       uiStore.visibleRows = {
         min: 0,
         max: 4,
@@ -140,37 +193,21 @@ describe('FoamcoreInteractionLayer', () => {
         collection,
         apiStore: fakeApiStore(),
         uiStore,
-        resizing: true,
+        resizing: false,
+        dragging: false,
+        coordinatesForPosition: jest.fn().mockReturnValue({ row: 0, col: 0 }),
       }
       rerender()
-    })
-    it('should render a PositionedBlankCard with resizing interactionType', () => {
-      expect(wrapper.find('PositionedBlankCard').exists()).toBeTruthy()
-    })
-  })
-
-  describe('onCursorMove', () => {
-    const fakeEv = {
-      clientX: 100,
-      clientY: 200,
-      target: {
-        classList: [FOAMCORE_INTERACTION_LAYER],
-      },
-    }
-
-    it('should look up coordinatesForPosition', () => {
-      const cursorMoveEvent = component.onCursorMove('mouse')
-      const result = cursorMoveEvent(fakeEv)
-      expect(result).toBeTruthy()
+      component.calculateOpenSpot = jest.fn().mockReturnValue({
+        row: 1,
+        col: 2,
+        width: 1,
+        height: 1,
+      }) // mock value for testing
     })
 
-    it('should ignore events that are outside foamcoreGridBoundary', () => {
-      fakeEv.target = {
-        classList: ['other'],
-      }
-      const cursorMoveEvent = component.onCursorMove('mouse')
-      const result = cursorMoveEvent(fakeEv)
-      expect(result).toEqual(true)
+    it('should render a PositionedBlankCard with dropping interactionType', () => {
+      expect(component.renderDropSpots.length > 0).toEqual(true)
     })
   })
 
@@ -218,10 +255,11 @@ describe('FoamcoreInteractionLayer', () => {
     describe('with two cards at the beginning of a row and two touching', () => {
       beforeEach(() => {
         props.collection.cardMatrix[1][0] = cardA
+        props.maxRow = _.maxBy(props.collection.collection_cards, 'row').row
         rerender()
       })
 
-      xit('should have vertical hotspots at the beginning of every row', () => {
+      it('should have vertical hotspots at the beginning of every row', () => {
         // cardA now is at the beginning of the row AND bumps into cardB (+2)
         const hotspots = wrapper.find('FoamcoreHotEdge')
         expect(hotspots.find({ horizontal: false }).length).toEqual(3)
@@ -232,10 +270,11 @@ describe('FoamcoreInteractionLayer', () => {
     describe('with two cards at the beginning of a row and two touching', () => {
       beforeEach(() => {
         props.collection.isFourWideBoard = true
+        props.maxRow = _.maxBy(props.collection.collection_cards, 'row').row
         rerender()
       })
 
-      xit('should have horizontal hotspots between rows', () => {
+      it('should have horizontal hotspots between rows', () => {
         expect(wrapper.find('FoamcoreHotEdge').length).toEqual(4)
         const hotspotProps = wrapper.find('FoamcoreHotEdge').map(h => h.props())
         // 1 vertical edge and 3 row hotspots

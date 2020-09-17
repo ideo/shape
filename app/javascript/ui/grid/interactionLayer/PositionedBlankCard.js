@@ -10,14 +10,6 @@ import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 
-const CircleIconHolder = styled.button`
-  border: 1px solid ${v.colors.secondaryMedium};
-  border-radius: 50%;
-  color: ${v.colors.secondaryMedium};
-  height: 32px;
-  width: 32px;
-`
-
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
 const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
@@ -56,18 +48,6 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   }};
   z-index: ${props =>
     _.includes(props.interactionType, 'drag') ? v.zIndex.cardHovering : 1};
-
-  /* FIXME: is this the same CircleIconHolder under GridCardEmptyHotspot? */
-
-  ${CircleIconHolder} {
-    display: none;
-    height: 32px;
-    width: 32px;
-  }
-
-  ${CircleIconHolder} + ${CircleIconHolder} {
-    margin-top: 8px;
-  }
 `
 
 BlankCardContainer.displayName = 'BlankCardContainer'
@@ -89,7 +69,7 @@ class PositionedBlankCard extends React.Component {
       blocked,
       interactionType,
     } = this.props
-    const { blankContentToolIsOpen, droppingFiles } = uiStore
+    const { blankContentToolIsOpen, droppingFilesCount } = uiStore
 
     const { xPos, yPos, height, width } = position
 
@@ -103,7 +83,7 @@ class PositionedBlankCard extends React.Component {
       zoomLevel: uiStore.relativeZoomLevel,
     }
 
-    if (droppingFiles) {
+    if (droppingFilesCount > 0) {
       return (
         <BlankCardContainer {...defaultProps}>
           <GridCardDropzone collection={collection} row={row} col={col} />
@@ -178,8 +158,13 @@ PositionedBlankCard.propTypes = {
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
   position: PropTypes.shape(propShapes.position).isRequired,
-  interactionType: PropTypes.oneOf(['hover', 'drag', 'unrendered', 'resize'])
-    .isRequired,
+  interactionType: PropTypes.oneOf([
+    'hover',
+    'drag',
+    'unrendered',
+    'resize',
+    'bct',
+  ]).isRequired,
   handleBlankCardClick: PropTypes.func,
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,

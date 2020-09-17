@@ -18,7 +18,9 @@ import {
   StyledGridCardInner,
   StyledTopRightActions,
   StyledGridCardPrivate,
+  CardLoader,
 } from '~/ui/grid/shared'
+import PlaceholderCard from '~/ui/grid/PlaceholderCard'
 import TextActionMenu from '~/ui/grid/TextActionMenu'
 import BottomLeftCardIcons from '~/ui/grid/BottomLeftCardIcons'
 import ActionMenu from '~/ui/grid/ActionMenu'
@@ -26,7 +28,6 @@ import ActionMenu from '~/ui/grid/ActionMenu'
 import Activity from '~/stores/jsonApi/Activity'
 import { routingStore, uiStore, apiStore } from '~/stores'
 
-import Loader from '~/ui/layout/Loader'
 import CollectionCardsTagEditorModal from '~/ui/pages/shared/CollectionCardsTagEditorModal'
 import TextButton from '~/ui/global/TextButton'
 import { NamedActionButton } from '~/ui/global/styled/buttons'
@@ -35,29 +36,10 @@ import HiddenIcon from '~/ui/icons/HiddenIcon'
 import RestoreIcon from '~/ui/icons/RestoreIcon'
 import FullScreenIcon from '~/ui/icons/FullScreenIcon'
 import EditButton from '~/ui/reporting/EditButton'
-import hexToRgba from '~/utils/hexToRgba'
 import v from '~/utils/variables'
 import { linkOffsite } from '~/utils/url'
 import { pageBoundsScroller } from '~/utils/ScrollNearPageBoundsService'
 import { openContextMenu } from '~/utils/clickUtils'
-
-const CardLoader = () => {
-  return (
-    <div
-      style={{
-        top: 0,
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        zIndex: v.zIndex.gridCardTop,
-        background: hexToRgba(v.colors.commonDark, 0.5),
-        color: 'white',
-      }}
-    >
-      <Loader size={30} containerHeight="100%" animation="circular" />
-    </div>
-  )
-}
 
 @observer
 class GridCard extends React.Component {
@@ -543,10 +525,21 @@ class GridCard extends React.Component {
         </StyledGridCardPrivate>
       )
     } else if (card.isBctPlaceholder) {
+      const { droppingFilesCount } = uiStore
+      const { row, col } = uiStore.blankContentToolState
+
+      let warnBeforeLeaving = false
+
+      if (row === card.row && col === card.col) {
+        warnBeforeLeaving = true
+      } else if (droppingFilesCount > 0) {
+        // will technically mark other collaborator's placeholders as true
+        // but this is still correct when the user is dropping files
+        warnBeforeLeaving = true
+      }
+
       contents = (
-        <StyledGridCardPrivate>
-          <CardLoader />
-        </StyledGridCardPrivate>
+        <PlaceholderCard card={card} warnBeforeLeaving={warnBeforeLeaving} />
       )
     } else {
       contents = (

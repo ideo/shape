@@ -147,14 +147,4 @@ class FilestackUpload {
   }
 }
 
-export const isFile = dataTransfer => {
-  return (
-    dataTransfer &&
-    dataTransfer.types &&
-    (dataTransfer.types.indexOf
-      ? dataTransfer.types.indexOf('Files') !== -1
-      : dataTransfer.types.contains('Files'))
-  )
-}
-
 export default FilestackUpload

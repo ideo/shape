@@ -132,7 +132,7 @@ const fakeUiStore = {
   setVisibleCols: jest.fn(),
   setVisibleRows: jest.fn(),
   setPlaceholderSpot: jest.fn(),
-  setDroppingFiles: jest.fn(),
+  setDroppingFilesCount: jest.fn(),
   drag: jest.fn(),
   startDragging: jest.fn(),
   adjustZoomLevel: jest.fn(),
@@ -150,6 +150,7 @@ const fakeUiStore = {
   clearTextEditingItem: jest.fn(),
   positionForCoordinates: jest.fn().mockReturnValue({ x:0, y:0, xPos: 0, yPos: 0, width: 1, height: 1 }),
   dragGridSpot: new Map(),
+  droppingFilesCount: 0,
 }
 
 export default fakeUiStore

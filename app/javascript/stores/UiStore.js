@@ -117,7 +117,7 @@ export default class UiStore {
   @observable
   templateName = ''
   @observable
-  droppingFiles = false
+  droppingFilesCount = 0
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
@@ -1711,9 +1711,9 @@ export default class UiStore {
   }
 
   @action
-  setDroppingFiles(droppingFiles) {
-    if (this.droppingFiles !== droppingFiles) {
-      this.droppingFiles = droppingFiles
+  setDroppingFilesCount(droppingFilesCount) {
+    if (this.droppingFilesCount !== droppingFilesCount) {
+      this.droppingFilesCount = droppingFilesCount
     }
   }
 
