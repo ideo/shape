@@ -11,12 +11,11 @@ const BctButton = styled.button`
   position: relative;
   width: 36px;
 
-  left: ${props => (props.creating ? '100px' : 0)};
+  left: 0;
   @media only screen and (min-width: ${v.responsive
       .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
-    left: ${props => (props.creating ? '80px' : 0)};
+    left: 0;
   }
-  transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
 
   &:hover {
     background-color: ${v.colors.commonDark};

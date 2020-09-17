@@ -29,7 +29,6 @@ import CollectionCreator from './CollectionCreator'
 import LinkCreator from './LinkCreator'
 import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
-import BctButtonRotation from './BctButtonRotation'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const StyledGridCardBlank = styled(StyledGridCard)`
@@ -77,7 +76,6 @@ const StyledBlankCreationTool = styled.div`
     /* because the BCTBoxes flex, we have to restrict the CardMenu when the PopoutMenu is open */
     max-width: 47px;
   }
-  transition: ${v.transitionWithDelay};
 
   /* handle "small 4-col" layout i.e. layoutSize == 3, except on Foamcore */
   ${props =>
@@ -459,7 +457,7 @@ class GridCardBlank extends React.Component {
         board={isBoard}
         replacing={isReplacing && !creating}
       >
-        <Flex className="foreground" justify="space-between">
+        <Flex className="foreground" justify="center">
           {/* First row of options */}
           {!isReplacing && !creating && (
             <BctButtonBox
@@ -502,37 +500,25 @@ class GridCardBlank extends React.Component {
             />
           )}
           {/* These are what to render on state change for second row */}
-          {creating === 'collection' && (
-            <BctButtonRotation>{collectionBctBox}</BctButtonRotation>
-          )}
-          {creating === 'foamcoreBoard' && (
-            <BctButtonRotation>{foamcoreBoardBctBox}</BctButtonRotation>
-          )}
-          {creating === 'submissionBox' && (
-            <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
-          )}
-          {creating === 'testCollection' && (
-            <BctButtonRotation>{testBctBox}</BctButtonRotation>
-          )}
+          {creating === 'collection' && collectionBctBox}
+          {creating === 'foamcoreBoard' && foamcoreBoardBctBox}
+          {creating === 'submissionBox' && submissionBctBox}
+          {creating === 'testCollection' && testBctBox}
           {creating === 'report' && (
-            <BctButtonRotation>
-              <BctButtonBox
-                type="data"
-                creating={creating}
-                size={size}
-                Icon={() => <ReportIcon size="large" />}
-              />
-            </BctButtonRotation>
+            <BctButtonBox
+              type="data"
+              creating={creating}
+              size={size}
+              Icon={() => <ReportIcon size="large" />}
+            />
           )}
           {creating === 'template' && (
-            <BctButtonRotation>
-              <BctButtonBox
-                type="template"
-                creating={creating}
-                size={size}
-                Icon={TemplateIcon}
-              />
-            </BctButtonRotation>
+            <BctButtonBox
+              type="template"
+              creating={creating}
+              size={size}
+              Icon={TemplateIcon}
+            />
           )}
         </Flex>
         {/* Second row display on initial load */}
