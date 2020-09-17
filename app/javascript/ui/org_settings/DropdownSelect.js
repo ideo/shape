@@ -11,8 +11,7 @@ import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 
 const currentValue = (record, options, fieldToUpdate) => {
   const object = _.find(options, option => option.id === record[fieldToUpdate])
-  // console.log(record, options, fieldToUpdate)
-  // console.log('current value record in select dropdown: ', object)
+
   if (object) return object.id
   return ''
 }
@@ -28,7 +27,7 @@ const DropdownSelect = ({
   ...additionalProps
 }) => {
   const value = currentValue(record, options, fieldToUpdate)
-  // console.log('first value: ', value)
+
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [previousValue, setPreviousValue] = useState('')
@@ -39,24 +38,19 @@ const DropdownSelect = ({
   }
 
   const cancelSelection = () => {
-    console.log('cancelling select: ', selectedValue)
     setSelectedValue(previousValue)
     setModalOpen(false)
   }
 
   const confirmSelection = () => {
-    console.log('confirm select: ', selectedValue)
     const recordAttrs = {}
     recordAttrs[fieldToUpdate] = selectedValue
-    console.log('confirm attrs: ', recordAttrs)
     updateRecord(recordAttrs)
     setModalOpen(false)
   }
 
   const updateSelectedValue = async e => {
     e.preventDefault()
-    console.log('current selected value: ', selectedValue)
-    console.log('attempting to update', e.target)
     setPreviousValue(selectedValue)
     setOpen(false)
     setSelectedValue(e.target.value)
@@ -114,7 +108,7 @@ DropdownSelect.propTypes = {
   label: PropTypes.string.isRequired,
   // toolTip: PropTypes.string,
   record: PropTypes.object.isRequired,
-  objectToUpdateName: PropTypes.string,
+  objectToUpdateName: PropTypes.string.isRequired,
   // TODO: fix these to use MobxPropTypes
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   fieldToUpdate: PropTypes.string.isRequired,

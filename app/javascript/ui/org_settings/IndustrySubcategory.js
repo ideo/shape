@@ -24,7 +24,6 @@ const IndustrySubcategorySelectField = ({
       options,
       option => option.id === record[fieldToUpdate]
     )
-    console.log('current value record in select dropdown: ', industry)
     if (industry) return industry.id
     return undefined
   }
@@ -65,6 +64,12 @@ const IndustrySubcategorySelectField = ({
   )
 }
 
+IndustrySubcategorySelectField.defaultProps = {
+  record: {},
+  options: [],
+  fieldToUpdate: '',
+  handleChange: () => null,
+}
 IndustrySubcategorySelectField.propTypes = {
   record: PropTypes.object, // TODO: make record to it can be a business unit
   options: PropTypes.arrayOf(PropTypes.object), // TODO: make options so it can be content versions

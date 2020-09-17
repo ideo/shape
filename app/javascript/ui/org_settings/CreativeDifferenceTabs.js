@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-import styled from 'styled-components'
 // import { makeStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Tabs from '@material-ui/core/Tabs'
@@ -31,9 +30,9 @@ function TabPanel(props) {
 }
 
 TabPanel.propTypes = {
-  children: PropTypes.node,
-  tabName: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
+  children: PropTypes.node.isRequired,
+  tabName: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
 }
 
 function a11yProps(index) {
@@ -83,7 +82,6 @@ class CreativeDifferenceTabs extends React.Component {
 
   handleChange = (event, newValue) => {
     // event.preventDefault()
-    console.log(event, newValue)
     this.setTabValue(newValue)
     this.props.routingStore.goToPath(`/org-settings/${newValue}`)
   }
@@ -134,6 +132,11 @@ class CreativeDifferenceTabs extends React.Component {
       </div>
     )
   }
+}
+
+CreativeDifferenceTabs.defaultProps = {
+  orgName: 'Org Name', // TODO: should these just be required?
+  tab: 'organization',
 }
 
 CreativeDifferenceTabs.propTypes = {

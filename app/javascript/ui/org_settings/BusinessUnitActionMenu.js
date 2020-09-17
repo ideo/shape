@@ -30,20 +30,17 @@ const BusinessUnitActionMenu = ({
 
   const handleCloneClick = e => {
     e.preventDefault()
-    console.log('clicked clone')
     handleClone()
     setOpen(false)
   }
 
   const handleRemoveClick = e => {
     e.preventDefault()
-    console.log('clicked remove')
     setModalOpen(true)
   }
 
   const handleRenameClick = e => {
     e.preventDefault()
-    console.log('clicked rename')
     handleRename()
     setOpen(false)
   }

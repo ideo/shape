@@ -31,24 +31,15 @@ const VerticalHorizontalSelectField = ({ organization }) => {
       try {
         setIsLoading(true)
         const result = await industrySubcategoriesStore.fetch()
-        console.log('subcategories fetch: ', result)
         setSubcategories(result)
         const industry = _.find(subcategories, subcategory => {
-          console.log(
-            'element: ',
-            subcategory,
-            organization.industry_subcategory_id
-          )
           return subcategory.id === organization.industry_subcategory_id
         })
         if (industry) {
           setSelectedCategory(industry)
         }
-        console.log('industry', industry)
         setIsLoading(false)
-        console.log('selectedCategory', selectedCategory)
       } catch (err) {
-        console.log('subcategory request failed')
         setIsError(err)
       }
     }
@@ -58,14 +49,12 @@ const VerticalHorizontalSelectField = ({ organization }) => {
 
   const handleChange = async e => {
     e.preventDefault()
-    console.log('handle change', e.target.value)
     try {
       setIsLoading(true)
       const orgModel = new organizationsStore.model()
       const orgModelInstance = new orgModel({
         id: organization.id,
       })
-      console.log('isNew?: ', orgModelInstance.isNew)
       debugger
       const promise = orgModelInstance.save(
         {
@@ -83,11 +72,9 @@ const VerticalHorizontalSelectField = ({ organization }) => {
       setSelectedCategory(result)
       setIsLoading(false)
     } catch (err) {
-      console.log('subcategory update failed: ', err)
       setIsError(true)
       setIsLoading(false)
     }
-    console.log(selectedCategory)
   }
 
   return (
@@ -138,7 +125,9 @@ const VerticalHorizontalSelectField = ({ organization }) => {
     </div>
   )
 }
-
+VerticalHorizontalSelectField.defaultProps = {
+  organization: {},
+}
 VerticalHorizontalSelectField.propTypes = {
   organization: PropTypes.object,
 }

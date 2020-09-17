@@ -78,14 +78,12 @@ class OrganizationTab extends React.Component {
       const data = {
         organization: orgParams,
       }
-      console.log('sending data for org: ', data)
       const promise = orgModelInstance.save(data, {
         optimistic: false,
       })
       const result = await promise
       this.setOrganization(result)
     } catch (err) {
-      console.log('org update failed: ', err)
       this.setIsError(true)
     }
   }
@@ -141,6 +139,12 @@ class OrganizationTab extends React.Component {
   }
 }
 
+OrganizationTab.defaultProps = {
+  organization: {},
+  contentVersions: [],
+  industrySubcategories: [],
+  supportedLanguages: [],
+}
 OrganizationTab.propTypes = {
   organization: PropTypes.object,
   contentVersions: PropTypes.arrayOf(PropTypes.object),

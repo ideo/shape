@@ -96,7 +96,7 @@ Block.propTypes = {
   children: PropTypes.node.isRequired,
   headerTooltip: PropTypes.string,
 }
-Block.defeaultProps = {
+Block.defaultProps = {
   headerTooltip: null,
 }
 

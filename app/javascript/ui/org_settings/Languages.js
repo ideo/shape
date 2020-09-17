@@ -40,7 +40,6 @@ class Languages extends React.Component {
     const allowed = _.reject(supportedLanguages, option =>
       orgLanguages.includes(option.handle)
     )
-    console.log('allowed languages: ', allowed)
     return this.tagsFromLanguages(allowed)
   }
 
@@ -68,8 +67,7 @@ class Languages extends React.Component {
   }
 
   render() {
-    const { orgLanguages, supportedLanguages } = this.props
-    console.log('Languages#render : ', orgLanguages, supportedLanguages)
+    // const { orgLanguages, supportedLanguages } = this.props
 
     return (
       <div>
@@ -107,6 +105,11 @@ class Languages extends React.Component {
   }
 }
 
+Languages.defaultProps = {
+  orgLanguages: [],
+  supportedLanguages: [],
+  updateRecord: () => null,
+}
 Languages.propTypes = {
   orgLanguages: MobxPropTypes.arrayOrObservableArrayOf(PropTypes.string),
   supportedLanguages: MobxPropTypes.arrayOrObservableArray,

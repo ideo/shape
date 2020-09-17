@@ -67,9 +67,8 @@ class TagEditor extends React.Component {
 
   @action
   handleAddition = tagData => {
-    console.log(tagData)
     const { validateTag, records, tagField, afterAddTag } = this.props
-    console.log(records)
+
     tagData.name = tagData.name.trim()
     const newTag = this.createFormattedTag(tagData.name)
     this.error = ''

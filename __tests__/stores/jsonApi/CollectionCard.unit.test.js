@@ -122,13 +122,11 @@ describe('CollectionCard', () => {
 
   describe('reselectOnlyEditableRecords', () => {
     beforeEach(() => {
-      apiStore.findAll = jest
-        .fn()
-        .mockReturnValue([
-          { id: '10', link: false, record: { can_edit: false } },
-          { id: '11', link: true, record: { can_edit: false } },
-          { id: '12', link: false, record: { can_edit: true } },
-        ])
+      apiStore.findAll = jest.fn().mockReturnValue([
+        { id: '10', link: false, record: { can_edit: false } },
+        { id: '11', link: true, record: { can_edit: false } },
+        { id: '12', link: false, record: { can_edit: true } },
+      ])
       collectionCard = new CollectionCard(collectionCardAttributes, apiStore)
     })
 
@@ -140,13 +138,11 @@ describe('CollectionCard', () => {
 
   describe('reselectOnlyMovableCards', () => {
     beforeEach(() => {
-      apiStore.findAll = jest
-        .fn()
-        .mockReturnValue([
-          { id: '10', canMove: true },
-          { id: '11', canMove: false },
-          { id: '12', canMove: true },
-        ])
+      apiStore.findAll = jest.fn().mockReturnValue([
+        { id: '10', canMove: true },
+        { id: '11', canMove: false },
+        { id: '12', canMove: true },
+      ])
       collectionCard = new CollectionCard(collectionCardAttributes, apiStore)
     })
 

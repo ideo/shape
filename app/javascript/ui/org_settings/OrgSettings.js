@@ -41,6 +41,9 @@ class OrgSettings extends React.Component {
   }
 }
 
+OrgSettings.defaultProps = {
+  match: {},
+}
 OrgSettings.propTypes = {
   match: PropTypes.object,
 }

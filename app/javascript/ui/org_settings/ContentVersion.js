@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
 import { Fragment, useState, useEffect } from 'react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import {
   // LabelContainer,
@@ -31,11 +31,10 @@ const ContentVersionSelectField = ({ organization }) => {
       try {
         setIsLoading(true)
         const result = await contentVersionsStore.fetch()
-        console.log('contentversions fetch: ', result)
+
         setContentVersions(result)
         setIsLoading(false)
       } catch (err) {
-        console.log('content version request failed')
         setIsError(err)
       }
     }
@@ -45,14 +44,14 @@ const ContentVersionSelectField = ({ organization }) => {
 
   const handleChange = async e => {
     e.preventDefault()
-    console.log('handle change', e.target.value)
+
     try {
       setIsLoading(true)
       const orgModel = new organizationsStore.model()
       const orgModelInstance = new orgModel({
         id: organization.id,
       })
-      console.log('isNew?: ', orgModelInstance.isNew)
+
       const promise = orgModelInstance.save(
         {
           organization: {
@@ -69,7 +68,6 @@ const ContentVersionSelectField = ({ organization }) => {
       setContentVersion(result)
       setIsLoading(false)
     } catch (err) {
-      console.log('content version update failed: ', err)
       setIsError(true)
       setIsLoading(false)
     }
@@ -131,8 +129,12 @@ const ContentVersionSelectField = ({ organization }) => {
   )
 }
 
+ContentVersionSelectField.defaultProps = {
+  organization: {},
+}
+
 ContentVersionSelectField.propTypes = {
-  organization: PropTypes.object,
+  organization: MobxPropTypes.objectOrObservableObject,
 }
 
 export default ContentVersionSelectField

@@ -9,7 +9,12 @@ import { DisplayText } from '~/ui/global/styled/typography'
 
 import BusinessUnitActionMenu from './BusinessUnitActionMenu'
 import { observable, runInAction } from 'mobx'
-import { observer, inject } from 'mobx-react'
+import {
+  observer,
+  inject,
+  PropTypes as MobxPropTypes,
+  PropTypes,
+} from 'mobx-react'
 import OrganizationRoles from './OrganizationRoles'
 import DropdownSelect from './DropdownSelect'
 
@@ -41,7 +46,6 @@ class BusinessUnitRow extends React.Component {
   }
 
   updateBusinessUnit = async (businessUnit, params) => {
-    console.log('updating BU: ', businessUnit.id, params)
     this.setLoading(true)
     const model = new businessUnitsStore.model()
     const modelInstance = new model({
@@ -50,22 +54,20 @@ class BusinessUnitRow extends React.Component {
     const data = {
       business_unit: params,
     }
-    console.log('sending data for business unit: ', data)
 
     try {
       const promise = modelInstance.save(data, {
         optimistic: false,
       })
       const result = await promise
-      console.log('BU update result: ', result)
       this.setEditingBusinessUnitId(null)
       this.setEditingBusinessUnitName(null)
       this.setBusinessUnitErrors(null)
       this.refreshBusinessUnits()
       // TODO: Just update one BU so we don't have to refetch all the BUs?
       this.setLoading(false)
+      return result
     } catch (err) {
-      console.log('BU update failed: ', err)
       this.setError(true)
       this.setBusinessUnitErrors(err.error)
     }
@@ -78,18 +80,15 @@ class BusinessUnitRow extends React.Component {
       const modelInstance = new model({
         id: businessUnit.id,
       })
-      console.log('cloning: ', businessUnit.id)
 
       const promise = modelInstance.rpc('clone', {
         optimistic: false,
       })
       const result = await promise
-      console.log('BU clone result: ', result)
       this.refreshBusinessUnits()
       this.setLoading(false)
-    } catch (err) {
-      console.log('error is: ', err)
-    }
+      return result
+    } catch (err) {}
   }
 
   removeBusinessUnit = async businessUnit => {
@@ -99,22 +98,18 @@ class BusinessUnitRow extends React.Component {
       const modelInstance = new model({
         id: businessUnit.id,
       })
-      console.log('removing: ', businessUnit.id)
 
       const promise = modelInstance.destroy({
         optimistic: false,
       })
       const result = await promise
-      console.log('BU destroy result: ', result)
       this.refreshBusinessUnits()
       this.setLoading(false)
-    } catch (err) {
-      console.log('error is: ', err)
-    }
+      return result
+    } catch (err) {}
   }
 
   updateBusinessUnitDeployment = async (businessUnitDeployment, params) => {
-    console.log('updating BU Deployment')
     const model = new businessUnitDeploymentsStore.model()
     const modelInstance = new model({
       id: businessUnitDeployment.id,
@@ -130,15 +125,11 @@ class BusinessUnitRow extends React.Component {
       if (result) {
         this.refreshBusinessUnits()
       }
-    } catch (err) {
-      console.log('error updating BU Deployment: ', err)
-    }
+    } catch (err) {}
   }
 
   handleNameInputKeyPress = businessUnit => {
-    console.log('pressed: ', event.key)
     if (event.key === 'Enter') {
-      console.log('On enter sending name as: ', this.editingBusinessUnitName)
       this.handleSaveBusinessUnit(businessUnit, {
         name: this.editingBusinessUnitName,
       })
@@ -146,14 +137,10 @@ class BusinessUnitRow extends React.Component {
   }
 
   handleNameInputChange = e => {
-    console.log('updating name input: ', e.target.value)
     this.setEditingBusinessUnitName(e.target.value)
-    console.log('new name: ', this.editingBusinessUnitName)
   }
 
   handleSaveBusinessUnit = businessUnit => {
-    console.log('saving BU: ', businessUnit)
-    console.log('On blur sending name as: ', this.editingBusinessUnitName)
     this.updateBusinessUnit(businessUnit, {
       name: this.editingBusinessUnitName,
     })
@@ -337,6 +324,32 @@ class BusinessUnitRow extends React.Component {
       </Row>
     )
   }
+}
+
+BusinessUnitRow.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
+BusinessUnitRow.defaultProps = {
+  organization: {},
+  contentVersions: [],
+  industrySubcategories: [],
+  supportedLanguages: [],
+}
+
+BusinessUnitRow.propTypes = {
+  updateBusinessUnit: PropTypes.func,
+  updateBusinessUnitDeployment: PropTypes.func,
+  organization: MobxPropTypes.objectOrObservableObject.isRequired,
+  contentVersions: MobxPropTypes.arrayOrObservableArray(
+    MobxPropTypes.objectOrObservableObject
+  ),
+  industrySubcategories: MobxPropTypes.arrayOrObservableArray(
+    MobxPropTypes.objectOrObservableObject
+  ),
+  supportedLanguages: MobxPropTypes.arrayOrObservableArray(
+    MobxPropTypes.objectOrObservableObject
+  ),
 }
 
 export default BusinessUnitRow

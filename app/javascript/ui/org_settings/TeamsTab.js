@@ -72,16 +72,13 @@ class TeamsTab extends React.Component {
   }
 
   refreshBusinessUnits = async () => {
-    console.log('ACTION: refreshing Business Units')
     try {
       const results = await businessUnitsStore.fetch()
       this.setBusinessUnits(results)
       if (this.focusNameInputForNewTeam) {
         this.focusOnNameInput()
       }
-    } catch (err) {
-      console.log('error fetching BUs: ', err)
-    }
+    } catch (err) {}
   }
 
   initialNewTeamValues = () => {
@@ -104,7 +101,6 @@ class TeamsTab extends React.Component {
   }
 
   createBusinessUnit = async () => {
-    console.log('creating new BU')
     const values = this.initialNewTeamValues()
     const businessUnitParams = {
       business_unit: values,
@@ -114,7 +110,6 @@ class TeamsTab extends React.Component {
     businessUnitModelInstance.set({
       id: null,
     })
-    console.log(businessUnitModelInstance.toJS())
 
     try {
       const creatingBusinessUnit = businessUnitModelInstance.save(
@@ -124,9 +119,7 @@ class TeamsTab extends React.Component {
         }
       )
       const result = await creatingBusinessUnit
-      console.log('created BU: ', result)
       if (result) {
-        console.log('after create, setting values and fetching all BUs')
         this.setEditingBusinessUnitId(result.id)
         this.setEditingBusinessUnitName(result.name)
         this.refreshBusinessUnits()
@@ -134,7 +127,6 @@ class TeamsTab extends React.Component {
         // TODO: Just update one BU so we don't have to refetch all the BUs?
       }
     } catch (err) {
-      console.log('error creating new BU: ', err)
       this.setError(true)
       this.setBusinessUnitErrors(err.error)
     }
