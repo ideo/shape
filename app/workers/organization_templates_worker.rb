@@ -42,7 +42,6 @@ class OrganizationTemplatesWorker
         height: 1,
         collection: profile_template,
       },
-      placement: 'end',
     )
     profile_template.reload.update_cached_tag_lists
     profile_template.reanchor!

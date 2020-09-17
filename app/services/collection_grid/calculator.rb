@@ -97,10 +97,7 @@ module CollectionGrid
 
       # TODO: memoize?
       # omit moving cards from our matrix
-      cards = collection
-              .collection_cards
-              .visible
-              .where.not(id: moving_cards.pluck(:id))
+      cards = collection.collection_cards.visible.where.not(id: moving_cards.pluck(:id)).order(created_at: :desc)
       if drag_positions.present?
         cards += drag_positions.values
       end
@@ -115,18 +112,7 @@ module CollectionGrid
         cols = (card.col..card_max_col(card))
         rows.each do |row|
           cols.each do |col|
-            if matrix[row][col].present? && col + 1 < collection.num_columns
-              # if card exists for [row][col] place newer card right next to the older card
-              # they will still overlap and will be captured by Calculator::overlapping_cards
-              if matrix[row][col].created_at > card.created_at
-                matrix[row][col + 1] = matrix[row][col]
-                matrix[row][col] = card
-              else
-                matrix[row][col + 1] = card
-              end
-            else
-              matrix[row][col] = card
-            end
+            matrix[row][col] = card
           end
         end
       end
@@ -507,7 +493,6 @@ module CollectionGrid
       uninterrupted_cards.flatten.uniq
     end
 
-    # NOTE: only captures adjacent cards for each row
     def self.overlapping_cards(collection:)
       card_matrix = board_matrix(
         collection: collection,
@@ -520,6 +505,7 @@ module CollectionGrid
 
       overlapping_cards = []
 
+      # capture overlapping cards by adjacency (cards placed within the card row)
       (0..total_rows).each do |grid_row|
         (0..total_cols - 1).each do |grid_col|
           # for each row, compare adjacent cards
@@ -540,7 +526,8 @@ module CollectionGrid
         end
       end
 
-      overlapping_cards
+      # combine with cards that have the same row and col
+      overlapping_cards.concat(collection.collection_cards.visible - card_matrix.flatten.compact.uniq)
     end
   end
 end

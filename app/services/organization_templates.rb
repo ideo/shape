@@ -62,7 +62,6 @@ class OrganizationTemplates < SimpleService
       params: {
         collection_id: template_collection.id,
       },
-      placement: 'end',
     )
   end
 

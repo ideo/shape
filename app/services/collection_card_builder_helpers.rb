@@ -1,6 +1,6 @@
 # These methods are intended to be used in interactors
 module CollectionCardBuilderHelpers
-  def create_card(params:, parent_collection:, created_by: nil, type: 'primary', placement: nil)
+  def create_card(params:, parent_collection:, created_by: nil, type: 'primary')
     builder = CollectionCardBuilder.new(
       params: params,
       parent_collection: parent_collection,
@@ -13,15 +13,6 @@ module CollectionCardBuilderHelpers
 
     if builder.errors.blank?
       collection_card = builder.collection_card
-
-      if placement == 'end'
-        CollectionGrid::BoardPlacement.call(
-          to_collection: parent_collection,
-          moving_cards: [collection_card],
-        )
-        collection_card.save
-        collection_card.reload
-      end
 
       return collection_card
     end
