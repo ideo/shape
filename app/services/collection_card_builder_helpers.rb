@@ -11,7 +11,11 @@ module CollectionCardBuilderHelpers
     builder.create
     parent_collection.reload
 
-    return builder.collection_card if builder.errors.blank?
+    if builder.errors.blank?
+      collection_card = builder.collection_card
+
+      return collection_card
+    end
 
     context.fail!(
       message: builder.errors.full_messages.to_sentence,
