@@ -117,7 +117,6 @@ class HotCellQuadrant extends React.Component {
 
   createContent = type => {
     const { onCreateContent } = this.props
-    console.log('create', type)
     onCreateContent(type)
   }
 

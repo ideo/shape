@@ -189,6 +189,7 @@ class HotCell extends React.Component {
           {primaryTypes.map(({ name, description, subTypes }) => (
             <HotCellQuadrant
               name={name}
+              key={name}
               description={description}
               subTypes={subTypes}
               onCreateContent={this.onCreateContent}
@@ -203,7 +204,6 @@ class HotCell extends React.Component {
 }
 
 HotCell.propTypes = {
-  parent: MobxPropTypes.objectOrObservableObject.isRequired,
   handleInsertRowClick: PropTypes.func.isRequired,
   handleRemoveRowClick: PropTypes.func.isRequired,
   onCreateContent: PropTypes.func.isRequired,

@@ -56,7 +56,7 @@ export const StyledMenuButtonWrapper = styled.div`
     `
     border-top: 1px solid ${v.colors.commonMedium};
     left: 0;
-    height: 100vh;
+    height: auto;
     position: fixed;
     top: 0;
     width: 100vw;
@@ -550,11 +550,6 @@ class PopoutMenu extends React.Component {
     const icon = this.buttonStyleIcon(buttonStyle)
     const Wrapper = isMobileFullScreen ? CornerPositioned : styled.div``
 
-    console.log('Popout render', {
-      menuOpen,
-      mobileFixedMenu,
-      isMobileFullScreen,
-    })
     return (
       <Wrapper>
         <ThemeProvider
@@ -609,7 +604,7 @@ const propTypeMenuItem = PropTypes.arrayOf(
     noBorder: PropTypes.bool,
     noHover: PropTypes.bool,
     onClick: PropTypes.func,
-    subItems: PropTypes.arrayOf(propTypeMenuItem),
+    subItems: PropTypes.arrayOf(PropTypes.object),
     TextComponent: PropTypes.object,
     withAvatar: PropTypes.bool,
   })
