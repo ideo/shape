@@ -5,17 +5,18 @@ import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 import googleTagManager from '~/vendor/googleTagManager'
 
-import AddTextIcon from '~/ui/icons/AddTextIcon'
-import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
-import SearchCollectionIcon from '~/ui/icons/SearchCollectionIcon'
-import AddFileIcon from '~/ui/icons/AddFileIcon'
-import AddVideoIcon from '~/ui/icons/AddVideoIcon'
-import AddLinkIcon from '~/ui/icons/AddLinkIcon'
-import ReportIcon from '~/ui/icons/ReportIcon'
-import TemplateIcon from '~/ui/icons/TemplateIcon'
-import TestCollectionIconSm from '~/ui/icons/TestCollectionIconSm'
-import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
-import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
+import CollectionIcon from '~/ui/icons/htc/CollectionIcon'
+import FeedbackIcon from '~/ui/icons/htc/FeedbackIcon'
+import FileIcon from '~/ui/icons/htc/FileIcon'
+import FoamcoreIcon from '~/ui/icons/htc/FoamcoreIcon'
+import LinkIcon from '~/ui/icons/htc/LinkIcon'
+import ReportIcon from '~/ui/icons/htc/ReportIcon'
+import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
+import SubmissionBoxIcon from '~/ui/icons/htc/SubmissionBoxIcon'
+import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
+import TextIcon from '~/ui/icons/htc/TextIcon'
+import VideoIcon from '~/ui/icons/htc/VideoIcon'
+
 import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
 import { StyledGridCard } from '~/ui/grid/shared'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -112,20 +113,6 @@ const StyledBlankCreationTool = styled.div`
 
   `};
 `
-
-const BctBackground = styled.div`
-  z-index: ${v.zIndex.gridCardBg};
-  position: absolute;
-  top: 40px;
-  left: 60px;
-  width: 175px;
-  height: 175px;
-  border-radius: 50%;
-  border: 8px solid ${v.colors.primaryLight};
-  background: ${v.colors.primaryLightest};
-  transition: ${v.transitionWithDelay};
-`
-BctBackground.displayName = 'BctBackground'
 
 @inject('uiStore', 'apiStore')
 @observer
@@ -433,7 +420,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('testCollection')}
-        Icon={() => <TestCollectionIconSm />}
+        Icon={() => <FeedbackIcon />}
       />
     )
     const submissionBctBox = (
@@ -453,7 +440,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('foamcoreBoard')}
-        Icon={FoamcoreBoardIcon}
+        Icon={FoamcoreIcon}
       />
     )
     const collectionBctBox = (
@@ -463,7 +450,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('collection')}
-        Icon={AddCollectionIcon}
+        Icon={CollectionIcon}
       />
     )
 
@@ -481,7 +468,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.createTextItem}
-              Icon={AddTextIcon}
+              Icon={TextIcon}
             />
           )}
           {(!creating || creating === 'file') && (
@@ -491,7 +478,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.pickImages}
-              Icon={AddFileIcon}
+              Icon={FileIcon}
             />
           )}
           {(!creating || creating === 'link') && (
@@ -501,7 +488,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('link')}
-              Icon={AddLinkIcon}
+              Icon={LinkIcon}
             />
           )}
           {(!creating || creating === 'video') && (
@@ -511,7 +498,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('video')}
-              Icon={AddVideoIcon}
+              Icon={VideoIcon}
             />
           )}
           {/* These are what to render on state change for second row */}
@@ -591,7 +578,6 @@ class GridCardBlank extends React.Component {
           </Flex>
         )}
         {inner}
-        <BctBackground className="bct-background" />
       </StyledBlankCreationTool>
     )
   }
