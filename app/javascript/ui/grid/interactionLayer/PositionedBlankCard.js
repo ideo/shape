@@ -10,14 +10,6 @@ import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
 import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 
-const CircleIconHolder = styled.button`
-  border: 1px solid ${v.colors.secondaryMedium};
-  border-radius: 50%;
-  color: ${v.colors.secondaryMedium};
-  height: 32px;
-  width: 32px;
-`
-
 // When you have attributes that will change a lot,
 // it's a performance gain to use `styled.div.attrs`
 const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
@@ -56,35 +48,6 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   }};
   z-index: ${props =>
     _.includes(props.interactionType, 'drag') ? v.zIndex.cardHovering : 1};
-
-  /* FIXME: is this the same CircleIconHolder under GridCardEmptyHotspot? */
-
-  ${CircleIconHolder} {
-    display: none;
-    height: 32px;
-    width: 32px;
-  }
-
-  ${CircleIconHolder} + ${CircleIconHolder} {
-    margin-top: 8px;
-  }
-
-  ${props =>
-    props.interactionType !== 'unrendered' &&
-    `&:hover {
-    background-color: ${v.colors.primaryLight} !important;
-
-    .plus-icon {
-      display: block;
-    }
-
-    ${CircleIconHolder} {
-      display: block;
-    }
-  }
-  `} .plus-icon {
-    display: none;
-  }
 `
 
 BlankCardContainer.displayName = 'BlankCardContainer'
@@ -120,7 +83,7 @@ class PositionedBlankCard extends React.Component {
       zoomLevel: uiStore.relativeZoomLevel,
     }
 
-    if (droppingFilesCount) {
+    if (droppingFilesCount > 0) {
       return (
         <BlankCardContainer {...defaultProps}>
           <GridCardDropzone collection={collection} row={row} col={col} />

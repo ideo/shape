@@ -17,13 +17,6 @@ describe('calculateOpenSpotMatrix', () => {
         { id: 2, row: 0, col: 2 },
         { id: 3, row: 0, col: 3 },
       ],
-      [null, { id: 4, row: 1, col: 1 }, { id: 5, row: 1, col: 2 }, null],
-      [
-        { id: 6, row: 2, col: 0 },
-        { id: 7, row: 2, col: 1 },
-        { id: 8, row: 2, col: 2 },
-        null,
-      ],
     ]
 
     fakeCollection = {
@@ -36,21 +29,19 @@ describe('calculateOpenSpotMatrix', () => {
     it('should calculate open spots given a collection card matrix', () => {
       expect(calculateOpenSpotMatrix({ collection: fakeCollection })).toEqual([
         [0, 1, 0, 0],
-        [1, 0, 0, 1],
-        [0, 0, 0, 1],
       ])
     })
   })
 
   describe('with takenSpots', () => {
     it('should calculate open spots given a collection card matrix', () => {
-      const takenSpots = [{ row: 0, col: 1 }, { row: 2, col: 3 }]
+      const takenSpots = [{ row: 0, col: 1 }]
       expect(
         calculateOpenSpotMatrix({
           collection: fakeCollection,
           takenSpots,
         })
-      ).toEqual([[0, 0, 0, 0], [1, 0, 0, 1], [0, 0, 0, 0]])
+      ).toEqual([[0, 'taken', 0, 0]])
     })
   })
 })

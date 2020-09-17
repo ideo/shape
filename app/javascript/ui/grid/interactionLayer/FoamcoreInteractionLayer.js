@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { action, observable } from 'mobx'
+import { observable, action } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
@@ -37,6 +37,11 @@ class FoamcoreInteractionLayer extends React.Component {
     )
   }
 
+  @action
+  resetHoveringRowCol() {
+    this.hoveringRowCol = { row: null, col: null }
+  }
+
   onCursorMove = type => ev => {
     const { coordinatesForPosition } = this.props
     let rect = { left: 0, top: 0 }
@@ -68,13 +73,14 @@ class FoamcoreInteractionLayer extends React.Component {
     })
 
     const { cardMatrix } = this.props.collection
-    let { row, col } = coords
+    const { row, col } = coords
+
+    // If there's a card already there don't render a positioned blank card
     if (cardMatrix[row] && cardMatrix[row][col]) {
-      row = null
-      col = null
+      this.resetHoveringRowCol()
+    } else {
+      this.throttledRepositionBlankCard({ row, col })
     }
-    this.throttledRepositionBlankCard({ row, col })
-    return { row, col }
   }
 
   onCreateBct = ({ row, col, create = false }) => {
@@ -90,6 +96,8 @@ class FoamcoreInteractionLayer extends React.Component {
       row,
       col,
     })
+
+    this.resetHoveringRowCol()
 
     if (create) {
       const placeholder = new CollectionCard(
@@ -294,7 +302,7 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   calculateOpenSpot = takenSpots => {
-    const { collection } = this.props
+    const { collection, uiStore } = this.props
     const { row, col } = this.hoveringRowCol
 
     if (!row && !col) return null
@@ -302,11 +310,11 @@ class FoamcoreInteractionLayer extends React.Component {
     // NOTE: Collection::cardMatrix only returns cards until the collection cards max row
     const openSpotMatrix = calculateOpenSpotMatrix({
       collection,
-      multiMoveCardIds: [],
       takenSpots,
+      maxVisibleRow: uiStore.visibleRows && Math.floor(uiStore.visibleRows.max),
     })
 
-    return findClosestOpenSpot(
+    const closestOpenSpot = findClosestOpenSpot(
       {
         row,
         col,
@@ -315,6 +323,10 @@ class FoamcoreInteractionLayer extends React.Component {
       },
       openSpotMatrix
     )
+
+    console.log({ closestOpenSpot })
+
+    return closestOpenSpot
   }
 
   get renderInnerDragLayer() {

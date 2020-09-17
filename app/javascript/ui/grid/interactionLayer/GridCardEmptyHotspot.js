@@ -47,12 +47,8 @@ const StyledGridCardEmpty = styled.div`
     .plus-icon {
       display: block;
     }
-    .cloud-icon {
-      display: block;
-    }
   }
   .plus-icon,
-  .cloud-icon {
     display: none;
   }
 `

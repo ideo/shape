@@ -71,18 +71,16 @@ describe('FoamcoreInteractionLayer', () => {
   })
 
   describe('onCursorMove', () => {
-    const fakeEv = {
-      clientX: 100,
-      clientY: 200,
-      target: {
-        classList: [FOAMCORE_INTERACTION_LAYER],
-      },
-    }
-
-    it('should look up coordinatesForPosition', () => {
-      const cursorMoveEvent = component.onCursorMove('mouse')
-      const result = cursorMoveEvent(fakeEv)
-      expect(result).toBeTruthy()
+    let fakeEv
+    beforeEach(() => {
+      fakeEv = {
+        clientX: 100,
+        clientY: 200,
+        target: {
+          classList: [FOAMCORE_INTERACTION_LAYER],
+        },
+      }
+      component.resetHoveringRowCol = jest.fn()
     })
 
     it('should ignore events that are outside foamcoreGridBoundary', () => {
@@ -92,6 +90,35 @@ describe('FoamcoreInteractionLayer', () => {
       const cursorMoveEvent = component.onCursorMove('mouse')
       const result = cursorMoveEvent(fakeEv)
       expect(result).toEqual(true)
+    })
+
+    it('not show a positioned blank card a card is already there', () => {
+      const cursorMoveEvent = component.onCursorMove('mouse')
+      cursorMoveEvent(fakeEv)
+      expect(component.resetHoveringRowCol).toHaveBeenCalled()
+    })
+
+    describe('when hovering over a spot with no cards', () => {
+      beforeEach(() => {
+        props.coordinatesForPosition = jest
+          .fn()
+          .mockReturnValue({ col: 1, row: 4, outsideDraggableArea: false })
+        fakeEv = {
+          clientX: 720,
+          clientY: 360,
+          target: {
+            classList: [FOAMCORE_INTERACTION_LAYER],
+          },
+        }
+        rerender()
+        component.throttledRepositionBlankCard = jest.fn()
+      })
+
+      it('not show a positioned blank card a card is already there', () => {
+        const cursorMoveEvent = component.onCursorMove('mouse')
+        cursorMoveEvent(fakeEv)
+        expect(component.throttledRepositionBlankCard).toHaveBeenCalled()
+      })
     })
   })
 

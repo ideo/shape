@@ -1079,9 +1079,6 @@ class FoamcoreGrid extends React.Component {
             onZoomOut={this.handleZoomOut}
           />
         )}
-        {/* FIXME: this is refactored into PositionedBlankCard, confirm if that's a good idea
-          this.renderBlanksAndBct()
-          */}
         {this.renderAddSubmission()}
         {this.renderMdlPlaceholder()}
         {this.renderVisibleCards()}
