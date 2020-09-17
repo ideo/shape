@@ -36,7 +36,7 @@ const RowActions = ({ row, onRemoveRow, onInsertRow }) => {
     width: 1,
     height: 1,
   })
-  const cardHeight = (uiStore.gridHeightFor(1) / uiStore.zoomLevel) * 2
+  const cardHeight = uiStore.gridHeightFor(1) / uiStore.zoomLevel
   position.y = position.y + cardHeight / 2 - 35
   return (
     <RightBlankActions position={position}>

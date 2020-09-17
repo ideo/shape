@@ -31,7 +31,8 @@ export const Quadrant = styled.div`
   width: calc(50% - 1px);
   z-index: ${props => props.moreMenuOpen && v.zIndex.gridCard};
 
-  &:hover {
+  &:hover,
+  &:active {
     color: ${v.colors.black};
   }
 `
@@ -136,7 +137,7 @@ class HotCellQuadrant extends React.Component {
                 name: subType.description,
                 iconLeft: <TypeIcon />,
                 onClick: () => {
-                  this.createContent(name)
+                  this.createContent(subType.name)
                 },
               }
             }),

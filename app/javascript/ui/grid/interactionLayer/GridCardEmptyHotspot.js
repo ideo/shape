@@ -43,6 +43,7 @@ class GridCardEmptyHotspot extends React.Component {
       emptyRow,
       handleRemoveRowClick,
       handleInsertRowClick,
+      onCloseHtc,
       interactionType,
       isFourWideBoard,
       onCreateContent,
@@ -76,6 +77,7 @@ class GridCardEmptyHotspot extends React.Component {
             handleRemoveRowClick={handleRemoveRowClick}
             handleInsertRowClick={handleInsertRowClick}
             onCreateContent={onCreateContent}
+            onCloseHtc={onCloseHtc}
             rowIdx={rowIdx}
             isFourWideBoard={isFourWideBoard}
             zoomLevel={zoomLevel}
@@ -103,6 +105,7 @@ GridCardEmptyHotspot.propTypes = {
   onCreateContent: PropTypes.func.isRequired,
   card: MobxPropTypes.objectOrObservableObject,
   zoomLevel: PropTypes.number.isRequired,
+  onCloseHtc: PropTypes.func.isRequired,
   visible: PropTypes.bool,
   interactionType: PropTypes.string,
   emptyRow: PropTypes.bool,

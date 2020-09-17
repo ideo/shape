@@ -111,7 +111,7 @@ class FoamcoreInteractionLayer extends React.Component {
     })
     if (!uiStore.isTouchDevice) {
       runInAction(() => {
-        this.hoveringRowCol = { row: null, col: null }
+        this.resetHoveringRowCol()
         this.touchSwiping = false
       })
     }
@@ -131,6 +131,10 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
+  onCloseHtc = () => {
+    this.resetHoveringRowCol()
+  }
+
   handleInsertRowClick = (ev, row) => {
     return this.onRowClick(ev, row, ROW_ACTIONS.INSERT)
   }
@@ -146,6 +150,7 @@ class FoamcoreInteractionLayer extends React.Component {
       return false
     }
     collection.API_manipulateRow({ row, action })
+    this.resetHoveringRowCol()
   }
 
   positionBlank = ({ row, col, width, height }, interactionType = 'drag') => {
@@ -212,6 +217,7 @@ class FoamcoreInteractionLayer extends React.Component {
         handleBlankCardClick={this.onCreateBct}
         handleInsertRowClick={this.handleInsertRowClick}
         handleRemoveRowClick={this.handleRemoveRowClick}
+        onCloseHtc={this.onCloseHtc}
         zoomLevel={relativeZoomLevel}
         data-empty-space-click
       />
@@ -223,6 +229,7 @@ class FoamcoreInteractionLayer extends React.Component {
       collection: { collection_cards, isFourWideBoard },
     } = this.props
     const { row } = this.hoveringRowCol
+    if (!_.isNumber(row)) return null
     const emptyRow =
       !_.some(collection_cards, { row }) &&
       !_.some(collection_cards, { row: row - 1, height: 2 })

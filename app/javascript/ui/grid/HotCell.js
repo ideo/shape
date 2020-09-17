@@ -4,12 +4,14 @@ import localStorage from 'mobx-localstorage'
 import { runInAction } from 'mobx'
 import styled from 'styled-components'
 
+import CloseIcon from '~/ui/icons/CloseIcon'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
 import v from '~/utils/variables'
 
 const Container = styled.div`
   height: 100%;
+  position: relative;
   width: 100%;
 
   ${props =>
@@ -50,6 +52,16 @@ const Container = styled.div`
     height: calc(50% + 1px);
   }
 `
+const CloseButton = styled.button`
+  color: ${v.colors.secondaryMedium};
+  cursor: pointer;
+  display: block;
+  right: 14px;
+  position: absolute;
+  top: 12px;
+  width: 12px;
+  z-index: ${v.zIndex.gridCardTop};
+`
 
 const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
 const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
@@ -59,6 +71,11 @@ const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 class HotCell extends React.Component {
   handleTypeClick = type => () => {
     this.startCreating(type)
+  }
+
+  handleClose = ev => {
+    const { onCloseHtc } = this.props
+    onCloseHtc()
   }
 
   onCreateContent = type => {
@@ -186,6 +203,11 @@ class HotCell extends React.Component {
           isMobileXs={uiStore.isMobileXs}
           smallCardWidth={cardWidth < 132}
         >
+          {uiStore.isMobileXs && (
+            <CloseButton onClick={this.handleClose}>
+              <CloseIcon />
+            </CloseButton>
+          )}
           {primaryTypes.map(({ name, description, subTypes }) => (
             <HotCellQuadrant
               name={name}
@@ -207,6 +229,7 @@ HotCell.propTypes = {
   handleInsertRowClick: PropTypes.func.isRequired,
   handleRemoveRowClick: PropTypes.func.isRequired,
   onCreateContent: PropTypes.func.isRequired,
+  onCloseHtc: PropTypes.func.isRequired,
   zoomLevel: PropTypes.number.isRequired,
   emptyRow: PropTypes.bool,
   isFourWideBoard: PropTypes.bool,
