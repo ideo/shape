@@ -28,6 +28,8 @@ class FoamcoreInteractionLayer extends React.Component {
     row: null,
     col: null,
   }
+  @observable
+  touchSwiping = false
 
   constructor(props) {
     super(props)
@@ -42,6 +44,14 @@ class FoamcoreInteractionLayer extends React.Component {
     this.hoveringRowCol = { row: null, col: null }
   }
 
+  onTouchStart = ev => {
+    runInAction(() => (this.touchSwiping = false))
+  }
+
+  onTouchMove = ev => {
+    runInAction(() => (this.touchSwiping = true))
+  }
+
   onCursorMove = type => ev => {
     const { coordinatesForPosition } = this.props
     let rect = { left: 0, top: 0 }
@@ -53,6 +63,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     let { clientX, clientY, target } = ev
     if (type === 'touch' && ev.touches) {
+      if (this.touchSwiping) return
       const touch = _.first(ev.touches)
       // Check if touch device and make sure touch event has real data
       if (touch && touch.clientX && touch.clientY) {
@@ -101,6 +112,7 @@ class FoamcoreInteractionLayer extends React.Component {
     if (!uiStore.isTouchDevice) {
       runInAction(() => {
         this.hoveringRowCol = { row: null, col: null }
+        this.touchSwiping = false
       })
     }
 
@@ -208,7 +220,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
   get renderRightBlankActions() {
     const {
-      collection: { collection_cards },
+      collection: { collection_cards, isFourWideBoard },
     } = this.props
     const { row } = this.hoveringRowCol
     const emptyRow =
@@ -216,6 +228,7 @@ class FoamcoreInteractionLayer extends React.Component {
       !_.some(collection_cards, { row: row - 1, height: 2 })
 
     if (!emptyRow) return null
+    if (!isFourWideBoard) return null
 
     return (
       <RowActions
@@ -464,7 +477,9 @@ class FoamcoreInteractionLayer extends React.Component {
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
         onMouseMove={this.onCursorMove('mouse')}
-        onTouchStart={this.onCursorMove('touch')}
+        onTouchStart={this.onTouchStart}
+        onTouchMove={this.onTouchMove}
+        onTouchEnd={this.onCursorMove('touch')}
         onDragOver={e => {
           e.preventDefault()
           this.onCursorMove('mouse')(e)
