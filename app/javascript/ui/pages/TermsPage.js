@@ -8,7 +8,6 @@ import { apiStore } from '~/stores'
 import {
   Heading1,
   DisplayText,
-  DisplayLink,
   QuillStyleWrapper,
 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -40,14 +39,6 @@ const StyledTitle = styled(DisplayText)`
   text-transform: uppercase;
 `
 
-const StyledLink = styled(DisplayLink)`
-  text-transform: uppercase;
-  margin-left: 80px;
-  margin-bottom: 30px;
-  font-weight: ${v.weights.medium};
-  display: inline-block;
-`
-
 const StyledSeal = styled.div`
   height: 80px;
   width: 57.98px;
@@ -58,6 +49,7 @@ const StyledSeal = styled.div`
   background-repeat: no-repeat;
   background-size: contain;
   margin-bottom: 10px;
+  cursor: pointer;
 `
 
 // copied from https://github.com/rexxars/react-markdown/issues/69
@@ -159,22 +151,17 @@ class TermsPage extends React.PureComponent {
       <div>
         {!loggedIn && <LoggedOutBasicHeader />}
         <PageContainer>
-          <Heading1>Terms and Privacy</Heading1>
+          <Heading1>IDEO Products Terms of Use</Heading1>
           {loggedIn && <OverdueBanner />}
-          <StyledTitle>IDEO Products Terms of Use</StyledTitle>
-          <StyledLink href="https://www.ideo.com/privacy" target="_blank">
-            Privacy Policy
-          </StyledLink>
-          <StyledSeal
-            assetUrl={
-              'https://ideo-sso.s3-us-west-2.amazonaws.com/assets/privacy_certified_globe.png'
-            }
-          />
           {inner}
           <StyledSeal
             assetUrl={
               'https://ideo-sso.s3-us-west-2.amazonaws.com/assets/privacy_certified_globe.png'
             }
+            onClick={() => {
+              window.location.href =
+                'http://www.esrb.org/confirm/ideo-confirmation.aspx'
+            }}
           />
         </PageContainer>
       </div>
