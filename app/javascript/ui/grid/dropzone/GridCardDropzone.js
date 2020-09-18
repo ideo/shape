@@ -26,7 +26,7 @@ class GridCardDropzone extends React.Component {
   didUpload = false
 
   @observable
-  placeholderCardIds = []
+  placeholderCards = []
 
   constructor(props) {
     super(props)
@@ -55,8 +55,14 @@ class GridCardDropzone extends React.Component {
   }
 
   @action
-  setPlaceholderCardIds = ids => {
-    this.placeholderCardIds = ids
+  addPlaceholderCard = card => {
+    if (!card) return
+    this.placeholderCards.push(card)
+  }
+
+  @action
+  clearPlaceholderCards = () => {
+    this.placeholderCards = []
   }
 
   resetUpload = () => {
@@ -100,12 +106,15 @@ class GridCardDropzone extends React.Component {
       data,
     })
 
-    // store placeholder cards to replace with actual file cards
-    this.setPlaceholderCardIds(
-      _.map(placeholderCards, placeholderCard => placeholderCard.id)
-    )
-
     _.each(placeholderCards, placeholderCard => {
+      // track placeholder cards that were created in order to create primary cards once filestack succeeds
+      this.addPlaceholderCard({
+        id: placeholderCard.id,
+        row: placeholderCard.row,
+        col: placeholderCard.col,
+      })
+
+      // add placeholders to the collection cards store
       collection.addCard(placeholderCard)
     })
 
@@ -114,18 +123,15 @@ class GridCardDropzone extends React.Component {
 
   createCardsForFiles = files => {
     const { collection, height, width, apiStore } = this.props
-    let { col, row } = this.props
 
     _.each(files, async (file, idx) => {
-      if (row !== null && col !== null) {
-        col += idx % 4
-        row += Math.floor(idx / 4)
-      }
+      // get row and col from placeholders
+      const placeholder = this.placeholderCards[idx]
 
       const attrs = {
         order: idx,
-        col,
-        row,
+        col: placeholder.col,
+        row: placeholder.row,
         width,
         height,
         parent_id: collection.id,
@@ -143,7 +149,7 @@ class GridCardDropzone extends React.Component {
       }
       const card = new CollectionCard(attrs, apiStore)
       card.parent = parent // Assign parent so store can get access to it
-      await card.API_createFromPlaceholderId(this.placeholderCardIds[idx])
+      await card.API_createFromPlaceholderId(placeholder.id)
 
       googleTagManager.push({
         event: 'formSubmission',
@@ -153,7 +159,7 @@ class GridCardDropzone extends React.Component {
     })
 
     // clear placeholder card ids for next upload
-    this.setPlaceholderCardIds([])
+    this.clearPlaceholderCards()
   }
 
   render() {

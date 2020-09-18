@@ -64,7 +64,7 @@ class FoamcoreInteractionLayer extends React.Component {
     const { classList } = target
     if (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) {
       // only perform calculation if target is the grid itself
-      return true
+      return
     }
 
     const coords = coordinatesForPosition({
