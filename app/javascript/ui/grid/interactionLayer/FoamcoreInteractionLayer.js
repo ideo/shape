@@ -447,6 +447,7 @@ class FoamcoreInteractionLayer extends React.Component {
         }}
         onMouseLeave={e => {
           e.preventDefault()
+          this.resetHoveringRowCol()
           uiStore.setDroppingFilesCount(0)
         }}
       >
