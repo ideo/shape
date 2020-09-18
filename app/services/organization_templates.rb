@@ -1,4 +1,6 @@
 class OrganizationTemplates < SimpleService
+  include CollectionCardBuilderHelpers
+
   def initialize(organization, user)
     @org = organization
     @user = user
@@ -48,17 +50,19 @@ class OrganizationTemplates < SimpleService
       [template_collection.id],
       [],
     )
-    if @org.shell
-      # Manually link the template collection to the org clone my collection
-      # collection that doesn't have a user yet
-      org_user_collection = Collection::UserCollection.find_by(
-        organization_id: @org.id,
-      )
-      CollectionCard::Link.create(
-        parent: org_user_collection,
+    return unless @org.shell
+
+    # Manually link the template collection to the org clone my collection
+    # collection that doesn't have a user yet
+    org_user_collection = Collection::UserCollection.find_by(
+      organization_id: @org.id,
+    )
+    create_card(
+      parent_collection: org_user_collection,
+      params: {
         collection_id: template_collection.id,
-      )
-    end
+      },
+    )
   end
 
   def getting_started_template
