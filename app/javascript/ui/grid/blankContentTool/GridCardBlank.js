@@ -47,6 +47,11 @@ const StyledGridCardBlank = styled(StyledGridCard)`
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
     background-color: ${v.colors.commonLight};
   `};
+  ${props =>
+    props.zoomScale &&
+    `
+    transform: scale(${props.zoomScale});
+  `}
 `
 StyledGridCardBlank.displayName = 'StyledGridCardBlank'
 
@@ -581,8 +586,10 @@ class GridCardBlank extends React.Component {
       !this.emptyState &&
       (!testCollectionCard || creating || this.replacingTestCollectionMedia)
 
+    let zoomScale = 0
+    if (uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
     return (
-      <StyledGridCardBlank boxShadow={isBoard}>
+      <StyledGridCardBlank boxShadow={isBoard} zoomScale={zoomScale}>
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridW}
