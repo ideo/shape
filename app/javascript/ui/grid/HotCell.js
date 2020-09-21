@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types'
+import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import localStorage from 'mobx-localstorage'
-import { runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import CloseIcon from '~/ui/icons/CloseIcon'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
 import v from '~/utils/variables'
+
+const SLIDE_MS = 200
 
 const Container = styled.div`
   height: 100%;
@@ -21,7 +23,9 @@ const Container = styled.div`
     height: 209px;
     left: 0;
     position: fixed;
-    width: 100%
+    transform: translateY(${props.animated ? 0 : 209}px);
+    transition: transform ${SLIDE_MS}ms ease-in;
+    width: 100%;
 
     ${Quadrant} {
       border-left: none !important;
@@ -69,13 +73,23 @@ const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 @inject('uiStore')
 @observer
 class HotCell extends React.Component {
+  @observable
+  animated = false
+
+  componentDidMount() {
+    setTimeout(() => runInAction(() => (this.animated = true)), SLIDE_MS)
+  }
+
   handleTypeClick = type => () => {
     this.startCreating(type)
   }
 
   handleClose = ev => {
     const { onCloseHtc } = this.props
-    onCloseHtc()
+    runInAction(() => (this.animated = false))
+    setTimeout(() => {
+      onCloseHtc()
+    }, SLIDE_MS)
   }
 
   onCreateContent = type => {
@@ -200,6 +214,7 @@ class HotCell extends React.Component {
     return (
       <PositionWrapper>
         <Container
+          animated={this.animated}
           isMobileXs={uiStore.isMobileXs}
           smallCardWidth={cardWidth < 132}
         >
