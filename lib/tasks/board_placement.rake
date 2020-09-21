@@ -40,6 +40,7 @@ end
 def check_for_empty_rows(collection)
   # special check for empty rows caused by C∆
   cards = collection.reload.collection_cards
+  return if cards.empty?
   return unless cards.first.row >= 2
 
   CollectionGrid::RowInserter.call(
