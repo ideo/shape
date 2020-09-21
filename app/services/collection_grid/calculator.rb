@@ -320,7 +320,7 @@ module CollectionGrid
       col = position.col
       width = position.width
       height = position.height
-      reflow = num_columns == 4
+      reflow = true
 
       possibilities = []
       exact_fit = false
