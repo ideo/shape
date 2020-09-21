@@ -98,7 +98,7 @@ class FoamcoreInteractionLayer extends React.Component {
     const { classList } = target
     if (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) {
       // only perform calculation if target is the grid itself
-      return true
+      return
     }
 
     const coords = coordinatesForPosition({
@@ -551,6 +551,7 @@ class FoamcoreInteractionLayer extends React.Component {
         }}
         onMouseLeave={e => {
           e.preventDefault()
+          this.resetHoveringRowCol()
           uiStore.setDroppingFilesCount(0)
         }}
       >

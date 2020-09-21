@@ -196,8 +196,8 @@ export const calculateOpenSpotMatrix = ({
   })
 
   // mark spots beyond the last row with cards as not taken
-  const firstRowWithNoCards = cardMatrix.length - 1
-  if (maxVisibleRow && maxVisibleRow > firstRowWithNoCards) {
+  const firstRowWithNoCards = cardMatrix.length
+  if (maxVisibleRow && maxVisibleRow > firstRowWithNoCards - 1) {
     const openRows = _.rangeRight(1, columnCount + 1)
     for (let rowIdx = firstRowWithNoCards; rowIdx < maxVisibleRow; rowIdx++) {
       openSpotMatrix[rowIdx] = openRows

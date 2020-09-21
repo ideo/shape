@@ -19,13 +19,12 @@ class PlaceholderCard extends React.Component {
     }
   }
 
-  // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
   onBeforeUnload = e => {
     e.preventDefault() // If you prevent default behavior in Mozilla Firefox prompt will always be shown
     // Chrome requires returnValue to be set
     e.returnValue = ''
     // FIXME: will still clean up placeholders when cancelling
-    this.cleanupPlaceholders()
+    // this.cleanupPlaceholders()
   }
 
   onUnload = e => {
@@ -41,6 +40,7 @@ class PlaceholderCard extends React.Component {
       type: 'application/json; charset=UTF-8',
     })
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
     navigator.sendBeacon('/api/v1/collection_cards/cleanup_placeholder', params)
   }
 
