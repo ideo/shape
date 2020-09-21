@@ -30,6 +30,8 @@ class FoamcoreInteractionLayer extends React.Component {
   }
   @observable
   touchSwiping = false
+  @observable
+  touchClickEv = null
 
   constructor(props) {
     super(props)
@@ -42,18 +44,31 @@ class FoamcoreInteractionLayer extends React.Component {
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
+    // this.touchClickEv = null
   }
 
-  onTouchStart = ev => {
-    runInAction(() => (this.touchSwiping = false))
+  handleTouchStart = ev => {
+    if (ev.target.id !== 'FoamcoreInteractionLayer') {
+      return false
+    }
+    runInAction(() => {
+      this.touchSwiping = false
+      this.touchClickEv = ev.touches[0]
+    })
   }
 
-  onTouchMove = ev => {
-    runInAction(() => (this.touchSwiping = true))
+  handleTouchMove = ev => {
+    runInAction(() => {
+      this.touchSwiping = true
+      this.touchClickEv = null
+    })
   }
 
   onCursorMove = type => ev => {
-    const { coordinatesForPosition } = this.props
+    if (ev.target.id !== 'FoamcoreInteractionLayer') return false
+    // For some reason, a mouse move event is being published after a touch click
+    if (this.touchClickEv && type === 'mouse') return
+    const { coordinatesForPosition, uiStore } = this.props
     let rect = { left: 0, top: 0 }
     const container = document.querySelector(`.${FOAMCORE_INTERACTION_LAYER}`)
     if (container) {
@@ -62,16 +77,24 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     let { clientX, clientY, target } = ev
-    if (type === 'touch' && ev.touches) {
+    // if (type === 'touch' && ev.touches) {
+    //   const touch = _.first(ev.touches)
+    //   // Check if touch device and make sure touch event has real data
+    //   if (touch && touch.clientX && touch.clientY) {
+    //     clientX = touch.clientX
+    //     clientY = touch.clientY
+    //     target = touch.target
+    //   }
+    // }
+    // TouchEnd doesn't give you a clientX, have to get it from start event
+    if (type === 'touch') {
       if (this.touchSwiping) return
-      const touch = _.first(ev.touches)
-      // Check if touch device and make sure touch event has real data
-      if (touch && touch.clientX && touch.clientY) {
-        clientX = touch.clientX
-        clientY = touch.clientY
-        target = touch.target
-      }
+      const { touchClickEv } = this
+      clientX = touchClickEv.clientX
+      clientY = touchClickEv.clientY
+      target = touchClickEv.target
     }
+
     const { classList } = target
     if (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) {
       // only perform calculation if target is the grid itself
@@ -86,11 +109,16 @@ class FoamcoreInteractionLayer extends React.Component {
     const { cardMatrix } = this.props.collection
     const { row, col } = coords
 
+    ev.preventDefault()
+    ev.stopPropagation()
     // If there's a card already there don't render a positioned blank card
     if (cardMatrix[row] && cardMatrix[row][col]) {
       this.resetHoveringRowCol()
     } else {
       this.throttledRepositionBlankCard({ row, col })
+      if (uiStore.isMobileXs) {
+        this.scrollToBlank(clientY)
+      }
     }
   }
 
@@ -113,6 +141,7 @@ class FoamcoreInteractionLayer extends React.Component {
       runInAction(() => {
         this.resetHoveringRowCol()
         this.touchSwiping = false
+        this.touchClickEv = null
       })
     }
 
@@ -151,6 +180,19 @@ class FoamcoreInteractionLayer extends React.Component {
     }
     collection.API_manipulateRow({ row, action })
     this.resetHoveringRowCol()
+  }
+
+  scrollToBlank(clientY) {
+    const { relativeZoomLevel } = this.props
+    const viewPortH = window.innerHeight
+    const mobileMenuH = 200
+    if (viewPortH - mobileMenuH < clientY) {
+      const scrollAmount = (clientY - mobileMenuH) / relativeZoomLevel
+      window.scrollBy({
+        top: scrollAmount,
+        behavior: 'smooth',
+      })
+    }
   }
 
   positionBlank = ({ row, col, width, height }, interactionType = 'drag') => {
@@ -481,11 +523,12 @@ class FoamcoreInteractionLayer extends React.Component {
 
     return (
       <DragLayerWrapper
+        id="FoamcoreInteractionLayer"
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
         onMouseMove={this.onCursorMove('mouse')}
-        onTouchStart={this.onTouchStart}
-        onTouchMove={this.onTouchMove}
+        onTouchStart={this.handleTouchStart}
+        onTouchMove={this.handleTouchMove}
         onTouchEnd={this.onCursorMove('touch')}
         onDragOver={e => {
           e.preventDefault()
