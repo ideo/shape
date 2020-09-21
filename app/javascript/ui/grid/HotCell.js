@@ -67,6 +67,7 @@ const CloseButton = styled.button`
   z-index: ${v.zIndex.gridCardTop};
 `
 
+const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
 const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
 const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 
@@ -105,7 +106,16 @@ class HotCell extends React.Component {
       } else if (itemType) {
         localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, type)
       }
+      if (this.isSmallCard) {
+        localStorage.setItem(HOT_CELL_DEFAULT_EITHER_TYPE, type)
+      }
     })
+  }
+
+  get isSmallCard() {
+    const { uiStore, zoomLevel } = this.props
+    const cardWidth = uiStore.gridSettings.gridW / zoomLevel
+    return cardWidth < 132
   }
 
   get collectionTypes() {
@@ -121,6 +131,7 @@ class HotCell extends React.Component {
   get itemTypes() {
     return [
       { name: 'file', description: 'Add File' },
+      { name: 'text', description: 'Add Text' },
       { name: 'link', description: 'Add Link' },
       { name: 'video', description: 'Link Video' },
       { name: 'report', description: 'Create Report' },
@@ -129,6 +140,13 @@ class HotCell extends React.Component {
 
   get templateTypes() {
     return [{ description: 'Create New Template', name: 'template' }]
+  }
+
+  get defaultEitherType() {
+    const bothType = localStorage.getItem(HOT_CELL_DEFAULT_EITHER_TYPE)
+    return [...this.collectionTypes, ...this.itemTypes].find(
+      type => type.name === bothType
+    )
   }
 
   get defaultCollectionType() {
@@ -170,12 +188,15 @@ class HotCell extends React.Component {
   }
 
   get defaultBothType() {
-    return this.defaultCollectionType || this.defaultItemType
+    return (
+      this.defaultEitherType ||
+      this.defaultCollectionType ||
+      this.defaultItemType
+    )
   }
 
   render() {
     const { uiStore, zoomLevel } = this.props
-    const cardWidth = uiStore.gridSettings.gridW / zoomLevel
     let primaryTypes = [
       { name: 'text', description: 'Add Text' },
       { ...this.defaultItemType, subTypes: () => this.itemTypes },
@@ -186,7 +207,7 @@ class HotCell extends React.Component {
         subTypes: () => this.templateTypes,
       },
     ]
-    if (cardWidth < 132 && !uiStore.isMobileXs) {
+    if (this.isSmallCard && !uiStore.isMobileXs) {
       primaryTypes = [
         { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
       ]
@@ -216,7 +237,7 @@ class HotCell extends React.Component {
         <Container
           animated={this.animated}
           isMobileXs={uiStore.isMobileXs}
-          smallCardWidth={cardWidth < 132}
+          smallCardWidth={this.isSmallCard}
         >
           {uiStore.isMobileXs && (
             <CloseButton onClick={this.handleClose}>

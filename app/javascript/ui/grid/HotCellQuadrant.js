@@ -48,9 +48,9 @@ const QuadrantIconHolder = styled.div`
   height: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
   margin: 0 auto;
   max-height: 100px;
-  max-width: 100px;
+  max-width: 200px;
   text-align: center;
-  width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
+  width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 55)}px;
   vertical-align: middle;
 `
 
@@ -65,8 +65,8 @@ const More = styled.button`
   ${props =>
     props.zoomLevel > 1 &&
     `
-    bottom: 2px;
-    right: 1px;
+    bottom: ${-(props.zoomLevel * 8)}px;
+    right: ${-(props.zoomLevel * 8)}px;
   `}
 `
 
@@ -162,6 +162,7 @@ class HotCellQuadrant extends React.Component {
       zoomLevel,
     } = this.props
     const TypeIcon = nameToIcon[name]
+    console.log('render', zoomLevel)
     return (
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
