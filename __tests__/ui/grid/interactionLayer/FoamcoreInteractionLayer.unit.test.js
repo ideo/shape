@@ -58,6 +58,7 @@ describe('FoamcoreInteractionLayer', () => {
       coordinatesForPosition: jest
         .fn()
         .mockReturnValue({ col: 1, row: 1, outsideDraggableArea: false }),
+      relativeZoomLevel: 1,
     }
     rerender = () => {
       props.collection.API_batchUpdateCardsWithUndo.mockClear()
@@ -77,8 +78,11 @@ describe('FoamcoreInteractionLayer', () => {
         clientX: 100,
         clientY: 200,
         target: {
+          id: 'FoamcoreInteractionLayer',
           classList: [FOAMCORE_INTERACTION_LAYER],
         },
+        preventDefault: jest.fn(),
+        stopPropagation: jest.fn(),
       }
       component.resetHoveringRowCol = jest.fn()
     })
@@ -88,8 +92,8 @@ describe('FoamcoreInteractionLayer', () => {
         classList: ['other'],
       }
       const cursorMoveEvent = component.onCursorMove('mouse')
-      const result = cursorMoveEvent(fakeEv)
-      expect(result).toEqual(true)
+      cursorMoveEvent(fakeEv)
+      expect(props.coordinatesForPosition).not.toHaveBeenCalled()
     })
 
     it('not show a positioned blank card a card is already there', () => {
@@ -102,14 +106,7 @@ describe('FoamcoreInteractionLayer', () => {
       beforeEach(() => {
         props.coordinatesForPosition = jest
           .fn()
-          .mockReturnValue({ col: 1, row: 4, outsideDraggableArea: false })
-        fakeEv = {
-          clientX: 720,
-          clientY: 360,
-          target: {
-            classList: [FOAMCORE_INTERACTION_LAYER],
-          },
-        }
+          .mockReturnValue({ col: 9, row: 9, outsideDraggableArea: false })
         rerender()
         component.throttledRepositionBlankCard = jest.fn()
       })

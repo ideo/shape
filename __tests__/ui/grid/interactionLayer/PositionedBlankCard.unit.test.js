@@ -22,6 +22,8 @@ describe('PositionedBlankCard', () => {
       handleBlankCardClick: jest.fn(),
       handleInsertRowClick: jest.fn(),
       handleRemoveRowClick: jest.fn(),
+      onCloseHtc: jest.fn(),
+      zoomLevel: 1,
     }
     rerender = props => {
       wrapper = shallow(<PositionedBlankCard.wrappedComponent {...props} />)
@@ -44,7 +46,8 @@ describe('PositionedBlankCard', () => {
     })
 
     it('should render GridCardBlank', () => {
-      expect(wrapper.find('GridCardBlank').exists()).toBe(true)
+      expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
+      expect(wrapper.find('GridCardEmptyHotspot').exists()).toBe(true)
     })
   })
 
