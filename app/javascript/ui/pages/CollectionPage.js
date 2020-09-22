@@ -723,7 +723,7 @@ class CollectionPage extends React.Component {
                 {isSubmissionBox &&
                   collection.submission_box_type &&
                   this.renderSubmissionsCollection()}
-                {(uiStore.dragging || uiStore.cardMenuOpenAndPositioned) && (
+                {uiStore.dragging && (
                   <ClickWrapper
                     clickHandlers={[this.handleAllClick]}
                     onContextMenu={this.handleAllClick}

@@ -402,13 +402,7 @@ class ActionMenu extends React.Component {
   }
 
   render() {
-    const {
-      className,
-      menuOpen,
-      wrapperClassName,
-      uiStore,
-      location,
-    } = this.props
+    const { className, menuOpen, wrapperClassName, location } = this.props
 
     return (
       <PopoutMenu
@@ -419,8 +413,6 @@ class ActionMenu extends React.Component {
         menuItems={this.menuItems}
         menuOpen={menuOpen}
         buttonStyle={this.buttonStyle}
-        position={{ x: uiStore.cardMenuOpen.x, y: uiStore.cardMenuOpen.y }}
-        offsetPosition={this.offsetPosition}
         width={250}
         location={location}
         positionRelative={false}
