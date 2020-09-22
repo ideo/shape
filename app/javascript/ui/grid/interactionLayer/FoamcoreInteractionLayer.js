@@ -44,7 +44,6 @@ class FoamcoreInteractionLayer extends React.Component {
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
-    // this.touchClickEv = null
   }
 
   handleTouchStart = ev => {
