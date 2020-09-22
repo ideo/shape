@@ -20,6 +20,11 @@ describe('GridCardEmptyHotspot', () => {
     props = {
       card: emptyCard,
       interactionType: 'hover',
+      handleInsertRowClick: jest.fn(),
+      handleRemoveRowClick: jest.fn(),
+      onCloseHtc: jest.fn(),
+      onCreateContent: jest.fn(),
+      zoomLevel: 1,
       uiStore,
     }
     rerender = (withProps = props) => {
@@ -29,22 +34,21 @@ describe('GridCardEmptyHotspot', () => {
     }
   })
 
-  it('renders a PlusIcon', () => {
+  it('renders a HotCell', () => {
     rerender(props)
-    expect(wrapper.find('PlusIcon').exists()).toBeTruthy()
+    expect(wrapper.find('HotCell').exists()).toBeTruthy()
   })
 
-  describe('render blanks with blank rows', () => {
+  describe('using touch device', () => {
     beforeEach(() => {
+      props.uiStore.isTouchDevice = true
       rerender({
         ...props,
-        isFourWideBoard: true,
-        emptyRow: true,
       })
     })
 
     it('should have a modified blank card for empty rows', () => {
-      expect(wrapper.find('RightBlankActions').exists()).toBe(true)
+      expect(wrapper.find('HotCell').exists()).toBeTruthy()
     })
   })
 })

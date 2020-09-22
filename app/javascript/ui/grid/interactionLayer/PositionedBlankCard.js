@@ -7,7 +7,6 @@ import hexToRgba from '~/utils/hexToRgba'
 import propShapes from '~/utils/propShapes'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
-import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 
 // When you have attributes that will change a lot,
@@ -69,7 +68,7 @@ class PositionedBlankCard extends React.Component {
       blocked,
       interactionType,
     } = this.props
-    const { blankContentToolIsOpen, droppingFilesCount } = uiStore
+    const { droppingFilesCount } = uiStore
 
     const { xPos, yPos, height, width } = position
 
@@ -89,33 +88,6 @@ class PositionedBlankCard extends React.Component {
           <GridCardDropzone collection={collection} row={row} col={col} />
         </BlankCardContainer>
       )
-    } else if (
-      blankContentToolIsOpen &&
-      interactionType === 'bct' &&
-      !!uiStore.blankContentToolState.blankType
-    ) {
-      // FIXME: should render new hot cell since bct will be deprecated
-      const blankContentTool = {
-        ...uiStore.blankContentToolState,
-        id: 'blank',
-        cardType: 'blank',
-        col,
-        row,
-        width,
-        height,
-      }
-      return (
-        <BlankCardContainer {...defaultProps}>
-          <GridCardBlank
-            card={blankContentTool}
-            cardType={'blank'}
-            position={position}
-            record={null}
-            parent={collection}
-            preselected={blankContentTool.blankType}
-          />
-        </BlankCardContainer>
-      )
     }
 
     const {
@@ -126,7 +98,6 @@ class PositionedBlankCard extends React.Component {
       onCloseHtc,
       zoomLevel,
     } = this.props
-    // const draggingOrResizing = _.includes(['drag', 'resize'], interactionType)
 
     return (
       <BlankCardContainer
