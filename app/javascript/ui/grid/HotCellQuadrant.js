@@ -162,12 +162,13 @@ class HotCellQuadrant extends React.Component {
       zoomLevel,
     } = this.props
     const TypeIcon = nameToIcon[name]
-    console.log('render', zoomLevel)
     return (
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
-        title={description}
         placement="bottom"
+        title={description}
+        enterDelay={400}
+        enterNextDelay={250}
       >
         <Quadrant
           moreMenuOpen={this.moreTypesOpen}

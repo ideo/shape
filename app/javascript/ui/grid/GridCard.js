@@ -629,7 +629,6 @@ class GridCard extends React.Component {
         data-cy="GridCard"
         onContextMenu={this.handleContextMenu}
         ref={r => this.setCardRef(r)}
-        onMouseLeave={this.closeContextMenu}
         selected={this.isSelected || this.props.hoveringOver}
         inSearchPage={searchResult}
       >

@@ -33,14 +33,6 @@ class FoamcoreInteractionLayer extends React.Component {
   @observable
   touchClickEv = null
 
-  constructor(props) {
-    super(props)
-    this.throttledRepositionBlankCard = _.throttle(
-      this.repositionBlankCard,
-      150
-    )
-  }
-
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
@@ -114,7 +106,7 @@ class FoamcoreInteractionLayer extends React.Component {
     if (cardMatrix[row] && cardMatrix[row][col]) {
       this.resetHoveringRowCol()
     } else {
-      this.throttledRepositionBlankCard({ row, col })
+      this.repositionBlankCard({ row, col })
       if (uiStore.isMobileXs) {
         this.scrollToBlank(clientY)
       }
