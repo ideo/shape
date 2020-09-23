@@ -107,6 +107,7 @@ class PositionedBlankCard extends React.Component {
       >
         <GridCardEmptyHotspot
           interactionType={interactionType}
+          parent={collection}
           emptyRow={emptyRow}
           isFourWideBoard={collection.isFourWideBoard}
           onCreateContent={contentType => {

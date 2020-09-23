@@ -3,6 +3,7 @@ import { Fragment } from 'react'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 
+import GridCardBlank from '~/ui/grid/blankContentTool/GridCardBlank'
 import HotCell from '~/ui/grid/HotCell'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import PlusIcon from '~/ui/icons/PlusIcon'
@@ -48,6 +49,7 @@ class GridCardEmptyHotspot extends React.Component {
       isFourWideBoard,
       onCreateContent,
       rowIdx,
+      parent,
       visible,
       uiStore,
       zoomLevel,
@@ -55,7 +57,7 @@ class GridCardEmptyHotspot extends React.Component {
 
     let inner = ''
 
-    if (interactionType === 'hover' || interactionType === 'bct') {
+    if (interactionType === 'hover') {
       inner = (
         <Fragment>
           {uiStore.isTouchDevice && (
@@ -84,6 +86,11 @@ class GridCardEmptyHotspot extends React.Component {
           />
         </Fragment>
       )
+    } else if (interactionType === 'bct') {
+      const {
+        blankContentToolState: { blankType },
+      } = uiStore
+      inner = <GridCardBlank parent={parent} preselected={blankType} />
     } else if (interactionType === 'unrendered') {
       inner = <InlineLoader background={v.colors.commonLightest} />
     }
@@ -102,6 +109,7 @@ class GridCardEmptyHotspot extends React.Component {
 }
 
 GridCardEmptyHotspot.propTypes = {
+  parent: MobxPropTypes.objectOrObservableObject,
   onCreateContent: PropTypes.func.isRequired,
   card: MobxPropTypes.objectOrObservableObject,
   zoomLevel: PropTypes.number.isRequired,

@@ -244,10 +244,10 @@ class HotCell extends React.Component {
               <CloseIcon />
             </CloseButton>
           )}
-          {primaryTypes.map(({ name, description, subTypes }) => (
+          {primaryTypes.map(({ name, description, subTypes }, idx) => (
             <HotCellQuadrant
               name={name}
-              key={name}
+              key={name + idx}
               description={description}
               subTypes={subTypes}
               onCreateContent={this.onCreateContent}
