@@ -54,9 +54,11 @@ const QuadrantIconHolder = styled.div`
   vertical-align: middle;
 
   .icon {
-    ${props => props.isMobileXs && (`
+    ${props =>
+      props.isMobileXs &&
+      `
       max-height: 33px;
-    `)}
+    `}
   }
 `
 
