@@ -337,6 +337,7 @@ const TieredMenuHeading = styled(Heading3)`
   `}
 
   .icon {
+    bottom: 20px;
     height: 15px;
     right: 16px;
     position: absolute;
