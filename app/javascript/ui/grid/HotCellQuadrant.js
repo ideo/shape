@@ -52,6 +52,12 @@ const QuadrantIconHolder = styled.div`
   text-align: center;
   width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 55)}px;
   vertical-align: middle;
+
+  .icon {
+    ${props => props.isMobileXs && (`
+      max-height: 33px;
+    `)}
+  }
 `
 
 const More = styled.button`
