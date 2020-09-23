@@ -176,10 +176,10 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
         it 'should insert cards into the layout and calculate collisions' do
           calculate
           expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
-            [2, 1, collection.id],
-            [2, 4, collection.id],
+            [1, 3, collection.id],
             [1, 5, collection.id],
-            [3, 0, collection.id],
+            [1, 7, collection.id],
+            [2, 5, collection.id],
           ])
         end
       end
@@ -295,10 +295,10 @@ RSpec.describe CollectionGrid::Calculator, type: :service do
 
           calculate
           expect(moving_cards.pluck(:row, :col, :parent_id)).to eq([
-            [2, 1, collection.id],
             [0, 4, collection.id],
-            [1, 3, collection.id],
-            [3, 0, collection.id],
+            [0, 5, collection.id],
+            [0, 7, collection.id],
+            [1, 5, collection.id],
           ])
         end
 
