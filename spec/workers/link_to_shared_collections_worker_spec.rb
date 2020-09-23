@@ -138,36 +138,14 @@ RSpec.describe LinkToSharedCollectionsWorker, type: :worker do
             [0, 1],
           ])
 
+          expect(CollectionGrid::BoardPlacement)
+            .to receive(:call).and_call_original.at_least(:twice)
+          expect(CollectionCard)
+            .to receive(:import).and_call_original.at_least(:twice)
           # now link the method library and dashboard
           perform
 
           expect(visible_cards.pluck(:collection_id, :item_id, :row, :col)).to eq([
-            [dashboard_collection.id, nil, 0, 0],
-            [method_library_collection.id, nil, 0, 3],
-            [nil, preexisting_links.first.item_id, 2, 0],
-            [nil, preexisting_links.second.item_id, 2, 1],
-            [other_collection.id, nil, 2, 2],
-          ])
-        end
-
-        it 'does not continue inserting rows when called multiple times' do
-          expect(CollectionGrid::RowInserter).to receive(:call).and_call_original
-          perform
-
-          # should not call a 2nd time
-          expect(CollectionGrid::RowInserter).not_to receive(:call)
-          LinkToSharedCollectionsWorker.new.perform(
-            users_to_add.map(&:id),
-            groups_to_add.map(&:id),
-            [
-              # now link a *differerent* collection but that would trigger another add
-              # but really just pointing to the same collections as above
-              method_library_collection.collections.first.id,
-            ],
-            [],
-          )
-
-          expect(visible_cards.reload.pluck(:collection_id, :item_id, :row, :col)).to eq([
             [dashboard_collection.id, nil, 0, 0],
             [method_library_collection.id, nil, 0, 3],
             [nil, preexisting_links.first.item_id, 2, 0],
