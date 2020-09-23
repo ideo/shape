@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { PropTypes as MobxPropTypes } from 'mobx-react'
+// import { PropTypes as MobxPropTypes } from 'mobx-react'
 
 import { Fragment } from 'react'
 // import { Label } from '~/ui/global/styled/forms'
@@ -38,13 +38,15 @@ const OrganizationRoles = ({ roles, canEdit }) => {
 
 // just for linting
 OrganizationRoles.defaultProps = {
-  roles: [],
+  roles: {},
   canEdit: true,
 }
 OrganizationRoles.propTypes = {
-  roles: MobxPropTypes.arrayOrObservableArray(
-    MobxPropTypes.objectOrObservableObject
-  ),
+  roles: PropTypes.object,
+  // Failed prop type: OrganizationRoles: prop type `roles` is invalid; it must be a function, usually from the `prop-types` package, but received `object`.
+  // roles: MobxPropTypes.arrayOrObservableArray(
+  //   MobxPropTypes.objectOrObservableObject
+  // ),
   canEdit: PropTypes.bool,
 }
 

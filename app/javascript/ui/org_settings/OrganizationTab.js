@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import {
@@ -17,11 +17,17 @@ import { apiStore } from '~/stores'
 @observer
 class OrganizationTab extends React.Component {
   @observable
-  isLoading = null
+  isLoading = true
   @observable
   isError = null
   @observable
   organization = null
+  @observable
+  industrySubcategories = null
+  @observable
+  contentVersions = null
+  @observable
+  supportedLanguages = null
 
   constructor(props) {
     super(props)
@@ -36,22 +42,34 @@ class OrganizationTab extends React.Component {
       // Does this come from apiStore.currentUserOrganization?
     })
 
-    // TODO: add try/catch here?
-    const responses = await Promise.all([
-      industrySubcategoriesStore.fetch(),
-      contentVersionsStore.fetch(),
-      orgModelInstance.fetch(),
-      supportedLanguagesStore.fetch(),
-    ])
+    try {
+      const responses = await Promise.all([
+        industrySubcategoriesStore.fetch(),
+        contentVersionsStore.fetch(),
+        orgModelInstance.fetch(),
+        supportedLanguagesStore.fetch(),
+      ])
 
-    runInAction(() => {
-      this.industrySubcategories = responses[0]
-      this.contentVersions = responses[1]
-      this.organization = responses[2]
-      this.supportedLanguages = responses[3]
-    })
+      runInAction(() => {
+        this.industrySubcategories = responses[0]
+        this.contentVersions = responses[1]
+        this.organization = responses[2]
+        this.supportedLanguages = responses[3]
+      })
 
-    this.setIsLoading(false)
+      this.setIsLoading(false)
+    } catch (error) {
+      this.setIsError(true)
+    }
+  }
+
+  hasLoadedAllRequests() {
+    return [
+      this.organization,
+      this.industrySubcategories,
+      this.contentVersions,
+      this.supportedLanguages,
+    ].every(observableValue => !null)
   }
 
   @action
@@ -98,11 +116,18 @@ class OrganizationTab extends React.Component {
       supportedLanguages,
       updateOrg,
     } = this
+    console.table(
+      isLoading,
+      organization,
+      industrySubcategories,
+      contentVersions,
+      supportedLanguages
+    )
 
     return (
       <div>
         {isError && <div> Something went wrong... </div>}{' '}
-        {!isLoading ? (
+        {isLoading ? (
           <Loader />
         ) : (
           <React.Fragment>
@@ -139,19 +164,22 @@ class OrganizationTab extends React.Component {
   }
 }
 
-OrganizationTab.defaultProps = {
-  organization: {},
-  contentVersions: [],
-  industrySubcategories: [],
-  supportedLanguages: [],
-}
-OrganizationTab.propTypes = {
-  organization: PropTypes.object,
-  contentVersions: PropTypes.arrayOf(PropTypes.object),
-  industrySubcategories: PropTypes.arrayOf(PropTypes.object),
-  supportedLanguages: PropTypes.arrayOf(PropTypes.object),
-  // TODO: load all groups and roles for organization
-  // http://localhost:3001/api/v1/organizations/1/groups
-}
+// THIS DOES NOT TAKE PROPS
+// OrganizationTab.defaultProps = {
+//   organization: {
+//     supported_languages: [],
+//   },
+//   contentVersions: [],
+//   industrySubcategories: [],
+//   supportedLanguages: [],
+// }
+// OrganizationTab.propTypes = {
+//   organization: PropTypes.object,
+//   contentVersions: PropTypes.arrayOf(PropTypes.object),
+//   industrySubcategories: PropTypes.arrayOf(PropTypes.object),
+//   supportedLanguages: PropTypes.arrayOf(PropTypes.object),
+//   // TODO: load all groups and roles for organization
+//   // http://localhost:3001/api/v1/organizations/1/groups
+// }
 
 export default OrganizationTab

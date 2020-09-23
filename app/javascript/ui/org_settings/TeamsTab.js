@@ -28,11 +28,11 @@ class TeamsTab extends React.Component {
   @observable
   isError = null
   @observable
-  businessUnits = null
+  businessUnits = []
 
-  constructor(props) {
-    super(props)
-  }
+  // constructor(props) {
+  //   super(props)
+  // }
 
   async componentDidMount() {
     try {
@@ -49,7 +49,6 @@ class TeamsTab extends React.Component {
         this.contentVersions = responses[1]
         this.businessUnits = responses[2]
       })
-
       this.setIsLoading(false)
     } catch (error) {
       this.setIsError(true)

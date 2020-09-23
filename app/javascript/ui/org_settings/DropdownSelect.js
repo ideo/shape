@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 import _ from 'lodash'
 
 import { Select, SelectOption } from '~/ui/global/styled/forms'
@@ -107,16 +107,21 @@ const DropdownSelect = ({
 DropdownSelect.propTypes = {
   label: PropTypes.string.isRequired,
   // toolTip: PropTypes.string,
-  record: PropTypes.object.isRequired,
-  objectToUpdateName: PropTypes.string.isRequired,
+  record: MobxPropTypes.objectOrObservableObject,
+  objectToUpdateName: PropTypes.string,
   // TODO: fix these to use MobxPropTypes
-  options: PropTypes.arrayOf(PropTypes.object).isRequired,
+  options: MobxPropTypes.arrayOrObservableArray(
+    MobxPropTypes.objectOrObservableObject
+  ),
   fieldToUpdate: PropTypes.string.isRequired,
   updateRecord: PropTypes.func.isRequired,
 }
 
-DropdownSelect.defaultPropTypes = {
+DropdownSelect.defaultProps = {
   toolTip: '',
+  record: {},
+  objectToUpdateName: '',
+  options: [],
 }
 
 export default DropdownSelect

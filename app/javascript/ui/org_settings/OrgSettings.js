@@ -16,6 +16,10 @@ const SettingsPageWrapper = styled.div`
 @inject('apiStore', 'uiStore')
 @observer
 class OrgSettings extends React.Component {
+  constructor(props) {
+    super(props)
+  }
+
   get user() {
     const { apiStore } = this.props
     return apiStore.currentUser
@@ -25,15 +29,22 @@ class OrgSettings extends React.Component {
     window.location = '/login?redirect=/user_settings'
   }
 
+  get startingTab() {
+    const { match } = this.props
+    if (match.params && match.params.tab) {
+      return match.params.tab
+    }
+
+    return 'organization'
+  }
+
   render() {
     if (!this.user) this.sendToLogin()
-    const { match } = this.props
-    const tab = match.params.tab ? match.params.tab : 'organization'
 
     return (
       <SettingsPageWrapper>
         <CreativeDifferenceTabs
-          tab={tab}
+          tab={this.startingTab}
           orgName={this.props.apiStore.currentUserOrganizationName}
         />
       </SettingsPageWrapper>
@@ -46,6 +57,8 @@ OrgSettings.defaultProps = {
 }
 OrgSettings.propTypes = {
   match: PropTypes.object,
+  // TODO: figure out why this error keeps happening. It's not a function!
+  // Failed prop type: inject-OrgSettings-with-apiStore-uiStore: prop type `match` is invalid; it must be a function, usually from the `prop-types` package, but received `undefined`.
 }
 
 OrgSettings.wrappedComponent.propTypes = {

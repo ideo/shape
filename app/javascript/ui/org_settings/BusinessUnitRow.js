@@ -25,7 +25,7 @@ class BusinessUnitRow extends React.Component {
   @observable
   isEditingName = null
   @observable
-  businessUnit = null
+  businessUnit = {}
   @observable
   editableNameValue = null
   @observable
