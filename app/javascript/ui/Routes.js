@@ -249,6 +249,7 @@ class Routes extends React.Component {
         blur={displayTermsPopup}
         id="AppWrapper"
       >
+        <LowerRightCorner />
         {selectedAreaEnabled && <SelectedArea />}
         <ErrorBoundary>
           <MuiThemeProvider theme={MuiTheme}>
@@ -332,7 +333,6 @@ class Routes extends React.Component {
               />
             </Switch>
           </MuiThemeProvider>
-          <LowerRightCorner />
         </ErrorBoundary>
       </AppWrapper>
     )

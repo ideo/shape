@@ -110,7 +110,9 @@ class HotCellQuadrant extends React.Component {
     })
   }
 
-  handleNoMore = () => {
+  handleNoMore = ev => {
+    ev.preventDefault()
+    ev.stopPropagation()
     runInAction(() => {
       this.moreTypesOpen = false
     })
@@ -202,6 +204,7 @@ class HotCellQuadrant extends React.Component {
                   menuOpen={this.moreTypesOpen}
                   menuItems={this.moreMenuItems}
                   onMouseLeave={this.handleNoMore}
+                  onClose={this.handleNoMore}
                   offsetPosition={{
                     x: 0,
                     y: -40,

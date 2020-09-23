@@ -8,6 +8,7 @@ import BctButton from '~/ui/global/BctButton'
 import CardActionHolder from '~/ui/icons/CardActionHolder'
 import CardMenuIcon from '~/ui/icons/CardMenuIcon'
 import Checkbox from '~/ui/forms/Checkbox'
+import CloseIcon from '~/ui/icons/CloseIcon'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import { Heading3 } from '~/ui/global/styled/typography'
 import MenuIcon from '~/ui/icons/MenuIcon'
@@ -62,6 +63,16 @@ export const StyledMenuButtonWrapper = styled.div`
     width: 100vw;
     z-index: ${v.zIndex.zoomControls};
   `}
+`
+
+const CloseButton = styled.button`
+  cursor: pointer;
+  display: block;
+  right: 14px;
+  position: absolute;
+  top: 12px;
+  width: 12px;
+  z-index: ${v.zIndex.gridCardTop};
 `
 
 export const StyledMenuWrapper = styled.div`
@@ -534,6 +545,7 @@ class PopoutMenu extends React.Component {
       menuOpen,
       mobileFixedMenu,
       onClick,
+      onClose,
       offsetPosition,
       onMouseLeave,
       position,
@@ -563,6 +575,11 @@ class PopoutMenu extends React.Component {
             mobileFixedMenu={mobileFixedMenu}
             multiTiered={this.isMultiTieredMenu}
           >
+            {isMobileFullScreen && (
+              <CloseButton onClick={onClose}>
+                <CloseIcon />
+              </CloseButton>
+            )}
             {!hideDotMenu && (
               <MenuToggle
                 disabled={disabled}
@@ -646,6 +663,7 @@ PopoutMenu.propTypes = {
   }),
   onClick: PropTypes.func,
   onMouseLeave: PropTypes.func,
+  onClose: PropTypes.func,
   /** Used to completely reposition the whole menu */
   position: PropTypes.shape({
     x: PropTypes.number,
@@ -674,6 +692,7 @@ PopoutMenu.defaultProps = {
   menuOpen: false,
   mobileFixedMenu: false,
   onMouseLeave: () => null,
+  onClose: () => null,
   onClick: () => null,
   position: null,
   offsetPosition: null,
