@@ -168,6 +168,7 @@ class HotCell extends React.Component {
 
   get expandedSubTypes() {
     return [
+      { name: 'text', description: 'Add Text' },
       {
         description: 'Media',
         isCategory: true,
