@@ -13,6 +13,7 @@ const fakeCollection = {
   id: '123',
   isCollection: true,
   parent_collection_card: {},
+  setCollaborators: jest.fn(),
 }
 const fakeEvent = {
   target: { closest: jest.fn() },
@@ -260,6 +261,7 @@ describe('UiStore', () => {
         bottom: 500,
         left: 0,
       })
+      uiStore.setViewingRecord({ ...fakeCollection, cardIds: ['1', '2', '5'] })
     })
 
     it('selects cards in within the selectedArea', () => {
@@ -273,6 +275,12 @@ describe('UiStore', () => {
       uiStore.setSelectedArea(coords, { shifted: true })
       uiStore.selectCardsWithinSelectedArea()
       expect(uiStore.selectedCardIds).toEqual(['1', '5'])
+    })
+
+    it('omits cards that are not in viewingCollection', () => {
+      uiStore.setViewingRecord({ ...fakeCollection, id: '999', cardIds: ['2'] })
+      uiStore.selectCardsWithinSelectedArea()
+      expect(uiStore.selectedCardIds).toEqual([])
     })
   })
 

@@ -363,6 +363,16 @@ export default class UiStore {
   }
 
   @action
+  removeCardPositions(cardIds = []) {
+    _.each(cardIds, cardId => {
+      const idx = _.findIndex(this.cardPositions, { cardId })
+      if (idx > 0) {
+        this.cardPositions.splice(idx, 1)
+      }
+    })
+  }
+
+  @action
   setCardPosition(cardId, { top, right, bottom, left } = {}) {
     const idx = _.findIndex(this.cardPositions, { cardId })
     const data = { cardId, position: { top, right, bottom, left } }
@@ -376,7 +386,8 @@ export default class UiStore {
   @action
   selectCardsWithinSelectedArea() {
     const { minX, minY, maxX, maxY } = this.selectedArea
-    const { selectedCardIds, selectedAreaShifted } = this
+    const { selectedCardIds, selectedAreaShifted, viewingCollection } = this
+    const viewingCardIds = viewingCollection.cardIds
     let newSelectedCardIds = []
 
     if (minY === null || minX === null) {
@@ -389,6 +400,10 @@ export default class UiStore {
     newSelectedCardIds = _.map(
       _.filter(this.cardPositions, pos => {
         const { top, right, bottom, left } = pos.position
+        // make sure this card hasn't been removed e.g. archived
+        if (!_.includes(viewingCardIds, pos.cardId)) {
+          return false
+        }
         return !(
           right < minX ||
           left > maxX ||

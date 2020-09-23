@@ -180,6 +180,7 @@ group :development do
   gem 'guard', require: false
   gem 'guard-rspec', require: false
   gem 'rubocop', require: false
+  gem 'rubocop-daemon', require: false
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'spring-watcher-listen', '~> 2.0.0'
