@@ -108,13 +108,13 @@ describe('FoamcoreInteractionLayer', () => {
           .fn()
           .mockReturnValue({ col: 9, row: 9, outsideDraggableArea: false })
         rerender()
-        component.throttledRepositionBlankCard = jest.fn()
+        component.repositionBlankCard = jest.fn()
       })
 
       it('not show a positioned blank card a card is already there', () => {
         const cursorMoveEvent = component.onCursorMove('mouse')
         cursorMoveEvent(fakeEv)
-        expect(component.throttledRepositionBlankCard).toHaveBeenCalled()
+        expect(component.repositionBlankCard).toHaveBeenCalled()
       })
     })
   })
