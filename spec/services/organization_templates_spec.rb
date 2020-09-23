@@ -81,8 +81,9 @@ RSpec.describe OrganizationTemplates, type: :service do
       }
       it 'should add create a org templates card' do
         user_collection.collection_cards.reload
-        expect(user_collection.collection_cards.last.record).to eq(template_collection)
-        expect(user_collection.collection_cards.last.parent).to eq(user_collection)
+        card = user_collection.collection_cards.visible.last
+        expect(card.record).to eq(template_collection)
+        expect(card.parent).to eq(user_collection)
       end
     end
   end

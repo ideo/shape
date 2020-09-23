@@ -320,7 +320,6 @@ module CollectionGrid
       col = position.col
       width = position.width
       height = position.height
-      reflow = num_columns == 4
 
       possibilities = []
       exact_fit = false
@@ -366,7 +365,7 @@ module CollectionGrid
             end
             distance = Math.sqrt(row_diff * row_diff + col_diff * col_diff)
 
-            if reflow && row_diff.positive?
+            if row_diff.positive?
               # reflow treats everything flowing "off to the right" so closest means "next in snake order"
               distance = ((row_idx * num_columns + col_idx) - (row * num_columns + col)).abs
             end

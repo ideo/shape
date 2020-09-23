@@ -41,6 +41,10 @@ module CollectionGrid
       moving_cards = select_cards_after
       return if moving_cards.none?
 
+      min_row = moving_cards.minimum(:row)
+      if min_row && min_row < @row
+        @row = min_row
+      end
       # trying to place these cards back on row/col will collision detect and rearrange appropriately
       CollectionGrid::BoardPlacement.call(
         moving_cards: moving_cards,
@@ -77,15 +81,27 @@ module CollectionGrid
     end
 
     def select_cards_after
-      cards_scope = @collection.all_collection_cards.active.where.not(id: @placeholder.id)
+      base_cards_scope = @collection.all_collection_cards.active.where.not(id: @placeholder.id)
+      cards_scope = base_cards_scope
+
+      tall_cards_to_the_right = cards_scope
+                                .where(
+                                  CollectionCard.arel_table[:row].eq(@row - 1),
+                                )
+                                .where(
+                                  CollectionCard.arel_table[:col].gteq(@col),
+                                )
+                                .where(
+                                  CollectionCard.arel_table[:height].eq(2),
+                                )
 
       cards_scope = begin
-        cards_scope
+        base_cards_scope
           .where(
             CollectionCard.arel_table[:row].gt(@row),
           )
           .or(
-            cards_scope
+            base_cards_scope
               .where(
                 CollectionCard.arel_table[:row].eq(@row),
               )
@@ -93,6 +109,20 @@ module CollectionGrid
                 CollectionCard.arel_table[:col].gteq(@col),
               ),
           )
+      end
+
+      if tall_cards_to_the_right.any?
+        tall_card_to_the_right = tall_cards_to_the_right.ordered_row_col.first
+        cards_scope = cards_scope
+                      .or(
+                        base_cards_scope
+                          .where(
+                            CollectionCard.arel_table[:row].eq(tall_card_to_the_right.row),
+                          )
+                          .where(
+                            CollectionCard.arel_table[:col].gteq(tall_card_to_the_right.col),
+                          ),
+                      )
       end
 
       if @collection.templated?

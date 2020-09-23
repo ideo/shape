@@ -27,19 +27,19 @@ class LinkToSharedCollectionsWorker
       # Check for already created links to not create doubles
       collections = collections.compact.uniq
 
-      if objects_to_add.any? { |o| within_creative_difference_application?(o) }
-        # make 2 rows of room for C∆ collections
-        collections.each do |collection|
-          ensure_two_open_rows(collection)
-        end
-      end
-
       objects_to_add.each do |object|
         collections.each do |collection|
           unless collection.link_collection_cards.with_record(object).exists?
             create_link(object, collection)
           end
         end
+      end
+
+      next unless objects_to_add.any? { |o| within_creative_difference_application?(o) }
+
+      # make 2 rows of room for C∆ collections
+      collections.each do |collection|
+        resolve_collisions(collection)
       end
     end
   end
@@ -78,24 +78,24 @@ class LinkToSharedCollectionsWorker
       end
   end
 
-  def ensure_two_open_rows(collection)
-    cards = collection.collection_cards.visible
-    non_dashboard_cards_taking_up_first_two_rows = false
-    cards.where(row: 0).or(cards.where(row: 1)).find_each do |card|
-      if within_creative_difference_application?(card.record)
-        return false
-      end
-
-      non_dashboard_cards_taking_up_first_two_rows = !within_creative_difference_application?(card.record)
+  def resolve_collisions(collection)
+    # e.g. if you placed CD collections at 0,0
+    non_app_cards = collection.collection_cards.visible.reject do |card|
+      within_creative_difference_application?(card.record)
     end
 
-    return unless non_dashboard_cards_taking_up_first_two_rows
+    return if non_app_cards.none?
 
-    # insert two rows at the top (push down everything below row: -1)
-    CollectionGrid::RowInserter.call(
-      row: -1,
-      collection: collection,
-      movement: 2,
+    CollectionGrid::BoardPlacement.call(
+      moving_cards: non_app_cards,
+      to_collection: collection,
+      row: 0,
+      col: 0,
+    )
+    CollectionCard.import(
+      non_app_cards.to_a,
+      validate: false,
+      on_duplicate_key_update: %i[row col],
     )
   end
 
@@ -112,26 +112,26 @@ class LinkToSharedCollectionsWorker
   end
 
   def create_link(object, collection)
-    CollectionCardBuilder.call(
+    card = CollectionCardBuilder.call(
       params: card_attrs(object),
       parent_collection: collection,
       type: 'link',
     )
+
+    return unless within_creative_difference_application?(object)
+
+    # force these
+    if org_dashboard_collection?(object)
+      card.update(row: 0, col: 0)
+    elsif method_library_collection?(object)
+      card.update(row: 0, col: 3)
+    end
   end
 
   def card_attrs(object)
     existing_card_attrs = object.parent_collection_card&.link_card_copy_attributes || {}
     row = nil
     col = nil
-    if within_creative_difference_application?(object)
-      if org_dashboard_collection?(object)
-        row = 0
-        col = 0
-      elsif method_library_collection?(object)
-        row = 0
-        col = 3
-      end
-    end
 
     existing_card_attrs.merge(
       item_id: (object.is_a?(Item) ? object.id : nil),
@@ -140,15 +140,4 @@ class LinkToSharedCollectionsWorker
       col: col,
     )
   end
-
-  # def card_order(object, collection)
-  #   # If sharing C∆/App collection, always put it at the beginning of your 'My Collection'
-  #   if within_creative_difference_application?(object)
-  #     return -9 if method_library_collection?(object)
-  #     # Use -10 because 'getting started' content is often beforehand
-  #     return -10 if org_dashboard_collection?(object)
-  #   end
-  #
-  #   collection.collection_cards.count
-  # end
 end
