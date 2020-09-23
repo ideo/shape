@@ -1,3 +1,4 @@
+import React from 'react'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
@@ -173,19 +174,19 @@ class HotCellQuadrant extends React.Component {
     } = this.props
     const TypeIcon = nameToIcon[name]
     return (
-      <Tooltip
-        classes={{ tooltip: 'Tooltip' }}
-        placement="bottom"
-        title={description}
-        enterDelay={400}
-        enterNextDelay={250}
+      <Quadrant
+        moreMenuOpen={this.moreTypesOpen}
+        onClick={this.handleClick}
+        zoomLevel={zoomLevel}
       >
-        <Quadrant
-          moreMenuOpen={this.moreTypesOpen}
-          onClick={this.handleClick}
-          zoomLevel={zoomLevel}
-        >
-          <QuadrantIconPositioner>
+        <QuadrantIconPositioner>
+          <Tooltip
+            classes={{ tooltip: 'Tooltip' }}
+            placement="top"
+            title={description}
+            enterDelay={400}
+            enterNextDelay={250}
+          >
             <QuadrantIconHolder
               isMobileXs={uiStore.isMobileXs}
               zoomLevel={zoomLevel}
@@ -197,35 +198,35 @@ class HotCellQuadrant extends React.Component {
                 </SmallHelperText>
               )}
             </QuadrantIconHolder>
-          </QuadrantIconPositioner>
-          {subTypes && (
-            <More onClick={this.handleMore} zoomLevel={zoomLevel}>
-              {!uiStore.isTouchDevice && <DropdownIcon />}
-              <div
-                style={{
-                  position: 'relative',
-                  transform: `translateZ(0) scale(${zoomLevel})`,
-                  zIndex: 8000,
+          </Tooltip>
+        </QuadrantIconPositioner>
+        {subTypes && (
+          <More onClick={this.handleMore} zoomLevel={zoomLevel}>
+            {!uiStore.isTouchDevice && <DropdownIcon />}
+            <div
+              style={{
+                position: 'relative',
+                transform: `translateZ(0) scale(${zoomLevel})`,
+                zIndex: 8000,
+              }}
+            >
+              <PopoutMenu
+                hideDotMenu
+                mobileFixedMenu
+                menuOpen={this.moreTypesOpen}
+                menuItems={this.moreMenuItems}
+                onMouseLeave={this.handleNoMore}
+                onClose={this.handleNoMore}
+                offsetPosition={{
+                  x: 0,
+                  y: -40,
                 }}
-              >
-                <PopoutMenu
-                  hideDotMenu
-                  mobileFixedMenu
-                  menuOpen={this.moreTypesOpen}
-                  menuItems={this.moreMenuItems}
-                  onMouseLeave={this.handleNoMore}
-                  onClose={this.handleNoMore}
-                  offsetPosition={{
-                    x: 0,
-                    y: -40,
-                  }}
-                  width={280}
-                />
-              </div>
-            </More>
-          )}
-        </Quadrant>
-      </Tooltip>
+                width={280}
+              />
+            </div>
+          </More>
+        )}
+      </Quadrant>
     )
   }
 }
