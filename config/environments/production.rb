@@ -125,8 +125,15 @@ Rails.application.configure do
   # config.action_cable.mount_path = nil
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
+  cookie_key = '_shape_user_session'
+  # namespace the cookie key to prevent conflicts from production '.shape.space' cookie and other dev/staging domains
+  shape_app = ENV.fetch('SHAPE_APP') { 'staging' }
+  if shape_app != 'production'
+    cookie_key += "_#{shape_app}"
+  end
+
   config.session_store :cookie_store,
-                       key: '_shape_user_session',
+                       key: cookie_key,
                        secure: true,
                        domain: is_anycable ? '.shape.space' : nil
                        # NOTE: SameSite cookie setting provided by 'rails_same_site_cookie' gem
