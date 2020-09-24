@@ -755,7 +755,12 @@ class FoamcoreGrid extends React.Component {
         this.hasDragCollision || !!this.findOverlap(position)
       return {}
     }
-    const openSpot = findClosestOpenSpot(position, this.openSpotMatrix)
+    // NOTE: may not be reachable
+    const openSpot = findClosestOpenSpot(
+      position,
+      this.openSpotMatrix,
+      collection.num_columns
+    )
     if (openSpot) {
       const {
         collection,

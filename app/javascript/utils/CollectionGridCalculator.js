@@ -90,14 +90,18 @@ export const calculateRowsCols = (
   return sortedCards
 }
 
-export const findClosestOpenSpot = (placeholder, openSpotMatrix) => {
+export const findClosestOpenSpot = (
+  placeholder,
+  openSpotMatrix,
+  numColumns
+) => {
   const { row, col, height, width } = placeholder
 
   let possibilities = []
   let exactFit = false
 
   _.each(openSpotMatrix, (rowVals, rowIdx) => {
-    if (rowIdx >= row && rowIdx <= row + 15) {
+    if (rowIdx >= row && rowIdx <= row + numColumns - 1) {
       _.each(rowVals, (openSpots, colIdx) => {
         let canFit = false
         if (openSpots >= width) {
@@ -122,7 +126,14 @@ export const findClosestOpenSpot = (placeholder, openSpotMatrix) => {
           } else {
             colDiff *= 0.99
           }
-          const distance = Math.sqrt(rowDiff * rowDiff + colDiff * colDiff)
+          let distance = Math.sqrt(rowDiff * rowDiff + colDiff * colDiff)
+
+          if (rowDiff > 0) {
+            distance = Math.abs(
+              rowIdx * numColumns + colIdx - (row * numColumns + col)
+            )
+          }
+
           exactFit = distance === 0
           possibilities.push({ row: rowIdx, col: colIdx, distance })
         }
@@ -182,11 +193,7 @@ export const calculateOpenSpotMatrix = ({
   const cardMatrix = withDraggedSpots
     ? matrixWithDraggedSpots(collection, dragGridSpot)
     : collection.cardMatrix
-  const columnCount =
-    collection.num_columns ||
-    (collection.isBoard && 16) ||
-    (collection.isFourWideBoard && 4) ||
-    null
+  const columnCount = collection.num_columns
 
   if (!columnCount) return [[]]
 
