@@ -46,6 +46,11 @@ Rails.application.configure do
   config.active_job.queue_adapter = :test
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  if ENV['CYPRESS'].present?
+    # default to 3001 e.g. for cypress, if not set in .env.test
+    config.action_cable.url = 'ws://localhost:3001/cable'
+  end
 end
 
 Rails.application.routes.default_url_options = {
