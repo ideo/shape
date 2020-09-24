@@ -193,7 +193,10 @@ class HotCellQuadrant extends React.Component {
             >
               <TypeIcon />
               {displayName && (
-                <SmallHelperText color={v.colors.secondaryMedium}>
+                <SmallHelperText
+                  color={v.colors.secondaryMedium}
+                  style={{ display: 'inline-block', minWidth: '100px' }}
+                >
                   {description}
                 </SmallHelperText>
               )}
