@@ -49,6 +49,9 @@ const chartAxisStyle = isSmallChartStyle => {
 
 const calculateRelativeWidth = label => {
   const modifier = label.isSmallChartStyle ? 11 : 8
+  if (!label.text) {
+    return modifier
+  }
   return label.text.length * modifier
 }
 
