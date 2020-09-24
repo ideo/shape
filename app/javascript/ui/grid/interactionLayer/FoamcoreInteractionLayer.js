@@ -121,6 +121,7 @@ class FoamcoreInteractionLayer extends React.Component {
           blankType: contentType,
         }
       })
+      return
     }
 
     uiStore.openBlankContentTool({
