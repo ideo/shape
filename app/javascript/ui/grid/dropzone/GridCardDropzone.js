@@ -122,7 +122,7 @@ class GridCardDropzone extends React.Component {
   }
 
   createCardsForFiles = files => {
-    const { collection, height, width, apiStore } = this.props
+    const { collection, apiStore } = this.props
 
     _.each(files, async (file, idx) => {
       // get row and col from placeholders
@@ -132,8 +132,8 @@ class GridCardDropzone extends React.Component {
         order: idx,
         col: placeholder.col,
         row: placeholder.row,
-        width,
-        height,
+        width: placeholder.width,
+        height: placeholder.height,
         parent_id: collection.id,
         item_attributes: {
           type: ITEM_TYPES.FILE,
@@ -191,8 +191,8 @@ GridCardDropzone.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
 }
+
+GridCardDropzone.displayName = 'GridCardDropzone'
 
 export default GridCardDropzone

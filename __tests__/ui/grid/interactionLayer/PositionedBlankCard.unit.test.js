@@ -35,7 +35,6 @@ describe('PositionedBlankCard', () => {
   it('should render GridCardEmptyHotspot', () => {
     rerender(props)
     expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
-    expect(wrapper.find('GridCardEmptyHotspot').exists()).toBe(true)
   })
 
   describe('creating a bct', () => {
@@ -53,12 +52,13 @@ describe('PositionedBlankCard', () => {
 
   describe('dragging file(s) over', () => {
     beforeEach(() => {
-      props.uiStore.draggingOver = true
+      props.uiStore.droppingFilesCount = 4
       rerender(props)
     })
 
     it('should render GridCardBlank', () => {
-      expect(wrapper.find('GridCardEmptyHotspot').exists()).toBe(true)
+      expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
+      expect(wrapper.find('GridCardDropzone').exists()).toBe(true)
     })
   })
 })
