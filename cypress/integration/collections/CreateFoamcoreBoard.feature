@@ -20,6 +20,8 @@ Feature: Creating a FoamcoreBoard Collection
     Then I should see the text "To my board." in the card at 0,2
     # closing it should move back
     When I wait for 1 second
+    # click any quadrant
+    And I click the "HotCellQuadrant-foamcoreBoard"
     And I click the "BCT-closeButton"
     And I wait for "@apiDeleteCollectionCard" to finish
     Then I should see the text "To my board." in the card at 0,1

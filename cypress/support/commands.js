@@ -79,22 +79,32 @@ Cypress.Commands.add(
   ({ name, collectionType = 'collection', empty = false }) => {
     if (
       _.includes(
-        ['template', 'searchCollection', 'submissionBox'],
+        [
+          'template',
+          'searchCollection',
+          'submissionBox',
+          'foamcoreBoard',
+          'test',
+        ],
         collectionType
       )
     ) {
+      let type = collectionType
+      if (collectionType === 'test') {
+        type = 'testCollection'
+      }
+
       // these cards get created via the BCT popout (...) menu
       cy.selectPopoutTemplateBctType({
-        type: collectionType,
+        type,
+        hotCellQuadrantType: 'collection',
         empty,
         name,
       })
     } else {
       let type = 'collection'
       // these types correspond to the BctButtonBox types in GridCardBlank
-      if (collectionType === 'test') {
-        type = 'testCollection'
-      } else if (collectionType !== 'normal') {
+      if (collectionType !== 'normal') {
         type = collectionType
       }
       cy.selectBctType({ type, empty })
@@ -130,22 +140,38 @@ Cypress.Commands.add(
         break
       case 'data':
         cy.selectPopoutTemplateBctType({
+          hotCellQuadrantType: 'file',
           type: 'report',
         })
         break
       case 'submissionBox':
         cy.selectPopoutTemplateBctType({
+          hotCellQuadrantType: 'collection',
           type: 'submissionBox',
         })
         break
       case 'template':
         cy.selectPopoutTemplateBctType({
+          hotCellQuadrantType: 'collection',
           type: 'template',
         })
         break
       case 'searchCollection':
         cy.selectPopoutTemplateBctType({
+          hotCellQuadrantType: 'collection',
           type: 'searchCollection',
+        })
+        break
+      case 'foamcoreBoard':
+        cy.selectPopoutTemplateBctType({
+          hotCellQuadrantType: 'collection',
+          type: 'foamcoreBoard',
+        })
+        break
+      case 'testCollection':
+        cy.selectPopoutTemplateBctType({
+          hotCellQuadrantType: 'collection',
+          type: 'testCollection',
         })
         break
       default:
@@ -267,9 +293,9 @@ Cypress.Commands.add(
 
 Cypress.Commands.add(
   'selectPopoutTemplateBctType',
-  ({ type, empty = false, name = '' }) => {
+  ({ type, empty = false, hotCellQuadrantType = '', name = '' }) => {
     // TODO: use different types
-    cy.selectBctType({ type: 'collection-more', empty })
+    cy.selectBctType({ type: `${hotCellQuadrantType}-more`, empty })
     cy.wait(100)
 
     const popoutType = `PopoutMenu_create${_.upperFirst(type)}`
@@ -281,6 +307,8 @@ Cypress.Commands.add(
       case 'template':
       case 'searchCollection':
       case 'submissionBox':
+      case 'foamcoreBoard':
+      case 'testCollection':
         cy.locate('CollectionCreatorTextField')
           .first()
           .click()
