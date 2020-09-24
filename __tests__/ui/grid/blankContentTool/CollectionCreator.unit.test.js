@@ -126,7 +126,7 @@ describe('CollectionCreator', () => {
 
     describe('when collection is a SearchColleciton', () => {
       beforeEach(() => {
-        props.type = 'search'
+        props.type = 'searchCollection'
         props.createCard.mockClear()
         rerender()
       })
