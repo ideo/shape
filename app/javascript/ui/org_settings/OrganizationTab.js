@@ -13,6 +13,8 @@ import OrganizationRoles from './OrganizationRoles'
 import Languages from './Languages'
 import Loader from '~/ui/layout/Loader'
 import { apiStore } from '~/stores'
+import { Label } from '../global/styled/forms'
+import HoverableDescriptionIcon from '~/ui/global/HoverableDescriptionIcon'
 
 @observer
 class OrganizationTab extends React.Component {
@@ -125,12 +127,26 @@ class OrganizationTab extends React.Component {
     )
 
     return (
-      <div>
+      <div
+        style={{
+          width: '500px',
+        }}
+      >
         {isError && <div> Something went wrong... </div>}{' '}
         {isLoading ? (
           <Loader />
         ) : (
           <React.Fragment>
+            <Label
+              style={{
+                fontSize: '13px',
+                marginBottom: '11px',
+                marginTop: '24px',
+                width: '170px',
+              }}
+            >
+              Industry
+            </Label>
             <DropdownSelect
               label={'Industry'}
               record={organization}
@@ -138,6 +154,22 @@ class OrganizationTab extends React.Component {
               updateRecord={updateOrg}
               fieldToUpdate={'industry_subcategory_id'}
             />
+            <Label
+              style={{
+                fontSize: '13px',
+                marginBottom: '11px',
+                marginTop: '24px',
+                width: '170px',
+              }}
+            >
+              Content Version
+              <HoverableDescriptionIcon
+                description={
+                  'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
+                }
+                width={16}
+              ></HoverableDescriptionIcon>
+            </Label>
             <DropdownSelect
               label={'Content Version'}
               toolTip={
@@ -148,6 +180,31 @@ class OrganizationTab extends React.Component {
               updateRecord={updateOrg}
               fieldToUpdate={'default_content_version_id'}
             />
+            <Label
+              style={{
+                fontSize: '13px',
+                marginBottom: '11px',
+                marginTop: '24px',
+                width: '170px',
+              }}
+            >
+              Organization Administrators
+            </Label>
+            <OrganizationRoles
+              roles={apiStore.currentUserOrganization.primary_group.roles}
+              canEdit={apiStore.currentUserOrganization.primary_group.can_edit}
+            />
+            <Label
+              style={{
+                fontSize: '13px',
+                marginBottom: '11px',
+                marginTop: '24px',
+                width: '170px',
+              }}
+            >
+              Organization Members
+            </Label>
+            {/* TODO: Need to figure out admins/members vs viewers/editors */}
             <OrganizationRoles
               roles={apiStore.currentUserOrganization.primary_group.roles}
               canEdit={apiStore.currentUserOrganization.primary_group.can_edit}
@@ -157,6 +214,20 @@ class OrganizationTab extends React.Component {
               supportedLanguages={supportedLanguages}
               updateRecord={updateOrg}
             />
+            {/* <Label
+              style={{
+                fontSize: '13px',
+                marginBottom: '11px',
+                marginTop: '24px',
+                width: '170px',
+              }}
+            >
+              Onboarding Message
+              <HoverableDescriptionIcon
+                description={'TBD'}
+                width={16}
+              ></HoverableDescriptionIcon>
+            </Label> */}
           </React.Fragment>
         )}
       </div>
