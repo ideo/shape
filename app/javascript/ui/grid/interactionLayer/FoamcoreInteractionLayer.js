@@ -113,8 +113,9 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
-    // BCT is already open as a hotcell, just modify it
-    if (uiStore.blankContentToolState.blankType === 'hotcell') {
+    // BCT is already open as a hotcell, just modify it. But don't do this
+    // if you're opening a new hotcell.
+    if (uiStore.blankContentToolState.blankType === 'hotcell' && !hotcell) {
       runInAction(() => {
         uiStore.blankContentToolState = {
           ...uiStore.blankContentToolState,
