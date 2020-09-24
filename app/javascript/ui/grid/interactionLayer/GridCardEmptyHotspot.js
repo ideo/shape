@@ -57,7 +57,7 @@ class GridCardEmptyHotspot extends React.Component {
 
     let inner = ''
 
-    if (interactionType === 'hover') {
+    if (interactionType === 'hover' || interactionType === 'hotcell') {
       inner = (
         <Fragment>
           {uiStore.isTouchDevice && (
