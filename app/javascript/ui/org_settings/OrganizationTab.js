@@ -118,13 +118,6 @@ class OrganizationTab extends React.Component {
       supportedLanguages,
       updateOrg,
     } = this
-    console.table(
-      isLoading,
-      organization,
-      industrySubcategories,
-      contentVersions,
-      supportedLanguages
-    )
 
     return (
       <div

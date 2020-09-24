@@ -25,7 +25,7 @@ class BusinessUnitRow extends React.Component {
   @observable
   isEditingName = null
   @observable
-  businessUnit = {}
+  businessUnit = null
   @observable
   editableNameValue = null
   @observable
@@ -147,12 +147,11 @@ class BusinessUnitRow extends React.Component {
   }
 
   render() {
-    // const {} = this.props
+    const { businessUnit } = this.props
     const {
       isEditingName,
       editableNameValue,
       businessUnitErrors,
-      businessUnit,
       handleNameInputKeyPress,
       handleNameInputChange,
       handleSaveBusinessUnit,
@@ -331,16 +330,17 @@ BusinessUnitRow.wrappedComponent.propTypes = {
 }
 
 BusinessUnitRow.defaultProps = {
-  organization: {},
+  // businessUnit: {},
   contentVersions: [],
   industrySubcategories: [],
   supportedLanguages: [],
 }
 
 BusinessUnitRow.propTypes = {
+  // TODO: Add other event handler functions
   updateBusinessUnit: PropTypes.func,
   updateBusinessUnitDeployment: PropTypes.func,
-  organization: MobxPropTypes.objectOrObservableObject.isRequired,
+  businessUnit: MobxPropTypes.objectOrObservableObject.isRequired,
   contentVersions: MobxPropTypes.arrayOrObservableArray(
     MobxPropTypes.objectOrObservableObject
   ),

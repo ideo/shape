@@ -11,7 +11,7 @@ import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 
 const findSelectedOption = (record, options, fieldToUpdate) => {
   const object = _.find(options, option => option.id === record[fieldToUpdate])
-  console.log(object)
+
   return object || {}
 }
 
