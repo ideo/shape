@@ -162,7 +162,7 @@ When('I place a card to the bottom using the snackbar', () => {
 // ----------------------
 When('I add a link URL', () => {
   // assumes BCT is already open
-  cy.locate(`BctButton-link`)
+  cy.locate(`HotCellQuadrant-link`)
     .first()
     .click()
   cy.locate('BctTextField').type(
