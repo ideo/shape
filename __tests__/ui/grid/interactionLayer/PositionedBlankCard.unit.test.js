@@ -1,5 +1,6 @@
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection } from '#/mocks/data'
+import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 
 let wrapper, component, props, rerender
@@ -16,7 +17,7 @@ describe('PositionedBlankCard', () => {
         height: 250,
         width: 316,
       },
-      interactionType: 'drag',
+      interactionType: 'hover',
       emptyRow: false,
       isFourWideBoard: false,
       handleBlankCardClick: jest.fn(),
@@ -35,7 +36,7 @@ describe('PositionedBlankCard', () => {
   it('should render GridCardEmptyHotspot', () => {
     rerender(props)
     expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
-    expect(wrapper.find('GridCardEmptyHotspot').exists()).toBe(true)
+    expect(wrapper.find(GridCardEmptyHotspot).exists()).toBe(true)
   })
 
   describe('creating a bct', () => {
@@ -47,18 +48,7 @@ describe('PositionedBlankCard', () => {
 
     it('should render GridCardBlank', () => {
       expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
-      expect(wrapper.find('GridCardEmptyHotspot').exists()).toBe(true)
-    })
-  })
-
-  describe('dragging file(s) over', () => {
-    beforeEach(() => {
-      props.uiStore.draggingOver = true
-      rerender(props)
-    })
-
-    it('should render GridCardBlank', () => {
-      expect(wrapper.find('GridCardEmptyHotspot').exists()).toBe(true)
+      expect(wrapper.find(GridCardEmptyHotspot).exists()).toBe(true)
     })
   })
 })
