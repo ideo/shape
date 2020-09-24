@@ -8,13 +8,8 @@ import { TextField } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
 
 import BusinessUnitActionMenu from './BusinessUnitActionMenu'
-import { observable, runInAction } from 'mobx'
-import {
-  observer,
-  inject,
-  PropTypes as MobxPropTypes,
-  PropTypes,
-} from 'mobx-react'
+import { action, observable, runInAction } from 'mobx'
+import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import OrganizationRoles from './OrganizationRoles'
 import DropdownSelect from './DropdownSelect'
 
@@ -23,13 +18,17 @@ import DropdownSelect from './DropdownSelect'
 @observer
 class BusinessUnitRow extends React.Component {
   @observable
+  isLoading = null
+  @observable
+  isError = null
+  @observable
+  businessUnitErrors = null
+  @observable
   isEditingName = null
   @observable
   businessUnit = null
   @observable
   editableNameValue = null
-  @observable
-  businessUnitErrors = null
 
   constructor(props) {
     super(props)
@@ -45,8 +44,31 @@ class BusinessUnitRow extends React.Component {
     )
   }
 
+  @action
+  setIsLoading = value => {
+    this.isLoading = value
+  }
+
+  @action
+  setIsError = value => {
+    this.isError = value
+  }
+
+  @action
+  setBusinessUnitErrors = err => {
+    this.businessUnitErrors = err
+  }
+
   updateBusinessUnit = async (businessUnit, params) => {
-    this.setLoading(true)
+    const {
+      setLoading,
+      setError,
+      setEditingBusinessUnitId,
+      setEditingBusinessUnitName,
+      setBusinessUnitErrors,
+      // refreshBusinessUnits,
+    } = this
+    setLoading(true)
     const model = new businessUnitsStore.model()
     const modelInstance = new model({
       id: businessUnit.id,
@@ -60,16 +82,17 @@ class BusinessUnitRow extends React.Component {
         optimistic: false,
       })
       const result = await promise
-      this.setEditingBusinessUnitId(null)
-      this.setEditingBusinessUnitName(null)
-      this.setBusinessUnitErrors(null)
-      this.refreshBusinessUnits()
+      setEditingBusinessUnitId(null)
+      setEditingBusinessUnitName(null)
+      setBusinessUnitErrors(null)
+      // Shouldn't need to do this since we are just updating the BU for this row?
+      // refreshBusinessUnits()
       // TODO: Just update one BU so we don't have to refetch all the BUs?
-      this.setLoading(false)
+      setLoading(false)
       return result
     } catch (err) {
-      this.setError(true)
-      this.setBusinessUnitErrors(err.error)
+      setError(true)
+      setBusinessUnitErrors(err.error)
     }
   }
 
@@ -147,7 +170,6 @@ class BusinessUnitRow extends React.Component {
   }
 
   render() {
-    const { businessUnit } = this.props
     const {
       isEditingName,
       editableNameValue,
@@ -155,14 +177,14 @@ class BusinessUnitRow extends React.Component {
       handleNameInputKeyPress,
       handleNameInputChange,
       handleSaveBusinessUnit,
+      // TODO: finish converting these to work inside of BU row instead of teams tab
+      // cloneBusinessUnit,
+      // removeBusinessUnit,
+      updateBusinessUnit,
+      updateBusinessUnitDeployment,
     } = this
 
-    const {
-      industrySubcategories,
-      contentVersions,
-      updateBusinessUnit, // TODO: move this here instead of passing it in?
-      updateBusinessUnitDeployment,
-    } = this.props
+    const { businessUnit, industrySubcategories, contentVersions } = this.props
 
     return (
       <Row>
@@ -330,16 +352,16 @@ BusinessUnitRow.wrappedComponent.propTypes = {
 }
 
 BusinessUnitRow.defaultProps = {
-  // businessUnit: {},
+  businessUnit: {},
   contentVersions: [],
   industrySubcategories: [],
-  supportedLanguages: [],
+  // supportedLanguages: [],
 }
 
 BusinessUnitRow.propTypes = {
   // TODO: Add other event handler functions
-  updateBusinessUnit: PropTypes.func,
-  updateBusinessUnitDeployment: PropTypes.func,
+  // updateBusinessUnit: PropTypes.func,
+  // updateBusinessUnitDeployment: PropTypes.func,
   businessUnit: MobxPropTypes.objectOrObservableObject.isRequired,
   contentVersions: MobxPropTypes.arrayOrObservableArray(
     MobxPropTypes.objectOrObservableObject
@@ -347,9 +369,9 @@ BusinessUnitRow.propTypes = {
   industrySubcategories: MobxPropTypes.arrayOrObservableArray(
     MobxPropTypes.objectOrObservableObject
   ),
-  supportedLanguages: MobxPropTypes.arrayOrObservableArray(
-    MobxPropTypes.objectOrObservableObject
-  ),
+  // supportedLanguages: MobxPropTypes.arrayOrObservableArray(
+  //   MobxPropTypes.objectOrObservableObject
+  // ),
 }
 
 export default BusinessUnitRow

@@ -132,7 +132,14 @@ class TeamsTab extends React.Component {
   }
 
   render() {
-    const { isLoading, isError, businessUnits, createBusinessUnit } = this
+    const {
+      isLoading,
+      isError,
+      businessUnits,
+      contentVersions,
+      industrySubcategories,
+      createBusinessUnit,
+    } = this
 
     return (
       <div>
@@ -168,7 +175,9 @@ class TeamsTab extends React.Component {
             {businessUnits.map(businessUnit => (
               <BusinessUnitRow
                 businessUnit={businessUnit}
-                // updateBusinessUnit={updateBusinessUnit}
+                contentVersions={contentVersions}
+                industrySubcategories={industrySubcategories}
+                // updateBusinessUnit={this.updateBusinessUnit}
                 // cloneBusinessUnit={this.cloneBusinessUnit}
                 // removeBusinessUnit={this.removeBusinessUnit}
               />
