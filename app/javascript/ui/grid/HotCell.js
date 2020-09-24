@@ -128,6 +128,10 @@ class HotCell extends React.Component {
     ]
   }
 
+  get textTypes() {
+    return [{ name: 'text', description: 'Add Text' }]
+  }
+
   get itemTypes() {
     return [
       { name: 'file', description: 'Add File' },
@@ -143,7 +147,7 @@ class HotCell extends React.Component {
 
   get defaultEitherType() {
     const bothType = localStorage.getItem(HOT_CELL_DEFAULT_EITHER_TYPE)
-    return [...this.collectionTypes, ...this.itemTypes].find(
+    return [...this.collectionTypes, ...this.itemTypes, ...this.textTypes].find(
       type => type.name === bothType
     )
   }

@@ -46,12 +46,12 @@ const QuadrantIconPositioner = styled.div`
 
 const QuadrantIconHolder = styled.div`
   display: table-cell;
-  height: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
+  height: auto;
   margin: 0 auto;
-  max-height: 100px;
+  max-height: ${props => props.zoomLevel * 22}px;
   max-width: 200px;
   text-align: center;
-  width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 55)}px;
+  width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
   vertical-align: middle;
 
   .icon {
