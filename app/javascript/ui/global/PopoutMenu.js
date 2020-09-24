@@ -576,7 +576,7 @@ class PopoutMenu extends React.Component {
             mobileFixedMenu={mobileFixedMenu}
             multiTiered={this.isMultiTieredMenu}
           >
-            {isMobileFullScreen && (
+            {isMobileFullScreen && menuOpen && (
               <CloseButton onClick={onClose}>
                 <CloseIcon />
               </CloseButton>
