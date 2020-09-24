@@ -261,6 +261,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
   get renderRightBlankActions() {
     const {
+      collection,
       collection: { collection_cards, isFourWideBoard },
     } = this.props
     const { row } = this.hoveringRowCol
@@ -272,9 +273,15 @@ class FoamcoreInteractionLayer extends React.Component {
     if (!emptyRow) return null
     if (!isFourWideBoard) return null
 
+    let card
+    if (collection.cardMatrix[row]) {
+      card = collection.cardMatrix[row][0]
+    }
+
     return (
       <RowActions
         row={row}
+        height={card ? card.height : 1}
         onInsertRow={this.handleInsertRowClick}
         onRemoveRow={this.handleRemoveRowClick}
       />

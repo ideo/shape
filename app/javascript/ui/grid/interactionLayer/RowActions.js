@@ -11,9 +11,11 @@ const RightBlankActions = styled.div`
   color: ${v.colors.secondaryMedium};
   display: flex;
   flex-direction: column;
+  height: ${props => props.height}px;
+  padding-top: ${props => props.height / 2}px;
   position: absolute;
-  left: -34px;
-  top: ${props => props.position.y}px;
+  left: -46px;
+  top: ${props => props.position.y - 8}px;
 
   &:hover {
     color: ${v.colors.black};
@@ -29,36 +31,51 @@ export const CircleIconHolder = styled.button`
   width: 32px;
 `
 
-const RowActions = ({ row, onRemoveRow, onInsertRow }) => {
+const IconPadding = styled.div`
+  padding-bottom: 6px;
+  padding-right: 10px;
+  padding-left: 6px;
+`
+
+const RowActions = ({ row, height, onRemoveRow, onInsertRow }) => {
   const position = uiStore.positionForCoordinates({
     col: 1,
     row,
     width: 1,
     height: 1,
   })
-  const cardHeight = uiStore.gridHeightFor(1) / uiStore.zoomLevel
-  position.y = position.y + cardHeight / 2 - 35
+  const relativeHeight = uiStore.gridHeightFor(height) / uiStore.zoomLevel
+  position.y = position.y - 35
   return (
-    <RightBlankActions position={position}>
+    <RightBlankActions
+      position={position}
+      height={relativeHeight}
+      id="RowActions"
+    >
       <Tooltip
         classes={{ tooltip: 'Tooltip' }}
         title="Remove row"
         placement="top"
       >
-        <CircleIconHolder onClick={ev => onRemoveRow(ev, row)}>
-          <CircleTrashIcon />
-        </CircleIconHolder>
+        <IconPadding onClick={ev => onRemoveRow(ev, row)}>
+          <CircleIconHolder>
+            <CircleTrashIcon />
+          </CircleIconHolder>
+        </IconPadding>
       </Tooltip>
       <Tooltip classes={{ tooltip: 'Tooltip' }} title="Add row" placement="top">
-        <CircleIconHolder onClick={ev => onInsertRow(ev, row)}>
-          <CircleAddRowIcon />
-        </CircleIconHolder>
+        <IconPadding onClick={ev => onInsertRow(ev, row)}>
+          <CircleIconHolder>
+            <CircleAddRowIcon />
+          </CircleIconHolder>
+        </IconPadding>
       </Tooltip>
     </RightBlankActions>
   )
 }
 RowActions.propTypes = {
   row: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
   onRemoveRow: PropTypes.func.isRequired,
   onInsertRow: PropTypes.func.isRequired,
 }
