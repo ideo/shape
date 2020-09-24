@@ -422,7 +422,8 @@ class FoamcoreInteractionLayer extends React.Component {
         width: 1,
         height: 1,
       },
-      openSpotMatrix
+      openSpotMatrix,
+      collection.num_columns
     )
 
     return closestOpenSpot
