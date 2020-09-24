@@ -113,6 +113,16 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
+    // BCT is already open as a hotcell, just modify it
+    if (uiStore.blankContentToolState.blankType === 'hotcell') {
+      runInAction(() => {
+        uiStore.blankContentToolState = {
+          ...uiStore.blankContentToolState,
+          blankType: contentType,
+        }
+      })
+    }
+
     uiStore.openBlankContentTool({
       row,
       col,
@@ -138,6 +148,7 @@ class FoamcoreInteractionLayer extends React.Component {
         apiStore
       )
       await placeholder.API_createBct()
+      uiStore.setBctPlaceholderCard(placeholder)
     }
   }
 
