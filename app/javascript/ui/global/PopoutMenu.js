@@ -556,7 +556,6 @@ class PopoutMenu extends React.Component {
     } = this.props
     const { isMultiTieredMenu, isMobileFullScreen } = this
 
-    const isBct = buttonStyle === 'bct'
     const isCard = buttonStyle === 'card'
 
     const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
@@ -587,7 +586,7 @@ class PopoutMenu extends React.Component {
                 onClick={onClick}
                 size={isCard ? 28 : 14}
                 className={`${className} menu-toggle`}
-                data-cy={isBct ? 'BctButton-more' : 'PopoutMenu'}
+                data-cy={'PopoutMenu'}
               >
                 {icon}
               </MenuToggle>

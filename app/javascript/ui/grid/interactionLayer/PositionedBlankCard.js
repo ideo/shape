@@ -43,6 +43,7 @@ const BlankCardContainer = styled.div.attrs(({ x, y, h, w, zoomLevel }) => ({
   opacity: ${props => {
     if (props.interactionType === 'unrendered') return 0.75
     if (_.includes(props.interactionType, 'drag')) return 0.5
+    if (props.interactionType === 'resize') return 0.5
     return 1
   }};
   z-index: ${props =>
@@ -87,6 +88,16 @@ class PositionedBlankCard extends React.Component {
         <BlankCardContainer {...defaultProps}>
           <GridCardDropzone collection={collection} row={row} col={col} />
         </BlankCardContainer>
+      )
+    } else if (
+      _.includes(['drag', 'resize', 'drag-overflow'], interactionType)
+    ) {
+      return (
+        <BlankCardContainer
+          {...defaultProps}
+          blocked={blocked}
+          interactionType={interactionType}
+        />
       )
     }
 

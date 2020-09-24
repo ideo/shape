@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { FOAMCORE_GRID_BOUNDARY } from '~/utils/variables'
+import { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
 
 // For more comprehensive examples of custom
 // commands please read more here:
@@ -217,6 +217,7 @@ Cypress.Commands.add('clickFirstHotEdge', () => {
   cy.locateDataOrClass('FoamcoreHotEdge-0:0')
     .first()
     .click({ force: true })
+  cy.wait('@apiCreateCollectionCardBct')
   // this is when it gets the placeholder
   cy.wait('@apiGetCollectionCard')
   cy.wait(200)
@@ -225,10 +226,8 @@ Cypress.Commands.add('clickFirstHotEdge', () => {
 Cypress.Commands.add(
   'selectBctType',
   ({ type, row = null, col = null, empty = false }) => {
-    let className = '.StyledHotspot'
-    if (row !== null && col !== null) {
-      className += `-${row}:${col}`
-    }
+    const className = `HotCellQuadrant-${type}`
+
     if (!empty) {
       // we need to hover over the right spot to make the BCT appear
       cy.window().then(win => {
@@ -245,29 +244,32 @@ Cypress.Commands.add(
           left: 50,
           top: 150,
         }
-        cy.get(`.${FOAMCORE_GRID_BOUNDARY}`)
+
+        cy.get(`.${FOAMCORE_INTERACTION_LAYER}`)
           .trigger('mousemove', {
             clientX: pos.x + rect.left,
             clientY: pos.y + rect.top,
             force: true,
           })
-          .wait(150)
-          .locateDataOrClass(className)
+          .wait(1000)
+          .locate(className)
           .first()
           .click({ force: true })
       })
+    } else {
+      cy.wait(type === 'file' ? 1000 : 150)
+      cy.locate(className)
+        .first()
+        .click({ force: true })
     }
-    cy.wait(type === 'file' ? 1000 : 150)
-    cy.locate(`BctButton-${type}`)
-      .first()
-      .click({ force: true })
   }
 )
 
 Cypress.Commands.add(
   'selectPopoutTemplateBctType',
   ({ type, empty = false, name = '' }) => {
-    cy.selectBctType({ type: 'more', empty })
+    // TODO: use different types
+    cy.selectBctType({ type: 'collection-more', empty })
     cy.wait(100)
 
     const popoutType = `PopoutMenu_create${_.upperFirst(type)}`

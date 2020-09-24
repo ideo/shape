@@ -178,6 +178,7 @@ class HotCellQuadrant extends React.Component {
         moreMenuOpen={this.moreTypesOpen}
         onClick={this.handleClick}
         zoomLevel={zoomLevel}
+        data-cy={`HotCellQuadrant-${name}`}
       >
         <QuadrantIconPositioner>
           <Tooltip
@@ -204,7 +205,11 @@ class HotCellQuadrant extends React.Component {
           </Tooltip>
         </QuadrantIconPositioner>
         {subTypes && (
-          <More onClick={this.handleMore} zoomLevel={zoomLevel}>
+          <More
+            onClick={this.handleMore}
+            zoomLevel={zoomLevel}
+            data-cy={`HotCellQuadrant-${name}-more`}
+          >
             {!uiStore.isTouchDevice && <DropdownIcon />}
             <div
               style={{

@@ -50,7 +50,7 @@ class CollectionCreator extends React.Component {
         num_columns: this.numColumns,
       },
     }
-    if (type === 'search')
+    if (type === 'searchCollection')
       cardParams.collection_attributes.search_term = this.state.inputText
 
     createCard(cardParams, {
@@ -77,7 +77,7 @@ class CollectionCreator extends React.Component {
       case 'foamcoreBoard':
         return 'Collection::Board'
         break
-      case 'search':
+      case 'searchCollection':
         return 'Collection::SearchCollection'
         break
       case 'collection':
@@ -105,7 +105,7 @@ class CollectionCreator extends React.Component {
   render() {
     const { type } = this.props
     const placeholder =
-      type === 'search'
+      type === 'searchCollection'
         ? 'add search term for collection'
         : `${this.typeName} name`
 
@@ -141,7 +141,7 @@ CollectionCreator.propTypes = {
     'testCollection',
     'submissionBox',
     'foamcoreBoard',
-    'search',
+    'searchCollection',
   ]),
   createCard: PropTypes.func.isRequired,
   closeBlankContentTool: PropTypes.func.isRequired,
