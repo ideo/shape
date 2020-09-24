@@ -3,8 +3,9 @@ import Icon from '../Icon'
 const VideoIcon = props => (
   <Icon fill>
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44">
-      <g>
+      <g id="Group-3_2_">
         <path
+          id="Path-4_1_"
           d="M19.8,17.9v8.5c0,0.3,0.2,0.5,0.4,0.5h0.1c0.1,0,0.2,0,0.3-0.1l6.9-4.3c0.2-0.2,0.3-0.5,0.2-0.7
 		c-0.1-0.1-0.1-0.2-0.2-0.2l-7-4.3c-0.2-0.2-0.5-0.1-0.7,0.2C19.9,17.7,19.8,17.8,19.8,17.9L19.8,17.9z"
         />

@@ -131,7 +131,6 @@ class HotCell extends React.Component {
   get itemTypes() {
     return [
       { name: 'file', description: 'Add File' },
-      { name: 'text', description: 'Add Text' },
       { name: 'link', description: 'Add Link' },
       { name: 'video', description: 'Link Video' },
       { name: 'report', description: 'Create Report' },
@@ -169,6 +168,7 @@ class HotCell extends React.Component {
 
   get expandedSubTypes() {
     return [
+      { name: 'text', description: 'Add Text' },
       {
         description: 'Media',
         isCategory: true,

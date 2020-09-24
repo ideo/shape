@@ -68,15 +68,6 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     let { clientX, clientY, target } = ev
-    // if (type === 'touch' && ev.touches) {
-    //   const touch = _.first(ev.touches)
-    //   // Check if touch device and make sure touch event has real data
-    //   if (touch && touch.clientX && touch.clientY) {
-    //     clientX = touch.clientX
-    //     clientY = touch.clientY
-    //     target = touch.target
-    //   }
-    // }
     // TouchEnd doesn't give you a clientX, have to get it from start event
     if (type === 'touch') {
       if (this.touchSwiping) return
@@ -113,7 +104,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
-  onCreateBct = ({ row, col, create = false }, contentType) => {
+  onCreateBct = async ({ row, col, hotcell = false }, contentType) => {
     const { selectedAreaMinX } = this
     const { apiStore, uiStore, collection } = this.props
 
@@ -122,11 +113,22 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
+    // BCT is already open as a hotcell, just modify it
+    if (uiStore.blankContentToolState.blankType === 'hotcell') {
+      runInAction(() => {
+        uiStore.blankContentToolState = {
+          ...uiStore.blankContentToolState,
+          blankType: contentType,
+        }
+      })
+      return
+    }
+
     uiStore.openBlankContentTool({
       row,
       col,
       collectionId: collection.id,
-      blankType: contentType,
+      blankType: hotcell ? 'hotcell' : contentType,
     })
     if (!uiStore.isTouchDevice) {
       runInAction(() => {
@@ -137,8 +139,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     this.resetHoveringRowCol()
-
-    if (create) {
+    if (hotcell) {
       const placeholder = new CollectionCard(
         {
           row,
@@ -147,7 +148,8 @@ class FoamcoreInteractionLayer extends React.Component {
         },
         apiStore
       )
-      placeholder.API_createBct()
+      await placeholder.API_createBct()
+      uiStore.setBctPlaceholderCard(placeholder)
     }
   }
 
@@ -259,6 +261,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
   get renderRightBlankActions() {
     const {
+      collection,
       collection: { collection_cards, isFourWideBoard },
     } = this.props
     const { row } = this.hoveringRowCol
@@ -270,9 +273,15 @@ class FoamcoreInteractionLayer extends React.Component {
     if (!emptyRow) return null
     if (!isFourWideBoard) return null
 
+    let card
+    if (collection.cardMatrix[row]) {
+      card = collection.cardMatrix[row][0]
+    }
+
     return (
       <RowActions
         row={row}
+        height={card ? card.height : 1}
         onInsertRow={this.handleInsertRowClick}
         onRemoveRow={this.handleRemoveRowClick}
       />
@@ -474,7 +483,7 @@ class FoamcoreInteractionLayer extends React.Component {
               col={col}
               horizontal={false}
               onClick={() => {
-                this.onCreateBct({ col, row, create: true })
+                this.onCreateBct({ col, row, hotcell: true })
               }}
             />
           )
@@ -504,7 +513,9 @@ class FoamcoreInteractionLayer extends React.Component {
 
     // NOTE: ensure that the bct is open in the same collection
     if (blankContentToolIsOpen && collectionId === collection.id) {
-      return this.positionBlank({ ...blankContentToolState }, 'bct')
+      const interactionType =
+        blankContentToolState.blankType === 'hotcell' ? 'hotcell' : 'bct'
+      return this.positionBlank({ ...blankContentToolState }, interactionType)
     }
 
     return null

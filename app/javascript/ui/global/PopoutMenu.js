@@ -84,7 +84,7 @@ export const StyledMenuWrapper = styled.div`
   }};
   padding: 10px;
   transition: left 120ms;
-  z-index: ${v.zIndex.aboveClickWrapper};
+  z-index: ${v.zIndex.aboveclickwrapper};
 
   ${props =>
     props.theme.isMobileFullScreen &&
@@ -337,6 +337,7 @@ const TieredMenuHeading = styled(Heading3)`
   `}
 
   .icon {
+    bottom: 20px;
     height: 15px;
     right: 16px;
     position: absolute;
@@ -575,7 +576,7 @@ class PopoutMenu extends React.Component {
             mobileFixedMenu={mobileFixedMenu}
             multiTiered={this.isMultiTieredMenu}
           >
-            {isMobileFullScreen && (
+            {isMobileFullScreen && menuOpen && (
               <CloseButton onClick={onClose}>
                 <CloseIcon />
               </CloseButton>
