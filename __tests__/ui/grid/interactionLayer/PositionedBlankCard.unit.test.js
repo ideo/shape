@@ -1,6 +1,5 @@
 import fakeUiStore from '#/mocks/fakeUiStore'
 import { fakeCollection } from '#/mocks/data'
-import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 
 let wrapper, component, props, rerender
@@ -17,7 +16,6 @@ describe('PositionedBlankCard', () => {
         height: 250,
         width: 316,
       },
-      interactionType: 'hover',
       emptyRow: false,
       isFourWideBoard: false,
       handleBlankCardClick: jest.fn(),
@@ -33,10 +31,32 @@ describe('PositionedBlankCard', () => {
     }
   })
 
-  it('should render GridCardEmptyHotspot', () => {
-    rerender(props)
-    expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
-    expect(wrapper.find(GridCardEmptyHotspot).exists()).toBe(true)
+  describe('with drag interaction', () => {
+    beforeEach(() => {
+      props.interactionType = 'drag'
+      rerender(props)
+    })
+
+    it('should not render GridCardEmptyHotspot', () => {
+      expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
+      expect(wrapper.find('GridCardEmptyHotspot').exists()).toBe(false)
+    })
+  })
+
+  describe('with hover interaction', () => {
+    beforeEach(() => {
+      props.uiStore.blankContentToolIsOpen = true
+      props.interactionType = 'hover'
+      rerender(props)
+    })
+
+    it('should render GridCardEmptyHotspot', () => {
+      rerender(props)
+      expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
+      expect(
+        wrapper.find('GridCardEmptyHotspot').props().interactionType
+      ).toEqual('hover')
+    })
   })
 
   describe('creating a bct', () => {
@@ -48,7 +68,21 @@ describe('PositionedBlankCard', () => {
 
     it('should render GridCardBlank', () => {
       expect(wrapper.find('BlankCardContainer').exists()).toBe(true)
-      expect(wrapper.find(GridCardEmptyHotspot).exists()).toBe(true)
+      expect(
+        wrapper.find('GridCardEmptyHotspot').props().interactionType
+      ).toEqual('bct')
+    })
+  })
+
+  describe('blocked movement (red hover state)', () => {
+    beforeEach(() => {
+      props.interactionType = 'drag'
+      props.blocked = true
+      rerender(props)
+    })
+
+    it('should render GridCardBlank', () => {
+      expect(wrapper.find('BlankCardContainer').props().blocked).toBe(true)
     })
   })
 })
