@@ -89,11 +89,7 @@ Cypress.Commands.add(
         collectionType
       )
     ) {
-      let type = collectionType
-      if (collectionType === 'test') {
-        type = 'testCollection'
-      }
-
+      const type = collectionType
       // these cards get created via the BCT popout (...) menu
       cy.selectPopoutTemplateBctType({
         type,
@@ -298,13 +294,17 @@ Cypress.Commands.add(
     cy.selectBctType({ type: `${hotCellQuadrantType}-more`, empty })
     cy.wait(100)
 
-    const popoutType = `PopoutMenu_create${_.upperFirst(type)}`
+    let popoutType = `PopoutMenu_create${_.upperFirst(type)}`
+    if (type === 'test') {
+      popoutType = 'PopoutMenu_getFeedback'
+    }
     cy.locate(popoutType)
       .first()
       .click({ force: true })
 
     switch (type) {
       case 'template':
+      case 'test':
       case 'searchCollection':
       case 'submissionBox':
       case 'foamcoreBoard':
