@@ -9,11 +9,10 @@ import ConfirmationDialog from '~/ui/global/modals/ConfirmationDialog'
 // import HoverableDescriptionIcon from '../global/HoverableDescriptionIcon'
 // import TruncatableText from '../global/TruncatableText'
 
-const currentValue = (record, options, fieldToUpdate) => {
+const findSelectedOption = (record, options, fieldToUpdate) => {
   const object = _.find(options, option => option.id === record[fieldToUpdate])
-
-  if (object) return object.id
-  return ''
+  console.log(object)
+  return object || {}
 }
 
 const DropdownSelect = ({
@@ -26,12 +25,12 @@ const DropdownSelect = ({
   objectToUpdateName,
   ...additionalProps
 }) => {
-  const value = currentValue(record, options, fieldToUpdate)
+  const option = findSelectedOption(record, options, fieldToUpdate)
 
   const [open, setOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [previousValue, setPreviousValue] = useState('')
-  const [selectedValue, setSelectedValue] = useState(value)
+  const [selectedValue, setSelectedValue] = useState(option.id)
 
   const isOpen = () => {
     return modalOpen ? 'confirm' : ''
@@ -57,14 +56,16 @@ const DropdownSelect = ({
     setModalOpen(true)
   }
 
+  const recordName = record => {
+    return record.name || record.name_display || objectToUpdateName
+  }
+
   return (
     // Should this really be setting margin?
     // Shouldn't its parent or container do that?
     <React.Fragment>
       <ConfirmationDialog
-        prompt={`You are about to change ${record.name ||
-          record.name_display ||
-          objectToUpdateName}
+        prompt={`You are about to change ${recordName(record)}
           's ${label}. Would you like to Continue?`}
         onConfirm={() => confirmSelection()}
         onCancel={() => cancelSelection()}
@@ -85,8 +86,9 @@ const DropdownSelect = ({
         onChange={e => updateSelectedValue(e)}
         value={selectedValue}
         open={open}
+        displayEmpty
+        renderValue={value => option.name || '– SELECT –'}
       >
-        {/* TODO: deal with placeholder if org has no subcategory */}
         {options.map(option => (
           <SelectOption
             classes={{
@@ -109,7 +111,6 @@ DropdownSelect.propTypes = {
   // toolTip: PropTypes.string,
   record: MobxPropTypes.objectOrObservableObject,
   objectToUpdateName: PropTypes.string,
-  // TODO: fix these to use MobxPropTypes
   options: MobxPropTypes.arrayOrObservableArray(
     MobxPropTypes.objectOrObservableObject
   ),
