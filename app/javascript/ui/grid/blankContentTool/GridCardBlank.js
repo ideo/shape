@@ -39,6 +39,8 @@ const StyledGridCardBlank = styled(StyledGridCard)`
   button {
     cursor: pointer;
     border: none;
+    margin-left: 10px;
+    margin-right: 10px;
     transition: all 200ms;
   }
   ${props =>
