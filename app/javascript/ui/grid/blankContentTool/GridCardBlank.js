@@ -618,7 +618,6 @@ class GridCardBlank extends React.Component {
       !this.emptyState &&
       (!testCollectionCard || creating || this.replacingTestCollectionMedia)
 
-    console.log('bct', blankContentToolState, this.state)
     let zoomScale = 0
     if (uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
     return (
