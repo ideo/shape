@@ -314,6 +314,9 @@ Cypress.Commands.add(
       case 'video':
         action = 'linkVideo'
         break
+      case 'report':
+        action = 'createReport'
+        break
     }
 
     const popoutType = `PopoutMenu_${action}`
@@ -331,6 +334,14 @@ Cypress.Commands.add(
           .first()
           .click()
           .type(name || `My ${type}`)
+        break
+      case 'report':
+        cy.locate('DataReportSelect-measure')
+          .first()
+          .click()
+        cy.locate('DataReportOption-participants')
+          .first()
+          .click()
         break
       case 'link':
       case 'video':

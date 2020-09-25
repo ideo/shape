@@ -17,10 +17,6 @@ const BctButton = styled.button`
     left: 0;
   }
 
-  &:hover {
-    background-color: ${v.colors.commonDark};
-  }
-
   .icon {
     position: absolute;
     left: 0;
