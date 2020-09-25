@@ -5,15 +5,17 @@
 # DEBUG + include rvm
 source ~/.bash_profile
 
+# -------------
+# NOTE: have to call Elastic setup directly in Codeship config otherwise ES server is inaccessible
 # Start Java 8 for Elasticsearch 6
 source $HOME/bin/jdk/jdk_switcher
 jdk_switcher home oraclejdk8
 jdk_switcher use oraclejdk8
-
 # Start up ElasticSearch Version 6.2.0 on port 9333 (so it doesn't conflict with default)
 export ELASTICSEARCH_VERSION=6.2.0
 export ELASTICSEARCH_PORT=9333
 \curl -sSL https://raw.githubusercontent.com/codeship/scripts/master/packages/elasticsearch.sh | bash -s
+# ---------------------
 
 # Setup nvm
 export NVM_DIR="$HOME/.nvm"
