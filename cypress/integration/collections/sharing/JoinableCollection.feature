@@ -1,4 +1,4 @@
-fFeature: Sharing a Collection
+Feature: Sharing a Collection
 
   Scenario: Making a collection joinable by anyone
     Given I login and visit the Test Area
