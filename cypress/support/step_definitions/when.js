@@ -21,7 +21,7 @@ When('I create a {word} card', itemType => {
 When(
   'I create a textItem card at {int},{int} on the board with {string}',
   (row, col, content) => {
-    cy.createCard('textItem', { content, row, col })
+    cy.createCard('text', { content, row, col })
   }
 )
 
@@ -50,7 +50,7 @@ When(
 )
 
 When('I add a link URL {string} and wait for {string}', (url, request) => {
-  cy.locate('CollectionCreatorTextField').type(url, {
+  cy.locate('BctTextField').type(url, {
     force: true,
   })
   cy.wait(request)
