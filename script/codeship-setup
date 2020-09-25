@@ -36,3 +36,4 @@ bundle install
 # Use postgres 9.6 -- docs: https://documentation.codeship.com/basic/databases/postgresql/
 sed -i "s|5432|5436|" "config/database.yml"
 bundle exec rake db:setup
+bundle exec rake searchkick:reindex:all
