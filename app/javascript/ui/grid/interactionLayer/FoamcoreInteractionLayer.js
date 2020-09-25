@@ -56,6 +56,12 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   onCursorMove = type => ev => {
+    const { hasSelectedArea } = this
+    if (hasSelectedArea) {
+      // ignore these interactions when you're already dragging a selection square
+      return
+    }
+
     if (ev.target.id !== 'FoamcoreInteractionLayer') return false
     // For some reason, a mouse move event is being published after a touch click
     if (this.touchClickEv && type === 'mouse') return
@@ -105,13 +111,7 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   onCreateBct = async ({ row, col, hotcell = false }, contentType) => {
-    const { selectedAreaMinX } = this
     const { apiStore, uiStore, collection } = this.props
-
-    // If user is selecting an area, don't trigger blank card click
-    if (selectedAreaMinX) {
-      return
-    }
 
     // BCT is already open as a hotcell, just modify it. But don't do this
     // if you're opening a new hotcell.
@@ -505,6 +505,11 @@ class FoamcoreInteractionLayer extends React.Component {
     })
 
     return <div>{hotEdges}</div>
+  }
+
+  get hasSelectedArea() {
+    const { minX, maxX } = this.props.uiStore.selectedArea
+    return minX && maxX && maxX > minX
   }
 
   get renderBct() {
