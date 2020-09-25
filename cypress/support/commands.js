@@ -79,13 +79,7 @@ Cypress.Commands.add(
   ({ name, collectionType = 'collection', empty = false }) => {
     if (
       _.includes(
-        [
-          'template',
-          'searchCollection',
-          'submissionBox',
-          'foamcoreBoard',
-          'test',
-        ],
+        ['searchCollection', 'submissionBox', 'foamcoreBoard', 'test'],
         collectionType
       )
     ) {
@@ -172,6 +166,17 @@ Cypress.Commands.add(
         cy.selectPopoutTemplateBctType({
           hotCellQuadrantType: 'collection',
           type: 'testCollection',
+        })
+        break
+      case 'file':
+        cy.selectBctType({ type: 'file', empty })
+        break
+      case 'link':
+      case 'video':
+        cy.selectPopoutTemplateBctType({
+          hotCellQuadrantType: 'file',
+          type: cardType,
+          name: content,
         })
         break
       default:
@@ -298,13 +303,26 @@ Cypress.Commands.add(
     cy.selectBctType({ type: `${hotCellQuadrantType}-more`, empty })
     cy.wait(100)
 
-    const popoutType = `PopoutMenu_create${_.upperFirst(type)}`
+    // see HotCell to get record names for PopoutMenu
+    let action = ''
+    switch (type) {
+      case 'testCollection':
+        action = 'getFeedback'
+        break
+      case 'link':
+        action = 'addLink'
+        break
+      case 'video':
+        action = 'linkVideo'
+        break
+    }
+
+    const popoutType = `PopoutMenu_${action}`
     cy.locate(popoutType)
       .first()
       .click({ force: true })
 
     switch (type) {
-      case 'template':
       case 'searchCollection':
       case 'submissionBox':
       case 'foamcoreBoard':
@@ -314,6 +332,14 @@ Cypress.Commands.add(
           .click()
           .type(name || `My ${type}`)
         break
+      case 'link':
+      case 'video':
+        cy.wait(50)
+        cy.locate('BctTextField')
+          .first()
+          .click()
+          .type(name)
+        break
       default:
         break
     }
@@ -321,6 +347,16 @@ Cypress.Commands.add(
     if (type === 'data' || type === 'report') {
       cy.wait('@apiCreateCollectionCard')
       cy.wait('@apiGetItemDataset')
+    } else if (type === 'link' || type === 'video') {
+      if (type === 'link') {
+        cy.wait('@externalUrl')
+      } else {
+        cy.wait('@vimeoApi')
+      }
+      cy.locate(`LinkCreatorFormButton`)
+        .first()
+        .click({ force: true })
+      cy.wait('@apiCreateCollectionCard')
     } else {
       cy.locate(`CollectionCreatorFormButton`)
         .first()

@@ -3,7 +3,7 @@ Feature: Undo actions
   Scenario: Performing several actions and then undoing them
     Given I login and visit the Test Area
 
-    And I create a textItem card with "Testing" using the first hot edge
+    And I create a text item card "Testing" using the first hot edge
     Then I should see a "TextItemCover" in the card at 0,0
     Then I should see the value "Testing" in the first text item
 

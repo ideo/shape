@@ -27,7 +27,7 @@ Feature: Creating a FoamcoreBoard Collection
     Then I should see the text "To my board." in the card at 0,1
 
     # There should be a hotspot to the left of the 0,0 card
-    And I create a textItem card with "Inserted!" using the first hot edge
+    And I create a text item card "Inserted!" using the first hot edge
     # should move both row 0 cards out of the way
     Then I should see the text "Inserted!" in the card at 0,0
     Then I should see the text "Welcome!" in the card at 0,1
