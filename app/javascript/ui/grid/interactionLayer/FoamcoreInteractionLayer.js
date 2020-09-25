@@ -39,7 +39,7 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   handleTouchStart = ev => {
-    if (ev.target.id !== 'FoamcoreInteractionLayer') {
+    if (ev.target.id !== FOAMCORE_INTERACTION_LAYER) {
       return false
     }
     runInAction(() => {
@@ -62,7 +62,15 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
-    if (ev.target.id !== 'FoamcoreInteractionLayer') return false
+    const childOfInteractionLayer = ev.target.closest(
+      `.${FOAMCORE_INTERACTION_LAYER}`
+    )
+    if (
+      ev.target.id !== FOAMCORE_INTERACTION_LAYER &&
+      !childOfInteractionLayer
+    ) {
+      return false
+    }
     // For some reason, a mouse move event is being published after a touch click
     if (this.touchClickEv && type === 'mouse') return
     const { coordinatesForPosition, uiStore } = this.props
@@ -84,7 +92,10 @@ class FoamcoreInteractionLayer extends React.Component {
     }
 
     const { classList } = target
-    if (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) {
+    if (
+      (!classList || !_.includes(classList, FOAMCORE_INTERACTION_LAYER)) &&
+      !childOfInteractionLayer
+    ) {
       // only perform calculation if target is the grid itself
       return
     }
@@ -99,8 +110,12 @@ class FoamcoreInteractionLayer extends React.Component {
 
     ev.preventDefault()
     ev.stopPropagation()
+    const { blankContentToolState } = uiStore
     // If there's a card already there don't render a positioned blank card
-    if (cardMatrix[row] && cardMatrix[row][col]) {
+    const cardOrBctOpenAtThisSpot =
+      (cardMatrix[row] && cardMatrix[row][col]) ||
+      (blankContentToolState.row === row && blankContentToolState.col === col)
+    if (cardOrBctOpenAtThisSpot) {
       this.resetHoveringRowCol()
     } else {
       this.repositionBlankCard({ row, col })
@@ -532,7 +547,7 @@ class FoamcoreInteractionLayer extends React.Component {
 
     return (
       <DragLayerWrapper
-        id="FoamcoreInteractionLayer"
+        id={FOAMCORE_INTERACTION_LAYER}
         data-empty-space-click
         className={FOAMCORE_INTERACTION_LAYER}
         onMouseMove={this.onCursorMove('mouse')}
