@@ -5,7 +5,7 @@ import BctButton from '~/ui/global/BctButton'
 import Tooltip from '~/ui/global/Tooltip'
 
 const BctButtonBox = ({ type, tooltip, size, creating, onClick, Icon }) => (
-  <Box>
+  <Box className="BctButtonBox">
     <Tooltip
       classes={{ tooltip: 'Tooltip' }}
       title={tooltip}

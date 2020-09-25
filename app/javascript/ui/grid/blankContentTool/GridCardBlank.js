@@ -36,11 +36,11 @@ const StyledGridCardBlank = styled(StyledGridCard)`
   background-color: transparent;
   cursor: auto;
   position: relative;
-  button {
+  .BctButtonBox {
     cursor: pointer;
     border: none;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
     transition: all 200ms;
   }
   ${props =>
@@ -67,7 +67,7 @@ const StyledGridCardInner = styled.div`
 `
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
-  padding-top: 1rem;
+  padding-top: 3rem;
   position: relative;
   .foreground {
     position: relative;
