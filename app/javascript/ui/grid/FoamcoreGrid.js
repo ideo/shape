@@ -1035,6 +1035,28 @@ class FoamcoreGrid extends React.Component {
     })
   }
 
+  renderSubmissionBct() {
+    const { collection, uiStore } = this.props
+    const { blankContentToolState, blankContentToolIsOpen } = uiStore
+
+    if (
+      !blankContentToolIsOpen ||
+      blankContentToolState.collectionId !== collection.id
+    ) {
+      return
+    }
+
+    const blankContentTool = {
+      id: 'blank',
+      blankType: 'bct',
+      num: 0,
+      cardType: 'blank',
+      ...blankContentToolState,
+    }
+
+    return this.renderMovableCard(blankContentTool, `bct-${0}:${0}`)
+  }
+
   // render the MDL placeholder to be draggable from the MoveSnackbar
   renderMdlPlaceholder() {
     const { apiStore, uiStore } = this.props
@@ -1085,9 +1107,10 @@ class FoamcoreGrid extends React.Component {
             onZoomOut={this.handleZoomOut}
           />
         )}
-        {this.renderAddSubmission()}
         {this.renderMdlPlaceholder()}
         {this.renderVisibleCards()}
+        {collection.isSubmissionsCollection && this.renderAddSubmission()}
+        {collection.isSubmissionsCollection && this.renderSubmissionBct()}
         {canEditCollection && (
           <FoamcoreInteractionLayer
             collection={collection}

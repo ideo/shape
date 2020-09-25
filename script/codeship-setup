@@ -3,7 +3,7 @@
 # https://codeship.com/documentation/languages/ruby/
 
 # DEBUG + include rvm
-source ~/.bash_profile
+# source ~/.bash_profile
 
 # Start Java 8 for Elasticsearch 6
 source $HOME/bin/jdk/jdk_switcher

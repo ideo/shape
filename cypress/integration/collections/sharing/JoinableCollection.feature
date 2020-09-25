@@ -1,8 +1,8 @@
-Feature: Sharing a Collection
+fFeature: Sharing a Collection
 
   Scenario: Making a collection joinable by anyone
     Given I login and visit the Test Area
-    When I create a normal collection named "Anyone Can See"
+    When I create a normal collection named "Anyone Can See" using the first hot edge
     When I navigate to the collection named "Anyone Can See" via the "CollectionCover"
     Then I should see "Anyone Can See" in a "EditableNameHeading-recordName"
 
