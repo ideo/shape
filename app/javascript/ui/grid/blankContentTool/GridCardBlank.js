@@ -46,12 +46,12 @@ const StyledGridCardBlank = styled(StyledGridCard)`
     transition: all 200ms;
   }
   ${props =>
-    props.boxShadow ||
-    (props.isReplacing &&
-      `
+    props.boxShadow &&
+    !props.isReplacing &&
+    `
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
     background-color: ${v.colors.commonLight};
-  `)};
+  `};
   ${props =>
     props.zoomScale &&
     `
@@ -604,12 +604,13 @@ class GridCardBlank extends React.Component {
       !this.emptyState &&
       (!testCollectionCard || creating || this.replacingTestCollectionMedia)
 
+    console.log('bct', blankContentToolState, this.state)
     let zoomScale = 0
     if (uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
     return (
       <StyledGridCardBlank
         boxShadow={isBoard}
-        isReplacing={isReplacing}
+        isReplacing={isReplacing && !creating}
         zoomScale={zoomScale}
       >
         <StyledGridCardInner
@@ -618,7 +619,7 @@ class GridCardBlank extends React.Component {
           gridH={gridH}
         >
           {this.renderInner()}
-          {isReplacing && (
+          {isReplacing && !creating && (
             <DropzoneIconHolder>
               <CloudIcon />
               <br />
