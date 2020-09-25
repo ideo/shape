@@ -105,9 +105,7 @@ class CollectionCreator extends React.Component {
   render() {
     const { type } = this.props
     const placeholder =
-      type === 'searchCollection'
-        ? 'add search term for collection'
-        : `${this.typeName} name`
+      type === 'searchCollection' ? 'add search term' : `${this.typeName} name`
 
     return (
       <PaddedCardCover>

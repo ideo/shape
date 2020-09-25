@@ -239,6 +239,8 @@ class HotCell extends React.Component {
     return (
       <PositionWrapper>
         <Container
+          // used by emptySpaceClick
+          className="HotCellContainer"
           animated={this.animated}
           isMobileXs={uiStore.isMobileXs}
           smallCardWidth={this.isSmallCard}

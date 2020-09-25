@@ -463,6 +463,16 @@ class GridCardBlank extends React.Component {
         Icon={FoamcoreIcon}
       />
     )
+    const searchCollectionBctBox = (
+      <BctButtonBox
+        tooltip="Create search collection"
+        type="searchCollection"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('searchCollection')}
+        Icon={SearchCollectionIcon}
+      />
+    )
     const collectionBctBox = (
       <BctButtonBox
         tooltip="Create collection"
@@ -521,11 +531,15 @@ class GridCardBlank extends React.Component {
               Icon={VideoIcon}
             />
           )}
-          {/* These are what to render on state change for second row */}
+          {/*
+            NOTE: somewhat legacy artifact, but we only need these BCTBoxes
+            so that you see the correct icon after making your collection type selection
+          */}
           {creating === 'collection' && collectionBctBox}
           {creating === 'foamcoreBoard' && foamcoreBoardBctBox}
           {creating === 'submissionBox' && submissionBctBox}
           {creating === 'testCollection' && testBctBox}
+          {creating === 'searchCollection' && searchCollectionBctBox}
           {creating === 'report' && (
             <BctButtonBox
               type="data"

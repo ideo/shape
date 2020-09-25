@@ -78,7 +78,8 @@ describe('FoamcoreInteractionLayer', () => {
         clientX: 100,
         clientY: 200,
         target: {
-          id: 'FoamcoreInteractionLayer',
+          closest: jest.fn(),
+          id: FOAMCORE_INTERACTION_LAYER,
           classList: [FOAMCORE_INTERACTION_LAYER],
         },
         preventDefault: jest.fn(),
@@ -89,6 +90,7 @@ describe('FoamcoreInteractionLayer', () => {
 
     it('should ignore events that are outside foamcoreGridBoundary', () => {
       fakeEv.target = {
+        closest: jest.fn(),
         classList: ['other'],
       }
       const cursorMoveEvent = component.onCursorMove('mouse')

@@ -12,7 +12,8 @@ const BctButtonBox = ({ type, tooltip, size, creating, onClick, Icon }) => (
       placement="bottom"
     >
       <BctButton
-        data-cy={`BctButton-${type}`}
+        // easier for cypress if this matches up with quadrant selectors
+        data-cy={`HotCellQuadrant-${type}`}
         creating={creating === type}
         onClick={onClick}
       >

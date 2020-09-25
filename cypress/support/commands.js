@@ -83,7 +83,10 @@ Cypress.Commands.add(
         collectionType
       )
     ) {
-      const type = collectionType
+      let type = collectionType
+      if (type === 'test') {
+        type = 'testCollection'
+      }
       // these cards get created via the BCT popout (...) menu
       cy.selectPopoutTemplateBctType({
         type,
@@ -114,7 +117,7 @@ Cypress.Commands.add(
   'createCard',
   (cardType, { content = 'Testing', row, col, empty = false } = {}) => {
     switch (cardType) {
-      case 'textItem':
+      case 'text':
         cy.selectBctType({ type: 'text', row, col, empty })
         cy.wait('@apiCreateCollectionCard')
         cy.wait(150)
@@ -300,7 +303,7 @@ Cypress.Commands.add(
     cy.wait(100)
 
     // see HotCell to get record names for PopoutMenu
-    let action = ''
+    let action = `create${_.upperFirst(type)}`
     switch (type) {
       case 'testCollection':
         action = 'getFeedback'
@@ -322,6 +325,7 @@ Cypress.Commands.add(
       .click({ force: true })
 
     switch (type) {
+      case 'template':
       case 'searchCollection':
       case 'submissionBox':
       case 'foamcoreBoard':
