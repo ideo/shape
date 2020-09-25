@@ -25,12 +25,18 @@ When(
   }
 )
 
+When('I create a {word} item card using the first hot edge', itemType => {
+  cy.clickFirstHotEdge()
+  // `empty` being equivalent to "BCT is already open"
+  cy.createCard(itemType, { empty: true })
+})
+
 When(
-  'I create a textItem card with {string} using the first hot edge',
-  content => {
+  'I create a {word} item card {string} using the first hot edge',
+  (itemType, content) => {
     cy.clickFirstHotEdge()
     // `empty` being equivalent to "BCT is already open"
-    cy.createCard('textItem', { content, empty: true })
+    cy.createCard(itemType, { content, empty: true })
   }
 )
 
@@ -44,7 +50,7 @@ When(
 )
 
 When('I add a link URL {string} and wait for {string}', (url, request) => {
-  cy.locate('BctTextField').type(url, {
+  cy.locate('CollectionCreatorTextField').type(url, {
     force: true,
   })
   cy.wait(request)
