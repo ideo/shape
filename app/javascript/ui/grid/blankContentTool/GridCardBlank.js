@@ -17,13 +17,15 @@ import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
 import TextIcon from '~/ui/icons/htc/TextIcon'
 import VideoIcon from '~/ui/icons/htc/VideoIcon'
 
-import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
-import { StyledGridCard } from '~/ui/grid/shared'
-import InlineLoader from '~/ui/layout/InlineLoader'
+import CloudIcon from '~/ui/icons/CloudIcon'
 import { CloseButton } from '~/ui/global/styled/buttons'
-import PopoutMenu from '~/ui/global/PopoutMenu'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { DisplayText } from '~/ui/global/styled/typography'
 import FilestackUpload from '~/utils/FilestackUpload'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import PopoutMenu from '~/ui/global/PopoutMenu'
+import { StyledGridCard } from '~/ui/grid/shared'
+import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
 
 import CollectionCreator from './CollectionCreator'
 import LinkCreator from './LinkCreator'
@@ -44,11 +46,12 @@ const StyledGridCardBlank = styled(StyledGridCard)`
     transition: all 200ms;
   }
   ${props =>
-    props.boxShadow &&
-    `
+    props.boxShadow ||
+    (props.isReplacing &&
+      `
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
     background-color: ${v.colors.commonLight};
-  `};
+  `)};
   ${props =>
     props.zoomScale &&
     `
@@ -117,6 +120,18 @@ const StyledBlankCreationTool = styled.div`
     }
 
   `};
+`
+
+const DropzoneIconHolder = styled.div`
+  color: ${v.colors.secondaryMedium};
+  text-align: center;
+  width: 100%;
+
+  .icon {
+    color: ${v.colors.secondaryMedium};
+    height: 35px;
+    width: 52px;
+  }
 `
 
 @inject('uiStore', 'apiStore')
@@ -580,6 +595,7 @@ class GridCardBlank extends React.Component {
     const { gridSettings, blankContentToolState } = uiStore
     const { creating } = this.state
     const { isBoard } = parent
+    const isReplacing = !!this.replacingId
     let { gridW, gridH } = gridSettings
     if (isBoard) {
       ;({ gridW, gridH } = v.defaultGridSettings)
@@ -591,13 +607,29 @@ class GridCardBlank extends React.Component {
     let zoomScale = 0
     if (uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
     return (
-      <StyledGridCardBlank boxShadow={isBoard} zoomScale={zoomScale}>
+      <StyledGridCardBlank
+        boxShadow={isBoard}
+        isReplacing={isReplacing}
+        zoomScale={zoomScale}
+      >
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridW}
           gridH={gridH}
         >
           {this.renderInner()}
+          {isReplacing && (
+            <DropzoneIconHolder>
+              <CloudIcon />
+              <br />
+              <DisplayText
+                textTransform="uppercase"
+                style={{ fontWeight: 500 }}
+              >
+                Drag & Drop
+              </DisplayText>
+            </DropzoneIconHolder>
+          )}
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
         {showCloseButton && (

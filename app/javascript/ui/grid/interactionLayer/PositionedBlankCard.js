@@ -69,7 +69,10 @@ class PositionedBlankCard extends React.Component {
       blocked,
       interactionType,
     } = this.props
-    const { droppingFilesCount } = uiStore
+    const {
+      droppingFilesCount,
+      blankContentToolState: { replacingId },
+    } = uiStore
 
     const { xPos, yPos, height, width } = position
 
@@ -83,7 +86,7 @@ class PositionedBlankCard extends React.Component {
       zoomLevel: uiStore.relativeZoomLevel,
     }
 
-    if (droppingFilesCount > 0) {
+    if (droppingFilesCount > 0 && !replacingId) {
       return (
         <BlankCardContainer {...defaultProps}>
           <GridCardDropzone collection={collection} row={row} col={col} />
