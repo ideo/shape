@@ -189,7 +189,7 @@ class HotCellQuadrant extends React.Component {
             classes={{ tooltip: 'Tooltip' }}
             placement="bottom"
             title={description}
-            enterDelay={400}
+            enterDelay={150}
             enterNextDelay={250}
           >
             <QuadrantIconHolder
