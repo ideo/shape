@@ -5,31 +5,32 @@ import styled from 'styled-components'
 import { Flex } from 'reflexbox'
 import googleTagManager from '~/vendor/googleTagManager'
 
-import AddTextIcon from '~/ui/icons/AddTextIcon'
-import AddCollectionIcon from '~/ui/icons/AddCollectionIcon'
-import SearchCollectionIcon from '~/ui/icons/SearchCollectionIcon'
-import AddFileIcon from '~/ui/icons/AddFileIcon'
-import AddVideoIcon from '~/ui/icons/AddVideoIcon'
-import AddLinkIcon from '~/ui/icons/AddLinkIcon'
-import ReportIcon from '~/ui/icons/ReportIcon'
-import TemplateIcon from '~/ui/icons/TemplateIcon'
-import TestCollectionIconSm from '~/ui/icons/TestCollectionIconSm'
-import SubmissionBoxIcon from '~/ui/icons/SubmissionBoxIcon'
-import FoamcoreBoardIcon from '~/ui/icons/collection_icons/FoamcoreBoardIcon'
-import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
-import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
-import { StyledGridCard } from '~/ui/grid/shared'
-import InlineLoader from '~/ui/layout/InlineLoader'
+import CollectionIcon from '~/ui/icons/htc/CollectionIcon'
+import FeedbackIcon from '~/ui/icons/htc/FeedbackIcon'
+import FileIcon from '~/ui/icons/htc/FileIcon'
+import FoamcoreIcon from '~/ui/icons/htc/FoamcoreIcon'
+import LinkIcon from '~/ui/icons/htc/LinkIcon'
+import ReportIcon from '~/ui/icons/htc/ReportIcon'
+import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
+import SubmissionBoxIcon from '~/ui/icons/htc/SubmissionBoxIcon'
+import TemplateIcon from '~/ui/icons/htc/TemplateIcon'
+import TextIcon from '~/ui/icons/htc/TextIcon'
+import VideoIcon from '~/ui/icons/htc/VideoIcon'
+
+import CloudIcon from '~/ui/icons/CloudIcon'
 import { CloseButton } from '~/ui/global/styled/buttons'
-import bctIcons from '~/assets/bct_icons.png'
-import PopoutMenu from '~/ui/global/PopoutMenu'
 import CollectionCard from '~/stores/jsonApi/CollectionCard'
+import { DisplayText } from '~/ui/global/styled/typography'
+import FilestackUpload from '~/utils/FilestackUpload'
+import InlineLoader from '~/ui/layout/InlineLoader'
+import PopoutMenu from '~/ui/global/PopoutMenu'
+import { StyledGridCard } from '~/ui/grid/shared'
+import v, { ITEM_TYPES, EVENT_SOURCE_TYPES } from '~/utils/variables'
 
 import CollectionCreator from './CollectionCreator'
 import LinkCreator from './LinkCreator'
 import DataItemCreator from './DataItemCreator'
 import BctButtonBox from './BctButtonBox'
-import BctButtonRotation from './BctButtonRotation'
 import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 
 const StyledGridCardBlank = styled(StyledGridCard)`
@@ -37,17 +38,25 @@ const StyledGridCardBlank = styled(StyledGridCard)`
   background-color: transparent;
   cursor: auto;
   position: relative;
-  button {
+  .BctButtonBox {
     cursor: pointer;
     border: none;
+    margin-left: 20px;
+    margin-right: 20px;
     transition: all 200ms;
   }
   ${props =>
     props.boxShadow &&
+    !props.isReplacing &&
     `
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
     background-color: ${v.colors.commonLight};
   `};
+  ${props =>
+    props.zoomScale &&
+    `
+    transform: scale(${props.zoomScale});
+  `}
 `
 StyledGridCardBlank.displayName = 'StyledGridCardBlank'
 
@@ -61,7 +70,7 @@ const StyledGridCardInner = styled.div`
 `
 const StyledBlankCreationTool = styled.div`
   padding: 2rem;
-  padding-top: 1rem;
+  padding-top: 3rem;
   position: relative;
   .foreground {
     position: relative;
@@ -77,7 +86,6 @@ const StyledBlankCreationTool = styled.div`
     /* because the BCTBoxes flex, we have to restrict the CardMenu when the PopoutMenu is open */
     max-width: 47px;
   }
-  transition: ${v.transitionWithDelay};
 
   /* handle "small 4-col" layout i.e. layoutSize == 3, except on Foamcore */
   ${props =>
@@ -114,76 +122,15 @@ const StyledBlankCreationTool = styled.div`
   `};
 `
 
-const BctBackground = styled.div`
-  z-index: ${v.zIndex.gridCardBg};
-  position: absolute;
-  top: 40px;
-  left: 60px;
-  width: 175px;
-  height: 175px;
-  border-radius: 50%;
-  border: 8px solid ${v.colors.primaryLight};
-  background: ${v.colors.primaryLightest};
-  transition: ${v.transitionWithDelay};
-`
-BctBackground.displayName = 'BctBackground'
-
-const BctDropzone = styled.div`
-  position: absolute;
+const DropzoneIconHolder = styled.div`
+  color: ${v.colors.secondaryMedium};
   text-align: center;
-  top: 40px;
-  left: 60px;
-  width: 175px;
-  .text {
-    z-index: ${v.zIndex.gridCardBg + 1};
-    font-family: ${v.fonts.sans};
-    font-weight: 500;
-    font-size: 1rem;
-    position: absolute;
-    top: 55px;
-    left: 38px;
-    .top,
-    .bottom {
-      text-transform: uppercase;
-    }
-    .top,
-    .or {
-      color: ${v.colors.primaryLight};
-    }
-    .bottom {
-      color: ${v.colors.black};
-    }
-    .or {
-      font-size: 0.75rem;
-      margin: 6px 0;
-    }
-    p {
-      font-size: 0.8rem;
-      color: ${v.colors.commonDark};
-    }
-    transition: ${v.transitionWithDelay};
-  }
+  width: 100%;
 
-  /* Override Filestack styling */
-  .fsp-drop-pane__container {
-    font-family: ${v.fonts.sans};
-    cursor: pointer;
-    z-index: ${v.zIndex.gridCardBg + 1};
-    border-radius: 50%;
-    /* must be transparent -- dropzone is transparent and content behind it is visible */
-    background: transparent;
-    border: none;
-    width: 160px;
-    height: 160px;
-    ${props =>
-      props.droppingFile &&
-      `
-      background: ${v.colors.primaryLight};
-      &::after {
-        content: '+';
-        font-size: 4rem;
-      }
-    `};
+  .icon {
+    color: ${v.colors.secondaryMedium};
+    height: 35px;
+    width: 52px;
   }
 `
 
@@ -196,20 +143,17 @@ class GridCardBlank extends React.Component {
     this.state = {
       creating: preselected || null,
       loading: false,
-      droppingFile: false,
       bctMenuOpen: false,
       bctMenuOffsetPosition: null,
     }
   }
 
   componentDidMount() {
-    // creating the DropPane via filestack is asynchronous;
-    // if the BCT mounts but then immediately gets closed via a uiStore action,
-    // we check to not to make the drop pane to prevent it throwing an error
-    setTimeout(this.createDropPane, 500)
-
     if (this.props.preselected === 'text') {
       this.createTextItem()
+    }
+    if (this.props.preselected === 'file') {
+      this.pickImages()
     }
   }
 
@@ -221,60 +165,6 @@ class GridCardBlank extends React.Component {
     const { uiStore, replacingId } = this.props
     if (replacingId) return replacingId
     return uiStore.blankContentToolState.replacingId
-  }
-
-  createDropPane = () => {
-    const { replacingId } = this
-    const { creating } = this.state
-    const { uiStore } = this.props
-    if (this.canceled || (creating && creating !== 'file')) return
-    const uploadOpts = {}
-    if (replacingId) {
-      uploadOpts.maxFiles = 1
-    }
-    const dropPaneOpts = {
-      id: 'dropzone',
-      onProgress: pct => {
-        if (this.state.loading) return
-        this.setState({ loading: true })
-      },
-      onDragOver: () => {
-        this.setState({ droppingFile: true })
-      },
-      onDragLeave: () => {
-        this.setState({ droppingFile: false })
-      },
-      onDrop: ev => {
-        if (this.state.loading) return
-        const { files } = ev.dataTransfer
-        const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
-        if (filesThatFit.length) {
-          this.setState({ loading: true, droppingFile: false })
-        } else {
-          this.setState({ loading: false, droppingFile: false })
-        }
-        if (filesThatFit.length < files.length) {
-          uiStore.popupAlert({
-            prompt: `
-              ${filesThatFit.length} file(s) were successfully added.
-              ${files.length -
-                filesThatFit.length} file(s) were over 25MB and could not
-              be added.
-            `,
-            fadeOutTime: 6000,
-          })
-        }
-      },
-      onSuccess: async res => {
-        if (res.length > 0) {
-          const files = await FilestackUpload.processFiles(res)
-          _.each(files, (file, idx) => {
-            this.createCardWith(file, idx)
-          })
-        }
-      },
-    }
-    FilestackUpload.makeDropPane(dropPaneOpts, uploadOpts)
   }
 
   get emptyState() {
@@ -462,8 +352,6 @@ class GridCardBlank extends React.Component {
       (uiStore.blankContentToolState.emptyCollection && !preselected)
     ) {
       this.setState({ creating: null })
-      // have to re-create the DropPane
-      this.createDropPane()
     } else {
       uiStore.closeBlankContentTool()
     }
@@ -492,7 +380,7 @@ class GridCardBlank extends React.Component {
     let inner
     const { parent } = this.props
     const { isBoard } = parent
-    const { creating, loading, droppingFile } = this.state
+    const { creating, loading } = this.state
     const isReplacing = !!this.replacingId
     const size = v.iconSizes.bct
 
@@ -502,7 +390,7 @@ class GridCardBlank extends React.Component {
       case 'template':
       case 'submissionBox':
       case 'foamcoreBoard':
-      case 'search':
+      case 'searchCollection':
         inner = (
           <CollectionCreator
             type={creating}
@@ -532,7 +420,7 @@ class GridCardBlank extends React.Component {
           />
         )
         break
-      case 'data':
+      case 'report':
         inner = (
           <DataItemCreator
             loading={loading}
@@ -542,26 +430,7 @@ class GridCardBlank extends React.Component {
         )
         break
       default:
-        inner = (
-          <BctDropzone
-            className="bct-dropzone"
-            droppingFile={droppingFile}
-            id="dropzone"
-          >
-            {!loading && !droppingFile && (
-              <div className="text">
-                <img
-                  src={bctIcons}
-                  alt="dropzone icons"
-                  style={{ width: '80px' }}
-                />
-                <div className="top">Drag &amp; Drop</div>
-                <div className="or">or</div>
-                <div className="bottom">Browse</div>
-              </div>
-            )}
-          </BctDropzone>
-        )
+        inner = null
     }
 
     const testBctBox = (
@@ -571,7 +440,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('testCollection')}
-        Icon={() => <TestCollectionIconSm />}
+        Icon={() => <FeedbackIcon />}
       />
     )
     const submissionBctBox = (
@@ -591,7 +460,17 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('foamcoreBoard')}
-        Icon={FoamcoreBoardIcon}
+        Icon={FoamcoreIcon}
+      />
+    )
+    const searchCollectionBctBox = (
+      <BctButtonBox
+        tooltip="Create search collection"
+        type="searchCollection"
+        creating={creating}
+        size={size}
+        onClick={this.startCreating('searchCollection')}
+        Icon={SearchCollectionIcon}
       />
     )
     const collectionBctBox = (
@@ -601,7 +480,7 @@ class GridCardBlank extends React.Component {
         creating={creating}
         size={size}
         onClick={this.startCreating('collection')}
-        Icon={AddCollectionIcon}
+        Icon={CollectionIcon}
       />
     )
 
@@ -610,7 +489,7 @@ class GridCardBlank extends React.Component {
         board={isBoard}
         replacing={isReplacing && !creating}
       >
-        <Flex className="foreground" justify="space-between">
+        <Flex className="foreground" justify="center">
           {/* First row of options */}
           {!isReplacing && !creating && (
             <BctButtonBox
@@ -619,7 +498,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.createTextItem}
-              Icon={AddTextIcon}
+              Icon={TextIcon}
             />
           )}
           {(!creating || creating === 'file') && (
@@ -629,7 +508,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.pickImages}
-              Icon={AddFileIcon}
+              Icon={FileIcon}
             />
           )}
           {(!creating || creating === 'link') && (
@@ -639,7 +518,7 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('link')}
-              Icon={AddLinkIcon}
+              Icon={LinkIcon}
             />
           )}
           {(!creating || creating === 'video') && (
@@ -649,41 +528,33 @@ class GridCardBlank extends React.Component {
               creating={creating}
               size={size}
               onClick={this.startCreating('video')}
-              Icon={AddVideoIcon}
+              Icon={VideoIcon}
             />
           )}
-          {/* These are what to render on state change for second row */}
-          {creating === 'collection' && (
-            <BctButtonRotation>{collectionBctBox}</BctButtonRotation>
-          )}
-          {creating === 'foamcoreBoard' && (
-            <BctButtonRotation>{foamcoreBoardBctBox}</BctButtonRotation>
-          )}
-          {creating === 'submissionBox' && (
-            <BctButtonRotation>{submissionBctBox}</BctButtonRotation>
-          )}
-          {creating === 'testCollection' && (
-            <BctButtonRotation>{testBctBox}</BctButtonRotation>
-          )}
-          {creating === 'data' && (
-            <BctButtonRotation>
-              <BctButtonBox
-                type="data"
-                creating={creating}
-                size={size}
-                Icon={() => <ReportIcon size="large" />}
-              />
-            </BctButtonRotation>
+          {/*
+            NOTE: somewhat legacy artifact, but we only need these BCTBoxes
+            so that you see the correct icon after making your collection type selection
+          */}
+          {creating === 'collection' && collectionBctBox}
+          {creating === 'foamcoreBoard' && foamcoreBoardBctBox}
+          {creating === 'submissionBox' && submissionBctBox}
+          {creating === 'testCollection' && testBctBox}
+          {creating === 'searchCollection' && searchCollectionBctBox}
+          {creating === 'report' && (
+            <BctButtonBox
+              type="data"
+              creating={creating}
+              size={size}
+              Icon={() => <ReportIcon size="large" />}
+            />
           )}
           {creating === 'template' && (
-            <BctButtonRotation>
-              <BctButtonBox
-                type="template"
-                creating={creating}
-                size={size}
-                Icon={TemplateIcon}
-              />
-            </BctButtonRotation>
+            <BctButtonBox
+              type="template"
+              creating={creating}
+              size={size}
+              Icon={TemplateIcon}
+            />
           )}
         </Flex>
         {/* Second row display on initial load */}
@@ -716,7 +587,7 @@ class GridCardBlank extends React.Component {
                 {
                   name: 'Create Search Collection',
                   iconLeft: <SearchCollectionIcon size="xs" />,
-                  onClick: this.startCreating('search'),
+                  onClick: this.startCreating('searchCollection'),
                 },
                 {
                   name: 'Create Report',
@@ -729,7 +600,6 @@ class GridCardBlank extends React.Component {
           </Flex>
         )}
         {inner}
-        <BctBackground className="bct-background" />
       </StyledBlankCreationTool>
     )
   }
@@ -739,6 +609,7 @@ class GridCardBlank extends React.Component {
     const { gridSettings, blankContentToolState } = uiStore
     const { creating } = this.state
     const { isBoard } = parent
+    const isReplacing = !!this.replacingId
     let { gridW, gridH } = gridSettings
     if (isBoard) {
       ;({ gridW, gridH } = v.defaultGridSettings)
@@ -747,14 +618,32 @@ class GridCardBlank extends React.Component {
       !this.emptyState &&
       (!testCollectionCard || creating || this.replacingTestCollectionMedia)
 
+    let zoomScale = 0
+    if (uiStore.zoomLevel > 2) zoomScale = uiStore.zoomLevel / 1.5
     return (
-      <StyledGridCardBlank boxShadow={isBoard}>
+      <StyledGridCardBlank
+        boxShadow={isBoard}
+        isReplacing={isReplacing && !creating}
+        zoomScale={zoomScale}
+      >
         <StyledGridCardInner
           height={blankContentToolState.height}
           gridW={gridW}
           gridH={gridH}
         >
           {this.renderInner()}
+          {isReplacing && !creating && (
+            <DropzoneIconHolder>
+              <CloudIcon />
+              <br />
+              <DisplayText
+                textTransform="uppercase"
+                style={{ fontWeight: 500 }}
+              >
+                Drag & Drop
+              </DisplayText>
+            </DropzoneIconHolder>
+          )}
         </StyledGridCardInner>
         {this.state.loading && <InlineLoader />}
         {showCloseButton && (

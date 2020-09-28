@@ -5,14 +5,15 @@ import BctButton from '~/ui/global/BctButton'
 import Tooltip from '~/ui/global/Tooltip'
 
 const BctButtonBox = ({ type, tooltip, size, creating, onClick, Icon }) => (
-  <Box>
+  <Box className="BctButtonBox">
     <Tooltip
       classes={{ tooltip: 'Tooltip' }}
       title={tooltip}
       placement="bottom"
     >
       <BctButton
-        data-cy={`BctButton-${type}`}
+        // easier for cypress if this matches up with quadrant selectors
+        data-cy={`HotCellQuadrant-${type}`}
         creating={creating === type}
         onClick={onClick}
       >

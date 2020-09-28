@@ -22,6 +22,8 @@ export const ACTIVITY_LOG_POSITION_KEY = 'ActivityLog:position'
 export const ACTIVITY_LOG_PAGE_KEY = 'ActivityLog:page'
 
 export const FOAMCORE_GRID_BOUNDARY = 'foamcoreGridBoundary'
+export const FOAMCORE_INTERACTION_LAYER = 'foamcoreInteractionLayer'
+export const FOAMCORE_CLICK_LAYER = 'foamcoreClickLayer'
 
 export const ITEM_TYPES = {
   TEXT: 'Item::TextItem',
@@ -39,6 +41,8 @@ export const COLLECTION_TYPES = {
   TEST: 'Collection::TestCollection',
   TEST_RESULTS: 'Collection::TestResultsCollection',
   TEST_DESIGN: 'Collection::TestDesign',
+  FOAMCORE: 'Collection::Foamcore',
+  TEMPLATE: 'Collection',
 }
 
 export const COLLECTION_CARD_TYPES = {
@@ -374,6 +378,14 @@ export default {
     gutter: 14,
     gridW: 253,
     gridH: 200,
+  },
+
+  placeholderDefaults: {
+    row: null,
+    col: null,
+    width: null,
+    height: null,
+    type: null,
   },
 
   commentScrollOpts: {

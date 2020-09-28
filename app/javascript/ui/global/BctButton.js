@@ -5,22 +5,16 @@ import styled from 'styled-components'
 import v from '~/utils/variables'
 
 const BctButton = styled.button`
+  height: 36px;
+  margin-bottom: 10px;
+  margin-top: 20px;
   position: relative;
-  width: 47px;
-  height: 47px;
-  border-radius: 50%;
-  background: ${v.colors.black};
-  color: white;
+  width: 36px;
 
-  left: ${props => (props.creating ? '100px' : 0)};
+  left: 0;
   @media only screen and (min-width: ${v.responsive
       .medBreakpoint}px) and (max-width: ${v.responsive.largeBreakpoint}px) {
-    left: ${props => (props.creating ? '80px' : 0)};
-  }
-  transform: ${props => (props.creating ? 'rotate(360deg)' : 'none')};
-
-  &:hover {
-    background-color: ${v.colors.commonDark};
+    left: 0;
   }
 
   .icon {

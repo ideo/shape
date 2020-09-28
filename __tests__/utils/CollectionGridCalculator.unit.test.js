@@ -1,5 +1,50 @@
 import _ from 'lodash'
-import { calculateRowsCols } from '~/utils/CollectionGridCalculator'
+import {
+  calculateRowsCols,
+  calculateOpenSpotMatrix,
+} from '~/utils/CollectionGridCalculator'
+
+describe('calculateOpenSpotMatrix', () => {
+  let cardMatrix = [[]]
+  let fakeCollection = {}
+  const num_columns = 4
+
+  beforeEach(() => {
+    cardMatrix = [
+      [
+        { id: 1, row: 0, col: 0 },
+        null,
+        { id: 2, row: 0, col: 2 },
+        { id: 3, row: 0, col: 3 },
+      ],
+    ]
+
+    fakeCollection = {
+      cardMatrix,
+      num_columns,
+    }
+  })
+
+  describe('with collection', () => {
+    it('should calculate open spots given a collection card matrix', () => {
+      expect(calculateOpenSpotMatrix({ collection: fakeCollection })).toEqual([
+        [0, 1, 0, 0],
+      ])
+    })
+  })
+
+  describe('with takenSpots', () => {
+    it('should calculate open spots given a collection card matrix', () => {
+      const takenSpots = [{ row: 0, col: 1 }]
+      expect(
+        calculateOpenSpotMatrix({
+          collection: fakeCollection,
+          takenSpots,
+        })
+      ).toEqual([[0, 'taken', 0, 0]])
+    })
+  })
+})
 
 describe('calculateRowsCols', () => {
   it('should calculate the 4 column layout of the given cards', () => {

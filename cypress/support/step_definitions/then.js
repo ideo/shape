@@ -8,9 +8,9 @@ Then('I should see a collection card named {string}', name => {
 })
 
 Then(
-  'I should see a collection card title {string} with a subtitle {string} and color {string}',
-  (title, subtitle, hex) => {
-    cy.locateDataOrClass('CollectionCover').within(cover => {
+  'I should see a collection card title {string} with a subtitle {string} and color {string} at {int},{int}',
+  (title, subtitle, hex, row, col) => {
+    cy.selectCardAt({ row, col }).within(cover => {
       cy.contains(title)
         .last()
         .should('be.visible')

@@ -23,6 +23,7 @@ const createNamedRoutes = () => {
   cy.route('POST', '/api/v1/collection_cards/create_bct').as(
     'apiCreateCollectionCardBct'
   )
+
   // update has to be first so that later matches like collection_cards/move can be more specific
   cy.route('PATCH', '/api/v1/collection_cards/*').as('apiUpdateCollectionCard')
   cy.route('PATCH', '/api/v1/collection_cards/archive').as(
@@ -130,7 +131,9 @@ const createNamedRoutes = () => {
   )
   // external routes
   cy.route('GET', '**/youtube/v3/videos*', 'fx:youtube-api').as('youtubeApi')
-  cy.route('GET', '**/cloud.filestackapi.com/**').as('fileStackApi')
+  cy.route('POST', '**/upload.filestackapi.com/prefetch').as(
+    'fileStackApiPrefetch'
+  )
   cy.route('POST', '**/cloud.filestackapi.com/**').as('fileStackApiPost')
   cy.route('GET', '**/api.vimeo.com/**').as('vimeoApi')
   cy.route('GET', '**/*.googleapis.com/**', {}).as('googleApi')

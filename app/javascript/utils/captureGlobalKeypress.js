@@ -14,7 +14,13 @@ const emptySpaceClick = e => {
 }
 
 export const handleMouseDownSelection = e => {
+  const { target } = e
   const emptySpaceMouseDown = emptySpaceClick(e)
+  // clicking over the hot cell counts as "empty space"
+  let onHotCell = false
+  if (target.closest && target.closest('.HotCellContainer')) {
+    onHotCell = true
+  }
   const { isEditingText } = uiStore
   const outsideQuillMouseDown = !quillEditorClick(e) && isEditingText
   if (emptySpaceMouseDown) {
@@ -28,14 +34,22 @@ export const handleMouseDownSelection = e => {
     }
     // if we clicked an empty space...
     if (!e.shiftKey) {
-      // Shift click should not deselect cards in case you want to drag select
-      // more.
+      // Shift click should not deselect cards in case you want to drag select more.
       uiStore.deselectCards()
     }
     uiStore.onEmptySpaceClick(e)
     uiStore.closeBlankContentTool()
     uiStore.closeCardMenu()
     uiStore.setEditingCardCover(null)
+    return 'emptySpace'
+  }
+  if (onHotCell) {
+    // don't close as many UI elements in this case, but just preserve selection
+    // if we clicked an empty space...
+    if (!e.shiftKey) {
+      // Shift click should not deselect cards in case you want to drag select more.
+      uiStore.deselectCards()
+    }
     return 'emptySpace'
   }
   return false

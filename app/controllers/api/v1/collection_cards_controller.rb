@@ -146,6 +146,28 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render_collection_card
   end
 
+  before_action :load_and_authorize_parent_collection_for_create_placeholders, only: %i[create_placeholders]
+  def create_placeholders
+    row = json_api_params[:data][:row]
+    col = json_api_params[:data][:col]
+    count = json_api_params[:data][:count]
+    if row.nil? || col.nil? || count.nil?
+      head :unprocessable_entity
+      return
+    end
+
+    service = CollectionGrid::PlaceholderInserter.new(
+      row: row,
+      col: col,
+      count: count,
+      collection: @collection,
+    )
+    service.call
+    # render the placeholder card
+    @collection_cards = service.placeholders
+    render_collection_cards
+  end
+
   before_action :authorize_card_for_destroy, only: %i[destroy]
   def destroy
     if @collection_card.destroy
@@ -324,6 +346,15 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     render_collection_card
   end
 
+  def cleanup_placeholder
+    placeholder_id = params[:placeholder_id]
+    placeholder = CollectionCard::Placeholder.find placeholder_id
+
+    placeholder.delete if placeholder.present?
+
+    head :no_content
+  end
+
   private
 
   def render_collection_cards(collection: @collection, collection_cards: @collection_cards, include_roles: false)
@@ -388,7 +419,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     placeholder_card_id = json_api_params[:data][:placeholder_card_id]
     return unless placeholder_card_id.present?
 
-    CollectionCard::Placeholder.find_by(
+    # NOTE: this might not be a placeholder card if you are replacing via file drag
+    CollectionCard.find_by(
       id: placeholder_card_id,
       parent: @collection,
     )
@@ -420,7 +452,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
   end
 
   def load_and_authorize_parent_collection
-    @collection = Collection.find(collection_card_params[:parent_id])
+    parent_id = collection_card_params[:parent_id]
+    @collection = Collection.find(parent_id)
     if @collection.is_a?(Collection::SubmissionsCollection)
       # if adding to a SubmissionsCollection, you only need to have viewer/"participant" access
       authorize! :read, @collection
@@ -431,6 +464,12 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
 
   def load_and_authorize_parent_collection_for_update
     @collection = @collection_card.parent
+    authorize! :edit_content, @collection
+  end
+
+  def load_and_authorize_parent_collection_for_create_placeholders
+    parent_id = json_api_params[:data][:parent_id]
+    @collection = Collection.find(parent_id)
     authorize! :edit_content, @collection
   end
 

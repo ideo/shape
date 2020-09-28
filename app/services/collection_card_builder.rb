@@ -117,8 +117,10 @@ class CollectionCardBuilder
     )
     if @placeholder.present?
       # take over its identity
-      @placeholder.destroy
       @collection_card.id = @placeholder.id
+      @collection_card.row = @placeholder.row
+      @collection_card.col = @placeholder.col
+      @placeholder.delete
     end
 
     # Don't place hidden cards on board => setting row/col for them messes up other card positions
@@ -135,7 +137,6 @@ class CollectionCardBuilder
     @collection_card.height ||= 1
     @collection_card.width ||= 1
     # valid row/col will get applied to the card here for later saving
-
     CollectionGrid::BoardPlacement.call(
       row: row,
       col: col,
