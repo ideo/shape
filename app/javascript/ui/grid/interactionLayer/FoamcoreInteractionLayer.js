@@ -62,12 +62,14 @@ class FoamcoreInteractionLayer extends React.Component {
       return
     }
 
-    const childOfInteractionLayer = ev.target.closest(
+    const childOfInteractionLayer = !!ev.target.closest(
       `.${FOAMCORE_INTERACTION_LAYER}`
     )
+    const childOfCardMenu = !!ev.target.closest('.card-menu')
     if (
-      ev.target.id !== FOAMCORE_INTERACTION_LAYER &&
-      !childOfInteractionLayer
+      (ev.target.id !== FOAMCORE_INTERACTION_LAYER &&
+        !childOfInteractionLayer) ||
+      childOfCardMenu
     ) {
       return false
     }

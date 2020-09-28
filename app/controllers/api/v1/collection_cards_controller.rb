@@ -419,7 +419,8 @@ class Api::V1::CollectionCardsController < Api::V1::BaseController
     placeholder_card_id = json_api_params[:data][:placeholder_card_id]
     return unless placeholder_card_id.present?
 
-    CollectionCard::Placeholder.find_by(
+    # NOTE: this might not be a placeholder card if you are replacing via file drag
+    CollectionCard.find_by(
       id: placeholder_card_id,
       parent: @collection,
     )

@@ -93,16 +93,31 @@ class GridCardDropzone extends React.Component {
 
     if (_.isEmpty(files)) return
 
-    const data = {
-      row,
-      col,
-      count: files.length,
-      parent_id: collection.id,
+    const { blankContentToolState } = uiStore
+    const { replacingId } = blankContentToolState
+    let placeholderCards = []
+    let count = files.length
+    if (replacingId) {
+      count -= 1
+      placeholderCards.push({
+        id: replacingId,
+        row: blankContentToolState.row,
+        col: blankContentToolState.col,
+      })
     }
 
-    const placeholderCards = await apiStore.createPlaceholderCards({
-      data,
-    })
+    if (count) {
+      const data = {
+        row,
+        col,
+        count,
+        parent_id: collection.id,
+      }
+      const newPlaceholderCards = await apiStore.createPlaceholderCards({
+        data,
+      })
+      placeholderCards = placeholderCards.concat(newPlaceholderCards)
+    }
 
     _.each(placeholderCards, placeholderCard => {
       // track placeholder cards that were created in order to create primary cards once filestack succeeds
@@ -120,7 +135,7 @@ class GridCardDropzone extends React.Component {
   }
 
   createCardsForFiles = files => {
-    const { collection, apiStore } = this.props
+    const { collection, apiStore, uiStore } = this.props
 
     _.each(files, async (file, idx) => {
       // get row and col from placeholders
@@ -158,6 +173,7 @@ class GridCardDropzone extends React.Component {
 
     // clear placeholder card ids for next upload
     this.clearPlaceholderCards()
+    uiStore.closeBlankContentTool()
   }
 
   render() {
