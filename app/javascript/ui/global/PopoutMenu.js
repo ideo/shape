@@ -61,7 +61,7 @@ export const StyledMenuButtonWrapper = styled.div`
     position: fixed;
     top: 0;
     width: 100vw;
-    z-index: ${v.zIndex.zoomControls};
+    z-index: ${v.zIndex.aboveClickWrapper};
   `}
 `
 
@@ -563,7 +563,7 @@ class PopoutMenu extends React.Component {
     const Wrapper = isMobileFullScreen ? CornerPositioned : styled.div``
 
     return (
-      <Wrapper>
+      <Wrapper style={{ position: 'relative', zIndex: v.zIndex.aboveClickWrapper }}>
         <ThemeProvider
           theme={{ mobileFixedMenu, isMobileFullScreen, isMultiTieredMenu }}
         >
