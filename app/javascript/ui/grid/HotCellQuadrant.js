@@ -39,26 +39,30 @@ export const Quadrant = styled.div`
 `
 
 const QuadrantIconPositioner = styled.div`
-  display: table;
-  margin: 0 auto;
+  align-items: center;
+  display: flex;
   height: 100%;
+  justify-content: center;
+  width: 100%;
+}
 `
 
 const QuadrantIconHolder = styled.div`
-  display: table-cell;
+  align-items: center;
+  display: flex;
   height: auto;
+  flex-direction: column;
+  justify-content: center;
   margin: 0 auto;
-  max-height: ${props => props.zoomLevel * 22}px;
   max-width: 200px;
   text-align: center;
-  width: ${props => (props.isMobileXs ? 33 : props.zoomLevel * 44)}px;
+  width: ${props => (props.isMobileXs ? 44 : props.zoomLevel * 44)}px;
   vertical-align: middle;
 
   .icon {
     ${props =>
       props.isMobileXs &&
       `
-      max-height: 33px;
     `}
   }
 `
@@ -196,7 +200,12 @@ class HotCellQuadrant extends React.Component {
               {displayName && (
                 <SmallHelperText
                   color={v.colors.secondaryMedium}
-                  style={{ display: 'inline-block', minWidth: '100px' }}
+                  style={{
+                    display: 'inline-block',
+                    marginTop: '6px',
+                    minWidth: '100px',
+                    textAlign: 'center',
+                  }}
                 >
                   {description}
                 </SmallHelperText>
