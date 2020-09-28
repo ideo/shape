@@ -349,11 +349,18 @@ StyledMenuItem.defaultProps = {
 
 const TieredMenuHeading = styled(Heading3)`
   ${props =>
-    props.theme.isMobileFullScreen &&
-    `
+    props.theme.isMobileFullScreen
+      ? `
     border-bottom: 2px solid ${v.colors.black};
+    font-weight: ${v.weights.book};
     margin-left: 7px;
     padding-bottom: 8px;
+    text-transform: uppercase;
+  `
+      : `
+    font-size: 1rem;
+    font-weight: ${v.weights.book};
+    text-transform: none;
   `}
 
   .icon {
@@ -461,7 +468,7 @@ class PopoutMenu extends React.Component {
       >
         {subItems ? (
           <Fragment>
-            <TieredMenuHeading noSpacing>
+            <TieredMenuHeading upperCased={this.isMobileFullScreen} noSpacing>
               {item.name}{' '}
               {!this.isMobileFullScreen && <ArrowIcon rotation={0} />}
             </TieredMenuHeading>
