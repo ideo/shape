@@ -30,6 +30,7 @@ const DragLayerWrapper = styled.div`
     background: ${v.colors.transparent};
     border: none;
     padding: 0px;
+    visibility: ${props => (props.droppingFiles ? 'visible' : 'hidden')};
   }
 `
 @inject('apiStore', 'uiStore')
@@ -47,10 +48,8 @@ class FoamcoreInteractionLayer extends React.Component {
   @observable
   placeholderCards = []
 
-  componentDidUpdate(prevProps) {
-    if (this.props.uiStore.droppingFilesCount > 0) {
-      this.createDropPane()
-    }
+  componentDidMount() {
+    this.createDropPane()
   }
 
   createDropPane = () => {
@@ -130,7 +129,6 @@ class FoamcoreInteractionLayer extends React.Component {
     })
 
     uiStore.setDroppingFilesCount(0)
-    FilestackUpload.closeDropPane()
   }
 
   handleSuccess = async res => {
@@ -616,16 +614,20 @@ class FoamcoreInteractionLayer extends React.Component {
     return closestOpenSpot
   }
 
-  get renderInnerDragLayer() {
-    const { uiStore, dragging, resizing } = this.props
-
+  get droppingFiles() {
+    const { uiStore } = this.props
     const { droppingFilesCount } = uiStore
+    return droppingFilesCount > 0
+  }
 
-    if (dragging && !resizing && droppingFilesCount === 0) {
+  get renderInnerDragLayer() {
+    const { dragging, resizing } = this.props
+
+    if (dragging && !resizing && !this.droppingFiles) {
       return this.renderDragSpots
-    } else if (resizing && droppingFilesCount === 0) {
+    } else if (resizing && !this.droppingFiles) {
       return this.renderResizeSpot
-    } else if (droppingFilesCount > 0) {
+    } else if (this.droppingFiles) {
       return this.renderDropSpots
     }
 
@@ -749,6 +751,7 @@ class FoamcoreInteractionLayer extends React.Component {
           this.resetHoveringRowCol()
           uiStore.setDroppingFilesCount(0)
         }}
+        droppingFiles={this.droppingFiles}
       >
         {this.renderInnerDragLayer}
         {this.renderHotEdges}

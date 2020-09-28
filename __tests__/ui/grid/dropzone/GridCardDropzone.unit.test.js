@@ -1,22 +1,17 @@
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
 import fakeUiStore from '#/mocks/fakeUiStore'
-import fakeApiStore from '#/mocks/fakeApiStore'
 import { fakeCollection } from '#/mocks/data'
 
-let wrapper, props, rerender, component, apiStore
+let wrapper, props, rerender
 describe('GridCardDropzone', () => {
   beforeEach(() => {
-    apiStore = fakeApiStore()
     props = {
-      apiStore,
       uiStore: fakeUiStore,
       collection: fakeCollection,
     }
 
     rerender = props => {
       wrapper = shallow(<GridCardDropzone.wrappedComponent {...props} />)
-      component = wrapper.instance()
-      component.handleDrop = jest.fn()
     }
   })
 
@@ -25,44 +20,13 @@ describe('GridCardDropzone', () => {
     expect(wrapper.find('GridCardDropzone').exists()).toBe(true)
   })
 
-  it('should render DropzoneHolder', () => {
-    rerender(props)
-    expect(wrapper.find('DropzoneHolder').exists()).toBe(true)
-  })
-
-  describe('onDragOver', () => {
+  describe('with showDropzoneIcon = true', () => {
     beforeEach(() => {
-      const fakeEv = {
-        preventDefault: jest.fn(),
-        target: { closest: jest.fn().mockReturnValue(true) },
-      }
-      component.debouncedWillResetUpload = jest.fn()
-      wrapper.find('GridCardDropzone').simulate('dragover', fakeEv)
-    })
-
-    it('should create placeholder cards', () => {
-      expect(component.debouncedWillResetUpload).toHaveBeenCalled()
-    })
-  })
-
-  xit('should render DropzoneHolder', () => {
-    rerender(props)
-    expect(wrapper.find('DropzoneHolder').exists()).toBe(true)
-  })
-
-  xit('should render CloudIcon', () => {
-    expect(wrapper.find('CloudIcon').exists()).toBe(true)
-  })
-
-  describe('componentDidUpdate', () => {
-    beforeEach(() => {
-      props.willUpload = false
+      props.showDropzoneIcon = true
       rerender(props)
     })
-
-    xit('should call createDropPane', () => {
-      wrapper.setProps({ willUpload: true })
-      expect(component.createDropPane).toHaveBeenCalled()
+    it('should render CloudIcon', () => {
+      expect(wrapper.find('CloudIcon').exists()).toBe(true)
     })
   })
 })
