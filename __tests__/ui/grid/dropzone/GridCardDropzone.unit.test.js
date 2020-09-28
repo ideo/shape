@@ -44,4 +44,25 @@ describe('GridCardDropzone', () => {
       expect(component.debouncedWillResetUpload).toHaveBeenCalled()
     })
   })
+
+  xit('should render DropzoneHolder', () => {
+    rerender(props)
+    expect(wrapper.find('DropzoneHolder').exists()).toBe(true)
+  })
+
+  xit('should render CloudIcon', () => {
+    expect(wrapper.find('CloudIcon').exists()).toBe(true)
+  })
+
+  describe('componentDidUpdate', () => {
+    beforeEach(() => {
+      props.willUpload = false
+      rerender(props)
+    })
+
+    xit('should call createDropPane', () => {
+      wrapper.setProps({ willUpload: true })
+      expect(component.createDropPane).toHaveBeenCalled()
+    })
+  })
 })

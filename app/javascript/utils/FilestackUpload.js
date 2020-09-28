@@ -135,6 +135,12 @@ class FilestackUpload {
     return this.client.picker(options).open()
   }
 
+  static closeDropPane() {
+    if (this.client && this.client.picker()) {
+      this.client.picker().close()
+    }
+  }
+
   static filestackFileAttrs(file) {
     return {
       url: file.url,
