@@ -129,10 +129,12 @@ describe('FoamcoreInteractionLayer', () => {
       }
       const uiStore = fakeUiStore
       uiStore.placeholderSpot = placeholderSpot
+      uiStore.droppingFilesCount = 0
       props = {
         collection: fakeCollection,
         apiStore: fakeApiStore(),
         uiStore,
+        dragging: false,
         resizing: true,
       }
       rerender()
@@ -153,16 +155,18 @@ describe('FoamcoreInteractionLayer', () => {
       }
       const uiStore = fakeUiStore
       uiStore.dragGridSpot = dragGridSpot
+      uiStore.droppingFilesCount = 0
       props = {
         collection: fakeCollection,
         apiStore: fakeApiStore(),
         uiStore,
         dragging: true,
+        resizing: false,
         hoveringOverCollection: false,
       }
       rerender()
     })
-    it('should render a PositionedBlankCard with resizing interactionType', () => {
+    it('should render a PositionedBlankCard with dragging interactionType', () => {
       expect(wrapper.find('PositionedBlankCard').exists()).toBeTruthy()
       expect(
         wrapper.find('PositionedBlankCard').props().interactionType

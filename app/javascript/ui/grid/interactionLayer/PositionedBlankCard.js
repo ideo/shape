@@ -84,9 +84,15 @@ class PositionedBlankCard extends React.Component {
     }
 
     if (droppingFilesCount > 0) {
+      const { showDropzoneIcon } = this.props
       return (
         <BlankCardContainer {...defaultProps}>
-          <GridCardDropzone collection={collection} row={row} col={col} />
+          <GridCardDropzone
+            collection={collection}
+            row={row}
+            col={col}
+            showDropzoneIcon={showDropzoneIcon}
+          />
         </BlankCardContainer>
       )
     } else if (
@@ -157,6 +163,7 @@ PositionedBlankCard.propTypes = {
   blocked: PropTypes.bool,
   emptyRow: PropTypes.bool,
   replacingId: PropTypes.string,
+  showDropzoneIcon: PropTypes.bool,
 }
 
 PositionedBlankCard.defaultProps = {
@@ -166,6 +173,7 @@ PositionedBlankCard.defaultProps = {
   blocked: false,
   emptyRow: false,
   replacingId: null,
+  showDropzoneIcon: false,
 }
 
 PositionedBlankCard.displayName = 'PositionedBlankCard'
