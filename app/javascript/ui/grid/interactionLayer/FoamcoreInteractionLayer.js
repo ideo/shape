@@ -13,12 +13,25 @@ import { ROW_ACTIONS } from '~/stores/jsonApi/Collection'
 import RowActions from './RowActions'
 import PositionedBlankCard from '~/ui/grid/interactionLayer/PositionedBlankCard'
 import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
-import v, { FOAMCORE_INTERACTION_LAYER } from '~/utils/variables'
+import FilestackUpload, { MAX_SIZE } from '~/utils/FilestackUpload'
+import v, { FOAMCORE_INTERACTION_LAYER, ITEM_TYPES } from '~/utils/variables'
+import googleTagManager from '~/vendor/googleTagManager'
 
 const DragLayerWrapper = styled.div`
   height: 100%;
   width: 100%;
   z-index: ${v.zIndex.gridCardTop};
+
+  /* Override Filestack styling */
+  .fsp-drop-pane__container {
+    height: 100%;
+    z-index: ${v.zIndex.gridCardBg + 1};
+    /* must be transparent -- dropzone is transparent and content behind it is visible */
+    background: ${v.colors.transparent};
+    border: none;
+    padding: 0px;
+    visibility: ${props => (props.droppingFiles ? 'visible' : 'hidden')};
+  }
 `
 @inject('apiStore', 'uiStore')
 @observer
@@ -32,10 +45,155 @@ class FoamcoreInteractionLayer extends React.Component {
   touchSwiping = false
   @observable
   touchClickEv = null
+  @observable
+  placeholderCards = []
+
+  componentDidMount() {
+    this.createDropPane()
+  }
+
+  createDropPane = () => {
+    const uploadOpts = {}
+
+    // CSS selector where the dropzone will be
+    const container = FOAMCORE_INTERACTION_LAYER
+    const dropPaneOpts = {
+      onDragLeave: this.handleDragLeave,
+      onDrop: this.handleDrop,
+      onProgress: this.handleProgress,
+      onSuccess: this.handleSuccess,
+    }
+    FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
+  }
+
+  handleDrop = async e => {
+    e.preventDefault()
+    const { dataTransfer } = e
+    const { files } = dataTransfer
+    const { row, col } = this.hoveringRowCol
+    const { collection, apiStore, uiStore } = this.props
+    const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
+
+    if (filesThatFit.length < files.length) {
+      uiStore.setDroppingFilesCount(0)
+      uiStore.popupAlert({
+        prompt: `There are
+        ${files.length -
+          filesThatFit.length} file(s) that were over the ${MAX_SIZE /
+          (1024 *
+            1024)} MB limit. Please remove them from your selection and try again.
+      `,
+        fadeOutTime: 6000,
+      })
+      return
+    }
+
+    if (_.isEmpty(files)) return
+
+    const { blankContentToolState } = uiStore
+    const { replacingId } = blankContentToolState
+    let placeholderCards = []
+    let count = files.length
+    if (replacingId) {
+      count -= 1
+      placeholderCards.push({
+        id: replacingId,
+        row: blankContentToolState.row,
+        col: blankContentToolState.col,
+      })
+    }
+
+    if (count) {
+      const data = {
+        row,
+        col,
+        count,
+        parent_id: collection.id,
+      }
+      const newPlaceholderCards = await apiStore.createPlaceholderCards({
+        data,
+      })
+      placeholderCards = placeholderCards.concat(newPlaceholderCards)
+    }
+
+    _.each(placeholderCards, placeholderCard => {
+      // track placeholder cards that were created in order to create primary cards once filestack succeeds
+      this.addPlaceholderCard({
+        id: placeholderCard.id,
+        row: placeholderCard.row,
+        col: placeholderCard.col,
+      })
+
+      // add placeholders to the collection cards store
+      collection.addCard(placeholderCard)
+    })
+
+    uiStore.setDroppingFilesCount(0)
+  }
+
+  handleSuccess = async res => {
+    if (res.length > 0) {
+      const files = await FilestackUpload.processFiles(res)
+      this.createCardsForFiles(files)
+    }
+  }
+
+  createCardsForFiles = files => {
+    const { collection, apiStore, uiStore } = this.props
+
+    _.each(files, async (file, idx) => {
+      // get row and col from placeholders
+      const placeholder = this.placeholderCards[idx]
+
+      const attrs = {
+        order: idx,
+        col: placeholder.col,
+        row: placeholder.row,
+        width: placeholder.width,
+        height: placeholder.height,
+        parent_id: collection.id,
+        item_attributes: {
+          type: ITEM_TYPES.FILE,
+          filestack_file_attributes: {
+            url: file.url,
+            handle: file.handle,
+            filename: file.filename,
+            size: file.size,
+            mimetype: file.mimetype,
+            docinfo: file.docinfo,
+          },
+        },
+      }
+      const card = new CollectionCard(attrs, apiStore)
+      card.parent = parent // Assign parent so store can get access to it
+      await card.API_createFromPlaceholderId(placeholder.id)
+
+      googleTagManager.push({
+        event: 'formSubmission',
+        formType: `Create ${ITEM_TYPES.FILE}`,
+        parentType: 'foamcore',
+      })
+    })
+
+    // clear placeholder card ids for next upload
+    this.clearPlaceholderCards()
+    uiStore.closeBlankContentTool()
+  }
 
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
+  }
+
+  @action
+  addPlaceholderCard = card => {
+    if (!card) return
+    this.placeholderCards.push(card)
+  }
+
+  @action
+  clearPlaceholderCards = () => {
+    this.placeholderCards = []
   }
 
   handleTouchStart = ev => {
@@ -206,7 +364,11 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
-  positionBlank = ({ row, col, width, height }, interactionType = 'drag') => {
+  positionBlank = (
+    { row, col, width, height },
+    interactionType = 'drag',
+    showDropzoneIcon = false
+  ) => {
     let emptyRow = false
     if (interactionType === 'hover') {
       const {
@@ -220,7 +382,8 @@ class FoamcoreInteractionLayer extends React.Component {
 
     return this.renderBlankCard(
       { row, col, width, height, emptyRow },
-      interactionType
+      interactionType,
+      showDropzoneIcon
     )
   }
 
@@ -236,7 +399,8 @@ class FoamcoreInteractionLayer extends React.Component {
 
   renderBlankCard = (
     { row, col, width, height, emptyRow = false },
-    interactionType
+    interactionType,
+    showDropzoneIcon
   ) => {
     const {
       uiStore,
@@ -257,6 +421,7 @@ class FoamcoreInteractionLayer extends React.Component {
         collection={collection}
         position={position}
         interactionType={interactionType}
+        showDropzoneIcon={showDropzoneIcon}
         key={`blank-${interactionType}-${row}:${col}`}
         row={row}
         col={col}
@@ -396,6 +561,7 @@ class FoamcoreInteractionLayer extends React.Component {
     const blankCards = []
     const { uiStore } = this.props
     const { droppingFilesCount } = uiStore
+    const { row, col } = this.hoveringRowCol
 
     const takenSpots = []
 
@@ -405,6 +571,7 @@ class FoamcoreInteractionLayer extends React.Component {
       const openSpot = this.calculateOpenSpot(takenSpots)
 
       if (openSpot) {
+        const showDropzoneIcon = openSpot.row === row && openSpot.col === col
         const position = {
           row: openSpot.row,
           col: openSpot.col,
@@ -412,7 +579,7 @@ class FoamcoreInteractionLayer extends React.Component {
           height: 1,
         }
         positions.push(position)
-        blankCards.push(this.positionBlank(position, 'hover'))
+        blankCards.push(this.positionBlank(position, 'hover', showDropzoneIcon))
         takenSpots.push(position)
       }
     }
@@ -447,16 +614,20 @@ class FoamcoreInteractionLayer extends React.Component {
     return closestOpenSpot
   }
 
-  get renderInnerDragLayer() {
-    const { uiStore, dragging, resizing } = this.props
-
+  get droppingFiles() {
+    const { uiStore } = this.props
     const { droppingFilesCount } = uiStore
+    return droppingFilesCount > 0
+  }
 
-    if (dragging && !resizing && droppingFilesCount === 0) {
+  get renderInnerDragLayer() {
+    const { dragging, resizing } = this.props
+
+    if (dragging && !resizing && !this.droppingFiles) {
       return this.renderDragSpots
-    } else if (resizing && droppingFilesCount === 0) {
+    } else if (resizing && !this.droppingFiles) {
       return this.renderResizeSpot
-    } else if (droppingFilesCount > 0) {
+    } else if (this.droppingFiles) {
       return this.renderDropSpots
     }
 
@@ -580,6 +751,7 @@ class FoamcoreInteractionLayer extends React.Component {
           this.resetHoveringRowCol()
           uiStore.setDroppingFilesCount(0)
         }}
+        droppingFiles={this.droppingFiles}
       >
         {this.renderInnerDragLayer}
         {this.renderHotEdges}
