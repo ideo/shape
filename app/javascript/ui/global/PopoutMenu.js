@@ -352,7 +352,7 @@ const TieredMenuHeading = styled(Heading3)`
     props.theme.isMobileFullScreen
       ? `
     border-bottom: 2px solid ${v.colors.black};
-    font-weight: ${v.weights.book};
+    font-weight: ${v.weights.medium};
     margin-left: 7px;
     padding-bottom: 8px;
     text-transform: uppercase;
