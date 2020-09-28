@@ -563,7 +563,9 @@ class PopoutMenu extends React.Component {
     const Wrapper = isMobileFullScreen ? CornerPositioned : styled.div``
 
     return (
-      <Wrapper style={{ position: 'relative', zIndex: v.zIndex.aboveClickWrapper }}>
+      <Wrapper
+        style={{ position: 'relative', zIndex: v.zIndex.aboveClickWrapper }}
+      >
         <ThemeProvider
           theme={{ mobileFixedMenu, isMobileFullScreen, isMultiTieredMenu }}
         >
