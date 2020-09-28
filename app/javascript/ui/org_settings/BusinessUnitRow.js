@@ -59,16 +59,21 @@ class BusinessUnitRow extends React.Component {
     this.businessUnitErrors = err
   }
 
+  @action
+  setBusinessUnit = record => {
+    this.businessUnit = record
+  }
+
   updateBusinessUnit = async (businessUnit, params) => {
     const {
-      setLoading,
+      setIsLoading,
       setError,
       setEditingBusinessUnitId,
       setEditingBusinessUnitName,
       setBusinessUnitErrors,
-      // refreshBusinessUnits,
+      setBusinessUnit,
     } = this
-    setLoading(true)
+    setIsLoading(true)
     const model = new businessUnitsStore.model()
     const modelInstance = new model({
       id: businessUnit.id,
@@ -85,10 +90,13 @@ class BusinessUnitRow extends React.Component {
       setEditingBusinessUnitId(null)
       setEditingBusinessUnitName(null)
       setBusinessUnitErrors(null)
+      // Need to check that the result has been properly updated record
+      setBusinessUnit(result)
+
       // Shouldn't need to do this since we are just updating the BU for this row?
       // refreshBusinessUnits()
       // TODO: Just update one BU so we don't have to refetch all the BUs?
-      setLoading(false)
+      setIsLoading(false)
       return result
     } catch (err) {
       setError(true)
@@ -98,7 +106,7 @@ class BusinessUnitRow extends React.Component {
 
   cloneBusinessUnit = async businessUnit => {
     try {
-      this.setLoading(true)
+      this.setIsLoading(true)
       const model = new businessUnitsStore.model()
       const modelInstance = new model({
         id: businessUnit.id,
@@ -108,15 +116,15 @@ class BusinessUnitRow extends React.Component {
         optimistic: false,
       })
       const result = await promise
-      this.refreshBusinessUnits()
-      this.setLoading(false)
+      this.refreshBusinessUnits() // Should we pass this function in from Teams Tab?
+      this.setIsLoading(false)
       return result
     } catch (err) {}
   }
 
   removeBusinessUnit = async businessUnit => {
     try {
-      this.setLoading(true)
+      this.setIsLoading(true)
       const model = new businessUnitsStore.model()
       const modelInstance = new model({
         id: businessUnit.id,
@@ -127,7 +135,7 @@ class BusinessUnitRow extends React.Component {
       })
       const result = await promise
       this.refreshBusinessUnits()
-      this.setLoading(false)
+      this.setIsLoading(false)
       return result
     } catch (err) {}
   }
