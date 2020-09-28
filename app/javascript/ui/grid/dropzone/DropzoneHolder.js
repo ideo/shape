@@ -40,10 +40,8 @@ class DropzoneHolder extends React.Component {
     super(props)
   }
 
-  componentDidUpdate(prevProps) {
-    if (!prevProps.willUpload && this.props.willUpload) {
-      this.createDropPane()
-    }
+  componentDidMount() {
+    this.createDropPane()
   }
 
   handleDragLeave = e => {

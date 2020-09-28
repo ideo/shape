@@ -39,8 +39,6 @@ class GridCardDropzone extends React.Component {
     e.preventDefault()
     if (e.target.closest('.gridCardDropzone')) {
       this.updateWillUpload(true)
-      // reset willUpload to prevent many instances of this class to render DropzoneHolder
-      this.debouncedWillResetUpload()
     }
   }
 
