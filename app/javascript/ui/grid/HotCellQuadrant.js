@@ -127,7 +127,7 @@ class HotCellQuadrant extends React.Component {
     ev.preventDefault()
     ev.stopPropagation()
     runInAction(() => {
-      this.moreTypesOpen = false
+      this.moreTypesOpen = true
     })
   }
 
@@ -238,6 +238,7 @@ class HotCellQuadrant extends React.Component {
                   x: 0,
                   y: -40,
                 }}
+                title="More"
                 width={280}
               />
             </div>
