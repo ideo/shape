@@ -52,7 +52,6 @@ class OrganizationTemplates < SimpleService
     )
     return unless @org.shell
 
-    if @org.users.count > 1
       # Manually link the template collection to the org clone my collection
       # collection that doesn't have a user yet
       org_user_collection = Collection::UserCollection.find_by(
@@ -64,7 +63,6 @@ class OrganizationTemplates < SimpleService
           collection_id: template_collection.id,
         },
       )
-    end
   end
 
   def getting_started_template
