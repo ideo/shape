@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
-import { observable, runInAction } from 'mobx'
 import styled from 'styled-components'
 
 import DropdownIcon from '~/ui/icons/DropdownIcon'
@@ -30,7 +29,6 @@ export const Quadrant = styled.div`
   height: calc(50% - 1px);
   position: relative;
   width: calc(50% - 1px);
-  z-index: ${props => props.moreMenuOpen && v.zIndex.gridCard};
 
   &:hover,
   &:active {
@@ -73,7 +71,7 @@ const More = styled.button`
   right: 6px;
   position: absolute;
   width: ${props => 28 * props.zoomLevel}px;
-  z-index: 149;
+  z-index: ${v.zIndex.gridCard};
 
   ${props =>
     props.zoomLevel > 1 &&
@@ -101,15 +99,11 @@ const nameToIcon = {
 @inject('uiStore')
 @observer
 class HotCellQuadrant extends React.Component {
-  @observable
-  moreTypesOpen = false
-
   handleClick = ev => {
     const { name } = this.props
     if (name === 'more') {
-      runInAction(() => {
-        this.moreTypesOpen = true
-      })
+      const { onMoreMenuOpen } = this.props
+      onMoreMenuOpen()
     } else {
       this.createContent(name)
     }
@@ -118,17 +112,15 @@ class HotCellQuadrant extends React.Component {
   handleMore = ev => {
     ev.preventDefault()
     ev.stopPropagation()
-    runInAction(() => {
-      this.moreTypesOpen = true
-    })
+    const { onMoreMenuOpen } = this.props
+    onMoreMenuOpen()
   }
 
   handleNoMore = ev => {
     ev.preventDefault()
     ev.stopPropagation()
-    runInAction(() => {
-      this.moreTypesOpen = true
-    })
+    const { onMoreMenuClose } = this.props
+    onMoreMenuClose()
   }
 
   createContent = type => {
@@ -170,6 +162,7 @@ class HotCellQuadrant extends React.Component {
   render() {
     const {
       name,
+      currentMenuOpen,
       description,
       displayName,
       subTypes,
@@ -179,7 +172,7 @@ class HotCellQuadrant extends React.Component {
     const TypeIcon = nameToIcon[name]
     return (
       <Quadrant
-        moreMenuOpen={this.moreTypesOpen}
+        moreMenuOpen={currentMenuOpen}
         onClick={this.handleClick}
         zoomLevel={zoomLevel}
         data-cy={`HotCellQuadrant-${name}`}
@@ -224,13 +217,13 @@ class HotCellQuadrant extends React.Component {
               style={{
                 position: 'relative',
                 transform: `translateZ(0) scale(${zoomLevel})`,
-                zIndex: 8000,
+                zIndex: 9000,
               }}
             >
               <PopoutMenu
                 hideDotMenu
                 mobileFixedMenu
-                menuOpen={this.moreTypesOpen}
+                menuOpen={currentMenuOpen}
                 menuItems={this.moreMenuItems}
                 onMouseLeave={this.handleNoMore}
                 onClose={this.handleNoMore}
@@ -253,8 +246,11 @@ HotCellQuadrant.propTypes = {
   name: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   onCreateContent: PropTypes.func.isRequired,
+  onMoreMenuOpen: PropTypes.func.isRequired,
+  onMoreMenuClose: PropTypes.func.isRequired,
   zoomLevel: PropTypes.number.isRequired,
   subTypes: PropTypes.func,
+  currentMenuOpen: PropTypes.bool,
   displayName: PropTypes.bool,
 }
 HotCellQuadrant.wrappedComponent.propTypes = {
@@ -263,6 +259,7 @@ HotCellQuadrant.wrappedComponent.propTypes = {
 HotCellQuadrant.defaultProps = {
   subTypes: null,
   displayName: false,
+  currentMenuOpen: false,
 }
 
 export default HotCellQuadrant
