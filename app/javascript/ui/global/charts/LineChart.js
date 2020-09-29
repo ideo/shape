@@ -25,7 +25,14 @@ const chartStyle = (style, order) => {
   }
 }
 
-const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
+const LineChart = ({
+  dataset,
+  order,
+  simpleDateTooltip,
+  cardArea,
+  domain,
+  isSmallChartStyle,
+}) => {
   const { measure, timeframe, style, dataWithDates } = dataset
   let tooltipFn
 
@@ -45,7 +52,8 @@ const LineChart = ({ dataset, order, simpleDateTooltip, cardArea, domain }) => {
     }
   }
   if (simpleDateTooltip) {
-    tooltipFn = datum => dateTooltipText(datum, dataset.name)
+    tooltipFn = datum =>
+      dateTooltipText(datum, dataset.name, { isSmallChartStyle })
   } else {
     tooltipFn = (datum, isLastDataPoint) =>
       advancedTooltipText({
@@ -83,6 +91,7 @@ LineChart.propTypes = {
   simpleDateTooltip: PropTypes.bool,
   cardArea: PropTypes.number,
   domain: domainProps.isRequired,
+  isSmallChartStyle: PropTypes.bool.isRequired,
 }
 
 LineChart.defaultProps = {

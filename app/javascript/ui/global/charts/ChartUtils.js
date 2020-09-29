@@ -146,18 +146,27 @@ export const tierTooltipLabel = ({ tiers, datum, dataset }) => {
     isFinalTier = true
   }
 
+  const momentDate = utcMoment(datum.date)
   const truncatedName = truncate(dataset.name, { length: 32 })
   return `${currentTier.name}\n${truncatedName}${
     isFinalTier
       ? ''
       : `\n${nextTier.value - datum.value}pts away from ${nextTier.name}`
-  }\n${utcMoment(datum.date).format('MMM YYYY')} | ${datum.value}/100`
+  }\nQ${momentDate.quarter()} ${momentDate.year()} | ${datum.value}/100`
 }
 
-export const dateTooltipText = (datum, datasetName = null) => {
+export const dateTooltipText = (
+  datum,
+  datasetName = null,
+  { isSmallChartStyle } = {}
+) => {
   if (!datum.date) return datum.value
-  const dateToShow = datum.tooltipDate || datum.date
-  const text = `${datum.value} on ${utcMoment(dateToShow).format('l')}`
+  const momentDate = utcMoment(datum.tooltipDate || datum.date)
+  let fullDate = momentDate.format('l')
+  if (isSmallChartStyle) {
+    fullDate = `Q${momentDate.quarter()} ${momentDate.year()}`
+  }
+  const text = `${datum.value} on ${fullDate}`
   if (!datasetName) return text
   return `${datasetName}\n${text}`
 }

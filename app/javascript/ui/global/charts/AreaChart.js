@@ -17,6 +17,7 @@ const chartStyle = (style, order, singleDataPoint) => {
   if (style.fill) {
     const darkFill = darkenColor(style.fill, order)
     const opacity = 0.8
+    // 1000 strokeWidth makes it appear as a full colored area when it's really a single point
     const strokeWidth = singleDataPoint ? 1000 : null
     return {
       data: { fill: darkFill, opacity, strokeWidth },
