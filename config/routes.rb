@@ -128,6 +128,8 @@ Rails.application.routes.draw do
           post 'link'
           post 'duplicate'
           post 'create_bct'
+          post 'create_placeholders'
+          post 'cleanup_placeholder'
         end
       end
       resources :groups, except: :delete do

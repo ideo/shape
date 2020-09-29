@@ -21,16 +21,22 @@ When('I create a {word} card', itemType => {
 When(
   'I create a textItem card at {int},{int} on the board with {string}',
   (row, col, content) => {
-    cy.createCard('textItem', { content, row, col })
+    cy.createCard('text', { content, row, col })
   }
 )
 
+When('I create a {word} item card using the first hot edge', itemType => {
+  cy.clickFirstHotEdge()
+  // `empty` being equivalent to "BCT is already open"
+  cy.createCard(itemType, { empty: true })
+})
+
 When(
-  'I create a textItem card with {string} using the first hot edge',
-  content => {
+  'I create a {word} item card {string} using the first hot edge',
+  (itemType, content) => {
     cy.clickFirstHotEdge()
     // `empty` being equivalent to "BCT is already open"
-    cy.createCard('textItem', { content, empty: true })
+    cy.createCard(itemType, { content, empty: true })
   }
 )
 
@@ -162,7 +168,7 @@ When('I place a card to the bottom using the snackbar', () => {
 // ----------------------
 When('I add a link URL', () => {
   // assumes BCT is already open
-  cy.locate(`BctButton-link`)
+  cy.locate(`HotCellQuadrant-link`)
     .first()
     .click()
   cy.locate('BctTextField').type(

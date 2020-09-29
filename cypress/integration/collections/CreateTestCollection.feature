@@ -2,7 +2,7 @@ Feature: Creating a Test Collection
 
   Scenario: Adding the test collection via the BCT
     Given I login and visit the Test Area
-    When I create a test collection named "Test Prototype"
+    When I create a test collection named "Test Prototype" using the first hot edge
     Then I should see a collection card named "Test Prototype"
     When I navigate to the collection named "Test Prototype" via the "CollectionCover"
     # the extra cards load for ideas collection

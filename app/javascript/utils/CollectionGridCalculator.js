@@ -90,14 +90,18 @@ export const calculateRowsCols = (
   return sortedCards
 }
 
-export const findClosestOpenSpot = (placeholder, openSpotMatrix) => {
+export const findClosestOpenSpot = (
+  placeholder,
+  openSpotMatrix,
+  numColumns
+) => {
   const { row, col, height, width } = placeholder
 
   let possibilities = []
   let exactFit = false
 
   _.each(openSpotMatrix, (rowVals, rowIdx) => {
-    if (rowIdx >= row && rowIdx <= row + 15) {
+    if (rowIdx >= row && rowIdx <= row + numColumns - 1) {
       _.each(rowVals, (openSpots, colIdx) => {
         let canFit = false
         if (openSpots >= width) {
@@ -122,7 +126,14 @@ export const findClosestOpenSpot = (placeholder, openSpotMatrix) => {
           } else {
             colDiff *= 0.99
           }
-          const distance = Math.sqrt(rowDiff * rowDiff + colDiff * colDiff)
+          let distance = Math.sqrt(rowDiff * rowDiff + colDiff * colDiff)
+
+          if (rowDiff > 0) {
+            distance = Math.abs(
+              rowIdx * numColumns + colIdx - (row * numColumns + col)
+            )
+          }
+
           exactFit = distance === 0
           possibilities.push({ row: rowIdx, col: colIdx, distance })
         }
@@ -173,18 +184,36 @@ const matrixWithDraggedSpots = (collection, dragGridSpot) => {
  */
 export const calculateOpenSpotMatrix = ({
   collection,
-  multiMoveCardIds,
-  dragGridSpot,
+  multiMoveCardIds = [],
+  dragGridSpot = null,
   withDraggedSpots = false,
+  takenSpots = [],
+  maxVisibleRow = null,
 } = {}) => {
   const cardMatrix = withDraggedSpots
     ? matrixWithDraggedSpots(collection, dragGridSpot)
     : collection.cardMatrix
-  const openSpotMatrix = [[]]
+  const columnCount = collection.num_columns
 
+  if (!columnCount) return [[]]
+
+  // initialize open spot matrix
+  const openSpotMatrix = _.map(Array(maxVisibleRow), () => {
+    return _.fill(new Array(columnCount))
+  })
+
+  // mark spots beyond the last row with cards as not taken
+  const firstRowWithNoCards = cardMatrix.length
+  if (maxVisibleRow && maxVisibleRow > firstRowWithNoCards - 1) {
+    const openRows = _.rangeRight(1, columnCount + 1)
+    for (let rowIdx = firstRowWithNoCards; rowIdx < maxVisibleRow; rowIdx++) {
+      openSpotMatrix[rowIdx] = openRows
+    }
+  }
+
+  // check every collection card in the card matrix to mark spot as open
   _.each(cardMatrix, (row, rowIdx) => {
     let open = 0
-    openSpotMatrix[rowIdx] = Array(16)
     const reversed = _.reverse(row)
     _.each(reversed, (card, colIdx) => {
       if (card && !_.includes(multiMoveCardIds, card.id)) {
@@ -192,8 +221,17 @@ export const calculateOpenSpotMatrix = ({
       } else {
         open += 1
       }
-      openSpotMatrix[rowIdx][15 - colIdx] = open
+      if (openSpotMatrix[rowIdx]) {
+        openSpotMatrix[rowIdx][columnCount - 1 - colIdx] = open
+      }
     })
+  })
+
+  // override card matrix spots that are now taken
+  _.each(takenSpots, spot => {
+    if (openSpotMatrix[spot.row]) {
+      openSpotMatrix[spot.row][spot.col] = 'taken'
+    }
   })
 
   return openSpotMatrix

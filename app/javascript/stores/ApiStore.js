@@ -666,6 +666,19 @@ class ApiStore extends jsonapi(datxCollection) {
     return result
   }
 
+  async createPlaceholderCards({ data }) {
+    const response = await this.request(
+      `collection_cards/create_placeholders`,
+      'POST',
+      {
+        data,
+      }
+    )
+    const { data: placeholderCards } = response
+
+    return placeholderCards
+  }
+
   async archiveCards({ cardIds, collection, undoable = true }) {
     const archiveResult = await this.request(
       'collection_cards/archive',

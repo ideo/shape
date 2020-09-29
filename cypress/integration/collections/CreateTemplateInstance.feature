@@ -1,7 +1,7 @@
 Feature: Template Instance
   Scenario: Using the Template Helper Modal to Add to My Collection
     Given I login and visit the Test Area
-    When I create a template collection named "Test Template"
+    When I create a template collection named "Test Template" using the first hot edge
     # this is the "Use Template" button
     Then I should see a 'CollectionCoverFormButton'
 

@@ -52,17 +52,17 @@ class OrganizationTemplates < SimpleService
     )
     return unless @org.shell
 
-    # Manually link the template collection to the org clone my collection
-    # collection that doesn't have a user yet
-    org_user_collection = Collection::UserCollection.find_by(
-      organization_id: @org.id,
-    )
-    create_card(
-      parent_collection: org_user_collection,
-      params: {
-        collection_id: template_collection.id,
-      },
-    )
+      # Manually link the template collection to the org clone my collection
+      # collection that doesn't have a user yet
+      org_user_collection = Collection::UserCollection.find_by(
+        organization_id: @org.id,
+      )
+      create_card(
+        parent_collection: org_user_collection,
+        params: {
+          collection_id: template_collection.id,
+        },
+      )
   end
 
   def getting_started_template

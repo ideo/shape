@@ -17,6 +17,7 @@ import { calculatePopoutMenuOffset } from '~/utils/clickUtils'
 import { getTouchDeviceOS } from '~/utils/detectOperatingSystem'
 import { calculatePageMargins } from '~/utils/pageUtils'
 import ChannelManager from '~/utils/ChannelManager'
+import { objectsEqual } from '~/utils/objectUtils'
 
 const MAX_COLS = 16
 const MAX_COLS_MOBILE = 8
@@ -36,6 +37,7 @@ export default class UiStore {
     collectionId: null,
     blankType: null,
     placeholderCard: null,
+    selectedContentType: null,
   }
   defaultCardMenuState = {
     id: null,
@@ -48,6 +50,8 @@ export default class UiStore {
   pageError = null
   @observable
   blankContentToolState = { ...this.defaultBCTState }
+  @observable
+  blankContentType = null
   @observable
   cardMenuOpen = { ...this.defaultCardMenuState }
   defaultSelectedTextRange = {
@@ -112,6 +116,8 @@ export default class UiStore {
   pastingCards = false
   @observable
   templateName = ''
+  @observable
+  droppingFilesCount = 0
   defaultDialogProps = {
     open: null, // track whether "info" or "confirm" dialog are open, or none
     prompt: null,
@@ -179,6 +185,9 @@ export default class UiStore {
   dragging = false
   @observable
   draggingFromMDL = false
+  dragGridSpot = observable.map({})
+  @observable
+  placeholderSpot = { ...v.placeholderDefaults }
   @observable
   // track if you are dragging/moving more cards than visible
   movingCardsOverflow = false
@@ -269,6 +278,20 @@ export default class UiStore {
   zoomLevels = []
   @observable
   currentlyZooming = false
+  @observable
+  // track which rows are visible on the page
+  visibleRows = {
+    min: 0,
+    max: 0,
+    num: 0,
+  }
+  @observable
+  // track which cols are visible on the page
+  visibleCols = {
+    min: 0,
+    max: 0,
+    num: 0,
+  }
 
   get routingStore() {
     return this.apiStore.routingStore
@@ -1700,6 +1723,35 @@ export default class UiStore {
     // zoomLevels start at 1, so we subtract to get the array idx
     const zoom = this.zoomLevels[zoomLevel - 1]
     return zoom ? zoom.relativeZoomLevel : 1
+  }
+
+  @action
+  setDroppingFilesCount(droppingFilesCount) {
+    if (this.droppingFilesCount !== droppingFilesCount) {
+      this.droppingFilesCount = droppingFilesCount
+    }
+  }
+
+  @action
+  setVisibleRows(visibleRows) {
+    this.visibleRows = visibleRows
+  }
+
+  @action
+  setVisibleCols(visibleCols) {
+    this.visibleCols = visibleCols
+  }
+
+  @action
+  setPlaceholderSpot(placeholderSpot = this.placeholderDefaults) {
+    if (!objectsEqual(this.placeholderSpot, placeholderSpot)) {
+      const { row, col, width, height, type } = placeholderSpot
+      this.placeholderSpot.row = row
+      this.placeholderSpot.col = col
+      this.placeholderSpot.width = width
+      this.placeholderSpot.height = height
+      this.placeholderSpot.type = type
+    }
   }
 
   pageMargins(collection) {

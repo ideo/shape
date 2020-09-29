@@ -700,6 +700,64 @@ describe Api::V1::CollectionCardsController, type: :request, json: true, auth: t
     end
   end
 
+  describe 'POST #create_placeholders' do
+    let(:path) { '/api/v1/collection_cards/create_placeholders' }
+    let(:merge_data) do
+      {
+        row: 0,
+        col: 2,
+        count: 1,
+        parent_id: collection.id,
+      }
+    end
+    # merge_data is used since it's not using json_api attributes
+    let(:params) { json_api_params('data', {}, merge_data) }
+    let(:bad_params) do
+      json_api_params('collection_cards', {}, parent_id: collection.id)
+    end
+
+    before do
+      allow(CollectionGrid::PlaceholderInserter).to receive(:new).and_call_original
+    end
+
+    context 'without content editor access' do
+      let(:user) { create(:user) }
+
+      it 'returns a 401' do
+        post(path, params: params)
+        expect(response.status).to eq(401)
+      end
+    end
+
+    context 'with errors' do
+      it 'returns a 422 bad request' do
+        post(path, params: bad_params)
+        expect(response.status).to eq(422)
+      end
+    end
+
+    context 'success' do
+      let(:collection) { create(:board_collection, add_editors: [user]) }
+
+      it 'returns a 200' do
+        post(path, params: params)
+        expect(response.status).to eq(200)
+      end
+
+      it 'creates a placeholder' do
+        expect(CollectionGrid::PlaceholderInserter).to receive(:new).with(
+          row: 0,
+          col: 2,
+          count: 1,
+          collection: collection,
+        )
+        expect {
+          post(path, params: params)
+        }.to change(CollectionCard::Placeholder, :count).by(1)
+      end
+    end
+  end
+
   describe 'POST #create_bct' do
     let(:path) { '/api/v1/collection_cards/create_bct' }
     let(:raw_params) do

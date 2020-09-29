@@ -1,9 +1,9 @@
-import FoamcoreHotspot from '~/ui/grid/FoamcoreHotspot'
+import FoamcoreHotEdge from '~/ui/grid/FoamcoreHotEdge'
 import v from '~/utils/variables'
 
 let wrapper, props, render, gutter, gridH, gridW
 
-describe('FoamcoreHotspot', () => {
+describe('FoamcoreHotEdge', () => {
   beforeEach(() => {
     props = {
       onClick: jest.fn(),
@@ -17,7 +17,7 @@ describe('FoamcoreHotspot', () => {
       gutter = v.defaultGridSettings.gutter / props.relativeZoomLevel
       gridH = v.defaultGridSettings.gridH / props.relativeZoomLevel
       gridW = v.defaultGridSettings.gridW / props.relativeZoomLevel
-      wrapper = shallow(<FoamcoreHotspot {...props} {...withProps} />)
+      wrapper = shallow(<FoamcoreHotEdge {...props} {...withProps} />)
     }
     render(props)
   })
