@@ -47,6 +47,8 @@ class FoamcoreInteractionLayer extends React.Component {
   touchClickEv = null
   @observable
   placeholderCards = []
+  @observable
+  fileDropProgress = null
 
   componentDidMount() {
     this.createDropPane()
@@ -60,10 +62,14 @@ class FoamcoreInteractionLayer extends React.Component {
     const dropPaneOpts = {
       onDragLeave: this.handleDragLeave,
       onDrop: this.handleDrop,
-      onProgress: this.handleProgress,
+      onProgress: this.handleDropStart,
       onSuccess: this.handleSuccess,
     }
     FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
+  }
+
+  handleDropStart = progress => {
+    runInAction(() => (this.fileDropProgress = progress))
   }
 
   handleDrop = async e => {
@@ -129,6 +135,7 @@ class FoamcoreInteractionLayer extends React.Component {
     })
 
     uiStore.setDroppingFilesCount(0)
+    runInAction(() => (this.fileDropProgress = null))
   }
 
   handleSuccess = async res => {
@@ -435,6 +442,7 @@ class FoamcoreInteractionLayer extends React.Component {
         handleBlankCardClick={this.onCreateBct}
         handleInsertRowClick={this.handleInsertRowClick}
         handleRemoveRowClick={this.handleRemoveRowClick}
+        fileDropProgress={this.fileDropProgress}
         onCloseHtc={this.onCloseHtc}
         zoomLevel={relativeZoomLevel}
         data-empty-space-click
