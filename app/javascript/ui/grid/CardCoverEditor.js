@@ -401,9 +401,8 @@ class CardCoverEditor extends React.Component {
   }
 
   onImageOptionSelect = async option => {
-    const { apiStore, uiStore, card } = this.props
+    const { apiStore, card } = this.props
     const { recordIsCollection } = this
-    uiStore.setEditingCardCover(null)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
       await selectedCard.patch({ attributes: { is_cover: true } })
@@ -429,10 +428,9 @@ class CardCoverEditor extends React.Component {
   }
 
   onBackgroundImageOptionSelect = async option => {
-    const { apiStore, uiStore, card } = this.props
+    const { apiStore, card } = this.props
     const collection = card.record
 
-    uiStore.setEditingCardCover(null)
     if (option.cardId) {
       const selectedCard = apiStore.find('collection_cards', option.cardId)
       await selectedCard.patch({ attributes: { is_background: true } })
@@ -447,8 +445,7 @@ class CardCoverEditor extends React.Component {
   }
 
   onFilterOptionSelect = async option => {
-    const { uiStore, card } = this.props
-    uiStore.setEditingCardCover(null)
+    const { card } = this.props
     await card.API_updateCardFilter(option.type)
   }
 
@@ -634,7 +631,7 @@ class CardCoverEditor extends React.Component {
               />
 
               <MediumBreak />
-              <h3>Font Color</h3>
+              <h3>Title Font Color</h3>
               <FontColorSelector
                 fontColor={record.fontColor}
                 defaultFontColor={v.colors.black}
