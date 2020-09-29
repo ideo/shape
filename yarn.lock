@@ -3625,7 +3625,7 @@ bytes@3.1.0:
     mobx-collection-store "^2.0.0"
     mobx-jsonapi-store "^4.3.0"
     mobx-react "^5.0.0"
-    mobx-rest "^6.0.0"
+    mobx-rest "^7.1.0"
     mobx-rest-jquery-adapter "^1.1.0"
     object-path-immutable "^3.0.0"
     webpack "^4.41.6"
@@ -9871,6 +9871,11 @@ lodash@4.17.15:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
+lodash@4.17.19:
+  version "4.17.19"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
+  integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
+
 lodash@^4.0.0, lodash@^4.15.0, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.12, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.3.0, lodash@^4.5.1, lodash@~4.17.10, lodash@~4.17.4:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
@@ -10424,14 +10429,14 @@ mobx-rest-jquery-adapter@^1.1.0:
     jquery "3.4.0"
     lodash "4.17.13"
 
-mobx-rest@^6.0.0:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/mobx-rest/-/mobx-rest-6.0.1.tgz#581966e306f6695ad776bf64f5dc2d55fa6fe021"
-  integrity sha512-3ZwwymUszL1uJH+MyIvx1SMImCQaXzB7OEq6ZXxXOx1jQLAFQQEoM8aIWNk2vmLXOy+y2HA906/8zhf00X/Itw==
+mobx-rest@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/mobx-rest/-/mobx-rest-7.1.0.tgz#7493b495c55095a0c76a920b2c4585aecb9e69cd"
+  integrity sha512-G6GzYy4jYhp4gBrT/ywCmgy6wk5ydrQ5AX1WNom1uvaNeLvH4+qWvKkridOK9D+x0WzKa+LNlNY4fcGU21nddg==
   dependencies:
     "@types/lodash" "4.14.136"
     deepmerge "3.2.0"
-    lodash "4.17.13"
+    lodash "4.17.19"
     mobx "5.9.4"
 
 mobx@5.9.4:
@@ -16267,10 +16272,39 @@ webpack@^3.11.0:
     webpack-sources "^1.0.1"
     yargs "^8.0.2"
 
-webpack@^4.17.1, webpack@^4.41.2, webpack@^4.41.6:
+webpack@^4.17.1, webpack@^4.41.2:
   version "4.44.1"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.44.1.tgz#17e69fff9f321b8f117d1fda714edfc0b939cc21"
   integrity sha512-4UOGAohv/VGUNQJstzEywwNxqX417FnjZgZJpJQegddzPmTvph37eBIRbRTfdySXzVtJXLJfbMN3mMYhM6GdmQ==
+  dependencies:
+    "@webassemblyjs/ast" "1.9.0"
+    "@webassemblyjs/helper-module-context" "1.9.0"
+    "@webassemblyjs/wasm-edit" "1.9.0"
+    "@webassemblyjs/wasm-parser" "1.9.0"
+    acorn "^6.4.1"
+    ajv "^6.10.2"
+    ajv-keywords "^3.4.1"
+    chrome-trace-event "^1.0.2"
+    enhanced-resolve "^4.3.0"
+    eslint-scope "^4.0.3"
+    json-parse-better-errors "^1.0.2"
+    loader-runner "^2.4.0"
+    loader-utils "^1.2.3"
+    memory-fs "^0.4.1"
+    micromatch "^3.1.10"
+    mkdirp "^0.5.3"
+    neo-async "^2.6.1"
+    node-libs-browser "^2.2.1"
+    schema-utils "^1.0.0"
+    tapable "^1.1.3"
+    terser-webpack-plugin "^1.4.3"
+    watchpack "^1.7.4"
+    webpack-sources "^1.4.1"
+
+webpack@^4.41.6:
+  version "4.44.2"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-4.44.2.tgz#6bfe2b0af055c8b2d1e90ed2cd9363f841266b72"
+  integrity sha512-6KJVGlCxYdISyurpQ0IPTklv+DULv05rs2hseIXer6D7KrUicRDLFb4IUM1S6LUAKypPM/nSiVSuv8jHu1m3/Q==
   dependencies:
     "@webassemblyjs/ast" "1.9.0"
     "@webassemblyjs/helper-module-context" "1.9.0"

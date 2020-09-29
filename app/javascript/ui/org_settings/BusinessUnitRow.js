@@ -1,8 +1,3 @@
-import {
-  businessUnitsStore,
-  businessUnitDeploymentsStore,
-} from 'c-delta-organization-settings'
-
 import { Row } from '~/ui/global/styled/layout'
 import { TextField } from '~/ui/global/styled/forms'
 import { DisplayText } from '~/ui/global/styled/typography'
@@ -12,6 +7,7 @@ import { action, observable, runInAction } from 'mobx'
 import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
 import OrganizationRoles from './OrganizationRoles'
 import DropdownSelect from './DropdownSelect'
+import Loader from '../layout/Loader'
 
 // TODO: maybe just pass in currentUserOrganization.primary_group as prop?
 @inject('apiStore')
@@ -65,49 +61,39 @@ class BusinessUnitRow extends React.Component {
   }
 
   updateBusinessUnit = async (businessUnit, params) => {
-    const {
-      setIsLoading,
-      setError,
-      setEditingBusinessUnitId,
-      setEditingBusinessUnitName,
-      setBusinessUnitErrors,
-      setBusinessUnit,
-    } = this
-    setIsLoading(true)
-    const model = new businessUnitsStore.model()
-    const modelInstance = new model({
-      id: businessUnit.id,
-    })
-    const data = {
-      business_unit: params,
-    }
+    console.log('in update business unit, ', businessUnit)
+
+    this.setIsLoading(true)
+
+    // const data = {
+    //   business_unit: params,
+    // }
+    console.log('sending params: ', params)
 
     try {
-      const promise = modelInstance.save(data, {
-        optimistic: false,
+      const result = await businessUnit.save(params, {
+        optimistic: true,
       })
-      const result = await promise
-      setEditingBusinessUnitId(null)
-      setEditingBusinessUnitName(null)
-      setBusinessUnitErrors(null)
-      // Need to check that the result has been properly updated record
-      setBusinessUnit(result)
 
-      // Shouldn't need to do this since we are just updating the BU for this row?
-      // refreshBusinessUnits()
-      // TODO: Just update one BU so we don't have to refetch all the BUs?
-      setIsLoading(false)
+      this.setBusinessUnitErrors(null)
+      // Need to check that the result has been properly updated record
+      console.log('result is: ', result)
+      // this.setBusinessUnit(result)
+      console.log('mobx object', businessUnit.toJS())
+
+      this.setIsLoading(false)
       return result
     } catch (err) {
-      setError(true)
-      setBusinessUnitErrors(err.error)
+      console.log('error: ', err)
+      this.setIsError(true)
+      this.setBusinessUnitErrors(err.error)
     }
   }
 
   cloneBusinessUnit = async businessUnit => {
     try {
       this.setIsLoading(true)
-      const model = new businessUnitsStore.model()
+      // const model = new this.props.BusinessUnitsStore
       const modelInstance = new model({
         id: businessUnit.id,
       })
@@ -125,7 +111,7 @@ class BusinessUnitRow extends React.Component {
   removeBusinessUnit = async businessUnit => {
     try {
       this.setIsLoading(true)
-      const model = new businessUnitsStore.model()
+      const model = new this.props.BusinessUnitsStore()
       const modelInstance = new model({
         id: businessUnit.id,
       })
@@ -141,7 +127,7 @@ class BusinessUnitRow extends React.Component {
   }
 
   updateBusinessUnitDeployment = async (businessUnitDeployment, params) => {
-    const model = new businessUnitDeploymentsStore.model()
+    const model = this.props.businessUnitDeploymentsStore.model()
     const modelInstance = new model({
       id: businessUnitDeployment.id,
     })
@@ -193,6 +179,9 @@ class BusinessUnitRow extends React.Component {
     } = this
 
     const { businessUnit, industrySubcategories, contentVersions } = this.props
+    console.log('rendering business unit:', businessUnit)
+
+    if (this.isLoading) return <Loader />
 
     return (
       <Row>
@@ -231,7 +220,7 @@ class BusinessUnitRow extends React.Component {
                 </span>
               </React.Fragment>
             ) : (
-              <DisplayText> {businessUnit.name} </DisplayText>
+              <DisplayText> {businessUnit.get('name')} </DisplayText>
             )}
           </div>
           <div
@@ -241,7 +230,7 @@ class BusinessUnitRow extends React.Component {
           >
             <DropdownSelect
               label={'Industry'}
-              record={businessUnit}
+              record={businessUnit.toJS()}
               options={industrySubcategories}
               updateRecord={params => updateBusinessUnit(businessUnit, params)}
               fieldToUpdate={'industry_subcategory_id'}
@@ -257,22 +246,22 @@ class BusinessUnitRow extends React.Component {
                                   - It should probably accept the BU Deployment as the record
                                   - and use content_version_id as the fieldToUpdate
                                 */}
-            <DropdownSelect
+            {/* <DropdownSelect
               label={'Content Version'}
               toolTip={
                 'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
               }
-              objectToUpdateName={businessUnit.name}
-              record={businessUnit.closest_business_unit_deployment}
+              objectToUpdateName={businessUnit.get('name')}
+              record={businessUnit.get('closest_business_unit_deployment')}
               options={contentVersions}
               updateRecord={params =>
                 updateBusinessUnitDeployment(
-                  businessUnit.closest_business_unit_deployment,
+                  businessUnit.get('closest_business_unit_deployment'),
                   params
                 )
               }
               fieldToUpdate={'content_version_id'}
-            />
+            /> */}
           </div>
           <div
             style={{
@@ -284,7 +273,7 @@ class BusinessUnitRow extends React.Component {
               toolTip={
                 "Select 'Vertical' for any market-facing team or organizational unit. Select 'Horizontal' for any internally-facing teams, departments, or other organizational groups."
               }
-              record={businessUnit}
+              record={businessUnit.toJS()}
               options={[
                 {
                   name: 'Vertical',
@@ -306,12 +295,12 @@ class BusinessUnitRow extends React.Component {
             }}
           >
             <BusinessUnitActionMenu
-              name={businessUnit.name}
+              name={businessUnit.get('name')}
               handleClone={() => this.cloneBusinessUnit(businessUnit)}
               handleRemove={() => this.removeBusinessUnit(businessUnit)}
               handleRename={() => {
-                this.setEditingBusinessUnitName(businessUnit.name)
-                this.setEditingBusinessUnitId(businessUnit.id)
+                this.setEditingBusinessUnitName(businessUnit.get('name'))
+                this.setEditingBusinessUnitId(businessUnit.get('id'))
               }}
             />
           </div>

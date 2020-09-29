@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { observable, runInAction, action } from 'mobx'
 import { observer } from 'mobx-react'
+import { v4 as uuidv4 } from 'uuid'
 import {
   businessUnitsStore,
   industrySubcategoriesStore,
@@ -24,7 +25,7 @@ const StyledIconWrapper = styled.span`
 @observer
 class TeamsTab extends React.Component {
   @observable
-  isLoading = null
+  isLoading = true
   @observable
   isError = null
   @observable
@@ -51,6 +52,7 @@ class TeamsTab extends React.Component {
       })
       this.setIsLoading(false)
     } catch (error) {
+      console.log('teams tab CDM error: ', error)
       this.setIsError(true)
     }
   }
@@ -135,11 +137,16 @@ class TeamsTab extends React.Component {
     const {
       isLoading,
       isError,
-      businessUnits,
+      // businessUnits,
       contentVersions,
       industrySubcategories,
       createBusinessUnit,
     } = this
+
+    if (businessUnitsStore.at(0)) {
+      console.log('teamstab: ', businessUnitsStore.toJS())
+      console.log('teamstab: ', businessUnitsStore.models.length)
+    }
 
     return (
       <div>
@@ -172,16 +179,23 @@ class TeamsTab extends React.Component {
             </div>
             {/* Table Headers */}
             <BusinessUnitRowHeadings createBusinessUnit={createBusinessUnit} />
-            {businessUnits.map(businessUnit => (
-              <BusinessUnitRow
-                businessUnit={businessUnit}
-                contentVersions={contentVersions}
-                industrySubcategories={industrySubcategories}
-                // updateBusinessUnit={this.updateBusinessUnit}
-                // cloneBusinessUnit={this.cloneBusinessUnit}
-                // removeBusinessUnit={this.removeBusinessUnit}
-              />
-            ))}
+            {businessUnitsStore
+              .filter({
+                id: 1548,
+              })
+              .map(businessUnit => (
+                <BusinessUnitRow
+                  key={uuidv4()}
+                  businessUnit={businessUnit}
+                  contentVersions={contentVersions}
+                  industrySubcategories={industrySubcategories}
+                  businessUnitsStore={businessUnitsStore}
+                  // businessUnitDeploymentsStore={businessUnitDeploymentsStore}
+                  // updateBusinessUnit={this.updateBusinessUnit}
+                  // cloneBusinessUnit={this.cloneBusinessUnit}
+                  // removeBusinessUnit={this.removeBusinessUnit}
+                />
+              ))}
             <div>
               <AddTeamButton handleClick={createBusinessUnit} />
             </div>
