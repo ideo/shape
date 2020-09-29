@@ -32,6 +32,10 @@ const DragLayerWrapper = styled.div`
     padding: 0px;
     visibility: ${props => (props.droppingFiles ? 'visible' : 'hidden')};
   }
+
+  .fsp-drop-pane__text {
+    display: none;
+  }
 `
 @inject('apiStore', 'uiStore')
 @observer
