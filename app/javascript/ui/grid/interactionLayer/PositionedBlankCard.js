@@ -84,7 +84,7 @@ class PositionedBlankCard extends React.Component {
     }
 
     if (droppingFilesCount > 0) {
-      const { showDropzoneIcon } = this.props
+      const { fileDropProgress, showDropzoneIcon } = this.props
       return (
         <BlankCardContainer {...defaultProps}>
           <GridCardDropzone
@@ -92,6 +92,7 @@ class PositionedBlankCard extends React.Component {
             row={row}
             col={col}
             showDropzoneIcon={showDropzoneIcon}
+            fileDropProgress={fileDropProgress}
           />
         </BlankCardContainer>
       )
@@ -160,6 +161,7 @@ PositionedBlankCard.propTypes = {
   handleBlankCardClick: PropTypes.func,
   handleRemoveRowClick: PropTypes.func,
   handleInsertRowClick: PropTypes.func,
+  fileDropProgress: PropTypes.oneOfType([PropTypes.number, PropTypes.null]),
   blocked: PropTypes.bool,
   emptyRow: PropTypes.bool,
   replacingId: PropTypes.string,
@@ -170,6 +172,7 @@ PositionedBlankCard.defaultProps = {
   handleBlankCardClick: null,
   handleRemoveRowClick: null,
   handleInsertRowClick: null,
+  fileDropProgress: null,
   blocked: false,
   emptyRow: false,
   replacingId: null,

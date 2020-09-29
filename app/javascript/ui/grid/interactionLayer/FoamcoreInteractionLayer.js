@@ -32,6 +32,10 @@ const DragLayerWrapper = styled.div`
     padding: 0px;
     visibility: ${props => (props.droppingFiles ? 'visible' : 'hidden')};
   }
+
+  .fsp-drop-pane__text {
+    display: none;
+  }
 `
 @inject('apiStore', 'uiStore')
 @observer
@@ -49,6 +53,8 @@ class FoamcoreInteractionLayer extends React.Component {
   placeholderCards = []
   @observable
   creatingHotEdge = false
+  @observable
+  fileDropProgress = null
 
   componentDidMount() {
     this.createDropPane()
@@ -62,10 +68,14 @@ class FoamcoreInteractionLayer extends React.Component {
     const dropPaneOpts = {
       onDragLeave: this.handleDragLeave,
       onDrop: this.handleDrop,
-      onProgress: this.handleProgress,
+      onProgress: this.handleDropStart,
       onSuccess: this.handleSuccess,
     }
     FilestackUpload.makeDropPane(container, dropPaneOpts, uploadOpts)
+  }
+
+  handleDropStart = progress => {
+    runInAction(() => (this.fileDropProgress = progress))
   }
 
   handleDrop = async e => {
@@ -131,6 +141,7 @@ class FoamcoreInteractionLayer extends React.Component {
     })
 
     uiStore.setDroppingFilesCount(0)
+    runInAction(() => (this.fileDropProgress = null))
   }
 
   handleSuccess = async res => {
@@ -448,6 +459,7 @@ class FoamcoreInteractionLayer extends React.Component {
         handleBlankCardClick={this.onCreateBct}
         handleInsertRowClick={this.handleInsertRowClick}
         handleRemoveRowClick={this.handleRemoveRowClick}
+        fileDropProgress={this.fileDropProgress}
         onCloseHtc={this.onCloseHtc}
         zoomLevel={relativeZoomLevel}
         data-empty-space-click
