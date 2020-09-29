@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import color from 'color'
-import { isEqual, maxBy, minBy } from 'lodash'
+import { truncate, isEqual, maxBy, minBy } from 'lodash'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import moment from 'moment-mini'
 import styled from 'styled-components'
@@ -146,7 +146,8 @@ export const tierTooltipLabel = ({ tiers, datum, dataset }) => {
     isFinalTier = true
   }
 
-  return `${currentTier.name}\n${dataset.name}${
+  const truncatedName = truncate(dataset.name, { length: 32 })
+  return `${currentTier.name}\n${truncatedName}${
     isFinalTier
       ? ''
       : `\n${nextTier.value - datum.value}pts away from ${nextTier.name}`
