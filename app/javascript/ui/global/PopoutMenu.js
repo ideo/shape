@@ -57,11 +57,11 @@ export const StyledMenuButtonWrapper = styled.div`
     `
     background-color: ${v.colors.commonLightest};
     border-top: 1px solid ${v.colors.commonMedium};
+    bottom: 0;
     left: 0;
     height: auto;
     padding-top: 36px;
     position: fixed;
-    top: 0;
     width: 100vw;
     z-index: ${v.zIndex.aboveClickWrapper};
   `}
