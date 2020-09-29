@@ -2,10 +2,10 @@ import _ from 'lodash'
 import styled from 'styled-components'
 import v from '~/utils/variables'
 import PropTypes from 'prop-types'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import hexToRgba from '~/utils/hexToRgba'
 import propShapes from '~/utils/propShapes'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
 import GridCardEmptyHotspot from '~/ui/grid/interactionLayer/GridCardEmptyHotspot'
 
@@ -68,8 +68,8 @@ class PositionedBlankCard extends React.Component {
       uiStore,
       blocked,
       interactionType,
+      droppingFilesCount,
     } = this.props
-    const { droppingFilesCount } = uiStore
 
     const { xPos, yPos, height, width } = position
 
@@ -84,14 +84,17 @@ class PositionedBlankCard extends React.Component {
     }
 
     if (droppingFilesCount > 0) {
-      const { showDropzoneIcon } = this.props
+      const { exactDropSpot, didDrop } = this.props
+
       return (
         <BlankCardContainer {...defaultProps}>
           <GridCardDropzone
             collection={collection}
             row={row}
             col={col}
-            showDropzoneIcon={showDropzoneIcon}
+            exactDropSpot={exactDropSpot}
+            didDrop={didDrop}
+            droppingFilesCount={droppingFilesCount}
           />
         </BlankCardContainer>
       )
@@ -163,7 +166,7 @@ PositionedBlankCard.propTypes = {
   blocked: PropTypes.bool,
   emptyRow: PropTypes.bool,
   replacingId: PropTypes.string,
-  showDropzoneIcon: PropTypes.bool,
+  exactDropSpot: PropTypes.bool,
 }
 
 PositionedBlankCard.defaultProps = {
@@ -173,7 +176,9 @@ PositionedBlankCard.defaultProps = {
   blocked: false,
   emptyRow: false,
   replacingId: null,
-  showDropzoneIcon: false,
+  exactDropSpot: false,
+  droppingFilesCount: 0,
+  didDrop: false,
 }
 
 PositionedBlankCard.displayName = 'PositionedBlankCard'

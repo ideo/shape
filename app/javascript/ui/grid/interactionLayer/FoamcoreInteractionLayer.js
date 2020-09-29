@@ -32,6 +32,10 @@ const DragLayerWrapper = styled.div`
     padding: 0px;
     visibility: ${props => (props.droppingFiles ? 'visible' : 'hidden')};
   }
+
+  .fsp-drop-pane__text {
+    display: none;
+  }
 `
 @inject('apiStore', 'uiStore')
 @observer
@@ -47,6 +51,8 @@ class FoamcoreInteractionLayer extends React.Component {
   touchClickEv = null
   @observable
   placeholderCards = []
+  @observable
+  didDrop = false
 
   componentDidMount() {
     this.createDropPane()
@@ -73,6 +79,8 @@ class FoamcoreInteractionLayer extends React.Component {
     const { row, col } = this.hoveringRowCol
     const { collection, apiStore, uiStore } = this.props
     const filesThatFit = _.filter(files, f => f.size < MAX_SIZE)
+
+    this.setDidDrop(true)
 
     if (filesThatFit.length < files.length) {
       uiStore.setDroppingFilesCount(0)
@@ -113,6 +121,8 @@ class FoamcoreInteractionLayer extends React.Component {
       const newPlaceholderCards = await apiStore.createPlaceholderCards({
         data,
       })
+
+      this.setDidDrop(false)
       placeholderCards = placeholderCards.concat(newPlaceholderCards)
     }
 
@@ -136,6 +146,11 @@ class FoamcoreInteractionLayer extends React.Component {
       const files = await FilestackUpload.processFiles(res)
       this.createCardsForFiles(files)
     }
+  }
+
+  @action
+  setDidDrop = didDrop => {
+    this.didDrop = didDrop
   }
 
   createCardsForFiles = files => {
@@ -367,7 +382,7 @@ class FoamcoreInteractionLayer extends React.Component {
   positionBlank = (
     { row, col, width, height },
     interactionType = 'drag',
-    showDropzoneIcon = false
+    exactDropSpot = false
   ) => {
     let emptyRow = false
     if (interactionType === 'hover') {
@@ -383,7 +398,7 @@ class FoamcoreInteractionLayer extends React.Component {
     return this.renderBlankCard(
       { row, col, width, height, emptyRow },
       interactionType,
-      showDropzoneIcon
+      exactDropSpot
     )
   }
 
@@ -400,7 +415,7 @@ class FoamcoreInteractionLayer extends React.Component {
   renderBlankCard = (
     { row, col, width, height, emptyRow = false },
     interactionType,
-    showDropzoneIcon
+    exactDropSpot
   ) => {
     const {
       uiStore,
@@ -411,6 +426,7 @@ class FoamcoreInteractionLayer extends React.Component {
     const position = uiStore.positionForCoordinates({ col, row, width, height })
     const {
       blankContentToolState: { replacingId },
+      droppingFilesCount,
     } = uiStore
 
     // could be drag or drag-overflow
@@ -421,7 +437,9 @@ class FoamcoreInteractionLayer extends React.Component {
         collection={collection}
         position={position}
         interactionType={interactionType}
-        showDropzoneIcon={showDropzoneIcon}
+        exactDropSpot={exactDropSpot}
+        droppingFilesCount={droppingFilesCount}
+        didDrop={this.didDrop}
         key={`blank-${interactionType}-${row}:${col}`}
         row={row}
         col={col}
@@ -571,7 +589,7 @@ class FoamcoreInteractionLayer extends React.Component {
       const openSpot = this.calculateOpenSpot(takenSpots)
 
       if (openSpot) {
-        const showDropzoneIcon = openSpot.row === row && openSpot.col === col
+        const exactDropSpot = openSpot.row === row && openSpot.col === col
         const position = {
           row: openSpot.row,
           col: openSpot.col,
@@ -579,7 +597,7 @@ class FoamcoreInteractionLayer extends React.Component {
           height: 1,
         }
         positions.push(position)
-        blankCards.push(this.positionBlank(position, 'hover', showDropzoneIcon))
+        blankCards.push(this.positionBlank(position, 'hover', exactDropSpot))
         takenSpots.push(position)
       }
     }

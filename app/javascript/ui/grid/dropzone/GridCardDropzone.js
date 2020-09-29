@@ -1,4 +1,4 @@
-import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
@@ -17,6 +17,12 @@ const StyledIconAndHeadingHolder = styled(IconHolder)`
   pointer-events: none;
 `
 
+const StyledDisplayText = styled(DisplayText)`
+  position: absolute;
+  top: 50%;
+  left: 25%;
+`
+
 const StyledGridCardDropzone = styled.div`
   width: 100%;
   height: 100%;
@@ -24,7 +30,6 @@ const StyledGridCardDropzone = styled.div`
 `
 StyledGridCardDropzone.displayName = 'GridCardDropzone'
 
-@inject('uiStore', 'apiStore')
 @observer
 class GridCardDropzone extends React.Component {
   constructor(props) {
@@ -32,37 +37,46 @@ class GridCardDropzone extends React.Component {
   }
 
   render() {
-    const { showDropzoneIcon } = this.props
+    const { exactDropSpot, didDrop, droppingFilesCount } = this.props
+
+    const dropzoneText = didDrop
+      ? `Uploading 0 of ${droppingFilesCount} files`
+      : 'Drag & Drop'
+
+    let inner = null
+
+    if (didDrop && exactDropSpot) {
+      inner = (
+        <StyledDisplayText fontSize={'.75em'} textTransform="uppercase">
+          {dropzoneText}
+        </StyledDisplayText>
+      )
+    } else if (exactDropSpot) {
+      inner = (
+        <StyledIconAndHeadingHolder display={'inline-block'}>
+          <CloudIcon />
+          <DisplayText fontSize={'.75em'} textTransform="uppercase">
+            {dropzoneText}
+          </DisplayText>
+        </StyledIconAndHeadingHolder>
+      )
+    }
 
     return (
-      <StyledGridCardDropzone
-        className={'gridCardDropzone'}
-        onDragOver={this.handleDragOver}
-        onDragLeave={this.resetUpload}
-      >
-        {showDropzoneIcon && (
-          <StyledIconAndHeadingHolder display={'inline-block'}>
-            <CloudIcon />
-            <DisplayText fontSize={'.75em'} textTransform="uppercase">
-              Drag & Drop
-            </DisplayText>
-          </StyledIconAndHeadingHolder>
-        )}
+      <StyledGridCardDropzone className={'gridCardDropzone'}>
+        {inner}
       </StyledGridCardDropzone>
     )
   }
-}
-
-GridCardDropzone.wrappedComponent.propTypes = {
-  uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 GridCardDropzone.propTypes = {
   collection: MobxPropTypes.objectOrObservableObject.isRequired,
   row: PropTypes.number.isRequired,
   col: PropTypes.number.isRequired,
-  showDropzoneIcon: PropTypes.bool.isRequired,
+  exactDropSpot: PropTypes.bool.isRequired,
+  didDrop: PropTypes.bool.isRequired,
+  droppingFilesCount: PropTypes.number.isRequired,
 }
 
 GridCardDropzone.displayName = 'GridCardDropzone'
