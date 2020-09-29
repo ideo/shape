@@ -64,7 +64,7 @@ const CloseButton = styled.button`
   position: absolute;
   top: 12px;
   width: 12px;
-  z-index: ${v.zIndex.gridCardTop};
+  z-index: ${v.zIndex.gridCard};
 `
 
 const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'

@@ -71,7 +71,7 @@ const More = styled.button`
   right: 6px;
   position: absolute;
   width: ${props => 28 * props.zoomLevel}px;
-  z-index: ${v.zIndex.gridCard};
+  z-index: ${props => (props.currentMenuOpen ? v.zIndex.gridCardTop : 1)};
 
   ${props =>
     props.zoomLevel > 1 &&
@@ -210,6 +210,7 @@ class HotCellQuadrant extends React.Component {
           <More
             onClick={this.handleMore}
             zoomLevel={zoomLevel}
+            currentMenuOpen={currentMenuOpen}
             data-cy={`HotCellQuadrant-${name}-more`}
           >
             {!uiStore.isTouchDevice && <DropdownIcon />}
@@ -217,7 +218,7 @@ class HotCellQuadrant extends React.Component {
               style={{
                 position: 'relative',
                 transform: `translateZ(0) scale(${zoomLevel})`,
-                zIndex: 9000,
+                zIndex: v.zIndex.gridCardTop + 1,
               }}
             >
               <PopoutMenu
