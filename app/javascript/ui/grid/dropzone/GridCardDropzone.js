@@ -1,4 +1,4 @@
-import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { observer } from 'mobx-react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
@@ -22,6 +22,8 @@ const StyledDisplayText = styled(DisplayText)`
   top: 50%;
   left: 25%;
 `
+
+StyledDisplayText.displayName = 'StyledUploadingText'
 
 const StyledGridCardDropzone = styled.div`
   width: 100%;
@@ -71,9 +73,6 @@ class GridCardDropzone extends React.Component {
 }
 
 GridCardDropzone.propTypes = {
-  collection: MobxPropTypes.objectOrObservableObject.isRequired,
-  row: PropTypes.number.isRequired,
-  col: PropTypes.number.isRequired,
   exactDropSpot: PropTypes.bool.isRequired,
   didDrop: PropTypes.bool.isRequired,
   droppingFilesCount: PropTypes.number.isRequired,

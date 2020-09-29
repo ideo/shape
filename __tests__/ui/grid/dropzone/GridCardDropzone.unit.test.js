@@ -1,32 +1,50 @@
 import GridCardDropzone from '~/ui/grid/dropzone/GridCardDropzone'
-import fakeUiStore from '#/mocks/fakeUiStore'
-import { fakeCollection } from '#/mocks/data'
 
 let wrapper, props, rerender
 describe('GridCardDropzone', () => {
   beforeEach(() => {
     props = {
-      uiStore: fakeUiStore,
-      collection: fakeCollection,
+      exactDropSpot: false,
+      didDrop: false,
+      droppingFilesCount: 0,
     }
 
     rerender = props => {
-      wrapper = shallow(<GridCardDropzone.wrappedComponent {...props} />)
+      wrapper = shallow(<GridCardDropzone {...props} />)
     }
+    rerender(props)
   })
 
   it('should render GridCardDropzone', () => {
-    rerender(props)
     expect(wrapper.find('GridCardDropzone').exists()).toBe(true)
   })
 
-  describe('with showDropzoneIcon = true', () => {
+  describe('dropped file to the dropzone', () => {
     beforeEach(() => {
-      props.showDropzoneIcon = true
+      props.exactDropSpot = true
+      props.didDrop = true
+      props.droppingFilesCount = 2
       rerender(props)
     })
-    it('should render CloudIcon', () => {
+    it('should display uploading text', () => {
+      expect(wrapper.find('CloudIcon').exists()).toBe(false)
+      expect(wrapper.find('StyledUploadingText').text()).toContain(
+        `Uploading 0 of ${props.droppingFilesCount} files`
+      )
+    })
+  })
+
+  describe('hovering over the dropzone', () => {
+    beforeEach(() => {
+      props.exactDropSpot = true
+      props.didDrop = false
+      props.droppingFilesCount = 0
+      rerender(props)
+    })
+
+    it('should display uploading text', () => {
       expect(wrapper.find('CloudIcon').exists()).toBe(true)
+      expect(wrapper.find('StyledDisplayText').text()).toContain('Drag & Drop')
     })
   })
 })
