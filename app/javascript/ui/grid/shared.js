@@ -350,7 +350,7 @@ export class GridCardIconWithName extends React.PureComponent {
     return (
       <Container>
         <IconHolder>{icon}</IconHolder>
-        <Truncator text={text} key={text} extraSpacing={80} />
+        {text && <Truncator text={text} key={text} extraSpacing={80} />}
       </Container>
     )
   }
