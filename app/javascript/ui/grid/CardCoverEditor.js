@@ -441,6 +441,8 @@ class CardCoverEditor extends React.Component {
         onSuccess: file => this.createCard(file, 'background'),
       })
     }
+    // The cover effects should be off by defaulting when selecting cover image
+    await card.API_updateCardFilter('nothing')
     collection.refetch()
   }
 
