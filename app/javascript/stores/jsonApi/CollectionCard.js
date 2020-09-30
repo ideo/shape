@@ -50,6 +50,8 @@ class CollectionCard extends BaseRecord {
   maxWidth = this.width || 1
   @observable
   maxHeight = this.height || 1
+  @observable
+  currentlyReplacing = false
 
   constructor(...args) {
     super(...args)
@@ -166,6 +168,7 @@ class CollectionCard extends BaseRecord {
     }
   }
 
+  @action
   beginReplacing() {
     this.uiStore.openBlankContentTool({
       order: this.order,
@@ -175,6 +178,12 @@ class CollectionCard extends BaseRecord {
       height: this.height,
       replacingId: this.id,
     })
+    this.currentlyReplacing = true
+  }
+
+  @action
+  stopReplacing() {
+    this.currentlyReplacing = false
   }
 
   async API_create() {
@@ -383,6 +392,7 @@ class CollectionCard extends BaseRecord {
         uiStore.cardAction === 'move' &&
         this.isBeingMultiDragged) ||
       this.isBeingMoved ||
+      this.currentlyReplacing ||
       this.hidden
     )
   }
