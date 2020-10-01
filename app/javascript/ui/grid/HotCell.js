@@ -17,9 +17,8 @@ const Container = styled.div`
   width: 100%;
 
   ${props =>
-    props.isMobileXs ||
-    (props.isTouchDevice &&
-      `
+    (props.isMobileXs || props.isTouchDevice) &&
+    `
     bottom: 0;
     height: 209px;
     left: 0;
@@ -34,7 +33,7 @@ const Container = styled.div`
       height: calc(50% - 1px) !important;
       width: calc(33.33%) !important;
     }
-  `)}
+  `}
 
   ${props =>
     props.smallCardWidth &&
@@ -260,12 +259,11 @@ class HotCell extends React.Component {
           isTouchDevice={uiStore.isTouchDevice}
           smallCardWidth={this.isSmallCard}
         >
-          {uiStore.isMobileXs ||
-            (uiStore.isTouchDevice && (
-              <CloseButton onClick={this.handleClose}>
-                <CloseIcon />
-              </CloseButton>
-            ))}
+          {(uiStore.isMobileXs || uiStore.isTouchDevice) && (
+            <CloseButton onClick={this.handleClose}>
+              <CloseIcon />
+            </CloseButton>
+          )}
           {primaryTypes.map(({ name, description, subTypes }, idx) => (
             <HotCellQuadrant
               name={name}
