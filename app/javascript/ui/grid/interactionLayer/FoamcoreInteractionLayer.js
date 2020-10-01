@@ -741,8 +741,11 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { resizing, uiStore } = this.props
 
+    if (resizing) {
+      return this.renderInnerDragLayer
+    }
     return (
       <DragLayerWrapper
         id={FOAMCORE_INTERACTION_LAYER}
