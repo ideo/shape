@@ -563,7 +563,7 @@ class MovableGridCard extends React.Component {
       dragging || resizing || currentlyZooming ? 'none' : cardCSSTransition
     // TODO this should actually check it's a breadcrumb
     const draggedOverBreadcrumb = !!activeDragTarget
-    if (dragging || this.state.allowTouchDeviceDragging) {
+    if (dragging && this.state.allowTouchDeviceDragging) {
       transform += ` translate(${xAdjust}px, ${yAdjust}px) rotate(${cardTiltDegrees}deg)`
       if (draggedOverBreadcrumb) {
         transform += ' scaleX(0.75) scaleY(0.75) translate(0px, 180px)'

@@ -247,6 +247,7 @@ class GridCardBlank extends React.Component {
       ? FilestackUpload.pickImages
       : FilestackUpload.pickImage
     filestackMethod({
+      onClose: () => setTimeout(() => this.closeBlankContentTool(), 150),
       onSuccess: fileData => {
         const files = _.isArray(fileData) ? fileData : [fileData]
         _.each(files, (file, idx) => {
@@ -346,7 +347,13 @@ class GridCardBlank extends React.Component {
   }
 
   closeBlankContentTool = () => {
-    const { testCollectionCard, preselected, uiStore } = this.props
+    const { apiStore, testCollectionCard, preselected, uiStore } = this.props
+    if (!!this.replacingId) {
+      const card = apiStore.find('collection_cards', this.replacingId)
+      if (card) {
+        card.stopReplacing()
+      }
+    }
     if (
       testCollectionCard ||
       (uiStore.blankContentToolState.emptyCollection && !preselected)

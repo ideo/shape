@@ -17,7 +17,7 @@ const Container = styled.div`
   width: 100%;
 
   ${props =>
-    props.isMobileXs &&
+    (props.isMobileXs || props.isTouchDevice) &&
     `
     bottom: 0;
     height: 209px;
@@ -38,6 +38,7 @@ const Container = styled.div`
   ${props =>
     props.smallCardWidth &&
     !props.isMobileXs &&
+    !props.isTouchDevice &&
     `
     ${Quadrant} {
       height: 100% !important;
@@ -64,7 +65,7 @@ const CloseButton = styled.button`
   position: absolute;
   top: 12px;
   width: 12px;
-  z-index: ${v.zIndex.gridCardTop};
+  z-index: ${v.zIndex.gridCard};
 `
 
 const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
@@ -76,6 +77,8 @@ const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 class HotCell extends React.Component {
   @observable
   animated = false
+  @observable
+  moreMenuOpen = null
 
   componentDidMount() {
     setTimeout(() => runInAction(() => (this.animated = true)), SLIDE_MS)
@@ -110,6 +113,16 @@ class HotCell extends React.Component {
         localStorage.setItem(HOT_CELL_DEFAULT_EITHER_TYPE, type)
       }
     })
+  }
+
+  onMoreMenuOpen = menuKey => {
+    runInAction(() => (this.moreMenuOpen = menuKey))
+  }
+
+  onMoreMenuClose = menuKey => {
+    if (this.moreMenuOpen === menuKey) {
+      runInAction(() => (this.moreMenuOpen = null))
+    }
   }
 
   get isSmallCard() {
@@ -216,7 +229,7 @@ class HotCell extends React.Component {
         { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
       ]
     }
-    if (uiStore.isMobileXs) {
+    if (uiStore.isTouchDevice) {
       primaryTypes = [
         { name: 'text', description: 'Add Text' },
         { name: 'file', description: 'Add File' },
@@ -230,11 +243,12 @@ class HotCell extends React.Component {
         },
       ]
     }
-    const PositionWrapper = uiStore.isMobileXs
-      ? CornerPositioned
-      : styled.div`
-          height: 100%;
-        `
+    const PositionWrapper =
+      uiStore.isMobileXs || uiStore.isTouchDevice
+        ? CornerPositioned
+        : styled.div`
+            height: 100%;
+          `
 
     return (
       <PositionWrapper>
@@ -243,9 +257,10 @@ class HotCell extends React.Component {
           className="HotCellContainer"
           animated={this.animated}
           isMobileXs={uiStore.isMobileXs}
+          isTouchDevice={uiStore.isTouchDevice}
           smallCardWidth={this.isSmallCard}
         >
-          {uiStore.isMobileXs && (
+          {(uiStore.isMobileXs || uiStore.isTouchDevice) && (
             <CloseButton onClick={this.handleClose}>
               <CloseIcon />
             </CloseButton>
@@ -257,8 +272,11 @@ class HotCell extends React.Component {
               description={description}
               subTypes={subTypes}
               onCreateContent={this.onCreateContent}
+              onMoreMenuOpen={() => this.onMoreMenuOpen(idx)}
+              onMoreMenuClose={() => this.onMoreMenuClose(idx)}
+              currentMenuOpen={this.moreMenuOpen === idx}
               zoomLevel={zoomLevel}
-              displayName={uiStore.isMobileXs}
+              displayName={uiStore.isTouchDevice}
             />
           ))}
         </Container>

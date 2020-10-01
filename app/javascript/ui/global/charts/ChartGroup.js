@@ -111,7 +111,8 @@ class ChartGroup extends React.Component {
     })
     // If there's one single value, and the secondary datasets are only
     // the percentitles (with no dates), then spread the domain out.
-    if (allValues.length === 1 && this.hasPercentileComparison) {
+    const uniqDates = _.uniqBy(_.map(allValues, 'date'), _.isEqual)
+    if (allValues.length === 1 || uniqDates.length === 1) {
       domain.x = domainXForSingleValue(allValues[0].date)
     }
     return domain
@@ -290,15 +291,6 @@ class ChartGroup extends React.Component {
   get chartAxis() {
     const { axisProps } = this
     if (this.isSmallChartStyle) {
-      // const overlappingIndexes = []
-      // this.axisFilteredDateValues.forEach((l, i) => {
-      //   if (l.overlapping) overlappingIndexes.push(i)
-      // })
-      // const previousTickFormat = axisProps.tickFormat
-      // axisProps.tickFormat = (label, index) => {
-      //   // if (overlappingIndexes.includes(index)) return '|'
-      //   return previousTickFormat(label, index)
-      // }
       const filteredLabels = _.sortBy(this.axisFilteredDateValues, 'x')
       if (filteredLabels.length > 2) {
         // cut off the earliest label
@@ -357,6 +349,7 @@ class ChartGroup extends React.Component {
           cardArea: width * height,
           dashWidth,
           domain: this.chartDomain,
+          isSmallChartStyle: this.isSmallChartStyle,
         })
       case DATASET_CHART_TYPES.BAR:
         return BarChart({

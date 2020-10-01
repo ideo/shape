@@ -17,6 +17,12 @@ import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
   position: ${props => (props.hideDotMenu ? 'absolute' : 'relative')};
+  ${props =>
+    !props.menuOpen &&
+    props.hideDotMenu &&
+    `
+    display: none;
+  `}
   .menu-wrapper {
     display: none;
     opacity: 0;
@@ -55,11 +61,13 @@ export const StyledMenuButtonWrapper = styled.div`
   ${props =>
     props.theme.isMobileFullScreen &&
     `
+    background-color: ${v.colors.commonLightest};
     border-top: 1px solid ${v.colors.commonMedium};
+    bottom: 0;
     left: 0;
     height: auto;
+    padding-top: 36px;
     position: fixed;
-    top: 0;
     width: 100vw;
     z-index: ${v.zIndex.aboveClickWrapper};
   `}
@@ -68,11 +76,28 @@ export const StyledMenuButtonWrapper = styled.div`
 const CloseButton = styled.button`
   cursor: pointer;
   display: block;
-  right: 14px;
+  left: 14px;
   position: absolute;
   top: 12px;
   width: 12px;
   z-index: ${v.zIndex.gridCardTop};
+`
+
+const MobileHeaderBar = styled.div`
+  align-items: center;
+  background-color: ${v.colors.white};
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  text-align: center;
+  top: 0px;
+  width: 100%;
+
+  ${Heading3} {
+    margin-bottom: 0;
+  }
 `
 
 export const StyledMenuWrapper = styled.div`
@@ -145,7 +170,8 @@ export const StyledMenuWrapper = styled.div`
 StyledMenuWrapper.displayName = 'StyledMenuWrapper'
 
 export const StyledMenu = styled.ul`
-  background-color: white;
+  background-color: ${props =>
+    props.theme.isMobileFullScreen ? v.colors.commonLightest : 'white'};
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.36);
   overflow-y: auto;
   overflow-x: hidden;
@@ -329,11 +355,18 @@ StyledMenuItem.defaultProps = {
 
 const TieredMenuHeading = styled(Heading3)`
   ${props =>
-    props.theme.isMobileFullScreen &&
-    `
+    props.theme.isMobileFullScreen
+      ? `
     border-bottom: 2px solid ${v.colors.black};
+    font-weight: ${v.weights.medium};
     margin-left: 7px;
     padding-bottom: 8px;
+    text-transform: uppercase;
+  `
+      : `
+    font-size: 1rem;
+    font-weight: ${v.weights.book};
+    text-transform: none;
   `}
 
   .icon {
@@ -441,7 +474,7 @@ class PopoutMenu extends React.Component {
       >
         {subItems ? (
           <Fragment>
-            <TieredMenuHeading noSpacing>
+            <TieredMenuHeading upperCased={this.isMobileFullScreen} noSpacing>
               {item.name}{' '}
               {!this.isMobileFullScreen && <ArrowIcon rotation={0} />}
             </TieredMenuHeading>
@@ -551,6 +584,7 @@ class PopoutMenu extends React.Component {
       onMouseLeave,
       position,
       positionRelative,
+      title,
       width,
       wrapperClassName,
     } = this.props
@@ -571,6 +605,7 @@ class PopoutMenu extends React.Component {
         >
           <StyledMenuButtonWrapper
             className={`${wrapperClassName} ${menuOpen && ' open'}`}
+            menuOpen={menuOpen}
             role="presentation"
             onMouseLeave={onMouseLeave}
             hideDotMenu={hideDotMenu}
@@ -578,9 +613,12 @@ class PopoutMenu extends React.Component {
             multiTiered={this.isMultiTieredMenu}
           >
             {isMobileFullScreen && menuOpen && (
-              <CloseButton onClick={onClose}>
-                <CloseIcon />
-              </CloseButton>
+              <MobileHeaderBar>
+                <CloseButton onClick={onClose}>
+                  <CloseIcon />
+                </CloseButton>
+                <Heading3>{title}</Heading3>
+              </MobileHeaderBar>
             )}
             {!hideDotMenu && (
               <MenuToggle
@@ -672,6 +710,8 @@ PopoutMenu.propTypes = {
     y: PropTypes.number,
   }),
   positionRelative: PropTypes.bool,
+  /** A title for the popout, will only display on the mobile fullscreen UI */
+  title: PropTypes.string,
   width: PropTypes.number,
   /** If the value is 'card-menu' it applies extra right margin. If the value
    * is 'add-audience-menu' it will apply special positioning to the right
@@ -699,6 +739,7 @@ PopoutMenu.defaultProps = {
   position: null,
   offsetPosition: null,
   positionRelative: true,
+  title: null,
   width: 200,
   wrapperClassName: 'card-menu',
   wrapText: false,

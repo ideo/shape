@@ -7,6 +7,7 @@ import CollectionIcon from '~/ui/icons/CollectionIcon'
 import Tooltip from '~/ui/global/Tooltip'
 import { capitalize } from 'lodash'
 import { Fragment } from 'react'
+import v from '~/utils/variables'
 
 @observer
 class CollectionTypeSelector extends React.Component {
@@ -106,7 +107,7 @@ class CollectionTypeSelector extends React.Component {
             {children}
           </Tooltip>
         </button>
-        <div style={{ position }}>
+        <div style={{ position, zIndex: v.zIndex.gridCardTop + 1 }}>
           <PopoutMenu
             offsetPosition={positionOffset}
             // y = top, x = left

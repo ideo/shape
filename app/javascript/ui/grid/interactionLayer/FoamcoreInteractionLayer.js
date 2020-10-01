@@ -52,6 +52,8 @@ class FoamcoreInteractionLayer extends React.Component {
   @observable
   placeholderCards = []
   @observable
+  creatingHotEdge = false
+  @observable
   fileDropProgress = null
 
   componentDidMount() {
@@ -299,6 +301,16 @@ class FoamcoreInteractionLayer extends React.Component {
   onCreateBct = async ({ row, col, hotcell = false }, contentType) => {
     const { apiStore, uiStore, collection } = this.props
 
+    // If we're already in the process of creating a hot edge and placeholder
+    // don't create another one.
+    if (hotcell && this.creatingHotEdge) return
+
+    // If opening one from a hot edge make sure to not allow opening them again
+    // until again.
+    if (hotcell) {
+      runInAction(() => (this.creatingHotEdge = true))
+    }
+
     // BCT is already open as a hotcell, just modify it. But don't do this
     // if you're opening a new hotcell.
     if (uiStore.blankContentToolState.blankType === 'hotcell' && !hotcell) {
@@ -337,6 +349,7 @@ class FoamcoreInteractionLayer extends React.Component {
       )
       await placeholder.API_createBct()
       uiStore.setBctPlaceholderCard(placeholder)
+      runInAction(() => (this.creatingHotEdge = false))
     }
   }
 
@@ -728,8 +741,11 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { resizing, uiStore } = this.props
 
+    if (resizing) {
+      return this.renderInnerDragLayer
+    }
     return (
       <DragLayerWrapper
         id={FOAMCORE_INTERACTION_LAYER}

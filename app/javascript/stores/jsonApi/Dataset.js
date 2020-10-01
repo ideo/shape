@@ -30,6 +30,10 @@ class Dataset extends SharedRecordMixin(BaseRecord) {
   get dataWithDates() {
     if (!this.data) return []
     const today = new Date()
+    today.setHours(0)
+    today.setMinutes(0)
+    today.setSeconds(0)
+    today.setMilliseconds(0)
 
     return this.data.map(datum => {
       const d = { ...datum }
