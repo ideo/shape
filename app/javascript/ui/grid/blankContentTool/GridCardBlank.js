@@ -247,7 +247,7 @@ class GridCardBlank extends React.Component {
       ? FilestackUpload.pickImages
       : FilestackUpload.pickImage
     filestackMethod({
-      onClose: () => this.closeBlankContentTool(),
+      onClose: () => setTimeout(() => this.closeBlankContentTool(), 150),
       onSuccess: fileData => {
         const files = _.isArray(fileData) ? fileData : [fileData]
         _.each(files, (file, idx) => {
