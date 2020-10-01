@@ -19,9 +19,8 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 const DragLayerWrapper = styled.div`
   height: 100%;
-  position: relative;
   width: 100%;
-  z-index: 0;
+  z-index: ${v.zIndex.gridCardTop};
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
