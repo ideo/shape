@@ -19,8 +19,9 @@ import googleTagManager from '~/vendor/googleTagManager'
 
 const DragLayerWrapper = styled.div`
   height: 100%;
+  position: relative;
   width: 100%;
-  z-index: ${v.zIndex.gridCardTop};
+  z-index: 0;
 
   /* Override Filestack styling */
   .fsp-drop-pane__container {
@@ -728,8 +729,11 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   render() {
-    const { uiStore } = this.props
+    const { resizing, uiStore } = this.props
 
+    if (resizing) {
+      return this.renderInnerDragLayer
+    }
     return (
       <DragLayerWrapper
         id={FOAMCORE_INTERACTION_LAYER}
