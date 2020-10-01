@@ -64,7 +64,7 @@ const CloseButton = styled.button`
   position: absolute;
   top: 12px;
   width: 12px;
-  z-index: ${v.zIndex.gridCardTop};
+  z-index: ${v.zIndex.gridCard};
 `
 
 const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
@@ -76,6 +76,8 @@ const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 class HotCell extends React.Component {
   @observable
   animated = false
+  @observable
+  moreMenuOpen = null
 
   componentDidMount() {
     setTimeout(() => runInAction(() => (this.animated = true)), SLIDE_MS)
@@ -110,6 +112,16 @@ class HotCell extends React.Component {
         localStorage.setItem(HOT_CELL_DEFAULT_EITHER_TYPE, type)
       }
     })
+  }
+
+  onMoreMenuOpen = menuKey => {
+    runInAction(() => (this.moreMenuOpen = menuKey))
+  }
+
+  onMoreMenuClose = menuKey => {
+    if (this.moreMenuOpen === menuKey) {
+      runInAction(() => (this.moreMenuOpen = null))
+    }
   }
 
   get isSmallCard() {
@@ -257,6 +269,9 @@ class HotCell extends React.Component {
               description={description}
               subTypes={subTypes}
               onCreateContent={this.onCreateContent}
+              onMoreMenuOpen={() => this.onMoreMenuOpen(idx)}
+              onMoreMenuClose={() => this.onMoreMenuClose(idx)}
+              currentMenuOpen={this.moreMenuOpen === idx}
               zoomLevel={zoomLevel}
               displayName={uiStore.isMobileXs}
             />

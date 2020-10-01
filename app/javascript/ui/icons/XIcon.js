@@ -1,15 +1,16 @@
 import Icon from './Icon'
 
-const MoreIcon = () => (
+const XIcon = () => (
   <Icon fill>
-    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44">
-      <g>
-        <circle cx="9.8" cy="22" r="3.5" />
-        <circle cx="22" cy="22" r="3.5" />
-        <circle cx="34.2" cy="22" r="3.5" />
-      </g>
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15">
+      <g id="Layer_2_1_" />
+      <path
+        d="M8.2,7.5l4.6-4.6c0.2-0.2,0.2-0.5,0-0.7S12.2,2,12,2.2L7.4,6.8L2.8,2.2C2.7,2,2.3,2,2.1,2.2s-0.2,0.5,0,0.7l4.6,4.6
+	l-4.6,4.6c-0.2,0.2-0.2,0.5,0,0.7c0.1,0.1,0.2,0.1,0.4,0.1s0.3,0,0.4-0.1l4.6-4.6l4.6,4.6c0.1,0.1,0.2,0.1,0.4,0.1s0.3,0,0.4-0.1
+	c0.2-0.2,0.2-0.5,0-0.7L8.2,7.5z"
+      />
     </svg>
   </Icon>
 )
 
-export default MoreIcon
+export default XIcon
