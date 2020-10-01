@@ -17,6 +17,12 @@ import v from '~/utils/variables'
 
 export const StyledMenuButtonWrapper = styled.div`
   position: ${props => (props.hideDotMenu ? 'absolute' : 'relative')};
+  ${props =>
+    !props.menuOpen &&
+    props.hideDotMenu &&
+    `
+    display: none;
+  `}
   .menu-wrapper {
     display: none;
     opacity: 0;
@@ -599,6 +605,7 @@ class PopoutMenu extends React.Component {
         >
           <StyledMenuButtonWrapper
             className={`${wrapperClassName} ${menuOpen && ' open'}`}
+            menuOpen={menuOpen}
             role="presentation"
             onMouseLeave={onMouseLeave}
             hideDotMenu={hideDotMenu}

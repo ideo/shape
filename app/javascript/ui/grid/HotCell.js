@@ -17,8 +17,9 @@ const Container = styled.div`
   width: 100%;
 
   ${props =>
-    props.isMobileXs &&
-    `
+    props.isMobileXs ||
+    (props.isTouchDevice &&
+      `
     bottom: 0;
     height: 209px;
     left: 0;
@@ -33,7 +34,7 @@ const Container = styled.div`
       height: calc(50% - 1px) !important;
       width: calc(33.33%) !important;
     }
-  `}
+  `)}
 
   ${props =>
     props.smallCardWidth &&
@@ -228,7 +229,7 @@ class HotCell extends React.Component {
         { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
       ]
     }
-    if (uiStore.isMobileXs) {
+    if (uiStore.isTouchDevice) {
       primaryTypes = [
         { name: 'text', description: 'Add Text' },
         { name: 'file', description: 'Add File' },
@@ -242,11 +243,12 @@ class HotCell extends React.Component {
         },
       ]
     }
-    const PositionWrapper = uiStore.isMobileXs
-      ? CornerPositioned
-      : styled.div`
-          height: 100%;
-        `
+    const PositionWrapper =
+      uiStore.isMobileXs || uiStore.isTouchDevice
+        ? CornerPositioned
+        : styled.div`
+            height: 100%;
+          `
 
     return (
       <PositionWrapper>
@@ -255,13 +257,15 @@ class HotCell extends React.Component {
           className="HotCellContainer"
           animated={this.animated}
           isMobileXs={uiStore.isMobileXs}
+          isTouchDevice={uiStore.isTouchDevice}
           smallCardWidth={this.isSmallCard}
         >
-          {uiStore.isMobileXs && (
-            <CloseButton onClick={this.handleClose}>
-              <CloseIcon />
-            </CloseButton>
-          )}
+          {uiStore.isMobileXs ||
+            (uiStore.isTouchDevice && (
+              <CloseButton onClick={this.handleClose}>
+                <CloseIcon />
+              </CloseButton>
+            ))}
           {primaryTypes.map(({ name, description, subTypes }, idx) => (
             <HotCellQuadrant
               name={name}
@@ -273,7 +277,7 @@ class HotCell extends React.Component {
               onMoreMenuClose={() => this.onMoreMenuClose(idx)}
               currentMenuOpen={this.moreMenuOpen === idx}
               zoomLevel={zoomLevel}
-              displayName={uiStore.isMobileXs}
+              displayName={uiStore.isTouchDevice}
             />
           ))}
         </Container>

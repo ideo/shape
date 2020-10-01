@@ -56,13 +56,6 @@ const QuadrantIconHolder = styled.div`
   text-align: center;
   width: ${props => (props.isMobileXs ? 44 : props.zoomLevel * 44)}px;
   vertical-align: middle;
-
-  .icon {
-    ${props =>
-      props.isMobileXs &&
-      `
-    `}
-  }
 `
 
 const More = styled.button`
@@ -186,7 +179,7 @@ class HotCellQuadrant extends React.Component {
             enterNextDelay={250}
           >
             <QuadrantIconHolder
-              isMobileXs={uiStore.isMobileXs}
+              isMobileXs={uiStore.isTouchDevice}
               zoomLevel={zoomLevel}
             >
               <TypeIcon />
