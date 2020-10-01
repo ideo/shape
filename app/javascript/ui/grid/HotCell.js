@@ -38,6 +38,7 @@ const Container = styled.div`
   ${props =>
     props.smallCardWidth &&
     !props.isMobileXs &&
+    !props.isTouchDevice &&
     `
     ${Quadrant} {
       height: 100% !important;
