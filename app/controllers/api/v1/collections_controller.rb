@@ -479,6 +479,8 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       content: template.collection_type,
       async: true,
     )
+    current_user.cached_last_5_used_templates << template.id
+    current_user.save
   end
 
   def log_collection_activity(activity)

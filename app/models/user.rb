@@ -579,11 +579,9 @@ class User < ApplicationRecord
     has_cached_role?(Role::SUPER_ADMIN)
   end
 
-  def most_used_template_ids(amount = 5)
-    Activity.where(action_id: id, action: :template_used)
-            .group(:source_id)
-            .order('count_id desc')
-            .count('id')
+  def last_used_template_ids(amount = 5)
+    Activity.where(organization: id, action: :template_used)
+            .order('created_at desc')
             .first(amount)
             .map { |arr| arr[0] }
   end

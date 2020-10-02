@@ -57,7 +57,7 @@ class Organization < ApplicationRecord
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
   store_accessor :cached_attributes,
-                 :cached_last_5_used_templates
+                 :cached_5_most_used_templates
 
   has_many :collections, dependent: :destroy
   has_many :items, through: :collections, dependent: :destroy
@@ -383,6 +383,11 @@ class Organization < ApplicationRecord
 
   def default_locale
     default_locale_in_database
+  end
+
+  def cache_most_used_template_ids!
+    self.cached_5_most_used_templates = most_used_template_ids
+    save
   end
 
   def most_used_template_ids(amount = 5)

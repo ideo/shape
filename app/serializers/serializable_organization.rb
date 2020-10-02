@@ -46,4 +46,8 @@ class SerializableOrganization < BaseJsonSerializer
   attribute :inaccessible_at do
     @object.overdue_at ? (@object.overdue_at + 2.week).to_s(:mdy) : nil
   end
+
+  attribute :most_used_templates do
+    @object.cached_5_most_used_templates
+  end
 end
