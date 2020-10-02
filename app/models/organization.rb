@@ -6,6 +6,7 @@
 #  active_users_count                    :integer          default(0), not null
 #  autojoin_domains                      :jsonb
 #  billable                              :boolean          default(FALSE)
+#  cached_attributes                     :jsonb
 #  deactivated                           :boolean          default(FALSE), not null
 #  default_locale                        :string           default("en")
 #  domain_whitelist                      :jsonb
@@ -54,6 +55,9 @@ class Organization < ApplicationRecord
   include Externalizable
   extend FriendlyId
   friendly_id :slug_candidates, use: %i[slugged finders history]
+
+  store_accessor :cached_attributes,
+                 :cached_last_5_used_templates
 
   has_many :collections, dependent: :destroy
   has_many :items, through: :collections, dependent: :destroy
@@ -379,6 +383,15 @@ class Organization < ApplicationRecord
 
   def default_locale
     default_locale_in_database
+  end
+
+  def most_used_template_ids(amount = 5)
+    Activity.where(organization: id, action: :template_used)
+            .group(:source_id)
+            .order('count_id desc')
+            .count('id')
+            .first(amount)
+            .map { |arr| arr[0] }
   end
 
   private
