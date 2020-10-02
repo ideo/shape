@@ -1,12 +1,25 @@
+import { action, runInAction } from 'mobx'
+import localStorage from 'mobx-localstorage'
+
 import { uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 import IdeoSSO from '~/utils/IdeoSSO'
 
 import BaseRecord from './BaseRecord'
 
+export const USER_MOST_USED_TEMPLATES = 'UserMostUsedTemplates'
+
 class User extends BaseRecord {
   static type = 'users'
   static endpoint = apiUrl('users')
+
+  constructor() {
+    if (this.isCurrentUser) {
+      runInAction(() => {
+        localStorage.setItem(USER_MOST_USED_TEMPLATES, this.most_used_templates)
+      })
+    }
+  }
 
   get name() {
     const nameDisplay = [this.first_name, this.last_name].join(' ')
@@ -100,6 +113,12 @@ class User extends BaseRecord {
     // set it ahead of time so the helper immediately disappears
     this.show_move_helper = false
     return this.API_updateCurrentUser({ show_move_helper: false })
+  }
+
+  @action
+  useTemplate(templateId) {
+    const templateIds = localStorage.getItem(USER_MOST_USED_TEMPLATES)
+    localStorage.setItem(USER_MOST_USED_TEMPLATES, [templateId, ...templateIds])
   }
 }
 
