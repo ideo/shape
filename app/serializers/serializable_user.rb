@@ -36,6 +36,6 @@ class SerializableUser < BaseJsonSerializer
   end
 
   attribute :most_used_templates do
-    @object.cached_5_most_used_templates
+    @object.cached_last_5_used_templates
   end
 end
