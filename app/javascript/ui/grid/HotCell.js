@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { observable, runInAction } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import localStorage from 'mobx-localstorage'
@@ -7,6 +8,7 @@ import styled from 'styled-components'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import CornerPositioned from '~/ui/global/CornerPositioned'
 import HotCellQuadrant, { Quadrant } from './HotCellQuadrant'
+import RecordSearch from '~/ui/global/RecordSearch'
 import v from '~/utils/variables'
 
 const SLIDE_MS = 200
@@ -79,6 +81,8 @@ class HotCell extends React.Component {
   animated = false
   @observable
   moreMenuOpen = null
+  @observable
+  templateSearchResults = []
 
   componentDidMount() {
     setTimeout(() => runInAction(() => (this.animated = true)), SLIDE_MS)
@@ -128,8 +132,18 @@ class HotCell extends React.Component {
 
   onMoreMenuClose = menuKey => {
     if (this.moreMenuOpen === menuKey) {
-      runInAction(() => (this.moreMenuOpen = null))
+      runInAction(() => {
+        this.moreMenuOpen = null
+        this.templateSearchResults = []
+      })
     }
+  }
+
+  onTemplateSearch = results => {
+    if (!results) return
+    runInAction(() => {
+      this.templateSearchResults = _.take(results, 5)
+    })
   }
 
   get isSmallCard() {
@@ -162,7 +176,27 @@ class HotCell extends React.Component {
   }
 
   get templateTypes() {
-    let templates = [{ description: 'Create New Template', name: 'template' }]
+    let templates = [
+      { description: 'Create New Template', name: 'template' },
+      {
+        name: 'component',
+        component: (
+          <RecordSearch
+            onSelect={this.onCreateContent}
+            onSearch={this.onTemplateSearch}
+            initialLoadAmount={0}
+            searchParams={{ master_template: true }}
+          />
+        ),
+      },
+    ]
+    if (this.templateSearchResults.length > 0) {
+      templates = [
+        ...templates,
+        ...this.templateSearchResults.map(this.collectionIntoQudrant),
+      ]
+      return templates
+    }
     const {
       apiStore: { currentUser, currentOrganization },
     } = this.props

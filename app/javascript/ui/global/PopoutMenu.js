@@ -437,6 +437,7 @@ class PopoutMenu extends React.Component {
     const {
       id,
       name,
+      component,
       iconLeft,
       iconRight,
       onClick,
@@ -451,6 +452,7 @@ class PopoutMenu extends React.Component {
       noHover,
     } = item
     let { padding } = item
+    if (component) return component
 
     let className = `menu-${_.kebabCase(name)}`
     const rightIconClassName = 'icon-right'
@@ -662,6 +664,7 @@ const propTypeMenuItem = PropTypes.arrayOf(
     noHover: PropTypes.bool,
     onClick: PropTypes.func,
     subItems: PropTypes.arrayOf(PropTypes.object),
+    component: PropTypes.object,
     TextComponent: PropTypes.object,
     withAvatar: PropTypes.bool,
   })

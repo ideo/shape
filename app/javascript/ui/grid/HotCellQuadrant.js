@@ -125,35 +125,39 @@ class HotCellQuadrant extends React.Component {
   get moreMenuItems() {
     const { subTypes } = this.props
     if (!subTypes()) return []
-    return subTypes().map(({ name, description, isCategory, subTypes }) => {
-      if (isCategory) {
+    return subTypes().map(
+      ({ name, component, description, isCategory, subTypes }) => {
+        if (isCategory) {
+          return {
+            name: description,
+            onClick: () => {},
+            subItems:
+              subTypes() &&
+              subTypes().map(subType => {
+                if (name === 'component') return { component }
+                let TypeIcon = nameToIcon[subType.name]
+                if (subType.description === 'Create New Template')
+                  TypeIcon = PlusIcon
+                return {
+                  name: subType.description,
+                  iconLeft: <TypeIcon />,
+                  onClick: () => {
+                    this.createContent(subType.name)
+                  },
+                }
+              }),
+          }
+        }
+        if (name === 'component') return { component }
+        let TypeIcon = nameToIcon[name]
+        if (description === 'Create New Template') TypeIcon = PlusIcon
         return {
           name: description,
-          onClick: () => {},
-          subItems:
-            subTypes() &&
-            subTypes().map(subType => {
-              let TypeIcon = nameToIcon[subType.name]
-              if (subType.description === 'Create New Template')
-                TypeIcon = PlusIcon
-              return {
-                name: subType.description,
-                iconLeft: <TypeIcon />,
-                onClick: () => {
-                  this.createContent(subType.name)
-                },
-              }
-            }),
+          iconLeft: <TypeIcon />,
+          onClick: () => this.createContent(name),
         }
       }
-      let TypeIcon = nameToIcon[name]
-      if (description === 'Create New Template') TypeIcon = PlusIcon
-      return {
-        name: description,
-        iconLeft: <TypeIcon />,
-        onClick: () => this.createContent(name),
-      }
-    })
+    )
   }
 
   render() {

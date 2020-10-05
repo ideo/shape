@@ -262,6 +262,7 @@ class ApiStore extends jsonapi(datxCollection) {
   // TODO rename searchRecords?
   searchCollections(params = {}) {
     const defaultParams = { query: '' }
+    return Promise.resolve([])
     return this.request(
       `organizations/${this.currentOrgSlug}/search?${queryString.stringify(
         _.merge(defaultParams, params)
