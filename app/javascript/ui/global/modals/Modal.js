@@ -68,6 +68,11 @@ const StyledDialogTitle = styled(DialogTitle)`
   }
 `
 
+const StyledDialogActions = styled(DialogActions)`
+  justify-content: normal !important;
+  padding: 0 24px 24px 45px !important;
+`
+
 export const ModalCloseButton = styled.button`
   cursor: pointer;
   display: block;
@@ -222,7 +227,7 @@ class Modal extends React.Component {
           >
             {children}
           </StyledDialogContent>
-          <DialogActions disableSpacing>
+          <StyledDialogActions>
             <FooterArea>
               <RolesAdd
                 roleTypes={[]}
@@ -231,7 +236,7 @@ class Modal extends React.Component {
                 ownerType={''}
               />
             </FooterArea>
-          </DialogActions>
+          </StyledDialogActions>
         </StyledDialog>
       </ThemeProvider>
     )
