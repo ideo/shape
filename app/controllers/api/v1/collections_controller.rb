@@ -479,7 +479,10 @@ class Api::V1::CollectionsController < Api::V1::BaseController
       content: template.collection_type,
       async: true,
     )
-    current_user.cached_last_5_used_templates << template.id
+    template_ids = current_user.cached_last_5_used_templates_ids
+    template_ids << template.id
+    template_ids = template_ids.first 5
+    current_user.cached_last_5_used_templates_ids = template_ids
     current_user.save
   end
 

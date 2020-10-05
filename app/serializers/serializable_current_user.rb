@@ -7,6 +7,12 @@ class SerializableCurrentUser < SerializableUser
              :feedback_terms_accepted, :respondent_terms_accepted,
              :current_org_terms_accepted, :locale, :use_template_setting
 
+  has_many :most_used_templates do
+    data do
+      Collection.where(id: @object.cached_last_5_used_template_ids)
+    end
+  end
+
   attribute :google_auth_token do
     # generate user login token for firebase
     GoogleAuthService.create_custom_token(@object.id)

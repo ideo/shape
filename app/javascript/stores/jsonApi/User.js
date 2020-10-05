@@ -117,9 +117,12 @@ class User extends BaseRecord {
   }
 
   @action
-  useTemplate(templateId) {
-    const templateIds = localStorage.getItem(USER_MOST_USED_TEMPLATES)
-    localStorage.setItem(USER_MOST_USED_TEMPLATES, [templateId, ...templateIds])
+  useTemplate(template) {
+    const templates = localStorage.getItem(USER_MOST_USED_TEMPLATES)
+    localStorage.setItem(USER_MOST_USED_TEMPLATES, [
+      template.toJsonApi(),
+      ...templates,
+    ])
   }
 }
 

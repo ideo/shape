@@ -34,8 +34,4 @@ class SerializableUser < BaseJsonSerializer
   attribute :newly_created, if: -> { @survey_response } do
     @created
   end
-
-  attribute :most_used_templates do
-    @object.cached_last_5_used_templates
-  end
 end

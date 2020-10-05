@@ -57,7 +57,7 @@ class Organization < ApplicationRecord
   friendly_id :slug_candidates, use: %i[slugged finders history]
 
   store_accessor :cached_attributes,
-                 :cached_5_most_used_templates
+                 :cached_5_most_used_template_ids
 
   has_many :collections, dependent: :destroy
   has_many :items, through: :collections, dependent: :destroy
@@ -386,7 +386,7 @@ class Organization < ApplicationRecord
   end
 
   def cache_most_used_template_ids!
-    self.cached_5_most_used_templates = most_used_template_ids
+    self.cached_5_most_used_template_ids = most_used_template_ids
     save
   end
 

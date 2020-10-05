@@ -57,7 +57,7 @@ class User < ApplicationRecord
 
   store_accessor :cached_attributes,
                  :cached_user_profiles,
-                 :cached_last_5_used_templates
+                 :cached_last_5_used_template_ids
 
   # list out all attributes here that we want to cache from Network
   store_accessor :network_data,
