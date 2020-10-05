@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import styled, { ThemeProvider } from 'styled-components'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogActions from '@material-ui/core/DialogActions'
 import Fade from '@material-ui/core/Fade'
 
 import { Heading2 } from '~/ui/global/styled/typography'
@@ -11,6 +12,8 @@ import v from '~/utils/variables'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import { uiStore } from '~/stores'
+import RolesAdd from '~/ui/roles/RolesAdd'
+import { FooterArea } from '~/ui/global/styled/layout'
 
 // Make border a prop to allow it be removed?
 // https://ideo.invisionapp.com/d/main#/console/14424671/360618724/inspect
@@ -185,7 +188,7 @@ class Modal extends React.Component {
           onClose={this.handleclose}
           onBackdropClick={disableBackdropClick ? null : this.handleClose}
           BackdropProps={{ invisible: true }}
-          scroll={'body'}
+          scroll={'paper'}
           {...labeledBy}
         >
           {/*
@@ -219,6 +222,16 @@ class Modal extends React.Component {
           >
             {children}
           </StyledDialogContent>
+          <DialogActions disableSpacing>
+            <FooterArea>
+              <RolesAdd
+                roleTypes={[]}
+                onCreateRoles={() => {}}
+                onCreateUsers={() => {}}
+                ownerType={''}
+              />
+            </FooterArea>
+          </DialogActions>
         </StyledDialog>
       </ThemeProvider>
     )
