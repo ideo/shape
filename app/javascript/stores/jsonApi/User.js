@@ -13,7 +13,8 @@ class User extends BaseRecord {
   static type = 'users'
   static endpoint = apiUrl('users')
 
-  constructor() {
+  constructor(...args) {
+    super(...args)
     if (this.isCurrentUser) {
       runInAction(() => {
         localStorage.setItem(USER_MOST_USED_TEMPLATES, this.most_used_templates)
