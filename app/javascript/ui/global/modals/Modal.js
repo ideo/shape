@@ -185,6 +185,7 @@ class Modal extends React.Component {
           onClose={this.handleclose}
           onBackdropClick={disableBackdropClick ? null : this.handleClose}
           BackdropProps={{ invisible: true }}
+          scroll={'body'}
           {...labeledBy}
         >
           {/*
