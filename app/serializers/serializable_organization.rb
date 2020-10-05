@@ -16,7 +16,6 @@ class SerializableOrganization < BaseJsonSerializer
     end
   end
 
-
   attribute :filestack_file_url do
     @object&.primary_group&.avatar_url
   end

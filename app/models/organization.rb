@@ -387,6 +387,17 @@ class Organization < ApplicationRecord
 
   def cache_most_used_template_ids!
     self.cached_5_most_used_template_ids = most_used_template_ids
+    if cached_5_most_used_template_ids.count > 5
+      templates_alpha_order = Collection
+                              .where(
+                                master_template: true,
+                                organization_id: id,
+                              )
+                              .order(:name)
+                              .first(5 - cached_5_most_used_template_ids.count)
+                              .pluck(:id)
+      cached_5_most_used_template_ids + templates_alpha_order
+    end
     save
   end
 

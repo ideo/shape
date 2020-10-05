@@ -1,6 +1,7 @@
-import { action, runInAction } from 'mobx'
+import { action, computed, runInAction } from 'mobx'
 import localStorage from 'mobx-localstorage'
 
+import Collection from './Collection'
 import { uiStore } from '~/stores'
 import { apiUrl } from '~/utils/url'
 import IdeoSSO from '~/utils/IdeoSSO'
@@ -15,9 +16,12 @@ class User extends BaseRecord {
 
   constructor(...args) {
     super(...args)
-    if (this.isCurrentUser) {
+    if (this.is_current_user) {
       runInAction(() => {
-        localStorage.setItem(USER_MOST_USED_TEMPLATES, this.most_used_templates)
+        localStorage.setItem(
+          USER_MOST_USED_TEMPLATES,
+          this.most_used_templates || []
+        )
       })
     }
   }
@@ -123,6 +127,14 @@ class User extends BaseRecord {
       template.toJsonApi(),
       ...templates,
     ])
+  }
+
+  @computed
+  get mostUsedTemplateCollections() {
+    const deserializedTemplates = localStorage.getItem(USER_MOST_USED_TEMPLATES)
+    return deserializedTemplates.map(data => {
+      return new Collection(data, this.apiStore)
+    })
   }
 }
 

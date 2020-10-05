@@ -13,6 +13,10 @@ class SerializableCurrentUser < SerializableUser
     end
   end
 
+  attribute :is_current_user do
+    true
+  end
+
   attribute :google_auth_token do
     # generate user login token for firebase
     GoogleAuthService.create_custom_token(@object.id)

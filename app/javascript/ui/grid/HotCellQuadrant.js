@@ -11,6 +11,7 @@ import FoamcoreIcon from '~/ui/icons/htc/FoamcoreIcon'
 import LinkIcon from '~/ui/icons/htc/LinkIcon'
 import MoreIcon from '~/ui/icons/MoreIcon'
 import ReportIcon from '~/ui/icons/htc/ReportIcon'
+import PlusIcon from '~/ui/icons/PlusIcon'
 import PopoutMenu from '~/ui/global/PopoutMenu'
 import SearchCollectionIcon from '~/ui/icons/htc/SearchCollectionIcon'
 import { SmallHelperText } from '~/ui/global/styled/typography'
@@ -132,7 +133,9 @@ class HotCellQuadrant extends React.Component {
           subItems:
             subTypes() &&
             subTypes().map(subType => {
-              const TypeIcon = nameToIcon[subType.name]
+              let TypeIcon = nameToIcon[subType.name]
+              if (subType.description === 'Create New Template')
+                TypeIcon = PlusIcon
               return {
                 name: subType.description,
                 iconLeft: <TypeIcon />,
@@ -143,7 +146,8 @@ class HotCellQuadrant extends React.Component {
             }),
         }
       }
-      const TypeIcon = nameToIcon[name]
+      let TypeIcon = nameToIcon[name]
+      if (description === 'Create New Template') TypeIcon = PlusIcon
       return {
         name: description,
         iconLeft: <TypeIcon />,

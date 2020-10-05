@@ -72,7 +72,7 @@ const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
 const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
 const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 
-@inject('uiStore')
+@inject('apiStore', 'uiStore')
 @observer
 class HotCell extends React.Component {
   @observable
@@ -82,6 +82,13 @@ class HotCell extends React.Component {
 
   componentDidMount() {
     setTimeout(() => runInAction(() => (this.animated = true)), SLIDE_MS)
+  }
+
+  collectionIntoQudrant(collection) {
+    return {
+      name: 'template',
+      description: collection.name,
+    }
   }
 
   handleTypeClick = type => () => {
@@ -155,7 +162,26 @@ class HotCell extends React.Component {
   }
 
   get templateTypes() {
-    return [{ description: 'Create New Template', name: 'template' }]
+    let templates = [{ description: 'Create New Template', name: 'template' }]
+    const {
+      apiStore: { currentUser, currentOrganization },
+    } = this.props
+    templates = [
+      ...templates,
+      ...currentUser.mostUsedTemplateCollections.map(
+        this.collectionIntoQudrant
+      ),
+    ]
+    // Should be 5 template options plus create new template
+    if (templates.length < 6) {
+      templates = [
+        ...templates,
+        ...currentOrganization.most_used_templates.map(
+          this.collectionIntoQudrant
+        ),
+      ]
+    }
+    return templates
   }
 
   get defaultEitherType() {
@@ -301,6 +327,7 @@ HotCell.defaultProps = {
   rowIdx: 0,
 }
 HotCell.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
