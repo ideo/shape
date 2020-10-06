@@ -6,7 +6,8 @@ import {
   businessUnitsStore,
   industrySubcategoriesStore,
   contentVersionsStore,
-} from 'c-delta-organization-settings'
+  organizationsStore,
+} from './creativeDifferenceApis'
 
 import v from '~/utils/variables'
 import InfoIconXs from '~/ui/icons/InfoIconXs'
@@ -14,6 +15,7 @@ import InfoIconXs from '~/ui/icons/InfoIconXs'
 import BusinessUnitRow from './BusinessUnitRow'
 import AddTeamButton from './AddTeamButton'
 import BusinessUnitRowHeadings from './BusinessUnitRowHeadings'
+import TestComponent from './TestComponent'
 
 const StyledIconWrapper = styled.span`
   margin-left: 8px;
@@ -30,12 +32,18 @@ class TeamsTab extends React.Component {
   isError = null
   @observable
   businessUnits = []
-
-  // constructor(props) {
-  //   super(props)
-  // }
+  @observable
+  newBusinessUnitId = null
 
   async componentDidMount() {
+    // Can't use organizationsStore.fetch() because C∆ only exposes /organizations/:id route
+    const orgModel = new organizationsStore.model()
+    const orgModelInstance = new orgModel({
+      id: 4,
+    })
+    // TODO: How do we reconcile Shape org ids vs C∆ org ids?
+    // Does this come from apiStore.currentUserOrganization?
+
     try {
       this.setIsLoading(true)
 
@@ -43,13 +51,18 @@ class TeamsTab extends React.Component {
         industrySubcategoriesStore.fetch(),
         contentVersionsStore.fetch(),
         businessUnitsStore.fetch(),
+        // This only works right now because I'm logged into C∆
+        // The C∆ controller uses current_user
+        orgModelInstance.fetch(),
       ])
 
       runInAction(() => {
         this.industrySubcategories = responses[0]
         this.contentVersions = responses[1]
         this.businessUnits = responses[2]
+        this.organization = responses[3]
       })
+
       this.setIsLoading(false)
     } catch (error) {
       console.log('teams tab CDM error: ', error)
@@ -68,18 +81,13 @@ class TeamsTab extends React.Component {
   }
 
   @action
-  setBusinessUnits(businessUnits) {
-    this.businessUnits = businessUnits
+  setBusinessUnitErrors = err => {
+    this.businessUnitErrors = err
   }
 
-  refreshBusinessUnits = async () => {
-    try {
-      const results = await businessUnitsStore.fetch()
-      this.setBusinessUnits(results)
-      if (this.focusNameInputForNewTeam) {
-        this.focusOnNameInput()
-      }
-    } catch (err) {}
+  @action
+  setBusinessUnits(businessUnits) {
+    this.businessUnits = businessUnits
   }
 
   initialNewTeamValues = () => {
@@ -89,11 +97,8 @@ class TeamsTab extends React.Component {
       id,
     } = this.organization
 
-    // Content version handled after create in backend
-    // TODO: How to assert it is the correct one coming back?
     return {
-      name: `Team ${this.businessUnits.length + 1}`,
-      // TODO: causes issues when deleting records, since soft archive means they are still around
+      // name is set in backend
       organization_id: id,
       industry_subcategory_id,
       structure: 'Vertical',
@@ -103,32 +108,28 @@ class TeamsTab extends React.Component {
 
   createBusinessUnit = async () => {
     const values = this.initialNewTeamValues()
-    const businessUnitParams = {
-      business_unit: values,
-    }
-    const foo = businessUnitsStore
-    const businessUnitModelInstance = foo.build(values)
-    businessUnitModelInstance.set({
-      id: null,
-    })
-
+    // TODO: how to show loader without causing rerender that makes componentDidMount fire?
     try {
+      const businessUnitModelInstance = businessUnitsStore.build(values)
       const creatingBusinessUnit = businessUnitModelInstance.save(
-        businessUnitParams,
+        {},
         {
           optimistic: false,
         }
       )
       const result = await creatingBusinessUnit
+
+      console.log('created BU: ', result)
+
       if (result) {
-        this.setEditingBusinessUnitId(result.id)
-        this.setEditingBusinessUnitName(result.name)
-        this.refreshBusinessUnits()
-        this.setFocusNameInputForNewTeam(true)
-        // TODO: Just update one BU so we don't have to refetch all the BUs?
+        console.log('new BU created: ', result)
+        runInAction(() => {
+          this.newBusinessUnitId = result.id
+        })
       }
     } catch (err) {
-      this.setError(true)
+      console.log('failed to create BU: ', err)
+      this.setIsError(true)
       this.setBusinessUnitErrors(err.error)
     }
   }
@@ -137,16 +138,14 @@ class TeamsTab extends React.Component {
     const {
       isLoading,
       isError,
+      businessUnitErrors,
+      newBusinessUnitId,
       // businessUnits,
       contentVersions,
       industrySubcategories,
       createBusinessUnit,
     } = this
-
-    if (businessUnitsStore.at(0)) {
-      console.log('teamstab: ', businessUnitsStore.toJS())
-      console.log('teamstab: ', businessUnitsStore.models.length)
-    }
+    console.log('rendering teams tab')
 
     return (
       <div>
@@ -179,25 +178,25 @@ class TeamsTab extends React.Component {
             </div>
             {/* Table Headers */}
             <BusinessUnitRowHeadings createBusinessUnit={createBusinessUnit} />
-            {businessUnitsStore
-              .filter({
-                id: 1548,
-              })
-              .map(businessUnit => (
-                <BusinessUnitRow
-                  key={uuidv4()}
-                  businessUnit={businessUnit}
-                  contentVersions={contentVersions}
-                  industrySubcategories={industrySubcategories}
-                  businessUnitsStore={businessUnitsStore}
-                  // businessUnitDeploymentsStore={businessUnitDeploymentsStore}
-                  // updateBusinessUnit={this.updateBusinessUnit}
-                  // cloneBusinessUnit={this.cloneBusinessUnit}
-                  // removeBusinessUnit={this.removeBusinessUnit}
-                />
-              ))}
+            {businessUnitsStore.map(businessUnit => (
+              <BusinessUnitRow
+                justCreated={newBusinessUnitId == businessUnit.id}
+                key={uuidv4()}
+                businessUnit={businessUnit}
+                contentVersions={contentVersions}
+                industrySubcategories={industrySubcategories}
+                businessUnitsStore={businessUnitsStore}
+              />
+            ))}
             <div>
               <AddTeamButton handleClick={createBusinessUnit} />
+              <span
+                style={{
+                  color: 'red',
+                }}
+              >
+                {businessUnitErrors}{' '}
+              </span>
             </div>
           </React.Fragment>
         )}

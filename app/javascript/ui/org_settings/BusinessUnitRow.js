@@ -4,7 +4,12 @@ import { DisplayText } from '~/ui/global/styled/typography'
 
 import BusinessUnitActionMenu from './BusinessUnitActionMenu'
 import { action, observable, runInAction } from 'mobx'
-import { observer, inject, PropTypes as MobxPropTypes } from 'mobx-react'
+import {
+  observer,
+  inject,
+  PropTypes as MobxPropTypes,
+  PropTypes,
+} from 'mobx-react'
 import OrganizationRoles from './OrganizationRoles'
 import DropdownSelect from './DropdownSelect'
 import Loader from '../layout/Loader'
@@ -18,26 +23,28 @@ class BusinessUnitRow extends React.Component {
   @observable
   isError = null
   @observable
+  businessUnit = null
+  @observable
   businessUnitErrors = null
   @observable
   isEditingName = null
-  @observable
-  businessUnit = null
-  @observable
-  editableNameValue = null
 
   constructor(props) {
     super(props)
 
-    runInAction(() => {
-      // this.isEditingName = props.editingBusinessUnitName
-    })
+    this.textInput = null
 
     props.apiStore.fetch(
       'groups',
       props.apiStore.currentUserOrganization.primary_group.id,
       true
     )
+  }
+
+  componentDidMount() {
+    if (this.props.justCreated) {
+      this.editBusinessUnitName(this.props.businessUnit)
+    }
   }
 
   @action
@@ -51,13 +58,13 @@ class BusinessUnitRow extends React.Component {
   }
 
   @action
-  setBusinessUnitErrors = err => {
-    this.businessUnitErrors = err
+  setIsEditingName = value => {
+    this.isEditingName = value
   }
 
   @action
-  setBusinessUnit = record => {
-    this.businessUnit = record
+  setBusinessUnitErrors = err => {
+    this.businessUnitErrors = err
   }
 
   updateBusinessUnit = async (businessUnit, params) => {
@@ -65,9 +72,6 @@ class BusinessUnitRow extends React.Component {
 
     this.setIsLoading(true)
 
-    // const data = {
-    //   business_unit: params,
-    // }
     console.log('sending params: ', params)
 
     try {
@@ -75,12 +79,8 @@ class BusinessUnitRow extends React.Component {
         optimistic: true,
       })
 
-      this.setBusinessUnitErrors(null)
-      // Need to check that the result has been properly updated record
       console.log('result is: ', result)
-      // this.setBusinessUnit(result)
-      console.log('mobx object', businessUnit.toJS())
-
+      this.setBusinessUnitErrors(null)
       this.setIsLoading(false)
       return result
     } catch (err) {
@@ -93,12 +93,12 @@ class BusinessUnitRow extends React.Component {
   cloneBusinessUnit = async businessUnit => {
     try {
       this.setIsLoading(true)
-      // const model = new this.props.BusinessUnitsStore
-      const modelInstance = new model({
-        id: businessUnit.id,
-      })
+      // // const model = new this.props.BusinessUnitsStore
+      // const modelInstance = new businessUnit({
+      //   id: businessUnit.id,
+      // })
 
-      const promise = modelInstance.rpc('clone', {
+      const promise = businessUnit.rpc('clone', {
         optimistic: false,
       })
       const result = await promise
@@ -111,75 +111,79 @@ class BusinessUnitRow extends React.Component {
   removeBusinessUnit = async businessUnit => {
     try {
       this.setIsLoading(true)
-      const model = new this.props.BusinessUnitsStore()
-      const modelInstance = new model({
-        id: businessUnit.id,
-      })
+      // const model = businessUnitsStore.model()
+      // const modelInstance = new model({
+      //   id: businessUnit.id,
+      // })
 
-      const promise = modelInstance.destroy({
+      const promise = businessUnit.destroy({
         optimistic: false,
       })
       const result = await promise
-      this.refreshBusinessUnits()
+      console.log('destroyed: ', result)
       this.setIsLoading(false)
       return result
-    } catch (err) {}
-  }
-
-  updateBusinessUnitDeployment = async (businessUnitDeployment, params) => {
-    const model = this.props.businessUnitDeploymentsStore.model()
-    const modelInstance = new model({
-      id: businessUnitDeployment.id,
-    })
-    const data = {
-      business_unit_deployment: params,
+    } catch (err) {
+      console.log('err destroying BU: ', err)
     }
-    try {
-      const promise = modelInstance.save(data, {
-        optimistic: false,
-      })
-      const result = await promise
-      if (result) {
-        this.refreshBusinessUnits()
-      }
-    } catch (err) {}
   }
 
-  handleNameInputKeyPress = businessUnit => {
-    if (event.key === 'Enter') {
+  setTextInputRef = element => {
+    this.textInput = element
+  }
+
+  focusOnNameInput = () => {
+    if (this.textInput) this.textInput.focus()
+  }
+
+  selectNameInput = () => {
+    if (this.textInput) this.textInput.select()
+  }
+
+  editBusinessUnitName = businessUnit => {
+    console.log('clicked rename')
+    this.setIsEditingName(true)
+    this.focusOnNameInput()
+    // Had to do this hack so that the select would work -- before it only focused
+    setTimeout(() => this.selectNameInput(), 10)
+  }
+
+  handleNameInputKeyPress = (e, businessUnit) => {
+    console.log('handleNameInputKeyPress:', e)
+    console.log(businessUnit.get('name'))
+    if (e.key === 'Enter') {
       this.handleSaveBusinessUnit(businessUnit, {
-        name: this.editingBusinessUnitName,
+        name: businessUnit.get('name'),
       })
     }
   }
 
-  handleNameInputChange = e => {
-    this.setEditingBusinessUnitName(e.target.value)
+  handleNameInputChange = (e, businessUnit) => {
+    console.log('setting name to: ', e.target.value)
+    businessUnit.set({ name: e.target.value })
   }
 
   handleSaveBusinessUnit = businessUnit => {
+    console.log('saving BU: ', businessUnit)
     this.updateBusinessUnit(businessUnit, {
-      name: this.editingBusinessUnitName,
+      name: businessUnit.get('name'),
     })
+    this.setIsEditingName(false)
   }
 
   render() {
     const {
       isEditingName,
-      editableNameValue,
       businessUnitErrors,
       handleNameInputKeyPress,
       handleNameInputChange,
       handleSaveBusinessUnit,
-      // TODO: finish converting these to work inside of BU row instead of teams tab
-      // cloneBusinessUnit,
-      // removeBusinessUnit,
       updateBusinessUnit,
-      updateBusinessUnitDeployment,
     } = this
 
     const { businessUnit, industrySubcategories, contentVersions } = this.props
-    console.log('rendering business unit:', businessUnit)
+
+    console.log('render BU: ', businessUnit)
 
     if (this.isLoading) return <Loader />
 
@@ -203,13 +207,11 @@ class BusinessUnitRow extends React.Component {
                   style={{
                     width: 'inherit',
                   }}
-                  autoFocus
-                  // onFocus={() => this.focusOnNameInput()} // TODO: use a ref
-                  id={'new-team-name'}
-                  value={editableNameValue} // TODO: May need to make this a separate component to handle updating value
-                  onChange={handleNameInputChange}
+                  ref={this.setTextInputRef}
+                  value={businessUnit.get('name')} // TODO: May need to make this a separate component to handle updating value
+                  onChange={e => handleNameInputChange(e, businessUnit)}
                   onBlur={e => handleSaveBusinessUnit(businessUnit)}
-                  onKeyPress={e => handleNameInputKeyPress(businessUnit)}
+                  onKeyPress={e => handleNameInputKeyPress(e, businessUnit)}
                 />
                 <span
                   style={{
@@ -241,12 +243,7 @@ class BusinessUnitRow extends React.Component {
               marginRight: '20px',
             }}
           >
-            {/*
-                                  TODO: this updates a BU Deployment, not the BU itself
-                                  - It should probably accept the BU Deployment as the record
-                                  - and use content_version_id as the fieldToUpdate
-                                */}
-            {/* <DropdownSelect
+            <DropdownSelect
               label={'Content Version'}
               toolTip={
                 'Content Versions provide alternative wording to content that are more suitable for certain kinds of teams or organizations. We suggest leaving the default if you are unsure.'
@@ -254,14 +251,19 @@ class BusinessUnitRow extends React.Component {
               objectToUpdateName={businessUnit.get('name')}
               record={businessUnit.get('closest_business_unit_deployment')}
               options={contentVersions}
-              updateRecord={params =>
-                updateBusinessUnitDeployment(
-                  businessUnit.get('closest_business_unit_deployment'),
-                  params
-                )
+              updateRecord={
+                params => {
+                  throw new Error(
+                    'IMPLEMENT NEW ROUTE FOR BU TO UPDATE PARENT CV'
+                  )
+                }
+                // updateBusinessUnitDeployment(
+                //   businessUnit.get('closest_business_unit_deployment'),
+                //   params
+                // )
               }
               fieldToUpdate={'content_version_id'}
-            /> */}
+            />
           </div>
           <div
             style={{
@@ -298,10 +300,7 @@ class BusinessUnitRow extends React.Component {
               name={businessUnit.get('name')}
               handleClone={() => this.cloneBusinessUnit(businessUnit)}
               handleRemove={() => this.removeBusinessUnit(businessUnit)}
-              handleRename={() => {
-                this.setEditingBusinessUnitName(businessUnit.get('name'))
-                this.setEditingBusinessUnitId(businessUnit.get('id'))
-              }}
+              handleRename={() => this.editBusinessUnitName(businessUnit)}
             />
           </div>
           {/* Admins */}
@@ -366,9 +365,14 @@ BusinessUnitRow.propTypes = {
   industrySubcategories: MobxPropTypes.arrayOrObservableArray(
     MobxPropTypes.objectOrObservableObject
   ),
+  justCreated: PropTypes.bool,
   // supportedLanguages: MobxPropTypes.arrayOrObservableArray(
   //   MobxPropTypes.objectOrObservableObject
   // ),
+}
+
+BusinessUnitRow.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default BusinessUnitRow

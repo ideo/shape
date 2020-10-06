@@ -1,4 +1,3 @@
-// import PropTypes from 'prop-types'
 import { action, observable, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import {
@@ -6,7 +5,7 @@ import {
   supportedLanguagesStore,
   contentVersionsStore,
   industrySubcategoriesStore,
-} from 'c-delta-organization-settings'
+} from './creativeDifferenceApis'
 
 import DropdownSelect from './DropdownSelect'
 import OrganizationRoles from './OrganizationRoles'
@@ -37,12 +36,13 @@ class OrganizationTab extends React.Component {
 
   async componentDidMount() {
     this.setIsLoading(true)
-
+    // Can't use organizationsStore.fetch() because C∆ only exposes /organizations/:id route
     const orgModel = new organizationsStore.model()
     const orgModelInstance = new orgModel({
-      id: 4, // TODO: how to fetch actual id
-      // Does this come from apiStore.currentUserOrganization?
+      id: 4,
     })
+    // TODO: How do we reconcile Shape org ids vs C∆ org ids?
+    // Does this come from apiStore.currentUserOrganization?
 
     try {
       const responses = await Promise.all([
@@ -63,15 +63,6 @@ class OrganizationTab extends React.Component {
     } catch (error) {
       this.setIsError(true)
     }
-  }
-
-  hasLoadedAllRequests() {
-    return [
-      this.organization,
-      this.industrySubcategories,
-      this.contentVersions,
-      this.supportedLanguages,
-    ].every(observableValue => !null)
   }
 
   @action
@@ -227,23 +218,5 @@ class OrganizationTab extends React.Component {
     )
   }
 }
-
-// THIS DOES NOT TAKE PROPS
-// OrganizationTab.defaultProps = {
-//   organization: {
-//     supported_languages: [],
-//   },
-//   contentVersions: [],
-//   industrySubcategories: [],
-//   supportedLanguages: [],
-// }
-// OrganizationTab.propTypes = {
-//   organization: PropTypes.object,
-//   contentVersions: PropTypes.arrayOf(PropTypes.object),
-//   industrySubcategories: PropTypes.arrayOf(PropTypes.object),
-//   supportedLanguages: PropTypes.arrayOf(PropTypes.object),
-//   // TODO: load all groups and roles for organization
-//   // http://localhost:3001/api/v1/organizations/1/groups
-// }
 
 export default OrganizationTab
