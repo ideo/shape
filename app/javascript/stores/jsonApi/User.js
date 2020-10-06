@@ -123,9 +123,10 @@ class User extends BaseRecord {
   @action
   useTemplate(template) {
     const templates = localStorage.getItem(USER_MOST_USED_TEMPLATES)
+    // Add the most recently used template to beginning, filtering out dupes
     localStorage.setItem(USER_MOST_USED_TEMPLATES, [
       template.toJsonApi(),
-      ...templates,
+      ...templates.filter(usedTemplate => usedTemplate.id !== template.id),
     ])
   }
 
