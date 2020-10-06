@@ -82,6 +82,8 @@ class HotCell extends React.Component {
   @observable
   moreMenuOpen = null
   @observable
+  templateSearch = ''
+  @observable
   templateSearchResults = []
 
   componentDidMount() {
@@ -90,7 +92,7 @@ class HotCell extends React.Component {
 
   collectionIntoQudrant(collection) {
     return {
-      name: 'template',
+      name: 'useTemplate',
       description: collection.name,
     }
   }
@@ -139,6 +141,12 @@ class HotCell extends React.Component {
     }
   }
 
+  onTemplateInputChange = value => {
+    runInAction(() => {
+      this.templateSearch = value
+    })
+  }
+
   onTemplateSearch = results => {
     if (!results) return
     runInAction(() => {
@@ -182,10 +190,13 @@ class HotCell extends React.Component {
         name: 'component',
         component: (
           <RecordSearch
+            text={this.templateSearch}
             onSelect={this.onCreateContent}
             onSearch={this.onTemplateSearch}
+            onInputChange={this.onTemplateInputChange}
             initialLoadAmount={0}
             searchParams={{ master_template: true }}
+            controlled
           />
         ),
       },

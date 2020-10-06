@@ -267,9 +267,11 @@ class AutoComplete extends React.Component {
   }
 
   handleOnInputChange = (inputValue, action) => {
+    const { onInputChange } = this.props
     if (action.action !== 'input-blur' && action.action !== 'menu-close') {
       this.setState({ inputValue })
     }
+    if (onInputChange) onInputChange(inputValue)
   }
 
   render() {
@@ -287,8 +289,10 @@ class AutoComplete extends React.Component {
       menuStyles,
       onMenuClose,
       numOptionsToShow,
+      searchValueOverride,
     } = this.props
     const { option, inputValue } = this.state
+    const searchValue = searchValueOverride || inputValue
     return (
       <div className={classes.root}>
         <Input
@@ -302,7 +306,7 @@ class AutoComplete extends React.Component {
             multi: true,
             value: keepSelectedOptions ? option : null,
             defaultOptions,
-            inputValue,
+            inputValue: searchValue,
             options,
             optionSearch,
             onChange: this.handleChange,
@@ -345,6 +349,7 @@ AutoComplete.propTypes = {
     })
   ),
   onOptionSelect: PropTypes.func.isRequired,
+  onInputChange: PropTypes.func,
   optionSearch: PropTypes.func,
   keepSelectedOptions: PropTypes.bool,
   placeholder: PropTypes.string,
@@ -352,6 +357,7 @@ AutoComplete.propTypes = {
   value: PropTypes.number,
   menuPlacement: PropTypes.string,
   keepMenuClosed: PropTypes.bool,
+  searchValueOverride: PropTypes.string,
   numOptionsToShow: PropTypes.number,
   onMenuClose: PropTypes.func,
   menuStyles: PropTypes.shape({
@@ -364,6 +370,7 @@ AutoComplete.defaultProps = {
   autoFocus: false,
   onSelect: () => {},
   keepSelectedOptions: false,
+  onInputChange: null,
   creatable: false,
   placeholder: '',
   value: undefined,
@@ -371,6 +378,7 @@ AutoComplete.defaultProps = {
   defaultOptions: [],
   optionSearch: null,
   menuPlacement: 'bottom',
+  searchValueOverride: null,
   keepMenuClosed: false,
   numOptionsToShow: 3.5,
   onMenuClose: () => {},

@@ -84,7 +84,8 @@ const nameToIcon = {
   report: ReportIcon,
   searchCollection: SearchCollectionIcon,
   submissionBox: SubmissionBoxIcon,
-  template: TemplateIcon,
+  template: PlusIcon,
+  useTemplate: TemplateIcon,
   testCollection: FeedbackIcon,
   text: TextIcon,
   video: VideoIcon,
@@ -149,7 +150,7 @@ class HotCellQuadrant extends React.Component {
           }
         }
         if (name === 'component') return { component }
-        let TypeIcon = nameToIcon[name]
+        let TypeIcon = nameToIcon[name] || TemplateIcon
         if (description === 'Create New Template') TypeIcon = PlusIcon
         return {
           name: description,
@@ -171,6 +172,7 @@ class HotCellQuadrant extends React.Component {
       zoomLevel,
     } = this.props
     const TypeIcon = nameToIcon[name]
+    if (name === 'template') TypeIcon = TemplateIcon
     return (
       <Quadrant
         moreMenuOpen={currentMenuOpen}

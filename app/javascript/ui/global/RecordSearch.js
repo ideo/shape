@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import { PropTypes as MobxPropTypes } from 'mobx-react'
 
+import { apiStore } from '~/stores'
 import AutoComplete from '~/ui/global/AutoComplete'
 import trackError from '~/utils/trackError'
 
@@ -13,80 +14,81 @@ function formatCollections(collections) {
   }))
 }
 
-@inject('apiStore')
-@observer
-class RecordSearch extends React.Component {
-  constructor(props) {
-    super(props)
-    this.debouncedSearch = _.debounce((term, callback) => {
-      if (!term) {
-        callback()
-        return
-      }
-      const tags = props.searchTags.map(tag => `#${tag}`).join(' ')
-      const params = _.merge(
-        {
-          query: _.trim(`${term} ${tags}`),
-          per_page: 30,
-        },
-        props.searchParams
-      )
-      props.apiStore
-        .searchCollections(params)
-        .then(res => _.map(res.data, 'record').filter(props.searchFilter))
-        .then(records =>
-          props.onSearch
-            ? props.onSearch(records)
-            : callback(formatCollections(records))
-        )
-        .catch(e => {
-          trackError(e)
-        })
-    }, 350)
-  }
-
-  componentDidMount() {
-    const { initialLoadAmount } = this.props
-    if (initialLoadAmount > 0) {
-      this.debouncedSearch(' ')
+const RecordSearch = ({
+  controlled,
+  initialLoadAmount,
+  onInputChange,
+  onSearch,
+  onSelect,
+  searchFilter,
+  searchTags,
+  searchParams,
+  text,
+}) => {
+  const handleSearch = (value, callback) => debouncedSearch(value, callback)
+  const debouncedSearch = _.debounce((term, callback) => {
+    if (!term) {
+      callback()
+      return
     }
-  }
-
-  onSearch = (value, callback) => this.debouncedSearch(value, callback)
-
-  render() {
-    return (
-      <AutoComplete
-        options={[]}
-        optionSearch={this.onSearch}
-        onOptionSelect={option => this.props.onSelect(option)}
-        placeholder="Collection name"
-        style={{ display: 'inline-block' }}
-        keepMenuClosed={!!this.props.onSearch}
-      />
+    const tags = searchTags.map(tag => `#${tag}`).join(' ')
+    const params = _.merge(
+      {
+        query: _.trim(`${term} ${tags}`),
+        per_page: 30,
+      },
+      searchParams
     )
+    apiStore
+      .searchCollections(params)
+      .then(res => _.map(res.data, 'record').filter(searchFilter))
+      .then(records =>
+        onSearch ? onSearch(records) : callback(formatCollections(records))
+      )
+      .catch(e => {
+        trackError(e)
+      })
+  }, 350)
+
+  if (initialLoadAmount > 0) {
+    debouncedSearch(' ')
   }
+
+  return (
+    <AutoComplete
+      options={[]}
+      optionSearch={handleSearch}
+      onOptionSelect={option => onSelect(option)}
+      placeholder="Collection name"
+      style={{ display: 'inline-block' }}
+      keepMenuClosed={!!onSearch}
+      searchValueOverride={controlled ? text : null}
+      onInputChange={controlled ? onInputChange : null}
+    />
+  )
 }
 
 RecordSearch.propTypes = {
   onSelect: PropTypes.func.isRequired,
+  controlled: PropTypes.bool,
+  onInputChange: PropTypes.func,
   onSearch: PropTypes.func,
   initialLoadAmount: PropTypes.number,
   searchFilter: PropTypes.func,
   searchTags: PropTypes.arrayOf(PropTypes.string),
   searchParams: MobxPropTypes.objectOrObservableObject,
-}
-
-RecordSearch.wrappedComponent.propTypes = {
-  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  text: PropTypes.string,
 }
 
 RecordSearch.defaultProps = {
-  onSearch: null,
+  controlled: false,
   initialLoadAmount: 0,
+  onInputChange: null,
+  onSearch: null,
   searchFilter: r => r,
   searchTags: [],
   searchParams: null,
+  text: null,
 }
 
 export default RecordSearch
