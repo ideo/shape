@@ -193,6 +193,19 @@ class FoamcoreInteractionLayer extends React.Component {
     uiStore.closeBlankContentTool()
   }
 
+  createTemplateInstance = async ({ col, row, templateId }) => {
+    const { apiStore, collection } = this.props
+    const data = {
+      parent_id: collection.id,
+      template_id: templateId,
+      placement: { col, row },
+    }
+    return apiStore.createTemplateInstance({
+      data,
+      template: { name: 'do this', collection_type: 'do this' },
+    })
+  }
+
   @action
   resetHoveringRowCol() {
     this.hoveringRowCol = { row: null, col: null }
@@ -298,8 +311,17 @@ class FoamcoreInteractionLayer extends React.Component {
     }
   }
 
-  onCreateBct = async ({ row, col, hotcell = false }, contentType) => {
+  onCreateBct = async ({ row, col, hotcell = false }, contentType, opts) => {
     const { apiStore, uiStore, collection } = this.props
+
+    if (contentType === 'useTemplate') {
+      await this.createTemplateInstance({
+        ...opts,
+        row,
+        col,
+      })
+      this.resetHoveringRowCol()
+    }
 
     // If we're already in the process of creating a hot edge and placeholder
     // don't create another one.

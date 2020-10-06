@@ -413,7 +413,7 @@ class Organization < ApplicationRecord
             .order('count_id desc')
             .count('id')
             .first(amount)
-            .map { |arr| arr[0] }
+            .map { |arr| arr[0].id }
   end
 
   private

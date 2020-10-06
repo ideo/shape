@@ -94,6 +94,9 @@ class HotCell extends React.Component {
     return {
       name: 'useTemplate',
       description: collection.name,
+      opts: {
+        templateId: collection.id,
+      },
     }
   }
 
@@ -109,21 +112,25 @@ class HotCell extends React.Component {
     }, SLIDE_MS)
   }
 
-  onCreateContent = type => {
+  onCreateContent = (type, opts) => {
     const { onCreateContent } = this.props
+    onCreateContent(type, opts)
+    let hotCellType = type
+    if (type === 'useTemplate') hotCellType = 'template'
     const collectionType = this.collectionTypes.find(
-      collectionType => collectionType.name === type
+      collectionType => collectionType.name === hotCellType
     )
-    const itemType = this.itemTypes.find(itemType => itemType.name === type)
-    onCreateContent(type)
+    const itemType = this.itemTypes.find(
+      itemType => itemType.name === hotCellType
+    )
     runInAction(() => {
       if (collectionType) {
-        localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, type)
+        localStorage.setItem(HOT_CELL_DEFAULT_COLLECTION_TYPE, hotCellType)
       } else if (itemType) {
-        localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, type)
+        localStorage.setItem(HOT_CELL_DEFAULT_ITEM_TYPE, hotCellType)
       }
       if (this.isSmallCard) {
-        localStorage.setItem(HOT_CELL_DEFAULT_EITHER_TYPE, type)
+        localStorage.setItem(HOT_CELL_DEFAULT_EITHER_TYPE, hotCellType)
       }
     })
   }

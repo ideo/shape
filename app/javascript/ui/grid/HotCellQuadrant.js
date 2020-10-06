@@ -118,16 +118,16 @@ class HotCellQuadrant extends React.Component {
     onMoreMenuClose()
   }
 
-  createContent = type => {
+  createContent = (type, opts) => {
     const { onCreateContent } = this.props
-    onCreateContent(type)
+    onCreateContent(type, opts)
   }
 
   get moreMenuItems() {
     const { subTypes } = this.props
     if (!subTypes()) return []
     return subTypes().map(
-      ({ name, component, description, isCategory, subTypes }) => {
+      ({ name, component, description, isCategory, opts, subTypes }) => {
         if (isCategory) {
           return {
             name: description,
@@ -143,7 +143,7 @@ class HotCellQuadrant extends React.Component {
                   name: subType.description,
                   iconLeft: <TypeIcon />,
                   onClick: () => {
-                    this.createContent(subType.name)
+                    this.createContent(subType.name, opts)
                   },
                 }
               }),
@@ -155,7 +155,7 @@ class HotCellQuadrant extends React.Component {
         return {
           name: description,
           iconLeft: <TypeIcon />,
-          onClick: () => this.createContent(name),
+          onClick: () => this.createContent(name, opts),
         }
       }
     )
@@ -171,7 +171,7 @@ class HotCellQuadrant extends React.Component {
       uiStore,
       zoomLevel,
     } = this.props
-    const TypeIcon = nameToIcon[name]
+    let TypeIcon = nameToIcon[name]
     if (name === 'template') TypeIcon = TemplateIcon
     return (
       <Quadrant
