@@ -5,12 +5,11 @@ import EntityAvatarAndName from '~/ui/global/EntityAvatarAndName'
 import LeaveIcon from '~/ui/icons/LeaveIcon'
 import Modal from '~/ui/global/modals/Modal'
 import Panel from '~/ui/global/Panel'
-import RolesAdd from '~/ui/roles/RolesAdd'
+import RolesDialogActions from '~/ui/roles/RolesDialogActions'
 import Tooltip from '~/ui/global/Tooltip'
 import { Heading3 } from '~/ui/global/styled/typography'
 import {
   FooterBreak,
-  FooterArea,
   Row,
   RowItemGrid,
   ScrollArea,
@@ -109,17 +108,8 @@ class AdminUsersModal extends React.Component {
     this.props.apiStore.removeShapeAdminUser(user)
   }
 
-  createRoles = (users, _, opts = {}) => {
-    this.props.apiStore.addShapeAdminUsers(users, opts)
-  }
-
-  createUsers = emails => {
-    const { apiStore, uiStore } = this.props
-    return apiStore
-      .request(`users/create_from_emails`, 'POST', { emails })
-      .catch(err => {
-        uiStore.alert(err.error[0])
-      })
+  get dialogActions() {
+    return <RolesDialogActions context={'admin'} />
   }
 
   render() {
@@ -127,7 +117,13 @@ class AdminUsersModal extends React.Component {
     const title = 'Invite Shape Admin Users'
 
     return (
-      <Modal title={title} onClose={this.handleClose} open={open} noScroll>
+      <Modal
+        title={title}
+        onClose={this.handleClose}
+        open={open}
+        noScroll
+        dialogActions={this.dialogActions}
+      >
         <React.Fragment>
           <StyledHeaderRow align="flex-end">
             <Heading3>Previously Invited</Heading3>
@@ -137,15 +133,6 @@ class AdminUsersModal extends React.Component {
             <Row>
               <FooterBreak />
             </Row>
-            <FooterArea>
-              <RolesAdd
-                title={'Add People:'}
-                roleTypes={['shapeAdmin']}
-                onCreateRoles={this.createRoles}
-                onCreateUsers={this.createUsers}
-                ownerType={'shapeAdmins'}
-              />
-            </FooterArea>
           </React.Fragment>
         </React.Fragment>
       </Modal>

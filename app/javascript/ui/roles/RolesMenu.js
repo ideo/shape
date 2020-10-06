@@ -57,6 +57,12 @@ class RolesMenu extends React.Component {
     this.setState({ anyoneCanView: anyone_can_view })
   }
 
+  componentDidUpdate(prevProps) {
+    if (!prevProps.addedNewRole && this.props.addedNewRole) {
+      this.initializeRolesAndGroups({ reset: true, page: 1 })
+    }
+  }
+
   async initializeRolesAndGroups({
     reset = false,
     page = 1,
@@ -221,13 +227,7 @@ class RolesMenu extends React.Component {
   }
 
   get renderEntities() {
-    const {
-      canEdit,
-      record,
-      submissionBox,
-      ownerType,
-      createRoles,
-    } = this.props
+    const { canEdit, record, submissionBox, ownerType } = this.props
     const { groupsByStatus } = this.state
 
     const showEntity = (entity, role) => {
@@ -261,7 +261,6 @@ class RolesMenu extends React.Component {
                     roleLabels={submissionBox ? { viewer: 'participant' } : {}}
                     entity={combined.entity}
                     onDelete={this.deleteRoles}
-                    onCreate={createRoles}
                     afterSwitchRoles={() => {
                       this.initializeRolesAndGroups({ reset: true, page: 1 })
                     }}
@@ -317,10 +316,9 @@ RolesMenu.propTypes = {
   canEdit: PropTypes.bool,
   ownerId: PropTypes.string.isRequired,
   ownerType: PropTypes.string.isRequired,
-  fixedRole: PropTypes.string,
   title: PropTypes.string,
   submissionBox: PropTypes.bool,
-  createRoles: PropTypes.func.isRequired,
+  addedNewRole: PropTypes.bool.isRequired,
 }
 RolesMenu.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
@@ -328,7 +326,6 @@ RolesMenu.wrappedComponent.propTypes = {
 }
 RolesMenu.defaultProps = {
   canEdit: false,
-  fixedRole: null,
   title: 'Shared with',
   submissionBox: false,
 }

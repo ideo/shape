@@ -4,6 +4,7 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
+import RolesDialogActions from '~/ui/roles/RolesDialogActions'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Loader from '~/ui/layout/Loader'
@@ -183,22 +184,12 @@ class OrganizationMenu extends React.Component {
   }
 
   renderEditRoles() {
-    let fixedRole = null
-    if (this.editGroup.is_guest) {
-      fixedRole = 'member'
-    } else if (this.editGroup.is_admin) {
-      fixedRole = 'admin'
-    }
-    if (!this.editGroup.id) {
-      return null
-    }
     return (
       <RolesMenu
         record={this.editGroup}
         canEdit={this.editGroup.can_edit}
         ownerId={this.editGroup.id}
         ownerType="groups"
-        fixedRole={fixedRole}
         title="Members:"
       />
     )
@@ -229,9 +220,29 @@ class OrganizationMenu extends React.Component {
     )
   }
 
+  renderDialogActions() {
+    let fixedRole = null
+    if (this.editGroup.is_guest) {
+      fixedRole = 'member'
+    } else if (this.editGroup.is_admin) {
+      fixedRole = 'admin'
+    }
+    if (!this.editGroup.id) {
+      return null
+    }
+
+    return (
+      <RolesDialogActions
+        record={this.editGroup}
+        setDidAddNewRole={this.setDidAddNewRole}
+        fixedRole={fixedRole}
+      />
+    )
+  }
+
   render() {
     const { open, uiStore, apiStore, locked } = this.props
-    let content, title, onBack, onEdit
+    let content, title, onBack, onEdit, dialogActions
     let noScroll = false
     switch (this.currentPage) {
       case 'addGroup':
@@ -263,6 +274,7 @@ class OrganizationMenu extends React.Component {
             })
           }
           content = this.renderEditRoles()
+          dialogActions = this.renderDialogActions()
           noScroll = true
         }
         if (this.editGroup.can_edit) {
@@ -288,6 +300,7 @@ class OrganizationMenu extends React.Component {
         onEdit={onEdit}
         open={open}
         noScroll={noScroll}
+        dialogActions={dialogActions}
       >
         {content}
       </Modal>
