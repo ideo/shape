@@ -12,8 +12,6 @@ import v from '~/utils/variables'
 import ArrowIcon from '~/ui/icons/ArrowIcon'
 import CloseIcon from '~/ui/icons/CloseIcon'
 import { uiStore } from '~/stores'
-import RolesAdd from '~/ui/roles/RolesAdd'
-import { FooterArea } from '~/ui/global/styled/layout'
 
 // Make border a prop to allow it be removed?
 // https://ideo.invisionapp.com/d/main#/console/14424671/360618724/inspect
@@ -71,6 +69,12 @@ const StyledDialogTitle = styled(DialogTitle)`
 const StyledDialogActions = styled(DialogActions)`
   justify-content: normal !important;
   padding: 0 24px 24px 45px !important;
+`
+
+const RolesAddContainer = styled.div`
+  flex: 1 1 auto;
+  padding-top: 24px;
+  padding-bottom: 30px;
 `
 
 export const ModalCloseButton = styled.button`
@@ -227,16 +231,11 @@ class Modal extends React.Component {
           >
             {children}
           </StyledDialogContent>
-          <StyledDialogActions>
-            <FooterArea>
-              <RolesAdd
-                roleTypes={[]}
-                onCreateRoles={() => {}}
-                onCreateUsers={() => {}}
-                ownerType={''}
-              />
-            </FooterArea>
-          </StyledDialogActions>
+          {this.props.dialogActions && (
+            <StyledDialogActions>
+              <RolesAddContainer>{this.props.dialogActions}</RolesAddContainer>
+            </StyledDialogActions>
+          )}
         </StyledDialog>
       </ThemeProvider>
     )
@@ -278,6 +277,7 @@ Modal.defaultProps = {
   disableBackdropClick: false,
   noScroll: false,
   scrollVisible: false,
+  dialogActions: PropTypes.node,
 }
 
 export default Modal
