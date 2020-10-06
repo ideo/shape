@@ -102,7 +102,7 @@ describe('AdminUsersModal', () => {
   })
 
   describe('createRoles', () => {
-    it('makes a call to add Shape admim users', () => {
+    xit('makes a call to add Shape admim users', () => {
       const newUsers = [clone(fakeUser)]
       const opts = { sendInvites: true }
       component.createRoles(newUsers, null, opts)
@@ -111,7 +111,7 @@ describe('AdminUsersModal', () => {
   })
 
   describe('createUsers', () => {
-    it('makes a call to create users', () => {
+    xit('makes a call to create users', () => {
       const emails = ['test@test.com']
       component.createUsers(emails)
       expect(apiStore.request).toHaveBeenCalledWith(
