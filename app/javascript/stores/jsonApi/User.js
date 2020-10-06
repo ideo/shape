@@ -20,7 +20,7 @@ class User extends BaseRecord {
       runInAction(() => {
         localStorage.setItem(
           USER_MOST_USED_TEMPLATES,
-          this.most_used_templates || []
+          this.most_used_templates.map(template => template.toJsonApi()) || []
         )
       })
     }

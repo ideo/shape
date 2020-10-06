@@ -225,7 +225,7 @@ class HotCell extends React.Component {
       ),
     ]
     // Should be 5 template options plus create new template
-    if (templates.length < 6) {
+    if (templates.length < 7) {
       templates = [
         ...templates,
         ...currentOrganization.most_used_templates.map(
@@ -233,7 +233,7 @@ class HotCell extends React.Component {
         ),
       ]
     }
-    return templates
+    return _.take(templates, 7)
   }
 
   get defaultEitherType() {

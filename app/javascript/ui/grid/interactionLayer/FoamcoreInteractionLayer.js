@@ -55,6 +55,8 @@ class FoamcoreInteractionLayer extends React.Component {
   creatingHotEdge = false
   @observable
   fileDropProgress = null
+  @observable
+  loadingCell = null
 
   componentDidMount() {
     this.createDropPane()
@@ -194,15 +196,29 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   createTemplateInstance = async ({ col, row, templateId }) => {
+    runInAction(() => {
+      this.resetHoveringRowCol()
+      this.loadingCell = { col, row }
+    })
     const { apiStore, collection } = this.props
     const data = {
       parent_id: collection.id,
       template_id: templateId,
       placement: { col, row },
     }
-    return apiStore.createTemplateInstance({
+    const res = await apiStore.createTemplateInstance({
       data,
       template: { name: 'do this', collection_type: 'do this' },
+    })
+    const { parent_collection_card } = res.data
+    const cardRes = await apiStore.fetch(
+      'collection_cards',
+      parent_collection_card.id,
+      true
+    )
+    collection.addCard(cardRes.data)
+    runInAction(() => {
+      this.loadingCell = null
     })
   }
 
@@ -315,12 +331,12 @@ class FoamcoreInteractionLayer extends React.Component {
     const { apiStore, uiStore, collection } = this.props
 
     if (contentType === 'useTemplate') {
-      await this.createTemplateInstance({
+      this.createTemplateInstance({
         ...opts,
         row,
         col,
       })
-      this.resetHoveringRowCol()
+      return
     }
 
     // If we're already in the process of creating a hot edge and placeholder
@@ -762,6 +778,10 @@ class FoamcoreInteractionLayer extends React.Component {
     return null
   }
 
+  get renderLoading() {
+    return this.positionBlank({ ...this.loadingCell }, 'unrendered')
+  }
+
   render() {
     const { resizing, uiStore } = this.props
 
@@ -806,6 +826,7 @@ class FoamcoreInteractionLayer extends React.Component {
         {this.renderInnerDragLayer}
         {this.renderHotEdges}
         {this.renderBct}
+        {this.renderLoading}
         {this.renderRightBlankActions}
       </DragLayerWrapper>
     )
