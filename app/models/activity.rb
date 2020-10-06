@@ -44,6 +44,8 @@ class Activity < ApplicationRecord
   has_many :notifications, dependent: :destroy
   belongs_to :organization
   belongs_to :source, polymorphic: true, optional: true
+  # This is ues to query for the most used templates (collections)
+  belongs_to :collection, -> {where(activities: {source_type: 'Collection'})}, foreign_key: 'source_id'
   belongs_to :destination, polymorphic: true, optional: true
 
   scope :in_org, ->(organization_id) { where(organization_id: organization_id) }

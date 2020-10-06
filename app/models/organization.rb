@@ -393,6 +393,10 @@ class Organization < ApplicationRecord
                                 master_template: true,
                                 organization_id: id,
                               )
+                              .joins(collection: [roles: :groups_roles])
+                              .where(GroupsRole.arel_table[:group_id].eq(
+                                primary_group.id),
+                              )
                               .order(:name)
                               .first(5 - cached_5_most_used_template_ids.count)
                               .pluck(:id)
@@ -403,7 +407,9 @@ class Organization < ApplicationRecord
 
   def most_used_template_ids(amount = 5)
     Activity.where(organization: id, action: :template_used)
-            .group(:source_id)
+            .joins(collection: [roles: :groups_roles])
+            .where(GroupsRole.arel_table[:group_id].eq(primary_group.id))
+            .group(:collection)
             .order('count_id desc')
             .count('id')
             .first(amount)
