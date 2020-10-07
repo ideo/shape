@@ -267,6 +267,8 @@ Modal.propTypes = {
   noScroll: PropTypes.bool,
   /** Sets a class to make the scrolling visible at all times */
   scrollVisible: PropTypes.bool,
+  /** The actions that appear at the bottom */
+  dialogActions: PropTypes.node,
 }
 
 Modal.defaultProps = {
@@ -277,7 +279,7 @@ Modal.defaultProps = {
   disableBackdropClick: false,
   noScroll: false,
   scrollVisible: false,
-  dialogActions: PropTypes.node,
+  dialogActions: <div />,
 }
 
 export default Modal

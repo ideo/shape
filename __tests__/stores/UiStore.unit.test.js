@@ -443,4 +443,102 @@ describe('UiStore', () => {
       })
     })
   })
+
+  describe('createRoles', () => {
+    beforeEach(() => {
+      const apiStore = fakeApiStore()
+      apiStore.fetchAll = jest.fn()
+      uiStore.apiStore = apiStore
+    })
+
+    describe('with users', () => {
+      let users
+      let record = fakeCollection
+
+      beforeEach(async () => {
+        record.internalType = 'collections'
+        users = [
+          { id: 3, internalType: 'users' },
+          { id: 5, internalType: 'users' },
+        ]
+        uiStore.apiStore.request.mockReturnValue(Promise.resolve({ data: [] }))
+        uiStore.apiStore.fetchAll.mockReturnValue(Promise.resolve({ data: [] }))
+        await uiStore.createRoles(
+          users,
+          'editor',
+          { isSwitching: true, sendInvites: false },
+          record
+        )
+      })
+
+      it('should send a request to create roles with role and user ids', () => {
+        expect(uiStore.apiStore.request).toHaveBeenCalledWith(
+          `${record.internalType}/${record.id}/roles`,
+          'POST',
+          {
+            role: { name: 'editor' },
+            user_ids: [3, 5],
+            group_ids: [],
+            is_switching: true,
+            send_invites: false,
+          }
+        )
+      })
+
+      describe('when not switching roles', () => {
+        record = {
+          id: 4,
+          internalType: 'group',
+        }
+        beforeEach(async () => {
+          uiStore.apiStore.request.mockClear()
+          await uiStore.createRoles(
+            users,
+            'editor',
+            { isSwitching: false, sendInvites: false },
+            record
+          )
+        })
+
+        it('should pass is switching as false', () => {
+          expect(
+            uiStore.apiStore.request.mock.calls[0][2].is_switching
+          ).toBeFalsy()
+        })
+      })
+
+      describe('when assigning to a group', () => {
+        beforeEach(async () => {
+          record = {
+            id: 4,
+            internalType: 'groups',
+          }
+          await uiStore.createRoles(
+            users,
+            'member',
+            {
+              addToGroupId: 4,
+              sendInvites: false,
+              isSwitching: true,
+            },
+            record
+          )
+        })
+
+        it('should request the groups endpoint with the group id', () => {
+          expect(uiStore.apiStore.request).toHaveBeenCalledWith(
+            `${record.internalType}/${record.id}/roles`,
+            'POST',
+            {
+              role: { name: 'member' },
+              user_ids: [3, 5],
+              group_ids: [],
+              is_switching: true,
+              send_invites: false,
+            }
+          )
+        })
+      })
+    })
+  })
 })

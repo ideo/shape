@@ -85,4 +85,6 @@ RolesDialogActions.defaultProps = {
   context: '',
 }
 
+RolesDialogActions.displayName = 'RolesDialogActions'
+
 export default RolesDialogActions
