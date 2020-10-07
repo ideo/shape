@@ -779,6 +779,13 @@ class FoamcoreInteractionLayer extends React.Component {
   }
 
   get renderLoading() {
+    if (
+      !this.loadingCell ||
+      !_.isNumber(this.loadingCell.x) ||
+      !_.isNumber(this.loadingCell.row)
+    ) {
+      return null
+    }
     return this.positionBlank({ ...this.loadingCell }, 'unrendered')
   }
 

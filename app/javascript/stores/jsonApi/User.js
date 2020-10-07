@@ -17,10 +17,11 @@ class User extends BaseRecord {
   constructor(...args) {
     super(...args)
     if (this.is_current_user) {
+      const mostUsedTemplates = this.most_used_templates || []
       runInAction(() => {
         localStorage.setItem(
           USER_MOST_USED_TEMPLATES,
-          this.most_used_templates.map(template => template.toJsonApi()) || []
+          mostUsedTemplates.map(template => template.toJsonApi())
         )
       })
     }
