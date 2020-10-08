@@ -11,7 +11,7 @@ import PageContainer from '~/ui/layout/PageContainer'
 import SearchResultsInfinite from '~/ui/search/SearchResultsInfinite'
 import { stringifyUrlParams } from '~/utils/url'
 
-@inject('apiStore', 'uiStore')
+@inject('apiStore', 'uiStore', 'routingStore')
 @observer
 class SearchPage extends React.Component {
   unmounted = false
@@ -65,7 +65,7 @@ class SearchPage extends React.Component {
   }
 
   fetchData = (page = 1) => {
-    const { apiStore, uiStore } = this.props
+    const { apiStore, uiStore, routingStore, match } = this.props
     uiStore.update('pageError', null)
     uiStore.update('isLoading', true)
 
@@ -80,6 +80,11 @@ class SearchPage extends React.Component {
         uiStore.update('pageError', err)
         uiStore.update('isLoading', false)
         // trackError(err, { name: 'PageApiFetch' })
+        if (!apiStore.currentUser && err.status === 401) {
+          // always redirect logged-out users to login
+          routingStore.routeToLogin({ redirect: match.url })
+          return
+        }
       })
   }
 
@@ -188,6 +193,7 @@ SearchPage.propTypes = {
 SearchPage.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
 export default SearchPage

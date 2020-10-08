@@ -1,4 +1,5 @@
 import { Grid } from '@material-ui/core'
+import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import Box from '~shared/components/atoms/Box'
 import { Heading1 } from '~/ui/global/styled/typography'
 import v from '~/utils/variables'
@@ -14,8 +15,8 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import { hasKeyValueParam } from '~/utils/paramUtils'
 import IdeoSSO from '~/utils/IdeoSSO'
 
-import { apiStore, routingStore } from '~/stores'
-
+@inject('apiStore', 'routingStore')
+@observer
 class BillingPage extends React.Component {
   constructor(props) {
     super(props)
@@ -24,8 +25,14 @@ class BillingPage extends React.Component {
     }
   }
   componentDidMount() {
+    const { routingStore } = this.props
+    // kick out if you're not logged-in
+    if (!this.organization) {
+      return routingStore.routeToLogin({ redirect: '/settings' })
+    }
+
     // kick out if you're not an org admin (i.e. primary_group admin)
-    if (!apiStore.currentUserOrganization.primary_group.can_edit) {
+    if (!this.organization.primary_group.can_edit) {
       routingStore.routeTo('homepage')
     }
     IdeoSSO.getUserInfo().catch(e => {
@@ -38,7 +45,14 @@ class BillingPage extends React.Component {
     }
   }
 
+  get organization() {
+    const { apiStore } = this.props
+    return apiStore.currentUserOrganization
+  }
+
   render() {
+    if (!this.organization) return null
+
     return (
       <Box mb={v.headerHeight}>
         <OverdueBanner />
@@ -64,7 +78,13 @@ class BillingPage extends React.Component {
   }
 }
 
+BillingPage.wrappedComponent.propTypes = {
+  apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
+  routingStore: MobxPropTypes.objectOrObservableObject.isRequired,
+}
+
 BillingPage.propTypes = {
   location: ReactRouterPropTypes.location.isRequired,
 }
+
 export default BillingPage

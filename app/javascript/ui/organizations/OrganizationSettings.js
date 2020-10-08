@@ -22,7 +22,15 @@ class OrganizationSettings extends React.Component {
   bumpTermsVersion = false
 
   componentDidMount() {
+    const { routingStore } = this.props
+
+    // kick out if you're not logged-in
+    if (!this.organization) {
+      return routingStore.routeToLogin({ redirect: '/settings' })
+    }
+
     const { organization } = this
+
     // kick out if you're not an org admin (i.e. primary_group admin)
     if (!organization.primary_group.can_edit) {
       this.props.routingStore.routeTo('homepage')
@@ -167,6 +175,8 @@ class OrganizationSettings extends React.Component {
   }
 
   render() {
+    if (!this.organization) return null
+
     return (
       <div>
         <Heading2>Official Domains</Heading2>
