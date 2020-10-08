@@ -70,6 +70,10 @@ const CloseButton = styled.button`
   z-index: ${v.zIndex.gridCard};
 `
 
+const DefaultWrapper = styled.div`
+  height: 100%;
+`
+
 const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
 const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
 const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
@@ -148,14 +152,7 @@ class HotCell extends React.Component {
     }
   }
 
-  onTemplateInputChange = value => {
-    runInAction(() => {
-      this.templateSearch = value
-    })
-  }
-
   onTemplateSearch = results => {
-    if (!results) return
     runInAction(() => {
       this.templateSearchResults = _.take(results, 5)
     })
@@ -200,7 +197,7 @@ class HotCell extends React.Component {
             onSelect={this.onCreateContent}
             onSearch={this.onTemplateSearch}
             initialLoadAmount={0}
-            searchParams={{ master_template: true }}
+            searchParams={{ master_template: true, per_page: 10 }}
           />
         ),
       },
@@ -321,9 +318,7 @@ class HotCell extends React.Component {
     const PositionWrapper =
       uiStore.isMobileXs || uiStore.isTouchDevice
         ? CornerPositioned
-        : styled.div`
-            height: 100%;
-          `
+        : DefaultWrapper
 
     return (
       <PositionWrapper>

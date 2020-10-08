@@ -12,6 +12,7 @@ import Loader from '~/ui/layout/Loader'
 import Option from '~/ui/global/AutocompleteOption'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import { uiStore } from '~/stores'
+import v from '~/utils/variables'
 
 const SearchIconContainer = styled.span`
   display: block;
@@ -72,7 +73,7 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   container: () => ({}),
   control: () => ({
     paddingBottom: '3px',
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     marginBottom: '-5px',
     paddingLeft: '24px',
     display: 'flex',
@@ -121,7 +122,7 @@ const selectStyles = (theme, menuStyles = {}, numOptionsToShow = 3.5) => ({
   placeholder: base => ({
     ...base,
     paddingTop: '0px',
-    paddingBottom: '12px',
+    paddingBottom: '5px',
   }),
   singleValue: () => ({}),
   valueContainer: () => ({}),
@@ -229,6 +230,9 @@ const styles = theme => ({
     paddingTop: 0,
   },
   input: {
+    backgroundColor: v.colors.commonLight,
+    borderRadius: '18px',
+    height: '11px',
     paddingBottom: '20px',
     paddingTop: '0px',
   },
@@ -296,11 +300,13 @@ class AutoComplete extends React.Component {
     return (
       <div className={classes.root}>
         <Input
+          disableUnderline
           fullWidth
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             autoFocus,
             classes,
+            disableUnderline: true,
             menuStyles,
             numOptionsToShow,
             multi: true,

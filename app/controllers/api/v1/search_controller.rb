@@ -5,12 +5,11 @@ class Api::V1::SearchController < Api::V1::BaseController
   before_action :switch_to_organization, only: %i[search search_collection_cards search_users_and_tags]
 
   def search
-    render json: cached_card_json(search_records)
+    render json: cached_card_json()
   end
 
   def search_collection_cards
-    results = search_records(index_name: [Collection, Item])
-    render json: cached_card_json(results)
+    render json: cached_card_json()
   end
 
   before_action :authorize_resource, only: :users_and_groups
@@ -220,8 +219,9 @@ class Api::V1::SearchController < Api::V1::BaseController
     current_user.switch_to_organization(@organization)
   end
 
-  def cached_card_json(results)
-    records = results.results.compact
+  def cached_card_json()
+    # records = results.results.compact
+    records = Collection.where(master_template: true).last(20)
     # we searched for Collection/Item results, however we want to
     # map those onto their parent cards as that's what we render
     cards = records.map do |result|
@@ -246,11 +246,10 @@ class Api::V1::SearchController < Api::V1::BaseController
     ).merge(
       meta: {
         page: @page,
-        total: results.total_count,
-        total_pages: results.total_pages,
-        size: results.size,
+        total: 20,
+        total_pages: 1,
+        size: 1,
       },
-      links: jsonapi_pagination(results),
     )
 
     json_data

@@ -454,7 +454,13 @@ class PopoutMenu extends React.Component {
       noHover,
     } = item
     let { padding } = item
-    if (component) return component
+    if (component) {
+      return (
+        <StyledMenuItem noHover width={width - 25} padding="0 0 0 16px">
+          {component}
+        </StyledMenuItem>
+      )
+    }
 
     let className = `menu-${_.kebabCase(name)}`
     const rightIconClassName = 'icon-right'
@@ -598,9 +604,10 @@ class PopoutMenu extends React.Component {
 
     const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
     const icon = this.buttonStyleIcon(buttonStyle)
+    const Wrapper = isMobileFullScreen ? CornerPositioned : DefaultWrapper
 
     return (
-      <div>
+      <Wrapper>
         <ThemeProvider
           theme={{ mobileFixedMenu, isMobileFullScreen, isMultiTieredMenu }}
         >
@@ -644,7 +651,7 @@ class PopoutMenu extends React.Component {
             </StyledMenuWrapper>
           </StyledMenuButtonWrapper>
         </ThemeProvider>
-      </div>
+      </Wrapper>
     )
   }
 }
