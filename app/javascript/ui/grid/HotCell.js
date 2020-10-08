@@ -197,13 +197,10 @@ class HotCell extends React.Component {
         name: 'component',
         component: (
           <RecordSearch
-            text={this.templateSearch}
             onSelect={this.onCreateContent}
             onSearch={this.onTemplateSearch}
-            onInputChange={this.onTemplateInputChange}
             initialLoadAmount={0}
             searchParams={{ master_template: true }}
-            controlled
           />
         ),
       },
@@ -267,17 +264,17 @@ class HotCell extends React.Component {
       {
         description: 'Media',
         isCategory: true,
-        subTypes: () => this.itemTypes,
+        subTypes: this.itemTypes,
       },
       {
         description: 'Collections',
         isCategory: true,
-        subTypes: () => this.collectionTypes,
+        subTypes: this.collectionTypes,
       },
       {
         description: 'Template',
         isCategory: true,
-        subTypes: () => this.templateTypes,
+        subTypes: this.templateTypes,
       },
     ]
   }
@@ -294,17 +291,17 @@ class HotCell extends React.Component {
     const { uiStore, zoomLevel } = this.props
     let primaryTypes = [
       { name: 'text', description: 'Add Text' },
-      { ...this.defaultItemType, subTypes: () => this.itemTypes },
-      { ...this.defaultCollectionType, subTypes: () => this.collectionTypes },
+      { ...this.defaultItemType, subTypes: this.itemTypes },
+      { ...this.defaultCollectionType, subTypes: this.collectionTypes },
       {
         name: 'template',
         description: 'Templates',
-        subTypes: () => this.templateTypes,
+        subTypes: this.templateTypes,
       },
     ]
     if (this.isSmallCard && !uiStore.isMobileXs) {
       primaryTypes = [
-        { ...this.defaultBothType, subTypes: () => this.expandedSubTypes },
+        { ...this.defaultBothType, subTypes: this.expandedSubTypes },
       ]
     }
     if (uiStore.isTouchDevice) {
@@ -317,7 +314,7 @@ class HotCell extends React.Component {
         {
           name: 'more',
           description: 'More',
-          subTypes: () => this.expandedSubTypes,
+          subTypes: this.expandedSubTypes,
         },
       ]
     }

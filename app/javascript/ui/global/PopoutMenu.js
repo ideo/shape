@@ -221,6 +221,8 @@ StyledMenuToggle.defaultTypes = {
 
 StyledMenuToggle.displayName = 'StyledMenuToggle'
 
+const DefaultWrapper = styled.div``
+
 export const StyledMenuButton = styled.button`
   text-transform: capitalize;
   font-family: ${v.fonts.sans};
@@ -596,12 +598,9 @@ class PopoutMenu extends React.Component {
 
     const MenuToggle = this.buttonStyleMenuToggle(buttonStyle)
     const icon = this.buttonStyleIcon(buttonStyle)
-    const Wrapper = isMobileFullScreen ? CornerPositioned : styled.div``
 
     return (
-      <Wrapper
-        style={{ position: 'relative', zIndex: v.zIndex.aboveClickWrapper }}
-      >
+      <div>
         <ThemeProvider
           theme={{ mobileFixedMenu, isMobileFullScreen, isMultiTieredMenu }}
         >
@@ -645,7 +644,7 @@ class PopoutMenu extends React.Component {
             </StyledMenuWrapper>
           </StyledMenuButtonWrapper>
         </ThemeProvider>
-      </Wrapper>
+      </div>
     )
   }
 }

@@ -125,16 +125,16 @@ class HotCellQuadrant extends React.Component {
 
   get moreMenuItems() {
     const { subTypes } = this.props
-    if (!subTypes()) return []
-    return subTypes().map(
+    if (!subTypes) return []
+    return subTypes.map(
       ({ name, component, description, isCategory, opts, subTypes }) => {
         if (isCategory) {
           return {
             name: description,
             onClick: () => {},
             subItems:
-              subTypes() &&
-              subTypes().map(subType => {
+              subTypes &&
+              subTypes.map(subType => {
                 if (name === 'component') return { component }
                 let TypeIcon = nameToIcon[subType.name]
                 if (subType.description === 'Create New Template')
