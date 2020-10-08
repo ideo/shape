@@ -663,7 +663,8 @@ class ApiStore extends jsonapi(datxCollection) {
       collectionType: template.collection_type,
       submissionContent: inSubmissionBox,
     })
-    this.apiStore.currentUser.useTemplate(template)
+
+    this.currentUser.useTemplate(template)
     return result
   }
 

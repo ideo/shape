@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { action, computed, runInAction } from 'mobx'
 import localStorage from 'mobx-localstorage'
 
@@ -125,10 +126,16 @@ class User extends BaseRecord {
   useTemplate(template) {
     const templates = localStorage.getItem(USER_MOST_USED_TEMPLATES)
     // Add the most recently used template to beginning, filtering out dupes
-    localStorage.setItem(USER_MOST_USED_TEMPLATES, [
-      template.toJsonApi(),
-      ...templates.filter(usedTemplate => usedTemplate.id !== template.id),
-    ])
+    localStorage.setItem(
+      USER_MOST_USED_TEMPLATES,
+      _.take(
+        [
+          template.toJsonApi(),
+          ...templates.filter(usedTemplate => usedTemplate.id !== template.id),
+        ],
+        5
+      )
+    )
   }
 
   @computed

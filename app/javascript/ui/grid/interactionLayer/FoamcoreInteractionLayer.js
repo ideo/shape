@@ -201,6 +201,7 @@ class FoamcoreInteractionLayer extends React.Component {
       this.loadingCell = { col, row }
     })
     const { apiStore, collection } = this.props
+    const template = apiStore.find('collections', templateId)
     const data = {
       parent_id: collection.id,
       template_id: templateId,
@@ -208,7 +209,7 @@ class FoamcoreInteractionLayer extends React.Component {
     }
     const res = await apiStore.createTemplateInstance({
       data,
-      template: { name: 'do this', collection_type: 'do this' },
+      template,
     })
     const { parent_collection_card } = res.data
     const cardRes = await apiStore.fetch(
@@ -781,7 +782,7 @@ class FoamcoreInteractionLayer extends React.Component {
   get renderLoading() {
     if (
       !this.loadingCell ||
-      !_.isNumber(this.loadingCell.x) ||
+      !_.isNumber(this.loadingCell.col) ||
       !_.isNumber(this.loadingCell.row)
     ) {
       return null

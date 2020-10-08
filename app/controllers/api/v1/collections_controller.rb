@@ -481,7 +481,7 @@ class Api::V1::CollectionsController < Api::V1::BaseController
     )
     template_ids = current_user.cached_last_5_used_template_ids || []
     template_ids.prepend template.id
-    template_ids = template_ids.reject { |t| t.id == template.id }.first 5
+    template_ids = template_ids.reject { |t| t == template.id }.first 5
     current_user.cached_last_5_used_template_ids = template_ids
     current_user.save
   end
