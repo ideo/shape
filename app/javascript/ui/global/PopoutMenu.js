@@ -230,8 +230,6 @@ export const StyledMenuButton = styled.button`
   font-family: ${v.fonts.sans};
   font-weight: 400;
   font-size: 1rem;
-  height: 20px;
-  line-height: 20px;
   max-width: 280px;
   margin-top: -13px;
   margin-bottom: -13px;

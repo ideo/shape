@@ -145,7 +145,7 @@ class HotCellQuadrant extends React.Component {
                   name: subType.description,
                   iconLeft: <TypeIcon />,
                   onClick: () => {
-                    this.createContent(subType.name, opts)
+                    this.createContent(subType.name, subType.opts)
                   },
                 }
               }),
