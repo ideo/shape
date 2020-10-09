@@ -141,9 +141,12 @@ class User extends BaseRecord {
   @computed
   get mostUsedTemplateCollections() {
     const deserializedTemplates = localStorage.getItem(USER_MOST_USED_TEMPLATES)
-    return deserializedTemplates.map(data => {
-      return new Collection(data, this.apiStore)
-    })
+    if (deserializedTemplates) {
+      return deserializedTemplates.map(data => {
+        return new Collection(data, this.apiStore)
+      })
+    }
+    return []
   }
 }
 

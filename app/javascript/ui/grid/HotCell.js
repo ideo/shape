@@ -217,11 +217,10 @@ class HotCell extends React.Component {
     ]
     // Should be 5 template options plus create new template
     if (templates.length < 7) {
+      const orgTemplates = currentOrganization.most_used_templates || []
       templates = [
         ...templates,
-        ...currentOrganization.most_used_templates.map(
-          this.collectionIntoQudrant
-        ),
+        ...orgTemplates.map(this.collectionIntoQudrant),
       ]
     }
     return _.take(templates, 7)
