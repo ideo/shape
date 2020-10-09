@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "is_super_admin": { "type": "boolean" },
-    "current_user": { "type": ["boolean", "null"] },
+    "is_current_user": { "type": "boolean" },
     "created_at": { "type": "date" },
     "current_user_collection_id": { "type": ["string", "null"] },
     "email": { "type": "string" },
