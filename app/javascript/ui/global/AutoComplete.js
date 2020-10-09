@@ -12,7 +12,6 @@ import Loader from '~/ui/layout/Loader'
 import Option from '~/ui/global/AutocompleteOption'
 import SearchIcon from '~/ui/icons/SearchIcon'
 import { uiStore } from '~/stores'
-import v from '~/utils/variables'
 
 const SearchIconContainer = styled.span`
   display: block;
@@ -230,8 +229,8 @@ const styles = theme => ({
     paddingTop: 0,
   },
   input: {
-    backgroundColor: v.colors.commonLight,
-    borderRadius: '18px',
+    backgroundColor: 'white',
+    borderRadius: 0,
     height: '11px',
     paddingBottom: '20px',
     paddingTop: '0px',
@@ -294,19 +293,20 @@ class AutoComplete extends React.Component {
       onMenuClose,
       numOptionsToShow,
       searchValueOverride,
+      disableUnderline,
     } = this.props
     const { option, inputValue } = this.state
     const searchValue = searchValueOverride || inputValue
     return (
       <div className={classes.root}>
         <Input
-          disableUnderline
+          disableUnderline={!!disableUnderline}
           fullWidth
           inputComponent={SelectWrappedWithStyles}
           inputProps={{
             autoFocus,
             classes,
-            disableUnderline: true,
+            disableUnderline: !!disableUnderline,
             menuStyles,
             numOptionsToShow,
             multi: true,
@@ -366,6 +366,7 @@ AutoComplete.propTypes = {
   searchValueOverride: PropTypes.string,
   numOptionsToShow: PropTypes.number,
   onMenuClose: PropTypes.func,
+  disableUnderline: PropTypes.bool,
   menuStyles: PropTypes.shape({
     width: PropTypes.string,
     zIndex: PropTypes.number,
@@ -387,6 +388,7 @@ AutoComplete.defaultProps = {
   searchValueOverride: null,
   keepMenuClosed: false,
   numOptionsToShow: 3.5,
+  disableUnderline: false,
   onMenuClose: () => {},
   menuStyles: {
     width: '370px',

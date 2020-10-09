@@ -1,10 +1,12 @@
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
+import styled from 'styled-components'
 
 import { apiStore } from '~/stores'
 import AutoComplete from '~/ui/global/AutoComplete'
 import trackError from '~/utils/trackError'
+import v from '~/utils/variables'
 
 function formatCollections(collections) {
   return collections.map(collection => ({
@@ -13,6 +15,15 @@ function formatCollections(collections) {
     data: collection,
   }))
 }
+
+const AutoCompleteWrapper = styled.div`
+  width: 100%;
+
+  #react-select-chip {
+    background-color: ${v.colors.commonLight} !important;
+    border-radius: 18px !important;
+  }
+`
 
 const RecordSearch = ({
   controlled,
@@ -55,16 +66,19 @@ const RecordSearch = ({
   }
 
   return (
-    <AutoComplete
-      options={[]}
-      optionSearch={handleSearch}
-      onOptionSelect={option => onSelect(option)}
-      placeholder="Collection name"
-      style={{ display: 'inline-block' }}
-      keepMenuClosed={!!onSearch}
-      searchValueOverride={controlled ? text : null}
-      onInputChange={controlled ? onInputChange : null}
-    />
+    <AutoCompleteWrapper>
+      <AutoComplete
+        options={[]}
+        optionSearch={handleSearch}
+        onOptionSelect={option => onSelect(option)}
+        placeholder="Collection name"
+        style={{ display: 'inline-block' }}
+        keepMenuClosed={!!onSearch}
+        searchValueOverride={controlled ? text : null}
+        onInputChange={controlled ? onInputChange : null}
+        disableUnderline
+      />
+    </AutoCompleteWrapper>
   )
 }
 
