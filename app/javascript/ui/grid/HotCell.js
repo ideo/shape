@@ -195,6 +195,7 @@ class HotCell extends React.Component {
             onSearch={this.onTemplateSearch}
             initialLoadAmount={0}
             searchParams={{ master_template: true, per_page: 10 }}
+            smallSearchStyle
           />
         ),
       },

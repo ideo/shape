@@ -19,10 +19,14 @@ function formatCollections(collections) {
 const AutoCompleteWrapper = styled.div`
   width: 100%;
 
-  #react-select-chip {
-    background-color: ${v.colors.commonLight} !important;
-    border-radius: 18px !important;
-  }
+  ${props =>
+    props.smallSearchStyle &&
+    `
+    #react-select-chip {
+      background-color: ${v.colors.commonLight} !important;
+      border-radius: 18px !important;
+    }
+  `}
 `
 
 const RecordSearch = ({
@@ -34,6 +38,7 @@ const RecordSearch = ({
   searchFilter,
   searchTags,
   searchParams,
+  smallSearchStyle,
   text,
 }) => {
   const handleSearch = (value, callback) => debouncedSearch(value, callback)
@@ -66,7 +71,7 @@ const RecordSearch = ({
   }
 
   return (
-    <AutoCompleteWrapper>
+    <AutoCompleteWrapper smallSearchStyle={smallSearchStyle}>
       <AutoComplete
         options={[]}
         optionSearch={handleSearch}
@@ -76,7 +81,7 @@ const RecordSearch = ({
         keepMenuClosed={!!onSearch}
         searchValueOverride={controlled ? text : null}
         onInputChange={controlled ? onInputChange : null}
-        disableUnderline
+        disableUnderline={smallSearchStyle}
       />
     </AutoCompleteWrapper>
   )
@@ -91,6 +96,7 @@ RecordSearch.propTypes = {
   searchFilter: PropTypes.func,
   searchTags: PropTypes.arrayOf(PropTypes.string),
   searchParams: MobxPropTypes.objectOrObservableObject,
+  smallSearchStyle: PropTypes.bool,
   text: PropTypes.string,
 }
 
@@ -102,6 +108,7 @@ RecordSearch.defaultProps = {
   searchFilter: r => r,
   searchTags: [],
   searchParams: null,
+  smallSearchStyle: false,
   text: null,
 }
 
