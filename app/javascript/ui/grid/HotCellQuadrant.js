@@ -74,6 +74,7 @@ const More = styled.button`
     right: ${-(props.zoomLevel * 8)}px;
   `}
 `
+More.displayName = 'More'
 
 const nameToIcon = {
   collection: CollectionIcon,
