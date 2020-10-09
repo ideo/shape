@@ -73,10 +73,11 @@ const CloseButton = styled.button`
 const DefaultWrapper = styled.div`
   height: 100%;
 `
+DefaultWrapper.displayName = 'DefaultWrapper'
 
-const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
-const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
-const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
+export const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
+export const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
+export const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -102,10 +103,6 @@ class HotCell extends React.Component {
         templateId: collection.id,
       },
     }
-  }
-
-  handleTypeClick = type => () => {
-    this.startCreating(type)
   }
 
   handleClose = ev => {
