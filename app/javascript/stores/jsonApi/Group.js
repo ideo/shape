@@ -22,6 +22,14 @@ class Group extends BaseRecord {
     return this.is_primary || this.is_guest || this.is_admin
   }
 
+  API_fetch() {
+    const fetchGroups = async () => {
+      await this.apiStore.request(`groups/`, 'GET')
+    }
+
+    fetchGroups()
+  }
+
   API_archive() {
     const onAgree = async () => {
       await this.apiStore.request(`groups/${this.id}/archive`, 'PATCH')

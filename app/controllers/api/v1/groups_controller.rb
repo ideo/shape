@@ -8,6 +8,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   before_action :load_user_groups, only: %i[index]
   before_action :load_and_filter_index, only: %i[index]
   def index
+    # TODO: handle group_ids parameter
     if current_organization.blank?
       render json: { errors: ['Organization is required'] }, status: :bad_request
     else

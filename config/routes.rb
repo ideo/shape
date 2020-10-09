@@ -225,6 +225,10 @@ Rails.application.routes.draw do
           end
         end
       end
+
+      namespace :creative_difference do
+        resources :groups, only: %i[index]
+      end
     end
   end
 

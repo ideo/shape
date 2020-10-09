@@ -10,7 +10,7 @@ import {
   PropTypes as MobxPropTypes,
   PropTypes,
 } from 'mobx-react'
-import OrganizationRoles from './OrganizationRoles'
+import OrganizationRoles from './SimpleUserSummary'
 import DropdownSelect from './DropdownSelect'
 import Loader from '../layout/Loader'
 

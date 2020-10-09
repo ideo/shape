@@ -8,7 +8,7 @@ import {
 } from './creativeDifferenceApis'
 
 import DropdownSelect from './DropdownSelect'
-import OrganizationRoles from './OrganizationRoles'
+import OrganizationRoles from './SimpleUserSummary'
 import Languages from './Languages'
 import Loader from '~/ui/layout/Loader'
 import { apiStore } from '~/stores'

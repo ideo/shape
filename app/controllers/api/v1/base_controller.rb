@@ -65,6 +65,7 @@ class Api::V1::BaseController < ApplicationController
       current_user: current_user || User.new,
       current_ability: current_ability,
       current_api_token: current_api_token,
+      current_application: current_application,
       frontend_url_for: lambda { |obj| frontend_url_for(obj) },
     }
   end
