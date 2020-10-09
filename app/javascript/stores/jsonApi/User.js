@@ -128,13 +128,7 @@ class User extends BaseRecord {
     // Add the most recently used template to beginning, filtering out dupes
     localStorage.setItem(
       USER_MOST_USED_TEMPLATES,
-      _.take(
-        [
-          template.toJsonApi(),
-          ...templates.filter(usedTemplate => usedTemplate.id !== template.id),
-        ],
-        5
-      )
+      _.take(_.uniqBy([template.toJsonApi(), ...templates], 'id'), 5)
     )
   }
 
