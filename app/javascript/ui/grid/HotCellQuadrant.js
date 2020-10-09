@@ -254,7 +254,16 @@ HotCellQuadrant.propTypes = {
   onMoreMenuOpen: PropTypes.func.isRequired,
   onMoreMenuClose: PropTypes.func.isRequired,
   zoomLevel: PropTypes.number.isRequired,
-  subTypes: PropTypes.func,
+  subTypes: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      description: PropTypes.string,
+      component: PropTypes.node,
+      opts: PropTypes.shape({
+        templateId: PropTypes.string,
+      }),
+    })
+  ),
   currentMenuOpen: PropTypes.bool,
   displayName: PropTypes.bool,
 }
