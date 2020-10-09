@@ -136,7 +136,8 @@ class HotCellQuadrant extends React.Component {
             subItems:
               subTypes &&
               subTypes.map(subType => {
-                if (name === 'component') return { component }
+                if (subType.name === 'component')
+                  return { component: subType.component }
                 let TypeIcon = nameToIcon[subType.name]
                 if (subType.description === 'Create New Template')
                   TypeIcon = PlusIcon

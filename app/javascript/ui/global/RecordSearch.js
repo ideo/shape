@@ -22,6 +22,7 @@ const AutoCompleteWrapper = styled.div`
   ${props =>
     props.smallSearchStyle &&
     `
+    max-width: 350px;
     #react-select-chip {
       background-color: ${v.colors.commonLight} !important;
       border-radius: 18px !important;

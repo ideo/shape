@@ -227,15 +227,17 @@ const DefaultWrapper = styled.div`
 `
 
 export const StyledMenuButton = styled.button`
-  text-transform: capitalize;
   font-family: ${v.fonts.sans};
   font-weight: 400;
   font-size: 1rem;
-  text-align: left;
+  height: 20px;
+  line-height: 20px;
   max-width: 280px;
-  padding-left: ${props => props.nested * 10}px;
   margin-top: -13px;
   margin-bottom: -13px;
+  padding-left: ${props => props.nested * 10}px;
+  text-align: left;
+  text-transform: capitalize;
   width: 100%;
   ${props =>
     props.wrapText
@@ -297,6 +299,10 @@ export const StyledMenuItem = styled.li`
     }
 
     .icon-left {
+      vertical-align: middle;
+      display: inline-block;
+      padding-top: 4px;
+
       margin-right: ${props => {
         if (props.hasCheckbox) {
           return 10

@@ -185,6 +185,7 @@ class HotCell extends React.Component {
   }
 
   get templateTypes() {
+    const { uiStore } = this.props
     let templates = [
       { description: 'Create New Template', name: 'template' },
       {
@@ -195,7 +196,7 @@ class HotCell extends React.Component {
             onSearch={this.onTemplateSearch}
             initialLoadAmount={0}
             searchParams={{ master_template: true, per_page: 10 }}
-            smallSearchStyle
+            smallSearchStyle={!uiStore.isTouchDevice}
           />
         ),
       },
