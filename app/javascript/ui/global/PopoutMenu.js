@@ -221,7 +221,10 @@ StyledMenuToggle.defaultTypes = {
 
 StyledMenuToggle.displayName = 'StyledMenuToggle'
 
-const DefaultWrapper = styled.div``
+const DefaultWrapper = styled.div`
+  position: relative;
+  z-index: ${v.zIndex.aboveClickWrapper};
+`
 
 export const StyledMenuButton = styled.button`
   text-transform: capitalize;
