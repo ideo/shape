@@ -4,8 +4,9 @@ import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
 
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
-import RolesDialogActions from '~/ui/roles/RolesDialogActions'
+import GroupsModifyDialogActions from '~/ui/groups/GroupsModifyDialogActions'
 import RolesMenu from '~/ui/roles/RolesMenu'
+import RolesMenuDialogActions from '~/ui/roles/RolesMenuDialogActions'
 import InlineLoader from '~/ui/layout/InlineLoader'
 import Loader from '~/ui/layout/Loader'
 import OrganizationPeople from '~/ui/organizations/OrganizationPeople'
@@ -22,6 +23,8 @@ class OrganizationMenu extends React.Component {
   editGroup = {}
   @observable
   isLoading = false
+  @observable
+  groupFormDisabled = false
 
   get currentPage() {
     return this.props.uiStore.organizationMenuPage
@@ -54,6 +57,11 @@ class OrganizationMenu extends React.Component {
     this.changePage('organizationPeople')
     this.isLoading = false
     this.editGroup = {}
+  }
+
+  @action
+  disableGroupForm = disabled => {
+    this.groupFormDisabled = disabled
   }
 
   saveOrganization = primaryGroup => {
@@ -145,27 +153,30 @@ class OrganizationMenu extends React.Component {
         group={{}}
         isLoading={this.isLoading}
         onSave={this.createGroup}
+        formDisabled={this.groupFormDisabled}
+        handleDisableForm={this.disableGroupForm}
       />
     )
   }
 
   renderCreateOrganization() {
+    if (this.isLoading) return <InlineLoader />
     return (
-      <div>
-        {this.isLoading && <InlineLoader />}
-        <GroupModify
-          group={{}}
-          isLoading={this.isLoading}
-          onSave={this.createOrganization}
-          onCancel={this.handleLogout}
-          groupType="Organization"
-          creatingOrg
-        />
-      </div>
+      <GroupModify
+        group={{}}
+        isLoading={this.isLoading}
+        onSave={this.createOrganization}
+        onCancel={this.handleLogout}
+        groupType="Organization"
+        creatingOrg
+        formDisabled={this.groupFormDisabled}
+        handleDisableForm={this.disableGroupForm}
+      />
     )
   }
 
   renderEditOrganization() {
+    /*FIXME this may not be used*/
     const { organization } = this.props
     const editGroup = organization.primary_group
     return (
@@ -220,19 +231,45 @@ class OrganizationMenu extends React.Component {
     )
   }
 
-  renderDialogActions() {
+  renderGroupsModifyDialogActions(dialogType) {
+    if (dialogType === 'group') {
+      return (
+        <GroupsModifyDialogActions
+          isLoading={this.isLoading}
+          onSave={this.createGroup}
+          formDisabled={this.groupFormDisabled}
+        />
+      )
+    } else if (dialogType === 'organization') {
+      return (
+        <GroupsModifyDialogActions
+          isLoading={this.isLoading}
+          onSave={this.createOrganization}
+          onCancel={this.handleLogout}
+          groupType="Organization"
+          creatingOrg
+          formDisabled={this.groupFormDisabled}
+        />
+      )
+    }
+
+    return null
+  }
+
+  renderRolesModifyDialogActions() {
     let fixedRole = null
     if (this.editGroup.is_guest) {
       fixedRole = 'member'
     } else if (this.editGroup.is_admin) {
       fixedRole = 'admin'
     }
+
     if (!this.editGroup.id) {
       return null
     }
 
     return (
-      <RolesDialogActions
+      <RolesMenuDialogActions
         record={this.editGroup}
         setDidAddNewRole={this.setDidAddNewRole}
         fixedRole={fixedRole}
@@ -249,13 +286,18 @@ class OrganizationMenu extends React.Component {
         content = this.renderAddGroup()
         title = 'New Group'
         onBack = this.goBack
+        dialogActions = this.renderGroupsModifyDialogActions('group')
+        noScroll = true
         break
       case 'newOrganization':
         title = 'New Organization'
         onBack = locked ? null : this.goBack
         content = this.renderCreateOrganization()
+        dialogActions = this.renderGroupsModifyDialogActions('organization')
+        noScroll = true
         break
       case 'editOrganization':
+        // FIXME: this is no longer reachable
         title = 'Your Organization'
         onBack = this.goBack
         content = this.renderEditOrganization()
@@ -274,7 +316,7 @@ class OrganizationMenu extends React.Component {
             })
           }
           content = this.renderEditRoles()
-          dialogActions = this.renderDialogActions()
+          dialogActions = this.renderRolesModifyDialogActions()
           noScroll = true
         }
         if (this.editGroup.can_edit) {

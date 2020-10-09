@@ -10,7 +10,7 @@ jest.mock('../../../app/javascript/stores/jsonApi/Organization')
 jest.mock('../../../app/javascript/vendor/googleTagManager')
 
 describe('OrganizationMenu', () => {
-  let component, props, wrapper
+  let props, rerender, wrapper, component
 
   beforeEach(() => {
     fakeUiStore.viewingCollection = { id: 1 }
@@ -50,8 +50,11 @@ describe('OrganizationMenu', () => {
     props.uiStore.update.mockClear()
     props.uiStore.alert.mockClear()
     Organization.mockClear()
-    wrapper = shallow(<OrganizationMenu.wrappedComponent {...props} />)
-    component = wrapper.instance()
+    rerender = () => {
+      wrapper = shallow(<OrganizationMenu.wrappedComponent {...props} />)
+      component = wrapper.instance()
+    }
+    rerender()
   })
 
   it('closes the organization menu when exited', () => {
@@ -163,6 +166,37 @@ describe('OrganizationMenu', () => {
         formType: 'Additional Org',
         organization: 'sluggity',
       })
+    })
+  })
+
+  describe('GroupModify', () => {
+    beforeEach(() => {
+      props.uiStore.organizationMenuPage = 'addGroup'
+      rerender()
+    })
+
+    it('should render GroupModify', () => {
+      expect(wrapper.find('GroupModify').exists()).toBe(true)
+    })
+
+    it('should assign dialogActions', () => {
+      expect(wrapper.find('Modal').props().dialogActions).toBeTruthy()
+    })
+  })
+
+  describe('RolesModify', () => {
+    beforeEach(() => {
+      props.uiStore.organizationMenuPage = 'editRoles'
+      rerender()
+      component.goToEditGroupRoles(fakeGroup)
+    })
+
+    it('should render RolesModify', () => {
+      expect(wrapper.find('Modal').props().dialogActions).toBeTruthy()
+    })
+
+    it('should assign dialogActions', () => {
+      expect(wrapper.find('Modal').props().dialogActions).toBeTruthy()
     })
   })
 })

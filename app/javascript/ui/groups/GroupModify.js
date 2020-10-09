@@ -3,18 +3,16 @@ import PropTypes from 'prop-types'
 import { action, runInAction, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
 import parameterize from 'parameterize'
-import Button from '~/ui/global/Button'
 import TextButton from '~/ui/global/TextButton'
-import { SmallHelperText, SubduedText } from '~/ui/global/styled/typography'
+import { SmallHelperText } from '~/ui/global/styled/typography'
 import {
   FieldContainer,
-  FormActionsContainer,
   Label,
   ImageField,
   TextField,
 } from '~/ui/global/styled/forms'
 import { uiStore } from '~/stores'
-import { FloatRight } from '~/ui/global/styled/layout'
+import { FloatRight, ScrollArea } from '~/ui/global/styled/layout'
 import FilestackUpload from '~/utils/FilestackUpload'
 import Avatar from '~/ui/global/Avatar'
 import v from '~/utils/variables'
@@ -35,12 +33,13 @@ class GroupModify extends React.Component {
   }
   @observable
   syncing = false
-  @observable
-  formDisabled = false
 
   constructor(props) {
     super(props)
-    const { group } = props
+  }
+
+  componentDidMount() {
+    const { group, handleDisableForm } = this.props
     runInAction(() => {
       this.editingGroup = {
         name: group.name || '',
@@ -50,7 +49,9 @@ class GroupModify extends React.Component {
       }
       if (!group.id) this.setSyncing(true)
       if (this.editingGroup.handle.length < 2) {
-        this.formDisabled = true
+        handleDisableForm(true)
+      } else {
+        handleDisableForm(false)
       }
     })
   }
@@ -67,11 +68,16 @@ class GroupModify extends React.Component {
 
   @action
   changeHandle(handle) {
+    const { handleDisableForm } = this.props
     // limit to 30
     this.editingGroup.handle = handle.slice(0, 30)
     const first = _.first(_.slice(handle, 0, 1))
     // disable the form if the handle starts with a number
-    this.formDisabled = parseInt(first).toString() === first
+    if (!first || parseInt(first).toString() === first) {
+      handleDisableForm(true)
+    } else {
+      handleDisableForm(false)
+    }
   }
 
   @action
@@ -136,10 +142,10 @@ class GroupModify extends React.Component {
   }
 
   render() {
-    const { creatingOrg, group, groupType, onCancel, isLoading } = this.props
+    const { group, groupType, formDisabled } = this.props
     const { editingGroup } = this
     return (
-      <form>
+      <ScrollArea>
         <FloatRight>
           {group.id && (
             <TextButton onClick={this.handleRoles}>Members</TextButton>
@@ -161,7 +167,7 @@ class GroupModify extends React.Component {
           <div style={{ marginTop: '-10px', marginBottom: '10px' }}>
             <SmallHelperText
               color={
-                this.formDisabled && editingGroup.name
+                formDisabled && (editingGroup.name || editingGroup.handle)
                   ? v.colors.alert
                   : v.colors.commonMedium
               }
@@ -184,29 +190,7 @@ class GroupModify extends React.Component {
             {this.renderImagePicker()}
           </button>
         </FieldContainer>
-        <FormActionsContainer>
-          <Button
-            data-cy="FormButton_submitGroup"
-            disabled={this.formDisabled || isLoading}
-            onClick={this.handleSave}
-            minWidth={190}
-            type="submit"
-          >
-            {groupType === 'Group' ? 'Add Members' : 'Save'}
-          </Button>
-        </FormActionsContainer>
-        {creatingOrg && (
-          <div style={{ textAlign: 'center' }}>
-            <SubduedText fontSize="12px">
-              Are you looking for your team? You may need to ask for an
-              invitation.
-            </SubduedText>
-            <br />
-            <br />
-            <TextButton onClick={onCancel}>Come back later</TextButton>
-          </div>
-        )}
-      </form>
+      </ScrollArea>
     )
   }
 }
@@ -214,11 +198,10 @@ class GroupModify extends React.Component {
 GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
   onSave: PropTypes.func.isRequired,
-  onCancel: PropTypes.func,
   onGroupRoles: PropTypes.func,
   groupType: PropTypes.oneOf(['Group', 'Organization']),
-  creatingOrg: PropTypes.bool,
-  isLoading: PropTypes.bool,
+  handleDisableForm: PropTypes.func.isRequired,
+  formDisabled: PropTypes.bool.isRequired,
 }
 GroupModify.defaultProps = {
   onGroupRoles: null,

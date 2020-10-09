@@ -6,7 +6,7 @@ import RolesAdd from '~/ui/roles/RolesAdd'
 
 @inject('uiStore', 'apiStore')
 @observer
-class RolesDialogActions extends React.Component {
+class RolesMenuDialogActions extends React.Component {
   createUsers = async emails => {
     const { apiStore, uiStore } = this.props
     return await apiStore
@@ -68,23 +68,23 @@ class RolesDialogActions extends React.Component {
   }
 }
 
-RolesDialogActions.wrappedComponent.propTypes = {
+RolesMenuDialogActions.wrappedComponent.propTypes = {
   apiStore: MobxPropTypes.objectOrObservableObject.isRequired,
   uiStore: MobxPropTypes.objectOrObservableObject.isRequired,
 }
 
-RolesDialogActions.propTypes = {
+RolesMenuDialogActions.propTypes = {
   record: MobxPropTypes.objectOrObservableObject,
   fixedRole: PropTypes.string,
   context: PropTypes.string,
 }
 
-RolesDialogActions.defaultProps = {
+RolesMenuDialogActions.defaultProps = {
   record: null,
   fixedRole: null,
   context: '',
 }
 
-RolesDialogActions.displayName = 'RolesDialogActions'
+RolesMenuDialogActions.displayName = 'RolesMenuDialogActions'
 
-export default RolesDialogActions
+export default RolesMenuDialogActions

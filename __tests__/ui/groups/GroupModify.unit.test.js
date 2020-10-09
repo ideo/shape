@@ -18,6 +18,8 @@ describe('GroupModify', () => {
       onSave: jest.fn(),
       onGroupRoles: jest.fn(),
       apiStore,
+      handleDisableForm: jest.fn(),
+      formDisabled: false,
     }
     rerender = () => {
       wrapper = shallow(<GroupModify {...props} />)
@@ -26,7 +28,7 @@ describe('GroupModify', () => {
     rerender()
   })
 
-  describe('constructor', () => {
+  describe('componentDidMount', () => {
     describe('with an uncreated group', () => {
       it('should set all the editingGroup attrs to empty strings', () => {
         expect(component.editingGroup.name).toEqual('')
@@ -49,7 +51,7 @@ describe('GroupModify', () => {
       })
 
       it('should disable the form button', () => {
-        expect(component.formDisabled).toBeTruthy()
+        expect(props.handleDisableForm).toHaveBeenCalled()
       })
     })
 
@@ -88,7 +90,7 @@ describe('GroupModify', () => {
     describe('with an invalid handle (starts with a number)', () => {
       it('should disable the form button', () => {
         component.handleHandleChange({ target: { value: '12a' } })
-        expect(component.formDisabled).toBeTruthy()
+        expect(props.handleDisableForm).toHaveBeenCalled()
       })
     })
   })
