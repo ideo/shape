@@ -214,7 +214,7 @@ const SelectWrapped = props => {
 
 const styles = theme => ({
   root: {
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     flexGrow: 1,
     height: 30,
     paddingTop: '8px',
@@ -229,8 +229,7 @@ const styles = theme => ({
     paddingTop: 0,
   },
   input: {
-    backgroundColor: 'white',
-    borderRadius: 0,
+    backgroundColor: 'transparent',
     height: '11px',
     paddingBottom: '20px',
     paddingTop: '0px',
