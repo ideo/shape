@@ -386,21 +386,21 @@ class Organization < ApplicationRecord
   end
 
   def cache_most_used_template_ids!
-    self.cached_5_most_used_template_ids = most_used_template_ids
-    if cached_5_most_used_template_ids.count > 5
+    self.cached_5_most_used_template_ids = most_used_template_ids || []
+    if self.cached_5_most_used_template_ids.count < 5
       templates_alpha_order = Collection
                               .where(
                                 master_template: true,
                                 organization_id: id,
                               )
-                              .joins(collection: [roles: :groups_roles])
+                              .joins(roles: :groups_roles)
                               .where(GroupsRole.arel_table[:group_id].eq(
                                 primary_group.id),
                               )
                               .order(:name)
                               .first(5 - cached_5_most_used_template_ids.count)
                               .pluck(:id)
-      cached_5_most_used_template_ids + templates_alpha_order
+      self.cached_5_most_used_template_ids += templates_alpha_order
     end
     save
   end
