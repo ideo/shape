@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { action, runInAction, observable } from 'mobx'
 import { observer, PropTypes as MobxPropTypes } from 'mobx-react'
@@ -25,13 +24,6 @@ function transformToHandle(name) {
 @observer
 class GroupModify extends React.Component {
   @observable
-  editingGroup = {
-    name: '',
-    handle: '',
-    filestack_file_url: '',
-    filestack_file_attributes: null,
-  }
-  @observable
   syncing = false
 
   constructor(props) {
@@ -39,20 +31,9 @@ class GroupModify extends React.Component {
   }
 
   componentDidMount() {
-    const { group, handleDisableForm } = this.props
+    const { group } = this.props
     runInAction(() => {
-      this.editingGroup = {
-        name: group.name || '',
-        handle: group.handle || '',
-        filestack_file_url: group.filestack_file_url || '',
-        filestack_file_attributes: null,
-      }
       if (!group.id) this.setSyncing(true)
-      if (this.editingGroup.handle.length < 2) {
-        handleDisableForm(true)
-      } else {
-        handleDisableForm(false)
-      }
     })
   }
 
@@ -61,38 +42,15 @@ class GroupModify extends React.Component {
     this.syncing = val
   }
 
-  @action
-  changeName(name) {
-    this.editingGroup.name = name
-  }
-
-  @action
-  changeHandle(handle) {
-    const { handleDisableForm } = this.props
-    // limit to 30
-    this.editingGroup.handle = handle.slice(0, 30)
-    const first = _.first(_.slice(handle, 0, 1))
-    // disable the form if the handle starts with a number
-    if (!first || parseInt(first).toString() === first) {
-      handleDisableForm(true)
-    } else {
-      handleDisableForm(false)
-    }
-  }
-
-  @action
-  changeUrl(fileAttrs) {
-    this.editingGroup.filestack_file_url = fileAttrs.url
-    this.editingGroup.filestack_file_attributes = fileAttrs
-  }
-
   handleNameChange = ev => {
-    this.changeName(ev.target.value)
-    if (this.syncing) this.changeHandle(transformToHandle(ev.target.value))
+    const { changeGroupFormName, changeGroupFormHandle } = this.props
+    changeGroupFormName(ev.target.value)
+    if (this.syncing) changeGroupFormHandle(transformToHandle(ev.target.value))
   }
 
   handleHandleChange = ev => {
-    this.changeHandle(ev.target.value)
+    const { changeGroupFormHandle } = this.props
+    changeGroupFormHandle(ev.target.value)
     this.setSyncing(false)
   }
 
@@ -103,10 +61,11 @@ class GroupModify extends React.Component {
   }
 
   handleImagePick = ev => {
+    const { changeGroupFormFileAttrs } = this.props
     ev.preventDefault()
     FilestackUpload.pickImage({
       onSuccess: fileAttrs => {
-        this.changeUrl(fileAttrs)
+        changeGroupFormFileAttrs(fileAttrs)
       },
       onFailure: filesFailed => {
         uiStore.alert(`Failed to upload image: ${filesFailed}`)
@@ -114,25 +73,18 @@ class GroupModify extends React.Component {
     })
   }
 
-  handleSave = ev => {
-    ev.preventDefault()
-    const { onSave } = this.props
-    if (onSave) {
-      onSave(this.editingGroup)
-    }
-  }
-
   renderImagePicker() {
+    const { groupFormFields } = this.props
     let imagePicker = (
       <ImageField>
         <span>+</span>
       </ImageField>
     )
-    if (this.editingGroup.filestack_file_url) {
+    if (groupFormFields.filestack_file_url) {
       imagePicker = (
         <Avatar
-          title={this.editingGroup.name}
-          url={this.editingGroup.filestack_file_url}
+          title={groupFormFields.name}
+          url={groupFormFields.filestack_file_url}
           size={100}
           clickable={true}
         />
@@ -142,8 +94,7 @@ class GroupModify extends React.Component {
   }
 
   render() {
-    const { group, groupType, formDisabled } = this.props
-    const { editingGroup } = this
+    const { group, groupType, formDisabled, groupFormFields } = this.props
     return (
       <ScrollArea>
         <FloatRight>
@@ -157,7 +108,7 @@ class GroupModify extends React.Component {
             id="groupName"
             type="text"
             data-cy="TextField_groupName"
-            value={editingGroup.name}
+            value={groupFormFields.name}
             onChange={this.handleNameChange}
             placeholder={`Enter ${groupType} Name`}
           />
@@ -167,7 +118,7 @@ class GroupModify extends React.Component {
           <div style={{ marginTop: '-10px', marginBottom: '10px' }}>
             <SmallHelperText
               color={
-                formDisabled && (editingGroup.name || editingGroup.handle)
+                formDisabled && (groupFormFields.name || groupFormFields.handle)
                   ? v.colors.alert
                   : v.colors.commonMedium
               }
@@ -179,7 +130,7 @@ class GroupModify extends React.Component {
             id="grouphandle"
             type="text"
             data-cy="TextField_groupHandle"
-            value={editingGroup.handle}
+            value={groupFormFields.handle}
             onChange={this.handleHandleChange}
             placeholder={`@${groupType.toLowerCase()}-handle`}
           />
@@ -197,18 +148,19 @@ class GroupModify extends React.Component {
 
 GroupModify.propTypes = {
   group: MobxPropTypes.objectOrObservableObject.isRequired,
-  onSave: PropTypes.func.isRequired,
+  groupFormFields: MobxPropTypes.objectOrObservableObject.isRequired,
   onGroupRoles: PropTypes.func,
   groupType: PropTypes.oneOf(['Group', 'Organization']),
-  handleDisableForm: PropTypes.func.isRequired,
   formDisabled: PropTypes.bool.isRequired,
+  changeGroupFormName: PropTypes.func.isRequired,
+  changeGroupFormHandle: PropTypes.func.isRequired,
+  changeGroupFormFileAttrs: PropTypes.func.isRequired,
 }
 GroupModify.defaultProps = {
   onGroupRoles: null,
   onCancel: () => {},
   groupType: 'Group',
   creatingOrg: false,
-  isLoading: false,
 }
 
 export default GroupModify

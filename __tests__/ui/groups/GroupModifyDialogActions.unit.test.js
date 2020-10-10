@@ -1,6 +1,6 @@
-import GroupsModifyDialogActions from '~/ui/groups/GroupsModifyDialogActions'
+import GroupModifyDialogActions from '~/ui/groups/GroupModifyDialogActions'
 
-describe('GroupsModifyDialogActions', () => {
+describe('GroupModifyDialogActions', () => {
   let props, wrapper, rerender
 
   beforeEach(() => {
@@ -10,9 +10,10 @@ describe('GroupsModifyDialogActions', () => {
       creatingOrg: false,
       isLoading: false,
       formDisabled: false,
+      onSave: jest.fn(),
     }
     rerender = () => {
-      wrapper = shallow(<GroupsModifyDialogActions {...props} />)
+      wrapper = shallow(<GroupModifyDialogActions {...props} />)
     }
     rerender()
   })
@@ -30,9 +31,10 @@ describe('GroupsModifyDialogActions', () => {
         creatingOrg: true,
         isLoading: false,
         formDisabled: false,
+        onSave: jest.fn(),
       }
       rerender = () => {
-        wrapper = shallow(<GroupsModifyDialogActions {...props} />)
+        wrapper = shallow(<GroupModifyDialogActions {...props} />)
       }
       rerender()
     })
@@ -70,6 +72,13 @@ describe('GroupsModifyDialogActions', () => {
 
     it('should disable the form button', () => {
       expect(wrapper.find('Button').props().disabled).toBe(true)
+    })
+  })
+
+  describe('onSave', () => {
+    it('should call the onSave prop', () => {
+      wrapper.find('Button').simulate('click')
+      expect(props.onSave).toHaveBeenCalled()
     })
   })
 })

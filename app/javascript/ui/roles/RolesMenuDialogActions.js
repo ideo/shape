@@ -48,11 +48,12 @@ class RolesMenuDialogActions extends React.Component {
     // e.g. "admin" is the only selection for Org Admins group
     const addRoleTypes = fixedRole ? [fixedRole] : roleTypes(ownerType)
 
-    // const editableGroups = groups.filter(group => group.can_edit)
+    // get editable groups within record roles
     const editableGroups = record.roles.map(role => {
-      return role.groups.filter(group => {
-        return group.can_edit
-      })
+      if (role && role.groups) {
+        return role.groups.filter(group => group.can_edit)
+      }
+      return []
     })
 
     return (
@@ -62,7 +63,9 @@ class RolesMenuDialogActions extends React.Component {
         onCreateUsers={this.createUsers}
         onCreateRoles={uiStore.createRoles}
         ownerType={ownerType}
-        addableGroups={_.flatten(editableGroups)}
+        addableGroups={
+          editableGroups.length > 0 ? _.flatten(editableGroups) : []
+        }
       />
     )
   }

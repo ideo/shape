@@ -1,10 +1,12 @@
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { action, runInAction, observable, toJS } from 'mobx'
 import { inject, observer, PropTypes as MobxPropTypes } from 'mobx-react'
+import _ from 'lodash'
 
 import Modal from '~/ui/global/modals/Modal'
 import GroupModify from '~/ui/groups/GroupModify'
-import GroupsModifyDialogActions from '~/ui/groups/GroupsModifyDialogActions'
+import GroupModifyDialogActions from '~/ui/groups/GroupModifyDialogActions'
 import RolesMenu from '~/ui/roles/RolesMenu'
 import RolesMenuDialogActions from '~/ui/roles/RolesMenuDialogActions'
 import InlineLoader from '~/ui/layout/InlineLoader'
@@ -24,7 +26,15 @@ class OrganizationMenu extends React.Component {
   @observable
   isLoading = false
   @observable
-  groupFormDisabled = false
+  groupFormDisabled = true
+  defaultGroupFormFields = {
+    name: '',
+    handle: '',
+    filestack_file_url: '',
+    filestack_file_attributes: null,
+  }
+  @observable
+  groupFormFields = { ...this.defaultGroupFormFields }
 
   get currentPage() {
     return this.props.uiStore.organizationMenuPage
@@ -42,6 +52,7 @@ class OrganizationMenu extends React.Component {
     this.editGroup = group
   }
 
+  @action
   goToAddGroup = ev => {
     this.changePage('addGroup')
   }
@@ -60,8 +71,27 @@ class OrganizationMenu extends React.Component {
   }
 
   @action
-  disableGroupForm = disabled => {
-    this.groupFormDisabled = disabled
+  changeGroupFormName(name) {
+    this.groupFormFields.name = name
+  }
+
+  @action
+  changeGroupFormHandle(handle) {
+    // limit to 30
+    this.groupFormFields.handle = handle.slice(0, 30)
+    const first = _.first(_.slice(handle, 0, 1))
+    // disable form if the handle starts with a number
+    if (!first || parseInt(first).toString() === first) {
+      this.groupFormDisabled = true
+    } else {
+      this.groupFormDisabled = false
+    }
+  }
+
+  @action
+  changeGroupFormFileAttrs(fileAttrs) {
+    this.groupFormFields.filestack_file_url = fileAttrs.url
+    this.groupFormFields.filestack_file_attributes = fileAttrs
   }
 
   saveOrganization = primaryGroup => {
@@ -135,6 +165,7 @@ class OrganizationMenu extends React.Component {
     this.props.onClose()
     this.isLoading = false
     this.editGroup = {}
+    this.groupFormFields = { ...this.defaultGroupFormFields }
   }
 
   handleLogout = ev => {
@@ -151,27 +182,43 @@ class OrganizationMenu extends React.Component {
     return (
       <GroupModify
         group={{}}
-        isLoading={this.isLoading}
-        onSave={this.createGroup}
         formDisabled={this.groupFormDisabled}
-        handleDisableForm={this.disableGroupForm}
+        groupFormFields={this.groupFormFields}
+        changeGroupFormName={name => {
+          this.changeGroupFormName(name)
+        }}
+        changeGroupFormHandle={handle => {
+          this.changeGroupFormHandle(handle)
+        }}
+        changeGroupFormFileAttrs={fileAttrs => {
+          this.changeGroupFormFileAttrs(fileAttrs)
+        }}
       />
     )
   }
 
   renderCreateOrganization() {
-    if (this.isLoading) return <InlineLoader />
     return (
-      <GroupModify
-        group={{}}
-        isLoading={this.isLoading}
-        onSave={this.createOrganization}
-        onCancel={this.handleLogout}
-        groupType="Organization"
-        creatingOrg
-        formDisabled={this.groupFormDisabled}
-        handleDisableForm={this.disableGroupForm}
-      />
+      <Fragment>
+        {this.isLoading && <InlineLoader />}
+        <GroupModify
+          group={{}}
+          onCancel={this.handleLogout}
+          groupType="Organization"
+          creatingOrg
+          formDisabled={this.groupFormDisabled}
+          groupFormFields={this.groupFormFields}
+          changeGroupFormName={name => {
+            this.changeGroupFormName(name)
+          }}
+          changeGroupFormHandle={handle => {
+            this.changeGroupFormHandle(handle)
+          }}
+          changeGroupFormFileAttrs={fileAttrs => {
+            this.changeGroupFormFileAttrs(fileAttrs)
+          }}
+        />
+      </Fragment>
     )
   }
 
@@ -183,6 +230,7 @@ class OrganizationMenu extends React.Component {
       <GroupModify
         onGroupRoles={this.onGroupRoles(editGroup)}
         group={editGroup}
+        groupFormFields={this.groupFormFields}
         isLoading={this.isLoading}
         onSave={group => {
           this.saveOrganization(group)
@@ -231,24 +279,31 @@ class OrganizationMenu extends React.Component {
     )
   }
 
-  renderGroupsModifyDialogActions(dialogType) {
+  renderGroupModifyDialogActions(dialogType) {
+    if (this.isLoading) return null
+
     if (dialogType === 'group') {
       return (
-        <GroupsModifyDialogActions
+        <GroupModifyDialogActions
           isLoading={this.isLoading}
-          onSave={this.createGroup}
+          onSave={() => {
+            this.createGroup(this.groupFormFields)
+          }}
           formDisabled={this.groupFormDisabled}
         />
       )
     } else if (dialogType === 'organization') {
       return (
-        <GroupsModifyDialogActions
+        <GroupModifyDialogActions
           isLoading={this.isLoading}
-          onSave={this.createOrganization}
+          onSave={() => {
+            this.createOrganization(this.groupFormFields)
+          }}
           onCancel={this.handleLogout}
           groupType="Organization"
           creatingOrg
           formDisabled={this.groupFormDisabled}
+          groupFormFields={this.groupFormFields}
         />
       )
     }
@@ -257,6 +312,8 @@ class OrganizationMenu extends React.Component {
   }
 
   renderRolesModifyDialogActions() {
+    if (this.isLoading) return null
+
     let fixedRole = null
     if (this.editGroup.is_guest) {
       fixedRole = 'member'
@@ -286,14 +343,14 @@ class OrganizationMenu extends React.Component {
         content = this.renderAddGroup()
         title = 'New Group'
         onBack = this.goBack
-        dialogActions = this.renderGroupsModifyDialogActions('group')
+        dialogActions = this.renderGroupModifyDialogActions('group')
         noScroll = true
         break
       case 'newOrganization':
         title = 'New Organization'
         onBack = locked ? null : this.goBack
         content = this.renderCreateOrganization()
-        dialogActions = this.renderGroupsModifyDialogActions('organization')
+        dialogActions = this.renderGroupModifyDialogActions('organization')
         noScroll = true
         break
       case 'editOrganization':

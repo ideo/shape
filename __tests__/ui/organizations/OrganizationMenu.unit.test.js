@@ -187,16 +187,24 @@ describe('OrganizationMenu', () => {
   describe('RolesModify', () => {
     beforeEach(() => {
       props.uiStore.organizationMenuPage = 'editRoles'
+      props.uiStore.organizationMenuGroupId = fakeGroup.id
       rerender()
-      component.goToEditGroupRoles(fakeGroup)
     })
 
     it('should render RolesModify', () => {
-      expect(wrapper.find('Modal').props().dialogActions).toBeTruthy()
+      expect(wrapper.find('RolesMenu').exists()).toBe(true)
+    })
+  })
+
+  describe('when isLoading = true', () => {
+    beforeEach(() => {
+      props.uiStore.organizationMenuPage = 'editRoles'
+      props.isLoading = true
+      rerender()
     })
 
     it('should assign dialogActions', () => {
-      expect(wrapper.find('Modal').props().dialogActions).toBeTruthy()
+      expect(wrapper.find('Modal').props().dialogActions).toBeFalsy()
     })
   })
 })

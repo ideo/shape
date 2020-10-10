@@ -5,7 +5,7 @@ import TextButton from '~/ui/global/TextButton'
 import { SubduedText } from '~/ui/global/styled/typography'
 import { FormActionsContainer } from '~/ui/global/styled/forms'
 
-class GroupsModifyDialogActions extends React.Component {
+class GroupModifyDialogActions extends React.Component {
   render() {
     const {
       groupType,
@@ -13,6 +13,7 @@ class GroupsModifyDialogActions extends React.Component {
       creatingOrg,
       onCancel,
       formDisabled,
+      onSave,
     } = this.props
 
     return (
@@ -21,7 +22,7 @@ class GroupsModifyDialogActions extends React.Component {
           <Button
             data-cy="FormButton_submitGroup"
             disabled={formDisabled || isLoading}
-            onClick={this.handleSave}
+            onClick={onSave}
             minWidth={190}
             type="submit"
           >
@@ -44,15 +45,16 @@ class GroupsModifyDialogActions extends React.Component {
   }
 }
 
-GroupsModifyDialogActions.propTypes = {
+GroupModifyDialogActions.propTypes = {
   onCancel: PropTypes.func,
+  onSave: PropTypes.func.isRequired,
   groupType: PropTypes.oneOf(['Group', 'Organization']),
   creatingOrg: PropTypes.bool,
   isLoading: PropTypes.bool,
   formDisabled: PropTypes.bool,
 }
 
-GroupsModifyDialogActions.defaultProps = {
+GroupModifyDialogActions.defaultProps = {
   onCancel: () => {},
   groupType: 'Group',
   creatingOrg: false,
@@ -60,4 +62,4 @@ GroupsModifyDialogActions.defaultProps = {
   formDisabled: false,
 }
 
-export default GroupsModifyDialogActions
+export default GroupModifyDialogActions

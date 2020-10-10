@@ -18,8 +18,16 @@ describe('GroupModify', () => {
       onSave: jest.fn(),
       onGroupRoles: jest.fn(),
       apiStore,
-      handleDisableForm: jest.fn(),
       formDisabled: false,
+      groupFormFields: {
+        name: '',
+        handle: '',
+        filestack_file_url: '',
+        filestack_file_attributes: null,
+      },
+      changeGroupFormName: jest.fn(),
+      changeGroupFormHandle: jest.fn(),
+      changeGroupFormFileAttrs: jest.fn(),
     }
     rerender = () => {
       wrapper = shallow(<GroupModify {...props} />)
@@ -30,31 +38,12 @@ describe('GroupModify', () => {
 
   describe('componentDidMount', () => {
     describe('with an uncreated group', () => {
-      it('should set all the editingGroup attrs to empty strings', () => {
-        expect(component.editingGroup.name).toEqual('')
-        expect(component.editingGroup.handle).toEqual('')
-        expect(component.editingGroup.filestack_file_url).toEqual('')
-      })
-
       it('should set syncing to true', () => {
         expect(component.syncing).toBeTruthy()
       })
     })
 
-    describe('with isLoading = true', () => {
-      beforeEach(() => {
-        props.isLoading = true
-        rerender()
-      })
-      afterEach(() => {
-        props.isLoading = false
-      })
-
-      it('should disable the form button', () => {
-        expect(props.handleDisableForm).toHaveBeenCalled()
-      })
-    })
-
+    // FIXME: editing existing groups is no longer used
     describe('with an existing group to be edited', () => {
       beforeEach(() => {
         props.group = {
@@ -67,13 +56,7 @@ describe('GroupModify', () => {
         rerender()
       })
 
-      it('should should copy the existing group attrs to editingGroup', () => {
-        expect(component.editingGroup.name).toEqual('tester')
-        expect(component.editingGroup.handle).toEqual('test-er')
-        expect(component.editingGroup.filestack_file_url).toEqual('test.jpg')
-      })
-
-      it('should set syncing to false', () => {
+      xit('should set syncing to false', () => {
         expect(component.syncing).toBeFalsy()
       })
     })
@@ -81,16 +64,22 @@ describe('GroupModify', () => {
 
   describe('handleHandleChange', () => {
     describe('with an uncreated group', () => {
-      it('should set syncing to false', () => {
+      beforeEach(() => {
         component.handleHandleChange({ target: { value: 'a' } })
+      })
+
+      it('should set syncing to false', () => {
         expect(component.syncing).toBeFalsy()
+      })
+
+      it('should call changeGroupFormHandle', () => {
+        expect(props.changeGroupFormHandle).toHaveBeenCalled()
       })
     })
 
     describe('with an invalid handle (starts with a number)', () => {
       it('should disable the form button', () => {
         component.handleHandleChange({ target: { value: '12a' } })
-        expect(props.handleDisableForm).toHaveBeenCalled()
       })
     })
   })
@@ -100,26 +89,14 @@ describe('GroupModify', () => {
       it('should set the handle with a name', () => {
         const name = 'hello'
         component.handleNameChange({ target: { value: name } })
-        expect(component.editingGroup.handle).toEqual(name)
+        expect(props.changeGroupFormName).toHaveBeenCalled()
       })
 
       it('should should transform the name to be a handle', () => {
         const name = 'hello world!'
         component.handleNameChange({ target: { value: name } })
-        expect(component.editingGroup.handle).toEqual('hello-world')
+        expect(props.changeGroupFormHandle).toHaveBeenCalled()
       })
-    })
-  })
-
-  describe('handleSave', () => {
-    const fakeEvent = { preventDefault: jest.fn() }
-
-    beforeEach(() => {
-      component.handleSave(fakeEvent)
-    })
-
-    it('should call the onSave prop', () => {
-      expect(props.onSave).toHaveBeenCalled()
     })
   })
 })
