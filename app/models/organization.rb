@@ -172,7 +172,7 @@ class Organization < ApplicationRecord
     profile.archive! if profile.present?
 
     # Remove last_active_at for org they are being removed from
-    timestamps = user.last_active_at.except(self.id.to_s)
+    timestamps = user.last_active_at.except(id.to_s)
     user.update_columns(last_active_at: timestamps)
     # Set current org as one they are a member of
     # If nil, that is fine as they shouldn't have a current organization
@@ -387,7 +387,7 @@ class Organization < ApplicationRecord
 
   def cache_most_used_template_ids!
     self.cached_5_most_used_template_ids = most_used_template_ids || []
-    if self.cached_5_most_used_template_ids.count < 5
+    if cached_5_most_used_template_ids.count < 5
       templates_alpha_order = Collection
                               .where(
                                 master_template: true,
@@ -395,8 +395,8 @@ class Organization < ApplicationRecord
                               )
                               .joins(roles: :groups_roles)
                               .where(GroupsRole.arel_table[:group_id].eq(
-                                primary_group.id),
-                              )
+                                       primary_group.id,
+                                     ))
                               .order(:name)
                               .first(5 - cached_5_most_used_template_ids.count)
                               .pluck(:id)

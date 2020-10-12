@@ -739,8 +739,7 @@ describe Organization, type: :model do
     let(:organization) { create(:organization) }
     let(:template) do
       create(:collection,
-             add_editors: [organization.primary_group],
-            )
+             add_editors: [organization.primary_group])
     end
 
     context 'with a template used by org' do
@@ -769,8 +768,7 @@ describe Organization, type: :model do
         create(:collection,
                add_editors: [organization.primary_group],
                master_template: true,
-               organization: organization,
-              )
+               organization: organization)
       end
 
       before do
