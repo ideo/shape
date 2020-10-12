@@ -409,6 +409,7 @@ class Organization < ApplicationRecord
     Activity.where(organization: id, action: :template_used)
             .joins(collection: [roles: :groups_roles])
             .where(GroupsRole.arel_table[:group_id].eq(primary_group.id))
+            .where(Collection.arel_table[:archived].eq(false))
             .group(:collection)
             .order('count_id desc')
             .count('id')
