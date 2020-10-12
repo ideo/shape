@@ -243,6 +243,8 @@ class OrganizationMenu extends React.Component {
   }
 
   renderEditRoles() {
+    const { uiStore } = this.props
+
     return (
       <RolesMenu
         record={this.editGroup}
@@ -250,6 +252,7 @@ class OrganizationMenu extends React.Component {
         ownerId={this.editGroup.id}
         ownerType="groups"
         title="Members:"
+        addedNewRole={uiStore.addedNewRole}
       />
     )
   }
