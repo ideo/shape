@@ -222,6 +222,7 @@ class Breadcrumb extends React.Component {
       isSmallScreen,
       isTouchDevice,
       onBreadcrumbDive,
+      offsetPosition,
     } = this.props
     const renderItems = items.length > 0
     const { truncatedItems } = this
@@ -249,6 +250,7 @@ class Breadcrumb extends React.Component {
                   onBreadcrumbClick={this.props.onBreadcrumbClick}
                   restoreBreadcrumb={() => this.onRestoreBreadcrumb(item)}
                   onBreadcrumbDive={onBreadcrumbDive}
+                  offsetPosition={offsetPosition}
                   isTouchDevice={isTouchDevice}
                   isSmallScreen={isSmallScreen}
                 />
@@ -317,6 +319,13 @@ Breadcrumb.propTypes = {
    * the user experience.
    */
   isSmallScreen: PropTypes.bool,
+  /**
+   * An x and y positon to offset the popout menu by, helpful for positioning.
+   */
+  offsetPosition: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
 }
 
 Breadcrumb.defaultProps = {
@@ -327,6 +336,7 @@ Breadcrumb.defaultProps = {
   onBreadcrumbDive: null,
   containerWidth: null,
   maxDepth: 6,
+  offsetPosition: null,
   showBackButton: false,
   visiblyHidden: false,
   isTouchDevice: false,

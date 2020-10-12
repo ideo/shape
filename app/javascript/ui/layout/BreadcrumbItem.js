@@ -333,6 +333,7 @@ export class BreadcrumbItem extends React.Component {
   }
 
   renderDropdown() {
+    const { offsetPosition } = this.props
     const {
       breadcrumbDropDownRecords,
       baseDropDownRecords,
@@ -343,8 +344,18 @@ export class BreadcrumbItem extends React.Component {
     if (!dropdownOpen) return null
     const itemWidth = '90%'
 
+    let offsetY = 0
+    let offsetX = -20
+    if (offsetPosition) {
+      offsetY += offsetPosition.y || 0
+      offsetX += offsetPosition.x || 0
+    }
+
     return (
-      <StyledMenuWrapper style={{ marginTop: '0px', left: '-20px' }} open>
+      <StyledMenuWrapper
+        style={{ marginTop: `${offsetY}px`, left: `${offsetX}px` }}
+        open
+      >
         <StyledMenu
           width={MENU_WIDTH}
           onMouseOver={this.onDropdownHoverOver}
@@ -471,6 +482,10 @@ BreadcrumbItem.propTypes = {
   restoreBreadcrumb: PropTypes.func.isRequired,
   onBreadcrumbDive: PropTypes.func,
   onBreadcrumbClick: PropTypes.func,
+  offsetPosition: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+  }),
   forwardedRef: PropTypes.oneOfType([PropTypes.element, PropTypes.object]),
   isTouchDevice: PropTypes.bool,
   isSmallScreen: PropTypes.bool,
@@ -480,6 +495,7 @@ BreadcrumbItem.propTypes = {
 BreadcrumbItem.defaultProps = {
   onBreadcrumbClick: () => {},
   onBreadcrumbDive: null,
+  offsetPosition: null,
   forwardedRef: React.createRef(),
   isTouchDevice: false,
   isSmallScreen: false,
