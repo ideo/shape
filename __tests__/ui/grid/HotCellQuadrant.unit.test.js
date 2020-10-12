@@ -111,7 +111,7 @@ describe('HotCellQuadrant', () => {
     })
   })
 
-  describe('handleNoMore', () => {
+  describe('handleMoreMenuClose', () => {
     beforeEach(() => {
       rerender({
         name: 'file',

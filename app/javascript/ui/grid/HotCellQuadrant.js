@@ -112,7 +112,7 @@ class HotCellQuadrant extends React.Component {
     onMoreMenuOpen()
   }
 
-  handleNoMore = ev => {
+  handleMoreMenuClose = ev => {
     ev.preventDefault()
     ev.stopPropagation()
     const { onMoreMenuClose } = this.props
@@ -231,8 +231,8 @@ class HotCellQuadrant extends React.Component {
                 mobileFixedMenu
                 menuOpen={currentMenuOpen}
                 menuItems={this.moreMenuItems}
-                onMouseLeave={this.handleNoMore}
-                onClose={this.handleNoMore}
+                onMouseLeave={this.handleMoreMenuClose}
+                onClose={this.handleMoreMenuClose}
                 offsetPosition={{
                   x: 0,
                   y: -40,
