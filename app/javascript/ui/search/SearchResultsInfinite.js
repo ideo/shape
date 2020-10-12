@@ -30,6 +30,8 @@ StyledSearchResult.displayName = 'StyledSearchResult'
 const StyledBreadcrumb = styled.div`
   margin-top: 16px;
   margin-bottom: 1px;
+  position: relative;
+  z-index: ${v.zIndex.gridCardTop};
 `
 
 const StyledScrollIndicator = styled.div`

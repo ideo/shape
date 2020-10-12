@@ -346,7 +346,7 @@ export class BreadcrumbItem extends React.Component {
     return (
       <StyledMenuWrapper
         style={{ marginTop: '0px', left: '-20px' }}
-        open={true}
+        open
       >
         <StyledMenu
           width={MENU_WIDTH}
@@ -378,6 +378,7 @@ export class BreadcrumbItem extends React.Component {
         {menuItemOpenId && (
           <StyledMenuWrapper
             offsetPosition={{ x: this.nestedMenuX, y: this.nestedMenuY }}
+            open
           >
             <StyledMenu
               width={MENU_WIDTH}
