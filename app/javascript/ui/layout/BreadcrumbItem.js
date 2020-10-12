@@ -344,10 +344,7 @@ export class BreadcrumbItem extends React.Component {
     const itemWidth = '90%'
 
     return (
-      <StyledMenuWrapper
-        style={{ marginTop: '0px', left: '-20px' }}
-        open
-      >
+      <StyledMenuWrapper style={{ marginTop: '0px', left: '-20px' }} open>
         <StyledMenu
           width={MENU_WIDTH}
           onMouseOver={this.onDropdownHoverOver}
