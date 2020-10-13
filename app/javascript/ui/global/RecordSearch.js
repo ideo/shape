@@ -63,7 +63,7 @@ const RecordSearch = ({
       .then(records => {
         if (onSearch) {
           onSearch(records)
-          _.isFunctiion(callback) && callback()
+          _.isFunction(callback) && callback()
         } else {
           callback(formatCollections(records))
         }
