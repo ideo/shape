@@ -394,7 +394,18 @@ class CollectionCard < ApplicationRecord
   # gets called by API collection_cards_controller
   def self.archive_all!(ids:, user_id:)
     cards = CollectionCard.where(id: ids)
-    cards.update_all(archived: true, updated_at: Time.current)
+    cards.each do |card|
+      card.archived = true
+      card.archive_batch = card.archive_batch_identifier
+      card.updated_at = Time.current
+    end
+
+    CollectionCard.import(
+      cards.to_a,
+      validate: false,
+      on_duplicate_key_update: %i[archived archive_batch updated_at],
+    )
+
     # should generally only be the one parent collection, but an array to be safe
     parents = cards.map(&:parent).uniq.compact
     parents.each do |parent|
