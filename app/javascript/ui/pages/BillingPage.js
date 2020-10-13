@@ -28,7 +28,7 @@ class BillingPage extends React.Component {
     const { routingStore } = this.props
     // kick out if you're not logged-in
     if (!this.organization) {
-      return routingStore.routeToLogin({ redirect: '/settings' })
+      return routingStore.routeToLogin({ redirect: '/billing' })
     }
 
     // kick out if you're not an org admin (i.e. primary_group admin)
