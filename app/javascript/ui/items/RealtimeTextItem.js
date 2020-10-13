@@ -41,11 +41,15 @@ const DockedToolbar = styled.div`
   height: 32px;
   left: -16px;
   margin-bottom: 20px;
-  min-width: 100%;
   padding: 8px;
   position: absolute;
-  width: auto;
+  transform: scale(${props => props.zoomLevel});
+  width: 220px;
   z-index: ${v.zIndex.gridCardTop};
+
+  .ql-toolbar {
+    width: auto !important;
+  }
 
   ${props =>
     props.fullPageView &&
@@ -64,6 +68,9 @@ const DockedToolbar = styled.div`
       top: -54px;
     `};
 `
+DockedToolbar.defaultProps = {
+  zoomLevel: 1,
+}
 
 const StyledContainer = styled.div`
   padding-top: 25px;
@@ -747,7 +754,10 @@ class RealtimeTextItem extends React.Component {
         className="no-drag"
         fullPageView={fullPageView}
       >
-        <DockedToolbar fullPageView={fullPageView}>
+        <DockedToolbar
+          fullPageView={fullPageView}
+          zoomLevel={uiStore.zoomLevel}
+        >
           {canEdit && (
             <TextItemToolbar
               onExpand={onExpand}

@@ -384,5 +384,9 @@ export const QuillStyleWrapper = styled.div`
       overflow-x: hidden;
       ${props => (props.notEditing ? 'overflow-y: hidden;' : '')};
     }
+
+    .ql-toolbar {
+      width: auto;
+    }
   }
 `
