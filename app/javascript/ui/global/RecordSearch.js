@@ -60,9 +60,14 @@ const RecordSearch = ({
     apiStore
       .searchCollections(params)
       .then(res => _.map(res.data, 'record').filter(searchFilter))
-      .then(records =>
-        onSearch ? onSearch(records) : callback(formatCollections(records))
-      )
+      .then(records => {
+        if (onSearch) {
+          onSearch(records)
+          _.isFunctiion(callback) && callback()
+        } else {
+          callback(formatCollections(records))
+        }
+      })
       .catch(e => {
         trackError(e)
       })
