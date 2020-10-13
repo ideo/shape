@@ -78,6 +78,7 @@ DefaultWrapper.displayName = 'DefaultWrapper'
 export const HOT_CELL_DEFAULT_EITHER_TYPE = 'HotCellDefaultEitherType'
 export const HOT_CELL_DEFAULT_ITEM_TYPE = 'HotCellDefaultItemType'
 export const HOT_CELL_DEFAULT_COLLECTION_TYPE = 'HotCellDefaultCollectionType'
+export const HOT_CELL_DEFAULT_TEMPLATE_TYPE = 'HotCellDefaultTemplateType'
 
 @inject('apiStore', 'uiStore')
 @observer
@@ -100,6 +101,7 @@ class HotCell extends React.Component {
       name: 'useTemplate',
       description: collection.name,
       opts: {
+        templateName: collection.name,
         templateId: collection.id,
       },
     }
@@ -116,8 +118,17 @@ class HotCell extends React.Component {
   onCreateContent = (type, opts) => {
     const { onCreateContent } = this.props
     onCreateContent(type, opts)
-    let hotCellType = type
-    if (type === 'useTemplate') hotCellType = 'template'
+    const hotCellType = type
+    if (type === 'useTemplate') {
+      localStorage.setItem(HOT_CELL_DEFAULT_TEMPLATE_TYPE, {
+        name: 'useTemplate',
+        description: opts.templateName,
+        opts: {
+          templateId: opts.templateId,
+        },
+      })
+      return
+    }
     const collectionType = this.collectionTypes.find(
       collectionType => collectionType.name === hotCellType
     )
@@ -253,6 +264,17 @@ class HotCell extends React.Component {
     return this.itemTypes[0]
   }
 
+  get defaultTemplateType() {
+    const quickUseTemplate = localStorage.getItem(
+      HOT_CELL_DEFAULT_TEMPLATE_TYPE
+    )
+    if (quickUseTemplate) return quickUseTemplate
+    return {
+      name: 'template',
+      description: 'Templates',
+    }
+  }
+
   get expandedSubTypes() {
     return [
       { name: 'text', description: 'Add Text' },
@@ -289,8 +311,7 @@ class HotCell extends React.Component {
       { ...this.defaultItemType, subTypes: this.itemTypes },
       { ...this.defaultCollectionType, subTypes: this.collectionTypes },
       {
-        name: 'template',
-        description: 'Templates',
+        ...this.defaultTemplateType,
         subTypes: this.templateTypes,
       },
     ]
