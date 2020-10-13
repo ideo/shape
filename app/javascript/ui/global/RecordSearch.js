@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { PropTypes as MobxPropTypes } from 'mobx-react'
 import styled from 'styled-components'
@@ -68,7 +69,9 @@ const RecordSearch = ({
   }, 350)
 
   if (initialLoadAmount > 0) {
-    debouncedSearch(' ')
+    useEffect(() => {
+      debouncedSearch(' ')
+    }, [])
   }
 
   return (
