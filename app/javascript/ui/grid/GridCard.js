@@ -106,12 +106,12 @@ class GridCard extends React.Component {
   renderTopRightActions() {
     const { menuOpen } = this
     const {
-      record,
-      zoomLevel,
       card,
       canEditCollection,
-      testCollectionCard,
+      record,
       searchResult,
+      testCollectionCard,
+      zoomLevel,
     } = this.props
 
     if (
@@ -128,10 +128,14 @@ class GridCard extends React.Component {
       className = 'hide-on-cover-edit'
     }
 
+    const cardWidth = uiStore.gridSettings.gridW / zoomLevel
+    const smallCard = cardWidth < 160
+
     return (
       <StyledTopRightActions
         color={this.actionsColor}
         className={className}
+        smallCard={smallCard}
         zoomLevel={zoomLevel}
       >
         {this.downloadableRecord && (
