@@ -277,11 +277,22 @@ export const StyledTopRightActions = styled.div`
   ${TopActions};
   background-color: ${v.colors.commonLightest};
   border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   height: 34px;
-  right: 0.25rem;
-  top: ${props => 0.25 * props.zoomLevel}rem;
+  right: 0;
+  top: ${props => -2.4 * props.zoomLevel}rem;
   transform: scale(${props => props.zoomLevel});
   transform-origin: top right;
+
+  &:after {
+    background: transparent;
+    content: ' ';
+    display: block;
+    height: 6px;
+    position: absolute;
+    top: calc(100% - 1px);
+    width: 100%;
+  }
 
   .selected {
     border-color: ${props => props.color};
